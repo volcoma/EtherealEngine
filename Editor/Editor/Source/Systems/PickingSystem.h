@@ -1,0 +1,27 @@
+#pragma once
+
+#include "Runtime/Ecs/World.h"
+#include "Runtime/Assets/AssetHandle.h"
+
+class RenderView;
+struct Texture;
+struct Program;
+
+class PickingSystem : public ecs::System<PickingSystem>
+{
+	// Size of the ID buffer
+	static const unsigned int _id_dimensions = 1;
+public:
+	PickingSystem();
+
+	virtual void frameRender(ecs::EntityManager &entities, ecs::EventManager &events, ecs::TimeDelta dt);
+private:
+
+ 	std::shared_ptr<RenderView> mRenderView;
+// 	std::shared_ptr<Texture> mPickingRT;
+// 	std::shared_ptr<Texture> mPickingRTDepth;
+	std::shared_ptr<Texture> mBlitTex;
+	std::unique_ptr<Program> mProgram;
+	std::uint8_t mBlitData[_id_dimensions*_id_dimensions * 4]; // Read blit into this
+	std::uint32_t mReading = 0;
+};

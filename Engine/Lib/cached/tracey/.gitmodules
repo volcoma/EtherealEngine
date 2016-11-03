@@ -1,0 +1,11 @@
+[submodule "oak"]
+	path = redist/deps/oak
+	url = https://github.com/r-lyeh/oak
+
+[submodule "route66"]
+	path = redist/deps/route66
+	url = https://github.com/r-lyeh/route66
+
+[submodule "heal"]
+	path = redist/deps/heal
+	url = https://github.com/r-lyeh/heal

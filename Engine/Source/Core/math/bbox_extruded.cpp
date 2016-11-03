@@ -1,0 +1,275 @@
+#include "bbox_extruded.h"
+
+namespace math
+{
+//-----------------------------------------------------------------------------
+// Module Local Variables
+//-----------------------------------------------------------------------------
+namespace 
+{
+    //  Friendly names for bit masked fields used throughout the various functions.
+    //  This list is a 3-bit field which defines 1 of 8 points in an axis-aligned bounding box.
+    enum : unsigned int
+    {
+	    MIN_X = 1,
+	    MAX_X = 0,
+	    MIN_Y = 2,
+	    MAX_Y = 0,
+	    MIN_Z = 4,
+	    MAX_Z = 0,
+	    INVALID = 0xFFFFFFFF 
+    };
+
+    const int HalfSpaceRemap[64] = { 
+	    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+	    -1, -1, -1, -1, -1,  0,  1,  2, -1,  3,  4,  5, -1,  6,  7,  8,
+	    -1, -1, -1, -1, -1,  9, 10, 11, -1, 12, 13, 14, -1, 15, 16, 17,
+	    -1, -1, -1, -1, -1, 18, 19, 20, -1, 21, 22, 23, -1, 24, 25, -1
+    };
+
+    // Lookup table that stores which edges will be extruded for a given half-space configuration.
+    const unsigned int SilhouetteLUT[26][6][2] = {
+        { { MIN_X|MAX_Y|MIN_Z, MAX_X|MAX_Y|MIN_Z }, { MAX_X|MIN_Y|MAX_Z, MIN_X|MIN_Y|MAX_Z }, { MAX_X|MIN_Y|MIN_Z, MAX_X|MIN_Y|MAX_Z }, { MIN_X|MAX_Y|MAX_Z, MIN_X|MAX_Y|MIN_Z }, { MIN_X|MIN_Y|MAX_Z, MIN_X|MAX_Y|MAX_Z }, { MAX_X|MAX_Y|MIN_Z, MAX_X|MIN_Y|MIN_Z } },
+	    { { MIN_X|MAX_Y|MIN_Z, MAX_X|MAX_Y|MIN_Z }, { MAX_X|MIN_Y|MAX_Z, MIN_X|MIN_Y|MAX_Z }, { MIN_X|MIN_Y|MAX_Z, MIN_X|MIN_Y|MIN_Z }, { MAX_X|MAX_Y|MIN_Z, MAX_X|MAX_Y|MAX_Z }, { MIN_X|MIN_Y|MIN_Z, MIN_X|MAX_Y|MIN_Z }, { MAX_X|MAX_Y|MAX_Z, MAX_X|MIN_Y|MAX_Z } },
+	    { { MIN_X|MAX_Y|MIN_Z, MAX_X|MAX_Y|MIN_Z }, { MAX_X|MIN_Y|MAX_Z, MIN_X|MIN_Y|MAX_Z }, { MIN_X|MAX_Y|MAX_Z, MIN_X|MAX_Y|MIN_Z }, { MAX_X|MAX_Y|MIN_Z, MAX_X|MAX_Y|MAX_Z }, { MIN_X|MIN_Y|MAX_Z, MIN_X|MAX_Y|MAX_Z }, { MAX_X|MAX_Y|MAX_Z, MAX_X|MIN_Y|MAX_Z } },
+	    { { MAX_X|MIN_Y|MIN_Z, MIN_X|MIN_Y|MIN_Z }, { MIN_X|MAX_Y|MAX_Z, MAX_X|MAX_Y|MAX_Z }, { MIN_X|MIN_Y|MIN_Z, MIN_X|MIN_Y|MAX_Z }, { MAX_X|MAX_Y|MAX_Z, MAX_X|MAX_Y|MIN_Z }, { MIN_X|MIN_Y|MAX_Z, MIN_X|MAX_Y|MAX_Z }, { MAX_X|MAX_Y|MIN_Z, MAX_X|MIN_Y|MIN_Z } },
+	    { { MAX_X|MIN_Y|MIN_Z, MIN_X|MIN_Y|MIN_Z }, { MIN_X|MAX_Y|MAX_Z, MAX_X|MAX_Y|MAX_Z }, { MAX_X|MIN_Y|MAX_Z, MAX_X|MIN_Y|MIN_Z }, { MIN_X|MAX_Y|MIN_Z, MIN_X|MAX_Y|MAX_Z }, { MIN_X|MIN_Y|MIN_Z, MIN_X|MAX_Y|MIN_Z }, { MAX_X|MAX_Y|MAX_Z, MAX_X|MIN_Y|MAX_Z } },
+	    { { MAX_X|MIN_Y|MIN_Z, MIN_X|MIN_Y|MIN_Z }, { MIN_X|MAX_Y|MAX_Z, MAX_X|MAX_Y|MAX_Z }, { MIN_X|MIN_Y|MIN_Z, MIN_X|MIN_Y|MAX_Z }, { MAX_X|MIN_Y|MAX_Z, MAX_X|MIN_Y|MIN_Z }, { MIN_X|MIN_Y|MAX_Z, MIN_X|MAX_Y|MAX_Z }, { MAX_X|MAX_Y|MAX_Z, MAX_X|MIN_Y|MAX_Z } },
+	    { { MAX_X|MIN_Y|MAX_Z, MIN_X|MIN_Y|MAX_Z }, { MIN_X|MAX_Y|MAX_Z, MAX_X|MAX_Y|MAX_Z }, { MAX_X|MIN_Y|MIN_Z, MAX_X|MIN_Y|MAX_Z }, { MAX_X|MAX_Y|MAX_Z, MAX_X|MAX_Y|MIN_Z }, { MIN_X|MIN_Y|MAX_Z, MIN_X|MAX_Y|MAX_Z }, { MAX_X|MAX_Y|MIN_Z, MAX_X|MIN_Y|MIN_Z } },
+	    { { MAX_X|MIN_Y|MAX_Z, MIN_X|MIN_Y|MAX_Z }, { MIN_X|MAX_Y|MAX_Z, MAX_X|MAX_Y|MAX_Z }, { MIN_X|MIN_Y|MAX_Z, MIN_X|MIN_Y|MIN_Z }, { MIN_X|MAX_Y|MIN_Z, MIN_X|MAX_Y|MAX_Z }, { MIN_X|MIN_Y|MIN_Z, MIN_X|MAX_Y|MIN_Z }, { MAX_X|MAX_Y|MAX_Z, MAX_X|MIN_Y|MAX_Z } },
+	    { { MAX_X|MIN_Y|MAX_Z, MIN_X|MIN_Y|MAX_Z }, { MIN_X|MAX_Y|MAX_Z, MAX_X|MAX_Y|MAX_Z }, { MIN_X|MIN_Y|MAX_Z, MIN_X|MAX_Y|MAX_Z }, { MAX_X|MAX_Y|MAX_Z, MAX_X|MIN_Y|MAX_Z }, { INVALID, INVALID }, { INVALID, INVALID } },
+	    { { MIN_X|MIN_Y|MIN_Z, MAX_X|MIN_Y|MIN_Z }, { MAX_X|MAX_Y|MAX_Z, MIN_X|MAX_Y|MAX_Z }, { MAX_X|MIN_Y|MIN_Z, MAX_X|MIN_Y|MAX_Z }, { MIN_X|MAX_Y|MAX_Z, MIN_X|MAX_Y|MIN_Z }, { MIN_X|MAX_Y|MIN_Z, MIN_X|MIN_Y|MIN_Z }, { MAX_X|MIN_Y|MAX_Z, MAX_X|MAX_Y|MAX_Z } },
+	    { { MIN_X|MIN_Y|MIN_Z, MAX_X|MIN_Y|MIN_Z }, { MAX_X|MAX_Y|MAX_Z, MIN_X|MAX_Y|MAX_Z }, { MIN_X|MIN_Y|MAX_Z, MIN_X|MIN_Y|MIN_Z }, { MAX_X|MAX_Y|MIN_Z, MAX_X|MAX_Y|MAX_Z }, { MIN_X|MAX_Y|MAX_Z, MIN_X|MIN_Y|MAX_Z }, { MAX_X|MIN_Y|MIN_Z, MAX_X|MAX_Y|MIN_Z } },
+	    { { MIN_X|MIN_Y|MIN_Z, MAX_X|MIN_Y|MIN_Z }, { MAX_X|MAX_Y|MAX_Z, MIN_X|MAX_Y|MAX_Z }, { MIN_X|MAX_Y|MAX_Z, MIN_X|MAX_Y|MIN_Z }, { MAX_X|MAX_Y|MIN_Z, MAX_X|MAX_Y|MAX_Z }, { MIN_X|MAX_Y|MIN_Z, MIN_X|MIN_Y|MIN_Z }, { MAX_X|MIN_Y|MIN_Z, MAX_X|MAX_Y|MIN_Z } },
+	    { { MAX_X|MAX_Y|MIN_Z, MIN_X|MAX_Y|MIN_Z }, { MIN_X|MIN_Y|MAX_Z, MAX_X|MIN_Y|MAX_Z }, { MIN_X|MIN_Y|MIN_Z, MIN_X|MIN_Y|MAX_Z }, { MAX_X|MAX_Y|MAX_Z, MAX_X|MAX_Y|MIN_Z }, { MIN_X|MAX_Y|MIN_Z, MIN_X|MIN_Y|MIN_Z }, { MAX_X|MIN_Y|MAX_Z, MAX_X|MAX_Y|MAX_Z } },
+	    { { MAX_X|MAX_Y|MIN_Z, MIN_X|MAX_Y|MIN_Z }, { MIN_X|MIN_Y|MAX_Z, MAX_X|MIN_Y|MAX_Z }, { MAX_X|MIN_Y|MAX_Z, MAX_X|MIN_Y|MIN_Z }, { MIN_X|MAX_Y|MIN_Z, MIN_X|MAX_Y|MAX_Z }, { MIN_X|MAX_Y|MAX_Z, MIN_X|MIN_Y|MAX_Z }, { MAX_X|MIN_Y|MIN_Z, MAX_X|MAX_Y|MIN_Z } },
+	    { { MAX_X|MAX_Y|MIN_Z, MIN_X|MAX_Y|MIN_Z }, { MIN_X|MIN_Y|MAX_Z, MAX_X|MIN_Y|MAX_Z }, { MIN_X|MIN_Y|MIN_Z, MIN_X|MIN_Y|MAX_Z }, { MAX_X|MIN_Y|MAX_Z, MAX_X|MIN_Y|MIN_Z }, { MIN_X|MAX_Y|MIN_Z, MIN_X|MIN_Y|MIN_Z }, { MAX_X|MIN_Y|MIN_Z, MAX_X|MAX_Y|MIN_Z } },
+	    { { MIN_X|MIN_Y|MIN_Z, MAX_X|MIN_Y|MIN_Z }, { MAX_X|MAX_Y|MIN_Z, MIN_X|MAX_Y|MIN_Z }, { MAX_X|MIN_Y|MIN_Z, MAX_X|MIN_Y|MAX_Z }, { MAX_X|MAX_Y|MAX_Z, MAX_X|MAX_Y|MIN_Z }, { MIN_X|MAX_Y|MIN_Z, MIN_X|MIN_Y|MIN_Z }, { MAX_X|MIN_Y|MAX_Z, MAX_X|MAX_Y|MAX_Z } },
+	    { { MIN_X|MIN_Y|MIN_Z, MAX_X|MIN_Y|MIN_Z }, { MAX_X|MAX_Y|MIN_Z, MIN_X|MAX_Y|MIN_Z }, { MIN_X|MIN_Y|MAX_Z, MIN_X|MIN_Y|MIN_Z }, { MIN_X|MAX_Y|MIN_Z, MIN_X|MAX_Y|MAX_Z }, { MIN_X|MAX_Y|MAX_Z, MIN_X|MIN_Y|MAX_Z }, { MAX_X|MIN_Y|MIN_Z, MAX_X|MAX_Y|MIN_Z } },
+	    { { MIN_X|MIN_Y|MIN_Z, MAX_X|MIN_Y|MIN_Z }, { MAX_X|MAX_Y|MIN_Z, MIN_X|MAX_Y|MIN_Z }, { MIN_X|MAX_Y|MIN_Z, MIN_X|MIN_Y|MIN_Z }, { MAX_X|MIN_Y|MIN_Z, MAX_X|MAX_Y|MIN_Z }, { INVALID, INVALID }, { INVALID, INVALID } },
+	    { { MIN_X|MAX_Y|MIN_Z, MAX_X|MAX_Y|MIN_Z }, { MAX_X|MAX_Y|MAX_Z, MIN_X|MAX_Y|MAX_Z }, { MAX_X|MIN_Y|MIN_Z, MAX_X|MIN_Y|MAX_Z }, { MIN_X|MAX_Y|MAX_Z, MIN_X|MAX_Y|MIN_Z }, { MAX_X|MAX_Y|MIN_Z, MAX_X|MIN_Y|MIN_Z }, { MAX_X|MIN_Y|MAX_Z, MAX_X|MAX_Y|MAX_Z } },
+	    { { MIN_X|MAX_Y|MIN_Z, MAX_X|MAX_Y|MIN_Z }, { MAX_X|MAX_Y|MAX_Z, MIN_X|MAX_Y|MAX_Z }, { MIN_X|MIN_Y|MAX_Z, MIN_X|MIN_Y|MIN_Z }, { MAX_X|MAX_Y|MIN_Z, MAX_X|MAX_Y|MAX_Z }, { MIN_X|MIN_Y|MIN_Z, MIN_X|MAX_Y|MIN_Z }, { MIN_X|MAX_Y|MAX_Z, MIN_X|MIN_Y|MAX_Z } },
+	    { { MIN_X|MAX_Y|MIN_Z, MAX_X|MAX_Y|MIN_Z }, { MAX_X|MAX_Y|MAX_Z, MIN_X|MAX_Y|MAX_Z }, { MIN_X|MAX_Y|MAX_Z, MIN_X|MAX_Y|MIN_Z }, { MAX_X|MAX_Y|MIN_Z, MAX_X|MAX_Y|MAX_Z }, { INVALID, INVALID }, { INVALID, INVALID } },
+	    { { MAX_X|MIN_Y|MIN_Z, MIN_X|MIN_Y|MIN_Z }, { MIN_X|MIN_Y|MAX_Z, MAX_X|MIN_Y|MAX_Z }, { MIN_X|MIN_Y|MIN_Z, MIN_X|MIN_Y|MAX_Z }, { MAX_X|MAX_Y|MAX_Z, MAX_X|MAX_Y|MIN_Z }, { MAX_X|MAX_Y|MIN_Z, MAX_X|MIN_Y|MIN_Z }, { MAX_X|MIN_Y|MAX_Z, MAX_X|MAX_Y|MAX_Z } },
+	    { { MAX_X|MIN_Y|MIN_Z, MIN_X|MIN_Y|MIN_Z }, { MIN_X|MIN_Y|MAX_Z, MAX_X|MIN_Y|MAX_Z }, { MAX_X|MIN_Y|MAX_Z, MAX_X|MIN_Y|MIN_Z }, { MIN_X|MAX_Y|MIN_Z, MIN_X|MAX_Y|MAX_Z }, { MIN_X|MIN_Y|MIN_Z, MIN_X|MAX_Y|MIN_Z }, { MIN_X|MAX_Y|MAX_Z, MIN_X|MIN_Y|MAX_Z } },
+	    { { MAX_X|MIN_Y|MIN_Z, MIN_X|MIN_Y|MIN_Z }, { MIN_X|MIN_Y|MAX_Z, MAX_X|MIN_Y|MAX_Z }, { MIN_X|MIN_Y|MIN_Z, MIN_X|MIN_Y|MAX_Z }, { MAX_X|MIN_Y|MAX_Z, MAX_X|MIN_Y|MIN_Z }, { INVALID, INVALID }, { INVALID, INVALID } },
+	    { { MAX_X|MIN_Y|MIN_Z, MAX_X|MIN_Y|MAX_Z }, { MAX_X|MAX_Y|MAX_Z, MAX_X|MAX_Y|MIN_Z }, { MAX_X|MAX_Y|MIN_Z, MAX_X|MIN_Y|MIN_Z }, { MAX_X|MIN_Y|MAX_Z, MAX_X|MAX_Y|MAX_Z }, { INVALID, INVALID }, { INVALID, INVALID } },
+	    { { MIN_X|MIN_Y|MAX_Z, MIN_X|MIN_Y|MIN_Z }, { MIN_X|MAX_Y|MIN_Z, MIN_X|MAX_Y|MAX_Z }, { MIN_X|MIN_Y|MIN_Z, MIN_X|MAX_Y|MIN_Z }, { MIN_X|MAX_Y|MAX_Z, MIN_X|MIN_Y|MAX_Z }, { INVALID, INVALID }, { INVALID, INVALID } }
+    };
+
+} // End Unnamed Namespace
+
+///////////////////////////////////////////////////////////////////////////////
+// bbox_extruded Member Functions
+///////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------------------------------------------
+//  Name : bbox_extruded () (Default Constructor)
+/// <summary>
+/// bbox_extruded Class Constructor
+/// </summary>
+//-----------------------------------------------------------------------------
+bbox_extruded::bbox_extruded( ) 
+{
+	// Initialize values
+    reset();
+}
+
+//-----------------------------------------------------------------------------
+//  Name : bbox_extruded () (Constructor)
+/// <summary>
+/// bbox_extruded Class Constructor, sets values from vector values passed
+/// </summary>
+//-----------------------------------------------------------------------------
+bbox_extruded::bbox_extruded( const bbox & AABB, const vec3 & vecOrigin, float fRange, const transform * pTransform /* = nullptr */ )
+{
+    // Generate extrude box values automatically
+    extrude( AABB, vecOrigin, fRange, pTransform );
+}
+
+//-----------------------------------------------------------------------------
+//  Name : reset ()
+/// <summary>
+/// Resets the bounding box values.
+/// </summary>
+//-----------------------------------------------------------------------------
+void bbox_extruded::reset()
+{
+    sourceMin       = vec3( 0, 0, 0 );
+	sourceMax       = vec3( 0, 0, 0 );
+    projectionPoint = vec3( 0, 0, 0 );
+    projectionRange = 0.0f;
+	edgeCount       = 0;
+}
+
+//-----------------------------------------------------------------------------
+//  Name : extrude()
+/// <summary>
+/// Generate the extruded box planes / edges.
+/// </summary>
+//-----------------------------------------------------------------------------
+void bbox_extruded::extrude( const bbox & AABB, const vec3 & vecOrigin, float fRange, const transform * pTransform /* = nullptr */ )
+{
+    bbox Bounds = AABB;
+
+    // Reset any previously computed data
+	reset();
+
+    // transform bounds if matrix provided
+    if ( pTransform != nullptr )
+        Bounds.mul( *pTransform );
+
+    // Make a copy of the values used to generate this box
+    sourceMin       = Bounds.min;
+    sourceMax       = Bounds.max;
+    projectionPoint = vecOrigin;
+    projectionRange = fRange;
+
+    // Simple comparisons of the bounding box against the projection origin quickly determine which
+    // halfspaces the box exists in. From this, look up values from the precomputed table that
+    // define which edges of the bounding box are silhouettes.
+	unsigned int nHalfSpace = 0;
+    if ( sourceMin.x <= vecOrigin.x ) nHalfSpace |= 0x1;
+	if ( sourceMax.x >= vecOrigin.x ) nHalfSpace |= 0x2;
+	if ( sourceMin.y <= vecOrigin.y ) nHalfSpace |= 0x4;
+	if ( sourceMax.y >= vecOrigin.y ) nHalfSpace |= 0x8;
+	if ( sourceMin.z <= vecOrigin.z ) nHalfSpace |= 0x10;
+	if ( sourceMax.z >= vecOrigin.z ) nHalfSpace |= 0x20;
+
+    // Lookup the appropriate silhouette edges
+    unsigned int nRemap = HalfSpaceRemap[nHalfSpace];
+    for ( edgeCount = 0; (SilhouetteLUT[nRemap][edgeCount][0] != INVALID) && (edgeCount < 6); )
+    {
+        vec3 vPoint1, vPoint2;
+		
+        // Lookup correct points to use
+        unsigned int nPoint1 = SilhouetteLUT[nRemap][edgeCount][0];
+		unsigned int nPoint2 = SilhouetteLUT[nRemap][edgeCount][1];
+		
+        // Select the actual point coordinates
+        vPoint1.x = (nPoint1 & MIN_X) ? sourceMin.x : sourceMax.x;
+		vPoint1.y = (nPoint1 & MIN_Y) ? sourceMin.y : sourceMax.y;
+		vPoint1.z = (nPoint1 & MIN_Z) ? sourceMin.z : sourceMax.z;
+		vPoint2.x = (nPoint2 & MIN_X) ? sourceMin.x : sourceMax.x;
+		vPoint2.y = (nPoint2 & MIN_Y) ? sourceMin.y : sourceMax.y;
+		vPoint2.z = (nPoint2 & MIN_Z) ? sourceMin.z : sourceMax.z;
+		
+        // Record the edge data we used
+		silhouetteEdges[edgeCount][0] = nPoint1;
+		silhouetteEdges[edgeCount][1] = nPoint2;
+		extrudedPlanes[edgeCount++] = plane::fromPoints( vecOrigin, vPoint1, vPoint2 );
+
+    } // Next Potential
+
+}
+
+//-----------------------------------------------------------------------------
+//  Name : getEdge()
+/// <summary>
+/// Retrieve the specified edge points.
+/// </summary>
+//-----------------------------------------------------------------------------
+bool bbox_extruded::getEdge( unsigned int nEdge, vec3 & vPoint1, vec3 & vPoint2 ) const
+{
+    // Valid index?
+    if ( nEdge >= edgeCount )
+        return false;
+
+    // Lookup correct points to use
+    unsigned int nPoint1 = silhouetteEdges[nEdge][0];
+	unsigned int nPoint2 = silhouetteEdges[nEdge][1];
+	
+    // Select the actual point coordinates
+    vPoint1.x = (nPoint1 & MIN_X) ? sourceMin.x : sourceMax.x;
+	vPoint1.y = (nPoint1 & MIN_Y) ? sourceMin.y : sourceMax.y;
+	vPoint1.z = (nPoint1 & MIN_Z) ? sourceMin.z : sourceMax.z;
+	vPoint2.x = (nPoint2 & MIN_X) ? sourceMin.x : sourceMax.x;
+	vPoint2.y = (nPoint2 & MIN_Y) ? sourceMin.y : sourceMax.y;
+	vPoint2.z = (nPoint2 & MIN_Z) ? sourceMin.z : sourceMax.z;
+
+    // Success!
+    return true;
+}
+
+//-----------------------------------------------------------------------------
+//  Name : testLine ()
+/// <summary>
+/// Determine whether or not the line passed is within the box.
+/// </summary>
+//-----------------------------------------------------------------------------
+bool bbox_extruded::testLine( const vec3 & v1, const vec3 & v2 ) const
+{
+    unsigned int nCode1 = 0, nCode2 = 0;
+    float   fDist1, fDist2, t;
+    int       nSide1, nSide2;
+    vec3 vDir, vIntersect;
+    unsigned int  i;
+
+    // Test each plane
+    for ( i = 0; i < edgeCount; ++i )
+    {
+        // Classify each point of the line against the plane.
+        fDist1 = plane::dotCoord( extrudedPlanes[i], v1 );
+        fDist2 = plane::dotCoord( extrudedPlanes[i], v2 );
+        nSide1 = (fDist1 >= 0) ? 1 : 0;
+        nSide2 = (fDist2 >= 0) ? 1 : 0;
+
+        // Accumulate the classification info to determine 
+        // if the edge was spanning any of the planes.
+        nCode1 |= (nSide1 << i);
+        nCode2 |= (nSide2 << i);
+
+        // If the line is completely in front of any plane
+        // then it cannot possibly be intersecting.
+        if ( nSide1 == 1 && nSide2 == 1 )
+            return false;
+
+        // The line is potentially spanning?
+        if ( nSide1 ^ nSide2 )
+        {
+            // Compute the point at which the line intersects this plane.
+            vDir = v2 - v1;
+            t    = -plane::dotCoord( extrudedPlanes[i], v1 ) / plane::dotNormal( extrudedPlanes[i], vDir );
+            
+            // Truly spanning?
+            if ( (t >= 0.0f) && (t <= 1.0f) )
+            {
+                vIntersect = v1 + (vDir * t);
+                if ( testSphere( vIntersect, 0.01f ) )
+                    return true;
+            
+            } // End if spanning
+        
+        } // End if different sides
+    
+    } // Next plane
+    
+    // Intersecting?
+    return (nCode1 == 0) || (nCode2 == 0);
+}
+
+//-----------------------------------------------------------------------------
+//  Name : testSphere ()
+/// <summary>
+/// Determine whether or not the sphere passed is within the box.
+/// </summary>
+//-----------------------------------------------------------------------------
+bool bbox_extruded::testSphere( const vec3 & vecCenter, float fRadius ) const
+{
+    unsigned int i;
+
+    // Test box planes
+    for ( i = 0; i < edgeCount; ++i )
+    {
+        float fDot = plane::dotCoord( extrudedPlanes[i], vecCenter );
+
+        // Sphere entirely in front of plane
+        if ( fDot >= fRadius )
+            return false;
+
+    } // Next plane
+
+    // Intersects
+    return true;
+}
+
+}

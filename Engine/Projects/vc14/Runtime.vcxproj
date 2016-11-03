@@ -1,0 +1,447 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Source\Runtime\Application\Application.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Assets\AssetWriter.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Assets\AssetReader.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Ecs\Components\CameraComponent.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Ecs\Components\ModelComponent.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Ecs\Components\TransformComponent.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Ecs\entityx\Entity.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Ecs\entityx\Event.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Ecs\entityx\help\Storage.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Ecs\entityx\System.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Ecs\Systems\CameraSystem.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Ecs\Systems\RenderingSystem.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Ecs\Systems\TransformSystem.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Ecs\World.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Input\InputContext.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Rendering\Camera.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Rendering\Debug\bounds.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Rendering\Debug\DebugDraw.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Rendering\IndexBuffer.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Rendering\Material.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Rendering\Mesh.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Rendering\Model.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Rendering\Program.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Rendering\RenderView.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Rendering\RenderWindow.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Rendering\Shader.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Rendering\Texture.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Rendering\Uniform.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Rendering\VertexBuffer.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\runtime.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\System\FileSystem.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\System\Platform\Windows\FileSystemImpl.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\System\Platform\Windows\MessageBoxImpl.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\System\SFML\System\Err.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Joystick.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\JoystickManager.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Keyboard.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Mouse.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Sensor.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\SensorManager.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Touch.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\VideoMode.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Win32\InputImpl.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Win32\JoystickImpl.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Win32\SensorImpl.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Win32\VideoModeImpl.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Win32\WindowImplWin32.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Window.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\WindowImpl.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\System\Timer.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Threading\thread_utils.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Source\Runtime\Application\Application.h" />
+    <ClInclude Include="..\..\Source\Runtime\Assets\AssetHandle.h" />
+    <ClInclude Include="..\..\Source\Runtime\Assets\AssetManager.h" />
+    <ClInclude Include="..\..\Source\Runtime\Assets\AssetWriter.h" />
+    <ClInclude Include="..\..\Source\Runtime\Assets\AssetReader.h" />
+    <ClInclude Include="..\..\Source\Runtime\Assets\LoadRequest.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\Ecs\Components\CameraComponent.h" />
+    <ClInclude Include="..\..\Source\Runtime\Ecs\Components\ModelComponent.h" />
+    <ClInclude Include="..\..\Source\Runtime\Ecs\Components\TagsComponent.h" />
+    <ClInclude Include="..\..\Source\Runtime\Ecs\Components\TransformComponent.h" />
+    <ClInclude Include="..\..\Source\Runtime\Ecs\entityx\config.h" />
+    <ClInclude Include="..\..\Source\Runtime\Ecs\entityx\deps\Dependencies.h" />
+    <ClInclude Include="..\..\Source\Runtime\Ecs\entityx\Entity.h" />
+    <ClInclude Include="..\..\Source\Runtime\Ecs\entityx\Event.h" />
+    <ClInclude Include="..\..\Source\Runtime\Ecs\entityx\help\NonCopyable.h" />
+    <ClInclude Include="..\..\Source\Runtime\Ecs\entityx\help\Storage.h" />
+    <ClInclude Include="..\..\Source\Runtime\Ecs\entityx\Component.h" />
+    <ClInclude Include="..\..\Source\Runtime\Ecs\entityx\quick.h" />
+    <ClInclude Include="..\..\Source\Runtime\Ecs\entityx\System.h" />
+    <ClInclude Include="..\..\Source\Runtime\Ecs\Systems\CameraSystem.h" />
+    <ClInclude Include="..\..\Source\Runtime\Ecs\Systems\RenderingSystem.h" />
+    <ClInclude Include="..\..\Source\Runtime\Ecs\Systems\TransformSystem.h" />
+    <ClInclude Include="..\..\Source\Runtime\Ecs\World.h" />
+    <ClInclude Include="..\..\Source\Runtime\Input\InputMapping.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\Input\InputContext.h" />
+    <ClInclude Include="..\..\Source\Runtime\Meta\Assets\AssetHandle.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\Meta\Core\BaseTypes.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\Components\CameraComponent.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\Components\Component.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\Components\ModelComponent.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\Components\TransformComponent.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\Entity.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\Meta\Math\Transform.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\Meta\Math\Vector.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Camera.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Material.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Model.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Program.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Texture.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\Rendering\Camera.h" />
+    <ClInclude Include="..\..\Source\Runtime\Rendering\Debug\bounds.h" />
+    <ClInclude Include="..\..\Source\Runtime\Rendering\Debug\DebugDraw.h" />
+    <ClInclude Include="..\..\Source\Runtime\Rendering\FrameBuffer.h" />
+    <ClInclude Include="..\..\Source\Runtime\Rendering\IndexBuffer.h" />
+    <ClInclude Include="..\..\Source\Runtime\Rendering\Material.h" />
+    <ClInclude Include="..\..\Source\Runtime\Rendering\Mesh.h" />
+    <ClInclude Include="..\..\Source\Runtime\Rendering\Model.h" />
+    <ClInclude Include="..\..\Source\Runtime\Rendering\Program.h" />
+    <ClInclude Include="..\..\Source\Runtime\Rendering\RenderView.h" />
+    <ClInclude Include="..\..\Source\Runtime\Rendering\RenderWindow.h" />
+    <ClInclude Include="..\..\Source\Runtime\Rendering\Shader.h" />
+    <ClInclude Include="..\..\Source\Runtime\Rendering\Texture.h" />
+    <ClInclude Include="..\..\Source\Runtime\Rendering\Uniform.h" />
+    <ClInclude Include="..\..\Source\Runtime\Rendering\VertexBuffer.h" />
+    <ClInclude Include="..\..\Source\Runtime\runtime.h" />
+    <ClInclude Include="..\..\Source\Runtime\System\FileSystem.h" />
+    <ClInclude Include="..\..\Source\Runtime\System\MessageBox.h" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Config.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\System.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\System\Err.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\System\NonCopyable.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\System\Utf.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Event.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\InputImpl.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Joystick.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\JoystickImpl.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\JoystickManager.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Keyboard.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Mouse.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Sensor.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\SensorImpl.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\SensorManager.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Touch.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\VideoMode.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\VideoModeImpl.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Win32\InputImpl.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Win32\JoystickImpl.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Win32\SensorImpl.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Win32\WindowImplWin32.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Window.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\WindowHandle.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\WindowImpl.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\WindowStyle.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\System\Singleton.h" />
+    <ClInclude Include="..\..\Source\Runtime\System\Timer.h" />
+    <ClInclude Include="..\..\Source\Runtime\System\Watchdog.h" />
+    <ClInclude Include="..\..\Source\Runtime\Threading\ThreadPool.h" />
+    <ClInclude Include="..\..\Source\Runtime\Threading\thread_utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Engine_Data\Meshes\_compile_.bat" />
+    <None Include="..\..\..\Engine_Data\Shaders\_compile_.bat" />
+    <None Include="..\..\..\Engine_Data\Textures\_compile_.bat" />
+    <None Include="..\..\..\Engine_Data\_compile_all.bat" />
+    <None Include="..\..\Source\Runtime\System\SFML\System\Utf.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Core.vcxproj">
+      <Project>{449848fa-a97c-43a4-99ba-5e5b333fd76b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="Graphics.vcxproj">
+      <Project>{139958cc-cfd4-41f0-a663-b130e403d9a6}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{B340CE5B-CFF1-4FD5-A1ED-4F74C628F525}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Insomnium</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>Runtime</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>
+    </CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>
+    </CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>
+    </CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>
+    </CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>..\..\Bin\Lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)Compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)</TargetName>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
+    <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
+    <ExcludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(MSBuild_ExecutablePath);$(VC_LibraryPath_x86);</ExcludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>..\..\Bin\Lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)Compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)</TargetName>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+    <ExecutablePath>$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);</ExecutablePath>
+    <ExcludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(MSBuild_ExecutablePath);$(VC_LibraryPath_x64);</ExcludePath>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>..\..\Bin\Lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)Compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>..\..\Bin\Lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)Compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <ExecutablePath>$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);</ExecutablePath>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\Source;..\..\Source\$(ProjectName);..\..\Lib\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <DisableSpecificWarnings>4005</DisableSpecificWarnings>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>winmm.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/LTCG /ignore:4221 /ignore:4006 %(AdditionalOptions)</AdditionalOptions>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\Source;..\..\Source\$(ProjectName);..\..\Lib\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <DisableSpecificWarnings>4005</DisableSpecificWarnings>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>winmm.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/LTCG /ignore:4221 /ignore:4006 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\Source;..\..\Source\$(ProjectName);..\..\Lib\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <StringPooling>true</StringPooling>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <DisableSpecificWarnings>4005</DisableSpecificWarnings>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>winmm.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/LTCG /ignore:4221 /ignore:4006 %(AdditionalOptions)</AdditionalOptions>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\Source;..\..\Source\$(ProjectName);..\..\Lib\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <StringPooling>true</StringPooling>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <DisableSpecificWarnings>4005</DisableSpecificWarnings>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>winmm.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/LTCG /ignore:4221 /ignore:4006 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

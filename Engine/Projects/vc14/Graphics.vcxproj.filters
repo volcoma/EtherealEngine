@@ -1,0 +1,527 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\bgfx">
+      <UniqueIdentifier>{2860de48-e873-4acf-a29a-6417e319f3a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\bx">
+      <UniqueIdentifier>{5ca62949-95fe-477d-9eab-25fb7b24ca7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tinystl">
+      <UniqueIdentifier>{56a17549-56e2-488c-a2a9-153954170f94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\bgfx\c99">
+      <UniqueIdentifier>{aab9bc31-1028-47ed-9f23-14cd08b1159a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src">
+      <UniqueIdentifier>{316331b7-ece0-4d07-a374-c555dd3794cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\compat">
+      <UniqueIdentifier>{230a116a-0cbd-4423-95e4-4559b9eb3cd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\compat\freebsd">
+      <UniqueIdentifier>{fcae021e-7d5c-44de-af7b-7fed63708e80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\compat\ios">
+      <UniqueIdentifier>{0853c670-2be5-4faa-a6b8-d634ad70ab11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\compat\mingw">
+      <UniqueIdentifier>{ef84788e-cdb4-4ab7-9f47-ed3f865e775d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\compat\msvc">
+      <UniqueIdentifier>{92906385-cdb6-4797-957a-02e64be927bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\compat\nacl">
+      <UniqueIdentifier>{d0f7f41b-f779-46ea-b4b9-b84bb7ff7350}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\compat\osx">
+      <UniqueIdentifier>{c42c319c-5700-4f0a-afde-38f9365f789c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\compat\msvc\pre1600">
+      <UniqueIdentifier>{2e9ecb95-1d8a-4cf6-8470-6a98a37a8dc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\renderdoc">
+      <UniqueIdentifier>{138504d2-7572-4fc3-a891-ab6402838906}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ib-compress">
+      <UniqueIdentifier>{b838dbe8-fafa-4499-b3b4-32045b36a60f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Source\Graphics\bgfx\c99\bgfx.h">
+      <Filter>Source Files\bgfx\c99</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bgfx\c99\bgfxplatform.h">
+      <Filter>Source Files\bgfx\c99</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bgfx\bgfx.h">
+      <Filter>Source Files\bgfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bgfx\bgfxdefines.h">
+      <Filter>Source Files\bgfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bgfx\bgfxplatform.h">
+      <Filter>Source Files\bgfx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\tinystl\stddef.h">
+      <Filter>Source Files\tinystl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\tinystl\string.h">
+      <Filter>Source Files\tinystl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\tinystl\traits.h">
+      <Filter>Source Files\tinystl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\tinystl\unordered_map.h">
+      <Filter>Source Files\tinystl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\tinystl\unordered_set.h">
+      <Filter>Source Files\tinystl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\tinystl\vector.h">
+      <Filter>Source Files\tinystl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\tinystl\allocator.h">
+      <Filter>Source Files\tinystl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\tinystl\buffer.h">
+      <Filter>Source Files\tinystl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\tinystl\hash.h">
+      <Filter>Source Files\tinystl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\tinystl\hash_base.h">
+      <Filter>Source Files\tinystl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\tinystl\new.h">
+      <Filter>Source Files\tinystl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\graphics.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\compat\freebsd\alloca.h">
+      <Filter>Source Files\compat\freebsd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\compat\freebsd\malloc.h">
+      <Filter>Source Files\compat\freebsd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\compat\freebsd\signal.h">
+      <Filter>Source Files\compat\freebsd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\compat\ios\malloc.h">
+      <Filter>Source Files\compat\ios</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\compat\mingw\dirent.h">
+      <Filter>Source Files\compat\mingw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\compat\mingw\sal.h">
+      <Filter>Source Files\compat\mingw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\compat\mingw\specstrings_strict.h">
+      <Filter>Source Files\compat\mingw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\compat\mingw\specstrings_undef.h">
+      <Filter>Source Files\compat\mingw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\compat\mingw\alloca.h">
+      <Filter>Source Files\compat\mingw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\compat\msvc\alloca.h">
+      <Filter>Source Files\compat\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\compat\msvc\dirent.h">
+      <Filter>Source Files\compat\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\compat\msvc\inttypes.h">
+      <Filter>Source Files\compat\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\compat\msvc\stdbool.h">
+      <Filter>Source Files\compat\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\compat\msvc\pre1600\stdint.h">
+      <Filter>Source Files\compat\msvc\pre1600</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\compat\nacl\memory.h">
+      <Filter>Source Files\compat\nacl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\compat\osx\malloc.h">
+      <Filter>Source Files\compat\osx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\renderdoc\renderdoc_app.h">
+      <Filter>Source Files\renderdoc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Lib\ib-compress\indexbuffercompression.h">
+      <Filter>Source Files\ib-compress</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Lib\ib-compress\indexbuffercompressionformat.h">
+      <Filter>Source Files\ib-compress</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Lib\ib-compress\indexbufferdecompression.h">
+      <Filter>Source Files\ib-compress</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Lib\ib-compress\indexcompressionconstants.h">
+      <Filter>Source Files\ib-compress</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Lib\ib-compress\readbitstream.h">
+      <Filter>Source Files\ib-compress</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Lib\ib-compress\writebitstream.h">
+      <Filter>Source Files\ib-compress</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\allocator.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\bx.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\cl.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\commandline.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\config.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\cpu.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\crtimpl.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\debug.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\endian.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\error.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\float4x4_t.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\float4_langext.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\float4_neon.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\float4_ni.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\float4_ref.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\float4_sse.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\float4_t.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\foreach.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\fpumath.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\handlealloc.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\hash.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\macros.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\maputil.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\mpscqueue.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\mutex.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\os.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\platform.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\process.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\radixsort.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\readerwriter.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\ringbuffer.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\rng.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\sem.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\simd_t.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\spscqueue.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\string.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\thread.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\timer.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\tokenizecmd.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\bx\uint32_t.h">
+      <Filter>Source Files\bx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\bgfx_p.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\charset.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\config.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\debug_renderdoc.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\fs_clear0.bin.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\fs_clear1.bin.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\fs_clear2.bin.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\fs_clear3.bin.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\fs_clear4.bin.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\fs_clear5.bin.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\fs_clear6.bin.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\fs_clear7.bin.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\fs_debugfont.bin.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\glcontext_eagl.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\glcontext_egl.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\glcontext_glx.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\glcontext_nsgl.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\glcontext_ppapi.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\glcontext_wgl.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\glimports.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\hmd.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\hmd_openvr.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\hmd_ovr.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\image.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\renderer.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\renderer_d3d.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\renderer_d3d11.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\renderer_d3d12.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\renderer_d3d9.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\renderer_gl.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\renderer_mtl.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\shader.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\shader_dx9bc.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\shader_dxbc.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\shader_spirv.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\topology.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\vertexdecl.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\vs_clear.bin.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Graphics\src\vs_debugfont.bin.h">
+      <Filter>Source Files\src</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Source\Graphics\graphics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Lib\ib-compress\indexbufferdecompression.cpp">
+      <Filter>Source Files\ib-compress</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Lib\ib-compress\indexbuffercompression.cpp">
+      <Filter>Source Files\ib-compress</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\bgfx.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\debug_renderdoc.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\glcontext_egl.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\glcontext_glx.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\glcontext_ppapi.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\glcontext_wgl.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\hmd.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\hmd_openvr.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\hmd_ovr.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\image.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\renderer_d3d11.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\renderer_d3d12.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\renderer_d3d9.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\renderer_gl.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\renderer_null.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\renderer_vk.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\shader.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\shader_dx9bc.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\shader_dxbc.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\shader_spirv.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\topology.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\vertexdecl.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Source\Graphics\bx\float4_swizzle.inl">
+      <Filter>Source Files\bx</Filter>
+    </None>
+    <None Include="..\..\Source\Graphics\bx\simd128_langext.inl">
+      <Filter>Source Files\bx</Filter>
+    </None>
+    <None Include="..\..\Source\Graphics\bx\simd128_neon.inl">
+      <Filter>Source Files\bx</Filter>
+    </None>
+    <None Include="..\..\Source\Graphics\bx\simd128_ref.inl">
+      <Filter>Source Files\bx</Filter>
+    </None>
+    <None Include="..\..\Source\Graphics\bx\simd128_sse.inl">
+      <Filter>Source Files\bx</Filter>
+    </None>
+    <None Include="..\..\Source\Graphics\bx\simd128_swizzle.inl">
+      <Filter>Source Files\bx</Filter>
+    </None>
+    <None Include="..\..\Source\Graphics\bx\simd256_avx.inl">
+      <Filter>Source Files\bx</Filter>
+    </None>
+    <None Include="..\..\Source\Graphics\bx\simd256_ref.inl">
+      <Filter>Source Files\bx</Filter>
+    </None>
+    <None Include="..\..\Source\Graphics\bx\simd_ni.inl">
+      <Filter>Source Files\bx</Filter>
+    </None>
+  </ItemGroup>
+</Project>

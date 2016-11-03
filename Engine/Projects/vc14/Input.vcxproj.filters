@@ -1,0 +1,369 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\gainput">
+      <UniqueIdentifier>{278603dc-c570-4ff7-86d6-2f02f0494269}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src">
+      <UniqueIdentifier>{7b7fbd81-62b8-4380-9a51-d7931bf83023}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\gainput">
+      <UniqueIdentifier>{09ad4457-567e-4782-a722-aa70a9f17188}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gainput\gestures">
+      <UniqueIdentifier>{cdfdacc5-7c46-46af-9374-0be6d37abd57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gainput\recorder">
+      <UniqueIdentifier>{cb8ffa8d-20db-484b-88e1-0ee4615a06df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\gainput\builtin">
+      <UniqueIdentifier>{d3b3410b-d2b2-4a42-98af-5212c37da73d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\gainput\dev">
+      <UniqueIdentifier>{16671a49-eb0e-4ef5-b852-5df3f16264b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\gainput\gestures">
+      <UniqueIdentifier>{0e0c7e29-2c30-494e-ac1f-8164112753e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\gainput\keyboard">
+      <UniqueIdentifier>{9bbc588d-0626-40a1-940a-b644903604cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\gainput\mouse">
+      <UniqueIdentifier>{fc7671b0-dd17-4263-8994-2bfcbba27521}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\gainput\pad">
+      <UniqueIdentifier>{11ddffe5-0bd2-455d-ab24-922fcfe0b9bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\gainput\recorder">
+      <UniqueIdentifier>{a2ae80f0-845c-4d9f-88f7-7116d4fe831b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\src\gainput\touch">
+      <UniqueIdentifier>{4160d3f1-33ed-4ac8-a2d6-02ba6440d1ba}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Source\Input\gainput\gainput.h">
+      <Filter>Source Files\gainput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\GainputAllocator.h">
+      <Filter>Source Files\gainput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\GainputContainers.h">
+      <Filter>Source Files\gainput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\GainputDebugRenderer.h">
+      <Filter>Source Files\gainput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\GainputInputDevice.h">
+      <Filter>Source Files\gainput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\GainputInputDeviceBuiltIn.h">
+      <Filter>Source Files\gainput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\GainputInputDeviceKeyboard.h">
+      <Filter>Source Files\gainput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\GainputInputDeviceMouse.h">
+      <Filter>Source Files\gainput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\GainputInputDevicePad.h">
+      <Filter>Source Files\gainput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\GainputInputDeviceTouch.h">
+      <Filter>Source Files\gainput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\GainputInputListener.h">
+      <Filter>Source Files\gainput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\GainputInputManager.h">
+      <Filter>Source Files\gainput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\GainputInputMap.h">
+      <Filter>Source Files\gainput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\GainputInputState.h">
+      <Filter>Source Files\gainput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\GainputIos.h">
+      <Filter>Source Files\gainput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\GainputMapFilters.h">
+      <Filter>Source Files\gainput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\gestures\GainputDoubleClickGesture.h">
+      <Filter>Source Files\gainput\gestures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\gestures\GainputGestures.h">
+      <Filter>Source Files\gainput\gestures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\gestures\GainputHoldGesture.h">
+      <Filter>Source Files\gainput\gestures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\gestures\GainputPinchGesture.h">
+      <Filter>Source Files\gainput\gestures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\gestures\GainputRotateGesture.h">
+      <Filter>Source Files\gainput\gestures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\gestures\GainputSimultaneouslyDownGesture.h">
+      <Filter>Source Files\gainput\gestures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\gestures\GainputTapGesture.h">
+      <Filter>Source Files\gainput\gestures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\gestures\GainputButtonStickGesture.h">
+      <Filter>Source Files\gainput\gestures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\recorder\GainputInputRecording.h">
+      <Filter>Source Files\gainput\recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\recorder\GainputInputPlayer.h">
+      <Filter>Source Files\gainput\recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\gainput\recorder\GainputInputRecorder.h">
+      <Filter>Source Files\gainput\recorder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\GainputHelpers.h">
+      <Filter>Source Files\src\gainput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\GainputHelpersEvdev.h">
+      <Filter>Source Files\src\gainput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\GainputInputDeltaState.h">
+      <Filter>Source Files\src\gainput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\GainputLog.h">
+      <Filter>Source Files\src\gainput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\GainputWindows.h">
+      <Filter>Source Files\src\gainput</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\builtin\GainputInputDeviceBuiltInAndroid.h">
+      <Filter>Source Files\src\gainput\builtin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\builtin\GainputInputDeviceBuiltInImpl.h">
+      <Filter>Source Files\src\gainput\builtin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\builtin\GainputInputDeviceBuiltInIos.h">
+      <Filter>Source Files\src\gainput\builtin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\builtin\GainputInputDeviceBuiltInNull.h">
+      <Filter>Source Files\src\gainput\builtin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\dev\GainputDev.h">
+      <Filter>Source Files\src\gainput\dev</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\dev\GainputDevProtocol.h">
+      <Filter>Source Files\src\gainput\dev</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\dev\GainputMemoryStream.h">
+      <Filter>Source Files\src\gainput\dev</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\dev\GainputNetAddress.h">
+      <Filter>Source Files\src\gainput\dev</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\dev\GainputNetConnection.h">
+      <Filter>Source Files\src\gainput\dev</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\dev\GainputNetListener.h">
+      <Filter>Source Files\src\gainput\dev</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\dev\GainputStream.h">
+      <Filter>Source Files\src\gainput\dev</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\keyboard\GainputInputDeviceKeyboardAndroid.h">
+      <Filter>Source Files\src\gainput\keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\keyboard\GainputInputDeviceKeyboardEvdev.h">
+      <Filter>Source Files\src\gainput\keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\keyboard\GainputInputDeviceKeyboardImpl.h">
+      <Filter>Source Files\src\gainput\keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\keyboard\GainputInputDeviceKeyboardLinux.h">
+      <Filter>Source Files\src\gainput\keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\keyboard\GainputInputDeviceKeyboardMac.h">
+      <Filter>Source Files\src\gainput\keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\keyboard\GainputInputDeviceKeyboardNull.h">
+      <Filter>Source Files\src\gainput\keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\keyboard\GainputInputDeviceKeyboardWin.h">
+      <Filter>Source Files\src\gainput\keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\keyboard\GainputInputDeviceKeyboardWinRaw.h">
+      <Filter>Source Files\src\gainput\keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\keyboard\GainputKeyboardKeyNames.h">
+      <Filter>Source Files\src\gainput\keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\mouse\GainputInputDeviceMouseEvdev.h">
+      <Filter>Source Files\src\gainput\mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\mouse\GainputInputDeviceMouseImpl.h">
+      <Filter>Source Files\src\gainput\mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\mouse\GainputInputDeviceMouseLinux.h">
+      <Filter>Source Files\src\gainput\mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\mouse\GainputInputDeviceMouseMac.h">
+      <Filter>Source Files\src\gainput\mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\mouse\GainputInputDeviceMouseNull.h">
+      <Filter>Source Files\src\gainput\mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\mouse\GainputInputDeviceMouseWin.h">
+      <Filter>Source Files\src\gainput\mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\mouse\GainputInputDeviceMouseWinRaw.h">
+      <Filter>Source Files\src\gainput\mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\mouse\GainputMouseInfo.h">
+      <Filter>Source Files\src\gainput\mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\pad\GainputInputDevicePadImpl.h">
+      <Filter>Source Files\src\gainput\pad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\pad\GainputInputDevicePadIos.h">
+      <Filter>Source Files\src\gainput\pad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\pad\GainputInputDevicePadLinux.h">
+      <Filter>Source Files\src\gainput\pad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\pad\GainputInputDevicePadMac.h">
+      <Filter>Source Files\src\gainput\pad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\pad\GainputInputDevicePadNull.h">
+      <Filter>Source Files\src\gainput\pad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\pad\GainputInputDevicePadWin.h">
+      <Filter>Source Files\src\gainput\pad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\touch\GainputInputDeviceTouchAndroid.h">
+      <Filter>Source Files\src\gainput\touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\touch\GainputInputDeviceTouchImpl.h">
+      <Filter>Source Files\src\gainput\touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\touch\GainputInputDeviceTouchIos.h">
+      <Filter>Source Files\src\gainput\touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\touch\GainputInputDeviceTouchNull.h">
+      <Filter>Source Files\src\gainput\touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\src\gainput\touch\GainputTouchInfo.h">
+      <Filter>Source Files\src\gainput\touch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Input\input.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Source\Input\src\gainput\gainput.cpp">
+      <Filter>Source Files\src\gainput</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\GainputAllocator.cpp">
+      <Filter>Source Files\src\gainput</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\GainputInputDeltaState.cpp">
+      <Filter>Source Files\src\gainput</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\GainputInputDevice.cpp">
+      <Filter>Source Files\src\gainput</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\GainputInputManager.cpp">
+      <Filter>Source Files\src\gainput</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\GainputInputMap.cpp">
+      <Filter>Source Files\src\gainput</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\GainputInputState.cpp">
+      <Filter>Source Files\src\gainput</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\GainputMapFilters.cpp">
+      <Filter>Source Files\src\gainput</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\builtin\GainputInputDeviceBuiltIn.cpp">
+      <Filter>Source Files\src\gainput\builtin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\dev\GainputDev.cpp">
+      <Filter>Source Files\src\gainput\dev</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\dev\GainputMemoryStream.cpp">
+      <Filter>Source Files\src\gainput\dev</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\dev\GainputNetAddress.cpp">
+      <Filter>Source Files\src\gainput\dev</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\dev\GainputNetConnection.cpp">
+      <Filter>Source Files\src\gainput\dev</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\dev\GainputNetListener.cpp">
+      <Filter>Source Files\src\gainput\dev</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\gestures\GainputButtonStickGesture.cpp">
+      <Filter>Source Files\src\gainput\gestures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\gestures\GainputDoubleClickGesture.cpp">
+      <Filter>Source Files\src\gainput\gestures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\gestures\GainputHoldGesture.cpp">
+      <Filter>Source Files\src\gainput\gestures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\gestures\GainputPinchGesture.cpp">
+      <Filter>Source Files\src\gainput\gestures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\gestures\GainputRotateGesture.cpp">
+      <Filter>Source Files\src\gainput\gestures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\gestures\GainputSimultaneouslyDownGesture.cpp">
+      <Filter>Source Files\src\gainput\gestures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\gestures\GainputTapGesture.cpp">
+      <Filter>Source Files\src\gainput\gestures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\keyboard\GainputInputDeviceKeyboard.cpp">
+      <Filter>Source Files\src\gainput\keyboard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\keyboard\GainputInputDeviceKeyboardMac.cpp">
+      <Filter>Source Files\src\gainput\keyboard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\mouse\GainputInputDeviceMouse.cpp">
+      <Filter>Source Files\src\gainput\mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\pad\GainputInputDevicePad.cpp">
+      <Filter>Source Files\src\gainput\pad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\pad\GainputInputDevicePadMac.cpp">
+      <Filter>Source Files\src\gainput\pad</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\recorder\GainputInputPlayer.cpp">
+      <Filter>Source Files\src\gainput\recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\recorder\GainputInputRecorder.cpp">
+      <Filter>Source Files\src\gainput\recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\recorder\GainputInputRecording.cpp">
+      <Filter>Source Files\src\gainput\recorder</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\src\gainput\touch\GainputInputDeviceTouch.cpp">
+      <Filter>Source Files\src\gainput\touch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Input\input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

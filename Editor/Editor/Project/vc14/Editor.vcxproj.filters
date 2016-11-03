@@ -1,0 +1,238 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\FileDialog">
+      <UniqueIdentifier>{06f28dda-5e20-4482-afd2-35f213692256}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FileDialog\nfd">
+      <UniqueIdentifier>{075b4858-13e5-485a-a7bb-d76c0b14f307}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Interface">
+      <UniqueIdentifier>{621a9bd6-d8cf-4886-a24d-98da4bac4ccb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Interface\Docks">
+      <UniqueIdentifier>{ee68fc98-a51f-41a4-8435-dcf0942417cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Interface\Gizmos">
+      <UniqueIdentifier>{3b07a197-2e2a-4a64-8ec4-74c1a62f6c99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Interface\Inspectors">
+      <UniqueIdentifier>{9a030a33-c334-4a42-98a0-5aaa2d1daea7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Interface\imgui">
+      <UniqueIdentifier>{20ffdd9f-acc6-489c-8120-bde9be5f3ad8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Systems">
+      <UniqueIdentifier>{fc6091d8-3c95-4785-a421-9c6ec74c0564}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\Res\Common.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Res\resource.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\EditorApp.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\FileDialog\FileDialog.h">
+      <Filter>Source Files\FileDialog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\FileDialog\nfd\common.h">
+      <Filter>Source Files\FileDialog\nfd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\FileDialog\nfd\nfd.h">
+      <Filter>Source Files\FileDialog\nfd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\FileDialog\nfd\nfd_common.h">
+      <Filter>Source Files\FileDialog\nfd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\Gizmos\ImGuizmo.h">
+      <Filter>Source Files\Interface\Gizmos</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\Docks\Docks.h">
+      <Filter>Source Files\Interface\Docks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\Docks\ImGuiDock.h">
+      <Filter>Source Files\Interface\Docks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\Inspectors\Inspector_Assets.h">
+      <Filter>Source Files\Interface\Inspectors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\Inspectors\Inspector_Entity.h">
+      <Filter>Source Files\Interface\Inspectors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\Inspectors\Inspectors.h">
+      <Filter>Source Files\Interface\Inspectors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\Inspectors\Inspector.h">
+      <Filter>Source Files\Interface\Inspectors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\imgui\imconfig.h">
+      <Filter>Source Files\Interface\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\imgui\imgui.h">
+      <Filter>Source Files\Interface\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\imgui\imgui_internal.h">
+      <Filter>Source Files\Interface\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\imgui\imgui_user.h">
+      <Filter>Source Files\Interface\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\imgui\robotomono_regular.ttf.h">
+      <Filter>Source Files\Interface\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\imgui\roboto_regular.ttf.h">
+      <Filter>Source Files\Interface\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\imgui\stb_rect_pack.h">
+      <Filter>Source Files\Interface\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\imgui\stb_textedit.h">
+      <Filter>Source Files\Interface\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\imgui\stb_truetype.h">
+      <Filter>Source Files\Interface\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\GUI.h">
+      <Filter>Source Files\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\Inspectors\Inspector_CoreTypes.h">
+      <Filter>Source Files\Interface\Inspectors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\Inspectors\Inspector_Math.h">
+      <Filter>Source Files\Interface\Inspectors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\EditorWindow.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Systems\PickingSystem.h">
+      <Filter>Source Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Systems\DebugDrawSystem.h">
+      <Filter>Source Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\EditState.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\GuiWindow.h">
+      <Filter>Source Files\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\Inspectors\Inspector_BaseTypes.h">
+      <Filter>Source Files\Interface\Inspectors</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Source\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\EditorApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FileDialog\nfd\nfd_win.cpp">
+      <Filter>Source Files\FileDialog\nfd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\Gizmos\ImGuizmo.cpp">
+      <Filter>Source Files\Interface\Gizmos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\Docks\AssetsDock.cpp">
+      <Filter>Source Files\Interface\Docks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\Docks\ConsoleDock.cpp">
+      <Filter>Source Files\Interface\Docks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\Docks\HierarcyDock.cpp">
+      <Filter>Source Files\Interface\Docks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\Docks\ImGuiDock.cpp">
+      <Filter>Source Files\Interface\Docks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\Docks\InspectorDock.cpp">
+      <Filter>Source Files\Interface\Docks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\Docks\SceneDock.cpp">
+      <Filter>Source Files\Interface\Docks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\Docks\StyleDock.cpp">
+      <Filter>Source Files\Interface\Docks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\Docks\GameDock.cpp">
+      <Filter>Source Files\Interface\Docks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\Inspectors\Inspector_Assets.cpp">
+      <Filter>Source Files\Interface\Inspectors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\Inspectors\Inspector_Entity.cpp">
+      <Filter>Source Files\Interface\Inspectors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\Inspectors\Inspector.cpp">
+      <Filter>Source Files\Interface\Inspectors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\imgui\imgui.cpp">
+      <Filter>Source Files\Interface\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\imgui\imgui_draw.cpp">
+      <Filter>Source Files\Interface\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\GUI.cpp">
+      <Filter>Source Files\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\Inspectors\Inspector_CoreTypes.cpp">
+      <Filter>Source Files\Interface\Inspectors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\Inspectors\Inspector_Math.cpp">
+      <Filter>Source Files\Interface\Inspectors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\Inspectors\Inspectors.cpp">
+      <Filter>Source Files\Interface\Inspectors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\EditState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\EditorWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Systems\PickingSystem.cpp">
+      <Filter>Source Files\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Systems\DebugDrawSystem.cpp">
+      <Filter>Source Files\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\Docks\GettingStartedDock.cpp">
+      <Filter>Source Files\Interface\Docks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\Docks\ProjectDock.cpp">
+      <Filter>Source Files\Interface\Docks</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\FileDialog\nfd\nfd_common.cpp">
+      <Filter>Source Files\FileDialog\nfd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\GuiWindow.cpp">
+      <Filter>Source Files\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\Inspectors\Inspector_BaseTypes.cpp">
+      <Filter>Source Files\Interface\Inspectors</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Source\Interface\imgui\imgui_user.inl">
+      <Filter>Source Files\Interface\imgui</Filter>
+    </None>
+  </ItemGroup>
+</Project>
