@@ -90,6 +90,9 @@ ipch/
 *.sap
 
 
+# User data
+Projects/
+
 # Don't want to ignore .objs files in Assets
 !Engine_Data/Meshes/*.obj
 !Editor_Data/Meshes/*.obj
