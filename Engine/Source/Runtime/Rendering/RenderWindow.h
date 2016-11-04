@@ -45,7 +45,7 @@ public:
 	virtual void frameUpdate(float dt);
 	virtual void frameRender();
 	virtual void frameEnd();
-
+	virtual void delayedClose();
 protected:
 	////////////////////////////////////////////////////////////
 	/// \brief Processes an event before it is sent to the user

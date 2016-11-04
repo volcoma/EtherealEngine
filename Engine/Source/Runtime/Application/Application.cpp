@@ -82,7 +82,7 @@ Application::Application()
 {
     // Set members to sensible defaults
 	mWorld = std::make_unique<World>();
-	mAssetManagerEx = std::make_unique<AssetManager>();
+	mAssetManager = std::make_unique<AssetManager>();
 	mTimer = std::make_unique<Timer>();
 	mThreadPool = std::make_unique<ThreadPool>();
 	mActionMapper = std::make_unique<ActionMapper>();
@@ -237,9 +237,14 @@ void Application::registerWindow(std::shared_ptr<RenderWindow> window)
 	auto onClosed = [this](RenderWindow& wnd)
 	{
 		mWindows.erase(std::remove_if(std::begin(mWindows), std::end(mWindows),
-			[&wnd](std::shared_ptr<RenderWindow>& other)
+			[this, &wnd](std::shared_ptr<RenderWindow>& other)
 		{
-			return &wnd == other.get();
+			if (&wnd == other.get())
+			{
+				mPendingClosureWindows.push_back(other);
+				return true;
+			}
+			return false;
 		}), std::end(mWindows));
 	};
 	
@@ -448,14 +453,17 @@ bool Application::frameAdvance( bool bRunSimulation /* = true */ )
     // Advance Game Frame.
     if ( frameBegin( bRunSimulation ) )
     {
-		// Did we receive a message, or are we idling ?
-		auto windows = mWindows;
-		for (auto sharedWindow : windows)
 		{
-			auto& window = *sharedWindow;
-			mWindow = sharedWindow;
-			processWindow(window);
-			mWindow.reset();
+			// Did we receive a message, or are we idling ?
+			// Copy window container to prevent iterator invalidation
+			auto windows = mWindows;
+			for (auto sharedWindow : windows)
+			{
+				auto& window = *sharedWindow;
+				mWindow = sharedWindow;
+				processWindow(window);
+				mWindow.reset();
+			}
 		}
 
 		frameEnd();
@@ -483,7 +491,7 @@ bool Application::shutDown()
 	mWindows.clear();
 	mWorld.reset();
 	mThreadPool.reset();
-	mAssetManagerEx.reset();
+	mAssetManager.reset();
 	mTimer.reset();
 
 	gfx::shutdown();
@@ -628,4 +636,5 @@ void Application::frameEnd()
 	// process submitted rendering primitives.
 	mRenderFrame = gfx::frame();
 	
+	mPendingClosureWindows.clear();
 }

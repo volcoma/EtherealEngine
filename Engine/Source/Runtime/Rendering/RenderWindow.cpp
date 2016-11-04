@@ -76,3 +76,9 @@ void RenderWindow::destroyView()
 {
 	mView.reset();
 }
+
+void RenderWindow::delayedClose()
+{
+	destroyView();
+	onClose();
+}

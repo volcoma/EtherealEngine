@@ -124,6 +124,8 @@ struct FrameBuffer : public ITexture
 	{
 		if (isValid())
 			gfx::destroyFrameBuffer(handle);
+
+		handle = { bgfx::invalidHandle };
 	}
 
 	//-----------------------------------------------------------------------------

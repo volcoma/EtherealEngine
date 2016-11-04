@@ -45,7 +45,7 @@ public:
 
 	inline World&							getWorld					( ) { return *mWorld; }
 	inline ThreadPool&						getThreadPool				( ) { return *mThreadPool; }
-	inline AssetManager&					getAssetManager				( ) { return *mAssetManagerEx; }
+	inline AssetManager&					getAssetManager				( ) { return *mAssetManager; }
 	inline Timer&							getTimer					( ) { return *mTimer; }
 	InputContext&							getInput					( );
     RenderWindow&							getWindow					( );
@@ -89,6 +89,7 @@ protected:
 	std::string								mCopyright;					// Cached copyright string retrieved from resource string table.
 	std::string								mRootDataDir;				// The root data directory used by the file system.
 	std::vector<std::shared_ptr<RenderWindow>>	mWindows;					// Collection of application windows.
+	std::vector<std::shared_ptr<RenderWindow>>	mPendingClosureWindows;
 	std::shared_ptr<RenderWindow>				mWindow;					// Currently processed window.
 
 	// Configuration
@@ -99,7 +100,7 @@ protected:
 	bool									mRunning = true;
 	std::uint32_t							mRenderFrame = 0;
 	std::unique_ptr<World>					mWorld;
-	std::unique_ptr<AssetManager>			mAssetManagerEx;
+	std::unique_ptr<AssetManager>			mAssetManager;
 	std::unique_ptr<Timer>					mTimer;
 	std::unique_ptr<ThreadPool>				mThreadPool;
 	std::unique_ptr<ActionMapper>			mActionMapper;

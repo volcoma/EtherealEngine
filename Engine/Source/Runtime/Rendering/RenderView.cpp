@@ -26,6 +26,8 @@ void releaseId(std::uint8_t id)
 
 RenderView::~RenderView()
 {
+	mRenderSurfaces.clear();
+	gfx::setViewFrameBuffer(mId, {gfx::invalidHandle});
 	releaseId(mId);
 }
 
