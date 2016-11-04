@@ -453,8 +453,7 @@ bool MainEditorWindow::onProjectManager()
 			{
 				app.createProject(path);
 				gui::CloseCurrentPopup();
-				mOpenProjectManager = false;
-					
+				mOpenProjectManager = false;	
 			}
 		}
 
