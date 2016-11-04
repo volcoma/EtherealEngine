@@ -137,6 +137,7 @@ void Window::create(WindowHandle handle)
 ////////////////////////////////////////////////////////////
 void Window::close()
 {	
+	onClose();
     // Delete the window implementation
     delete m_impl;
     m_impl = NULL;
@@ -353,7 +354,6 @@ bool Window::filterEvent(const Event& event)
 	if (event.type == Event::Closed)
 	{
 		// Notify the derived class
-		onClose();
 		close();
 	}
 
