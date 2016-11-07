@@ -39,6 +39,7 @@ enum class ActionType : unsigned int
 	Released,
 	Count,
 };
+
 struct Mapping
 {
 	ActionType type = ActionType::NotMapped;

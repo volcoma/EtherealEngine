@@ -8,11 +8,6 @@ InputContext::InputContext()
 	mPreviousMouseInfo = mCurrentMouseInfo;
 }
 
-void InputContext::setActionMapper(ActionMapper* actionMapper)
-{
-	mActionMapper = actionMapper;
-}
-
 void InputContext::update()
 {
 	keyUpdate();
@@ -50,21 +45,6 @@ bool InputContext::isKeyReleased(sf::Keyboard::Key key)
 	return mKeysReleased[key];
 }
 
-bool InputContext::mouseMoved()
-{
-	return mMouseMoveEvent;
-}
-
-const iPoint& InputContext::getMouseCurrentPosition()
-{
-	return mCurrentMouseInfo;
-}
-
-const iPoint& InputContext::getMousePreviousPosition()
-{
-	return mPreviousMouseInfo;
-}
-
 bool InputContext::isMouseButtonPressed(sf::Mouse::Button button)
 {
 	return mMouseButtonsPressed[button];
@@ -78,16 +58,6 @@ bool InputContext::isMouseButtonDown(sf::Mouse::Button button)
 bool InputContext::isMouseButtonReleased(sf::Mouse::Button button)
 {
 	return mMouseButtonsReleased[button];
-}
-
-bool InputContext::mouseWheelScrolled()
-{
-	return mMouseWheelScrolled;
-}
-
-float InputContext::getMouseWheelScrollDelta()
-{
-	return mMouseScrollDelta;
 }
 
 bool InputContext::isJoystickConnected(unsigned int joystickId)

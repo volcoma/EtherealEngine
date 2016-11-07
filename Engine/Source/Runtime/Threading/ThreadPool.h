@@ -16,71 +16,182 @@
 struct ITask
 {
 	virtual ~ITask() = default;
+	//-----------------------------------------------------------------------------
+	//  Name : isReady (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	virtual bool isReady() const = 0;
+
+	//-----------------------------------------------------------------------------
+	//  Name : invokeCallback (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	virtual void invokeCallback() = 0;
+
+	//-----------------------------------------------------------------------------
+	//  Name : waitUntilReady (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	virtual void waitUntilReady() = 0;
 };
 
 template<typename ReturnType, typename OnReadyFunc>
 struct Task : public ITask
 {
+	//-----------------------------------------------------------------------------
+	//  Name : Task ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	explicit Task(std::shared_future<ReturnType> f, OnReadyFunc&& readyFunction)
 		: sharedFuture(f)
 		, onReady(readyFunction)
 	{}
 
+	//-----------------------------------------------------------------------------
+	//  Name : isReady (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	virtual bool isReady() const
 	{
 		return sharedFuture.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready;
 	}
 
+	//-----------------------------------------------------------------------------
+	//  Name : invokeCallback (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	virtual void invokeCallback()
 	{
 		onReady();
 	}
 
+	//-----------------------------------------------------------------------------
+	//  Name : waitUntilReady (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	virtual void waitUntilReady()
 	{
 		sharedFuture.get();
 	}
 
+	//-----------------------------------------------------------------------------
+	//  Name : getResult ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	ReturnType& getResult() const
 	{
 		return sharedFuture.get();
 	}
 
+	/// shared future holding the result
 	std::shared_future<ReturnType> sharedFuture;
+	/// ready callback
 	OnReadyFunc onReady;
 };
 
 template<typename OnReadyFunc>
 struct Task<void, OnReadyFunc> : public ITask
 {
+	//-----------------------------------------------------------------------------
+	//  Name : Task ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	explicit Task(std::shared_future<void> f, OnReadyFunc&& readyFunction)
 		: sharedFuture(f)
 		, onReady(readyFunction)
 	{}
+
+	//-----------------------------------------------------------------------------
+	//  Name : isReady (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	virtual bool isReady() const
 	{
 		return sharedFuture.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready;
 	}
 
+	//-----------------------------------------------------------------------------
+	//  Name : invokeCallback (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	virtual void invokeCallback()
 	{
 		onReady();
 	}
 
+	//-----------------------------------------------------------------------------
+	//  Name : waitUntilReady (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	virtual void waitUntilReady()
 	{
 		sharedFuture.get();
 	}
 
+	//-----------------------------------------------------------------------------
+	//  Name : getResult ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	void getResult() const
 	{
 		return sharedFuture.get();
 	}
 
+	/// shared future
 	std::shared_future<void> sharedFuture;
+	/// ready callback
 	OnReadyFunc onReady;
 };
 
@@ -149,18 +260,20 @@ public:
 	//-----------------------------------------------------------------------------
 	void shutdown();
 private:
-	// need to keep track of threads so we can join them
-	std::vector< std::thread > workers;
-	// the task queue
-	std::queue< std::function<void()> > tasks;
-	// the result array
-	std::vector<std::shared_ptr<ITask>> results;
-	// synchronization
-	std::mutex queue_mutex;
-	std::condition_variable condition;
-	std::mutex result_mutex;
-
-	bool stopped = false;
+	/// need to keep track of threads so we can join them
+	std::vector< std::thread > mWorkers;
+	/// the task queue
+	std::queue< std::function<void()> > mTasks;
+	/// the result array
+	std::vector<std::shared_ptr<ITask>> mResults;
+	/// Mutex for synchronization of the tasks
+	std::mutex mTaskMutex;
+	/// Condition variable for notifying threads
+	std::condition_variable mCondition;
+	/// Mutex for synchronization of the results
+	std::mutex mResultMutex;
+	/// Is pool stopped
+	bool mStopped = false;
 };
 
 // the constructor just launches some amount of workers
@@ -174,22 +287,22 @@ inline ThreadPool::ThreadPool(unsigned int threads)
 			for (;;)
 			{
 				{
-					std::unique_lock<std::mutex> lock(queue_mutex);
-					condition.wait(lock,
+					std::unique_lock<std::mutex> lock(mTaskMutex);
+					mCondition.wait(lock,
 						[this]()
 					{
-						return stopped || !tasks.empty();
+						return mStopped || !mTasks.empty();
 					});
-					if (stopped && tasks.empty())
+					if (mStopped && mTasks.empty())
 						return;
-					task = std::move(tasks.front());
-					tasks.pop();
+					task = std::move(mTasks.front());
+					mTasks.pop();
 				}
 				task();
 			}
 		});
 		thread_utils::setThreadName(&worker, string_utils::format("Worker_Thread_%d", i));
-		workers.emplace_back(std::move(worker));
+		mWorkers.emplace_back(std::move(worker));
 	}
 }
 
@@ -199,7 +312,7 @@ template<class F, class C, class... Args>
 inline auto ThreadPool::enqueue_with_callback(F&& f, C&& callback, Args&&... args)
 -> std::shared_ptr<Task<typename std::result_of<F(Args...)>::type, C>>
 {
-	Expects(!stopped);
+	Expects(!mStopped);
 
 	using return_type = typename std::result_of<F(Args...)>::type;
 
@@ -210,16 +323,16 @@ inline auto ThreadPool::enqueue_with_callback(F&& f, C&& callback, Args&&... arg
 
 	std::shared_future<return_type> res = task->get_future();
 	{
-		std::unique_lock<std::mutex> lock(queue_mutex);
-		tasks.emplace([task]() { (*task)(); });
+		std::unique_lock<std::mutex> lock(mTaskMutex);
+		mTasks.emplace([task]() { (*task)(); });
 	}
 	auto sharedFutureWrapper = std::make_shared<Task<return_type, C>>(res, std::forward<C>(callback));
 	{
-		std::unique_lock<std::mutex> lock(result_mutex);
-		results.push_back(sharedFutureWrapper);
+		std::unique_lock<std::mutex> lock(mResultMutex);
+		mResults.push_back(sharedFutureWrapper);
 	}
 
-	condition.notify_one();
+	mCondition.notify_one();
 
 	return sharedFutureWrapper;
 }
@@ -233,23 +346,23 @@ inline ThreadPool::~ThreadPool()
 inline void ThreadPool::shutdown()
 {
 	{
-		std::unique_lock<std::mutex> lock(queue_mutex);
-		stopped = true;
+		std::unique_lock<std::mutex> lock(mTaskMutex);
+		mStopped = true;
 	}
-	condition.notify_all();
+	mCondition.notify_all();
 
-	for (auto &worker : workers)
+	for (auto &worker : mWorkers)
 		worker.join();
 
-	workers.clear();
+	mWorkers.clear();
 }
 
 inline void ThreadPool::poll()
 {
 	std::vector<std::shared_ptr<ITask>> result_container;
 	{
-		std::unique_lock<std::mutex> lock(result_mutex);
-		result_container = results;
+		std::unique_lock<std::mutex> lock(mResultMutex);
+		result_container = mResults;
 	}
 
 	for (auto result : result_container)
@@ -263,14 +376,13 @@ inline void ThreadPool::poll(std::shared_ptr<ITask> result)
 	if (result->isReady())
 	{
 		{
-			std::unique_lock<std::mutex> lock(result_mutex);
-			results.erase(std::remove_if(std::begin(results), std::end(results),
+			std::unique_lock<std::mutex> lock(mResultMutex);
+			mResults.erase(std::remove_if(std::begin(mResults), std::end(mResults),
 				[result](std::shared_ptr<ITask> res)
 			{
 				return res == result;
-			}), std::end(results));
+			}), std::end(mResults));
 		}
-
 		result->invokeCallback();
 	}
 }

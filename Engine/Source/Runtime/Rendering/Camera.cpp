@@ -56,7 +56,6 @@ void Camera::setProjectionMode(ProjectionMode Mode)
 	if (Mode == mProjectionMode)
 		return;
 
-
 	// Alter the projection mode.
 	mProjectionMode = Mode;
 
