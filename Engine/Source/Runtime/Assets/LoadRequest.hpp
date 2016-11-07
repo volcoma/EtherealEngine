@@ -6,6 +6,7 @@
 #include "AssetHandle.h"
 #include "../Application/Application.h"
 #include "../Threading/ThreadPool.h"
+#include "../System/Singleton.h"
 
 template<typename T>
 struct LoadRequest
