@@ -51,7 +51,7 @@ void RenderWindow::frameBegin()
 }
 
 void RenderWindow::frameUpdate(float dt)
-{	
+{
 
 }
 

@@ -59,14 +59,14 @@ public:
 	float getMinDistance() const { return mMinDistance; }
 
 	void setTransitionTime(float time) { mTransitionTime = time; }
-	void setMaxDistance(float distance) 
-	{ 
+	void setMaxDistance(float distance)
+	{
 		if (distance < mMinDistance)
 			distance = mMinDistance;
 
-		mMaxDistance = distance; 
+		mMaxDistance = distance;
 	}
-	void setMinDistance(float distance) 
+	void setMinDistance(float distance)
 	{
 		if (distance > mMaxDistance)
 			distance = mMaxDistance;

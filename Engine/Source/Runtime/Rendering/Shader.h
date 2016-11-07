@@ -4,7 +4,6 @@
 #include <memory>
 #include <vector>
 
-
 struct Shader
 {
 	//-----------------------------------------------------------------------------
@@ -47,6 +46,8 @@ struct Shader
 	//-----------------------------------------------------------------------------
 	void populate(const gfx::Memory* _mem);
 
-	gfx::ShaderHandle handle = { gfx::invalidHandle };
+	/// Uniforms for this shader
 	std::vector<std::shared_ptr<Uniform>> uniforms;
+	/// Internal handle
+	gfx::ShaderHandle handle = { gfx::invalidHandle };
 };

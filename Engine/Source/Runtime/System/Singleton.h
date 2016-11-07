@@ -1,5 +1,65 @@
 #pragma once
 
+//! A static, pre-execution object
+/*! This class will create a single copy (singleton) of some
+type and ensures that merely referencing this type will
+cause it to be instantiated and initialized pre-execution.*/
+template <class T>
+class Singleton
+{
+public:
+	//-----------------------------------------------------------------------------
+	//  Name : getInstance ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	static T & getInstance()
+	{
+		return create();
+	}
+
+private:
+	//-----------------------------------------------------------------------------
+	//  Name : instantiate ()
+	/// <summary>
+	/// Forces instantiation at pre-execution time
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	static void instantiate(T const &) {}
+
+	//-----------------------------------------------------------------------------
+	//  Name : create ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	static T & create()
+	{
+		static T t;
+		instantiate(t);
+		return t;
+	}
+
+	//-----------------------------------------------------------------------------
+	//  Name : Singleton ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	Singleton(Singleton const & /*other*/) {}
+
+	/// Internal instance
+	static T & instance;
+};
+
+template <class T> T & Singleton<T>::instance = Singleton<T>::create();
 
 template<void(*ctor)()>
 struct StaticInitializer
@@ -10,33 +70,3 @@ struct StaticInitializer
 
 template<void(*ctor)()>
 typename StaticInitializer<ctor>::constructor StaticInitializer<ctor>::initializer;
-
-
-//! A static, pre-execution object
-/*! This class will create a single copy (singleton) of some
-type and ensures that merely referencing this type will
-cause it to be instantiated and initialized pre-execution.*/
-template <class T>
-class Singleton
-{
-public:
-	static T & getInstance()
-	{
-		return create();
-	}
-
-private:
-	//! Forces instantiation at pre-execution time
-	static void instantiate(T const &) {}
-	static T & create()
-	{
-		static T t;
-		instantiate(t);
-		return t;
-	}
-
-	Singleton(Singleton const & /*other*/) {}
-	static T & instance;
-};
-
-template <class T> T & Singleton<T>::instance = Singleton<T>::create();

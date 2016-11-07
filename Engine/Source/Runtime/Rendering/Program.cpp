@@ -42,7 +42,7 @@ void Program::setTexture(std::uint8_t _stage, const std::string& _sampler, gfx::
 }
 void Program::setTexture(std::uint8_t _stage, const std::string& _sampler, Texture* _texture, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
-	if (!_texture )
+	if (!_texture)
 		return;
 
 	gfx::setTexture(_stage, getUniform(_sampler)->handle, _texture->handle, _flags);

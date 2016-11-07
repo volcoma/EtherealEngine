@@ -5,5 +5,5 @@
 
 namespace thread_utils
 {
-void setThreadName(std::thread* thread, const std::string& threadName);
+	void setThreadName(std::thread* thread, const std::string& threadName);
 }

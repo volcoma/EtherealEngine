@@ -54,7 +54,10 @@ struct Uniform
 	//-----------------------------------------------------------------------------
 	void populate(gfx::UniformHandle _handle);
 
+	/// Uniform type
 	gfx::UniformType::Enum type;
+	/// Uniform id
 	std::string id;
+	/// Internal handle
 	gfx::UniformHandle handle = { gfx::invalidHandle };
 };

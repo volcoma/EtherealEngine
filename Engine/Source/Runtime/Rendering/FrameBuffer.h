@@ -6,7 +6,7 @@
 struct FrameBuffer : public ITexture
 {
 	REFLECTABLE(FrameBuffer, ITexture)
-	FrameBuffer() 
+	FrameBuffer()
 	{}
 	FrameBuffer(
 		std::uint16_t _width
@@ -221,11 +221,11 @@ struct FrameBuffer : public ITexture
 	)
 	{
 		dispose();
-		
+
 		handle = gfx::createFrameBuffer(_nwh, _width, _height, _depthFormat);
 	}
 
-	
+
 	gfx::FrameBufferHandle handle = { gfx::invalidHandle };
 
 };

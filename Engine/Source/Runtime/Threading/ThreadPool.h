@@ -87,15 +87,15 @@ struct Task<void, OnReadyFunc> : public ITask
 class ThreadPool
 {
 public:
-    //-----------------------------------------------------------------------------
-    //  Name : ThreadPool ()
-    /// <summary>
-    /// 
-    /// 
-    /// 
-    /// </summary>
-    //-----------------------------------------------------------------------------
-    ThreadPool(unsigned int threads = std::thread::hardware_concurrency());
+	//-----------------------------------------------------------------------------
+	//  Name : ThreadPool ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	ThreadPool(unsigned int threads = std::thread::hardware_concurrency());
 
 	//-----------------------------------------------------------------------------
 	//  Name : ~ThreadPool ()
@@ -107,17 +107,17 @@ public:
 	//-----------------------------------------------------------------------------
 	~ThreadPool();
 
-    //-----------------------------------------------------------------------------
-    //  Name : enqueue_with_callback ()
-    /// <summary>
-    /// 
-    /// 
-    /// 
-    /// </summary>
-    //-----------------------------------------------------------------------------
-    template<class F, class C, class... Args>
-    auto enqueue_with_callback(F&& f, C&& c, Args&&... args) 
-        ->std::shared_ptr<Task<typename std::result_of<F(Args...)>::type, C>>;
+	//-----------------------------------------------------------------------------
+	//  Name : enqueue_with_callback ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	template<class F, class C, class... Args>
+	auto enqueue_with_callback(F&& f, C&& c, Args&&... args)
+		->std::shared_ptr<Task<typename std::result_of<F(Args...)>::type, C>>;
 
 	//-----------------------------------------------------------------------------
 	//  Name : poll ()
@@ -149,20 +149,20 @@ public:
 	//-----------------------------------------------------------------------------
 	void shutdown();
 private:
-    // need to keep track of threads so we can join them
-    std::vector< std::thread > workers;
-    // the task queue
-    std::queue< std::function<void()> > tasks;
+	// need to keep track of threads so we can join them
+	std::vector< std::thread > workers;
+	// the task queue
+	std::queue< std::function<void()> > tasks;
 	// the result array
 	std::vector<std::shared_ptr<ITask>> results;
-    // synchronization
-    std::mutex queue_mutex;
-    std::condition_variable condition;
+	// synchronization
+	std::mutex queue_mutex;
+	std::condition_variable condition;
 	std::mutex result_mutex;
 
-    bool stopped = false;
+	bool stopped = false;
 };
- 
+
 // the constructor just launches some amount of workers
 inline ThreadPool::ThreadPool(unsigned int threads)
 {
@@ -176,9 +176,9 @@ inline ThreadPool::ThreadPool(unsigned int threads)
 				{
 					std::unique_lock<std::mutex> lock(queue_mutex);
 					condition.wait(lock,
-						[this] ()
+						[this]()
 					{
-						return stopped || !tasks.empty(); 
+						return stopped || !tasks.empty();
 					});
 					if (stopped && tasks.empty())
 						return;
@@ -189,7 +189,7 @@ inline ThreadPool::ThreadPool(unsigned int threads)
 			}
 		});
 		thread_utils::setThreadName(&worker, string_utils::format("Worker_Thread_%d", i));
-        workers.emplace_back(std::move(worker));
+		workers.emplace_back(std::move(worker));
 	}
 }
 
@@ -197,31 +197,31 @@ inline ThreadPool::ThreadPool(unsigned int threads)
 // add new work item to the pool
 template<class F, class C, class... Args>
 inline auto ThreadPool::enqueue_with_callback(F&& f, C&& callback, Args&&... args)
-    -> std::shared_ptr<Task<typename std::result_of<F(Args...)>::type, C>>
+-> std::shared_ptr<Task<typename std::result_of<F(Args...)>::type, C>>
 {
 	Expects(!stopped);
 
-    using return_type = typename std::result_of<F(Args...)>::type;
+	using return_type = typename std::result_of<F(Args...)>::type;
 
-    auto task = std::make_shared< std::packaged_task<return_type()> >
+	auto task = std::make_shared< std::packaged_task<return_type()> >
 		(
-            std::bind(std::forward<F>(f), std::forward<Args>(args)...)
-        );
-        
-    std::shared_future<return_type> res = task->get_future();
-    {
-        std::unique_lock<std::mutex> lock(queue_mutex);
-        tasks.emplace([task](){ (*task)(); });
-    }
+			std::bind(std::forward<F>(f), std::forward<Args>(args)...)
+			);
+
+	std::shared_future<return_type> res = task->get_future();
+	{
+		std::unique_lock<std::mutex> lock(queue_mutex);
+		tasks.emplace([task]() { (*task)(); });
+	}
 	auto sharedFutureWrapper = std::make_shared<Task<return_type, C>>(res, std::forward<C>(callback));
 	{
 		std::unique_lock<std::mutex> lock(result_mutex);
 		results.push_back(sharedFutureWrapper);
 	}
 
-    condition.notify_one();
+	condition.notify_one();
 
-    return sharedFutureWrapper;
+	return sharedFutureWrapper;
 }
 
 inline ThreadPool::~ThreadPool()

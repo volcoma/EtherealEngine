@@ -7,17 +7,32 @@
 struct ITexture
 {
 	REFLECTABLE(ITexture)
-
-	virtual ~ITexture() {}
+	virtual ~ITexture() = default;
 };
 
 
 struct Texture : public ITexture
 {
 	REFLECTABLE(Texture, ITexture)
-	Texture()
-	{
-	}
+
+	//-----------------------------------------------------------------------------
+	//  Name : Texture ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	Texture() = default;
+	
+	//-----------------------------------------------------------------------------
+	//  Name : Texture ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	Texture(const gfx::Memory* _mem
 		, std::uint32_t _flags = BGFX_TEXTURE_NONE
 		, std::uint8_t _skip = 0
@@ -191,8 +206,12 @@ struct Texture : public ITexture
 		, const gfx::Memory* _mem = nullptr
 	);
 
-	gfx::TextureHandle handle = { gfx::invalidHandle };
+	/// Texture detail info.
 	gfx::TextureInfo info;
+	/// Creation flags.
 	std::uint32_t flags = BGFX_TEXTURE_NONE;
+	/// Back buffer ratio if any.
 	gfx::BackbufferRatio::Enum ratio = gfx::BackbufferRatio::Count;
+	/// Internal handle
+	gfx::TextureHandle handle = { gfx::invalidHandle };
 };

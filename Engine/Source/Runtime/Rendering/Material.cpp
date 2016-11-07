@@ -43,7 +43,7 @@ std::uint64_t Material::getRenderStates(bool applyCull, bool depthWrite, bool de
 
 	if (depthTest)
 		states |= BGFX_STATE_DEPTH_TEST_LESS;
-	
+
 	if (applyCull)
 	{
 		auto cullType = getCullType();
@@ -52,7 +52,7 @@ std::uint64_t Material::getRenderStates(bool applyCull, bool depthWrite, bool de
 		if (cullType == CullType::ClockWise)
 			states |= BGFX_STATE_CULL_CW;
 	}
-	
+
 	return states;
 }
 

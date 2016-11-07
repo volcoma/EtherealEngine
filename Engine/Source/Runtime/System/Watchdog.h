@@ -248,7 +248,7 @@ protected:
 					}
 				}
 			}
-			
+
 		}
 		return pathFilter;
 	}

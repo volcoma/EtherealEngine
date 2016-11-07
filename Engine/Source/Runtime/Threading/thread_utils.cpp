@@ -18,10 +18,10 @@ typedef struct tagTHREADNAME_INFO
 #endif
 namespace thread_utils
 {
-void setThreadName(std::thread* thread, const std::string& threadName)
-{
-	$windows(
-		DWORD dwThreadID = ::GetThreadId( static_cast<HANDLE>(thread->native_handle() ) );
+	void setThreadName(std::thread* thread, const std::string& threadName)
+	{
+		$windows(
+			DWORD dwThreadID = ::GetThreadId(static_cast<HANDLE>(thread->native_handle()));
 		const DWORD MS_VC_EXCEPTION = 0x406D1388;
 
 		THREADNAME_INFO info;
@@ -37,9 +37,9 @@ void setThreadName(std::thread* thread, const std::string& threadName)
 		__except (EXCEPTION_EXECUTE_HANDLER)
 		{
 		}
-	)
-	$welse(
-		pthread_setname_np(thread->native_handle(), threadName.c_str());
-	)
-}
+		)
+			$welse(
+				pthread_setname_np(thread->native_handle(), threadName.c_str());
+		)
+	}
 }

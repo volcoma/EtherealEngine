@@ -4,13 +4,11 @@
 #include "Core/math/math_includes.h"
 #include <vector>
 
-
 #include "Core/reflection/rttr/rttr_enable.h"
 #include "Core/serialization/serialization.h"
 
 struct Program;
 struct Texture;
-
 
 enum class CullType : std::uint32_t
 {
@@ -23,8 +21,8 @@ class Material
 {
 public:
 	REFLECTABLE(Material)
-	SERIALIZABLE(Material)
-	Material();
+		SERIALIZABLE(Material)
+		Material();
 	virtual ~Material();
 	bool isValid() const { return !!mProgram; }
 
@@ -54,9 +52,9 @@ class StandardMaterial : public Material
 {
 public:
 	REFLECTABLE(StandardMaterial, Material)
-	SERIALIZABLE(StandardMaterial)
+		SERIALIZABLE(StandardMaterial)
 
-	StandardMaterial();
+		StandardMaterial();
 	const math::color& getBaseColor() const { return mBaseColor; }
 	void setBaseColor(const math::color& val) { mBaseColor = val; }
 	const math::color& getSpecularColor() const { return mSpecularColor; }

@@ -32,7 +32,7 @@ public:
 	///
 	////////////////////////////////////////////////////////////
 	event<void(RenderWindow&)> onClosed;
-	
+
 	inline std::shared_ptr<RenderView> getRenderView() { return mView; }
 	inline std::shared_ptr<RenderView> getRenderView() const { return mView; }
 
@@ -60,14 +60,14 @@ protected:
 	///
 	////////////////////////////////////////////////////////////
 	virtual bool filterEvent(const sf::Event& event);
-    ////////////////////////////////////////////////////////////
-    /// \brief Function called after the window has been resized
-    ///
-    /// This function is called so that derived classes can
-    /// perform custom actions when the size of the window changes.
-    ///
-    ////////////////////////////////////////////////////////////
-    virtual void onResize();
+	////////////////////////////////////////////////////////////
+	/// \brief Function called after the window has been resized
+	///
+	/// This function is called so that derived classes can
+	/// perform custom actions when the size of the window changes.
+	///
+	////////////////////////////////////////////////////////////
+	virtual void onResize();
 
 	////////////////////////////////////////////////////////////
 	/// \brief Function called after the window has been closed
@@ -79,5 +79,5 @@ protected:
 	virtual void onClose();
 
 	InputContext mInputManager;
-	std::shared_ptr<RenderView> mView;	
+	std::shared_ptr<RenderView> mView;
 };
