@@ -9,11 +9,11 @@
 struct TextureAttachment
 {
 	//!< Texture handle.
-	std::shared_ptr<Texture> texture; 
+	std::shared_ptr<Texture> texture;
 	//!< Mip level.
-	uint16_t mip = 0; 
+	uint16_t mip = 0;
 	//!< Cubemap side or depth layer/slice.
-	uint16_t layer = 0;       
+	uint16_t layer = 0;
 };
 
 class RenderView
@@ -28,23 +28,23 @@ public:
 		void setSize(gfx::BackbufferRatio::Enum ratio);
 		uSize getSize() const;
 		void populate(
-			std::uint16_t _width, 
-			std::uint16_t _height, 
-			gfx::TextureFormat::Enum _format, 
+			std::uint16_t _width,
+			std::uint16_t _height,
+			gfx::TextureFormat::Enum _format,
 			std::uint32_t _textureFlags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP
 		);
 		void populate(
-			gfx::BackbufferRatio::Enum _ratio, 
-			gfx::TextureFormat::Enum _format, 
+			gfx::BackbufferRatio::Enum _ratio,
+			gfx::TextureFormat::Enum _format,
 			std::uint32_t _textureFlags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP
 		);
 		void populate(const std::vector<std::shared_ptr<Texture>>& textures);
 		void populate(const std::vector<TextureAttachment>& textures);
 		void populate(
 			std::uint8_t id,
-			void* _nwh, 
-			std::uint16_t _width, 
-			std::uint16_t _height, 
+			void* _nwh,
+			std::uint16_t _width,
+			std::uint16_t _height,
 			gfx::TextureFormat::Enum _depthFormat = gfx::TextureFormat::UnknownDepth
 		);
 		inline std::shared_ptr<FrameBuffer> getBuffer() const { return mBuffer; }
@@ -62,7 +62,7 @@ public:
 	{}
 
 	~RenderView();
-	
+
 	//-----------------------------------------------------------------------------
 	//  Name : clear ()
 	/// <summary>
@@ -155,7 +155,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	
+
 
 private:
 	static std::uint8_t generateId();

@@ -46,5 +46,6 @@ struct VertexBuffer
 		, const gfx::VertexDecl& _decl
 		, std::uint16_t _flags = BGFX_BUFFER_NONE);
 
+	/// Internal handle
 	gfx::VertexBufferHandle handle = { gfx::invalidHandle };
 };

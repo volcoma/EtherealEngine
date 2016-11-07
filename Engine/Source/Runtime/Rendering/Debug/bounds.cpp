@@ -132,12 +132,12 @@ uint32_t aabbOverlapTest(const Aabb& _aabb0, const Aabb& _aabb1)
 	const uint32_t gtMaxZ = _aabb0.m_min[2] > _aabb1.m_max[2];
 
 	return 0
-		| (ltMinX<<0)
-		| (gtMaxX<<1)
-		| (ltMinY<<2)
-		| (gtMaxY<<3)
-		| (ltMinZ<<4)
-		| (gtMaxZ<<5)
+		| (ltMinX << 0)
+		| (gtMaxX << 1)
+		| (ltMinY << 2)
+		| (gtMaxY << 3)
+		| (ltMinZ << 4)
+		| (gtMaxZ << 5)
 		;
 }
 
@@ -150,7 +150,7 @@ void calcObb(Obb& _obb, const void* _vertices, uint32_t _numVertices, uint32_t _
 	Obb best;
 	aabbToObb(best, aabb);
 
-	float angleStep = float(math::half_pi<float>()/_steps);
+	float angleStep = float(math::half_pi<float>() / _steps);
 	float ax = 0.0f;
 	math::mat4 mtx;
 
@@ -184,7 +184,7 @@ void calcObb(Obb& _obb, const void* _vertices, uint32_t _numVertices, uint32_t _
 		ax += angleStep;
 	}
 
-	memcpy(&_obb, &best, sizeof(Obb) );
+	memcpy(&_obb, &best, sizeof(Obb));
 }
 
 void calcMaxBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _numVertices, uint32_t _stride)
@@ -226,7 +226,7 @@ void calcMinBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _num
 	math::vec3 position = *(math::vec3*)&vertex[0];
 	center = position;
 
-	position = *(math::vec3*)&vertex[1*_stride];
+	position = *(math::vec3*)&vertex[1 * _stride];
 	center[0] += position[0];
 	center[1] += position[1];
 	center[2] += position[2];
@@ -247,7 +247,7 @@ void calcMinBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _num
 	{
 		;
 		done = true;
-		for (uint32_t ii = 0, index = math::linearRand<std::uint32_t>(0, _numVertices); ii < _numVertices; ++ii, index = (index + 1)%_numVertices)
+		for (uint32_t ii = 0, index = math::linearRand<std::uint32_t>(0, _numVertices); ii < _numVertices; ++ii, index = (index + 1) % _numVertices)
 		{
 			position = *(math::vec3*)&vertex[index*_stride];
 
@@ -278,13 +278,13 @@ void calcMinBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _num
 void calcPlaneUv(const Plane& _plane, math::vec3& _udir, math::vec3& _vdir)
 {
 	const uint8_t axis =
-		   math::abs(_plane.m_normal[0]) > 0.6f ? 0
+		math::abs(_plane.m_normal[0]) > 0.6f ? 0
 		: (math::abs(_plane.m_normal[1]) > 0.6f ? 1
-		:                                             2
-		);
-	const uint8_t* index  = (uint8_t*)&"\x1\x2\x0\x2\x0\x1"[axis*2];
-	const uint8_t idx0 = *(index  );
-	const uint8_t idx1 = *(index+1);
+			: 2
+			);
+	const uint8_t* index = (uint8_t*)&"\x1\x2\x0\x2\x0\x1"[axis * 2];
+	const uint8_t idx0 = *(index);
+	const uint8_t idx1 = *(index + 1);
 
 	_udir[0] = 0.0f;
 	_udir[1] = 0.0f;
@@ -300,69 +300,69 @@ void calcPlaneUv(const Plane& _plane, math::vec3& _udir, math::vec3& _vdir)
 
 	_udir[axis] -= math::dot(_udir, _plane.m_normal) * invPlaneAxis;
 	_udir = math::normalize(_udir);
-	
+
 	_vdir[axis] -= math::dot(_vdir, _plane.m_normal) * invPlaneAxis;
 	_vdir = math::normalize(_vdir);
 }
 
 void buildFrustumPlanes(Plane* _result, const float* _viewProj)
 {
-	const float xw = _viewProj[ 3];
-	const float yw = _viewProj[ 7];
+	const float xw = _viewProj[3];
+	const float yw = _viewProj[7];
 	const float zw = _viewProj[11];
 	const float ww = _viewProj[15];
 
-	const float xz = _viewProj[ 2];
-	const float yz = _viewProj[ 6];
+	const float xz = _viewProj[2];
+	const float yz = _viewProj[6];
 	const float zz = _viewProj[10];
 	const float wz = _viewProj[14];
 
-	Plane& near   = _result[0];
-	Plane& far    = _result[1];
-	Plane& left   = _result[2];
-	Plane& right  = _result[3];
-	Plane& top    = _result[4];
+	Plane& near = _result[0];
+	Plane& far = _result[1];
+	Plane& left = _result[2];
+	Plane& right = _result[3];
+	Plane& top = _result[4];
 	Plane& bottom = _result[5];
 
 	near.m_normal[0] = xw - xz;
 	near.m_normal[1] = yw - yz;
 	near.m_normal[2] = zw - zz;
-	near.m_dist      = ww - wz;
+	near.m_dist = ww - wz;
 
 	far.m_normal[0] = xw + xz;
 	far.m_normal[1] = yw + yz;
 	far.m_normal[2] = zw + zz;
-	far.m_dist      = ww + wz;
+	far.m_dist = ww + wz;
 
-	const float xx = _viewProj[ 0];
-	const float yx = _viewProj[ 4];
-	const float zx = _viewProj[ 8];
+	const float xx = _viewProj[0];
+	const float yx = _viewProj[4];
+	const float zx = _viewProj[8];
 	const float wx = _viewProj[12];
 
 	left.m_normal[0] = xw - xx;
 	left.m_normal[1] = yw - yx;
 	left.m_normal[2] = zw - zx;
-	left.m_dist      = ww - wx;
+	left.m_dist = ww - wx;
 
 	right.m_normal[0] = xw + xx;
 	right.m_normal[1] = yw + yx;
 	right.m_normal[2] = zw + zx;
-	right.m_dist      = ww + wx;
+	right.m_dist = ww + wx;
 
-	const float xy = _viewProj[ 1];
-	const float yy = _viewProj[ 5];
-	const float zy = _viewProj[ 9];
+	const float xy = _viewProj[1];
+	const float yy = _viewProj[5];
+	const float zy = _viewProj[9];
 	const float wy = _viewProj[13];
 
 	top.m_normal[0] = xw + xy;
 	top.m_normal[1] = yw + yy;
 	top.m_normal[2] = zw + zy;
-	top.m_dist      = ww + wy;
+	top.m_dist = ww + wy;
 
 	bottom.m_normal[0] = xw - xy;
 	bottom.m_normal[1] = yw - yy;
 	bottom.m_normal[2] = zw - zy;
-	bottom.m_dist      = ww - wy;
+	bottom.m_dist = ww - wy;
 
 	Plane* plane = _result;
 	for (uint32_t ii = 0; ii < 6; ++ii)
