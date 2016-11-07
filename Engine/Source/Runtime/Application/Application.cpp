@@ -26,7 +26,7 @@ struct GfxCallback : public gfx::CallbackI
 	}
 
 	virtual void traceVargs(const char* _filePath, std::uint16_t _line, const char* _format, std::va_list _argList) BX_OVERRIDE
-	{		
+	{
 		auto logger = logging::get("Log");
 		logger->trace() << string_utils::format(_format, _argList).c_str();
 	}
@@ -72,15 +72,10 @@ struct GfxCallback : public gfx::CallbackI
 
 };
 static GfxCallback sGfxCallback;
-//-----------------------------------------------------------------------------
-//  Name : Application () (Constructor)
-/// <summary>
-/// Application Class Constructor
-/// </summary>
-//-----------------------------------------------------------------------------
+
 Application::Application()
 {
-    // Set members to sensible defaults
+	// Set members to sensible defaults
 	mWorld = std::make_unique<World>();
 	mAssetManager = std::make_unique<AssetManager>();
 	mTimer = std::make_unique<Timer>();
@@ -88,12 +83,6 @@ Application::Application()
 	mActionMapper = std::make_unique<ActionMapper>();
 }
 
-//-----------------------------------------------------------------------------
-//  Name : ~Application () (Destructor)
-/// <summary>
-/// Application Class Destructor
-/// </summary>
-//-----------------------------------------------------------------------------
 Application::~Application()
 {
 }
@@ -113,13 +102,7 @@ RenderWindow& Application::getMainWindow()
 	Expects(!mWindows.empty()) return *(mWindows[0].get());
 }
 
-//-----------------------------------------------------------------------------
-//  Name : initInstance ()
-/// <summary>
-/// Initializes the entire engine here.
-/// </summary>
-//-----------------------------------------------------------------------------
-bool Application::initInstance(const std::string& rootDataDir, const std::string& strCmdLine )
+bool Application::initInstance(const std::string& rootDataDir, const std::string& strCmdLine)
 {
 	setRootDataPath(rootDataDir);
 
@@ -131,8 +114,8 @@ bool Application::initInstance(const std::string& rootDataDir, const std::string
 	// Create and initialize the input mappings
 	if (!initInputMappings()) { shutDown(); return false; }
 
-    // Create and initialize the primary display device
-    if (!initDisplay()) { shutDown(); return false; }
+	// Create and initialize the primary display device
+	if (!initDisplay()) { shutDown(); return false; }
 
 	// Create and initialize the logging system
 	if (!initAssetManager()) { shutDown(); return false; }
@@ -140,22 +123,13 @@ bool Application::initInstance(const std::string& rootDataDir, const std::string
 	// Create and initialize the systems
 	if (!initSystems()) { shutDown(); return false; }
 
-    // Initialize the application systems
-    if (!initApplication()) { shutDown(); return false; }
+	// Initialize the application systems
+	if (!initApplication()) { shutDown(); return false; }
 
-    // Success!
-    return true;
+	// Success!
+	return true;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : setRootDataPath ()
-/// <summary>
-/// Set the path that represents the root from which all data will be loaded
-/// or leave blank to use the process current directory. The information
-/// provided via this method only takes effect during a subsequent call to 
-/// 'initInstance()' and cannot be used to make changes after the fact.
-/// </summary>
-//-----------------------------------------------------------------------------
 void Application::setRootDataPath(const std::string & path)
 {
 	mRootDataDir = path;
@@ -164,45 +138,27 @@ void Application::setRootDataPath(const std::string & path)
 	fs::setRootDirectory(mRootDataDir);
 }
 
-//-----------------------------------------------------------------------------
-//  Name : setCopyrightData ()
-/// <summary>
-/// Set the application copyright information as it should be displayed to the
-/// user where applicable.
-/// </summary>
-//-----------------------------------------------------------------------------
-void Application::setCopyrightData( const std::string & copyright )
+void Application::setCopyrightData(const std::string & copyright)
 {
-    mCopyright = copyright;
+	mCopyright = copyright;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : setVersionData ()
-/// <summary>
-/// Set the application version information as it should be displayed to the
-/// user where applicable.
-/// </summary>
-//-----------------------------------------------------------------------------
-void Application::setVersionData( const std::string & version )
+void Application::setVersionData(const std::string & version)
 {
-    mVersion = version;
+	mVersion = version;
 }
 
-
-//-----------------------------------------------------------------------------
-//  Name : createMainWindow ()
-/// <summary>
-/// Set the application main window.
-/// </summary>
-//-----------------------------------------------------------------------------
 bool Application::registerMainWindow(RenderWindow& window)
 {
-	gfx::PlatformData pd;
-	pd.ndt = nullptr;
-	pd.nwh = window.getSystemHandle();
-	pd.context = nullptr;
-	pd.backBuffer = nullptr;
-	pd.backBufferDS = nullptr;
+	gfx::PlatformData pd
+	{
+		nullptr,
+		window.getSystemHandle(),
+		nullptr,
+		nullptr,
+		nullptr
+	};
+
 	gfx::setPlatformData(pd);
 
 	if (!gfx::init(gfx::RendererType::Count, 0, 0, &sGfxCallback))
@@ -221,13 +177,13 @@ bool Application::registerMainWindow(RenderWindow& window)
 		mRunning = false;
 	};
 
-	
+
 	auto size = window.getSize();
 
 	onResized(window, size);
 	window.onResized.addListener(onResized);
 	window.onClosed.addListener(onClosed);
-	
+
 	return true;
 }
 
@@ -247,7 +203,7 @@ void Application::registerWindow(std::shared_ptr<RenderWindow> window)
 			return false;
 		}), std::end(mWindows));
 	};
-	
+
 	window->getInput().setActionMapper(mActionMapper.get());
 	window->prepareView();
 	window->onClosed.addListener(onClosed);
@@ -293,7 +249,7 @@ bool Application::initAssetManager()
 		auto storage = manager.add<Shader>();
 		storage->loadFromFile = AssetReader::loadShaderFromFile;
 		storage->loadFromMemory = AssetReader::loadShaderFromMemory;
-		
+
 		switch (gfx::getRendererType())
 		{
 		case gfx::RendererType::Direct3D9:
@@ -351,13 +307,6 @@ bool Application::initInputMappings()
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : initDisplay ()
-/// <summary>
-/// Initialize the display driver, create device window, load
-/// render configuration etc.
-/// </summary>
-//-----------------------------------------------------------------------------
 bool Application::initDisplay()
 {
 	auto logger = logging::get("Log");
@@ -382,8 +331,8 @@ bool Application::initDisplay()
 
 	registerWindow(window);
 
-    // Success!!
-    return true;
+	// Success!!
+	return true;
 }
 
 bool Application::initSystems()
@@ -395,15 +344,8 @@ bool Application::initSystems()
 	// Success!!
 	return true;
 }
-//-----------------------------------------------------------------------------
-//  Name : initApplication ()
-/// <summary>
-/// Initialize all required aspects of the application ready for us to begin.
-/// This includes setting up all required states that the application may enter
-/// etc.
-/// </summary>
-//-----------------------------------------------------------------------------
-bool Application::initApplication( )
+
+bool Application::initApplication()
 {
 	auto& world = getWorld();
 
@@ -411,48 +353,36 @@ bool Application::initApplication( )
 
 	ddInit(true);
 	// Success!!
-    return true;
+	return true;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : begin ()
-/// <summary>
-/// Signals the beginning of the physical post-initialization stage.
-/// From here on, the game engine has control over processing.
-/// </summary>
-//-----------------------------------------------------------------------------
-int Application::begin( )
+int Application::begin()
 {
-    // Get access to required systems
+	// Get access to required systems
 	auto logger = logging::get("Log");
-    // 'Ping' the timer for the first frame
+	// 'Ping' the timer for the first frame
 	mTimer->tick();
- 
-     // Write debug info
+
+	// Write debug info
 	logger->info() << "Entered main application processing loop.";
 
-    // Start main loop
-    while(mRunning)
-    {
-        // Advance and render frame.
-		frameAdvance( );
-    } // Until quit message is received
+	// Start main loop
+	while (mRunning)
+	{
+		// Advance and render frame.
+		frameAdvance();
+	} // Until quit message is received
 
-    return 0;
+	return 0;
 }
 
 
-//-----------------------------------------------------------------------------
-//  Name : frameAdvance ()
-/// <summary>
-/// Process the next application frame.
-/// </summary>
-//-----------------------------------------------------------------------------
-bool Application::frameAdvance( bool bRunSimulation /* = true */ )
+
+bool Application::frameAdvance(bool bRunSimulation /* = true */)
 {
-    // Advance Game Frame.
-    if ( frameBegin( bRunSimulation ) )
-    {
+	// Advance Game Frame.
+	if (frameBegin(bRunSimulation))
+	{
 		{
 			// Did we receive a message, or are we idling ?
 			// Copy window container to prevent iterator invalidation
@@ -467,21 +397,14 @@ bool Application::frameAdvance( bool bRunSimulation /* = true */ )
 		}
 
 		frameEnd();
-        return true;
-    
-    } // End if frame rendering can commence
+		return true;
 
-    return false;
+	} // End if frame rendering can commence
+
+	return false;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : shutDown ()
-/// <summary>
-/// Shuts down the game engine, and frees up all resources.
-/// Note : You must explicitly call this method PRIOR to cleaning up the
-/// engine with a call to EngineCleanup()
-/// </summary>
-//-----------------------------------------------------------------------------
+
 bool Application::shutDown()
 {
 	ddShutdown();
@@ -496,8 +419,8 @@ bool Application::shutDown()
 
 	gfx::shutdown();
 
-    // Shutdown Success
-    return true;
+	// Shutdown Success
+	return true;
 }
 
 void Application::quit()
@@ -506,56 +429,48 @@ void Application::quit()
 }
 
 
-
-//-----------------------------------------------------------------------------
-//  Name : frameBegin () (Protected, Virtual)
-/// <summary>
-/// Called to signal that we are just about to commence rendering of the
-/// current frame.
-/// </summary>
-//-----------------------------------------------------------------------------
-bool Application::frameBegin( bool bRunSimulation /* = true */ )
+bool Application::frameBegin(bool bRunSimulation /* = true */)
 {
 	// Allowing simulation to run?
-    if ( bRunSimulation )
-    {
-        // In order to help avoid input lag when VSync is enabled, it is sometimes
-        // recommended that the application cap its frame-rate manually where possible.
-        // This helps to ensure that there is a consistent delay between input polls
-        // rather than the variable time when the hardware is waiting to draw.
-        auto fCap = mMaximumFPS;
+	if (bRunSimulation)
+	{
+		// In order to help avoid input lag when VSync is enabled, it is sometimes
+		// recommended that the application cap its frame-rate manually where possible.
+		// This helps to ensure that there is a consistent delay between input polls
+		// rather than the variable time when the hardware is waiting to draw.
+		auto fCap = mMaximumFPS;
 		bool vsync = mVsync;
 		if (vsync)
 		{
-		    float fSmoothedCap = mMaximumSmoothedFPS;
-		    if ( fSmoothedCap < fCap || fCap == 0 )
+			float fSmoothedCap = mMaximumSmoothedFPS;
+			if (fSmoothedCap < fCap || fCap == 0)
 			{
-		        fCap = fSmoothedCap;
+				fCap = fSmoothedCap;
 			}
 
 		} // End if cap frame rate
 
-        // Advance timer.
-		mTimer->tick( fCap );
+		// Advance timer.
+		mTimer->tick(fCap);
 
-    } // End if bRunSimulation
-    else
-    {
-        // Do not advance simulation time.
-        auto fOldSimulationSpeed = mTimer->getSimulationSpeed();
-        mTimer->setSimulationSpeed( 0.0 );
-        mTimer->tick();
-        mTimer->setSimulationSpeed( fOldSimulationSpeed );
-    
-    } // End if !bRunSimulation
+	} // End if bRunSimulation
+	else
+	{
+		// Do not advance simulation time.
+		auto fOldSimulationSpeed = mTimer->getSimulationSpeed();
+		mTimer->setSimulationSpeed(0.0);
+		mTimer->tick();
+		mTimer->setSimulationSpeed(fOldSimulationSpeed);
+
+	} // End if !bRunSimulation
 
 	// Increment the frame counter
-	mTimer->incrementFrameCounter( );
+	mTimer->incrementFrameCounter();
 
 	mThreadPool->poll();
 
-    // Success, continue on to render
-    return true;
+	// Success, continue on to render
+	return true;
 }
 
 void Application::processWindow(RenderWindow& window)
@@ -585,19 +500,14 @@ void Application::frameWindowBegin(RenderWindow& window)
 }
 
 void Application::frameWindowUpdate(RenderWindow& window)
-{	
+{
 	window.frameUpdate(static_cast<float>(mTimer->getDeltaTime()));
 
-	if(window.hasFocus())
+	if (window.hasFocus())
 		getWorld().systems.frameUpdate(static_cast<float>(mTimer->getDeltaTime()));
 }
 
-//-----------------------------------------------------------------------------
-//  Name : onFrame () (Protected, Virtual)
-/// <summary>
-/// Actually performs the default rendering of the current frame.
-/// </summary>
-//-----------------------------------------------------------------------------
+
 void Application::frameWindowRender(RenderWindow& window)
 {
 	window.frameRender();
@@ -606,27 +516,17 @@ void Application::frameWindowRender(RenderWindow& window)
 		getWorld().systems.frameRender(static_cast<float>(mTimer->getDeltaTime()));
 }
 
-//-----------------------------------------------------------------------------
-//  Name : frameWindowEnd () (Protected, Virtual)
-/// <summary>
-/// Called to signal that we have finished rendering the current frame.
-/// </summary>
-//-----------------------------------------------------------------------------
+
 void Application::frameWindowEnd(RenderWindow& window)
 {
 	window.frameEnd();
 
 	if (window.hasFocus())
 		getWorld().systems.frameEnd(static_cast<float>(mTimer->getDeltaTime()));
-	
+
 }
 
-//-----------------------------------------------------------------------------
-//  Name : frameEnd () (Protected, Virtual)
-/// <summary>
-/// Called to signal that we have finished rendering the current frame.
-/// </summary>
-//-----------------------------------------------------------------------------
+
 void Application::frameEnd()
 {
 	Expects(RenderView::getStack().empty());
@@ -635,6 +535,6 @@ void Application::frameEnd()
 	// Advance to next frame. Rendering thread will be kicked to
 	// process submitted rendering primitives.
 	mRenderFrame = gfx::frame();
-	
+
 	mPendingClosureWindows.clear();
 }
