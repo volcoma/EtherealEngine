@@ -13,14 +13,14 @@
 #include "deps/Dependencies.h"
 #include "config.h"
 
-namespace entityx 
+namespace entityx
 {
 
 	/**
 	 * A convenience class for instantiating an EventManager, EntityManager and
 	 * SystemManager.
 	 */
-	class EntityX 
+	class EntityX
 	{
 	public:
 		EntityX() : entities(events), systems(entities, events) {}

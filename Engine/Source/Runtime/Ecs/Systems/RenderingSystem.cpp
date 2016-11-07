@@ -12,7 +12,7 @@
 #include "../../Rendering/Texture.h"
 #include "../../Rendering/Material.h"
 
-void updateLodData(RenderingSystem::LodData& lodData, std::size_t totalLods, float minDist, float maxDist, float transTime, float distanceToCamera, float dt)
+void updateLodData(LodData& lodData, std::size_t totalLods, float minDist, float maxDist, float transTime, float distanceToCamera, float dt)
 {
 	totalLods -= 1;
 	if (totalLods < 0)
@@ -43,7 +43,7 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 		auto renderView = cameraComponent.getRenderView();
 		auto camera = cameraComponent.getCamera();
 		auto& cameraLods = mLodDataMap[ce];
-		ScopedRenderView pushView(renderView);
+		RenderViewRAII pushView(renderView);
 		renderView->clear();
 
 		gfx::setViewTransform(renderView->getId(), &camera->getView(), &camera->getProj());
@@ -154,4 +154,9 @@ void RenderingSystem::receive(const EntityDestroyedEvent &event)
 	{
 		pair.second.erase(event.entity);
 	}
+}
+
+void RenderingSystem::configure(EventManager &events)
+{
+	events.subscribe<EntityDestroyedEvent>(*this);
 }

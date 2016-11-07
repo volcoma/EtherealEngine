@@ -3,19 +3,14 @@
 ////////////////////////////////////////////////////////////
 #include "RenderWindow.h"
 #include "RenderView.h"
-////////////////////////////////////////////////////////////
 
-
-////////////////////////////////////////////////////////////
 void RenderWindow::onResize()
 {
 	prepareView();
 	auto size = getSize();
-
 	onResized(*this, size);
 }
 
-////////////////////////////////////////////////////////////
 void RenderWindow::onClose()
 {
 	onClosed(*this);
@@ -37,8 +32,7 @@ RenderWindow::~RenderWindow()
 
 bool RenderWindow::filterEvent(const sf::Event& event)
 {
-	mInputManager.handleEvent(event);
-
+	mInput.handleEvent(event);
 	return sf::Window::filterEvent(event);;
 }
 
@@ -47,17 +41,15 @@ void RenderWindow::frameBegin()
 	auto view = getRenderView();
 	RenderView::pushView(view);
 	view->clear();
-	mInputManager.update();
+	mInput.update();
 }
 
 void RenderWindow::frameUpdate(float dt)
 {
-
 }
 
 void RenderWindow::frameEnd()
 {
-
 	RenderView::popView();
 }
 

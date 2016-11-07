@@ -51,7 +51,7 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 	const auto viewProj = proj * view;
 	const auto cameraPos = camera->getPosition();
 
-	ScopedRenderView pushView(renderView);
+	RenderViewRAII pushView(renderView);
 	const auto viewId = renderView->getId();
 	gfx::setViewTransform(viewId, &view, &proj);
 

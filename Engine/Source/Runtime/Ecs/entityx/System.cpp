@@ -10,7 +10,8 @@
 
 #include "System.h"
 
-namespace entityx {
+namespace entityx
+{
 
 	BaseSystem::Family BaseSystem::family_counter_;
 
@@ -53,7 +54,7 @@ namespace entityx {
 	}
 
 
-	void SystemManager::configure() 
+	void SystemManager::configure()
 	{
 		for (auto &pair : systems_)
 		{

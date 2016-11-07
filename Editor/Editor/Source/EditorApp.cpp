@@ -149,6 +149,14 @@ bool EditorApp::initDocks()
 	return true;
 }
 
+bool EditorApp::initEditState()
+{
+	auto& manager = getAssetManager();
+	mEditState.loadIcons(manager);
+
+	return true;
+}
+
 bool EditorApp::frameBegin(bool runSimulation /*= true*/)
 {
 	gui::begin();
@@ -192,16 +200,14 @@ bool EditorApp::initSystems()
 	return true;
 }
 
-
 bool EditorApp::initApplication()
 {
-	// Create and initialize the UI
 	if (!initUI()) { shutDown(); return false; }
+
 	if (!initDocks()) { shutDown(); return false; }
 
-	auto& manager = getAssetManager();
-	getEditState().loadIcons(manager);
-
+	if (!initEditState()) { shutDown(); return false; }
+	
 	return Application::initApplication();
 }
 
@@ -211,7 +217,7 @@ bool EditorApp::shutDown()
 	
 	gui::shutdown();
 
-	getEditState().clear();
+	mEditState.clear();
 
 	return Application::shutDown();
 }

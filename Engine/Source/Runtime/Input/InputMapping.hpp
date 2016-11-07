@@ -50,16 +50,33 @@ template<typename T>
 class InputMapper
 {
 public:
-	~InputMapper() {}
+	~InputMapper() = default;
 
+	//-----------------------------------------------------------------------------
+	//  Name : map ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	void map(const std::string& action, T input)
 	{
 		bindings[input].push_back(action);
 	}
 
+	//-----------------------------------------------------------------------------
+	//  Name : getMapping (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	virtual Mapping getMapping(const sf::Event& e) = 0;
 
 protected:
+	/// mappings
 	std::unordered_map<T, std::vector<std::string>> bindings;
 };
 

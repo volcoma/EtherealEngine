@@ -10,7 +10,6 @@
 
 #pragma once
 
-
 #include <cstdint>
 #include <unordered_map>
 #include <utility>
@@ -21,17 +20,13 @@
 #include "help/NonCopyable.h"
 
 
-namespace entityx 
+namespace entityx
 {
-
-
 	class SystemManager;
-
-
 	/**
 	 * Base System class. Generally should not be directly used, instead see System<Derived>.
 	 */
-	class BaseSystem : entityx::help::NonCopyable 
+	class BaseSystem : entityx::help::NonCopyable
 	{
 	public:
 		typedef size_t Family;
@@ -79,7 +74,7 @@ namespace entityx
 	 * }
 	 */
 	template <typename Derived>
-	class System : public BaseSystem 
+	class System : public BaseSystem
 	{
 	public:
 		virtual ~System() {}
@@ -92,7 +87,7 @@ namespace entityx
 	private:
 		friend class SystemManager;
 
-		static Family family() 
+		static Family family()
 		{
 			static Family family = family_counter_++;
 			return family;
@@ -100,7 +95,7 @@ namespace entityx
 	};
 
 
-	class SystemManager : entityx::help::NonCopyable 
+	class SystemManager : entityx::help::NonCopyable
 	{
 	public:
 		SystemManager(EntityManager &entity_manager,
@@ -118,7 +113,7 @@ namespace entityx
 		 * system.add(movement);
 		 */
 		template <typename S>
-		void add(std::shared_ptr<S> system) 
+		void add(std::shared_ptr<S> system)
 		{
 			systems_.insert(std::make_pair(S::family(), system));
 		}
@@ -160,7 +155,7 @@ namespace entityx
 		 * Call the System::update() method for a registered system.
 		 */
 		template <typename S>
-		void update(TimeDelta dt) 
+		void update(TimeDelta dt)
 		{
 			assert(initialized_ && "SystemManager::configure() not called");
 			std::shared_ptr<S> s = system<S>();

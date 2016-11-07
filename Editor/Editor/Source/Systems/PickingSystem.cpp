@@ -144,7 +144,7 @@ void PickingSystem::frameRender(ecs::EntityManager &entities, ecs::EventManager 
 	auto viewId = mRenderView->getId();
 	{
 		// View rect and transforms for picking pass
-		ScopedRenderView pushView(mRenderView);
+		RenderViewRAII pushView(mRenderView);
 		gfx::setViewTransform(viewId, &pickView, &pickProj);
 
 		entities.each<TransformComponent, ModelComponent>([this, viewId, camera, dt](
@@ -268,7 +268,7 @@ void PickingSystem::frameRender(ecs::EntityManager &entities, ecs::EventManager 
 	{
 		auto& surface = mRenderView->getRenderSurface();
 		// Blit and read
-		gfx::blit(0, mBlitTex->handle, 0, 0, surface.getBuffer()->handle);
+		gfx::blit(0, mBlitTex->handle, 0, 0, surface.getBufferRaw()->handle);
 		mReading = gfx::readTexture(mBlitTex->handle, mBlitData);
 	}
 

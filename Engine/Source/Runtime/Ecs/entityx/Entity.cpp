@@ -11,10 +11,9 @@
 #include <algorithm>
 #include "Entity.h"
 #include "Component.h"
-namespace entityx {
-
+namespace entityx
+{
 	const Entity::Id Entity::INVALID;
-
 
 	void Entity::setName(std::string name)
 	{
@@ -49,7 +48,7 @@ namespace entityx {
 		invalidate();
 	}
 
-	std::bitset<entityx::MAX_COMPONENTS> Entity::component_mask() const 
+	std::bitset<entityx::MAX_COMPONENTS> Entity::component_mask() const
 	{
 		return manager_->component_mask(id_);
 	}
@@ -73,12 +72,12 @@ namespace entityx {
 		return mEntityNames[id.id()];
 	}
 
-	void EntityManager::reset() 
+	void EntityManager::reset()
 	{
 		for (Entity entity : entities_for_debugging()) entity.destroy();
 		for (ComponentStorage *pool : component_pools_)
 		{
-			if (pool) 
+			if (pool)
 				delete pool;
 		}
 		component_pools_.clear();
@@ -189,7 +188,7 @@ namespace entityx {
 		entity_component_mask_[index].reset();
 		entity_version_[index]++;
 		free_list_.push_back(index);
-		
+
 	}
 
 	entityx::Entity EntityManager::create_from_copy(Entity original)

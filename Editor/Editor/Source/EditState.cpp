@@ -3,8 +3,8 @@
 #include "Runtime/Rendering/Texture.h"
 #include "Runtime/Rendering/Mesh.h"
 #include "Runtime/Rendering/Material.h"
-#include "EditorApp.h"
 #include "Runtime/System/SFML/Window.hpp"
+
 void EditState::clear()
 {
 	selected = {};

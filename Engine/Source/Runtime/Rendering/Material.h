@@ -118,74 +118,332 @@ class StandardMaterial : public Material
 {
 public:
 	REFLECTABLE(StandardMaterial, Material)
-		SERIALIZABLE(StandardMaterial)
+	SERIALIZABLE(StandardMaterial)
 
-		StandardMaterial();
-	const math::color& getBaseColor() const { return mBaseColor; }
-	void setBaseColor(const math::color& val) { mBaseColor = val; }
-	const math::color& getSpecularColor() const { return mSpecularColor; }
-	void setSpecularColor(const math::color& val) { mSpecularColor = val; }
-	const math::color& getEmissiveColor() const { return mEmissiveColor; }
-	void setEmissiveColor(const math::color& val) { mEmissiveColor = val; }
-	float getRoughness() const { return mSurfaceData.x; }
-	void setRoughness(float rougness) { mSurfaceData.x = rougness; }
-	float getMetalness() const { return mSurfaceData.y; }
-	void setMetalness(float metalness) { mSurfaceData.y = metalness; }
-	float getBumpiness() const { return mSurfaceData.z; }
-	void setBumpiness(float bumpiness) { mSurfaceData.z = bumpiness; }
-	float getAlphaTestValue() const { return mSurfaceData.w; }
-	void setAlphaTestValue(float alphaTestValue) { mSurfaceData.w = alphaTestValue; }
-	const math::vec4& getTiling() const { return mTiling; }
-	void setTiling(const math::vec4& tiling) { mTiling = tiling; }
-	const math::vec2& getDitherThreshold() const { return mDitherThreshold; }
-	void setDitherThreshold(const math::vec2& threshold) { mDitherThreshold = threshold; }
+	//-----------------------------------------------------------------------------
+	//  Name : StandardMaterial ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	StandardMaterial();
 
-	AssetHandle<Texture> getAlbedoTexture() const { return mAlbedo; }
-	void setAlbedoTexture(AssetHandle<Texture> val) { mAlbedo = val; }
-	AssetHandle<Texture> getNormalTexture() const { return mNormal; }
-	void setNormalTexture(AssetHandle<Texture> val) { mNormal = val; }
-	AssetHandle<Texture> getRoughnessTexture() const { return mRoughness; }
-	void setRoughnessTexture(AssetHandle<Texture> val) { mRoughness = val; }
-	AssetHandle<Texture> getMetalnessTexture() const { return mMetalness; }
-	void setMetalnessTexture(AssetHandle<Texture> val) { mMetalness = val; }
+	//-----------------------------------------------------------------------------
+	//  Name : getBaseColor ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline const math::color& getBaseColor() const { return mBaseColor; }
 
+	//-----------------------------------------------------------------------------
+	//  Name : setBaseColor ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline void setBaseColor(const math::color& val) { mBaseColor = val; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : getSpecularColor ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline const math::color& getSpecularColor() const { return mSpecularColor; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : setSpecularColor ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline void setSpecularColor(const math::color& val) { mSpecularColor = val; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : getEmissiveColor ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline const math::color& getEmissiveColor() const { return mEmissiveColor; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : setEmissiveColor ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline void setEmissiveColor(const math::color& val) { mEmissiveColor = val; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : getRoughness ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline float getRoughness() const { return mSurfaceData.x; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : setRoughness ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline void setRoughness(float rougness) { mSurfaceData.x = rougness; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : getMetalness ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline float getMetalness() const { return mSurfaceData.y; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : setMetalness ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline void setMetalness(float metalness) { mSurfaceData.y = metalness; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : getBumpiness ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline float getBumpiness() const { return mSurfaceData.z; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : setBumpiness ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline void setBumpiness(float bumpiness) { mSurfaceData.z = bumpiness; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : getAlphaTestValue ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline float getAlphaTestValue() const { return mSurfaceData.w; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : setAlphaTestValue ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline void setAlphaTestValue(float alphaTestValue) { mSurfaceData.w = alphaTestValue; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : getTiling ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline const math::vec4& getTiling() const { return mTiling; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : setTiling ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline void setTiling(const math::vec4& tiling) { mTiling = tiling; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : getDitherThreshold ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline const math::vec2& getDitherThreshold() const { return mDitherThreshold; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : setDitherThreshold ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline void setDitherThreshold(const math::vec2& threshold) { mDitherThreshold = threshold; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : getAlbedoTexture ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline AssetHandle<Texture> getAlbedoTexture() const { return mAlbedo; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : setAlbedoTexture ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline void setAlbedoTexture(AssetHandle<Texture> val) { mAlbedo = val; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : getNormalTexture ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline AssetHandle<Texture> getNormalTexture() const { return mNormal; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : setNormalTexture ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline void setNormalTexture(AssetHandle<Texture> val) { mNormal = val; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : getRoughnessTexture ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline AssetHandle<Texture> getRoughnessTexture() const { return mRoughness; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : setRoughnessTexture ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline void setRoughnessTexture(AssetHandle<Texture> val) { mRoughness = val; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : getMetalnessTexture ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline AssetHandle<Texture> getMetalnessTexture() const { return mMetalness; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : setMetalnessTexture ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline void setMetalnessTexture(AssetHandle<Texture> val) { mMetalness = val; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : submit (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	virtual void submit();
 private:
+	/// Base color
 	math::color mBaseColor
 	{
-		1.0f, 1.0f, 1.0f, // Color
-		1.0f // Opacity
+		1.0f, 1.0f, 1.0f, /// Color
+		1.0f /// Opacity
 	};
+	/// Specular color
 	math::color mSpecularColor
 	{
-		0.5f, 0.5f, 0.5f, // Color
-		1.0f // Unused
+		0.5f, 0.5f, 0.5f, /// Color
+		1.0f /// Unused
 	};
+	/// Emissive color
 	math::color mEmissiveColor
 	{
-		0.0f, 0.0f, 0.0f, // Color
-		0.0f // HDR Scale
+		0.0f, 0.0f, 0.0f, /// Color
+		0.0f /// HDR Scale
 	};
+	/// Surface data
 	math::vec4 mSurfaceData
 	{
-		0.5f, // Roughness
-		0.0f, // Metalness
-		1.0f, // Bumpiness
-		0.25f  // AlphaTestValue
+		0.5f, /// Roughness
+		0.0f, /// Metalness
+		1.0f, /// Bumpiness
+		0.25f /// AlphaTestValue
 	};
+	/// Tiling data
 	math::vec4 mTiling
 	{
-		1.0f, 1.0f, //Primary
-		1.0f, 1.0f	//Secondary
+		1.0f, 1.0f, ///Primary
+		1.0f, 1.0f  ///Secondary
 	};
+	/// Dithering data
 	math::vec2 mDitherThreshold
 	{
-		0.5f, //Alpha threshold
-		0.5f  //Distance threshold
+		0.5f, ///Alpha threshold
+		0.5f  ///Distance threshold
 	};
-
+	/// Albedo map
 	AssetHandle<Texture> mAlbedo;
+	/// Normal map
 	AssetHandle<Texture> mNormal;
+	/// Roughness map
 	AssetHandle<Texture> mRoughness;
+	/// Metalness map
 	AssetHandle<Texture> mMetalness;
 };

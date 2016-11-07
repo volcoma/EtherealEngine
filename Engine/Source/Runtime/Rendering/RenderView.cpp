@@ -107,9 +107,9 @@ void RenderView::setView(std::shared_ptr<RenderView> view)
 		std::uint16_t(size.height)
 	);
 	auto& surface = view->getRenderSurface();
-	if (surface.getBuffer()->isValid())
+	if (surface.getBufferRaw()->isValid())
 	{
-		gfx::setViewFrameBuffer(view->mId, surface.getBuffer()->handle);
+		gfx::setViewFrameBuffer(view->mId, surface.getBufferRaw()->handle);
 		gfx::touch(view->mId);
 	}
 }
@@ -224,12 +224,12 @@ void RenderView::RenderSurface::setSize(gfx::BackbufferRatio::Enum ratio)
 {
 	mRatio = ratio;
 }
-ScopedRenderView::ScopedRenderView(std::shared_ptr<RenderView> renderView)
+RenderViewRAII::RenderViewRAII(std::shared_ptr<RenderView> renderView)
 {
 	RenderView::pushView(renderView);
 }
 
-ScopedRenderView::~ScopedRenderView()
+RenderViewRAII::~RenderViewRAII()
 {
 	RenderView::popView();
 }

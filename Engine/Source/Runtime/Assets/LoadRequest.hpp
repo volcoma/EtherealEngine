@@ -10,6 +10,14 @@
 template<typename T>
 struct LoadRequest
 {
+	//-----------------------------------------------------------------------------
+	//  Name : then ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	void then(std::function<void(AssetHandle<T>)> callback)
 	{
 		if (isReady())
@@ -18,11 +26,27 @@ struct LoadRequest
 			callbacks.addListener(callback);
 	}
 
+	//-----------------------------------------------------------------------------
+	//  Name : isReady ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	bool isReady() const
 	{
 		return !!asset.link->asset;
 	}
 
+	//-----------------------------------------------------------------------------
+	//  Name : waitUntilReady ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	void waitUntilReady()
 	{
 		if (loadTask)
@@ -34,24 +58,51 @@ struct LoadRequest
 		}
 	}
 
+	//-----------------------------------------------------------------------------
+	//  Name : setTask ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	void setTask(std::shared_ptr<ITask> task)
 	{
 		loadTask = task;
 	}
 
+	//-----------------------------------------------------------------------------
+	//  Name : setData ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	void setData(const std::string& id, std::shared_ptr<T> data)
 	{
 		asset.link->id = id;
 		asset.link->asset = data;
 	}
 
+	//-----------------------------------------------------------------------------
+	//  Name : invokeCallbacks ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	void invokeCallbacks()
 	{
 		callbacks(asset);
 		callbacks = {};
 	}
 
+	/// Requested asset
 	AssetHandle<T> asset;
-	event<void(AssetHandle<T>)> callbacks;
+	/// Associated task with this request
 	std::shared_ptr<ITask> loadTask;
+	/// Subscribed callbacks
+	event<void(AssetHandle<T>)> callbacks;
 };

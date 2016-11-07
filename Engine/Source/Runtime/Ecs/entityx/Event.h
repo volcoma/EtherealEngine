@@ -21,11 +21,8 @@
 #include "3rdparty/simplesignal.h"
 #include "help/NonCopyable.h"
 
-
-namespace entityx 
+namespace entityx
 {
-
-
 	/// Used internally by the EventManager.
 	class BaseEvent
 	{
@@ -65,12 +62,12 @@ namespace entityx
 	};
 
 
-	class BaseReceiver 
+	class BaseReceiver
 	{
 	public:
 		virtual ~BaseReceiver()
 		{
-			for (auto connection : connections_) 
+			for (auto connection : connections_)
 			{
 				auto &ptr = connection.second.first;
 				if (!ptr.expired())
@@ -81,7 +78,7 @@ namespace entityx
 		}
 
 		// Return number of signals connected to this receiver.
-		std::size_t connected_signals() const 
+		std::size_t connected_signals() const
 		{
 			std::size_t size = 0;
 			for (auto connection : connections_)
@@ -113,7 +110,7 @@ namespace entityx
 	 *
 	 * Subscriptions are automatically removed when receivers are destroyed..
 	 */
-	class EventManager : entityx::help::NonCopyable 
+	class EventManager : entityx::help::NonCopyable
 	{
 	public:
 		EventManager();
@@ -160,7 +157,7 @@ namespace entityx
 			auto pair = base.connections_[Event<E>::family()];
 			auto connection = pair.second;
 			auto &ptr = pair.first;
-			if (!ptr.expired()) 
+			if (!ptr.expired())
 			{
 				ptr.lock()->disconnect(connection);
 			}
@@ -168,7 +165,7 @@ namespace entityx
 		}
 
 		template <typename E>
-		void emit(const E &event) 
+		void emit(const E &event)
 		{
 			auto sig = signal_for(Event<E>::family());
 			sig->emit(&event);
@@ -226,7 +223,7 @@ namespace entityx
 
 		// Functor used as an event signal callback that casts to E.
 		template <typename E>
-		struct EventCallbackWrapper 
+		struct EventCallbackWrapper
 		{
 			explicit EventCallbackWrapper(std::function<void(const E &)> callback) : callback(callback) {}
 			void operator()(const void *event) { callback(*(static_cast<const E*>(event))); }

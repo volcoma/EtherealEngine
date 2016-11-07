@@ -3,7 +3,6 @@
 
 namespace misc
 {
-
 	namespace
 	{
 
