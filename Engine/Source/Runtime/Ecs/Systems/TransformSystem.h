@@ -10,7 +10,7 @@ class TransformSystem : public System<TransformSystem>
 public:
 	virtual void frameBegin(EntityManager &entities, EventManager &events, TimeDelta dt);
 
-	const std::vector<ComponentHandle<TransformComponent>>& getRoots() const { return mRoots;}
+	const std::vector<ComponentHandle<TransformComponent>>& getRoots() const { return mRoots; }
 private:
 	std::vector<ComponentHandle<TransformComponent>> mRoots;
 };

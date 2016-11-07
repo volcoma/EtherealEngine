@@ -36,7 +36,7 @@ void updateLodData(RenderingSystem::LodData& lodData, std::size_t totalLods, flo
 void RenderingSystem::frameRender(EntityManager &entities, EventManager &events, TimeDelta dt)
 {
 	entities.each<CameraComponent>([this, &entities, dt](
-		Entity ce, 
+		Entity ce,
 		CameraComponent& cameraComponent
 		)
 	{
@@ -57,10 +57,10 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 			const auto& model = modelComponent.getModel();
 			if (!model.isValid())
 				return;
-			
+
 			const auto& worldTransform = transformComponent.getTransform();
-			const auto clip_planes = math::vec2(camera->getNearClip(), camera->getFarClip());	
-			
+			const auto clip_planes = math::vec2(camera->getNearClip(), camera->getFarClip());
+
 			auto& lodData = cameraLods[e];
 			const auto transitionTime = model.getTransitionTime();
 			const auto minDistance = model.getMinDistance();
@@ -69,7 +69,7 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 			const auto currentTime = lodData.currentTime;
 			const auto currentLodIndex = lodData.currentLodIndex;
 			const auto targetLodIndex = lodData.targetLodIndex;
-			
+
 			auto material = model.getMaterialForGroup({});
 			if (!material)
 				return;
@@ -82,7 +82,7 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 
 			const auto& frustum = camera->getFrustum();
 			const auto& bounds = hMeshCurr->aabb;
-		
+
 			float t = 0;
 			const auto rayOrigin = camera->getPosition();
 			const auto invWorld = math::inverse(worldTransform);
@@ -108,7 +108,7 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 			// Test the bounding box of the mesh
 			if (!math::frustum::testOBB(frustum, bounds, worldTransform))
 				return;
-	
+
 			const auto params = math::vec3{
 				0.0f,
 				-1.0f,
@@ -120,7 +120,7 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 				1.0f,
 				currentTime / transitionTime
 			};
-			
+
 			program->setUniform("u_camera_wpos", &camera->getPosition());
 			program->setUniform("u_camera_clip_planes", &clip_planes);
 			program->setUniform("u_lod_params", &params);

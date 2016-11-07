@@ -43,48 +43,43 @@ struct ActionMapper
 class InputContext
 {
 public:
-	InputContext								();
-	~InputContext								() {}
+	InputContext();
+	~InputContext() {}
 
-	void			setActionMapper				(ActionMapper* actionMapper);
-	void			update						();
-	void			handleEvent					(const sf::Event& event);
+	void setActionMapper(ActionMapper* actionMapper);
+	void update();
+	void handleEvent(const sf::Event& event);
 
-	bool			isKeyPressed				(sf::Keyboard::Key key);
-	bool			isKeyDown					(sf::Keyboard::Key key);
-	bool			isKeyReleased				(sf::Keyboard::Key key);
+	bool isKeyPressed(sf::Keyboard::Key key);
+	bool isKeyDown(sf::Keyboard::Key key);
+	bool isKeyReleased(sf::Keyboard::Key key);
 
-	bool			mouseMoved					();
-	const iPoint&	getMouseCurrentPosition		();
-	const iPoint&	getMousePreviousPosition	();
-	bool			isMouseButtonPressed		(sf::Mouse::Button button);
-	bool			isMouseButtonDown			(sf::Mouse::Button button);
-	bool			isMouseButtonReleased		(sf::Mouse::Button button);
-	bool			mouseWheelScrolled			();
-	float			getMouseWheelScrollDelta	();
+	bool mouseMoved();
+	const iPoint& getMouseCurrentPosition();
+	const iPoint& getMousePreviousPosition();
+	bool isMouseButtonPressed(sf::Mouse::Button button);
+	bool isMouseButtonDown(sf::Mouse::Button button);
+	bool isMouseButtonReleased(sf::Mouse::Button button);
+	bool mouseWheelScrolled();
+	float getMouseWheelScrollDelta();
 
-	bool			isJoystickConnected			(unsigned int joystickId);
-	bool			isJoystickActive			(unsigned int joystickId);
-	bool			isJoystickDisconnected		(unsigned int joystickId);
-	bool			isJoystickButtonPressed		(unsigned int joystickId, unsigned int button);
-	bool			isJoystickButtonDown		(unsigned int joystickId, unsigned int button);
-	bool			isJoystickButtonReleased	(unsigned int joystickId, unsigned int button);
-	float			getJoystickAxisPosition		(unsigned int joystickId, sf::Joystick::Axis axis);
+	bool isJoystickConnected(unsigned int joystickId);
+	bool isJoystickActive(unsigned int joystickId);
+	bool isJoystickDisconnected(unsigned int joystickId);
+	bool isJoystickButtonPressed(unsigned int joystickId, unsigned int button);
+	bool isJoystickButtonDown(unsigned int joystickId, unsigned int button);
+	bool isJoystickButtonReleased(unsigned int joystickId, unsigned int button);
+	float getJoystickAxisPosition(unsigned int joystickId, sf::Joystick::Axis axis);
 
 private:
-	void			keyUpdate					();
-	bool			keyEvent					(const sf::Event& event);
+	void keyUpdate();
+	bool keyEvent(const sf::Event& event);
+	void mouseUpdate();
+	bool mouseEvent(const sf::Event& event);
+	void joystickUpdate();
+	bool joystickEvent(const sf::Event& event);
 
-
-	void			mouseUpdate					();
-	bool			mouseEvent					(const sf::Event& event);
-
-
-
-	void			joystickUpdate				();
-	bool			joystickEvent				(const sf::Event& event);
-
-	// non_owning
+	/// non_owning
 	ActionMapper*	mActionMapper = nullptr;
 
 	bool			mMouseMoveEvent = false;

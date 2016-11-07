@@ -2,7 +2,6 @@
 #include "../Components/TransformComponent.h"
 #include "../Components/CameraComponent.h"
 
-
 void CameraSystem::frameBegin(ecs::EntityManager &entities, ecs::EventManager &events, ecs::TimeDelta dt)
 {
 

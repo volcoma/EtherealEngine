@@ -73,12 +73,12 @@ struct KeyboardMapper : public InputMapper<sf::Keyboard::Key>
 			binds.actions = bindings[e.key.code];
 			binds.type = ActionType::Pressed;
 		}
-		if ( e.type == sf::Event::EventType::KeyReleased)
+		if (e.type == sf::Event::EventType::KeyReleased)
 		{
 			binds.actions = bindings[e.key.code];
 			binds.type = ActionType::Released;
 		}
- 		return binds;
+		return binds;
 	}
 
 };

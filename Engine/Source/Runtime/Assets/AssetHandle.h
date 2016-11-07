@@ -50,7 +50,7 @@ struct AssetHandle
 	AssetHandle & operator=(const AssetHandle & handle)
 	{
 		// Share the specified handle's data pointer
-		if(link != handle.link)
+		if (link != handle.link)
 			link = handle.link;
 
 		return *this;

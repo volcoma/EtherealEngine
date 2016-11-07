@@ -33,7 +33,7 @@ struct LoadRequest
 			threadPool.poll(loadTask);
 		}
 	}
-	
+
 	void setTask(std::shared_ptr<ITask> task)
 	{
 		loadTask = task;

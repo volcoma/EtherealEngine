@@ -129,7 +129,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	ProjectionMode getProjectionMode() const;
-	
+
 	//-----------------------------------------------------------------------------
 	//  Name : getCamera ()
 	/// <summary>
@@ -225,8 +225,10 @@ private:
 	//-------------------------------------------------------------------------
 	// Private Member Variables.
 	//-------------------------------------------------------------------------
-	// the camera object this component represents
+	/// The camera object this component represents
 	std::unique_ptr<Camera> mCamera;
+	/// The render view of this camera
 	std::shared_ptr<RenderView> mRenderView;
+	/// Is the camera HDR?
 	bool mHDR = true;
 };

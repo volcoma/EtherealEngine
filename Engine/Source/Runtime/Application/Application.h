@@ -176,7 +176,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	inline const std::vector<std::shared_ptr<RenderWindow>>& getWindows() const { return mWindows; }
-	
+
 	//-------------------------------------------------------------------------
 	// Public Virtual Methods
 	//-------------------------------------------------------------------------
@@ -187,7 +187,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	virtual bool initInstance(const std::string& rootDataDir, const std::string& commandLine);
-	
+
 	//-----------------------------------------------------------------------------
 	//  Name : begin ()
 	/// <summary>
@@ -373,23 +373,38 @@ protected:
 	//-------------------------------------------------------------------------
 	// Protected Member Variables
 	//-------------------------------------------------------------------------
+	/// Application Version Information
 	std::string mVersion;
-	std::string mCopyright;					// Cached copyright string retrieved from resource string table.
-	std::string mRootDataDir;				// The root data directory used by the file system.
-	std::vector<std::shared_ptr<RenderWindow>> mWindows;					// Collection of application windows.
+	/// Cached copyright string retrieved from resource string table.
+	std::string mCopyright;
+	/// The root data directory used by the file system.
+	std::string mRootDataDir;
+	/// Collection of application windows.
+	std::vector<std::shared_ptr<RenderWindow>> mWindows;
+	/// Collection of application windows that are pending closure.
 	std::vector<std::shared_ptr<RenderWindow>> mPendingClosureWindows;
-	std::shared_ptr<RenderWindow> mWindow;					// Currently processed window.
-
-	// Configuration
-	bool mVsync = false;			// 
-	float mMaximumFPS = 0;			// Maximum frame rate cap (0 = disabled)
-	float mMaximumSmoothedFPS = 59.0f;// Maximum frame rate to attempt to smooth VSync input lag.
+	/// Currently processed window.
+	std::shared_ptr<RenderWindow> mWindow;
+	/// Is V-sync enabled?
+	bool mVsync = false;
+	/// Maximum frame rate cap (0 = disabled)
+	float mMaximumFPS = 0;
+	/// Maximum frame rate to attempt to smooth VSync input lag.
+	float mMaximumSmoothedFPS = 59.0f;
+	/// Is timer smoothing enabled?
 	bool mTimerSmoothing = false;
+	/// Is Application running?
 	bool mRunning = true;
+	/// Current render frame.
 	std::uint32_t mRenderFrame = 0;
+	/// The Application's World containing the ECS
 	std::unique_ptr<World> mWorld;
+	/// The Application's Asset Manager
 	std::unique_ptr<AssetManager> mAssetManager;
+	/// The Application's Timer
 	std::unique_ptr<Timer> mTimer;
+	/// The Application's ThreadPool
 	std::unique_ptr<ThreadPool>	mThreadPool;
+	/// The Application's ActionMapper
 	std::unique_ptr<ActionMapper> mActionMapper;
 };

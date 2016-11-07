@@ -27,7 +27,7 @@ using namespace entityx;
 class TagsComponent : public Component
 {
 	COMPONENT(TagsComponent)
-	REFLECTABLE(TagsComponent, Component)
+		REFLECTABLE(TagsComponent, Component)
 public:
 	/**
 	 * Construct a new TagsComponent with the given tags.

@@ -1,11 +1,9 @@
 #pragma once
 
 #include "../entityx/System.h"
-
 #include <vector>
+
 using namespace entityx;
-
-
 
 class RenderingSystem : public System<RenderingSystem>, public Receiver<System<RenderingSystem>>
 {
@@ -24,6 +22,6 @@ public:
 		float currentTime = 0.0f;
 	};
 private:
-	
+
 	std::unordered_map<Entity, std::unordered_map<Entity, LodData>> mLodDataMap;
 };

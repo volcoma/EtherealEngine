@@ -16,7 +16,7 @@ Camera::Camera()
 	mFarClip = 1000.0f;
 	mProjectionWindow = { 0, 0, 0, 0 };
 	mZoomFactor = 1.0f;
-	
+
 	// Reset / Clear all required values
 	mAspectRatio = 1.0f;
 
@@ -59,7 +59,7 @@ void Camera::setViewportSize(const uSize& viewportSize)
 {
 	mViewportSize = viewportSize;
 	setAspectRatio(float(viewportSize.width) / float(viewportSize.height));
-	const fRect rect = 
+	const fRect rect =
 	{
 		-(float)viewportSize.width / 2.0f,
 		(float)viewportSize.height / 2.0f,
@@ -151,20 +151,20 @@ void Camera::setProjectionMode(ProjectionMode Mode)
 /// Set the near plane distance
 /// </summary>
 //-----------------------------------------------------------------------------
-void Camera::setNearClip( float fDistance )
+void Camera::setNearClip(float fDistance)
 {
-    // Skip if this is a no-op
-    if ( fDistance == mNearClip )
-        return;
+	// Skip if this is a no-op
+	if (fDistance == mNearClip)
+		return;
 
-    // Store value
-    mNearClip = fDistance;
+	// Store value
+	mNearClip = fDistance;
 
 	onModified();
 
-    // Make sure near clip is less than the far clip
-    if ( mNearClip > mFarClip )
-        setFarClip( mNearClip );
+	// Make sure near clip is less than the far clip
+	if (mNearClip > mFarClip)
+		setFarClip(mNearClip);
 }
 
 //-----------------------------------------------------------------------------
@@ -173,20 +173,20 @@ void Camera::setNearClip( float fDistance )
 /// Set the far plane distance
 /// </summary>
 //-----------------------------------------------------------------------------
-void Camera::setFarClip( float fDistance )
+void Camera::setFarClip(float fDistance)
 {
-    // Skip if this is a no-op
-    if ( fDistance == mFarClip )
-        return;
+	// Skip if this is a no-op
+	if (fDistance == mFarClip)
+		return;
 
-    // Store value
-    mFarClip = fDistance;
+	// Store value
+	mFarClip = fDistance;
 
 	onModified();
 
-    // Make sure near clip is less than the far clip
-    if ( mNearClip > mFarClip )
-        setNearClip( mFarClip );
+	// Make sure near clip is less than the far clip
+	if (mNearClip > mFarClip)
+		setNearClip(mFarClip);
 }
 
 //-----------------------------------------------------------------------------
@@ -345,8 +345,8 @@ const math::transform & Camera::getProj()
 			// Generate the updated perspective projection matrix
 			float fFOVRadians = math::radians<float>(getFOV());
 			mProj = math::perspective(fFOVRadians, mAspectRatio, getNearClip(), getFarClip());
- 			mProj[2][0] += mAAData.z;
- 			mProj[2][1] += mAAData.w;
+			mProj[2][0] += mAAData.z;
+			mProj[2][1] += mAAData.w;
 			// Matrix has been updated
 			mProjectionDirty = false;
 			mAspectDirty = false;
@@ -371,8 +371,8 @@ const math::transform & Camera::getProj()
 			float fZoom = getZoomFactor();
 			const auto& rect = getProjectionWindow();
 			mProj = math::ortho(rect.left * fZoom, rect.right * fZoom, rect.bottom * fZoom, rect.top * fZoom, getNearClip(), getFarClip());
- 			mProj[2][0] += mAAData.z;
- 			mProj[2][1] += mAAData.w;
+			mProj[2][0] += mAAData.z;
+			mProj[2][1] += mAAData.w;
 			// Matrix has been updated
 			mProjectionDirty = false;
 			mAspectDirty = false;
@@ -876,7 +876,7 @@ const math::transform & Camera::getPreviousProj() const
 // Name : setJitterAA ()
 // Desc : Sets the current jitter value for temporal anti-aliasing
 //-----------------------------------------------------------------------------
-void Camera::setAAData(const uSize& viewportSize, std::uint32_t currentSubpixelIndex, std::uint32_t temporalAASamples )
+void Camera::setAAData(const uSize& viewportSize, std::uint32_t currentSubpixelIndex, std::uint32_t temporalAASamples)
 {
 	if (temporalAASamples > 1)
 	{
@@ -941,7 +941,7 @@ void Camera::setAAData(const uSize& viewportSize, std::uint32_t currentSubpixelI
 		float fHeight = static_cast<float>(viewportSize.height);
 		mAAData.z *= (2.0f / fWidth);
 		mAAData.w *= (2.0f / fHeight);
-		
+
 	}
 	else
 	{

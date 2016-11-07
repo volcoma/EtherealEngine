@@ -1,11 +1,11 @@
 #include "TransformComponent.h"
-#include <algorithm>
-
 #include "../../Application/Application.h"
 #include "../../System/Singleton.h"
 #include "../World.h"
 #include "Core/logging/logging.h"
-ComponentHandle<TransformComponent> createFromComponent(ComponentHandle<TransformComponent> component)
+#include <algorithm>
+
+HTransformComponent createFromComponent(HTransformComponent component)
 {
 	if (!component.expired())
 	{
@@ -15,14 +15,9 @@ ComponentHandle<TransformComponent> createFromComponent(ComponentHandle<Transfor
 		return entity.component<TransformComponent>();
 	}
 	logging::get("Log")->error("trying to clone a null component");
-	return ComponentHandle<TransformComponent>();
+	return HTransformComponent();
 }
-//-----------------------------------------------------------------------------
-//  Name : TransformComponent () (Constructor)
-/// <TransformComponent>
-/// Entity Class Constructor.
-/// </summary>
-//-----------------------------------------------------------------------------
+
 TransformComponent::TransformComponent()
 {
 }
@@ -43,46 +38,34 @@ TransformComponent::TransformComponent(const TransformComponent& rhs)
 	mSlowParentingSpeed = rhs.mSlowParentingSpeed;
 }
 
-
 void TransformComponent::onEntitySet()
 {
-// 	if (!mParent.expired())
-// 	{
-// 		mParent.lock()->attachChild(makeHandle());
-// 	}
+	// 	if (!mParent.expired())
+	// 	{
+	// 		mParent.lock()->attachChild(makeHandle());
+	// 	}
 
 	for (auto& child : mChildren)
 	{
 		child.lock()->mParent = makeHandle();
 	}
 }
-//-----------------------------------------------------------------------------
-//  Name : TransformComponent () (Destructor)
-/// <summary>
-/// TransformComponent Class Destructor.
-/// </summary>
-//-----------------------------------------------------------------------------
+
 TransformComponent::~TransformComponent()
 {
 	if (!mParent.expired())
 	{
-		if(getEntity())
+		if (getEntity())
 			mParent.lock()->removeChild(makeHandle());
 	}
 	for (auto& child : mChildren)
 	{
-		if(!child.expired())
+		if (!child.expired())
 			child.lock()->getEntity().destroy();
 	}
 
 }
 
-//-----------------------------------------------------------------------------
-//  Name : move()
-/// <summary>
-/// Move the current position of the node by the specified amount.
-/// </summary>
-//-----------------------------------------------------------------------------
 TransformComponent& TransformComponent::move(const math::vec3 & amount)
 {
 	math::vec3 vNewPos = getPosition();
@@ -96,13 +79,6 @@ TransformComponent& TransformComponent::move(const math::vec3 & amount)
 	return *this;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : moveLocal()
-/// <summary>
-/// Move the current position of the node by the specified amount relative to
-/// its own local axes.
-/// </summary>
-//-----------------------------------------------------------------------------
 TransformComponent& TransformComponent::moveLocal(const math::vec3 & amount)
 {
 	math::vec3 vNewPos = getLocalPosition();
@@ -116,15 +92,6 @@ TransformComponent& TransformComponent::moveLocal(const math::vec3 & amount)
 	return *this;
 }
 
-
-//-----------------------------------------------------------------------------
-//  Name : setPosition()
-/// <summary>
-/// Set the current world space position of the node.
-/// Note : This bypasses the physics system, so should really only be used
-/// for initialization purposes.
-/// </summary>
-//-----------------------------------------------------------------------------
 TransformComponent& TransformComponent::setLocalPosition(const math::vec3 & position)
 {
 	// Set new cell relative position
@@ -133,14 +100,6 @@ TransformComponent& TransformComponent::setLocalPosition(const math::vec3 & posi
 	return *this;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : setPosition()
-/// <summary>
-/// Set the current world space position of the node.
-/// Note : This bypasses the physics system, so should really only be used
-/// for initialization purposes.
-/// </summary>
-//-----------------------------------------------------------------------------
 TransformComponent& TransformComponent::setPosition(const math::vec3 & position)
 {
 	// Rotate a copy of the current math::transform.
@@ -157,182 +116,80 @@ TransformComponent& TransformComponent::setPosition(const math::vec3 & position)
 	return *this;
 }
 
-
-//-----------------------------------------------------------------------------
-//  Name : getScale()
-/// <summary>
-/// Retrieve the current scale of the node along its world space axes.
-/// </summary>
-//-----------------------------------------------------------------------------
 math::vec3 TransformComponent::getLocalScale()
 {
 	return mLocalTransform.getScale();
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getPosition()
-/// <summary>
-/// Retrieve the current world space position of the node.
-/// Optionally, caller can retrieve the position at the pivot point or 
-/// otherwise.
-/// </summary>
-//-----------------------------------------------------------------------------
 const math::vec3 & TransformComponent::getLocalPosition()
 {
 	return mLocalTransform.getPosition();
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getOrientation()
-/// <summary>
-/// Retrieve the current orientation of the node in world space.
-/// Optionally, caller can retrieve the orientation at the pivot point or 
-/// otherwise.
-/// </summary>
-//-----------------------------------------------------------------------------
 math::quat TransformComponent::getLocalRotation()
 {
 	return mLocalTransform.getRotation();
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getXAxis()
-/// <summary>
-/// Retrieve the current orientation of the node in world space.
-/// Optionally, caller can retrieve the orientation at the pivot point or 
-/// otherwise.
-/// </summary>
-//-----------------------------------------------------------------------------
 math::vec3 TransformComponent::getLocalXAxis()
 {
 	return mLocalTransform.xUnitAxis();
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getYAxis()
-/// <summary>
-/// Retrieve the current orientation of the node in world space.
-/// Optionally, caller can retrieve the orientation at the pivot point or 
-/// otherwise.
-/// </summary>
-//-----------------------------------------------------------------------------
 math::vec3 TransformComponent::getLocalYAxis()
 {
 	return mLocalTransform.yUnitAxis();
 
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getZAxis()
-/// <summary>
-/// Retrieve the current orientation of the node in world space.
-/// Optionally, caller can retrieve the orientation at the pivot point or 
-/// otherwise.
-/// </summary>
-//-----------------------------------------------------------------------------
 math::vec3 TransformComponent::getLocalZAxis()
 {
 	return mLocalTransform.zUnitAxis();
 
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getPosition()
-/// <summary>
-/// Retrieve the current world space position of the node.
-/// </summary>
-//-----------------------------------------------------------------------------
 const math::vec3 & TransformComponent::getPosition()
 {
 	return getTransform().getPosition();
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getOrientation()
-/// <summary>
-/// Retrieve the current orientation of the node in world space.
-/// </summary>
-//-----------------------------------------------------------------------------
 math::quat TransformComponent::getRotation()
 {
 	return getTransform().getRotation();
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getXAxis()
-/// <summary>
-/// Retrieve the current orientation of the node in world space.
-/// </summary>
-//-----------------------------------------------------------------------------
 math::vec3 TransformComponent::getXAxis()
 {
 	return getTransform().xUnitAxis();
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getYAxis()
-/// <summary>
-/// Retrieve the current orientation of the node in world space.
-/// </summary>
-//-----------------------------------------------------------------------------
 math::vec3 TransformComponent::getYAxis()
 {
 	return getTransform().yUnitAxis();
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getZAxis()
-/// <summary>
-/// Retrieve the current orientation of the node in world space.
-/// </summary>
-//-----------------------------------------------------------------------------
 math::vec3 TransformComponent::getZAxis()
 {
 	return getTransform().zUnitAxis();
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getScale()
-/// <summary>
-/// Retrieve the current scale of the node along its world space axes.
-/// </summary>
-//-----------------------------------------------------------------------------
 math::vec3 TransformComponent::getScale()
 {
 	return getTransform().getScale();
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getTransform()
-/// <summary>
-/// Retrieve the node's current world math::transform at its pivot.
-/// </summary>
-//-----------------------------------------------------------------------------
 const math::transform & TransformComponent::getTransform()
 {
 	resolveTransform();
 	return mWorldTransform;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getLocalTransform()
-/// <summary>
-/// Retrieve the node's parent relative 'local' transformation matrix.
-/// </summary>
-//-----------------------------------------------------------------------------
 const math::transform & TransformComponent::getLocalTransform() const
 {
 	// Return reference to our internal matrix
 	return mLocalTransform;
 }
 
-
-//-----------------------------------------------------------------------------
-//  Name : lookAt()
-/// <summary>
-/// Instruct the object to look at the specified point.
-/// </summary>
-//-----------------------------------------------------------------------------
 TransformComponent& TransformComponent::lookAt(float x, float y, float z)
 {
 	//TODO("General", "These lookAt methods need to consider the pivot and the currently applied math::transform method!!!");
@@ -340,24 +197,12 @@ TransformComponent& TransformComponent::lookAt(float x, float y, float z)
 	return *this;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : lookAt()
-/// <summary>
-/// Instruct the object to look at the specified point.
-/// </summary>
-//-----------------------------------------------------------------------------
 TransformComponent& TransformComponent::lookAt(const math::vec3 & point)
 {
 	lookAt(getPosition(), point);
 	return *this;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : lookAt()
-/// <summary>
-/// Instruct the object to look at the specified point.
-/// </summary>
-//-----------------------------------------------------------------------------
 TransformComponent& TransformComponent::lookAt(const math::vec3 & eye, const math::vec3 & at)
 {
 	math::transform m;
@@ -375,13 +220,6 @@ TransformComponent& TransformComponent::lookAt(const math::vec3 & eye, const mat
 	return *this;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : lookAt()
-/// <summary>
-/// Instruct the object to look at the specified point, aligned to a
-/// prefered / specific up axis.
-/// </summary>
-//-----------------------------------------------------------------------------
 TransformComponent& TransformComponent::lookAt(const math::vec3 & eye, const math::vec3 & at, const math::vec3 & up)
 {
 	math::transform m;
@@ -399,13 +237,6 @@ TransformComponent& TransformComponent::lookAt(const math::vec3 & eye, const mat
 	return *this;
 }
 
-
-//-----------------------------------------------------------------------------
-//  Name : rotateLocal ()
-/// <summary>
-/// Rotate the node around its own local axes.
-/// </summary>
-//-----------------------------------------------------------------------------
 TransformComponent& TransformComponent::rotateLocal(float x, float y, float z)
 {
 	// Do nothing if rotation is disallowed.
@@ -421,12 +252,6 @@ TransformComponent& TransformComponent::rotateLocal(float x, float y, float z)
 	return *this;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : rotateAxis ()
-/// <summary>
-/// Rotate the node around a specified axis
-/// </summary>
-//-----------------------------------------------------------------------------
 TransformComponent& TransformComponent::rotateAxis(float degrees, const math::vec3 & axis)
 {
 	// No - op?
@@ -463,13 +288,6 @@ TransformComponent& TransformComponent::rotateAxis(float degrees, const math::ve
 	return *this;
 }
 
-
-//-----------------------------------------------------------------------------
-//  Name : rotate ()
-/// <summary>
-/// Rotate the node by the amounts specified in world space.
-/// </summary>
-//-----------------------------------------------------------------------------
 TransformComponent& TransformComponent::rotate(float x, float y, float z)
 {
 	// No - op?
@@ -507,12 +325,6 @@ TransformComponent& TransformComponent::rotate(float x, float y, float z)
 	return *this;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : rotate ()
-/// <summary>
-/// Rotate the node by the amounts specified in world space.
-/// </summary>
-//-----------------------------------------------------------------------------
 TransformComponent& TransformComponent::rotate(float x, float y, float z, const math::vec3 & center)
 {
 	// No - op?
@@ -551,13 +363,6 @@ TransformComponent& TransformComponent::rotate(float x, float y, float z, const 
 	return *this;
 }
 
-
-//-----------------------------------------------------------------------------
-//  Name : scale()
-/// <summary>
-/// Scale the node by the specified amount in world space.
-/// </summary>
-//-----------------------------------------------------------------------------
 TransformComponent& TransformComponent::setScale(const math::vec3& s)
 {
 	// If scaling is disallowed, only process position change. Otherwise
@@ -580,10 +385,6 @@ TransformComponent& TransformComponent::setScale(const math::vec3& s)
 	return *this;
 }
 
-//-----------------------------------------------------------------------------
-// Name : setLocalScale() (Virtual)
-/// <summary>Scale the node by the specified amount in "local" space.</summary>
-//-----------------------------------------------------------------------------
 TransformComponent& TransformComponent::setLocalScale(const math::vec3 & scale)
 {
 	// Do nothing if scaling is disallowed.
@@ -594,12 +395,6 @@ TransformComponent& TransformComponent::setLocalScale(const math::vec3 & scale)
 	return *this;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : setRotation ()
-/// <summary>
-/// Update the node's orientation using the quaternion provided.
-/// </summary>
-//-----------------------------------------------------------------------------
 TransformComponent& TransformComponent::setRotation(const math::quat & rotation)
 {
 	// Do nothing if rotation is disallowed.
@@ -620,13 +415,6 @@ TransformComponent& TransformComponent::setRotation(const math::quat & rotation)
 	return *this;
 }
 
-
-//-----------------------------------------------------------------------------
-//  Name : setLocalRotation ()
-/// <summary>
-/// Update the node's orientation using the quaternion provided.
-/// </summary>
-//-----------------------------------------------------------------------------
 TransformComponent& TransformComponent::setLocalRotation(const math::quat & rotation)
 {
 	// Do nothing if rotation is disallowed.
@@ -640,13 +428,6 @@ TransformComponent& TransformComponent::setLocalRotation(const math::quat & rota
 	return *this;
 }
 
-//-----------------------------------------------------------------------------
-// Name : resetOrientation() (Virtual)
-/// <summary>
-/// Simply reset the orientation of the node, maintaining the current position
-/// and scale.
-/// </summary>
-//-----------------------------------------------------------------------------
 TransformComponent& TransformComponent::resetRotation()
 {
 	// Do nothing if rotation is disallowed.
@@ -656,13 +437,6 @@ TransformComponent& TransformComponent::resetRotation()
 	return *this;
 }
 
-//-----------------------------------------------------------------------------
-// Name : resetScale() (Virtual)
-/// <summary>
-/// Simply reset the scale of the node, maintaining the current position
-/// and orientation.
-/// </summary>
-//-----------------------------------------------------------------------------
 TransformComponent& TransformComponent::resetScale()
 {
 	// Do nothing if scaling is disallowed.
@@ -673,13 +447,6 @@ TransformComponent& TransformComponent::resetScale()
 	return *this;
 }
 
-//-----------------------------------------------------------------------------
-// Name : resetOrientation() (Virtual)
-/// <summary>
-/// Simply reset the orientation of the node, maintaining the current position
-/// and scale.
-/// </summary>
-//-----------------------------------------------------------------------------
 TransformComponent& TransformComponent::resetLocalRotation()
 {
 	// Do nothing if rotation is disallowed.
@@ -691,13 +458,6 @@ TransformComponent& TransformComponent::resetLocalRotation()
 	return *this;
 }
 
-//-----------------------------------------------------------------------------
-// Name : resetScale() (Virtual)
-/// <summary>
-/// Simply reset the scale of the node, maintaining the current position
-/// and orientation.
-/// </summary>
-//-----------------------------------------------------------------------------
 TransformComponent& TransformComponent::resetLocalScale()
 {
 	// Do nothing if scaling is disallowed.
@@ -709,12 +469,6 @@ TransformComponent& TransformComponent::resetLocalScale()
 	return *this;
 }
 
-//-----------------------------------------------------------------------------
-// Name : resetPivot() (Virtual)
-/// <summary>
-/// Reset the pivot such that it sits at the origin of the object.
-/// </summary>
-//-----------------------------------------------------------------------------
 TransformComponent& TransformComponent::resetPivot()
 {
 	// Do nothing if pivot adjustment is disallowed.
@@ -724,52 +478,32 @@ TransformComponent& TransformComponent::resetPivot()
 	return *this;
 }
 
-
-//-----------------------------------------------------------------------------
-// Name : canScale ( )
-/// <summary>Determine if scaling of this node's math::transform is allowed.</summary>
-//-----------------------------------------------------------------------------
 bool TransformComponent::canScale() const
 {
 	// Default is to allow scaling.
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-// Name : canRotate ( )
-/// <summary>Determine if rotation of this node's math::transform is allowed.</summary>
-//-----------------------------------------------------------------------------
 bool TransformComponent::canRotate() const
 {
 	// Default is to allow rotation.
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-// Name : canAdjustPivot ( )
-/// <summary>
-/// Determine if separation of this node's pivot and object space is allowed.
-/// </summary>
-//-----------------------------------------------------------------------------
 bool TransformComponent::canAdjustPivot() const
 {
 	// Default is to allow pivot adjustment.
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : setParent ()
-/// <summary>
-/// Attach this node to the specified parent as a child
-/// </summary>
-//-----------------------------------------------------------------------------
-TransformComponent& TransformComponent::setParent(ComponentHandle<TransformComponent> parent)
+TransformComponent& TransformComponent::setParent(HTransformComponent parent)
 {
 	setParent(parent, true, false);
 
 	return *this;
 }
-TransformComponent& TransformComponent::setParent(ComponentHandle<TransformComponent> parent, bool worldPositionStays, bool localPositionStays)
+
+TransformComponent& TransformComponent::setParent(HTransformComponent parent, bool worldPositionStays, bool localPositionStays)
 {
 	auto parentPtr = parent.lock().get();
 	auto thisParentPtr = mParent.lock().get();
@@ -823,20 +557,20 @@ TransformComponent& TransformComponent::setParent(ComponentHandle<TransformCompo
 	return *this;
 }
 
-const ComponentHandle<TransformComponent>& TransformComponent::getParent() const
+const HTransformComponent& TransformComponent::getParent() const
 {
 	return mParent;
 }
 
-void TransformComponent::attachChild(ComponentHandle<TransformComponent> child)
+void TransformComponent::attachChild(HTransformComponent child)
 {
 	mChildren.push_back(child);
 }
 
-void TransformComponent::removeChild(ComponentHandle<TransformComponent> child)
+void TransformComponent::removeChild(HTransformComponent child)
 {
 	mChildren.erase(std::remove_if(std::begin(mChildren), std::end(mChildren),
-		[&child](ComponentHandle<TransformComponent> other) { return child.lock() == other.lock(); }
+		[&child](HTransformComponent other) { return child.lock() == other.lock(); }
 	), std::end(mChildren));
 }
 
@@ -885,7 +619,7 @@ void TransformComponent::resolveTransform(bool force, float dt)
 		{
 			auto target = mParent.lock()->getTransform() * mLocalTransform;
 
-			if(mSlowParenting)
+			if (mSlowParenting)
 			{
 				float t = math::clamp(mSlowParentingSpeed * dt, 0.0f, 1.0f);
 				mWorldTransform.setPosition(math::lerp(mWorldTransform.getPosition(), target.getPosition(), t));
@@ -895,7 +629,7 @@ void TransformComponent::resolveTransform(bool force, float dt)
 			else
 			{
 				mWorldTransform = target;
-			}	
+			}
 		}
 		else
 		{
@@ -919,7 +653,7 @@ bool TransformComponent::isDirty() const
 }
 
 
-const std::vector<ComponentHandle<TransformComponent>>& TransformComponent::getChildren() const
+const std::vector<HTransformComponent>& TransformComponent::getChildren() const
 {
 	return mChildren;
 }

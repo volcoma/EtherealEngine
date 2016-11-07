@@ -5,7 +5,7 @@
 
 World::World() : entities(events), systems(entities, events)
 {
-	
+
 }
 
 void World::reset()

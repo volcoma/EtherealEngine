@@ -11,7 +11,7 @@ REFLECT(ModelComponent)
 		(
 			rttr::policy::ctor::as_std_shared_ptr,
 			rttr::metadata("CanExecuteInEditor", true)
-		)
+			)
 		.property("Static",
 			&ModelComponent::isStatic,
 			&ModelComponent::setStatic)

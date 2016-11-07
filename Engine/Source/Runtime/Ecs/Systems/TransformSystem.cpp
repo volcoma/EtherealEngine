@@ -3,18 +3,18 @@
 
 void updateTransform(ComponentHandle<TransformComponent> hTransform, TimeDelta dt)
 {
-	auto transform = hTransform.lock();
-	if (transform)
+	auto pTransform = hTransform.lock();
+	if (pTransform)
 	{
-		transform->resolveTransform(true, dt);
+		pTransform->resolveTransform(true, dt);
 
-		auto& children = transform->getChildren();
+		auto& children = pTransform->getChildren();
 		for (auto& child : children)
 		{
 			updateTransform(child, dt);
 		}
 	}
-	
+
 
 }
 

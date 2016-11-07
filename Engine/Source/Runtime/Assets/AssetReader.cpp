@@ -73,7 +73,7 @@ void AssetReader::loadTextureFromFile(const std::string& relativeKey, const std:
 				, &height
 				, &comp
 				, 4
-				);
+			);
 
 			read_memory->clear();
 			read_memory.reset();
@@ -89,7 +89,7 @@ void AssetReader::loadTextureFromFile(const std::string& relativeKey, const std:
 					, 0
 					, gfx::copy(img, width*height * 4)
 					);
-				
+
 
 				free(img);
 
@@ -104,13 +104,13 @@ void AssetReader::loadTextureFromFile(const std::string& relativeKey, const std:
 		auto& app = Singleton<Application>::getInstance();
 		auto& threadPool = app.getThreadPool();
 		auto task = threadPool.enqueue_with_callback(
-		// load function
-		[readMemory]()
+			// load function
+			[readMemory]()
 		{
 			readMemory();
 		},
-		// callback to the issuer
-		[createResource]() mutable
+			// callback to the issuer
+			[createResource]() mutable
 		{
 			createResource();
 		});

@@ -1,14 +1,7 @@
 #include "CameraComponent.h"
 #include "../../Rendering/Camera.h"
 #include "../../Rendering/RenderView.h"
-//-----------------------------------------------------------------------------
-//  Name : CameraComponent ()
-/// <summary>
-/// 
-/// 
-/// 
-/// </summary>
-//-----------------------------------------------------------------------------
+
 CameraComponent::CameraComponent()
 {
 	mCamera = std::make_unique<Camera>();
@@ -21,7 +14,7 @@ CameraComponent::CameraComponent(const CameraComponent& cameraComponent)
 	mCamera = std::make_unique<Camera>(*cameraComponent.getCamera());
 	mHDR = cameraComponent.mHDR;
 	mRenderView = std::make_shared<RenderView>();
-	init({0, 0});
+	init({ 0, 0 });
 }
 
 void CameraComponent::init(const uSize& size)
@@ -43,12 +36,12 @@ void CameraComponent::init(const uSize& size)
 		surface.populate
 		(
 			std::vector<std::shared_ptr<Texture>>
-			{
-				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surfaceFormat, samplerFlags),
+		{
+			std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surfaceFormat, samplerFlags),
 				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surfaceFormat, samplerFlags),
 				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surfaceFormat, samplerFlags),
 				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, depthFormat, samplerFlags)
-			}
+		}
 		);
 	}
 	else
@@ -56,39 +49,23 @@ void CameraComponent::init(const uSize& size)
 		surface.populate
 		(
 			std::vector<std::shared_ptr<Texture>>
-			{
-				std::make_shared<Texture>(size.width, size.height, false, 1, surfaceFormat, samplerFlags),
+		{
+			std::make_shared<Texture>(size.width, size.height, false, 1, surfaceFormat, samplerFlags),
 				std::make_shared<Texture>(size.width, size.height, false, 1, surfaceFormat, samplerFlags),
 				std::make_shared<Texture>(size.width, size.height, false, 1, surfaceFormat, samplerFlags),
 				std::make_shared<Texture>(size.width, size.height, false, 1, depthFormat, samplerFlags)
-			}
+		}
 		);
 	}
-	
+
 
 	setProjectionWindow();
 }
 
-//-----------------------------------------------------------------------------
-//  Name : ~CameraComponent ()
-/// <summary>
-/// 
-/// 
-/// 
-/// </summary>
-//-----------------------------------------------------------------------------
 CameraComponent::~CameraComponent()
 {
 }
 
-//-----------------------------------------------------------------------------
-//  Name : update ()
-/// <summary>
-/// 
-/// 
-/// 
-/// </summary>
-//-----------------------------------------------------------------------------
 void CameraComponent::updateInternal(const math::transform& t)
 {
 	// First update so the camera can cache the previous matrices
@@ -139,27 +116,11 @@ void CameraComponent::setZoomFactor(float zoom)
 	mCamera->setZoomFactor(zoom);
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getCamera ()
-/// <summary>
-/// 
-/// 
-/// 
-/// </summary>
-//-----------------------------------------------------------------------------
 Camera* CameraComponent::getCamera() const
 {
 	return mCamera.get();
 }
 
-//-----------------------------------------------------------------------------
-//  Name : setFieldOfView ()
-/// <summary>
-/// 
-/// 
-/// 
-/// </summary>
-//-----------------------------------------------------------------------------
 CameraComponent& CameraComponent::setFieldOfView(float fovDegrees)
 {
 	mCamera->setFOV(fovDegrees);
@@ -179,7 +140,6 @@ CameraComponent& CameraComponent::setFarClip(float distance)
 
 	return *this;
 }
-
 
 CameraComponent& CameraComponent::setProjectionMode(ProjectionMode mode)
 {
@@ -213,14 +173,6 @@ ProjectionMode CameraComponent::getProjectionMode() const
 	return mCamera->getProjectionMode();
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getView() ()
-/// <summary>
-/// 
-/// 
-/// 
-/// </summary>
-//-----------------------------------------------------------------------------
 std::shared_ptr<RenderView> CameraComponent::getRenderView() const
 {
 	return mRenderView;

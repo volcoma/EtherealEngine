@@ -1,6 +1,5 @@
 #include "InputContext.h"
 
-
 InputContext::InputContext()
 {
 	auto p = sf::Mouse::getPosition();
@@ -25,7 +24,7 @@ void InputContext::update()
 
 void InputContext::handleEvent(const sf::Event& event)
 {
-	if(mActionMapper)
+	if (mActionMapper)
 		mActionMapper->handleEvent(event);
 
 	if (keyEvent(event)) return;

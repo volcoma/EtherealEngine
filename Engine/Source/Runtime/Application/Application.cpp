@@ -187,7 +187,6 @@ bool Application::registerMainWindow(RenderWindow& window)
 	return true;
 }
 
-
 void Application::registerWindow(std::shared_ptr<RenderWindow> window)
 {
 	auto onClosed = [this](RenderWindow& wnd)
@@ -240,7 +239,6 @@ bool Application::initLogging()
 
 	return true;
 }
-
 
 bool Application::initAssetManager()
 {
@@ -376,8 +374,6 @@ int Application::begin()
 	return 0;
 }
 
-
-
 bool Application::frameAdvance(bool bRunSimulation /* = true */)
 {
 	// Advance Game Frame.
@@ -404,7 +400,6 @@ bool Application::frameAdvance(bool bRunSimulation /* = true */)
 	return false;
 }
 
-
 bool Application::shutDown()
 {
 	ddShutdown();
@@ -427,7 +422,6 @@ void Application::quit()
 {
 	mRunning = false;
 }
-
 
 bool Application::frameBegin(bool bRunSimulation /* = true */)
 {
@@ -523,9 +517,7 @@ void Application::frameWindowEnd(RenderWindow& window)
 
 	if (window.hasFocus())
 		getWorld().systems.frameEnd(static_cast<float>(mTimer->getDeltaTime()));
-
 }
-
 
 void Application::frameEnd()
 {
