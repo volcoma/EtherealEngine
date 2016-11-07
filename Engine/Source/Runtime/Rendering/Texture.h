@@ -42,7 +42,7 @@ struct Texture : public ITexture
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : populate ()
+	//  Name : Texture ()
 	/// <summary>
 	/// 
 	/// 
@@ -62,7 +62,7 @@ struct Texture : public ITexture
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : populate ()
+	//  Name : Texture ()
 	/// <summary>
 	/// 
 	/// 
@@ -80,7 +80,7 @@ struct Texture : public ITexture
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : populate ()
+	//  Name : Texture ()
 	/// <summary>
 	/// 
 	/// 
@@ -99,7 +99,14 @@ struct Texture : public ITexture
 		populate(_width, _height, _depth, _hasMips, _format, _flags, _mem);
 	}
 
-
+	//-----------------------------------------------------------------------------
+	//  Name : Texture ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	Texture(std::uint16_t _size
 		, bool _hasMips
 		, std::uint16_t _numLayers
@@ -110,6 +117,7 @@ struct Texture : public ITexture
 	{
 		populate(_size, _hasMips, _numLayers, _format, _flags, _mem);
 	}
+
 	//-----------------------------------------------------------------------------
 	//  Name : ~Texture ()
 	/// <summary>
@@ -187,6 +195,14 @@ struct Texture : public ITexture
 		, std::uint32_t _flags = BGFX_TEXTURE_NONE
 	);
 
+	//-----------------------------------------------------------------------------
+	//  Name : populate ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	void populate(
 		std::uint16_t _width
 		, std::uint16_t _height
@@ -197,6 +213,14 @@ struct Texture : public ITexture
 		, const gfx::Memory* _mem = nullptr
 	);
 
+	//-----------------------------------------------------------------------------
+	//  Name : populate ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	void populate(
 		std::uint16_t _size
 		, bool _hasMips

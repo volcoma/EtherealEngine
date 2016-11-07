@@ -13,9 +13,36 @@ struct Uniform;
 
 struct Program
 {
-	Program() {}
+	//-----------------------------------------------------------------------------
+	//  Name : Program ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	Program() = default;
+	
+	//-----------------------------------------------------------------------------
+	//  Name : Program ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	Program(AssetHandle<Shader> computeShader);
+	
+	//-----------------------------------------------------------------------------
+	//  Name : Program ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	Program(AssetHandle<Shader> vertexShader, AssetHandle<Shader> fragmentShader);
+	
 	//-----------------------------------------------------------------------------
 	//  Name : ~Program ()
 	/// <summary>
@@ -49,6 +76,15 @@ struct Program
 		, FrameBuffer* _handle
 		, uint8_t _attachment = 0
 		, std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
+	
+	//-----------------------------------------------------------------------------
+	//  Name : setTexture ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	void setTexture(std::uint8_t _stage
 		, const std::string& _sampler
 		, gfx::FrameBufferHandle _handle
@@ -67,10 +103,20 @@ struct Program
 		, const std::string& _sampler
 		, Texture* _texture
 		, std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
+	
+	//-----------------------------------------------------------------------------
+	//  Name : setTexture ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	void setTexture(std::uint8_t _stage
 		, const std::string& _sampler
 		, gfx::TextureHandle _texture
 		, std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
+	
 	//-----------------------------------------------------------------------------
 	//  Name : setUniform ()
 	/// <summary>
@@ -100,9 +146,21 @@ struct Program
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void addShader(AssetHandle<Shader> shader);
+	
+	//-----------------------------------------------------------------------------
+	//  Name : populate ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	void populate();
 
-	gfx::ProgramHandle handle = { gfx::invalidHandle };
+	/// Shaders that created this program.
 	std::vector<AssetHandle<Shader>> shaders;
+	/// All uniforms for this program.
 	std::unordered_map<std::string, std::shared_ptr<Uniform>> uniforms;
+	/// Internal handle
+	gfx::ProgramHandle handle = { gfx::invalidHandle };
 };

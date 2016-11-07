@@ -1,60 +1,6 @@
 #include "Camera.h"
 #include <limits>
 
-//-----------------------------------------------------------------------------
-//  Name : Camera ()
-/// <summary>
-/// Default constructor of this class.
-/// </summary>
-//-----------------------------------------------------------------------------
-Camera::Camera()
-{
-	// Reset / Clear all required values
-	mProjectionMode = ProjectionMode::Perspective;
-	mFOV = 60.0f;
-	mNearClip = 0.1f;
-	mFarClip = 1000.0f;
-	mProjectionWindow = { 0, 0, 0, 0 };
-	mZoomFactor = 1.0f;
-
-	// Reset / Clear all required values
-	mAspectRatio = 1.0f;
-
-	// Internal features are dirty by default
-	mViewDirty = true;
-	mProjectionDirty = true;
-	mAspectDirty = true;
-	mFrustumDirty = true;
-	mFrustumLocked = false;
-	mAspectLocked = false;
-
-	// Assume no jittering initially
-	mAAData = math::vec4(0, 0, 0, 0);
-}
-
-//-----------------------------------------------------------------------------
-//  Name : ~Camera ()
-/// <summary>
-/// Destructor of this class.
-/// </summary>
-//-----------------------------------------------------------------------------
-Camera::~Camera()
-{
-}
-
-
-
-//-----------------------------------------------------------------------------
-// Name : getZoomFactor( )
-/// <summary>
-/// Get the zoom factor (scale) currently applied to any orthographic view.
-/// </summary>
-//-----------------------------------------------------------------------------
-float Camera::getZoomFactor() const
-{
-	return mZoomFactor;
-}
-
 void Camera::setViewportSize(const uSize& viewportSize)
 {
 	mViewportSize = viewportSize;
@@ -71,12 +17,6 @@ void Camera::setViewportSize(const uSize& viewportSize)
 	setZoomFactor(estimateZoomFactor(viewportSize, math::vec3{ 0.0f, 0.0f, 0.0f }));
 }
 
-//-----------------------------------------------------------------------------
-// Name : setZoomFactor( )
-/// <summary>
-/// Set the zoom factor (scale) currently applied to any orthographic view.
-/// </summary>
-//-----------------------------------------------------------------------------
 void Camera::setZoomFactor(float fZoom)
 {
 	const float MinZoomFactor = 0.0001f;
@@ -88,16 +28,9 @@ void Camera::setZoomFactor(float fZoom)
 
 	mZoomFactor = fZoom;
 
-	onModified();
+	touch();
 }
 
-
-//-----------------------------------------------------------------------------
-//  Name : setFOV ()
-/// <summary>
-/// Sets the field of view angle of this camera (perspective only).
-/// </summary>
-//-----------------------------------------------------------------------------
 void Camera::setFOV(float fFOVY)
 {
 	// Skip if no-op
@@ -107,30 +40,16 @@ void Camera::setFOV(float fFOVY)
 	// Update projection matrix and view frustum
 	mFOV = fFOVY;
 
-	onModified();
+	touch();
 }
 
-//-----------------------------------------------------------------------------
-//  Name : setProjectionWindow ()
-/// <summary>
-/// Sets offsets for the projection window (orthographic only).
-/// </summary>
-//-----------------------------------------------------------------------------
 void Camera::setProjectionWindow(const fRect& rect)
 {
 	mProjectionWindow = rect;
 
-	onModified();
+	touch();
 }
 
-
-//-----------------------------------------------------------------------------
-//  Name : setProjectionMode ()
-/// <summary>
-/// Sets the current projection mode for this camera (i.e. orthographic
-/// or perspective).
-/// </summary>
-//-----------------------------------------------------------------------------
 void Camera::setProjectionMode(ProjectionMode Mode)
 {
 	// Bail if this is a no op.
@@ -141,16 +60,9 @@ void Camera::setProjectionMode(ProjectionMode Mode)
 	// Alter the projection mode.
 	mProjectionMode = Mode;
 
-	onModified();
+	touch();
 }
 
-
-//-----------------------------------------------------------------------------
-//  Name : setNearClip ()
-/// <summary>
-/// Set the near plane distance
-/// </summary>
-//-----------------------------------------------------------------------------
 void Camera::setNearClip(float fDistance)
 {
 	// Skip if this is a no-op
@@ -160,19 +72,13 @@ void Camera::setNearClip(float fDistance)
 	// Store value
 	mNearClip = fDistance;
 
-	onModified();
+	touch();
 
 	// Make sure near clip is less than the far clip
 	if (mNearClip > mFarClip)
 		setFarClip(mNearClip);
 }
 
-//-----------------------------------------------------------------------------
-//  Name : setFarClip()
-/// <summary>
-/// Set the far plane distance
-/// </summary>
-//-----------------------------------------------------------------------------
 void Camera::setFarClip(float fDistance)
 {
 	// Skip if this is a no-op
@@ -182,75 +88,13 @@ void Camera::setFarClip(float fDistance)
 	// Store value
 	mFarClip = fDistance;
 
-	onModified();
+	touch();
 
 	// Make sure near clip is less than the far clip
 	if (mNearClip > mFarClip)
 		setNearClip(mFarClip);
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getFOV()
-/// <summary>
-/// Retrieve the current field of view angle in degrees.
-/// </summary>
-//-----------------------------------------------------------------------------
-float Camera::getFOV() const
-{
-	return mFOV;
-}
-
-//-----------------------------------------------------------------------------
-//  Name : getProjectionWindow ()
-/// <summary>
-/// Retrieve offsets for the projection window (orthographic only).
-/// </summary>
-//-----------------------------------------------------------------------------
-const fRect& Camera::getProjectionWindow() const
-{
-	return mProjectionWindow;
-}
-
-//-----------------------------------------------------------------------------
-//  Name : getNearClip()
-/// <summary>
-/// Retrieve the distance from the camera to the near clip plane.
-/// </summary>
-//-----------------------------------------------------------------------------
-float Camera::getNearClip() const
-{
-	return mNearClip;
-}
-
-//-----------------------------------------------------------------------------
-//  Name : getFarClip()
-/// <summary>
-/// Retrieve the distance from the camera to the far clip plane.
-/// </summary>
-//-----------------------------------------------------------------------------
-float Camera::getFarClip() const
-{
-	return mFarClip;
-}
-
-
-//-----------------------------------------------------------------------------
-//  Name : getProjectionMode ()
-/// <summary>
-/// Retrieve the current projection mode for this camera.
-/// </summary>
-//-----------------------------------------------------------------------------
-ProjectionMode Camera::getProjectionMode() const
-{
-	return mProjectionMode;
-}
-
-//-----------------------------------------------------------------------------
-//  Name : getLocalBoundingBox ()
-/// <summary>
-/// Retrieve the bounding box of this object.
-/// </summary>
-//-----------------------------------------------------------------------------
 math::bbox Camera::getLocalBoundingBox()
 {
 	float fNearSize = math::tan(math::radians<float>(mFOV*0.5f)) * mNearClip;
@@ -258,36 +102,6 @@ math::bbox Camera::getLocalBoundingBox()
 	return math::bbox(-fFarSize, -fFarSize, mNearClip, fFarSize, fFarSize, mFarClip);
 }
 
-//-----------------------------------------------------------------------------
-//  Name : lockFrustum ()
-/// <summary>
-/// Prevent the frustum from updating.
-/// </summary>
-//-----------------------------------------------------------------------------
-void Camera::lockFrustum(bool Locked)
-{
-	mFrustumLocked = Locked;
-}
-
-//-----------------------------------------------------------------------------
-//  Name : isFrustumLocked ()
-/// <summary>
-/// Inform the caller whether or not the frustum is currently locked
-/// This is useful as a debugging tool.
-/// </summary>
-//-----------------------------------------------------------------------------
-bool Camera::isFrustumLocked() const
-{
-	return mFrustumLocked;
-}
-
-//-----------------------------------------------------------------------------
-//  Name : setAspectRatio ()
-/// <summary>
-/// Set the aspect ratio that should be used to generate the horizontal
-/// FOV angle (perspective only).
-/// </summary>
-//-----------------------------------------------------------------------------
 void Camera::setAspectRatio(float fAspect, bool bLocked /* = false */)
 {
 	// Is this a no-op?
@@ -306,35 +120,11 @@ void Camera::setAspectRatio(float fAspect, bool bLocked /* = false */)
 	mProjectionDirty = true;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getAspectRatio()
-/// <summary>
-/// Retrieve the aspect ratio used to generate the horizontal FOV angle.
-/// </summary>
-//-----------------------------------------------------------------------------
-float Camera::getAspectRatio() const
-{
-	return mAspectRatio;
-}
-
-//-----------------------------------------------------------------------------
-//  Name : isAspectLocked()
-/// <summary>
-/// Determine if the aspect ratio is currently being updated by the
-/// render driver.
-/// </summary>
-//-----------------------------------------------------------------------------
 bool Camera::isAspectLocked() const
 {
 	return (getProjectionMode() == ProjectionMode::Orthographic || mAspectLocked);
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getProjectionMatrix ()
-/// <summary>
-/// Return the current projection matrix.
-/// </summary>
-//-----------------------------------------------------------------------------
 const math::transform & Camera::getProj()
 {
 	// Only update matrix if something has changed
@@ -385,30 +175,18 @@ const math::transform & Camera::getProj()
 	return mProj;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getViewMatrix ()
-/// <summary>
-/// Return the current view matrix.
-/// </summary>
-//-----------------------------------------------------------------------------
-const math::transform & Camera::getView()
-{
-	// Return the view matrix.
-	return mView;
-}
-
 void Camera::lookAt(const math::vec3 & vEye, const math::vec3 & vAt)
 {
 	mView.lookAt(vEye, vAt);
 
-	onModified();
+	touch();
 }
 
 void Camera::lookAt(const math::vec3 & vEye, const math::vec3 & vAt, const math::vec3 & vUp)
 {
 	mView.lookAt(vEye, vAt, vUp);
 
-	onModified();
+	touch();
 }
 
 math::vec3 Camera::getPosition() const
@@ -421,12 +199,6 @@ math::vec3 Camera::zUnitAxis() const
 	return math::inverse(mView).zUnitAxis();
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getFrustum()
-/// <summary>
-/// Retrieve the current camera object frustum.
-/// </summary>
-//-----------------------------------------------------------------------------
 const math::frustum & Camera::getFrustum()
 {
 	// Recalculate frustum if necessary
@@ -461,14 +233,6 @@ const math::frustum & Camera::getFrustum()
 	return mFrustum;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getClippingVolume()
-/// <summary>
-/// Retrieve the frustum / volume that represents the space between the camera 
-/// position and its near plane. This frustum represents the 'volume' that can 
-/// end up clipping geometry.
-/// </summary>
-//-----------------------------------------------------------------------------
 const math::frustum & Camera::getClippingVolume()
 {
 	// Reclaculate frustum if necessary
@@ -479,12 +243,6 @@ const math::frustum & Camera::getClippingVolume()
 	return mClippingVolume;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : boundsInFrustum ()
-/// <summary>
-/// Determine whether or not the AABB specified falls within the frustum.
-/// </summary>
-//-----------------------------------------------------------------------------
 math::VolumeQuery::E Camera::boundsInFrustum(const math::bbox & AABB)
 {
 	// Recompute the frustum as necessary.
@@ -494,12 +252,6 @@ math::VolumeQuery::E Camera::boundsInFrustum(const math::bbox & AABB)
 	return f.classifyAABB(AABB);
 }
 
-//-----------------------------------------------------------------------------
-//  Name : boundsInFrustum ()
-/// <summary>
-/// Determine whether or not the OOBB specified is within the frustum.
-/// </summary>
-//-----------------------------------------------------------------------------
 math::VolumeQuery::E Camera::boundsInFrustum(const math::bbox &AABB, const math::transform & t)
 {
 	// Recompute the frustum as necessary.
@@ -508,13 +260,7 @@ math::VolumeQuery::E Camera::boundsInFrustum(const math::bbox &AABB, const math:
 	// Request that frustum classifies
 	return math::frustum::classifyOBB(f, AABB, t);
 }
-//-----------------------------------------------------------------------------
-//  Name : worldToViewport()
-/// <summary>
-/// Transform a point from world space, into screen space. Returns false 
-/// if the point was clipped off the screen.
-/// </summary>
-//-----------------------------------------------------------------------------
+
 bool Camera::worldToViewport(const uSize & ViewportSize, const math::vec3 & WorldPos, math::vec3 & ViewportPos, bool bClipX /* = true */, bool bClipY /* = true */, bool bClipZ /* = true */)
 {
 	// Ensure we have an up-to-date projection and view matrix
@@ -543,13 +289,6 @@ bool Camera::worldToViewport(const uSize & ViewportSize, const math::vec3 & Worl
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : viewportToRay()
-/// <summary>
-/// Convert the specified screen position into a ray origin and direction
-/// vector, suitable for use during picking.
-/// </summary>
-//-----------------------------------------------------------------------------
 bool Camera::viewportToRay(const uSize & ViewportSize, const math::vec2 & ViewportPos, math::vec3 & vecRayStart, math::vec3 & vecRayDir)
 {
 	math::vec3 vCursor;
@@ -590,14 +329,6 @@ bool Camera::viewportToRay(const uSize & ViewportSize, const math::vec2 & Viewpo
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : viewportToWorld ()
-/// <summary>
-/// Given a view screen position (in screen space) this function will cast that 
-/// ray and return the world space position on the specified plane. The value
-/// is returned via the world parameter passed.
-/// </summary>
-//-----------------------------------------------------------------------------
 bool Camera::viewportToWorld(const uSize & ViewportSize, const math::vec2 & ViewportPos, const math::plane & Plane, math::vec3 & WorldPos)
 {
 	math::vec3 vPickRayDir, vPickRayOrig;
@@ -637,27 +368,11 @@ bool Camera::viewportToWorld(const uSize & ViewportSize, const math::vec2 & View
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : viewportToMajorAxis ()
-/// <summary>
-/// Given a view screen position (in screen space) this function will cast that 
-/// ray and return the world space intersection point on one of the major axis
-/// planes selected based on the camera look vector.
-/// </summary>
-//-----------------------------------------------------------------------------
 bool Camera::viewportToMajorAxis(const uSize & ViewportSize, const math::vec2 & ViewportPos, const math::vec3 & Origin, math::vec3 & WorldPos, math::vec3 & MajorAxis)
 {
 	return viewportToMajorAxis(ViewportSize, ViewportPos, Origin, zUnitAxis(), WorldPos, MajorAxis);
 }
 
-//-----------------------------------------------------------------------------
-//  Name : viewportToMajorAxis ()
-/// <summary>
-/// Given a view screen position (in screen space) this function will cast that 
-/// ray and return the world space intersection point on one of the major axis
-/// planes selected based on the specified normal.
-/// </summary>
-//-----------------------------------------------------------------------------
 bool Camera::viewportToMajorAxis(const uSize & ViewportSize, const math::vec2 & ViewportPos, const math::vec3 & Origin, const math::vec3 & Normal, math::vec3 & WorldPos, math::vec3 & MajorAxis)
 {
 	// First select the major axis plane based on the specified normal
@@ -689,13 +404,6 @@ bool Camera::viewportToMajorAxis(const uSize & ViewportSize, const math::vec2 & 
 	return viewportToWorld(ViewportSize, ViewportPos, p, WorldPos);
 }
 
-//-----------------------------------------------------------------------------
-//  Name : viewportToCamera ()
-/// <summary>
-/// Given a view screen position (in screen space) this function will convert
-/// the point into a camera space position at the near plane.
-/// </summary>
-//-----------------------------------------------------------------------------
 bool Camera::viewportToCamera(const uSize & ViewportSize, const math::vec3 & ViewportPos, math::vec3 & CameraPos)
 {
 	// Ensure that we have an up-to-date projection and view matrix
@@ -711,14 +419,6 @@ bool Camera::viewportToCamera(const uSize & ViewportSize, const math::vec3 & Vie
 	return true;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : estimateZoomFactor ()
-/// <summary>
-/// Given the current viewport type and projection mode, estimate the "zoom"
-/// factor that can be used for scaling various operations relative to their
-/// "scale" as it appears in the viewport.
-/// </summary>
-//-----------------------------------------------------------------------------
 float Camera::estimateZoomFactor(const uSize & ViewportSize, const math::plane & Plane)
 {
 	math::vec3 vWorld;
@@ -747,37 +447,6 @@ float Camera::estimateZoomFactor(const uSize & ViewportSize, const math::vec3 & 
 	return estimateZoomFactor(ViewportSize, WorldPos, std::numeric_limits<float>::max());
 }
 
-//-----------------------------------------------------------------------------
-// Name : estimatePickTolerance ()
-/// <summary>
-/// Estimate the distance (along each axis) from the specified object space 
-/// point to use as a tolerance for picking.
-/// </summary>
-//-----------------------------------------------------------------------------
-math::vec3 Camera::estimatePickTolerance(const uSize & ViewportSize, float WireTolerance, const math::vec3 & Pos, const math::transform & ObjectTransform)
-{
-	// Scale tolerance based on estimated world space zoom factor.
-	math::vec3 v;
-	ObjectTransform.transformCoord(v, Pos);
-	WireTolerance *= estimateZoomFactor(ViewportSize, v);
-
-	// Convert into object space tolerance.
-	math::vec3 ObjectWireTolerance;
-	math::vec3 vAxisScale = ObjectTransform.getScale();
-	ObjectWireTolerance.x = WireTolerance / vAxisScale.x;
-	ObjectWireTolerance.y = WireTolerance / vAxisScale.y;
-	ObjectWireTolerance.z = WireTolerance / vAxisScale.z;
-	return ObjectWireTolerance;
-}
-
-//-----------------------------------------------------------------------------
-//  Name : estimateZoomFactor ()
-/// <summary>
-/// Given the current viewport type and projection mode, estimate the "zoom"
-/// factor that can be used for scaling various operations relative to their
-/// "scale" as it appears in the viewport.
-/// </summary>
-//-----------------------------------------------------------------------------
 float Camera::estimateZoomFactor(const uSize & ViewportSize, const math::plane & Plane, float fMax)
 {
 	// Just return the actual zoom factor if this is orthographic
@@ -796,14 +465,6 @@ float Camera::estimateZoomFactor(const uSize & ViewportSize, const math::plane &
 	return estimateZoomFactor(ViewportSize, vWorld, fMax);
 }
 
-//-----------------------------------------------------------------------------
-// Name : estimateZoomFactor ()
-/// <summary>
-/// Given the current viewport type and projection mode, estimate the "zoom"
-/// factor that can be used for scaling various operations relative to the
-/// "scale" of an object as it appears in the viewport at the specified position.
-/// </summary>
-//-----------------------------------------------------------------------------
 float Camera::estimateZoomFactor(const uSize & ViewportSize, const math::vec3 & WorldPos, float fMax)
 {
 	// Just return the actual zoom factor if this is orthographic
@@ -821,61 +482,28 @@ float Camera::estimateZoomFactor(const uSize & ViewportSize, const math::vec3 & 
 	return std::min<float>(fMax, distance);
 }
 
-//-----------------------------------------------------------------------------
-//  Name : update ()
-/// <summary>
-/// Update the scene object.
-/// </summary>
-//-----------------------------------------------------------------------------
-void Camera::update()
+math::vec3 Camera::estimatePickTolerance(const uSize & ViewportSize, float WireTolerance, const math::vec3 & Pos, const math::transform & ObjectTransform)
 {
-	// Automatically record matrices last used in the previous frame.
-	recordCurrentMatrices();
+	// Scale tolerance based on estimated world space zoom factor.
+	math::vec3 v;
+	ObjectTransform.transformCoord(v, Pos);
+	WireTolerance *= estimateZoomFactor(ViewportSize, v);
 
+	// Convert into object space tolerance.
+	math::vec3 ObjectWireTolerance;
+	math::vec3 vAxisScale = ObjectTransform.getScale();
+	ObjectWireTolerance.x = WireTolerance / vAxisScale.x;
+	ObjectWireTolerance.y = WireTolerance / vAxisScale.y;
+	ObjectWireTolerance.z = WireTolerance / vAxisScale.z;
+	return ObjectWireTolerance;
 }
 
-//-----------------------------------------------------------------------------
-//  Name : recordCurrentMatrices ()
-/// <summary>
-/// Make a copy of the current view / projection matrices before they
-/// are changed. Useful for performing effects such as motion blur.
-/// </summary>
-//-----------------------------------------------------------------------------
 void Camera::recordCurrentMatrices()
 {
 	mPreviousView = getView();
 	mPreviousProj = getProj();
 }
 
-//-----------------------------------------------------------------------------
-//  Name : getPreviousView ()
-/// <summary>
-/// Retrieve a copy of the view matrix recorded with the most recent call
-/// to recordCurrentMatrices().
-/// </summary>
-//-----------------------------------------------------------------------------
-const math::transform & Camera::getPreviousView() const
-{
-	return mPreviousView;
-}
-
-//-----------------------------------------------------------------------------
-//  Name : getPreviousProjection ()
-/// <summary>
-/// Retrieve a copy of the projection matrix recorded with the most
-/// recent call to recordCurrentMatrices().
-/// </summary>
-//-----------------------------------------------------------------------------
-const math::transform & Camera::getPreviousProj() const
-{
-	return mPreviousProj;
-}
-
-
-//-----------------------------------------------------------------------------
-// Name : setJitterAA ()
-// Desc : Sets the current jitter value for temporal anti-aliasing
-//-----------------------------------------------------------------------------
 void Camera::setAAData(const uSize& viewportSize, std::uint32_t currentSubpixelIndex, std::uint32_t temporalAASamples)
 {
 	if (temporalAASamples > 1)
@@ -951,23 +579,11 @@ void Camera::setAAData(const uSize& viewportSize, std::uint32_t currentSubpixelI
 	mProjectionDirty = true;
 }
 
-const math::vec4& Camera::getAAData() const
-{
-	return mAAData;
-}
-
-//-----------------------------------------------------------------------------
-//  Name : () (Virtual)
-/// <summary>
-/// When the camera is modified.
-/// </summary>
-//-----------------------------------------------------------------------------
-void Camera::onModified()
+void Camera::touch()
 {
 	// All modifications require projection matrix and
 	// frustum to be updated.
 	mViewDirty = true;
 	mProjectionDirty = true;
 	mFrustumDirty = true;
-
 }

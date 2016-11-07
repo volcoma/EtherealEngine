@@ -44,6 +44,6 @@ struct IndexBuffer
 	//-----------------------------------------------------------------------------
 	void populate(const gfx::Memory* _mem, std::uint16_t _flags = BGFX_BUFFER_NONE);
 
-
+	/// Internal handle
 	gfx::IndexBufferHandle handle = { gfx::invalidHandle };
 };

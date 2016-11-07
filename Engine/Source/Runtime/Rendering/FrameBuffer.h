@@ -6,8 +6,25 @@
 struct FrameBuffer : public ITexture
 {
 	REFLECTABLE(FrameBuffer, ITexture)
-	FrameBuffer()
-	{}
+
+	//-----------------------------------------------------------------------------
+	//  Name : FrameBuffer ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	FrameBuffer() = default;
+
+	//-----------------------------------------------------------------------------
+	//  Name : FrameBuffer ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	FrameBuffer(
 		std::uint16_t _width
 		, std::uint16_t _height
@@ -19,7 +36,7 @@ struct FrameBuffer : public ITexture
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : populate ()
+	//  Name : FrameBuffer ()
 	/// <summary>
 	/// 
 	/// 
@@ -36,7 +53,7 @@ struct FrameBuffer : public ITexture
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : populate ()
+	//  Name : FrameBuffer ()
 	/// <summary>
 	/// 
 	/// 
@@ -53,7 +70,7 @@ struct FrameBuffer : public ITexture
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : populate ()
+	//  Name : FrameBuffer ()
 	/// <summary>
 	/// 
 	/// 
@@ -70,7 +87,7 @@ struct FrameBuffer : public ITexture
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : populate ()
+	//  Name : FrameBuffer ()
 	/// <summary>
 	/// 
 	/// 
@@ -225,7 +242,6 @@ struct FrameBuffer : public ITexture
 		handle = gfx::createFrameBuffer(_nwh, _width, _height, _depthFormat);
 	}
 
-
+	/// Internal handle
 	gfx::FrameBufferHandle handle = { gfx::invalidHandle };
-
 };

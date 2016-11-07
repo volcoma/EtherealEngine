@@ -604,7 +604,7 @@ TransformComponent& TransformComponent::setLocalTransform(const math::transform 
 		return *this;
 
 	static const std::string strContext = "LocalTransform";
-	onModified(strContext);
+	touch(strContext);
 	mLocalTransform = trans;
 	return *this;
 }

@@ -23,7 +23,7 @@ ModelComponent& ModelComponent::setCastShadow(bool castShadow)
 		return *this;
 
 	static const std::string strContext = "CastsShadow";
-	onModified(strContext);
+	touch(strContext);
 	mCastShadow = castShadow;
 	return *this;
 }
@@ -34,7 +34,7 @@ ModelComponent& ModelComponent::setStatic(bool bStatic)
 		return *this;
 
 	static const std::string strContext = "Static";
-	onModified(strContext);
+	touch(strContext);
 	mStatic = bStatic;
 	return *this;
 }
@@ -45,7 +45,7 @@ ModelComponent& ModelComponent::setCastReflelction(bool castReflection)
 		return *this;
 
 	static const std::string strContext = "CastReflection";
-	onModified(strContext);
+	touch(strContext);
 	mCastReflection = castReflection;
 	return *this;
 }
@@ -70,7 +70,7 @@ ModelComponent& ModelComponent::setModel(const Model& model)
 	mModel = model;
 
 	static const std::string strContext = "ModelChange";
-	onModified(strContext);
+	touch(strContext);
 	return *this;
 }
 

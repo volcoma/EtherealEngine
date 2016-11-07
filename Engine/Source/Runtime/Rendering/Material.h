@@ -21,12 +21,48 @@ class Material
 {
 public:
 	REFLECTABLE(Material)
-		SERIALIZABLE(Material)
-		Material();
-	virtual ~Material();
-	bool isValid() const { return !!mProgram; }
+	SERIALIZABLE(Material)
 
-	Program* getProgram() const { return mProgram.get(); }
+	//-----------------------------------------------------------------------------
+	//  Name : Material ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	Material();
+
+	//-----------------------------------------------------------------------------
+	//  Name : ~Material (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	virtual ~Material();
+
+	//-----------------------------------------------------------------------------
+	//  Name : isValid ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline bool isValid() const { return !!mProgram; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : getProgram ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline Program* getProgram() const { return mProgram.get(); }
+
 	//-----------------------------------------------------------------------------
 	//  Name : submit (virtual )
 	/// <summary>
@@ -37,14 +73,44 @@ public:
 	//-----------------------------------------------------------------------------
 	virtual void submit() {};
 
-	CullType getCullType() const { return mCullType; }
-	void setCullType(CullType val) { mCullType = val; }
+	//-----------------------------------------------------------------------------
+	//  Name : getCullType ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline CullType getCullType() const { return mCullType; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : setCullType ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline void setCullType(CullType val) { mCullType = val; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : getRenderStates ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	std::uint64_t getRenderStates(bool applyCull = true, bool depthWrite = true, bool depthTest = true) const;
 protected:
+	/// Program that is responsible for rendering.
 	std::unique_ptr<Program> mProgram;
-	AssetHandle<Texture> mDefaultAlbedo;
-	AssetHandle<Texture> mDefaultNormal;
+	/// Cull type for this material.
 	CullType mCullType = CullType::CounterClockWise;
+	/// Default abledo texture
+	AssetHandle<Texture> mDefaultAlbedo;
+	/// Default normal texture
+	AssetHandle<Texture> mDefaultNormal;
 };
 
 

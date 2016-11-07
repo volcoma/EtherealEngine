@@ -69,7 +69,7 @@ CameraComponent::~CameraComponent()
 void CameraComponent::updateInternal(const math::transform& t)
 {
 	// First update so the camera can cache the previous matrices
-	mCamera->update();
+	mCamera->recordCurrentMatrices();
 
 	// Set new transform
 	mCamera->lookAt(t.getPosition(), t.getPosition() + t.zUnitAxis(), t.yUnitAxis());

@@ -92,3 +92,19 @@ AssetHandle<Material> Model::getMaterialForGroup(const Group& group) const
 
 	return mMaterials[0];
 }
+
+void Model::setMaxDistance(float distance)
+{
+	if (distance < mMinDistance)
+		distance = mMinDistance;
+
+	mMaxDistance = distance;
+}
+
+void Model::setMinDistance(float distance)
+{
+	if (distance > mMaxDistance)
+		distance = mMaxDistance;
+
+	mMinDistance = distance;
+}
