@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include <string>
-#include <functional>
+
 #include "Core/events/event.hpp"
 #include "AssetHandle.h"
 #include "../System/Application.h"
@@ -18,7 +18,7 @@ struct LoadRequest
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void then(std::function<void(AssetHandle<T>)> callback)
+	void then(delegate<void(AssetHandle<T>)> callback)
 	{
 		if (isReady())
 			callback(asset);

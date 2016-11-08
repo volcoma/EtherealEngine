@@ -2,7 +2,7 @@ cls
 @echo off
 
 setlocal
-set PATH=%PATH%;D:\Software\Cygwin\bin
+set PATH=%PATH%;D:/Software/Cygwin/bin
 
 echo *************************************************
 echo This script will compile the assets in this folder

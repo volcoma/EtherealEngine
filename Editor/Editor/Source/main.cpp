@@ -1,7 +1,6 @@
 #include "EditorApp.h"
 #include "Runtime/runtime.h"
 
-
 int main(int _argc, char* _argv[])
 {
 	auto& app = Singleton<Application>::getInstance();

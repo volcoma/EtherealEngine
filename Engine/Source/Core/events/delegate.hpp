@@ -1,11 +1,13 @@
-#pragma once
 #ifndef DELEGATE_HPP
 #define DELEGATE_HPP
+#pragma once
+
+// #include <functional>
+// template<typename T>
+// using delegate = std::function<T>;
 
 #include <memory>
-
 template <typename T> class delegate;
-
 template<class R, class ...A>
 class delegate<R(A...)>
 {
@@ -343,4 +345,4 @@ struct hash<delegate<R(A...)> >
 };
 } // namespace std
 
-#endif // DELEGATE_HPP)
+#endif // DELEGATE_HPP
