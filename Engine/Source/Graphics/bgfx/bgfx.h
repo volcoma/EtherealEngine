@@ -2875,6 +2875,7 @@ namespace bgfx
 	void getSizeFromRatio(BackbufferRatio::Enum _ratio, uint16_t& _width, uint16_t& _height);
 	UniformType::Enum getUniformType(UniformHandle _handle);
 	const char* getUniformName(UniformHandle _handle);
+	uint16_t getUniformNum(UniformHandle _handle);
 } // namespace bgfx
 
 #endif // BGFX_H_HEADER_GUARD

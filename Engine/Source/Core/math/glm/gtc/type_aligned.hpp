@@ -1,7 +1,22 @@
 /// @ref gtc_type_aligned
 /// @file glm/gtc/type_aligned.hpp
+///
+/// @see core (dependence)
+///
+/// @defgroup gtc_type_aligned GLM_GTC_type_aligned
+/// @ingroup gtc
+///
+/// @brief Aligned types.
+/// <glm/gtc/type_aligned.hpp> need to be included to use these features.
 
 #pragma once
+
+#if !GLM_HAS_ALIGNED_TYPE
+#	error "GLM: Aligned types are not supported on this platform"
+#endif
+#if GLM_MESSAGES == GLM_MESSAGES_ENABLED && !defined(GLM_EXT_INCLUDED)
+# pragma message("GLM: GLM_GTC_type_aligned extension included")
+#endif
 
 #include "../vec2.hpp"
 #include "../vec3.hpp"
@@ -14,8 +29,6 @@ namespace glm
 	template <typename T, precision P> struct tvec2;
 	template <typename T, precision P> struct tvec3;
 	template <typename T, precision P> struct tvec4;
-
-
 	/// @addtogroup gtc_type_aligned
 	/// @{
 

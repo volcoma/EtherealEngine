@@ -7,8 +7,12 @@ Shader::~Shader()
 
 void Shader::dispose()
 {
+	uniforms.clear();
+
 	if (isValid())
 		gfx::destroyShader(handle);
+
+	handle = { bgfx::invalidHandle };
 }
 
 bool Shader::isValid() const

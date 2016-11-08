@@ -47,8 +47,8 @@ struct ITask
 	virtual void waitUntilReady() = 0;
 };
 
-template<typename ReturnType, typename OnReadyFunc>
-struct Task : public ITask
+template<typename ReturnType>
+struct TTask : public ITask
 {
 	//-----------------------------------------------------------------------------
 	//  Name : Task ()
@@ -58,9 +58,8 @@ struct Task : public ITask
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	explicit Task(std::shared_future<ReturnType> f, OnReadyFunc&& readyFunction)
+	explicit TTask(std::shared_future<ReturnType> f)
 		: sharedFuture(f)
-		, onReady(readyFunction)
 	{}
 
 	//-----------------------------------------------------------------------------
@@ -74,19 +73,6 @@ struct Task : public ITask
 	virtual bool isReady() const
 	{
 		return sharedFuture.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready;
-	}
-
-	//-----------------------------------------------------------------------------
-	//  Name : invokeCallback (virtual )
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	virtual void invokeCallback()
-	{
-		onReady();
 	}
 
 	//-----------------------------------------------------------------------------
@@ -115,14 +101,24 @@ struct Task : public ITask
 		return sharedFuture.get();
 	}
 
+	//-----------------------------------------------------------------------------
+	//  Name : invokeCallback (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	virtual void invokeCallback()
+	{
+	}
+
 	/// shared future holding the result
 	std::shared_future<ReturnType> sharedFuture;
-	/// ready callback
-	OnReadyFunc onReady;
 };
 
-template<typename OnReadyFunc>
-struct Task<void, OnReadyFunc> : public ITask
+template<>
+struct TTask<void> : public ITask
 {
 	//-----------------------------------------------------------------------------
 	//  Name : Task ()
@@ -132,9 +128,8 @@ struct Task<void, OnReadyFunc> : public ITask
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	explicit Task(std::shared_future<void> f, OnReadyFunc&& readyFunction)
+	explicit TTask(std::shared_future<void> f)
 		: sharedFuture(f)
-		, onReady(readyFunction)
 	{}
 
 	//-----------------------------------------------------------------------------
@@ -148,19 +143,6 @@ struct Task<void, OnReadyFunc> : public ITask
 	virtual bool isReady() const
 	{
 		return sharedFuture.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready;
-	}
-
-	//-----------------------------------------------------------------------------
-	//  Name : invokeCallback (virtual )
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	virtual void invokeCallback()
-	{
-		onReady();
 	}
 
 	//-----------------------------------------------------------------------------
@@ -189,8 +171,81 @@ struct Task<void, OnReadyFunc> : public ITask
 		return sharedFuture.get();
 	}
 
-	/// shared future
+	//-----------------------------------------------------------------------------
+	//  Name : invokeCallback (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	virtual void invokeCallback()
+	{
+	}
+	/// shared future holding the result
 	std::shared_future<void> sharedFuture;
+};
+
+template<typename ReturnType, typename OnReadyFunc>
+struct Task : public TTask<ReturnType>
+{
+	//-----------------------------------------------------------------------------
+	//  Name : Task ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	explicit Task(std::shared_future<ReturnType> f, OnReadyFunc&& readyFunction)
+		: TTask(f)
+		, onReady(readyFunction)
+	{}
+
+	//-----------------------------------------------------------------------------
+	//  Name : invokeCallback (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	virtual void invokeCallback()
+	{
+		onReady();
+	}
+	/// ready callback
+	OnReadyFunc onReady;
+};
+
+template<typename OnReadyFunc>
+struct Task<void, OnReadyFunc> : public TTask<void>
+{
+	//-----------------------------------------------------------------------------
+	//  Name : Task ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	explicit Task(std::shared_future<void> f, OnReadyFunc&& readyFunction)
+		: TTask(f)
+		, onReady(readyFunction)
+	{}
+
+	//-----------------------------------------------------------------------------
+	//  Name : invokeCallback (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	virtual void invokeCallback()
+	{
+		onReady();
+	}
 	/// ready callback
 	OnReadyFunc onReady;
 };
@@ -305,7 +360,6 @@ inline ThreadPool::ThreadPool(unsigned int threads)
 		mWorkers.emplace_back(std::move(worker));
 	}
 }
-
 
 // add new work item to the pool
 template<class F, class C, class... Args>

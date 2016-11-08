@@ -5,7 +5,7 @@
 
 #include "../fwd.hpp"
 #include "type_vec.hpp"
-#ifdef GLM_SWIZZLE
+#if GLM_SWIZZLE == GLM_SWIZZLE_ENABLED
 #	if GLM_HAS_UNRESTRICTED_UNIONS
 #		include "_swizzle.hpp"
 #	else
@@ -21,20 +21,30 @@ namespace glm
 	{
 		// -- Implementation detail --
 
+		typedef T value_type;
 		typedef tvec1<T, P> type;
 		typedef tvec1<bool, P> bool_type;
-		typedef T value_type;
 
 		// -- Data --
 
-#		if GLM_HAS_UNRESTRICTED_UNIONS
+#		if GLM_HAS_ALIGNED_TYPE
+#			if GLM_COMPILER & GLM_COMPILER_GCC
+#				pragma GCC diagnostic push
+#				pragma GCC diagnostic ignored "-Wpedantic"
+#			endif
+#			if GLM_COMPILER & GLM_COMPILER_CLANG
+#				pragma clang diagnostic push
+#				pragma clang diagnostic ignored "-Wgnu-anonymous-struct"
+#				pragma clang diagnostic ignored "-Wnested-anon-types"
+#			endif
+		
 			union
 			{
 				T x;
 				T r;
 				T s;
 /*
-#				ifdef GLM_SWIZZLE
+#				if GLM_SWIZZLE == GLM_SWIZZLE_ENABLED
 					_GLM_SWIZZLE1_2_MEMBERS(T, P, tvec2, x)
 					_GLM_SWIZZLE1_2_MEMBERS(T, P, tvec2, r)
 					_GLM_SWIZZLE1_2_MEMBERS(T, P, tvec2, s)
@@ -46,10 +56,17 @@ namespace glm
 					_GLM_SWIZZLE1_4_MEMBERS(T, P, tvec4, s)
 #				endif//GLM_SWIZZLE*/
 			};
+		
+#			if GLM_COMPILER & GLM_COMPILER_CLANG
+#				pragma clang diagnostic pop
+#			endif
+#			if GLM_COMPILER & GLM_COMPILER_GCC
+#				pragma GCC diagnostic pop
+#			endif
 #		else
 			union {T x, r, s;};
 /*
-#			ifdef GLM_SWIZZLE
+#			if GLM_SWIZZLE == GLM_SWIZZLE_ENABLED
 				GLM_SWIZZLE_GEN_VEC_FROM_VEC1(T, P, tvec2, tvec2, tvec3, tvec4)
 #			endif//GLM_SWIZZLE*/
 #		endif
@@ -58,7 +75,7 @@ namespace glm
 
 		/// Return the count of components of the vector
 		typedef length_t length_type;
-		GLM_FUNC_DECL GLM_CONSTEXPR length_type length() const;
+		GLM_FUNC_DECL static length_type length(){return 1;}
 
 		GLM_FUNC_DECL T & operator[](length_type i);
 		GLM_FUNC_DECL T const & operator[](length_type i) const;
@@ -93,13 +110,13 @@ namespace glm
 
 		// -- Swizzle constructors --
 /*
-#		if(GLM_HAS_UNRESTRICTED_UNIONS && defined(GLM_SWIZZLE))
+#		if(GLM_HAS_UNRESTRICTED_UNIONS && (GLM_SWIZZLE == GLM_SWIZZLE_ENABLED))
 			template <int E0>
 			GLM_FUNC_DECL tvec1(detail::_swizzle<1, T, P, tvec1, E0, -1,-2,-3> const & that)
 			{
 				*this = that();
 			}
-#		endif//(GLM_HAS_UNRESTRICTED_UNIONS && defined(GLM_SWIZZLE))
+#		endif//(GLM_HAS_UNRESTRICTED_UNIONS && (GLM_SWIZZLE == GLM_SWIZZLE_ENABLED))
 */
 		// -- Unary arithmetic operators --
 

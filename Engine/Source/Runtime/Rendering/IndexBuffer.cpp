@@ -9,6 +9,8 @@ void IndexBuffer::dispose()
 {
 	if (isValid())
 		gfx::destroyIndexBuffer(handle);
+
+	handle = { bgfx::invalidHandle };
 }
 
 bool IndexBuffer::isValid() const

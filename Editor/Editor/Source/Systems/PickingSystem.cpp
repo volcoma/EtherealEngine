@@ -125,24 +125,36 @@ void PickingSystem::frameRender(ecs::EntityManager &entities, ecs::EventManager 
 		mouseYNDC < -1.0f ||
 		mouseYNDC > 1.0f)
 		return;
-	math::vec4 mousePosNDC = { mouseXNDC, mouseYNDC, 0.0f, 1.0f };
-	math::vec4 mousePosNDCEnd = { mouseXNDC, mouseYNDC, 1.0f, 1.0f };
 
-	// Un-project and perspective divide
-	math::vec4 rayBegin = invViewProj.matrix() * mousePosNDC;
-	rayBegin *= 1.0f / rayBegin.w;
-	math::vec4 rayEnd = invViewProj.matrix() * mousePosNDCEnd;
-	rayEnd *= 1.0f / rayEnd.w;
-
-	math::vec3 pickEye = rayBegin;
-	math::vec3 pickAt = rayEnd;
-	math::vec3 pickUp = { 0.0f, 1.0f, 0.0f };
-
-	auto pickView = math::lookAt(pickEye, pickAt, pickUp);
-	auto pickProj = math::perspective(math::radians(1.0f), 1.0f, nearClip, farClip);
-
-	auto viewId = mRenderView->getId();
+	// If the user previously clicked, and we're done reading data from GPU, look at ID buffer on CPU
+	// Whatever mesh has the most pixels in the ID buffer is the one the user clicked on.
+	if (!mReading && input.isMouseButtonReleased(sf::Mouse::Left))
 	{
+		auto& surface = mRenderView->getRenderSurface();
+		// Blit and read
+		gfx::blit(0, mBlitTex->handle, 0, 0, surface.getBufferRaw()->handle);
+		mReading = gfx::readTexture(mBlitTex->handle, mBlitData);
+	}
+
+	if(input.isMouseButtonPressed(sf::Mouse::Left))
+	{
+		math::vec4 mousePosNDC = { mouseXNDC, mouseYNDC, 0.0f, 1.0f };
+		math::vec4 mousePosNDCEnd = { mouseXNDC, mouseYNDC, 1.0f, 1.0f };
+
+		// Un-project and perspective divide
+		math::vec4 rayBegin = invViewProj.matrix() * mousePosNDC;
+		rayBegin *= 1.0f / rayBegin.w;
+		math::vec4 rayEnd = invViewProj.matrix() * mousePosNDCEnd;
+		rayEnd *= 1.0f / rayEnd.w;
+
+		math::vec3 pickEye = rayBegin;
+		math::vec3 pickAt = rayEnd;
+		math::vec3 pickUp = { 0.0f, 1.0f, 0.0f };
+
+		auto pickView = math::lookAt(pickEye, pickAt, pickUp);
+		auto pickProj = math::perspective(math::radians(1.0f), 1.0f, nearClip, farClip);
+
+		auto viewId = mRenderView->getId();
 		// View rect and transforms for picking pass
 		RenderViewRAII pushView(mRenderView);
 		gfx::setViewTransform(viewId, &pickView, &pickProj);
@@ -191,85 +203,71 @@ void PickingSystem::frameRender(ecs::EntityManager &entities, ecs::EventManager 
 			// Set render states.
 			auto states = material->getRenderStates();
 
-			hMesh->submit(viewId, mProgram->handle, worldTransform, states);
+			hMesh->submit(viewId, mProgram->handle, worldTransform, states);	
+		});	
+	}
 
-		});
-
-		// If the user previously clicked, and we're done reading data from GPU, look at ID buffer on CPU
-		// Whatever mesh has the most pixels in the ID buffer is the one the user clicked on.
-		if (mReading == renderFrame)
+	if (mReading && mReading <= renderFrame)
+	{
+		mReading = 0;
+		std::map<std::uint32_t, std::uint32_t> ids;  // This contains all the IDs found in the buffer
+		std::uint32_t maxAmount = 0;
+		for (std::uint8_t* x = mBlitData; x < mBlitData + _id_dimensions * _id_dimensions * 4;)
 		{
-			mReading = 0;
-			std::map<std::uint32_t, std::uint32_t> ids;  // This contains all the IDs found in the buffer
-			std::uint32_t maxAmount = 0;
-			for (std::uint8_t* x = mBlitData; x < mBlitData + _id_dimensions * _id_dimensions * 4;)
+			std::uint8_t rr = *x++;
+			std::uint8_t gg = *x++;
+			std::uint8_t bb = *x++;
+			std::uint8_t aa = *x++;
+
+			const gfx::Caps* caps = gfx::getCaps();
+			if (gfx::RendererType::Direct3D9 == caps->rendererType)
 			{
-				std::uint8_t rr = *x++;
-				std::uint8_t gg = *x++;
-				std::uint8_t bb = *x++;
-				std::uint8_t aa = *x++;
-
-				const gfx::Caps* caps = gfx::getCaps();
-				if (gfx::RendererType::Direct3D9 == caps->rendererType)
-				{
-					// Comes back as BGRA
-					std::swap(rr, bb);
-				}
-
-				// Skip background
-				if (0 == (rr | gg | bb))
-				{
-					continue;
-				}
-
-				std::uint32_t hashKey = rr + (gg << 8) + (bb << 16);
-				std::uint32_t amount = 1;
-				auto mapIter = ids.find(hashKey);
-				if (mapIter != ids.end())
-				{
-					amount = mapIter->second + 1;
-				}
-				
-				// Amount of times this ID (color) has been clicked on in buffer
-				ids[hashKey] = amount; 
-				maxAmount = maxAmount > amount ? maxAmount : amount;
+				// Comes back as BGRA
+				std::swap(rr, bb);
 			}
 
-			std::uint32_t idKey = 0;
-			if (maxAmount)
+			// Skip background
+			if (0 == (rr | gg | bb))
 			{
-				for (auto& pair : ids)
+				continue;
+			}
+
+			std::uint32_t hashKey = rr + (gg << 8) + (bb << 16);
+			std::uint32_t amount = 1;
+			auto mapIter = ids.find(hashKey);
+			if (mapIter != ids.end())
+			{
+				amount = mapIter->second + 1;
+			}
+
+			// Amount of times this ID (color) has been clicked on in buffer
+			ids[hashKey] = amount;
+			maxAmount = maxAmount > amount ? maxAmount : amount;
+		}
+
+		std::uint32_t idKey = 0;
+		if (maxAmount)
+		{
+			for (auto& pair : ids)
+			{
+				if (pair.second == maxAmount)
 				{
-					if (pair.second == maxAmount)
+					idKey = pair.first;
+					if (world.entities.valid_index(idKey))
 					{
-						idKey = pair.first;
-						if (world.entities.valid_index(idKey))
-						{
-							auto eid = world.entities.create_id(idKey);
-							auto pickedEntity = world.entities.get(eid);
-							if (pickedEntity)
-								editState.select(pickedEntity);
-						}
-						break;
+						auto eid = world.entities.create_id(idKey);
+						auto pickedEntity = world.entities.get(eid);
+						if (pickedEntity)
+							editState.select(pickedEntity);
 					}
+					break;
 				}
+			}
 
-			}
-			else
-			{
-				editState.unselect();
-			}
+		}
+		else
+		{
+			editState.unselect();
 		}
 	}
-	
-
-	// Start a new read back?
-	if (!mReading && input.isMouseButtonPressed(sf::Mouse::Left))
-	{
-		auto& surface = mRenderView->getRenderSurface();
-		// Blit and read
-		gfx::blit(0, mBlitTex->handle, 0, 0, surface.getBufferRaw()->handle);
-		mReading = gfx::readTexture(mBlitTex->handle, mBlitData);
-	}
-
 }

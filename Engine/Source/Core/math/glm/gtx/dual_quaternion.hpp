@@ -21,7 +21,7 @@
 #include "../gtc/constants.hpp"
 #include "../gtc/quaternion.hpp"
 
-#if(defined(GLM_MESSAGES) && !defined(GLM_EXT_INCLUDED))
+#if GLM_MESSAGES == GLM_MESSAGES_ENABLED && !defined(GLM_EXT_INCLUDED)
 #	pragma message("GLM: GLM_GTX_dual_quaternion extension included")
 #endif
 
@@ -46,7 +46,7 @@ namespace glm
 
 		typedef length_t length_type;
 		/// Return the count of components of a dual quaternion
-		GLM_FUNC_DECL GLM_CONSTEXPR length_type length() const;
+		GLM_FUNC_DECL static length_type length(){return 2;}
 
 		GLM_FUNC_DECL part_type & operator[](length_type i);
 		GLM_FUNC_DECL part_type const & operator[](length_type i) const;

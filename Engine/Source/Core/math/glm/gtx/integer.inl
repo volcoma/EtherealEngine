@@ -111,8 +111,6 @@ namespace detail
 
 	GLM_FUNC_QUALIFIER uint pow(uint x, uint y)
 	{
-		if (y == 0)
-			return 1;
 		uint result = x;
 		for(uint i = 1; i < y; ++i)
 			result *= x;

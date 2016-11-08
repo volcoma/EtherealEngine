@@ -29,12 +29,21 @@ namespace detail
 #		if(defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)) // C99 detected, 64 bit types available
 			typedef int64_t					sint64;
 			typedef uint64_t				uint64;
+	
 #		elif GLM_COMPILER & GLM_COMPILER_VC
 			typedef signed __int64			sint64;
 			typedef unsigned __int64		uint64;
+	
 #		elif GLM_COMPILER & GLM_COMPILER_GCC
+#			pragma GCC diagnostic ignored "-Wlong-long"
 			__extension__ typedef signed long long		sint64;
 			__extension__ typedef unsigned long long	uint64;
+	
+#		elif (GLM_COMPILER & GLM_COMPILER_CLANG)
+#			pragma clang diagnostic ignored "-Wc++11-long-long"
+			typedef signed long	long		sint64;
+			typedef unsigned long long		uint64;
+	
 #		else//unknown compiler
 			typedef signed long	long		sint64;
 			typedef unsigned long long		uint64;
@@ -91,13 +100,7 @@ namespace detail
 		{
 			typedef long type;
 		};
-
-		template <>
-		struct make_signed<long long>
-		{
-			typedef long long type;
-		};
-
+	
 		template <>
 		struct make_signed<unsigned char>
 		{
@@ -120,12 +123,6 @@ namespace detail
 		struct make_signed<unsigned long>
 		{
 			typedef long type;
-		};
-
-		template <>
-		struct make_signed<unsigned long long>
-		{
-			typedef long long type;
 		};
 
 		template <typename genType>
@@ -157,12 +154,6 @@ namespace detail
 		};
 
 		template <>
-		struct make_unsigned<long long>
-		{
-			typedef unsigned long long type;
-		};
-
-		template <>
 		struct make_unsigned<unsigned char>
 		{
 			typedef unsigned char type;
@@ -186,6 +177,24 @@ namespace detail
 			typedef unsigned long type;
 		};
 
+		template <>
+		struct make_signed<long long>
+		{
+			typedef long long type;
+		};
+	
+		template <>
+		struct make_signed<unsigned long long>
+		{
+			typedef long long type;
+		};
+	
+		template <>
+		struct make_unsigned<long long>
+		{
+			typedef unsigned long long type;
+		};
+	
 		template <>
 		struct make_unsigned<unsigned long long>
 		{

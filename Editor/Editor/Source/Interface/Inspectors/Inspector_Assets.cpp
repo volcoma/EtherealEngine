@@ -10,6 +10,26 @@
 bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<AssetHandle<Texture>>();
+	auto& app = Singleton<EditorApp>::getInstance();
+	auto& manager = app.getAssetManager();
+	auto& editState = app.getEditState();
+	auto& selected = editState.selected;
+
+	bool changed = false;
+	if (selected && selected.is_type<AssetHandle<Texture>>())
+	{
+		PropertyLayout propName("Name");
+		const auto& item = data.id();
+		auto assetName = fs::getFileName(item);
+		rttr::variant vari = assetName;
+		changed |= inspectVar(vari);
+		if (changed)
+		{
+			auto dirName = fs::getDirectoryName(item);
+			manager.renameAsset<Texture>(item, dirName + "/" + vari.get_value<std::string>());
+		}
+	}
+
 
 	float available = math::min(64.0f, gui::GetContentRegionAvailWidth() / 1.5f);
 	ImVec2 size = { available, available };
@@ -32,74 +52,64 @@ bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, s
 	bool hoveredFrame = gui::IsItemHovered();
 	auto bbMinFrame = gui::GetItemRectMin();
 	auto bbMaxFrame = gui::GetItemBoxMax();
-
-
-	auto& app = Singleton<EditorApp>::getInstance();
-	auto& manager = app.getAssetManager();
-	auto& editState = app.getEditState();
-	auto& selected = editState.selected;
-	if (selected)
+	
+	if (selected && !selected.is_type<AssetHandle<Texture>>())
 	{
-		if (selected.is_type<AssetHandle<Texture>>())
+		std::string item = data ? data.id() : "none";
+		rttr::variant var_str = item;
+		if (inspectVar(var_str))
 		{
-			rttr::variant varInfo = data->info;
-			if (inspectVar(varInfo))
-				return true;
-		}
-		else
-		{
-			std::string item = data ? data.id() : "none";
-			rttr::variant var_str = item;
-			if (inspectVar(var_str))
+			item = var_str.to_string();
+			if (item.empty())
 			{
-				item = var_str.to_string();
-				if (item.empty())
-				{
-					data = AssetHandle<Texture>();
-				}
-				else
-				{
-					manager.load<Texture>(item, false)
-						.then([&data](auto asset) mutable
-					{
-						data = asset;
-					});
-				}
-				
-
-				var = data;
-				return true;
+				data = AssetHandle<Texture>();
 			}
-
-
-			auto& dragged = editState.dragged;
-			if (dragged && dragged.is_type<AssetHandle<Texture>>())
+			else
 			{
-				gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.5f));
+				manager.load<Texture>(item, false)
+					.then([&data](auto asset) mutable
+				{
+					data = asset;
+				});
+			}
+			var = data;
+			return true;
+		}
+
+		auto& dragged = editState.dragged;
+		if (dragged && dragged.is_type<AssetHandle<Texture>>())
+		{
+			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.5f));
+			gui::RenderFrameEx(bbMinFrame, bbMaxFrame, true, 0.0f, 2.0f);
+			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
+			gui::PopStyleColor();
+
+			if (hoveredFrame || gui::IsItemHovered())
+			{
+				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
 				gui::RenderFrameEx(bbMinFrame, bbMaxFrame, true, 0.0f, 2.0f);
-				gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
+				gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
 				gui::PopStyleColor();
 
-				if (hoveredFrame || gui::IsItemHovered())
+				if (gui::IsMouseReleased(2))
 				{
-					gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
-					gui::RenderFrameEx(bbMinFrame, bbMaxFrame, true, 0.0f, 2.0f);
-					gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
-					gui::PopStyleColor();
+					data = dragged.get_value<AssetHandle<Texture>>();
+					var = data;
+					return true;
 
-					if (gui::IsMouseReleased(2))
-					{
-						data = dragged.get_value<AssetHandle<Texture>>();
-						var = data;
-						return true;
-
-					}
 				}
 			}
-		}	
+		}
+		return false;
 	}
+	
 
-	return false;
+	{
+		rttr::variant vari = data.get()->info;
+		changed |= inspectVar(vari);
+	}
+	return changed;
+
 }
 
 
@@ -167,7 +177,8 @@ bool Inspector_AssetHandle_Material::inspect(rttr::variant& var, bool readOnly, 
 		changed |= inspectVar(vari);
 		if (changed)
 		{
-			manager.renameAsset<Material>(item, item + assetName);
+			auto dirName = fs::getDirectoryName(item);
+			manager.renameAsset<Material>(item, dirName + "/" + vari.get_value<std::string>());
 		}
 	}
 
@@ -236,8 +247,23 @@ bool Inspector_AssetHandle_Mesh::inspect(rttr::variant& var, bool readOnly, std:
 		return false;
 	}
 
+	bool changed = false;
+	{
+		PropertyLayout propName("Name");
+		const auto& item = data.id();
+		auto assetName = fs::getFileName(item);
+		rttr::variant vari = assetName;
+		changed |= inspectVar(vari);
+		if (changed)
+		{
+			auto dirName = fs::getDirectoryName(item);
+			manager.renameAsset<Mesh>(item, dirName + "/" + vari.get_value<std::string>());
+		}
+	}
 
-
-	rttr::variant vari = data.get();
-	return inspectVar(vari);
+	{
+		rttr::variant vari = data.get();
+		changed |= inspectVar(vari);
+	}
+	return changed;
 }

@@ -9,6 +9,8 @@ void VertexBuffer::dispose()
 {
 	if (isValid())
 		gfx::destroyVertexBuffer(handle);
+
+	handle = { bgfx::invalidHandle };
 }
 
 bool VertexBuffer::isValid() const

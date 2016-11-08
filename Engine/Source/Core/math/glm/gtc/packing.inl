@@ -639,6 +639,22 @@ namespace detail
 		return vec3(Unpack.data.x, Unpack.data.y, Unpack.data.z) * pow(2.0f, Unpack.data.w - 15.f - 9.f);
 	}
 
+	// Based on Brian Karis http://graphicrants.blogspot.fr/2009/04/rgbm-color-encoding.html
+	template <typename T, precision P>
+	GLM_FUNC_QUALIFIER tvec4<T, P> packRGBM(tvec3<T, P> const & rgb)
+	{
+		tvec3<T, P> const Color(rgb * static_cast<T>(1.0 / 6.0));
+		T Alpha = clamp(max(max(Color.x, Color.y), max(Color.z, static_cast<T>(1e-6))), static_cast<T>(0), static_cast<T>(1));
+		Alpha = ceil(Alpha * static_cast<T>(255.0)) / static_cast<T>(255.0);
+		return tvec4<T, P>(Color / Alpha, Alpha);
+	}
+
+	template <typename T, precision P>
+	GLM_FUNC_QUALIFIER tvec3<T, P> unpackRGBM(tvec4<T, P> const & rgbm)
+	{
+		return tvec3<T, P>(rgbm.x, rgbm.y, rgbm.z) * rgbm.w * static_cast<T>(6);
+	}
+
 	template <precision P, template <typename, precision> class vecType>
 	GLM_FUNC_QUALIFIER vecType<uint16, P> packHalf(vecType<float, P> const & v)
 	{
@@ -725,7 +741,7 @@ namespace detail
 
 	GLM_FUNC_QUALIFIER uint16 packUnorm1x5_1x6_1x5(vec3 const & v)
 	{
-		u32vec3 const Unpack(round(clamp(v, 0.0f, 1.0f) * vec3(15.f, 31.f, 15.f)));
+		u32vec3 const Unpack(round(clamp(v, 0.0f, 1.0f) * vec3(31.f, 63.f, 31.f)));
 		detail::u5u6u5 Result;
 		Result.data.x = Unpack.x;
 		Result.data.y = Unpack.y;
@@ -735,7 +751,7 @@ namespace detail
 
 	GLM_FUNC_QUALIFIER vec3 unpackUnorm1x5_1x6_1x5(uint16 v)
 	{
-		vec3 const ScaleFactor(1.f / 15.f, 1.f / 31.f, 1.f / 15.f);
+		vec3 const ScaleFactor(1.f / 31.f, 1.f / 63.f, 1.f / 31.f);
 		detail::u5u6u5 Unpack;
 		Unpack.pack = v;
 		return vec3(Unpack.data.x, Unpack.data.y, Unpack.data.z) * ScaleFactor;
@@ -743,7 +759,7 @@ namespace detail
 
 	GLM_FUNC_QUALIFIER uint16 packUnorm3x5_1x1(vec4 const & v)
 	{
-		u32vec4 const Unpack(round(clamp(v, 0.0f, 1.0f) * vec4(15.f, 15.f, 15.f, 1.f)));
+		u32vec4 const Unpack(round(clamp(v, 0.0f, 1.0f) * vec4(31.f, 31.f, 31.f, 1.f)));
 		detail::u5u5u5u1 Result;
 		Result.data.x = Unpack.x;
 		Result.data.y = Unpack.y;
@@ -754,7 +770,7 @@ namespace detail
 
 	GLM_FUNC_QUALIFIER vec4 unpackUnorm3x5_1x1(uint16 v)
 	{
-		vec4 const ScaleFactor(1.f / 15.f, 1.f / 15.f, 1.f / 15.f, 1.f);
+		vec4 const ScaleFactor(1.f / 31.f, 1.f / 31.f, 1.f / 31.f, 1.f);
 		detail::u5u5u5u1 Unpack;
 		Unpack.pack = v;
 		return vec4(Unpack.data.x, Unpack.data.y, Unpack.data.z, Unpack.data.w) * ScaleFactor;

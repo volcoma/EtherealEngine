@@ -21,7 +21,7 @@
 #include "../vec4.hpp"
 #include "../gtc/constants.hpp"
 
-#if(defined(GLM_MESSAGES) && !defined(GLM_EXT_INCLUDED))
+#if GLM_MESSAGES == GLM_MESSAGES_ENABLED && !defined(GLM_EXT_INCLUDED)
 #	pragma message("GLM: GLM_GTC_quaternion extension included")
 #endif
 
@@ -40,13 +40,38 @@ namespace glm
 
 		// -- Data --
 
-		T x, y, z, w;
+#		if GLM_HAS_ALIGNED_TYPE
+#			if GLM_COMPILER & GLM_COMPILER_GCC
+#				pragma GCC diagnostic push
+#				pragma GCC diagnostic ignored "-Wpedantic"
+#			endif
+#			if GLM_COMPILER & GLM_COMPILER_CLANG
+#				pragma clang diagnostic push
+#				pragma clang diagnostic ignored "-Wgnu-anonymous-struct"
+#				pragma clang diagnostic ignored "-Wnested-anon-types"
+#			endif
+		
+			union
+			{
+				struct { T x, y, z, w;};
+				typename detail::storage<T, sizeof(T) * 4, detail::is_aligned<P>::value>::type data;
+			};
+		
+#			if GLM_COMPILER & GLM_COMPILER_CLANG
+#				pragma clang diagnostic pop
+#			endif
+#			if GLM_COMPILER & GLM_COMPILER_GCC
+#				pragma GCC diagnostic pop
+#			endif
+#		else
+			T x, y, z, w;
+#		endif
 
 		// -- Component accesses --
 
 		typedef length_t length_type;
 		/// Return the count of components of a quaternion
-		GLM_FUNC_DECL GLM_CONSTEXPR length_type length() const;
+		GLM_FUNC_DECL static length_type length(){return 4;}
 
 		GLM_FUNC_DECL T & operator[](length_type i);
 		GLM_FUNC_DECL T const & operator[](length_type i) const;
@@ -96,6 +121,8 @@ namespace glm
 		GLM_FUNC_DECL tquat<T, P> & operator=(tquat<U, P> const & m);
 		template <typename U>
 		GLM_FUNC_DECL tquat<T, P> & operator+=(tquat<U, P> const & q);
+		template <typename U>
+		GLM_FUNC_DECL tquat<T, P> & operator-=(tquat<U, P> const & q);
 		template <typename U>
 		GLM_FUNC_DECL tquat<T, P> & operator*=(tquat<U, P> const & q);
 		template <typename U>
@@ -341,6 +368,29 @@ namespace glm
 	/// @see gtc_quaternion
 	template <typename T, precision P>
 	GLM_FUNC_DECL tvec4<bool, P> notEqual(tquat<T, P> const & x, tquat<T, P> const & y);
+
+	/// Returns true if x holds a NaN (not a number)
+	/// representation in the underlying implementation's set of
+	/// floating point representations. Returns false otherwise,
+	/// including for implementations with no NaN
+	/// representations.
+	/// 
+	/// /!\ When using compiler fast math, this function may fail.
+	/// 
+	/// @tparam genType Floating-point scalar or vector types.
+	template <typename T, precision P>
+	GLM_FUNC_DECL tvec4<bool, P> isnan(tquat<T, P> const & x);
+
+	/// Returns true if x holds a positive infinity or negative
+	/// infinity representation in the underlying implementation's
+	/// set of floating point representations. Returns false
+	/// otherwise, including for implementations with no infinity
+	/// representations.
+	/// 
+	/// @tparam genType Floating-point scalar or vector types.
+	template <typename T, precision P>
+	GLM_FUNC_DECL tvec4<bool, P> isinf(tquat<T, P> const & x);
+
 	/// @}
 } //namespace glm
 

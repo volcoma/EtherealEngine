@@ -1577,6 +1577,11 @@ namespace bgfx
 		return m_uniformRef[_handle.idx].m_name.getPtr();
 	}
 
+	uint16_t Context::getNum(UniformHandle _handle) const
+	{
+		return m_uniformRef[_handle.idx].m_num;
+	}
+
 	UniformType::Enum Context::getUniformType(UniformHandle _handle)
 	{
 		if (!isValid(_handle))
@@ -3721,7 +3726,12 @@ error:
 		BGFX_CHECK_MAIN_THREAD();
 		return s_ctx->getName(_handle);
 	}
-
+	uint16_t getUniformNum(UniformHandle _handle)
+	{
+		BGFX_CHECK_MAIN_THREAD();
+		return s_ctx->getNum(_handle);
+	}
+	
 	void getSizeFromRatio(BackbufferRatio::Enum _ratio, uint16_t& _width, uint16_t& _height)
 	{
 		auto& resolution = s_ctx->m_resolution;

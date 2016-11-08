@@ -1,6 +1,8 @@
 /// @ref gtx_norm
 /// @file glm/gtx/norm.inl
 
+#include "../detail/precision.hpp"
+
 namespace glm{
 namespace detail
 {

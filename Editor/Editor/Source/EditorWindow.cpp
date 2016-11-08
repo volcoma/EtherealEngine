@@ -216,7 +216,7 @@ auto openScene()
 		if (world.loadData(path, outData))
 		{
 			auto time = timer.getTime(true);
-			std::string log_msg = "Data loading time : " + std::to_string(time);
+			std::string log_msg = "Scene loading time : " + std::to_string(time);
 			logging::get("Log")->info(log_msg.c_str());
 			editState.scene = path;
 		}
@@ -231,8 +231,12 @@ auto saveScene()
 	const auto& path = editState.scene;
 	if (path != "")
 	{
+		Timer timer;
 		std::vector<ecs::Entity> entities = gatherSceneData();
 		world.saveData(path, entities);
+		auto time = timer.getTime(true);
+		std::string log_msg = "Scene saving time : " + std::to_string(time);
+		logging::get("Log")->info(log_msg.c_str());
 	}
 }
 
@@ -248,10 +252,8 @@ void saveSceneAs()
 	std::string path;
 	if (saveFileDialog("scene", fs::resolveFileLocation("app://data/scenes/"), path))
 	{
-		std::vector<ecs::Entity> entities = gatherSceneData();
-		world.saveData(path, entities);
-		
-		editState.scene = path;
+		editState.scene = path;		
+		saveScene();	
 	}
 }
 

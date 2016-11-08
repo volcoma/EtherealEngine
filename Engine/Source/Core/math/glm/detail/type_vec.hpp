@@ -16,15 +16,23 @@ namespace detail
 			uint8 data[size];
 		} type;
 	};
-/*
-	template <typename T, std::size_t size>
-	struct storage<T, size, true>
-	{
-		typedef GLM_ALIGNED_STRUCT(size) type {
-			uint8 data[size];
-		} type;
-	};
-*/
+
+	#define GLM_ALIGNED_STORAGE_TYPE_STRUCT(x) \
+		template <typename T> \
+		struct storage<T, x, true> { \
+			GLM_ALIGNED_STRUCT(x) type { \
+				uint8 data[x]; \
+			}; \
+		};
+
+	GLM_ALIGNED_STORAGE_TYPE_STRUCT(1)
+	GLM_ALIGNED_STORAGE_TYPE_STRUCT(2)
+	GLM_ALIGNED_STORAGE_TYPE_STRUCT(4)
+	GLM_ALIGNED_STORAGE_TYPE_STRUCT(8)
+	GLM_ALIGNED_STORAGE_TYPE_STRUCT(16)
+	GLM_ALIGNED_STORAGE_TYPE_STRUCT(32)
+	GLM_ALIGNED_STORAGE_TYPE_STRUCT(64)
+		
 #	if GLM_ARCH & GLM_ARCH_SSE2_BIT
 		template <>
 		struct storage<float, 16, true>
@@ -43,6 +51,31 @@ namespace detail
 		{
 			typedef glm_uvec4 type;
 		};
+/*
+#	else
+		typedef union __declspec(align(16)) glm_128
+		{
+			unsigned __int8 data[16];
+		} glm_128;
+
+		template <>
+		struct storage<float, 16, true>
+		{
+			typedef glm_128 type;
+		};
+
+		template <>
+		struct storage<int, 16, true>
+		{
+			typedef glm_128 type;
+		};
+
+		template <>
+		struct storage<unsigned int, 16, true>
+		{
+			typedef glm_128 type;
+		};
+*/
 #	endif
 
 #	if (GLM_ARCH & GLM_ARCH_AVX_BIT)

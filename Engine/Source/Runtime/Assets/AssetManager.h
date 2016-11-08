@@ -4,20 +4,45 @@
 #include <unordered_map>
 
 #include "Core/common/string_utils.h"
+#include "Core/events/delegate.hpp"
 #include "../System/FileSystem.h"
 #include "LoadRequest.hpp"
 
+/// aliases
 template<typename T>
 using RequestContainer = std::unordered_map<std::string, LoadRequest<T>>;
 
-
 struct Storage
 {
+	typedef std::size_t Family;
+	//-----------------------------------------------------------------------------
+	//  Name : ~Storage (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	virtual ~Storage() = default;
+
+	//-----------------------------------------------------------------------------
+	//  Name : clear (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	virtual void clear() = 0;
 
-	typedef std::size_t Family;
-
+	//-----------------------------------------------------------------------------
+	//  Name : getCounter ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	static Family& getCounter()
 	{
 		static Family family_counter_;
@@ -28,32 +53,84 @@ struct Storage
 template<typename T>
 struct TStorage : Storage
 {
+	//-----------------------------------------------------------------------------
+	//  Name : ~TStorage ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	~TStorage() = default;
 
+	//-----------------------------------------------------------------------------
+	//  Name : family ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	static Family family()
 	{
 		static Family family = getCounter()++;
 		return family;
 	}
+	//-----------------------------------------------------------------------------
+	//  Name : clear ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	void clear()
 	{
 		container.clear();
 	}
+
+	//-----------------------------------------------------------------------------
+	//  Name : loadFromMemoryDefault ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	static void loadFromMemoryDefault(const std::string&, const std::uint8_t*, std::uint32_t, LoadRequest<T>&) {}
+	
+	//-----------------------------------------------------------------------------
+	//  Name : loadFromFileDefault ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	static void loadFromFileDefault(const std::string&, const std::string&, bool, LoadRequest<T>&) {}
+	
+	//-----------------------------------------------------------------------------
+	//  Name : saveToFileDefault ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	static void saveToFileDefault(const std::string&, const AssetHandle<T>&) {}
 
-	//relativeKey, data, size, outRequest
-	std::function<void(const std::string&, const std::uint8_t*, std::uint32_t, LoadRequest<T>&)> loadFromMemory = loadFromMemoryDefault;
+	/// relativeKey, data, size, outRequest
+	delegate<void(const std::string&, const std::uint8_t*, std::uint32_t, LoadRequest<T>&)> loadFromMemory = loadFromMemoryDefault;
 
-	//relativeKey, absolutKey, async, outReqeust
-	std::function<void(const std::string&, const std::string&, bool, LoadRequest<T>&)> loadFromFile = loadFromFileDefault;
+	/// relativeKey, absolutKey, async, outReqeust
+	delegate<void(const std::string&, const std::string&, bool, LoadRequest<T>&)> loadFromFile = loadFromFileDefault;
 
-	//absolutKey, asset
-	std::function<void(const std::string&, const AssetHandle<T>&)> saveToFile = saveToFileDefault;
+	/// absolutKey, asset
+	delegate<void(const std::string&, const AssetHandle<T>&)> saveToFile = saveToFileDefault;
 
-	//storage
+	/// Storage container
 	std::unordered_map<std::string, LoadRequest<T>> container;
+	/// Sub directory
 	std::string subdir;
 };
 
@@ -61,12 +138,28 @@ class AssetManager
 {
 public:
 
+	//-----------------------------------------------------------------------------
+	//  Name : add ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	template <typename S>
 	void add(std::shared_ptr<TStorage<S>> system)
 	{
 		storages.insert(std::make_pair(TStorage<S>::family(), system));
 	}
 
+	//-----------------------------------------------------------------------------
+	//  Name : add ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	template <typename S, typename ... Args>
 	std::shared_ptr<TStorage<S>> add(Args && ... args)
 	{
@@ -75,6 +168,14 @@ public:
 		return s;
 	}
 
+	//-----------------------------------------------------------------------------
+	//  Name : getStorage ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	template <typename S>
 	std::shared_ptr<TStorage<S>> getStorage()
 	{
@@ -178,9 +279,10 @@ public:
 
 		auto absoluteKey = getAbsoluteKey(toLowerKey, storage);
 		auto absoluteNewKey = getAbsoluteKey(toLowerNewKey, storage);
-		fs::copyFile(absoluteKey, absoluteNewKey, true);
+		fs::moveFile(absoluteKey, absoluteNewKey, true);
 
 		storage->container[toLowerNewKey] = storage->container[toLowerKey];
+		storage->container[toLowerNewKey].asset.link->id = toLowerNewKey;
 		storage->container.erase(toLowerKey);
 	}
 

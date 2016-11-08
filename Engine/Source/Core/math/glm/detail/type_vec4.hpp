@@ -3,10 +3,9 @@
 
 #pragma once
 
-#include "setup.hpp"
 #include "type_vec.hpp"
-#ifdef GLM_SWIZZLE
-#	if GLM_HAS_ANONYMOUS_UNION
+#if GLM_SWIZZLE == GLM_SWIZZLE_ENABLED
+#	if GLM_HAS_UNRESTRICTED_UNIONS
 #		include "_swizzle.hpp"
 #	else
 #		include "_swizzle_func.hpp"
@@ -27,7 +26,17 @@ namespace glm
 
 		// -- Data --
 
-#		if GLM_HAS_UNRESTRICTED_UNIONS
+#		if GLM_HAS_ALIGNED_TYPE
+#			if GLM_COMPILER & GLM_COMPILER_GCC
+#				pragma GCC diagnostic push
+#				pragma GCC diagnostic ignored "-Wpedantic"
+#			endif
+#			if GLM_COMPILER & GLM_COMPILER_CLANG
+#				pragma clang diagnostic push
+#				pragma clang diagnostic ignored "-Wgnu-anonymous-struct"
+#				pragma clang diagnostic ignored "-Wnested-anon-types"
+#			endif
+		
 			union
 			{
 				struct { T x, y, z, w;};
@@ -36,7 +45,7 @@ namespace glm
 
 				typename detail::storage<T, sizeof(T) * 4, detail::is_aligned<P>::value>::type data;
 
-#				ifdef GLM_SWIZZLE
+#				if GLM_SWIZZLE == GLM_SWIZZLE_ENABLED
 					_GLM_SWIZZLE4_2_MEMBERS(T, P, glm::tvec2, x, y, z, w)
 					_GLM_SWIZZLE4_2_MEMBERS(T, P, glm::tvec2, r, g, b, a)
 					_GLM_SWIZZLE4_2_MEMBERS(T, P, glm::tvec2, s, t, p, q)
@@ -48,36 +57,43 @@ namespace glm
 					_GLM_SWIZZLE4_4_MEMBERS(T, P, glm::tvec4, s, t, p, q)
 #				endif//GLM_SWIZZLE
 			};
+
+#			if GLM_COMPILER & GLM_COMPILER_CLANG
+#				pragma clang diagnostic pop
+#			endif
+#			if GLM_COMPILER & GLM_COMPILER_GCC
+#				pragma GCC diagnostic pop
+#			endif
 #		else
 			union { T x, r, s; };
 			union { T y, g, t; };
 			union { T z, b, p; };
 			union { T w, a, q; };
 
-#			ifdef GLM_SWIZZLE
+#			if GLM_SWIZZLE == GLM_SWIZZLE_ENABLED
 				GLM_SWIZZLE_GEN_VEC_FROM_VEC4(T, P, tvec4, tvec2, tvec3, tvec4)
 #			endif//GLM_SWIZZLE
-#		endif//GLM_LANG
+#		endif
 
 		// -- Component accesses --
 
 		/// Return the count of components of the vector
 		typedef length_t length_type;
-		GLM_FUNC_DECL GLM_CONSTEXPR length_type length() const;
+		GLM_FUNC_DECL static length_type length(){return 4;}
 
 		GLM_FUNC_DECL T & operator[](length_type i);
 		GLM_FUNC_DECL T const & operator[](length_type i) const;
 
 		// -- Implicit basic constructors --
 
-		GLM_FUNC_DECL GLM_CONSTEXPR tvec4() GLM_DEFAULT_CTOR;
-		GLM_FUNC_DECL GLM_CONSTEXPR tvec4(tvec4<T, P> const& v) GLM_DEFAULT;
+		GLM_FUNC_DECL GLM_CONSTEXPR_SIMD tvec4() GLM_DEFAULT_CTOR;
+		GLM_FUNC_DECL GLM_CONSTEXPR_SIMD tvec4(tvec4<T, P> const& v) GLM_DEFAULT;
 		template <precision Q>
-		GLM_FUNC_DECL GLM_CONSTEXPR tvec4(tvec4<T, Q> const& v);
+		GLM_FUNC_DECL GLM_CONSTEXPR_SIMD tvec4(tvec4<T, Q> const& v);
 
 		// -- Explicit basic constructors --
 
-		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR explicit tvec4(ctor);
+		GLM_FUNC_DECL GLM_CONSTEXPR_SIMD explicit tvec4(ctor);
 		GLM_FUNC_DECL GLM_CONSTEXPR_SIMD explicit tvec4(T scalar);
 		GLM_FUNC_DECL GLM_CONSTEXPR_SIMD tvec4(T a, T b, T c, T d);
 
@@ -85,9 +101,9 @@ namespace glm
 
 		/// Explicit converions (From section 5.4.1 Conversion and scalar constructors of GLSL 1.30.08 specification)
 		template <typename A, typename B, typename C, typename D>
-		GLM_FUNC_DECL GLM_CONSTEXPR tvec4(A a, B b, C c, D d);
+		GLM_FUNC_DECL GLM_CONSTEXPR_SIMD tvec4(A a, B b, C c, D d);
 		template <typename A, typename B, typename C, typename D>
-		GLM_FUNC_DECL GLM_CONSTEXPR tvec4(tvec1<A, P> const& a, tvec1<B, P> const& b, tvec1<C, P> const& c, tvec1<D, P> const& d);
+		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR tvec4(tvec1<A, P> const& a, tvec1<B, P> const& b, tvec1<C, P> const& c, tvec1<D, P> const& d);
 
 		// -- Conversion vector constructors --
 
@@ -130,7 +146,7 @@ namespace glm
 		GLM_FUNC_DECL GLM_CONSTEXPR GLM_EXPLICIT tvec4(tvec4<U, Q> const& v);
 
 		// -- Swizzle constructors --
-#		if GLM_HAS_UNRESTRICTED_UNIONS && defined(GLM_SWIZZLE)
+#		if GLM_HAS_UNRESTRICTED_UNIONS && (GLM_SWIZZLE == GLM_SWIZZLE_ENABLED)
 			template <int E0, int E1, int E2, int E3>
 			GLM_FUNC_DECL tvec4(detail::_swizzle<4, T, P, glm::tvec4, E0, E1, E2, E3> const & that)
 			{
@@ -172,7 +188,7 @@ namespace glm
 			{
 				*this = tvec4<T, P>(x, v());
 			}
-#		endif// GLM_HAS_UNRESTRICTED_UNIONS && defined(GLM_SWIZZLE)
+#		endif// GLM_HAS_UNRESTRICTED_UNIONS && (GLM_SWIZZLE == GLM_SWIZZLE_ENABLED)
 
 		// -- Unary arithmetic operators --
 

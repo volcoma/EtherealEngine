@@ -14,10 +14,10 @@
 #pragma once
 
 // Dependency:
-#include "../glm.hpp"
+#include "../detail/func_geometric.hpp"
 #include "../gtx/quaternion.hpp"
 
-#if(defined(GLM_MESSAGES) && !defined(GLM_EXT_INCLUDED))
+#if GLM_MESSAGES == GLM_MESSAGES_ENABLED && !defined(GLM_EXT_INCLUDED)
 #	pragma message("GLM: GLM_GTX_norm extension included")
 #endif
 

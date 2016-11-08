@@ -3957,7 +3957,7 @@ namespace bgfx
 		void swap();
 		const char* getName(UniformHandle _handle) const;
 		UniformType::Enum getUniformType(UniformHandle _handle);
-
+		uint16_t getNum(UniformHandle _handle) const;
 		// render thread
 		bool renderFrame();
 		void flushTextureUpdateBatch(CommandBuffer& _cmdbuf);
