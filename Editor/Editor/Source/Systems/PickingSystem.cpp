@@ -128,7 +128,7 @@ void PickingSystem::frameRender(ecs::EntityManager &entities, ecs::EventManager 
 
 	// If the user previously clicked, and we're done reading data from GPU, look at ID buffer on CPU
 	// Whatever mesh has the most pixels in the ID buffer is the one the user clicked on.
-	if (!mReading && input.isMouseButtonReleased(sf::Mouse::Left))
+	if (!mReading)
 	{
 		auto& surface = mRenderView->getRenderSurface();
 		// Blit and read
@@ -138,6 +138,7 @@ void PickingSystem::frameRender(ecs::EntityManager &entities, ecs::EventManager 
 
 	if(input.isMouseButtonPressed(sf::Mouse::Left))
 	{
+		mReading = 0;
 		math::vec4 mousePosNDC = { mouseXNDC, mouseYNDC, 0.0f, 1.0f };
 		math::vec4 mousePosNDCEnd = { mouseXNDC, mouseYNDC, 1.0f, 1.0f };
 

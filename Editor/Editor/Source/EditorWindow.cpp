@@ -418,6 +418,12 @@ void MainEditorWindow::onToolbar()
 	{
 		editState.mode = ImGuizmo::MODE::WORLD;
 	}
+	gui::SameLine(0.0f);
+	if (gui::ToolbarButton(icons["grid"].get(), "Show Grid", editState.showGrid))
+	{
+		editState.showGrid = !editState.showGrid;
+	}
+
 	gui::SameLine(width / 2.0f - 36.0f);
 	if (gui::ToolbarButton(icons["play"].get(), "Play", false))
 	{

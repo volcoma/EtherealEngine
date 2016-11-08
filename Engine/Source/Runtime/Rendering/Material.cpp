@@ -30,6 +30,31 @@ Material::~Material()
 
 }
 
+void Material::setTexture(std::uint8_t _stage, const std::string& _sampler, gfx::TextureHandle _texture, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
+{
+	mProgram->setTexture(_stage, _sampler, _texture, _flags);
+}
+
+void Material::setTexture(std::uint8_t _stage, const std::string& _sampler, Texture* _texture, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
+{
+	mProgram->setTexture(_stage, _sampler, _texture, _flags);
+}
+
+void Material::setTexture(std::uint8_t _stage, const std::string& _sampler, gfx::FrameBufferHandle _handle, uint8_t _attachment /*= 0 */, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
+{
+	mProgram->setTexture(_stage, _sampler, _handle, _attachment, _flags);
+}
+
+void Material::setTexture(std::uint8_t _stage, const std::string& _sampler, FrameBuffer* _handle, uint8_t _attachment /*= 0 */, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
+{
+	mProgram->setTexture(_stage, _sampler, _handle, _attachment, _flags);
+}
+
+void Material::setUniform(const std::string& _name, const void* _value, std::uint16_t _num /*= 1*/)
+{
+	mProgram->setUniform(_name, _value, _num);
+}
+
 std::uint64_t Material::getRenderStates(bool applyCull, bool depthWrite, bool depthTest) const
 {
 	// Set render states.

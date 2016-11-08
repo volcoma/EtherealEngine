@@ -18,8 +18,6 @@ public:
 private:
 
  	std::shared_ptr<RenderView> mRenderView;
-// 	std::shared_ptr<Texture> mPickingRT;
-// 	std::shared_ptr<Texture> mPickingRTDepth;
 	std::shared_ptr<Texture> mBlitTex;
 	std::unique_ptr<Program> mProgram;
 	std::uint8_t mBlitData[_id_dimensions*_id_dimensions * 4]; // Read blit into this

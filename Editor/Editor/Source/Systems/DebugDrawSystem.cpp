@@ -90,14 +90,18 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 
 	};
 
-	const auto farClip = 200;
-	const auto height = 40.0f;
-	const auto divison = 10;
-	const auto iterations = math::power_of_n_round_down(farClip, divison);
-	for (std::uint32_t i = 0; i < iterations; ++i)
+	if (editState.showGrid)
 	{
-		drawGrid(colorGrid, math::abs(cameraPos.y), height, farClip, divison, i, iterations);
+		static const auto farClip = 200;
+		static const auto height = 40.0f;
+		static const auto divison = 10;
+		const auto iterations = math::power_of_n_round_down(farClip, divison);
+		for (std::uint32_t i = 0; i < iterations; ++i)
+		{
+			drawGrid(colorGrid, math::abs(cameraPos.y), height, farClip, divison, i, iterations);
+		}
 	}
+	
 
 	if (!selected || !selected.is_type<ecs::Entity>())
 		return;

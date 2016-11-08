@@ -6,9 +6,11 @@
 
 #include "Core/reflection/rttr/rttr_enable.h"
 #include "Core/serialization/serialization.h"
+#include "Graphics/graphics.h"
 
 struct Program;
 struct Texture;
+struct FrameBuffer;
 
 enum class CullType : std::uint32_t
 {
@@ -52,6 +54,70 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	inline bool isValid() const { return !!mProgram; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : setTexture ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	void setTexture(std::uint8_t _stage
+		, const std::string& _sampler
+		, FrameBuffer* _handle
+		, uint8_t _attachment = 0
+		, std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
+
+	//-----------------------------------------------------------------------------
+	//  Name : setTexture ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	void setTexture(std::uint8_t _stage
+		, const std::string& _sampler
+		, gfx::FrameBufferHandle _handle
+		, uint8_t _attachment = 0
+		, std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
+
+	//-----------------------------------------------------------------------------
+	//  Name : setTexture ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	void setTexture(std::uint8_t _stage
+		, const std::string& _sampler
+		, Texture* _texture
+		, std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
+
+	//-----------------------------------------------------------------------------
+	//  Name : setTexture ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	void setTexture(std::uint8_t _stage
+		, const std::string& _sampler
+		, gfx::TextureHandle _texture
+		, std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
+
+	//-----------------------------------------------------------------------------
+	//  Name : setUniform ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	void setUniform(const std::string& _name, const void* _value, std::uint16_t _num = 1);
 
 	//-----------------------------------------------------------------------------
 	//  Name : getProgram ()

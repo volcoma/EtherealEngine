@@ -14,6 +14,9 @@
 
 void updateLodData(LodData& lodData, std::size_t totalLods, float minDist, float maxDist, float transTime, float distanceToCamera, float dt)
 {
+	if (totalLods == 1)
+		return;
+
 	totalLods -= 1;
 	if (totalLods < 0)
 		totalLods = 0;
@@ -74,8 +77,6 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 			if (!material)
 				return;
 
-			auto program = material->getProgram();
-
 			const auto hMeshCurr = model.getLod(currentLodIndex);
 			if (!hMeshCurr)
 				return;
@@ -121,19 +122,21 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 				currentTime / transitionTime
 			};
 
-			program->setUniform("u_camera_wpos", &camera->getPosition());
-			program->setUniform("u_camera_clip_planes", &clip_planes);
-			program->setUniform("u_lod_params", &params);
+			material->setUniform("u_camera_wpos", &camera->getPosition());
+			material->setUniform("u_camera_clip_planes", &clip_planes);
+			material->setUniform("u_lod_params", &params);
 			material->submit();
 
 			// Set render states.
 			const auto states = material->getRenderStates();
 
+			auto program = material->getProgram();
+
 			hMeshCurr->submit(renderView->getId(), program->handle, worldTransform, states);
 
 			if (currentTime != 0.0f)
 			{
-				program->setUniform("u_lod_params", &paramsInv);
+				material->setUniform("u_lod_params", &paramsInv);
 				material->submit();
 
 				const auto hMeshTarget = model.getLod(targetLodIndex);

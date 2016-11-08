@@ -87,7 +87,11 @@ void EditState::loadIcons(AssetManager& manager)
 		icons["import"] = asset;
 	});
 
-
+	manager.load<Texture>("editor://icons/grid", false)
+		.then([this](auto asset) mutable
+	{
+		icons["grid"] = asset;
+	});
 }
 
 void EditState::select(rttr::variant object)
