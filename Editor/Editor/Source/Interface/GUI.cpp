@@ -12,8 +12,7 @@
 #include "Runtime/Rendering/RenderView.h"
 #include "Runtime/Rendering/RenderWindow.h"
 #include "Runtime/Assets/AssetManager.h"
-#include "Runtime/Application/Application.h"
-#include "Runtime/System/Singleton.h"
+#include "Runtime/System/Application.h"
 #include <unordered_map>
 
 // -------------------------------------------------------------------

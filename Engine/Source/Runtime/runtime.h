@@ -3,10 +3,9 @@
 #include "Core/core.h"
 #include "Graphics/graphics.h"
 
-#include "Application/Application.h"
+#include "System/Application.h"
 #include "System/FileSystem.h"
 #include "System/Timer.h"
-#include "System/Singleton.h"
 #include "System/MessageBox.h"
 #include "Rendering/RenderView.h"
 #include "Rendering/Material.h"

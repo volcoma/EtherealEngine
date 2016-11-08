@@ -1,9 +1,11 @@
 #pragma once
+
 #include <string>
 #include <cstdint>
 #include <vector>
 #include <memory>
 #include "Core/internal/assert/assert.h"
+#include "Singleton.h"
 //-----------------------------------------------------------------------------
 // Forward Declarations
 //-----------------------------------------------------------------------------
@@ -404,7 +406,7 @@ protected:
 	/// The Application's Timer
 	std::unique_ptr<Timer> mTimer;
 	/// The Application's ThreadPool
-	std::unique_ptr<ThreadPool>	mThreadPool;
+	std::unique_ptr<ThreadPool> mThreadPool;
 	/// The Application's ActionMapper
 	std::unique_ptr<ActionMapper> mActionMapper;
 };

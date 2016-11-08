@@ -7,8 +7,7 @@
 #include "../Rendering/VertexBuffer.h"
 #include "../Rendering/IndexBuffer.h"
 #include "../System/FileSystem.h"
-#include "../System/Singleton.h"
-#include "../Application/Application.h"
+#include "../System/Application.h"
 #include "../Threading/ThreadPool.h"
 
 #include "Core/serialization/archives.h"

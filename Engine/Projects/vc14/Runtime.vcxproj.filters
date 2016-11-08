@@ -61,9 +61,6 @@
     <Filter Include="Source Files\System\SFML\Window\Win32">
       <UniqueIdentifier>{a15e9c16-2344-4939-9672-2b9e49824efe}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Application">
-      <UniqueIdentifier>{b383e985-4db6-47c1-890e-4b73dbba7666}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Input">
       <UniqueIdentifier>{42505552-4876-4471-95f5-fa5c2249b0ca}</UniqueIdentifier>
     </Filter>
@@ -174,9 +171,6 @@
     <ClCompile Include="..\..\Source\Runtime\System\SFML\System\Err.cpp">
       <Filter>Source Files\System\SFML\System</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Application\Application.cpp">
-      <Filter>Source Files\Application</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\Rendering\RenderView.cpp">
       <Filter>Source Files\Rendering</Filter>
     </ClCompile>
@@ -266,6 +260,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\System\Platform\Windows\MessageBoxImpl.cpp">
       <Filter>Source Files\System\Platform\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\System\Application.cpp">
+      <Filter>Source Files\System</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -373,9 +370,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\Rendering\FrameBuffer.h">
       <Filter>Source Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Application\Application.h">
-      <Filter>Source Files\Application</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\Input\InputMapping.hpp">
       <Filter>Source Files\Input</Filter>
@@ -535,6 +529,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\Threading\thread_utils.h">
       <Filter>Source Files\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\System\Application.h">
+      <Filter>Source Files\System</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

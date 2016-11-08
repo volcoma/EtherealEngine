@@ -1,15 +1,13 @@
 #pragma once
 #include "../../Ecs/entityx/Entity.h"
+#include "../../System/Application.h"
+#include "../../Ecs/World.h"
 #include "Core/reflection/reflection.h"
 #include "Core/serialization/serialization.h"
 #include "Core/serialization/cereal/types/vector.hpp"
-#include "../../Application/Application.h"
-#include "../../System/Singleton.h"
-#include "../../Ecs/World.h"
 
 namespace entityx
 {
-
 
 SAVE(Entity)
 {

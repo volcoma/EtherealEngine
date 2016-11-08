@@ -2,9 +2,9 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "Core/math/math_includes.h"
+#include "../System/Application.h"
 #include "../Assets/AssetManager.h"
-#include "../Application/Application.h"
-#include "../System/Singleton.h"
+
 
 Model::Model()
 {

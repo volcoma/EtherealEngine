@@ -3,9 +3,8 @@
 #include "Uniform.h"
 #include "Texture.h"
 
+#include "../System/Application.h"
 #include "../Assets/AssetManager.h"
-#include "../Application/Application.h"
-#include "../System/Singleton.h"
 
 Material::Material()
 {

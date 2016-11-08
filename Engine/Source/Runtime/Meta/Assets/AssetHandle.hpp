@@ -5,8 +5,7 @@
 #include "Core/common/string_utils.h"
 #include "../../Assets/AssetHandle.h"
 #include "../../Assets/AssetManager.h"
-#include "../../Application/Application.h"
-#include "../../System/Singleton.h"
+#include "../../System/Application.h"
 
 #include "../../Rendering/Mesh.h"
 #include "../../Rendering/Texture.h"

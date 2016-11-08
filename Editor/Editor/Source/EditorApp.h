@@ -1,6 +1,5 @@
 #pragma once
-#include "Runtime/Application/Application.h"
-#include "Runtime/System/Singleton.h"
+#include "Runtime/System/Application.h"
 #include "EditState.h"
 #include "Runtime/Assets/AssetManager.h"
 #include "Core/logging/logging.h"

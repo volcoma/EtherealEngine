@@ -1,8 +1,7 @@
 #include "TransformComponent.h"
-#include "../../Application/Application.h"
-#include "../../System/Singleton.h"
-#include "../World.h"
 #include "Core/logging/logging.h"
+#include "../../System/Application.h"
+#include "../World.h"
 #include <algorithm>
 
 HTransformComponent createFromComponent(HTransformComponent component)

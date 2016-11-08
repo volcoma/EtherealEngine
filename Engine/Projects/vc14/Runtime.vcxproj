@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\Runtime\Application\Application.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Assets\AssetWriter.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Assets\AssetReader.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Ecs\Components\CameraComponent.cpp" />
@@ -49,6 +48,7 @@
     <ClCompile Include="..\..\Source\Runtime\Rendering\Uniform.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Rendering\VertexBuffer.cpp" />
     <ClCompile Include="..\..\Source\Runtime\runtime.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\System\Application.cpp" />
     <ClCompile Include="..\..\Source\Runtime\System\FileSystem.cpp" />
     <ClCompile Include="..\..\Source\Runtime\System\Platform\Windows\FileSystemImpl.cpp" />
     <ClCompile Include="..\..\Source\Runtime\System\Platform\Windows\MessageBoxImpl.cpp" />
@@ -72,7 +72,6 @@
     <ClCompile Include="..\..\Source\Runtime\Threading\thread_utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\Runtime\Application\Application.h" />
     <ClInclude Include="..\..\Source\Runtime\Assets\AssetHandle.h" />
     <ClInclude Include="..\..\Source\Runtime\Assets\AssetManager.h" />
     <ClInclude Include="..\..\Source\Runtime\Assets\AssetWriter.h" />
@@ -127,6 +126,7 @@
     <ClInclude Include="..\..\Source\Runtime\Rendering\Uniform.h" />
     <ClInclude Include="..\..\Source\Runtime\Rendering\VertexBuffer.h" />
     <ClInclude Include="..\..\Source\Runtime\runtime.h" />
+    <ClInclude Include="..\..\Source\Runtime\System\Application.h" />
     <ClInclude Include="..\..\Source\Runtime\System\FileSystem.h" />
     <ClInclude Include="..\..\Source\Runtime\System\MessageBox.h" />
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Config.hpp" />
