@@ -22,4 +22,5 @@ private:
 	std::unique_ptr<Program> mProgram;
 	std::uint8_t mBlitData[_id_dimensions*_id_dimensions * 4]; // Read blit into this
 	std::uint32_t mReading = 0;
+	bool mStartReadback = false;
 };

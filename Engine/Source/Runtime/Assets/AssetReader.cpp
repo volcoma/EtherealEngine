@@ -271,7 +271,8 @@ void AssetReader::loadMeshFromFile(const std::string& relativeKey, const std::st
 				gfx::read(&_reader, numVertices);
 				buffers.first.resize(numVertices*stride);
 				gfx::read(&_reader, (std::uint8_t*)buffers.first.data(), (std::uint32_t)buffers.first.size());
-				data->aabb.fromPoints(buffers.first.data(), numVertices, stride, true);
+				
+				data->aabb.fromPoints(buffers.first.data(), numVertices, stride, false);
 			}
 			break;
 

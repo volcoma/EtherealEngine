@@ -144,6 +144,13 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 		// Test the bounding box of the mesh
 		if (math::frustum::testOBB(frustum, bounds, worldTransform))
 		{
+			ddPush();
+			ddSetColor(0xff00ff00);
+			ddSetTransform(&worldTransform);
+			ddDraw(Aabb{ bounds.min, bounds.max });
+			ddPop();
+
+
 			const float u_params[8] =
 			{
 				1.0f, 1.0f, 0.0f, 1.0f,
