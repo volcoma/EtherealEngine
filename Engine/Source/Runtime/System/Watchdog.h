@@ -9,48 +9,81 @@
 #include <mutex>
 
 #include "FileSystem.h"
+#include "Core/logging/logging.h"
 
-//! Exception for when Watchdog can't locate a file or parse the wild card
-class WatchedFileSystemExc : public std::exception
+//-----------------------------------------------------------------------------
+//  Name : logPath ()
+/// <summary>
+/// When Watchdog can't locate a file or parse the wild card
+/// </summary>
+//-----------------------------------------------------------------------------
+inline void logPath(const fs::path& path)
 {
-public:
-	WatchedFileSystemExc(const fs::path &path)
-	{
-		mMessage = std::string("Failed to find file or directory at: ") + path.string();
-	}
+	auto logger = logging::get("Log");
+	logger->error() << (std::string("Watchdog can't locate a file or parse the wild card at: ") + path.string());
+}
 
-	virtual const char * what() const throw() { return mMessage.c_str(); }
-
-	std::string mMessage;
-};
 
 class Watchdog
 {
 public:
 
-	//! Watches a file or directory for modification and call back the specified std::function. The path specified is passed as argument of the callback even if there is multiple files. Use the second watch method if you want to receive a list of all the files that have been modified.
+	//-----------------------------------------------------------------------------
+	//  Name : watch ()
+	/// <summary>
+	/// Watches a file or directory for modification and call back the specified 
+	/// std::function. The path specified is passed as argument of the callback 
+	/// even if there is multiple files. Use the second watch method if you want
+	/// to receive a list of all the files that have been modified.
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	static void watch(const fs::path &path, const std::function<void(const fs::path&)> &callback)
 	{
 		watchImpl(path, callback, std::function<void(const std::vector<fs::path>&)>());
 	}
 
-	//! Watches a file or directory for modification and call back the specified std::function. A list of modified files or directory is passed as argument of the callback. Use this version only if you are watching multiple files or a directory.
+	//-----------------------------------------------------------------------------
+	//  Name : watch ()
+	/// <summary>
+	/// Watches a file or directory for modification and call back the specified
+	/// std::function. A list of modified files or directory is passed as argument 
+	/// of the callback. Use this version only if you are watching multiple files 
+	/// or a directory.
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	static void watch(const fs::path &path, const std::function<void(const std::vector<fs::path>&)> &callback)
 	{
 		watchImpl(path, std::function<void(const fs::path&)>(), callback);
 	}
-	//! Un-watches a previously registered file or directory
+
+	//-----------------------------------------------------------------------------
+	//  Name : unwatch ()
+	/// <summary>
+	/// Un-watches a previously registered file or directory
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	static void unwatch(const fs::path &path)
 	{
 		watchImpl(path);
 	}
-	//! Un-watches all previously registered file or directory
+
+	//-----------------------------------------------------------------------------
+	//  Name : unwatchAll ()
+	/// <summary>
+	/// Un-watches all previously registered file or directory
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	static void unwatchAll()
 	{
 		watchImpl(fs::path());
 	}
-	//! Sets the last modification time of a file or directory. by default sets the time to the current time
 
+	//-----------------------------------------------------------------------------
+	//  Name : touch ()
+	/// <summary>
+	/// Sets the last modification time of a file or directory. by default sets the time to the current time 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	static void touch(const fs::path &path, fs::file_time_type time = fs::file_time_type::clock::now())
 	{
 
@@ -72,21 +105,46 @@ public:
 		// otherwise throw an exception
 		else
 		{
-			throw WatchedFileSystemExc(path);
+			logPath(path);
 		}
 	}
+
+	//-----------------------------------------------------------------------------
+	//  Name : ~Watchdog ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	~Watchdog()
 	{
 		close();
 	}
 protected:
 
+	//-----------------------------------------------------------------------------
+	//  Name : Watchdog ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	Watchdog()
 		: mWatching(false)
 	{
 	}
 
 
+	//-----------------------------------------------------------------------------
+	//  Name : close ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	void close()
 	{
 		// remove all watchers
@@ -99,7 +157,14 @@ protected:
 			mThread.join();
 	}
 
-
+	//-----------------------------------------------------------------------------
+	//  Name : start ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	void start()
 	{
 		mWatching = true;
@@ -126,6 +191,15 @@ protected:
 			}
 		});
 	}
+
+	//-----------------------------------------------------------------------------
+	//  Name : watchImpl ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	static void watchImpl(const fs::path &path, const std::function<void(const fs::path&)> &callback = std::function<void(const fs::path&)>(), const std::function<void(const std::vector<fs::path>&)> &listCallback = std::function<void(const std::vector<fs::path>&)>())
 	{
 		// create the static Watchdog instance
@@ -152,7 +226,7 @@ protected:
 				});
 				if (!found)
 				{
-					throw WatchedFileSystemExc(path);
+					logPath(path);
 				}
 				else
 				{
@@ -193,6 +267,14 @@ protected:
 		}
 	}
 
+	//-----------------------------------------------------------------------------
+	//  Name : getPathFilterPair ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	static std::pair<fs::path, std::string> getPathFilterPair(const fs::path &path)
 	{
 		// extract wild card and parent path
@@ -209,7 +291,7 @@ protected:
 		// throw an exception if the file doesn't exist
 		if (filter.empty() && !fs::exists(p))
 		{
-			throw WatchedFileSystemExc(path);
+			logPath(path);
 		}
 
 
@@ -217,6 +299,14 @@ protected:
 
 	}
 
+	//-----------------------------------------------------------------------------
+	//  Name : visitWildCardPath ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	static std::pair<fs::path, std::string> visitWildCardPath(const fs::path &path, const std::function<bool(const fs::path&)> &visitor)
 	{
 		std::pair<fs::path, std::string> pathFilter = getPathFilterPair(path);
@@ -256,6 +346,14 @@ protected:
 	class Watcher
 	{
 	public:
+		//-----------------------------------------------------------------------------
+		//  Name : Watcher ()
+		/// <summary>
+		/// 
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		Watcher(const fs::path &path, const std::string &filter, const std::function<void(const fs::path&)> &callback, const std::function<void(const std::vector<fs::path>&)> &listCallback)
 			: mPath(path), mFilter(filter), mCallback(callback), mListCallback(listCallback)
 		{
@@ -282,6 +380,14 @@ protected:
 			}
 		}
 
+		//-----------------------------------------------------------------------------
+		//  Name : watch ()
+		/// <summary>
+		/// 
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		void watch()
 		{
 			// if there's no filter we just check for one item
@@ -315,6 +421,14 @@ protected:
 
 		}
 
+		//-----------------------------------------------------------------------------
+		//  Name : hasChanged ()
+		/// <summary>
+		/// 
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		bool hasChanged(const fs::path &path)
 		{
 			// get the last modification time
@@ -337,20 +451,25 @@ protected:
 		};
 
 	protected:
-		fs::path                                            mPath;
-		std::string                                         mFilter;
-		std::function<void(const fs::path&)>                mCallback;
-		std::function<void(const std::vector<fs::path>&)>   mListCallback;
-		std::map< std::string, fs::file_time_type >         mModificationTimes;
-
+		/// Path to watch
+		fs::path mPath;
+		/// Filter applied
+		std::string mFilter;
+		/// Callback for single modification
+		std::function<void(const fs::path&)> mCallback;
+		/// Callback for list of modifications
+		std::function<void(const std::vector<fs::path>&)> mListCallback;
+		/// Cache modification times
+		std::map< std::string, fs::file_time_type > mModificationTimes;
 	};
-
-	friend class SleepyWatchdog;
-
-	std::mutex                      mMutex;
-	std::atomic<bool>               mWatching;
-	std::thread						mThread;
-	std::map<std::string, Watcher>	mFileWatchers;
+	/// Mutex for the file watchers
+	std::mutex mMutex;
+	/// Atomic bool sync
+	std::atomic<bool> mWatching;
+	/// Thread that polls for changes
+	std::thread mThread;
+	/// Registered file watchers
+	std::map<std::string, Watcher> mFileWatchers;
 };
 
 typedef Watchdog wd;

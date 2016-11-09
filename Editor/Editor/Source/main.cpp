@@ -9,6 +9,7 @@ int main(int _argc, char* _argv[])
 	if (!app.initInstance(rootDataDir, string_utils::commandLineArgs(_argc, _argv)))
 	{
 		// Release the framework
+		app.shutDown();
 		return -1;
 	}
 
