@@ -1,108 +1,78 @@
 #pragma once
-#include <memory>
+
+#include "Core/logging/logging.h"
+#include <Core/console/console.h>
 #include <string>
-
-#include "Core/events/event.hpp"
-#include "AssetHandle.h"
-#include "../System/Application.h"
-#include "../Threading/ThreadPool.h"
-
-template<typename T>
-struct LoadRequest
+#include <vector>
+class ConsoleLog : public logging::sinks::base_sink<std::mutex>, public Console
 {
+public:
+	using ItemContainer = std::vector<std::pair<std::string, logging::level::level_enum>>;
+
 	//-----------------------------------------------------------------------------
-	//  Name : then ()
+	//  Name : _sink_it ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void then(const delegate<void(AssetHandle<T>)>& callback)
-	{
-		if (isReady())
-			callback(asset);
-		else
-			callbacks.addListener(callback);
-	}
+	void _sink_it(const logging::details::log_msg& msg) override;
 
 	//-----------------------------------------------------------------------------
-	//  Name : isReady ()
+	//  Name : flush ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool isReady() const
-	{
-		return !!asset.link->asset;
-	}
+	void flush() override;
 
 	//-----------------------------------------------------------------------------
-	//  Name : waitUntilReady ()
+	//  Name : getItems ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void waitUntilReady()
-	{
-		if (loadTask)
-		{
-			loadTask->waitUntilReady();
-			auto& app = Singleton<Application>::getInstance();
-			auto& threadPool = app.getThreadPool();
-			threadPool.poll(loadTask);
-		}
-	}
+	ItemContainer getItems();
 
 	//-----------------------------------------------------------------------------
-	//  Name : setTask ()
+	//  Name : clearLog ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setTask(std::shared_ptr<ITask> task)
-	{
-		loadTask = task;
-	}
-
+	void clearLog();
+	
 	//-----------------------------------------------------------------------------
-	//  Name : setData ()
+	//  Name : getPendingEntries ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setData(const std::string& id, std::shared_ptr<T> data)
-	{
-		asset.link->id = id;
-		asset.link->asset = data;
-	}
+	inline int getPendingEntries() const { return mPendingEntries; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : invokeCallbacks ()
+	//  Name : setPendingEntries ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void invokeCallbacks()
-	{
-		callbacks(asset);
-		callbacks = {};
-	}
-
-	/// Requested asset
-	AssetHandle<T> asset;
-	/// Associated task with this request
-	std::shared_ptr<ITask> loadTask;
-	/// Subscribed callbacks
-	event<void(AssetHandle<T>)> callbacks;
+	inline void setPendingEntries(bool val) { mPendingEntries = val; }
+private:
+	///
+	ItemContainer mItems;
+	///
+	int mPendingEntries = 0;
+	///
+	const std::size_t mMaxSize = 20;
 };

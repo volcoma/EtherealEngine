@@ -1,27 +1,7 @@
 #pragma once
 #include "Runtime/System/Application.h"
 #include "EditState.h"
-#include "Runtime/Assets/AssetManager.h"
-#include "Core/logging/logging.h"
-struct ConsoleLog : public logging::sinks::base_sink<std::mutex>//, public IConsole
-{
-	using ItemContainer = std::vector<std::pair<std::string, logging::level::level_enum>>;
-
-	ConsoleLog();
-
-	void _sink_it(const logging::details::log_msg& msg) override;
-	void flush() override;
-	ItemContainer getItems();
-	void clearLog();
-	void clearInput();
-
-	std::string					InputBuf;
-	ItemContainer				Items;
-	bool						ScrollToBottom = true;
-	const std::size_t			MaxSize = 20;
-};
-
-
+#include "Console/ConsoleLog.h"
 
 class EditorApp : public Application
 {
@@ -156,10 +136,13 @@ public:
 	//-----------------------------------------------------------------------------
 	void openProject(const std::string& projectDir);
 private:
+	/// Edit state
 	EditState mEditState;
+	/// Editor docks
 	std::vector<std::unique_ptr<ImGuiDock::Dock>> mDocks;
+	/// Editor Console log
+	std::shared_ptr<ConsoleLog> mConsoleLog = std::make_shared<ConsoleLog>();
 };
-
 
 template<>
 inline Application& Singleton<Application>::create()

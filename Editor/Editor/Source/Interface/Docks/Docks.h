@@ -2,7 +2,7 @@
 
 #include "../GUI.h"
 
-struct ConsoleLog;
+class ConsoleLog;
 
 namespace Docks
 {

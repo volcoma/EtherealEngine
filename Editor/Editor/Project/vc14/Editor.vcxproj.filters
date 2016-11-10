@@ -37,6 +37,9 @@
     <Filter Include="Source Files\Systems">
       <UniqueIdentifier>{fc6091d8-3c95-4785-a421-9c6ec74c0564}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Console">
+      <UniqueIdentifier>{0a97d13e-fc7b-421d-ae64-33dfabdd946c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\Res\Common.rc">
@@ -137,6 +140,9 @@
     <ClInclude Include="..\..\Source\Interface\Inspectors\Inspector_BaseTypes.h">
       <Filter>Source Files\Interface\Inspectors</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\Console\ConsoleLog.h">
+      <Filter>Source Files\Console</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\main.cpp">
@@ -228,6 +234,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\Interface\Inspectors\Inspector_BaseTypes.cpp">
       <Filter>Source Files\Interface\Inspectors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Console\ConsoleLog.cpp">
+      <Filter>Source Files\Console</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

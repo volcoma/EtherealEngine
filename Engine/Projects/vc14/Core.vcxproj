@@ -25,6 +25,7 @@
     <ClInclude Include="..\..\Source\Core\config\cfg.h" />
     <ClInclude Include="..\..\Source\Core\config\cfg\Config.h" />
     <ClInclude Include="..\..\Source\Core\config\cfg\Parser.h" />
+    <ClInclude Include="..\..\Source\Core\console\console.h" />
     <ClInclude Include="..\..\Source\Core\core.h" />
     <ClInclude Include="..\..\Source\Core\events\delegate.hpp" />
     <ClInclude Include="..\..\Source\Core\events\event.hpp" />
@@ -395,6 +396,7 @@
     <ClCompile Include="..\..\Source\Core\common\string_utils.cpp" />
     <ClCompile Include="..\..\Source\Core\config\cfg\Config.cpp" />
     <ClCompile Include="..\..\Source\Core\config\cfg\Parser.cpp" />
+    <ClCompile Include="..\..\Source\Core\console\console.cpp" />
     <ClCompile Include="..\..\Source\Core\core.cpp" />
     <ClCompile Include="..\..\Source\Core\internal\memory\tracey.cpp" />
     <ClCompile Include="..\..\Source\Core\logging\spdlog\details\format.cc" />

@@ -166,6 +166,9 @@
     <Filter Include="Source Files\math\glm\simd">
       <UniqueIdentifier>{8c6d59e0-0eed-46a2-8a72-8df17331ad84}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\console">
+      <UniqueIdentifier>{489d2678-89bf-4200-8465-a146aea2b155}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\Core\events\delegate.hpp">
@@ -1281,6 +1284,9 @@
     <ClInclude Include="..\..\Source\Core\math\glm\detail\_vectorize.hpp">
       <Filter>Source Files\math\glm\detail</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\Core\console\console.h">
+      <Filter>Source Files\console</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\Core\internal\memory\tracey.cpp">
@@ -1402,6 +1408,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\Core\math\glm\detail\glm.cpp">
       <Filter>Source Files\math\glm\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\console\console.cpp">
+      <Filter>Source Files\console</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

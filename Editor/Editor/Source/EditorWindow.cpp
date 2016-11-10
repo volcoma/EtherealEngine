@@ -10,6 +10,8 @@
 #include "Runtime/System/FileSystem.h"
 #include "Runtime/System/Timer.h"
 #include "Runtime/Rendering/RenderView.h"
+#include "Runtime/Assets/AssetManager.h"
+
 #include "Core/logging/logging.h"
 
 std::vector<ecs::Entity> gatherSceneData()

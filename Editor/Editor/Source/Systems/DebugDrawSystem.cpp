@@ -12,6 +12,7 @@
 #include "Runtime/Rendering/Texture.h"
 #include "Runtime/Rendering/Material.h"
 #include "Runtime/Rendering/Debug/DebugDraw.h"
+#include "Runtime/Assets/AssetManager.h"
 #include "../EditorApp.h"
 DebugDrawSystem::DebugDrawSystem()
 {

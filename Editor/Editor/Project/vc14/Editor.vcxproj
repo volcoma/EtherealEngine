@@ -281,6 +281,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Console\ConsoleLog.cpp" />
     <ClCompile Include="..\..\Source\EditorApp.cpp" />
     <ClCompile Include="..\..\Source\EditorWindow.cpp" />
     <ClCompile Include="..\..\Source\EditState.cpp" />
@@ -317,6 +318,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Res\resource.h" />
+    <ClInclude Include="..\..\Source\Console\ConsoleLog.h" />
     <ClInclude Include="..\..\Source\EditorApp.h" />
     <ClInclude Include="..\..\Source\EditorWindow.h" />
     <ClInclude Include="..\..\Source\EditState.h" />

@@ -1,6 +1,6 @@
 #include "Docks.h"
 #include "../../EditorApp.h"
-
+#include "../../Console/ConsoleLog.h"
 namespace Docks
 {
 	void renderConsole(ImVec2 area, ConsoleLog& console)
@@ -36,7 +36,7 @@ namespace Docks
 			{ logging::level::trace,{ 1.0f, 1.0f, 1.0f, 1.0f } },
 			{ logging::level::debug,{ 1.0f, 1.0f, 1.0f, 1.0f } },
 			{ logging::level::info,{ 1.0f, 1.0f, 1.0f, 1.0f } },
-			{ logging::level::notice,{ 1.0f, 1.0f, 1.0f, 1.0f } },
+			{ logging::level::notice,{ 1.0f, 5.0f, 0.0f, 1.0f } },
 			{ logging::level::warn,{ 1.0f, 0.494f, 0.0f, 1.0f } },
 			{ logging::level::err,{ 1.0f, 0.0f, 0.0f, 1.0f } },
 			{ logging::level::critical,{ 1.0f, 1.0f, 1.0f, 1.0f } },
@@ -56,34 +56,34 @@ namespace Docks
 			gui::TextWrapped(itemCstr);
 			gui::PopStyleColor();
 		}
-		if (console.ScrollToBottom)
+		if (console.getPendingEntries() > 0)
 			gui::SetScrollHere();
 
-		console.ScrollToBottom = false;
+		console.setPendingEntries(0);
 
 		gui::PopStyleVar();
 		gui::EndChild();
 		gui::Separator();
-		auto lambda = [](ImGuiTextEditCallbackData* data) -> int
-		{
-			return 0;
-		};
+
 		// Command-line
+		std::string inputBuff;
+		inputBuff.resize(64, 0);
+		inputBuff.shrink_to_fit();
 		if (gui::InputText(
 			"Enter Command", 
-			&console.InputBuf[0], 
-			console.InputBuf.size(),
-			ImGuiInputTextFlags_EnterReturnsTrue |
-			ImGuiInputTextFlags_CallbackCompletion |
-			ImGuiInputTextFlags_CallbackHistory, 
-			lambda))
+			&inputBuff[0],
+			inputBuff.size(),
+			ImGuiInputTextFlags_EnterReturnsTrue)
+			)
 		{
-			
-
-			std::string command(console.InputBuf);
-			//if (command != "")
-			//	executeCommand(t_command);
-			console.clearInput();
+			// copy from c_str to remove trailing zeros
+			std::string command = inputBuff.c_str();
+			std::string errorMsg = console.processInput(command);
+			if (errorMsg != "")
+			{
+				auto logger = logging::get("Log");
+				logger->notice() << errorMsg;
+			}
 			// Demonstrate keeping auto focus on the input box
 			if (gui::IsItemHovered() || (gui::IsRootWindowOrAnyChildFocused() && !gui::IsAnyItemActive() && !gui::IsMouseClicked(0)))
 				gui::SetKeyboardFocusHere(-1); // Auto focus previous widget

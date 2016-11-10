@@ -83,7 +83,7 @@ namespace string_utils
 	//  Name : trim()
 	/// <summary>
 	/// Strips all white space (space and tab characters) from both the head 
-	/// and tail of this std::string, returning a reference to self (not copy).
+	/// and tail of this std::string.
 	/// </summary>
 	//-------------------------------------------------------------------------
 	std::string trim(const std::string& str);
@@ -100,7 +100,7 @@ namespace string_utils
 	//  Name : toUpper()
 	/// <summary>
 	/// Process the std::string, transforming all characters to upper case where
-	/// appropriate. Returns a reference to self (not a copy).
+	/// appropriate.
 	/// </summary>
 	//-------------------------------------------------------------------------
 	std::string toUpper(const std::string& str);
@@ -109,7 +109,7 @@ namespace string_utils
 	//  Name : toLower()
 	/// <summary>
 	/// Process the std::string, transforming all characters to lower case where
-	/// appropriate. Returns a reference to self (not a copy).
+	/// appropriate.
 	/// </summary>
 	//-------------------------------------------------------------------------
 	std::string toLower(const std::string& str);

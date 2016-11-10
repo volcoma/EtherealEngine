@@ -1,4 +1,5 @@
 #include "Inspector_CoreTypes.h"
+#include "Core/common/string_utils.h"
 
 bool Inspector_Bool::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
@@ -473,13 +474,13 @@ bool Inspector_String::inspect(rttr::variant& var, bool readOnly, std::function<
 	}
 	else
 	{
-		char buffer[64];
-		memset(buffer, 0, 64);
-		memcpy(buffer, data.c_str(), data.size());
-
-		if (gui::InputText("", buffer, math::countof(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
+		std::string inputBuff;
+		inputBuff.resize(64, 0);
+		inputBuff.shrink_to_fit();
+		if (gui::InputText("", &inputBuff[0], inputBuff.size(), ImGuiInputTextFlags_EnterReturnsTrue))
 		{
-			var = std::string(buffer);
+			// copy from c_str to remove trailing zeros
+			var = inputBuff.c_str();
 			return true;
 		}
 	}

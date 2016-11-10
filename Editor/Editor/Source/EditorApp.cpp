@@ -12,6 +12,7 @@
 #include "Runtime/Rendering/Mesh.h"
 #include "Runtime/Rendering/Shader.h"
 #include "Runtime/Threading/ThreadPool.h"
+#include "Console/ConsoleLog.h"
 
 template<typename T>
 void watchAssets(const std::string& toLowerKey, bool reloadAsync)
@@ -87,10 +88,6 @@ bool EditorApp::initUI()
 
 bool EditorApp::initDocks()
 {
-	auto logger = logging::get("Log");
-	auto consoleLog = std::make_shared<ConsoleLog>();
-	logger->add_sink(consoleLog);
-
 	mDocks.emplace_back(std::make_unique<ImGuiDock::Dock>());
 	mDocks.emplace_back(std::make_unique<ImGuiDock::Dock>());
 	mDocks.emplace_back(std::make_unique<ImGuiDock::Dock>());
@@ -117,9 +114,9 @@ bool EditorApp::initDocks()
 	assets->initialize("Assets", true, ImVec2(200.0f, 200.0f), &Docks::renderAssets);
 
 	auto& console = mDocks[5];
-	console->initialize("Console", true, ImVec2(200.0f, 200.0f), [consoleLog](ImVec2 area)
+	console->initialize("Console", true, ImVec2(200.0f, 200.0f), [this](ImVec2 area)
 	{
-		Docks::renderConsole(area, *consoleLog.get());
+		Docks::renderConsole(area, *mConsoleLog.get());
 	});
 
 	auto& style = mDocks[6];
@@ -202,6 +199,21 @@ bool EditorApp::initSystems()
 
 bool EditorApp::initApplication()
 {
+	auto logger = logging::get("Log");
+	logger->add_sink(mConsoleLog);
+
+	std::function<void()> logVersion = [logger]()
+	{
+		logger->info() << "Version 1.0";
+	};
+	mConsoleLog->registerCommand(
+		"version",
+		"Returns the current version of the Editor.",
+		{ },
+		{ },
+		logVersion
+	);
+
 	if (!initUI()) { shutDown(); return false; }
 
 	if (!initDocks()) { shutDown(); return false; }
@@ -263,47 +275,4 @@ void EditorApp::openProject(const std::string& projectDir)
 	manager.clear();
 	auto projName = fs::getFileName(projectDir);
 	editState.project = projName;
-
-	
-}
-
-ConsoleLog::ConsoleLog()
-{
-	InputBuf.resize(64, 0);
-	InputBuf.shrink_to_fit();
-}
-
-void ConsoleLog::_sink_it(const logging::details::log_msg& msg)
-{
-	Items.push_back({ msg.formatted.c_str(), msg.level });
-	if (Items.size() > MaxSize)
-		Items.pop_back();
-	flush();
-	ScrollToBottom = true;
-}
-
-void ConsoleLog::flush()
-{
-
-}
-
-ConsoleLog::ItemContainer ConsoleLog::getItems()
-{
-	ItemContainer itemsCopy;
-	{
-		std::lock_guard<std::mutex> lock(_mutex);
-		itemsCopy = Items;
-	}
-	return itemsCopy;
-}
-
-void ConsoleLog::clearLog()
-{
-	Items.clear();
-	ScrollToBottom = true;
-}
-
-void ConsoleLog::clearInput()
-{
-	std::fill(std::begin(InputBuf), std::end(InputBuf), 0);
 }
