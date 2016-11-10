@@ -328,7 +328,7 @@ private:
 	/// Mutex for synchronization of the results
 	std::mutex mResultMutex;
 	/// Is pool stopped
-	bool mStopped = false;
+	std::atomic<bool> mStopped = false;
 };
 
 // the constructor just launches some amount of workers
@@ -399,10 +399,8 @@ inline ThreadPool::~ThreadPool()
 // the destructor joins all threads
 inline void ThreadPool::shutdown()
 {
-	{
-		std::unique_lock<std::mutex> lock(mTaskMutex);
-		mStopped = true;
-	}
+	mStopped = true;
+	
 	mCondition.notify_all();
 
 	for (auto &worker : mWorkers)

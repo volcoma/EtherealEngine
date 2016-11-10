@@ -3,25 +3,13 @@
 #include <unordered_map>
 #include <istream>
 #include <filesystem>
-//-----------------------------------------------------------------------------
-// Main Class Declarations
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//  Name : FileSystem (Static Class)
-/// <summary>
-/// Class that contains our core file system handling functionality.
-/// Access is via entirely static methods to provide support application
-/// wide.
-/// </summary>
-//-----------------------------------------------------------------------------
+
 namespace fs
 {
 	using namespace std::experimental::filesystem;
 	using ProtocolMap = std::unordered_map<std::string, std::string>;
 	using ByteArray = std::vector<std::uint8_t>;
-	//-------------------------------------------------------------------------
-	// Public Static Functions
-	//-------------------------------------------------------------------------
+
 	//-----------------------------------------------------------------------------
 	//  Name : shutdown ()
 	/// <summary>
@@ -37,7 +25,14 @@ namespace fs
 	/// When indexing, this will be the base path in which we recurse.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool setRootDirectory(const std::string & directoryName);
+	bool setRootDirectory(const std::string& directoryName);
+
+	//-----------------------------------------------------------------------------
+	//  Name : getRootDirectory ()
+	/// <summary>
+	/// Gets the directory that the file system will consider to be its root.
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	const std::string& getRootDirectory();
 
 	//-----------------------------------------------------------------------------
@@ -49,7 +44,7 @@ namespace fs
 	/// relevant mapped path.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool addPathProtocol(const std::string & protocol, const std::string & directoryName);
+	bool addPathProtocol(const std::string& protocol, const std::string& directoryName);
 
 	//-----------------------------------------------------------------------------
 	//  Name : getProtocols ()
@@ -67,7 +62,7 @@ namespace fs
 	/// Determine if a path protocol with the specified name has been defined.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool pathProtocolDefined(const std::string & protocol);
+	bool pathProtocolDefined(const std::string& protocol);
 
 	//-----------------------------------------------------------------------------
 	//  Name : readStream ()
@@ -76,7 +71,7 @@ namespace fs
 	/// package or in the main file system.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	ByteArray readStream(std::istream & stream);
+	ByteArray readStream(std::istream& stream);
 
 	//-----------------------------------------------------------------------------
 	//  Name : getFileNameExtension ()
@@ -84,7 +79,7 @@ namespace fs
 	/// Given a full path name, return just the extension portion of it.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::string getFileNameExtension(const std::string & pathFile);
+	std::string getFileNameExtension(const std::string& pathFile);
 
 	//-----------------------------------------------------------------------------
 	//  Name : getFileName ()
@@ -92,7 +87,7 @@ namespace fs
 	/// Given a full path name, return just the filename portion of it.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::string getFileName(const std::string & pathFile);
+	std::string getFileName(const std::string& pathFile);
 
 	//-----------------------------------------------------------------------------
 	//  Name : getFileName ()
@@ -101,7 +96,7 @@ namespace fs
 	/// the extension can be automatically stripped.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::string getFileName(const std::string & pathFile, bool stripExtension);
+	std::string getFileName(const std::string& pathFile, bool stripExtension);
 
 	//-----------------------------------------------------------------------------
 	//  Name : getDirectoryName ()
@@ -109,8 +104,17 @@ namespace fs
 	/// Given a full path name, return just the direction portion of it.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::string getDirectoryName(const std::string & pathFile);
-	std::string ensurePath(const std::string & pathFile, bool resolove);
+	std::string getDirectoryName(const std::string& pathFile);
+
+	//-----------------------------------------------------------------------------
+	//  Name : ensurePath ()
+	/// <summary>
+	/// This function will create a directory if it doesn't exist.
+	/// 'pathFile' can be either relative e.g "sys://assets/file.txt
+	/// but then the resolve should be set to true or it can be an absolute path.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	std::string ensurePath(const std::string& pathFile, bool resolove);
 
 	//-----------------------------------------------------------------------------
 	//  Name : getAbsolutePath ()
@@ -120,7 +124,7 @@ namespace fs
 	/// Note : This function is mildly expensive and should be used sparingly.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::string getAbsolutePath(const std::string & pathFile, const std::string & currentDirectory = "");
+	std::string getAbsolutePath(const std::string& pathFile, const std::string& currentDirectory = "");
 
 	//-----------------------------------------------------------------------------
 	//  Name : getRelativePath ()
@@ -130,7 +134,7 @@ namespace fs
 	/// Note : This function is mildly expensive and should be used sparingly.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::string getRelativePath(const std::string & pathFile, const std::string & currentDirectory = "");
+	std::string getRelativePath(const std::string& pathFile, const std::string& currentDirectory = "");
 
 	//-----------------------------------------------------------------------------
 	//  Name : fileExists ()
@@ -138,7 +142,7 @@ namespace fs
 	/// Given a full path name, determine if it exists (and is a file).
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool fileExists(const std::string & pathFile);
+	bool fileExists(const std::string& pathFile);
 
 	//-----------------------------------------------------------------------------
 	//  Name : directoryExists ()
@@ -146,7 +150,7 @@ namespace fs
 	/// Given a full directory name, determine if it exists (and is a directory).
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool directoryExists(const std::string & directoryName);
+	bool directoryExists(const std::string& directoryName);
 
 	//-----------------------------------------------------------------------------
 	//  Name : resolveFileLocation()
@@ -157,7 +161,7 @@ namespace fs
 	/// filename.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::string resolveFileLocation(const std::string & fileName);
+	std::string resolveFileLocation(const std::string& fileName);
 
 	//-----------------------------------------------------------------------------
 	//  Name : getAppDirectory()
@@ -195,7 +199,7 @@ namespace fs
 	/// generated.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::string getTemporaryFile(const std::string & basePath);
+	std::string getTemporaryFile(const std::string& basePath);
 
 	//-----------------------------------------------------------------------------
 	//  Name : createDirectory ()
@@ -204,7 +208,7 @@ namespace fs
 	/// required.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool createDirectory(const std::string & directoryName);
+	bool createDirectory(const std::string& directoryName);
 
 	//-----------------------------------------------------------------------------
 	//  Name : copyFile ()
@@ -216,7 +220,7 @@ namespace fs
 	/// failed for this or any other reason.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool copyFile(const std::string & source, const std::string & destination, bool overwriteExisting);
+	bool copyFile(const std::string& source, const std::string& destination, bool overwriteExisting);
 
 	//-----------------------------------------------------------------------------
 	//  Name : moveFile ()
@@ -226,7 +230,7 @@ namespace fs
 	/// failed for any reason.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool moveFile(const std::string & source, const std::string & destination, bool overwriteExisting);
+	bool moveFile(const std::string& source, const std::string& destination, bool overwriteExisting);
 
 	//-----------------------------------------------------------------------------
 	//  Name : deleteFile ()
@@ -235,7 +239,7 @@ namespace fs
 	/// for any reason, i.e. the file was not found, or access was denied.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool deleteFile(const std::string & pathFile);
+	bool deleteFile(const std::string& pathFile);
 
 	//-----------------------------------------------------------------------------
 	//  Name : deleteFile ()
@@ -244,7 +248,7 @@ namespace fs
 	/// for any reason, i.e. the file was not found, or access was denied.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool createFile(const std::string & pathFile);
+	bool createFile(const std::string& pathFile);
 
 	//-----------------------------------------------------------------------------
 	//  Name : isSameFile ()
@@ -257,5 +261,5 @@ namespace fs
 	/// separate network shares.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool isSameFile(const std::string & file1, const std::string & file2, bool & success);
+	bool isSameFile(const std::string& file1, const std::string& file2, bool& success);
 };
