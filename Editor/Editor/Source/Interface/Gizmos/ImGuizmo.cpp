@@ -1,33 +1,3 @@
-//   _____            _____       _                     
-//  |_   _|          / ____|     (_)                    
-//    | |  _ __ ___ | |  __ _   _ _ _____ __ ___   ___  
-//    | | | '_ ` _ \| | |_ | | | | |_  / '_ ` _ \ / _ \ 
-//   _| |_| | | | | | |__| | |_| | |/ /| | | | | | (_) |
-//  |_____|_| |_| |_|\_____|\__,_|_/___|_| |_| |_|\___/ 
-//                                                      
-//                                                      
-// The MIT License(MIT)
-// 
-// Copyright(c) 2016 Cedric Guillemet
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files(the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and / or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions :
-// 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
 #include "../GUI.h"
 #include "ImGuizmo.h"
 
@@ -715,7 +685,6 @@ namespace ImGuizmo
 				colors[0] = (type == MOVE_SCREEN) ? selectionColor : _sc_color;
 				for (int i = 0; i < 3; i++)
 				{
-					int colorPlaneIndex = (i + 2) % 3;
 					colors[i + 1] = (type == (int)(MOVE_X + i)) ? selectionColor : directionColor[i];
 					colors[i + 4] = (type == (int)(MOVE_XY + i)) ? selectionColor : planeColor;
 				}
@@ -770,8 +739,7 @@ namespace ImGuizmo
 			
 			vec_t cameraEyeToGizmo = Normalized(gContext.mModel.v.position - gContext.mCameraEye);
 			float dotCameraDirX = cameraEyeToGizmo.Dot3(dirPlaneXWorld);
-			float dotCameraDirY = cameraEyeToGizmo.Dot3(dirPlaneYWorld);
-			
+
 			// compute factor values
 			float mulAxisX = 1.0f;
 			float mulAxisY = 1.0f;
@@ -829,7 +797,6 @@ namespace ImGuizmo
 	static void DrawRotationGizmo(int type)
 	{
 		ImDrawList* drawList = gContext.mDrawList;
-		ImGuiIO& io = ImGui::GetIO();
 
 		// colors
 		ImU32 colors[7];
@@ -938,7 +905,7 @@ namespace ImGuizmo
 
 		if (gContext.mbUsing)
 		{
-			ImVec2 sourcePosOnScreen = worldToPos(gContext.mMatrixOrigin, gContext.mViewProjection);
+			//ImVec2 sourcePosOnScreen = worldToPos(gContext.mMatrixOrigin, gContext.mViewProjection);
 			ImVec2 destinationPosOnScreen = worldToPos(gContext.mModel.v.position, gContext.mViewProjection);
 			/*vec_t dif(destinationPosOnScreen.x - sourcePosOnScreen.x, destinationPosOnScreen.y - sourcePosOnScreen.y);
 			dif.Normalize();
@@ -1417,7 +1384,7 @@ namespace ImGuizmo
 		float validScale[3];
 		for (int i = 0; i < 3; i++)
 		{
-			if (fabsf(scale[i] < FLT_EPSILON))
+			if (fabsf(scale[i]) < FLT_EPSILON)
 				validScale[i] = 0.001f;
 			else
 				validScale[i] = scale[i];

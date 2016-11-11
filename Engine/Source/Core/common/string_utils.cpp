@@ -174,7 +174,7 @@ std::string string_utils::format(const char* format, va_list args)
 
 	std::string str(buf);
 	delete[] buf;
-	return std::move(str);
+	return str;
 }
 
 

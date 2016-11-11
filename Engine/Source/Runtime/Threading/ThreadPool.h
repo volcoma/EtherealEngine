@@ -197,8 +197,8 @@ struct Task : public TTask<ReturnType>
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	explicit Task(std::shared_future<ReturnType> f, OnReadyFunc&& readyFunction)
-		: TTask(f)
+	Task(std::shared_future<ReturnType> f, OnReadyFunc&& readyFunction)
+		: TTask<ReturnType>(f)
 		, onReady(readyFunction)
 	{}
 
@@ -328,11 +328,12 @@ private:
 	/// Mutex for synchronization of the results
 	std::mutex mResultMutex;
 	/// Is pool stopped
-	std::atomic<bool> mStopped = false;
+	std::atomic<bool> mStopped;
 };
 
 // the constructor just launches some amount of workers
 inline ThreadPool::ThreadPool(unsigned int threads)
+	: mStopped(false)
 {
 	for (unsigned int i = 0; i < threads; ++i)
 	{

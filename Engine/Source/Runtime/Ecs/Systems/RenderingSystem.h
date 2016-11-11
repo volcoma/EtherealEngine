@@ -23,7 +23,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void frameRender(EntityManager &entities, EventManager &events, TimeDelta dt);
+	virtual void frameRender(EntityManager &entities, EventManager &events, TimeDelta dt) override;
 	
 	//-----------------------------------------------------------------------------
 	//  Name : receive ()

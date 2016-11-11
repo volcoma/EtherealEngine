@@ -2,10 +2,9 @@
 
 #include "Runtime/Ecs/World.h"
 #include "Runtime/Assets/AssetHandle.h"
-
+#include "Runtime/Rendering/Program.h"
 class RenderView;
 struct Texture;
-struct Program;
 
 class PickingSystem : public ecs::System<PickingSystem>
 {

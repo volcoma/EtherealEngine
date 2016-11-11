@@ -36,9 +36,9 @@ namespace glm
 	template <typename T, precision P>
 	GLM_FUNC_QUALIFIER tvec3<T, P> convertD50XYZToLinearSRGB(tvec3<T, P> const& ColorD50XYZ)
 	{
-		tvec3<T, P> const M();
-		tvec3<T, P> const N();
-		tvec3<T, P> const O();
+		tvec3<T, P> const M;
+		tvec3<T, P> const N;
+		tvec3<T, P> const O;
 
 		return M * ColorD50XYZ + N * ColorD50XYZ + O * ColorD50XYZ;
 	}
@@ -56,9 +56,9 @@ namespace glm
 	template <typename T, precision P>
 	GLM_FUNC_QUALIFIER tvec3<T, P> convertD50XYZToD65XYZ(tvec3<T, P> const& ColorD50XYZ)
 	{
-		tvec3<T, P> const M();
-		tvec3<T, P> const N();
-		tvec3<T, P> const O();
+		tvec3<T, P> const M;
+		tvec3<T, P> const N;
+		tvec3<T, P> const O;
 
 		return M * ColorD50XYZ + N * ColorD50XYZ + O * ColorD50XYZ;
 	}

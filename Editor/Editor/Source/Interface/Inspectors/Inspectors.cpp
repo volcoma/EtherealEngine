@@ -1,5 +1,3 @@
-#pragma  once
-
 #include "Inspectors.h"
 #include <unordered_map>
 #include <vector>
@@ -15,7 +13,6 @@ struct InspectorRegistry
 			if (inspectedTypeVar)
 			{
 				auto inspectedType = inspectedTypeVar.get_value<rttr::type>();
-				auto name = inspectedType.get_name();
 				auto inspectorVar = inspectorType.create();
 				if (inspectorVar)
 				{

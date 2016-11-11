@@ -13,7 +13,6 @@ namespace Docks
 		auto& world = app.getWorld();
 		auto& editState = app.getEditState();
 		auto& editorCamera = editState.camera;
-		auto& selected = editState.selected;
 		if (entity && entity != editorCamera)
 		{
 			if (gui::BeginPopupContextItem("Entity Context Menu"))
@@ -67,8 +66,6 @@ namespace Docks
 		{
 			if (isHovered)
 			{
-				auto rounding = gui::GetStyle().FrameRounding;
-				float thickness = 2.0f;
 				if (gui::IsMouseClicked(2) && entity != editorCamera)
 				{
 					editState.drag(entity);

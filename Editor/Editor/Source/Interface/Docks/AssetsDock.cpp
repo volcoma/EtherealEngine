@@ -31,9 +31,9 @@ namespace Docks
 		auto& app = Singleton<EditorApp>::getInstance();
 		auto& editState = app.getEditState();
 		auto& manager = app.getAssetManager();
-		auto& meshes = manager.getStorage<Mesh>();
-		auto& textures = manager.getStorage<Texture>();
-		auto& materials = manager.getStorage<Material>();
+		auto meshes = manager.getStorage<Mesh>();
+		auto textures = manager.getStorage<Texture>();
+		auto materials = manager.getStorage<Material>();
 		auto& icons = editState.icons;
 
 		float width = gui::GetContentRegionAvailWidth();
@@ -83,7 +83,7 @@ namespace Docks
 
 		if (gui::BeginChild("###assets_content", gui::GetContentRegionAvail(), false, flags))
 		{
-			auto& listItems = [](const auto& storage, auto& editState)
+			auto listItems = [](const auto& storage, auto& editState)
 			{
 
 				if (scaleIcons > 0.2f)

@@ -446,7 +446,6 @@ void MainEditorWindow::onToolbar()
 bool MainEditorWindow::onProjectManager()
 {
 	auto& app = Singleton<EditorApp>::getInstance();
-	auto& editState = app.getEditState();
 
 	if (mOpenProjectManager)
 	{
@@ -479,7 +478,6 @@ bool MainEditorWindow::onProjectManager()
 			}
 		}
 		gui::Separator();
-		auto frame_padding = gui::GetStyle().FramePadding;
 		ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |
 			ImGuiWindowFlags_NoMove |
 			ImGuiWindowFlags_NoResize |

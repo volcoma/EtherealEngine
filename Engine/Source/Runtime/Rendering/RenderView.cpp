@@ -130,8 +130,6 @@ std::uint8_t RenderView::generateId()
 	return getAvailableId();
 }
 
-
-
 void RenderView::RenderSurface::populate(std::uint16_t _width, std::uint16_t _height, gfx::TextureFormat::Enum _format, std::uint32_t _textureFlags /*= BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP */)
 {
 	mBuffer->populate(_width, _height, _format, _textureFlags);

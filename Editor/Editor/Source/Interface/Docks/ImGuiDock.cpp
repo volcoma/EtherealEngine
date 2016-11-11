@@ -76,7 +76,7 @@ namespace ImGuiDock
 		else if (currentContainer->splits[1] == nullptr)
 		{
 			currentContainer->splits[1] = childContainer;
-			Node *otherSplit = currentContainer->splits[0];
+			//Node *otherSplit = currentContainer->splits[0];
 			if (size > 0)
 			{
 				currentContainer->splits[0]->alwaysAutoResize = true;
@@ -609,7 +609,6 @@ namespace ImGuiDock
 
 	bool Dockspace::_getMinSize(Node* container, ImVec2& min)
 	{
-		int begin = 0;
 		if (container->splits[0] == nullptr)
 		{
 			if (min.x < container->activeDock->minSize.x)

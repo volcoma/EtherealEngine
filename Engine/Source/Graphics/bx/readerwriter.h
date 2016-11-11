@@ -106,7 +106,7 @@ namespace bx
 		const uint32_t tmp0      = uint32_sels(64   - _size,   64, _size);
 		const uint32_t tmp1      = uint32_sels(256  - _size,  256, tmp0);
 		const uint32_t blockSize = uint32_sels(1024 - _size, 1024, tmp1);
-		uint8_t* temp = (uint8_t*)alloca(blockSize);
+		uint8_t* temp = (uint8_t*)_alloca(blockSize);
 		memset(temp, _byte, blockSize);
 
 		int32_t size = 0;
@@ -163,7 +163,7 @@ namespace bx
 		int32_t len = vsnprintf(out, max, _format, argList);
 		if (len > max)
 		{
-			out = (char*)alloca(len);
+			out = (char*)_alloca(len);
 			len = vsnprintf(out, len, _format, argList);
 		}
 

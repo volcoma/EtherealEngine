@@ -81,7 +81,7 @@ namespace ImGuiDock
 		Node node;
 		std::vector<Node*> nodes;
 	protected:
-		friend class GuiWindow;
+		friend class ::GuiWindow;
 
 		DockSlot _renderDockSlotPreview(const ImVec2& mousePos, const ImVec2& cPos, const ImVec2& cSize);
 		void _renderTabBar(Node* container, const ImVec2& size, const ImVec2& cursorPos);

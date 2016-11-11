@@ -152,8 +152,8 @@ GuiWindow::GuiWindow()
 }
 
 GuiWindow::GuiWindow(sf::VideoMode mode, const std::string& title, std::uint32_t style /*= sf::Style::Default*/)
-: mDockspace(this)
-, RenderWindow(mode, title, style)
+: RenderWindow(mode, title, style)
+, mDockspace(this)
 {
 	mGuiContext = imguiCreateContext();
 }

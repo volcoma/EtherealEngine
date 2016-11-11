@@ -8,8 +8,6 @@ namespace Docks
 	void renderProject(ImVec2 area)
 	{
 		auto& app = Singleton<EditorApp>::getInstance();
-		auto& editState = app.getEditState();
-		auto& icons = editState.icons;
 		if (gui::Button("New"))
 		{
 
@@ -21,7 +19,6 @@ namespace Docks
 
 		}
 		gui::Separator();
-		auto frame_padding = gui::GetStyle().FramePadding;
 		ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |
 			ImGuiWindowFlags_NoMove |
 			ImGuiWindowFlags_NoResize |

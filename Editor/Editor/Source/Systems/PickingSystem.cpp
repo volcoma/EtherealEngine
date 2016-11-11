@@ -9,7 +9,7 @@
 #include "Runtime/Rendering/Model.h"
 #include "Runtime/Rendering/VertexBuffer.h"
 #include "Runtime/Rendering/IndexBuffer.h"
-#include "Runtime/Rendering/Program.h"
+
 #include "Runtime/Rendering/Texture.h"
 #include "Runtime/Rendering/Material.h"
 #include "Runtime/Rendering/RenderWindow.h"
@@ -219,7 +219,8 @@ void PickingSystem::frameRender(ecs::EntityManager &entities, ecs::EventManager 
 			std::uint8_t rr = *x++;
 			std::uint8_t gg = *x++;
 			std::uint8_t bb = *x++;
-			std::uint8_t aa = *x++;
+			x++;
+			/*std::uint8_t aa = *x++*/;
 
 			const gfx::Caps* caps = gfx::getCaps();
 			if (gfx::RendererType::Direct3D9 == caps->rendererType)

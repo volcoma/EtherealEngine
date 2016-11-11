@@ -20,6 +20,7 @@
 #include "stb/stb_image.c"
 typedef unsigned char stbi_uc;
 extern "C" stbi_uc *stbi_load_from_memory(stbi_uc const *buffer, int len, int *x, int *y, int *comp, int req_comp);
+extern "C" void stbi_image_free(void *retval_from_stbi_load);
 
 void AssetReader::loadTextureFromFile(const std::string& relativeKey, const std::string& absoluteKey, bool async, LoadRequest<Texture>& request)
 {
@@ -65,8 +66,7 @@ void AssetReader::loadTextureFromFile(const std::string& relativeKey, const std:
 			int height = 0;
 			int comp = 0;
 
-			uint8_t* img = nullptr;
-			img = stbi_load_from_memory((uint8_t*)read_memory->data()
+			uint8_t* img = stbi_load_from_memory(read_memory->data()
 				, static_cast<int>(read_memory->size())
 				, &width
 				, &height
@@ -90,7 +90,7 @@ void AssetReader::loadTextureFromFile(const std::string& relativeKey, const std:
 					);
 
 
-				free(img);
+				stbi_image_free(img);
 
 				request.setData(relativeKey, texture);
 				request.invokeCallbacks();

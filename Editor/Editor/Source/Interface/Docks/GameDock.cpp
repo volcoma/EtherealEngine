@@ -12,7 +12,6 @@ namespace Docks
 		auto& app = Singleton<EditorApp>::getInstance();
 		auto& world = app.getWorld();
 		auto& editState = app.getEditState();
-		auto& icons = editState.icons;
 		auto& editorCamera = editState.camera;
 
 		world.entities.each<CameraComponent>([&editorCamera](

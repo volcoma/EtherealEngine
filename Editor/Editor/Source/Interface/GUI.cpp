@@ -219,11 +219,11 @@ bool init()
 	ImFontConfig config;
 	config.FontDataOwnedByAtlas = false;
 	config.MergeMode = false;
-	//config.MergeGlyphCenterV = true;
+	config.MergeGlyphCenterV = true;
 
 	io.Fonts->AddFontDefault(&config);
-	//io.Fonts->AddFontFromMemoryTTF((void*)s_robotoRegularTtf, sizeof(s_robotoRegularTtf), _fontSize, &config);
-	//io.Fonts->AddFontFromMemoryTTF((void*)s_robotoMonoRegularTtf, sizeof(s_robotoMonoRegularTtf), _fontSize - 3.0f, &config);
+	io.Fonts->AddFontFromMemoryTTF((void*)s_robotoRegularTtf, sizeof(s_robotoRegularTtf), _fontSize, &config);
+	io.Fonts->AddFontFromMemoryTTF((void*)s_robotoMonoRegularTtf, sizeof(s_robotoMonoRegularTtf), _fontSize - 3.0f, &config);
 	io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
 
 	sFontTexture = std::make_shared<Texture>(

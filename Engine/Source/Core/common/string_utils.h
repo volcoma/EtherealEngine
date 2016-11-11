@@ -167,7 +167,7 @@ namespace string_utils
 
 		std::string str(buf);
 		delete[] buf;
-		return std::move(str);
+		return str;
 	}
 
 	//-------------------------------------------------------------------------

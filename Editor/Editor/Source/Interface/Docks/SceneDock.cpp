@@ -24,11 +24,11 @@ namespace Docks
 			ImGuiWindowFlags_AlwaysAutoResize);
 		gui::Text("FPS  : %u", timer.getFrameRate());
 		gui::Separator();
-		gui::Text("MSPF : %.3f ms ", 1000.0f / (float)timer.getFrameRate());
+		gui::Text("MSPF : %.3f ms ", 1000.0f / float(timer.getFrameRate()));
 		gui::Separator();
 		
 		
-		gui::Text("Total Entities  : %u", totalEntiteis);
+		gui::Text("Total Entities  : %u", unsigned int(totalEntiteis));
 		gui::Separator();
 
 		static bool renderStats = false;
@@ -320,7 +320,6 @@ namespace Docks
 		auto& world = app.getWorld();
 		auto& editState = app.getEditState();
 		auto& window = app.getWindow();
-		auto& icons = editState.icons;
 		auto& editorCamera = editState.camera;
 		auto& selected = editState.selected;
 		bool hasEditCamera = editorCamera

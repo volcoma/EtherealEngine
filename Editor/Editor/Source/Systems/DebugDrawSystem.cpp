@@ -30,12 +30,9 @@ DebugDrawSystem::DebugDrawSystem()
 }
 
 void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManager &events, ecs::TimeDelta dt)
-{
-	
+{	
 	auto& app = Singleton<EditorApp>::getInstance();
-	auto currentRenderFrame = app.getRenderFrame();
 	auto& editState = app.getEditState();
-	auto& world = app.getWorld();
 
 	auto& editorCamera = editState.camera;
 	auto& selected = editState.selected;
@@ -49,7 +46,6 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 	const auto camera = cameraComponent->getCamera();
 	const auto view = camera->getView();
 	const auto proj = camera->getProj();
-	const auto viewProj = proj * view;
 	const auto cameraPos = camera->getPosition();
 
 	RenderViewRAII pushView(renderView);
