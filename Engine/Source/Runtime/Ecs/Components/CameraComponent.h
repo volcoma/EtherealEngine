@@ -11,8 +11,7 @@
 //-----------------------------------------------------------------------------
 enum class ProjectionMode : std::uint32_t;
 class Camera;
-class RenderView;
-
+class RenderSurface;
 
 using namespace entityx;
 //-----------------------------------------------------------------------------
@@ -141,14 +140,14 @@ public:
 	Camera* getCamera() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : getRenderView ()
+	//  Name : getRenderSurface ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::shared_ptr<RenderView> getRenderView() const;
+	std::shared_ptr<RenderSurface> getRenderSurface() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : updateInternal ()
@@ -227,8 +226,8 @@ private:
 	//-------------------------------------------------------------------------
 	/// The camera object this component represents
 	std::unique_ptr<Camera> mCamera;
-	/// The render view of this camera
-	std::shared_ptr<RenderView> mRenderView;
+	/// The render surface of this camera
+	std::shared_ptr<RenderSurface> mSurface;
 	/// Is the camera HDR?
 	bool mHDR = true;
 };

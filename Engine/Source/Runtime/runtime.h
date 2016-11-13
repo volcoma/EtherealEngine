@@ -7,7 +7,7 @@
 #include "System/FileSystem.h"
 #include "System/Timer.h"
 #include "System/MessageBox.h"
-#include "Rendering/RenderView.h"
+#include "Rendering/RenderSurface.h"
 #include "Rendering/Material.h"
 #include "Rendering/Program.h"
 #include "Rendering/Shader.h"

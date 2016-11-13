@@ -2,6 +2,7 @@
 
 #include "../entityx/System.h"
 #include <vector>
+#include <memory>
 
 using namespace entityx;
 
@@ -44,7 +45,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void configure(EventManager &events) override;
+
 private:
-	
 	std::unordered_map<Entity, std::unordered_map<Entity, LodData>> mLodDataMap;
 };

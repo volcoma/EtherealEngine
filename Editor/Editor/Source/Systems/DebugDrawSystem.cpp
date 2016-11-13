@@ -2,7 +2,7 @@
 #include "Runtime/ecs/Components/TransformComponent.h"
 #include "Runtime/ecs/Components/CameraComponent.h"
 #include "Runtime/ecs/Components/ModelComponent.h"
-#include "Runtime/Rendering/RenderView.h"
+#include "Runtime/Rendering/RenderSurface.h"
 #include "Runtime/Rendering/Camera.h"
 #include "Runtime/Rendering/Mesh.h"
 #include "Runtime/Rendering/Model.h"
@@ -42,14 +42,14 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 
 	const auto cameraComponentRef = editorCamera.component<CameraComponent>();
 	const auto cameraComponent = cameraComponentRef.lock();
-	const auto renderView = cameraComponent->getRenderView();
+	const auto surface = cameraComponent->getRenderSurface();
 	const auto camera = cameraComponent->getCamera();
 	const auto view = camera->getView();
 	const auto proj = camera->getProj();
 	const auto cameraPos = camera->getPosition();
 
-	RenderViewRAII pushView(renderView);
-	const auto viewId = renderView->getId();
+	const auto viewId = surface->getId();
+	RenderSurfaceScope surfaceScope(surface);
 	gfx::setViewTransform(viewId, &view, &proj);
 
 	ddRAII dd(viewId);

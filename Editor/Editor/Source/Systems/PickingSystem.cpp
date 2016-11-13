@@ -3,7 +3,7 @@
 #include "Runtime/ecs/Components/CameraComponent.h"
 #include "Runtime/ecs/Components/ModelComponent.h"
 #include "Runtime/Assets/AssetManager.h"
-#include "Runtime/Rendering/RenderView.h"
+#include "Runtime/Rendering/RenderSurface.h"
 #include "Runtime/Rendering/Camera.h"
 #include "Runtime/Rendering/Mesh.h"
 #include "Runtime/Rendering/Model.h"
@@ -17,14 +17,7 @@
 #include "../Interface/GuiWindow.h"
 PickingSystem::PickingSystem()
 {
-	mRenderView = std::make_shared<RenderView>();
-	// ID buffer clears to black, which represents clicking on nothing (background)
-	mRenderView->clear(BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
-		, 0x000000ff
-		, 1.0f
-		, 0);
-
-
+	
 	// Set up ID buffer, which has a color target and depth buffer
 	auto pickingRT = std::make_shared<Texture>(_id_dimensions, _id_dimensions, false, 1, gfx::TextureFormat::RGBA8, 0
 		| BGFX_TEXTURE_RT
@@ -44,8 +37,7 @@ PickingSystem::PickingSystem()
 		| BGFX_TEXTURE_V_CLAMP
 	);
 
-	auto& surface = mRenderView->getRenderSurface();
-	surface.populate
+	mSurface = std::make_shared<RenderSurface>
 	(
 		std::vector<std::shared_ptr<Texture>>
 		{
@@ -115,6 +107,7 @@ void PickingSystem::frameRender(ecs::EntityManager &entities, ecs::EventManager 
 	const auto& size = camera->getViewportSize();
 	const auto& pos = camera->getViewportPos();
 	const auto& mousePos = input.getMouseCurrentPosition();
+	const auto viewId = mSurface->getId();
 
 	float mouseXNDC = ((float(mousePos.x) - float(pos.x)) / (float(size.width))) * 2.0f - 1.0f;
 	float mouseYNDC = ((float(size.height) - (float(mousePos.y) - float(pos.y))) / float(size.height)) * 2.0f - 1.0f;
@@ -130,9 +123,8 @@ void PickingSystem::frameRender(ecs::EntityManager &entities, ecs::EventManager 
 	// Whatever mesh has the most pixels in the ID buffer is the one the user clicked on.
 	if (!mReading && mStartReadback)
 	{
-		auto& surface = mRenderView->getRenderSurface();
 		// Blit and read
-		gfx::blit(0, mBlitTex->handle, 0, 0, surface.getBufferRaw()->handle);
+		gfx::blit(viewId, mBlitTex->handle, 0, 0, mSurface->getBufferRaw()->handle);
 		mReading = gfx::readTexture(mBlitTex->handle, mBlitData);
 		mStartReadback = false;
 	}
@@ -156,9 +148,15 @@ void PickingSystem::frameRender(ecs::EntityManager &entities, ecs::EventManager 
 		auto pickView = math::lookAt(pickEye, pickAt, pickUp);
 		auto pickProj = math::perspective(math::radians(1.0f), 1.0f, nearClip, farClip);
 
-		auto viewId = mRenderView->getId();
+		RenderSurfaceScope surfaceScope(mSurface);
+		// ID buffer clears to black, which represents clicking on nothing (background)
+		mSurface->clear(BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
+			, 0x000000ff
+			, 1.0f
+			, 0);
+
+		
 		// View rect and transforms for picking pass
-		RenderViewRAII pushView(mRenderView);
 		gfx::setViewTransform(viewId, &pickView, &pickProj);
 
 		entities.each<TransformComponent, ModelComponent>([this, viewId, camera, dt](

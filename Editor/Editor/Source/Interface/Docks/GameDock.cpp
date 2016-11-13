@@ -2,7 +2,7 @@
 #include "../../EditorApp.h"
 #include "Runtime/Ecs/World.h"
 #include "Runtime/Ecs/Components/CameraComponent.h"
-#include "Runtime/Rendering/RenderView.h"
+#include "Runtime/Rendering/RenderSurface.h"
 
 namespace Docks
 {
@@ -22,9 +22,8 @@ namespace Docks
 			if (e == editorCamera)
 				return;
 
-			auto renderView = cameraComponent.getRenderView();
-			auto& surface = renderView->getRenderSurface();
-			auto frameBuffer = surface.getBuffer();
+			const auto surface = cameraComponent.getRenderSurface();
+			const auto frameBuffer = surface->getBuffer();
 			auto size = gui::GetContentRegionAvail();
 			if (size.x > 0 && size.y > 0 && frameBuffer)
 			{

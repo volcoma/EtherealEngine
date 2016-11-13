@@ -1,5 +1,5 @@
 #include "GuiWindow.h"
-#include "Runtime/Rendering/RenderView.h"
+#include "Runtime/Rendering/RenderSurface.h"
 
 void handleSFMLEvent(sf::Event event)
 {
@@ -57,11 +57,11 @@ void handleSFMLEvent(sf::Event event)
 	}
 }
 
-void imguiFrameUpdate(RenderWindow& window, float dt, std::uint32_t viewWidth, std::uint32_t viewHeight, std::uint8_t viewId)
+void imguiFrameUpdate(RenderWindow& window, float dt, const uSize& viewSize, std::uint8_t viewId)
 {
 	auto& io = gui::GetIO();
 	// Setup display size (every frame to accommodate for window resizing)
-	io.DisplaySize = ImVec2(static_cast<float>(viewWidth), static_cast<float>(viewHeight));
+	io.DisplaySize = ImVec2(static_cast<float>(viewSize.width), static_cast<float>(viewSize.height));
 	// Setup time step
 	io.DeltaTime = dt;
 
@@ -98,7 +98,7 @@ void imguiFrameUpdate(RenderWindow& window, float dt, std::uint32_t viewWidth, s
 	style.ViewId = (float)viewId;
 
 	gui::SetNextWindowPos(ImVec2(0, 0));
-	gui::SetNextWindowSize(ImVec2(static_cast<float>(viewWidth), static_cast<float>(viewHeight)));
+	gui::SetNextWindowSize(ImVec2(static_cast<float>(viewSize.width), static_cast<float>(viewSize.height)));
 	ImGuiWindowFlags flags =
 		ImGuiWindowFlags_NoTitleBar
 		| ImGuiWindowFlags_NoResize
@@ -181,10 +181,9 @@ void GuiWindow::frameUpdate(float dt)
 {
 	RenderWindow::frameUpdate(dt);
 
-	auto renderView = getRenderView();
-	auto& surface = renderView->getRenderSurface();
-	auto size = surface.getSize();
-	imguiFrameUpdate(*this, dt, size.width, size.height, renderView->getId());
+	const auto size = mSurface->getSize();
+	const auto id = mSurface->getId();
+	imguiFrameUpdate(*this, dt, size, id);
 }
 
 void GuiWindow::frameRender()

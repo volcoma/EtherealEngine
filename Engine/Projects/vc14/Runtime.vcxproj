@@ -41,7 +41,7 @@
     <ClCompile Include="..\..\Source\Runtime\Rendering\Mesh.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Rendering\Model.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Rendering\Program.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Rendering\RenderView.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Rendering\RenderSurface.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Rendering\RenderWindow.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Rendering\Shader.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Rendering\Texture.cpp" />
@@ -119,7 +119,7 @@
     <ClInclude Include="..\..\Source\Runtime\Rendering\Mesh.h" />
     <ClInclude Include="..\..\Source\Runtime\Rendering\Model.h" />
     <ClInclude Include="..\..\Source\Runtime\Rendering\Program.h" />
-    <ClInclude Include="..\..\Source\Runtime\Rendering\RenderView.h" />
+    <ClInclude Include="..\..\Source\Runtime\Rendering\RenderSurface.h" />
     <ClInclude Include="..\..\Source\Runtime\Rendering\RenderWindow.h" />
     <ClInclude Include="..\..\Source\Runtime\Rendering\Shader.h" />
     <ClInclude Include="..\..\Source\Runtime\Rendering\Texture.h" />

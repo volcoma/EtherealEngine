@@ -171,9 +171,6 @@
     <ClCompile Include="..\..\Source\Runtime\System\SFML\System\Err.cpp">
       <Filter>Source Files\System\SFML\System</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Rendering\RenderView.cpp">
-      <Filter>Source Files\Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\Ecs\entityx\System.cpp">
       <Filter>Source Files\Ecs\entityx</Filter>
     </ClCompile>
@@ -263,6 +260,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\System\Application.cpp">
       <Filter>Source Files\System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Rendering\RenderSurface.cpp">
+      <Filter>Source Files\Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -364,9 +364,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\System.hpp">
       <Filter>Source Files\System\SFML</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Rendering\RenderView.h">
-      <Filter>Source Files\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\Rendering\FrameBuffer.h">
       <Filter>Source Files\Rendering</Filter>
@@ -532,6 +529,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\Application.h">
       <Filter>Source Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Rendering\RenderSurface.h">
+      <Filter>Source Files\Rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

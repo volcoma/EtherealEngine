@@ -9,7 +9,7 @@
 #include "../Assets/AssetManager.h"
 #include "../Assets/AssetReader.h"
 #include "../Assets/AssetWriter.h"
-#include "../Rendering/RenderView.h"
+#include "../Rendering/RenderSurface.h"
 #include "../Rendering/FrameBuffer.h"
 #include "../Rendering/Debug/DebugDraw.h"
 #include "../Rendering/RenderWindow.h"
@@ -164,24 +164,11 @@ bool Application::registerMainWindow(RenderWindow& window)
 	if (!gfx::init(gfx::RendererType::Count, 0, 0, &sGfxCallback))
 		return false;
 
-	auto onResized = [this](RenderWindow& wnd, const uSize& size)
-	{
-		std::uint32_t flags = 0;
-		if (mVsync)
-			flags |= BGFX_RESET_VSYNC;
-		gfx::reset(size.width, size.height, flags);
-	};
-
 	auto onClosed = [this](RenderWindow& wnd)
 	{
 		mRunning = false;
 	};
-
-
-	auto size = window.getSize();
-
-	onResized(window, size);
-	window.onResized.addListener(onResized);
+	window.setMain(true);
 	window.onClosed.addListener(onClosed);
 
 	return true;
@@ -204,7 +191,7 @@ void Application::registerWindow(std::shared_ptr<RenderWindow> window)
 	};
 
 	window->getInput().setActionMapper(mActionMapper.get());
-	window->prepareView();
+	window->prepareSurface();
 	window->onClosed.addListener(onClosed);
 	mWindows.emplace_back(window);
 }
@@ -222,6 +209,7 @@ bool Application::initLogging()
 		std::make_shared<logging::sinks::platform_sink_mt>(),
 		std::make_shared<logging::sinks::daily_file_sink_mt>("Log", "log", 23, 59),
 	});
+
 	//logger->set_level(logging::level::trace);
 	if (!logger)
 	{
@@ -385,9 +373,8 @@ bool Application::frameAdvance(bool bRunSimulation /* = true */)
 			auto windows = mWindows;
 			for (auto sharedWindow : windows)
 			{
-				auto& window = *sharedWindow;
 				mWindow = sharedWindow;
-				processWindow(window);
+				processWindow(*sharedWindow);
 				mWindow.reset();
 			}
 		}
@@ -521,9 +508,7 @@ void Application::frameWindowEnd(RenderWindow& window)
 
 void Application::frameEnd()
 {
-	Expects(RenderView::getStack().empty());
-
-	RenderView::clearStack();
+	RenderSurface::clearStack();
 	// Advance to next frame. Rendering thread will be kicked to
 	// process submitted rendering primitives.
 	mRenderFrame = gfx::frame();

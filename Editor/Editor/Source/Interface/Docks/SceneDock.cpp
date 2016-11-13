@@ -5,7 +5,7 @@
 #include "Runtime/Ecs/World.h"
 #include "Runtime/Ecs/Components/TransformComponent.h"
 #include "Runtime/Ecs/Components/CameraComponent.h"
-#include "Runtime/Rendering/RenderView.h"
+#include "Runtime/Rendering/RenderSurface.h"
 #include "Runtime/Rendering/Camera.h"
 #include "Runtime/Rendering/RenderWindow.h"
 
@@ -75,9 +75,9 @@ namespace Docks
 
 			if (sel && (editorCamera != sel) && sel.has_component<CameraComponent>())
 			{
-				auto selectedCamera = sel.component<CameraComponent>();
-				auto renderView = selectedCamera.lock()->getRenderView();
-				auto camera = selectedCamera.lock()->getCamera();
+				auto selectedCamera = sel.component<CameraComponent>().lock();
+				auto camera = selectedCamera->getCamera();
+				auto surface = selectedCamera->getRenderSurface();
 				auto viewSize = camera->getViewportSize();
 
 				float factor = std::min(size.x / float(viewSize.width), size.y / float(viewSize.height)) / 4.0f;
@@ -96,8 +96,8 @@ namespace Docks
 					ImGuiWindowFlags_NoResize |
 					ImGuiWindowFlags_AlwaysAutoResize))
 				{
-					auto& surface = renderView->getRenderSurface();
-					auto frameBuffer = surface.getBuffer();
+					
+					auto frameBuffer = surface->getBuffer();
 					if (frameBuffer)
 					{
 						ImVec2 uv0 = { 0.0f, 0.0f };
@@ -330,8 +330,6 @@ namespace Docks
 
 		if (!hasEditCamera)
 			return;
-
-
 	
 		auto size = gui::GetContentRegionAvail();
 		auto pos = gui::GetCursorScreenPos();
@@ -344,9 +342,8 @@ namespace Docks
 			cameraComponent->getCamera()->setViewportPos({ static_cast<std::uint32_t>(pos.x), static_cast<std::uint32_t>(pos.y) });
 			cameraComponent->setViewportSize({ static_cast<std::uint32_t>(size.x), static_cast<std::uint32_t>(size.y) });
 			
-			auto renderView = cameraComponent->getRenderView();
-			auto& surface = renderView->getRenderSurface();
-			auto frameBuffer = surface.getBuffer();
+			const auto surface = cameraComponent->getRenderSurface();
+			const auto frameBuffer = surface->getBuffer();
 			if (frameBuffer)
 			{
 				ImVec2 uv0 = { 0.0f, 0.0f };

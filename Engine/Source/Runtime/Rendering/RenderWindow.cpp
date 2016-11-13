@@ -2,11 +2,11 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "RenderWindow.h"
-#include "RenderView.h"
+#include "RenderSurface.h"
 
 void RenderWindow::onResize()
 {
-	prepareView();
+	prepareSurface();
 	auto size = getSize();
 	onResized(*this, size);
 }
@@ -18,12 +18,12 @@ void RenderWindow::onClose()
 
 RenderWindow::RenderWindow()
 {
-	mView = std::make_shared<RenderView>();
+	mSurface = std::make_shared<RenderSurface>();
 }
 
 RenderWindow::RenderWindow(sf::VideoMode mode, const std::string& title, std::uint32_t style /*= sf::Style::Default*/) : sf::Window(mode, title, style)
 {
-	mView = std::make_shared<RenderView>();
+	mSurface = std::make_shared<RenderSurface>();
 }
 
 RenderWindow::~RenderWindow()
@@ -38,9 +38,8 @@ bool RenderWindow::filterEvent(const sf::Event& event)
 
 void RenderWindow::frameBegin()
 {
-	auto view = getRenderView();
-	RenderView::pushView(view);
-	view->clear();
+	RenderSurface::pushSurface(mSurface);
+	mSurface->clear();
 	mInput.update();
 }
 
@@ -50,27 +49,35 @@ void RenderWindow::frameUpdate(float dt)
 
 void RenderWindow::frameEnd()
 {
-	RenderView::popView();
+	RenderSurface::popSurface();
 }
 
 void RenderWindow::frameRender()
 {
 }
 
-void RenderWindow::prepareView()
+void RenderWindow::prepareSurface()
 {
 	auto size = getSize();
-	auto& surface = mView->getRenderSurface();
-	surface.populate(mView->getId(), getSystemHandle(), size.width, size.height);
+	if (mIsMain)
+	{
+		gfx::reset(size.width, size.height, 0);
+		mSurface->setSize(size);
+	}
+	else
+	{
+		mSurface->populate(getSystemHandle(), size.width, size.height);
+	}
+
 }
 
-void RenderWindow::destroyView()
+void RenderWindow::destroySurface()
 {
-	mView.reset();
+	mSurface.reset();
 }
 
 void RenderWindow::delayedClose()
 {
-	destroyView();
+	destroySurface();
 	onClose();
 }

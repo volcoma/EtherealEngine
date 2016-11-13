@@ -2,7 +2,7 @@
 #include "../Components/TransformComponent.h"
 #include "../Components/CameraComponent.h"
 #include "../Components/ModelComponent.h"
-#include "../../Rendering/RenderView.h"
+#include "../../Rendering/RenderSurface.h"
 #include "../../Rendering/Camera.h"
 #include "../../Rendering/Mesh.h"
 #include "../../Rendering/Model.h"
@@ -43,15 +43,16 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 		CameraComponent& cameraComponent
 		)
 	{
-		auto renderView = cameraComponent.getRenderView();
-		auto camera = cameraComponent.getCamera();
+		const auto surface = cameraComponent.getRenderSurface();
+		const auto camera = cameraComponent.getCamera();
+		const auto viewId = surface->getId();
 		auto& cameraLods = mLodDataMap[ce];
-		RenderViewRAII pushView(renderView);
-		renderView->clear();
+		RenderSurfaceScope surfaceScope(surface);
+		surface->clear();
 
-		gfx::setViewTransform(renderView->getId(), &camera->getView(), &camera->getProj());
+		gfx::setViewTransform(viewId, &camera->getView(), &camera->getProj());
 
-		entities.each<TransformComponent, ModelComponent>([this, &cameraLods, camera, dt, renderView](
+		entities.each<TransformComponent, ModelComponent>([this, &cameraLods, camera, dt, viewId](
 			Entity e,
 			TransformComponent& transformComponent,
 			ModelComponent& modelComponent
@@ -132,7 +133,7 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 
 			auto program = material->getProgram();
 
-			hMeshCurr->submit(renderView->getId(), program->handle, worldTransform, states);
+			hMeshCurr->submit(viewId, program->handle, worldTransform, states);
 
 			if (currentTime != 0.0f)
 			{
@@ -142,7 +143,7 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 				const auto hMeshTarget = model.getLod(targetLodIndex);
 				if (!hMeshTarget)
 					return;
-				hMeshTarget->submit(renderView->getId(), program->handle, worldTransform, states);
+				hMeshTarget->submit(viewId, program->handle, worldTransform, states);
 			}
 
 		});

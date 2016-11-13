@@ -1,11 +1,11 @@
 #include "CameraComponent.h"
 #include "../../Rendering/Camera.h"
-#include "../../Rendering/RenderView.h"
+#include "../../Rendering/RenderSurface.h"
 
 CameraComponent::CameraComponent()
 {
 	mCamera = std::make_unique<Camera>();
-	mRenderView = std::make_shared<RenderView>();
+	mSurface = std::make_shared<RenderSurface>();
 	init({ 0, 0 });
 }
 
@@ -13,7 +13,7 @@ CameraComponent::CameraComponent(const CameraComponent& cameraComponent)
 {
 	mCamera = std::make_unique<Camera>(*cameraComponent.getCamera());
 	mHDR = cameraComponent.mHDR;
-	mRenderView = std::make_shared<RenderView>();
+	mSurface = std::make_shared<RenderSurface>();
 	init({ 0, 0 });
 }
 
@@ -30,10 +30,9 @@ void CameraComponent::init(const uSize& size)
 
 	auto surfaceFormat = gfx::TextureFormat::BGRA8;
 	auto depthFormat = gfx::TextureFormat::D24;
-	auto& surface = mRenderView->getRenderSurface();
 	if (size.width == 0 && size.height == 0)
 	{
-		surface.populate
+		mSurface->populate
 		(
 			std::vector<std::shared_ptr<Texture>>
 		{
@@ -46,7 +45,7 @@ void CameraComponent::init(const uSize& size)
 	}
 	else
 	{
-		surface.populate
+		mSurface->populate
 		(
 			std::vector<std::shared_ptr<Texture>>
 		{
@@ -73,8 +72,7 @@ void CameraComponent::updateInternal(const math::transform& t)
 
 	// Set new transform
 	mCamera->lookAt(t.getPosition(), t.getPosition() + t.zUnitAxis(), t.yUnitAxis());
-	auto& surface = mRenderView->getRenderSurface();
-	mCamera->setZoomFactor(mCamera->estimateZoomFactor(surface.getSize(), math::vec3{ 0.0f, 0.0f, 0.0f }));
+	mCamera->setZoomFactor(mCamera->estimateZoomFactor(mSurface->getSize(), math::vec3{ 0.0f, 0.0f, 0.0f }));
 	setProjectionWindow();
 }
 
@@ -90,8 +88,7 @@ void CameraComponent::setHDR(bool hdr)
 
 void CameraComponent::setViewportSize(const uSize& size)
 {
-	auto& surface = mRenderView->getRenderSurface();
-	auto oldSize = surface.getSize();
+	auto oldSize = mSurface->getSize();
 	if (size != oldSize)
 	{
 		init(size);
@@ -100,8 +97,7 @@ void CameraComponent::setViewportSize(const uSize& size)
 
 void CameraComponent::setProjectionWindow()
 {
-	auto& surface = mRenderView->getRenderSurface();
-	auto size = surface.getSize();
+	auto size = mSurface->getSize();
 
 	mCamera->setViewportSize(size);
 }
@@ -173,7 +169,7 @@ ProjectionMode CameraComponent::getProjectionMode() const
 	return mCamera->getProjectionMode();
 }
 
-std::shared_ptr<RenderView> CameraComponent::getRenderView() const
+std::shared_ptr<RenderSurface> CameraComponent::getRenderSurface() const
 {
-	return mRenderView;
+	return mSurface;
 }

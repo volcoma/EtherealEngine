@@ -7,8 +7,7 @@
 #include "../Input/InputContext.h"
 #include "Core/events/event.hpp"
 
-class RenderView;
-
+class RenderSurface;
 class RenderWindow : public sf::Window
 {
 public:
@@ -55,7 +54,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline std::shared_ptr<RenderView> getRenderView() { return mView; }
+	inline std::shared_ptr<RenderSurface> getRenderSurface() { return mSurface; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : getRenderView ()
@@ -65,7 +64,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline std::shared_ptr<RenderView> getRenderView() const { return mView; }
+	inline std::shared_ptr<RenderSurface> getRenderSurface() const { return mSurface; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : getInput ()
@@ -88,24 +87,24 @@ public:
 	inline const InputContext& getInput() const { return mInput; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : prepareView (virtual )
+	//  Name : prepareSurface (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void prepareView();
+	virtual void prepareSurface();
 
 	//-----------------------------------------------------------------------------
-	//  Name : destroyView (virtual )
+	//  Name : destroySurface (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void destroyView();
+	virtual void destroySurface();
 
 	//-----------------------------------------------------------------------------
 	//  Name : frameBegin (virtual )
@@ -156,7 +155,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	virtual void delayedClose();
-
+	inline void setMain(bool isMain) { mIsMain = isMain; }
 protected:
 	//-----------------------------------------------------------------------------
 	//  Name : filterEvent (virtual )
@@ -190,7 +189,8 @@ protected:
 
 	/// Input Context for this window.
 	InputContext mInput;
-
-	/// Render view for this window.
-	std::shared_ptr<RenderView> mView;
+	/// Render surface for this window.
+	std::shared_ptr<RenderSurface> mSurface;
+	///
+	bool mIsMain = false;
 };
