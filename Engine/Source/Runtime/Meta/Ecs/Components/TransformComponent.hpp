@@ -24,24 +24,6 @@ REFLECT(TransformComponent)
 		(
 			rttr::metadata("Tooltip", "This is the world transformation. Affected by parent transformation.")
 		)
-// 		.property("Local Position",
-// 			&TransformComponent::getLocalPosition,
-// 			&TransformComponent::setLocalPosition)
-// 		.property("Local Rotation",
-// 			&TransformComponent::getLocalRotation,
-// 			&TransformComponent::setLocalRotation)
-// 		.property("Local Scale",
-// 			&TransformComponent::getLocalScale,
-// 			&TransformComponent::setLocalScale)
-// 		.property("Position",
-// 			&TransformComponent::getPosition,
-// 			&TransformComponent::setPosition)
-// 		.property("Rotation",
-// 			&TransformComponent::getRotation,
-// 			&TransformComponent::setRotation)
-// 		.property("Scale",
-// 			&TransformComponent::getScale,
-// 			&TransformComponent::setScale)
 		.property("Slow Parenting",
 			&TransformComponent::getSlowParenting,
 			&TransformComponent::setSlowParenting)
@@ -64,7 +46,6 @@ SAVE(TransformComponent)
 {
 	ar(
 		cereal::make_nvp("base_type", cereal::base_class<Component>(&obj)),
-		cereal::make_nvp("hierarchy_level", obj.mHierarchyLevel),
 		cereal::make_nvp("local_transform", obj.mLocalTransform),
 		cereal::make_nvp("children", obj.mChildren),
 		cereal::make_nvp("slow_parenting", obj.mSlowParenting),
@@ -77,7 +58,6 @@ LOAD(TransformComponent)
 {
 	ar(
 		cereal::make_nvp("base_type", cereal::base_class<Component>(&obj)),
-		cereal::make_nvp("hierarchy_level", obj.mHierarchyLevel),
 		cereal::make_nvp("local_transform", obj.mLocalTransform),
 		cereal::make_nvp("children", obj.mChildren),
 		cereal::make_nvp("slow_parenting", obj.mSlowParenting),

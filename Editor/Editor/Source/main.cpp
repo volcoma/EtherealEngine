@@ -1,6 +1,10 @@
 #include "EditorApp.h"
 #include "Runtime/runtime.h"
 
+//Regex to count lines of code
+//^(?!(\s*\*))(?!(\s*\-\-\>))(?!(\s*\<\!\-\-))(?!(\s*\n))(?!(\s*\*\/))(?!(\s*\/\*))(?!(\s*\/\/\/))(?!(\s*\/\/))(?!(\s*\}))(?!(\s*\{))(?!(\s(using))).*$
+
+
 int main(int _argc, char* _argv[])
 {
 	auto& app = Singleton<Application>::getInstance();

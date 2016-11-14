@@ -144,6 +144,24 @@ namespace entityx
 		return components;
 	}
 
+	std::vector<std::shared_ptr<Component>> EntityManager::all_components_shared(Entity::Id id) const
+	{
+		std::vector<std::shared_ptr<Component>> components;
+		auto mask = component_mask(id);
+		for (size_t i = 0; i < component_pools_.size(); i++)
+		{
+			if (mask.test(i))
+			{
+				auto pool = component_pools_[i];
+				if (pool)
+					components.push_back(pool->get(id.index()));
+			}
+
+		}
+
+		return components;
+	}
+
 	ComponentHandle<Component> EntityManager::assign(Entity::Id id, std::shared_ptr<Component> component)
 	{
 		assert_valid(id);

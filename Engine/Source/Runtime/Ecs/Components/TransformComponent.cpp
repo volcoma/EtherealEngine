@@ -32,7 +32,6 @@ TransformComponent::TransformComponent(const TransformComponent& rhs)
 
 	mLocalTransform = rhs.mLocalTransform;
 	mWorldTransform = rhs.mWorldTransform;
-	mHierarchyLevel = rhs.mHierarchyLevel;
 	mSlowParenting = rhs.mSlowParenting;
 	mSlowParentingSpeed = rhs.mSlowParentingSpeed;
 }
@@ -532,13 +531,8 @@ TransformComponent& TransformComponent::setParent(HTransformComponent parent, bo
 		auto shParent = parent.lock();
 		// We're now attached / detached as required.	
 		shParent->attachChild(makeHandle());
+	}
 
-		mHierarchyLevel = shParent->mHierarchyLevel + 1;
-	}
-	else
-	{
-		mHierarchyLevel = 0;
-	}
 
 	if (worldPositionStays)
 	{
@@ -633,7 +627,6 @@ void TransformComponent::resolveTransform(bool force, float dt)
 		else
 		{
 			mWorldTransform = mLocalTransform;
-			mHierarchyLevel = 0;
 		}
 	}
 

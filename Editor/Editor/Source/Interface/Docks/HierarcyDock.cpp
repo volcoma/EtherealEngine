@@ -4,6 +4,7 @@
 #include "Runtime/Ecs/Components/TransformComponent.h"
 #include "Runtime/Ecs/Systems/TransformSystem.h"
 #include "Runtime/Input/InputContext.h"
+#include "Runtime/System/FileSystem.h"
 namespace Docks
 {
 
@@ -30,6 +31,10 @@ namespace Docks
 						->setParent(entity.component<TransformComponent>().lock()->getParent(), false, true);
 					
 					editState.select(object);
+				}
+				if (gui::Selectable("Create Prefab"))
+				{
+					world.saveEntity(fs::resolveFileLocation("app://data/prefabs/" + entity.getName() + ".prefab"), entity);
 				}
 				if (gui::Selectable("Delete"))
 				{

@@ -99,3 +99,17 @@ struct World
 	/// Keep count of deserialized entities
 	std::map<uint32_t, Entity> deserialized;
 };
+
+struct Prefab
+{
+	static Prefab create(Entity e)
+	{
+		Prefab p;
+		p.name = e.getName();
+		p.components = e.all_components_shared();
+		return p;
+	}
+
+	std::string name;
+	std::vector<std::shared_ptr<Component>> components;
+};

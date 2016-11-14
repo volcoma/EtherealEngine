@@ -251,6 +251,7 @@ void EditorApp::createProject(const std::string& projectDir)
 	fs::ensurePath(projectDir + "/data/textures/runtime/", true);
 	fs::ensurePath(projectDir + "/data/materials/runtime/", true);
 	fs::ensurePath(projectDir + "/data/meshes/runtime/", true);
+	fs::ensurePath(projectDir + "/data/prefabs/", true);
 	fs::ensurePath(projectDir + "/data/scenes/", true);
 	fs::ensurePath(projectDir + "/settings/", true);
 	fs::createFile(projFile);

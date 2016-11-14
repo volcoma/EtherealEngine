@@ -69,3 +69,19 @@ LOAD(Entity)
 }
 
 }
+
+SAVE(Prefab)
+{
+	ar(
+		cereal::make_nvp("name", obj.getName()),
+		cereal::make_nvp("components", obj.all_components())
+	);
+}
+
+SAVE(Prefab)
+{
+	ar(
+		cereal::make_nvp("name", obj.getName()),
+		cereal::make_nvp("components", obj.all_components())
+	);
+}

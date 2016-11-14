@@ -196,6 +196,9 @@ namespace Docks
 				}
 			}
 
+			//if (selectedCategory == "Prefabs")
+				//listItems(textures, editState);
+
 			gui::EndChild();
 		}
 

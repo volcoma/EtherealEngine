@@ -161,6 +161,7 @@ namespace entityx
 		std::tuple<ComponentHandle<const Components>...> components() const;
 
 		std::vector<ComponentHandle<Component>> all_components() const;
+		std::vector<std::shared_ptr<Component>> all_components_shared() const;
 
 		template <typename C>
 		bool has_component() const;
@@ -620,7 +621,7 @@ namespace entityx
 		}
 
 		std::vector<ComponentHandle<Component>> all_components(Entity::Id id) const;
-
+		std::vector<std::shared_ptr<Component>> all_components_shared(Entity::Id id) const;
 		/**
 		 * Find Entities that have all of the specified Components.
 		 *
@@ -868,6 +869,12 @@ namespace entityx
 	{
 		assert(valid());
 		return manager_->all_components(id_);
+	}
+
+	inline std::vector<std::shared_ptr<Component>> Entity::all_components_shared() const
+	{
+		assert(valid());
+		return manager_->all_components_shared(id_);
 	}
 
 	template <typename ... Components>

@@ -27,7 +27,6 @@ namespace Docks
 		gui::Text("MSPF : %.3f ms ", 1000.0f / float(timer.getFrameRate()));
 		gui::Separator();
 		
-		
 		gui::Text("Total Entities  : %u", unsigned int(totalEntiteis));
 		gui::Separator();
 
@@ -331,12 +330,12 @@ namespace Docks
 		if (!hasEditCamera)
 			return;
 	
+		
 		auto size = gui::GetContentRegionAvail();
 		auto pos = gui::GetCursorScreenPos();
 		drawSelectedCamera(size);
 
 		auto cameraComponent = editorCamera.component<CameraComponent>().lock();
-		
 		if (size.x > 0 && size.y > 0)
 		{
 			cameraComponent->getCamera()->setViewportPos({ static_cast<std::uint32_t>(pos.x), static_cast<std::uint32_t>(pos.y) });

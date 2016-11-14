@@ -10,7 +10,6 @@
 #include "../Assets/AssetReader.h"
 #include "../Assets/AssetWriter.h"
 #include "../Rendering/RenderSurface.h"
-#include "../Rendering/FrameBuffer.h"
 #include "../Rendering/Debug/DebugDraw.h"
 #include "../Rendering/RenderWindow.h"
 #include "../Input/InputContext.h"
@@ -277,7 +276,7 @@ bool Application::initAssetManager()
 	}
 	{
 		auto storage = manager.add<Material>();
-		storage->subdir = "/runtime/";
+		storage->subdir = "/";
 		storage->loadFromFile = AssetReader::loadMaterialFromFile;
 		storage->saveToFile = AssetWriter::saveMaterialToFile;
 		//storage->loadFromMemory = AssetReader::loadMaterialFromMemory;

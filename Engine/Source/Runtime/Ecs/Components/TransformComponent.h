@@ -526,16 +526,6 @@ public:
 	const std::vector<HTransformComponent>& getChildren() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : getHierarchyLevel ()
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	std::uint32_t getHierarchyLevel() { return mHierarchyLevel; }
-
-	//-----------------------------------------------------------------------------
 	//  Name : attachChild ()
 	/// <summary>
 	/// 
@@ -602,8 +592,6 @@ protected:
 	HTransformComponent	mParent;
 	/// Children object.
 	std::vector<HTransformComponent> mChildren;
-	/// Hierarchy depth.
-	std::uint32_t mHierarchyLevel = 0;
 	/// Local transformation relative to the parent
 	math::transform mLocalTransform;
 	/// Cached world transformation at pivot point.
