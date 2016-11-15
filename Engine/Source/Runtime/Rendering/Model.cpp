@@ -10,7 +10,7 @@ Model::Model()
 {
 	auto& app = Singleton<Application>::getInstance();
 	auto& manager = app.getAssetManager();
-	manager.load<Material>("data://materials/standard", false)
+	manager.load<Material>("sys://materials/standard", false)
 		.then([this](auto asset)
 	{
 		mMaterials.push_back(asset);

@@ -255,7 +255,6 @@ void EditorApp::createProject(const std::string& projectDir)
 	fs::ensurePath(projectDir + "/settings/", true);
 	fs::createFile(projFile);
 
-	fs::copy(fs::resolveFileLocation("sys://materials/"), fs::resolveFileLocation("app://data/materials/"));
 	fs::copy(fs::resolveFileLocation("sys://meshes/runtime"), fs::resolveFileLocation("app://data/meshes/runtime"));
 
 	openProject(projFile);
