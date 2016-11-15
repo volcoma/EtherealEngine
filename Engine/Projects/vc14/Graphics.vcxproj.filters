@@ -494,6 +494,9 @@
     <ClCompile Include="..\..\Source\Graphics\src\vertexdecl.cpp">
       <Filter>Source Files\src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\Graphics\src\renderer_gnm.cpp">
+      <Filter>Source Files\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Source\Graphics\bx\float4_swizzle.inl">

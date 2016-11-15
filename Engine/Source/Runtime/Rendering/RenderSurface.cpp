@@ -82,7 +82,6 @@ void releaseId(std::uint8_t id)
 	else
 		releaseWndId(id);
 
-	gfx::resetView(id);
 }
 
 std::uint8_t getAvailableId(bool window)
@@ -187,6 +186,8 @@ uSize RenderSurface::getSize() const
 RenderSurface::~RenderSurface()
 {
 	releaseId(mId);
+
+	gfx::resetView(mId);
 }
 
 

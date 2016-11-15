@@ -1005,8 +1005,8 @@ namespace bgfx { namespace d3d12
 									| BGFX_CAPS_TEXTURE_2D_ARRAY
 									| BGFX_CAPS_TEXTURE_CUBE_ARRAY
 									);
-				g_caps.maxTextureSize   = 16384;
-				g_caps.maxFBAttachments = uint8_t(bx::uint32_min(16, BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS) );
+				g_caps.limits.maxTextureSize   = 16384;
+				g_caps.limits.maxFBAttachments = uint8_t(bx::uint32_min(16, BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS) );
 
 				for (uint32_t ii = 0; ii < TextureFormat::Count; ++ii)
 				{
@@ -1401,7 +1401,7 @@ namespace bgfx { namespace d3d12
 		{
 		}
 
-		void readTexture(TextureHandle _handle, void* _data) BX_OVERRIDE
+		void readTexture(TextureHandle _handle, void* _data, uint8_t _mip ) BX_OVERRIDE
 		{
 			const TextureD3D12& texture = m_textures[_handle.idx];
 
@@ -1412,7 +1412,7 @@ namespace bgfx { namespace d3d12
 			uint64_t total;
 			uint64_t srcPitch;
 			m_device->GetCopyableFootprints(&desc
-				, 0
+				, _mip
 				, 1
 				, 0
 				, &layout
@@ -1438,16 +1438,18 @@ namespace bgfx { namespace d3d12
 			finish();
 			m_commandList = m_cmd.alloc();
 
+			uint32_t srcWidth  = bx::uint32_max(1, texture.m_width >>_mip);
+			uint32_t srcHeight = bx::uint32_max(1, texture.m_height>>_mip);
 			uint8_t* src;
 			readback->Map(0, NULL, (void**)&src);
 
 			const uint8_t bpp = getBitsPerPixel(TextureFormat::Enum(texture.m_textureFormat) );
 			uint8_t* dst      = (uint8_t*)_data;
-			uint32_t dstPitch = texture.m_width*bpp/8;
+			uint32_t dstPitch = srcWidth*bpp/8;
 
 			uint32_t pitch = bx::uint32_min(uint32_t(srcPitch), dstPitch);
 
-			for (uint32_t yy = 0, height = texture.m_height; yy < height; ++yy)
+			for (uint32_t yy = 0, height = srcHeight; yy < height; ++yy)
 			{
 				memcpy(dst, src, pitch);
 
@@ -3012,6 +3014,7 @@ data.NumQualityLevels = 0;
 
 		D3D12_UNORDERED_ACCESS_VIEW_DESC tmpUavd;
 		D3D12_UNORDERED_ACCESS_VIEW_DESC* uavd = &_texture.m_uavd;
+
 		if (0 != _mip)
 		{
 			memcpy(&tmpUavd, uavd, sizeof(tmpUavd) );
@@ -3023,6 +3026,10 @@ data.NumQualityLevels = 0;
 			case D3D12_UAV_DIMENSION_TEXTURE2D:
 				uavd->Texture2D.MipSlice   = _mip;
 				uavd->Texture2D.PlaneSlice = 0;
+				break;
+			case D3D12_UAV_DIMENSION_TEXTURE2DARRAY:
+				uavd->Texture2DArray.MipSlice   = _mip;
+				uavd->Texture2DArray.PlaneSlice = 0;
 				break;
 
 			case D3D12_UAV_DIMENSION_TEXTURE3D:
@@ -3873,7 +3880,7 @@ data.NumQualityLevels = 0;
 				}
 				else if (0 == (BGFX_UNIFORM_SAMPLERBIT & type) )
 				{
-					const UniformInfo* info = s_renderD3D12->m_uniformReg.find(name);
+					const UniformRegInfo* info = s_renderD3D12->m_uniformReg.find(name);
 					BX_WARN(NULL != info, "User defined uniform '%s' is not found, it won't be set.", name);
 
 					if (NULL != info)
@@ -4239,6 +4246,14 @@ data.NumQualityLevels = 0;
 					m_uavd.Texture2D.MipSlice   = 0;
 					m_uavd.Texture2D.PlaneSlice = 0;
 				}
+
+				if( m_type==TextureCube )
+				{
+					m_uavd.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2DARRAY;
+					m_uavd.Texture2DArray.MipSlice   = 0;
+					m_uavd.Texture2DArray.ArraySize = 6;
+				}
+
 				break;
 
 			case Texture3D:
@@ -4761,7 +4776,7 @@ data.NumQualityLevels = 0;
 		_render->m_hmdInitialized = false;
 
 		const bool hmdEnabled = false;
-		ViewState viewState(_render, hmdEnabled);
+		static ViewState viewState;
 		viewState.reset(_render, hmdEnabled);
 
 // 		bool wireframe = !!(_render->m_debug&BGFX_DEBUG_WIREFRAME);

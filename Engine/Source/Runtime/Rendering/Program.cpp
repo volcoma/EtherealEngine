@@ -78,7 +78,7 @@ void Program::addShader(AssetHandle<Shader> shader)
 	shaders.push_back(shader);
 	for (auto& uniform : shader->uniforms)
 	{
-		uniforms[uniform->id] = uniform;
+		uniforms[uniform->info.name] = uniform;
 	}
 }
 

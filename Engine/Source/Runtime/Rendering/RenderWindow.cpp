@@ -28,6 +28,13 @@ RenderWindow::RenderWindow(sf::VideoMode mode, const std::string& title, std::ui
 
 RenderWindow::~RenderWindow()
 {
+	if (mSurface)
+	{
+		mSurface.reset();
+		gfx::frame();
+		gfx::frame();
+	}
+	
 }
 
 bool RenderWindow::filterEvent(const sf::Event& event)
@@ -71,13 +78,7 @@ void RenderWindow::prepareSurface()
 
 }
 
-void RenderWindow::destroySurface()
-{
-	mSurface.reset();
-}
-
 void RenderWindow::delayedClose()
 {
-	destroySurface();
 	onClose();
 }

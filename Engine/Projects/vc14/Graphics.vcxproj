@@ -157,6 +157,7 @@
     <ClCompile Include="..\..\Source\Graphics\src\renderer_d3d12.cpp" />
     <ClCompile Include="..\..\Source\Graphics\src\renderer_d3d9.cpp" />
     <ClCompile Include="..\..\Source\Graphics\src\renderer_gl.cpp" />
+    <ClCompile Include="..\..\Source\Graphics\src\renderer_gnm.cpp" />
     <ClCompile Include="..\..\Source\Graphics\src\renderer_null.cpp" />
     <ClCompile Include="..\..\Source\Graphics\src\renderer_vk.cpp" />
     <ClCompile Include="..\..\Source\Graphics\src\shader.cpp" />

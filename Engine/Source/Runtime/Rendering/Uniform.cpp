@@ -22,18 +22,14 @@ void Uniform::populate(const std::string& _name, gfx::UniformType::Enum _type, s
 {
 	dispose();
 
-	type = _type;
-	id = _name;
-	num = _num;
 	handle = gfx::createUniform(_name.c_str(), _type, _num);
+	gfx::getUniformInfo(handle, info);
 }
 
 void Uniform::populate(gfx::UniformHandle _handle)
 {
 	dispose();
 
-	type = gfx::getUniformType(_handle);
-	id = gfx::getUniformName(_handle);
-	num = gfx::getUniformNum(_handle);
-	handle = gfx::createUniform(id.c_str(), type, num);
+	gfx::getUniformInfo(_handle, info);
+	handle = gfx::createUniform(info.name, info.type, info.num);
 }
