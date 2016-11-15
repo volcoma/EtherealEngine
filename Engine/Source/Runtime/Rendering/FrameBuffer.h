@@ -242,6 +242,8 @@ struct FrameBuffer : public ITexture
 		handle = gfx::createFrameBuffer(_nwh, _width, _height, _depthFormat);
 	}
 
+	virtual inline bool isRenderTarget() const { return true; }
+
 	/// Internal handle
 	gfx::FrameBufferHandle handle = { gfx::invalidHandle };
 };

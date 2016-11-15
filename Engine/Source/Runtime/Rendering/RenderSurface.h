@@ -241,6 +241,16 @@ public:
 	inline const TextureAttachment& getAttachment(std::uint32_t index) const { return mTextures[index]; }
 
 	//-----------------------------------------------------------------------------
+	//  Name : getAttachmentCount ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline const std::size_t getAttachmentCount() const { return mTextures.size(); }
+
+	//-----------------------------------------------------------------------------
 	//  Name : clear ()
 	/// <summary>
 	/// 

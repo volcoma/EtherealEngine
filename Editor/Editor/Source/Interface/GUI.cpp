@@ -264,13 +264,41 @@ void begin()
 void Image(std::shared_ptr<ITexture> texture, const ImVec2& _size, const ImVec2& _uv0 /*= ImVec2(0.0f, 0.0f) */, const ImVec2& _uv1 /*= ImVec2(1.0f, 1.0f) */, const ImVec4& _tintCol /*= ImVec4(1.0f, 1.0f, 1.0f, 1.0f) */, const ImVec4& _borderCol /*= ImVec4(0.0f, 0.0f, 0.0f, 0.0f) */)
 {
 	sTextures.push_back(texture);
-	ImGui::Image(texture.get(), _size, _uv0, _uv1, _tintCol, _borderCol);
+
+	ImVec2 uv0 = _uv0;
+	ImVec2 uv1 = _uv1;
+
+	if (texture->isRenderTarget())
+	{
+		auto originBottomLeft = gfx::getCaps()->originBottomLeft;
+		if (originBottomLeft)
+		{
+			uv0 = { 0.0f, 1.0f };
+			uv1 = { 1.0f, 0.0f };
+		}
+	}
+
+	ImGui::Image(texture.get(), _size, uv0, uv1, _tintCol, _borderCol);
 }
 
 bool ImageButton(std::shared_ptr<ITexture> texture, const ImVec2& _size, const ImVec2& _uv0 /*= ImVec2(0.0f, 0.0f) */, const ImVec2& _uv1 /*= ImVec2(1.0f, 1.0f) */, int _framePadding /*= -1 */, const ImVec4& _bgCol /*= ImVec4(0.0f, 0.0f, 0.0f, 0.0f) */, const ImVec4& _tintCol /*= ImVec4(1.0f, 1.0f, 1.0f, 1.0f) */)
 {
 	sTextures.push_back(texture);
-	return ImGui::ImageButton(texture.get(), _size, _uv0, _uv1, _framePadding, _bgCol, _tintCol);
+
+	ImVec2 uv0 = _uv0;
+	ImVec2 uv1 = _uv1;
+
+	if (texture->isRenderTarget())
+	{
+		auto originBottomLeft = gfx::getCaps()->originBottomLeft;
+		if (originBottomLeft)
+		{
+			uv0 = { 0.0f, 1.0f };
+			uv1 = { 1.0f, 0.0f };
+		}
+	}
+	
+	return ImGui::ImageButton(texture.get(), _size, uv0, uv1, _framePadding, _bgCol, _tintCol);
 }
 
 bool ImageButtonEx(std::shared_ptr<ITexture> texture, ImVec2 size, const char* tooltip, bool selected, bool enabled)

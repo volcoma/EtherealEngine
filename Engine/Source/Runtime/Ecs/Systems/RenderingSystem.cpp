@@ -43,110 +43,124 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 		CameraComponent& cameraComponent
 		)
 	{
-		const auto surface = cameraComponent.getRenderSurface();
+		const auto gBufferSurface = cameraComponent.getGBufferSurface();
 		const auto camera = cameraComponent.getCamera();
-		const auto viewId = surface->getId();
+		const auto viewId = gBufferSurface->getId();
 		auto& cameraLods = mLodDataMap[ce];
-		RenderSurfaceScope surfaceScope(surface);
-		surface->clear();
 
-		gfx::setViewTransform(viewId, &camera->getView(), &camera->getProj());
-
-		entities.each<TransformComponent, ModelComponent>([this, &cameraLods, camera, dt, viewId](
-			Entity e,
-			TransformComponent& transformComponent,
-			ModelComponent& modelComponent
-			)
 		{
-			const auto& model = modelComponent.getModel();
-			if (!model.isValid())
-				return;
+			RenderSurfaceScope surfaceScope(gBufferSurface);
+			gBufferSurface->clear();
 
-			const auto& worldTransform = transformComponent.getTransform();
-			const auto clip_planes = math::vec2(camera->getNearClip(), camera->getFarClip());
+			gfx::setViewTransform(viewId, &camera->getView(), &camera->getProj());
 
-			auto& lodData = cameraLods[e];
-			const auto transitionTime = model.getTransitionTime();
-			const auto minDistance = model.getMinDistance();
-			const auto maxDistance = model.getMaxDistance();
-			const auto lodCount = model.getLods().size();
-			const auto currentTime = lodData.currentTime;
-			const auto currentLodIndex = lodData.currentLodIndex;
-			const auto targetLodIndex = lodData.targetLodIndex;
-
-			auto material = model.getMaterialForGroup({});
-			if (!material)
-				return;
-
-			const auto hMeshCurr = model.getLod(currentLodIndex);
-			if (!hMeshCurr)
-				return;
-
-			const auto& frustum = camera->getFrustum();
-			const auto& bounds = hMeshCurr->aabb;
-
-			float t = 0;
-			const auto rayOrigin = camera->getPosition();
-			const auto invWorld = math::inverse(worldTransform);
-			const auto objectRayOrigin = invWorld.transformCoord(rayOrigin);
-			const auto objectRayDirection = math::normalize(bounds.getCenter() - objectRayOrigin);
-			bounds.intersect(objectRayOrigin, objectRayDirection, t);
-
-			// Compute final object space intersection point.
-			auto intersectionPoint = objectRayOrigin + (objectRayDirection * t);
-
-			// transform intersection point back into world space to compute
-			// the final intersection distance.
-			intersectionPoint = worldTransform.transformCoord(intersectionPoint);
-			const float distance = math::length(intersectionPoint - rayOrigin);
-			updateLodData(
-				lodData,
-				lodCount,
-				minDistance,
-				maxDistance,
-				transitionTime,
-				distance,
-				dt);
-			// Test the bounding box of the mesh
-			if (!math::frustum::testOBB(frustum, bounds, worldTransform))
-				return;
-
-			const auto params = math::vec3{
-				0.0f,
-				-1.0f,
-				(transitionTime - currentTime) / transitionTime
-			};
-
-			const auto paramsInv = math::vec3{
-				1.0f,
-				1.0f,
-				currentTime / transitionTime
-			};
-
-			material->setUniform("u_camera_wpos", &camera->getPosition());
-			material->setUniform("u_camera_clip_planes", &clip_planes);
-			material->setUniform("u_lod_params", &params);
-			material->submit();
-
-			// Set render states.
-			const auto states = material->getRenderStates();
-
-			auto program = material->getProgram();
-
-			hMeshCurr->submit(viewId, program->handle, worldTransform, states);
-
-			if (currentTime != 0.0f)
+			entities.each<TransformComponent, ModelComponent>([this, &cameraLods, camera, dt, viewId](
+				Entity e,
+				TransformComponent& transformComponent,
+				ModelComponent& modelComponent
+				)
 			{
-				material->setUniform("u_lod_params", &paramsInv);
+				const auto& model = modelComponent.getModel();
+				if (!model.isValid())
+					return;
+
+				const auto& worldTransform = transformComponent.getTransform();
+				const auto clip_planes = math::vec2(camera->getNearClip(), camera->getFarClip());
+
+				auto& lodData = cameraLods[e];
+				const auto transitionTime = model.getTransitionTime();
+				const auto minDistance = model.getMinDistance();
+				const auto maxDistance = model.getMaxDistance();
+				const auto lodCount = model.getLods().size();
+				const auto currentTime = lodData.currentTime;
+				const auto currentLodIndex = lodData.currentLodIndex;
+				const auto targetLodIndex = lodData.targetLodIndex;
+
+				auto material = model.getMaterialForGroup({});
+				if (!material)
+					return;
+
+				const auto hMeshCurr = model.getLod(currentLodIndex);
+				if (!hMeshCurr)
+					return;
+
+				const auto& frustum = camera->getFrustum();
+				const auto& bounds = hMeshCurr->aabb;
+
+				float t = 0;
+				const auto rayOrigin = camera->getPosition();
+				const auto invWorld = math::inverse(worldTransform);
+				const auto objectRayOrigin = invWorld.transformCoord(rayOrigin);
+				const auto objectRayDirection = math::normalize(bounds.getCenter() - objectRayOrigin);
+				bounds.intersect(objectRayOrigin, objectRayDirection, t);
+
+				// Compute final object space intersection point.
+				auto intersectionPoint = objectRayOrigin + (objectRayDirection * t);
+
+				// transform intersection point back into world space to compute
+				// the final intersection distance.
+				intersectionPoint = worldTransform.transformCoord(intersectionPoint);
+				const float distance = math::length(intersectionPoint - rayOrigin);
+				updateLodData(
+					lodData,
+					lodCount,
+					minDistance,
+					maxDistance,
+					transitionTime,
+					distance,
+					dt);
+				// Test the bounding box of the mesh
+				if (!math::frustum::testOBB(frustum, bounds, worldTransform))
+					return;
+
+				const auto params = math::vec3{
+					0.0f,
+					-1.0f,
+					(transitionTime - currentTime) / transitionTime
+				};
+
+				const auto paramsInv = math::vec3{
+					1.0f,
+					1.0f,
+					currentTime / transitionTime
+				};
+
+				material->setUniform("u_camera_wpos", &camera->getPosition());
+				material->setUniform("u_camera_clip_planes", &clip_planes);
+				material->setUniform("u_lod_params", &params);
 				material->submit();
 
-				const auto hMeshTarget = model.getLod(targetLodIndex);
-				if (!hMeshTarget)
-					return;
-				hMeshTarget->submit(viewId, program->handle, worldTransform, states);
-			}
+				// Set render states.
+				const auto states = material->getRenderStates();
 
-		});
+				auto program = material->getProgram();
+
+				hMeshCurr->submit(viewId, program->handle, worldTransform, states);
+
+				if (currentTime != 0.0f)
+				{
+					material->setUniform("u_lod_params", &paramsInv);
+					material->submit();
+
+					const auto hMeshTarget = model.getLod(targetLodIndex);
+					if (!hMeshTarget)
+						return;
+					hMeshTarget->submit(viewId, program->handle, worldTransform, states);
+				}
+
+			});
+
+		}
+
+
+		{
+			auto surface = cameraComponent.getRenderSurface();
+			RenderSurfaceScope scope(surface);			
+
+			//this will change soon
+			gfx::blit(surface->getId(), surface->getAttachment(0).texture->handle, 0, 0, gBufferSurface->getAttachment(0).texture->handle);
+		}
+		
 	});
 
 }

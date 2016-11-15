@@ -215,7 +215,7 @@ void RenderSurface::clear(std::uint16_t _flags, std::uint32_t _rgba /*= 0x000000
 void RenderSurface::clear() const
 {
 	gfx::setViewClear(mId
-		, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
+		, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH | BGFX_CLEAR_STENCIL
 		, 0x2D2D2DFF
 		, 1.0f
 		, 0
@@ -232,6 +232,7 @@ void RenderSurface::pushSurface(std::shared_ptr<RenderSurface> surface)
 void RenderSurface::popSurface()
 {
 	auto& surfaceStack = getSurfaceStack();
+
 	surfaceStack.pop_back();
 
 	if (!surfaceStack.empty())

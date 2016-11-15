@@ -150,6 +150,16 @@ public:
 	std::shared_ptr<RenderSurface> getRenderSurface() const;
 
 	//-----------------------------------------------------------------------------
+	//  Name : getGBufferSurface ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	std::shared_ptr<RenderSurface> getGBufferSurface() const;
+	
+	//-----------------------------------------------------------------------------
 	//  Name : updateInternal ()
 	/// <summary>
 	/// 
@@ -220,6 +230,14 @@ public:
 	void setZoomFactor(float zoom);
 
 private:
+	//-----------------------------------------------------------------------------
+	//  Name : init ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	void init(const uSize& size);
 	//-------------------------------------------------------------------------
 	// Private Member Variables.
@@ -228,6 +246,8 @@ private:
 	std::unique_ptr<Camera> mCamera;
 	/// The render surface of this camera
 	std::shared_ptr<RenderSurface> mSurface;
+	/// The g-buffer for this camera.
+	std::shared_ptr<RenderSurface> mGBufferSurface;
 	/// Is the camera HDR?
 	bool mHDR = true;
 };

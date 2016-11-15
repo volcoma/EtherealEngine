@@ -169,7 +169,6 @@ bool Application::registerMainWindow(RenderWindow& window)
 	};
 	window.setMain(true);
 	window.onClosed.addListener(onClosed);
-
 	return true;
 }
 

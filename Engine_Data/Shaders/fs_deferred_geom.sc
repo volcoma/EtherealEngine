@@ -51,9 +51,7 @@ void main()
 	{
 		discard;
 	}
-	float depth = v_pos.z;// * 0.5 + 0.5;
 	gl_FragData[0] = albedoColor * vec4(evalSh(wnormal), 1.0f);
 	gl_FragData[1] = vec4(encodeNormalUint(wnormal), 1.0);
 	gl_FragData[2] = vec4(specularColor, 1.0);
-	gl_FragData[3] = vec4(depth, depth, depth, depth);
 }

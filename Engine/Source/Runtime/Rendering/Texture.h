@@ -8,6 +8,7 @@ struct ITexture
 {
 	REFLECTABLE(ITexture)
 	virtual ~ITexture() = default;
+	virtual inline bool isRenderTarget() const { return false; }
 };
 
 
@@ -51,7 +52,7 @@ struct Texture : public ITexture
 	//-----------------------------------------------------------------------------
 	Texture(std::uint16_t _width
 		, std::uint16_t _height
-		, bool     _hasMips
+		, bool _hasMips
 		, std::uint16_t _numLayers
 		, gfx::TextureFormat::Enum _format
 		, std::uint32_t _flags = BGFX_TEXTURE_NONE
@@ -229,6 +230,8 @@ struct Texture : public ITexture
 		, std::uint32_t _flags = BGFX_TEXTURE_NONE
 		, const gfx::Memory* _mem = nullptr
 	);
+
+	inline bool isRenderTarget() const { return 0 == (flags & BGFX_TEXTURE_RT_MASK); }
 
 	/// Texture detail info.
 	gfx::TextureInfo info;

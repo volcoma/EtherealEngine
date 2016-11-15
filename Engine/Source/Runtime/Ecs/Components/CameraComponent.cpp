@@ -5,6 +5,7 @@
 CameraComponent::CameraComponent()
 {
 	mCamera = std::make_unique<Camera>();
+	mGBufferSurface = std::make_shared<RenderSurface>();
 	mSurface = std::make_shared<RenderSurface>();
 	init({ 0, 0 });
 }
@@ -13,6 +14,7 @@ CameraComponent::CameraComponent(const CameraComponent& cameraComponent)
 {
 	mCamera = std::make_unique<Camera>(*cameraComponent.getCamera());
 	mHDR = cameraComponent.mHDR;
+	mGBufferSurface = std::make_shared<RenderSurface>();
 	mSurface = std::make_shared<RenderSurface>();
 	init({ 0, 0 });
 }
@@ -32,31 +34,52 @@ void CameraComponent::init(const uSize& size)
 	auto depthFormat = gfx::TextureFormat::D24;
 	if (size.width == 0 && size.height == 0)
 	{
+		//create a depth buffer to share
+		auto depthBuffer = std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, depthFormat, samplerFlags);
+		mGBufferSurface->populate
+		(
+			std::vector<std::shared_ptr<Texture>>
+			{
+				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surfaceFormat, samplerFlags),
+				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surfaceFormat, samplerFlags),
+				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surfaceFormat, samplerFlags),
+				depthBuffer
+			}
+		);
+
 		mSurface->populate
 		(
 			std::vector<std::shared_ptr<Texture>>
-		{
-			std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surfaceFormat, samplerFlags),
+			{
 				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surfaceFormat, samplerFlags),
-				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surfaceFormat, samplerFlags),
-				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, depthFormat, samplerFlags)
-		}
+				depthBuffer
+			}
 		);
 	}
 	else
 	{
+		//create a depth buffer to share
+		auto depthBuffer = std::make_shared<Texture>(size.width, size.height, false, 1, depthFormat, samplerFlags);
+		mGBufferSurface->populate
+		(
+			std::vector<std::shared_ptr<Texture>>
+			{
+				std::make_shared<Texture>(size.width, size.height, false, 1, surfaceFormat, samplerFlags),
+				std::make_shared<Texture>(size.width, size.height, false, 1, surfaceFormat, samplerFlags),
+				std::make_shared<Texture>(size.width, size.height, false, 1, surfaceFormat, samplerFlags),
+				depthBuffer
+			}
+		);
+
 		mSurface->populate
 		(
 			std::vector<std::shared_ptr<Texture>>
-		{
-			std::make_shared<Texture>(size.width, size.height, false, 1, surfaceFormat, samplerFlags),
+			{
 				std::make_shared<Texture>(size.width, size.height, false, 1, surfaceFormat, samplerFlags),
-				std::make_shared<Texture>(size.width, size.height, false, 1, surfaceFormat, samplerFlags),
-				std::make_shared<Texture>(size.width, size.height, false, 1, depthFormat, samplerFlags)
-		}
+				depthBuffer
+			}
 		);
 	}
-
 
 	setProjectionWindow();
 }
@@ -172,4 +195,9 @@ ProjectionMode CameraComponent::getProjectionMode() const
 std::shared_ptr<RenderSurface> CameraComponent::getRenderSurface() const
 {
 	return mSurface;
+}
+
+std::shared_ptr<RenderSurface> CameraComponent::getGBufferSurface() const
+{
+	return mGBufferSurface;
 }

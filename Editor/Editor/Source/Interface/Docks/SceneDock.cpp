@@ -11,6 +11,7 @@
 
 namespace Docks
 {
+	static bool showGBuffer = false;
 
 	void showStatistics(const Timer& timer, const World& world)
 	{
@@ -22,6 +23,7 @@ namespace Docks
 			ImGuiWindowFlags_NoMove |
 			ImGuiWindowFlags_NoResize |
 			ImGuiWindowFlags_AlwaysAutoResize);
+		
 		gui::Text("FPS  : %u", timer.getFrameRate());
 		gui::Separator();
 		gui::Text("MSPF : %.3f ms ", 1000.0f / float(timer.getFrameRate()));
@@ -39,6 +41,9 @@ namespace Docks
 				gfx::setDebug(BGFX_DEBUG_NONE);
 
 		}
+		gui::Separator();
+		gui::Checkbox("Show G-Buffer", &showGBuffer);
+		
 //		if (renderStats)
 //		{
 // 			gui::Text("Graphics");
@@ -74,10 +79,10 @@ namespace Docks
 
 			if (sel && (editorCamera != sel) && sel.has_component<CameraComponent>())
 			{
-				auto selectedCamera = sel.component<CameraComponent>().lock();
-				auto camera = selectedCamera->getCamera();
-				auto surface = selectedCamera->getRenderSurface();
-				auto viewSize = camera->getViewportSize();
+				const auto selectedCamera = sel.component<CameraComponent>().lock();
+				const auto camera = selectedCamera->getCamera();
+				const auto surface = selectedCamera->getRenderSurface();
+				const auto viewSize = camera->getViewportSize();
 
 				float factor = std::min(size.x / float(viewSize.width), size.y / float(viewSize.height)) / 4.0f;
 				ImVec2 bounds(viewSize.width * factor, viewSize.height * factor);
@@ -96,20 +101,9 @@ namespace Docks
 					ImGuiWindowFlags_AlwaysAutoResize))
 				{
 					
-					auto frameBuffer = surface->getBuffer();
-					if (frameBuffer)
-					{
-						ImVec2 uv0 = { 0.0f, 0.0f };
-						ImVec2 uv1 = { 1.0f, 1.0f };
+					const auto frameBuffer = surface->getBuffer();
+					gui::Image(frameBuffer, bounds);
 
-						auto originBottomLeft = gfx::getCaps()->originBottomLeft;
-						if (originBottomLeft)
-						{
-							uv0 = { 0.0f, 1.0f };
-							uv1 = { 1.0f, 0.0f };
-						}
-						gui::Image(frameBuffer, bounds, uv0, uv1);
-					}
 				}
 				gui::End();
 
@@ -342,58 +336,53 @@ namespace Docks
 			cameraComponent->setViewportSize({ static_cast<std::uint32_t>(size.x), static_cast<std::uint32_t>(size.y) });
 			
 			const auto surface = cameraComponent->getRenderSurface();
-			const auto frameBuffer = surface->getBuffer();
-			if (frameBuffer)
+			const auto output = surface->getBuffer();
+			gui::Image(output, size);
+
+			if (gui::IsItemClicked(1) || gui::IsItemClicked(2))
 			{
-				ImVec2 uv0 = { 0.0f, 0.0f };
-				ImVec2 uv1 = { 1.0f, 1.0f };
+				gui::SetWindowFocus();
+				window.setMouseCursorVisible(false);
+			}
 
-				auto originBottomLeft = gfx::getCaps()->originBottomLeft;
-				if (originBottomLeft)
+			manipulationGizmos();
+
+			handleCameraMovement();
+			if (gui::IsWindowFocused())
+			{
+				ImGui::PushStyleColor(ImGuiCol_Border, gui::GetStyle().Colors[ImGuiCol_Button]);
+				ImGui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
+				ImGui::PopStyleColor();
+
+				if (input.isKeyPressed(sf::Keyboard::Delete))
 				{
-					uv0 = { 0.0f, 1.0f };
-					uv1 = { 1.0f, 0.0f };
-				}
-				gui::Image(frameBuffer, size, uv0, uv1);
-				manipulationGizmos();
-				if (gui::IsItemHovered())
-				{	
-					if (gui::IsMouseClicked(1) || gui::IsMouseClicked(2))
+					if (selected && selected.is_type<ecs::Entity>())
 					{
-						gui::SetWindowFocus();
-						window.setMouseCursorVisible(false);
-
-					}
-				}
-				handleCameraMovement();
-				if (gui::IsWindowFocused())
-				{
-					ImGui::PushStyleColor(ImGuiCol_Border, gui::GetStyle().Colors[ImGuiCol_Button]);
-					ImGui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
-					ImGui::PopStyleColor();
-
-					if (input.isKeyPressed(sf::Keyboard::Delete))
-					{
-						if (selected && selected.is_type<ecs::Entity>())
+						auto sel = selected.get_value<ecs::Entity>();
+						if (sel != editorCamera)
 						{
-							auto sel = selected.get_value<ecs::Entity>();
-							if (sel != editorCamera)
-							{
-								sel.destroy();
-								editState.unselect();
-							}
+							sel.destroy();
+							editState.unselect();
 						}
 					}
-
-				}
-
-
-				if (gui::IsMouseReleased(1) || gui::IsMouseReleased(2))
-				{
-					window.setMouseCursorVisible(true);
 				}
 			}
-			
+
+
+			if (gui::IsMouseReleased(1) || gui::IsMouseReleased(2))
+			{
+				window.setMouseCursorVisible(true);
+			}
+
+			if (showGBuffer)
+			{
+				const auto gBufferSurface = cameraComponent->getGBufferSurface();
+				for (std::uint32_t i = 0; i < gBufferSurface->getAttachmentCount(); ++i)
+				{
+					const auto attachment = gBufferSurface->getAttachment(i).texture;
+					gui::Image(attachment, size);
+				}
+			}
 
 		}
 	}

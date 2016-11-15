@@ -25,22 +25,10 @@ namespace Docks
 			const auto surface = cameraComponent.getRenderSurface();
 			const auto frameBuffer = surface->getBuffer();
 			auto size = gui::GetContentRegionAvail();
-			if (size.x > 0 && size.y > 0 && frameBuffer)
-			{
-				cameraComponent.setViewportSize({ static_cast<std::uint32_t>(size.x), static_cast<std::uint32_t>(size.y) });
 
-				ImVec2 uv0 = { 0.0f, 0.0f };
-				ImVec2 uv1 = { 1.0f, 1.0f };
-
-				auto originBottomLeft = gfx::getCaps()->originBottomLeft;
-				if (originBottomLeft)
-				{
-					uv0 = { 0.0f, 1.0f };
-					uv1 = { 1.0f, 0.0f };
-				}
-				gui::Image(frameBuffer, size, uv0, uv1);
-
-			}
+			cameraComponent.setViewportSize({ static_cast<std::uint32_t>(size.x), static_cast<std::uint32_t>(size.y) });
+			gui::Image(frameBuffer, size);
+	
 		});
 	}
 
