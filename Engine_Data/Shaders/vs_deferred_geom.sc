@@ -25,6 +25,6 @@ void main()
 	v_wtangent   = wtangent;
 	v_wbitangent = wbitangent;
 
-	v_texcoord0 = a_texcoord0.x;
+	v_texcoord0 = a_texcoord0;
 
 }
