@@ -3,7 +3,6 @@
 #include "AssetHandle.h"
 
 class Material;
-
 struct AssetWriter
 {
 	//-----------------------------------------------------------------------------

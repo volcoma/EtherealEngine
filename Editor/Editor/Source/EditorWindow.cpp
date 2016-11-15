@@ -40,16 +40,7 @@ void defaultScene()
 	auto& app = Singleton<EditorApp>::getInstance();
 	auto& manager = app.getAssetManager();
 	auto& world = app.getWorld();
-// 	{
-// 		//Create an overwrite material
-// 		auto object = world.entities.create();
-// 		object.assign<TransformComponent>();
-// 
-// 		//Add component and configure it.
-// // 		object.addComponent<ecs::SphereReflectionProbeComponent>()
-// // 			.setRange(256)
-// // 			.setAffectMethod(AffectMethod::SkyOnly);
-// 	}
+
 	{
 		auto object = world.entities.create();
 		object.setName("MainCamera");
@@ -64,16 +55,10 @@ void defaultScene()
 			->setLocalScale({ 10.0f, 0.1f, 10.0f });
 
 		Model model;
-		manager.load<Mesh>("sys://meshes/platform", false)
+		manager.load<Mesh>("data://meshes/platform", false)
 			.then([&model](auto asset)
 		{
 			model.setLod(asset, 0);
-		});
-
-		manager.load<Material>("sys://materials/checker", false)
-			.then([&model](auto asset)
-		{
-			model.setMaterial(asset, 0);
 		});
 
 		//Add component and configure it.
@@ -83,98 +68,24 @@ void defaultScene()
 			.setModel(model);
 	}
 	{
-		auto tree = world.entities.create();
-		tree.setName("tree");
-		tree.assign<TransformComponent>().lock()
-			->setLocalScale({ 0.25f, 0.25f, 0.25f });
+		auto object = world.entities.create();
+		object.setName("object");
+		object.assign<TransformComponent>();
 
+		Model model;
+		manager.load<Mesh>("data://meshes/bunny", false)
+			.then([&model](auto asset)
 		{
-			auto object = world.entities.create();
-			object.setName("leafs");
-			object.assign<TransformComponent>().lock()
-				->setParent(tree.component<TransformComponent>());
+			model.setLod(asset, 0);
+		});
 
-			Model model;
-			manager.load<Mesh>("sys://meshes/tree_leafs_0", false)
-				.then([&model](auto asset)
-			{
-				model.setLod(asset, 0);
-			});
-			manager.load<Mesh>("sys://meshes/tree_leafs_1", false)
-				.then([&model](auto asset)
-			{
-				model.setLod(asset, 1);
-			});
-			manager.load<Mesh>("sys://meshes/tree_leafs_2", false)
-				.then([&model](auto asset)
-			{
-				model.setLod(asset, 2);
-			});
-			manager.load<Material>("sys://materials/leafs", false)
-				.then([&model](auto asset)
-			{
-				model.setMaterial(asset, 0);
-			});
-
-			//Add component and configure it.
-			object.assign<ModelComponent>().lock()
-				->setCastShadow(true)
-				.setCastReflelction(false)
-				.setModel(model);
-		}
-		{
-			auto object = world.entities.create();
-			object.setName("trunk");
-			object.assign<TransformComponent>().lock()
-				->setParent(tree.component<TransformComponent>());
-
-			Model model;
-			manager.load<Mesh>("sys://meshes/tree_trunk_0", false)
-				.then([&model](auto asset)
-			{
-				model.setLod(asset, 0);
-			});
-			manager.load<Mesh>("sys://meshes/tree_trunk_1", false)
-				.then([&model](auto asset)
-			{
-				model.setLod(asset, 1);
-			});
-			manager.load<Mesh>("sys://meshes/tree_trunk_2", false)
-				.then([&model](auto asset)
-			{
-				model.setLod(asset, 2);
-			});
-
-			manager.load<Material>("sys://materials/trunk", false)
-				.then([&model](auto asset)
-			{
-				model.setMaterial(asset, 0);
-			});
-
-
-			//Add component and configure it.
-			object.assign<ModelComponent>().lock()
-				->setCastShadow(true)
-				.setCastReflelction(false)
-				.setModel(model);
-		}
+		//Add component and configure it.
+		object.assign<ModelComponent>().lock()
+			->setCastShadow(true)
+			.setCastReflelction(false)
+			.setModel(model);
 	}
-	
-// 	{
-// 		auto object = world.createEntity();
-// 		object.addComponent<ecs::TransformComponent>()
-// 			.rotateLocal(45.0f, -45.0f, 0.0f);
-// 
-// 		//Add component and configure it.
-// 		object.addComponent<ecs::DirectionalLightComponent>()
-// 			.setColor(ColorValue::White)
-// 			.setIntensity(10.0f)
-// 			.enableShadows(true);
-// 	}
 }
-
-
-
 
 void loadEditorCamera()
 {
@@ -208,7 +119,7 @@ auto openScene()
 	auto& world = app.getWorld();
 	auto& editState = app.getEditState();
 	std::string path;
-	if (openFileDialog("scene", fs::resolveFileLocation("app://data/scenes/"), path))
+	if (openFileDialog("scene", fs::resolveFileLocation("data://scenes/"), path))
 	{
 		world.reset();
 		loadEditorCamera();
@@ -252,7 +163,7 @@ void saveSceneAs()
 		return;
 
 	std::string path;
-	if (saveFileDialog("scene", fs::resolveFileLocation("app://data/scenes/"), path))
+	if (saveFileDialog("scene", fs::resolveFileLocation("data://scenes/"), path))
 	{
 		editState.scene = path;		
 		saveScene();	
@@ -424,6 +335,11 @@ void MainEditorWindow::onToolbar()
 	if (gui::ToolbarButton(icons["grid"].get(), "Show Grid", editState.showGrid))
 	{
 		editState.showGrid = !editState.showGrid;
+	}
+	gui::SameLine(0.0f);
+	if (gui::ToolbarButton(icons["wireframe"].get(), "Wireframe Selection", editState.wireframeSelection))
+	{
+		editState.wireframeSelection = !editState.wireframeSelection;
 	}
 
 	gui::SameLine(width / 2.0f - 36.0f);

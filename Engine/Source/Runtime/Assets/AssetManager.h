@@ -8,6 +8,7 @@
 #include "../System/FileSystem.h"
 #include "LoadRequest.hpp"
 
+
 /// aliases
 template<typename T>
 using RequestContainer = std::unordered_map<std::string, LoadRequest<T>>;
@@ -34,6 +35,16 @@ struct Storage
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	virtual void clear() = 0;
+
+	//-----------------------------------------------------------------------------
+	//  Name : clear (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	virtual void clear(const std::string& protocol) = 0;
 
 	//-----------------------------------------------------------------------------
 	//  Name : getCounter ()
@@ -90,6 +101,27 @@ struct TStorage : Storage
 	}
 
 	//-----------------------------------------------------------------------------
+	//  Name : clear ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	void clear(const std::string& protocol)
+	{
+		auto containerCopy = container;
+		for (auto& pair : containerCopy)
+		{
+			const auto& id = pair.first;
+			if (string_utils::beginsWith(id, protocol, true))
+			{
+				container.erase(id);
+			}
+		}
+	}
+
+	//-----------------------------------------------------------------------------
 	//  Name : loadFromMemoryDefault ()
 	/// <summary>
 	/// 
@@ -133,6 +165,21 @@ struct TStorage : Storage
 	/// Sub directory
 	std::string subdir;
 };
+
+template<typename T>
+inline std::string getAbsoluteKey(const std::string& toLowerKey, T storage)
+{
+	std::string absoluteKey = fs::resolveFileLocation(toLowerKey);
+	std::string dir = fs::getDirectoryName(absoluteKey);
+	std::string file = fs::getFileName(absoluteKey);
+	dir = string_utils::replace(dir, '\\', '/');
+	dir = string_utils::toLower(dir);
+	file = string_utils::toLower(file);
+	static const std::string ext = ".asset";
+	absoluteKey = dir + storage->subdir + file + ext;
+	return absoluteKey;
+};
+
 
 class AssetManager
 {
@@ -229,6 +276,23 @@ public:
 	}
 
 	//-----------------------------------------------------------------------------
+	//  Name : clear ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	void clear(const std::string& protocol)
+	{
+		for (auto& pair : storages)
+		{
+			auto& storage = pair.second;
+			storage->clear(protocol);
+		}
+	}
+
+	//-----------------------------------------------------------------------------
 	//  Name : createAssetFromMemory ()
 	/// <summary>
 	/// 
@@ -263,20 +327,7 @@ public:
 		auto storage = getStorage<T>();
 		const std::string toLowerKey = string_utils::toLower(relativeKey);
 		const std::string toLowerNewKey = string_utils::toLower(newRelativeKey);
-		auto getAbsoluteKey = [](const std::string& toLowerKey, auto storage)
-		{
-
-			std::string absoluteKey = fs::resolveFileLocation(toLowerKey);
-			std::string dir = fs::getDirectoryName(absoluteKey);
-			std::string file = fs::getFileName(absoluteKey);
-			dir = string_utils::replace(dir, '\\', '/');
-			dir = string_utils::toLower(dir);
-			file = string_utils::toLower(file);
-			static const std::string ext = ".asset";
-			absoluteKey = dir + storage->subdir + file + ext;
-			return absoluteKey;
-		};
-
+		
 		auto absoluteKey = getAbsoluteKey(toLowerKey, storage);
 		auto absoluteNewKey = getAbsoluteKey(toLowerNewKey, storage);
 		fs::moveFile(absoluteKey, absoluteNewKey, true);
@@ -306,6 +357,29 @@ public:
 		request.asset.link->id.clear();
 		storage->container.erase(toLowerKey);
 	}
+
+	//-----------------------------------------------------------------------------
+	//  Name : clearAsset ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	template<typename T>
+	void deleteAsset(
+		const std::string& relativeKey)
+	{
+		auto storage = getStorage<T>();
+		const std::string toLowerKey = string_utils::toLower(relativeKey);
+		const std::string absoluteKey = getAbsoluteKey(toLowerKey, storage);
+		fs::deleteFile(absoluteKey);
+
+		auto& request = storage->container[toLowerKey];
+		request.asset.link->asset.reset();
+		request.asset.link->id.clear();
+		storage->container.erase(toLowerKey);
+	}
 	//-----------------------------------------------------------------------------
 	//  Name : load ()
 	/// <summary>
@@ -329,15 +403,7 @@ public:
 		}
 		else
 		{
-			std::string absoluteKey = fs::resolveFileLocation(toLowerKey);
-			std::string dir = fs::getDirectoryName(absoluteKey);
-			std::string file = fs::getFileName(absoluteKey);
-			dir = string_utils::replace(dir, '\\', '/');
-			dir = string_utils::toLower(dir);
-			file = string_utils::toLower(file);
-			static const std::string ext = ".asset";
-			absoluteKey = dir + storage->subdir + file + ext;
-
+			const std::string absoluteKey = getAbsoluteKey(toLowerKey, storage);
 			return loadAssetFromFileImpl<T>(toLowerKey, absoluteKey, async, force, storage->container, storage->loadFromFile);
 
 		}
@@ -355,17 +421,8 @@ public:
 	void save(const AssetHandle<T>& asset)
 	{
 		auto storage = getStorage<T>();
-
 		const std::string toLowerKey = string_utils::toLower(asset.id());
-		std::string absoluteKey = fs::resolveFileLocation(toLowerKey);
-		std::string dir = fs::getDirectoryName(absoluteKey);
-		std::string file = fs::getFileName(absoluteKey);
-		dir = string_utils::replace(dir, '\\', '/');
-		dir = string_utils::toLower(dir);
-		file = string_utils::toLower(file);
-		static const std::string ext = ".asset";
-		absoluteKey = dir + storage->subdir + file + ext;
-
+		const std::string absoluteKey = getAbsoluteKey(toLowerKey, storage);
 		storage->saveToFile(absoluteKey, asset);
 	}
 

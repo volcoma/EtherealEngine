@@ -50,13 +50,13 @@ void World::serializeData(std::ostream& stream, const std::vector<ecs::Entity>& 
 	ar(
 		cereal::make_nvp("data", data)
 	);
-	deserialized.clear();
+	serializationMap.clear();
 }
 
 bool World::deserializeData(std::istream& stream, std::vector<ecs::Entity>& outData)
 {
 	// get length of file:
-	deserialized.clear();
+	serializationMap.clear();
 	stream.seekg(0, stream.end);
 	std::streampos length = stream.tellg();
 	stream.seekg(0, stream.beg);
@@ -70,7 +70,7 @@ bool World::deserializeData(std::istream& stream, std::vector<ecs::Entity>& outD
 
 		stream.clear();
 		stream.seekg(0);
-		deserialized.clear();
+		serializationMap.clear();
 		return true;
 	}
 	return false;

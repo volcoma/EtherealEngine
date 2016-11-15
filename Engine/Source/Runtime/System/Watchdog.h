@@ -171,7 +171,7 @@ protected:
 		mThread = std::thread([this]()
 		{
 			// keep watching for modifications every ms milliseconds
-			auto ms = std::chrono::milliseconds(2000);
+			auto ms = std::chrono::milliseconds(500);
 			while (mWatching)
 			{
 				do

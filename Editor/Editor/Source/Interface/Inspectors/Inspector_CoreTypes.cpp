@@ -476,11 +476,11 @@ bool Inspector_String::inspect(rttr::variant& var, bool readOnly, std::function<
 	{
 		std::string inputBuff;
 		inputBuff.resize(64, 0);
-		inputBuff.shrink_to_fit();
+		std::copy(data.begin(), data.end(), inputBuff.begin());
 		if (gui::InputText("", &inputBuff[0], inputBuff.size(), ImGuiInputTextFlags_EnterReturnsTrue))
 		{
 			// copy from c_str to remove trailing zeros
-			var = inputBuff.c_str();
+			var = std::string(inputBuff.c_str());
 			return true;
 		}
 	}

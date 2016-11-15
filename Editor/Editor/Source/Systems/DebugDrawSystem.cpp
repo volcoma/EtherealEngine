@@ -147,20 +147,22 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 			ddDraw(Aabb{ bounds.min, bounds.max });
 			ddPop();
 
-
-			const float u_params[8] =
+			if (editState.wireframeSelection)
 			{
-				1.0f, 1.0f, 0.0f, 1.0f,
-				1.0f, 2.0f, 0.0f, 0.0f
-			};
-			mProgram->setUniform("u_params", u_params, 2);
-			const auto material = model.getMaterialForGroup({});
-			if (!material)
-				return;
-			const std::uint64_t state = material->getRenderStates(false, false, false)
-				| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
-				;
-			hMesh->submit(viewId, mProgram->handle, worldTransform, state);
+				const float u_params[8] =
+				{
+					1.0f, 1.0f, 0.0f, 1.0f,
+					1.0f, 2.0f, 0.0f, 0.0f
+				};
+				mProgram->setUniform("u_params", u_params, 2);
+				const auto material = model.getMaterialForGroup({});
+				if (!material)
+					return;
+				const std::uint64_t state = material->getRenderStates(false, false, false)
+					| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
+					;
+				hMesh->submit(viewId, mProgram->handle, worldTransform, state);
+			}	
 		}
 	}
 }

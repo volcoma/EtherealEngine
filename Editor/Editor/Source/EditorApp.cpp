@@ -249,12 +249,15 @@ void EditorApp::createProject(const std::string& projectDir)
 	fs::ensurePath(projectDir + "/data/scenes/", true);
 	fs::ensurePath(projectDir + "/data/shaders/runtime/", true);
 	fs::ensurePath(projectDir + "/data/textures/runtime/", true);
-	fs::ensurePath(projectDir + "/data/materials/runtime/", true);
 	fs::ensurePath(projectDir + "/data/meshes/runtime/", true);
 	fs::ensurePath(projectDir + "/data/prefabs/", true);
 	fs::ensurePath(projectDir + "/data/scenes/", true);
 	fs::ensurePath(projectDir + "/settings/", true);
 	fs::createFile(projFile);
+
+	fs::copy(fs::resolveFileLocation("sys://materials/"), fs::resolveFileLocation("app://data/materials/"));
+	fs::copy(fs::resolveFileLocation("sys://meshes/runtime"), fs::resolveFileLocation("app://data/meshes/runtime"));
+
 	openProject(projFile);
 }
 
@@ -273,7 +276,7 @@ void EditorApp::openProject(const std::string& projectDir)
 	editState.unselect();
 	editState.scene.clear();
 	auto& manager = getAssetManager();
-	manager.clear();
+	manager.clear("data://");
 	auto projName = fs::getFileName(projectDir);
 	editState.project = projName;
 }

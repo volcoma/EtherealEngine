@@ -273,6 +273,12 @@ bool ImageButton(std::shared_ptr<ITexture> texture, const ImVec2& _size, const I
 	return ImGui::ImageButton(texture.get(), _size, _uv0, _uv1, _framePadding, _bgCol, _tintCol);
 }
 
+bool ImageButtonEx(std::shared_ptr<ITexture> texture, ImVec2 size, const char* tooltip, bool selected, bool enabled)
+{
+	sTextures.push_back(texture);
+	return ImGui::ImageButtonEx(texture.get(), size, tooltip, selected, enabled);
+}
+
 GUIStyle& getGUIStyle()
 {
 	return sGUIStyle;

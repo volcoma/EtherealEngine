@@ -66,7 +66,12 @@ namespace gui
 		, const ImVec4& _bgCol = ImVec4(0.0f, 0.0f, 0.0f, 0.0f)
 		, const ImVec4& _tintCol = ImVec4(1.0f, 1.0f, 1.0f, 1.0f)
 	);
-
+	bool ImageButtonEx(std::shared_ptr<ITexture> texture
+		, ImVec2 size
+		, const char* tooltip = nullptr
+		, bool selected = false
+		, bool enabled = true
+	);
 	GUIStyle& getGUIStyle();
 };
 

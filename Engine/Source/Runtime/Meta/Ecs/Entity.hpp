@@ -17,10 +17,10 @@ SAVE(Entity)
 	ar(
 		cereal::make_nvp("entity_id", id)
 	);
-	auto it = world.deserialized.find(id);
-	if (it == world.deserialized.end())
+	auto it = world.serializationMap.find(id);
+	if (it == world.serializationMap.end())
 	{
-		world.deserialized[id] = obj;
+		world.serializationMap[id] = obj;
 		ar(
 			cereal::make_nvp("name", obj.getName()),
 			cereal::make_nvp("components", obj.all_components())
@@ -31,7 +31,7 @@ SAVE(Entity)
 
 LOAD(Entity)
 {
-	uint32_t id;
+	std::uint32_t id;
 	std::string name;
 	std::vector<ComponentHandle<Component>> components;
 
@@ -42,15 +42,15 @@ LOAD(Entity)
 	
 	auto& app = Singleton<Application>::getInstance();
 	auto& world = app.getWorld();
-	auto it = world.deserialized.find(id);
-	if (it != world.deserialized.end())
+	auto it = world.serializationMap.find(id);
+	if (it != world.serializationMap.end())
 	{
 		obj = it->second;
 	}
 	else
 	{
 		obj = world.entities.create();
-		world.deserialized[id] = obj;
+		world.serializationMap[id] = obj;
 
 		ar(
 			cereal::make_nvp("name", name),
@@ -61,27 +61,11 @@ LOAD(Entity)
 		{
 			auto component_shared = component.lock();
 			obj.assign(component_shared);
-			static std::string context = "deserialized";
+			static const std::string context = "deserialized";
 			component_shared->touch(context);
 		}
 	}
 
 }
 
-}
-
-SAVE(Prefab)
-{
-	ar(
-		cereal::make_nvp("name", obj.getName()),
-		cereal::make_nvp("components", obj.all_components())
-	);
-}
-
-SAVE(Prefab)
-{
-	ar(
-		cereal::make_nvp("name", obj.getName()),
-		cereal::make_nvp("components", obj.all_components())
-	);
 }

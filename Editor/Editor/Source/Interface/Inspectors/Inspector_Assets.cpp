@@ -172,13 +172,13 @@ bool Inspector_AssetHandle_Material::inspect(rttr::variant& var, bool readOnly, 
 	{
 		PropertyLayout propName("Name");
 		const auto& item = data.id();
-		auto assetName = fs::getFileName(item);
-		rttr::variant vari = assetName;
+		rttr::variant vari = fs::getFileName(item);
 		changed |= inspectVar(vari);
 		if (changed)
 		{
 			auto dirName = fs::getDirectoryName(item);
-			manager.renameAsset<Material>(item, dirName + "/" + vari.get_value<std::string>());
+			auto fileName = vari.get_value<std::string>();
+			manager.renameAsset<Material>(item, dirName + std::string("/") + fileName);
 		}
 	}
 

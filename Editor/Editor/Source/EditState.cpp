@@ -92,6 +92,12 @@ void EditState::loadIcons(AssetManager& manager)
 	{
 		icons["grid"] = asset;
 	});
+
+	manager.load<Texture>("editor://icons/wireframe", false)
+		.then([this](auto asset) mutable
+	{
+		icons["wireframe"] = asset;
+	});
 }
 
 void EditState::select(rttr::variant object)

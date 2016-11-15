@@ -21,6 +21,7 @@ struct EditState
 	std::string project;
 	std::string scene;
 	bool showGrid = true;
+	bool wireframeSelection = true;
 	ImGuizmo::OPERATION operation = ImGuizmo::TRANSLATE;
 	ImGuizmo::MODE mode = ImGuizmo::LOCAL;
 	std::unordered_map<std::string, AssetHandle<Texture>> icons;

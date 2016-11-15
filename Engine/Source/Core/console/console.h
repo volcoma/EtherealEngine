@@ -120,12 +120,13 @@ void Console::registerCommand(const std::string& name, const std::string& descri
 	assert(names.find(name) == names.end());
 
 	auto command = std::make_shared<Command>(name, description, static_cast<unsigned int>(argCount), argumentNames, defaultArguments);
+	auto commandRaw = command.get();
 
-	command->call = [this, command, callback](std::vector<std::string>& arguments)
+	command->call = [this, commandRaw, callback](std::vector<std::string>& arguments)
 	{
 
 		// add the arguments checks and set the default arguments
-		auto requiredArguments = argCount -command->defaultArguments.size();
+		auto requiredArguments = argCount - commandRaw->defaultArguments.size();
 
 		// make sure the number of arguments matches
 		if (arguments.size() < requiredArguments)
@@ -139,7 +140,7 @@ void Console::registerCommand(const std::string& name, const std::string& descri
 		else
 		{
 			// append default arguments as necessary
-			arguments.insert(arguments.end(), command->defaultArguments.begin() + (arguments.size() - requiredArguments), command->defaultArguments.end());
+			arguments.insert(arguments.end(), commandRaw->defaultArguments.begin() + (arguments.size() - requiredArguments), commandRaw->defaultArguments.end());
 			assert(arguments.size() == argCount);
 
 			bool failed = false;
@@ -166,13 +167,13 @@ void Console::registerCommand(const std::string& name, const std::string& descri
 		}
 
 		// if we end up here, something went wrong
-		print(command->getUsage());
+		print(commandRaw->getUsage());
 	};
 
-	command->getUsage = [this, command]()
+	command->getUsage = [this, commandRaw]()
 	{
-		auto requiredArguments = sizeof...(Args)-command->defaultArguments.size();
-		return "Usage: " + command->name + NameArguments<Args...>::get(command->argumentNames, 0, static_cast<unsigned int>(requiredArguments));
+		auto requiredArguments = sizeof...(Args)-commandRaw->defaultArguments.size();
+		return "Usage: " + commandRaw->name + NameArguments<Args...>::get(commandRaw->argumentNames, 0, static_cast<unsigned int>(requiredArguments));
 	};
 
 	commands[name] = command;
