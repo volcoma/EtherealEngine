@@ -124,7 +124,7 @@ void PickingSystem::frameRender(ecs::EntityManager &entities, ecs::EventManager 
 	if (!mReading && mStartReadback)
 	{
 		// Blit and read
-		gfx::blit(viewId, mBlitTex->handle, 0, 0, mSurface->getBufferRaw()->handle);
+		gfx::blit(viewId, mBlitTex->handle, 0, 0, gfx::getTexture(mSurface->getBufferRaw()->handle));
 		mReading = gfx::readTexture(mBlitTex->handle, mBlitData);
 		mStartReadback = false;
 	}

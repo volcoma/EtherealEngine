@@ -3,6 +3,7 @@
 #include "Graphics/graphics.h"
 #include <memory>
 
+#include "Core/common/basetypes.hpp"
 #include "Core/reflection/reflection.h"
 struct ITexture
 {
@@ -231,6 +232,24 @@ struct Texture : public ITexture
 		, const gfx::Memory* _mem = nullptr
 	);
 
+	//-----------------------------------------------------------------------------
+	//  Name : getSize ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	uSize getSize() const;
+
+	//-----------------------------------------------------------------------------
+	//  Name : isRenderTarget ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	inline bool isRenderTarget() const { return 0 == (flags & BGFX_TEXTURE_RT_MASK); }
 
 	/// Texture detail info.

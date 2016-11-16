@@ -34,11 +34,11 @@ void Program::setTexture(std::uint8_t _stage, const std::string& _sampler, Frame
 	if (!frameBuffer)
 		return;
 
-	gfx::setTexture(_stage, getUniform(_sampler)->handle, frameBuffer->handle, _attachment, _flags);
+	gfx::setTexture(_stage, getUniform(_sampler)->handle, gfx::getTexture(frameBuffer->handle, _attachment), _flags);
 }
 void Program::setTexture(std::uint8_t _stage, const std::string& _sampler, gfx::FrameBufferHandle frameBuffer, uint8_t _attachment /*= 0 */, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
-	gfx::setTexture(_stage, getUniform(_sampler)->handle, frameBuffer, _attachment, _flags);
+	gfx::setTexture(_stage, getUniform(_sampler)->handle, gfx::getTexture(frameBuffer, _attachment), _flags);
 }
 void Program::setTexture(std::uint8_t _stage, const std::string& _sampler, Texture* _texture, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
