@@ -33,10 +33,11 @@ void main()
 
 	vec3 wnormal = normalize( mul( tangentToWorldSpace, tangentSpaceNormal ).xyz );
 	
-	vec4 albedoColor = texture2D(s_texColor, texCoords) * u_baseColor;
-	albedoColor.rgb = albedoColor.rgb - albedoColor.rgb * metalness;
+	vec4 baseColor = texture2D(s_texColor, texCoords) * u_baseColor;
+	vec4 albedoColor = baseColor;
+	albedoColor.rgb = baseColor.rgb - baseColor.rgb * metalness;
 	// Compute specular reflectance
-	vec3 specularColor = mix( 0.08f * u_speculatColor.rgb, albedoColor.rgb, metalness );
+	vec3 specularColor = mix( 0.08f * u_speculatColor.rgb, baseColor.rgb, metalness );
 
 	
 	float distance = length(viewDir) - u_camera_clip_planes.x * 2.0f;

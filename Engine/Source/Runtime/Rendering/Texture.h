@@ -250,7 +250,7 @@ struct Texture : public ITexture
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline bool isRenderTarget() const { return 0 == (flags & BGFX_TEXTURE_RT_MASK); }
+	inline bool isRenderTarget() const { return 0 != (flags & BGFX_TEXTURE_RT_MASK); }
 
 	/// Texture detail info.
 	gfx::TextureInfo info;
