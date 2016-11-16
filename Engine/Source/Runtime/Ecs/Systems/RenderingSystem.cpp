@@ -158,7 +158,6 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 			RenderSurfaceScope scope(surface);			
 
 			//this will change soon
-			gfx::blit(surface->getId(), surface->getAttachment(0).texture->handle, 0, 0, gBufferSurface->getAttachment(0).texture->handle);
 		}
 		
 	});
