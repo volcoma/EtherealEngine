@@ -179,12 +179,7 @@ void Application::registerWindow(std::shared_ptr<RenderWindow> window)
 		mWindows.erase(std::remove_if(std::begin(mWindows), std::end(mWindows),
 			[this, &wnd](std::shared_ptr<RenderWindow>& other)
 		{
-			if (&wnd == other.get())
-			{
-				mPendingClosureWindows.push_back(other);
-				return true;
-			}
-			return false;
+			return (&wnd == other.get());
 		}), std::end(mWindows));
 	};
 
@@ -510,6 +505,4 @@ void Application::frameEnd()
 	// Advance to next frame. Rendering thread will be kicked to
 	// process submitted rendering primitives.
 	mRenderFrame = gfx::frame();
-
-	mPendingClosureWindows.clear();
 }
