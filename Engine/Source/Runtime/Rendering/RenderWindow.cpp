@@ -30,11 +30,14 @@ RenderWindow::~RenderWindow()
 {
 	if (mSurface)
 	{
+		auto buffer = mSurface->getBufferRaw();
+		// force internal handle destruction
+		if (buffer)
+			buffer->dispose();
 		mSurface.reset();
 		gfx::frame();
 		gfx::frame();
 	}
-	
 }
 
 bool RenderWindow::filterEvent(const sf::Event& event)
@@ -76,9 +79,4 @@ void RenderWindow::prepareSurface()
 		mSurface->populate(getSystemHandle(), size.width, size.height);
 	}
 
-}
-
-void RenderWindow::delayedClose()
-{
-	onClose();
 }

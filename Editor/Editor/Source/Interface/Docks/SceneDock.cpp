@@ -81,7 +81,7 @@ namespace Docks
 			{
 				const auto selectedCamera = sel.component<CameraComponent>().lock();
 				const auto camera = selectedCamera->getCamera();
-				const auto surface = selectedCamera->getRenderSurface();
+				const auto surface = selectedCamera->getOutputBuffer();
 				const auto viewSize = camera->getViewportSize();
 
 				float factor = std::min(size.x / float(viewSize.width), size.y / float(viewSize.height)) / 4.0f;
@@ -335,7 +335,7 @@ namespace Docks
 			cameraComponent->getCamera()->setViewportPos({ static_cast<std::uint32_t>(pos.x), static_cast<std::uint32_t>(pos.y) });
 			cameraComponent->setViewportSize({ static_cast<std::uint32_t>(size.x), static_cast<std::uint32_t>(size.y) });
 			
-			const auto surface = cameraComponent->getRenderSurface();
+			const auto surface = cameraComponent->getOutputBuffer();
 			const auto output = surface->getBuffer();
 			gui::Image(output, size);
 
@@ -376,7 +376,7 @@ namespace Docks
 
 			if (showGBuffer)
 			{
-				const auto gBufferSurface = cameraComponent->getGBufferSurface();
+				const auto gBufferSurface = cameraComponent->getGBuffer();
 				for (std::uint32_t i = 0; i < gBufferSurface->getAttachmentCount(); ++i)
 				{
 					const auto attachment = gBufferSurface->getAttachment(i).texture;

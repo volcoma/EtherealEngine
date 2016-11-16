@@ -43,14 +43,14 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 		CameraComponent& cameraComponent
 		)
 	{
-		const auto gBufferSurface = cameraComponent.getGBufferSurface();
+		const auto gBuffer = cameraComponent.getGBuffer();
 		const auto camera = cameraComponent.getCamera();
-		const auto viewId = gBufferSurface->getId();
+		const auto viewId = gBuffer->getId();
 		auto& cameraLods = mLodDataMap[ce];
 
 		{
-			RenderSurfaceScope surfaceScope(gBufferSurface);
-			gBufferSurface->clear();
+			RenderSurfaceScope surfaceScope(gBuffer);
+			gBuffer->clear();
 
 			gfx::setViewTransform(viewId, &camera->getView(), &camera->getProj());
 
@@ -154,11 +154,11 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 
 
 		{
-			auto surface = cameraComponent.getRenderSurface();
+			auto surface = cameraComponent.getOutputBuffer();
 			RenderSurfaceScope scope(surface);			
 
 			//this will change soon
-			gfx::blit(surface->getId(), gfx::getTexture(surface->getBufferRaw()->handle), 0, 0, gfx::getTexture(gBufferSurface->getBufferRaw()->handle));
+			gfx::blit(surface->getId(), gfx::getTexture(surface->getBufferRaw()->handle), 0, 0, gfx::getTexture(gBuffer->getBufferRaw()->handle));
 		}
 		
 	});

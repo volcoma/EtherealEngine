@@ -42,7 +42,7 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 
 	const auto cameraComponentRef = editorCamera.component<CameraComponent>();
 	const auto cameraComponent = cameraComponentRef.lock();
-	const auto surface = cameraComponent->getRenderSurface();
+	const auto surface = cameraComponent->getOutputBuffer();
 	const auto camera = cameraComponent->getCamera();
 	const auto view = camera->getView();
 	const auto proj = camera->getProj();

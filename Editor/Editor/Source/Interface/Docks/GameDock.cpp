@@ -22,7 +22,7 @@ namespace Docks
 			if (e == editorCamera)
 				return;
 
-			const auto surface = cameraComponent.getRenderSurface();
+			const auto surface = cameraComponent.getOutputBuffer();
 			const auto frameBuffer = surface->getBuffer();
 			auto size = gui::GetContentRegionAvail();
 

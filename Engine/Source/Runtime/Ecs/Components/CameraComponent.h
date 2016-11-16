@@ -147,17 +147,17 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::shared_ptr<RenderSurface> getRenderSurface() const;
+	std::shared_ptr<RenderSurface> getOutputBuffer() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : getGBufferSurface ()
+	//  Name : getGBuffer ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::shared_ptr<RenderSurface> getGBufferSurface() const;
+	std::shared_ptr<RenderSurface> getGBuffer() const;
 	
 	//-----------------------------------------------------------------------------
 	//  Name : updateInternal ()
@@ -245,9 +245,9 @@ private:
 	/// The camera object this component represents
 	std::unique_ptr<Camera> mCamera;
 	/// The render surface of this camera
-	std::shared_ptr<RenderSurface> mSurface;
+	std::shared_ptr<RenderSurface> mOutputBuffer;
 	/// The g-buffer for this camera.
-	std::shared_ptr<RenderSurface> mGBufferSurface;
+	std::shared_ptr<RenderSurface> mGBuffer;
 	/// Is the camera HDR?
 	bool mHDR = true;
 };

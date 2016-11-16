@@ -270,7 +270,7 @@ namespace ImGuiDock
 							activeDock->redockSlot, 0, true);
 						activeDock->redockTo = nullptr;
 
-						window->delayedClose();
+						window->close();
 					}
 					else
 					{

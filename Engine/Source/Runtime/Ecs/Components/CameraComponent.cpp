@@ -5,8 +5,8 @@
 CameraComponent::CameraComponent()
 {
 	mCamera = std::make_unique<Camera>();
-	mGBufferSurface = std::make_shared<RenderSurface>();
-	mSurface = std::make_shared<RenderSurface>();
+	mGBuffer = std::make_shared<RenderSurface>();
+	mOutputBuffer = std::make_shared<RenderSurface>();
 	init({ 0, 0 });
 }
 
@@ -14,8 +14,8 @@ CameraComponent::CameraComponent(const CameraComponent& cameraComponent)
 {
 	mCamera = std::make_unique<Camera>(*cameraComponent.getCamera());
 	mHDR = cameraComponent.mHDR;
-	mGBufferSurface = std::make_shared<RenderSurface>();
-	mSurface = std::make_shared<RenderSurface>();
+	mGBuffer = std::make_shared<RenderSurface>();
+	mOutputBuffer = std::make_shared<RenderSurface>();
 	init({ 0, 0 });
 }
 
@@ -36,7 +36,7 @@ void CameraComponent::init(const uSize& size)
 	{
 		//create a depth buffer to share
 		auto depthBuffer = std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, depthFormat, samplerFlags);
-		mGBufferSurface->populate
+		mGBuffer->populate
 		(
 			std::vector<std::shared_ptr<Texture>>
 			{
@@ -47,7 +47,7 @@ void CameraComponent::init(const uSize& size)
 			}
 		);
 
-		mSurface->populate
+		mOutputBuffer->populate
 		(
 			std::vector<std::shared_ptr<Texture>>
 			{
@@ -60,7 +60,7 @@ void CameraComponent::init(const uSize& size)
 	{
 		//create a depth buffer to share
 		auto depthBuffer = std::make_shared<Texture>(size.width, size.height, false, 1, depthFormat, samplerFlags);
-		mGBufferSurface->populate
+		mGBuffer->populate
 		(
 			std::vector<std::shared_ptr<Texture>>
 			{
@@ -71,7 +71,7 @@ void CameraComponent::init(const uSize& size)
 			}
 		);
 
-		mSurface->populate
+		mOutputBuffer->populate
 		(
 			std::vector<std::shared_ptr<Texture>>
 			{
@@ -95,7 +95,7 @@ void CameraComponent::updateInternal(const math::transform& t)
 
 	// Set new transform
 	mCamera->lookAt(t.getPosition(), t.getPosition() + t.zUnitAxis(), t.yUnitAxis());
-	mCamera->setZoomFactor(mCamera->estimateZoomFactor(mSurface->getSize(), math::vec3{ 0.0f, 0.0f, 0.0f }));
+	mCamera->setZoomFactor(mCamera->estimateZoomFactor(mOutputBuffer->getSize(), math::vec3{ 0.0f, 0.0f, 0.0f }));
 	setProjectionWindow();
 }
 
@@ -111,7 +111,7 @@ void CameraComponent::setHDR(bool hdr)
 
 void CameraComponent::setViewportSize(const uSize& size)
 {
-	auto oldSize = mSurface->getSize();
+	auto oldSize = mOutputBuffer->getSize();
 	if (size != oldSize)
 	{
 		init(size);
@@ -120,7 +120,7 @@ void CameraComponent::setViewportSize(const uSize& size)
 
 void CameraComponent::setProjectionWindow()
 {
-	auto size = mSurface->getSize();
+	auto size = mOutputBuffer->getSize();
 
 	mCamera->setViewportSize(size);
 }
@@ -192,12 +192,12 @@ ProjectionMode CameraComponent::getProjectionMode() const
 	return mCamera->getProjectionMode();
 }
 
-std::shared_ptr<RenderSurface> CameraComponent::getRenderSurface() const
+std::shared_ptr<RenderSurface> CameraComponent::getOutputBuffer() const
 {
-	return mSurface;
+	return mOutputBuffer;
 }
 
-std::shared_ptr<RenderSurface> CameraComponent::getGBufferSurface() const
+std::shared_ptr<RenderSurface> CameraComponent::getGBuffer() const
 {
-	return mGBufferSurface;
+	return mGBuffer;
 }
