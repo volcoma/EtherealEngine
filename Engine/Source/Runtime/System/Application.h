@@ -383,8 +383,6 @@ protected:
 	std::string mRootDataDir;
 	/// Collection of application windows.
 	std::vector<std::shared_ptr<RenderWindow>> mWindows;
-	/// Collection of application windows that are pending closure.
-	std::vector<std::shared_ptr<RenderWindow>> mPendingClosureWindows;
 	/// Currently processed window.
 	std::shared_ptr<RenderWindow> mWindow;
 	/// Is V-sync enabled?
