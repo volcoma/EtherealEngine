@@ -262,7 +262,7 @@ bool Inspector_AssetHandle_Mesh::inspect(rttr::variant& var, bool readOnly, std:
 	}
 
 	{
-		rttr::variant vari = data.get();
+		rttr::variant vari = data.get()->info;
 		changed |= inspectVar(vari);
 	}
 	return changed;

@@ -7,19 +7,27 @@
 struct VertexBuffer;
 struct IndexBuffer;
 
-struct Primitive
+
+struct MeshInfo
+{
+	std::uint32_t vertices = 0;
+	std::uint32_t indices = 0;
+	std::uint32_t primitives = 0;
+};
+
+struct Subset
 {
 	std::string name;
-	uint32_t m_startIndex;
-	uint32_t m_numIndices;
-	uint32_t m_startVertex;
-	uint32_t m_numVertices;
+	std::uint32_t m_startIndex = 0;
+	std::uint32_t m_numIndices = 0;
+	std::uint32_t m_startVertex = 0;
+	std::uint32_t m_numVertices = 0;
 };
 
 struct Group
 {
 	std::string material;
-	std::vector<Primitive> primitives;
+	std::vector<Subset> subsets;
 	std::shared_ptr<VertexBuffer> vertexBuffer;
 	std::shared_ptr<IndexBuffer> indexBuffer;
 };
@@ -48,8 +56,10 @@ struct Mesh
 
 	/// Vertex declaration for this mesh
 	gfx::VertexDecl decl;
-	/// All primitive groups
+	/// All subset groups
 	std::vector<Group> groups;
 	/// Local bounding box.
 	math::bbox aabb;
+	/// Mesh info
+	MeshInfo info;
 };

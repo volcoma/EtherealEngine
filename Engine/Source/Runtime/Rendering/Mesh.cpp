@@ -46,3 +46,4 @@ void Mesh::submit(uint8_t _id, gfx::ProgramHandle _program, const float* _mtx, u
 		gfx::submit(_id, _program, 0, it != itEnd - 1);
 	}
 }
+

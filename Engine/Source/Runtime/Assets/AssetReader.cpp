@@ -234,6 +234,7 @@ struct MeshData
 	std::vector<Group> groups;
 	std::vector<std::pair<fs::ByteArray, fs::ByteArray>> buffersMem; // vb, ib
 	math::bbox aabb;
+	MeshInfo info;
 };
 
 
@@ -315,20 +316,23 @@ void AssetReader::loadMeshFromFile(const std::string& relativeKey, const std::st
 
 				for (std::uint32_t ii = 0; ii < num; ++ii)
 				{
-					Primitive prim;
+					Subset subset;
 					gfx::read(&_reader, len);
-					prim.name.resize(len);
-					gfx::read(&_reader, const_cast<char*>(prim.name.data()), len);
+					subset.name.resize(len);
+					gfx::read(&_reader, const_cast<char*>(subset.name.data()), len);
 
-					gfx::read(&_reader, prim.m_startIndex);
-					gfx::read(&_reader, prim.m_numIndices);
-					gfx::read(&_reader, prim.m_startVertex);
-					gfx::read(&_reader, prim.m_numVertices);
+					gfx::read(&_reader, subset.m_startIndex);
+					gfx::read(&_reader, subset.m_numIndices);
+					gfx::read(&_reader, subset.m_startVertex);
+					gfx::read(&_reader, subset.m_numVertices);
 					// 					read(_reader, prim.m_sphere);
 					// 					read(_reader, prim.m_aabb);
 					// 					read(_reader, prim.m_obb);
 
-					group.primitives.push_back(prim);
+					group.subsets.push_back(subset);
+					data->info.vertices += subset.m_numVertices;
+					data->info.indices += subset.m_numIndices;
+					data->info.primitives += subset.m_numIndices / 3;
 				}
 
 				data->groups.emplace_back(group);
@@ -358,6 +362,7 @@ void AssetReader::loadMeshFromFile(const std::string& relativeKey, const std::st
 		mesh->decl = data->decl;
 		mesh->groups = data->groups;
 		mesh->aabb = data->aabb;
+		mesh->info = data->info;
 		for (std::size_t i = 0; i < mesh->groups.size(); ++i)
 		{
 			auto& group = mesh->groups[i];

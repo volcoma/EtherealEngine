@@ -107,6 +107,7 @@
     <ClInclude Include="..\..\Source\Runtime\Meta\Math\Vector.hpp" />
     <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Camera.hpp" />
     <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Material.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Mesh.hpp" />
     <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Model.hpp" />
     <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Program.hpp" />
     <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Texture.hpp" />

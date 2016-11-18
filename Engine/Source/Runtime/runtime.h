@@ -38,6 +38,7 @@
 #include "Meta/Rendering/Model.hpp"
 #include "Meta/Rendering/Program.hpp"
 #include "Meta/Rendering/Texture.hpp"
+#include "Meta/Rendering/Mesh.hpp"
 #include "Meta/Rendering/Camera.hpp"
 
 #include "Meta/Core/BaseTypes.hpp"
