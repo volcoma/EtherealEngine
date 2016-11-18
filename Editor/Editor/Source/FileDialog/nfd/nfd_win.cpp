@@ -438,6 +438,100 @@ nfdresult_t NFD_OpenDialog( const char *filterList,
     return nfdResult;
 }
 
+nfdresult_t NFD_OpenFolderDialog(const char *filterList,
+	const nfdchar_t *defaultPath,
+	nfdchar_t **outPath)
+{
+	nfdresult_t nfdResult = NFD_ERROR;
+
+	// Init COM library.
+	HRESULT result = ::CoInitializeEx(NULL,
+		::COINIT_APARTMENTTHREADED |
+		::COINIT_DISABLE_OLE1DDE);
+	if (!SUCCEEDED(result))
+	{
+		NFDi_SetError("Could not initialize COM.");
+		goto end;
+	}
+
+	::IFileOpenDialog *fileOpenDialog(NULL);
+
+	// Create dialog
+	result = ::CoCreateInstance(::CLSID_FileOpenDialog, NULL,
+		CLSCTX_ALL, ::IID_IFileOpenDialog,
+		reinterpret_cast<void**>(&fileOpenDialog));
+
+	if (!SUCCEEDED(result))
+	{
+		NFDi_SetError("Could not create dialog.");
+		goto end;
+	}
+
+	// Build the filter list
+	if (!AddFiltersToDialog(fileOpenDialog, filterList))
+	{
+		goto end;
+	}
+
+	// Set the default path
+	if (!SetDefaultPath(fileOpenDialog, defaultPath))
+	{
+		goto end;
+	}
+
+	DWORD dwOptions;
+	if (SUCCEEDED(fileOpenDialog->GetOptions(&dwOptions)))
+	{
+		fileOpenDialog->SetOptions(dwOptions | FOS_PICKFOLDERS);
+	}
+
+	// Show the dialog.
+	result = fileOpenDialog->Show(NULL);
+	if (SUCCEEDED(result))
+	{
+		// Get the file name
+		::IShellItem *shellItem(NULL);
+		result = fileOpenDialog->GetResult(&shellItem);
+		if (!SUCCEEDED(result))
+		{
+			NFDi_SetError("Could not get shell item from dialog.");
+			goto end;
+		}
+		wchar_t *filePath(NULL);
+		result = shellItem->GetDisplayName(::SIGDN_FILESYSPATH, &filePath);
+		if (!SUCCEEDED(result))
+		{
+			NFDi_SetError("Could not get file path for selected.");
+			goto end;
+		}
+
+		CopyWCharToNFDChar(filePath, outPath);
+		CoTaskMemFree(filePath);
+		if (!*outPath)
+		{
+			/* error is malloc-based, error message would be redundant */
+			goto end;
+		}
+
+		nfdResult = NFD_OKAY;
+		shellItem->Release();
+	}
+	else if (result == HRESULT_FROM_WIN32(ERROR_CANCELLED))
+	{
+		nfdResult = NFD_CANCEL;
+	}
+	else
+	{
+		NFDi_SetError("File dialog box show failed.");
+		nfdResult = NFD_ERROR;
+	}
+
+end:
+	::CoUninitialize();
+
+	return nfdResult;
+}
+
 nfdresult_t NFD_OpenDialogMultiple( const nfdchar_t *filterList,
                                     const nfdchar_t *defaultPath,
                                     nfdpathset_t *outPaths )

@@ -19,10 +19,14 @@ Program::Program(AssetHandle<Shader> vertexShader, AssetHandle<Shader> fragmentS
 
 Program::~Program()
 {
+	dispose();
+}
+
+void Program::dispose()
+{
 	if (isValid())
 		gfx::destroyProgram(handle);
 }
-
 
 bool Program::isValid() const
 {
@@ -76,6 +80,7 @@ std::shared_ptr<Uniform> Program::getUniform(const std::string& _name)
 void Program::addShader(AssetHandle<Shader> shader)
 {
 	shaders.push_back(shader);
+	shadersCached.push_back(shader->handle.idx);
 	for (auto& uniform : shader->uniforms)
 	{
 		uniforms[uniform->info.name] = uniform;
@@ -84,12 +89,33 @@ void Program::addShader(AssetHandle<Shader> shader)
 
 void Program::populate()
 {
+	dispose();
+
 	if (shaders.size() == 1)
 	{
 		handle = gfx::createProgram(shaders[0]->handle);
+		shadersCached[0] = shaders[0]->handle.idx;
 	}
 	else if (shaders.size() == 2)
 	{
 		handle = gfx::createProgram(shaders[0]->handle, shaders[1]->handle);
+		shadersCached[0] = shaders[0]->handle.idx;
+		shadersCached[1] = shaders[1]->handle.idx;
 	}
+}
+
+void Program::beginPass()
+{
+	bool repopulate = false;
+	for (std::size_t i = 0; i < shadersCached.size(); ++i)
+	{
+		if (shadersCached[i] != shaders[i]->handle.idx)
+		{
+			repopulate = true;
+			break;
+		}
+	}
+
+	if (repopulate)
+		populate();
 }

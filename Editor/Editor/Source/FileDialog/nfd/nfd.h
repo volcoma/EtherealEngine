@@ -40,6 +40,11 @@ nfdresult_t NFD_OpenDialog( const nfdchar_t *filterList,
                             const nfdchar_t *defaultPath,
                             nfdchar_t **outPath );
 
+/* single folder select dialog */    
+nfdresult_t NFD_OpenFolderDialog( const nfdchar_t *filterList,
+                            const nfdchar_t *defaultPath,
+                            nfdchar_t **outPath );
+
 /* multiple file open dialog */    
 nfdresult_t NFD_OpenDialogMultiple( const nfdchar_t *filterList,
                                     const nfdchar_t *defaultPath,

@@ -101,6 +101,8 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 				// the final intersection distance.
 				intersectionPoint = worldTransform.transformCoord(intersectionPoint);
 				const float distance = math::length(intersectionPoint - rayOrigin);
+
+				//Compute Lods
 				updateLodData(
 					lodData,
 					lodCount,
@@ -124,18 +126,14 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 					1.0f,
 					currentTime / transitionTime
 				};
-
+				// Set render states.
+				const auto states = material->getRenderStates();
+				material->beginPass();
 				material->setUniform("u_camera_wpos", &camera->getPosition());
 				material->setUniform("u_camera_clip_planes", &clip_planes);
 				material->setUniform("u_lod_params", &params);
 				material->submit();
-
-				// Set render states.
-				const auto states = material->getRenderStates();
-
-				auto program = material->getProgram();
-
-				hMeshCurr->submit(viewId, program->handle, worldTransform, states);
+				hMeshCurr->submit(viewId, material->getProgram()->handle, worldTransform, states);
 
 				if (currentTime != 0.0f)
 				{
@@ -145,7 +143,7 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 					const auto hMeshTarget = model.getLod(targetLodIndex);
 					if (!hMeshTarget)
 						return;
-					hMeshTarget->submit(viewId, program->handle, worldTransform, states);
+					hMeshTarget->submit(viewId, material->getProgram()->handle, worldTransform, states);
 				}
 
 			});

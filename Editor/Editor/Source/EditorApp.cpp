@@ -237,38 +237,35 @@ bool EditorApp::shutDown()
 void EditorApp::createProject(const std::string& projectDir)
 {
 	auto projName = fs::getFileName(projectDir);
-	auto projFile = fs::resolveFileLocation(projectDir + "/" + projName + std::string(".projinfo"));
-
 	fs::addPathProtocol("app", projectDir);
-	fs::ensurePath(projectDir + "/", true);
-	fs::ensurePath(projectDir + "/data/", true);
-	fs::ensurePath(projectDir + "/data/shaders/", true);
-	fs::ensurePath(projectDir + "/data/textures/", true);
-	fs::ensurePath(projectDir + "/data/materials/", true);
-	fs::ensurePath(projectDir + "/data/meshes/", true);
-	fs::ensurePath(projectDir + "/data/scenes/", true);
-	fs::ensurePath(projectDir + "/data/shaders/runtime/", true);
-	fs::ensurePath(projectDir + "/data/textures/runtime/", true);
-	fs::ensurePath(projectDir + "/data/meshes/runtime/", true);
-	fs::ensurePath(projectDir + "/data/prefabs/", true);
-	fs::ensurePath(projectDir + "/data/scenes/", true);
-	fs::ensurePath(projectDir + "/settings/", true);
-	fs::createFile(projFile);
+	fs::ensurePath("app://data/", true);
+	fs::ensurePath("app://data/shaders/", true);
+	fs::ensurePath("app://data/textures/", true);
+	fs::ensurePath("app://data/materials/", true);
+	fs::ensurePath("app://data/meshes/", true);
+	fs::ensurePath("app://data/scenes/", true);
+	fs::ensurePath("app://data/shaders/runtime/", true);
+	fs::ensurePath("app://data/textures/runtime/", true);
+	fs::ensurePath("app://data/meshes/runtime/", true);
+	fs::ensurePath("app://data/prefabs/", true);
+	fs::ensurePath("app://data/scenes/", true);
+	fs::ensurePath("app://settings/", true);
 
 	fs::copy(fs::resolveFileLocation("sys://meshes/runtime"), fs::resolveFileLocation("app://data/meshes/runtime"));
-
-	openProject(projFile);
+	
+	openProject(projectDir);
 }
 
 void EditorApp::openProject(const std::string& projectDir)
 {
-	fs::addPathProtocol("app", fs::getDirectoryName(projectDir));
+	fs::addPathProtocol("app", projectDir);
 	fs::addPathProtocol("data", fs::resolveFileLocation("app://data/"));
 	wd::unwatchAll();
 	watchAssets<Texture>("data://textures/", true);
 	watchAssets<Mesh>("data://meshes/", true);
 	watchAssets<Material>("data://materials/", false);
 
+	watchAssets<Shader>("sys://shaders/", true);
 	auto& world = getWorld();
 	world.reset();
 	auto& editState = getEditState();

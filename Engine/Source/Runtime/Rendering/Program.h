@@ -54,6 +54,16 @@ struct Program
 	~Program();
 
 	//-----------------------------------------------------------------------------
+	//  Name : dispose ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	void dispose();
+
+	//-----------------------------------------------------------------------------
 	//  Name : isValid ()
 	/// <summary>
 	/// 
@@ -157,8 +167,20 @@ struct Program
 	//-----------------------------------------------------------------------------
 	void populate();
 
+	//-----------------------------------------------------------------------------
+	//  Name : beginPass ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	void beginPass();
+
 	/// Shaders that created this program.
 	std::vector<AssetHandle<Shader>> shaders;
+	/// Shaders that created this program.
+	std::vector<std::uint16_t> shadersCached;
 	/// All uniforms for this program.
 	std::unordered_map<std::string, std::shared_ptr<Uniform>> uniforms;
 	/// Internal handle

@@ -374,7 +374,7 @@ bool MainEditorWindow::onProjectManager()
 		if (gui::Button("NEW PROJECT"))
 		{
 			std::string path;
-			if (saveFileDialog("", fs::resolveFileLocation("engine://"), path))
+			if (openFolderDialog("", fs::resolveFileLocation("engine://"), path))
 			{
 				app.createProject(path);
 				gui::CloseCurrentPopup();
@@ -386,7 +386,7 @@ bool MainEditorWindow::onProjectManager()
 		if (gui::Button("OPEN OTHER"))
 		{
 			std::string path;
-			if (openFileDialog("projinfo", fs::resolveFileLocation("engine://"), path))
+			if (openFolderDialog("", fs::resolveFileLocation("engine://"), path))
 			{
 				app.openProject(path);
 				gui::CloseCurrentPopup();

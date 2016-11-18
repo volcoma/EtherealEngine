@@ -80,6 +80,12 @@ std::uint64_t Material::getRenderStates(bool applyCull, bool depthWrite, bool de
 	return states;
 }
 
+void Material::beginPass()
+{
+	if (isValid())
+		mProgram->beginPass();
+}
+
 StandardMaterial::StandardMaterial()
 {
 	auto& app = Singleton<Application>::getInstance();
