@@ -374,13 +374,16 @@ void ProjectManagerWindow::frameRender()
 		ImGuiWindowFlags_NoMove |
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoSavedSettings;
-
+	
 	gui::BeginGroup();
 	{
+		
 		if (gui::BeginChild("###projects_content", ImVec2(gui::GetContentRegionAvail().x / 1.3f, gui::GetContentRegionAvail().y), false, flags))
 		{
+			gui::Text("Recent Projects");
+			gui::Separator();
 			//for testing purposes
-			for (auto& project : std::array<std::string, 2>{ "my/recent/project/name1", "my/recent/project/name1" })
+			for (auto& project : std::array<std::string, 3>{ "my/recent/project/name1", "my/recent/project/name2", "my/recent/project/name3" })
 			{
 				if (gui::Selectable(project.c_str()))
 				{
@@ -402,6 +405,7 @@ void ProjectManagerWindow::frameRender()
 			if (openFolderDialog("", fs::resolveFileLocation("engine://"), path))
 			{
 				app.createProject(path);
+				setMain(false);
 				close();
 			}
 		}

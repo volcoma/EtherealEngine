@@ -220,7 +220,6 @@ bool EditorApp::initApplication()
 
 	if (!initEditState()) { shutDown(); return false; }
 
-	getMainWindow().setVisible(false);
 	openProjectManager();
 
 	return Application::initApplication();
@@ -279,14 +278,19 @@ void EditorApp::openProject(const std::string& projectDir)
 	auto projName = fs::getFileName(projectDir);
 	editState.project = projName;
 
-	getMainWindow().setVisible(true);
+	
 }
 
 void EditorApp::openProjectManager()
 {
+	getMainWindow().setVisible(false);
 	sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 	desktop.width = 500;
 	desktop.height = 300;;
-	auto wnd = std::make_shared<ProjectManagerWindow>(desktop, "Project Manager", sf::Style::Titlebar | sf::Style::Close);
+	auto wnd = std::make_shared<ProjectManagerWindow>(desktop, "Project Manager", sf::Style::Titlebar);
 	registerWindow(wnd);
+ 	wnd->onClosed.addListener([this](RenderWindow& window)
+ 	{
+		getMainWindow().setVisible(true);
+ 	});
 }
