@@ -77,6 +77,9 @@ void releaseWndId(std::uint8_t id)
 }
 void releaseId(std::uint8_t id)
 {
+	if (id == 255)
+		return;
+
 	if (id < 200)
 		releaseNormalId(id);
 	else
@@ -94,6 +97,7 @@ std::uint8_t getAvailableId(bool window)
 
 void RenderSurface::populate(std::uint16_t _width, std::uint16_t _height, gfx::TextureFormat::Enum _format, std::uint32_t _textureFlags /*= BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP */)
 {
+	releaseId(mId);
 	mTextures.clear();
 	mId = getAvailableId(false);
 	mBuffer->populate(_width, _height, _format, _textureFlags);
@@ -102,6 +106,7 @@ void RenderSurface::populate(std::uint16_t _width, std::uint16_t _height, gfx::T
 
 void RenderSurface::populate(gfx::BackbufferRatio::Enum _ratio, gfx::TextureFormat::Enum _format, std::uint32_t _textureFlags /*= BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP */)
 {
+	releaseId(mId);
 	mTextures.clear();
 	mId = getAvailableId(false);
 	mBuffer->populate(_ratio, _format, _textureFlags);
@@ -124,6 +129,7 @@ void RenderSurface::populate(const std::vector<std::shared_ptr<Texture>>& textur
 
 void RenderSurface::populate(const std::vector<TextureAttachment>& textures)
 {
+	releaseId(mId);
 	mTextures.clear();
 	mId = getAvailableId(false);
 
@@ -154,6 +160,7 @@ void RenderSurface::populate(const std::vector<TextureAttachment>& textures)
 void RenderSurface::populate(void* _nwh, std::uint16_t _width, std::uint16_t _height, gfx::TextureFormat::Enum _depthFormat /*= gfx::TextureFormat::UnknownDepth */)
 {
 	mTextures.clear();
+	releaseId(mId);
 	mId = getAvailableId(true);
 
 	mBuffer->populate(_nwh, _width, _height, _depthFormat);

@@ -49,14 +49,6 @@ public:
 	void setFOV(float degrees);
 
 	//-----------------------------------------------------------------------------
-	//  Name : setProjectionWindow ()
-	/// <summary>
-	/// Sets offsets for the projection window (orthographic only).
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void setProjectionWindow(const fRect& rect);
-
-	//-----------------------------------------------------------------------------
 	//  Name : setNearClip ()
 	/// <summary>
 	/// Set the near plane distance
@@ -73,12 +65,12 @@ public:
 	void setFarClip(float distance);
 
 	//-----------------------------------------------------------------------------
-	// Name : setZoomFactor( )
+	// Name : setOrthographicSize( )
 	/// <summary>
-	/// Set the zoom factor (scale) currently applied to any orthographic view.
+	/// Sets the half of the vertical size of the viewing volume in world units.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setZoomFactor(float zoom);
+	void setOrthographicSize(float size);
 
 	//-----------------------------------------------------------------------------
 	//  Name : getProjectionMode ()
@@ -97,14 +89,6 @@ public:
 	inline float getFOV() const { return mFOV; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getProjectionWindow ()
-	/// <summary>
-	/// Retrieve offsets for the projection window (orthographic only).
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	inline const fRect& getProjectionWindow() const { return mProjectionWindow; }
-
-	//-----------------------------------------------------------------------------
 	//  Name : getNearClip()
 	/// <summary>
 	/// Retrieve the distance from the camera to the near clip plane.
@@ -121,12 +105,32 @@ public:
 	inline float getFarClip() const { return mFarClip; }
 
 	//-----------------------------------------------------------------------------
-	// Name : getZoomFactor( )
+	// Name : getOrthographicSize( )
 	/// <summary>
-	/// Get the zoom factor (scale) currently applied to any orthographic view.
+	/// Get the orthographic size.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline float getZoomFactor() const { return mZoomFactor; }
+	inline float getOrthographicSize() const { return mOrthographicSize; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : getZoomFactor ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	float getZoomFactor() const;
+
+	//-----------------------------------------------------------------------------
+	//  Name : getPixelsPerUnit ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	float getPixelsPerUnit() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : setViewportSize ()
@@ -481,10 +485,8 @@ protected:
 	float mNearClip = 0.1f;
 	/// Far clip plane Distance
 	float mFarClip = 1000.0f;
-	/// Projection window (orthographic only)
-	fRect mProjectionWindow = { 0.0f, 0.0f, 0.0f, 0.0f };
-	/// The zoom factor (scale) currently applied to any orthographic view.
-	float mZoomFactor = 1.0f;
+	/// Camera's half-size when in orthographic mode.
+	float mOrthographicSize = 5;
 	/// Viewport position
 	uPoint mViewportPos = { 0, 0 };
 	/// Viewport size

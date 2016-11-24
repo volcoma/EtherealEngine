@@ -77,7 +77,6 @@ PickingSystem::PickingSystem()
 
 void PickingSystem::frameRender(ecs::EntityManager &entities, ecs::EventManager &events, ecs::TimeDelta dt)
 {
-
 	auto& app = Singleton<EditorApp>::getInstance();
 	auto& editState = app.getEditState();
 	auto& input = app.getInput();

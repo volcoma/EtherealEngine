@@ -145,6 +145,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	inline void setMain(bool isMain) { mIsMain = isMain; }
+
 protected:
 	//-----------------------------------------------------------------------------
 	//  Name : filterEvent (virtual )

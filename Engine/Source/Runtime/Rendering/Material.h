@@ -183,10 +183,10 @@ protected:
 	std::unique_ptr<Program> mProgram;
 	/// Cull type for this material.
 	CullType mCullType = CullType::CounterClockWise;
-	/// Default abledo texture
-	AssetHandle<Texture> mDefaultAlbedo;
+	/// Default color texture
+	AssetHandle<Texture> mDefaultColorMap;
 	/// Default normal texture
-	AssetHandle<Texture> mDefaultNormal;
+	AssetHandle<Texture> mDefaultNormalMap;
 };
 
 
@@ -394,7 +394,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> getAlbedoTexture() const { return mAlbedo; }
+	inline AssetHandle<Texture> getColorMap() const { return mColorMap; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : setAlbedoTexture ()
@@ -404,7 +404,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setAlbedoTexture(AssetHandle<Texture> val) { mAlbedo = val; }
+	inline void setColorMap(AssetHandle<Texture> val) { mColorMap = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : getNormalTexture ()
@@ -414,7 +414,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> getNormalTexture() const { return mNormal; }
+	inline AssetHandle<Texture> getNormalMap() const { return mNormalMap; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : setNormalTexture ()
@@ -424,7 +424,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setNormalTexture(AssetHandle<Texture> val) { mNormal = val; }
+	inline void setNormalMap(AssetHandle<Texture> val) { mNormalMap = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : getRoughnessTexture ()
@@ -434,7 +434,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> getRoughnessTexture() const { return mRoughness; }
+	inline AssetHandle<Texture> getRoughnessMap() const { return mRoughnessMap; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : setRoughnessTexture ()
@@ -444,7 +444,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setRoughnessTexture(AssetHandle<Texture> val) { mRoughness = val; }
+	inline void setRoughnessMap(AssetHandle<Texture> val) { mRoughnessMap = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : getMetalnessTexture ()
@@ -454,7 +454,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> getMetalnessTexture() const { return mMetalness; }
+	inline AssetHandle<Texture> getMetalnessMap() const { return mMetalnessMap; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : setMetalnessTexture ()
@@ -464,7 +464,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setMetalnessTexture(AssetHandle<Texture> val) { mMetalness = val; }
+	inline void setMetalnessMap(AssetHandle<Texture> val) { mMetalnessMap = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : submit (virtual )
@@ -514,12 +514,12 @@ private:
 		0.5f, ///Alpha threshold
 		0.5f  ///Distance threshold
 	};
-	/// Albedo map
-	AssetHandle<Texture> mAlbedo;
+	/// Color map
+	AssetHandle<Texture> mColorMap;
 	/// Normal map
-	AssetHandle<Texture> mNormal;
+	AssetHandle<Texture> mNormalMap;
 	/// Roughness map
-	AssetHandle<Texture> mRoughness;
+	AssetHandle<Texture> mRoughnessMap;
 	/// Metalness map
-	AssetHandle<Texture> mMetalness;
+	AssetHandle<Texture> mMetalnessMap;
 };

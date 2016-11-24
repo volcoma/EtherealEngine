@@ -174,15 +174,17 @@ void saveSceneAs()
 MainEditorWindow::MainEditorWindow()
 {
 	maximize();
-	openProjectManager();
 
+	// Force id init order
+	TransformComponent::getId();
+	CameraComponent::getId();
+	ModelComponent::getId();
 }
 
 MainEditorWindow::MainEditorWindow(sf::VideoMode mode, const std::string& title, std::uint32_t style /*= sf::Style::Default*/)
 	:GuiWindow(mode, title, style)
 {
 	maximize();
-	openProjectManager();
 }
 
 MainEditorWindow::~MainEditorWindow()
@@ -202,7 +204,6 @@ void MainEditorWindow::frameRender()
 
 	
 	onToolbar();
-	onProjectManager();
 	GuiWindow::frameRender();
 }
 
@@ -250,7 +251,7 @@ void MainEditorWindow::onMenuBar()
 		}
 		if (gui::MenuItem("Open Project Manager", "Ctrl+P"))
 		{
-			openProjectManager();
+			app.openProjectManager();
 		}
 
 		if (gui::MenuItem("Save", "Ctrl+S", false, editState.scene != "" && editState.project != ""))
@@ -359,17 +360,41 @@ void MainEditorWindow::onToolbar()
 	}
 }
 
-bool MainEditorWindow::onProjectManager()
+ProjectManagerWindow::ProjectManagerWindow(sf::VideoMode mode, const std::string& title, std::uint32_t style /*= sf::Style::Default*/)
+	: GuiWindow(mode, title, style)
+{
+
+}
+
+void ProjectManagerWindow::frameRender()
 {
 	auto& app = Singleton<EditorApp>::getInstance();
 
-	if (mOpenProjectManager)
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |
+		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoSavedSettings;
+
+	gui::BeginGroup();
 	{
-		gui::OpenPopup("ProjectManager");
-		gui::SetNextWindowSize(ImVec2(gui::GetContentRegionAvail().x / 3, gui::GetContentRegionAvail().y / 3));
+		if (gui::BeginChild("###projects_content", ImVec2(gui::GetContentRegionAvail().x / 1.3f, gui::GetContentRegionAvail().y), false, flags))
+		{
+			//for testing purposes
+			for (auto& project : std::array<std::string, 2>{ "my/recent/project/name1", "my/recent/project/name1" })
+			{
+				if (gui::Selectable(project.c_str()))
+				{
+					//app.openProject(project);
+				}
+			}
+			gui::EndChild();
+		}
 	}
-	
-	if (gui::BeginPopupModal("ProjectManager", &mOpenProjectManager, ImGuiWindowFlags_ShowBorders))
+	gui::EndGroup();
+
+	gui::SameLine();
+
+	gui::BeginGroup();
 	{
 		if (gui::Button("NEW PROJECT"))
 		{
@@ -377,44 +402,22 @@ bool MainEditorWindow::onProjectManager()
 			if (openFolderDialog("", fs::resolveFileLocation("engine://"), path))
 			{
 				app.createProject(path);
-				gui::CloseCurrentPopup();
-				mOpenProjectManager = false;	
+				close();
 			}
 		}
 
-		gui::SameLine();
 		if (gui::Button("OPEN OTHER"))
 		{
 			std::string path;
 			if (openFolderDialog("", fs::resolveFileLocation("engine://"), path))
 			{
 				app.openProject(path);
-				gui::CloseCurrentPopup();
-				mOpenProjectManager = false;
+				close();
 			}
 		}
-		gui::Separator();
-		ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |
-			ImGuiWindowFlags_NoMove |
-			ImGuiWindowFlags_NoResize |
-			ImGuiWindowFlags_NoSavedSettings;
-		gui::BeginChild("###projects_content", gui::GetContentRegionAvail(), false, flags);
-		{
-// 			for (auto& project : editState.projects)
-// 			{
-// 				if (gui::Selectable(project.c_str()))
-// 				{
-// 					gui::CloseCurrentPopup();
-// 					mOpenProjectManager = false;
-// 				}
-// 			}
-
-
-		}
-		gui::EndChild();
-		gui::EndPopup();
-		return true;
 	}
-
-	return false;
+	gui::EndGroup();
+	
+	//Call grandparent directly to skip dockspace update
+	RenderWindow::frameRender();
 }

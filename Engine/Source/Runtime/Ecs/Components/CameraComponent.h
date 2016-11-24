@@ -200,6 +200,16 @@ public:
 	void setViewportSize(const uSize& size);
 
 	//-----------------------------------------------------------------------------
+	//  Name : getViewportSize ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	const uSize& getViewportSize() const;
+
+	//-----------------------------------------------------------------------------
 	//  Name : setProjectionWindow ()
 	/// <summary>
 	/// 
@@ -210,24 +220,34 @@ public:
 	void setProjectionWindow();
 
 	//-----------------------------------------------------------------------------
-	//  Name : getZoomFactor ()
+	//  Name : getOrthographicSize ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float getZoomFactor() const;
+	float getOrthographicSize() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : setZoomFactor ()
+	//  Name : setPixelsPerUnit ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setZoomFactor(float zoom);
+	void setOrthographicSize(float size);
+
+	//-----------------------------------------------------------------------------
+	//  Name : getPixelsPerUnit ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	float getPixelsPerUnit() const;
 
 private:
 	//-----------------------------------------------------------------------------

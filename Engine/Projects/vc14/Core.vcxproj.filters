@@ -1287,6 +1287,9 @@
     <ClInclude Include="..\..\Source\Core\console\console.h">
       <Filter>Source Files\console</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\Core\math\glm\gtc\matrix_transform_ex.hpp">
+      <Filter>Source Files\math\glm\gtc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\Core\internal\memory\tracey.cpp">
@@ -1755,6 +1758,9 @@
     </None>
     <None Include="..\..\Source\Core\math\glm\detail\type_vec4_simd.inl">
       <Filter>Source Files\math\glm\detail</Filter>
+    </None>
+    <None Include="..\..\Source\Core\math\glm\gtc\matrix_transform_ex.inl">
+      <Filter>Source Files\math\glm\gtc</Filter>
     </None>
   </ItemGroup>
 </Project>

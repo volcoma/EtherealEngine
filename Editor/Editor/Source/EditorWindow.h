@@ -5,7 +5,7 @@ class MainEditorWindow : public GuiWindow
 {
 public:
 	//-----------------------------------------------------------------------------
-	//  Name : EditorWindow ()
+	//  Name : ProjectManagerWindow ()
 	/// <summary>
 	/// 
 	/// 
@@ -13,8 +13,9 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	MainEditorWindow();
+	
 	//-----------------------------------------------------------------------------
-	//  Name : EditorWindow ()
+	//  Name : ProjectManagerWindow ()
 	/// <summary>
 	/// 
 	/// 
@@ -22,8 +23,9 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	MainEditorWindow(sf::VideoMode mode, const std::string& title, std::uint32_t style = sf::Style::Default);
+	
 	//-----------------------------------------------------------------------------
-	//  Name : ~EditorWindow (virtual )
+	//  Name : ~ProjectManagerWindow (virtual )
 	/// <summary>
 	/// 
 	/// 
@@ -31,6 +33,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	virtual ~MainEditorWindow();
+
 	//-----------------------------------------------------------------------------
 	//  Name : frameRender (virtual )
 	/// <summary>
@@ -40,6 +43,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	virtual void frameRender();
+
 	//-----------------------------------------------------------------------------
 	//  Name : onMenuBar (virtual )
 	/// <summary>
@@ -49,11 +53,59 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	virtual void onMenuBar();
+
+	//-----------------------------------------------------------------------------
+	//  Name : onToolbar (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	virtual void onToolbar();
 
-	virtual bool onProjectManager();
-	virtual void openProjectManager() { mOpenProjectManager = true; }
 
 private:
 	bool mOpenProjectManager = false;
+};
+
+class ProjectManagerWindow : public GuiWindow
+{
+public:
+	//-----------------------------------------------------------------------------
+	//  Name : ProjectManagerWindow ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	ProjectManagerWindow() = default;
+	//-----------------------------------------------------------------------------
+	//  Name : ProjectManagerWindow ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	ProjectManagerWindow(sf::VideoMode mode, const std::string& title, std::uint32_t style = sf::Style::Default);
+	//-----------------------------------------------------------------------------
+	//  Name : ~ProjectManagerWindow (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	virtual ~ProjectManagerWindow() = default;
+	//-----------------------------------------------------------------------------
+	//  Name : frameRender (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	virtual void frameRender();
 };

@@ -1,32 +1,29 @@
 #include "Camera.h"
 #include <limits>
+#include "Graphics/graphics.h"
+
+float Camera::getZoomFactor() const
+{
+	if (mViewportSize.height == 0)
+		return 0.0f;
+
+	return mOrthographicSize / (float(mViewportSize.height) / 2.0f);
+}
+
+float Camera::getPixelsPerUnit() const
+{
+	return float(mViewportSize.height) / (2.0f * mOrthographicSize);
+}
 
 void Camera::setViewportSize(const uSize& viewportSize)
 {
 	mViewportSize = viewportSize;
 	setAspectRatio(float(viewportSize.width) / float(viewportSize.height));
-	const fRect rect =
-	{
-		-(float)viewportSize.width / 2.0f,
-		(float)viewportSize.height / 2.0f,
-		(float)viewportSize.width / 2.0f,
-		-(float)viewportSize.height / 2.0f
-	};
-	setProjectionWindow(rect);
-
-	setZoomFactor(estimateZoomFactor(viewportSize, math::vec3{ 0.0f, 0.0f, 0.0f }));
 }
 
-void Camera::setZoomFactor(float fZoom)
+void Camera::setOrthographicSize(float size)
 {
-	const float MinZoomFactor = 0.0001f;
-	const float MaxZoomFactor = 20000.0f;
-
-	// Clamp the new zoom factor
-	if (fZoom < MinZoomFactor) fZoom = MinZoomFactor;
-	if (fZoom > MaxZoomFactor) fZoom = MaxZoomFactor;
-
-	mZoomFactor = fZoom;
+	mOrthographicSize = size;
 
 	touch();
 }
@@ -39,13 +36,6 @@ void Camera::setFOV(float fFOVY)
 
 	// Update projection matrix and view frustum
 	mFOV = fFOVY;
-
-	touch();
-}
-
-void Camera::setProjectionWindow(const fRect& rect)
-{
-	mProjectionWindow = rect;
 
 	touch();
 }
@@ -96,9 +86,20 @@ void Camera::setFarClip(float fDistance)
 
 math::bbox Camera::getLocalBoundingBox()
 {
-	float fNearSize = math::tan(math::radians<float>(mFOV*0.5f)) * mNearClip;
-	float fFarSize = math::tan(math::radians<float>(mFOV*0.5f)) * mFarClip;
-	return math::bbox(-fFarSize, -fFarSize, mNearClip, fFarSize, fFarSize, mFarClip);
+	if (mProjectionMode == ProjectionMode::Perspective)
+	{
+		float fNearSize = math::tan(math::radians<float>(mFOV*0.5f)) * mNearClip;
+		float fFarSize = math::tan(math::radians<float>(mFOV*0.5f)) * mFarClip;
+		return math::bbox(-fFarSize* mAspectRatio, -fFarSize, mNearClip, fFarSize* mAspectRatio, fFarSize, mFarClip);
+	}
+	else
+	{
+		float spread = mFarClip - mNearClip;
+		math::vec3 center = { 0.0f, 0.0f, (mFarClip + mNearClip) * 0.5f };
+		float orthographicSize = getOrthographicSize();
+		math::vec3 size = { orthographicSize * 2.0f * mAspectRatio, orthographicSize * 2.0f, spread };	
+		return math::bbox(center - (size / 2.0f), center + (size / 2.0f));
+	}
 }
 
 void Camera::setAspectRatio(float fAspect, bool bLocked /* = false */)
@@ -126,6 +127,7 @@ bool Camera::isAspectLocked() const
 
 const math::transform & Camera::getProj()
 {
+
 	// Only update matrix if something has changed
 	if (getProjectionMode() == ProjectionMode::Perspective)
 	{
@@ -133,7 +135,7 @@ const math::transform & Camera::getProj()
 		{
 			// Generate the updated perspective projection matrix
 			float fFOVRadians = math::radians<float>(getFOV());
-			mProj = math::perspective(fFOVRadians, mAspectRatio, getNearClip(), getFarClip());
+			mProj = math::perspective(fFOVRadians, mAspectRatio, mNearClip, mFarClip, gfx::getCaps()->homogeneousDepth);
 			mProj[2][0] += mAAData.z;
 			mProj[2][1] += mAAData.w;
 			// Matrix has been updated
@@ -158,8 +160,14 @@ const math::transform & Camera::getProj()
 		{
 			// Generate the updated orthographic projection matrix
 			float fZoom = getZoomFactor();
-			const auto& rect = getProjectionWindow();
-			mProj = math::ortho(rect.left * fZoom, rect.right * fZoom, rect.bottom * fZoom, rect.top * fZoom, getNearClip(), getFarClip());
+			const fRect rect =
+			{
+				-(float)mViewportSize.width / 2.0f,
+				(float)mViewportSize.height / 2.0f,
+				(float)mViewportSize.width / 2.0f,
+				-(float)mViewportSize.height / 2.0f
+			};
+			mProj = math::ortho(rect.left * fZoom, rect.right * fZoom, rect.bottom * fZoom, rect.top * fZoom, getNearClip(), getFarClip(), gfx::getCaps()->homogeneousDepth);
 			mProj[2][0] += mAAData.z;
 			mProj[2][1] += mAAData.w;
 			// Matrix has been updated
@@ -423,8 +431,8 @@ float Camera::estimateZoomFactor(const uSize & ViewportSize, const math::plane &
 	math::vec3 vWorld;
 
 	// Just return the actual zoom factor if this is orthographic
-// 	if (getProjectionMode() == ProjectionMode::Orthographic)
-// 		return getZoomFactor();
+	if (getProjectionMode() == ProjectionMode::Orthographic)
+		return getZoomFactor();
 
 	// Otherwise, estimate is based on the distance from the grid plane.
 	viewportToWorld(ViewportSize, math::vec2((float)ViewportSize.width / 2, (float)ViewportSize.height / 2), Plane, vWorld);
@@ -449,14 +457,13 @@ float Camera::estimateZoomFactor(const uSize & ViewportSize, const math::vec3 & 
 float Camera::estimateZoomFactor(const uSize & ViewportSize, const math::plane & Plane, float fMax)
 {
 	// Just return the actual zoom factor if this is orthographic
-// 	if (getProjectionMode() == ProjectionMode::Orthographic)
-// 	{
-// 		float fFactor = getZoomFactor();
-// 		return std::min<float>(fMax, fFactor);
-// 
-// 	} // End if Orthographic
+	if (getProjectionMode() == ProjectionMode::Orthographic)
+	{
+		float fFactor = getZoomFactor();
+		return math::min(fMax, fFactor);
 
-	  // Otherwise, estimate is based on the distance from the grid plane.
+	} // End if Orthographic
+	// Otherwise, estimate is based on the distance from the grid plane.
 	math::vec3 vWorld;
 	viewportToWorld(ViewportSize, math::vec2((float)ViewportSize.width / 2, (float)ViewportSize.height / 2), Plane, vWorld);
 
@@ -467,15 +474,15 @@ float Camera::estimateZoomFactor(const uSize & ViewportSize, const math::plane &
 float Camera::estimateZoomFactor(const uSize & ViewportSize, const math::vec3 & WorldPos, float fMax)
 {
 	// Just return the actual zoom factor if this is orthographic
-// 	if (getProjectionMode() == ProjectionMode::Orthographic)
-// 	{
-// 		float fFactor = getZoomFactor();
-// 		return std::min<float>(fMax, fFactor);
-// 
-// 	} // End if Orthographic
+	if (getProjectionMode() == ProjectionMode::Orthographic)
+	{
+		float fFactor = getZoomFactor();
+		return math::min(fMax, fFactor);
 
-	  // New Zoom factor is based on the distance to this position 
-	  // along the camera's look vector.
+	} // End if Orthographic
+
+	// New Zoom factor is based on the distance to this position 
+	// along the camera's look vector.
 	math::vec3 viewPos = math::transform::transformCoord(WorldPos, getView());
 	float distance = viewPos.z / ((float)ViewportSize.height * (45.0f / getFOV()));
 	return std::min<float>(fMax, distance);

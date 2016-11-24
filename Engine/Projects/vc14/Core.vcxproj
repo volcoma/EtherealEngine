@@ -115,6 +115,7 @@
     <ClInclude Include="..\..\Source\Core\math\glm\gtc\matrix_integer.hpp" />
     <ClInclude Include="..\..\Source\Core\math\glm\gtc\matrix_inverse.hpp" />
     <ClInclude Include="..\..\Source\Core\math\glm\gtc\matrix_transform.hpp" />
+    <ClInclude Include="..\..\Source\Core\math\glm\gtc\matrix_transform_ex.hpp" />
     <ClInclude Include="..\..\Source\Core\math\glm\gtc\noise.hpp" />
     <ClInclude Include="..\..\Source\Core\math\glm\gtc\packing.hpp" />
     <ClInclude Include="..\..\Source\Core\math\glm\gtc\quaternion.hpp" />
@@ -481,6 +482,7 @@
     <None Include="..\..\Source\Core\math\glm\gtc\matrix_access.inl" />
     <None Include="..\..\Source\Core\math\glm\gtc\matrix_inverse.inl" />
     <None Include="..\..\Source\Core\math\glm\gtc\matrix_transform.inl" />
+    <None Include="..\..\Source\Core\math\glm\gtc\matrix_transform_ex.inl" />
     <None Include="..\..\Source\Core\math\glm\gtc\noise.inl" />
     <None Include="..\..\Source\Core\math\glm\gtc\packing.inl" />
     <None Include="..\..\Source\Core\math\glm\gtc\quaternion.inl" />

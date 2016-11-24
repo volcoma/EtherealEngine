@@ -13,13 +13,13 @@ Material::Material()
 	manager.load<Texture>("sys://textures/default_color", false)
 		.then([this](auto asset) mutable
 	{
-		mDefaultAlbedo = asset;
+		mDefaultColorMap = asset;
 	});
 
 	manager.load<Texture>("sys://textures/default_normal", false)
 		.then([this](auto asset) mutable
 	{
-		mDefaultNormal = asset;
+		mDefaultNormalMap = asset;
 	});
 }
 
@@ -111,8 +111,8 @@ void StandardMaterial::submit()
 	mProgram->setUniform("u_tiling", &mTiling);
 	mProgram->setUniform("u_dither_threshold", &mDitherThreshold);
 
-	auto albedo = mAlbedo ? mAlbedo : mDefaultAlbedo;
-	auto normal = mNormal ? mNormal : mDefaultNormal;
+	auto albedo = mColorMap ? mColorMap : mDefaultColorMap;
+	auto normal = mNormalMap ? mNormalMap : mDefaultNormalMap;
 	mProgram->setTexture(0, "s_texColor", albedo.get());
 	mProgram->setTexture(1, "s_texNormal", normal.get());
 }

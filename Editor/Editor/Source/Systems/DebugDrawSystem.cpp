@@ -116,13 +116,22 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 	if (selectedEntity.has_component<CameraComponent>() && selectedEntity != editorCamera)
 	{
 		auto& cameraComponent = *selectedEntity.component<CameraComponent>().lock();
+		const auto selectedCamera = cameraComponent.getCamera();
 
-		const auto& frust = cameraComponent.getCamera()->getFrustum();
+		const auto& frust = selectedCamera->getFrustum();
 		ddPush();
 		ddSetColor(0xffffffff);
 		ddSetTransform(nullptr);
 		ddDrawFrustum(frust);
 		ddPop();
+
+
+		const auto bounds = selectedCamera->getLocalBoundingBox();
+		ddPush();
+		ddSetColor(0xff00ff00);
+		ddSetTransform(&worldTransform);
+		ddDraw(Aabb{ bounds.min, bounds.max });
+		ddPop();	
 	}
 	
 	if (selectedEntity.has_component<ModelComponent>())

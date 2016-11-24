@@ -87,7 +87,7 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 				const auto& frustum = camera->getFrustum();
 				const auto& bounds = hMeshCurr->aabb;
 
-				float t = 0;
+				float t = 0.0f;
 				const auto rayOrigin = camera->getPosition();
 				const auto invWorld = math::inverse(worldTransform);
 				const auto objectRayOrigin = invWorld.transformCoord(rayOrigin);

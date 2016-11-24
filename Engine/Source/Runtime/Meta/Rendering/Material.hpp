@@ -86,12 +86,18 @@ REFLECT(StandardMaterial)
 		.property("Dither Threshold",
 			&StandardMaterial::getDitherThreshold,
 			&StandardMaterial::setDitherThreshold)
-		.property("Albedo Map",
-			&StandardMaterial::getAlbedoTexture,
-			&StandardMaterial::setAlbedoTexture)
+		.property("Color Map",
+			&StandardMaterial::getColorMap,
+			&StandardMaterial::setColorMap)
 		.property("Normal Map",
-			&StandardMaterial::getNormalTexture,
-			&StandardMaterial::setNormalTexture)
+			&StandardMaterial::getNormalMap,
+			&StandardMaterial::setNormalMap)
+		.property("Roughness Map",
+			&StandardMaterial::getRoughnessMap,
+			&StandardMaterial::setRoughnessMap)
+		.property("Metalness Map",
+			&StandardMaterial::getMetalnessMap,
+			&StandardMaterial::setMetalnessMap)
 		;
 }
 
@@ -106,8 +112,10 @@ SAVE(StandardMaterial)
 		, cereal::make_nvp("surface_data", obj.mSurfaceData)
 		, cereal::make_nvp("tiling", obj.mTiling)
 		, cereal::make_nvp("dither_threshold", obj.mDitherThreshold)
-		, cereal::make_nvp("albedo_map", obj.mAlbedo)
-		, cereal::make_nvp("normal_map", obj.mNormal)
+		, cereal::make_nvp("color_map", obj.mColorMap)
+		, cereal::make_nvp("normal_map", obj.mNormalMap)
+		, cereal::make_nvp("roughness_map", obj.mRoughnessMap)
+		, cereal::make_nvp("metalness_map", obj.mMetalnessMap)
 	);
 
 }
@@ -122,8 +130,10 @@ LOAD(StandardMaterial)
 		, cereal::make_nvp("surface_data", obj.mSurfaceData)
 		, cereal::make_nvp("tiling", obj.mTiling)
 		, cereal::make_nvp("dither_threshold", obj.mDitherThreshold)
- 		, cereal::make_nvp("albedo_map", obj.mAlbedo)
- 		, cereal::make_nvp("normal_map", obj.mNormal)
+ 		, cereal::make_nvp("color_map", obj.mColorMap)
+ 		, cereal::make_nvp("normal_map", obj.mNormalMap)
+		, cereal::make_nvp("roughness_map", obj.mRoughnessMap)
+		, cereal::make_nvp("metalness_map", obj.mMetalnessMap)
 	);
 }
 

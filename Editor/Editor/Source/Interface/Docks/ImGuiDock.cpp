@@ -524,7 +524,7 @@ namespace ImGuiDock
 		{
 			GuiWindow* guiWindow = static_cast<GuiWindow*>(window.get());
 			auto& dockspace = guiWindow->getDockspace();
-			if (dockspace.node.splits[0]->activeDock)
+			if (dockspace.node.splits[0] && dockspace.node.splits[0]->activeDock)
 			{
 				if (dockspace.node.splits[0]->activeDock->draging)
 					return guiWindow;

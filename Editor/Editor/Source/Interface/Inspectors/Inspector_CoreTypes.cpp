@@ -33,6 +33,7 @@ bool Inspector_Float::inspect(rttr::variant& var, bool readOnly, std::function<r
 	{
 		float min = 0.0f;
 		float max = 0.0f;
+		float step = 0.05f;
 		std::string format = "%.3f";
 
 		auto minVar = get_metadata("Min");
@@ -47,6 +48,10 @@ bool Inspector_Float::inspect(rttr::variant& var, bool readOnly, std::function<r
 		if (formatVar)
 			format = formatVar.to_string();
 
+		auto stepVar = get_metadata("Step");
+		if (stepVar)
+			step = stepVar.to_float();
+
 		bool isRange = maxVar.is_valid();
 		
 		if (isRange)
@@ -59,7 +64,7 @@ bool Inspector_Float::inspect(rttr::variant& var, bool readOnly, std::function<r
 		}
 		else
 		{
-			if (gui::DragFloat("", &data, 0.05f))
+			if (gui::DragFloat("", &data, step))
 			{
 				var = data;
 				return true;
@@ -83,6 +88,7 @@ bool Inspector_Double::inspect(rttr::variant& var, bool readOnly, std::function<
 	{
 		float min = 0.0f;
 		float max = 0.0f;
+		float step = 0.05f;
 		std::string format = "%.3f";
 
 		auto minVar = get_metadata("Min");
@@ -97,6 +103,10 @@ bool Inspector_Double::inspect(rttr::variant& var, bool readOnly, std::function<
 		if (formatVar)
 			format = formatVar.to_string();
 
+		auto stepVar = get_metadata("Step");
+		if (stepVar)
+			step = stepVar.to_float();
+
 		bool isRange = maxVar.is_valid();
 		
 		if (isRange)
@@ -109,7 +119,7 @@ bool Inspector_Double::inspect(rttr::variant& var, bool readOnly, std::function<
 		}
 		else
 		{
-			if (gui::DragFloat("", &data, 0.05f))
+			if (gui::DragFloat("", &data, step))
 			{
 				var = data;
 				return true;

@@ -42,7 +42,7 @@
 					"x": 0.5,
 					"y": 0.5
 				},
-				"albedo_map": {
+				"color_map": {
 					"link": {
 						"ptr_wrapper": {
 							"id": 2147483650,
@@ -56,6 +56,26 @@
 					"link": {
 						"ptr_wrapper": {
 							"id": 2147483651,
+							"data": {
+								"id": ""
+							}
+						}
+					}
+				},
+				"roughness_map": {
+					"link": {
+						"ptr_wrapper": {
+							"id": 2147483652,
+							"data": {
+								"id": ""
+							}
+						}
+					}
+				},
+				"metalness_map": {
+					"link": {
+						"ptr_wrapper": {
+							"id": 2147483653,
 							"data": {
 								"id": ""
 							}

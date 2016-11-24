@@ -135,6 +135,16 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void openProject(const std::string& projectDir);
+
+	//-----------------------------------------------------------------------------
+	//  Name : openProjectManager ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	void openProjectManager();
 private:
 	/// Edit state
 	EditState mEditState;

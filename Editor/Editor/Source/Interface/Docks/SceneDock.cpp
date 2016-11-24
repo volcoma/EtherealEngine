@@ -381,6 +381,12 @@ namespace Docks
 				{
 					const auto attachment = gBufferSurface->getAttachment(i).texture;
 					gui::Image(attachment, size);
+
+					if (gui::IsItemClicked(1) || gui::IsItemClicked(2))
+					{
+						gui::SetWindowFocus();
+						window.setMouseCursorVisible(false);
+					}
 				}
 			}
 

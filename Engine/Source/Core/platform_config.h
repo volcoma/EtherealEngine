@@ -72,12 +72,12 @@
 #   define $bits32    $yes
 #endif
 
-#if defined(NDEBUG) || defined(_NDEBUG) || defined(RELEASE)
-#   define $release   $yes
-#   define $debug     $no
-#else
+#if defined(DEBUG) || defined(_DEBUG) || defined(NDEBUG) || defined(_NDEBUG)
 #   define $release   $no
 #   define $debug     $yes
+#else
+#   define $release   $yes
+#   define $debug     $no
 #endif
 
 #if defined(NDEVEL) || defined(_NDEVEL) || defined(PUBLIC)
@@ -124,3 +124,16 @@
 #else
 #   define $undefined_os $yes
 #endif
+
+template<bool>
+inline bool eval()
+{
+	return true;
+}
+
+template<>
+inline bool eval<false>()
+{
+	return false;
+}
+#define runtime_eval(_x) eval<!!(_x)>()

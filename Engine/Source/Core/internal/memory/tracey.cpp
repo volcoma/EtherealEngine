@@ -620,12 +620,12 @@ namespace std {
 #   define $bits32    $yes
 #endif
 
-#if defined(NDEBUG) || defined(_NDEBUG) || defined(RELEASE)
-#   define $release   $yes
-#   define $debug     $no
-#else
+#if defined(DEBUG) || defined(_DEBUG) || defined(NDEBUG) || defined(_NDEBUG)
 #   define $release   $no
 #   define $debug     $yes
+#else
+#   define $release   $yes
+#   define $debug     $no
 #endif
 
 #if defined(NDEVEL) || defined(_NDEVEL) || defined(PUBLIC)

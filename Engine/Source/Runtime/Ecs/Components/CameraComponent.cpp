@@ -95,7 +95,6 @@ void CameraComponent::updateInternal(const math::transform& t)
 
 	// Set new transform
 	mCamera->lookAt(t.getPosition(), t.getPosition() + t.zUnitAxis(), t.yUnitAxis());
-	mCamera->setZoomFactor(mCamera->estimateZoomFactor(mOutputBuffer->getSize(), math::vec3{ 0.0f, 0.0f, 0.0f }));
 	setProjectionWindow();
 }
 
@@ -116,6 +115,13 @@ void CameraComponent::setViewportSize(const uSize& size)
 	{
 		init(size);
 	}
+
+	setProjectionWindow();
+}
+
+const uSize& CameraComponent::getViewportSize() const
+{
+	return mCamera->getViewportSize();
 }
 
 void CameraComponent::setProjectionWindow()
@@ -125,14 +131,19 @@ void CameraComponent::setProjectionWindow()
 	mCamera->setViewportSize(size);
 }
 
-float CameraComponent::getZoomFactor() const
+float CameraComponent::getOrthographicSize() const
 {
-	return mCamera->getZoomFactor();
+	return mCamera->getOrthographicSize();
 }
 
-void CameraComponent::setZoomFactor(float zoom)
+void CameraComponent::setOrthographicSize(float size)
 {
-	mCamera->setZoomFactor(zoom);
+	mCamera->setOrthographicSize(size);
+}
+
+float CameraComponent::getPixelsPerUnit() const
+{
+	return mCamera->getPixelsPerUnit();
 }
 
 Camera* CameraComponent::getCamera() const
@@ -167,11 +178,6 @@ CameraComponent& CameraComponent::setProjectionMode(ProjectionMode mode)
 	setProjectionWindow();
 
 	return *this;
-}
-
-const fRect& CameraComponent::getProjectionWindow() const
-{
-	return mCamera->getProjectionWindow();
 }
 
 float CameraComponent::getFieldOfView() const

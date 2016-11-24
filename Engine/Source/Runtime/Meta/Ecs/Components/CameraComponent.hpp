@@ -19,6 +19,9 @@ REFLECT(CameraComponent)
 			rttr::policy::ctor::as_std_shared_ptr,
 			rttr::metadata("CanExecuteInEditor", true)
 		)
+		.property("Projection Mode",
+			&CameraComponent::getProjectionMode,
+			&CameraComponent::setProjectionMode)
 		.property("Field of View",
 			&CameraComponent::getFieldOfView,
 			&CameraComponent::setFieldOfView)
@@ -26,15 +29,25 @@ REFLECT(CameraComponent)
 			rttr::metadata("Min", 5.0f),
 			rttr::metadata("Max", 180.0f)
 		)
+		.property("Orthographic Size",
+			&CameraComponent::getOrthographicSize,
+			&CameraComponent::setOrthographicSize)
+		(
+			rttr::metadata("Tooltip", "This is half of the vertical size of the viewing volume. Horizontal viewing size varies depending on viewport's aspect ratio. Orthographic size is ignored when camera is not orthographic.")
+		)
+		.property_readonly("Pixels Per Unit",
+			&CameraComponent::getPixelsPerUnit)
+		(
+			rttr::metadata("Tooltip", "Pixels per unit only usable in orthographic mode.")
+		)
+		.property_readonly("Viewport Size",
+		&CameraComponent::getViewportSize)
 		.property("Near Clip Distance",
 			&CameraComponent::getNearClip,
 			&CameraComponent::setNearClip)
 		.property("Far Clip Distance",
 			&CameraComponent::getFarClip,
 			&CameraComponent::setFarClip)
-		.property("Projection Mode",
-			&CameraComponent::getProjectionMode,
-			&CameraComponent::setProjectionMode)
 		.property("HDR",
 			&CameraComponent::getHDR,
 			&CameraComponent::setHDR)

@@ -32,9 +32,9 @@
 /*/ When enabled, Tracey memsets memory on mallocs()
 /*/ #define kTraceyMemsetAllocations           1
 /*/ When enabled, Tracey shows a report automatically on application exit.
-/*/ #define kTraceyReportOnExit                1
+/*/ #define kTraceyReportOnExit                $is($debug)
 /*/ When enabled, Tracey is enabled
-/*/ #define kTraceyEnabled                     1
+/*/ #define kTraceyEnabled                     $is($debug)
 /*/ When >0, Tracey web service is enabled. Note: requires C++11
 /*/ #define kTraceyWebserverPort               2001
 /*/ When enabled, Tracey will hook up C CRT as well (@todo)
