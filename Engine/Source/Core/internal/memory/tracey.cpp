@@ -71,6 +71,13 @@
 #endif
 //#define _HAS_ITERATOR_DEBUGGING 0
 
+#if !(defined(DEBUG) || defined(_DEBUG)) && !defined(NDEBUG)
+#define NDEBUG
+#endif
+#if !(defined(DEBUG) || defined(_DEBUG)) && !defined(_NDEBUG)
+#define _NDEBUG
+#endif
+
 // Include C, then C++
 
 #include <cassert>
@@ -620,12 +627,12 @@ namespace std {
 #   define $bits32    $yes
 #endif
 
-#if defined(DEBUG) || defined(_DEBUG)
-#   define $release   $no
-#   define $debug     $yes
-#else
+#if defined(NDEBUG) || defined(_NDEBUG) || defined(RELEASE)
 #   define $release   $yes
 #   define $debug     $no
+#else
+#   define $release   $no
+#   define $debug     $yes
 #endif
 
 #if defined(NDEVEL) || defined(_NDEVEL) || defined(PUBLIC)

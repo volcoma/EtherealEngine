@@ -1,5 +1,12 @@
 #pragma  once
 
+#if !(defined(DEBUG) || defined(_DEBUG)) && !defined(NDEBUG)
+#define NDEBUG
+#endif
+#if !(defined(DEBUG) || defined(_DEBUG)) && !defined(_NDEBUG)
+#define _NDEBUG
+#endif
+
 #if (__cplusplus < 201103L && !defined(_MSC_VER)) || (defined(_MSC_VER) && (_MSC_VER < 1700)) || (defined(__GLIBCXX__) && __GLIBCXX__ < 20130322L)
 #define $cpp11          $no
 #define $cpp03          $yes
@@ -72,12 +79,12 @@
 #   define $bits32    $yes
 #endif
 
-#if defined(DEBUG) || defined(_DEBUG)
-#   define $release   $no
-#   define $debug     $yes
-#else
+#if defined(NDEBUG) || defined(_NDEBUG) || defined(RELEASE)
 #   define $release   $yes
 #   define $debug     $no
+#else
+#   define $release   $no
+#   define $debug     $yes
 #endif
 
 #if defined(NDEVEL) || defined(_NDEVEL) || defined(PUBLIC)
