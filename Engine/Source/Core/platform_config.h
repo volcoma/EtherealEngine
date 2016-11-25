@@ -72,7 +72,7 @@
 #   define $bits32    $yes
 #endif
 
-#if defined(DEBUG) || defined(_DEBUG) || defined(NDEBUG) || defined(_NDEBUG)
+#if defined(DEBUG) || defined(_DEBUG)
 #   define $release   $no
 #   define $debug     $yes
 #else
