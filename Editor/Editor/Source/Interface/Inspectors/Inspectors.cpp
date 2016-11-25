@@ -53,6 +53,7 @@ bool inspectVar(rttr::variant& var, bool readOnly, std::function<rttr::variant(c
 		for (auto& prop : properties)
 		{
 			auto propVar = prop.get_value(object);
+			auto propName = prop.get_name();
 			bool rdOnly = prop.is_readonly();
 			bool isArray = prop.is_array();
 			bool isEnum = prop.is_enumeration();

@@ -19,7 +19,7 @@ PropertyLayout::PropertyLayout(const rttr::property& prop, bool columns /*= true
 	gui::TextUnformatted(prop.get_name().data());
 	Tooltip(prop);
 	if (columns)
-		gui::SetColumnOffset(1, 130.0f);
+		gui::SetColumnOffset(1, 140.0f);
 	gui::NextColumn();
 
 	gui::PushID(prop.get_name().data());
@@ -35,7 +35,7 @@ PropertyLayout::PropertyLayout(const std::string& name, bool columns /*= true*/)
 
 	gui::TextUnformatted(name.c_str());
 	if (columns)
-		gui::SetColumnOffset(1, 130.0f);
+		gui::SetColumnOffset(1, 140.0f);
 	gui::NextColumn();
 
 	gui::PushID(name.c_str());

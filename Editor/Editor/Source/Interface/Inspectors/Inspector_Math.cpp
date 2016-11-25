@@ -78,16 +78,17 @@ bool Inspector_Transform::inspect(rttr::variant& var, bool readOnly, std::functi
 	math::vec3 position = data.getPosition();
 	math::vec3 scale = data.getScale();
 	math::quat rotation = data.getRotation();
+	math::vec3 localEulerAngles = math::degrees(math::eulerAngles(rotation));
 
 	static math::quat oldQuat;
 	static math::vec3 eulerAngles;
 	bool changed = false;
 	bool equal = math::epsilonEqual(math::abs(math::dot(oldQuat, rotation)), 1.0f, math::epsilon<float>());
-	if (!equal)
+	if (!equal && !gui::IsMouseDragging())
 	{
-		eulerAngles = math::eulerAngles(rotation);
+		eulerAngles = localEulerAngles;
+		oldQuat = rotation;
 	}
-	oldQuat = rotation;
 
 	gui::Columns(1);
 	if (gui::Button("P"))
@@ -109,16 +110,17 @@ bool Inspector_Transform::inspect(rttr::variant& var, bool readOnly, std::functi
 	if (gui::Button("R"))
 	{
 		data.setRotation(math::quat());
+		eulerAngles = { 0.0f, 0.0f, 0.0f };
 		changed = true;
 	}
 	gui::SameLine();
 	gui::PushID("Rotation");
 
-	auto degrees = math::degrees(eulerAngles);
+	auto degrees = eulerAngles;
 	if (gui::DragFloatNEx(names, &degrees[0], 3, 0.05f))
 	{
-		auto delta = math::radians(degrees) - eulerAngles;
-		data.rotateLocal(delta);
+		data.rotateLocal(math::radians(degrees - eulerAngles));
+		eulerAngles = degrees;
 		changed = true;
 	}
 	gui::PopID();

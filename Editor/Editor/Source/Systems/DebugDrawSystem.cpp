@@ -124,14 +124,6 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 		ddSetTransform(nullptr);
 		ddDrawFrustum(frust);
 		ddPop();
-
-
-		const auto bounds = selectedCamera->getLocalBoundingBox();
-		ddPush();
-		ddSetColor(0xff00ff00);
-		ddSetTransform(&worldTransform);
-		ddDraw(Aabb{ bounds.min, bounds.max });
-		ddPop();	
 	}
 	
 	if (selectedEntity.has_component<ModelComponent>())
