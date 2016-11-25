@@ -548,7 +548,7 @@ namespace ImGuizmo
 	static const float quadUV[8] = { quadMin, quadMin, quadMin, quadMax, quadMax, quadMax, quadMax, quadMin };
 	static const int halfCircleSegmentCount = 64;
 	static const float snapTension = 0.5f;
-	static const float screenRotateSize = 0.09f;
+	static const float screenRotateSize = 0.15f;
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// 
 	static int GetMoveType(vec_t *gizmoHitProportion);
@@ -820,7 +820,7 @@ namespace ImGuizmo
 			}
 			drawList->AddPolyline(circlePos, halfCircleSegmentCount, colors[3 - axis], false, 4, true);
 		}
-		drawList->AddCircle(worldToPos(gContext.mModel.v.position, gContext.mViewProjection), screenRotateSize * gContext.mWidth, colors[0], 64, 4.0f);
+		drawList->AddCircle(worldToPos(gContext.mModel.v.position, gContext.mViewProjection), screenRotateSize * gContext.mHeight, colors[0], 64, 4.0f);
 
 
 		if (gContext.mbUsing)
@@ -1045,7 +1045,7 @@ namespace ImGuizmo
 
 		vec_t deltaScreen = { io.MousePos.x - gContext.mScreenSquareCenter.x, io.MousePos.y - gContext.mScreenSquareCenter.y };
 		float dist = deltaScreen.Length();
-		if (dist >= (screenRotateSize - 0.002f) * gContext.mWidth && dist < (screenRotateSize + 0.002f) * gContext.mWidth)
+		if (dist >= (screenRotateSize - 0.002f) * gContext.mHeight && dist < (screenRotateSize + 0.002f) * gContext.mHeight)
 			type = ROTATE_SCREEN;
 
 		const vec_t planNormals[] = { gContext.mModel.v.right, gContext.mModel.v.up, gContext.mModel.v.dir };

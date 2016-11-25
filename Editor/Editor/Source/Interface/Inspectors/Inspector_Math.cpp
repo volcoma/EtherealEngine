@@ -1,5 +1,5 @@
 #include "Inspector_Math.h"
-
+#include "../Gizmos/ImGuizmo.h"
 bool Inspector_Vector2::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<math::vec2>();
@@ -84,12 +84,11 @@ bool Inspector_Transform::inspect(rttr::variant& var, bool readOnly, std::functi
 	static math::vec3 eulerAngles;
 	bool changed = false;
 	bool equal = math::epsilonEqual(math::abs(math::dot(oldQuat, rotation)), 1.0f, math::epsilon<float>());
-	if (!equal && !gui::IsMouseDragging())
+	if (!equal && !gui::IsMouseDragging() || ImGuizmo::IsUsing())
 	{
 		eulerAngles = localEulerAngles;
 		oldQuat = rotation;
 	}
-
 	gui::Columns(1);
 	if (gui::Button("P"))
 	{
@@ -123,6 +122,7 @@ bool Inspector_Transform::inspect(rttr::variant& var, bool readOnly, std::functi
 		eulerAngles = degrees;
 		changed = true;
 	}
+	
 	gui::PopID();
 
 	if (gui::Button("S"))
