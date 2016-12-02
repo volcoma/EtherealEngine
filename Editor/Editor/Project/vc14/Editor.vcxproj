@@ -281,6 +281,8 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Assets\AssetCompiler.cpp" />
+    <ClCompile Include="..\..\Source\Assets\AssetImporter.cpp" />
     <ClCompile Include="..\..\Source\Console\ConsoleLog.cpp" />
     <ClCompile Include="..\..\Source\EditorApp.cpp" />
     <ClCompile Include="..\..\Source\EditorWindow.cpp" />
@@ -307,6 +309,7 @@
     <ClCompile Include="..\..\Source\Interface\Inspectors\Inspector_Assets.cpp" />
     <ClCompile Include="..\..\Source\Interface\Inspectors\Inspector_CoreTypes.cpp" />
     <ClCompile Include="..\..\Source\Interface\Inspectors\Inspector_Entity.cpp" />
+    <ClCompile Include="..\..\Source\Interface\Inspectors\Inspector_LightComponent.cpp" />
     <ClCompile Include="..\..\Source\Interface\Inspectors\Inspector_Math.cpp" />
     <ClCompile Include="..\..\Source\Interface\Inspectors\Inspector_BaseTypes.cpp" />
     <ClCompile Include="..\..\Source\main.cpp" />
@@ -318,6 +321,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Res\resource.h" />
+    <ClInclude Include="..\..\Source\Assets\AssetCompiler.h" />
+    <ClInclude Include="..\..\Source\Assets\AssetImporter.h" />
     <ClInclude Include="..\..\Source\Console\ConsoleLog.h" />
     <ClInclude Include="..\..\Source\EditorApp.h" />
     <ClInclude Include="..\..\Source\EditorWindow.h" />
@@ -345,6 +350,7 @@
     <ClInclude Include="..\..\Source\Interface\Inspectors\Inspector_Assets.h" />
     <ClInclude Include="..\..\Source\Interface\Inspectors\Inspector_CoreTypes.h" />
     <ClInclude Include="..\..\Source\Interface\Inspectors\Inspector_Entity.h" />
+    <ClInclude Include="..\..\Source\Interface\Inspectors\Inspector_LightComponent.h" />
     <ClInclude Include="..\..\Source\Interface\Inspectors\Inspector_Math.h" />
     <ClInclude Include="..\..\Source\Interface\Inspectors\Inspector_BaseTypes.h" />
     <ClInclude Include="..\..\Source\Systems\DebugDrawSystem.h" />

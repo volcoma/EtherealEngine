@@ -40,6 +40,9 @@
     <Filter Include="Source Files\Console">
       <UniqueIdentifier>{0a97d13e-fc7b-421d-ae64-33dfabdd946c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Assets">
+      <UniqueIdentifier>{7c51b4dd-6aee-4bf7-a5a2-9fea8581866d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\Res\Common.rc">
@@ -143,6 +146,15 @@
     <ClInclude Include="..\..\Source\Console\ConsoleLog.h">
       <Filter>Source Files\Console</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\Assets\AssetCompiler.h">
+      <Filter>Source Files\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Assets\AssetImporter.h">
+      <Filter>Source Files\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Interface\Inspectors\Inspector_LightComponent.h">
+      <Filter>Source Files\Interface\Inspectors</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\main.cpp">
@@ -237,6 +249,15 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\Console\ConsoleLog.cpp">
       <Filter>Source Files\Console</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Assets\AssetCompiler.cpp">
+      <Filter>Source Files\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Assets\AssetImporter.cpp">
+      <Filter>Source Files\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Interface\Inspectors\Inspector_LightComponent.cpp">
+      <Filter>Source Files\Interface\Inspectors</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -22,6 +22,7 @@
     <ClCompile Include="..\..\Source\Runtime\Assets\AssetWriter.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Assets\AssetReader.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Ecs\Components\CameraComponent.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Ecs\Components\LightComponent.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Ecs\Components\ModelComponent.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Ecs\Components\TransformComponent.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Ecs\entityx\Entity.cpp" />
@@ -37,6 +38,7 @@
     <ClCompile Include="..\..\Source\Runtime\Rendering\Debug\bounds.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Rendering\Debug\DebugDraw.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Rendering\IndexBuffer.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Rendering\Light.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Rendering\Material.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Rendering\Mesh.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Rendering\Model.cpp" />
@@ -78,6 +80,7 @@
     <ClInclude Include="..\..\Source\Runtime\Assets\AssetReader.h" />
     <ClInclude Include="..\..\Source\Runtime\Assets\LoadRequest.hpp" />
     <ClInclude Include="..\..\Source\Runtime\Ecs\Components\CameraComponent.h" />
+    <ClInclude Include="..\..\Source\Runtime\Ecs\Components\LightComponent.h" />
     <ClInclude Include="..\..\Source\Runtime\Ecs\Components\ModelComponent.h" />
     <ClInclude Include="..\..\Source\Runtime\Ecs\Components\TagsComponent.h" />
     <ClInclude Include="..\..\Source\Runtime\Ecs\Components\TransformComponent.h" />
@@ -100,12 +103,14 @@
     <ClInclude Include="..\..\Source\Runtime\Meta\Core\BaseTypes.hpp" />
     <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\Components\CameraComponent.hpp" />
     <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\Components\Component.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\Components\LightComponent.hpp" />
     <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\Components\ModelComponent.hpp" />
     <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\Components\TransformComponent.hpp" />
     <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\Entity.hpp" />
     <ClInclude Include="..\..\Source\Runtime\Meta\Math\Transform.hpp" />
     <ClInclude Include="..\..\Source\Runtime\Meta\Math\Vector.hpp" />
     <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Camera.hpp" />
+    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Light.hpp" />
     <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Material.hpp" />
     <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Mesh.hpp" />
     <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Model.hpp" />
@@ -116,6 +121,7 @@
     <ClInclude Include="..\..\Source\Runtime\Rendering\Debug\DebugDraw.h" />
     <ClInclude Include="..\..\Source\Runtime\Rendering\FrameBuffer.h" />
     <ClInclude Include="..\..\Source\Runtime\Rendering\IndexBuffer.h" />
+    <ClInclude Include="..\..\Source\Runtime\Rendering\Light.h" />
     <ClInclude Include="..\..\Source\Runtime\Rendering\Material.h" />
     <ClInclude Include="..\..\Source\Runtime\Rendering\Mesh.h" />
     <ClInclude Include="..\..\Source\Runtime\Rendering\Model.h" />

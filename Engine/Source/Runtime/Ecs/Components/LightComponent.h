@@ -1,58 +1,45 @@
 #pragma once
-
+//-----------------------------------------------------------------------------
+// LightComponent Header Includes
+//-----------------------------------------------------------------------------
 #include "../entityx/Component.h"
-#include "../../Rendering/Model.h"
+#include "../../Rendering/Light.h"
+//-----------------------------------------------------------------------------
+// Forward Declarations
+//-----------------------------------------------------------------------------
 
 using namespace entityx;
-
-class Material;
 //-----------------------------------------------------------------------------
 // Main Class Declarations
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-//  Name : ModelComponent (Class)
+//  Name : LightComponent (Class)
 /// <summary>
-/// Class that contains core data for meshes.
+/// Class that contains our core Light data, used for rendering and other things.
 /// </summary>
 //-----------------------------------------------------------------------------
-class ModelComponent : public Component
+class LightComponent : public Component
 {
-	COMPONENT(ModelComponent)
-	SERIALIZABLE(ModelComponent)
-	REFLECTABLE(ModelComponent, Component)
-
+	COMPONENT(LightComponent)
+	SERIALIZABLE(LightComponent)
+	REFLECTABLE(LightComponent, Component)
 public:
 	//-------------------------------------------------------------------------
 	// Constructors & Destructors
 	//-------------------------------------------------------------------------
-	ModelComponent();
-	ModelComponent(const ModelComponent& component);
-	virtual ~ModelComponent();
-
-	//-------------------------------------------------------------------------
-	// Public Virtual Methods (Override)
+	LightComponent();
+	LightComponent(const LightComponent& camera);
+	virtual ~LightComponent();
 
 	//-------------------------------------------------------------------------
 	// Public Methods
 	//-------------------------------------------------------------------------
-	ModelComponent& setCastShadow(bool castShadow);
-	ModelComponent& setCastReflelction(bool castReflection);
-	ModelComponent& setStatic(bool bStatic);
-
-	bool castsShadow() const;
-	bool castsReflection() const;
-	bool isStatic() const;
-
-	const Model& getModel() const;
-	ModelComponent& setModel(const Model& model);
-
+	inline Light& getLight() { return mLight; }
+	inline const Light& getLight() const { return mLight; }
 private:
 	//-------------------------------------------------------------------------
 	// Private Member Variables.
 	//-------------------------------------------------------------------------
-
-	bool mStatic = true;
-	bool mCastShadow = true;
-	bool mCastReflection = true;
-	Model mModel;
+	/// The light object this component represents
+	Light mLight;
 };

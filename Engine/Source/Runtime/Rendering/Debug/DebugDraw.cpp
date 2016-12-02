@@ -193,23 +193,6 @@ uint32_t genSphere(uint8_t _subdiv0, void* _pos0 = NULL, uint16_t _posStride0 = 
 				}
 				else
 				{
-					// 					float tmp0[4];
-					// 					float tmp1[4];
-					// 
-					// 					float v01[4];
-					// 					bx::vec3Add(tmp0, _v0, _v1);
-					// 					bx::vec3Norm(tmp1, tmp0);
-					// 					bx::vec3Mul(v01, tmp1, _scale);
-					// 
-					// 					float v12[4];
-					// 					bx::vec3Add(tmp0, _v1, _v2);
-					// 					bx::vec3Norm(tmp1, tmp0);
-					// 					bx::vec3Mul(v12, tmp1, _scale);
-					// 
-					// 					float v20[4];
-					// 					bx::vec3Add(tmp0, _v2, _v0);
-					// 					bx::vec3Norm(tmp1, tmp0);
-					// 					bx::vec3Mul(v20, tmp1, _scale);
 
 					math::vec3 tmp0;
 					math::vec3 tmp1;

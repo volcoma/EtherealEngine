@@ -5,15 +5,7 @@
 #include <unordered_map>
 #include <string>
 
-struct TextureAttachment
-{
-	/// Texture handle.
-	std::shared_ptr<Texture> texture;
-	/// Mip level.
-	uint16_t mip = 0;
-	/// Cubemap side or depth layer/slice.
-	uint16_t layer = 0;
-};
+
 
 class RenderSurface
 {
@@ -117,26 +109,6 @@ public:
 	~RenderSurface();
 
 	//-----------------------------------------------------------------------------
-	//  Name : setSize ()
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void setSize(const uSize& size);
-
-	//-----------------------------------------------------------------------------
-	//  Name : setSize ()
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void setSize(gfx::BackbufferRatio::Enum ratio);
-
-	//-----------------------------------------------------------------------------
 	//  Name : getSize ()
 	/// <summary>
 	/// 
@@ -231,26 +203,6 @@ public:
 	inline FrameBuffer* getBufferRaw() const { return mBuffer.get(); }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getAttachment ()
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	inline const TextureAttachment& getAttachment(std::uint32_t index) const { return mTextures[index]; }
-
-	//-----------------------------------------------------------------------------
-	//  Name : getAttachmentCount ()
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	inline const std::size_t getAttachmentCount() const { return mTextures.size(); }
-
-	//-----------------------------------------------------------------------------
 	//  Name : clear ()
 	/// <summary>
 	/// 
@@ -313,12 +265,6 @@ public:
 	//-----------------------------------------------------------------------------
 	static void clearStack();
 private:
-	/// Back buffer ratio if any.
-	gfx::BackbufferRatio::Enum mRatio = gfx::BackbufferRatio::Equal;
-	/// Size of the surface. If {0,0} then it is controlled by backbuffer ratio
-	uSize mSize = { 0, 0 };
-	/// Texture attachments to the frame buffer
-	std::vector<TextureAttachment> mTextures;
 	/// Frame buffer
 	std::shared_ptr<FrameBuffer> mBuffer = std::make_shared<FrameBuffer>();
 	/// View id

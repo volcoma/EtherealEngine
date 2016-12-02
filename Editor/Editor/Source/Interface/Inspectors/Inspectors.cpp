@@ -47,6 +47,14 @@ bool inspectVar(rttr::variant& var, bool readOnly, std::function<rttr::variant(c
 		{
 			changed |= inspector->inspect(var, readOnly, get_metadata);
 		}
+		else
+		{
+			if (type.is_enumeration())
+			{
+				changed |= inspectEnum(var, type.get_enumeration(), readOnly);
+			}
+		}
+
 	}
 	else
 	{

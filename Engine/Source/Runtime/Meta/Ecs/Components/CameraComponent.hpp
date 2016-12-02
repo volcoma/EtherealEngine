@@ -7,12 +7,6 @@
 REFLECT(CameraComponent)
 {
 
-	rttr::registration::enumeration<ProjectionMode>("ProjectionMode")
-		(
-			rttr::value("Perspective", ProjectionMode::Perspective),
-			rttr::value("Orthographic", ProjectionMode::Orthographic)
-		);
-
 	rttr::registration::class_<CameraComponent>("CameraComponent")
 		.constructor<>()
 		(

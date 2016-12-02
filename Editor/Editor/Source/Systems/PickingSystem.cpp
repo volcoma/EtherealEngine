@@ -96,15 +96,15 @@ void PickingSystem::frameRender(ecs::EntityManager &entities, ecs::EventManager 
 	auto cameraComponent = cameraComponentRef.lock();
 	auto transformComponentRef = editorCamera.component<TransformComponent>();
 	auto transformComponent = transformComponentRef.lock();
-	const auto camera = cameraComponent->getCamera();
-	const auto& view = camera->getView();
-	const auto& proj = camera->getProj();
-	auto nearClip = camera->getNearClip();
-	auto farClip = camera->getFarClip();
+	auto& camera = cameraComponent->getCamera();
+	const auto& view = camera.getView();
+	const auto& proj = camera.getProj();
+	auto nearClip = camera.getNearClip();
+	auto farClip = camera.getFarClip();
 	auto viewProj = proj * view;
 	auto invViewProj = math::inverse(viewProj);
-	const auto& size = camera->getViewportSize();
-	const auto& pos = camera->getViewportPos();
+	const auto& size = camera.getViewportSize();
+	const auto& pos = camera.getViewportPos();
 	const auto& mousePos = input.getMouseCurrentPosition();
 	const auto viewId = mSurface->getId();
 
@@ -158,7 +158,7 @@ void PickingSystem::frameRender(ecs::EntityManager &entities, ecs::EventManager 
 		// View rect and transforms for picking pass
 		gfx::setViewTransform(viewId, &pickView, &pickProj);
 
-		entities.each<TransformComponent, ModelComponent>([this, viewId, camera, dt](
+		entities.each<TransformComponent, ModelComponent>([this, viewId, &camera, dt](
 			ecs::Entity e,
 			TransformComponent& transformComponent,
 			ModelComponent& modelComponent
@@ -178,7 +178,7 @@ void PickingSystem::frameRender(ecs::EntityManager &entities, ecs::EventManager 
 			if (!hMesh)
 				return;
 
-			const auto& frustum = camera->getFrustum();
+			const auto& frustum = camera.getFrustum();
 			const auto& bounds = hMesh->aabb;
 
 			// Test the bounding box of the mesh

@@ -12,7 +12,7 @@ CameraComponent::CameraComponent()
 
 CameraComponent::CameraComponent(const CameraComponent& cameraComponent)
 {
-	mCamera = std::make_unique<Camera>(*cameraComponent.getCamera());
+	mCamera = std::make_unique<Camera>(cameraComponent.getCamera());
 	mHDR = cameraComponent.mHDR;
 	mGBuffer = std::make_shared<RenderSurface>();
 	mOutputBuffer = std::make_shared<RenderSurface>();
@@ -144,11 +144,6 @@ void CameraComponent::setOrthographicSize(float size)
 float CameraComponent::getPixelsPerUnit() const
 {
 	return mCamera->getPixelsPerUnit();
-}
-
-Camera* CameraComponent::getCamera() const
-{
-	return mCamera.get();
 }
 
 CameraComponent& CameraComponent::setFieldOfView(float fovDegrees)

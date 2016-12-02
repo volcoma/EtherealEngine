@@ -2,6 +2,7 @@
 #include "Runtime/ecs/Components/TransformComponent.h"
 #include "Runtime/ecs/Components/CameraComponent.h"
 #include "Runtime/ecs/Components/ModelComponent.h"
+#include "Runtime/ecs/Components/LightComponent.h"
 #include "Runtime/Rendering/RenderSurface.h"
 #include "Runtime/Rendering/Camera.h"
 #include "Runtime/Rendering/Mesh.h"
@@ -43,10 +44,10 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 	const auto cameraComponentRef = editorCamera.component<CameraComponent>();
 	const auto cameraComponent = cameraComponentRef.lock();
 	const auto surface = cameraComponent->getOutputBuffer();
-	const auto camera = cameraComponent->getCamera();
-	const auto view = camera->getView();
-	const auto proj = camera->getProj();
-	const auto cameraPos = camera->getPosition();
+	auto& camera = cameraComponent->getCamera();
+	const auto& view = camera.getView();
+	const auto proj = camera.getProj();
+	const auto cameraPos = camera.getPosition();
 
 	const auto viewId = surface->getId();
 	RenderSurfaceScope surfaceScope(surface);
@@ -116,14 +117,53 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 	if (selectedEntity.has_component<CameraComponent>() && selectedEntity != editorCamera)
 	{
 		auto& cameraComponent = *selectedEntity.component<CameraComponent>().lock();
-		const auto selectedCamera = cameraComponent.getCamera();
+		auto& selectedCamera = cameraComponent.getCamera();
 
-		const auto& frust = selectedCamera->getFrustum();
+		const auto& frust = selectedCamera.getFrustum();
 		ddPush();
 		ddSetColor(0xffffffff);
 		ddSetTransform(nullptr);
 		ddDrawFrustum(frust);
 		ddPop();
+	}
+
+	if (selectedEntity.has_component<LightComponent>())
+	{
+		auto& lightComponent = *selectedEntity.component<LightComponent>().lock();
+		auto& light = lightComponent.getLight();
+		if (light.lightType == LightType::Spot)
+		{
+			auto sinAngle = math::max(math::sin(math::radians(light.spotData.spotOuterAngle * 2.0f)), 0.1f);
+			auto height = 10.0f;//light.getRange();
+			auto radius = sinAngle * height;
+			ddPush();
+			ddSetColor(0xff00ff00);
+			ddSetTransform(&worldTransform);
+			ddDrawCone(math::vec3(0.0f, 0.0f, height), math::vec3(0.0f, 0.0f, 0.0f), radius);
+			ddPop();
+		}
+		else if (light.lightType == LightType::Point)
+		{
+			auto radius = 10.0f;//light.getRange();
+			ddPush();
+			ddSetColor(0xff00ff00);
+			ddSetTransform(&worldTransform);
+			ddDrawCircle(Axis::X, 0.0f, 0.0f, 0.0f, radius);
+			ddDrawCircle(Axis::Y, 0.0f, 0.0f, 0.0f, radius);
+			ddDrawCircle(Axis::Z, 0.0f, 0.0f, 0.0f, radius);
+			ddPop();
+		}
+		else if (light.lightType == LightType::Directional)
+		{
+			ddPush();
+			ddSetLod(UINT8_MAX);
+			ddSetColor(0xff00ff00);
+			ddSetTransform(&worldTransform);
+			ddSetWireframe(false);
+			ddDrawCylinder(math::vec3(0.0f, 0.0f, 0.0f), math::vec3(0.0f, 0.0f, 1.0f), 0.1f);
+			ddDrawCone(math::vec3(0.0f, 0.0f, 1.0f), math::vec3(0.0f, 0.0f, 2.5f), 0.5f);
+			ddPop();
+		}
 	}
 	
 	if (selectedEntity.has_component<ModelComponent>())
@@ -136,7 +176,7 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 		const auto hMesh = model.getLod(0);
 		if (!hMesh)
 			return;
-		const auto& frustum = camera->getFrustum();
+		const auto& frustum = camera.getFrustum();
 		const auto& bounds = hMesh->aabb;
 
 		// Test the bounding box of the mesh

@@ -72,7 +72,6 @@ void RenderWindow::prepareSurface()
 	if (mIsMain)
 	{
 		gfx::reset(size.width, size.height, 0);
-		mSurface->setSize(size);
 	}
 	else
 	{

@@ -4,6 +4,16 @@
 #include "../Core/BaseTypes.hpp"
 #include "../../Rendering/Camera.h"
 
+REFLECT(Camera)
+{
+	rttr::registration::enumeration<ProjectionMode>("ProjectionMode")
+		(
+			rttr::value("Perspective", ProjectionMode::Perspective),
+			rttr::value("Orthographic", ProjectionMode::Orthographic)
+			);
+	rttr::registration::class_<Camera>("Camera");
+}
+
 SAVE(Camera)
 {
 	ar(

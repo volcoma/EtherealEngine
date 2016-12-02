@@ -44,7 +44,7 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 		)
 	{
 		const auto gBuffer = cameraComponent.getGBuffer();
-		const auto camera = cameraComponent.getCamera();
+		auto& camera = cameraComponent.getCamera();
 		const auto viewId = gBuffer->getId();
 		auto& cameraLods = mLodDataMap[ce];
 
@@ -52,9 +52,9 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 			RenderSurfaceScope surfaceScope(gBuffer);
 			gBuffer->clear();
 
-			gfx::setViewTransform(viewId, &camera->getView(), &camera->getProj());
+			gfx::setViewTransform(viewId, &camera.getView(), &camera.getProj());
 
-			entities.each<TransformComponent, ModelComponent>([this, &cameraLods, camera, dt, viewId](
+			entities.each<TransformComponent, ModelComponent>([this, &cameraLods, &camera, dt, viewId](
 				Entity e,
 				TransformComponent& transformComponent,
 				ModelComponent& modelComponent
@@ -65,7 +65,7 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 					return;
 
 				const auto& worldTransform = transformComponent.getTransform();
-				const auto clip_planes = math::vec2(camera->getNearClip(), camera->getFarClip());
+				const auto clip_planes = math::vec2(camera.getNearClip(), camera.getFarClip());
 
 				auto& lodData = cameraLods[e];
 				const auto transitionTime = model.getTransitionTime();
@@ -84,11 +84,11 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 				if (!hMeshCurr)
 					return;
 
-				const auto& frustum = camera->getFrustum();
+				const auto& frustum = camera.getFrustum();
 				const auto& bounds = hMeshCurr->aabb;
 
 				float t = 0.0f;
-				const auto rayOrigin = camera->getPosition();
+				const auto rayOrigin = camera.getPosition();
 				const auto invWorld = math::inverse(worldTransform);
 				const auto objectRayOrigin = invWorld.transformCoord(rayOrigin);
 				const auto objectRayDirection = math::normalize(bounds.getCenter() - objectRayOrigin);
@@ -129,7 +129,7 @@ void RenderingSystem::frameRender(EntityManager &entities, EventManager &events,
 				// Set render states.
 				const auto states = material->getRenderStates();
 				material->beginPass();
-				material->setUniform("u_camera_wpos", &camera->getPosition());
+				material->setUniform("u_camera_wpos", &camera.getPosition());
 				material->setUniform("u_camera_clip_planes", &clip_planes);
 				material->setUniform("u_lod_params", &params);
 				material->submit();

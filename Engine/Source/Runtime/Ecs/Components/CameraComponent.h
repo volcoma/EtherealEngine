@@ -80,16 +80,6 @@ public:
 	CameraComponent& setProjectionMode(ProjectionMode mode);
 
 	//-----------------------------------------------------------------------------
-	//  Name : getProjectionWindow ()
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	const fRect& getProjectionWindow() const;
-
-	//-----------------------------------------------------------------------------
 	//  Name : getFieldOfView ()
 	/// <summary>
 	/// 
@@ -137,8 +127,17 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	Camera* getCamera() const;
+	inline Camera& getCamera() { return *mCamera.get(); }
 
+	//-----------------------------------------------------------------------------
+	//  Name : getCamera ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline const Camera& getCamera() const { return *mCamera.get(); }
 	//-----------------------------------------------------------------------------
 	//  Name : getRenderSurface ()
 	/// <summary>

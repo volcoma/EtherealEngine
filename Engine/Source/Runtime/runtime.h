@@ -15,11 +15,13 @@
 #include "Rendering/Texture.h"
 #include "Rendering/Model.h"
 #include "Rendering/Debug/DebugDraw.h"
+#include "Rendering/Light.h"
 
 #include "Ecs/World.h"
 #include "Ecs/Components/TransformComponent.h"
 #include "Ecs/Components/CameraComponent.h"
 #include "Ecs/Components/ModelComponent.h"
+#include "Ecs/Components/LightComponent.h"
 
 #include "Ecs/Systems/TransformSystem.h"
 #include "Ecs/Systems/CameraSystem.h"
@@ -32,6 +34,7 @@
 #include "Meta/Ecs/Components/TransformComponent.hpp"
 #include "Meta/Ecs/Components/CameraComponent.hpp"
 #include "Meta/Ecs/Components/ModelComponent.hpp"
+#include "Meta/Ecs/Components/LightComponent.hpp"
 #include "Meta/Ecs/Entity.hpp"
 
 #include "Meta/Rendering/Material.hpp"

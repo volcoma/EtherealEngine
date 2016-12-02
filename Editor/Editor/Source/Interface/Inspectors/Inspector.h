@@ -1,8 +1,6 @@
 #pragma once
 
-
 #include "Core/reflection/reflection.h"
-/*#include "Core/common/basetypes.hpp"*/
 #include "../GUI.h"
 
 struct Inspector
@@ -32,25 +30,26 @@ REFLECT(Inspector)
 
 #define INSPECTED_TYPE "inspected_type"
 
-#define INSPECTOR_REFLECT(editorType, editType)\
-REFLECT(editorType)\
-{\
-	rttr::registration::class_<editorType>(#editorType)\
-	(\
-		rttr::metadata(INSPECTED_TYPE, rttr::type::get<editType>())\
-	)\
-	.constructor<>()\
-	(\
-		rttr::policy::ctor::as_std_shared_ptr\
-	)\
-	;\
+#define INSPECTOR_REFLECT(editorType, editType)						\
+REFLECT(editorType)													\
+{																	\
+	rttr::registration::class_<editorType>(#editorType)				\
+	(																\
+		rttr::metadata(INSPECTED_TYPE, rttr::type::get<editType>())	\
+	)																\
+	.constructor<>()												\
+	(																\
+		rttr::policy::ctor::as_std_shared_ptr						\
+	)																\
+	;																\
 }
 
-
-#define DECLARE_INSPECTOR(inspector, type)\
-struct inspector : public Inspector\
-{\
-	REFLECTABLE(Inspector_Bool, Inspector)\
-	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);\
-};\
+#define DECLARE_INSPECTOR(inspector, type)									\
+struct inspector : public Inspector											\
+{																			\
+	REFLECTABLE(Inspector_Bool, Inspector)									\
+	bool inspect(rttr::variant& var,										\
+		bool readOnly,														\
+		std::function<rttr::variant(const rttr::variant&)> get_metadata);	\
+};																			\
 INSPECTOR_REFLECT(inspector, type)

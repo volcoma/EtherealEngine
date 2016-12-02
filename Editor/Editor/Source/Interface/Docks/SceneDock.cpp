@@ -80,9 +80,9 @@ namespace Docks
 			if (sel && (editorCamera != sel) && sel.has_component<CameraComponent>())
 			{
 				const auto selectedCamera = sel.component<CameraComponent>().lock();
-				const auto camera = selectedCamera->getCamera();
+				const auto& camera = selectedCamera->getCamera();
 				const auto surface = selectedCamera->getOutputBuffer();
-				const auto viewSize = camera->getViewportSize();
+				const auto viewSize = camera.getViewportSize();
 
 				float factor = std::min(size.x / float(viewSize.width), size.y / float(viewSize.height)) / 4.0f;
 				ImVec2 bounds(viewSize.width * factor, viewSize.height * factor);
@@ -183,8 +183,8 @@ namespace Docks
 				}
 
 				ImGuizmo::Manipulate(
-					cameraComponent->getCamera()->getView(),
-					cameraComponent->getCamera()->getProj(),
+					cameraComponent->getCamera().getView(),
+					cameraComponent->getCamera().getProj(),
 					operation,
 					mode,
 					transform,
@@ -332,7 +332,7 @@ namespace Docks
 		auto cameraComponent = editorCamera.component<CameraComponent>().lock();
 		if (size.x > 0 && size.y > 0)
 		{
-			cameraComponent->getCamera()->setViewportPos({ static_cast<std::uint32_t>(pos.x), static_cast<std::uint32_t>(pos.y) });
+			cameraComponent->getCamera().setViewportPos({ static_cast<std::uint32_t>(pos.x), static_cast<std::uint32_t>(pos.y) });
 			cameraComponent->setViewportSize({ static_cast<std::uint32_t>(size.x), static_cast<std::uint32_t>(size.y) });
 			
 			const auto surface = cameraComponent->getOutputBuffer();
@@ -376,7 +376,7 @@ namespace Docks
 
 			if (showGBuffer)
 			{
-				const auto gBufferSurface = cameraComponent->getGBuffer();
+				const auto gBufferSurface = cameraComponent->getGBuffer()->getBufferRaw();
 				for (std::uint32_t i = 0; i < gBufferSurface->getAttachmentCount(); ++i)
 				{
 					const auto attachment = gBufferSurface->getAttachment(i).texture;
