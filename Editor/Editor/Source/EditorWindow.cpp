@@ -6,6 +6,7 @@
 #include "Runtime/Ecs/Components/ModelComponent.h"
 #include "Runtime/Ecs/Components/TransformComponent.h"
 #include "Runtime/Ecs/Components/CameraComponent.h"
+#include "Runtime/Ecs/Components/LightComponent.h"
 #include "Runtime/Ecs/World.h"
 #include "Runtime/System/FileSystem.h"
 #include "Runtime/System/Timer.h"
@@ -43,10 +44,19 @@ void defaultScene()
 
 	{
 		auto object = world.entities.create();
-		object.setName("MainCamera");
+		object.setName("Main Camera");
 		object.assign<TransformComponent>().lock()
 			->setLocalPosition({ 0.0f, 2.0f, -5.0f });
 		object.assign<CameraComponent>();
+	}
+	{
+		auto object = world.entities.create();
+		object.setName("Light");
+		object.assign<TransformComponent>().lock()
+			->setLocalPosition({ 1.0f, 6.0f, -3.0f })
+			.rotateLocal(50.0f, -30.0f, 0.0f);
+		object.assign<LightComponent>().lock()
+			->getLight().lightType = LightType::Directional;
 	}
 	{
 		auto object = world.entities.create();
@@ -93,7 +103,7 @@ void loadEditorCamera()
 	auto& world = app.getWorld();
 	auto& editState = app.getEditState();
 	ecs::Entity outData = world.entities.create();
-	outData.setName("EditorCamera");
+	outData.setName("Editor Camera");
 	outData.assign<TransformComponent>().lock()
 		->setLocalPosition({ 0.0f, 2.0f, -5.0f });
 	outData.assign<CameraComponent>();

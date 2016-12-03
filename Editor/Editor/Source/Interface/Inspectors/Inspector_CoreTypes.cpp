@@ -64,7 +64,7 @@ bool Inspector_Float::inspect(rttr::variant& var, bool readOnly, std::function<r
 		}
 		else
 		{
-			if (gui::DragFloat("", &data, step))
+			if (gui::DragFloat("", &data, step, min, max))
 			{
 				var = data;
 				return true;
@@ -119,7 +119,7 @@ bool Inspector_Double::inspect(rttr::variant& var, bool readOnly, std::function<
 		}
 		else
 		{
-			if (gui::DragFloat("", &data, step))
+			if (gui::DragFloat("", &data, step, min, max))
 			{
 				var = data;
 				return true;

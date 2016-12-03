@@ -211,7 +211,7 @@ const math::frustum & Camera::getFrustum()
 	// Recalculate frustum if necessary
 	if (mFrustumDirty == true && mFrustumLocked == false)
 	{
-		mFrustum.update(getView(), getProj());
+		mFrustum.update(getView(), getProj(), gfx::getCaps()->homogeneousDepth);
 		mFrustumDirty = false;
 
 		// Also build the frustum / volume that represents the space between the

@@ -82,7 +82,8 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 			step = step ? step : 1;
 			ddPush();
 			ddSetColor(detailGridColor);
-			ddDrawGrid(Axis::Y, math::vec3{ 0.0f, 0.0f, 0.0f }, gridSize / step, float(step));
+			math::vec3 center{ 0.0f, 0.0f, 0.0f };
+			ddDrawGrid(Axis::Y, &center, gridSize / step, float(step));
 			ddPop();
 		}
 
@@ -118,12 +119,11 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 	{
 		auto& cameraComponent = *selectedEntity.component<CameraComponent>().lock();
 		auto& selectedCamera = cameraComponent.getCamera();
-
-		const auto& frust = selectedCamera.getFrustum();
+		const auto viewProj = selectedCamera.getProj() * selectedCamera.getView();
 		ddPush();
 		ddSetColor(0xffffffff);
 		ddSetTransform(nullptr);
-		ddDrawFrustum(frust);
+		ddDrawFrustum(&viewProj);
 		ddPop();
 	}
 
@@ -133,24 +133,28 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 		auto& light = lightComponent.getLight();
 		if (light.lightType == LightType::Spot)
 		{
-			auto sinAngle = math::max(math::sin(math::radians(light.spotData.spotOuterAngle * 2.0f)), 0.1f);
-			auto height = 10.0f;//light.getRange();
-			auto radius = sinAngle * height;
+			auto adjacent = light.spotData.range;
+			auto tanAngle = math::tan(math::radians(light.spotData.spotOuterAngle));
+			// oposite = tan * adjacent
+			auto oposite = tanAngle * adjacent;
 			ddPush();
 			ddSetColor(0xff00ff00);
-			ddSetTransform(&worldTransform);
-			ddDrawCone(math::vec3(0.0f, 0.0f, height), math::vec3(0.0f, 0.0f, 0.0f), radius);
+			ddSetWireframe(true);
+			math::vec3 from = transformComponent.getPosition();
+			math::vec3 to = from + transformComponent.getZAxis() * adjacent;
+			ddDrawCone(&to, &from, oposite);
 			ddPop();
 		}
 		else if (light.lightType == LightType::Point)
 		{
-			auto radius = 10.0f;//light.getRange();
+			auto radius = light.pointData.range;
 			ddPush();
 			ddSetColor(0xff00ff00);
-			ddSetTransform(&worldTransform);
-			ddDrawCircle(Axis::X, 0.0f, 0.0f, 0.0f, radius);
-			ddDrawCircle(Axis::Y, 0.0f, 0.0f, 0.0f, radius);
-			ddDrawCircle(Axis::Z, 0.0f, 0.0f, 0.0f, radius);
+			ddSetWireframe(true);
+			math::vec3 center = transformComponent.getPosition();
+			ddDrawCircle(Axis::X, center.x, center.y, center.z, radius);
+			ddDrawCircle(Axis::Y, center.x, center.y, center.z, radius);
+			ddDrawCircle(Axis::Z, center.x, center.y, center.z, radius);
 			ddPop();
 		}
 		else if (light.lightType == LightType::Directional)
@@ -158,10 +162,13 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 			ddPush();
 			ddSetLod(UINT8_MAX);
 			ddSetColor(0xff00ff00);
-			ddSetTransform(&worldTransform);
-			ddSetWireframe(false);
-			ddDrawCylinder(math::vec3(0.0f, 0.0f, 0.0f), math::vec3(0.0f, 0.0f, 1.0f), 0.1f);
-			ddDrawCone(math::vec3(0.0f, 0.0f, 1.0f), math::vec3(0.0f, 0.0f, 2.5f), 0.5f);
+			ddSetWireframe(true);
+			math::vec3 from1 = transformComponent.getPosition();
+			math::vec3 to1 = from1 + transformComponent.getZAxis() * 2.0f;
+			ddDrawCylinder(&from1, &to1, 0.1f);
+			math::vec3 from2 = to1;
+			math::vec3 to2 = from2 + transformComponent.getZAxis() * 1.5f;;
+			ddDrawCone(&from2, &to2, 0.5f);
 			ddPop();
 		}
 	}
@@ -185,7 +192,7 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 			ddPush();
 			ddSetColor(0xff00ff00);
 			ddSetTransform(&worldTransform);
-			ddDraw(Aabb{ bounds.min, bounds.max });
+			ddDrawAabb(&bounds.min, &bounds.max);
 			ddPop();
 
 			if (editState.wireframeSelection)

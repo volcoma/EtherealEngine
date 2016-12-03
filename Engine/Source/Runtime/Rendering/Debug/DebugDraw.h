@@ -9,6 +9,11 @@
 #include "bounds.h"
 #include <cstdint>
 
+namespace bx
+{
+	struct AllocatorI;
+}
+
 struct Axis
 {
 	enum Enum
@@ -22,7 +27,7 @@ struct Axis
 };
 
 ///
-void ddInit(bool _depthTestLess = true);
+void ddInit(bool _depthTestLess = true, bx::AllocatorI* _allocator = NULL);
 
 ///
 void ddShutdown();
@@ -91,34 +96,41 @@ void ddDraw(const Obb& _obb);
 void ddDraw(const Sphere& _sphere);
 
 ///
-void ddDrawFrustum(const math::frustum& _frustum);
+void ddDrawFrustum(const void* _viewProj);
 
 ///
 void ddDrawArc(Axis::Enum _axis, float _x, float _y, float _z, float _radius, float _degrees);
 
 ///
-void ddDrawCircle(const math::vec3& _normal, const math::vec3& _center, float _radius, float _weight = 0.0f);
+void ddDrawCircle(const void* _normal, const void* _center, float _radius, float _weight = 0.0f);
 
 ///
 void ddDrawCircle(Axis::Enum _axis, float _x, float _y, float _z, float _radius, float _weight = 0.0f);
 
 ///
-void ddDrawCone(const math::vec3& _from, const math::vec3& _to, float _radius, float _weight = 0.0f);
+void ddDrawCone(const void* _from, const void* _to, float _radius);
 
 ///
-void ddDrawCylinder(const math::vec3& _from, const math::vec3& _to, float _radius, float _weight = 0.0f);
+void ddDrawCylinder(const void* _from, const void* _to, float _radius, bool _capsule = false);
 
 ///
-void ddDrawAxis(float _x, float _y, float _z, float _len = 1.0f, Axis::Enum _highlight = Axis::Count);
+void ddDrawCapsule(const void* _from, const void* _to, float _radius);
 
 ///
-void ddDrawGrid(const math::vec3& _normal, const math::vec3& _center, uint32_t _size = 20, float _step = 1.0f);
+void ddDrawAxis(float _x, float _y, float _z, float _len = 1.0f, Axis::Enum _highlight = Axis::Count, float _thickness = 0.0f);
 
 ///
-void ddDrawGrid(Axis::Enum _axis, const math::vec3& _center, uint32_t _size = 20, float _step = 1.0f);
+void ddDrawGrid(const void* _normal, const void* _center, uint32_t _size = 20, float _step = 1.0f);
+
+///
+void ddDrawGrid(Axis::Enum _axis, const void* _center, uint32_t _size = 20, float _step = 1.0f);
 
 ///
 void ddDrawOrb(float _x, float _y, float _z, float _radius, Axis::Enum _highlight = Axis::Count);
+
+///
+void ddDrawAabb(const void* _min, const void* _max );
+
 
 struct ddRAII
 {

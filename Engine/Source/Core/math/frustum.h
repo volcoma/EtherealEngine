@@ -28,16 +28,13 @@ public:
 	// Constructors & Destructors
 	//-------------------------------------------------------------------------
     frustum( );
-    frustum( const transform & view, const transform & proj );
+    frustum( const transform & view, const transform & proj, bool _oglNDC);
     frustum( const bbox & sourceBounds );
 
-    // TODO: 6767 - Not a pleasant constructor. Do we still need this?
-	frustum( unsigned int cubeFaceIndex, const vec3 & origin, float farDistance, float nearDistance = 1.0f ); 
-    
 	//-------------------------------------------------------------------------
 	// Public Methods
 	//-------------------------------------------------------------------------
-    void							update				( const transform & view, const transform & proj );
+    void							update				( const transform & view, const transform & proj, bool _oglNDC);
     void							setPlanes			( const plane newPlanes[] );
     void							recomputePoints		( );
     VolumeQuery::E					classifyAABB		( const bbox & bounds ) const;

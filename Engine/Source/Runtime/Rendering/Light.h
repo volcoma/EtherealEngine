@@ -197,12 +197,14 @@ struct Light
 
 	struct Spot
 	{
+		float range = 10.0f;
 		float spotOuterAngle = 45.0f;
 		float spotInnerAngle = 30.0f;
 	};
 	
 	struct Point
 	{
+		float range = 10.0f;
 		float fovXAdjust = 0.0f;
 		float fovYAdjust = 0.0f;
 		bool stencilPack = true;

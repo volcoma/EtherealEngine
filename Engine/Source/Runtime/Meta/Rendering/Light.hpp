@@ -8,6 +8,10 @@
 REFLECT(Light)
 {
 	rttr::registration::class_<Light::Spot>("Spot")
+		.property("Range", &Light::Spot::range)
+		(
+			rttr::metadata("Min", 0.1f)
+		)
 		.property("Inner Angle", &Light::Spot::spotInnerAngle)
 		(
 			rttr::metadata("Min", 1.0f),
@@ -22,6 +26,10 @@ REFLECT(Light)
 		);
 
 	rttr::registration::class_<Light::Point>("Point")
+		.property("Range", &Light::Point::range)
+		(
+			rttr::metadata("Min", 0.1f)
+		)
 		.property("FovX adjust", &Light::Point::fovXAdjust)
 		(
 			rttr::metadata("Min", -20.0f),

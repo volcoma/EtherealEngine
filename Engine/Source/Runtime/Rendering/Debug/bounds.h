@@ -3,58 +3,58 @@
 
 struct Aabb
 {
-	math::vec3 m_min;
-	math::vec3 m_max;
+	float m_min[3];
+	float m_max[3];
 };
 
 struct Cylinder
 {
-	math::vec3 m_pos;
-	math::vec3 m_end;
+	float m_pos[3];
+	float m_end[3];
 	float m_radius;
 };
 
 struct Disk
 {
-	math::vec3 m_center;
-	math::vec3 m_normal;
+	float m_center[3];
+	float m_normal[3];
 	float m_radius;
 };
 
 struct Obb
 {
-	math::mat4 m_mtx;
+	float m_mtx[16];
 };
 
 struct Plane
 {
-	math::vec3 m_normal;
+	float m_normal[3];
 	float m_dist;
 };
 
 struct Ray
 {
-	math::vec3 m_pos;
-	math::vec3 m_dir;
+	float m_pos[3];
+	float m_dir[3];
 };
 
 struct Sphere
 {
-	math::vec3 m_center;
+	float m_center[3];
 	float m_radius;
 };
 
 struct Tris
 {
-	math::vec3 m_v0;
-	math::vec3 m_v1;
-	math::vec3 m_v2;
+	float m_v0[3];
+	float m_v1[3];
+	float m_v2[3];
 };
 
 struct Intersection
 {
-	math::vec3 m_pos;
-	math::vec3 m_normal;
+	float m_pos[3];
+	float m_normal[3];
 	float m_dist;
 };
 
@@ -71,7 +71,7 @@ float calcAabbArea(Aabb& _aabb);
 void calcAabb(Aabb& _aabb, const void* _vertices, uint32_t _numVertices, uint32_t _stride);
 
 /// Transform vertices and calculate axis aligned bounding box.
-void calcAabb(Aabb& _aabb, const math::mat4& _mtx, const void* _vertices, uint32_t _numVertices, uint32_t _stride);
+void calcAabb(Aabb& _aabb, const float* _mtx, const void* _vertices, uint32_t _numVertices, uint32_t _stride);
 
 /// Expand AABB.
 void aabbExpand(Aabb& _aabb, float _factor);
@@ -90,31 +90,31 @@ void calcMaxBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _num
 void calcMinBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _numVertices, uint32_t _stride, float _step = 0.01f);
 
 /// Calculate coplanar U/V vectors.
-void calcPlaneUv(const Plane& _plane, math::vec3& _udir, math::vec3& _vdir);
+void calcPlaneUv(const Plane& _plane, float* _udir, float* _vdir);
 
 /// Returns 6 (near, far, left, right, top, bottom) planes representing frustum planes.
-void buildFrustumPlanes(Plane* _planes, const float* _viewProj);
+void buildFrustumPlanes(Plane* _planes, const float* _viewProj, bool _oglNDC);
 
 /// Returns point from 3 intersecting planes.
-void intersectPlanes(math::vec3& _result, const Plane& _pa, const Plane& _pb, const Plane& _pc);
-// 
-// /// Make screen space ray from x, y coordinate and inverse view-projection matrix.
-// Ray makeRay(float _x, float _y, const float* _invVp);
-// 
-// /// Intersect ray / aabb.
-// bool intersect(const Ray& _ray, const Aabb& _aabb, Intersection* _intersection = nullptr);
-// 
-// /// Intersect ray / cylinder.
-// bool intersect(const Ray& _ray, const Cylinder& _cylinder, bool _capsule, Intersection* _intersection = nullptr);
-// 
-// /// Intersect ray / disk.
-// bool intersect(const Ray& _ray, const Disk& _disk, Intersection* _intersection = nullptr);
-// 
-// /// Intersect ray / plane.
-// bool intersect(const Ray& _ray, const Plane& _plane, Intersection* _intersection = nullptr);
-// 
-// /// Intersect ray / sphere.
-// bool intersect(const Ray& _ray, const Sphere& _sphere, Intersection* _intersection = nullptr);
-// 
-// /// Intersect ray / triangle.
-// bool intersect(const Ray& _ray, const Tris& _triangle, Intersection* _intersection = nullptr);
+void intersectPlanes(float _result[3], const Plane& _pa, const Plane& _pb, const Plane& _pc);
+
+/// Make screen space ray from x, y coordinate and inverse view-projection matrix.
+Ray makeRay(float _x, float _y, const float* _invVp);
+
+/// Intersect ray / aabb.
+bool intersect(const Ray& _ray, const Aabb& _aabb, Intersection* _intersection = NULL);
+
+/// Intersect ray / cylinder.
+bool intersect(const Ray& _ray, const Cylinder& _cylinder, bool _capsule, Intersection* _intersection = NULL);
+
+/// Intersect ray / disk.
+bool intersect(const Ray& _ray, const Disk& _disk, Intersection* _intersection = NULL);
+
+/// Intersect ray / plane.
+bool intersect(const Ray& _ray, const Plane& _plane, Intersection* _intersection = NULL);
+
+/// Intersect ray / sphere.
+bool intersect(const Ray& _ray, const Sphere& _sphere, Intersection* _intersection = NULL);
+
+/// Intersect ray / triangle.
+bool intersect(const Ray& _ray, const Tris& _triangle, Intersection* _intersection = NULL);

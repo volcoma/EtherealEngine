@@ -330,7 +330,7 @@ bool Application::initApplication()
 
 	world.systems.configure();
 
-	ddInit(true);
+	ddInit();
 	// Success!!
 	return true;
 }
