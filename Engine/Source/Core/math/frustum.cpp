@@ -76,85 +76,54 @@ namespace math
 		using namespace VolumePlane;
 
 		// Build a combined view & projection matrix
-		transform m = Proj * View;
+		const transform m = Proj * View;
 
-// 		if (_oglNDC)
-// 		{
-// 			// Left clipping plane
-// 			planes[Left].data.x = (m[0][3] - m[0][0]);
-// 			planes[Left].data.y = (m[1][3] - m[1][0]);
-// 			planes[Left].data.z = (m[2][3] - m[2][0]);
-// 			planes[Left].data.w = (m[3][3] - m[3][0]);
-// 
-// 			// Right clipping plane
-// 			planes[Right].data.x = (m[0][3] + m[0][0]);
-// 			planes[Right].data.y = (m[1][3] + m[1][0]);
-// 			planes[Right].data.z = (m[2][3] + m[2][0]);
-// 			planes[Right].data.w = (m[3][3] + m[3][0]);
-// 
-// 			// Top clipping plane
-// 			planes[Top].data.x = (m[0][3] + m[0][1]);
-// 			planes[Top].data.y = (m[1][3] + m[1][1]);
-// 			planes[Top].data.z = (m[2][3] + m[2][1]);
-// 			planes[Top].data.w = (m[3][3] + m[3][1]);
-// 
-// 			// Bottom clipping plane
-// 			planes[Bottom].data.x = (m[0][3] - m[0][1]);
-// 			planes[Bottom].data.y = (m[1][3] - m[1][1]);
-// 			planes[Bottom].data.z = (m[2][3] - m[2][1]);
-// 			planes[Bottom].data.w = (m[3][3] - m[3][1]);
-// 
-// 			// Near clipping plane
-// 			planes[Near].data.x = (m[0][3] - m[0][2]);
-// 			planes[Near].data.y = (m[1][3] - m[1][2]);
-// 			planes[Near].data.z = (m[2][3] - m[2][2]);
-// 			planes[Near].data.w = (m[3][3] - m[3][2]);
-// 
-// 			// Far clipping plane
-// 			planes[Far].data.x = (m[0][3] + m[0][2]);
-// 			planes[Far].data.y = (m[1][3] + m[1][2]);
-// 			planes[Far].data.z = (m[2][3] + m[2][2]);
-// 			planes[Far].data.w = (m[3][3] + m[3][2]);
-// 		}
-// 		else
+		// Left clipping plane
+		planes[Left].data.x = -(m[0][3] + m[0][0]);
+		planes[Left].data.y = -(m[1][3] + m[1][0]);
+		planes[Left].data.z = -(m[2][3] + m[2][0]);
+		planes[Left].data.w = -(m[3][3] + m[3][0]);
+
+		// Right clipping plane
+		planes[Right].data.x = -(m[0][3] - m[0][0]);
+		planes[Right].data.y = -(m[1][3] - m[1][0]);
+		planes[Right].data.z = -(m[2][3] - m[2][0]);
+		planes[Right].data.w = -(m[3][3] - m[3][0]);
+
+		// Top clipping plane
+		planes[Top].data.x = -(m[0][3] - m[0][1]);
+		planes[Top].data.y = -(m[1][3] - m[1][1]);
+		planes[Top].data.z = -(m[2][3] - m[2][1]);
+		planes[Top].data.w = -(m[3][3] - m[3][1]);
+
+		// Bottom clipping plane
+		planes[Bottom].data.x = -(m[0][3] + m[0][1]);
+		planes[Bottom].data.y = -(m[1][3] + m[1][1]);
+		planes[Bottom].data.z = -(m[2][3] + m[2][1]);
+		planes[Bottom].data.w = -(m[3][3] + m[3][1]);
+
+		// Far clipping plane
+		planes[Far].data.x = -(m[0][3] - m[0][2]);
+		planes[Far].data.y = -(m[1][3] - m[1][2]);
+		planes[Far].data.z = -(m[2][3] - m[2][2]);
+		planes[Far].data.w = -(m[3][3] - m[3][2]);
+
+		if (_oglNDC)
 		{
-			// Left clipping plane
-			planes[Left].data.x = -(m[0][3] + m[0][0]);
-			planes[Left].data.y = -(m[1][3] + m[1][0]);
-			planes[Left].data.z = -(m[2][3] + m[2][0]);
-			planes[Left].data.w = -(m[3][3] + m[3][0]);
-
-			// Right clipping plane
-			planes[Right].data.x = -(m[0][3] - m[0][0]);
-			planes[Right].data.y = -(m[1][3] - m[1][0]);
-			planes[Right].data.z = -(m[2][3] - m[2][0]);
-			planes[Right].data.w = -(m[3][3] - m[3][0]);
-
-			// Top clipping plane
-			planes[Top].data.x = -(m[0][3] - m[0][1]);
-			planes[Top].data.y = -(m[1][3] - m[1][1]);
-			planes[Top].data.z = -(m[2][3] - m[2][1]);
-			planes[Top].data.w = -(m[3][3] - m[3][1]);
-
-			// Bottom clipping plane
-			planes[Bottom].data.x = -(m[0][3] + m[0][1]);
-			planes[Bottom].data.y = -(m[1][3] + m[1][1]);
-			planes[Bottom].data.z = -(m[2][3] + m[2][1]);
-			planes[Bottom].data.w = -(m[3][3] + m[3][1]);
-
+			// Near clipping plane
+			planes[Near].data.x = -(m[0][3] + m[0][2]);
+			planes[Near].data.y = -(m[1][3] + m[1][2]);
+			planes[Near].data.z = -(m[2][3] + m[2][2]);
+			planes[Near].data.w = -(m[3][3] + m[3][2]);	
+		}
+		else
+		{
 			// Near clipping plane
 			planes[Near].data.x = -(m[0][2]);
 			planes[Near].data.y = -(m[1][2]);
 			planes[Near].data.z = -(m[2][2]);
 			planes[Near].data.w = -(m[3][2]);
-
-			// Far clipping plane
-			planes[Far].data.x = -(m[0][3] - m[0][2]);
-			planes[Far].data.y = -(m[1][3] - m[1][2]);
-			planes[Far].data.z = -(m[2][3] - m[2][2]);
-			planes[Far].data.w = -(m[3][3] - m[3][2]);
 		}
-		
 
 		// Normalize and compute additional information.
 		setPlanes(planes);

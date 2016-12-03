@@ -282,6 +282,27 @@ void calcPlaneUv(const Plane& _plane, float* _udir, float* _vdir)
 	bx::vec3TangentFrame(_plane.m_normal, _udir, _vdir);
 }
 
+inline float vec4Dot(const float* __restrict _a, const float* __restrict _b)
+{
+	return _a[0] * _b[0] + _a[1] * _b[1] + _a[2] * _b[2] + _a[3] * _b[3];
+}
+
+inline float vec4Length(const float* _a)
+{
+	return sqrtf(vec4Dot(_a, _a));
+}
+
+inline float vec4Norm(float* __restrict _result, const float* __restrict _a)
+{
+	const float len = vec4Length(_a);
+	const float invLen = 1.0f / len;
+	_result[0] = _a[0] * invLen;
+	_result[1] = _a[1] * invLen;
+	_result[2] = _a[2] * invLen;
+	_result[3] = _a[3] * invLen;
+	return len;
+}
+
 void buildFrustumPlanes(Plane* _result, const float* _viewProj, bool _oglNDC)
 {
 	Plane& near = _result[0];
@@ -310,77 +331,42 @@ void buildFrustumPlanes(Plane* _result, const float* _viewProj, bool _oglNDC)
 	const float yx = _viewProj[4];
 	const float zx = _viewProj[8];
 	const float wx = _viewProj[12];
+	left.m_normal[0] = xw + xx;
+	left.m_normal[1] = yw + yx;
+	left.m_normal[2] = zw + zx;
+	left.m_dist = ww + wx;
 
+	right.m_normal[0] = xw - xx;
+	right.m_normal[1] = yw - yx;
+	right.m_normal[2] = zw - zx;
+	right.m_dist = ww - wx;
 
-	if (_oglNDC)
-	{
-		left.m_normal[0] = xw - xx;
-		left.m_normal[1] = yw - yx;
-		left.m_normal[2] = zw - zx;
-		left.m_dist = ww - wx;
+	top.m_normal[0] = xw - xy;
+	top.m_normal[1] = yw - yy;
+	top.m_normal[2] = zw - zy;
+	top.m_dist = ww - wy;
 
-		right.m_normal[0] = xw + xx;
-		right.m_normal[1] = yw + yx;
-		right.m_normal[2] = zw + zx;
-		right.m_dist = ww + wx;
+	bottom.m_normal[0] = xw + xy;
+	bottom.m_normal[1] = yw + yy;
+	bottom.m_normal[2] = zw + zy;
+	bottom.m_dist = ww + wy;
 
-		top.m_normal[0] = xw + xy;
-		top.m_normal[1] = yw + yy;
-		top.m_normal[2] = zw + zy;
-		top.m_dist = ww + wy;
+	near.m_normal[0] = xw + xz;
+	near.m_normal[1] = yw + yz;
+	near.m_normal[2] = zw + zz;
+	near.m_dist = ww + wz;
 
-		bottom.m_normal[0] = xw - xy;
-		bottom.m_normal[1] = yw - yy;
-		bottom.m_normal[2] = zw - zy;
-		bottom.m_dist = ww - wy;
-
-		near.m_normal[0] = xw - xz;
-		near.m_normal[1] = yw - yz;
-		near.m_normal[2] = zw - zz;
-		near.m_dist = ww - wz;
-
-		far.m_normal[0] = xw + xz;
-		far.m_normal[1] = yw + yz;
-		far.m_normal[2] = zw + zz;
-		far.m_dist = ww + wz;
-	}
-	else
-	{
-		const float* m = _viewProj;
-		left.m_normal[0] = -(xw + xx);
-		left.m_normal[1] = -(yw + yx);
-		left.m_normal[2] = -(zw + zx);
-		left.m_dist = -(yw + wx);
-
-		right.m_normal[0] = -(xw - xx);
-		right.m_normal[1] = -(yw - yx);
-		right.m_normal[2] = -(zw - zx);
-		right.m_dist = -(yw - wx);
-
-		top.m_normal[0] = -(xw - xy);
-		top.m_normal[1] = -(yw - yy);
-		top.m_normal[2] = -(zw - zy);
-		top.m_dist = -(yw - wy);
-
-		bottom.m_normal[0] = -(xw + xy);
-		bottom.m_normal[1] = -(yw + yy);
-		bottom.m_normal[2] = -(zw + zy);
-		bottom.m_dist = -(yw + wy);
-
-		near.m_normal[0] = -(xz);
-		near.m_normal[1] = -(yz);
-		near.m_normal[2] = -(zz);
-		near.m_dist = -(wz);
-
-		far.m_normal[0] = -(xw - xz);
-		far.m_normal[1] = -(yw - yz);
-		far.m_normal[2] = -(zw - zz);
-		far.m_dist = -(yw - wz);
-	}
+	far.m_normal[0] = xw - xz;
+	far.m_normal[1] = yw - yz;
+	far.m_normal[2] = zw - zz;
+	far.m_dist = ww - wz;
+	float sig = _oglNDC ? 1.0f : -1.0f;
 
 	Plane* plane = _result;
 	for (uint32_t ii = 0; ii < 6; ++ii)
 	{
+		bx::vec3Mul(plane->m_normal, plane->m_normal, sig);
+		plane->m_dist *= sig;
 		float invLen = 1.0f / bx::vec3Norm(plane->m_normal, plane->m_normal);
 		plane->m_dist *= invLen;
 		++plane;
