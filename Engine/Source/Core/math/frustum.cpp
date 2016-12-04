@@ -78,52 +78,68 @@ namespace math
 		// Build a combined view & projection matrix
 		const transform m = Proj * View;
 
-		// Left clipping plane
-		planes[Left].data.x = -(m[0][3] + m[0][0]);
-		planes[Left].data.y = -(m[1][3] + m[1][0]);
-		planes[Left].data.z = -(m[2][3] + m[2][0]);
-		planes[Left].data.w = -(m[3][3] + m[3][0]);
+		const float* _viewProj = m;
+		const float xw = _viewProj[3];
+		const float yw = _viewProj[7];
+		const float zw = _viewProj[11];
+		const float ww = _viewProj[15];
 
-		// Right clipping plane
-		planes[Right].data.x = -(m[0][3] - m[0][0]);
-		planes[Right].data.y = -(m[1][3] - m[1][0]);
-		planes[Right].data.z = -(m[2][3] - m[2][0]);
-		planes[Right].data.w = -(m[3][3] - m[3][0]);
+		const float xz = _viewProj[2];
+		const float yz = _viewProj[6];
+		const float zz = _viewProj[10];
+		const float wz = _viewProj[14];
 
-		// Top clipping plane
-		planes[Top].data.x = -(m[0][3] - m[0][1]);
-		planes[Top].data.y = -(m[1][3] - m[1][1]);
-		planes[Top].data.z = -(m[2][3] - m[2][1]);
-		planes[Top].data.w = -(m[3][3] - m[3][1]);
+		const float xy = _viewProj[1];
+		const float yy = _viewProj[5];
+		const float zy = _viewProj[9];
+		const float wy = _viewProj[13];
 
-		// Bottom clipping plane
-		planes[Bottom].data.x = -(m[0][3] + m[0][1]);
-		planes[Bottom].data.y = -(m[1][3] + m[1][1]);
-		planes[Bottom].data.z = -(m[2][3] + m[2][1]);
-		planes[Bottom].data.w = -(m[3][3] + m[3][1]);
+		const float xx = _viewProj[0];
+		const float yx = _viewProj[4];
+		const float zx = _viewProj[8];
+		const float wx = _viewProj[12];
 
-		// Far clipping plane
-		planes[Far].data.x = -(m[0][3] - m[0][2]);
-		planes[Far].data.y = -(m[1][3] - m[1][2]);
-		planes[Far].data.z = -(m[2][3] - m[2][2]);
-		planes[Far].data.w = -(m[3][3] - m[3][2]);
+		planes[Left].data.x = xw + xx;
+		planes[Left].data.y = yw + yx;
+		planes[Left].data.z = zw + zx;
+		planes[Left].data.w = ww + wx;
 
-		if (_oglNDC)
+		planes[Right].data.x = xw - xx;
+		planes[Right].data.y = yw - yx;
+		planes[Right].data.z = zw - zx;
+		planes[Right].data.w = ww - wx;
+
+		planes[Top].data.x = xw - xy;
+		planes[Top].data.y = yw - yy;
+		planes[Top].data.z = zw - zy;
+		planes[Top].data.w = ww - wy;
+
+		planes[Bottom].data.x = xw + xy;
+		planes[Bottom].data.y = yw + yy;
+		planes[Bottom].data.z = zw + zy;
+		planes[Bottom].data.w= ww + wy;
+
+		planes[Near].data.x = xw + xz;
+		planes[Near].data.y = yw + yz;
+		planes[Near].data.z = zw + zz;
+		planes[Near].data.w = ww + wz;
+
+		planes[Far].data.x = xw - xz;
+		planes[Far].data.y = yw - yz;
+		planes[Far].data.z = zw - zz;
+		planes[Far].data.w = ww - wz;
+	
+		if (!_oglNDC)
 		{
-			// Near clipping plane
-			planes[Near].data.x = -(m[0][3] + m[0][2]);
-			planes[Near].data.y = -(m[1][3] + m[1][2]);
-			planes[Near].data.z = -(m[2][3] + m[2][2]);
-			planes[Near].data.w = -(m[3][3] + m[3][2]);	
+			planes[Near].data.x = xz;
+			planes[Near].data.y = yz;
+			planes[Near].data.z = zz;
+			planes[Near].data.w = wz;
 		}
-		else
-		{
-			// Near clipping plane
-			planes[Near].data.x = -(m[0][2]);
-			planes[Near].data.y = -(m[1][2]);
-			planes[Near].data.z = -(m[2][2]);
-			planes[Near].data.w = -(m[3][2]);
-		}
+
+		// Copy and normalize the planes
+		for (int i = 0; i < 6; i++)
+			planes[i].data *= -1.0f;
 
 		// Normalize and compute additional information.
 		setPlanes(planes);

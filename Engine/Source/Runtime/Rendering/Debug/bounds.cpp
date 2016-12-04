@@ -282,27 +282,6 @@ void calcPlaneUv(const Plane& _plane, float* _udir, float* _vdir)
 	bx::vec3TangentFrame(_plane.m_normal, _udir, _vdir);
 }
 
-inline float vec4Dot(const float* __restrict _a, const float* __restrict _b)
-{
-	return _a[0] * _b[0] + _a[1] * _b[1] + _a[2] * _b[2] + _a[3] * _b[3];
-}
-
-inline float vec4Length(const float* _a)
-{
-	return sqrtf(vec4Dot(_a, _a));
-}
-
-inline float vec4Norm(float* __restrict _result, const float* __restrict _a)
-{
-	const float len = vec4Length(_a);
-	const float invLen = 1.0f / len;
-	_result[0] = _a[0] * invLen;
-	_result[1] = _a[1] * invLen;
-	_result[2] = _a[2] * invLen;
-	_result[3] = _a[3] * invLen;
-	return len;
-}
-
 void buildFrustumPlanes(Plane* _result, const float* _viewProj, bool _oglNDC)
 {
 	Plane& near = _result[0];
@@ -331,6 +310,7 @@ void buildFrustumPlanes(Plane* _result, const float* _viewProj, bool _oglNDC)
 	const float yx = _viewProj[4];
 	const float zx = _viewProj[8];
 	const float wx = _viewProj[12];
+
 	left.m_normal[0] = xw + xx;
 	left.m_normal[1] = yw + yx;
 	left.m_normal[2] = zw + zx;
@@ -360,13 +340,20 @@ void buildFrustumPlanes(Plane* _result, const float* _viewProj, bool _oglNDC)
 	far.m_normal[1] = yw - yz;
 	far.m_normal[2] = zw - zz;
 	far.m_dist = ww - wz;
-	float sig = _oglNDC ? 1.0f : -1.0f;
+
+	if (!_oglNDC)
+	{
+		near.m_normal[0] = xz;
+		near.m_normal[1] = yz;
+		near.m_normal[2] = zz;
+		near.m_dist = wz;
+	}
 
 	Plane* plane = _result;
 	for (uint32_t ii = 0; ii < 6; ++ii)
 	{
-		bx::vec3Mul(plane->m_normal, plane->m_normal, sig);
-		plane->m_dist *= sig;
+		bx::vec3Mul(plane->m_normal, plane->m_normal, -1.0f);
+		plane->m_dist *= -1.0f;
 		float invLen = 1.0f / bx::vec3Norm(plane->m_normal, plane->m_normal);
 		plane->m_dist *= invLen;
 		++plane;
