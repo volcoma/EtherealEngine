@@ -150,7 +150,7 @@ bool EditorApp::initEditState()
 {
 	auto& manager = getAssetManager();
 	mEditState.loadIcons(manager);
-
+	mEditState.loadOptions();
 	return true;
 }
 
@@ -181,7 +181,7 @@ bool EditorApp::initInstance(const std::string& rootDataDir, const std::string& 
 {
 	fs::addPathProtocol("engine", rootDataDir + "../../");
 	fs::addPathProtocol("editor", rootDataDir + "../../Editor_Data/");
-
+	fs::ensurePath("editor://Config", true);
 	return Application::initInstance(rootDataDir, commandLine);
 }
 
@@ -277,8 +277,12 @@ void EditorApp::openProject(const std::string& projectDir)
 	manager.clear("data://");
 	auto projName = fs::getFileName(projectDir);
 	editState.project = projName;
-
-	
+	auto& rp = editState.options.recentProjects;
+	if (std::find(std::begin(rp), std::end(rp), projectDir) == std::end(rp))
+	{
+		rp.push_back(projectDir);
+		editState.saveOptions();
+	}
 }
 
 void EditorApp::openProjectManager()

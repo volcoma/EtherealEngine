@@ -379,6 +379,7 @@ ProjectManagerWindow::ProjectManagerWindow(sf::VideoMode mode, const std::string
 void ProjectManagerWindow::frameRender()
 {
 	auto& app = Singleton<EditorApp>::getInstance();
+	auto& editState = app.getEditState();
 
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoMove |
@@ -393,11 +394,13 @@ void ProjectManagerWindow::frameRender()
 		{
 			
 			//for testing purposes
-			for (auto& project : std::array<std::string, 3>{ "my/recent/project/name1", "my/recent/project/name2", "my/recent/project/name3" })
+			for (auto& project : editState.options.recentProjects)
 			{
 				if (gui::Selectable(project.c_str()))
 				{
-					//app.openProject(project);
+					app.openProject(project);
+					setMain(false);
+					close();
 				}
 			}
 			gui::EndChild();
@@ -426,6 +429,7 @@ void ProjectManagerWindow::frameRender()
 			if (openFolderDialog("", fs::resolveFileLocation("engine://"), path))
 			{
 				app.openProject(path);
+				setMain(false);
 				close();
 			}
 		}

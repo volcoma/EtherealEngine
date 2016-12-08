@@ -3,6 +3,8 @@
 #include "Interface/Gizmos/ImGuizmo.h"
 #include "Runtime/Ecs/World.h"
 #include "Runtime/Assets/AssetHandle.h"
+#include "EditorOptions.h"
+
 class AssetManager;
 struct Texture;
 struct EditState
@@ -14,12 +16,15 @@ struct EditState
 	void drag(rttr::variant object);
 	void drop();
 	void frameEnd();
+	void loadOptions();
+	void saveOptions();
 	ecs::Entity camera;
 	rttr::variant selected;
 	rttr::variant dragged;
 
 	std::string project;
 	std::string scene;
+	EditorOptions options;
 	bool showGrid = true;
 	bool wireframeSelection = true;
 	ImGuizmo::OPERATION operation = ImGuizmo::TRANSLATE;

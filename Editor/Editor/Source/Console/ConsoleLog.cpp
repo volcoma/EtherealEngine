@@ -5,7 +5,7 @@ void ConsoleLog::_sink_it(const logging::details::log_msg& msg)
 {
 	mItems.push_back({ msg.formatted.c_str(), msg.level });
 	if (mItems.size() > mMaxSize)
-		mItems.pop_back();
+		mItems.pop_front();
 	flush();
 	++mPendingEntries;
 }
@@ -27,6 +27,6 @@ ConsoleLog::ItemContainer ConsoleLog::getItems()
 
 void ConsoleLog::clearLog()
 {
-	mItems.clear();
+	mItems = ItemContainer();
 	mPendingEntries = 0;
 }

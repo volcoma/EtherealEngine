@@ -285,6 +285,7 @@
     <ClCompile Include="..\..\Source\Assets\AssetImporter.cpp" />
     <ClCompile Include="..\..\Source\Console\ConsoleLog.cpp" />
     <ClCompile Include="..\..\Source\EditorApp.cpp" />
+    <ClCompile Include="..\..\Source\EditorOptions.cpp" />
     <ClCompile Include="..\..\Source\EditorWindow.cpp" />
     <ClCompile Include="..\..\Source\EditState.cpp" />
     <ClCompile Include="..\..\Source\FileDialog\nfd\nfd_common.cpp" />
@@ -325,6 +326,7 @@
     <ClInclude Include="..\..\Source\Assets\AssetImporter.h" />
     <ClInclude Include="..\..\Source\Console\ConsoleLog.h" />
     <ClInclude Include="..\..\Source\EditorApp.h" />
+    <ClInclude Include="..\..\Source\EditorOptions.h" />
     <ClInclude Include="..\..\Source\EditorWindow.h" />
     <ClInclude Include="..\..\Source\EditState.h" />
     <ClInclude Include="..\..\Source\FileDialog\FileDialog.h" />
@@ -353,6 +355,7 @@
     <ClInclude Include="..\..\Source\Interface\Inspectors\Inspector_LightComponent.h" />
     <ClInclude Include="..\..\Source\Interface\Inspectors\Inspector_Math.h" />
     <ClInclude Include="..\..\Source\Interface\Inspectors\Inspector_BaseTypes.h" />
+    <ClInclude Include="..\..\Source\Meta\EditorOptions.hpp" />
     <ClInclude Include="..\..\Source\Systems\DebugDrawSystem.h" />
     <ClInclude Include="..\..\Source\Systems\PickingSystem.h" />
   </ItemGroup>

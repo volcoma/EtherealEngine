@@ -43,6 +43,9 @@
     <Filter Include="Source Files\Assets">
       <UniqueIdentifier>{7c51b4dd-6aee-4bf7-a5a2-9fea8581866d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Meta">
+      <UniqueIdentifier>{4174b488-7bdc-43fe-a33e-2f26f018d859}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\Res\Common.rc">
@@ -155,6 +158,12 @@
     <ClInclude Include="..\..\Source\Interface\Inspectors\Inspector_LightComponent.h">
       <Filter>Source Files\Interface\Inspectors</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\EditorOptions.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Meta\EditorOptions.hpp">
+      <Filter>Source Files\Meta</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\main.cpp">
@@ -258,6 +267,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\Interface\Inspectors\Inspector_LightComponent.cpp">
       <Filter>Source Files\Interface\Inspectors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\EditorOptions.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

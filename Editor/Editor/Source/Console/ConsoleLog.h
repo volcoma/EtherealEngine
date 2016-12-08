@@ -3,11 +3,11 @@
 #include "Core/logging/logging.h"
 #include <Core/console/console.h>
 #include <string>
-#include <vector>
+#include <deque>
 class ConsoleLog : public logging::sinks::base_sink<std::mutex>, public Console
 {
 public:
-	using ItemContainer = std::vector<std::pair<std::string, logging::level::level_enum>>;
+	using ItemContainer = std::deque<std::pair<std::string, logging::level::level_enum>>;
 
 	//-----------------------------------------------------------------------------
 	//  Name : _sink_it ()
@@ -74,5 +74,5 @@ private:
 	///
 	int mPendingEntries = 0;
 	///
-	const std::size_t mMaxSize = 20;
+	const std::size_t mMaxSize = 50;
 };

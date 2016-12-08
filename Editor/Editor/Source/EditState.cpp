@@ -5,6 +5,8 @@
 #include "Runtime/Rendering/Material.h"
 #include "Runtime/System/SFML/Window.hpp"
 
+#include "Core/serialization/archives.h"
+#include "Meta/EditorOptions.hpp"
 void EditState::clear()
 {
 	selected = {};
@@ -158,4 +160,33 @@ void EditState::frameEnd()
 	{
 		drop();
 	}
+}
+
+void EditState::loadOptions()
+{
+	const std::string absoluteKey = fs::resolveFileLocation("editor://Config/Options.cfg");
+	if (!fs::fileExists(absoluteKey))
+	{
+		saveOptions();
+	}
+	else
+	{
+		std::ifstream output(absoluteKey);
+		cereal::IArchive_JSON ar(output);
+
+		ar(
+			cereal::make_nvp("options", options)
+		);
+	}
+}
+
+void EditState::saveOptions()
+{
+	const std::string absoluteKey = fs::resolveFileLocation("editor://Config/Options.cfg");
+	std::ofstream output(absoluteKey);
+	cereal::OArchive_JSON ar(output);
+
+	ar(
+		cereal::make_nvp("options", options)
+	);
 }
