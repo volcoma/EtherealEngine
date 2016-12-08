@@ -222,16 +222,19 @@ namespace ImGuiDock
 					{
 						delete nodes[i];
 						nodes.erase(nodes.begin() + i);
+						break;
 					}
 					if (nodes.size() > 1 && parentToDelete == nodes[i])
 					{
 						delete nodes[i];
 						nodes.erase(nodes.begin() + i);
+						break;
 					}
 					if (nodes.size() > 1 && toDelete == nodes[i])
 					{
 						delete nodes[i];
 						nodes.erase(nodes.begin() + i);
+						break;
 					}
 				}
 			}

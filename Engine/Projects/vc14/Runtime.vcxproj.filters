@@ -261,14 +261,14 @@
     <ClCompile Include="..\..\Source\Runtime\System\Application.cpp">
       <Filter>Source Files\System</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Rendering\RenderSurface.cpp">
-      <Filter>Source Files\Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\Rendering\Light.cpp">
       <Filter>Source Files\Rendering</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\Ecs\Components\LightComponent.cpp">
       <Filter>Source Files\Ecs\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Rendering\RenderPass.cpp">
+      <Filter>Source Files\Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -536,9 +536,6 @@
     <ClInclude Include="..\..\Source\Runtime\System\Application.h">
       <Filter>Source Files\System</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Rendering\RenderSurface.h">
-      <Filter>Source Files\Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Mesh.hpp">
       <Filter>Source Files\Meta\Rendering</Filter>
     </ClInclude>
@@ -553,6 +550,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Light.hpp">
       <Filter>Source Files\Meta\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Rendering\RenderPass.h">
+      <Filter>Source Files\Rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

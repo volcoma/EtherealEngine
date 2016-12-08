@@ -10,7 +10,7 @@
 #include "Runtime/Ecs/World.h"
 #include "Runtime/System/FileSystem.h"
 #include "Runtime/System/Timer.h"
-#include "Runtime/Rendering/RenderSurface.h"
+#include "Runtime/Rendering/RenderPass.h"
 #include "Runtime/Assets/AssetManager.h"
 
 #include "Core/logging/logging.h"

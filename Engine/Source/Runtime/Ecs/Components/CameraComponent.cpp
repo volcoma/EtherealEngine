@@ -1,12 +1,12 @@
 #include "CameraComponent.h"
 #include "../../Rendering/Camera.h"
-#include "../../Rendering/RenderSurface.h"
+#include "../../Rendering/RenderPass.h"
 
 CameraComponent::CameraComponent()
 {
 	mCamera = std::make_unique<Camera>();
-	mGBuffer = std::make_shared<RenderSurface>();
-	mOutputBuffer = std::make_shared<RenderSurface>();
+	mGBuffer = std::make_shared<FrameBuffer>();
+	mOutputBuffer = std::make_shared<FrameBuffer>();
 	init({ 0, 0 });
 }
 
@@ -14,8 +14,8 @@ CameraComponent::CameraComponent(const CameraComponent& cameraComponent)
 {
 	mCamera = std::make_unique<Camera>(cameraComponent.getCamera());
 	mHDR = cameraComponent.mHDR;
-	mGBuffer = std::make_shared<RenderSurface>();
-	mOutputBuffer = std::make_shared<RenderSurface>();
+	mGBuffer = std::make_shared<FrameBuffer>();
+	mOutputBuffer = std::make_shared<FrameBuffer>();
 	init({ 0, 0 });
 }
 
@@ -193,12 +193,12 @@ ProjectionMode CameraComponent::getProjectionMode() const
 	return mCamera->getProjectionMode();
 }
 
-std::shared_ptr<RenderSurface> CameraComponent::getOutputBuffer() const
+std::shared_ptr<FrameBuffer> CameraComponent::getOutputBuffer() const
 {
 	return mOutputBuffer;
 }
 
-std::shared_ptr<RenderSurface> CameraComponent::getGBuffer() const
+std::shared_ptr<FrameBuffer> CameraComponent::getGBuffer() const
 {
 	return mGBuffer;
 }

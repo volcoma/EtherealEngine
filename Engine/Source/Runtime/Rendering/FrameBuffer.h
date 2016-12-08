@@ -63,7 +63,7 @@ struct FrameBuffer : public ITexture
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : RenderSurface ()
+	//  Name : FrameBuffer ()
 	/// <summary>
 	/// 
 	/// 
@@ -76,7 +76,7 @@ struct FrameBuffer : public ITexture
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : RenderSurface ()
+	//  Name : FrameBuffer ()
 	/// <summary>
 	/// 
 	/// 

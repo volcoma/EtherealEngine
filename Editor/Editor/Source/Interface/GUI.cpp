@@ -8,7 +8,7 @@
 #include "Runtime/Rendering/IndexBuffer.h"
 #include "Runtime/Rendering/Program.h"
 #include "Runtime/Rendering/Texture.h"
-#include "Runtime/Rendering/FrameBuffer.h"
+#include "Runtime/Rendering/RenderPass.h"
 #include "Runtime/Rendering/Uniform.h"
 #include "Runtime/Rendering/RenderWindow.h"
 #include "Runtime/Assets/AssetManager.h"
@@ -119,7 +119,7 @@ void renderFunc(ImDrawData *_drawData)
 				gfx::setVertexBuffer(&tvb, 0, numVertices);
 				gfx::setIndexBuffer(&tib, offset, cmd->ElemCount);
 				gfx::setState(state);
-				gfx::submit(cmd->ViewId, program->handle);
+				gfx::submit(RenderPass::getPass(), program->handle);
 			}
 
 			offset += cmd->ElemCount;

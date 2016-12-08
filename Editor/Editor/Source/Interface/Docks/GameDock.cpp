@@ -2,7 +2,7 @@
 #include "../../EditorApp.h"
 #include "Runtime/Ecs/World.h"
 #include "Runtime/Ecs/Components/CameraComponent.h"
-#include "Runtime/Rendering/RenderSurface.h"
+#include "Runtime/Rendering/RenderPass.h"
 
 namespace Docks
 {
@@ -23,11 +23,10 @@ namespace Docks
 				return;
 
 			const auto surface = cameraComponent.getOutputBuffer();
-			const auto frameBuffer = surface->getBuffer();
 			auto size = gui::GetContentRegionAvail();
 
 			cameraComponent.setViewportSize({ static_cast<std::uint32_t>(size.x), static_cast<std::uint32_t>(size.y) });
-			gui::Image(frameBuffer, size);
+			gui::Image(surface, size);
 	
 		});
 	}

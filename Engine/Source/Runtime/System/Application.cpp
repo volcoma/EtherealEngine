@@ -9,7 +9,7 @@
 #include "../Assets/AssetManager.h"
 #include "../Assets/AssetReader.h"
 #include "../Assets/AssetWriter.h"
-#include "../Rendering/RenderSurface.h"
+#include "../Rendering/RenderPass.h"
 #include "../Rendering/Debug/DebugDraw.h"
 #include "../Rendering/RenderWindow.h"
 #include "../Input/InputContext.h"
@@ -93,12 +93,14 @@ InputContext& Application::getInput()
 
 RenderWindow& Application::getWindow()
 {
-	Expects(mWindow) return *mWindow.get();
+	Expects(mWindow); 
+	return *mWindow.get();
 }
 
 RenderWindow& Application::getMainWindow()
 {
-	Expects(!mWindows.empty()) return *(mWindows[0].get());
+	Expects(!mWindows.empty()); 
+	return *(mWindows[0].get());
 }
 
 bool Application::initInstance(const std::string& rootDataDir, const std::string& strCmdLine)
@@ -501,8 +503,9 @@ void Application::frameWindowEnd(RenderWindow& window)
 
 void Application::frameEnd()
 {
-	RenderSurface::clearStack();
 	// Advance to next frame. Rendering thread will be kicked to
 	// process submitted rendering primitives.
 	mRenderFrame = gfx::frame();
+
+	RenderPass::reset();
 }

@@ -11,7 +11,7 @@
 //-----------------------------------------------------------------------------
 enum class ProjectionMode : std::uint32_t;
 class Camera;
-class RenderSurface;
+struct FrameBuffer;
 
 using namespace entityx;
 //-----------------------------------------------------------------------------
@@ -146,7 +146,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::shared_ptr<RenderSurface> getOutputBuffer() const;
+	std::shared_ptr<FrameBuffer> getOutputBuffer() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : getGBuffer ()
@@ -156,7 +156,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::shared_ptr<RenderSurface> getGBuffer() const;
+	std::shared_ptr<FrameBuffer> getGBuffer() const;
 	
 	//-----------------------------------------------------------------------------
 	//  Name : updateInternal ()
@@ -264,9 +264,9 @@ private:
 	/// The camera object this component represents
 	std::unique_ptr<Camera> mCamera;
 	/// The render surface of this camera
-	std::shared_ptr<RenderSurface> mOutputBuffer;
+	std::shared_ptr<FrameBuffer> mOutputBuffer;
 	/// The g-buffer for this camera.
-	std::shared_ptr<RenderSurface> mGBuffer;
+	std::shared_ptr<FrameBuffer> mGBuffer;
 	/// Is the camera HDR?
 	bool mHDR = true;
 };

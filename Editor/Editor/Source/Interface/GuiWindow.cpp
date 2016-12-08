@@ -1,5 +1,5 @@
 #include "GuiWindow.h"
-#include "Runtime/Rendering/RenderSurface.h"
+#include "Runtime/Rendering/RenderPass.h"
 
 void handleSFMLEvent(sf::Event event)
 {
@@ -57,7 +57,7 @@ void handleSFMLEvent(sf::Event event)
 	}
 }
 
-void imguiFrameUpdate(RenderWindow& window, float dt, const uSize& viewSize, std::uint8_t viewId)
+void imguiFrameUpdate(RenderWindow& window, float dt, const uSize& viewSize)
 {
 	auto& io = gui::GetIO();
 	// Setup display size (every frame to accommodate for window resizing)
@@ -94,8 +94,6 @@ void imguiFrameUpdate(RenderWindow& window, float dt, const uSize& viewSize, std
 
 	// Start the frame	
 	gui::NewFrame();
-	auto& style = gui::GetStyle();
-	style.ViewId = (float)viewId;
 
 	gui::SetNextWindowPos(ImVec2(0, 0));
 	gui::SetNextWindowSize(ImVec2(static_cast<float>(viewSize.width), static_cast<float>(viewSize.height)));
@@ -182,18 +180,18 @@ void GuiWindow::frameUpdate(float dt)
 	RenderWindow::frameUpdate(dt);
 
 	const auto size = mSurface->getSize();
-	const auto id = mSurface->getId();
-	imguiFrameUpdate(*this, dt, size, id);
+	
+	imguiFrameUpdate(*this, dt, size);
 }
 
 void GuiWindow::frameRender()
 {
-	mDockspace.updateAndDraw(gui::GetContentRegionAvail());
 	RenderWindow::frameRender();
+	mDockspace.updateAndDraw(gui::GetContentRegionAvail());
 }
 
 void GuiWindow::frameEnd()
 {
-	imguiFrameEnd();
 	RenderWindow::frameEnd();
+	imguiFrameEnd();
 }

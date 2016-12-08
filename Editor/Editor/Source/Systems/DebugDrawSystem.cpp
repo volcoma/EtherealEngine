@@ -3,7 +3,7 @@
 #include "Runtime/ecs/Components/CameraComponent.h"
 #include "Runtime/ecs/Components/ModelComponent.h"
 #include "Runtime/ecs/Components/LightComponent.h"
-#include "Runtime/Rendering/RenderSurface.h"
+#include "Runtime/Rendering/RenderPass.h"
 #include "Runtime/Rendering/Camera.h"
 #include "Runtime/Rendering/Mesh.h"
 #include "Runtime/Rendering/Model.h"
@@ -49,11 +49,10 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 	const auto proj = camera.getProj();
 	const auto cameraPos = camera.getPosition();
 
-	const auto viewId = surface->getId();
-	RenderSurfaceScope surfaceScope(surface);
-	gfx::setViewTransform(viewId, &view, &proj);
-
-	ddRAII dd(viewId);
+	RenderPass pass("DebugDrawPass");
+	pass.bind(surface.get());
+	gfx::setViewTransform(pass.id, &view, &proj);
+	ddRAII dd(pass.id);
 	const std::uint32_t colorGrid = 0xff606060;
 	auto drawGrid = [](std::uint32_t gridColor, float height, float heightIntervals, std::uint32_t gridSize, std::uint32_t sizeIntervals, std::uint32_t iteration, std::uint32_t maxIterations)
 	{
@@ -134,16 +133,30 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 		if (light.lightType == LightType::Spot)
 		{
 			auto adjacent = light.spotData.range;
-			auto tanAngle = math::tan(math::radians(light.spotData.spotOuterAngle));
-			// oposite = tan * adjacent
-			auto oposite = tanAngle * adjacent;
-			ddPush();
-			ddSetColor(0xff00ff00);
-			ddSetWireframe(true);
-			math::vec3 from = transformComponent.getPosition();
-			math::vec3 to = from + transformComponent.getZAxis() * adjacent;
-			ddDrawCone(&to, &from, oposite);
-			ddPop();
+			{
+				auto tanAngle = math::tan(math::radians(light.spotData.spotOuterAngle));
+				// oposite = tan * adjacent
+				auto oposite = tanAngle * adjacent;
+				ddPush();
+				ddSetColor(0xff00ff00);
+				ddSetWireframe(true);
+				math::vec3 from = transformComponent.getPosition();
+				math::vec3 to = from + transformComponent.getZAxis() * adjacent;
+				ddDrawCone(&to, &from, oposite);
+				ddPop();
+			}
+			{
+				auto tanAngle = math::tan(math::radians(light.spotData.spotInnerAngle));
+				// oposite = tan * adjacent
+				auto oposite = tanAngle * adjacent;
+				ddPush();
+				ddSetColor(0xff00ffff);
+				ddSetWireframe(true);
+				math::vec3 from = transformComponent.getPosition();
+				math::vec3 to = from + transformComponent.getZAxis() * adjacent;
+				ddDrawCone(&to, &from, oposite);
+				ddPop();
+			}
 		}
 		else if (light.lightType == LightType::Point)
 		{
@@ -209,7 +222,7 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 				const std::uint64_t state = material->getRenderStates(false, false, false)
 					| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
 					;
-				hMesh->submit(viewId, mProgram->handle, worldTransform, state);
+				hMesh->submit(pass.id, mProgram->handle, worldTransform, state);
 			}	
 		}
 	}

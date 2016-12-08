@@ -5,7 +5,7 @@
 #include "Runtime/Ecs/World.h"
 #include "Runtime/Ecs/Components/TransformComponent.h"
 #include "Runtime/Ecs/Components/CameraComponent.h"
-#include "Runtime/Rendering/RenderSurface.h"
+#include "Runtime/Rendering/RenderPass.h"
 #include "Runtime/Rendering/Camera.h"
 #include "Runtime/Rendering/RenderWindow.h"
 
@@ -100,10 +100,7 @@ namespace Docks
 					ImGuiWindowFlags_NoResize |
 					ImGuiWindowFlags_AlwaysAutoResize))
 				{
-					
-					const auto frameBuffer = surface->getBuffer();
-					gui::Image(frameBuffer, bounds);
-
+					gui::Image(surface, bounds);
 				}
 				gui::End();
 
@@ -333,11 +330,10 @@ namespace Docks
 		if (size.x > 0 && size.y > 0)
 		{
 			cameraComponent->getCamera().setViewportPos({ static_cast<std::uint32_t>(pos.x), static_cast<std::uint32_t>(pos.y) });
-			cameraComponent->setViewportSize({ static_cast<std::uint32_t>(size.x), static_cast<std::uint32_t>(size.y) });
+			//cameraComponent->setViewportSize({ static_cast<std::uint32_t>(size.x), static_cast<std::uint32_t>(size.y) });
 			
 			const auto surface = cameraComponent->getOutputBuffer();
-			const auto output = surface->getBuffer();
-			gui::Image(output, size);
+			gui::Image(surface, size);
 
 			if (gui::IsItemClicked(1) || gui::IsItemClicked(2))
 			{
@@ -376,7 +372,7 @@ namespace Docks
 
 			if (showGBuffer)
 			{
-				const auto gBufferSurface = cameraComponent->getGBuffer()->getBufferRaw();
+				const auto gBufferSurface = cameraComponent->getGBuffer();
 				for (std::uint32_t i = 0; i < gBufferSurface->getAttachmentCount(); ++i)
 				{
 					const auto attachment = gBufferSurface->getAttachment(i).texture;

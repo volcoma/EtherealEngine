@@ -7,7 +7,7 @@
 #include "../Input/InputContext.h"
 #include "Core/events/event.hpp"
 
-class RenderSurface;
+struct FrameBuffer;
 class RenderWindow : public sf::Window
 {
 public:
@@ -54,7 +54,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline std::shared_ptr<RenderSurface> getRenderSurface() { return mSurface; }
+	inline std::shared_ptr<FrameBuffer> getRenderSurface() { return mSurface; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : getRenderView ()
@@ -64,7 +64,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline std::shared_ptr<RenderSurface> getRenderSurface() const { return mSurface; }
+	inline std::shared_ptr<FrameBuffer> getRenderSurface() const { return mSurface; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : getInput ()
@@ -189,7 +189,7 @@ protected:
 	/// Input Context for this window.
 	InputContext mInput;
 	/// Render surface for this window.
-	std::shared_ptr<RenderSurface> mSurface;
+	std::shared_ptr<FrameBuffer> mSurface;
 	///
 	bool mIsMain = false;
 };

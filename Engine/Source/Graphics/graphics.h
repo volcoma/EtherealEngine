@@ -1,6 +1,5 @@
 #pragma once
 
-//#define BGFX_CONFIG_DEBUG 1
 #include "bgfx/bgfx.h"
 #include "bgfx/bgfxplatform.h"
 #include "bx/spscqueue.h"
