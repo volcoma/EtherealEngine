@@ -2,7 +2,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "RenderWindow.h"
-#include "RenderSurface.h"
+#include "RenderPass.h"
 
 void RenderWindow::onResize()
 {
@@ -18,26 +18,21 @@ void RenderWindow::onClose()
 
 RenderWindow::RenderWindow()
 {
-	mSurface = std::make_shared<RenderSurface>();
+	mSurface = std::make_shared<FrameBuffer>();
 }
 
 RenderWindow::RenderWindow(sf::VideoMode mode, const std::string& title, std::uint32_t style /*= sf::Style::Default*/) : sf::Window(mode, title, style)
 {
-	mSurface = std::make_shared<RenderSurface>();
+	mSurface = std::make_shared<FrameBuffer>();
 }
 
 RenderWindow::~RenderWindow()
 {
-	if (mSurface)
-	{
-		auto buffer = mSurface->getBufferRaw();
-		// force internal handle destruction
-		if (buffer)
-			buffer->dispose();
-		mSurface.reset();
-		gfx::frame();
-		gfx::frame();
-	}
+	// force internal handle destruction
+	mSurface->dispose();
+	mSurface.reset();
+	gfx::frame();
+	gfx::frame();
 }
 
 bool RenderWindow::filterEvent(const sf::Event& event)
@@ -48,8 +43,7 @@ bool RenderWindow::filterEvent(const sf::Event& event)
 
 void RenderWindow::frameBegin()
 {
-	RenderSurface::pushSurface(mSurface);
-	mSurface->clear();
+
 	mInput.update();
 }
 
@@ -59,7 +53,9 @@ void RenderWindow::frameUpdate(float dt)
 
 void RenderWindow::frameEnd()
 {
-	RenderSurface::popSurface();
+	RenderPass pass("RenderWindowPass");
+	pass.bind(mSurface.get());
+	pass.clear();
 }
 
 void RenderWindow::frameRender()
