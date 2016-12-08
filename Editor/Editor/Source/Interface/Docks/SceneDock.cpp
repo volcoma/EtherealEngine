@@ -330,7 +330,7 @@ namespace Docks
 		if (size.x > 0 && size.y > 0)
 		{
 			cameraComponent->getCamera().setViewportPos({ static_cast<std::uint32_t>(pos.x), static_cast<std::uint32_t>(pos.y) });
-			//cameraComponent->setViewportSize({ static_cast<std::uint32_t>(size.x), static_cast<std::uint32_t>(size.y) });
+			cameraComponent->setViewportSize({ static_cast<std::uint32_t>(size.x), static_cast<std::uint32_t>(size.y) });
 			
 			const auto surface = cameraComponent->getOutputBuffer();
 			gui::Image(surface, size);
