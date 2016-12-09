@@ -1,6 +1,7 @@
 #include "Docks.h"
 #include "../../EditorApp.h"
 #include "Runtime/Ecs/World.h"
+#include "Runtime/Ecs/Prefab.h"
 #include "Runtime/Ecs/Utils.h"
 #include "Runtime/Ecs/Components/TransformComponent.h"
 #include "Runtime/Ecs/Systems/TransformSystem.h"

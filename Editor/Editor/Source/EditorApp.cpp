@@ -12,7 +12,7 @@
 #include "Runtime/Rendering/Mesh.h"
 #include "Runtime/Rendering/Shader.h"
 #include "Runtime/Threading/ThreadPool.h"
-#include "Runtime/Ecs/World.h"
+#include "Runtime/Ecs/Prefab.h"
 #include "Console/ConsoleLog.h"
 
 template<typename T>

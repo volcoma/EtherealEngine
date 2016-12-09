@@ -14,6 +14,7 @@
 #include "../Rendering/RenderWindow.h"
 #include "../Input/InputContext.h"
 #include "../Ecs/World.h"
+#include "../Ecs/Prefab.h"
 #include "../Ecs/Systems/TransformSystem.h"
 #include "../Ecs/Systems/CameraSystem.h"
 #include "../Ecs/Systems/RenderingSystem.h"

@@ -9,7 +9,7 @@
 #include "../System/FileSystem.h"
 #include "../System/Application.h"
 #include "../Threading/ThreadPool.h"
-#include "../Ecs/World.h"
+#include "../Ecs/Prefab.h"
 #include "Core/serialization/archives.h"
 #include "Meta/Rendering/Material.hpp"
 

@@ -29,6 +29,7 @@
     <ClCompile Include="..\..\Source\Runtime\Ecs\entityx\Event.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Ecs\entityx\help\Storage.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Ecs\entityx\System.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Ecs\Prefab.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Ecs\Systems\CameraSystem.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Ecs\Systems\RenderingSystem.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Ecs\Systems\TransformSystem.cpp" />
@@ -94,6 +95,7 @@
     <ClInclude Include="..\..\Source\Runtime\Ecs\entityx\Component.h" />
     <ClInclude Include="..\..\Source\Runtime\Ecs\entityx\quick.h" />
     <ClInclude Include="..\..\Source\Runtime\Ecs\entityx\System.h" />
+    <ClInclude Include="..\..\Source\Runtime\Ecs\Prefab.h" />
     <ClInclude Include="..\..\Source\Runtime\Ecs\Systems\CameraSystem.h" />
     <ClInclude Include="..\..\Source\Runtime\Ecs\Systems\RenderingSystem.h" />
     <ClInclude Include="..\..\Source\Runtime\Ecs\Systems\TransformSystem.h" />

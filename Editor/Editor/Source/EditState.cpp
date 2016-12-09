@@ -4,6 +4,7 @@
 #include "Runtime/Rendering/Mesh.h"
 #include "Runtime/Rendering/Material.h"
 #include "Runtime/System/SFML/Window.hpp"
+#include "Runtime/Ecs/Prefab.h"
 
 #include "Core/serialization/archives.h"
 #include "Meta/EditorOptions.hpp"

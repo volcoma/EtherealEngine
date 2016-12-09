@@ -6,7 +6,7 @@
 #include "Runtime/Assets/AssetManager.h"
 #include "Runtime/System/MessageBox.h"
 #include "Runtime/System/FileSystem.h"
-#include "Runtime/Ecs/World.h"
+#include "Runtime/Ecs/Prefab.h"
 #include <cstdio>
 
 static float scaleIcons = 1.0f;

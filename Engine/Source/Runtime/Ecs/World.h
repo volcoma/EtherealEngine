@@ -35,9 +35,3 @@ struct World
 	/// System manager
 	SystemManager systems;
 };
-
-struct Prefab
-{
-	Entity instantiate();
-	std::shared_ptr<std::istream> data;
-};
