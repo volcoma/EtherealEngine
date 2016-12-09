@@ -9,7 +9,7 @@
 #include "../System/FileSystem.h"
 #include "../System/Application.h"
 #include "../Threading/ThreadPool.h"
-
+#include "../Ecs/World.h"
 #include "Core/serialization/archives.h"
 #include "Meta/Rendering/Material.hpp"
 
@@ -454,6 +454,53 @@ void AssetReader::loadMaterialFromFile(const std::string& relativeKey, const std
 	else
 	{
 		deserialize();
+		createResource();
+	}
+}
+
+void AssetReader::loadPrefabFromFile(const std::string& relativeKey, const std::string& absoluteKey, bool async, LoadRequest<Prefab>& request)
+{
+
+	std::shared_ptr<std::fstream> read_memory = std::make_shared<std::fstream>();
+
+	auto readMemory = [read_memory, absoluteKey]()
+	{
+		if (!read_memory)
+			return;
+
+		*read_memory = std::fstream{ absoluteKey, std::fstream::in | std::fstream::out | std::ios::binary };
+	};
+
+	auto createResource = [read_memory, relativeKey, request]() mutable
+	{
+		auto prefab = std::make_shared<Prefab>();
+		prefab->data = read_memory;
+		request.setData(relativeKey, prefab);
+		request.invokeCallbacks();
+	};
+	
+
+	if (async)
+	{
+		auto& application = Singleton<Application>::getInstance();
+		auto& threadPool = application.getThreadPool();
+		auto task = threadPool.enqueue_with_callback(
+			// load function
+			[readMemory]() mutable
+		{
+			readMemory();
+		},
+			// callback to the issuer
+			[createResource]() mutable
+		{
+			createResource();
+		});
+
+		request.setTask(task);
+	}
+	else
+	{
+		readMemory();
 		createResource();
 	}
 }

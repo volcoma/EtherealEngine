@@ -100,6 +100,11 @@ void EditState::loadIcons(AssetManager& manager)
 	{
 		icons["wireframe"] = asset;
 	});
+	manager.load<Texture>("editor://icons/prefab", false)
+		.then([this](auto asset) mutable
+	{
+		icons["prefab"] = asset;
+	});
 }
 
 void EditState::select(rttr::variant object)
@@ -144,7 +149,10 @@ void EditState::frameEnd()
 		{
 			tooltip = dragged.get_value<AssetHandle<Material>>().id();
 		}
-			
+		if (dragged.is_type<AssetHandle<Prefab>>())
+		{
+			tooltip = dragged.get_value<AssetHandle<Prefab>>().id();
+		}
 		gui::SetTooltip(tooltip.c_str());
 	}
 

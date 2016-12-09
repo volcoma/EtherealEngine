@@ -6,6 +6,7 @@
 #include "Runtime/Assets/AssetManager.h"
 #include "Runtime/System/MessageBox.h"
 #include "Runtime/System/FileSystem.h"
+#include "Runtime/Ecs/World.h"
 #include <cstdio>
 
 static float scaleIcons = 1.0f;
@@ -134,6 +135,13 @@ namespace Docks
 	{
 		return asset;
 	}
+	AssetHandle<Texture> getAssetIcon(AssetHandle<Prefab> asset)
+	{
+		auto& app = Singleton<EditorApp>::getInstance();
+		auto& editState = app.getEditState();
+		return editState.icons["prefab"];
+	}
+
 	AssetHandle<Texture> getAssetIcon(AssetHandle<Mesh> asset)
 	{
 		auto& app = Singleton<EditorApp>::getInstance();
@@ -155,6 +163,7 @@ namespace Docks
 		auto meshes = manager.getStorage<Mesh>();
 		auto textures = manager.getStorage<Texture>();
 		auto materials = manager.getStorage<Material>();
+		auto prefabs = manager.getStorage<Prefab>();
 		auto& icons = editState.icons;
 
 		float width = gui::GetContentRegionAvailWidth();
@@ -173,7 +182,7 @@ namespace Docks
 		gui::Separator();
 
 		static std::string selectedCategory;
-		static const std::vector<std::string> categories = { "Materials", "Textures", "Meshes" };
+		static const std::vector<std::string> categories = { "Materials", "Textures", "Prefabs", "Meshes" };
 
 		ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |
 			ImGuiWindowFlags_NoMove |
@@ -210,6 +219,9 @@ namespace Docks
 			if(selectedCategory == "Textures")
 				listItems(textures, manager, editState);
 
+			if (selectedCategory == "Prefabs")
+				listItems(prefabs, manager, editState);
+
 			if (selectedCategory == "Materials")
 			{
 				if (!listItems(materials, manager, editState))
@@ -228,9 +240,6 @@ namespace Docks
 				}
 				
 			}
-
-			//if (selectedCategory == "Prefabs")
-				//listItems(textures, editState);
 
 			gui::EndChild();
 		}

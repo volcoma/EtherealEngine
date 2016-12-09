@@ -39,5 +39,5 @@ struct World
 struct Prefab
 {
 	Entity instantiate();
-	std::istream data;
+	std::shared_ptr<std::istream> data;
 };

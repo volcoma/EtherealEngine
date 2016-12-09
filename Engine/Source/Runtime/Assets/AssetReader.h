@@ -5,6 +5,7 @@ struct Texture;
 struct Shader;
 struct Mesh;
 class Material;
+struct Prefab;
 
 struct AssetReader
 {
@@ -57,4 +58,15 @@ struct AssetReader
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	static void loadMaterialFromFile(const std::string& relativeKey, const std::string& absoluteKey, bool async, LoadRequest<Material>& request);
+
+	//-----------------------------------------------------------------------------
+	//  Name : loadPrefabFromFile ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	static void loadPrefabFromFile(const std::string& relativeKey, const std::string& absoluteKey, bool async, LoadRequest<Prefab>& request);
+
 };

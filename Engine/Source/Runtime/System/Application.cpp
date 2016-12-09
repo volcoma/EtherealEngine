@@ -274,8 +274,12 @@ bool Application::initAssetManager()
 		auto storage = manager.add<Material>();
 		storage->subdir = "/";
 		storage->loadFromFile = AssetReader::loadMaterialFromFile;
-		storage->saveToFile = AssetWriter::saveMaterialToFile;
 		//storage->loadFromMemory = AssetReader::loadMaterialFromMemory;
+	}
+	{
+		auto storage = manager.add<Prefab>();
+		storage->subdir = "/";
+		storage->loadFromFile = AssetReader::loadPrefabFromFile;
 	}
 
 	return true;

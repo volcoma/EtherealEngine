@@ -33,9 +33,9 @@ namespace Docks
 					
 					editState.select(object);
 				}
-				if (gui::Selectable("Create Prefab"))
+				if (gui::Selectable("Save As Prefab"))
 				{
-					ecs::utils::saveEntity(fs::resolveFileLocation("data://prefabs/" + entity.getName() + ".prefab"), entity);
+					ecs::utils::saveEntity(fs::resolveFileLocation("data://prefabs/" + entity.getName() + ".asset"), entity);
 				}
 				if (gui::Selectable("Delete"))
 				{
@@ -78,14 +78,26 @@ namespace Docks
 				}
 				if (gui::IsMouseReleased(2))
 				{
-					if (dragged && dragged.is_type<ecs::Entity>() && entity != editorCamera)
+					if (dragged && entity != editorCamera)
 					{
-						auto draggedEntity = dragged.get_value<ecs::Entity>();
-						draggedEntity.component<TransformComponent>().lock()
-							->setParent(entity.component<TransformComponent>());
-					
-						editState.drop();
+						if (dragged.is_type<ecs::Entity>())
+						{
+							auto draggedEntity = dragged.get_value<ecs::Entity>();
+							draggedEntity.component<TransformComponent>().lock()
+								->setParent(entity.component<TransformComponent>());
 
+							editState.drop();
+						}
+
+						if (dragged.is_type<AssetHandle<Prefab>>())
+						{
+							auto prefab = dragged.get_value<AssetHandle<Prefab>>();;
+							auto draggedEntity = prefab->instantiate();
+							draggedEntity.component<TransformComponent>().lock()
+								->setParent(entity.component<TransformComponent>());
+
+							editState.drop();
+						}
 					}
 				}
 			}
@@ -101,6 +113,12 @@ namespace Docks
 							draggedEntity.component<TransformComponent>().lock()
 								->setParent(ecs::ComponentHandle<TransformComponent>());
 
+							editState.drop();
+						}
+						if (dragged.is_type<AssetHandle<Prefab>>())
+						{
+							auto prefab = dragged.get_value<AssetHandle<Prefab>>();
+							auto draggedEntity = prefab->instantiate();
 							editState.drop();
 						}
 					}

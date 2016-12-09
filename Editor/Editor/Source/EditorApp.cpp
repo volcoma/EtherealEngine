@@ -12,6 +12,7 @@
 #include "Runtime/Rendering/Mesh.h"
 #include "Runtime/Rendering/Shader.h"
 #include "Runtime/Threading/ThreadPool.h"
+#include "Runtime/Ecs/World.h"
 #include "Console/ConsoleLog.h"
 
 template<typename T>
@@ -265,8 +266,8 @@ void EditorApp::openProject(const std::string& projectDir)
 	wd::unwatchAll();
 	watchAssets<Texture>("data://textures/", true);
 	watchAssets<Mesh>("data://meshes/", true);
+	watchAssets<Prefab>("data://prefabs/", true);
 	watchAssets<Material>("data://materials/", false);
-
 	watchAssets<Shader>("sys://shaders/", true);
 	auto& world = getWorld();
 	world.reset();
