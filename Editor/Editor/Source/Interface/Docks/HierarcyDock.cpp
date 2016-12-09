@@ -1,6 +1,7 @@
 #include "Docks.h"
 #include "../../EditorApp.h"
 #include "Runtime/Ecs/World.h"
+#include "Runtime/Ecs/Utils.h"
 #include "Runtime/Ecs/Components/TransformComponent.h"
 #include "Runtime/Ecs/Systems/TransformSystem.h"
 #include "Runtime/Input/InputContext.h"
@@ -34,7 +35,7 @@ namespace Docks
 				}
 				if (gui::Selectable("Create Prefab"))
 				{
-					world.saveEntity(fs::resolveFileLocation("data://prefabs/" + entity.getName() + ".prefab"), entity);
+					ecs::utils::saveEntity(fs::resolveFileLocation("data://prefabs/" + entity.getName() + ".prefab"), entity);
 				}
 				if (gui::Selectable("Delete"))
 				{

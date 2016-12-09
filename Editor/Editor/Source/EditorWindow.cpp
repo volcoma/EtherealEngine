@@ -8,6 +8,7 @@
 #include "Runtime/Ecs/Components/CameraComponent.h"
 #include "Runtime/Ecs/Components/LightComponent.h"
 #include "Runtime/Ecs/World.h"
+#include "Runtime/Ecs/Utils.h"
 #include "Runtime/System/FileSystem.h"
 #include "Runtime/System/Timer.h"
 #include "Runtime/Rendering/RenderPass.h"
@@ -136,7 +137,7 @@ auto openScene()
 
 		Timer timer;
 		std::vector<Entity> outData;
-		if (world.loadData(path, outData))
+		if (ecs::utils::loadData(path, outData))
 		{
 			auto time = timer.getTime(true);
 			std::string log_msg = "Scene loading time : " + std::to_string(time);
@@ -149,14 +150,13 @@ auto openScene()
 auto saveScene()
 {
 	auto& app = Singleton<EditorApp>::getInstance();
-	auto& world = app.getWorld();
 	auto& editState = app.getEditState();
 	const auto& path = editState.scene;
 	if (path != "")
 	{
 		Timer timer;
 		std::vector<ecs::Entity> entities = gatherSceneData();
-		world.saveData(path, entities);
+		ecs::utils::saveData(path, entities);
 		auto time = timer.getTime(true);
 		std::string log_msg = "Scene saving time : " + std::to_string(time);
 		logging::get("Log")->info(log_msg.c_str());

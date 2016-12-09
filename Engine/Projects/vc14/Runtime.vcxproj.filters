@@ -270,6 +270,9 @@
     <ClCompile Include="..\..\Source\Runtime\Rendering\RenderPass.cpp">
       <Filter>Source Files\Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Ecs\Utils.cpp">
+      <Filter>Source Files\Ecs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\Runtime\runtime.h">
@@ -553,6 +556,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\Rendering\RenderPass.h">
       <Filter>Source Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Ecs\Utils.h">
+      <Filter>Source Files\Ecs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -32,6 +32,7 @@
     <ClCompile Include="..\..\Source\Runtime\Ecs\Systems\CameraSystem.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Ecs\Systems\RenderingSystem.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Ecs\Systems\TransformSystem.cpp" />
+    <ClCompile Include="..\..\Source\Runtime\Ecs\Utils.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Ecs\World.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Input\InputContext.cpp" />
     <ClCompile Include="..\..\Source\Runtime\Rendering\Camera.cpp" />
@@ -96,6 +97,7 @@
     <ClInclude Include="..\..\Source\Runtime\Ecs\Systems\CameraSystem.h" />
     <ClInclude Include="..\..\Source\Runtime\Ecs\Systems\RenderingSystem.h" />
     <ClInclude Include="..\..\Source\Runtime\Ecs\Systems\TransformSystem.h" />
+    <ClInclude Include="..\..\Source\Runtime\Ecs\Utils.h" />
     <ClInclude Include="..\..\Source\Runtime\Ecs\World.h" />
     <ClInclude Include="..\..\Source\Runtime\Input\InputMapping.hpp" />
     <ClInclude Include="..\..\Source\Runtime\Input\InputContext.h" />
