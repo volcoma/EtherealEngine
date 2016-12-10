@@ -46,7 +46,7 @@ RTTR_INLINE variant_array_view::variant_array_view()
 /////////////////////////////////////////////////////////////////////////////////
 
 RTTR_INLINE variant_array_view::variant_array_view(const variant_array_view& other)
-:   m_array_wrapper(other.m_array_wrapper->clone())
+:   m_array_wrapper(std::move(other.m_array_wrapper->clone()))
 {
 
 }

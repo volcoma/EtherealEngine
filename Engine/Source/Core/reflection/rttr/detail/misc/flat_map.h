@@ -42,50 +42,68 @@ namespace rttr
 namespace detail
 {
 
+template<typename T>
+struct equal_types
+{
+    bool operator()(const T& left, const T& right) const
+    {
+        return (left == right);
+    }
+};
+
+template<>
+struct equal_types<const char*>
+{
+    bool operator()(const char *const left, const char *const right) const
+    {
+        return (std::strcmp(left, right) == 0);
+    }
+};
+
+
+template<typename Key, typename Hash_Type = std::size_t>
+struct key_data
+{
+    Key         m_key;
+    Hash_Type   m_hash_value;
+
+    struct order
+    {
+        RTTR_INLINE bool operator () (const key_data& left, const key_data& right)  const
+        {
+            return (left.m_hash_value < right.m_hash_value);
+        }
+        RTTR_INLINE bool operator () (const Hash_Type& left, const key_data& right) const
+        {
+            return (left < right.m_hash_value);
+        }
+        RTTR_INLINE bool operator () (const key_data& left, const Hash_Type& right) const
+        {
+            return (left.m_hash_value < right);
+        }
+    };
+};
+
 /*!
  * \brief The flat_map class implements a simple map based on std::vector instead of a binary tree.
  *
  */
-template<typename Key, typename Value, template<class> class Hash = std::hash, typename Compare = std::equal_to<Key>>
+template<typename Key, typename Value, class Hash = std::size_t, typename Compare = equal_types<Key>>
 class flat_map
 {
-    template<typename Hash_Type = std::size_t>
-    struct key_data
-    {
-        Key         m_key;
-        Hash_Type   m_hash_value;
-
-        struct order
-        {
-            RTTR_INLINE bool operator () (const key_data& left, const key_data& right)  const
-            {
-                return (left.m_hash_value < right.m_hash_value);
-            }
-            RTTR_INLINE bool operator () (const Hash_Type& left, const key_data& right) const
-            {
-                return (left < right.m_hash_value);
-            }
-            RTTR_INLINE bool operator () (const key_data& left, const Hash_Type& right) const
-            {
-                return (left.m_hash_value < right);
-            }
-        };
-    };
-
     public:
-        using key_data_type = key_data<>;
+        using key_data_type = key_data<Key>;
         using value_type = std::pair<const Key, Value>;
         using iterator = typename std::vector<Value>::iterator;
         using const_iterator = typename std::vector<Value>::const_iterator;
         using const_iterator_key = typename std::vector<key_data_type>::const_iterator;
-        using iterator_key = typename std::vector<key_data_type>::iterator;
         using hash_type = std::size_t;
 
 
         flat_map() {}
 
     private:
-        using has_type = Hash<Key>;
+
 
     public:
         iterator end()
@@ -103,49 +121,39 @@ class flat_map
             return m_value_list.cend();
         }
 
-        void insert(value_type&& value)
+        bool insert(value_type&& value)
         {
-            insert(std::move(value.first), std::move(value.second));
+            return insert(std::move(value.first), std::move(value.second));
         }
 
         void insert(const Key&& key, Value&& value)
         {
-            if (find(key) != end())
-                return;
-
-            m_key_list.push_back(key_data_type{std::move(key), has_type()(key)});
+            m_key_list.push_back(key_data_type{std::move(key), Hash()(key)});
             std::stable_sort(m_key_list.begin(), m_key_list.end(), typename key_data_type::order());
 
-            auto found_key = find_key_const(key);
+            auto found_key = find_key(key);
             if (found_key != m_key_list.cend())
             {
+                auto itr_key = found_key;
+                for (; itr_key != m_key_list.cend(); ++itr_key)
+                {
+                    if (Compare()(itr_key->m_key, key))
+                        found_key = itr_key;
+                    else
+                        break;
+                }
+
                 const auto index = std::distance(m_key_list.cbegin(), found_key);
-                m_value_list.insert(m_value_list.begin() + index, std::move(value));
+                m_value_list.insert(m_value_list.begin() + index, value);
             }
-        }
 
-        template<typename T>
-        const_iterator find(const T& key) const
-        {
-            const auto hash_value = Hash<T>()(key);
-            auto itr = std::lower_bound(m_key_list.begin(), m_key_list.end(),
-                                        hash_value,
-                                        typename key_data_type::order());
-            for (; itr != m_key_list.end(); ++itr)
-            {
-                auto& item = *itr;
-                if (item.m_hash_value != hash_value)
-                    break;
-
-                if (item.m_key == key)
-                    return (m_value_list.cbegin() + std::distance(m_key_list.cbegin(), itr));;
-            }
-            return m_value_list.cend();
+            m_key_list.shrink_to_fit();
+            m_value_list.shrink_to_fit();
         }
 
         iterator find(const Key& key)
         {
-            const auto itr = find_key_const(key);
+            const auto itr = find_key(key);
             if (itr != m_key_list.end())
                 return (m_value_list.begin() + std::distance(m_key_list.cbegin(), itr));
             else
@@ -154,83 +162,26 @@ class flat_map
 
         const_iterator find(const Key& key) const
         {
-            const auto itr = find_key_const(key);
+            const auto itr = find_key(key);
             if (itr != m_key_list.end())
                 return (m_value_list.cbegin() + std::distance(m_key_list.cbegin(), itr));
             else
                 return (m_value_list.cend());
         }
-// older versions of gcc stl, have no support for const_iterator in std::vector<T>::erase(const_iterator)
-#if RTTR_COMPILER == RTTR_COMPILER_GNUC && RTTR_COMP_VER < 4900
-        void erase(const Key& key)
-        {
-            iterator_key itr = find_key(key);
-            if (itr != m_key_list.end())
-            {
-                auto value_itr = m_value_list.begin() + std::distance(m_key_list.begin(), itr);
-                if (value_itr != m_value_list.end())
-                {
-                    m_key_list.erase(itr);
-                    m_value_list.erase(value_itr);
-                }
-            }
 
-        }
-#else
-        void erase(const Key& key)
-        {
-            const_iterator_key itr = find_key_const(key);
-            if (itr != m_key_list.end())
-            {
-                auto value_itr = m_value_list.cbegin() + std::distance(m_key_list.cbegin(), itr);
-                if (value_itr != m_value_list.cend())
-                {
-                    m_key_list.erase(itr);
-                    m_value_list.erase(value_itr);
-                }
-            }
-
-        }
-#endif
-
-        void clear()
-        {
-            m_key_list.clear();
-            m_value_list.clear();
-        }
-
-        const std::vector<Value>& value_data() const
+        std::vector<Value>& value_data()
         {
             return m_value_list;
         }
 
     private:
-
-        const_iterator_key find_key_const(const Key& key) const
+        const_iterator_key find_key(const Key& key) const
         {
-            const auto hash_value = has_type()(key);
-            auto itr = std::lower_bound(m_key_list.begin(), m_key_list.end(),
+            const auto hash_value = Hash()(key);
+            auto itr = std::lower_bound(m_key_list.cbegin(), m_key_list.cend(),
                                         hash_value,
                                         typename key_data_type::order());
-            for (; itr != m_key_list.end(); ++itr)
-            {
-                auto& item = *itr;
-                if (item.m_hash_value != hash_value)
-                    break;
-
-                if (Compare()(item.m_key, key))
-                    return itr;
-            }
-            return m_key_list.end();
-        }
-
-        iterator_key find_key(const Key& key)
-        {
-            const auto hash_value = has_type()(key);
-            auto itr = std::lower_bound(m_key_list.begin(), m_key_list.end(),
-                                        hash_value,
-                                        typename key_data_type::order());
-            for (; itr != m_key_list.end(); ++itr)
+            for (; itr != m_key_list.cend(); ++itr)
             {
                 auto& item = *itr;
                 if (item.m_hash_value != hash_value)

@@ -625,7 +625,7 @@ struct RTTR_API variant_data_policy_empty
             case variant_policy_operation::COMPARE_EQUAL:
             {
                 const auto& param   = arg.get_value<std::tuple<const variant&, const variant&>>();
-                //const variant& lhs  = std::get<0>(param);
+                const variant& lhs  = std::get<0>(param);
                 const variant& rhs  = std::get<1>(param);
                 return !rhs.is_valid();
             }
@@ -721,7 +721,7 @@ struct RTTR_API variant_data_policy_void
             case variant_policy_operation::COMPARE_EQUAL:
             {
                 const auto& param   = arg.get_value<std::tuple<const variant&, const variant&>>();
-                //const variant& lhs  = std::get<0>(param);
+                const variant& lhs  = std::get<0>(param);
                 const variant& rhs  = std::get<1>(param);
                 return (rhs.is_type<void>());
             }

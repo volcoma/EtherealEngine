@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../Assets/AssetHandle.h"
-#include "Core/reflection/rttr/rttr_enable.h"
+#include "Core/reflection/reflection.h"
 #include "Core/serialization/serialization.h"
 
 #include <vector>

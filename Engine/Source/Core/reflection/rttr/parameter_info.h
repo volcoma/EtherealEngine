@@ -29,8 +29,6 @@
 
 #include "detail/base/core_prerequisites.h"
 
-#include "string_view.h"
-
 #include <string>
 #include <vector>
 #include <cstdint>
@@ -137,7 +135,7 @@ class RTTR_API parameter_info
          *
          * \return The name of the parameter.
          */
-        string_view get_name() const;
+        std::string get_name() const;
 
          /*!
          * \brief Returns the zero-based position of the parameter in the formal parameter list.

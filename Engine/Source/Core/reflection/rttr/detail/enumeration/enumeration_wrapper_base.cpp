@@ -26,7 +26,7 @@
 *************************************************************************************/
 
 #include "enumeration_wrapper_base.h"
-
+#include "../type/type_database_p.h"
 #include "../../argument.h"
 
 namespace rttr

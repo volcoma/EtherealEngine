@@ -33,7 +33,6 @@
 #include "parameter_info.h"
 #include "access_levels.h"
 #include "array_range.h"
-#include "string_view.h"
 
 #include <string>
 #include <vector>
@@ -134,14 +133,14 @@ class RTTR_API constructor
          *
          * \return The signature as readable string.
          */
-        string_view get_signature() const;
+        std::string get_signature() const;
 
         /*!
          * \brief Returns an ordered range of \ref parameter_info objects, which matches the signature of the constructor.
          *
          * \return A range of parameter_info objects of the constructor signature.
          */
-        array_range<parameter_info> get_parameter_infos() const;
+        parameter_info_range get_parameter_infos() const;
 
         /*!
          * \brief Returns the meta data for the given key \p key.
@@ -265,6 +264,8 @@ class RTTR_API constructor
 
         template<typename T>
         friend T detail::create_item(const detail::class_item_to_wrapper_t<T>* wrapper);
+        template<typename T>
+        friend void detail::destroy_item(T& item);
 
     private:
         const detail::constructor_wrapper_base* m_wrapper;

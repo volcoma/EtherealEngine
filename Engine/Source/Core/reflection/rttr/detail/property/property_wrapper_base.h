@@ -33,7 +33,6 @@
 #include "../../type.h"
 #include "../../variant.h"
 #include "../../access_levels.h"
-#include "../../string_view.h"
 
 namespace rttr
 {
@@ -53,12 +52,15 @@ namespace detail
 class RTTR_API property_wrapper_base
 {
     public:
-        property_wrapper_base(string_view name, type declaring_type);
+        property_wrapper_base();
 
         virtual ~property_wrapper_base();
 
+        //! sets the name of this property.
+        void set_name(const char* name);
+
         //! returns the name of this property.
-        string_view get_name() const;
+        const char* get_name() const;
 
         virtual access_levels get_access_level() const = 0;
 
@@ -74,6 +76,9 @@ class RTTR_API property_wrapper_base
         //! Returns the class that declares this property.
         type get_declaring_type() const;
 
+        //! Sets the declaring type for this property.
+        void set_declaring_type(type declaring_type);
+
         //! Retrieve the stored metadata for this property
         virtual variant get_metadata(const variant& key) const = 0;
 
@@ -85,11 +90,9 @@ class RTTR_API property_wrapper_base
 
         //! Returns the value of this property from the given instance \p instance.
         virtual variant get_value(instance& object) const = 0;
-    protected:
-        void init();
 
     private:
-        string_view m_name;
+        const char* m_name;
         type        m_declaring_type;
 };
 

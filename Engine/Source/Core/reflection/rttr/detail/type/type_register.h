@@ -30,8 +30,6 @@
 
 #include "../base/core_prerequisites.h"
 
-#include "../../string_view.h"
-
 #include <memory>
 #include <string>
 #include <vector>
@@ -89,7 +87,7 @@ public:
 
     static void enumeration(const type& t, std::unique_ptr<enumeration_wrapper_base> enum_data);
 
-    static void custom_name(const type& t, string_view name);
+    static void custom_name(const type& t, std::string );
 
     static void metadata( const type& t, std::vector<metadata> data);
 
@@ -105,7 +103,7 @@ public:
      *
      * \return A valid type object.
      */
-    static uint16_t type_reg(string_view name,
+    static uint16_t type_reg(const char* name,
                              const type& raw_type,
                              const type& wrapped_type,
                              const type& array_raw_type,
@@ -125,7 +123,7 @@ public:
 
 private:
 
-    friend class rttr::type;
+    friend class type;
     template<typename T>
     friend class class_;
 

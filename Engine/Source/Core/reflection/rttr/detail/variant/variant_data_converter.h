@@ -60,6 +60,7 @@ struct default_type_converter
     static bool convert_to(const T& value, argument& arg)
     {
         const type target_type = arg.get_type();
+        bool result = false;
         if (target_type == type::get<bool>())
             return Type_Converter::to(value, arg.get_value<bool>());
         else if (target_type == type::get<char>())
@@ -1313,7 +1314,7 @@ struct RTTR_API convert_from<std::string>
 
     static RTTR_INLINE bool to_enum(const std::string& from, argument& to)
     {
-        return to_enumeration(string_view(from), to);
+        return to_enumeration(from, to);
     }
 
 };
@@ -1431,7 +1432,7 @@ struct convert_from_enum
 
     static RTTR_INLINE bool to(const T& from, std::string& to)
     {
-        to = get_enumeration_name(from).to_string();
+        to = get_enumeration_name(from);
         return (to.empty() == false);
     }
 

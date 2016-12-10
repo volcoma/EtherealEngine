@@ -29,7 +29,8 @@
 #define RTTR_ENUMERATION_HELPER_H_
 
 #include "../base/core_prerequisites.h"
-#include "../../string_view.h"
+
+#include <string>
 
 
 namespace rttr
@@ -46,7 +47,7 @@ namespace detail
  * \brief Returns the corresponding name of the given enumeration value \p enum_value.
  *        Otherwise an empty string is returned.
  */
-RTTR_API string_view get_enumeration_name(const argument& enum_value);
+RTTR_API std::string get_enumeration_name(const argument& enum_value);
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -57,7 +58,7 @@ RTTR_API string_view get_enumeration_name(const argument& enum_value);
  * \remark The parameter \p to should contain a variant with \ref type object of the enumeration.
  *         The result is stored then inside this variant.
  */
-RTTR_API bool to_enumeration(string_view from, argument& to);
+RTTR_API bool to_enumeration(const std::string& from, argument& to);
 
 /////////////////////////////////////////////////////////////////////////////////////////
 

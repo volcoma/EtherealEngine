@@ -32,8 +32,6 @@ set(HEADER_FILES access_levels.h
                  constructor.h
                  destructor.h
                  enumeration.h
-                 enum_flags.h
-                 filter_item.h
                  instance.h
                  method.h
                  policy.h
@@ -41,7 +39,6 @@ set(HEADER_FILES access_levels.h
                  parameter_info.h
                  registration
                  registration.h
-                 string_view.h
                  rttr_cast.h
                  rttr_enable.h
                  type
@@ -73,10 +70,8 @@ set(HEADER_FILES access_levels.h
                  detail/enumeration/enum_data.h
                  detail/impl/argument_impl.h
                  detail/impl/array_range_impl.h
-                 detail/impl/enum_flags_impl.h
                  detail/impl/instance_impl.h
                  detail/impl/rttr_cast_impl.h
-                 detail/impl/string_view_impl.h
                  detail/impl/wrapper_mapper_impl.h
                  detail/metadata/metadata.h
                  detail/metadata/metadata_handler.h
@@ -92,8 +87,7 @@ set(HEADER_FILES access_levels.h
                  detail/misc/compare_less.h
                  detail/misc/compare_less_impl.h
                  detail/misc/data_address_container.h
-                 detail/misc/flat_map.h
-                 detail/misc/flat_multimap.h
+                 detail/misc/flat_map.h                
                  detail/misc/function_traits.h
                  detail/misc/misc_type_traits.h
                  detail/misc/std_type_traits.h

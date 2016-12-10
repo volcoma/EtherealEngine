@@ -44,6 +44,12 @@ method create_item(const method_wrapper_base* wrapper)
     return method(wrapper);
 }
 
+template<>
+ void destroy_item(method& meth)
+ {
+     delete meth.m_wrapper;
+ }
+
 } // end namespace detail;
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -70,12 +76,12 @@ method::operator bool() const
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-string_view method::get_name() const
+string method::get_name() const
 {
     if (is_valid())
         return m_wrapper->get_name();
     else
-        return string_view();
+        return string();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -120,22 +126,22 @@ type method::get_declaring_type() const
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-array_range<parameter_info> method::get_parameter_infos() const
+parameter_info_range method::get_parameter_infos() const
 {
     if (is_valid())
         return m_wrapper->get_parameter_infos();
     else
-        return array_range<parameter_info>();
+        return parameter_info_range();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-string_view method::get_signature() const
+string method::get_signature() const
 {
     if (is_valid())
         return m_wrapper->get_signature();
     else
-        return string_view();
+        return string();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

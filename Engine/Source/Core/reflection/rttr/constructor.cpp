@@ -45,6 +45,12 @@ constructor create_item(const constructor_wrapper_base* wrapper)
     return constructor(wrapper);
 }
 
+template<>
+ void destroy_item(constructor& ctor)
+ {
+     delete ctor.m_wrapper;
+ }
+
 } // end namespace detail
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -102,22 +108,22 @@ type constructor::get_declaring_type() const
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-string_view constructor::get_signature() const
+string constructor::get_signature() const
 {
     if (is_valid())
         return m_wrapper->get_signature();
     else
-        return string_view();
+        return string();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-array_range<parameter_info> constructor::get_parameter_infos() const
+parameter_info_range constructor::get_parameter_infos() const
 {
     if (is_valid())
         return m_wrapper->get_parameter_infos();
     else
-        return array_range<parameter_info>();
+        return parameter_info_range();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

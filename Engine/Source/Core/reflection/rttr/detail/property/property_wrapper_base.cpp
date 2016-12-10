@@ -26,6 +26,7 @@
 *************************************************************************************/
 
 #include "property_wrapper_base.h"
+#include "../type/type_database_p.h"
 
 namespace rttr
 {
@@ -34,9 +35,8 @@ namespace detail
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-property_wrapper_base::property_wrapper_base(string_view name, type declaring_type)
-:   m_name(name),
-    m_declaring_type(declaring_type)
+property_wrapper_base::property_wrapper_base()
+:   m_declaring_type(get_invalid_type())
 {
 }
 
@@ -48,16 +48,23 @@ property_wrapper_base::~property_wrapper_base()
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-void property_wrapper_base::init()
+void property_wrapper_base::set_name(const char* name)
 {
-    get_type();
+    m_name = name;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-string_view property_wrapper_base::get_name() const
+const char* property_wrapper_base::get_name() const
 {
     return m_name;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+void property_wrapper_base::set_declaring_type(type declaring_type)
+{
+    m_declaring_type = declaring_type;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

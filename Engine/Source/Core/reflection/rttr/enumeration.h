@@ -30,8 +30,6 @@
 
 #include "detail/base/core_prerequisites.h"
 #include "type.h"
-#include "string_view.h"
-#include "detail/misc/class_item_mapper.h"
 
 #include <memory>
 #include <string>
@@ -60,7 +58,7 @@ namespace detail
  * ----------------
  * An \ref enumeration is described by it's declared name (\ref get_name()), it's enumerator names (\ref get_names())
  * and it's corresponding constant values (\ref get_values()).
- * The name is represented as \ref string_view and the values are stored as the underlying enum value.
+ * The name is represented as std::string and the values are stored as the underlying enum value.
  * When the \ref enumeration was declared inside a class, then \ref get_declaring_type() can be used to obtain the type of this class.
  *
  * The conversion functions \ref name_to_value(), \ref value_to_name() allow conversion between the value representation of an enumeration and its literal representation.
@@ -88,7 +86,7 @@ namespace detail
   if (enum_align)
   {
      MyStruct::E_Alignment enum_value = MyStruct::AlignLeft;
-     string_view name = enum_align.value_to_name(enum_value);
+     std::string name = enum_align.value_to_name(enum_value);
      std::cout << name; // prints "AlignLeft"
 
      variant var = enum_align.name_to_value("AlignJustify");
@@ -122,7 +120,7 @@ class RTTR_API enumeration
          *
          * \return Name of the \ref enumeration.
          */
-        string_view get_name() const;
+        std::string get_name() const;
 
         /*!
          * \brief Returns the underlying type (int, unsigned int, etc.) of this \ref enumeration.
@@ -161,36 +159,36 @@ class RTTR_API enumeration
         /*!
          * \brief Returns all enum names registered for this enumeration.
          *
-         * \remark When the enumeration is invalid then an empty range is returned.
+         * \remark When the enumeration is invalid then an empty vector is returned.
          *
-         * \return A range of enumeration names.
+         * \return A vector of enumeration names.
          */
-        array_range<string_view> get_names() const;
+        std::vector<std::string> get_names() const;
 
 
          /*!
          * \brief Returns all enum values registered for this enumeration.
          *
-         * \remark When the enumeration is invalid then an empty range is returned.
+         * \remark When the enumeration is invalid then an empty vector is returned.
          *
-         * \return A range of enumeration values.
+         * \return A vector of enumeration values.
          */
-        array_range<variant> get_values() const;
+        std::vector<variant> get_values() const;
 
         /*!
-         * \brief Returns the string_view that is used as the name of the given enumeration \p value,
-         *        or an empty string_view if the \p value is not defined.
+         * \brief Returns the string that is used as the name of the given enumeration \p value,
+         *        or an empty string if the \p value is not defined.
          *
-         * \return A string_view object, containing the name for the given value.
+         * \return A std::string object, containing the name for the given value.
          */
-        string_view value_to_name(argument value) const;
+        std::string value_to_name(argument value) const;
 
         /*!
-         * \brief Returns the value of the given enumeration \p name, or an empty variant if the name is not defined.
+         * \brief Returns the value of the given enumeration name, or an empty variant if the name is not defined.
          *
-         * \return A variant object, containing the value for the given \p name.
+         * \return A variant object, containing the value for the given name.
          */
-        variant name_to_value(string_view name) const;
+        variant name_to_value(const std::string& name) const;
 
         /*!
          * \brief Returns true if this enumeration is the same like the \p other.
@@ -210,9 +208,6 @@ class RTTR_API enumeration
         friend class type; // to prevent creation of this class
         //! Constructs a valid MetaProperty from a PropertyContainerBase.
         enumeration(const detail::enumeration_wrapper_base* wrapper = nullptr);
-
-        template<typename T>
-        friend T detail::create_item(const detail::class_item_to_wrapper_t<T>* wrapper);
     private:
         const detail::enumeration_wrapper_base* m_wrapper;
 };

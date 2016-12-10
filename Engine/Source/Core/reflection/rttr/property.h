@@ -32,7 +32,6 @@
 #include "detail/misc/class_item_mapper.h"
 #include "parameter_info.h"
 #include "access_levels.h"
-#include "string_view.h"
 
 #include <string>
 
@@ -192,11 +191,11 @@ class RTTR_API property
         /*!
          * \brief Returns the name of this property.
          *
-         * \remark When the property is not valid, this function will return an empty string_view.
+         * \remark When the property is not valid, this function will return an empty string.
          *
          * \return Name of the property.
          */
-        string_view get_name() const;
+        std::string get_name() const;
 
         /*!
          * \brief Returns the underlying \ref type object of this property.
@@ -272,7 +271,8 @@ class RTTR_API property
 
         template<typename T>
         friend T detail::create_item(const detail::class_item_to_wrapper_t<T>* wrapper);
-
+        template<typename T>
+        friend void detail::destroy_item(T& item);
     private:
         const detail::property_wrapper_base* m_wrapper;
 };
