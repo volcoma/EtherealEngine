@@ -100,13 +100,13 @@ TransformComponent& TransformComponent::setLocalPosition(const math::vec3 & posi
 
 TransformComponent& TransformComponent::setPosition(const math::vec3 & position)
 {
-	// Rotate a copy of the current math::transform.
-	math::transform m = getTransform();
+	// Rotate a copy of the current math::transform_t.
+	math::transform_t m = getTransform();
 	m.setPosition(position);
 
 	if (!mParent.expired())
 	{
-		math::transform invParentTransform = math::inverse(mParent.lock()->getTransform());
+		math::transform_t invParentTransform = math::inverse(mParent.lock()->getTransform());
 		m = invParentTransform * m;
 	}
 
@@ -176,13 +176,13 @@ math::vec3 TransformComponent::getScale()
 	return getTransform().getScale();
 }
 
-const math::transform & TransformComponent::getTransform()
+const math::transform_t & TransformComponent::getTransform()
 {
 	resolveTransform();
 	return mWorldTransform;
 }
 
-const math::transform & TransformComponent::getLocalTransform() const
+const math::transform_t & TransformComponent::getLocalTransform() const
 {
 	// Return reference to our internal matrix
 	return mLocalTransform;
@@ -190,7 +190,7 @@ const math::transform & TransformComponent::getLocalTransform() const
 
 TransformComponent& TransformComponent::lookAt(float x, float y, float z)
 {
-	//TODO("General", "These lookAt methods need to consider the pivot and the currently applied math::transform method!!!");
+	//TODO("General", "These lookAt methods need to consider the pivot and the currently applied math::transform_t method!!!");
 	lookAt(getPosition(), math::vec3(x, y, z));
 	return *this;
 }
@@ -203,7 +203,7 @@ TransformComponent& TransformComponent::lookAt(const math::vec3 & point)
 
 TransformComponent& TransformComponent::lookAt(const math::vec3 & eye, const math::vec3 & at)
 {
-	math::transform m;
+	math::transform_t m;
 	m.lookAt(eye, at);
 
 	// Update the component position / orientation through the common base method.
@@ -220,7 +220,7 @@ TransformComponent& TransformComponent::lookAt(const math::vec3 & eye, const mat
 
 TransformComponent& TransformComponent::lookAt(const math::vec3 & eye, const math::vec3 & at, const math::vec3 & up)
 {
-	math::transform m;
+	math::transform_t m;
 	m.lookAt(eye, at, up);
 
 	// Update the component position / orientation through the common base method.
@@ -262,7 +262,7 @@ TransformComponent& TransformComponent::rotateAxis(float degrees, const math::ve
 	{
 		// Scale the position, but do not allow axes to scale.
 		math::vec3 vPos = getPosition();
-		math::transform t;
+		math::transform_t t;
 		t.rotateAxis(math::radians(degrees), axis);
 		t.transformCoord(vPos, vPos);
 		setPosition(vPos);
@@ -270,13 +270,13 @@ TransformComponent& TransformComponent::rotateAxis(float degrees, const math::ve
 	} // End if !canRotate()
 	else
 	{
-		// Rotate a copy of the current math::transform.
-		math::transform m = getTransform();
+		// Rotate a copy of the current math::transform_t.
+		math::transform_t m = getTransform();
 		m.rotateAxis(math::radians(degrees), axis);
 
 		if (!mParent.expired())
 		{
-			math::transform invParentTransform = math::inverse(mParent.lock()->getTransform());
+			math::transform_t invParentTransform = math::inverse(mParent.lock()->getTransform());
 			m = invParentTransform * m;
 		}
 
@@ -297,7 +297,7 @@ TransformComponent& TransformComponent::rotate(float x, float y, float z)
 	if (!canRotate())
 	{
 		// Scale the position, but do not allow axes to scale.
-		math::transform t;
+		math::transform_t t;
 		math::vec3 position = getPosition();
 		t.rotate(math::radians(x), math::radians(y), math::radians(z));
 		t.transformCoord(position, position);
@@ -306,14 +306,14 @@ TransformComponent& TransformComponent::rotate(float x, float y, float z)
 	} // End if !canRotate()
 	else
 	{
-		// Scale a copy of the cell math::transform
-		// Set orientation of new math::transform
-		math::transform m = getTransform();
+		// Scale a copy of the cell math::transform_t
+		// Set orientation of new math::transform_t
+		math::transform_t m = getTransform();
 		m.rotate(math::radians(x), math::radians(y), math::radians(z));
 
 		if (!mParent.expired())
 		{
-			math::transform invParentTransform = math::inverse(mParent.lock()->getTransform());
+			math::transform_t invParentTransform = math::inverse(mParent.lock()->getTransform());
 			m = invParentTransform * m;
 		}
 
@@ -334,7 +334,7 @@ TransformComponent& TransformComponent::rotate(float x, float y, float z, const 
 	if (!canRotate())
 	{
 		// Scale the position, but do not allow axes to scale.
-		math::transform t;
+		math::transform_t t;
 		math::vec3 position = getPosition() - center;
 		t.rotate(math::radians(x), math::radians(y), math::radians(z));
 		t.transformCoord(position, position);
@@ -344,14 +344,14 @@ TransformComponent& TransformComponent::rotate(float x, float y, float z, const 
 	else
 	{
 
-		// Scale a copy of the cell math::transform
-		// Set orientation of new math::transform
-		math::transform m = getTransform();
+		// Scale a copy of the cell math::transform_t
+		// Set orientation of new math::transform_t
+		math::transform_t m = getTransform();
 		m.rotate(math::radians(x), math::radians(y), math::radians(z));
 
 		if (!mParent.expired())
 		{
-			math::transform invParentTransform = math::inverse(mParent.lock()->getTransform());
+			math::transform_t invParentTransform = math::inverse(mParent.lock()->getTransform());
 			m = invParentTransform * m;
 		}
 
@@ -368,14 +368,14 @@ TransformComponent& TransformComponent::setScale(const math::vec3& s)
 	if (!canScale())
 		return *this;
 
-	// Scale a copy of the cell math::transform
-	// Set orientation of new math::transform
-	math::transform m = getTransform();
+	// Scale a copy of the cell math::transform_t
+	// Set orientation of new math::transform_t
+	math::transform_t m = getTransform();
 	m.setScale(s);
 
 	if (!mParent.expired())
 	{
-		math::transform invParentTransform = math::inverse(mParent.lock()->getTransform());
+		math::transform_t invParentTransform = math::inverse(mParent.lock()->getTransform());
 		m = invParentTransform * m;
 	}
 
@@ -399,13 +399,13 @@ TransformComponent& TransformComponent::setRotation(const math::quat & rotation)
 	if (!canRotate())
 		return *this;
 
-	// Set orientation of new math::transform
-	math::transform m = getTransform();
+	// Set orientation of new math::transform_t
+	math::transform_t m = getTransform();
 	m.setRotation(rotation);
 
 	if (!mParent.expired())
 	{
-		math::transform invParentTransform = math::inverse(mParent.lock()->getTransform());
+		math::transform_t invParentTransform = math::inverse(mParent.lock()->getTransform());
 		m = invParentTransform * m;
 	}
 
@@ -419,7 +419,7 @@ TransformComponent& TransformComponent::setLocalRotation(const math::quat & rota
 	if (!canRotate())
 		return *this;
 
-	// Set orientation of new math::transform
+	// Set orientation of new math::transform_t
 	mLocalTransform.setRotation(rotation);
 	setLocalTransform(mLocalTransform);
 
@@ -510,9 +510,9 @@ TransformComponent& TransformComponent::setParent(HTransformComponent parent, bo
 		return *this;
 	if (parentPtr && (parentPtr->mParent.lock().get() == this))
 		return *this;
-	// Before we do anything, make sure that all pending math::transform 
+	// Before we do anything, make sure that all pending math::transform_t 
 	// operations are resolved (including those applied to our parent).
-	math::transform cachedWorldTranform;
+	math::transform_t cachedWorldTranform;
 	if (worldPositionStays)
 	{
 		resolveTransform(true);
@@ -542,7 +542,7 @@ TransformComponent& TransformComponent::setParent(HTransformComponent parent, bo
 	else
 	{
 		if (!localPositionStays)
-			setLocalTransform(math::transform::Identity);
+			setLocalTransform(math::transform_t::Identity);
 	}
 
 
@@ -567,7 +567,7 @@ void TransformComponent::removeChild(HTransformComponent child)
 	), std::end(mChildren));
 }
 
-TransformComponent& TransformComponent::setTransform(const math::transform & tr)
+TransformComponent& TransformComponent::setTransform(const math::transform_t & tr)
 {
 	if (mWorldTransform.compare(tr, 0.0001f) == 0)
 		return *this;
@@ -576,14 +576,14 @@ TransformComponent& TransformComponent::setTransform(const math::transform & tr)
 	math::quat orientation;
 	tr.decompose(scaling, orientation, position);
 
-	math::transform m = getTransform();
+	math::transform_t m = getTransform();
 	m.setScale(scaling);
 	m.setRotation(orientation);
 	m.setPosition(position);
 
 	if (!mParent.expired())
 	{
-		math::transform invParentTransform = math::inverse(mParent.lock()->getTransform());
+		math::transform_t invParentTransform = math::inverse(mParent.lock()->getTransform());
 		m = invParentTransform * m;
 	}
 
@@ -591,7 +591,7 @@ TransformComponent& TransformComponent::setTransform(const math::transform & tr)
 	return *this;
 }
 
-TransformComponent& TransformComponent::setLocalTransform(const math::transform & trans)
+TransformComponent& TransformComponent::setLocalTransform(const math::transform_t & trans)
 {
 	if (mLocalTransform.compare(trans, 0.0001f) == 0)
 		return *this;

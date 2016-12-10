@@ -239,7 +239,7 @@ public:
 	/// Return the current projection matrix.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const math::transform& getProj();
+	const math::transform_t& getProj();
 
 	//-----------------------------------------------------------------------------
 	//  Name : getView ()
@@ -247,7 +247,7 @@ public:
 	/// Return the current view matrix.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::transform& getView() const { return mView; }
+	inline const math::transform_t& getView() const { return mView; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : getPreviousView ()
@@ -256,7 +256,7 @@ public:
 	/// to recordCurrentMatrices().
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::transform& getPreviousView() const { return mPreviousView; }
+	inline const math::transform_t& getPreviousView() const { return mPreviousView; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : getPreviousProj ()
@@ -265,7 +265,7 @@ public:
 	/// recent call to recordCurrentMatrices().
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::transform& getPreviousProj() const { return mPreviousProj; }
+	inline const math::transform_t& getPreviousProj() const { return mPreviousProj; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : recordCurrentMatrices ()
@@ -308,7 +308,7 @@ public:
 	/// Determine whether or not the OOBB specified is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::VolumeQuery::E boundsInFrustum(const math::bbox & bounds, const math::transform & t);
+	math::VolumeQuery::E boundsInFrustum(const math::bbox & bounds, const math::transform_t & t);
 
 	//-----------------------------------------------------------------------------
 	//  Name : viewportToRay()
@@ -415,7 +415,7 @@ public:
 	/// point to use as a tolerance for picking.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::vec3 estimatePickTolerance(const uSize & viewportSize, float pixelTolerance, const math::vec3 & referencePosition, const math::transform & objectTransform);
+	math::vec3 estimatePickTolerance(const uSize & viewportSize, float pixelTolerance, const math::vec3 & referencePosition, const math::transform_t & objectTransform);
 
 	//-----------------------------------------------------------------------------
 	//  Name : lookAt ()
@@ -492,13 +492,13 @@ protected:
 	/// Viewport size
 	uSize mViewportSize = { 0, 0 };
 	/// Cached view matrix
-	math::transform mView;
+	math::transform_t mView;
 	/// Cached projection matrix.
-	math::transform mProj;
+	math::transform_t mProj;
 	/// Cached "previous" view matrix.
-	math::transform mPreviousView;
+	math::transform_t mPreviousView;
 	/// Cached "previous" projection matrix.
-	math::transform mPreviousProj;
+	math::transform_t mPreviousProj;
 	/// Details regarding the camera frustum.
 	math::frustum mFrustum;
 	/// The near clipping volume (area of space between the camera position and the near plane).

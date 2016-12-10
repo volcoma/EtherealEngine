@@ -18,17 +18,17 @@ using namespace glm;
 /// providing much of the same functionality provided by standard matrices.
 /// </summary>
 //-----------------------------------------------------------------------------
-class transform
+class transform_t
 {
 public:
     //-------------------------------------------------------------------------
 	// Constructors & Destructors
 	//-------------------------------------------------------------------------
-    transform( );
-    transform( const transform & t );
-    transform( const vec3 & translation );
-    transform( const quat & orientation, const vec3 & translation );
-    transform( const mat4 & m );
+    transform_t( );
+    transform_t( const transform_t & t );
+    transform_t( const vec3 & translation );
+    transform_t( const quat & orientation, const vec3 & translation );
+    transform_t( const mat4 & m );
     
 	//-------------------------------------------------------------------------
 	// Public Methods
@@ -40,7 +40,7 @@ public:
     bool					decompose                   ( vec3 & scale, vec3 & shear, quat & rotation, vec3 & translation ) const;
     bool					decompose                   ( vec3 & scale, quat & rotation, vec3 & translation ) const;
     bool					decompose                   ( quat & rotation, vec3 & translation ) const;
-    transform&				invert                      ( );
+    transform_t&				invert                      ( );
     
     const vec3&				getPosition                 ( ) const;
     vec3					getScale					( ) const;
@@ -55,40 +55,40 @@ public:
 	mat4&					matrix						( );
 
     // transformation Operations
-    transform&				rotateAxis                  ( float a, const vec3 & v );
-    transform&				rotate						( float x, float y, float z );
-	transform&				rotateLocal					( float x, float y, float z );
-	transform&				rotateLocal					( const vec3 & v );
-	transform&				scale						( const vec3 & v );
-	transform&				scale						( float x, float y, float z );
-    transform&				translate                   ( float x, float y, float z );
-    transform&				translate                   ( const vec3 & v );
-    transform&				translateLocal              ( float x, float y, float z );
-    transform&				translateLocal              ( const vec3 & v );
-    transform&				setPosition                 ( float x, float y, float z );
-    transform&				setPosition                 ( const vec3 & v );
-    transform&				setScale					( float x, float y, float z );
-    transform&				setScale					( const vec3 & v );
-    transform&				setShear					( float xy, float xz, float yz );
-    transform&				setRotation					( const vec3 & x, const vec3 & y, const vec3 & z );
-    transform&				setRotation					( const quat & q );
+    transform_t&				rotateAxis                  ( float a, const vec3 & v );
+    transform_t&				rotate						( float x, float y, float z );
+	transform_t&				rotateLocal					( float x, float y, float z );
+	transform_t&				rotateLocal					( const vec3 & v );
+	transform_t&				scale						( const vec3 & v );
+	transform_t&				scale						( float x, float y, float z );
+    transform_t&				translate                   ( float x, float y, float z );
+    transform_t&				translate                   ( const vec3 & v );
+    transform_t&				translateLocal              ( float x, float y, float z );
+    transform_t&				translateLocal              ( const vec3 & v );
+    transform_t&				setPosition                 ( float x, float y, float z );
+    transform_t&				setPosition                 ( const vec3 & v );
+    transform_t&				setScale					( float x, float y, float z );
+    transform_t&				setScale					( const vec3 & v );
+    transform_t&				setShear					( float xy, float xz, float yz );
+    transform_t&				setRotation					( const vec3 & x, const vec3 & y, const vec3 & z );
+    transform_t&				setRotation					( const quat & q );
 
     // Full Re-Populate
-	transform&				zero                        ( );
-	transform&				compose                     ( const vec3 & scale, const vec3 & shear, const quat & rotation, const vec3 & translation );
-	transform&				compose                     ( const vec3 & scale, const quat & rotation, const vec3 & translation );
-    transform&				compose                     ( const quat & rotation, const vec3 & translation );
-    transform&				scaling                     ( float x, float y, float z );
-    transform&				rotation                    ( float x, float y, float z );
-    transform&				rotationAxis                ( float angle, const vec3 & axis );
-    transform&				translation                 ( float x, float y, float z );
-    transform&				translation                 ( const vec3 & v );
-    transform&				lookAt                      ( const vec3 & eye, const vec3 & at );
-    transform&				lookAt                      ( const vec3 & eye, const vec3 & at, const vec3 & upAlign );
+	transform_t&				zero                        ( );
+	transform_t&				compose                     ( const vec3 & scale, const vec3 & shear, const quat & rotation, const vec3 & translation );
+	transform_t&				compose                     ( const vec3 & scale, const quat & rotation, const vec3 & translation );
+    transform_t&				compose                     ( const quat & rotation, const vec3 & translation );
+    transform_t&				scaling                     ( float x, float y, float z );
+    transform_t&				rotation                    ( float x, float y, float z );
+    transform_t&				rotationAxis                ( float angle, const vec3 & axis );
+    transform_t&				translation                 ( float x, float y, float z );
+    transform_t&				translation                 ( const vec3 & v );
+    transform_t&				lookAt                      ( const vec3 & eye, const vec3 & at );
+    transform_t&				lookAt                      ( const vec3 & eye, const vec3 & at, const vec3 & upAlign );
 	
     // Comparisons
-    int						compare                     ( const transform & t ) const;
-    int						compare                     ( const transform & t, float tolerance ) const;
+    int						compare                     ( const transform_t & t ) const;
+    int						compare                     ( const transform_t & t, float tolerance ) const;
     bool					isIdentity                  ( ) const;
     
     //-------------------------------------------------------------------------
@@ -103,37 +103,37 @@ public:
 	mat4::col_type &		operator[]					( mat4::length_type i );
 	mat4::col_type const &	operator[]					( mat4::length_type i ) const;
 
-    transform&				operator=                   ( const mat4 & m );
-    bool					operator==                  ( const transform & t ) const;
-    bool					operator!=                  ( const transform & t ) const;
+    transform_t&				operator=                   ( const mat4 & m );
+    bool					operator==                  ( const transform_t & t ) const;
+    bool					operator!=                  ( const transform_t & t ) const;
 
     // Assignment operators
-    transform&				operator *=                 ( const transform & t );
-    transform&				operator *=                 ( float f );
-    transform&				operator +=                 ( const transform & t );
-	transform&				operator -=                 ( const transform & t );
+    transform_t&				operator *=                 ( const transform_t & t );
+    transform_t&				operator *=                 ( float f );
+    transform_t&				operator +=                 ( const transform_t & t );
+	transform_t&				operator -=                 ( const transform_t & t );
 
     // Binary operators
-    transform				operator *                  ( const transform & t ) const;
-    transform				operator *                  ( float f ) const;
-    transform				operator +                  ( const transform & t ) const;
-	transform				operator -                  ( const transform & t ) const;
+    transform_t				operator *                  ( const transform_t & t ) const;
+    transform_t				operator *                  ( float f ) const;
+    transform_t				operator +                  ( const transform_t & t ) const;
+	transform_t				operator -                  ( const transform_t & t ) const;
 
     //-------------------------------------------------------------------------
 	// Public Static Functions
 	//-------------------------------------------------------------------------
-    static vec3				transformCoord              ( const vec3 & v, const transform & t );
-    static vec3				inverseTransformCoord       ( const vec3 & v, const transform & t );
-    static vec3				transformNormal             ( const vec3 & v, const transform & t );
-    static vec3				inverseTransformNormal      ( const vec3 & v, const transform & t );
-    static bool				decompose                   ( vec3 & scale, vec3 & shear, quat & rotation, vec3 & translation, const transform & t );
-    static bool				decompose                   ( vec3 & scale, quat & rotation, vec3 & translation, const transform & t );
-    static bool				decompose                   ( quat & rotation, vec3 & translation, const transform & t );
-	static transform		lerp						( transform & t1, transform & t2, float dt);
+    static vec3				transformCoord              ( const vec3 & v, const transform_t & t );
+    static vec3				inverseTransformCoord       ( const vec3 & v, const transform_t & t );
+    static vec3				transformNormal             ( const vec3 & v, const transform_t & t );
+    static vec3				inverseTransformNormal      ( const vec3 & v, const transform_t & t );
+    static bool				decompose                   ( vec3 & scale, vec3 & shear, quat & rotation, vec3 & translation, const transform_t & t );
+    static bool				decompose                   ( vec3 & scale, quat & rotation, vec3 & translation, const transform_t & t );
+    static bool				decompose                   ( quat & rotation, vec3 & translation, const transform_t & t );
+	static transform_t		lerp						( transform_t & t1, transform_t & t2, float dt);
     //-------------------------------------------------------------------------
 	// Public Static Variables
 	//-------------------------------------------------------------------------
-    static const transform Identity;
+    static const transform_t Identity;
     
 private:
 	vec3& position                    ( );
@@ -143,7 +143,7 @@ private:
     mat4				mMatrix;
 };
 
-transform inverse(transform const& t);
-transform transpose(transform const& t);
+transform_t inverse(transform_t const& t);
+transform_t transpose(transform_t const& t);
 
 }

@@ -88,7 +88,7 @@ CameraComponent::~CameraComponent()
 {
 }
 
-void CameraComponent::updateInternal(const math::transform& t)
+void CameraComponent::updateInternal(const math::transform_t& t)
 {
 	// First update so the camera can cache the previous matrices
 	mCamera->recordCurrentMatrices();

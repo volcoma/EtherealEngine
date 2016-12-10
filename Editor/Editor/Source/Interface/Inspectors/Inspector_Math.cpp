@@ -73,7 +73,7 @@ bool Inspector_Quaternion::inspect(rttr::variant& var, bool readOnly, std::funct
 
 bool Inspector_Transform::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<math::transform>();
+	auto data = var.get_value<math::transform_t>();
 	const char* names[] = { "X", "Y", "Z" };
 	math::vec3 position = data.getPosition();
 	math::vec3 scale = data.getScale();

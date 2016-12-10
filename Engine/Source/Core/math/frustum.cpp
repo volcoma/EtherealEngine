@@ -27,7 +27,7 @@ namespace math
 	/// frustum Class Constructor
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	frustum::frustum(const transform & View, const transform & Proj, bool _oglNDC)
+	frustum::frustum(const transform_t & View, const transform_t & Proj, bool _oglNDC)
 	{
 		update(View, Proj, _oglNDC);
 	}
@@ -71,12 +71,12 @@ namespace math
 	/// Compute the new frustum details based on the matrices specified.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void frustum::update(const transform & View, const transform & Proj, bool _oglNDC)
+	void frustum::update(const transform_t & View, const transform_t & Proj, bool _oglNDC)
 	{
 		using namespace VolumePlane;
 
 		// Build a combined view & projection matrix
-		const transform m = Proj * View;
+		const transform_t m = Proj * View;
 
 		const float* _viewProj = m;
 		const float xw = _viewProj[3];
@@ -250,9 +250,9 @@ namespace math
 	/// Determine whether or not the box passed is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	VolumeQuery::E frustum::classifyOBB(frustum frustum, const bbox & AABB, const transform & t)
+	VolumeQuery::E frustum::classifyOBB(frustum frustum, const bbox & AABB, const transform_t & t)
 	{
-		transform invTransform = inverse(t);
+		transform_t invTransform = inverse(t);
 
 		frustum.mul(invTransform);
 
@@ -346,9 +346,9 @@ namespace math
 	/// Determine whether or not the box passed is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	VolumeQuery::E frustum::classifyOBB(frustum frustum, const bbox & AABB, const transform & t, unsigned int & FrustumBits, int & LastOutside)
+	VolumeQuery::E frustum::classifyOBB(frustum frustum, const bbox & AABB, const transform_t & t, unsigned int & FrustumBits, int & LastOutside)
 	{
-		transform invTransform = inverse(t);
+		transform_t invTransform = inverse(t);
 
 		frustum.mul(invTransform);
 
@@ -395,9 +395,9 @@ namespace math
 	/// Determine whether or not the box passed is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool frustum::testOBB(frustum frustum, const bbox & AABB, const transform & t)
+	bool frustum::testOBB(frustum frustum, const bbox & AABB, const transform_t & t)
 	{
-		transform invTransform = inverse(t);
+		transform_t invTransform = inverse(t);
 
 		frustum.mul(invTransform);
 
@@ -411,9 +411,9 @@ namespace math
 	/// Determine whether or not the box passed is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool frustum::testExtrudedOBB(frustum frustum, const bbox_extruded & AABB, const transform & t)
+	bool frustum::testExtrudedOBB(frustum frustum, const bbox_extruded & AABB, const transform_t & t)
 	{
-		transform invTransform = inverse(t);
+		transform_t invTransform = inverse(t);
 
 		frustum.mul(invTransform);
 
@@ -772,10 +772,10 @@ namespace math
 	/// Transforms this frustum by the specified matrix.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	frustum& frustum::mul(const transform & t)
+	frustum& frustum::mul(const transform_t & t)
 	{
 		plane NewPlane;
-		transform mtxIT, mtx = t;
+		transform_t mtxIT, mtx = t;
 		mtxIT = inverse(mtx);
 		mtxIT = transpose(mtxIT);
 
@@ -789,10 +789,10 @@ namespace math
 
 		// transform points
 		for (unsigned int i = 0; i < 8; ++i)
-			points[i] = transform::transformCoord(points[i], mtx);
+			points[i] = transform_t::transformCoord(points[i], mtx);
 
 		// transform originating position.
-		position = transform::transformCoord(position, mtx);
+		position = transform_t::transformCoord(position, mtx);
 
 		// Return reference to self.
 		return *this;
@@ -805,7 +805,7 @@ namespace math
 	/// resulting frustum as a copy.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	frustum frustum::mul(frustum f, const transform & t)
+	frustum frustum::mul(frustum f, const transform_t & t)
 	{
 		return f.mul(t);
 	}

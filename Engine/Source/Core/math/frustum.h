@@ -28,13 +28,13 @@ public:
 	// Constructors & Destructors
 	//-------------------------------------------------------------------------
     frustum( );
-    frustum( const transform & view, const transform & proj, bool _oglNDC);
+    frustum( const transform_t & view, const transform_t & proj, bool _oglNDC);
     frustum( const bbox & sourceBounds );
 
 	//-------------------------------------------------------------------------
 	// Public Methods
 	//-------------------------------------------------------------------------
-    void							update				( const transform & view, const transform & proj, bool _oglNDC);
+    void							update				( const transform_t & view, const transform_t & proj, bool _oglNDC);
     void							setPlanes			( const plane newPlanes[] );
     void							recomputePoints		( );
     VolumeQuery::E					classifyAABB		( const bbox & bounds ) const;
@@ -49,15 +49,15 @@ public:
     bool							testSweptSphere		( const vec3 & center, float radius, const vec3 & sweepDirection ) const;
     bool							testFrustum			( const frustum & frustum ) const;
     bool							testLine			( const vec3 & v1, const vec3 & v2 ) const;
-    frustum             &			mul					( const transform & t );
+    frustum             &			mul					( const transform_t & t );
     //-------------------------------------------------------------------------
 	// Public Static Functions
 	//-------------------------------------------------------------------------
-    static frustum					mul					( frustum f, const transform & t );
-	static bool						testOBB             ( frustum f, const bbox & bounds, const transform & t );
-	static bool						testExtrudedOBB     ( frustum f, const bbox_extruded & bounds, const transform & t );
-	static VolumeQuery::E			classifyOBB			( frustum f, const bbox & bounds, const transform & t );
-	static VolumeQuery::E			classifyOBB			( frustum f, const bbox & bounds, const transform & t, unsigned int & frustumBits, int & lastOutside );
+    static frustum					mul					( frustum f, const transform_t & t );
+	static bool						testOBB             ( frustum f, const bbox & bounds, const transform_t & t );
+	static bool						testExtrudedOBB     ( frustum f, const bbox_extruded & bounds, const transform_t & t );
+	static VolumeQuery::E			classifyOBB			( frustum f, const bbox & bounds, const transform_t & t );
+	static VolumeQuery::E			classifyOBB			( frustum f, const bbox & bounds, const transform_t & t, unsigned int & frustumBits, int & lastOutside );
     //-------------------------------------------------------------------------
 	// Public Operators
 	//-------------------------------------------------------------------------

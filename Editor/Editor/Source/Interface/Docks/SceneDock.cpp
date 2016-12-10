@@ -163,8 +163,8 @@ namespace Docks
 				auto transformComponent = sel.component<TransformComponent>().lock();
 				transformComponent->resolveTransform(true);
 				auto transform = transformComponent->getTransform();
-				math::transform delta;
-				math::transform inputTransform = transform;
+				math::transform_t delta;
+				math::transform_t inputTransform = transform;
 				float* snap = nullptr;
 				static math::vec3 translationSnap = { 1.0f, 1.0f, 1.0f };
 				static float rotationDegreeSnap = 15.0f;

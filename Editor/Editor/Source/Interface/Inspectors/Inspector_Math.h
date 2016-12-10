@@ -44,4 +44,4 @@ struct Inspector_Transform : public Inspector
 	REFLECTABLE(Inspector_Transform, Inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_Transform, math::transform)
+INSPECTOR_REFLECT(Inspector_Transform, math::transform_t)

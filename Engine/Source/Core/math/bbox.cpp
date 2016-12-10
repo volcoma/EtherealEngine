@@ -705,7 +705,7 @@ vec3 bbox::closestPoint( const vec3 & TestPoint ) const
 /// transformation'.
 /// </summary>
 //-----------------------------------------------------------------------------
-bbox & bbox::mul( const transform & t )
+bbox & bbox::mul( const transform_t & t )
 {
     vec3 BoundsCenter = getCenter();
     
@@ -743,7 +743,7 @@ bbox & bbox::mul( const transform & t )
 /// new resulting box as a copy.
 /// </summary>
 //-----------------------------------------------------------------------------
-bbox bbox::mul( bbox Bounds, const transform & t )
+bbox bbox::mul( bbox Bounds, const transform_t & t )
 {
     return Bounds.mul( t );
 }
@@ -839,7 +839,7 @@ bbox& bbox::operator*= ( float fScale )
 /// Transforms the bounding box by the matrix passed.
 /// </summary>
 //-----------------------------------------------------------------------------
-bbox& bbox::operator*= ( const transform & t )
+bbox& bbox::operator*= ( const transform_t & t )
 {
     mul( t );
     return *this;

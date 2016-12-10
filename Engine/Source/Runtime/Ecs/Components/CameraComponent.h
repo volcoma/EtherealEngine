@@ -166,7 +166,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void updateInternal(const math::transform& t);
+	void updateInternal(const math::transform_t& t);
 
 	//-----------------------------------------------------------------------------
 	//  Name : getHDR ()

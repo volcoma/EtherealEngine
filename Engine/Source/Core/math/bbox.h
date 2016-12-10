@@ -47,7 +47,7 @@ struct bbox
     vec3				closestPoint			( const vec3 & sourcePoint ) const;
     void				validate				( );
     void				reset					( );
-    bbox&				mul						( const transform & t );
+    bbox&				mul						( const transform_t & t );
     void				inflate					( float amount);
     void				inflate					( const vec3 & amount);
     bool				isPopulated				( ) const;
@@ -62,7 +62,7 @@ struct bbox
     //-------------------------------------------------------------------------
 	// Public Static Functions
 	//-------------------------------------------------------------------------
-    static bbox			mul						( bbox bounds, const transform & t );
+    static bbox			mul						( bbox bounds, const transform_t & t );
 
     //-------------------------------------------------------------------------
 	// Public Operators
@@ -70,7 +70,7 @@ struct bbox
 	bbox				operator *				( float scale ) const;
 	bbox&				operator +=				( const vec3 & shift );
 	bbox&				operator -=				( const vec3 & shift );
-	bbox&				operator *=				( const transform & t );
+	bbox&				operator *=				( const transform_t & t );
 	bbox&				operator *=				( float scale );
     bool				operator !=				( const bbox & bounds ) const;
     bool				operator ==				( const bbox & bounds ) const;

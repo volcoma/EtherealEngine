@@ -98,7 +98,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const math::transform& getLocalTransform() const;
+	const math::transform_t& getLocalTransform() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : getTransform ()
@@ -108,7 +108,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const math::transform& getTransform();
+	const math::transform_t& getTransform();
 
 	//-----------------------------------------------------------------------------
 	//  Name : getPosition ()
@@ -423,7 +423,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& setLocalTransform(const math::transform & trans);
+	virtual TransformComponent& setLocalTransform(const math::transform_t & trans);
 
 	//-----------------------------------------------------------------------------
 	//  Name : setTransform (virtual )
@@ -433,7 +433,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& setTransform(const math::transform & trans);
+	virtual TransformComponent& setTransform(const math::transform_t & trans);
 
 	//-----------------------------------------------------------------------------
 	//  Name : lookAt (virtual )
@@ -593,9 +593,9 @@ protected:
 	/// Children object.
 	std::vector<HTransformComponent> mChildren;
 	/// Local transformation relative to the parent
-	math::transform mLocalTransform;
+	math::transform_t mLocalTransform;
 	/// Cached world transformation at pivot point.
-	math::transform mWorldTransform;
+	math::transform_t mWorldTransform;
 	/// Is slow parenting enabled?
 	bool mSlowParenting = false;
 	/// Slow parenting speed.

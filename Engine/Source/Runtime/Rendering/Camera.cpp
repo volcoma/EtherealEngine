@@ -125,7 +125,7 @@ bool Camera::isAspectLocked() const
 	return (getProjectionMode() == ProjectionMode::Orthographic || mAspectLocked);
 }
 
-const math::transform & Camera::getProj()
+const math::transform_t & Camera::getProj()
 {
 
 	// Only update matrix if something has changed
@@ -259,7 +259,7 @@ math::VolumeQuery::E Camera::boundsInFrustum(const math::bbox & AABB)
 	return f.classifyAABB(AABB);
 }
 
-math::VolumeQuery::E Camera::boundsInFrustum(const math::bbox &AABB, const math::transform & t)
+math::VolumeQuery::E Camera::boundsInFrustum(const math::bbox &AABB, const math::transform_t & t)
 {
 	// Recompute the frustum as necessary.
 	const math::frustum & f = getFrustum();
@@ -274,7 +274,7 @@ bool Camera::worldToViewport(const uSize & ViewportSize, const math::vec3 & Worl
 	auto mtxTransform = getView() * getProj();
 
 	// Transform the point into clip space
-	math::vec4 vClip = { math::transform::transformCoord(WorldPos, mtxTransform), 0 };
+	math::vec4 vClip = { math::transform_t::transformCoord(WorldPos, mtxTransform), 0 };
 
 	// Was this clipped?
 	if (bClipX == true && (vClip.x < -vClip.w || vClip.x > vClip.w)) return false;
@@ -301,9 +301,9 @@ bool Camera::viewportToRay(const uSize & ViewportSize, const math::vec2 & Viewpo
 	math::vec3 vCursor;
 
 	// Ensure we have an up-to-date projection and view matrix
-	math::transform mtxInvView;
-	math::transform mtxProj = getProj();
-	math::transform mtxView = getView();
+	math::transform_t mtxInvView;
+	math::transform_t mtxProj = getProj();
+	math::transform_t mtxView = getView();
 	mtxInvView = math::inverse(mtxView);
 
 	// Transform the pick position from viewport space into camera space
@@ -315,7 +315,7 @@ bool Camera::viewportToRay(const uSize & ViewportSize, const math::vec2 & Viewpo
 	if (getProjectionMode() == ProjectionMode::Orthographic)
 	{
 		// Obtain the ray from the cursor position
-		vecRayStart = math::transform::transformCoord(vCursor, mtxInvView);
+		vecRayStart = math::transform_t::transformCoord(vCursor, mtxInvView);
 		vecRayDir = (math::vec3&)mtxInvView[2];
 
 	} // End If IsOrthohraphic
@@ -483,12 +483,12 @@ float Camera::estimateZoomFactor(const uSize & ViewportSize, const math::vec3 & 
 
 	// New Zoom factor is based on the distance to this position 
 	// along the camera's look vector.
-	math::vec3 viewPos = math::transform::transformCoord(WorldPos, getView());
+	math::vec3 viewPos = math::transform_t::transformCoord(WorldPos, getView());
 	float distance = viewPos.z / ((float)ViewportSize.height * (45.0f / getFOV()));
 	return std::min<float>(fMax, distance);
 }
 
-math::vec3 Camera::estimatePickTolerance(const uSize & ViewportSize, float WireTolerance, const math::vec3 & Pos, const math::transform & ObjectTransform)
+math::vec3 Camera::estimatePickTolerance(const uSize & ViewportSize, float WireTolerance, const math::vec3 & Pos, const math::transform_t & ObjectTransform)
 {
 	// Scale tolerance based on estimated world space zoom factor.
 	math::vec3 v;
