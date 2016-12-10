@@ -46,6 +46,9 @@
     <Filter Include="Source Files\Meta">
       <UniqueIdentifier>{4174b488-7bdc-43fe-a33e-2f26f018d859}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Meta\Interface">
+      <UniqueIdentifier>{5c7e67be-4764-434f-8dab-12bfbdeb6718}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\Res\Common.rc">
@@ -163,6 +166,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\Meta\EditorOptions.hpp">
       <Filter>Source Files\Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Meta\Interface\GUI.hpp">
+      <Filter>Source Files\Meta\Interface</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

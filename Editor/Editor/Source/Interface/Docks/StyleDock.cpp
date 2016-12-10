@@ -7,24 +7,25 @@ namespace Docks
 	void renderStyle(ImVec2 area)
 	{
 		auto& GUIStyle = gui::getGUIStyle();
+		auto& setup = GUIStyle.setup;
 		ImVec4 rgb;
 
-		auto& col_main_hue = GUIStyle.col_main_hue;
-		auto& col_main_sat = GUIStyle.col_main_sat;
-		auto& col_main_val = GUIStyle.col_main_val;
+		auto& col_main_hue = setup.col_main_hue;
+		auto& col_main_sat = setup.col_main_sat;
+		auto& col_main_val = setup.col_main_val;
 
-		auto& col_area_hue = GUIStyle.col_area_hue;
-		auto& col_area_sat = GUIStyle.col_area_sat;
-		auto& col_area_val = GUIStyle.col_area_val;
+		auto& col_area_hue = setup.col_area_hue;
+		auto& col_area_sat = setup.col_area_sat;
+		auto& col_area_val = setup.col_area_val;
 
-		auto& col_back_hue = GUIStyle.col_back_hue;
-		auto& col_back_sat = GUIStyle.col_back_sat;
-		auto& col_back_val = GUIStyle.col_back_val;
+		auto& col_back_hue = setup.col_back_hue;
+		auto& col_back_sat = setup.col_back_sat;
+		auto& col_back_val = setup.col_back_val;
 
-		auto& col_text_hue = GUIStyle.col_text_hue;
-		auto& col_text_sat = GUIStyle.col_text_sat;
-		auto& col_text_val = GUIStyle.col_text_val;
-		auto& frameRounding = GUIStyle.frameRounding;
+		auto& col_text_hue = setup.col_text_hue;
+		auto& col_text_sat = setup.col_text_sat;
+		auto& col_text_val = setup.col_text_val;
+		auto& frameRounding = setup.frameRounding;
 
 		gui::ColorConvertHSVtoRGB(col_main_hue, col_main_sat, col_main_val, rgb.x, rgb.y, rgb.z);
 		if(gui::ColorEdit3("Main", &rgb.x, ImGuiColorEditFlags_HSV))
@@ -44,18 +45,26 @@ namespace Docks
 
 		gui::SliderFloat("Rounding", &frameRounding, 0.0f, 10.0f);
 
-		if (gui::Button("Reset to Defaults"))
+		if (gui::Button("Save"))
+		{
+			GUIStyle.saveStyle();
+		}
+		gui::SameLine();
+		if (gui::Button("Reload"))
+		{
+			GUIStyle.loadStyle();
+		}
+		gui::SameLine();
+		if (gui::Button("Default"))
 		{
 			GUIStyle.resetStyle();
 		}
 		else
 		{
-			ImVec4 col_text = ImColor::HSV(col_text_hue, col_text_sat, col_text_val);
-			ImVec4 col_main = ImColor::HSV(col_main_hue, col_main_sat, col_main_val);
-			ImVec4 col_back = ImColor::HSV(col_back_hue, col_back_sat, col_back_val);
-			ImVec4 col_area = ImColor::HSV(col_area_hue, col_area_sat, col_area_val);
-			GUIStyle.setStyleColors(frameRounding, col_text, col_main, col_back, col_area);
+			GUIStyle.setStyleColors(setup);
 		}
+		
+		
 	}
 
 };

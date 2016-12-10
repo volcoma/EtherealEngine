@@ -10,25 +10,32 @@ namespace gui
 }
 struct GUIStyle
 {
+	struct HSVSetup
+	{
+		float col_main_hue = 145.0f / 255.0f;
+		float col_main_sat = 255.0f / 255.0f;
+		float col_main_val = 205.0f / 255.0f;
+
+		float col_area_hue = 145.0f / 255.0f;
+		float col_area_sat = 0.0f / 255.0f;
+		float col_area_val = 65.0f / 255.0f;
+
+		float col_back_hue = 145.0f / 255.0f;
+		float col_back_sat = 0.0f / 255.0f;
+		float col_back_val = 45.0f / 255.0f;
+
+		float col_text_hue = 0.0f / 255.0f;
+		float col_text_sat = 0.0f / 255.0f;
+		float col_text_val = 255.0f / 255.0f;
+		float frameRounding = 0.0f;
+	};
+
 	void resetStyle();
-	void setStyleColors(float rounding, const ImVec4& col_text, const ImVec4& col_main, const ImVec4& col_back, const ImVec4& col_area);
+	void setStyleColors(const HSVSetup& _setup);
+	void loadStyle();
+	void saveStyle();
 
-	float col_main_hue = 145.0f / 255.0f;
-	float col_main_sat = 255.0f / 255.0f;
-	float col_main_val = 205.0f / 255.0f;
-
-	float col_area_hue = 145.0f / 255.0f;
-	float col_area_sat = 0.0f / 255.0f;
-	float col_area_val = 65.0f / 255.0f;
-
-	float col_back_hue = 145.0f / 255.0f;
-	float col_back_sat = 0.0f / 255.0f;
-	float col_back_val = 45.0f / 255.0f;
-
-	float col_text_hue = 0.0f / 255.0f;
-	float col_text_sat = 0.0f / 255.0f;
-	float col_text_val = 255.0f / 255.0f;
-	float frameRounding = 0.0f;
+	HSVSetup setup;
 };
 
 //-----------------------------------------------------------------------------

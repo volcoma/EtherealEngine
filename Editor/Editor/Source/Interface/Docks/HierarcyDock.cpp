@@ -36,7 +36,7 @@ namespace Docks
 				}
 				if (gui::Selectable("Save As Prefab"))
 				{
-					ecs::utils::saveEntity(fs::resolveFileLocation("data://prefabs/" + entity.getName() + ".asset"), entity);
+					ecs::utils::saveEntity("data://prefabs/", entity);
 				}
 				if (gui::Selectable("Delete"))
 				{

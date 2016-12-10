@@ -356,6 +356,7 @@
     <ClInclude Include="..\..\Source\Interface\Inspectors\Inspector_Math.h" />
     <ClInclude Include="..\..\Source\Interface\Inspectors\Inspector_BaseTypes.h" />
     <ClInclude Include="..\..\Source\Meta\EditorOptions.hpp" />
+    <ClInclude Include="..\..\Source\Meta\Interface\GUI.hpp" />
     <ClInclude Include="..\..\Source\Systems\DebugDrawSystem.h" />
     <ClInclude Include="..\..\Source\Systems\PickingSystem.h" />
   </ItemGroup>

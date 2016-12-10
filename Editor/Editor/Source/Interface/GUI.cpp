@@ -239,7 +239,7 @@ bool init()
 	// Store our identifier
 	io.Fonts->TexID = sFontTexture.get();
 
-	sGUIStyle.resetStyle();
+	sGUIStyle.loadStyle();
 
 	return true;
 }
@@ -316,32 +316,18 @@ GUIStyle& getGUIStyle()
 
 void GUIStyle::resetStyle()
 {
-	col_main_hue = 145.0f / 255.0f;
-	col_main_sat = 255.0f / 255.0f;
-	col_main_val = 205.0f / 255.0f;
-
-	col_area_hue = 145.0f / 255.0f;
-	col_area_sat = 0.0f / 255.0f;
-	col_area_val = 65.0f / 255.0f;
-
-	col_back_hue = 145.0f / 255.0f;
-	col_back_sat = 0.0f / 255.0f;
-	col_back_val = 45.0f / 255.0f;
-
-	col_text_hue = 0.0f / 255.0f;
-	col_text_sat = 0.0f / 255.0f;
-	col_text_val = 255.0f / 255.0f;
-	frameRounding = 0.0f;
-
-	ImVec4 col_text = ImColor::HSV(col_text_hue, col_text_sat, col_text_val);
-	ImVec4 col_main = ImColor::HSV(col_main_hue, col_main_sat, col_main_val);
-	ImVec4 col_back = ImColor::HSV(col_back_hue, col_back_sat, col_back_val);
-	ImVec4 col_area = ImColor::HSV(col_area_hue, col_area_sat, col_area_val);
-	setStyleColors(frameRounding, col_text, col_main, col_back, col_area);
+	setStyleColors(HSVSetup());
 }
 
-void GUIStyle::setStyleColors(float rounding, const ImVec4& col_text, const ImVec4& col_main, const ImVec4& col_back, const ImVec4& col_area)
+void GUIStyle::setStyleColors(const HSVSetup& _setup)
 {
+	setup = _setup;
+	ImVec4 col_text = ImColor::HSV(setup.col_text_hue, setup.col_text_sat, setup.col_text_val);
+	ImVec4 col_main = ImColor::HSV(setup.col_main_hue, setup.col_main_sat, setup.col_main_val);
+	ImVec4 col_back = ImColor::HSV(setup.col_back_hue, setup.col_back_sat, setup.col_back_val);
+	ImVec4 col_area = ImColor::HSV(setup.col_area_hue, setup.col_area_sat, setup.col_area_val);
+	float rounding = setup.frameRounding;
+
 	ImGuiStyle& style = gui::GetStyle();
 	style.FrameRounding = rounding;
 	style.WindowRounding = rounding;
@@ -388,4 +374,37 @@ void GUIStyle::setStyleColors(float rounding, const ImVec4& col_text, const ImVe
 	style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
 	style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(col_main.x, col_main.y, col_main.z, 0.43f);
 	style.Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(0.10f, 0.10f, 0.10f, 0.55f);
+}
+
+//////////////////////////////////////////////////////////////////////////
+#include "Core/serialization/archives.h"
+#include "Meta/Interface/GUI.hpp"
+
+void GUIStyle::loadStyle()
+{
+	const std::string absoluteKey = fs::resolveFileLocation("editor://Config/Style.cfg");
+	if (!fs::fileExists(absoluteKey))
+	{
+		saveStyle();
+	}
+	else
+	{
+		std::ifstream output(absoluteKey);
+		cereal::IArchive_JSON ar(output);
+
+		ar(
+			cereal::make_nvp("style", setup)
+		);
+	}
+}
+
+void GUIStyle::saveStyle()
+{
+	const std::string absoluteKey = fs::resolveFileLocation("editor://Config/Style.cfg");
+	std::ofstream output(absoluteKey);
+	cereal::OArchive_JSON ar(output);
+
+	ar(
+		cereal::make_nvp("style", setup)
+	);
 }

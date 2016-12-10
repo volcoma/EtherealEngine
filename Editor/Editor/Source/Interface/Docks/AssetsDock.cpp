@@ -22,7 +22,7 @@ namespace Docks
 		bool openPopup = false;
 		if (scaleIcons > 0.2f)
 		{
-			const float size = 74.0f * scaleIcons;
+			const float size = 50.0f * scaleIcons;
 			for (auto& asset : container)
 			{
 				auto& assetRelativeName = asset.first;
@@ -76,6 +76,7 @@ namespace Docks
 					}
 					gui::EndPopup();
 				}
+		
 				gui::PopID();
 				gui::SameLine();
 
@@ -91,9 +92,11 @@ namespace Docks
 			{
 				auto& assetRelativeName = asset.first;
 				auto& assetHandle = asset.second.asset;
+				auto dir = fs::getDirectoryName(assetRelativeName);
+				if (!string_utils::beginsWith(dir, "data://", true))
+					continue;
+
 				auto assetName = fs::getFileName(assetRelativeName);
-
-
 				bool alreadySelected = false;
 				if (editState.selected.is_type<std::decay<decltype(assetHandle)>::type>())
 				{
@@ -220,7 +223,7 @@ namespace Docks
 				if (dragged && dragged.is_type<ecs::Entity>())
 				{
 					auto entity = dragged.get_value<ecs::Entity>();
-					ecs::utils::saveEntity(fs::resolveFileLocation("data://prefabs/" + entity.getName() + ".asset"), entity);
+					ecs::utils::saveEntity("data://prefabs/", entity);
 					editState.drop();
 				}
 			}

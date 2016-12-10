@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/reflection/reflection.h"
+#include "../EditorOptions.h"
 #include "Core/serialization/serialization.h"
 #include "Core/serialization/cereal/types/deque.hpp"
 #include "Core/serialization/cereal/types/string.hpp"

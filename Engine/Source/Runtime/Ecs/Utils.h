@@ -16,7 +16,7 @@ namespace ecs
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void saveEntity(const std::string& name, const Entity& data);
+		void saveEntity(const std::string& dir, const Entity& data);
 
 		//-----------------------------------------------------------------------------
 		//  Name : tryLoadEntity ()

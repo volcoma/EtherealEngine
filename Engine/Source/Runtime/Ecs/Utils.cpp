@@ -2,13 +2,15 @@
 #include "Core/serialization/serialization.h"
 #include "Core/serialization/archives.h"
 #include "../Meta/Ecs/Entity.hpp"
+#include "../System/FileSystem.h"
 
 namespace ecs
 {
 	namespace utils
 	{
-		void saveEntity(const std::string& name, const Entity& data)
+		void saveEntity(const std::string& dir, const Entity& data)
 		{
+			const std::string name = fs::resolveFileLocation(dir + data.getName() + ".asset");
 			saveData(name, { data });
 		}
 
