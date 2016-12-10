@@ -31,7 +31,7 @@
 #define CEREAL_TYPES_BITSET_HPP_
 
 #include "../cereal.hpp"
-#include "string.hpp"
+#include "../types/string.hpp"
 #include <bitset>
 
 namespace cereal
@@ -147,6 +147,8 @@ namespace cereal
         // but doing this at runtime doesn't break any old serialization
         std::uint8_t chunk = 0;
         std::uint8_t mask  = 0;
+
+        bits.reset();
 
         // Load one chunk at a time, rotating through the chunk
         // to set bits in the bitset

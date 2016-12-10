@@ -30,7 +30,7 @@
 #ifndef CEREAL_TYPES_LIST_HPP_
 #define CEREAL_TYPES_LIST_HPP_
 
-#include "serialization/cereal/cereal.hpp"
+#include "../cereal.hpp"
 #include <list>
 
 namespace cereal

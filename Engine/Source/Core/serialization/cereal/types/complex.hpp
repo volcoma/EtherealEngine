@@ -30,6 +30,7 @@
 #ifndef CEREAL_TYPES_COMPLEX_HPP_
 #define CEREAL_TYPES_COMPLEX_HPP_
 
+#include "../cereal.hpp"
 #include <complex>
 
 namespace cereal

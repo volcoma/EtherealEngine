@@ -30,6 +30,7 @@
 #ifndef CEREAL_TYPES_CHRONO_HPP_
 #define CEREAL_TYPES_CHRONO_HPP_
 
+#include "../cereal.hpp"
 #include <chrono>
 
 namespace cereal
