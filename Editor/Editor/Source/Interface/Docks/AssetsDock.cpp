@@ -7,6 +7,7 @@
 #include "Runtime/System/MessageBox.h"
 #include "Runtime/System/FileSystem.h"
 #include "Runtime/Ecs/Prefab.h"
+#include "Runtime/Ecs/Utils.h"
 #include <cstdio>
 
 static float scaleIcons = 1.0f;
@@ -213,6 +214,18 @@ namespace Docks
 
 		if (gui::BeginChild("###assets_content", gui::GetContentRegionAvail(), false, flags))
 		{
+			if (gui::IsWindowHovered() && gui::IsMouseReleased(2))
+			{
+				auto& dragged = editState.dragged;
+				if (dragged && dragged.is_type<ecs::Entity>())
+				{
+					auto entity = dragged.get_value<ecs::Entity>();
+					ecs::utils::saveEntity(fs::resolveFileLocation("data://prefabs/" + entity.getName() + ".asset"), entity);
+					editState.drop();
+				}
+			}
+			
+
 			if(selectedCategory == "Meshes")
 				listItems(meshes, manager, editState);
 

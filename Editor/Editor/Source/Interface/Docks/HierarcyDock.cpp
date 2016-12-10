@@ -98,13 +98,14 @@ namespace Docks
 								->setParent(entity.component<TransformComponent>());
 
 							editState.drop();
+							editState.select(draggedEntity);
 						}
 					}
 				}
 			}
 			else
 			{
-				if (gui::IsWindowHovered() && !gui::IsAnyItemHovered())
+				if (dragged && gui::IsWindowHovered() && !gui::IsAnyItemHovered())
 				{
 					if (gui::IsMouseReleased(2))
 					{
@@ -121,6 +122,8 @@ namespace Docks
 							auto prefab = dragged.get_value<AssetHandle<Prefab>>();
 							auto draggedEntity = prefab->instantiate();
 							editState.drop();
+							editState.select(draggedEntity);
+							
 						}
 					}
 				}
@@ -271,9 +274,7 @@ namespace Docks
 		{
 			if (!root.expired())
 				drawEntity(root.lock()->getEntity());
-		}
-
-		
+		}		
 	}
 
 };
