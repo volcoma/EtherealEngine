@@ -1423,7 +1423,7 @@ struct DebugDraw
 		const uint32_t num = (_size / 2) * 2 - 1;
 		const float halfExtent = float(_size / 2) * _step;
 
-		setColor(0xff606060);
+		//setColor(0xff606060);
 		float yy = -halfExtent + _step;
 		for (uint32_t ii = 0; ii < num; ++ii)
 		{
@@ -1436,7 +1436,7 @@ struct DebugDraw
 			yy += _step;
 		}
 
-		setColor(0xff101010);
+		//setColor(0xff101010);
 		moveTo(_axis, -halfExtent, -halfExtent);
 		lineTo(_axis, -halfExtent, halfExtent);
 		lineTo(_axis, halfExtent, halfExtent);

@@ -80,6 +80,7 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 			auto step = (sizeIntervals * iteration);
 			step = step ? step : 1;
 			ddPush();
+			ddSetState(true, false, true);
 			ddSetColor(detailGridColor);
 			math::vec3 center{ 0.0f, 0.0f, 0.0f };
 			ddDrawGrid(Axis::Y, &center, gridSize / step, float(step));
