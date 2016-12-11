@@ -13,7 +13,7 @@ bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, s
 	auto& app = Singleton<EditorApp>::getInstance();
 	auto& manager = app.getAssetManager();
 	auto& editState = app.getEditState();
-	auto& selected = editState.selected;
+	auto& selected = editState.selectionData.object;
 
 	bool changed = false;
 	if (selected && selected.is_type<AssetHandle<Texture>>())
@@ -76,7 +76,7 @@ bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, s
 			return true;
 		}
 
-		auto& dragged = editState.dragged;
+		auto& dragged = editState.dragData.object;
 		if (dragged && dragged.is_type<AssetHandle<Texture>>())
 		{
 			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.5f));
@@ -120,7 +120,7 @@ bool Inspector_AssetHandle_Material::inspect(rttr::variant& var, bool readOnly, 
 	auto& app = Singleton<EditorApp>::getInstance();
 	auto& manager = app.getAssetManager();
 	auto& editState = app.getEditState();
-	auto& selected = editState.selected;
+	auto& selected = editState.selectionData.object;
 	if (selected && !selected.is_type<AssetHandle<Material>>())
 	{
 		std::string item = data ? data.id() : "none";
@@ -144,7 +144,7 @@ bool Inspector_AssetHandle_Material::inspect(rttr::variant& var, bool readOnly, 
 			return true;
 		}
 
-		auto& dragged = editState.dragged;
+		auto& dragged = editState.dragData.object;
 		if (dragged && dragged.is_type<AssetHandle<Material>>())
 		{
 			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
@@ -201,7 +201,7 @@ bool Inspector_AssetHandle_Mesh::inspect(rttr::variant& var, bool readOnly, std:
 	auto& app = Singleton<EditorApp>::getInstance();
 	auto& manager = app.getAssetManager();
 	auto& editState = app.getEditState();
-	auto& selected = editState.selected;
+	auto& selected = editState.selectionData.object;
 	if (selected && !selected.is_type<AssetHandle<Mesh>>())
 	{
 		std::string item = data ? data.id() : "none";
@@ -225,7 +225,7 @@ bool Inspector_AssetHandle_Mesh::inspect(rttr::variant& var, bool readOnly, std:
 			return true;
 		}
 		
-		auto& dragged = editState.dragged;
+		auto& dragged = editState.dragData.object;
 		if (dragged && dragged.is_type<AssetHandle<Mesh>>())
 		{
 			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);

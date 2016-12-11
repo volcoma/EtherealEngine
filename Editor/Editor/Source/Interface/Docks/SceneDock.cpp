@@ -70,7 +70,7 @@ namespace Docks
 		auto& app = Singleton<EditorApp>::getInstance();
 		auto& input = app.getInput();
 		auto& editState = app.getEditState();
-		auto& selected = editState.selected;
+		auto& selected = editState.selectionData.object;
 		auto& editorCamera = editState.camera;
 
 		if (selected.is_type<ecs::Entity>())
@@ -121,7 +121,7 @@ namespace Docks
 		auto& app = Singleton<EditorApp>::getInstance();
 		auto& input = app.getInput();
 		auto& editState = app.getEditState();
-		auto& selected = editState.selected;
+		auto& selected = editState.selectionData.object;
 		auto& editorCamera = editState.camera;
 		auto& operation = editState.operation;
 		auto& mode = editState.mode;
@@ -311,7 +311,7 @@ namespace Docks
 		auto& editState = app.getEditState();
 		auto& window = app.getWindow();
 		auto& editorCamera = editState.camera;
-		auto& selected = editState.selected;
+		auto& selected = editState.selectionData.object;
 		bool hasEditCamera = editorCamera
 			&& editorCamera.has_component<CameraComponent>()
 			&& editorCamera.has_component<TransformComponent>();

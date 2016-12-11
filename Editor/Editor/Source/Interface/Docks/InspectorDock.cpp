@@ -10,7 +10,7 @@ namespace Docks
 		auto& app = Singleton<EditorApp>::getInstance();
 		auto& editState = app.getEditState();
 		
-		auto& selected = editState.selected;
+		auto& selected = editState.selectionData.object;
 		if (selected)
 		{
 			inspectVar(selected);

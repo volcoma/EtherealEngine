@@ -36,7 +36,7 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 	auto& editState = app.getEditState();
 
 	auto& editorCamera = editState.camera;
-	auto& selected = editState.selected;
+	auto& selected = editState.selectionData.object;
 	if (!editorCamera || 
 		!editorCamera.has_component<CameraComponent>())
 		return;
@@ -68,7 +68,7 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 			std::uint32_t b = (gridColor >> 16) & 0xff;
 			std::uint32_t a = (gridColor >> 24) & 0xff;
 			a = static_cast<std::uint32_t>(math::lerp(255.0f, 0.0f, factor));
-			if (a < 0.01f)
+			if (a < 10)
 				shouldRender = false;
 
 			detailGridColor = r + (g << 8) + (b << 16) + (a << 24);
@@ -82,7 +82,7 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 			ddPush();
 			ddSetState(true, false, true);
 			ddSetColor(detailGridColor);
-			math::vec3 center{ 0.0f, 0.0f, 0.0f };
+			math::vec3 center = { 0.0f, 0.0f, 0.0f };
 			ddDrawGrid(Axis::Y, &center, gridSize / step, float(step));
 			ddPop();
 		}
@@ -203,19 +203,14 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 		// Test the bounding box of the mesh
 		if (math::frustum::testOBB(frustum, bounds, worldTransform))
 		{
-			ddPush();
-			ddSetColor(0xff00ff00);
-			ddSetTransform(&worldTransform);
-			ddDrawAabb(&bounds.min, &bounds.max);
-			ddPop();
-
 			if (editState.wireframeSelection)
 			{
 				const float u_params[8] =
 				{
-					1.0f, 1.0f, 0.0f, 1.0f,
-					1.0f, 2.0f, 0.0f, 0.0f
+					1.0f, 1.0f, 0.0f, 0.5f,
+					1.0f, 1.0f, 0.0f, 0.0f
 				};
+				mProgram->beginPass();
 				mProgram->setUniform("u_params", u_params, 2);
 				const auto material = model.getMaterialForGroup({});
 				if (!material)
@@ -224,7 +219,15 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 					| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
 					;
 				hMesh->submit(pass.id, mProgram->handle, worldTransform, state);
-			}	
+			}
+			else
+			{
+				ddPush();
+				ddSetColor(0xff00ff00);
+				ddSetTransform(&worldTransform);
+				ddDrawAabb(&bounds.min, &bounds.max);
+				ddPop();
+			}
 		}
 	}
 }

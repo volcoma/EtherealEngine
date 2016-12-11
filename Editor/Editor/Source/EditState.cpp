@@ -10,8 +10,8 @@
 #include "Meta/EditorOptions.hpp"
 void EditState::clear()
 {
-	selected = {};
-	dragged = {};
+	dragData = {};
+	selectionData = {};
 	icons.clear();
 }
 
@@ -110,51 +110,32 @@ void EditState::loadIcons(AssetManager& manager)
 
 void EditState::select(rttr::variant object)
 {
-	selected = object;
+	selectionData.object = object;
 }
 
 void EditState::unselect()
 {
-	selected = {};
+	selectionData = {};
 }
 
-void EditState::drag(rttr::variant object)
+void EditState::drag(rttr::variant object, const std::string& description)
 {
-	dragged = object;
+	dragData.object = object;
+	dragData.description = description;
 	gui::SetWindowFocus();
 }
 
 void EditState::drop()
 {
-	dragged = {};
+	dragData = {};
 }
 
 void EditState::frameEnd()
 {
-	if (dragged)
+	if (dragData.object)
 	{
-		std::string tooltip;
-		if (dragged.is_type<ecs::Entity>())
-		{
-			tooltip = dragged.get_value<ecs::Entity>().to_string();
-		}
-		if (dragged.is_type<AssetHandle<Mesh>>())
-		{
-			tooltip = dragged.get_value<AssetHandle<Mesh>>().id();
-		}
-		if (dragged.is_type<AssetHandle<Texture>>())
-		{
-			tooltip = dragged.get_value<AssetHandle<Texture>>().id();
-		}
-		if (dragged.is_type<AssetHandle<Material>>())
-		{
-			tooltip = dragged.get_value<AssetHandle<Material>>().id();
-		}
-		if (dragged.is_type<AssetHandle<Prefab>>())
-		{
-			tooltip = dragged.get_value<AssetHandle<Prefab>>().id();
-		}
-		gui::SetTooltip(tooltip.c_str());
+		gui::SetMouseCursor(ImGuiMouseCursor_Move);
+		gui::SetTooltip(dragData.description.c_str());
 	}
 
 	if (!gui::IsAnyItemHovered())

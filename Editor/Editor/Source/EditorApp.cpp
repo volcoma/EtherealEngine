@@ -265,10 +265,13 @@ void EditorApp::openProject(const std::string& projectDir)
 	fs::addPathProtocol("data", fs::resolveFileLocation("app://data/"));
 	wd::unwatchAll();
 	watchAssets<Texture>("data://textures/", true);
+	watchAssets<Texture>("editor://icons/", true);
 	watchAssets<Mesh>("data://meshes/", true);
 	watchAssets<Prefab>("data://prefabs/", true);
 	watchAssets<Material>("data://materials/", false);
 	watchAssets<Shader>("sys://shaders/", true);
+	watchAssets<Shader>("editor://shaders/", true);
+
 	auto& world = getWorld();
 	world.reset();
 	auto& editState = getEditState();

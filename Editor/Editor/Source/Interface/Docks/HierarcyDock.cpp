@@ -7,6 +7,8 @@
 #include "Runtime/Ecs/Systems/TransformSystem.h"
 #include "Runtime/Input/InputContext.h"
 #include "Runtime/System/FileSystem.h"
+#include "Runtime/Rendering/Mesh.h"
+#include "Runtime/Ecs/Components/ModelComponent.h"
 namespace Docks
 {
 
@@ -67,15 +69,16 @@ namespace Docks
 	{
 		auto& app = Singleton<EditorApp>::getInstance();
 		auto& editState = app.getEditState();
+		auto& world = app.getWorld();
 		auto& editorCamera = editState.camera;
-		auto& dragged = editState.dragged;
+		auto& dragged = editState.dragData.object;
 		if (entity)
 		{
 			if (isHovered)
 			{
 				if (gui::IsMouseClicked(2) && entity != editorCamera)
 				{
-					editState.drag(entity);
+					editState.drag(entity, entity.to_string());
 				}
 				if (gui::IsMouseReleased(2))
 				{
@@ -92,13 +95,32 @@ namespace Docks
 
 						if (dragged.is_type<AssetHandle<Prefab>>())
 						{
-							auto prefab = dragged.get_value<AssetHandle<Prefab>>();;
+							auto prefab = dragged.get_value<AssetHandle<Prefab>>();
 							auto draggedEntity = prefab->instantiate();
 							draggedEntity.component<TransformComponent>().lock()
 								->setParent(entity.component<TransformComponent>());
 
 							editState.drop();
 							editState.select(draggedEntity);
+						}
+						if (dragged.is_type<AssetHandle<Mesh>>())
+						{
+							auto mesh = dragged.get_value<AssetHandle<Mesh>>();
+							Model model;		
+							model.setLod(mesh, 0);
+
+							auto object = world.entities.create();
+							//Add component and configure it.
+							object.assign<TransformComponent>().lock()
+								->setParent(entity.component<TransformComponent>());
+							//Add component and configure it.
+							object.assign<ModelComponent>().lock()
+								->setCastShadow(true)
+								.setCastReflelction(false)
+								.setModel(model);
+
+							editState.drop();
+							editState.select(object);
 						}
 					}
 				}
@@ -124,6 +146,24 @@ namespace Docks
 							editState.drop();
 							editState.select(draggedEntity);
 							
+						}
+						if (dragged.is_type<AssetHandle<Mesh>>())
+						{
+							auto mesh = dragged.get_value<AssetHandle<Mesh>>();
+							Model model;
+							model.setLod(mesh, 0);
+
+							auto object = world.entities.create();
+							//Add component and configure it.
+							object.assign<TransformComponent>();
+							//Add component and configure it.
+							object.assign<ModelComponent>().lock()
+								->setCastShadow(true)
+								.setCastReflelction(false)
+								.setModel(model);
+
+							editState.drop();
+							editState.select(object);
 						}
 					}
 				}
@@ -154,7 +194,7 @@ namespace Docks
 		gui::AlignFirstTextHeightToWidgets();
 		auto& app = Singleton<EditorApp>::getInstance();
 		auto& editState = app.getEditState();
-		auto& selected = editState.selected;
+		auto& selected = editState.selectionData.object;
 
 		bool isSselected = false;
 		if (selected && selected.is_type<ecs::Entity>())
@@ -230,7 +270,7 @@ namespace Docks
 		auto& roots = system->getRoots();
 
 		auto& editorCamera = editState.camera;
-		auto& selected = editState.selected;
+		auto& selected = editState.selectionData.object;
 
 		checkContextMenu(ecs::Entity());
 

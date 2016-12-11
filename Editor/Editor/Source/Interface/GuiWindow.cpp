@@ -72,6 +72,12 @@ void imguiFrameUpdate(RenderWindow& window, float dt, const uSize& viewSize)
 		case ImGuiMouseCursor_Arrow:
 			window.setMouseCursor(sf::Window::Arrow);
 			break;
+		case ImGuiMouseCursor_Move:
+			window.setMouseCursor(sf::Window::Hand);
+			break;
+		case ImGuiMouseCursor_Help:
+			window.setMouseCursor(sf::Window::Help);
+			break;
 		case ImGuiMouseCursor_TextInput:			// When hovering over InputText, etc.
 			window.setMouseCursor(sf::Window::Text);
 			break;

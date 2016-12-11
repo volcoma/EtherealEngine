@@ -686,6 +686,7 @@ enum ImGuiMouseCursor_
     ImGuiMouseCursor_Arrow = 0,
     ImGuiMouseCursor_TextInput,         // When hovering over InputText, etc.
     ImGuiMouseCursor_Move,              // Unused
+	ImGuiMouseCursor_Help,				// Unused
     ImGuiMouseCursor_ResizeNS,          // Unused
     ImGuiMouseCursor_ResizeEW,          // When hovering over a column
     ImGuiMouseCursor_ResizeNESW,        // Unused

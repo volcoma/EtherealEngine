@@ -9,7 +9,7 @@
 #include <bx/platform.h>
 
 #ifndef BGFX_CONFIG_DEBUG
-#	define BGFX_CONFIG_DEBUG 0
+#	define BGFX_CONFIG_DEBUG 1
 #endif // BGFX_CONFIG_DEBUG
 
 #if BGFX_CONFIG_DEBUG || BX_COMPILER_CLANG_ANALYZER

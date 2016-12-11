@@ -37,7 +37,7 @@ void Mesh::submit(uint8_t _id, gfx::ProgramHandle _program, const float* _mtx, u
 	gfx::setTransform(_mtx);
 	gfx::setState(_state);
 
-	for (auto it = groups.begin(), itEnd = groups.end(); it != itEnd; ++it)
+	for (auto it = std::begin(groups), itEnd = std::end(groups); it != itEnd; ++it)
 	{
 		const auto& group = *it;
 

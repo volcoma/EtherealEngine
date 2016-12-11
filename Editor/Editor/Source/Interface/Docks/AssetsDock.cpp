@@ -12,11 +12,46 @@
 
 static float scaleIcons = 1.0f;
 
+template<typename T>
+AssetHandle<Texture> getAssetIcon(AssetHandle<T> asset)
+{
+	auto& app = Singleton<EditorApp>::getInstance();
+	auto& editState = app.getEditState();
+	return editState.icons["prefab"];
+}
+
+template<>
+AssetHandle<Texture> getAssetIcon(AssetHandle<Texture> asset)
+{
+	return asset;
+}
+template<>
+AssetHandle<Texture> getAssetIcon(AssetHandle<Prefab> asset)
+{
+	auto& app = Singleton<EditorApp>::getInstance();
+	auto& editState = app.getEditState();
+	return editState.icons["prefab"];
+}
+template<>
+AssetHandle<Texture> getAssetIcon(AssetHandle<Mesh> asset)
+{
+	auto& app = Singleton<EditorApp>::getInstance();
+	auto& editState = app.getEditState();
+	return editState.icons["mesh"];
+}
+template<>
+AssetHandle<Texture> getAssetIcon(AssetHandle<Material> asset)
+{
+	auto& app = Singleton<EditorApp>::getInstance();
+	auto& editState = app.getEditState();
+	return editState.icons["material"];
+}
 namespace Docks
 {
 	template<typename T>
 	bool listItems(std::shared_ptr<TStorage<T>> storage, AssetManager& manager, EditState& editState)
 	{
+		auto& selected = editState.selectionData.object;
 		//copy for safe removal from original
 		auto container = storage->container;
 		bool openPopup = false;
@@ -33,9 +68,9 @@ namespace Docks
 
 				auto assetName = fs::getFileName(assetRelativeName);
 				bool alreadySelected = false;
-				if (editState.selected.is_type<std::decay<decltype(assetHandle)>::type>())
+				if (selected.is_type<std::decay<decltype(assetHandle)>::type>())
 				{
-					if (editState.selected.get_value<std::decay<decltype(assetHandle)>::type>() == assetHandle)
+					if (selected.get_value<std::decay<decltype(assetHandle)>::type>() == assetHandle)
 					{
 						alreadySelected = true;
 					}
@@ -62,7 +97,7 @@ namespace Docks
 				{
 					if (gui::IsMouseClicked(2))
 					{
-						editState.drag(assetHandle);
+						editState.drag(assetHandle, assetRelativeName);
 					}
 				}
 				if (gui::BeginPopupContextItem(assetName.c_str()))
@@ -98,9 +133,9 @@ namespace Docks
 
 				auto assetName = fs::getFileName(assetRelativeName);
 				bool alreadySelected = false;
-				if (editState.selected.is_type<std::decay<decltype(assetHandle)>::type>())
+				if (selected.is_type<std::decay<decltype(assetHandle)>::type>())
 				{
-					if (editState.selected.get_value<std::decay<decltype(assetHandle)>::type>() == assetHandle)
+					if (selected.get_value<std::decay<decltype(assetHandle)>::type>() == assetHandle)
 					{
 						alreadySelected = true;
 					}
@@ -117,7 +152,7 @@ namespace Docks
 				{
 					if (gui::IsMouseClicked(2))
 					{
-						editState.drag(assetHandle);
+						editState.drag(assetHandle, assetRelativeName);
 					}
 				}
 				if (gui::BeginPopupContextItem(assetName.c_str()))
@@ -134,30 +169,6 @@ namespace Docks
 		}
 		return openPopup;
 	};
-
-	AssetHandle<Texture> getAssetIcon(AssetHandle<Texture> asset)
-	{
-		return asset;
-	}
-	AssetHandle<Texture> getAssetIcon(AssetHandle<Prefab> asset)
-	{
-		auto& app = Singleton<EditorApp>::getInstance();
-		auto& editState = app.getEditState();
-		return editState.icons["prefab"];
-	}
-
-	AssetHandle<Texture> getAssetIcon(AssetHandle<Mesh> asset)
-	{
-		auto& app = Singleton<EditorApp>::getInstance();
-		auto& editState = app.getEditState();
-		return editState.icons["mesh"];
-	}
-	AssetHandle<Texture> getAssetIcon(AssetHandle<Material> asset)
-	{
-		auto& app = Singleton<EditorApp>::getInstance();
-		auto& editState = app.getEditState();
-		return editState.icons["material"];
-	}
 
 	void renderAssets(ImVec2 area)
 	{
@@ -219,7 +230,7 @@ namespace Docks
 		{
 			if (gui::IsWindowHovered() && gui::IsMouseReleased(2))
 			{
-				auto& dragged = editState.dragged;
+				auto& dragged = editState.dragData.object;
 				if (dragged && dragged.is_type<ecs::Entity>())
 				{
 					auto entity = dragged.get_value<ecs::Entity>();

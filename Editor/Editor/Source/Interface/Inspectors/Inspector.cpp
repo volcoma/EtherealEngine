@@ -2,11 +2,14 @@
 
 void Tooltip(const rttr::property& prop)
 {
-	auto tooltipVar = prop.get_metadata("Tooltip");
-	if (tooltipVar)
+	if (gui::IsItemHovered())
 	{
-		if (gui::IsItemHovered())
+		gui::SetMouseCursor(ImGuiMouseCursor_Help);
+		auto tooltipVar = prop.get_metadata("Tooltip");
+		if (tooltipVar)
+		{
 			gui::SetTooltip(tooltipVar.to_string().c_str());
+		}
 	}
 }
 
