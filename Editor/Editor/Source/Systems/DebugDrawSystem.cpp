@@ -207,8 +207,8 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 			{
 				const float u_params[8] =
 				{
-					1.0f, 1.0f, 0.0f, 0.5f,
-					1.0f, 1.0f, 0.0f, 0.0f
+					1.0f, 1.0f, 0.0f, 0.5f, //r,g,b,a
+					1.0f, 0.0f, 0.0f, 0.0f  //thickness, unused, unused, unused
 				};
 				mProgram->beginPass();
 				mProgram->setUniform("u_params", u_params, 2);

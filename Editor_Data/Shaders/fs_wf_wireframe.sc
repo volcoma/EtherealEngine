@@ -4,8 +4,7 @@ $input v_bc
 uniform vec4 u_params[2];
 #define u_wfColor      u_params[0].xyz
 #define u_wfOpacity    u_params[0].w
-#define u_drawEdges    u_params[1].x
-#define u_wfThickness  u_params[1].y
+#define u_wfThickness  u_params[1].x
 
 void main()
 {
