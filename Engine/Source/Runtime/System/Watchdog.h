@@ -37,9 +37,9 @@ public:
 	/// to receive a list of all the files that have been modified.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void watch(const fs::path &path, const std::function<void(const fs::path&)> &callback)
+	static void watch(const fs::path &path, bool initialList, const std::function<void(const fs::path&)> &callback)
 	{
-		watchImpl(path, callback, std::function<void(const std::vector<fs::path>&)>());
+		watchImpl(path, initialList, callback, std::function<void(const std::vector<fs::path>&)>());
 	}
 
 	//-----------------------------------------------------------------------------
@@ -51,9 +51,9 @@ public:
 	/// or a directory.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void watch(const fs::path &path, const std::function<void(const std::vector<fs::path>&)> &callback)
+	static void watch(const fs::path &path, bool initialList, const std::function<void(const std::vector<fs::path>&)> &callback)
 	{
-		watchImpl(path, std::function<void(const fs::path&)>(), callback);
+		watchImpl(path, initialList, std::function<void(const fs::path&)>(), callback);
 	}
 
 	//-----------------------------------------------------------------------------
@@ -200,7 +200,7 @@ protected:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void watchImpl(const fs::path &path, const std::function<void(const fs::path&)> &callback = std::function<void(const fs::path&)>(), const std::function<void(const std::vector<fs::path>&)> &listCallback = std::function<void(const std::vector<fs::path>&)>())
+	static void watchImpl(const fs::path &path, bool initialList = true, const std::function<void(const fs::path&)> &callback = std::function<void(const fs::path&)>(), const std::function<void(const std::vector<fs::path>&)> &listCallback = std::function<void(const std::vector<fs::path>&)>())
 	{
 		// create the static Watchdog instance
 		static Watchdog wd;
@@ -239,7 +239,7 @@ protected:
 			std::lock_guard<std::mutex> lock(wd.mMutex);
 			if (wd.mFileWatchers.find(key) == wd.mFileWatchers.end())
 			{
-				wd.mFileWatchers.emplace(make_pair(key, Watcher(p, filter, callback, listCallback)));
+				wd.mFileWatchers.emplace(make_pair(key, Watcher(p, filter, initialList, callback, listCallback)));
 			}
 		}
 		// if there is no callback that means that we are unwatching
@@ -354,7 +354,7 @@ protected:
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		Watcher(const fs::path &path, const std::string &filter, const std::function<void(const fs::path&)> &callback, const std::function<void(const std::vector<fs::path>&)> &listCallback)
+		Watcher(const fs::path &path, const std::string &filter, bool initialList, const std::function<void(const fs::path&)> &callback, const std::function<void(const std::vector<fs::path>&)> &listCallback)
 			: mPath(path), mFilter(filter), mCallback(callback), mListCallback(listCallback)
 		{
 			// make sure we store all initial write time
@@ -367,16 +367,20 @@ protected:
 					paths.push_back(p);
 					return false;
 				});
-				// this means that the first watch won't call the callback function
-				// so we have to manually call it here
-				if (mCallback)
+
+				if (initialList)
 				{
-					mCallback(mPath / mFilter);
-				}
-				else
-				{
-					mListCallback(paths);
-				}
+					// this means that the first watch won't call the callback function
+					// so we have to manually call it here if we want that behavior
+					if (mCallback)
+					{
+						mCallback(mPath / mFilter);
+					}
+					else
+					{
+						mListCallback(paths);
+					}
+				}				
 			}
 		}
 

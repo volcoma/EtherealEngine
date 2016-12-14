@@ -6,7 +6,7 @@
 #ifndef BGFX_P_H_HEADER_GUARD
 #define BGFX_P_H_HEADER_GUARD
 
-#include <bx/platform.h>
+#include "../bx/platform.h"
 
 #ifndef BGFX_CONFIG_DEBUG
 #	define BGFX_CONFIG_DEBUG 1
@@ -19,7 +19,7 @@
 #	define BX_CONFIG_ALLOCATOR_DEBUG 1
 #endif // BGFX_CONFIG_DEBUG
 
-#include <bgfx/bgfx.h>
+#include "../bgfx/bgfx.h"
 #include "config.h"
 
 #include <inttypes.h>

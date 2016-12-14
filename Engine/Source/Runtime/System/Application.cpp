@@ -231,27 +231,27 @@ bool Application::initAssetManager()
 		auto storage = manager.add<Shader>();
 		storage->loadFromFile = AssetReader::loadShaderFromFile;
 		storage->loadFromMemory = AssetReader::loadShaderFromMemory;
-
+		storage->subdir = "/runtime/";
 		switch (gfx::getRendererType())
 		{
 		case gfx::RendererType::Direct3D9:
-			storage->subdir = "/runtime/dx9/";
+			storage->platform = "dx9/";
 			break;
 		case gfx::RendererType::Direct3D11:
 		case gfx::RendererType::Direct3D12:
-			storage->subdir = "/runtime/dx11/";
+			storage->platform = "dx11/";
 			break;
 
 		case gfx::RendererType::OpenGL:
-			storage->subdir = "/runtime/glsl/";
+			storage->platform = "glsl/";
 			break;
 
 		case gfx::RendererType::Metal:
-			storage->subdir = "/runtime/metal/";
+			storage->platform = "metal/";
 			break;
 
 		case gfx::RendererType::OpenGLES:
-			storage->subdir = "/runtime/gles/";
+			storage->platform = "gles/";
 			break;
 
 		default:

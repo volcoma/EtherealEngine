@@ -164,6 +164,8 @@ struct TStorage : Storage
 	std::unordered_map<std::string, LoadRequest<T>> container;
 	/// Sub directory
 	std::string subdir;
+	/// Sub directory
+	std::string platform;
 };
 
 template<typename T>
@@ -176,7 +178,7 @@ inline std::string getAbsoluteKey(const std::string& toLowerKey, T storage)
 	dir = string_utils::toLower(dir);
 	file = string_utils::toLower(file);
 	static const std::string ext = ".asset";
-	absoluteKey = dir + storage->subdir + file + ext;
+	absoluteKey = dir + storage->subdir + storage->platform + file + ext;
 	return absoluteKey;
 };
 

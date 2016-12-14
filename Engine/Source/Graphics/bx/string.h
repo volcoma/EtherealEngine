@@ -7,15 +7,15 @@
 #define BX_STRING_H_HEADER_GUARD
 
 #include "bx.h"
-#include <alloca.h>
+//#include <alloca.h>
 #include <ctype.h>  // tolower
 #include <stdarg.h> // va_list
 #include <stdio.h>  // vsnprintf, vsnwprintf
 #include <string.h>
 #include <wchar.h>  // wchar_t
 
-#include <bx/allocator.h>
-#include <bx/hash.h>
+#include "allocator.h"
+#include "hash.h"
 
 #ifndef va_copy
 #	define va_copy(_a, _b) (_a) = (_b)

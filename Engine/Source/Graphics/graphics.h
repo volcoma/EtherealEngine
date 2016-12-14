@@ -6,7 +6,7 @@
 #include "bx/handlealloc.h"
 #include "bx/readerwriter.h"
 #include "bx/error.h"
-
+#include "src/vertexdecl.h"
 namespace gfx
 {
 
@@ -62,11 +62,6 @@ namespace gfx
 
 
 #include <fstream>
-
-namespace bgfx
-{
-	std::int32_t read(bx::ReaderI* _reader, VertexDecl& _decl, bx::Error* _err = nullptr);
-}
 
 struct FileStreamReaderSeeker : public bx::ReaderSeekerI
 {
