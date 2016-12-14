@@ -307,6 +307,12 @@ void EditorApp::createProject(const std::string& projectDir)
 
 void EditorApp::openProject(const std::string& projectDir)
 {
+	if (!fs::directoryExists(projectDir))
+	{
+		auto logger = logging::get("Log");
+		logger->error().write("Project directory doesn't exist {0}", projectDir);
+		return;
+	}
 	fs::addPathProtocol("app", projectDir);
 	fs::addPathProtocol("data", fs::resolveFileLocation("app://data/"));
 	wd::unwatchAll();

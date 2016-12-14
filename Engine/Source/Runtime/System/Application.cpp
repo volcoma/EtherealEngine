@@ -163,7 +163,7 @@ bool Application::registerMainWindow(RenderWindow& window)
 
 	gfx::setPlatformData(pd);
 
-	if (!gfx::init(gfx::RendererType::Count, 0, 0, &sGfxCallback))
+	if (!gfx::init(gfx::RendererType::OpenGL, 0, 0, &sGfxCallback))
 		return false;
 
 	auto onClosed = [this](RenderWindow& wnd)

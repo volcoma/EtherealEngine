@@ -87,7 +87,8 @@ void ShaderCompiler::compile(const std::string& absoluteKey)
 		args_array[17] = "--disasm";
 
 		auto logger = logging::get("Log");
-
+		static std::mutex mtx;
+		std::lock_guard<std::mutex> lock(mtx);
 		if (compileShader(18, args_array) == EXIT_FAILURE)
 		{
 			logger->error().write("Failed to compile shader: {0}", output.c_str());

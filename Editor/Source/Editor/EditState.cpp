@@ -167,6 +167,22 @@ void EditState::loadOptions()
 		ar(
 			cereal::make_nvp("options", options)
 		);
+
+		auto& items = options.recentProjects;
+		auto iter = std::begin(items);
+		while (iter != items.end())
+		{
+			auto& item = *iter;
+
+			if (!fs::directoryExists(item))
+			{
+				iter = items.erase(iter);				
+			}
+			else
+			{
+				++iter;
+			}
+		}
 	}
 }
 
