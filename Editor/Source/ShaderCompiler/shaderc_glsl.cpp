@@ -36,37 +36,37 @@ namespace bgfx { namespace glsl
 		}
 
 		glslopt_ctx* ctx = glslopt_initialize(target);
+// 
+// 		glslopt_shader* shader = glslopt_optimize(ctx, type, _code.c_str(), 0);
+// 
+// 		if (!glslopt_get_status(shader) )
+// 		{
+// 			const char* log = glslopt_get_log(shader);
+// 			int32_t source  = 0;
+// 			int32_t line    = 0;
+// 			int32_t column  = 0;
+// 			int32_t start   = 0;
+// 			int32_t end     = INT32_MAX;
+// 
+// 			bool found = false
+// 				|| 3 == sscanf(log, "%u:%u(%u):", &source, &line, &column)
+// 				;
+// 
+// 			if (found
+// 			&&  0 != line)
+// 			{
+// 				start = bx::uint32_imax(1, line-10);
+// 				end   = start + 20;
+// 			}
+// 
+// 			printCode(_code.c_str(), line, start, end, column);
+// 			fprintf(stderr, "Error: %s\n", log);
+// 			glslopt_cleanup(ctx);
+// 			return false;
+// 		}
 
-		glslopt_shader* shader = glslopt_optimize(ctx, type, _code.c_str(), 0);
-
-		if (!glslopt_get_status(shader) )
-		{
-			const char* log = glslopt_get_log(shader);
-			int32_t source  = 0;
-			int32_t line    = 0;
-			int32_t column  = 0;
-			int32_t start   = 0;
-			int32_t end     = INT32_MAX;
-
-			bool found = false
-				|| 3 == sscanf(log, "%u:%u(%u):", &source, &line, &column)
-				;
-
-			if (found
-			&&  0 != line)
-			{
-				start = bx::uint32_imax(1, line-10);
-				end   = start + 20;
-			}
-
-			printCode(_code.c_str(), line, start, end, column);
-			fprintf(stderr, "Error: %s\n", log);
-			glslopt_cleanup(ctx);
-			return false;
-		}
-
-		const char* optimizedShader = glslopt_get_output(shader);
-
+		//const char* optimizedShader = glslopt_get_output(shader);
+		const char* optimizedShader = _code.c_str();
 		// Trim all directives.
 		while ('#' == *optimizedShader)
 		{
