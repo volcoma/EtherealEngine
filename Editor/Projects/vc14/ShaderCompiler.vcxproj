@@ -1,0 +1,470 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Source\ShaderCompiler\fcpp\cpp1.c" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\fcpp\cpp2.c" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\fcpp\cpp3.c" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\fcpp\cpp4.c" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\fcpp\cpp5.c" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\fcpp\cpp6.c" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ast_array_index.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ast_expr.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ast_function.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ast_to_hir.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ast_type.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\builtin_functions.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\builtin_types.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\builtin_variables.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\glcpp\glcpp-lex.c" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\glcpp\glcpp-parse.c" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\glcpp\pp.c" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\glsl_lexer.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\glsl_optimizer.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\glsl_parser.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\glsl_parser_extras.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\glsl_symbol_table.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\glsl_types.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\hir_field_selection.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_basic_block.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_builder.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_clone.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_constant_expression.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_equals.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_expression_flattening.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_function.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_function_can_inline.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_function_detect_recursion.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_hierarchical_visitor.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_hv_accept.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_import_prototypes.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_print_glsl_visitor.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_print_metal_visitor.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_print_visitor.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_rvalue_visitor.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_stats.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_unused_structs.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_validate.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_variable_refcount.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\linker.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\link_atomics.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\link_functions.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\link_interface_blocks.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\link_uniforms.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\link_uniform_blocks.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\link_uniform_block_active_visitor.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\link_uniform_initializers.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\link_varyings.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\loop_analysis.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\loop_controls.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\loop_unroll.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\lower_clip_distance.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\lower_discard.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\lower_discard_flow.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\lower_if_to_cond_assign.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\lower_instructions.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\lower_jumps.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\lower_mat_op_to_vec.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\lower_named_interface_blocks.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\lower_noise.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\lower_offset_array.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\lower_output_reads.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\lower_packed_varyings.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\lower_packing_builtins.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\lower_ubo_reference.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\lower_variable_index_to_cond_assign.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\lower_vector.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\lower_vector_insert.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\lower_vec_index_to_cond_assign.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\lower_vec_index_to_swizzle.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\lower_vertex_id.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_algebraic.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_array_splitting.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_constant_folding.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_constant_propagation.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_constant_variable.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_copy_propagation.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_copy_propagation_elements.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_cse.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_dead_builtin_variables.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_dead_builtin_varyings.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_dead_code.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_dead_code_local.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_dead_functions.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_flatten_nested_if_blocks.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_flip_matrices.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_function_inlining.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_if_simplification.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_minmax.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_noop_swizzle.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_rebalance_tree.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_redundant_jumps.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_structure_splitting.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_swizzle_swizzle.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_tree_grafting.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\opt_vectorize.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\standalone_scaffolding.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\strtod.c" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\s_expression.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\mesa\main\imports.c" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\mesa\program\prog_hash_table.c" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\mesa\program\symbol_table.c" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\util\hash_table.c" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\util\ralloc.c" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\shaderc.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\shaderc_glsl.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\shaderc_hlsl.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\shaderc_pssl.cpp" />
+    <ClCompile Include="..\..\Source\ShaderCompiler\shaderc_spirv.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Source\ShaderCompiler\fcpp\cpp.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\fcpp\cppadd.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\fcpp\cppdef.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\fcpp\fpp.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\fcpp\FPPBase.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\fcpp\fpp_pragmas.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\fcpp\FPP_protos.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\include\c99\inttypes.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\include\c99\stdbool.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\include\c99\stdint.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\include\c99_compat.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ast.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\builtin_type_macros.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\glcpp\glcpp-parse.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\glcpp\glcpp.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\glsl_optimizer.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\glsl_parser.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\glsl_parser_extras.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\glsl_symbol_table.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\glsl_types.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_basic_block.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_builder.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_expression_flattening.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_function_inlining.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_hierarchical_visitor.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_optimization.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_print_glsl_visitor.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_print_metal_visitor.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_print_visitor.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_rvalue_visitor.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_stats.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_uniform.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_unused_structs.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_variable_refcount.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\ir_visitor.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\linker.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\link_uniform_block_active_visitor.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\link_varyings.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\list.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\loop_analysis.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\program.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\standalone_scaffolding.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\strtod.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\glsl\s_expression.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\mesa\main\compiler.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\mesa\main\config.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\mesa\main\context.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\mesa\main\core.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\mesa\main\dd.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\mesa\main\errors.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\mesa\main\glheader.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\mesa\main\glminimal.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\mesa\main\imports.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\mesa\main\macros.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\mesa\main\mtypes.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\mesa\main\simple_list.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\mesa\program\hash_table.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\mesa\program\prog_instruction.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\mesa\program\prog_parameter.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\mesa\program\prog_statevars.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\mesa\program\symbol_table.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\util\hash_table.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\util\macros.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\glsl-optimizer\src\util\ralloc.h" />
+    <ClInclude Include="..\..\Source\ShaderCompiler\shaderc.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4B8A4AD9-D7C0-4978-99D7-F4E9DDE756AB}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>
+    </RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>ShaderCompiler</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>
+    </CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>
+    </CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>
+    </CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>
+    </CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>..\..\Bin\Lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)Compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)</TargetName>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
+    <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
+    <ExcludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(MSBuild_ExecutablePath);$(VC_LibraryPath_x86);</ExcludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>..\..\Bin\Lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)Compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)</TargetName>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+    <ExecutablePath>$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);</ExecutablePath>
+    <ExcludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(MSBuild_ExecutablePath);$(VC_LibraryPath_x64);</ExcludePath>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>..\..\Bin\Lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)Compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>..\..\Bin\Lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)Compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <ExecutablePath>$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);</ExecutablePath>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;__STDC__;__STDC_VERSION__=199901L;strdup=_strdup;alloca=_alloca;isascii=__isascii;NINCLUDE=64;NWORK=65536;NBUFF=65536;OLD_PREPROCESSOR=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\Source\$(ProjectName);..\..\..\Engine\Source;..\..\Source\$(ProjectName)\fcpp;..\..\Source\$(ProjectName)\glsl-optimizer\include;..\..\Source\$(ProjectName)\glsl-optimizer\include\c99;..\..\Source\$(ProjectName)\glsl-optimizer\src;..\..\Source\$(ProjectName)\glsl-optimizer\src\glsl;..\..\Source\$(ProjectName)\glsl-optimizer\src\mesa</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>false</ExceptionHandling>
+      <DisableSpecificWarnings>4005</DisableSpecificWarnings>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalOptions>/wd4201 /wd4324 /Ob2 /wd4996  %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;__STDC__;__STDC_VERSION__=199901L;strdup=_strdup;alloca=_alloca;isascii=__isascii;NINCLUDE=64;NWORK=65536;NBUFF=65536;OLD_PREPROCESSOR=0;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\Source\$(ProjectName);..\..\..\Engine\Source;..\..\Source\$(ProjectName)\fcpp;..\..\Source\$(ProjectName)\glsl-optimizer\include;..\..\Source\$(ProjectName)\glsl-optimizer\include\c99;..\..\Source\$(ProjectName)\glsl-optimizer\src;..\..\Source\$(ProjectName)\glsl-optimizer\src\glsl;..\..\Source\$(ProjectName)\glsl-optimizer\src\mesa</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>false</ExceptionHandling>
+      <DisableSpecificWarnings>4005</DisableSpecificWarnings>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <AdditionalOptions>/wd4201 /wd4324 /Ob2 /wd4996  %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+    </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;__STDC__;__STDC_VERSION__=199901L;strdup=_strdup;alloca=_alloca;isascii=__isascii;NINCLUDE=64;NWORK=65536;NBUFF=65536;OLD_PREPROCESSOR=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\Source\$(ProjectName);..\..\..\Engine\Source;..\..\Source\$(ProjectName)\fcpp;..\..\Source\$(ProjectName)\glsl-optimizer\include;..\..\Source\$(ProjectName)\glsl-optimizer\include\c99;..\..\Source\$(ProjectName)\glsl-optimizer\src;..\..\Source\$(ProjectName)\glsl-optimizer\src\glsl;..\..\Source\$(ProjectName)\glsl-optimizer\src\mesa</AdditionalIncludeDirectories>
+      <StringPooling>true</StringPooling>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <DisableSpecificWarnings>4005</DisableSpecificWarnings>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <ExceptionHandling>false</ExceptionHandling>
+      <AdditionalOptions>/wd4201 /wd4324 /Ob2 /wd4996  %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;__STDC__;__STDC_VERSION__=199901L;strdup=_strdup;alloca=_alloca;isascii=__isascii;NINCLUDE=64;NWORK=65536;NBUFF=65536;OLD_PREPROCESSOR=0;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\Source\$(ProjectName);..\..\..\Engine\Source;..\..\Source\$(ProjectName)\fcpp;..\..\Source\$(ProjectName)\glsl-optimizer\include;..\..\Source\$(ProjectName)\glsl-optimizer\include\c99;..\..\Source\$(ProjectName)\glsl-optimizer\src;..\..\Source\$(ProjectName)\glsl-optimizer\src\glsl;..\..\Source\$(ProjectName)\glsl-optimizer\src\mesa</AdditionalIncludeDirectories>
+      <StringPooling>true</StringPooling>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <DisableSpecificWarnings>4005</DisableSpecificWarnings>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <ExceptionHandling>false</ExceptionHandling>
+      <AdditionalOptions>/wd4201 /wd4324 /Ob2 /wd4996  %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -91,7 +91,6 @@ ipch/
 
 
 # User data
-Projects/
 build/
 
 # Don't want to ignore .objs files in Assets
