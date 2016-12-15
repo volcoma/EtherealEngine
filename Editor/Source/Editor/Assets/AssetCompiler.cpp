@@ -20,14 +20,14 @@ void ShaderCompiler::compile(const std::string& absoluteKey)
 	bool vs = string_utils::beginsWith(file, "vs_");
 	bool fs = string_utils::beginsWith(file, "fs_");
 	bool cs = string_utils::beginsWith(file, "cs_");
-	const char* supported[] = { "dx9", "dx11", "glsl", "metal" };
+	std::string supported[] = { "dx9", "dx11", "glsl", "metal" };
 	
 	for (int i = 0; i < 4; ++i)
 	{
 		std::string output = dir + "/runtime/";
 		fs::ensurePath(output, false);
 
-		output = output + std::string(supported[i]) + "/" + file + ext;
+		output = output + supported[i] + "/" + file + ext;
 		fs::ensurePath(output, false);
 
 		const char* args_array[18];
@@ -91,7 +91,7 @@ void ShaderCompiler::compile(const std::string& absoluteKey)
 		
 		if (i >= 2)
 		{
-			//glsl shader compilation is not thread safe
+			//glsl shader compilation is not thread safe-
 			static std::mutex mtx;
 			std::lock_guard<std::mutex> lock(mtx);
 			if (compileShader(18, args_array) == EXIT_FAILURE)
