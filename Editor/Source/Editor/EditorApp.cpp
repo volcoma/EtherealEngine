@@ -75,7 +75,7 @@ void watchRawShaders(const std::string& toLowerKey, bool reloadAsync)
 	static const std::string ext = "/*.sc";
 	const std::string watchDir = dir + ext;
 
-	wd::watch(watchDir, true, [&app, absoluteKey, reloadAsync](const std::vector<fs::path>& paths)
+	wd::watch(watchDir, false, [&app, absoluteKey, reloadAsync](const std::vector<fs::path>& paths)
 	{
 		for (auto& p : paths)
 		{

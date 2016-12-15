@@ -210,6 +210,9 @@ void DebugDrawSystem::frameRender(ecs::EntityManager &entities, ecs::EventManage
 					1.0f, 1.0f, 0.0f, 0.5f, //r,g,b,a
 					1.0f, 0.0f, 0.0f, 0.0f  //thickness, unused, unused, unused
 				};
+				if (!mProgram)
+					return;
+
 				mProgram->beginPass();
 				mProgram->setUniform("u_params", u_params, 2);
 				const auto material = model.getMaterialForGroup({});
