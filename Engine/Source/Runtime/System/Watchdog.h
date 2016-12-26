@@ -88,9 +88,9 @@ public:
 	{
 
 		// if the file or directory exists change its last write time
-		if (fs::exists(path))
+		if (fs::exists(path, std::error_code{}))
 		{
-			fs::last_write_time(path, time);
+			fs::last_write_time(path, time, std::error_code{});
 			return;
 		}
 		// if not, visit each path if there's a wild card
@@ -98,7 +98,7 @@ public:
 		{
 			visitWildCardPath(path, [time](const fs::path &p)
 			{
-				fs::last_write_time(p, time);
+				fs::last_write_time(p, time, std::error_code{});
 				return false;
 			});
 		}
@@ -289,7 +289,7 @@ protected:
 		}
 
 		// throw an exception if the file doesn't exist
-		if (filter.empty() && !fs::exists(p))
+		if (filter.empty() && !fs::exists(p, std::error_code{}))
 		{
 			logPath(path);
 		}
@@ -317,7 +317,7 @@ protected:
 			std::string before = full.substr(0, wildcardPos);
 			std::string after = full.substr(wildcardPos + 1);
 			fs::directory_iterator end;
-			if (fs::is_empty(pathFilter.first))
+			if (fs::is_empty(pathFilter.first, std::error_code{}))
 			{
 				visitor(pathFilter.first);
 			}
@@ -436,7 +436,7 @@ protected:
 		bool hasChanged(const fs::path &path)
 		{
 			// get the last modification time
-			auto time = fs::last_write_time(path);
+			auto time = fs::last_write_time(path, std::error_code{});
 			// add a new modification time to the map
 			std::string key = path.string();
 			if (mModificationTimes.find(key) == mModificationTimes.end())

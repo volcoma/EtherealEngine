@@ -39,7 +39,7 @@ void watchAssets(const std::string& toLowerKey, bool reloadAsync)
 			auto& pool = app.getThreadPool();
 			auto relativeKey = toLowerKey + p.filename().replace_extension().string();
 
-			if (!fs::exists(p))
+			if (!fs::exists(p, std::error_code{}))
 			{
 				//removed
 				pool.enqueue_with_callback([]() {}, [reloadAsync, relativeKey, &manager]()
@@ -51,7 +51,7 @@ void watchAssets(const std::string& toLowerKey, bool reloadAsync)
 			else
 			{
 				//created or modified
-				if (fs::is_regular_file(p))
+				if (fs::is_regular_file(p, std::error_code{}))
 				{			
 					pool.enqueue_with_callback([]() {}, [reloadAsync, relativeKey, &manager]()
 					{
@@ -84,14 +84,14 @@ void watchRawShaders(const std::string& toLowerKey, bool reloadAsync)
 
 			auto& pool = app.getThreadPool();
 	
-			if (!fs::exists(p))
+			if (!fs::exists(p, std::error_code{}))
 			{
 				//removed
 			}
 			else
 			{
 				//created or modified
-				if (fs::is_regular_file(p))
+				if (fs::is_regular_file(p, std::error_code{}))
 				{
 					std::string absolutePath = p.string();
 					auto callback = []() {};
@@ -300,7 +300,7 @@ void EditorApp::createProject(const std::string& projectDir)
 	fs::ensurePath("app://data/scenes/", true);
 	fs::ensurePath("app://settings/", true);
 
-	fs::copy(fs::resolveFileLocation("sys://meshes/runtime"), fs::resolveFileLocation("app://data/meshes/runtime"));
+	fs::copy(fs::resolveFileLocation("sys://meshes/runtime"), fs::resolveFileLocation("app://data/meshes/runtime"), std::error_code{});
 	
 	openProject(projectDir);
 }
