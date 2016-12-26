@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef CORE_CHECKED_DELETE_H
-#define CORE_CHECKED_DELETE_H
-
 // verify that types are complete for increased safety
 template<typename T> 
 inline void checked_delete(T*& x)
@@ -38,4 +35,3 @@ struct checked_array_deleter
     }
 };
 
-#endif  // #ifndef CORE_CHECKED_DELETE_H

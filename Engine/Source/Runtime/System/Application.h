@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <vector>
 #include <memory>
-#include "Core/internal/assert/assert.h"
+#include "Core/common/assert.hpp"
 #include "Singleton.h"
 //-----------------------------------------------------------------------------
 // Forward Declarations

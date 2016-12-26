@@ -1,6 +1,7 @@
 #pragma  once
 
-#include "internal/internal.h"
+#include "memory/memory.h"
+#include "common/common.h"
 #include "random/random.h"
 #include "events/event.hpp"
 #include "reflection/reflection.h"

@@ -1,7 +1,7 @@
 #pragma once
 #include "thread_utils.h"
 #include "Core/common/string_utils.h"
-#include "Core/internal/assert/assert.h"
+#include "Core/common/assert.hpp"
 
 #include <vector>
 #include <queue>

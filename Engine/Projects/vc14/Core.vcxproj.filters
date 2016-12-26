@@ -79,15 +79,6 @@
     <Filter Include="Source Files\reflection\rttr\detail\variant_array_view">
       <UniqueIdentifier>{58a8f8d0-8521-4e7d-aebd-95892a831bbe}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\internal">
-      <UniqueIdentifier>{b376ac6d-7ce8-4cd6-9488-a378b84688b2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\internal\memory">
-      <UniqueIdentifier>{25a09521-99fe-4c47-bd41-867e57a66017}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\internal\assert">
-      <UniqueIdentifier>{cc7c18fa-9e38-43a0-b935-59b9ab80efc0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\events">
       <UniqueIdentifier>{d09d6d9e-ee7a-4edd-8b24-e53df25688ee}</UniqueIdentifier>
     </Filter>
@@ -169,6 +160,9 @@
     <Filter Include="Source Files\console">
       <UniqueIdentifier>{489d2678-89bf-4200-8465-a146aea2b155}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\memory">
+      <UniqueIdentifier>{eb5e947b-b7b2-4cb7-82e2-e4bf8b05c2c7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\Core\events\delegate.hpp">
@@ -179,18 +173,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\Core\events\signal.hpp">
       <Filter>Source Files\events</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Core\internal\internal.h">
-      <Filter>Source Files\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Core\internal\assert\assert.h">
-      <Filter>Source Files\internal\assert</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Core\internal\memory\checked_delete.h">
-      <Filter>Source Files\internal\memory</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Core\internal\memory\tracey.hpp">
-      <Filter>Source Files\internal\memory</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Core\reflection\reflection.h">
       <Filter>Source Files\reflection</Filter>
@@ -1290,11 +1272,47 @@
     <ClInclude Include="..\..\Source\Core\math\glm\gtc\matrix_transform_ex.hpp">
       <Filter>Source Files\math\glm\gtc</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\Core\common\spin.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\common\tuple.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\common\type_traits.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\common\variant.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\common\handle.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\common\handle_object_set.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\common\handle_set.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\common\assert.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\memory\checked_delete.h">
+      <Filter>Source Files\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\memory\memory.h">
+      <Filter>Source Files\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\memory\memory_pool.hpp">
+      <Filter>Source Files\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\memory\tracey.hpp">
+      <Filter>Source Files\memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\common\common.h">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\Core\internal\memory\tracey.cpp">
-      <Filter>Source Files\internal\memory</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\Core\reflection\rttr\enumeration.cpp">
       <Filter>Source Files\reflection\rttr</Filter>
     </ClCompile>
@@ -1414,6 +1432,15 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\Core\console\console.cpp">
       <Filter>Source Files\console</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\common\handle_set.cpp">
+      <Filter>Source Files\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\memory\memory_pool.cpp">
+      <Filter>Source Files\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\memory\tracey.cpp">
+      <Filter>Source Files\memory</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

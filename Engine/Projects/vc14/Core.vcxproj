@@ -19,9 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\Core\common\assert.hpp" />
     <ClInclude Include="..\..\Source\Core\common\basetypes.hpp" />
+    <ClInclude Include="..\..\Source\Core\common\common.h" />
+    <ClInclude Include="..\..\Source\Core\common\handle.hpp" />
+    <ClInclude Include="..\..\Source\Core\common\handle_object_set.hpp" />
+    <ClInclude Include="..\..\Source\Core\common\handle_set.hpp" />
+    <ClInclude Include="..\..\Source\Core\common\spin.hpp" />
     <ClInclude Include="..\..\Source\Core\common\string_utils.h" />
+    <ClInclude Include="..\..\Source\Core\common\tuple.hpp" />
+    <ClInclude Include="..\..\Source\Core\common\type_traits.hpp" />
     <ClInclude Include="..\..\Source\Core\common\utils.h" />
+    <ClInclude Include="..\..\Source\Core\common\variant.hpp" />
     <ClInclude Include="..\..\Source\Core\config\cfg.h" />
     <ClInclude Include="..\..\Source\Core\config\cfg\Config.h" />
     <ClInclude Include="..\..\Source\Core\config\cfg\Parser.h" />
@@ -30,10 +39,6 @@
     <ClInclude Include="..\..\Source\Core\events\delegate.hpp" />
     <ClInclude Include="..\..\Source\Core\events\event.hpp" />
     <ClInclude Include="..\..\Source\Core\events\signal.hpp" />
-    <ClInclude Include="..\..\Source\Core\internal\assert\assert.h" />
-    <ClInclude Include="..\..\Source\Core\internal\internal.h" />
-    <ClInclude Include="..\..\Source\Core\internal\memory\checked_delete.h" />
-    <ClInclude Include="..\..\Source\Core\internal\memory\tracey.hpp" />
     <ClInclude Include="..\..\Source\Core\logging\logging.h" />
     <ClInclude Include="..\..\Source\Core\logging\spdlog\async_logger.h" />
     <ClInclude Include="..\..\Source\Core\logging\spdlog\common.h" />
@@ -201,6 +206,10 @@
     <ClInclude Include="..\..\Source\Core\math\math_types.h" />
     <ClInclude Include="..\..\Source\Core\math\plane.h" />
     <ClInclude Include="..\..\Source\Core\math\transform.h" />
+    <ClInclude Include="..\..\Source\Core\memory\checked_delete.h" />
+    <ClInclude Include="..\..\Source\Core\memory\memory.h" />
+    <ClInclude Include="..\..\Source\Core\memory\memory_pool.hpp" />
+    <ClInclude Include="..\..\Source\Core\memory\tracey.hpp" />
     <ClInclude Include="..\..\Source\Core\platform_config.h" />
     <ClInclude Include="..\..\Source\Core\random\random.h" />
     <ClInclude Include="..\..\Source\Core\reflection\reflection.h" />
@@ -394,12 +403,12 @@
     <ClInclude Include="..\..\Source\Core\serialization\serialization.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\Core\common\handle_set.cpp" />
     <ClCompile Include="..\..\Source\Core\common\string_utils.cpp" />
     <ClCompile Include="..\..\Source\Core\config\cfg\Config.cpp" />
     <ClCompile Include="..\..\Source\Core\config\cfg\Parser.cpp" />
     <ClCompile Include="..\..\Source\Core\console\console.cpp" />
     <ClCompile Include="..\..\Source\Core\core.cpp" />
-    <ClCompile Include="..\..\Source\Core\internal\memory\tracey.cpp" />
     <ClCompile Include="..\..\Source\Core\logging\spdlog\details\format.cc" />
     <ClCompile Include="..\..\Source\Core\math\bbox.cpp" />
     <ClCompile Include="..\..\Source\Core\math\bbox_extruded.cpp" />
@@ -408,6 +417,8 @@
     <ClCompile Include="..\..\Source\Core\math\glm\detail\glm.cpp" />
     <ClCompile Include="..\..\Source\Core\math\plane.cpp" />
     <ClCompile Include="..\..\Source\Core\math\transform.cpp" />
+    <ClCompile Include="..\..\Source\Core\memory\memory_pool.cpp" />
+    <ClCompile Include="..\..\Source\Core\memory\tracey.cpp" />
     <ClCompile Include="..\..\Source\Core\random\random.cpp" />
     <ClCompile Include="..\..\Source\Core\reflection\rttr\constructor.cpp" />
     <ClCompile Include="..\..\Source\Core\reflection\rttr\destructor.cpp" />

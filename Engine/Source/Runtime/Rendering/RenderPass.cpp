@@ -1,5 +1,5 @@
 #include "RenderPass.h"
-#include "Core/internal/assert/assert.h"
+#include "Core/common/assert.hpp"
 #include "Graphics/graphics.h"
 #include <bitset>
 
