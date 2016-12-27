@@ -94,7 +94,7 @@ public:
 		// if not, visit each path if there's a wild card
 		if (path.string().find("*") != std::string::npos)
 		{
-			visitWildCardPath(path, [time](const fs::path &p)
+			visitWildCardPath(path, true, [time](const fs::path &p)
 			{
 				fs::last_write_time(p, time, std::error_code{});
 				return false;
@@ -217,7 +217,7 @@ protected:
 			if (path.string().find("*") != std::string::npos)
 			{
 				bool found = false;
-				std::pair<fs::path, std::string> pathFilter = visitWildCardPath(path, [&found](const fs::path &p)
+				std::pair<fs::path, std::string> pathFilter = visitWildCardPath(path, true, [&found](const fs::path &p)
 				{
 					found = true;
 					return true;
@@ -313,7 +313,7 @@ protected:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static std::pair<fs::path, std::string> visitWildCardPath(const fs::path &path, const std::function<bool(const fs::path&)> &visitor)
+	static std::pair<fs::path, std::string> visitWildCardPath(const fs::path &path, bool visitEmpty, const std::function<bool(const fs::path&)> &visitor)
 	{
 		std::pair<fs::path, std::string> pathFilter = getPathFilterPair(path);
 		if (!pathFilter.second.empty())
@@ -323,7 +323,7 @@ protected:
 			std::string before = full.substr(0, wildcardPos);
 			std::string after = full.substr(wildcardPos + 1);
 			fs::directory_iterator end;
-			if (fs::is_empty(pathFilter.first, std::error_code{}))
+			if (visitEmpty && fs::is_empty(pathFilter.first, std::error_code{}))
 			{
 				visitor(pathFilter.first);
 			}
@@ -370,7 +370,7 @@ protected:
 			// make sure we store all initial write time
 			if (!mFilter.empty())
 			{
-				visitWildCardPath(path / filter, [this, &entries](const fs::path &p)
+				visitWildCardPath(path / filter, false, [this, &entries](const fs::path &p)
 				{
 					auto entry = pollEntry(p);
 					entries.push_back(entry);
@@ -409,7 +409,7 @@ protected:
 			// otherwise we check the whole parent directory
 			if (!mFilter.empty())
 			{
-				visitWildCardPath(mRoot.path / mFilter, [this, &entries](const fs::path &p)
+				visitWildCardPath(mRoot.path / mFilter, false, [this, &entries](const fs::path &p)
 				{
 					auto entry = pollEntry(p);
 					if (entry.state == Entry::State::Modified && mListCallback)

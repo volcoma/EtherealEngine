@@ -23,65 +23,66 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 		fs::path output = dir / "runtime";
 		fs::create_directory(output, std::error_code{});
 
-		output = output / supported[i] / fs::path(file + ext);
+		output = output / supported[i];
 		fs::create_directory(output, std::error_code{});
+		output /= fs::path(file + ext);
+
 		std::string strOutput = output.string();
 
-		const char* args_array[18];
+		static const int arg_count = 16;
+		const char* args_array[arg_count];
 		args_array[0] = "-f";
 		args_array[1] = strInput.c_str();
 		args_array[2] = "-o";
 		args_array[3] = strOutput.c_str();
-		args_array[4] = "--depends";
-		args_array[5] = "-i";
+		args_array[4] = "-i";
 		fs::path include = fs::resolve_protocol("engine://Tools/include");
 		std::string strInclude = include.string();
-		args_array[6] = strInclude.c_str();
-		args_array[7] = "--varyingdef";
+		args_array[5] = strInclude.c_str();
+		args_array[6] = "--varyingdef";
 		fs::path varying = dir / "varying.def.sc";
 		std::string strVarying = varying.string();
-		args_array[8] = strVarying.c_str();
-		args_array[9] = "--platform";
+		args_array[7] = strVarying.c_str();
+		args_array[8] = "--platform";
 
 		if(i < 2)
 		{
-			args_array[10] = "windows";
-			args_array[11] = "--profile";
+			args_array[9] = "windows";
+			args_array[10] = "--profile";
 
 			if (vs)
-				args_array[12] = "vs_4_0";
+				args_array[11] = "vs_4_0";
 			else if (fs)
-				args_array[12] = "ps_4_0";
+				args_array[11] = "ps_4_0";
 			else if (cs)
-				args_array[12] = "cs_5_0";
+				args_array[11] = "cs_5_0";
 		}
 		else if (i == 2)
 		{
-			args_array[10] = "linux";
-			args_array[11] = "--profile";
+			args_array[9] = "linux";
+			args_array[10] = "--profile";
 
 			if (vs || fs)
-				args_array[12] = "120";
+				args_array[11] = "120";
 			else if (cs)
-				args_array[12] = "430";
+				args_array[11] = "430";
 		}
 		else if (i == 3)
 		{
-			args_array[10] = "osx";
-			args_array[11] = "--profile";
-			args_array[12] = "metal";
+			args_array[9] = "osx";
+			args_array[10] = "--profile";
+			args_array[11] = "metal";
 		}
-		args_array[13] = "--type";
+		args_array[12] = "--type";
 		if (vs)
-			args_array[14] = "vertex";
+			args_array[13] = "vertex";
 		else if (fs)
-			args_array[14] = "fragment";
+			args_array[13] = "fragment";
 		else if (cs)
-			args_array[14] = "compute";
+			args_array[13] = "compute";
 
-		args_array[15] = "-O";
-		args_array[16] = "3";
-		args_array[17] = "--disasm";
+		args_array[14] = "-O";
+		args_array[15] = "3";
 
 		auto logger = logging::get("Log");
 		
@@ -91,7 +92,7 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 			//glsl shader compilation is not thread safe-
 			static std::mutex mtx;
 			std::lock_guard<std::mutex> lock(mtx);
-			if (compileShader(18, args_array) == EXIT_FAILURE)
+			if (compileShader(arg_count, args_array) == EXIT_FAILURE)
 			{
 				logger->error().write("Failed to compile shader: {0}", strOutput.c_str());
 			}
@@ -102,7 +103,7 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 		}
 		else
 		{
-			if (compileShader(18, args_array) == EXIT_FAILURE)
+			if (compileShader(arg_count, args_array) == EXIT_FAILURE)
 			{
 				logger->error().write("Failed to compile shader: {0}", strOutput.c_str());
 			}

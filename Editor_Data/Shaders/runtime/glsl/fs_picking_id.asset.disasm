@@ -1,7 +1,0 @@
-uniform vec4 u_id;
-void main ()
-{
-  gl_FragColor.xyz = u_id.xyz;
-  gl_FragColor.w = 1.0;
-}
-
