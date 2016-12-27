@@ -168,7 +168,7 @@
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\WindowStyle.hpp" />
     <ClInclude Include="..\..\Source\Runtime\System\Singleton.h" />
     <ClInclude Include="..\..\Source\Runtime\System\Timer.h" />
-    <ClInclude Include="..\..\Source\Runtime\System\Watchdog.h" />
+    <ClInclude Include="..\..\Source\Runtime\System\FileSystemWatcher.h" />
     <ClInclude Include="..\..\Source\Runtime\Threading\ThreadPool.h" />
     <ClInclude Include="..\..\Source\Runtime\Threading\thread_utils.h" />
   </ItemGroup>

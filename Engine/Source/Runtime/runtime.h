@@ -5,9 +5,9 @@
 
 #include "System/Application.h"
 #include "System/FileSystem.h"
+#include "System/FileSystemWatcher.h"
 #include "System/Timer.h"
 #include "System/MessageBox.h"
-#include "System/Watchdog.h"
 #include "Rendering/RenderPass.h"
 #include "Rendering/Material.h"
 #include "Rendering/Program.h"

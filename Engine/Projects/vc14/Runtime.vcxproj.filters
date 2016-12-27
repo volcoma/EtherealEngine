@@ -512,9 +512,6 @@
     <ClInclude Include="..\..\Source\Runtime\Input\InputContext.h">
       <Filter>Source Files\Input</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\System\Watchdog.h">
-      <Filter>Source Files\System</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Program.hpp">
       <Filter>Source Files\Meta\Rendering</Filter>
     </ClInclude>
@@ -562,6 +559,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\Ecs\Prefab.h">
       <Filter>Source Files\Ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\System\FileSystemWatcher.h">
+      <Filter>Source Files\System</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

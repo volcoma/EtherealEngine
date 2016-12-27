@@ -5,8 +5,8 @@
 #include "Systems/DebugDrawSystem.h"
 #include "Runtime/System/MessageBox.h"
 #include "Runtime/System/FileSystem.h"
+#include "Runtime/System/FileSystemWatcher.h"
 #include "Runtime/Assets/AssetManager.h"
-#include "Runtime/System/Watchdog.h"
 #include "Runtime/Rendering/Material.h"
 #include "Runtime/Rendering/Texture.h"
 #include "Runtime/Rendering/Mesh.h"
@@ -30,7 +30,7 @@ void watchAssets(const fs::path& protocol, bool reloadAsync)
 	fs::create_directory(watchDir);
 	watchDir /= ext;
 
-	wd::watch(watchDir, true, [&app, &manager, protocol, reloadAsync](const std::vector<wd::Entry>& entries)
+	fs::watcher::watch(watchDir, true, [&app, &manager, protocol, reloadAsync](const std::vector<fs::watcher::Entry>& entries)
 	{
 		for (auto& entry : entries)
 		{
@@ -38,7 +38,7 @@ void watchAssets(const fs::path& protocol, bool reloadAsync)
 			auto p = entry.path;
 			auto key = (protocol / p.filename().replace_extension()).generic_string();
 
-			if (entry.state == wd::Entry::Removed)
+			if (entry.state == fs::watcher::Entry::Removed)
 			{
 				//removed
 				pool.enqueue_with_callback([]() {}, [reloadAsync, key, &manager]()
@@ -71,7 +71,7 @@ void watchRawShaders(const fs::path& protocol, bool reloadAsync)
 	static const std::string ext = "*.sc";
 	const fs::path watchDir = dir / ext;
 
-	wd::watch(watchDir, false, [&app, reloadAsync](const std::vector<wd::Entry>& entries)
+	fs::watcher::watch(watchDir, false, [&app, reloadAsync](const std::vector<fs::watcher::Entry>& entries)
 	{
 		for (auto& entry : entries)
 		{
@@ -81,7 +81,7 @@ void watchRawShaders(const fs::path& protocol, bool reloadAsync)
 
 			auto& pool = app.getThreadPool();
 	
-			if (entry.state == wd::Entry::Removed)
+			if (entry.state == fs::watcher::Entry::Removed)
 			{
 				//removed
 			}
@@ -280,18 +280,18 @@ bool EditorApp::shutDown()
 void EditorApp::createProject(const fs::path& projectPath)
 {
 	fs::add_path_protocol("app:", projectPath);
-	fs::create_directory(fs::resolve_protocol("app://data"));
-	fs::create_directory(fs::resolve_protocol("app://data/shaders"));
-	fs::create_directory(fs::resolve_protocol("app://data/textures"));
-	fs::create_directory(fs::resolve_protocol("app://data/materials"));
-	fs::create_directory(fs::resolve_protocol("app://data/meshes"));
-	fs::create_directory(fs::resolve_protocol("app://data/scenes"));
-	fs::create_directory(fs::resolve_protocol("app://data/shaders/runtime"));
-	fs::create_directory(fs::resolve_protocol("app://data/textures/runtime"));
-	fs::create_directory(fs::resolve_protocol("app://data/meshes/runtime"));
-	fs::create_directory(fs::resolve_protocol("app://data/prefabs"));
-	fs::create_directory(fs::resolve_protocol("app://data/scenes"));
-	fs::create_directory(fs::resolve_protocol("app://settings"));
+	fs::create_directory(fs::resolve_protocol("app://data"), std::error_code{});
+	fs::create_directory(fs::resolve_protocol("app://data/shaders"), std::error_code{});
+	fs::create_directory(fs::resolve_protocol("app://data/textures"), std::error_code{});
+	fs::create_directory(fs::resolve_protocol("app://data/materials"), std::error_code{});
+	fs::create_directory(fs::resolve_protocol("app://data/meshes"), std::error_code{});
+	fs::create_directory(fs::resolve_protocol("app://data/scenes"), std::error_code{});
+	fs::create_directory(fs::resolve_protocol("app://data/shaders/runtime"), std::error_code{});
+	fs::create_directory(fs::resolve_protocol("app://data/textures/runtime"), std::error_code{});
+	fs::create_directory(fs::resolve_protocol("app://data/meshes/runtime"), std::error_code{});
+	fs::create_directory(fs::resolve_protocol("app://data/prefabs"), std::error_code{});
+	fs::create_directory(fs::resolve_protocol("app://data/scenes"), std::error_code{});
+	fs::create_directory(fs::resolve_protocol("app://settings"), std::error_code{});
 
 	fs::copy(fs::resolve_protocol("engine_data://meshes/runtime"), fs::resolve_protocol("app://data/meshes/runtime"), std::error_code{});
 	
@@ -308,7 +308,7 @@ void EditorApp::openProject(const fs::path& projectPath)
 	}
 	fs::add_path_protocol("app:", projectPath);
 	fs::add_path_protocol("data:", fs::resolve_protocol("app://data"));
-	wd::unwatchAll();
+	fs::watcher::unwatchAll();
 	watchAssets<Texture>("data://textures", true);
 	watchAssets<Texture>("editor_data://icons", true);
 	watchAssets<Mesh>("data://meshes", true);
