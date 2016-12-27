@@ -5,75 +5,26 @@
 namespace fs
 {
 
-	static std::string	mRootDirectory;     // The main file system root directory.
-	static ProtocolMap	mProtocols;
-
-	bool setRootDirectory(const std::string & strDir)
+	bool add_path_protocol(const path& protocol, const path& dir)
 	{
-		// Duplicate the data path (trim off any white space)
-		mRootDirectory = string_utils::trim(strDir);
-
-		// Skip if empty
-		if (mRootDirectory.empty())
-			return true;
-
-		// No trailing slash?
-		if (mRootDirectory.substr(mRootDirectory.length() - 1) != "\\" &&
-			mRootDirectory.substr(mRootDirectory.length() - 1) != "/")
-		{
-			// Append a slash to the end of the data path
-			mRootDirectory += "\\";
-
-		} // End if no trailing slash
-
-		// Success!
-		return true;
-	}
-
-	bool addPathProtocol(const std::string & strProtocol, const std::string & strDir)
-	{
-		// Duplicate the data directory (trim off any white space)
-		std::string strNewDir = string_utils::trim(strDir);
-		std::string strNewProtocol = string_utils::trim(strProtocol);
 		// Protocol matching is case insensitive, convert to lower case
-		strNewProtocol = string_utils::toLower(strNewProtocol);
+		std::string strNewProtocol = string_utils::toLower(protocol.string());
 
-		// Append a slash to the end of the data path if required
-		if (!strNewDir.empty() &&
-			!string_utils::endsWith(strNewDir, "\\") &&
-			!string_utils::endsWith(strNewDir, "/"))
-			strNewDir.append("\\");
-
+		auto& protocols = get_path_protocols();
 		// Add to the list
-		mProtocols[strNewProtocol] = strNewDir;
+		protocols[strNewProtocol] = dir.string();
 
 		// Success!
 		return true;
 	}
 
-	ProtocolMap& getProtocols()
+	ProtocolMap& get_path_protocols()
 	{
+		static ProtocolMap mProtocols;
 		return mProtocols;
 	}
 
-	const std::string& getRootDirectory()
-	{
-		return mRootDirectory;
-	}
-
-	bool pathProtocolDefined(const std::string & strProtocol)
-	{
-		// Protocol matching is case insensitive, convert to lower case
-		std::string strKey = strProtocol;
-		string_utils::toLower(strKey);
-		return (mProtocols.find(strKey) != mProtocols.end());
-	}
-
-	void shutdown()
-	{
-	}
-
-	ByteArray readStream(std::istream & stream)
+	ByteArray read_stream(std::istream & stream)
 	{
 		// Open the stream
 		ByteArray read_memory;
@@ -95,94 +46,140 @@ namespace fs
 		return read_memory;
 	}
 
-	std::string getDirectoryName(const std::string & strPathFile)
+	path resolve_protocol(const path& _path)
 	{
-		std::string::size_type nLastSlash, nLastSlash2;
+		const auto root = _path.root_name().string();
+		const auto relativePath = _path.relative_path();
+		// Matching path protocol in our list?
+		auto& protocols = get_path_protocols();
 
-		// Return the path portion only
-		nLastSlash = strPathFile.rfind('\\');
-		nLastSlash2 = strPathFile.rfind('/');
-		if (nLastSlash == std::string::npos || (nLastSlash2 != std::string::npos && nLastSlash2 > nLastSlash))
-			nLastSlash = nLastSlash2;
+		auto itProtocol = protocols.find(root);
 
-		// Any slash found?
-		if (nLastSlash != std::string::npos)
-			return strPathFile.substr(0, nLastSlash);
+		if (itProtocol == std::end(protocols))
+			return path{};
 
-		// No path
-		return std::string();
-	}
-
-	std::string getFileName(const std::string & strPathFile)
-	{
-		std::string              strFileName = strPathFile;
-		std::string::size_type   nLastSlash;
-
-		// Get filename only portion of the specified path
-		nLastSlash = strPathFile.rfind('\\');
-		if (nLastSlash == std::string::npos) nLastSlash = strPathFile.rfind('/');
-		if (nLastSlash != std::string::npos) strFileName = strPathFile.substr(nLastSlash + 1);
-
-		// Return result
-		return strFileName;
-	}
-
-	std::string getFileName(const std::string & strPathFile, bool bStripExtension)
-	{
-		std::string              strFileName = strPathFile;
-		std::string::size_type   nLastSlash;
-
-		// Get filename only portion of the specified path
-		nLastSlash = strPathFile.rfind('\\');
-		if (nLastSlash == std::string::npos) nLastSlash = strPathFile.rfind('/');
-		if (nLastSlash != std::string::npos) strFileName = strPathFile.substr(nLastSlash + 1);
-
-		// Strip extension?
-		if (bStripExtension)
-		{
-			// Find the portion of the specified file
-			std::string::size_type nLastDot = strFileName.rfind('.');
-			if (nLastDot != std::string::npos)
-				strFileName = strFileName.substr(0, nLastDot);
-
-		} // End if strip extension
-
-		// Return result
-		return strFileName;
-	}
-
-	std::string getFileNameExtension(const std::string & strPathFile)
-	{
-		std::string            strFileName;
-		std::string::size_type nLastDot;
-
-		// First ensure we only have the file name portion of a full path+file
-		// std::string so that we don't mistake a 'dot' in the path as the extension
-		// delimeter.
-		strFileName = getFileName(strPathFile);
-
-		// Get extension only portion of the specified file
-		nLastDot = strFileName.rfind('.');
-		if (nLastDot == std::string::npos) return std::string();
-
-		// Return only the extension
-		return strFileName.substr(nLastDot + 1);
-	}
-
-	std::string ensurePath(const std::string & strPathFile, bool resolve)
-	{
-		std::string filepath = strPathFile;
-		if (resolve)
-			filepath = resolveFileLocation(strPathFile);
-
-		std::string directoryName = getDirectoryName(filepath);
-
-		if (!directoryExists(directoryName))
-		{
-			createDirectory(directoryName);
-		}
-
-		return filepath;
+		const auto resolvedPath = itProtocol->second;
+		auto result = resolvedPath / relativePath;
+		return result;
 	}
 
 }
+
+#include <stdio.h>
+#include <stdlib.h>
+
+namespace fs
+{
+	path executable_path_fallback(const char *argv0)
+	{
+		if (0 == argv0 || 0 == argv0[0])
+		{
+			return "";
+		}
+		path full_path(
+			system_complete(
+				path(std::string(argv0)), std::error_code{}));
+		return full_path;
+	}
+}
+#if defined(_WIN32)
+
+#  include <Windows.h>
+namespace fs
+{
+	path executable_path(const char *argv0)
+	{
+		char buf[1024] = { 0 };
+		DWORD ret = GetModuleFileNameA(NULL, buf, sizeof(buf));
+		if (ret == 0 || ret == sizeof(buf))
+		{
+			return executable_path_fallback(argv0);
+		}
+		return path(std::string(buf));
+	}
+}
+#elif defined(__APPLE__)
+
+#  include <mach-o/dyld.h>
+namespace fs
+{
+	path executable_path(const char *argv0)
+	{
+		char buf[1024] = { 0 };
+		uint32_t size = sizeof(buf);
+		int ret = _NSGetExecutablePath(buf, &size);
+		if (0 != ret)
+		{
+			return executable_path_fallback(argv0);
+		}
+		path full_path(
+			system_complete(
+				path(std::string(buf)).normalize(), std::error_code{}));
+		return full_path;
+	}
+}
+#elif defined(sun) || defined(__sun)
+
+#  include <stdlib.h>
+namespace fs
+{
+	path executable_path(const char *argv0)
+	{
+		return path(std::string(getexecname()));
+	}
+}
+#elif defined(__FreeBSD__)
+
+#  include <sys/sysctl.h>
+namespace fs
+{
+	path executable_path(const char *argv0)
+	{
+		int mib[4] = { 0 };
+		mib[0] = CTL_KERN;
+		mib[1] = KERN_PROC;
+		mib[2] = KERN_PROC_PATHNAME;
+		mib[3] = -1;
+		char buf[1024] = { 0 };
+		size_t size = sizeof(buf);
+		sysctl(mib, 4, buf, &size, NULL, 0);
+		if (size == 0 || size == sizeof(buf))
+		{
+			return executable_path_fallback(argv0);
+		}
+		std::string path(buf, size);
+		path full_path(
+			system_complete(
+				path(path).normalize(), std::error_code{}));
+		return full_path;
+	}
+}
+#elif defined(__linux__)
+
+#  include <unistd.h>
+namespace fs
+{
+	path executable_path(const char *argv0)
+	{
+		char buf[1024] = { 0 };
+		ssize_t size = readlink("/proc/self/exe", buf, sizeof(buf));
+		if (size == 0 || size == sizeof(buf))
+		{
+			return executable_path_fallback(argv0);
+		}
+		std::string path(buf, size);
+		path full_path(
+			system_complete(
+				path(path).normalize(), std::error_code{}));
+		return full_path;
+	}
+}
+#else
+namespace fs
+{
+	path executable_path(const char *argv0)
+	{
+		return executable_path_fallback(argv0);
+	}
+}
+#endif

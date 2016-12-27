@@ -3,6 +3,8 @@
 #include "entityx/quick.h"
 #include <vector>
 #include <fstream>
+#include "../System/FileSystem.h"
+
 
 namespace ecs
 {
@@ -16,7 +18,7 @@ namespace ecs
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void saveEntity(const std::string& dir, const Entity& data);
+		void saveEntity(const fs::path& dir, const Entity& data);
 
 		//-----------------------------------------------------------------------------
 		//  Name : tryLoadEntity ()
@@ -26,7 +28,7 @@ namespace ecs
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool tryLoadEntity(const std::string& name, Entity& outData);
+		bool tryLoadEntity(const fs::path& fullPath, Entity& outData);
 
 		//-----------------------------------------------------------------------------
 		//  Name : saveData ()
@@ -36,7 +38,7 @@ namespace ecs
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void saveData(const std::string& fullPath, const std::vector<Entity>& data);
+		void saveData(const fs::path& fullPath, const std::vector<Entity>& data);
 
 		//-----------------------------------------------------------------------------
 		//  Name : loadData ()
@@ -46,7 +48,7 @@ namespace ecs
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool loadData(const std::string& fullPath, std::vector<Entity>& outData);
+		bool loadData(const fs::path& fullPath, std::vector<Entity>& outData);
 
 		//-----------------------------------------------------------------------------
 		//  Name : serializeData ()

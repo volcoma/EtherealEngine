@@ -4,46 +4,43 @@
 #include "Runtime/System/FileSystem.h"
 #include "ShaderCompiler/shaderc.h"
 
-void ShaderCompiler::compile(const std::string& absoluteKey)
+void ShaderCompiler::compile(const fs::path& absoluteKey)
 {
-	std::string input = fs::resolveFileLocation(absoluteKey);
-	input = string_utils::replace(input, '\\', '/');
-	input = string_utils::toLower(input);
-	std::string dir = fs::getDirectoryName(input);
-	
-	std::string file = fs::getFileName(input, true);
-	dir = string_utils::replace(dir, '\\', '/');
-	dir = string_utils::toLower(dir);
-	file = string_utils::toLower(file);
+	fs::path input = absoluteKey;
+	std::string strInput = input.string();
+	std::string file = input.filename().replace_extension().string();
+	fs::path dir = input.remove_filename();
+
 	static const std::string ext = ".asset";
 
 	bool vs = string_utils::beginsWith(file, "vs_");
 	bool fs = string_utils::beginsWith(file, "fs_");
 	bool cs = string_utils::beginsWith(file, "cs_");
-	std::string supported[] = { "dx9", "dx11", "glsl", "metal" };
+	fs::path supported[] = { "dx9", "dx11", "glsl", "metal" };
 	
 	for (int i = 0; i < 4; ++i)
 	{
-		std::string output = dir + "/runtime/";
-		fs::ensurePath(output, false);
+		fs::path output = dir / "runtime";
+		fs::create_directory(output, std::error_code{});
 
-		output = output + supported[i] + "/" + file + ext;
-		fs::ensurePath(output, false);
+		output = output / supported[i] / fs::path(file + ext);
+		fs::create_directory(output, std::error_code{});
+		std::string strOutput = output.string();
 
 		const char* args_array[18];
 		args_array[0] = "-f";
-		args_array[1] = input.c_str();
+		args_array[1] = strInput.c_str();
 		args_array[2] = "-o";
-		args_array[3] = output.c_str();
+		args_array[3] = strOutput.c_str();
 		args_array[4] = "--depends";
 		args_array[5] = "-i";
-		std::string include = fs::resolveFileLocation("engine://Tools/include/");
-		include = string_utils::replace(include, '\\', '/');
-		include = string_utils::toLower(include);
-		args_array[6] = include.c_str();
+		fs::path include = fs::resolve_protocol("engine://Tools/include");
+		std::string strInclude = include.string();
+		args_array[6] = strInclude.c_str();
 		args_array[7] = "--varyingdef";
-		std::string varying = dir + "/varying.def.sc";
-		args_array[8] = varying.c_str();
+		fs::path varying = dir / "varying.def.sc";
+		std::string strVarying = varying.string();
+		args_array[8] = strVarying.c_str();
 		args_array[9] = "--platform";
 
 		if(i < 2)
@@ -96,22 +93,22 @@ void ShaderCompiler::compile(const std::string& absoluteKey)
 			std::lock_guard<std::mutex> lock(mtx);
 			if (compileShader(18, args_array) == EXIT_FAILURE)
 			{
-				logger->error().write("Failed to compile shader: {0}", output.c_str());
+				logger->error().write("Failed to compile shader: {0}", strOutput.c_str());
 			}
 			else
 			{
-				logger->info().write("Successfully compiled shader: {0}", output.c_str());
+				logger->info().write("Successfully compiled shader: {0}", strOutput.c_str());
 			}
 		}
 		else
 		{
 			if (compileShader(18, args_array) == EXIT_FAILURE)
 			{
-				logger->error().write("Failed to compile shader: {0}", output.c_str());
+				logger->error().write("Failed to compile shader: {0}", strOutput.c_str());
 			}
 			else
 			{
-				logger->info().write("Successfully compiled shader: {0}", output.c_str());
+				logger->info().write("Successfully compiled shader: {0}", strOutput.c_str());
 			}
 		}
 		

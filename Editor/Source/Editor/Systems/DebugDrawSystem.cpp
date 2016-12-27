@@ -19,10 +19,10 @@ DebugDrawSystem::DebugDrawSystem()
 {
 	auto& app = Singleton<EditorApp>::getInstance();
 	auto& manager = app.getAssetManager();
-	manager.load<Shader>("editor://shaders/vs_wf_wireframe", false)
+	manager.load<Shader>("editor_data://shaders/vs_wf_wireframe", false)
 		.then([this, &manager](auto vs)
 	{
-		manager.load<Shader>("editor://shaders/fs_wf_wireframe", false)
+		manager.load<Shader>("editor_data://shaders/fs_wf_wireframe", false)
 			.then([this, vs](auto fs)
 		{
 			mProgram = std::make_unique<Program>(vs, fs);

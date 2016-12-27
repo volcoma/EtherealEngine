@@ -54,7 +54,6 @@
     <ClCompile Include="..\..\Source\Runtime\runtime.cpp" />
     <ClCompile Include="..\..\Source\Runtime\System\Application.cpp" />
     <ClCompile Include="..\..\Source\Runtime\System\FileSystem.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\System\Platform\Windows\FileSystemImpl.cpp" />
     <ClCompile Include="..\..\Source\Runtime\System\Platform\Windows\MessageBoxImpl.cpp" />
     <ClCompile Include="..\..\Source\Runtime\System\SFML\System\Err.cpp" />
     <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Joystick.cpp" />

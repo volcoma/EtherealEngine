@@ -252,9 +252,6 @@
     <ClCompile Include="..\..\Source\Runtime\Threading\thread_utils.cpp">
       <Filter>Source Files\Threading</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\System\Platform\Windows\FileSystemImpl.cpp">
-      <Filter>Source Files\System\Platform\Windows</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\System\Platform\Windows\MessageBoxImpl.cpp">
       <Filter>Source Files\System\Platform\Windows</Filter>
     </ClCompile>

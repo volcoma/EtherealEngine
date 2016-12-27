@@ -64,10 +64,10 @@ PickingSystem::PickingSystem()
 
 	auto& app = Singleton<EditorApp>::getInstance();
 	auto& manager = app.getAssetManager();
-	manager.load<Shader>("editor://shaders/vs_picking_id", false)
+	manager.load<Shader>("editor_data://shaders/vs_picking_id", false)
 		.then([this, &manager](auto vs)
 	{
-		manager.load<Shader>("editor://shaders/fs_picking_id", false)
+		manager.load<Shader>("editor_data://shaders/fs_picking_id", false)
 			.then([this, vs](auto fs)
 		{
 			mProgram = std::make_unique<Program>(vs, fs);

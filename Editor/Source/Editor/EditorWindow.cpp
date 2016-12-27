@@ -130,7 +130,7 @@ auto openScene()
 	auto& world = app.getWorld();
 	auto& editState = app.getEditState();
 	std::string path;
-	if (openFileDialog("scene", fs::resolveFileLocation("data://scenes/"), path))
+	if (openFileDialog("scene", fs::resolve_protocol("data://scenes").string(), path))
 	{
 		world.reset();
 		loadEditorCamera();
@@ -173,7 +173,7 @@ void saveSceneAs()
 		return;
 
 	std::string path;
-	if (saveFileDialog("scene", fs::resolveFileLocation("data://scenes/"), path))
+	if (saveFileDialog("scene", fs::resolve_protocol("data://scenes").string(), path))
 	{
 		editState.scene = path;		
 		saveScene();	
@@ -415,7 +415,7 @@ void ProjectManagerWindow::frameRender()
 		if (gui::Button("NEW PROJECT"))
 		{
 			std::string path;
-			if (openFolderDialog("", fs::resolveFileLocation("engine://"), path))
+			if (openFolderDialog("", fs::resolve_protocol("engine://").string(), path))
 			{
 				app.createProject(path);
 				setMain(false);
@@ -426,7 +426,7 @@ void ProjectManagerWindow::frameRender()
 		if (gui::Button("OPEN OTHER"))
 		{
 			std::string path;
-			if (openFolderDialog("", fs::resolveFileLocation("engine://"), path))
+			if (openFolderDialog("", fs::resolve_protocol("engine://").string(), path))
 			{
 				app.openProject(path);
 				setMain(false);

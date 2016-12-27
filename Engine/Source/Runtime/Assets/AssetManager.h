@@ -3,6 +3,7 @@
 #include <functional>
 #include <unordered_map>
 
+#include "Core/common/type_traits.hpp"
 #include "Core/common/string_utils.h"
 #include "Core/events/delegate.hpp"
 #include "../System/FileSystem.h"
@@ -15,7 +16,6 @@ using RequestContainer = std::unordered_map<std::string, LoadRequest<T>>;
 
 struct Storage
 {
-	typedef std::size_t Family;
 	//-----------------------------------------------------------------------------
 	//  Name : ~Storage (virtual )
 	/// <summary>
@@ -46,19 +46,6 @@ struct Storage
 	//-----------------------------------------------------------------------------
 	virtual void clear(const std::string& protocol) = 0;
 
-	//-----------------------------------------------------------------------------
-	//  Name : getCounter ()
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	static Family& getCounter()
-	{
-		static Family family_counter_;
-		return family_counter_;
-	}
 };
 
 template<typename T>
@@ -74,19 +61,6 @@ struct TStorage : Storage
 	//-----------------------------------------------------------------------------
 	~TStorage() = default;
 
-	//-----------------------------------------------------------------------------
-	//  Name : family ()
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	static Family family()
-	{
-		static Family family = getCounter()++;
-		return family;
-	}
 	//-----------------------------------------------------------------------------
 	//  Name : clear ()
 	/// <summary>
@@ -129,7 +103,7 @@ struct TStorage : Storage
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void loadFromMemoryDefault(const std::string&, const std::uint8_t*, std::uint32_t, LoadRequest<T>&) {}
+	static void loadFromMemoryDefault(const fs::path&, const std::uint8_t*, std::uint32_t, LoadRequest<T>&) {}
 	
 	//-----------------------------------------------------------------------------
 	//  Name : loadFromFileDefault ()
@@ -139,7 +113,7 @@ struct TStorage : Storage
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void loadFromFileDefault(const std::string&, const std::string&, bool, LoadRequest<T>&) {}
+	static void loadFromFileDefault(const fs::path&, const fs::path&, bool, LoadRequest<T>&) {}
 	
 	//-----------------------------------------------------------------------------
 	//  Name : saveToFileDefault ()
@@ -149,36 +123,35 @@ struct TStorage : Storage
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void saveToFileDefault(const std::string&, const AssetHandle<T>&) {}
+	static void saveToFileDefault(const fs::path&, const AssetHandle<T>&) {}
 
-	/// relativeKey, data, size, outRequest
+	/// key, data, size, outRequest
 	delegate<void(const std::string&, const std::uint8_t*, std::uint32_t, LoadRequest<T>&)> loadFromMemory = loadFromMemoryDefault;
 
-	/// relativeKey, absolutKey, async, outReqeust
-	delegate<void(const std::string&, const std::string&, bool, LoadRequest<T>&)> loadFromFile = loadFromFileDefault;
+	/// key, absolutKey, async, outReqeust
+	delegate<void(const std::string&, const fs::path&, bool, LoadRequest<T>&)> loadFromFile = loadFromFileDefault;
 
 	/// absolutKey, asset
-	delegate<void(const std::string&, const AssetHandle<T>&)> saveToFile = saveToFileDefault;
+	delegate<void(const fs::path&, const AssetHandle<T>&)> saveToFile = saveToFileDefault;
 
 	/// Storage container
 	std::unordered_map<std::string, LoadRequest<T>> container;
 	/// Sub directory
-	std::string subdir;
+	fs::path subdir;
 	/// Sub directory
-	std::string platform;
+	fs::path platform;
 };
 
 template<typename T>
-inline std::string getAbsoluteKey(const std::string& toLowerKey, T storage)
+inline fs::path getAbsoluteKey(const std::string& toLowerKey, T storage)
 {
-	std::string absoluteKey = fs::resolveFileLocation(toLowerKey);
-	std::string dir = fs::getDirectoryName(absoluteKey);
-	std::string file = fs::getFileName(absoluteKey);
-	dir = string_utils::replace(dir, '\\', '/');
-	dir = string_utils::toLower(dir);
-	file = string_utils::toLower(file);
+	fs::path absoluteKey = fs::resolve_protocol(toLowerKey);
+	fs::path dir = absoluteKey;
+	dir.remove_filename();
+	std::string file = absoluteKey.filename().string();
+
 	static const std::string ext = ".asset";
-	absoluteKey = dir + storage->subdir + storage->platform + file + ext;
+	absoluteKey = fs::absolute(dir / storage->subdir / storage->platform / fs::path(file + ext));
 	return absoluteKey;
 };
 
@@ -198,7 +171,7 @@ public:
 	template <typename S>
 	void add(std::shared_ptr<TStorage<S>> system)
 	{
-		storages.insert(std::make_pair(TStorage<S>::family(), system));
+		storages.insert(std::make_pair(core::TypeInfo::id<Storage, TStorage<S>>(), system));
 	}
 
 	//-----------------------------------------------------------------------------
@@ -228,7 +201,7 @@ public:
 	template <typename S>
 	std::shared_ptr<TStorage<S>> getStorage()
 	{
-		auto it = storages.find(TStorage<S>::family());
+		auto it = storages.find(core::TypeInfo::id<Storage, TStorage<S>>());
 		assert(it != storages.end());
 		return it == storages.end()
 			? std::shared_ptr<TStorage<S>>()
@@ -304,12 +277,12 @@ public:
 	//-----------------------------------------------------------------------------
 	template<typename T>
 	LoadRequest<T>& createAssetFromMemory(
-		const std::string& relativeKey,
+		const std::string& key,
 		const std::uint8_t* data,
 		const std::uint32_t& size)
 	{
 		auto storage = getStorage<T>();
-		const std::string toLowerKey = string_utils::toLower(relativeKey);
+		const std::string toLowerKey = string_utils::toLower(key);
 		return createAssetFromMemoryImpl<T>(toLowerKey, data, size, storage->container, storage->loadFromMemory);
 	}
 
@@ -323,16 +296,17 @@ public:
 	//-----------------------------------------------------------------------------
 	template<typename T>
 	void renameAsset(
-		const std::string& relativeKey,
+		const std::string& key,
 		const std::string& newRelativeKey)
 	{
 		auto storage = getStorage<T>();
-		const std::string toLowerKey = string_utils::toLower(relativeKey);
+		const std::string toLowerKey = string_utils::toLower(key);
 		const std::string toLowerNewKey = string_utils::toLower(newRelativeKey);
 		
 		auto absoluteKey = getAbsoluteKey(toLowerKey, storage);
 		auto absoluteNewKey = getAbsoluteKey(toLowerNewKey, storage);
-		fs::moveFile(absoluteKey, absoluteNewKey, true);
+
+		fs::rename(absoluteKey, absoluteNewKey, std::error_code{});
 
 		storage->container[toLowerNewKey] = storage->container[toLowerKey];
 		storage->container[toLowerNewKey].asset.link->id = toLowerNewKey;
@@ -349,10 +323,10 @@ public:
 	//-----------------------------------------------------------------------------
 	template<typename T>
 	void clearAsset(
-		const std::string& relativeKey)
+		const std::string& key)
 	{
 		auto storage = getStorage<T>();
-		const std::string toLowerKey = string_utils::toLower(relativeKey);
+		const std::string toLowerKey = string_utils::toLower(key);
 
 		auto& request = storage->container[toLowerKey];
 		request.asset.link->asset.reset();
@@ -370,12 +344,12 @@ public:
 	//-----------------------------------------------------------------------------
 	template<typename T>
 	void deleteAsset(
-		const std::string& relativeKey)
+		const std::string& key)
 	{
 		auto storage = getStorage<T>();
-		const std::string toLowerKey = string_utils::toLower(relativeKey);
-		const std::string absoluteKey = getAbsoluteKey(toLowerKey, storage);
-		fs::deleteFile(absoluteKey);
+		const std::string toLowerKey = string_utils::toLower(key);
+		const fs::path absoluteKey = getAbsoluteKey(toLowerKey, storage);
+		fs::remove(absoluteKey, std::error_code{});
 
 		auto& request = storage->container[toLowerKey];
 		request.asset.link->asset.reset();
@@ -392,11 +366,11 @@ public:
 	//-----------------------------------------------------------------------------
 	template<typename T>
 	LoadRequest<T>& load(
-		const std::string& relativeKey,
+		const std::string& key,
 		bool async,
 		bool force = false)
 	{
-		const std::string toLowerKey = string_utils::toLower(relativeKey);
+		const auto toLowerKey = string_utils::toLower(key);
 		auto storage = getStorage<T>();
 		//if embedded resource
 		if (toLowerKey.find("embedded") != std::string::npos)
@@ -405,7 +379,7 @@ public:
 		}
 		else
 		{
-			const std::string absoluteKey = getAbsoluteKey(toLowerKey, storage);
+			const fs::path absoluteKey = getAbsoluteKey(toLowerKey, storage);
 			return loadAssetFromFileImpl<T>(toLowerKey, absoluteKey, async, force, storage->container, storage->loadFromFile);
 
 		}
@@ -424,7 +398,7 @@ public:
 	{
 		auto storage = getStorage<T>();
 		const std::string toLowerKey = string_utils::toLower(asset.id());
-		const std::string absoluteKey = getAbsoluteKey(toLowerKey, storage);
+		const fs::path absoluteKey = getAbsoluteKey(toLowerKey, storage);
 		storage->saveToFile(absoluteKey, asset);
 	}
 
@@ -439,8 +413,8 @@ private:
 	//-----------------------------------------------------------------------------
 	template<typename T, typename F>
 	LoadRequest<T>& loadAssetFromFileImpl(
-		const std::string& relativeKey,
-		const std::string& absoluteKey,
+		const std::string& key,
+		const fs::path& absoluteKey,
 		bool async,
 		bool force,
 		RequestContainer<T>& container,
@@ -448,14 +422,14 @@ private:
 	)
 	{
 
-		auto it = container.find(relativeKey);
+		auto it = container.find(key);
 		if (it != std::end(container))
 		{
 			auto& request = it->second;
 
 			if (force)
 			{
-				loadFunc(relativeKey, absoluteKey, async, request);
+				loadFunc(key, absoluteKey, async, request);
 			}
 			else if (!async && !request.isReady())
 			{
@@ -464,16 +438,16 @@ private:
 
 			return request;
 		}
-		else if (!fs::fileExists(absoluteKey))
+		else if (!fs::exists(absoluteKey, std::error_code{}))
 		{
 			static LoadRequest<T> emptyRequest;
 			return emptyRequest;
 		}
 		else
 		{
-			auto& request = findOrCreateAssetImpl(relativeKey, container);
+			auto& request = findOrCreateAssetImpl(key, container);
 			//Dispatch the loading
-			loadFunc(relativeKey, absoluteKey, async, request);
+			loadFunc(key, absoluteKey, async, request);
 
 			return request;
 		}
@@ -489,7 +463,7 @@ private:
 	//-----------------------------------------------------------------------------
 	template<typename T, typename F>
 	LoadRequest<T>& createAssetFromMemoryImpl(
-		const std::string& relativeKey,
+		const std::string& key,
 		const std::uint8_t* data,
 		const std::uint32_t& size,
 		RequestContainer<T>& container,
@@ -497,7 +471,7 @@ private:
 	)
 	{
 
-		auto it = container.find(relativeKey);
+		auto it = container.find(key);
 		if (it != std::end(container))
 		{
 			// If there is already a loading request.
@@ -506,9 +480,9 @@ private:
 		}
 		else
 		{
-			auto& request = findOrCreateAssetImpl(relativeKey, container);
+			auto& request = findOrCreateAssetImpl(key, container);
 			//Dispatch the loading
-			loadFunc(relativeKey, data, size, request);
+			loadFunc(key, data, size, request);
 
 			return request;
 		}
@@ -525,14 +499,14 @@ private:
 	//-----------------------------------------------------------------------------
 	template<typename T>
 	LoadRequest<T>& findOrCreateAssetImpl(
-		const std::string& relativeKey,
+		const std::string& key,
 		RequestContainer<T>& container
 	)
 	{
-		auto& request = container[relativeKey];
+		auto& request = container[key];
 		return request;
 	}
 
 	/// Different storages
-	std::unordered_map<Storage::Family, std::shared_ptr<Storage>> storages;
+	std::unordered_map<core::TypeInfo::index_t, std::shared_ptr<Storage>> storages;
 };

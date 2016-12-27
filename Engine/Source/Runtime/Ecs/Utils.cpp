@@ -2,22 +2,21 @@
 #include "Core/serialization/serialization.h"
 #include "Core/serialization/archives.h"
 #include "../Meta/Ecs/Entity.hpp"
-#include "../System/FileSystem.h"
 
 namespace ecs
 {
 	namespace utils
 	{
-		void saveEntity(const std::string& dir, const Entity& data)
+		void saveEntity(const fs::path& dir, const Entity& data)
 		{
-			const std::string name = fs::resolveFileLocation(dir + data.getName() + ".asset");
-			saveData(name, { data });
+			const fs::path fullPath = fs::resolve_protocol(dir / fs::path(data.getName()+ ".asset"));
+			saveData(fullPath, { data });
 		}
 
-		bool tryLoadEntity(const std::string& name, Entity& outData)
+		bool tryLoadEntity(const fs::path& fullPath, Entity& outData)
 		{
 			std::vector<Entity> outDataVec;
-			if (!loadData(name, outDataVec))
+			if (!loadData(fullPath, outDataVec))
 				return false;
 
 			if (!outDataVec.empty())
@@ -27,13 +26,13 @@ namespace ecs
 		}
 
 
-		void saveData(const std::string& fullPath, const std::vector<Entity>& data)
+		void saveData(const fs::path& fullPath, const std::vector<Entity>& data)
 		{
 			std::ofstream os(fullPath, std::fstream::binary | std::fstream::trunc);
 			serializeData(os, data);
 		}
 
-		bool loadData(const std::string& fullPath, std::vector<Entity>& outData)
+		bool loadData(const fs::path& fullPath, std::vector<Entity>& outData)
 		{
 			std::ifstream is(fullPath, std::fstream::binary);
 			return deserializeData(is, outData);

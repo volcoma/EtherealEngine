@@ -104,12 +104,8 @@ RenderWindow& Application::getMainWindow()
 	return *(mWindows[0].get());
 }
 
-bool Application::initInstance(const std::string& rootDataDir, const std::string& strCmdLine)
+bool Application::initInstance(const std::string& strCmdLine)
 {
-	setRootDataPath(rootDataDir);
-
-	fs::addPathProtocol("sys", rootDataDir + "../../Engine_Data/");
-
 	// Create and initialize the logging system
 	if (!initLogging()) { shutDown(); return false; }
 
@@ -130,14 +126,6 @@ bool Application::initInstance(const std::string& rootDataDir, const std::string
 
 	// Success!
 	return true;
-}
-
-void Application::setRootDataPath(const std::string & path)
-{
-	mRootDataDir = path;
-
-	// Initialize file system and search for all valid data packages
-	fs::setRootDirectory(mRootDataDir);
 }
 
 void Application::setCopyrightData(const std::string & copyright)
@@ -231,7 +219,7 @@ bool Application::initAssetManager()
 		auto storage = manager.add<Shader>();
 		storage->loadFromFile = AssetReader::loadShaderFromFile;
 		storage->loadFromMemory = AssetReader::loadShaderFromMemory;
-		storage->subdir = "/runtime/";
+		storage->subdir = "runtime/";
 		switch (gfx::getRendererType())
 		{
 		case gfx::RendererType::Direct3D9:
@@ -261,25 +249,25 @@ bool Application::initAssetManager()
 	}
 	{
 		auto storage = manager.add<Texture>();
-		storage->subdir = "/runtime/";
+		storage->subdir = "runtime/";
 		storage->loadFromFile = AssetReader::loadTextureFromFile;
 		//storage->loadFromMemory = AssetReader::loadTextureFromMemory;
 	}
 	{
 		auto storage = manager.add<Mesh>();
-		storage->subdir = "/runtime/";
+		storage->subdir = "runtime/";
 		storage->loadFromFile = AssetReader::loadMeshFromFile;
 		//storage->loadFromMemory = AssetReader::loadMeshFromMemory;
 	}
 	{
 		auto storage = manager.add<Material>();
-		storage->subdir = "/";
+		storage->subdir = "";
 		storage->loadFromFile = AssetReader::loadMaterialFromFile;
 		//storage->loadFromMemory = AssetReader::loadMaterialFromMemory;
 	}
 	{
 		auto storage = manager.add<Prefab>();
-		storage->subdir = "/";
+		storage->subdir = "";
 		storage->loadFromFile = AssetReader::loadPrefabFromFile;
 	}
 

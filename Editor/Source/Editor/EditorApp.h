@@ -1,5 +1,6 @@
 #pragma once
 #include "Runtime/System/Application.h"
+#include "Runtime/System/FileSystem.h"
 #include "EditState.h"
 #include "Console/ConsoleLog.h"
 
@@ -44,7 +45,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual bool initInstance(const std::string& rootDataDir, const std::string& commandLine);
+	virtual bool initInstance(const std::string& commandLine);
 	
 	//-----------------------------------------------------------------------------
 	//  Name : initApplication (virtual )
@@ -124,7 +125,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void createProject(const std::string& projectDir);
+	void createProject(const fs::path& projectPath);
 
 	//-----------------------------------------------------------------------------
 	//  Name : openProject ()
@@ -134,7 +135,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void openProject(const std::string& projectDir);
+	void openProject(const fs::path& projectPath);
 
 	//-----------------------------------------------------------------------------
 	//  Name : openProjectManager ()

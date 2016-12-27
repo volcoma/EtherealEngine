@@ -62,11 +62,11 @@ namespace Docks
 			{
 				auto& assetRelativeName = asset.first;
 				auto& assetHandle = asset.second.asset;
-				auto dir = fs::getDirectoryName(assetRelativeName);
-				if(!string_utils::beginsWith(dir, "data://", true))
-					continue;
 
-				auto assetName = fs::getFileName(assetRelativeName);
+				if(!string_utils::beginsWith(assetRelativeName, "data://", true))
+					continue;
+				
+				const auto assetName = fs::path(assetRelativeName).filename().string();
 				bool alreadySelected = false;
 				if (selected.is_type<std::decay<decltype(assetHandle)>::type>())
 				{
@@ -127,11 +127,11 @@ namespace Docks
 			{
 				auto& assetRelativeName = asset.first;
 				auto& assetHandle = asset.second.asset;
-				auto dir = fs::getDirectoryName(assetRelativeName);
-				if (!string_utils::beginsWith(dir, "data://", true))
+
+				if (!string_utils::beginsWith(assetRelativeName, "data://", true))
 					continue;
 
-				auto assetName = fs::getFileName(assetRelativeName);
+				const auto assetName = fs::path(assetRelativeName).filename().string();
 				bool alreadySelected = false;
 				if (selected.is_type<std::decay<decltype(assetHandle)>::type>())
 				{
@@ -234,7 +234,7 @@ namespace Docks
 				if (dragged && dragged.is_type<ecs::Entity>())
 				{
 					auto entity = dragged.get_value<ecs::Entity>();
-					ecs::utils::saveEntity("data://prefabs/", entity);
+					ecs::utils::saveEntity("data://prefabs", entity);
 					editState.drop();
 				}
 			}
@@ -258,7 +258,7 @@ namespace Docks
 						if (gui::Selectable("Create Material"))
 						{
 							AssetHandle<Material> asset;
-							asset.link->id = string_utils::format("data://materials/new_material_{%s}", fs::getFileName(std::tmpnam(nullptr)).c_str());
+							asset.link->id = string_utils::format("data://materials/new_material_{%s}", fs::path(std::tmpnam(nullptr)).filename().string().c_str());
 							asset.link->asset = std::make_shared<StandardMaterial>();
 							manager.save<Material>(asset);
 						}

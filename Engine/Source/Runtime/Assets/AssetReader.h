@@ -1,5 +1,6 @@
 #pragma once
 #include "LoadRequest.hpp"
+#include "../System/FileSystem.h"
 
 struct Texture;
 struct Shader;
@@ -17,7 +18,7 @@ struct AssetReader
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void loadTextureFromFile(const std::string& relativeKey, const std::string& absoluteKey, bool async, LoadRequest<Texture>& request);
+	static void loadTextureFromFile(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Texture>& request);
 	
 	//-----------------------------------------------------------------------------
 	//  Name : loadShaderFromFile ()
@@ -27,7 +28,7 @@ struct AssetReader
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void loadShaderFromFile(const std::string& relativeKey, const std::string& absoluteKey, bool async, LoadRequest<Shader>& request);
+	static void loadShaderFromFile(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Shader>& request);
 	
 	//-----------------------------------------------------------------------------
 	//  Name : loadShaderFromMemory ()
@@ -37,7 +38,7 @@ struct AssetReader
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void loadShaderFromMemory(const std::string& relativeKey, const std::uint8_t* data, std::uint32_t size, LoadRequest<Shader>& request);
+	static void loadShaderFromMemory(const std::string& key, const std::uint8_t* data, std::uint32_t size, LoadRequest<Shader>& request);
 	
 	//-----------------------------------------------------------------------------
 	//  Name : loadMeshFromFile ()
@@ -47,7 +48,7 @@ struct AssetReader
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void loadMeshFromFile(const std::string& relativeKey, const std::string& absoluteKey, bool async, LoadRequest<Mesh>& request);
+	static void loadMeshFromFile(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Mesh>& request);
 	
 	//-----------------------------------------------------------------------------
 	//  Name : loadMaterialFromFile ()
@@ -57,7 +58,7 @@ struct AssetReader
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void loadMaterialFromFile(const std::string& relativeKey, const std::string& absoluteKey, bool async, LoadRequest<Material>& request);
+	static void loadMaterialFromFile(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Material>& request);
 
 	//-----------------------------------------------------------------------------
 	//  Name : loadPrefabFromFile ()
@@ -67,6 +68,6 @@ struct AssetReader
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void loadPrefabFromFile(const std::string& relativeKey, const std::string& absoluteKey, bool async, LoadRequest<Prefab>& request);
+	static void loadPrefabFromFile(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Prefab>& request);
 
 };

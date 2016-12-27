@@ -29,8 +29,9 @@ namespace core
 	{
 		using index_t = size_t;
 
-		template<typename Base> static index_t id()
+		template<typename Base, typename Derived> static index_t id()
 		{
+			static_assert(std::is_base_of<Base, Derived>::value, "D should be derived from B.");
 			static index_t sid = counter<Base>::value++;
 			return sid;
 		}

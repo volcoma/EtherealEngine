@@ -16,35 +16,34 @@
 #include "Console/ConsoleLog.h"
 #include "Assets/AssetCompiler.h"
 template<typename T>
-void watchAssets(const std::string& toLowerKey, bool reloadAsync)
+void watchAssets(const fs::path& protocol, bool reloadAsync)
 {
 	auto& app = Singleton<Application>::getInstance();
 	auto& manager = app.getAssetManager();
 	auto storage = manager.getStorage<T>();
 
-	std::string absoluteKey = fs::resolveFileLocation(toLowerKey);
-	std::string dir = fs::getDirectoryName(absoluteKey);
-	dir = string_utils::replace(dir, '\\', '/');
-	dir = string_utils::toLower(dir);
+	const fs::path dir = fs::resolve_protocol(protocol);
 	static const std::string ext = "*.asset";
-	std::string watchDir = dir + storage->subdir;
-	fs::ensurePath(watchDir, false);
-	watchDir += storage->platform + ext;
-	fs::ensurePath(watchDir, false);
+	fs::path watchDir = dir / storage->subdir;
+	fs::create_directory(watchDir);
+	watchDir /= storage->platform;
+	fs::create_directory(watchDir);
+	watchDir /= ext;
 
-	wd::watch(watchDir, true, [&app, &manager, toLowerKey, reloadAsync](const std::vector<fs::path>& paths)
+	wd::watch(watchDir, true, [&app, &manager, protocol, reloadAsync](const std::vector<wd::Entry>& entries)
 	{
-		for (auto& p : paths)
+		for (auto& entry : entries)
 		{
 			auto& pool = app.getThreadPool();
-			auto relativeKey = toLowerKey + p.filename().replace_extension().string();
+			auto p = entry.path;
+			auto key = (protocol / p.filename().replace_extension()).generic_string();
 
-			if (!fs::exists(p, std::error_code{}))
+			if (entry.state == wd::Entry::Removed)
 			{
 				//removed
-				pool.enqueue_with_callback([]() {}, [reloadAsync, relativeKey, &manager]()
+				pool.enqueue_with_callback([]() {}, [reloadAsync, key, &manager]()
 				{
-					manager.clearAsset<T>(relativeKey);
+					manager.clearAsset<T>(key);
 				});
 				
 			}
@@ -53,9 +52,9 @@ void watchAssets(const std::string& toLowerKey, bool reloadAsync)
 				//created or modified
 				if (fs::is_regular_file(p, std::error_code{}))
 				{			
-					pool.enqueue_with_callback([]() {}, [reloadAsync, relativeKey, &manager]()
+					pool.enqueue_with_callback([]() {}, [reloadAsync, key, &manager]()
 					{
-						manager.load<T>(relativeKey, reloadAsync, true);
+						manager.load<T>(key, reloadAsync, true);
 					});
 
 				}
@@ -64,27 +63,25 @@ void watchAssets(const std::string& toLowerKey, bool reloadAsync)
 	});
 }
 
-void watchRawShaders(const std::string& toLowerKey, bool reloadAsync)
+void watchRawShaders(const fs::path& protocol, bool reloadAsync)
 {
 	auto& app = Singleton<Application>::getInstance();
 
-	std::string absoluteKey = fs::resolveFileLocation(toLowerKey);
-	std::string dir = fs::getDirectoryName(absoluteKey);
-	dir = string_utils::replace(dir, '\\', '/');
-	dir = string_utils::toLower(dir);
-	static const std::string ext = "/*.sc";
-	const std::string watchDir = dir + ext;
+	const fs::path dir = fs::resolve_protocol(protocol);
+	static const std::string ext = "*.sc";
+	const fs::path watchDir = dir / ext;
 
-	wd::watch(watchDir, false, [&app, absoluteKey, reloadAsync](const std::vector<fs::path>& paths)
+	wd::watch(watchDir, false, [&app, reloadAsync](const std::vector<wd::Entry>& entries)
 	{
-		for (auto& p : paths)
+		for (auto& entry : entries)
 		{
+			const auto& p = entry.path;
 			if(string_utils::endsWith(p.string(), "def.sc"))
 				continue;
 
 			auto& pool = app.getThreadPool();
 	
-			if (!fs::exists(p, std::error_code{}))
+			if (entry.state == wd::Entry::Removed)
 			{
 				//removed
 			}
@@ -93,12 +90,11 @@ void watchRawShaders(const std::string& toLowerKey, bool reloadAsync)
 				//created or modified
 				if (fs::is_regular_file(p, std::error_code{}))
 				{
-					std::string absolutePath = p.string();
 					auto callback = []() {};
-					pool.enqueue_with_callback([absolutePath]()
+					pool.enqueue_with_callback([p]()
 					{
 						ShaderCompiler compiler;
-						compiler.compile(absolutePath);
+						compiler.compile(p);
 					}, callback);
 
 				}
@@ -224,12 +220,10 @@ std::shared_ptr<RenderWindow> EditorApp::createMainWindow()
 	return std::make_shared<MainEditorWindow>(desktop, "Editor v1.0", sf::Style::Default);
 }
 
-bool EditorApp::initInstance(const std::string& rootDataDir, const std::string& commandLine)
+bool EditorApp::initInstance(const std::string& commandLine)
 {
-	fs::addPathProtocol("engine", rootDataDir + "../../");
-	fs::addPathProtocol("editor", rootDataDir + "../../Editor_Data/");
-	fs::ensurePath("editor://Config", true);
-	return Application::initInstance(rootDataDir, commandLine);
+	fs::create_directory(fs::resolve_protocol("editor_data://Config"));
+	return Application::initInstance(commandLine);
 }
 
 bool EditorApp::initSystems()
@@ -283,49 +277,48 @@ bool EditorApp::shutDown()
 	return Application::shutDown();
 }
 
-void EditorApp::createProject(const std::string& projectDir)
+void EditorApp::createProject(const fs::path& projectPath)
 {
-	auto projName = fs::getFileName(projectDir);
-	fs::addPathProtocol("app", projectDir);
-	fs::ensurePath("app://data/", true);
-	fs::ensurePath("app://data/shaders/", true);
-	fs::ensurePath("app://data/textures/", true);
-	fs::ensurePath("app://data/materials/", true);
-	fs::ensurePath("app://data/meshes/", true);
-	fs::ensurePath("app://data/scenes/", true);
-	fs::ensurePath("app://data/shaders/runtime/", true);
-	fs::ensurePath("app://data/textures/runtime/", true);
-	fs::ensurePath("app://data/meshes/runtime/", true);
-	fs::ensurePath("app://data/prefabs/", true);
-	fs::ensurePath("app://data/scenes/", true);
-	fs::ensurePath("app://settings/", true);
+	fs::add_path_protocol("app:", projectPath);
+	fs::create_directory(fs::resolve_protocol("app://data"));
+	fs::create_directory(fs::resolve_protocol("app://data/shaders"));
+	fs::create_directory(fs::resolve_protocol("app://data/textures"));
+	fs::create_directory(fs::resolve_protocol("app://data/materials"));
+	fs::create_directory(fs::resolve_protocol("app://data/meshes"));
+	fs::create_directory(fs::resolve_protocol("app://data/scenes"));
+	fs::create_directory(fs::resolve_protocol("app://data/shaders/runtime"));
+	fs::create_directory(fs::resolve_protocol("app://data/textures/runtime"));
+	fs::create_directory(fs::resolve_protocol("app://data/meshes/runtime"));
+	fs::create_directory(fs::resolve_protocol("app://data/prefabs"));
+	fs::create_directory(fs::resolve_protocol("app://data/scenes"));
+	fs::create_directory(fs::resolve_protocol("app://settings"));
 
-	fs::copy(fs::resolveFileLocation("sys://meshes/runtime"), fs::resolveFileLocation("app://data/meshes/runtime"), std::error_code{});
+	fs::copy(fs::resolve_protocol("engine_data://meshes/runtime"), fs::resolve_protocol("app://data/meshes/runtime"), std::error_code{});
 	
-	openProject(projectDir);
+	openProject(projectPath);
 }
 
-void EditorApp::openProject(const std::string& projectDir)
+void EditorApp::openProject(const fs::path& projectPath)
 {
-	if (!fs::directoryExists(projectDir))
+	if (!fs::exists(projectPath, std::error_code{}))
 	{
 		auto logger = logging::get("Log");
-		logger->error().write("Project directory doesn't exist {0}", projectDir);
+		logger->error().write("Project directory doesn't exist {0}", projectPath.string());
 		return;
 	}
-	fs::addPathProtocol("app", projectDir);
-	fs::addPathProtocol("data", fs::resolveFileLocation("app://data/"));
+	fs::add_path_protocol("app:", projectPath);
+	fs::add_path_protocol("data:", fs::resolve_protocol("app://data"));
 	wd::unwatchAll();
-	watchAssets<Texture>("data://textures/", true);
-	watchAssets<Texture>("editor://icons/", true);
-	watchAssets<Mesh>("data://meshes/", true);
-	watchAssets<Prefab>("data://prefabs/", true);
-	watchAssets<Material>("data://materials/", false);
-	watchAssets<Shader>("sys://shaders/", true);
-	watchRawShaders("sys://shaders/", true);
+	watchAssets<Texture>("data://textures", true);
+	watchAssets<Texture>("editor_data://icons", true);
+	watchAssets<Mesh>("data://meshes", true);
+	watchAssets<Prefab>("data://prefabs", true);
+	watchAssets<Material>("data://materials", false);
+	watchAssets<Shader>("engine_data://shaders", true);
+	watchRawShaders("engine_data://shaders", true);
 
-	watchAssets<Shader>("editor://shaders/", true);
-	watchRawShaders("editor://shaders/", true);
+	watchAssets<Shader>("editor_data://shaders", true);
+	watchRawShaders("editor_data://shaders", true);
 	
 	auto& world = getWorld();
 	world.reset();
@@ -334,12 +327,12 @@ void EditorApp::openProject(const std::string& projectDir)
 	editState.scene.clear();
 	auto& manager = getAssetManager();
 	manager.clear("data://");
-	auto projName = fs::getFileName(projectDir);
-	editState.project = projName;
+	auto projName = projectPath.filename();
+	editState.project = projName.string();
 	auto& rp = editState.options.recentProjects;
-	if (std::find(std::begin(rp), std::end(rp), projectDir) == std::end(rp))
+	if (std::find(std::begin(rp), std::end(rp), projectPath.generic_string()) == std::end(rp))
 	{
-		rp.push_back(projectDir);
+		rp.push_back(projectPath.generic_string());
 		editState.saveOptions();
 	}
 }

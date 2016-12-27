@@ -382,8 +382,8 @@ void GUIStyle::setStyleColors(const HSVSetup& _setup)
 
 void GUIStyle::loadStyle()
 {
-	const std::string absoluteKey = fs::resolveFileLocation("editor://Config/Style.cfg");
-	if (!fs::fileExists(absoluteKey))
+	const fs::path absoluteKey = fs::resolve_protocol("editor_data://Config/Style.cfg");
+	if (!fs::exists(absoluteKey, std::error_code{}))
 	{
 		saveStyle();
 	}
@@ -400,7 +400,7 @@ void GUIStyle::loadStyle()
 
 void GUIStyle::saveStyle()
 {
-	const std::string absoluteKey = fs::resolveFileLocation("editor://Config/Style.cfg");
+	const fs::path absoluteKey = fs::resolve_protocol("editor_data://Config/Style.cfg");
 	std::ofstream output(absoluteKey);
 	cereal::OArchive_JSON ar(output);
 

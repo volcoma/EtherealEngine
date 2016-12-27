@@ -18,90 +18,90 @@ void EditState::clear()
 
 void EditState::loadIcons(AssetManager& manager)
 {
-	manager.load<Texture>("editor://icons/translate", false)
+	manager.load<Texture>("editor_data://icons/translate", false)
 		.then([this](auto asset) mutable
 	{
 		icons["translate"] = asset;
 	});
 	
-	manager.load<Texture>("editor://icons/rotate", false)
+	manager.load<Texture>("editor_data://icons/rotate", false)
 		.then([this](auto asset) mutable
 	{
 		icons["rotate"] = asset;
 	});
 
-	manager.load<Texture>("editor://icons/scale", false)
+	manager.load<Texture>("editor_data://icons/scale", false)
 		.then([this](auto asset) mutable
 	{
 		icons["scale"] = asset;
 	});
 
-	manager.load<Texture>("editor://icons/local", false)
+	manager.load<Texture>("editor_data://icons/local", false)
 		.then([this](auto asset) mutable
 	{
 		icons["local"] = asset;
 	});
 
-	manager.load<Texture>("editor://icons/global", false)
+	manager.load<Texture>("editor_data://icons/global", false)
 		.then([this](auto asset) mutable
 	{
 		icons["global"] = asset;
 	});
 
-	manager.load<Texture>("editor://icons/play", false)
+	manager.load<Texture>("editor_data://icons/play", false)
 		.then([this](auto asset) mutable
 	{
 		icons["play"] = asset;
 	});
 
-	manager.load<Texture>("editor://icons/pause", false)
+	manager.load<Texture>("editor_data://icons/pause", false)
 		.then([this](auto asset) mutable
 	{
 		icons["pause"] = asset;
 	});
 
-	manager.load<Texture>("editor://icons/stop", false)
+	manager.load<Texture>("editor_data://icons/stop", false)
 		.then([this](auto asset) mutable
 	{
 		icons["stop"] = asset;
 	});
 
-	manager.load<Texture>("editor://icons/next", false)
+	manager.load<Texture>("editor_data://icons/next", false)
 		.then([this](auto asset) mutable
 	{
 		icons["next"] = asset;
 	});
 
-	manager.load<Texture>("editor://icons/material", false)
+	manager.load<Texture>("editor_data://icons/material", false)
 		.then([this](auto asset) mutable
 	{
 		icons["material"] = asset;
 	});
 
-	manager.load<Texture>("editor://icons/mesh", false)
+	manager.load<Texture>("editor_data://icons/mesh", false)
 		.then([this](auto asset) mutable
 	{
 		icons["mesh"] = asset;
 	});
 
-	manager.load<Texture>("editor://icons/export", false)
+	manager.load<Texture>("editor_data://icons/export", false)
 		.then([this](auto asset) mutable
 	{
 		icons["import"] = asset;
 	});
 
-	manager.load<Texture>("editor://icons/grid", false)
+	manager.load<Texture>("editor_data://icons/grid", false)
 		.then([this](auto asset) mutable
 	{
 		icons["grid"] = asset;
 	});
 
-	manager.load<Texture>("editor://icons/wireframe", false)
+	manager.load<Texture>("editor_data://icons/wireframe", false)
 		.then([this](auto asset) mutable
 	{
 		icons["wireframe"] = asset;
 	});
-	manager.load<Texture>("editor://icons/prefab", false)
+	manager.load<Texture>("editor_data://icons/prefab", false)
 		.then([this](auto asset) mutable
 	{
 		icons["prefab"] = asset;
@@ -154,8 +154,8 @@ void EditState::frameEnd()
 
 void EditState::loadOptions()
 {
-	const std::string absoluteKey = fs::resolveFileLocation("editor://Config/Options.cfg");
-	if (!fs::fileExists(absoluteKey))
+	const fs::path absoluteKey = fs::resolve_protocol("editor_data://Config/Options.cfg");
+	if (!fs::exists(absoluteKey, std::error_code{}))
 	{
 		saveOptions();
 	}
@@ -174,7 +174,7 @@ void EditState::loadOptions()
 		{
 			auto& item = *iter;
 
-			if (!fs::directoryExists(item))
+			if (!fs::exists(item, std::error_code{}))
 			{
 				iter = items.erase(iter);				
 			}
@@ -188,7 +188,7 @@ void EditState::loadOptions()
 
 void EditState::saveOptions()
 {
-	const std::string absoluteKey = fs::resolveFileLocation("editor://Config/Options.cfg");
+	const std::string absoluteKey = fs::resolve_protocol("editor_data://Config/Options.cfg").string();
 	std::ofstream output(absoluteKey);
 	cereal::OArchive_JSON ar(output);
 

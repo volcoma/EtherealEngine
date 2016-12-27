@@ -20,13 +20,14 @@ bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, s
 	{
 		PropertyLayout propName("Name");
 		const auto& item = data.id();
-		auto assetName = fs::getFileName(item);
+		auto itemPath = fs::path(item);
+		auto assetName = itemPath.filename().string();
 		rttr::variant vari = assetName;
 		changed |= inspectVar(vari);
 		if (changed)
 		{
-			auto dirName = fs::getDirectoryName(item);
-			manager.renameAsset<Texture>(item, dirName + "/" + vari.get_value<std::string>());
+			auto dirName = itemPath.remove_filename();
+			manager.renameAsset<Texture>(item, (dirName / fs::path(vari.get_value<std::string>())).generic_string());
 		}
 	}
 
@@ -172,13 +173,14 @@ bool Inspector_AssetHandle_Material::inspect(rttr::variant& var, bool readOnly, 
 	{
 		PropertyLayout propName("Name");
 		const auto& item = data.id();
-		rttr::variant vari = fs::getFileName(item);
+		auto itemPath = fs::path(item);
+		auto assetName = itemPath.filename().string();
+		rttr::variant vari = assetName;
 		changed |= inspectVar(vari);
 		if (changed)
 		{
-			auto dirName = fs::getDirectoryName(item);
-			auto fileName = vari.get_value<std::string>();
-			manager.renameAsset<Material>(item, dirName + std::string("/") + fileName);
+			auto dirName = itemPath.remove_filename();
+			manager.renameAsset<Material>(item, (dirName / fs::path(vari.get_value<std::string>())).generic_string());
 		}
 	}
 
@@ -251,13 +253,15 @@ bool Inspector_AssetHandle_Mesh::inspect(rttr::variant& var, bool readOnly, std:
 	{
 		PropertyLayout propName("Name");
 		const auto& item = data.id();
-		auto assetName = fs::getFileName(item);
+		auto itemPath = fs::path(item);
+		auto assetName = itemPath.filename().string();
 		rttr::variant vari = assetName;
 		changed |= inspectVar(vari);
 		if (changed)
 		{
-			auto dirName = fs::getDirectoryName(item);
-			manager.renameAsset<Mesh>(item, dirName + "/" + vari.get_value<std::string>());
+			auto dirName = itemPath.remove_filename();
+			manager.renameAsset<Mesh>(item, (dirName / fs::path(vari.get_value<std::string>())).generic_string());
+
 		}
 	}
 

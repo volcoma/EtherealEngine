@@ -1,7 +1,7 @@
 #pragma once
-#include <string>
+#include "Runtime/System/FileSystem.h"
 
 struct ShaderCompiler
 {
-	void compile(const std::string& absoluteKey);
+	void compile(const fs::path& absoluteKey);
 };

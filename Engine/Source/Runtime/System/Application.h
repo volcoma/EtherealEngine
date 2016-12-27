@@ -61,17 +61,6 @@ public:
 	bool frameAdvance(bool runSimulation = true);
 
 	//-----------------------------------------------------------------------------
-	//  Name : setRootDataPath ()
-	/// <summary>
-	/// Set the path that represents the root from which all data will be loaded
-	/// or leave blank to use the process current directory. The information
-	/// provided via this method only takes effect during a subsequent call to 
-	/// 'initInstance()' and cannot be used to make changes after the fact.
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void setRootDataPath(const std::string & path);
-
-	//-----------------------------------------------------------------------------
 	//  Name : setCopyrightData ()
 	/// <summary>
 	/// Set the application copyright information as it should be displayed to the
@@ -188,7 +177,7 @@ public:
 	/// Initializes the entire engine here.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual bool initInstance(const std::string& rootDataDir, const std::string& commandLine);
+	virtual bool initInstance(const std::string& commandLine);
 
 	//-----------------------------------------------------------------------------
 	//  Name : begin ()
@@ -379,8 +368,6 @@ protected:
 	std::string mVersion;
 	/// Cached copyright string retrieved from resource string table.
 	std::string mCopyright;
-	/// The root data directory used by the file system.
-	std::string mRootDataDir;
 	/// Collection of application windows.
 	std::vector<std::shared_ptr<RenderWindow>> mWindows;
 	/// Currently processed window.

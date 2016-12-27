@@ -24,23 +24,21 @@ inline void logPath(const fs::path& path)
 }
 
 
-class Watchdog
+class WatchdogEx
 {
 public:
-
-	//-----------------------------------------------------------------------------
-	//  Name : watch ()
-	/// <summary>
-	/// Watches a file or directory for modification and call back the specified 
-	/// std::function. The path specified is passed as argument of the callback 
-	/// even if there is multiple files. Use the second watch method if you want
-	/// to receive a list of all the files that have been modified.
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	static void watch(const fs::path &path, bool initialList, const std::function<void(const fs::path&)> &callback)
+	struct Entry
 	{
-		watchImpl(path, initialList, callback, std::function<void(const std::vector<fs::path>&)>());
-	}
+		enum State
+		{
+			Modified,
+			Removed,
+			Unmodified,
+		};
+		fs::path path;
+		State state;
+		fs::file_time_type last_mod_time;
+	};
 
 	//-----------------------------------------------------------------------------
 	//  Name : watch ()
@@ -51,9 +49,9 @@ public:
 	/// or a directory.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void watch(const fs::path &path, bool initialList, const std::function<void(const std::vector<fs::path>&)> &callback)
+	static void watch(const fs::path &path, bool initialList, const std::function<void(const std::vector<Entry>&)> &callback)
 	{
-		watchImpl(path, initialList, std::function<void(const fs::path&)>(), callback);
+		watchImpl(path, initialList, callback);
 	}
 
 	//-----------------------------------------------------------------------------
@@ -117,7 +115,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	~Watchdog()
+	~WatchdogEx()
 	{
 		close();
 	}
@@ -131,7 +129,7 @@ protected:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	Watchdog()
+	WatchdogEx()
 		: mWatching(false)
 	{
 	}
@@ -178,8 +176,8 @@ protected:
 				{
 					// iterate through each watcher and check for modification
 					std::lock_guard<std::mutex> lock(mMutex);
-					auto end = mFileWatchers.end();
-					for (auto it = mFileWatchers.begin(); it != end; ++it)
+					auto end = mWatchers.end();
+					for (auto it = mWatchers.begin(); it != end; ++it)
 					{
 						it->second.watch();
 					}
@@ -200,10 +198,10 @@ protected:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void watchImpl(const fs::path &path, bool initialList = true, const std::function<void(const fs::path&)> &callback = std::function<void(const fs::path&)>(), const std::function<void(const std::vector<fs::path>&)> &listCallback = std::function<void(const std::vector<fs::path>&)>())
+	static void watchImpl(const fs::path &path, bool initialList = true, const std::function<void(const std::vector<Entry>&)> &listCallback = std::function<void(const std::vector<Entry>&)>())
 	{
 		// create the static Watchdog instance
-		static Watchdog wd;
+		static WatchdogEx wd;
 		// and start its thread
 		if (!wd.mWatching)
 			wd.start();
@@ -211,8 +209,8 @@ protected:
 		const std::string key = path.string();
 
 		// add a new watcher
-		if (callback || listCallback) {
-
+		if (listCallback)
+		{
 			std::string filter;
 			fs::path p = path;
 			// try to see if there's a match for the wild card
@@ -227,6 +225,7 @@ protected:
 				if (!found)
 				{
 					logPath(path);
+					return;
 				}
 				else
 				{
@@ -234,34 +233,41 @@ protected:
 					filter = pathFilter.second;
 				}
 			}
-
+			else
+			{
+				if (!fs::exists(path, std::error_code{}))
+				{
+					logPath(path);
+					return;
+				}
+			}
 
 			std::lock_guard<std::mutex> lock(wd.mMutex);
-			if (wd.mFileWatchers.find(key) == wd.mFileWatchers.end())
+			if (wd.mWatchers.find(key) == wd.mWatchers.end())
 			{
-				wd.mFileWatchers.emplace(make_pair(key, Watcher(p, filter, initialList, callback, listCallback)));
+				wd.mWatchers.emplace(make_pair(key, Watcher(p, filter, initialList, listCallback)));
 			}
 		}
-		// if there is no callback that means that we are unwatching
+		// if there is no callback that means that we are un-watching
 		else
 		{
 			// if the path is empty we unwatch all files
 			if (path.empty())
 			{
 				std::lock_guard<std::mutex> lock(wd.mMutex);
-				for (auto it = wd.mFileWatchers.begin(); it != wd.mFileWatchers.end(); )
+				for (auto it = wd.mWatchers.begin(); it != wd.mWatchers.end(); )
 				{
-					it = wd.mFileWatchers.erase(it);
+					it = wd.mWatchers.erase(it);
 				}
 			}
 			// or the specified file or directory
 			else
 			{
 				std::lock_guard<std::mutex> lock(wd.mMutex);
-				auto watcher = wd.mFileWatchers.find(key);
-				if (watcher != wd.mFileWatchers.end())
+				auto watcher = wd.mWatchers.find(key);
+				if (watcher != wd.mWatchers.end())
 				{
-					wd.mFileWatchers.erase(watcher);
+					wd.mWatchers.erase(watcher);
 				}
 			}
 		}
@@ -354,34 +360,38 @@ protected:
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		Watcher(const fs::path &path, const std::string &filter, bool initialList, const std::function<void(const fs::path&)> &callback, const std::function<void(const std::vector<fs::path>&)> &listCallback)
-			: mPath(path), mFilter(filter), mCallback(callback), mListCallback(listCallback)
+		Watcher(const fs::path &path, const std::string &filter, bool initialList, const std::function<void(const std::vector<Entry>&)> &listCallback)
+			: mFilter(filter), mListCallback(listCallback)
 		{
+			
+			mRoot = pollEntry(path);
+
+			std::vector<Entry> entries;
 			// make sure we store all initial write time
 			if (!mFilter.empty())
 			{
-				std::vector<fs::path> paths;
-				visitWildCardPath(path / filter, [this, &paths](const fs::path &p)
+				visitWildCardPath(path / filter, [this, &entries](const fs::path &p)
 				{
-					hasChanged(p);
-					paths.push_back(p);
+					auto entry = pollEntry(p);
+					entries.push_back(entry);
 					return false;
 				});
-
-				if (initialList)
-				{
-					// this means that the first watch won't call the callback function
-					// so we have to manually call it here if we want that behavior
-					if (mCallback)
-					{
-						mCallback(mPath / mFilter);
-					}
-					else
-					{
-						mListCallback(paths);
-					}
-				}				
 			}
+			else
+			{
+				entries.push_back(mRoot);
+			}
+			mLastEntries = mEntries;
+			if (initialList)
+			{
+				// this means that the first watch won't call the callback function
+				// so we have to manually call it here if we want that behavior
+				if(mListCallback)
+				{
+					mListCallback(entries);
+				}
+			}				
+			
 		}
 
 		//-----------------------------------------------------------------------------
@@ -394,35 +404,51 @@ protected:
 		//-----------------------------------------------------------------------------
 		void watch()
 		{
-			// if there's no filter we just check for one item
-			if (mFilter.empty() && hasChanged(mPath) && mCallback)
-				mCallback(mPath);
-
+			mRoot = pollEntry(mRoot.path);
+			std::vector<Entry> entries;
 			// otherwise we check the whole parent directory
-			else if (!mFilter.empty())
+			if (!mFilter.empty())
 			{
-
-				std::vector<fs::path> paths;
-				visitWildCardPath(mPath / mFilter, [this, &paths](const fs::path &p)
+				visitWildCardPath(mRoot.path / mFilter, [this, &entries](const fs::path &p)
 				{
-					bool pathHasChanged = hasChanged(p);
-					if (pathHasChanged && mCallback)
+					auto entry = pollEntry(p);
+					if (entry.state == Entry::State::Modified && mListCallback)
 					{
-						mCallback(mPath / mFilter);
-						return true;
-					}
-					else if (pathHasChanged && mListCallback)
-					{
-						paths.push_back(p);
+						entries.push_back(entry);
 					}
 					return false;
 				});
-				if (paths.size() && mListCallback)
+				if (mRoot.state != Entry::State::Unmodified)
 				{
-					mListCallback(paths);
+					for (auto& var : mLastEntries)
+					{
+						auto& entry = var.second;
+						if (!fs::exists(entry.path, std::error_code{}))
+						{
+							entry.state = Entry::State::Removed;
+							entries.push_back(entry);
+							mEntries.erase(var.first);
+						}
+					}
+					mLastEntries = mEntries;
 				}
 			}
-
+			else
+			{
+				auto& Entry = mRoot;
+				if (!fs::exists(Entry.path, std::error_code{}))
+				{
+					Entry.state = Entry::State::Removed;
+					mEntries.erase(Entry.path.string());
+				}
+				entries.push_back(mRoot);
+				mLastEntries = mEntries;
+			}
+			
+			if (entries.size() > 0 && mListCallback)
+			{
+				mListCallback(entries);
+			}
 		}
 
 		//-----------------------------------------------------------------------------
@@ -433,38 +459,46 @@ protected:
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool hasChanged(const fs::path &path)
+		Entry& pollEntry(const fs::path &path)
 		{
 			// get the last modification time
 			auto time = fs::last_write_time(path, std::error_code{});
 			// add a new modification time to the map
 			std::string key = path.string();
-			if (mModificationTimes.find(key) == mModificationTimes.end())
+			if (mEntries.find(key) == mEntries.end())
 			{
-				mModificationTimes[key] = time;
-				return true;
+				auto &fi = mEntries[key];
+				fi.path = path;
+				fi.last_mod_time = time;
+				fi.state = Entry::State::Modified;
+				return fi;
 			}
 			// or compare with an older one
-			auto &prev = mModificationTimes[key];
-			if (prev < time)
+			auto &fi = mEntries[key];
+			if (fi.last_mod_time < time)
 			{
-				prev = time;
-				return true;
+				fi.last_mod_time = time;
+				fi.state = Entry::State::Modified;
+				return fi;
 			}
-			return false;
+			else
+			{
+				fi.state = Entry::State::Unmodified;
+				return fi;
+			}
 		};
 
 	protected:
 		/// Path to watch
-		fs::path mPath;
+		Entry mRoot;
 		/// Filter applied
 		std::string mFilter;
-		/// Callback for single modification
-		std::function<void(const fs::path&)> mCallback;
 		/// Callback for list of modifications
-		std::function<void(const std::vector<fs::path>&)> mListCallback;
-		/// Cache modification times
-		std::map< std::string, fs::file_time_type > mModificationTimes;
+		std::function<void(const std::vector<Entry>&)> mListCallback;
+		/// Cache watched files
+		std::map <std::string, Entry> mEntries;
+		/// Cache watched files
+		std::map <std::string, Entry> mLastEntries;
 	};
 	/// Mutex for the file watchers
 	std::mutex mMutex;
@@ -473,7 +507,7 @@ protected:
 	/// Thread that polls for changes
 	std::thread mThread;
 	/// Registered file watchers
-	std::map<std::string, Watcher> mFileWatchers;
+	std::map<std::string, Watcher> mWatchers;
 };
 
-typedef Watchdog wd;
+using wd = WatchdogEx;

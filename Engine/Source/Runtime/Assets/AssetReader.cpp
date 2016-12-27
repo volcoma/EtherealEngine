@@ -22,7 +22,7 @@ typedef unsigned char stbi_uc;
 extern "C" stbi_uc *stbi_load_from_memory(stbi_uc const *buffer, int len, int *x, int *y, int *comp, int req_comp);
 extern "C" void stbi_image_free(void *retval_from_stbi_load);
 
-void AssetReader::loadTextureFromFile(const std::string& relativeKey, const std::string& absoluteKey, bool async, LoadRequest<Texture>& request)
+void AssetReader::loadTextureFromFile(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Texture>& request)
 {
 	std::shared_ptr<fs::ByteArray> read_memory = std::make_shared<fs::ByteArray>();
 
@@ -31,10 +31,10 @@ void AssetReader::loadTextureFromFile(const std::string& relativeKey, const std:
 		if (!read_memory)
 			return;
 
-		*read_memory = fs::readStream(std::ifstream{ absoluteKey, std::ios::in | std::ios::binary });
+		*read_memory = fs::read_stream(std::ifstream{ absoluteKey, std::ios::in | std::ios::binary });
 	};
 
-	auto createResource = [read_memory, relativeKey, absoluteKey, &request]() mutable
+	auto createResource = [read_memory, key, absoluteKey, &request]() mutable
 	{
 		// if someone destroyed our memory
 		if (!read_memory)
@@ -43,11 +43,11 @@ void AssetReader::loadTextureFromFile(const std::string& relativeKey, const std:
 		if (read_memory->empty())
 			return;
 
-		std::string ext = fs::getFileNameExtension(absoluteKey);
-		if (ext == "dds"
-			|| ext == "pvr"
-			|| ext == "ktx"
-			|| ext == "asset")
+		std::string ext = absoluteKey.extension().string();
+		if (ext == ".dds"
+			|| ext == ".pvr"
+			|| ext == ".ktx"
+			|| ext == ".asset")
 		{
 			const gfx::Memory* mem = gfx::copy(read_memory->data(), static_cast<std::uint32_t>(read_memory->size()));
 			read_memory->clear();
@@ -56,7 +56,7 @@ void AssetReader::loadTextureFromFile(const std::string& relativeKey, const std:
 			if (nullptr != mem)
 			{
 				auto texture = std::make_shared<Texture>(mem, 0, 0, nullptr);
-				request.setData(relativeKey, texture);
+				request.setData(key, texture);
 				request.invokeCallbacks();
 			}
 		}
@@ -92,7 +92,7 @@ void AssetReader::loadTextureFromFile(const std::string& relativeKey, const std:
 
 				stbi_image_free(img);
 
-				request.setData(relativeKey, texture);
+				request.setData(key, texture);
 				request.invokeCallbacks();
 			}
 		}
@@ -123,7 +123,7 @@ void AssetReader::loadTextureFromFile(const std::string& relativeKey, const std:
 
 }
 
-void AssetReader::loadShaderFromFile(const std::string& relativeKey, const std::string& absoluteKey, bool async, LoadRequest<Shader>& request)
+void AssetReader::loadShaderFromFile(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Shader>& request)
 {
 
 	std::shared_ptr<fs::ByteArray> read_memory = std::make_shared<fs::ByteArray>();
@@ -133,10 +133,10 @@ void AssetReader::loadShaderFromFile(const std::string& relativeKey, const std::
 		if (!read_memory)
 			return;
 
-		*read_memory = fs::readStream(std::ifstream{ absoluteKey, std::ios::in | std::ios::binary });
+		*read_memory = fs::read_stream(std::ifstream{ absoluteKey, std::ios::in | std::ios::binary });
 	};
 
-	auto createResource = [read_memory, &request, relativeKey]() mutable
+	auto createResource = [read_memory, &request, key]() mutable
 	{
 		// if someone destroyed our memory
 		if (!read_memory)
@@ -163,7 +163,7 @@ void AssetReader::loadShaderFromFile(const std::string& relativeKey, const std::
 				shader->uniforms.push_back(hUniform);
 			}
 
-			request.setData(relativeKey, shader);
+			request.setData(key, shader);
 			request.invokeCallbacks();
 
 		}
@@ -194,9 +194,9 @@ void AssetReader::loadShaderFromFile(const std::string& relativeKey, const std::
 	}
 }
 
-void AssetReader::loadShaderFromMemory(const std::string& relativeKey, const std::uint8_t* data, std::uint32_t size, LoadRequest<Shader>& request)
+void AssetReader::loadShaderFromMemory(const std::string& key, const std::uint8_t* data, std::uint32_t size, LoadRequest<Shader>& request)
 {
-	auto createResource = [&relativeKey, data, size, &request]() mutable
+	auto createResource = [&key, data, size, &request]() mutable
 	{
 		// if nothing was read
 		if (!data && size == 0)
@@ -218,7 +218,7 @@ void AssetReader::loadShaderFromMemory(const std::string& relativeKey, const std
 				shader->uniforms.push_back(hUniform);
 			}
 
-			request.setData(relativeKey, shader);
+			request.setData(key, shader);
 			request.invokeCallbacks();
 
 		}
@@ -238,7 +238,7 @@ struct MeshData
 };
 
 
-void AssetReader::loadMeshFromFile(const std::string& relativeKey, const std::string& absoluteKey, bool async, LoadRequest<Mesh>& request)
+void AssetReader::loadMeshFromFile(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Mesh>& request)
 {
 #define BGFX_CHUNK_MAGIC_VB  BX_MAKEFOURCC('V', 'B', ' ', 0x1)
 #define BGFX_CHUNK_MAGIC_IB  BX_MAKEFOURCC('I', 'B', ' ', 0x0)
@@ -252,7 +252,7 @@ void AssetReader::loadMeshFromFile(const std::string& relativeKey, const std::st
 		if (!data)
 			return;
 
-		FileStreamReaderSeeker _reader(absoluteKey);
+		FileStreamReaderSeeker _reader(absoluteKey.string());
 
 		std::pair<fs::ByteArray, fs::ByteArray> buffers;
 		std::uint32_t chunk;
@@ -349,7 +349,7 @@ void AssetReader::loadMeshFromFile(const std::string& relativeKey, const std::st
 		}
 	};
 
-	auto createResource = [data, &request, relativeKey]() mutable
+	auto createResource = [data, &request, key]() mutable
 	{
 		// if someone destroyed our memory
 		if (!data)
@@ -379,7 +379,7 @@ void AssetReader::loadMeshFromFile(const std::string& relativeKey, const std::st
 
 		}
 		data.reset();
-		request.setData(relativeKey, mesh);
+		request.setData(key, mesh);
 		request.invokeCallbacks();
 	};
 
@@ -408,7 +408,7 @@ void AssetReader::loadMeshFromFile(const std::string& relativeKey, const std::st
 	}
 }
 
-void AssetReader::loadMaterialFromFile(const std::string& relativeKey, const std::string& absoluteKey, bool async, LoadRequest<Material>& request)
+void AssetReader::loadMaterialFromFile(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Material>& request)
 {
 	struct MatWrapper
 	{
@@ -427,9 +427,9 @@ void AssetReader::loadMaterialFromFile(const std::string& relativeKey, const std
 		);
 	};
 
-	auto createResource = [matWrapper, relativeKey, request]() mutable
+	auto createResource = [matWrapper, key, request]() mutable
 	{
-		request.setData(relativeKey, matWrapper->hMaterial);
+		request.setData(key, matWrapper->hMaterial);
 		request.invokeCallbacks();
 	};
 
@@ -458,24 +458,25 @@ void AssetReader::loadMaterialFromFile(const std::string& relativeKey, const std
 	}
 }
 
-void AssetReader::loadPrefabFromFile(const std::string& relativeKey, const std::string& absoluteKey, bool async, LoadRequest<Prefab>& request)
+void AssetReader::loadPrefabFromFile(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Prefab>& request)
 {
 
-	std::shared_ptr<std::fstream> read_memory = std::make_shared<std::fstream>();
+	std::shared_ptr<std::istringstream> read_memory = std::make_shared<std::istringstream>();
 
 	auto readMemory = [read_memory, absoluteKey]()
 	{
 		if (!read_memory)
 			return;
 
-		*read_memory = std::fstream{ absoluteKey, std::fstream::in | std::fstream::out | std::ios::binary };
+		auto mem = fs::read_stream(std::fstream{ absoluteKey, std::fstream::in | std::fstream::out | std::ios::binary });
+ 		*read_memory = std::istringstream(std::string(reinterpret_cast<const char*>(mem.data()), mem.size()));
 	};
 
-	auto createResource = [read_memory, relativeKey, request]() mutable
+	auto createResource = [read_memory, key, request]() mutable
 	{
 		auto prefab = std::make_shared<Prefab>();
 		prefab->data = read_memory;
-		request.setData(relativeKey, prefab);
+		request.setData(key, prefab);
 		request.invokeCallbacks();
 	};
 	
