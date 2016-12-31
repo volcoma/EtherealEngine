@@ -1,9 +1,9 @@
-#include "Graphics/graphics.h"
-#include "Graphics/bx/fpumath.h"
-#include "Graphics/bx/radixsort.h"
-#include "Graphics/bx/uint32_t.h"
-#include "Graphics/bx/crtimpl.h"
-#include "Graphics/bx/allocator.h"
+#include "graphics/graphics.h"
+#include "graphics/bx/fpumath.h"
+#include "graphics/bx/radixsort.h"
+#include "graphics/bx/uint32_t.h"
+#include "graphics/bx/crtimpl.h"
+#include "graphics/bx/allocator.h"
 #include "debugdraw.h"
 
 struct DebugVertex

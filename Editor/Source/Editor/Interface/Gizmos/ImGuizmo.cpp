@@ -1,5 +1,5 @@
-#include "../GUI.h"
-#include "ImGuizmo.h"
+#include "../gui_system.h"
+#include "imguizmo.h"
 
 namespace ImGuizmo
 {

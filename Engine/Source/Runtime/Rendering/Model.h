@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../Assets/AssetHandle.h"
-#include "Core/reflection/reflection.h"
-#include "Core/serialization/serialization.h"
+#include "../assets/asset_handle.h"
+#include "core/reflection/reflection.h"
+#include "core/serialization/serialization.h"
 
 #include <vector>
 

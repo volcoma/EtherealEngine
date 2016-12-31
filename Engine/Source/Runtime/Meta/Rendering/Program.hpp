@@ -1,9 +1,9 @@
 #pragma once
-#include "Core/serialization/serialization.h"
-#include "Core/serialization/cereal/types/vector.hpp"
-#include "Core/reflection/reflection.h"
-#include "../../Rendering/Program.h"
-#include "../Assets/AssetHandle.hpp"
+#include "core/serialization/serialization.h"
+#include "core/serialization/cereal/types/vector.hpp"
+#include "core/reflection/reflection.h"
+#include "../../rendering/program.h"
+#include "../assets/asset_handle.hpp"
 
 SAVE(Program)
 {

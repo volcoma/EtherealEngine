@@ -1,4 +1,4 @@
-#include "Inspector_BaseTypes.h"
+#include "inspector_basetypes.h"
 
 bool Inspector_iRect::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {

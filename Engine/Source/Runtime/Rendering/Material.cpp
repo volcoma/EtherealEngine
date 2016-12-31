@@ -1,22 +1,20 @@
-#include "Material.h"
-#include "Program.h"
-#include "Uniform.h"
-#include "Texture.h"
+#include "material.h"
+#include "program.h"
+#include "uniform.h"
+#include "texture.h"
 
-#include "../System/Application.h"
-#include "../Assets/AssetManager.h"
+#include "../assets/asset_manager.h"
 
 Material::Material()
 {
-	auto& app = Singleton<Application>::getInstance();
-	auto& manager = app.getAssetManager();
-	manager.load<Texture>("engine_data://textures/default_color", false)
+	auto am = core::get_subsystem<AssetManager>();
+	am->load<Texture>("engine_data://textures/default_color", false)
 		.then([this](auto asset) mutable
 	{
 		mDefaultColorMap = asset;
 	});
 
-	manager.load<Texture>("engine_data://textures/default_normal", false)
+	am->load<Texture>("engine_data://textures/default_normal", false)
 		.then([this](auto asset) mutable
 	{
 		mDefaultNormalMap = asset;
@@ -88,13 +86,12 @@ void Material::beginPass()
 
 StandardMaterial::StandardMaterial()
 {
-	auto& app = Singleton<Application>::getInstance();
-	auto& manager = app.getAssetManager();
+	auto am = core::get_subsystem<AssetManager>();
 
-	manager.load<Shader>("engine_data://shaders/vs_deferred_geom", false)
-		.then([this, &manager](auto vs)
+	am->load<Shader>("engine_data://shaders/vs_deferred_geom", false)
+		.then([this, am](auto vs)
 	{
-		manager.load<Shader>("engine_data://shaders/fs_deferred_geom", false)
+		am->load<Shader>("engine_data://shaders/fs_deferred_geom", false)
 			.then([this, vs](auto fs)
 		{
 			mProgram = std::make_unique<Program>(vs, fs);

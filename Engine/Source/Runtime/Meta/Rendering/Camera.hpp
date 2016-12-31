@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Core/serialization/serialization.h"
-#include "../Core/BaseTypes.hpp"
-#include "../../Rendering/Camera.h"
+#include "core/serialization/serialization.h"
+#include "../core/basetypes.hpp"
+#include "../../rendering/camera.h"
 
 REFLECT(Camera)
 {

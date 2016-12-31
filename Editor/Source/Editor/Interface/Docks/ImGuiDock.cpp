@@ -1,7 +1,7 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
-#include "ImGuiDock.h"
-#include "../GuiWindow.h"
-#include "../../EditorApp.h"
+#include "imguidock.h"
+#include "../gui_window.h"
+#include "runtime/system/engine.h"
 
 namespace ImGuiDock
 {
@@ -464,7 +464,9 @@ namespace ImGuiDock
 						"",//std::string(m_currentDockTo->title),
 						sf::Style::Resize
 						);
-					Singleton<EditorApp>::getInstance().registerWindow(guiWindow);
+
+					auto engine = core::get_subsystem<runtime::Engine>();
+					engine->register_window(guiWindow);
 					guiWindow->getDockspace().dock(mCurrentDockTo, DockSlot::Tab, 0, true);
 					guiWindow->setPosition(sf::Mouse::getPosition());
 					guiWindow->requestFocus();
@@ -521,7 +523,8 @@ namespace ImGuiDock
 
 	GuiWindow *Dockspace::_isAnyWindowDragging()
 	{
-		auto windows = Singleton<EditorApp>::getInstance().getWindows();
+		auto engine = core::get_subsystem<runtime::Engine>();
+		const auto& windows = engine->get_windows();
 
 		for (auto window : windows)
 		{

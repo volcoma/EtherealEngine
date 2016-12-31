@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Inspector.h"
+#include "inspector.h"
 
 struct Inspector_Bool : public Inspector
 {

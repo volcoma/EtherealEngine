@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Core/reflection/reflection.h"
-#include "../GUI.h"
+#include "core/reflection/reflection.h"
+#include "../gui_system.h"
 
 struct Inspector
 {

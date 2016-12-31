@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../GUI.h"
+#include "../gui_system.h"
 
 class ConsoleLog;
 
@@ -12,7 +12,5 @@ namespace Docks
 	void renderScene(ImVec2 area);
 	void renderGame(ImVec2 area);
 	void renderStyle(ImVec2 area);
-	void renderProject(ImVec2 area);
-	void renderGettingStarted(ImVec2 area);
 	void renderConsole(ImVec2 area, ConsoleLog& console);
 }

@@ -1,6 +1,6 @@
-#include "Mesh.h"
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
+#include "mesh.h"
+#include "vertex_buffer.h"
+#include "index_buffer.h"
 
 bool Mesh::isValid() const
 {

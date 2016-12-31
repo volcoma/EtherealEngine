@@ -1,6 +1,6 @@
 #pragma once
-#include "Core/reflection/reflection.h"
-#include "../../Rendering/Mesh.h"
+#include "core/reflection/reflection.h"
+#include "../../rendering/mesh.h"
 
 REFLECT(MeshInfo)
 {

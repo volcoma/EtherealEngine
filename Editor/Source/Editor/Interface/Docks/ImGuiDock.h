@@ -2,7 +2,7 @@
 #include <vector>
 #include <functional>
 #include <string>
-#include "../GUI.h"
+#include "../gui_system.h"
 class GuiWindow;
 
 namespace ImGuiDock

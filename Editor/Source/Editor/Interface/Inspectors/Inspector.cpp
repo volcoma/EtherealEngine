@@ -1,4 +1,4 @@
-#include "Inspector.h"
+#include "inspector.h"
 
 void Tooltip(const rttr::property& prop)
 {

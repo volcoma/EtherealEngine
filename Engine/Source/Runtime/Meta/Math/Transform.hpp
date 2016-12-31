@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Core/math/math_includes.h"
-#include "Core/serialization/serialization.h"
-#include "Vector.hpp"
+#include "core/math/math_includes.h"
+#include "core/serialization/serialization.h"
+#include "vector.hpp"
 
 namespace cereal
 {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Assets/AssetHandle.h"
-#include "Graphics/graphics.h"
+#include "../assets/asset_handle.h"
+#include "graphics/graphics.h"
 #include <vector>
 #include <unordered_map>
 #include <limits>

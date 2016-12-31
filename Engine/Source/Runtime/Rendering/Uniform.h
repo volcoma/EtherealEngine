@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graphics/graphics.h"
+#include "graphics/graphics.h"
 
 struct Uniform
 {

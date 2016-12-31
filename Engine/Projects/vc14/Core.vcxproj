@@ -36,6 +36,7 @@
     <ClInclude Include="..\..\Source\Core\config\cfg\Parser.h" />
     <ClInclude Include="..\..\Source\Core\console\console.h" />
     <ClInclude Include="..\..\Source\Core\core.h" />
+    <ClInclude Include="..\..\Source\Core\ecs.h" />
     <ClInclude Include="..\..\Source\Core\events\delegate.hpp" />
     <ClInclude Include="..\..\Source\Core\events\event.hpp" />
     <ClInclude Include="..\..\Source\Core\events\signal.hpp" />
@@ -401,6 +402,8 @@
     <ClInclude Include="..\..\Source\Core\serialization\cereal\types\valarray.hpp" />
     <ClInclude Include="..\..\Source\Core\serialization\cereal\types\vector.hpp" />
     <ClInclude Include="..\..\Source\Core\serialization\serialization.h" />
+    <ClInclude Include="..\..\Source\Core\subsystem.h" />
+    <ClInclude Include="..\..\Source\Core\task.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\Core\common\handle_set.cpp" />
@@ -409,6 +412,7 @@
     <ClCompile Include="..\..\Source\Core\config\cfg\Parser.cpp" />
     <ClCompile Include="..\..\Source\Core\console\console.cpp" />
     <ClCompile Include="..\..\Source\Core\core.cpp" />
+    <ClCompile Include="..\..\Source\Core\ecs.cpp" />
     <ClCompile Include="..\..\Source\Core\logging\spdlog\details\format.cc" />
     <ClCompile Include="..\..\Source\Core\math\bbox.cpp" />
     <ClCompile Include="..\..\Source\Core\math\bbox_extruded.cpp" />
@@ -446,6 +450,8 @@
     <ClCompile Include="..\..\Source\Core\reflection\rttr\type.cpp" />
     <ClCompile Include="..\..\Source\Core\reflection\rttr\variant.cpp" />
     <ClCompile Include="..\..\Source\Core\reflection\rttr\variant_array_view.cpp" />
+    <ClCompile Include="..\..\Source\Core\subsystem.cpp" />
+    <ClCompile Include="..\..\Source\Core\task.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Source\Core\math\glm\detail\func_common.inl" />

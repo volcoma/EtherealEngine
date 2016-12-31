@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/math/math_includes.h"
+#include "core/math/math_includes.h"
 
 struct Aabb
 {

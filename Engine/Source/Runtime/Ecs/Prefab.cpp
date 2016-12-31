@@ -1,17 +1,17 @@
 #include "Prefab.h"
 #include "Utils.h"
 
-Entity Prefab::instantiate()
+core::Entity Prefab::instantiate()
 {
-	std::vector<Entity> outDataVec;
+	std::vector<core::Entity> outDataVec;
 	if (!data)
-		return Entity();
+		return core::Entity();
 		
 	if(!ecs::utils::deserializeData(*data, outDataVec))
-		return Entity();
+		return core::Entity();
 
 	if (outDataVec.empty())
-		return Entity();
+		return core::Entity();
 	else
 		return outDataVec[0];
 

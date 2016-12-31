@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Graphics/graphics.h"
+#include "graphics/graphics.h"
 #include <memory>
 
-#include "Core/common/basetypes.hpp"
-#include "Core/reflection/reflection.h"
+#include "core/common/basetypes.hpp"
+#include "core/reflection/reflection.h"
 struct ITexture
 {
 	REFLECTABLE(ITexture)

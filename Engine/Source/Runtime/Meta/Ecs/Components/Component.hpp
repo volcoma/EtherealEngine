@@ -1,16 +1,16 @@
 #pragma once
-#include "../../../Ecs/entityx/Component.h"
-#include "Core/reflection/reflection.h"
+#include "core/ecs.h"
+#include "core/reflection/reflection.h"
 
 
 
-REFLECT(entityx::Component)
+REFLECT(core::Component)
 {
-	rttr::registration::class_<entityx::Component>("Component");
+	rttr::registration::class_<core::Component>("Component");
 
 }
 
-namespace entityx
+namespace core
 {
 	SAVE(Component)
 	{

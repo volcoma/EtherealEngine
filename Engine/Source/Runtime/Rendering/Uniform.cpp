@@ -1,4 +1,4 @@
-#include "Uniform.h"
+#include "uniform.h"
 
 Uniform::~Uniform()
 {

@@ -1,19 +1,18 @@
-#include "Inspector_Assets.h"
-#include "Inspectors.h"
-#include "Runtime/Rendering/Texture.h"
-#include "Runtime/Rendering/Material.h"
-#include "Runtime/Rendering/Mesh.h"
-#include "Runtime/Assets/AssetManager.h"
-#include "Runtime/System/FileSystem.h"
-#include "Core/serialization/archives.h"
-#include "../../EditorApp.h"
+#include "inspector_assets.h"
+#include "inspectors.h"
+#include "runtime/rendering/texture.h"
+#include "runtime/rendering/material.h"
+#include "runtime/rendering/mesh.h"
+#include "runtime/assets/asset_manager.h"
+#include "runtime/system/filesystem.h"
+#include "core/serialization/archives.h"
+#include "../../edit_state.h"
 bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<AssetHandle<Texture>>();
-	auto& app = Singleton<EditorApp>::getInstance();
-	auto& manager = app.getAssetManager();
-	auto& editState = app.getEditState();
-	auto& selected = editState.selectionData.object;
+	auto es = core::get_subsystem<EditState>();
+	auto am = core::get_subsystem<AssetManager>();
+	auto& selected = es->selectionData.object;
 
 	bool changed = false;
 	if (selected && selected.is_type<AssetHandle<Texture>>())
@@ -23,11 +22,11 @@ bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, s
 		auto itemPath = fs::path(item);
 		auto assetName = itemPath.filename().string();
 		rttr::variant vari = assetName;
-		changed |= inspectVar(vari);
+		changed |= inspect_var(vari);
 		if (changed)
 		{
 			auto dirName = itemPath.remove_filename();
-			manager.renameAsset<Texture>(item, (dirName / fs::path(vari.get_value<std::string>())).generic_string());
+			am->renameAsset<Texture>(item, (dirName / fs::path(vari.get_value<std::string>())).generic_string());
 		}
 	}
 
@@ -58,7 +57,7 @@ bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, s
 	{
 		std::string item = data ? data.id() : "none";
 		rttr::variant var_str = item;
-		if (inspectVar(var_str))
+		if (inspect_var(var_str))
 		{
 			item = var_str.to_string();
 			if (item.empty())
@@ -67,7 +66,7 @@ bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, s
 			}
 			else
 			{
-				manager.load<Texture>(item, false)
+				am->load<Texture>(item, false)
 					.then([&data](auto asset) mutable
 				{
 					data = asset;
@@ -77,7 +76,7 @@ bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, s
 			return true;
 		}
 
-		auto& dragged = editState.dragData.object;
+		auto& dragged = es->dragData.object;
 		if (dragged && dragged.is_type<AssetHandle<Texture>>())
 		{
 			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.5f));
@@ -107,7 +106,7 @@ bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, s
 
 	{
 		rttr::variant vari = data.get()->info;
-		changed |= inspectVar(vari);
+		changed |= inspect_var(vari);
 	}
 	return changed;
 
@@ -118,15 +117,14 @@ bool Inspector_AssetHandle_Material::inspect(rttr::variant& var, bool readOnly, 
 {
 	auto data = var.get_value<AssetHandle<Material>>();
 
-	auto& app = Singleton<EditorApp>::getInstance();
-	auto& manager = app.getAssetManager();
-	auto& editState = app.getEditState();
-	auto& selected = editState.selectionData.object;
+	auto es = core::get_subsystem<EditState>();
+	auto am = core::get_subsystem<AssetManager>();
+	auto& selected = es->selectionData.object;
 	if (selected && !selected.is_type<AssetHandle<Material>>())
 	{
 		std::string item = data ? data.id() : "none";
 		rttr::variant var_str = item;
-		if (inspectVar(var_str))
+		if (inspect_var(var_str))
 		{
 			item = var_str.to_string();
 			if (item.empty())
@@ -135,7 +133,7 @@ bool Inspector_AssetHandle_Material::inspect(rttr::variant& var, bool readOnly, 
 			}
 			else
 			{
-				manager.load<Material>(item, false)
+				am->load<Material>(item, false)
 					.then([&data](auto asset) mutable
 				{
 					data = asset;
@@ -145,7 +143,7 @@ bool Inspector_AssetHandle_Material::inspect(rttr::variant& var, bool readOnly, 
 			return true;
 		}
 
-		auto& dragged = editState.dragData.object;
+		auto& dragged = es->dragData.object;
 		if (dragged && dragged.is_type<AssetHandle<Material>>())
 		{
 			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
@@ -176,22 +174,22 @@ bool Inspector_AssetHandle_Material::inspect(rttr::variant& var, bool readOnly, 
 		auto itemPath = fs::path(item);
 		auto assetName = itemPath.filename().string();
 		rttr::variant vari = assetName;
-		changed |= inspectVar(vari);
+		changed |= inspect_var(vari);
 		if (changed)
 		{
 			auto dirName = itemPath.remove_filename();
-			manager.renameAsset<Material>(item, (dirName / fs::path(vari.get_value<std::string>())).generic_string());
+			am->renameAsset<Material>(item, (dirName / fs::path(vari.get_value<std::string>())).generic_string());
 		}
 	}
 
 	{
 		rttr::variant vari = data.get();
-		changed |= inspectVar(vari);
+		changed |= inspect_var(vari);
 	}
 	gui::Separator();
 	if (gui::Button("Apply to Asset"))
 	{
-		manager.save(data);
+		am->save(data);
 	}
 	return changed;
 }
@@ -200,15 +198,14 @@ bool Inspector_AssetHandle_Mesh::inspect(rttr::variant& var, bool readOnly, std:
 {
 	auto data = var.get_value<AssetHandle<Mesh>>();
 
-	auto& app = Singleton<EditorApp>::getInstance();
-	auto& manager = app.getAssetManager();
-	auto& editState = app.getEditState();
-	auto& selected = editState.selectionData.object;
+	auto es = core::get_subsystem<EditState>();
+	auto am = core::get_subsystem<AssetManager>();
+	auto& selected = es->selectionData.object;
 	if (selected && !selected.is_type<AssetHandle<Mesh>>())
 	{
 		std::string item = data ? data.id() : "none";
 		rttr::variant var_str = item;
-		if (inspectVar(var_str))
+		if (inspect_var(var_str))
 		{
 			item = var_str.to_string();
 			if (item.empty())
@@ -217,7 +214,7 @@ bool Inspector_AssetHandle_Mesh::inspect(rttr::variant& var, bool readOnly, std:
 			}
 			else
 			{
-				manager.load<Mesh>(item, false)
+				am->load<Mesh>(item, false)
 					.then([&data](auto asset) mutable
 				{
 					data = asset;
@@ -227,7 +224,7 @@ bool Inspector_AssetHandle_Mesh::inspect(rttr::variant& var, bool readOnly, std:
 			return true;
 		}
 		
-		auto& dragged = editState.dragData.object;
+		auto& dragged = es->dragData.object;
 		if (dragged && dragged.is_type<AssetHandle<Mesh>>())
 		{
 			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
@@ -256,18 +253,18 @@ bool Inspector_AssetHandle_Mesh::inspect(rttr::variant& var, bool readOnly, std:
 		auto itemPath = fs::path(item);
 		auto assetName = itemPath.filename().string();
 		rttr::variant vari = assetName;
-		changed |= inspectVar(vari);
+		changed |= inspect_var(vari);
 		if (changed)
 		{
 			auto dirName = itemPath.remove_filename();
-			manager.renameAsset<Mesh>(item, (dirName / fs::path(vari.get_value<std::string>())).generic_string());
+			am->renameAsset<Mesh>(item, (dirName / fs::path(vari.get_value<std::string>())).generic_string());
 
 		}
 	}
 
 	{
 		rttr::variant vari = data.get()->info;
-		changed |= inspectVar(vari);
+		changed |= inspect_var(vari);
 	}
 	return changed;
 }

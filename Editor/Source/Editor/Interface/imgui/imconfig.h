@@ -41,7 +41,7 @@
         operator MyVec4() const { return MyVec4(x,y,z,w); }
 */
 
-#include "Core/math/math_includes.h"
+#include "core/math/math_includes.h"
 #define IM_VEC2_CLASS_EXTRA                                             \
     template <typename T>                                               \
     ImVec2(const math::tvec2<T>& v) {                                   \

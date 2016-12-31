@@ -1311,6 +1311,15 @@
     <ClInclude Include="..\..\Source\Core\common\common.h">
       <Filter>Source Files\common</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\Core\ecs.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\task.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\subsystem.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\Core\reflection\rttr\enumeration.cpp">
@@ -1441,6 +1450,15 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\Core\memory\tracey.cpp">
       <Filter>Source Files\memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\subsystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\ecs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\task.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

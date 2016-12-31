@@ -1,16 +1,14 @@
-#include "Model.h"
-#include "Material.h"
-#include "Mesh.h"
-#include "Core/math/math_includes.h"
-#include "../System/Application.h"
-#include "../Assets/AssetManager.h"
+#include "model.h"
+#include "material.h"
+#include "mesh.h"
+#include "core/math/math_includes.h"
+#include "../assets/asset_manager.h"
 
 
 Model::Model()
 {
-	auto& app = Singleton<Application>::getInstance();
-	auto& manager = app.getAssetManager();
-	manager.load<Material>("engine_data://materials/standard", false)
+	auto am = core::get_subsystem<AssetManager>();
+	am->load<Material>("engine_data://materials/standard", false)
 		.then([this](auto asset)
 	{
 		mMaterials.push_back(asset);

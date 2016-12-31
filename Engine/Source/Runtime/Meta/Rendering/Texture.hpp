@@ -1,6 +1,6 @@
 #pragma once
-#include "Core/reflection/reflection.h"
-#include "../../Rendering/Texture.h"
+#include "core/reflection/reflection.h"
+#include "../../rendering/texture.h"
 
 REFLECT(gfx::TextureInfo)
 {

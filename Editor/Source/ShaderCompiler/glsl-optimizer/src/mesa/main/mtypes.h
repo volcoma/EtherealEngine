@@ -1625,7 +1625,7 @@ struct gl_context
     */
    struct dd_function_table Driver;
 
-   /** Core/Driver constants */
+   /** core/Driver constants */
    struct gl_constants Const;
 
    /** Extension information */

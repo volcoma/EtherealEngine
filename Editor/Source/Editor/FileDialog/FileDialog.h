@@ -3,7 +3,7 @@
 #include "nfd/nfd.h"
 #include "nfd/nfd_common.h"
 
-inline bool openFileDialog(const std::string& filterList, const std::string& defaultPath, std::string& outPath)
+inline bool open_file_dialog(const std::string& filterList, const std::string& defaultPath, std::string& outPath)
 {
 	nfdchar_t *out = nullptr;
 	nfdresult_t result = NFD_OpenDialog(filterList.c_str(), defaultPath.c_str(), &out);
@@ -17,7 +17,7 @@ inline bool openFileDialog(const std::string& filterList, const std::string& def
 	return false;
 }
 
-inline bool openFolderDialog(const std::string& filterList, const std::string& defaultPath, std::string& outPath)
+inline bool open_folder_dialog(const std::string& filterList, const std::string& defaultPath, std::string& outPath)
 {
 	nfdchar_t *out = nullptr;
 	nfdresult_t result = NFD_OpenFolderDialog(filterList.c_str(), defaultPath.c_str(), &out);
@@ -31,7 +31,7 @@ inline bool openFolderDialog(const std::string& filterList, const std::string& d
 	return false;
 }
 
-inline bool saveFileDialog(const std::string& filterList, const std::string& defaultPath, std::string& outPath)
+inline bool save_file_dialog(const std::string& filterList, const std::string& defaultPath, std::string& outPath)
 {
 	nfdchar_t *out = nullptr;
 	nfdresult_t result = NFD_SaveDialog(filterList.c_str(), defaultPath.c_str(), &out);

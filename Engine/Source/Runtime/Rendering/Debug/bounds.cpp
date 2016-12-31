@@ -3,8 +3,8 @@
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
-#include "Graphics/bx/rng.h"
-#include "Graphics/bx/fpumath.h"
+#include "graphics/bx/rng.h"
+#include "graphics/bx/fpumath.h"
 #include "bounds.h"
 
 void aabbToObb(Obb& _obb, const Aabb& _aabb)

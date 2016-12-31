@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Inspector.h"
-#include "Core/common/basetypes.hpp"
+#include "inspector.h"
+#include "core/common/basetypes.hpp"
 
 struct Inspector_iRect : public Inspector
 {

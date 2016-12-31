@@ -1,4 +1,4 @@
-#include "Inspectors.h"
+#include "inspectors.h"
 #include <unordered_map>
 #include <vector>
 
@@ -32,7 +32,7 @@ std::shared_ptr<Inspector> getInspector(rttr::type type)
 	return inspector;
 }
 
-bool inspectVar(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspect_var(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	rttr::instance object = var;
 	auto type = object.get_derived_type();
@@ -51,7 +51,7 @@ bool inspectVar(rttr::variant& var, bool readOnly, std::function<rttr::variant(c
 		{
 			if (type.is_enumeration())
 			{
-				changed |= inspectEnum(var, type.get_enumeration(), readOnly);
+				changed |= inspect_enum(var, type.get_enumeration(), readOnly);
 			}
 		}
 
@@ -83,15 +83,15 @@ bool inspectVar(rttr::variant& var, bool readOnly, std::function<rttr::variant(c
 				};
 				if (isArray)
 				{
-					changed |= inspectArray(propVar, rdOnly);
+					changed |= inspect_array(propVar, rdOnly);
 				}
 				else if (isEnum)
 				{
-					changed |= inspectEnum(propVar, prop.get_enumeration(), rdOnly);
+					changed |= inspect_enum(propVar, prop.get_enumeration(), rdOnly);
 				}
 				else
 				{
-					changed |= inspectVar(propVar, rdOnly, getMeta);
+					changed |= inspect_var(propVar, rdOnly, getMeta);
 				}
 
 				if(details)
@@ -110,7 +110,7 @@ bool inspectVar(rttr::variant& var, bool readOnly, std::function<rttr::variant(c
 	return changed;
 }
 
-bool inspectArray(rttr::variant& var, bool readOnly)
+bool inspect_array(rttr::variant& var, bool readOnly)
 {
 	auto array_view = var.create_array_view();
 	auto size = array_view.get_size();
@@ -136,7 +136,7 @@ bool inspectArray(rttr::variant& var, bool readOnly)
 
 		PropertyLayout layout(element.data());
 
-		changed |= inspectVar(value);
+		changed |= inspect_var(value);
 
 		if (changed)
 			array_view.set_value(i, value);
@@ -148,7 +148,7 @@ bool inspectArray(rttr::variant& var, bool readOnly)
 }
 
 
-bool inspectEnum(rttr::variant& var, rttr::enumeration& data, bool readOnly)
+bool inspect_enum(rttr::variant& var, rttr::enumeration& data, bool readOnly)
 {
 	auto strings = data.get_names();
 	std::vector<const char*> cstrings{};

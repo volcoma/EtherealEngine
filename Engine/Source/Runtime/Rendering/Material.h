@@ -1,12 +1,12 @@
 #pragma once
 
-#include "../Assets/AssetHandle.h"
-#include "Core/math/math_includes.h"
+#include "../assets/asset_handle.h"
+#include "core/math/math_includes.h"
 #include <vector>
 
-#include "Core/reflection/rttr/rttr_enable.h"
-#include "Core/serialization/serialization.h"
-#include "Graphics/graphics.h"
+#include "core/reflection/rttr/rttr_enable.h"
+#include "core/serialization/serialization.h"
+#include "graphics/graphics.h"
 
 struct Program;
 struct Texture;

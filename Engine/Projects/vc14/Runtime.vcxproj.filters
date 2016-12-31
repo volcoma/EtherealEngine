@@ -13,15 +13,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Source Files\System">
-      <UniqueIdentifier>{e39a2e55-f530-404f-aef9-d4a5584d37a7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\System\Platform">
-      <UniqueIdentifier>{b621f7e8-1d53-4960-8c43-cafd4ec46366}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Threading">
-      <UniqueIdentifier>{3bbc4f1d-d5ca-4391-95c9-d38386573ef0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files\Meshes">
       <UniqueIdentifier>{f871a466-b31d-41be-8c51-96692fb4938b}</UniqueIdentifier>
     </Filter>
@@ -31,537 +22,480 @@
     <Filter Include="Resource Files\Shaders">
       <UniqueIdentifier>{254a51c7-f8b0-49ad-899f-0f363ac0cb25}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Rendering">
-      <UniqueIdentifier>{aaa6a591-e384-4211-b98a-552136c6070c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\System\Platform\Windows">
-      <UniqueIdentifier>{3c6ca2ac-ef6b-4c4f-bd83-e2b431f834b7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\System\SFML">
-      <UniqueIdentifier>{c1e8aaca-eb37-4843-9399-de27bfe794d6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\System\SFML\Window">
-      <UniqueIdentifier>{835c8538-b1dc-4094-8db7-d9bbcf11632c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\System\SFML\System">
-      <UniqueIdentifier>{c64dab96-bcac-4cc6-89a3-d2de07657feb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\System\SFML\Window\Unix">
-      <UniqueIdentifier>{fa276463-bedf-4b3b-a8b0-3ea82e73aecc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\System\SFML\Window\Android">
-      <UniqueIdentifier>{93364af1-4d7e-4eda-b5a1-a9e7a0f1ff62}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\System\SFML\Window\OSX">
-      <UniqueIdentifier>{a7d9e762-d26f-4d82-b086-02748e48a917}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\System\SFML\Window\iOs">
-      <UniqueIdentifier>{a19c8019-a9c3-4dcc-bf78-b02c252778f1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\System\SFML\Window\Win32">
-      <UniqueIdentifier>{a15e9c16-2344-4939-9672-2b9e49824efe}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Input">
-      <UniqueIdentifier>{42505552-4876-4471-95f5-fa5c2249b0ca}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Assets">
+    <Filter Include="Source Files\assets">
       <UniqueIdentifier>{ad4f3d97-e392-4c10-afb5-b6876555d7ed}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Ecs">
+    <Filter Include="Source Files\ecs">
       <UniqueIdentifier>{9bc3e55c-315c-4625-a7ff-fe6f8d412f17}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Ecs\entityx">
-      <UniqueIdentifier>{fe40ac0a-6901-4dc9-9ce3-141cfb59e4b6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Ecs\entityx\help">
-      <UniqueIdentifier>{5e32aed7-a976-4523-aa1d-2b3f7c103110}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Ecs\entityx\deps">
-      <UniqueIdentifier>{f576a2d8-5a68-49fe-bdb9-71ca10dbf734}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Meta">
-      <UniqueIdentifier>{eba453ed-6f71-469a-933e-66702148fbcc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Meta\Assets">
-      <UniqueIdentifier>{e559e4a9-cb8d-4cb9-ab4c-9c69eb26a75a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Meta\Math">
-      <UniqueIdentifier>{dd09f2d5-ce37-4ecf-8496-9724dc990320}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Meta\Rendering">
-      <UniqueIdentifier>{259fd2b3-8a04-4f58-9573-953fd9b6f585}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Ecs\Components">
+    <Filter Include="Source Files\ecs\components">
       <UniqueIdentifier>{247cb37f-34dd-4a15-abb4-e8a54830ded6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Ecs\Systems">
+    <Filter Include="Source Files\ecs\systems">
       <UniqueIdentifier>{361d5900-1a48-42ca-b9d8-920796a1a6bf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Meta\Ecs">
+    <Filter Include="Source Files\input">
+      <UniqueIdentifier>{42505552-4876-4471-95f5-fa5c2249b0ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\meta">
+      <UniqueIdentifier>{eba453ed-6f71-469a-933e-66702148fbcc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\meta\Rendering">
+      <UniqueIdentifier>{259fd2b3-8a04-4f58-9573-953fd9b6f585}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\meta\Ecs">
       <UniqueIdentifier>{3a5850f1-8b7a-4424-8371-a84de9e3d2f0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Meta\Ecs\Components">
+    <Filter Include="Source Files\meta\assets">
+      <UniqueIdentifier>{e559e4a9-cb8d-4cb9-ab4c-9c69eb26a75a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\meta\core">
+      <UniqueIdentifier>{08fd9721-91e2-4203-a5f4-aaf2a94e0339}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\meta\Ecs\components">
       <UniqueIdentifier>{32aefb5a-88f4-406b-823a-847fcb2521ee}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Rendering\Debug">
+    <Filter Include="Source Files\meta\math">
+      <UniqueIdentifier>{dd09f2d5-ce37-4ecf-8496-9724dc990320}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\rendering">
+      <UniqueIdentifier>{aaa6a591-e384-4211-b98a-552136c6070c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\rendering\debug">
       <UniqueIdentifier>{c9524f26-16b6-4462-a709-ed88df49631e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Meta\Core">
-      <UniqueIdentifier>{08fd9721-91e2-4203-a5f4-aaf2a94e0339}</UniqueIdentifier>
+    <Filter Include="Source Files\system">
+      <UniqueIdentifier>{e39a2e55-f530-404f-aef9-d4a5584d37a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\system\SFML">
+      <UniqueIdentifier>{c1e8aaca-eb37-4843-9399-de27bfe794d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\system\SFML\Window">
+      <UniqueIdentifier>{835c8538-b1dc-4094-8db7-d9bbcf11632c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\system\SFML\Window\Unix">
+      <UniqueIdentifier>{fa276463-bedf-4b3b-a8b0-3ea82e73aecc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\system\SFML\Window\Android">
+      <UniqueIdentifier>{93364af1-4d7e-4eda-b5a1-a9e7a0f1ff62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\system\SFML\Window\OSX">
+      <UniqueIdentifier>{a7d9e762-d26f-4d82-b086-02748e48a917}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\system\SFML\Window\iOs">
+      <UniqueIdentifier>{a19c8019-a9c3-4dcc-bf78-b02c252778f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\system\SFML\Window\Win32">
+      <UniqueIdentifier>{a15e9c16-2344-4939-9672-2b9e49824efe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\system\SFML\System">
+      <UniqueIdentifier>{c64dab96-bcac-4cc6-89a3-d2de07657feb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\Runtime\runtime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\System\Timer.cpp">
-      <Filter>Source Files\System</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\System\FileSystem.cpp">
-      <Filter>Source Files\System</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Rendering\Camera.cpp">
-      <Filter>Source Files\Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Window.cpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\WindowImpl.cpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Joystick.cpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\JoystickManager.cpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Keyboard.cpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Mouse.cpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Sensor.cpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\SensorManager.cpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Touch.cpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\VideoMode.cpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Win32\InputImpl.cpp">
-      <Filter>Source Files\System\SFML\Window\Win32</Filter>
+      <Filter>Source Files\system\SFML\Window\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Win32\JoystickImpl.cpp">
-      <Filter>Source Files\System\SFML\Window\Win32</Filter>
+      <Filter>Source Files\system\SFML\Window\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Win32\SensorImpl.cpp">
-      <Filter>Source Files\System\SFML\Window\Win32</Filter>
+      <Filter>Source Files\system\SFML\Window\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Win32\VideoModeImpl.cpp">
-      <Filter>Source Files\System\SFML\Window\Win32</Filter>
+      <Filter>Source Files\system\SFML\Window\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Win32\WindowImplWin32.cpp">
-      <Filter>Source Files\System\SFML\Window\Win32</Filter>
+      <Filter>Source Files\system\SFML\Window\Win32</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\System\SFML\System\Err.cpp">
-      <Filter>Source Files\System\SFML\System</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Ecs\entityx\System.cpp">
-      <Filter>Source Files\Ecs\entityx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Ecs\entityx\Event.cpp">
-      <Filter>Source Files\Ecs\entityx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Ecs\entityx\Entity.cpp">
-      <Filter>Source Files\Ecs\entityx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Ecs\entityx\help\Storage.cpp">
-      <Filter>Source Files\Ecs\entityx\help</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Rendering\Texture.cpp">
-      <Filter>Source Files\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Rendering\Uniform.cpp">
-      <Filter>Source Files\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Rendering\VertexBuffer.cpp">
-      <Filter>Source Files\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Rendering\IndexBuffer.cpp">
-      <Filter>Source Files\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Rendering\Material.cpp">
-      <Filter>Source Files\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Rendering\Mesh.cpp">
-      <Filter>Source Files\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Rendering\Model.cpp">
-      <Filter>Source Files\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Rendering\Program.cpp">
-      <Filter>Source Files\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Rendering\Shader.cpp">
-      <Filter>Source Files\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Ecs\Components\TransformComponent.cpp">
-      <Filter>Source Files\Ecs\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Ecs\Systems\TransformSystem.cpp">
-      <Filter>Source Files\Ecs\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Ecs\World.cpp">
-      <Filter>Source Files\Ecs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Ecs\Components\CameraComponent.cpp">
-      <Filter>Source Files\Ecs\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Ecs\Systems\CameraSystem.cpp">
-      <Filter>Source Files\Ecs\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Ecs\Systems\RenderingSystem.cpp">
-      <Filter>Source Files\Ecs\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Ecs\Components\ModelComponent.cpp">
-      <Filter>Source Files\Ecs\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Rendering\Debug\DebugDraw.cpp">
-      <Filter>Source Files\Rendering\Debug</Filter>
+      <Filter>Source Files\system\SFML\System</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Source\Runtime\Rendering\Debug\bounds.cpp">
-      <Filter>Source Files\Rendering\Debug</Filter>
+      <Filter>Source Files\rendering\debug</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Rendering\RenderWindow.cpp">
-      <Filter>Source Files\Rendering</Filter>
+    <ClCompile Include="..\..\Source\Runtime\Assets\asset_manager.cpp">
+      <Filter>Source Files\assets</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Input\InputContext.cpp">
-      <Filter>Source Files\Input</Filter>
+    <ClCompile Include="..\..\Source\Runtime\Assets\asset_reader.cpp">
+      <Filter>Source Files\assets</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Assets\AssetWriter.cpp">
-      <Filter>Source Files\Assets</Filter>
+    <ClCompile Include="..\..\Source\Runtime\Assets\asset_writer.cpp">
+      <Filter>Source Files\assets</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Assets\AssetReader.cpp">
-      <Filter>Source Files\Assets</Filter>
+    <ClCompile Include="..\..\Source\Runtime\Ecs\Components\camera_component.cpp">
+      <Filter>Source Files\ecs\components</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Threading\thread_utils.cpp">
-      <Filter>Source Files\Threading</Filter>
+    <ClCompile Include="..\..\Source\Runtime\Ecs\Components\light_component.cpp">
+      <Filter>Source Files\ecs\components</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\System\Platform\Windows\MessageBoxImpl.cpp">
-      <Filter>Source Files\System\Platform\Windows</Filter>
+    <ClCompile Include="..\..\Source\Runtime\Ecs\Components\model_component.cpp">
+      <Filter>Source Files\ecs\components</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\System\Application.cpp">
-      <Filter>Source Files\System</Filter>
+    <ClCompile Include="..\..\Source\Runtime\Ecs\Components\transform_component.cpp">
+      <Filter>Source Files\ecs\components</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Rendering\Light.cpp">
-      <Filter>Source Files\Rendering</Filter>
+    <ClCompile Include="..\..\Source\Runtime\Ecs\Systems\camera_system.cpp">
+      <Filter>Source Files\ecs\systems</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Ecs\Components\LightComponent.cpp">
-      <Filter>Source Files\Ecs\Components</Filter>
+    <ClCompile Include="..\..\Source\Runtime\Ecs\Systems\rendering_system.cpp">
+      <Filter>Source Files\ecs\systems</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Rendering\RenderPass.cpp">
-      <Filter>Source Files\Rendering</Filter>
+    <ClCompile Include="..\..\Source\Runtime\Ecs\Systems\transform_system.cpp">
+      <Filter>Source Files\ecs\systems</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Ecs\Utils.cpp">
-      <Filter>Source Files\Ecs</Filter>
+    <ClCompile Include="..\..\Source\Runtime\Ecs\prefab.cpp">
+      <Filter>Source Files\ecs</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Source\Runtime\Ecs\Prefab.cpp">
-      <Filter>Source Files\Ecs</Filter>
+    <ClCompile Include="..\..\Source\Runtime\Ecs\utils.cpp">
+      <Filter>Source Files\ecs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Input\input_context.cpp">
+      <Filter>Source Files\input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Rendering\Debug\debugdraw.cpp">
+      <Filter>Source Files\rendering\debug</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Rendering\camera.cpp">
+      <Filter>Source Files\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Rendering\index_buffer.cpp">
+      <Filter>Source Files\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Rendering\light.cpp">
+      <Filter>Source Files\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Rendering\material.cpp">
+      <Filter>Source Files\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Rendering\mesh.cpp">
+      <Filter>Source Files\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Rendering\model.cpp">
+      <Filter>Source Files\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Rendering\program.cpp">
+      <Filter>Source Files\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Rendering\render_pass.cpp">
+      <Filter>Source Files\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Rendering\render_window.cpp">
+      <Filter>Source Files\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Rendering\shader.cpp">
+      <Filter>Source Files\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Rendering\texture.cpp">
+      <Filter>Source Files\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Rendering\uniform.cpp">
+      <Filter>Source Files\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\Rendering\vertex_buffer.cpp">
+      <Filter>Source Files\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\System\filesystem.cpp">
+      <Filter>Source Files\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\System\renderer.cpp">
+      <Filter>Source Files\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\System\app.cpp">
+      <Filter>Source Files\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Runtime\System\engine.cpp">
+      <Filter>Source Files\system</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\Runtime\runtime.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Threading\ThreadPool.h">
-      <Filter>Source Files\Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\System\Timer.h">
-      <Filter>Source Files\System</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\System\FileSystem.h">
-      <Filter>Source Files\System</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\System\Singleton.h">
-      <Filter>Source Files\System</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Rendering\Camera.h">
-      <Filter>Source Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\System\MessageBox.h">
-      <Filter>Source Files\System</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window.hpp">
-      <Filter>Source Files\System\SFML</Filter>
+      <Filter>Source Files\system\SFML</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\VideoMode.hpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\VideoModeImpl.hpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Window.hpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\WindowHandle.hpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\WindowImpl.hpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\WindowStyle.hpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Event.hpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\InputImpl.hpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Joystick.hpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\JoystickImpl.hpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\JoystickManager.hpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Keyboard.hpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Mouse.hpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Sensor.hpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\SensorImpl.hpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\SensorManager.hpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Touch.hpp">
-      <Filter>Source Files\System\SFML\Window</Filter>
+      <Filter>Source Files\system\SFML\Window</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Config.hpp">
-      <Filter>Source Files\System\SFML</Filter>
+      <Filter>Source Files\system\SFML</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\System\NonCopyable.hpp">
-      <Filter>Source Files\System\SFML\System</Filter>
+      <Filter>Source Files\system\SFML\System</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Win32\InputImpl.hpp">
-      <Filter>Source Files\System\SFML\Window\Win32</Filter>
+      <Filter>Source Files\system\SFML\Window\Win32</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Win32\JoystickImpl.hpp">
-      <Filter>Source Files\System\SFML\Window\Win32</Filter>
+      <Filter>Source Files\system\SFML\Window\Win32</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Win32\WindowImplWin32.hpp">
-      <Filter>Source Files\System\SFML\Window\Win32</Filter>
+      <Filter>Source Files\system\SFML\Window\Win32</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\System\Err.hpp">
-      <Filter>Source Files\System\SFML\System</Filter>
+      <Filter>Source Files\system\SFML\System</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\System\Utf.hpp">
-      <Filter>Source Files\System\SFML\System</Filter>
+      <Filter>Source Files\system\SFML\System</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\System.hpp">
-      <Filter>Source Files\System\SFML</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Rendering\FrameBuffer.h">
-      <Filter>Source Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Input\InputMapping.hpp">
-      <Filter>Source Files\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Assets\AssetHandle.h">
-      <Filter>Source Files\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Ecs\entityx\Entity.h">
-      <Filter>Source Files\Ecs\entityx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Ecs\entityx\Event.h">
-      <Filter>Source Files\Ecs\entityx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Ecs\entityx\quick.h">
-      <Filter>Source Files\Ecs\entityx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Ecs\entityx\System.h">
-      <Filter>Source Files\Ecs\entityx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Ecs\entityx\help\NonCopyable.h">
-      <Filter>Source Files\Ecs\entityx\help</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Ecs\entityx\deps\Dependencies.h">
-      <Filter>Source Files\Ecs\entityx\deps</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Ecs\entityx\config.h">
-      <Filter>Source Files\Ecs\entityx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Ecs\entityx\Component.h">
-      <Filter>Source Files\Ecs\entityx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Ecs\entityx\help\Storage.h">
-      <Filter>Source Files\Ecs\entityx\help</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Rendering\Shader.h">
-      <Filter>Source Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Rendering\Texture.h">
-      <Filter>Source Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Rendering\Uniform.h">
-      <Filter>Source Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Rendering\VertexBuffer.h">
-      <Filter>Source Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Rendering\IndexBuffer.h">
-      <Filter>Source Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Rendering\Material.h">
-      <Filter>Source Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Rendering\Mesh.h">
-      <Filter>Source Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Rendering\Model.h">
-      <Filter>Source Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Rendering\Program.h">
-      <Filter>Source Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Meta\Assets\AssetHandle.hpp">
-      <Filter>Source Files\Meta\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Meta\Math\Vector.hpp">
-      <Filter>Source Files\Meta\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Material.hpp">
-      <Filter>Source Files\Meta\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Ecs\Components\TransformComponent.h">
-      <Filter>Source Files\Ecs\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Ecs\Systems\TransformSystem.h">
-      <Filter>Source Files\Ecs\Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Ecs\Components\TagsComponent.h">
-      <Filter>Source Files\Ecs\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Ecs\World.h">
-      <Filter>Source Files\Ecs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Ecs\Components\CameraComponent.h">
-      <Filter>Source Files\Ecs\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Ecs\Systems\CameraSystem.h">
-      <Filter>Source Files\Ecs\Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Ecs\Systems\RenderingSystem.h">
-      <Filter>Source Files\Ecs\Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Ecs\Components\ModelComponent.h">
-      <Filter>Source Files\Ecs\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Model.hpp">
-      <Filter>Source Files\Meta\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Camera.hpp">
-      <Filter>Source Files\Meta\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Meta\Math\Transform.hpp">
-      <Filter>Source Files\Meta\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\Components\CameraComponent.hpp">
-      <Filter>Source Files\Meta\Ecs\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\Components\Component.hpp">
-      <Filter>Source Files\Meta\Ecs\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\Components\ModelComponent.hpp">
-      <Filter>Source Files\Meta\Ecs\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\Components\TransformComponent.hpp">
-      <Filter>Source Files\Meta\Ecs\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\Entity.hpp">
-      <Filter>Source Files\Meta\Ecs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Rendering\Debug\DebugDraw.h">
-      <Filter>Source Files\Rendering\Debug</Filter>
+      <Filter>Source Files\system\SFML</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\Rendering\Debug\bounds.h">
-      <Filter>Source Files\Rendering\Debug</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Texture.hpp">
-      <Filter>Source Files\Meta\Rendering</Filter>
+      <Filter>Source Files\rendering\debug</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Win32\SensorImpl.hpp">
-      <Filter>Source Files\System\SFML\Window\Win32</Filter>
+      <Filter>Source Files\system\SFML\Window\Win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Rendering\RenderWindow.h">
-      <Filter>Source Files\Rendering</Filter>
+    <ClInclude Include="..\..\Source\Runtime\Input\input.h">
+      <Filter>Source Files\input</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Input\InputContext.h">
-      <Filter>Source Files\Input</Filter>
+    <ClInclude Include="..\..\Source\Runtime\Assets\asset_handle.h">
+      <Filter>Source Files\assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Program.hpp">
-      <Filter>Source Files\Meta\Rendering</Filter>
+    <ClInclude Include="..\..\Source\Runtime\Assets\asset_manager.h">
+      <Filter>Source Files\assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Assets\AssetManager.h">
-      <Filter>Source Files\Assets</Filter>
+    <ClInclude Include="..\..\Source\Runtime\Assets\asset_reader.h">
+      <Filter>Source Files\assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Assets\AssetWriter.h">
-      <Filter>Source Files\Assets</Filter>
+    <ClInclude Include="..\..\Source\Runtime\Assets\asset_writer.h">
+      <Filter>Source Files\assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Assets\AssetReader.h">
-      <Filter>Source Files\Assets</Filter>
+    <ClInclude Include="..\..\Source\Runtime\Assets\load_request.hpp">
+      <Filter>Source Files\assets</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Assets\LoadRequest.hpp">
-      <Filter>Source Files\Assets</Filter>
+    <ClInclude Include="..\..\Source\Runtime\Ecs\Components\camera_component.h">
+      <Filter>Source Files\ecs\components</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Meta\Core\BaseTypes.hpp">
-      <Filter>Source Files\Meta\Core</Filter>
+    <ClInclude Include="..\..\Source\Runtime\Ecs\Components\light_component.h">
+      <Filter>Source Files\ecs\components</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Threading\thread_utils.h">
-      <Filter>Source Files\Threading</Filter>
+    <ClInclude Include="..\..\Source\Runtime\Ecs\Components\model_component.h">
+      <Filter>Source Files\ecs\components</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\System\Application.h">
-      <Filter>Source Files\System</Filter>
+    <ClInclude Include="..\..\Source\Runtime\Ecs\Components\tags_component.h">
+      <Filter>Source Files\ecs\components</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Mesh.hpp">
-      <Filter>Source Files\Meta\Rendering</Filter>
+    <ClInclude Include="..\..\Source\Runtime\Ecs\Components\transform_component.h">
+      <Filter>Source Files\ecs\components</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Rendering\Light.h">
-      <Filter>Source Files\Rendering</Filter>
+    <ClInclude Include="..\..\Source\Runtime\Ecs\Systems\camera_system.h">
+      <Filter>Source Files\ecs\systems</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Ecs\Components\LightComponent.h">
-      <Filter>Source Files\Ecs\Components</Filter>
+    <ClInclude Include="..\..\Source\Runtime\Ecs\Systems\rendering_system.h">
+      <Filter>Source Files\ecs\systems</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\Components\LightComponent.hpp">
-      <Filter>Source Files\Meta\Ecs\Components</Filter>
+    <ClInclude Include="..\..\Source\Runtime\Ecs\Systems\transform_system.h">
+      <Filter>Source Files\ecs\systems</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\Light.hpp">
-      <Filter>Source Files\Meta\Rendering</Filter>
+    <ClInclude Include="..\..\Source\Runtime\Ecs\prefab.h">
+      <Filter>Source Files\ecs</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Rendering\RenderPass.h">
-      <Filter>Source Files\Rendering</Filter>
+    <ClInclude Include="..\..\Source\Runtime\Ecs\utils.h">
+      <Filter>Source Files\ecs</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Ecs\Utils.h">
-      <Filter>Source Files\Ecs</Filter>
+    <ClInclude Include="..\..\Source\Runtime\Input\input_context.h">
+      <Filter>Source Files\input</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\Ecs\Prefab.h">
-      <Filter>Source Files\Ecs</Filter>
+    <ClInclude Include="..\..\Source\Runtime\Input\input_mapping.hpp">
+      <Filter>Source Files\input</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Source\Runtime\System\FileSystemWatcher.h">
-      <Filter>Source Files\System</Filter>
+    <ClInclude Include="..\..\Source\Runtime\Meta\Assets\asset_handle.hpp">
+      <Filter>Source Files\meta\assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Meta\Core\basetypes.hpp">
+      <Filter>Source Files\meta\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\entity.hpp">
+      <Filter>Source Files\meta\Ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\components\component.hpp">
+      <Filter>Source Files\meta\Ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\components\light_component.hpp">
+      <Filter>Source Files\meta\Ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\components\model_component.hpp">
+      <Filter>Source Files\meta\Ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\components\transform_component.hpp">
+      <Filter>Source Files\meta\Ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\components\camera_component.hpp">
+      <Filter>Source Files\meta\Ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Meta\Math\transform.hpp">
+      <Filter>Source Files\meta\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Meta\Math\vector.hpp">
+      <Filter>Source Files\meta\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\model.hpp">
+      <Filter>Source Files\meta\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\program.hpp">
+      <Filter>Source Files\meta\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\texture.hpp">
+      <Filter>Source Files\meta\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\camera.hpp">
+      <Filter>Source Files\meta\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\light.hpp">
+      <Filter>Source Files\meta\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\material.hpp">
+      <Filter>Source Files\meta\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\mesh.hpp">
+      <Filter>Source Files\meta\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Rendering\Debug\debugdraw.h">
+      <Filter>Source Files\rendering\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Rendering\camera.h">
+      <Filter>Source Files\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Rendering\frame_buffer.h">
+      <Filter>Source Files\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Rendering\index_buffer.h">
+      <Filter>Source Files\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Rendering\light.h">
+      <Filter>Source Files\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Rendering\material.h">
+      <Filter>Source Files\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Rendering\mesh.h">
+      <Filter>Source Files\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Rendering\model.h">
+      <Filter>Source Files\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Rendering\program.h">
+      <Filter>Source Files\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Rendering\render_pass.h">
+      <Filter>Source Files\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Rendering\render_window.h">
+      <Filter>Source Files\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Rendering\shader.h">
+      <Filter>Source Files\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Rendering\texture.h">
+      <Filter>Source Files\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Rendering\uniform.h">
+      <Filter>Source Files\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\System\filesystem.h">
+      <Filter>Source Files\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\System\filesystem_watcher.hpp">
+      <Filter>Source Files\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\System\renderer.h">
+      <Filter>Source Files\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\System\app.h">
+      <Filter>Source Files\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\System\engine.h">
+      <Filter>Source Files\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\Rendering\vertex_buffer.h">
+      <Filter>Source Files\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Runtime\System\singleton.h">
+      <Filter>Source Files\system</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -578,7 +512,7 @@
       <Filter>Resource Files\Textures</Filter>
     </None>
     <None Include="..\..\Source\Runtime\System\SFML\System\Utf.inl">
-      <Filter>Source Files\System\SFML\System</Filter>
+      <Filter>Source Files\system\SFML\System</Filter>
     </None>
   </ItemGroup>
 </Project>

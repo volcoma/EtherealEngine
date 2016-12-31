@@ -1,13 +1,13 @@
 #pragma once
-#include "Core/reflection/reflection.h"
-#include "Core/serialization/serialization.h"
-#include "Core/serialization/cereal/types/vector.hpp"
-#include "Core/serialization/cereal/types/string.hpp"
-#include "Core/serialization/cereal/types/utility.hpp"
-#include "../../Rendering/Material.h"
-#include "../../Rendering/Program.h"
-#include "../Math/Vector.hpp"
-#include "../Assets/AssetHandle.hpp"
+#include "core/reflection/reflection.h"
+#include "core/serialization/serialization.h"
+#include "core/serialization/cereal/types/vector.hpp"
+#include "core/serialization/cereal/types/string.hpp"
+#include "core/serialization/cereal/types/utility.hpp"
+#include "../../rendering/material.h"
+#include "../../rendering/program.h"
+#include "../math/vector.hpp"
+#include "../assets/asset_handle.hpp"
 
 REFLECT(Material)
 {
@@ -137,5 +137,5 @@ LOAD(StandardMaterial)
 	);
 }
 
-#include "Core/serialization/archives.h"
+#include "core/serialization/archives.h"
 CEREAL_REGISTER_TYPE(StandardMaterial);

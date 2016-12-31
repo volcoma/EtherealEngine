@@ -1,8 +1,8 @@
-#include "Program.h"
-#include "Shader.h"
-#include "FrameBuffer.h"
-#include "Texture.h"
-#include "Uniform.h"
+#include "program.h"
+#include "shader.h"
+#include "texture.h"
+#include "uniform.h"
+#include "frame_buffer.h"
 
 Program::Program(AssetHandle<Shader> computeShader)
 {

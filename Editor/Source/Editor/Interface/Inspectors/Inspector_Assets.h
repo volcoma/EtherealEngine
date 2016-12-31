@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Inspector.h"
-#include "Runtime/Assets/AssetHandle.h"
+#include "inspector.h"
+#include "runtime/assets/asset_handle.h"
 
 struct Texture;
 struct Mesh;

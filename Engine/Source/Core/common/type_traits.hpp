@@ -45,4 +45,23 @@ namespace core
 
 	template<typename B> TypeInfo::index_t TypeInfo::counter<B>::value = 0;
 
+	struct TypeInfoGeneric
+	{
+		using index_t = size_t;
+
+		template<typename Base, typename Type> static index_t id()
+		{
+			static index_t sid = counter<Base>::value++;
+			return sid;
+		}
+
+	protected:
+		template<typename Base> struct counter
+		{
+			static index_t value;
+		};
+	};
+
+	template<typename B> TypeInfo::index_t TypeInfoGeneric::counter<B>::value = 0;
+
 }

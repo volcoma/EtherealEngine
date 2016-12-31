@@ -15,7 +15,7 @@ namespace fs
 	/// <summary>
 	/// Allows us to map a protocol to a specific directory. A path protocol
 	/// gives the caller the ability to prepend an identifier to their file
-	/// name i.e. "engine_data://Textures/MyTex.png" and have it return the
+	/// name i.e. "engine_data://textures/tex.png" and have it return the
 	/// relevant mapped path.
 	/// </summary>
 	//-----------------------------------------------------------------------------

@@ -13,3 +13,5 @@
 #include "math/math_includes.h"
 #include "serialization/serialization.h"
 #include "config/cfg.h"
+#include "ecs.h"
+#include "task.h"

@@ -32,7 +32,7 @@
 #include "WindowHandle.hpp"
 #include "WindowStyle.hpp"
 #include "../System/NonCopyable.hpp"
-#include "Core/common/basetypes.hpp"
+#include "core/common/basetypes.hpp"
 #include <string>
 #include <cstdint>
 

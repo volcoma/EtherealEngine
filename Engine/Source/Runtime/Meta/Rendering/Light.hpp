@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Core/serialization/serialization.h"
-#include "Core/reflection/reflection.h"
+#include "core/serialization/serialization.h"
+#include "core/reflection/reflection.h"
 
-#include "../../Rendering/Light.h"
+#include "../../rendering/light.h"
 
 REFLECT(Light)
 {

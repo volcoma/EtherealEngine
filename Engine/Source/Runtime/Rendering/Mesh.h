@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Graphics/graphics.h"
-#include "Core/math/math_includes.h"
+#include "graphics/graphics.h"
+#include "core/math/math_includes.h"
 #include <vector>
 #include <memory>
 struct VertexBuffer;

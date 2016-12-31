@@ -1,5 +1,5 @@
-#include "Inspector_Math.h"
-#include "../Gizmos/ImGuizmo.h"
+#include "inspector_math.h"
+#include "../gizmos/imguizmo.h"
 bool Inspector_Vector2::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<math::vec2>();

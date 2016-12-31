@@ -1,8 +1,8 @@
 #pragma once
-#include "Core/math/math_includes.h"
-#include "Core/common/basetypes.hpp"
-#include "Core/reflection/rttr/rttr_enable.h"
-#include "Core/serialization/serialization.h"
+#include "core/math/math_includes.h"
+#include "core/common/basetypes.hpp"
+#include "core/reflection/rttr/rttr_enable.h"
+#include "core/serialization/serialization.h"
 
 enum class ProjectionMode : std::uint32_t
 {

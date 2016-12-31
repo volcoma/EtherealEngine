@@ -1,8 +1,8 @@
 #pragma once
 #include <cstdint>
-#include "Program.h"
-#include "Core/reflection/rttr/rttr_enable.h"
-#include "Core/serialization/serialization.h"
+#include "program.h"
+#include "core/reflection/rttr/rttr_enable.h"
+#include "core/serialization/serialization.h"
 
 enum class LightType : std::uint8_t
 {

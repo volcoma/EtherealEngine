@@ -1,9 +1,9 @@
-#include "Inspector_Entity.h"
-#include "Inspectors.h"
+#include "inspector_entity.h"
+#include "inspectors.h"
 
 bool Inspector_Entity::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<ecs::Entity>();
+	auto data = var.get_value<core::Entity>();
 	if (!data)
 		return false;
 	bool changed = false;
@@ -11,11 +11,11 @@ bool Inspector_Entity::inspect(rttr::variant& var, bool readOnly, std::function<
 		PropertyLayout propName("Name");
 		rttr::variant varName = data.to_string();
 		
-		changed |= inspectVar(varName);
+		changed |= inspect_var(varName);
 
 		if(changed)
 		{
-			data.setName(varName.to_string());
+			data.set_name(varName.to_string());
 		}
 	}
 
@@ -37,7 +37,7 @@ bool Inspector_Entity::inspect(rttr::variant& var, bool readOnly, std::function<
 			gui::TreePush(info.get_name().data());
 
 			rttr::variant componentVar = component;
-			changed |= inspectVar(componentVar);
+			changed |= inspect_var(componentVar);
 			
 			gui::TreePop();
 			gui::PopStyleVar();
@@ -64,7 +64,7 @@ bool Inspector_Entity::inspect(rttr::variant& var, bool readOnly, std::function<
 		filter.Draw("Filter", 180);
 		gui::Separator();
 		gui::BeginChild("ComponentMenuContent", ImVec2(gui::GetContentRegionAvailWidth(), 200.0f));
-		auto component_types = rttr::type::get<ecs::Component>().get_derived_classes();
+		auto component_types = rttr::type::get<core::Component>().get_derived_classes();
 		for (auto& component_type : component_types)
 		{
 
@@ -82,7 +82,7 @@ bool Inspector_Entity::inspect(rttr::variant& var, bool readOnly, std::function<
 					if (gui::Selectable(component_type.get_name().data()))
 					{
 						auto c = cstructor.invoke();
-						auto c_ptr = c.get_value<std::shared_ptr<Component>>();
+						auto c_ptr = c.get_value<std::shared_ptr<core::Component>>();
 						if (c_ptr)
 							data.assign(c_ptr);
 

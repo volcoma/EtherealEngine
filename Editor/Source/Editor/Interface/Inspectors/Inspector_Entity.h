@@ -1,6 +1,6 @@
 #pragma once
-#include "Inspector.h"
-#include "Runtime/Ecs/World.h"
+#include "inspector.h"
+#include "core/ecs.h"
 
 struct Inspector_Entity : public Inspector
 {
@@ -9,4 +9,4 @@ struct Inspector_Entity : public Inspector
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
 
-INSPECTOR_REFLECT(Inspector_Entity, ecs::Entity)
+INSPECTOR_REFLECT(Inspector_Entity, core::Entity)

@@ -156,7 +156,7 @@ namespace core
 		*
 		* @return     Returns size of alive handles.
 		*/
-		index_t size() const;
+		size_t size() const;
 
 	public:
 		using const_iterator_t = HashSetIterator<DynamicHandleSet>;
@@ -346,7 +346,7 @@ namespace core
 	}
 
 	template<typename T, size_t N>
-	inline typename DynamicHandleObjectSet<T, N>::index_t DynamicHandleObjectSet<T, N>::size() const
+	inline typename size_t DynamicHandleObjectSet<T, N>::size() const
 	{
 		return _handles.size();
 	}

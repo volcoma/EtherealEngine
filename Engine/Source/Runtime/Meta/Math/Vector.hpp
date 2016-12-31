@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Core/math/math_includes.h"
-#include "Core/serialization/serialization.h"
+#include "core/math/math_includes.h"
+#include "core/serialization/serialization.h"
 
 namespace cereal
 {

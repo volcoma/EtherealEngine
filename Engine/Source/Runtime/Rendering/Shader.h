@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Uniform.h"
+#include "uniform.h"
 #include <memory>
 #include <vector>
 
