@@ -3,7 +3,7 @@
 #include "runtime/rendering/texture.h"
 #include "runtime/rendering/mesh.h"
 #include "runtime/rendering/material.h"
-#include "runtime/system/SFML/Window.hpp"
+#include "runtime/system/sfml/Window.hpp"
 #include "runtime/ecs/prefab.h"
 
 void EditState::dispose()

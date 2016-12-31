@@ -45,27 +45,28 @@ namespace runtime
 
 		RenderWindow& get_window() { return *_window; }
 	protected:
-		// minimum/maximum frames per second
+		/// minimum/maximum frames per second
 		unsigned _min_fps, _max_fps, _max_inactive_fps;
-		// previous timesteps for smoothing in seconds
+		/// previous timesteps for smoothing in seconds
 		std::vector<duration> _previous_timesteps;
-		// next frame timestep in seconds
+		/// next frame timestep in seconds
 		duration _timestep;
-		// how many frames to average for the smoothed timestep
+		/// how many frames to average for the smoothed timestep
 		unsigned _smoothing_step;
-		// frame update timer
+		/// frame update timer
 		timepoint _last_frame_timepoint;
-		// timepoint when we launched
+		/// timepoint when we launched
 		timepoint _launch_timepoint;
-		// exiting flag
+		/// exiting flag
 		bool _running;
-
+		/// engine windows
 		std::vector<std::shared_ptr<RenderWindow>> _windows;
+		/// currently processed window
 		std::shared_ptr<RenderWindow> _window;
 	};
 
-	extern event<void(std::chrono::duration<float>)> onFrameBegin;
-	extern event<void(std::chrono::duration<float>)> onFrameUpdate;
-	extern event<void(std::chrono::duration<float>)> onFrameRender;
-	extern event<void(std::chrono::duration<float>)> onFrameEnd;
+	extern event<void(std::chrono::duration<float>)> on_frame_begin;
+	extern event<void(std::chrono::duration<float>)> on_frame_update;
+	extern event<void(std::chrono::duration<float>)> on_frame_render;
+	extern event<void(std::chrono::duration<float>)> on_frame_end;
 }

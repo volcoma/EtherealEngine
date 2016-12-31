@@ -22,7 +22,7 @@
     <ProjectGuid>{48467439-9939-47F7-9908-99F6B287AB7C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>My1Initializing</RootNamespace>
-    <ProjectName>Editor</ProjectName>
+    <ProjectName>editor</ProjectName>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -74,27 +74,27 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)..\..\Bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)Compiled\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)\compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IntDir>$(ProjectDir)Compiled\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(ProjectDir)\compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)..\..\Bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)..\..\Bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)Compiled\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)\compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IntDir>$(ProjectDir)Compiled\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(ProjectDir)\compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)..\..\Bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)..\..\bin\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -103,7 +103,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>NOMINMAX;__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\Engine\Source;..\..\Res;..\..\Source;..\..\Source\Editor\Tools\shaderc\glsl-optimizer\src;..\..\Source\Editor\Tools\shaderc\glsl-optimizer\src\mesa;..\..\Source\Editor\Tools\shaderc\glsl-optimizer\src\glsl;..\..\Source\Editor\Tools\shaderc\fcpp;..\..\Source\Editor\Tools\shaderc\glsl-optimizer\include;..\..\Source\Editor\Tools\shaderc\glsl-optimizer\include\c99</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\engine\source;..\..\res;..\..\source;</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <OmitFramePointers>true</OmitFramePointers>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -147,7 +147,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>NOMINMAX;__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\Engine\Source;..\..\Res;..\..\Source;..\..\Source\Editor\Tools\shaderc\glsl-optimizer\src;..\..\Source\Editor\Tools\shaderc\glsl-optimizer\src\mesa;..\..\Source\Editor\Tools\shaderc\glsl-optimizer\src\glsl;..\..\Source\Editor\Tools\shaderc\fcpp;..\..\Source\Editor\Tools\shaderc\glsl-optimizer\include;..\..\Source\Editor\Tools\shaderc\glsl-optimizer\include\c99</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\engine\source;..\..\res;..\..\source;</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <OmitFramePointers>true</OmitFramePointers>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -192,7 +192,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <PreprocessorDefinitions>NOMINMAX;__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\Engine\Source;..\..\Res;..\..\Source;..\..\Source\Editor\Tools\shaderc\glsl-optimizer\src;..\..\Source\Editor\Tools\shaderc\glsl-optimizer\src\mesa;..\..\Source\Editor\Tools\shaderc\glsl-optimizer\src\glsl;..\..\Source\Editor\Tools\shaderc\fcpp;..\..\Source\Editor\Tools\shaderc\glsl-optimizer\include;..\..\Source\Editor\Tools\shaderc\glsl-optimizer\include\c99</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\engine\source;..\..\res;..\..\source;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
@@ -240,7 +240,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <PreprocessorDefinitions>NOMINMAX;__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\..\Engine\Source;..\..\Res;..\..\Source;..\..\Source\Editor\Tools\shaderc\glsl-optimizer\src;..\..\Source\Editor\Tools\shaderc\glsl-optimizer\src\mesa;..\..\Source\Editor\Tools\shaderc\glsl-optimizer\src\glsl;..\..\Source\Editor\Tools\shaderc\fcpp;..\..\Source\Editor\Tools\shaderc\glsl-optimizer\include;..\..\Source\Editor\Tools\shaderc\glsl-optimizer\include\c99</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\engine\source;..\..\res;..\..\source;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
@@ -281,91 +281,91 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\..\Res\Common.rc" />
+    <ResourceCompile Include="..\..\res\common.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Res\resource.h" />
-    <ClInclude Include="..\..\Source\Editor\Assets\asset_compiler.h" />
-    <ClInclude Include="..\..\Source\Editor\Console\console_log.h" />
-    <ClInclude Include="..\..\Source\Editor\editor_window.h" />
-    <ClInclude Include="..\..\Source\Editor\editor_app.h" />
-    <ClInclude Include="..\..\Source\Editor\edit_state.h" />
-    <ClInclude Include="..\..\Source\Editor\FileDialog\filedialog.h" />
-    <ClInclude Include="..\..\Source\Editor\FileDialog\nfd\common.h" />
-    <ClInclude Include="..\..\Source\Editor\FileDialog\nfd\nfd.h" />
-    <ClInclude Include="..\..\Source\Editor\FileDialog\nfd\nfd_common.h" />
-    <ClInclude Include="..\..\Source\Editor\Interface\Docks\docking.h" />
-    <ClInclude Include="..\..\Source\Editor\Interface\Docks\docks.h" />
-    <ClInclude Include="..\..\Source\Editor\Interface\Docks\imguidock.h" />
-    <ClInclude Include="..\..\Source\Editor\Interface\Gizmos\imguizmo.h" />
-    <ClInclude Include="..\..\Source\Editor\Interface\gui_system.h" />
-    <ClInclude Include="..\..\Source\Editor\Interface\gui_window.h" />
-    <ClInclude Include="..\..\Source\Editor\Interface\imgui\imconfig.h" />
-    <ClInclude Include="..\..\Source\Editor\Interface\imgui\imgui.h" />
-    <ClInclude Include="..\..\Source\Editor\Interface\imgui\imgui_internal.h" />
-    <ClInclude Include="..\..\Source\Editor\Interface\imgui\imgui_user.h" />
-    <ClInclude Include="..\..\Source\Editor\Interface\imgui\stb_rect_pack.h" />
-    <ClInclude Include="..\..\Source\Editor\Interface\imgui\stb_textedit.h" />
-    <ClInclude Include="..\..\Source\Editor\Interface\imgui\stb_truetype.h" />
-    <ClInclude Include="..\..\Source\Editor\Interface\Inspectors\inspector.h" />
-    <ClInclude Include="..\..\Source\Editor\Interface\Inspectors\inspectors.h" />
-    <ClInclude Include="..\..\Source\Editor\Interface\Inspectors\inspector_assets.h" />
-    <ClInclude Include="..\..\Source\Editor\Interface\Inspectors\inspector_basetypes.h" />
-    <ClInclude Include="..\..\Source\Editor\Interface\Inspectors\inspector_coretypes.h" />
-    <ClInclude Include="..\..\Source\Editor\Interface\Inspectors\inspector_entity.h" />
-    <ClInclude Include="..\..\Source\Editor\Interface\Inspectors\inspector_light.h" />
-    <ClInclude Include="..\..\Source\Editor\Interface\Inspectors\inspector_math.h" />
-    <ClInclude Include="..\..\Source\Editor\Meta\project.hpp" />
-    <ClInclude Include="..\..\Source\Editor\Meta\Interface\gui_system.hpp" />
-    <ClInclude Include="..\..\Source\Editor\project.h" />
-    <ClInclude Include="..\..\Source\Editor\Systems\debugdraw_system.h" />
-    <ClInclude Include="..\..\Source\Editor\Systems\picking_system.h" />
+    <ClInclude Include="..\..\res\resource.h" />
+    <ClInclude Include="..\..\source\editor\assets\asset_compiler.h" />
+    <ClInclude Include="..\..\source\editor\console\console_log.h" />
+    <ClInclude Include="..\..\source\editor\editor_window.h" />
+    <ClInclude Include="..\..\source\editor\editor_app.h" />
+    <ClInclude Include="..\..\source\editor\edit_state.h" />
+    <ClInclude Include="..\..\source\editor\filedialog\filedialog.h" />
+    <ClInclude Include="..\..\source\editor\filedialog\nfd\common.h" />
+    <ClInclude Include="..\..\source\editor\filedialog\nfd\nfd.h" />
+    <ClInclude Include="..\..\source\editor\filedialog\nfd\nfd_common.h" />
+    <ClInclude Include="..\..\source\editor\interface\docks\docking.h" />
+    <ClInclude Include="..\..\source\editor\interface\docks\docks.h" />
+    <ClInclude Include="..\..\source\editor\interface\docks\imguidock.h" />
+    <ClInclude Include="..\..\source\editor\interface\gizmos\imguizmo.h" />
+    <ClInclude Include="..\..\source\editor\interface\gui_system.h" />
+    <ClInclude Include="..\..\source\editor\interface\gui_window.h" />
+    <ClInclude Include="..\..\source\editor\interface\imgui\imconfig.h" />
+    <ClInclude Include="..\..\source\editor\interface\imgui\imgui.h" />
+    <ClInclude Include="..\..\source\editor\interface\imgui\imgui_internal.h" />
+    <ClInclude Include="..\..\source\editor\interface\imgui\imgui_user.h" />
+    <ClInclude Include="..\..\source\editor\interface\imgui\stb_rect_pack.h" />
+    <ClInclude Include="..\..\source\editor\interface\imgui\stb_textedit.h" />
+    <ClInclude Include="..\..\source\editor\interface\imgui\stb_truetype.h" />
+    <ClInclude Include="..\..\source\editor\interface\inspectors\inspector.h" />
+    <ClInclude Include="..\..\source\editor\interface\inspectors\inspectors.h" />
+    <ClInclude Include="..\..\source\editor\interface\inspectors\inspector_assets.h" />
+    <ClInclude Include="..\..\source\editor\interface\inspectors\inspector_basetypes.h" />
+    <ClInclude Include="..\..\source\editor\interface\inspectors\inspector_coretypes.h" />
+    <ClInclude Include="..\..\source\editor\interface\inspectors\inspector_entity.h" />
+    <ClInclude Include="..\..\source\editor\interface\inspectors\inspector_light.h" />
+    <ClInclude Include="..\..\source\editor\interface\inspectors\inspector_math.h" />
+    <ClInclude Include="..\..\source\editor\meta\project.hpp" />
+    <ClInclude Include="..\..\source\editor\meta\interface\gui_system.hpp" />
+    <ClInclude Include="..\..\source\editor\project.h" />
+    <ClInclude Include="..\..\source\editor\systems\debugdraw_system.h" />
+    <ClInclude Include="..\..\source\editor\systems\picking_system.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Engine\Projects\vc14\Runtime.vcxproj">
+    <ProjectReference Include="..\..\..\engine\projects\vc14\runtime.vcxproj">
       <Project>{b340ce5b-cff1-4fd5-a1ed-4f74c628f525}</Project>
     </ProjectReference>
-    <ProjectReference Include="ShaderCompiler.vcxproj">
+    <ProjectReference Include="shaderc.vcxproj">
       <Project>{4b8a4ad9-d7c0-4978-99d7-f4e9dde756ab}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\Editor\Assets\asset_compiler.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Console\console_log.cpp" />
-    <ClCompile Include="..\..\Source\Editor\editor_window.cpp" />
-    <ClCompile Include="..\..\Source\Editor\editor_app.cpp" />
-    <ClCompile Include="..\..\Source\Editor\edit_state.cpp" />
-    <ClCompile Include="..\..\Source\Editor\FileDialog\nfd\nfd_common.cpp" />
-    <ClCompile Include="..\..\Source\Editor\FileDialog\nfd\nfd_win.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\Docks\assets_dock.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\Docks\console_dock.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\Docks\docking.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\Docks\game_dock.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\Docks\hierarchy_dock.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\Docks\imguidock.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\Docks\inspector_dock.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\Docks\scene_dock.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\Docks\style_dock.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\Gizmos\imguizmo.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\gui_system.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\gui_window.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\imgui\imgui.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\imgui\imgui_draw.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\Inspectors\inspector.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\Inspectors\inspectors.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\Inspectors\inspector_assets.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\Inspectors\inspector_basetypes.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\Inspectors\inspector_coretypes.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\Inspectors\inspector_entity.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\Inspectors\inspector_light.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Interface\Inspectors\inspector_math.cpp" />
-    <ClCompile Include="..\..\Source\Editor\main.cpp" />
-    <ClCompile Include="..\..\Source\Editor\project.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Systems\debugdraw_system.cpp" />
-    <ClCompile Include="..\..\Source\Editor\Systems\picking_system.cpp" />
+    <ClCompile Include="..\..\source\editor\assets\asset_compiler.cpp" />
+    <ClCompile Include="..\..\source\editor\console\console_log.cpp" />
+    <ClCompile Include="..\..\source\editor\editor_window.cpp" />
+    <ClCompile Include="..\..\source\editor\editor_app.cpp" />
+    <ClCompile Include="..\..\source\editor\edit_state.cpp" />
+    <ClCompile Include="..\..\source\editor\filedialog\nfd\nfd_common.cpp" />
+    <ClCompile Include="..\..\source\editor\filedialog\nfd\nfd_win.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\docks\assets_dock.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\docks\console_dock.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\docks\docking.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\docks\game_dock.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\docks\hierarchy_dock.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\docks\imguidock.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\docks\inspector_dock.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\docks\scene_dock.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\docks\style_dock.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\gizmos\imguizmo.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\gui_system.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\gui_window.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\imgui\imgui.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\inspectors\inspector.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\inspectors\inspectors.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\inspectors\inspector_assets.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\inspectors\inspector_basetypes.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\inspectors\inspector_coretypes.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\inspectors\inspector_entity.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\inspectors\inspector_light.cpp" />
+    <ClCompile Include="..\..\source\editor\interface\inspectors\inspector_math.cpp" />
+    <ClCompile Include="..\..\source\editor\main.cpp" />
+    <ClCompile Include="..\..\source\editor\project.cpp" />
+    <ClCompile Include="..\..\source\editor\systems\debugdraw_system.cpp" />
+    <ClCompile Include="..\..\source\editor\systems\picking_system.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Source\Editor\Interface\imgui\imgui_user.inl" />
+    <None Include="..\..\source\editor\interface\imgui\imgui_user.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

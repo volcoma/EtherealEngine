@@ -2,7 +2,7 @@
 #include "core/common/string_utils.h"
 #include "core/logging/logging.h"
 #include "runtime/system/FileSystem.h"
-#include "ShaderCompiler/shaderc.h"
+#include "shaderc/shaderc.h"
 
 void ShaderCompiler::compile(const fs::path& absoluteKey)
 {

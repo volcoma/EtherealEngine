@@ -223,7 +223,7 @@ void PickingSystem::frame_render(std::chrono::duration<float> dt)
 
 bool PickingSystem::initialize()
 {
-	runtime::onFrameRender.addListener(this, &PickingSystem::frame_render);
+	runtime::on_frame_render.addListener(this, &PickingSystem::frame_render);
 	// Set up ID buffer, which has a color target and depth buffer
 	auto pickingRT = std::make_shared<Texture>(_id_dimensions, _id_dimensions, false, 1, gfx::TextureFormat::RGBA8, 0
 		| BGFX_TEXTURE_RT
@@ -281,5 +281,5 @@ bool PickingSystem::initialize()
 
 void PickingSystem::dispose()
 {
-	runtime::onFrameRender.removeListener(this, &PickingSystem::frame_render);
+	runtime::on_frame_render.removeListener(this, &PickingSystem::frame_render);
 }

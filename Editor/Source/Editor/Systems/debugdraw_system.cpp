@@ -224,7 +224,7 @@ void DebugDrawSystem::frame_render(std::chrono::duration<float> dt)
 
 bool DebugDrawSystem::initialize()
 {
-	runtime::onFrameRender.addListener(this, &DebugDrawSystem::frame_render);
+	runtime::on_frame_render.addListener(this, &DebugDrawSystem::frame_render);
 
 	auto am = core::get_subsystem<AssetManager>();
 	am->load<Shader>("editor_data://shaders/vs_wf_wireframe", false)
@@ -244,5 +244,5 @@ bool DebugDrawSystem::initialize()
 void DebugDrawSystem::dispose()
 {
 	ddShutdown();
-	runtime::onFrameRender.removeListener(this, &DebugDrawSystem::frame_render);
+	runtime::on_frame_render.removeListener(this, &DebugDrawSystem::frame_render);
 }

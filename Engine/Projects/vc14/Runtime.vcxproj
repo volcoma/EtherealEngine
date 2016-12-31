@@ -19,164 +19,165 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\Runtime\Assets\asset_manager.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Assets\asset_writer.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Assets\asset_reader.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Ecs\Components\camera_component.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Ecs\Components\light_component.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Ecs\Components\model_component.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Ecs\Components\transform_component.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Ecs\prefab.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Ecs\Systems\camera_system.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Ecs\Systems\rendering_system.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Ecs\Systems\transform_system.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Ecs\utils.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Input\input_context.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Rendering\camera.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Rendering\Debug\bounds.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Rendering\Debug\debugdraw.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Rendering\index_buffer.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Rendering\light.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Rendering\material.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Rendering\mesh.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Rendering\model.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Rendering\program.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Rendering\render_pass.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Rendering\render_window.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Rendering\shader.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Rendering\texture.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Rendering\uniform.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\Rendering\vertex_buffer.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\runtime.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\System\app.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\System\engine.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\System\filesystem.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\System\renderer.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\System\SFML\System\Err.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Joystick.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\JoystickManager.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Keyboard.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Mouse.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Sensor.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\SensorManager.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Touch.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\VideoMode.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Win32\InputImpl.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Win32\JoystickImpl.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Win32\SensorImpl.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Win32\VideoModeImpl.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Win32\WindowImplWin32.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\Window.cpp" />
-    <ClCompile Include="..\..\Source\Runtime\System\SFML\Window\WindowImpl.cpp" />
+    <ClCompile Include="..\..\source\runtime\assets\asset_manager.cpp" />
+    <ClCompile Include="..\..\source\runtime\assets\asset_writer.cpp" />
+    <ClCompile Include="..\..\source\runtime\assets\asset_reader.cpp" />
+    <ClCompile Include="..\..\source\runtime\ecs\components\camera_component.cpp" />
+    <ClCompile Include="..\..\source\runtime\ecs\components\light_component.cpp" />
+    <ClCompile Include="..\..\source\runtime\ecs\components\model_component.cpp" />
+    <ClCompile Include="..\..\source\runtime\ecs\components\transform_component.cpp" />
+    <ClCompile Include="..\..\source\runtime\ecs\prefab.cpp" />
+    <ClCompile Include="..\..\source\runtime\ecs\systems\camera_system.cpp" />
+    <ClCompile Include="..\..\source\runtime\ecs\systems\rendering_system.cpp" />
+    <ClCompile Include="..\..\source\runtime\ecs\systems\transform_system.cpp" />
+    <ClCompile Include="..\..\source\runtime\ecs\utils.cpp" />
+    <ClCompile Include="..\..\source\runtime\input\input_context.cpp" />
+    <ClCompile Include="..\..\source\runtime\rendering\camera.cpp" />
+    <ClCompile Include="..\..\source\runtime\rendering\debug\bounds.cpp" />
+    <ClCompile Include="..\..\source\runtime\rendering\debug\debugdraw.cpp" />
+    <ClCompile Include="..\..\source\runtime\rendering\index_buffer.cpp" />
+    <ClCompile Include="..\..\source\runtime\rendering\light.cpp" />
+    <ClCompile Include="..\..\source\runtime\rendering\material.cpp" />
+    <ClCompile Include="..\..\source\runtime\rendering\mesh.cpp" />
+    <ClCompile Include="..\..\source\runtime\rendering\model.cpp" />
+    <ClCompile Include="..\..\source\runtime\rendering\program.cpp" />
+    <ClCompile Include="..\..\source\runtime\rendering\render_pass.cpp" />
+    <ClCompile Include="..\..\source\runtime\rendering\render_window.cpp" />
+    <ClCompile Include="..\..\source\runtime\rendering\shader.cpp" />
+    <ClCompile Include="..\..\source\runtime\rendering\texture.cpp" />
+    <ClCompile Include="..\..\source\runtime\rendering\uniform.cpp" />
+    <ClCompile Include="..\..\source\runtime\rendering\vertex_buffer.cpp" />
+    <ClCompile Include="..\..\source\runtime\runtime.cpp" />
+    <ClCompile Include="..\..\source\runtime\system\app.cpp" />
+    <ClCompile Include="..\..\source\runtime\system\engine.cpp" />
+    <ClCompile Include="..\..\source\runtime\system\filesystem.cpp" />
+    <ClCompile Include="..\..\source\runtime\system\renderer.cpp" />
+    <ClCompile Include="..\..\source\runtime\system\sfml\System\Err.cpp" />
+    <ClCompile Include="..\..\source\runtime\system\sfml\Window\Joystick.cpp" />
+    <ClCompile Include="..\..\source\runtime\system\sfml\Window\JoystickManager.cpp" />
+    <ClCompile Include="..\..\source\runtime\system\sfml\Window\Keyboard.cpp" />
+    <ClCompile Include="..\..\source\runtime\system\sfml\Window\Mouse.cpp" />
+    <ClCompile Include="..\..\source\runtime\system\sfml\Window\Sensor.cpp" />
+    <ClCompile Include="..\..\source\runtime\system\sfml\Window\SensorManager.cpp" />
+    <ClCompile Include="..\..\source\runtime\system\sfml\Window\Touch.cpp" />
+    <ClCompile Include="..\..\source\runtime\system\sfml\Window\VideoMode.cpp" />
+    <ClCompile Include="..\..\source\runtime\system\sfml\Window\Win32\InputImpl.cpp" />
+    <ClCompile Include="..\..\source\runtime\system\sfml\Window\Win32\JoystickImpl.cpp" />
+    <ClCompile Include="..\..\source\runtime\system\sfml\Window\Win32\SensorImpl.cpp" />
+    <ClCompile Include="..\..\source\runtime\system\sfml\Window\Win32\VideoModeImpl.cpp" />
+    <ClCompile Include="..\..\source\runtime\system\sfml\Window\Win32\WindowImplWin32.cpp" />
+    <ClCompile Include="..\..\source\runtime\system\sfml\Window\Window.cpp" />
+    <ClCompile Include="..\..\source\runtime\system\sfml\Window\WindowImpl.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\Runtime\Assets\asset_handle.h" />
-    <ClInclude Include="..\..\Source\Runtime\Assets\asset_manager.h" />
-    <ClInclude Include="..\..\Source\Runtime\Assets\asset_writer.h" />
-    <ClInclude Include="..\..\Source\Runtime\Assets\asset_reader.h" />
-    <ClInclude Include="..\..\Source\Runtime\Assets\load_request.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\Ecs\Components\camera_component.h" />
-    <ClInclude Include="..\..\Source\Runtime\Ecs\Components\light_component.h" />
-    <ClInclude Include="..\..\Source\Runtime\Ecs\Components\model_component.h" />
-    <ClInclude Include="..\..\Source\Runtime\Ecs\Components\tags_component.h" />
-    <ClInclude Include="..\..\Source\Runtime\Ecs\Components\transform_component.h" />
-    <ClInclude Include="..\..\Source\Runtime\Ecs\prefab.h" />
-    <ClInclude Include="..\..\Source\Runtime\Ecs\Systems\camera_system.h" />
-    <ClInclude Include="..\..\Source\Runtime\Ecs\Systems\rendering_system.h" />
-    <ClInclude Include="..\..\Source\Runtime\Ecs\Systems\transform_system.h" />
-    <ClInclude Include="..\..\Source\Runtime\Ecs\utils.h" />
-    <ClInclude Include="..\..\Source\Runtime\Input\input.h" />
-    <ClInclude Include="..\..\Source\Runtime\Input\input_mapping.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\Input\input_context.h" />
-    <ClInclude Include="..\..\Source\Runtime\Meta\Assets\asset_handle.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\Meta\Core\basetypes.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\components\camera_component.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\components\component.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\components\light_component.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\components\model_component.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\components\transform_component.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\Meta\Ecs\entity.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\Meta\Math\transform.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\Meta\Math\vector.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\camera.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\light.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\material.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\mesh.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\model.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\program.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\Meta\Rendering\texture.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\Rendering\camera.h" />
-    <ClInclude Include="..\..\Source\Runtime\Rendering\Debug\bounds.h" />
-    <ClInclude Include="..\..\Source\Runtime\Rendering\Debug\debugdraw.h" />
-    <ClInclude Include="..\..\Source\Runtime\Rendering\frame_buffer.h" />
-    <ClInclude Include="..\..\Source\Runtime\Rendering\index_buffer.h" />
-    <ClInclude Include="..\..\Source\Runtime\Rendering\light.h" />
-    <ClInclude Include="..\..\Source\Runtime\Rendering\material.h" />
-    <ClInclude Include="..\..\Source\Runtime\Rendering\mesh.h" />
-    <ClInclude Include="..\..\Source\Runtime\Rendering\model.h" />
-    <ClInclude Include="..\..\Source\Runtime\Rendering\program.h" />
-    <ClInclude Include="..\..\Source\Runtime\Rendering\render_pass.h" />
-    <ClInclude Include="..\..\Source\Runtime\Rendering\render_window.h" />
-    <ClInclude Include="..\..\Source\Runtime\Rendering\shader.h" />
-    <ClInclude Include="..\..\Source\Runtime\Rendering\texture.h" />
-    <ClInclude Include="..\..\Source\Runtime\Rendering\uniform.h" />
-    <ClInclude Include="..\..\Source\Runtime\Rendering\vertex_buffer.h" />
-    <ClInclude Include="..\..\Source\Runtime\runtime.h" />
-    <ClInclude Include="..\..\Source\Runtime\System\app.h" />
-    <ClInclude Include="..\..\Source\Runtime\System\engine.h" />
-    <ClInclude Include="..\..\Source\Runtime\System\filesystem.h" />
-    <ClInclude Include="..\..\Source\Runtime\System\filesystem_watcher.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\renderer.h" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Config.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\System.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\System\Err.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\System\NonCopyable.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\System\Utf.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Event.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\InputImpl.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Joystick.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\JoystickImpl.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\JoystickManager.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Keyboard.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Mouse.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Sensor.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\SensorImpl.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\SensorManager.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Touch.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\VideoMode.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\VideoModeImpl.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Win32\InputImpl.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Win32\JoystickImpl.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Win32\SensorImpl.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Win32\WindowImplWin32.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\Window.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\WindowHandle.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\WindowImpl.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\SFML\Window\WindowStyle.hpp" />
-    <ClInclude Include="..\..\Source\Runtime\System\singleton.h" />
+    <ClInclude Include="..\..\source\runtime\assets\asset_handle.h" />
+    <ClInclude Include="..\..\source\runtime\assets\asset_manager.h" />
+    <ClInclude Include="..\..\source\runtime\assets\asset_writer.h" />
+    <ClInclude Include="..\..\source\runtime\assets\asset_reader.h" />
+    <ClInclude Include="..\..\source\runtime\assets\load_request.hpp" />
+    <ClInclude Include="..\..\source\runtime\ecs\components\camera_component.h" />
+    <ClInclude Include="..\..\source\runtime\ecs\components\light_component.h" />
+    <ClInclude Include="..\..\source\runtime\ecs\components\model_component.h" />
+    <ClInclude Include="..\..\source\runtime\ecs\components\tags_component.h" />
+    <ClInclude Include="..\..\source\runtime\ecs\components\transform_component.h" />
+    <ClInclude Include="..\..\source\runtime\ecs\prefab.h" />
+    <ClInclude Include="..\..\source\runtime\ecs\systems\camera_system.h" />
+    <ClInclude Include="..\..\source\runtime\ecs\systems\rendering_system.h" />
+    <ClInclude Include="..\..\source\runtime\ecs\systems\transform_system.h" />
+    <ClInclude Include="..\..\source\runtime\ecs\utils.h" />
+    <ClInclude Include="..\..\source\runtime\input\input.h" />
+    <ClInclude Include="..\..\source\runtime\input\input_mapping.hpp" />
+    <ClInclude Include="..\..\source\runtime\input\input_context.h" />
+    <ClInclude Include="..\..\source\runtime\meta\assets\asset_handle.hpp" />
+    <ClInclude Include="..\..\source\runtime\meta\core\basetypes.hpp" />
+    <ClInclude Include="..\..\source\runtime\meta\ecs\components\camera_component.hpp" />
+    <ClInclude Include="..\..\source\runtime\meta\ecs\components\component.hpp" />
+    <ClInclude Include="..\..\source\runtime\meta\ecs\components\light_component.hpp" />
+    <ClInclude Include="..\..\source\runtime\meta\ecs\components\model_component.hpp" />
+    <ClInclude Include="..\..\source\runtime\meta\ecs\components\transform_component.hpp" />
+    <ClInclude Include="..\..\source\runtime\meta\ecs\entity.hpp" />
+    <ClInclude Include="..\..\source\runtime\meta\math\transform.hpp" />
+    <ClInclude Include="..\..\source\runtime\meta\math\vector.hpp" />
+    <ClInclude Include="..\..\source\runtime\meta\rendering\camera.hpp" />
+    <ClInclude Include="..\..\source\runtime\meta\rendering\light.hpp" />
+    <ClInclude Include="..\..\source\runtime\meta\rendering\material.hpp" />
+    <ClInclude Include="..\..\source\runtime\meta\rendering\mesh.hpp" />
+    <ClInclude Include="..\..\source\runtime\meta\rendering\model.hpp" />
+    <ClInclude Include="..\..\source\runtime\meta\rendering\program.hpp" />
+    <ClInclude Include="..\..\source\runtime\meta\rendering\texture.hpp" />
+    <ClInclude Include="..\..\source\runtime\rendering\camera.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\debug\bounds.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\debug\debugdraw.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\frame_buffer.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\index_buffer.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\light.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\material.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\mesh.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\model.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\program.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\render_pass.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\render_window.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\shader.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\texture.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\uniform.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\vertex_buffer.h" />
+    <ClInclude Include="..\..\source\runtime\runtime.h" />
+    <ClInclude Include="..\..\source\runtime\system\app.h" />
+    <ClInclude Include="..\..\source\runtime\system\engine.h" />
+    <ClInclude Include="..\..\source\runtime\system\filesystem.h" />
+    <ClInclude Include="..\..\source\runtime\system\filesystem_watcher.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\renderer.h" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Config.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\System.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\System\Err.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\System\NonCopyable.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\System\Utf.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window\Event.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window\InputImpl.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window\Joystick.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window\JoystickImpl.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window\JoystickManager.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window\Keyboard.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window\Mouse.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window\Sensor.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window\SensorImpl.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window\SensorManager.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window\Touch.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window\VideoMode.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window\VideoModeImpl.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window\Win32\InputImpl.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window\Win32\JoystickImpl.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window\Win32\SensorImpl.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window\Win32\WindowImplWin32.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window\Window.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window\WindowHandle.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window\WindowImpl.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\sfml\Window\WindowStyle.hpp" />
+    <ClInclude Include="..\..\source\runtime\system\singleton.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Engine_Data\Meshes\_compile_.bat" />
-    <None Include="..\..\..\Engine_Data\Shaders\_compile_.bat" />
-    <None Include="..\..\..\Engine_Data\Textures\_compile_.bat" />
-    <None Include="..\..\..\Engine_Data\_compile_all.bat" />
-    <None Include="..\..\Source\Runtime\System\SFML\System\Utf.inl" />
+    <None Include="..\..\..\engine_data\meshes\_compile_.bat" />
+    <None Include="..\..\..\engine_data\shaders\_compile_.bat" />
+    <None Include="..\..\..\engine_data\textures\_compile_.bat" />
+    <None Include="..\..\..\engine_data\_compile_all.bat" />
+    <None Include="..\..\source\runtime\system\sfml\System\Utf.inl" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Core.vcxproj">
+    <ProjectReference Include="core.vcxproj">
       <Project>{449848fa-a97c-43a4-99ba-5e5b333fd76b}</Project>
     </ProjectReference>
-    <ProjectReference Include="Graphics.vcxproj">
+    <ProjectReference Include="grahpics.vcxproj">
       <Project>{139958cc-cfd4-41f0-a663-b130e403d9a6}</Project>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B340CE5B-CFF1-4FD5-A1ED-4F74C628F525}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Insomnium</RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
-    <ProjectName>Runtime</ProjectName>
+    <ProjectName>runtime</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -226,8 +227,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>..\..\Bin\Lib\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)Compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>..\..\bin\lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)\compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
@@ -235,8 +236,8 @@
     <ExcludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(MSBuild_ExecutablePath);$(VC_LibraryPath_x86);</ExcludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\..\Bin\Lib\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)Compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>..\..\bin\lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)\compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
@@ -245,14 +246,14 @@
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>..\..\Bin\Lib\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)Compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>..\..\bin\lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)\compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>..\..\Bin\Lib\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)Compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>..\..\bin\lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)\compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <ExecutablePath>$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);</ExecutablePath>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -264,7 +265,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\Source;..\..\Source\$(ProjectName);..\..\Lib\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\source;..\..\source\$(ProjectName);..\..\lib\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -309,7 +310,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\Source;..\..\Source\$(ProjectName);..\..\Lib\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\source;..\..\source\$(ProjectName);..\..\lib\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -354,7 +355,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\Source;..\..\Source\$(ProjectName);..\..\Lib\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\source;..\..\source\$(ProjectName);..\..\lib\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <StringPooling>true</StringPooling>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
@@ -400,7 +401,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\Source;..\..\Source\$(ProjectName);..\..\Lib\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\source;..\..\source\$(ProjectName);..\..\lib\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <StringPooling>true</StringPooling>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>

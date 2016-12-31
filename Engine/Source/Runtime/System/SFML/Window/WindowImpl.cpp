@@ -35,27 +35,27 @@
 
 #if defined(SFML_SYSTEM_WINDOWS)
 
-    #include "System/SFML/Window/Win32/WindowImplWin32.hpp"
+    #include "Win32/WindowImplWin32.hpp"
     typedef sf::priv::WindowImplWin32 WindowImplType;
 
 #elif defined(SFML_SYSTEM_LINUX) || defined(SFML_SYSTEM_FREEBSD)
 
-    #include "System/SFML/Window/Unix/WindowImplX11.hpp"
+    #include "Unix/WindowImplX11.hpp"
     typedef sf::priv::WindowImplX11 WindowImplType;
 
 #elif defined(SFML_SYSTEM_MACOS)
 
-    #include "System/SFML/Window/OSX/WindowImplCocoa.hpp"
+    #include "OSX/WindowImplCocoa.hpp"
     typedef sf::priv::WindowImplCocoa WindowImplType;
 
 #elif defined(SFML_SYSTEM_IOS)
 
-    #include "System/SFML/Window/iOS/WindowImplUIKit.hpp"
+    #include "iOS/WindowImplUIKit.hpp"
     typedef sf::priv::WindowImplUIKit WindowImplType;
 
 #elif defined(SFML_SYSTEM_ANDROID)
 
-    #include "System/SFML/Window/Android/WindowImplAndroid.hpp"
+    #include "Android/WindowImplAndroid.hpp"
     typedef sf::priv::WindowImplAndroid WindowImplType;
 
 #endif

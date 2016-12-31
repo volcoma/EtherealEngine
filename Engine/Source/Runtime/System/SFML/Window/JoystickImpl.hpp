@@ -80,27 +80,27 @@ struct JoystickState
 
 #if defined(SFML_SYSTEM_WINDOWS)
 
-    #include "System/SFML/Window/Win32/JoystickImpl.hpp"
+    #include "Win32/JoystickImpl.hpp"
 
 #elif defined(SFML_SYSTEM_LINUX)
 
-    #include "System/SFML/Window/Unix/JoystickImpl.hpp"
+    #include "Unix/JoystickImpl.hpp"
 
 #elif defined(SFML_SYSTEM_FREEBSD)
 
-    #include "System/SFML/Window/FreeBSD/JoystickImpl.hpp"
+    #include "FreeBSD/JoystickImpl.hpp"
 
 #elif defined(SFML_SYSTEM_MACOS)
 
-    #include "System/SFML/Window/OSX/JoystickImpl.hpp"
+    #include "OSX/JoystickImpl.hpp"
 
 #elif defined(SFML_SYSTEM_IOS)
 
-    #include "System/SFML/Window/iOS/JoystickImpl.hpp"
+    #include "iOS/JoystickImpl.hpp"
 
 #elif defined(SFML_SYSTEM_ANDROID)
 
-    #include "System/SFML/Window/Android/JoystickImpl.hpp"
+    #include "Android/JoystickImpl.hpp"
 
 #endif
 

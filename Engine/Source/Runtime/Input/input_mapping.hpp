@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../system/SFML/Window/Event.hpp"
-#include "../system/SFML/Window/Mouse.hpp"
-#include "../system/SFML/Window/Keyboard.hpp"
-#include "../system/SFML/Window/Touch.hpp"
-#include "../system/SFML/Window/Joystick.hpp"
-#include "../system/SFML/Window/Sensor.hpp"
+#include "../system/sfml/Window/Event.hpp"
+#include "../system/sfml/Window/Mouse.hpp"
+#include "../system/sfml/Window/Keyboard.hpp"
+#include "../system/sfml/Window/Touch.hpp"
+#include "../system/sfml/Window/Joystick.hpp"
+#include "../system/sfml/Window/Sensor.hpp"
 #include <unordered_map>
 #include <vector>
 #include <string>

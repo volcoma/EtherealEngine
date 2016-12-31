@@ -12,10 +12,10 @@
 
 namespace runtime
 {
-	event<void(std::chrono::duration<float>)> onFrameBegin;
-	event<void(std::chrono::duration<float>)> onFrameUpdate;
-	event<void(std::chrono::duration<float>)> onFrameRender;
-	event<void(std::chrono::duration<float>)> onFrameEnd;
+	event<void(std::chrono::duration<float>)> on_frame_begin;
+	event<void(std::chrono::duration<float>)> on_frame_update;
+	event<void(std::chrono::duration<float>)> on_frame_render;
+	event<void(std::chrono::duration<float>)> on_frame_end;
 
 	bool Engine::initialize()
 	{
@@ -133,19 +133,19 @@ namespace runtime
 			while (window->pollEvent(e)){}
 
 			if (focused)
-				onFrameBegin(dt);
+				on_frame_begin(dt);
 
 			window->frameUpdate(dt.count());
 			if (focused)
-				onFrameUpdate(dt);
+				on_frame_update(dt);
 
 			window->frameRender();
 			if (focused)
-				onFrameRender(dt);
+				on_frame_render(dt);
 			
 			window->frameEnd();
 			if (focused)
-				onFrameEnd(dt);
+				on_frame_end(dt);
 
 			if (window->isMain())
 				_running = window->isOpen();

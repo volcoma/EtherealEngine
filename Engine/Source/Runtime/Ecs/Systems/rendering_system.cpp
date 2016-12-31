@@ -175,12 +175,12 @@ void RenderingSystem::receive(core::Entity e)
 bool RenderingSystem::initialize()
 {
 	core::onEntityDestroyed.addListener(this, &RenderingSystem::receive);
-	runtime::onFrameRender.addListener(this, &RenderingSystem::frame_render);
+	runtime::on_frame_render.addListener(this, &RenderingSystem::frame_render);
 	return true;
 }
 
 void RenderingSystem::dispose()
 {
 	core::onEntityDestroyed.removeListener(this, &RenderingSystem::receive);
-	runtime::onFrameRender.removeListener(this, &RenderingSystem::frame_render);
+	runtime::on_frame_render.removeListener(this, &RenderingSystem::frame_render);
 }

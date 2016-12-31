@@ -19,171 +19,171 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Lib\ib-compress\indexbuffercompression.h" />
-    <ClInclude Include="..\..\Lib\ib-compress\indexbuffercompressionformat.h" />
-    <ClInclude Include="..\..\Lib\ib-compress\indexbufferdecompression.h" />
-    <ClInclude Include="..\..\Lib\ib-compress\indexcompressionconstants.h" />
-    <ClInclude Include="..\..\Lib\ib-compress\readbitstream.h" />
-    <ClInclude Include="..\..\Lib\ib-compress\writebitstream.h" />
-    <ClInclude Include="..\..\Source\Graphics\bgfx\bgfx.h" />
-    <ClInclude Include="..\..\Source\Graphics\bgfx\bgfxdefines.h" />
-    <ClInclude Include="..\..\Source\Graphics\bgfx\bgfxplatform.h" />
-    <ClInclude Include="..\..\Source\Graphics\bgfx\c99\bgfx.h" />
-    <ClInclude Include="..\..\Source\Graphics\bgfx\c99\bgfxplatform.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\allocator.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\bx.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\cl.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\commandline.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\config.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\cpu.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\crtimpl.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\debug.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\endian.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\error.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\float4x4_t.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\float4_langext.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\float4_neon.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\float4_ni.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\float4_ref.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\float4_sse.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\float4_t.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\foreach.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\fpumath.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\handlealloc.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\hash.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\macros.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\maputil.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\mpscqueue.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\mutex.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\os.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\platform.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\process.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\radixsort.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\readerwriter.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\ringbuffer.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\rng.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\sem.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\simd_t.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\spscqueue.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\string.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\thread.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\timer.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\tokenizecmd.h" />
-    <ClInclude Include="..\..\Source\Graphics\bx\uint32_t.h" />
-    <ClInclude Include="..\..\Source\Graphics\compat\freebsd\alloca.h" />
-    <ClInclude Include="..\..\Source\Graphics\compat\freebsd\malloc.h" />
-    <ClInclude Include="..\..\Source\Graphics\compat\freebsd\signal.h" />
-    <ClInclude Include="..\..\Source\Graphics\compat\ios\malloc.h" />
-    <ClInclude Include="..\..\Source\Graphics\compat\mingw\alloca.h" />
-    <ClInclude Include="..\..\Source\Graphics\compat\mingw\dirent.h" />
-    <ClInclude Include="..\..\Source\Graphics\compat\mingw\sal.h" />
-    <ClInclude Include="..\..\Source\Graphics\compat\mingw\specstrings_strict.h" />
-    <ClInclude Include="..\..\Source\Graphics\compat\mingw\specstrings_undef.h" />
-    <ClInclude Include="..\..\Source\Graphics\compat\msvc\alloca.h" />
-    <ClInclude Include="..\..\Source\Graphics\compat\msvc\dirent.h" />
-    <ClInclude Include="..\..\Source\Graphics\compat\msvc\inttypes.h" />
-    <ClInclude Include="..\..\Source\Graphics\compat\msvc\pre1600\stdint.h" />
-    <ClInclude Include="..\..\Source\Graphics\compat\msvc\stdbool.h" />
-    <ClInclude Include="..\..\Source\Graphics\compat\nacl\memory.h" />
-    <ClInclude Include="..\..\Source\Graphics\compat\osx\malloc.h" />
-    <ClInclude Include="..\..\Source\Graphics\graphics.h" />
-    <ClInclude Include="..\..\Source\Graphics\renderdoc\renderdoc_app.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\bgfx_p.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\charset.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\config.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\debug_renderdoc.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\fs_clear0.bin.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\fs_clear1.bin.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\fs_clear2.bin.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\fs_clear3.bin.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\fs_clear4.bin.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\fs_clear5.bin.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\fs_clear6.bin.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\fs_clear7.bin.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\fs_debugfont.bin.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\glcontext_eagl.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\glcontext_egl.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\glcontext_glx.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\glcontext_nsgl.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\glcontext_ppapi.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\glcontext_wgl.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\glimports.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\hmd.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\hmd_openvr.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\hmd_ovr.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\image.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\renderer.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\renderer_d3d.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\renderer_d3d11.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\renderer_d3d12.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\renderer_d3d9.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\renderer_gl.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\renderer_mtl.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\shader.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\shader_dx9bc.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\shader_dxbc.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\shader_spirv.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\topology.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\vertexdecl.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\vs_clear.bin.h" />
-    <ClInclude Include="..\..\Source\Graphics\src\vs_debugfont.bin.h" />
-    <ClInclude Include="..\..\Source\Graphics\tinystl\allocator.h" />
-    <ClInclude Include="..\..\Source\Graphics\tinystl\buffer.h" />
-    <ClInclude Include="..\..\Source\Graphics\tinystl\hash.h" />
-    <ClInclude Include="..\..\Source\Graphics\tinystl\hash_base.h" />
-    <ClInclude Include="..\..\Source\Graphics\tinystl\new.h" />
-    <ClInclude Include="..\..\Source\Graphics\tinystl\stddef.h" />
-    <ClInclude Include="..\..\Source\Graphics\tinystl\string.h" />
-    <ClInclude Include="..\..\Source\Graphics\tinystl\traits.h" />
-    <ClInclude Include="..\..\Source\Graphics\tinystl\unordered_map.h" />
-    <ClInclude Include="..\..\Source\Graphics\tinystl\unordered_set.h" />
-    <ClInclude Include="..\..\Source\Graphics\tinystl\vector.h" />
+    <ClInclude Include="..\..\lib\ib-compress\indexbuffercompression.h" />
+    <ClInclude Include="..\..\lib\ib-compress\indexbuffercompressionformat.h" />
+    <ClInclude Include="..\..\lib\ib-compress\indexbufferdecompression.h" />
+    <ClInclude Include="..\..\lib\ib-compress\indexcompressionconstants.h" />
+    <ClInclude Include="..\..\lib\ib-compress\readbitstream.h" />
+    <ClInclude Include="..\..\lib\ib-compress\writebitstream.h" />
+    <ClInclude Include="..\..\source\graphics\\bgfx\bgfx.h" />
+    <ClInclude Include="..\..\source\graphics\\bgfx\bgfxdefines.h" />
+    <ClInclude Include="..\..\source\graphics\\bgfx\bgfxplatform.h" />
+    <ClInclude Include="..\..\source\graphics\\bgfx\c99\bgfx.h" />
+    <ClInclude Include="..\..\source\graphics\\bgfx\c99\bgfxplatform.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\allocator.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\bx.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\cl.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\commandline.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\config.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\cpu.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\crtimpl.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\debug.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\endian.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\error.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\float4x4_t.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\float4_langext.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\float4_neon.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\float4_ni.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\float4_ref.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\float4_sse.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\float4_t.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\foreach.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\fpumath.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\handlealloc.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\hash.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\macros.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\maputil.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\mpscqueue.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\mutex.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\os.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\platform.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\process.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\radixsort.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\readerwriter.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\ringbuffer.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\rng.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\sem.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\simd_t.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\spscqueue.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\string.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\thread.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\timer.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\tokenizecmd.h" />
+    <ClInclude Include="..\..\source\graphics\\bx\uint32_t.h" />
+    <ClInclude Include="..\..\source\graphics\\compat\freebsd\alloca.h" />
+    <ClInclude Include="..\..\source\graphics\\compat\freebsd\malloc.h" />
+    <ClInclude Include="..\..\source\graphics\\compat\freebsd\signal.h" />
+    <ClInclude Include="..\..\source\graphics\\compat\ios\malloc.h" />
+    <ClInclude Include="..\..\source\graphics\\compat\mingw\alloca.h" />
+    <ClInclude Include="..\..\source\graphics\\compat\mingw\dirent.h" />
+    <ClInclude Include="..\..\source\graphics\\compat\mingw\sal.h" />
+    <ClInclude Include="..\..\source\graphics\\compat\mingw\specstrings_strict.h" />
+    <ClInclude Include="..\..\source\graphics\\compat\mingw\specstrings_undef.h" />
+    <ClInclude Include="..\..\source\graphics\\compat\msvc\alloca.h" />
+    <ClInclude Include="..\..\source\graphics\\compat\msvc\dirent.h" />
+    <ClInclude Include="..\..\source\graphics\\compat\msvc\inttypes.h" />
+    <ClInclude Include="..\..\source\graphics\\compat\msvc\pre1600\stdint.h" />
+    <ClInclude Include="..\..\source\graphics\\compat\msvc\stdbool.h" />
+    <ClInclude Include="..\..\source\graphics\\compat\nacl\memory.h" />
+    <ClInclude Include="..\..\source\graphics\\compat\osx\malloc.h" />
+    <ClInclude Include="..\..\source\graphics\\graphics.h" />
+    <ClInclude Include="..\..\source\graphics\\renderdoc\renderdoc_app.h" />
+    <ClInclude Include="..\..\source\graphics\\src\bgfx_p.h" />
+    <ClInclude Include="..\..\source\graphics\\src\charset.h" />
+    <ClInclude Include="..\..\source\graphics\\src\config.h" />
+    <ClInclude Include="..\..\source\graphics\\src\debug_renderdoc.h" />
+    <ClInclude Include="..\..\source\graphics\\src\fs_clear0.bin.h" />
+    <ClInclude Include="..\..\source\graphics\\src\fs_clear1.bin.h" />
+    <ClInclude Include="..\..\source\graphics\\src\fs_clear2.bin.h" />
+    <ClInclude Include="..\..\source\graphics\\src\fs_clear3.bin.h" />
+    <ClInclude Include="..\..\source\graphics\\src\fs_clear4.bin.h" />
+    <ClInclude Include="..\..\source\graphics\\src\fs_clear5.bin.h" />
+    <ClInclude Include="..\..\source\graphics\\src\fs_clear6.bin.h" />
+    <ClInclude Include="..\..\source\graphics\\src\fs_clear7.bin.h" />
+    <ClInclude Include="..\..\source\graphics\\src\fs_debugfont.bin.h" />
+    <ClInclude Include="..\..\source\graphics\\src\glcontext_eagl.h" />
+    <ClInclude Include="..\..\source\graphics\\src\glcontext_egl.h" />
+    <ClInclude Include="..\..\source\graphics\\src\glcontext_glx.h" />
+    <ClInclude Include="..\..\source\graphics\\src\glcontext_nsgl.h" />
+    <ClInclude Include="..\..\source\graphics\\src\glcontext_ppapi.h" />
+    <ClInclude Include="..\..\source\graphics\\src\glcontext_wgl.h" />
+    <ClInclude Include="..\..\source\graphics\\src\glimports.h" />
+    <ClInclude Include="..\..\source\graphics\\src\hmd.h" />
+    <ClInclude Include="..\..\source\graphics\\src\hmd_openvr.h" />
+    <ClInclude Include="..\..\source\graphics\\src\hmd_ovr.h" />
+    <ClInclude Include="..\..\source\graphics\\src\image.h" />
+    <ClInclude Include="..\..\source\graphics\\src\renderer.h" />
+    <ClInclude Include="..\..\source\graphics\\src\renderer_d3d.h" />
+    <ClInclude Include="..\..\source\graphics\\src\renderer_d3d11.h" />
+    <ClInclude Include="..\..\source\graphics\\src\renderer_d3d12.h" />
+    <ClInclude Include="..\..\source\graphics\\src\renderer_d3d9.h" />
+    <ClInclude Include="..\..\source\graphics\\src\renderer_gl.h" />
+    <ClInclude Include="..\..\source\graphics\\src\renderer_mtl.h" />
+    <ClInclude Include="..\..\source\graphics\\src\shader.h" />
+    <ClInclude Include="..\..\source\graphics\\src\shader_dx9bc.h" />
+    <ClInclude Include="..\..\source\graphics\\src\shader_dxbc.h" />
+    <ClInclude Include="..\..\source\graphics\\src\shader_spirv.h" />
+    <ClInclude Include="..\..\source\graphics\\src\topology.h" />
+    <ClInclude Include="..\..\source\graphics\\src\vertexdecl.h" />
+    <ClInclude Include="..\..\source\graphics\\src\vs_clear.bin.h" />
+    <ClInclude Include="..\..\source\graphics\\src\vs_debugfont.bin.h" />
+    <ClInclude Include="..\..\source\graphics\\tinystl\allocator.h" />
+    <ClInclude Include="..\..\source\graphics\\tinystl\buffer.h" />
+    <ClInclude Include="..\..\source\graphics\\tinystl\hash.h" />
+    <ClInclude Include="..\..\source\graphics\\tinystl\hash_base.h" />
+    <ClInclude Include="..\..\source\graphics\\tinystl\new.h" />
+    <ClInclude Include="..\..\source\graphics\\tinystl\stddef.h" />
+    <ClInclude Include="..\..\source\graphics\\tinystl\string.h" />
+    <ClInclude Include="..\..\source\graphics\\tinystl\traits.h" />
+    <ClInclude Include="..\..\source\graphics\\tinystl\unordered_map.h" />
+    <ClInclude Include="..\..\source\graphics\\tinystl\unordered_set.h" />
+    <ClInclude Include="..\..\source\graphics\\tinystl\vector.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Lib\ib-compress\indexbuffercompression.cpp" />
-    <ClCompile Include="..\..\Lib\ib-compress\indexbufferdecompression.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\graphics.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\bgfx.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\debug_renderdoc.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\glcontext_egl.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\glcontext_glx.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\glcontext_ppapi.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\glcontext_wgl.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\hmd.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\hmd_openvr.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\hmd_ovr.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\image.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\renderer_d3d11.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\renderer_d3d12.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\renderer_d3d9.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\renderer_gl.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\renderer_gnm.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\renderer_null.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\renderer_vk.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\shader.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\shader_dx9bc.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\shader_dxbc.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\shader_spirv.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\topology.cpp" />
-    <ClCompile Include="..\..\Source\Graphics\src\vertexdecl.cpp" />
+    <ClCompile Include="..\..\lib\ib-compress\indexbuffercompression.cpp" />
+    <ClCompile Include="..\..\lib\ib-compress\indexbufferdecompression.cpp" />
+    <ClCompile Include="..\..\source\graphics\\graphics.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\bgfx.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\debug_renderdoc.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\glcontext_egl.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\glcontext_glx.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\glcontext_ppapi.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\glcontext_wgl.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\hmd.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\hmd_openvr.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\hmd_ovr.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\image.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\renderer_d3d11.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\renderer_d3d12.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\renderer_d3d9.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\renderer_gl.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\renderer_gnm.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\renderer_null.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\renderer_vk.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\shader.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\shader_dx9bc.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\shader_dxbc.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\shader_spirv.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\topology.cpp" />
+    <ClCompile Include="..\..\source\graphics\\src\vertexdecl.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Source\Graphics\bx\float4_swizzle.inl" />
-    <None Include="..\..\Source\Graphics\bx\simd128_langext.inl" />
-    <None Include="..\..\Source\Graphics\bx\simd128_neon.inl" />
-    <None Include="..\..\Source\Graphics\bx\simd128_ref.inl" />
-    <None Include="..\..\Source\Graphics\bx\simd128_sse.inl" />
-    <None Include="..\..\Source\Graphics\bx\simd128_swizzle.inl" />
-    <None Include="..\..\Source\Graphics\bx\simd256_avx.inl" />
-    <None Include="..\..\Source\Graphics\bx\simd256_ref.inl" />
-    <None Include="..\..\Source\Graphics\bx\simd_ni.inl" />
+    <None Include="..\..\source\graphics\\bx\float4_swizzle.inl" />
+    <None Include="..\..\source\graphics\\bx\simd128_langext.inl" />
+    <None Include="..\..\source\graphics\\bx\simd128_neon.inl" />
+    <None Include="..\..\source\graphics\\bx\simd128_ref.inl" />
+    <None Include="..\..\source\graphics\\bx\simd128_sse.inl" />
+    <None Include="..\..\source\graphics\\bx\simd128_swizzle.inl" />
+    <None Include="..\..\source\graphics\\bx\simd256_avx.inl" />
+    <None Include="..\..\source\graphics\\bx\simd256_ref.inl" />
+    <None Include="..\..\source\graphics\\bx\simd_ni.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{139958CC-CFD4-41F0-A663-B130E403D9A6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Insomnium</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
-    <ProjectName>Graphics</ProjectName>
+    <ProjectName>graphics</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -233,8 +233,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>..\..\Bin\Lib\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)Compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>..\..\bin\lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)\compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
@@ -242,8 +242,8 @@
     <ExcludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(MSBuild_ExecutablePath);$(VC_LibraryPath_x86);</ExcludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\..\Bin\Lib\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)Compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>..\..\bin\lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)\compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
@@ -252,14 +252,14 @@
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>..\..\Bin\Lib\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)Compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>..\..\bin\lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)\compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>..\..\Bin\Lib\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)Compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>..\..\bin\lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)\compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <ExecutablePath>$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);</ExecutablePath>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -271,7 +271,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\Source\$(ProjectName)\compat\msvc;..\..\Source\$(ProjectName);..\..\Lib\;..\..\Lib\dxsdk\include;..\..\Lib\khronos;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\source\$(ProjectName)\compat\msvc;..\..\source\$(ProjectName);..\..\lib\;..\..\lib\dxsdk\include;..\..\lib\khronos;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -315,7 +315,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\Source\$(ProjectName)\compat\msvc;..\..\Source\$(ProjectName);..\..\Lib\;..\..\Lib\dxsdk\include;..\..\Lib\khronos;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\source\$(ProjectName)\compat\msvc;..\..\source\$(ProjectName);..\..\lib\;..\..\lib\dxsdk\include;..\..\lib\khronos;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -359,7 +359,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\Source\$(ProjectName)\compat\msvc;..\..\Source\$(ProjectName);..\..\Lib\;..\..\Lib\dxsdk\include;..\..\Lib\khronos;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\source\$(ProjectName)\compat\msvc;..\..\source\$(ProjectName);..\..\lib\;..\..\lib\dxsdk\include;..\..\lib\khronos;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <StringPooling>true</StringPooling>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
@@ -401,7 +401,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\Source\$(ProjectName)\compat\msvc;..\..\Source\$(ProjectName);..\..\Lib\;..\..\Lib\dxsdk\include;..\..\Lib\khronos;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\source\$(ProjectName)\compat\msvc;..\..\source\$(ProjectName);..\..\lib\;..\..\lib\dxsdk\include;..\..\lib\khronos;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <StringPooling>true</StringPooling>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>

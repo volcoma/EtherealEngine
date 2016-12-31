@@ -20,13 +20,13 @@ void CameraSystem::frame_begin(std::chrono::duration<float> dt)
 
 bool CameraSystem::initialize()
 {
-	runtime::onFrameBegin.addListener(this, &CameraSystem::frame_begin);
+	runtime::on_frame_begin.addListener(this, &CameraSystem::frame_begin);
 
 	return true;
 }
 
 void CameraSystem::dispose()
 {
-	runtime::onFrameBegin.removeListener(this, &CameraSystem::frame_begin);
+	runtime::on_frame_begin.removeListener(this, &CameraSystem::frame_begin);
 }
 

@@ -40,12 +40,12 @@ void TransformSystem::frame_begin(std::chrono::duration<float> dt)
 
 bool TransformSystem::initialize()
 {
-	runtime::onFrameBegin.addListener(this, &TransformSystem::frame_begin);
+	runtime::on_frame_begin.addListener(this, &TransformSystem::frame_begin);
 
 	return true;
 }
 
 void TransformSystem::dispose()
 {
-	runtime::onFrameBegin.removeListener(this, &TransformSystem::frame_begin);
+	runtime::on_frame_begin.removeListener(this, &TransformSystem::frame_begin);
 }
