@@ -144,9 +144,6 @@
     <ClCompile Include="..\..\source\runtime\system\sfml\system\Err.cpp">
       <Filter>Source Files\system\sfml\system</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\runtime\rendering\Debug\bounds.cpp">
-      <Filter>Source Files\rendering\debug</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\runtime\assets\asset_manager.cpp">
       <Filter>Source Files\assets</Filter>
     </ClCompile>
@@ -182,9 +179,6 @@
     </ClCompile>
     <ClCompile Include="..\..\source\runtime\ecs\utils.cpp">
       <Filter>Source Files\ecs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\runtime\rendering\Debug\debugdraw.cpp">
-      <Filter>Source Files\rendering\debug</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\runtime\rendering\camera.cpp">
       <Filter>Source Files\rendering</Filter>
@@ -245,6 +239,12 @@
     </ClCompile>
     <ClCompile Include="..\..\source\runtime\system\task.cpp">
       <Filter>Source Files\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\runtime\rendering\debug\bounds.cpp">
+      <Filter>Source Files\rendering\debug</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\runtime\rendering\debug\debugdraw.cpp">
+      <Filter>Source Files\rendering\debug</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -328,9 +328,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\runtime\system\sfml\system.hpp">
       <Filter>Source Files\system\sfml</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\runtime\rendering\Debug\bounds.h">
-      <Filter>Source Files\rendering\debug</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\runtime\system\sfml\Window\Win32\SensorImpl.hpp">
       <Filter>Source Files\system\sfml\Window\Win32</Filter>
@@ -437,9 +434,6 @@
     <ClInclude Include="..\..\source\runtime\meta\rendering\mesh.hpp">
       <Filter>Source Files\meta\rendering</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\runtime\rendering\Debug\debugdraw.h">
-      <Filter>Source Files\rendering\debug</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\runtime\rendering\camera.h">
       <Filter>Source Files\rendering</Filter>
     </ClInclude>
@@ -505,6 +499,36 @@
     </ClInclude>
     <ClInclude Include="..\..\source\runtime\system\task.h">
       <Filter>Source Files\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\rendering\debug\bounds.h">
+      <Filter>Source Files\rendering\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\rendering\debug\debugdraw.h">
+      <Filter>Source Files\rendering\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\rendering\debug\fs_debugdraw_fill.bin.h">
+      <Filter>Source Files\rendering\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\rendering\debug\fs_debugdraw_fill_lit.bin.h">
+      <Filter>Source Files\rendering\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\rendering\debug\fs_debugdraw_lines.bin.h">
+      <Filter>Source Files\rendering\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\rendering\debug\fs_debugdraw_lines_stipple.bin.h">
+      <Filter>Source Files\rendering\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\rendering\debug\vs_debugdraw_fill.bin.h">
+      <Filter>Source Files\rendering\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\rendering\debug\vs_debugdraw_fill_lit.bin.h">
+      <Filter>Source Files\rendering\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\rendering\debug\vs_debugdraw_lines.bin.h">
+      <Filter>Source Files\rendering\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\rendering\debug\vs_debugdraw_lines_stipple.bin.h">
+      <Filter>Source Files\rendering\debug</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

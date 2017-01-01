@@ -110,6 +110,14 @@
     <ClInclude Include="..\..\source\runtime\rendering\camera.h" />
     <ClInclude Include="..\..\source\runtime\rendering\debug\bounds.h" />
     <ClInclude Include="..\..\source\runtime\rendering\debug\debugdraw.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\debug\fs_debugdraw_fill.bin.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\debug\fs_debugdraw_fill_lit.bin.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\debug\fs_debugdraw_lines.bin.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\debug\fs_debugdraw_lines_stipple.bin.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\debug\vs_debugdraw_fill.bin.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\debug\vs_debugdraw_fill_lit.bin.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\debug\vs_debugdraw_lines.bin.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\debug\vs_debugdraw_lines_stipple.bin.h" />
     <ClInclude Include="..\..\source\runtime\rendering\frame_buffer.h" />
     <ClInclude Include="..\..\source\runtime\rendering\index_buffer.h" />
     <ClInclude Include="..\..\source\runtime\rendering\light.h" />
