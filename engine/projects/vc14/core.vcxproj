@@ -574,7 +574,7 @@
     <ProjectGuid>{449848FA-A97C-43A4-99BA-5E5B333FD76B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>
-	</RootNamespace>
+    </RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
     <ProjectName>core</ProjectName>
   </PropertyGroup>
@@ -646,7 +646,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>..\..\bin\lib\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)\Compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(ProjectDir)\compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
     <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>

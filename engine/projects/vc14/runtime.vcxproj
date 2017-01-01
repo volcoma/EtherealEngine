@@ -167,7 +167,7 @@
     <ProjectReference Include="core.vcxproj">
       <Project>{449848fa-a97c-43a4-99ba-5e5b333fd76b}</Project>
     </ProjectReference>
-    <ProjectReference Include="grahpics.vcxproj">
+    <ProjectReference Include="graphics.vcxproj">
       <Project>{139958cc-cfd4-41f0-a663-b130e403d9a6}</Project>
     </ProjectReference>
   </ItemGroup>

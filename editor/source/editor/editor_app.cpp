@@ -31,15 +31,16 @@ namespace editor
 			_exitcode = -1;
 
 		engine->register_window(main_window);
+
 		am->setup();
+
 		core::add_subsystem<GuiSystem>();
 		core::add_subsystem<DockingSystem>();
 		core::add_subsystem<EditState>();
 		core::add_subsystem<PickingSystem>();
 		core::add_subsystem<DebugDrawSystem>();
-		auto pm = core::add_subsystem<ProjectManager>();
 
-		
+		auto pm = core::add_subsystem<ProjectManager>();
 		pm->open();
 	}
 

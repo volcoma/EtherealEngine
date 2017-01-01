@@ -14,7 +14,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "core", "..\..\..\engine\pro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "shaderc", "shaderc.vcxproj", "{4B8A4AD9-D7C0-4978-99D7-F4E9DDE756AB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "graphics", "..\..\..\engine\projects\vc14\grahpics.vcxproj", "{139958CC-CFD4-41F0-A663-B130E403D9A6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "graphics", "..\..\..\engine\projects\vc14\graphics.vcxproj", "{139958CC-CFD4-41F0-A663-B130E403D9A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
