@@ -19,14 +19,14 @@ REFLECT(LightComponent)
 SAVE(LightComponent)
 {
 	ar(
-		cereal::make_nvp("base_type", cereal::base_class<core::Component>(&obj))
+		cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj))
 		);
 }
 
 LOAD(LightComponent)
 {
 	ar(
-		cereal::make_nvp("base_type", cereal::base_class<core::Component>(&obj))
+		cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj))
 		);
 }
 

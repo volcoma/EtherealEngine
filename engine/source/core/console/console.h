@@ -28,29 +28,29 @@ public:
 	* requires and may only consist of int, float and std::string arguments.
 	*/
 	template <typename... Args>
-	void registerCommand(const std::string& name, const std::string& description, const std::vector<std::string>& argumentNames, const std::vector<std::string>& defaultArguments, const std::function<void(Args...)>& callback);
-	void registerAlias(const std::string& alias, const std::string& command);
+	void register_command(const std::string& name, const std::string& description, const std::vector<std::string>& argumentNames, const std::vector<std::string>& defaultArguments, const std::function<void(Args...)>& callback);
+	void register_alias(const std::string& alias, const std::string& command);
 
-	std::string processInput(const std::string& line);
-	std::vector<std::string> listOfCommands(const std::string& filter = "");
+	std::string process_input(const std::string& line);
+	std::vector<std::string> list_of_commands(const std::string& filter = "");
 
 private:
 	struct Command
 	{
 		const std::string name;
 		std::string description;
-		const unsigned int numArguments;
-		const std::vector<std::string> argumentNames;
-		const std::vector<std::string> defaultArguments;
+		const unsigned int num_arguments;
+		const std::vector<std::string> argument_names;
+		const std::vector<std::string> default_arguments;
 		std::function<void(std::vector<std::string>&)> call;
-		std::function<std::string(void)> getUsage;
+		std::function<std::string(void)> get_usage;
 
 		explicit Command(const std::string& name, const std::string& description, unsigned int numArguments, const std::vector<std::string>& argumentNames, const std::vector<std::string>& defaultArguments)
 			: name(name)
 			, description(description)
-			, numArguments(numArguments)
-			, argumentNames(argumentNames)
-			, defaultArguments(defaultArguments)
+			, num_arguments(numArguments)
+			, argument_names(argumentNames)
+			, default_arguments(defaultArguments)
 		{
 		}
 
@@ -61,8 +61,8 @@ private:
 
 	std::unordered_map<std::string, std::shared_ptr<Command>> commands;
 	std::set<std::string> names;
-	void registerHelpCommand();
-	void helpCommand(const std::string& term);
+	void register_help_command();
+	void help_command(const std::string& term);
 
 	template <typename T>
 	struct argumentConverter
@@ -70,9 +70,9 @@ private:
 		static inline T convert(const std::string& s);
 	};
 
-	static inline std::function<void()> bindCallback(std::function<void()> callback, const std::vector<std::string>& arguments, int argumentIndex);
+	static inline std::function<void()> bind_callback(std::function<void()> callback, const std::vector<std::string>& arguments, int argumentIndex);
 	template <typename T, typename... Args>
-	static std::function<void()> bindCallback(std::function<void(T, Args...)> callback, const std::vector<std::string>& arguments, int argumentIndex);
+	static std::function<void()> bind_callback(std::function<void(T, Args...)> callback, const std::vector<std::string>& arguments, int argumentIndex);
 
 	template <typename... Args>
 	struct NameArguments
@@ -85,7 +85,7 @@ private:
 
 public:
 	// TODO: make this private (or move to a StringUtils class)
-	static std::vector<std::string> tokenizeLine(const std::string& line);
+	static std::vector<std::string> tokenize_line(const std::string& line);
 
 };
 
@@ -111,7 +111,7 @@ struct function_traits<std::function<R(Args...)>>
 };
 
 template <typename... Args>
-void Console::registerCommand(const std::string& name, const std::string& description, const std::vector<std::string>& argumentNames, const std::vector<std::string>& defaultArguments, const std::function<void(Args...)>& callback)
+void Console::register_command(const std::string& name, const std::string& description, const std::vector<std::string>& argumentNames, const std::vector<std::string>& defaultArguments, const std::function<void(Args...)>& callback)
 {
 	static const auto argCount = function_traits<std::function<void(Args...)>>::nargs;
 	assert(argumentNames.size() <= argCount);
@@ -126,7 +126,7 @@ void Console::registerCommand(const std::string& name, const std::string& descri
 	{
 
 		// add the arguments checks and set the default arguments
-		auto requiredArguments = argCount - commandRaw->defaultArguments.size();
+		auto requiredArguments = argCount - commandRaw->default_arguments.size();
 
 		// make sure the number of arguments matches
 		if (arguments.size() < requiredArguments)
@@ -140,7 +140,7 @@ void Console::registerCommand(const std::string& name, const std::string& descri
 		else
 		{
 			// append default arguments as necessary
-			arguments.insert(arguments.end(), commandRaw->defaultArguments.begin() + (arguments.size() - requiredArguments), commandRaw->defaultArguments.end());
+			arguments.insert(arguments.end(), commandRaw->default_arguments.begin() + (arguments.size() - requiredArguments), commandRaw->default_arguments.end());
 			assert(arguments.size() == argCount);
 
 			bool failed = false;
@@ -148,7 +148,7 @@ void Console::registerCommand(const std::string& name, const std::string& descri
 			// bind the command callback recursively while allowing type conversion errors to raise exceptions
 // 			try 
 // 			{
-			boundCallback = bindCallback(callback, arguments, 0);
+			boundCallback = bind_callback(callback, arguments, 0);
 			/*			}*/
 			// 			catch (const std::exception&) 
 			//			{
@@ -167,13 +167,13 @@ void Console::registerCommand(const std::string& name, const std::string& descri
 		}
 
 		// if we end up here, something went wrong
-		print(commandRaw->getUsage());
+		print(commandRaw->get_usage());
 	};
 
-	command->getUsage = [this, commandRaw]()
+	command->get_usage = [this, commandRaw]()
 	{
-		auto requiredArguments = sizeof...(Args)-commandRaw->defaultArguments.size();
-		return "Usage: " + commandRaw->name + NameArguments<Args...>::get(commandRaw->argumentNames, 0, static_cast<unsigned int>(requiredArguments));
+		auto requiredArguments = sizeof...(Args)-commandRaw->default_arguments.size();
+		return "Usage: " + commandRaw->name + NameArguments<Args...>::get(commandRaw->argument_names, 0, static_cast<unsigned int>(requiredArguments));
 	};
 
 	commands[name] = command;
@@ -183,7 +183,7 @@ void Console::registerCommand(const std::string& name, const std::string& descri
 /**
 * bindCallback, base case
 */
-inline std::function<void()> Console::bindCallback(
+inline std::function<void()> Console::bind_callback(
 	std::function<void()> callback,
 	const std::vector<std::string>&,
 	int)
@@ -197,14 +197,14 @@ inline std::function<void()> Console::bindCallback(
 * Run the "bind" code for each argument.
 */
 template <typename T, typename... Args>
-std::function<void()> Console::bindCallback(std::function<void(T, Args...)> callback, const std::vector<std::string>& arguments, int argumentIndex)
+std::function<void()> Console::bind_callback(std::function<void(T, Args...)> callback, const std::vector<std::string>& arguments, int argumentIndex)
 {
 	T value = argumentConverter<T>::convert(arguments.at(argumentIndex));
 	std::function<void(Args...)> nextCallback = [callback, value](Args... args)
 	{
 		callback(value, args...);
 	};
-	return bindCallback(nextCallback, arguments, argumentIndex + 1);
+	return bind_callback(nextCallback, arguments, argumentIndex + 1);
 }
 
 /**

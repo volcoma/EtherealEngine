@@ -1,7 +1,7 @@
 #include "../gui_system.h"
 #include "imguizmo.h"
 
-namespace ImGuizmo
+namespace imguizmo
 {
 	static const float ZPI = 3.14159265358979323846f;
 	static const float RAD2DEG = (180.f / ZPI);
@@ -599,7 +599,7 @@ namespace ImGuizmo
 		return -(numer / denom);
 	}
 
-	void SetViewRect(float x, float y, float width, float height)
+	void set_view_rect(float x, float y, float width, float height)
 	{
 		gContext.mX = x;
 		gContext.mY = y;
@@ -608,17 +608,17 @@ namespace ImGuizmo
 		gContext.mDrawList = ImGui::GetWindowDrawList();
 	}
 
-	bool IsUsing()
+	bool is_using()
 	{
 		return gContext.mbUsing;
 	}
 
-	bool IsOver()
+	bool is_over()
 	{
-		return (GetMoveType(NULL) != NONE) || GetRotateType() != NONE || GetScaleType() != NONE || IsUsing();
+		return (GetMoveType(NULL) != NONE) || GetRotateType() != NONE || GetScaleType() != NONE || is_using();
 	}
 
-	void Enable(bool enable)
+	void enable(bool enable)
 	{
 		gContext.mbEnable = enable;
 		if (!enable)
@@ -1352,50 +1352,7 @@ namespace ImGuizmo
 		}
 	}
 
-	void DecomposeMatrixToComponents(const float *matrix, float *translation, float *rotation, float *scale)
-	{
-		matrix_t mat = *(matrix_t*)matrix;
-
-		scale[0] = mat.v.right.Length();
-		scale[1] = mat.v.up.Length();
-		scale[2] = mat.v.dir.Length();
-
-		mat.OrthoNormalize();
-
-		rotation[0] = RAD2DEG * atan2f(mat.m[1][2], mat.m[2][2]);
-		rotation[1] = RAD2DEG * atan2f(-mat.m[0][2], sqrtf(mat.m[1][2] * mat.m[1][2] + mat.m[2][2] * mat.m[2][2]));
-		rotation[2] = RAD2DEG * atan2f(mat.m[0][1], mat.m[0][0]);
-
-		translation[0] = mat.v.position.x;
-		translation[1] = mat.v.position.y;
-		translation[2] = mat.v.position.z;
-	}
-
-	void RecomposeMatrixFromComponents(const float *translation, const float *rotation, const float *scale, float *matrix)
-	{
-		matrix_t& mat = *(matrix_t*)matrix;
-
-		matrix_t rot[3];
-		for (int i = 0; i < 3; i++)
-			rot[i].RotationAxis(directionUnary[i], rotation[i] * DEG2RAD);
-
-		mat = rot[0] * rot[1] * rot[2];
-
-		float validScale[3];
-		for (int i = 0; i < 3; i++)
-		{
-			if (fabsf(scale[i]) < FLT_EPSILON)
-				validScale[i] = 0.001f;
-			else
-				validScale[i] = scale[i];
-		}
-		mat.v.right *= validScale[0];
-		mat.v.up *= validScale[1];
-		mat.v.dir *= validScale[2];
-		mat.v.position.Set(translation[0], translation[1], translation[2], 1.f);
-	}
-
-	void Manipulate(const float *view, const float *projection, OPERATION operation, MODE mode, float *matrix, float *deltaMatrix, float *snap)
+	void manipulate(const float *view, const float *projection, OPERATION operation, MODE mode, float *matrix, float *deltaMatrix, float *snap)
 	{
 		ComputeContext(view, projection, matrix, mode);
 		// set delta to identity 
@@ -1440,7 +1397,7 @@ namespace ImGuizmo
 		}
 	}
 
-	void DrawCube(const float *view, const float *projection, float *matrix)
+	void draw_cube(const float *view, const float *projection, float *matrix)
 	{
 		matrix_t viewInverse;
 		viewInverse.Inverse(*(matrix_t*)view);

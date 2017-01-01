@@ -7,13 +7,13 @@ VertexBuffer::~VertexBuffer()
 
 void VertexBuffer::dispose()
 {
-	if (isValid())
+	if (is_valid())
 		gfx::destroyVertexBuffer(handle);
 
 	handle = { bgfx::invalidHandle };
 }
 
-bool VertexBuffer::isValid() const
+bool VertexBuffer::is_valid() const
 {
 	return gfx::isValid(handle);
 }

@@ -4,52 +4,52 @@
 bool Inspector_LightComponent::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<LightComponent*>();
-	auto& light = data->getLight();
+	auto& light = data->get_light();
 	bool changed = false;
 	{
 		PropertyLayout propName("Depth Impl");
-		rttr::variant v = light.depthImpl;
+		rttr::variant v = light.depth_impl;
 
 		changed |= inspect_var(v);
 		if (changed)
-			light.depthImpl = v.get_value<DepthImpl>();
+			light.depth_impl = v.get_value<DepthImpl>();
 	}
 	{
 		PropertyLayout propName("Shadows Impl");
-		rttr::variant v = light.smImpl;
+		rttr::variant v = light.sm_impl;
 
 		changed |= inspect_var(v);
 		if (changed)
-			light.smImpl = v.get_value<SmImpl>();
+			light.sm_impl = v.get_value<SmImpl>();
 	}
 	{
 		PropertyLayout propName("Light Impl");
-		rttr::variant v = light.lightType;
+		rttr::variant v = light.light_type;
 		
 		changed |= inspect_var(v);
 		if (changed)
-			light.lightType = v.get_value<LightType>();
+			light.light_type = v.get_value<LightType>();
 	}
-	if (light.lightType == LightType::Spot)
+	if (light.light_type == LightType::Spot)
 	{
-		rttr::variant v = light.spotData;
+		rttr::variant v = light.spot_data;
 		changed |= inspect_var(v);
 		if (changed)
-			light.spotData = v.get_value<Light::Spot>();
+			light.spot_data = v.get_value<Light::Spot>();
 	}
-	else if (light.lightType == LightType::Point)
+	else if (light.light_type == LightType::Point)
 	{
-		rttr::variant v = light.pointData;
+		rttr::variant v = light.point_data;
 		changed |= inspect_var(v);
 		if (changed)
-			light.pointData = v.get_value<Light::Point>();
+			light.point_data = v.get_value<Light::Point>();
 	}
-	else if (light.lightType == LightType::Directional)
+	else if (light.light_type == LightType::Directional)
 	{
-		rttr::variant v = light.directionalData;
+		rttr::variant v = light.directional_data;
 		changed |= inspect_var(v);
 		if (changed)
-			light.directionalData = v.get_value<Light::Directional>();
+			light.directional_data = v.get_value<Light::Directional>();
 	}
 
 	if (changed)

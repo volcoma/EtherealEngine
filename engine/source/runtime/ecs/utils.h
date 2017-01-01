@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/ecs.h"
+#include "ecs.h"
 #include <vector>
 #include <fstream>
 #include "../System/FileSystem.h"
@@ -11,63 +11,63 @@ namespace ecs
 	namespace utils
 	{
 		//-----------------------------------------------------------------------------
-		//  Name : saveEntity ()
+		//  Name : save_entity ()
 		/// <summary>
 		/// 
 		/// 
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void saveEntity(const fs::path& dir, const core::Entity& data);
+		void save_entity(const fs::path& dir, const runtime::Entity& data);
 
 		//-----------------------------------------------------------------------------
-		//  Name : tryLoadEntity ()
+		//  Name : try_load_entity ()
 		/// <summary>
 		/// 
 		/// 
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool tryLoadEntity(const fs::path& fullPath, core::Entity& outData);
+		bool try_load_entity(const fs::path& fullPath, runtime::Entity& outData);
 
 		//-----------------------------------------------------------------------------
-		//  Name : saveData ()
+		//  Name : save_data ()
 		/// <summary>
 		/// 
 		/// 
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void saveData(const fs::path& fullPath, const std::vector<core::Entity>& data);
+		void save_data(const fs::path& fullPath, const std::vector<runtime::Entity>& data);
 
 		//-----------------------------------------------------------------------------
-		//  Name : loadData ()
+		//  Name : load_data ()
 		/// <summary>
 		/// 
 		/// 
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool loadData(const fs::path& fullPath, std::vector<core::Entity>& outData);
+		bool load_data(const fs::path& fullPath, std::vector<runtime::Entity>& outData);
 
 		//-----------------------------------------------------------------------------
-		//  Name : serializeData ()
+		//  Name : serialize_data ()
 		/// <summary>
 		/// 
 		/// 
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void serializeData(std::ostream& stream, const std::vector<core::Entity>& data);
+		void serialize_data(std::ostream& stream, const std::vector<runtime::Entity>& data);
 
 		//-----------------------------------------------------------------------------
-		//  Name : deserializeData ()
+		//  Name : deserialize_data ()
 		/// <summary>
 		/// 
 		/// 
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool deserializeData(std::istream& stream, std::vector<core::Entity>& outData);
+		bool deserialize_data(std::istream& stream, std::vector<runtime::Entity>& outData);
 	}
 }

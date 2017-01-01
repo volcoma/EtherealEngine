@@ -1,28 +1,28 @@
 #pragma once
-#include "core/ecs.h"
+#include "../../../ecs/ecs.h"
 #include "core/reflection/reflection.h"
 
 
 
-REFLECT(core::Component)
+REFLECT(runtime::Component)
 {
-	rttr::registration::class_<core::Component>("Component");
+	rttr::registration::class_<runtime::Component>("Component");
 
 }
 
-namespace core
+namespace runtime
 {
 	SAVE(Component)
 	{
 		ar(
-			cereal::make_nvp("owner", obj.mEntity)
+			cereal::make_nvp("owner", obj._entity)
 		);
 	}
 
 	LOAD(Component)
 	{
 		ar(
-			cereal::make_nvp("owner", obj.mEntity)
+			cereal::make_nvp("owner", obj._entity)
 		);
 	}
 }

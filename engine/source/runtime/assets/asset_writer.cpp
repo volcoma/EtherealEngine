@@ -4,7 +4,7 @@
 #include "core/serialization/archives.h"
 #include "meta/rendering/material.hpp"
 
-void AssetWriter::saveMaterialToFile(const fs::path& absoluteKey, const AssetHandle<Material>& asset)
+void AssetWriter::write_material_to_file(const fs::path& absoluteKey, const AssetHandle<Material>& asset)
 {
 	std::ofstream output(absoluteKey);
 	cereal::OArchive_JSON ar(output);

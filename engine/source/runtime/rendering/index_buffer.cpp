@@ -7,13 +7,13 @@ IndexBuffer::~IndexBuffer()
 
 void IndexBuffer::dispose()
 {
-	if (isValid())
+	if (is_valid())
 		gfx::destroyIndexBuffer(handle);
 
 	handle = { bgfx::invalidHandle };
 }
 
-bool IndexBuffer::isValid() const
+bool IndexBuffer::is_valid() const
 {
 	return gfx::isValid(handle);
 }

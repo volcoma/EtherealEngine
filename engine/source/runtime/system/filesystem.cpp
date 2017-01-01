@@ -8,7 +8,7 @@ namespace fs
 	bool add_path_protocol(const path& protocol, const path& dir)
 	{
 		// Protocol matching is case insensitive, convert to lower case
-		std::string strNewProtocol = string_utils::toLower(protocol.string());
+		std::string strNewProtocol = string_utils::to_lower(protocol.string());
 
 		auto& protocols = get_path_protocols();
 		// Add to the list

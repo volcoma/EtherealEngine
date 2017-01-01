@@ -4,18 +4,18 @@
 
 CameraComponent::CameraComponent()
 {
-	mCamera = std::make_unique<Camera>();
-	mGBuffer = std::make_shared<FrameBuffer>();
-	mOutputBuffer = std::make_shared<FrameBuffer>();
+	_camera = std::make_unique<Camera>();
+	_g_buffer = std::make_shared<FrameBuffer>();
+	_output_buffer = std::make_shared<FrameBuffer>();
 	init({ 0, 0 });
 }
 
 CameraComponent::CameraComponent(const CameraComponent& cameraComponent)
 {
-	mCamera = std::make_unique<Camera>(cameraComponent.getCamera());
-	mHDR = cameraComponent.mHDR;
-	mGBuffer = std::make_shared<FrameBuffer>();
-	mOutputBuffer = std::make_shared<FrameBuffer>();
+	_camera = std::make_unique<Camera>(cameraComponent.get_camera());
+	_hdr = cameraComponent._hdr;
+	_g_buffer = std::make_shared<FrameBuffer>();
+	_output_buffer = std::make_shared<FrameBuffer>();
 	init({ 0, 0 });
 }
 
@@ -36,7 +36,7 @@ void CameraComponent::init(const uSize& size)
 	{
 		//create a depth buffer to share
 		auto depthBuffer = std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, depthFormat, samplerFlags);
-		mGBuffer->populate
+		_g_buffer->populate
 		(
 			std::vector<std::shared_ptr<Texture>>
 			{
@@ -47,7 +47,7 @@ void CameraComponent::init(const uSize& size)
 			}
 		);
 
-		mOutputBuffer->populate
+		_output_buffer->populate
 		(
 			std::vector<std::shared_ptr<Texture>>
 			{
@@ -60,7 +60,7 @@ void CameraComponent::init(const uSize& size)
 	{
 		//create a depth buffer to share
 		auto depthBuffer = std::make_shared<Texture>(size.width, size.height, false, 1, depthFormat, samplerFlags);
-		mGBuffer->populate
+		_g_buffer->populate
 		(
 			std::vector<std::shared_ptr<Texture>>
 			{
@@ -71,7 +71,7 @@ void CameraComponent::init(const uSize& size)
 			}
 		);
 
-		mOutputBuffer->populate
+		_output_buffer->populate
 		(
 			std::vector<std::shared_ptr<Texture>>
 			{
@@ -81,124 +81,124 @@ void CameraComponent::init(const uSize& size)
 		);
 	}
 
-	setProjectionWindow();
+	update_projection_window();
 }
 
 CameraComponent::~CameraComponent()
 {
 }
 
-void CameraComponent::updateInternal(const math::transform_t& t)
+void CameraComponent::update(const math::transform_t& t)
 {
 	// First update so the camera can cache the previous matrices
-	mCamera->recordCurrentMatrices();
+	_camera->record_current_matrices();
 
 	// Set new transform
-	mCamera->lookAt(t.getPosition(), t.getPosition() + t.zUnitAxis(), t.yUnitAxis());
-	setProjectionWindow();
+	_camera->look_at(t.getPosition(), t.getPosition() + t.zUnitAxis(), t.yUnitAxis());
+	update_projection_window();
 }
 
-bool CameraComponent::getHDR() const
+bool CameraComponent::get_hdr() const
 {
-	return mHDR;
+	return _hdr;
 }
 
-void CameraComponent::setHDR(bool hdr)
+void CameraComponent::set_hdr(bool hdr)
 {
-	mHDR = hdr;
+	_hdr = hdr;
 }
 
-void CameraComponent::setViewportSize(const uSize& size)
+void CameraComponent::set_viewport_size(const uSize& size)
 {
-	auto oldSize = mOutputBuffer->getSize();
+	auto oldSize = _output_buffer->get_size();
 	if (size != oldSize)
 	{
 		init(size);
 	}
 
-	setProjectionWindow();
+	update_projection_window();
 }
 
-const uSize& CameraComponent::getViewportSize() const
+const uSize& CameraComponent::get_viewport_size() const
 {
-	return mCamera->getViewportSize();
+	return _camera->get_viewport_size();
 }
 
-void CameraComponent::setProjectionWindow()
+void CameraComponent::update_projection_window()
 {
-	auto size = mOutputBuffer->getSize();
+	auto size = _output_buffer->get_size();
 
-	mCamera->setViewportSize(size);
+	_camera->set_viewport_size(size);
 }
 
-float CameraComponent::getOrthographicSize() const
+float CameraComponent::get_ortho_size() const
 {
-	return mCamera->getOrthographicSize();
+	return _camera->get_ortho_size();
 }
 
-void CameraComponent::setOrthographicSize(float size)
+void CameraComponent::set_ortho_size(float size)
 {
-	mCamera->setOrthographicSize(size);
+	_camera->set_orthographic_size(size);
 }
 
-float CameraComponent::getPixelsPerUnit() const
+float CameraComponent::get_ppu() const
 {
-	return mCamera->getPixelsPerUnit();
+	return _camera->get_ppu();
 }
 
-CameraComponent& CameraComponent::setFieldOfView(float fovDegrees)
+CameraComponent& CameraComponent::set_fov(float fovDegrees)
 {
-	mCamera->setFOV(fovDegrees);
+	_camera->set_fov(fovDegrees);
 
 	return *this;
 }
 
-CameraComponent& CameraComponent::setNearClip(float distance)
+CameraComponent& CameraComponent::set_near_clip(float distance)
 {
-	mCamera->setNearClip(distance);
+	_camera->set_near_clip(distance);
 
 	return *this;
 }
-CameraComponent& CameraComponent::setFarClip(float distance)
+CameraComponent& CameraComponent::set_far_clip(float distance)
 {
-	mCamera->setFarClip(distance);
-
-	return *this;
-}
-
-CameraComponent& CameraComponent::setProjectionMode(ProjectionMode mode)
-{
-	mCamera->setProjectionMode(mode);
-
-	setProjectionWindow();
+	_camera->set_far_clip(distance);
 
 	return *this;
 }
 
-float CameraComponent::getFieldOfView() const
+CameraComponent& CameraComponent::set_projection_mode(ProjectionMode mode)
 {
-	return mCamera->getFOV();
-}
-float CameraComponent::getNearClip() const
-{
-	return mCamera->getNearClip();
-}
-float CameraComponent::getFarClip() const
-{
-	return mCamera->getFarClip();
+	_camera->set_projection_mode(mode);
+
+	update_projection_window();
+
+	return *this;
 }
 
-ProjectionMode CameraComponent::getProjectionMode() const
+float CameraComponent::get_fov() const
 {
-	return mCamera->getProjectionMode();
+	return _camera->get_fov();
+}
+float CameraComponent::get_near_clip() const
+{
+	return _camera->get_near_clip();
+}
+float CameraComponent::get_far_clip() const
+{
+	return _camera->get_far_clip();
 }
 
-std::shared_ptr<FrameBuffer> CameraComponent::getOutputBuffer() const
+ProjectionMode CameraComponent::get_projection_mode() const
 {
-	return mOutputBuffer;
+	return _camera->get_projection_mode();
 }
 
-std::shared_ptr<FrameBuffer> CameraComponent::getGBuffer() const
+std::shared_ptr<FrameBuffer> CameraComponent::get_output_buffer() const
 {
-	return mGBuffer;
+	return _output_buffer;
+}
+
+std::shared_ptr<FrameBuffer> CameraComponent::get_g_buffer() const
+{
+	return _g_buffer;
 }

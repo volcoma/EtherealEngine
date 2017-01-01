@@ -11,10 +11,10 @@
 namespace Docks
 {
 
-	void checkContextMenu(core::Entity entity)
+	void check_context_menu(runtime::Entity entity)
 	{
-		auto es = core::get_subsystem<EditState>();
-		auto ecs = core::get_subsystem<core::EntityComponentSystem>();
+		auto es = core::get_subsystem<editor::EditState>();
+		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 		auto& editorCamera = es->camera;
 		if (entity && entity != editorCamera)
 		{
@@ -24,19 +24,19 @@ namespace Docks
 				{
 					auto object = ecs->create();
 					object.assign<TransformComponent>().lock()
-						->setParent(entity.component<TransformComponent>());
+						->set_parent(entity.component<TransformComponent>());
 				}
 				if (gui::Selectable("Clone"))
 				{
 					auto object = ecs->create_from_copy(entity);
 					object.component<TransformComponent>().lock()
-						->setParent(entity.component<TransformComponent>().lock()->getParent(), false, true);
+						->set_parent(entity.component<TransformComponent>().lock()->get_parent(), false, true);
 					
 					es->select(object);
 				}
 				if (gui::Selectable("Save As Prefab"))
 				{
-					ecs::utils::saveEntity("data://prefabs/", entity);
+					ecs::utils::save_entity("data://prefabs/", entity);
 				}
 				if (gui::Selectable("Delete"))
 				{
@@ -63,13 +63,13 @@ namespace Docks
 
 	}
 
-	void checkDrag(core::Entity entity, bool isHovered)
+	void check_drag(runtime::Entity entity, bool isHovered)
 	{
-		auto es = core::get_subsystem<EditState>();
+		auto es = core::get_subsystem<editor::EditState>();
 		auto& editorCamera = es->camera;
-		auto& dragged = es->dragData.object;
+		auto& dragged = es->drag_data.object;
 
-		auto ecs = core::get_subsystem<core::EntityComponentSystem>();
+		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 
 		if (entity)
 		{
@@ -83,12 +83,12 @@ namespace Docks
 				{
 					if (dragged && entity != editorCamera)
 					{
-						if (dragged.is_type<core::Entity>())
+						if (dragged.is_type<runtime::Entity>())
 						{
 							
-							auto draggedEntity = dragged.get_value<core::Entity>();
+							auto draggedEntity = dragged.get_value<runtime::Entity>();
 							draggedEntity.component<TransformComponent>().lock()
-								->setParent(entity.component<TransformComponent>());
+								->set_parent(entity.component<TransformComponent>());
 
 							es->drop();
 						}
@@ -98,7 +98,7 @@ namespace Docks
 							auto prefab = dragged.get_value<AssetHandle<Prefab>>();
 							auto draggedEntity = prefab->instantiate();
 							draggedEntity.component<TransformComponent>().lock()
-								->setParent(entity.component<TransformComponent>());
+								->set_parent(entity.component<TransformComponent>());
 
 							es->drop();
 							es->select(draggedEntity);
@@ -107,17 +107,17 @@ namespace Docks
 						{
 							auto mesh = dragged.get_value<AssetHandle<Mesh>>();
 							Model model;		
-							model.setLod(mesh, 0);
+							model.set_lod(mesh, 0);
 
 							auto object = ecs->create();
 							//Add component and configure it.
 							object.assign<TransformComponent>().lock()
-								->setParent(entity.component<TransformComponent>());
+								->set_parent(entity.component<TransformComponent>());
 							//Add component and configure it.
 							object.assign<ModelComponent>().lock()
-								->setCastShadow(true)
-								.setCastReflelction(false)
-								.setModel(model);
+								->set_casts_shadow(true)
+								.set_casts_reflection(false)
+								.set_model(model);
 
 							es->drop();
 							es->select(object);
@@ -131,11 +131,11 @@ namespace Docks
 				{
 					if (gui::IsMouseReleased(2))
 					{
-						if (dragged.is_type<core::Entity>())
+						if (dragged.is_type<runtime::Entity>())
 						{
-							auto draggedEntity = dragged.get_value<core::Entity>();
+							auto draggedEntity = dragged.get_value<runtime::Entity>();
 							draggedEntity.component<TransformComponent>().lock()
-								->setParent(core::CHandle<TransformComponent>());
+								->set_parent(runtime::CHandle<TransformComponent>());
 
 							es->drop();
 						}
@@ -151,16 +151,16 @@ namespace Docks
 						{
 							auto mesh = dragged.get_value<AssetHandle<Mesh>>();
 							Model model;
-							model.setLod(mesh, 0);
+							model.set_lod(mesh, 0);
 
 							auto object = ecs->create();
 							//Add component and configure it.
 							object.assign<TransformComponent>();
 							//Add component and configure it.
 							object.assign<ModelComponent>().lock()
-								->setCastShadow(true)
-								.setCastReflelction(false)
-								.setModel(model);
+								->set_casts_shadow(true)
+								.set_casts_reflection(false)
+								.set_model(model);
 
 							es->drop();
 							es->select(object);
@@ -172,7 +172,7 @@ namespace Docks
 		
 	}
 
-	bool isParentOf(TransformComponent* trans, TransformComponent* selectedTransform)
+	bool is_parent_of(TransformComponent* trans, TransformComponent* selectedTransform)
 	{
 		if (!selectedTransform)
 			return false;
@@ -181,30 +181,30 @@ namespace Docks
 		{
 			return true;
 		}
-		auto parent = selectedTransform->getParent().lock().get();
-		return isParentOf(trans, parent);
+		auto parent = selectedTransform->get_parent().lock().get();
+		return is_parent_of(trans, parent);
 	};
 
-	void drawEntity(core::Entity entity)
+	void draw_entity(runtime::Entity entity)
 	{
 		if (!entity)
 			return;
 
 		gui::PushID(entity.id().index());
 		gui::AlignFirstTextHeightToWidgets();
-		auto es = core::get_subsystem<EditState>();
-		auto& selected = es->selectionData.object;
+		auto es = core::get_subsystem<editor::EditState>();
+		auto& selected = es->selection_data.object;
 
 		bool isSselected = false;
-		if (selected && selected.is_type<core::Entity>())
+		if (selected && selected.is_type<runtime::Entity>())
 		{
-			isSselected = selected.get_value<core::Entity>() == entity;
+			isSselected = selected.get_value<runtime::Entity>() == entity;
 		}	
 		
 		bool isParentOfSelected = false;
-// 		if (selected && selected.is_type<core::Entity>())
+// 		if (selected && selected.is_type<runtime::Entity>())
 // 		{
-// 			auto selectedEntity = selected.get_value<core::Entity>();
+// 			auto selectedEntity = selected.get_value<runtime::Entity>();
 // 			auto selectedTransformComponent = selectedEntity.component<TransformComponent>().lock()->getParent().lock().get();
 // 			auto entityTransformComponent = entity.component<TransformComponent>().lock().get();
 // 			isParentOfSelected = isParentOf(entityTransformComponent, selectedTransformComponent);
@@ -224,7 +224,7 @@ namespace Docks
 		auto transformComponent = entity.component<TransformComponent>().lock();
 		if (transformComponent)
 		{
-			noChildren = transformComponent->getChildren().empty();
+			noChildren = transformComponent->get_children().empty();
 		}
 
 		if (noChildren)
@@ -240,17 +240,17 @@ namespace Docks
 			es->select(entity);
 		}
 
-		checkContextMenu(entity);
-		checkDrag(entity, hovered);
+		check_context_menu(entity);
+		check_drag(entity, hovered);
 		if (opened)
 		{
 			if (!noChildren)
 			{
-				auto children = entity.component<TransformComponent>().lock()->getChildren();
+				auto children = entity.component<TransformComponent>().lock()->get_children();
 				for (auto& child : children)
 				{
 					if (!child.expired())
-						drawEntity(child.lock()->getEntity());
+						draw_entity(child.lock()->get_entity());
 				}
 			}
 
@@ -260,27 +260,27 @@ namespace Docks
 		gui::PopID();
 	}
 
-	void renderHierarcy(ImVec2 area)
+	void render_hierarchy(ImVec2 area)
 	{
-		auto es = core::get_subsystem<EditState>();
-		auto ecs = core::get_subsystem<core::EntityComponentSystem>();
-		auto ts = core::get_subsystem<TransformSystem>();
-		auto input = core::get_subsystem<Input>();
+		auto es = core::get_subsystem<editor::EditState>();
+		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
+		auto ts = core::get_subsystem<runtime::TransformSystem>();
+		auto input = core::get_subsystem<runtime::Input>();
 
 		auto& roots = ts->get_roots();
 
 		auto& editorCamera = es->camera;
-		auto& selected = es->selectionData.object;
+		auto& selected = es->selection_data.object;
 
-		checkContextMenu(core::Entity());
+		check_context_menu(runtime::Entity());
 
 		if (gui::IsWindowFocused())
 		{
 			if (input->is_key_pressed(sf::Keyboard::Delete))
 			{
-				if (selected && selected.is_type<core::Entity>())
+				if (selected && selected.is_type<runtime::Entity>())
 				{
-					auto sel = selected.get_value<core::Entity>();
+					auto sel = selected.get_value<runtime::Entity>();
 					if (sel != editorCamera)
 					{
 						sel.destroy();
@@ -293,14 +293,14 @@ namespace Docks
 			{
 				if (input->is_key_down(sf::Keyboard::LControl))
 				{
-					if (selected && selected.is_type<core::Entity>())
+					if (selected && selected.is_type<runtime::Entity>())
 					{
-						auto sel = selected.get_value<core::Entity>();
+						auto sel = selected.get_value<runtime::Entity>();
 						if (sel != editorCamera)
 						{
 							auto clone = ecs->create_from_copy(sel);
 							clone.component<TransformComponent>().lock()
-								->setParent(sel.component<TransformComponent>().lock()->getParent(), false, true);
+								->set_parent(sel.component<TransformComponent>().lock()->get_parent(), false, true);
 							es->select(clone);
 						}
 					}
@@ -311,7 +311,7 @@ namespace Docks
 		for (auto& root : roots)
 		{
 			if (!root.expired())
-				drawEntity(root.lock()->getEntity());
+				draw_entity(root.lock()->get_entity());
 		}		
 	}
 

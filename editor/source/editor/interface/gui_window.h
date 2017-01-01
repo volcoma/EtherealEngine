@@ -6,7 +6,7 @@ class GuiWindow : public RenderWindow
 {
 public:
 	//-----------------------------------------------------------------------------
-	//  Name : EditorWindow ()
+	//  Name : GuiWindow ()
 	/// <summary>
 	/// 
 	/// 
@@ -15,7 +15,7 @@ public:
 	//-----------------------------------------------------------------------------
 	GuiWindow();
 	//-----------------------------------------------------------------------------
-	//  Name : EditorWindow ()
+	//  Name : GuiWindow ()
 	/// <summary>
 	/// 
 	/// 
@@ -24,7 +24,7 @@ public:
 	//-----------------------------------------------------------------------------
 	GuiWindow(sf::VideoMode mode, const std::string& title, std::uint32_t style = sf::Style::Default);
 	//-----------------------------------------------------------------------------
-	//  Name : ~EditorWindow (virtual )
+	//  Name : ~GuiWindow (virtual )
 	/// <summary>
 	/// 
 	/// 
@@ -34,41 +34,41 @@ public:
 	virtual ~GuiWindow();
 
 	//-----------------------------------------------------------------------------
-	//  Name : frameBegin (virtual )
+	//  Name : frame_begin (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void frameBegin();
+	virtual void frame_begin();
 	//-----------------------------------------------------------------------------
-	//  Name : frameUpdate (virtual )
+	//  Name : frame_update (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void frameUpdate(float dt);
+	virtual void frame_update(float dt);
 	//-----------------------------------------------------------------------------
-	//  Name : frameRender (virtual )
+	//  Name : frame_render (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void frameRender();
+	virtual void frame_render();
 	//-----------------------------------------------------------------------------
-	//  Name : frameEnd (virtual )
+	//  Name : frame_end (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void frameEnd();
+	virtual void frame_end();
 	//-----------------------------------------------------------------------------
 	//  Name : filterEvent (virtual )
 	/// <summary>
@@ -80,16 +80,18 @@ public:
 	virtual bool filterEvent(const sf::Event& event);
 
 	//-----------------------------------------------------------------------------
-	//  Name : getDockspace ()
+	//  Name : get_dockspace ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline ImGuiDock::Dockspace& getDockspace() { return mDockspace; }
-	inline ImGuiContext* getContext() { return mGuiContext; }
+	inline ImGuiDock::Dockspace& get_dockspace() { return _dockspace; }
+
 private:
-	ImGuiDock::Dockspace mDockspace;
-	ImGuiContext* mGuiContext;
+	///
+	ImGuiDock::Dockspace _dockspace;
+	///
+	ImGuiContext* _gui_context;
 };

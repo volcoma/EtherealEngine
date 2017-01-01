@@ -84,7 +84,7 @@ bool Inspector_Transform::inspect(rttr::variant& var, bool readOnly, std::functi
 	static math::vec3 eulerAngles;
 	bool changed = false;
 	bool equal = math::epsilonEqual(math::abs(math::dot(oldQuat, rotation)), 1.0f, math::epsilon<float>());
-	if (!equal && !gui::IsMouseDragging() || ImGuizmo::IsUsing())
+	if (!equal && !gui::IsMouseDragging() || imguizmo::is_using())
 	{
 		eulerAngles = localEulerAngles;
 		oldQuat = rotation;

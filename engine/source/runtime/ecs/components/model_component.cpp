@@ -6,10 +6,10 @@ ModelComponent::ModelComponent()
 }
 
 ModelComponent::ModelComponent(const ModelComponent& component)
-	: mModel(component.mModel)
-	, mStatic(component.mStatic)
-	, mCastShadow(component.mCastShadow)
-	, mCastReflection(component.mCastReflection)
+	: _model(component._model)
+	, _static(component._static)
+	, _casts_shadow(component._casts_shadow)
+	, _casts_reflection(component._casts_reflection)
 {
 }
 
@@ -17,65 +17,65 @@ ModelComponent::~ModelComponent()
 {
 }
 
-ModelComponent& ModelComponent::setCastShadow(bool castShadow)
+ModelComponent& ModelComponent::set_casts_shadow(bool castShadow)
 {
-	if (mCastShadow == castShadow)
+	if (_casts_shadow == castShadow)
 		return *this;
 
 	static const std::string strContext = "CastsShadow";
 	touch(strContext);
-	mCastShadow = castShadow;
+	_casts_shadow = castShadow;
 	return *this;
 }
 
-ModelComponent& ModelComponent::setStatic(bool bStatic)
+ModelComponent& ModelComponent::set_static(bool bStatic)
 {
-	if (mStatic == bStatic)
+	if (_static == bStatic)
 		return *this;
 
 	static const std::string strContext = "Static";
 	touch(strContext);
-	mStatic = bStatic;
+	_static = bStatic;
 	return *this;
 }
 
-ModelComponent& ModelComponent::setCastReflelction(bool castReflection)
+ModelComponent& ModelComponent::set_casts_reflection(bool castReflection)
 {
-	if (mCastReflection == castReflection)
+	if (_casts_reflection == castReflection)
 		return *this;
 
 	static const std::string strContext = "CastReflection";
 	touch(strContext);
-	mCastReflection = castReflection;
+	_casts_reflection = castReflection;
 	return *this;
 }
 
-bool ModelComponent::castsShadow() const
+bool ModelComponent::casts_shadow() const
 {
-	return mCastShadow;
+	return _casts_shadow;
 }
 
-bool ModelComponent::isStatic() const
+bool ModelComponent::is_static() const
 {
-	return mStatic;
+	return _static;
 }
 
-const Model& ModelComponent::getModel() const
+const Model& ModelComponent::get_model() const
 {
-	return mModel;
+	return _model;
 }
 
-ModelComponent& ModelComponent::setModel(const Model& model)
+ModelComponent& ModelComponent::set_model(const Model& model)
 {
-	mModel = model;
+	_model = model;
 
 	static const std::string strContext = "ModelChange";
 	touch(strContext);
 	return *this;
 }
 
-bool ModelComponent::castsReflection() const
+bool ModelComponent::casts_reflection() const
 {
-	return mCastReflection;
+	return _casts_reflection;
 }
 

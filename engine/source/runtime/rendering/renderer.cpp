@@ -88,7 +88,7 @@ namespace runtime
 		if (!gfx::init(gfx::RendererType::Count, 0, 0, &sGfxCallback))
 			return false;
 
-		main_window.setMain(true);
+		main_window.set_main(true);
 
 		return true;
 	}

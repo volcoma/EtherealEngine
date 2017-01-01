@@ -9,14 +9,14 @@ class Singleton
 {
 public:
 	//-----------------------------------------------------------------------------
-	//  Name : getInstance ()
+	//  Name : get_instance ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static T & getInstance()
+	static T & get_instance()
 	{
 		return create();
 	}

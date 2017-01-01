@@ -13,26 +13,26 @@ REFLECT(TransformComponent)
 			rttr::metadata("CanExecuteInEditor", true)
 		)
 		.property("Local",
-			&TransformComponent::getLocalTransform,
-			&TransformComponent::setLocalTransform)
+			&TransformComponent::get_local_transform,
+			&TransformComponent::set_local_transform)
 		(
 			rttr::metadata("Tooltip", "This is the local transformation. It is relative to the parent.")
 		)
 		.property("World",
-			&TransformComponent::getTransform,
-			&TransformComponent::setTransform)
+			&TransformComponent::get_transform,
+			&TransformComponent::set_transform)
 		(
 			rttr::metadata("Tooltip", "This is the world transformation. Affected by parent transformation.")
 		)
 		.property("Slow Parenting",
-			&TransformComponent::getSlowParenting,
-			&TransformComponent::setSlowParenting)
+			&TransformComponent::get_slow_parenting,
+			&TransformComponent::set_slow_parenting)
 		(
 			rttr::metadata("Tooltip", "Enables/disables slow parenting.")
 		)
 		.property("Slow Parenting Speed",
-			&TransformComponent::getSlowParentingSpeed,
-			&TransformComponent::setSlowParentingSpeed)
+			&TransformComponent::get_slow_parenting_speed,
+			&TransformComponent::set_slow_parenting_speed)
 		(
 			rttr::metadata("Tooltip", "Controls the speed at which the slow parenting works."),
 			rttr::metadata("Min", 0.0f),
@@ -45,11 +45,11 @@ REFLECT(TransformComponent)
 SAVE(TransformComponent)
 {
 	ar(
-		cereal::make_nvp("base_type", cereal::base_class<core::Component>(&obj)),
-		cereal::make_nvp("local_transform", obj.mLocalTransform),
-		cereal::make_nvp("children", obj.mChildren),
-		cereal::make_nvp("slow_parenting", obj.mSlowParenting),
-		cereal::make_nvp("slow_parenting_speed", obj.mSlowParentingSpeed)
+		cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)),
+		cereal::make_nvp("local_transform", obj._local_transform),
+		cereal::make_nvp("children", obj._children),
+		cereal::make_nvp("slow_parenting", obj._slow_parenting),
+		cereal::make_nvp("slow_parenting_speed", obj._slow_parenting_speed)
 		);
 
 }
@@ -57,17 +57,17 @@ SAVE(TransformComponent)
 LOAD(TransformComponent)
 {
 	ar(
-		cereal::make_nvp("base_type", cereal::base_class<core::Component>(&obj)),
-		cereal::make_nvp("local_transform", obj.mLocalTransform),
-		cereal::make_nvp("children", obj.mChildren),
-		cereal::make_nvp("slow_parenting", obj.mSlowParenting),
-		cereal::make_nvp("slow_parenting_speed", obj.mSlowParentingSpeed)
+		cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)),
+		cereal::make_nvp("local_transform", obj._local_transform),
+		cereal::make_nvp("children", obj._children),
+		cereal::make_nvp("slow_parenting", obj._slow_parenting),
+		cereal::make_nvp("slow_parenting_speed", obj._slow_parenting_speed)
 		);
 
 	auto thisHandle = obj.handle();
-	for (auto child : obj.mChildren)
+	for (auto child : obj._children)
 	{
-		child.lock()->mParent = thisHandle;
+		child.lock()->_parent = thisHandle;
 	}
 }
 

@@ -36,164 +36,164 @@ public:
 	virtual ~Model() = default;
 
 	//-----------------------------------------------------------------------------
-	//  Name : isValid ()
+	//  Name : is_valid ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool isValid() const;
+	bool is_valid() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : getLod ()
+	//  Name : get_lod ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	AssetHandle<Mesh> getLod(std::uint32_t lod) const;
+	AssetHandle<Mesh> get_lod(std::uint32_t lod) const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : setLod ()
+	//  Name : set_lod ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setLod(AssetHandle<Mesh> mesh, std::uint32_t lod);
+	void set_lod(AssetHandle<Mesh> mesh, std::uint32_t lod);
 
 	//-----------------------------------------------------------------------------
-	//  Name : setMaterial ()
+	//  Name : set_material ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setMaterial(AssetHandle<Material> material, std::uint32_t index);
+	void set_material(AssetHandle<Material> material, std::uint32_t index);
 
 	//-----------------------------------------------------------------------------
-	//  Name : getLods ()
+	//  Name : get_lods ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const std::vector<AssetHandle<Mesh>>& getLods() const;
+	const std::vector<AssetHandle<Mesh>>& get_lods() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : setLods ()
+	//  Name : set_lods ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setLods(const std::vector<AssetHandle<Mesh>>& lods);
+	void set_lods(const std::vector<AssetHandle<Mesh>>& lods);
 
 	//-----------------------------------------------------------------------------
-	//  Name : getMaterials ()
+	//  Name : get_materials ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const std::vector<AssetHandle<Material>>& getMaterials() const;
+	const std::vector<AssetHandle<Material>>& get_materials() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : setMaterials ()
+	//  Name : set_materials ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setMaterials(const std::vector<AssetHandle<Material>>& materials);
+	void set_materials(const std::vector<AssetHandle<Material>>& materials);
 
 	//-----------------------------------------------------------------------------
-	//  Name : getMaterialForGroup ()
+	//  Name : get_material_for_group ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	AssetHandle<Material> getMaterialForGroup(const Group& group) const;
+	AssetHandle<Material> get_material_for_group(const Group& group) const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : getTransitionTime ()
+	//  Name : get_lod_transition_time ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline float getTransitionTime() const { return mTransitionTime; }
+	inline float get_lod_transition_time() const { return _transition_time; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getMaxDistance ()
+	//  Name : get_lod_max_distance ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline float getMaxDistance() const { return mMaxDistance; }
+	inline float get_lod_max_distance() const { return _max_distance; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getMinDistance ()
+	//  Name : get_lod_min_distance ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline float getMinDistance() const { return mMinDistance; }
+	inline float get_lod_min_distance() const { return _min_distance; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : setTransitionTime ()
+	//  Name : set_lod_transition_time ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setTransitionTime(float time) { mTransitionTime = time; }
+	inline void set_lod_transition_time(float time) { _transition_time = time; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : setMaxDistance ()
+	//  Name : set_lod_max_distance ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setMaxDistance(float distance);
+	void set_lod_max_distance(float distance);
 
 	//-----------------------------------------------------------------------------
-	//  Name : setMinDistance ()
+	//  Name : set_lod_min_distance ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setMinDistance(float distance);
+	void set_lod_min_distance(float distance);
 
 private:
 	/// Collection of all materials for this model.
-	std::vector<AssetHandle<Material>> mMaterials;
+	std::vector<AssetHandle<Material>> _materials;
 	/// Collection of all lods for this model.
-	std::vector<AssetHandle<Mesh>> mMeshLods;
+	std::vector<AssetHandle<Mesh>> _mesh_lods;
 	/// Duration for a transition between two lods.
-	float mTransitionTime = 1.0f;
+	float _transition_time = 1.0f;
 	/// Maximum distance at which lod should have reached maximum value
-	float mMaxDistance = 13.0;
+	float _max_distance = 13.0;
 	/// Maximum distance at which lod should have reached 0 (first lod)
-	float mMinDistance = 5.0f;
+	float _min_distance = 5.0f;
 };

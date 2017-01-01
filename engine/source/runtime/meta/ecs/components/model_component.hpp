@@ -13,17 +13,17 @@ REFLECT(ModelComponent)
 			rttr::metadata("CanExecuteInEditor", true)
 		)
 		.property("Static",
-			&ModelComponent::isStatic,
-			&ModelComponent::setStatic)
+			&ModelComponent::is_static,
+			&ModelComponent::set_static)
 		.property("Casts Shadow",
-			&ModelComponent::castsShadow,
-			&ModelComponent::setCastShadow)
+			&ModelComponent::casts_shadow,
+			&ModelComponent::set_casts_shadow)
 		.property("Casts Reflection",
-			&ModelComponent::castsReflection,
-			&ModelComponent::setCastReflelction)
+			&ModelComponent::casts_reflection,
+			&ModelComponent::set_casts_reflection)
 		.property("Model",
-			&ModelComponent::getModel,
-			&ModelComponent::setModel)
+			&ModelComponent::get_model,
+			&ModelComponent::set_model)
 		;
 }
 
@@ -31,11 +31,11 @@ REFLECT(ModelComponent)
 SAVE(ModelComponent)
 {
 	ar(
-		cereal::make_nvp("base_type", cereal::base_class<core::Component>(&obj)),
-		cereal::make_nvp("static", obj.mStatic),
-		cereal::make_nvp("casts_shadow", obj.mCastShadow),
-		cereal::make_nvp("casts_reflection", obj.mCastReflection),
-		cereal::make_nvp("model", obj.mModel)
+		cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)),
+		cereal::make_nvp("static", obj._static),
+		cereal::make_nvp("casts_shadow", obj._casts_shadow),
+		cereal::make_nvp("casts_reflection", obj._casts_reflection),
+		cereal::make_nvp("model", obj._model)
 	);
 }
 
@@ -43,11 +43,11 @@ SAVE(ModelComponent)
 LOAD(ModelComponent)
 {
 	ar(
-		cereal::make_nvp("base_type", cereal::base_class<core::Component>(&obj)),
-		cereal::make_nvp("static", obj.mStatic),
-		cereal::make_nvp("casts_shadow", obj.mCastShadow),
-		cereal::make_nvp("casts_reflection", obj.mCastReflection),
-		cereal::make_nvp("model", obj.mModel)
+		cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)),
+		cereal::make_nvp("static", obj._static),
+		cereal::make_nvp("casts_shadow", obj._casts_shadow),
+		cereal::make_nvp("casts_reflection", obj._casts_reflection),
+		cereal::make_nvp("model", obj._model)
 	);
 }
 

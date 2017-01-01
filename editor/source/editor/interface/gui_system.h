@@ -47,10 +47,10 @@ struct GUIStyle
 		float frameRounding = 0.0f;
 	};
 
-	void resetStyle();
-	void setStyleColors(const HSVSetup& _setup);
-	void loadStyle();
-	void saveStyle();
+	void reset_style();
+	void set_style_colors(const HSVSetup& _setup);
+	void load_style();
+	void save_style();
 
 	HSVSetup setup;
 };
@@ -58,8 +58,6 @@ struct GUIStyle
 struct ITexture;
 namespace gui
 {    
-    bool init();
-	void shutdown();
 	void begin();
 
 	// Helper function for passing ITexture to ImGui::Image.

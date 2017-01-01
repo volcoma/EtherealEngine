@@ -9,13 +9,13 @@ void Shader::dispose()
 {
 	uniforms.clear();
 
-	if (isValid())
+	if (is_valid())
 		gfx::destroyShader(handle);
 
 	handle = { bgfx::invalidHandle };
 }
 
-bool Shader::isValid() const
+bool Shader::is_valid() const
 {
 	return gfx::isValid(handle);
 }

@@ -1,51 +1,51 @@
 #include "transform_system.h"
 #include "../components/transform_component.h"
 #include "../../system/engine.h"
-
-void updateTransform(core::CHandle<TransformComponent> hTransform, std::chrono::duration<float> dt)
+namespace runtime
 {
-	auto pTransform = hTransform.lock();
-	if (pTransform)
+	void update_transform(CHandle<TransformComponent> hTransform, std::chrono::duration<float> dt)
 	{
-		pTransform->resolveTransform(true, dt.count());
-
-		auto& children = pTransform->getChildren();
-		for (auto& child : children)
+		auto pTransform = hTransform.lock();
+		if (pTransform)
 		{
-			updateTransform(child, dt);
+			pTransform->resolve(true, dt.count());
+
+			auto& children = pTransform->get_children();
+			for (auto& child : children)
+			{
+				update_transform(child, dt);
+			}
 		}
 	}
 
-
-}
-
-void TransformSystem::frame_begin(std::chrono::duration<float> dt)
-{
-	auto ecs = core::get_subsystem<core::EntityComponentSystem>();
-	_roots.clear();
-	ecs->each<TransformComponent>([this](core::Entity e, TransformComponent& transformComponent)
+	void TransformSystem::frame_begin(std::chrono::duration<float> dt)
 	{
-		auto parent = transformComponent.getParent();
-		if (parent.expired())
+		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
+		_roots.clear();
+		ecs->each<TransformComponent>([this](runtime::Entity e, TransformComponent& transformComponent)
 		{
-			_roots.push_back(transformComponent.handle());
+			auto parent = transformComponent.get_parent();
+			if (parent.expired())
+			{
+				_roots.push_back(transformComponent.handle());
+			}
+		});
+
+		for (auto& hComponent : _roots)
+		{
+			update_transform(hComponent, dt);
 		}
-	});
-
-	for (auto& hComponent : _roots)
-	{
-		updateTransform(hComponent, dt);
 	}
-}
 
-bool TransformSystem::initialize()
-{
-	runtime::on_frame_begin.addListener(this, &TransformSystem::frame_begin);
+	bool TransformSystem::initialize()
+	{
+		runtime::on_frame_begin.addListener(this, &TransformSystem::frame_begin);
 
-	return true;
-}
+		return true;
+	}
 
-void TransformSystem::dispose()
-{
-	runtime::on_frame_begin.removeListener(this, &TransformSystem::frame_begin);
+	void TransformSystem::dispose()
+	{
+		runtime::on_frame_begin.removeListener(this, &TransformSystem::frame_begin);
+	}
 }

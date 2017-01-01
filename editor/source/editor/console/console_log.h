@@ -7,7 +7,7 @@
 class ConsoleLog : public logging::sinks::base_sink<std::mutex>, public Console
 {
 public:
-	using ItemContainer = std::deque<std::pair<std::string, logging::level::level_enum>>;
+	using entries_t = std::deque<std::pair<std::string, logging::level::level_enum>>;
 
 	//-----------------------------------------------------------------------------
 	//  Name : _sink_it ()
@@ -30,14 +30,14 @@ public:
 	void flush() override;
 
 	//-----------------------------------------------------------------------------
-	//  Name : getItems ()
+	//  Name : get_items ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	ItemContainer getItems();
+	entries_t get_items();
 
 	//-----------------------------------------------------------------------------
 	//  Name : clearLog ()
@@ -50,29 +50,29 @@ public:
 	void clearLog();
 	
 	//-----------------------------------------------------------------------------
-	//  Name : getPendingEntries ()
+	//  Name : get_pending_entries ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline int getPendingEntries() const { return mPendingEntries; }
+	inline int get_pending_entries() const { return _pending; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : setPendingEntries ()
+	//  Name : set_pending_entries ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setPendingEntries(bool val) { mPendingEntries = val; }
+	inline void set_pending_entries(bool val) { _pending = val; }
 private:
 	///
-	ItemContainer mItems;
+	entries_t _entries;
 	///
-	int mPendingEntries = 0;
+	int _pending = 0;
 	///
-	const std::size_t mMaxSize = 50;
+	static const std::size_t _max_size = 50;
 };

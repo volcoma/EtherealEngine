@@ -1,18 +1,18 @@
 #pragma once
-#include "core/ecs.h"
+#include "../../ecs/ecs.h"
 #include "core/reflection/reflection.h"
 #include "core/serialization/serialization.h"
 #include "core/serialization/cereal/types/vector.hpp"
 
-inline std::map<uint32_t, core::Entity>& getSerializationMap()
+inline std::map<uint32_t, runtime::Entity>& getSerializationMap()
 {
 	/// Keep count of serialized entities
-	static std::map<uint32_t, core::Entity> serializationMap;
+	static std::map<uint32_t, runtime::Entity> serializationMap;
 	return serializationMap;
 }
 
 
-namespace core
+namespace runtime
 {
 
 SAVE(Entity)
@@ -52,7 +52,7 @@ LOAD(Entity)
 	}
 	else
 	{
-		auto ecs = get_subsystem<EntityComponentSystem>();
+		auto ecs = core::get_subsystem<EntityComponentSystem>();
 		obj = ecs->create();
 		serializationMap[id] = obj;
 

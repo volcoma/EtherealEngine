@@ -35,38 +35,38 @@ public:
 	virtual ~MainEditorWindow();
 
 	//-----------------------------------------------------------------------------
-	//  Name : frameRender (virtual )
+	//  Name : frame_render (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void frameRender();
+	virtual void frame_render();
 
 	//-----------------------------------------------------------------------------
-	//  Name : onMenuBar (virtual )
+	//  Name : on_menubar (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void onMenuBar();
+	virtual void on_menubar();
 
 	//-----------------------------------------------------------------------------
-	//  Name : onToolbar (virtual )
+	//  Name : on_toolbar (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void onToolbar();
+	virtual void on_toolbar();
 
 
 private:
-	bool mOpenProjectManager = false;
+	bool _open_project_manager = false;
 };
 
 class ProjectManagerWindow : public GuiWindow
@@ -100,12 +100,12 @@ public:
 	//-----------------------------------------------------------------------------
 	virtual ~ProjectManagerWindow() = default;
 	//-----------------------------------------------------------------------------
-	//  Name : frameRender (virtual )
+	//  Name : frame_render (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void frameRender();
+	virtual void frame_render();
 };

@@ -63,21 +63,21 @@ namespace Docks
 
 	void draw_selected_camera(const ImVec2& size)
 	{
-		auto input = core::get_subsystem<Input>();
-		auto es = core::get_subsystem<EditState>();
-		auto& selected = es->selectionData.object;
+		auto input = core::get_subsystem<runtime::Input>();
+		auto es = core::get_subsystem<editor::EditState>();
+		auto& selected = es->selection_data.object;
 		auto& editor_camera = es->camera;
 
-		if (selected.is_type<core::Entity>())
+		if (selected.is_type<runtime::Entity>())
 		{
-			auto sel = selected.get_value<core::Entity>();
+			auto sel = selected.get_value<runtime::Entity>();
 
 			if (sel && (editor_camera != sel) && sel.has_component<CameraComponent>())
 			{
 				const auto selected_camera = sel.component<CameraComponent>().lock();
-				const auto& camera = selected_camera->getCamera();
-				const auto surface = selected_camera->getOutputBuffer();
-				const auto view_size = camera.getViewportSize();
+				const auto& camera = selected_camera->get_camera();
+				const auto surface = selected_camera->get_output_buffer();
+				const auto view_size = camera.get_viewport_size();
 
 				float factor = std::min(size.x / float(view_size.width), size.y / float(view_size.height)) / 4.0f;
 				ImVec2 bounds(view_size.width * factor, view_size.height * factor);
@@ -103,7 +103,7 @@ namespace Docks
 				{
 					auto transform = editor_camera.component<TransformComponent>().lock();
 					auto transform_selected = sel.component<TransformComponent>().lock();
-					transform_selected->setTransform(transform->getTransform());
+					transform_selected->set_transform(transform->get_transform());
 				}
 			}
 		}
@@ -113,50 +113,50 @@ namespace Docks
 
 	void manipulation_gizmos()
 	{
-		auto input = core::get_subsystem<Input>();
-		auto es = core::get_subsystem<EditState>();
-		auto& selected = es->selectionData.object;
+		auto input = core::get_subsystem<runtime::Input>();
+		auto es = core::get_subsystem<editor::EditState>();
+		auto& selected = es->selection_data.object;
 		auto& editor_camera = es->camera;
 		auto& operation = es->operation;
 		auto& mode = es->mode;
 
-		if (!input->is_mouse_button_down(sf::Mouse::Right) && !gui::IsAnyItemActive() && !ImGuizmo::IsUsing())
+		if (!input->is_mouse_button_down(sf::Mouse::Right) && !gui::IsAnyItemActive() && !imguizmo::is_using())
 		{
 			if (input->is_key_pressed(sf::Keyboard::W))
 			{
-				operation = ImGuizmo::OPERATION::TRANSLATE;
+				operation = imguizmo::OPERATION::TRANSLATE;
 			}
 			if (input->is_key_pressed(sf::Keyboard::E))
 			{
-				operation = ImGuizmo::OPERATION::ROTATE;
+				operation = imguizmo::OPERATION::ROTATE;
 			}
 			if (input->is_key_pressed(sf::Keyboard::R))
 			{
-				operation = ImGuizmo::OPERATION::SCALE;
-				mode = ImGuizmo::MODE::LOCAL;
+				operation = imguizmo::OPERATION::SCALE;
+				mode = imguizmo::MODE::LOCAL;
 			}
 			if (input->is_key_pressed(sf::Keyboard::T))
 			{
-				mode = ImGuizmo::MODE::LOCAL;
+				mode = imguizmo::MODE::LOCAL;
 			}
-			if (input->is_key_pressed(sf::Keyboard::Y) && operation != ImGuizmo::OPERATION::SCALE)
+			if (input->is_key_pressed(sf::Keyboard::Y) && operation != imguizmo::OPERATION::SCALE)
 			{
-				mode = ImGuizmo::MODE::WORLD;
+				mode = imguizmo::MODE::WORLD;
 			}
 		}
 
-		if (selected && selected.is_type<core::Entity>())
+		if (selected && selected.is_type<runtime::Entity>())
 		{
-			auto sel = selected.get_value<core::Entity>();
+			auto sel = selected.get_value<runtime::Entity>();
 			if (sel && sel != editor_camera && sel.has_component<TransformComponent>())
 			{
 				auto p = gui::GetItemRectMin();
 				auto s = gui::GetItemRectSize();
-				ImGuizmo::SetViewRect(p.x, p.y, s.x, s.y);
+				imguizmo::set_view_rect(p.x, p.y, s.x, s.y);
 				auto camera_component = editor_camera.component<CameraComponent>().lock();
 				auto transform_component = sel.component<TransformComponent>().lock();
-				transform_component->resolveTransform(true);
-				auto transform = transform_component->getTransform();
+				transform_component->resolve(true);
+				auto transform = transform_component->get_transform();
 				math::transform_t delta;
 				math::transform_t inputTransform = transform;
 				float* snap = nullptr;
@@ -165,17 +165,17 @@ namespace Docks
 				static float scale_snap = 0.1f;
 				if (input->is_key_down(sf::Keyboard::LControl))
 				{
-					if (operation == ImGuizmo::OPERATION::TRANSLATE)
+					if (operation == imguizmo::OPERATION::TRANSLATE)
 						snap = &translation_snap[0];
-					else if (operation == ImGuizmo::OPERATION::ROTATE)
+					else if (operation == imguizmo::OPERATION::ROTATE)
 						snap = &rotation_degree_snap;
-					else if (operation == ImGuizmo::OPERATION::SCALE)
+					else if (operation == imguizmo::OPERATION::SCALE)
 						snap = &scale_snap;
 				}
 
-				ImGuizmo::Manipulate(
-					camera_component->getCamera().getView(),
-					camera_component->getCamera().getProj(),
+				imguizmo::manipulate(
+					camera_component->get_camera().get_view(),
+					camera_component->get_camera().get_last_projection(),
 					operation,
 					mode,
 					transform,
@@ -183,7 +183,7 @@ namespace Docks
 					snap);
 
 
-				transform_component->setTransform(transform);
+				transform_component->set_transform(transform);
 			}
 		}
 	}
@@ -193,8 +193,8 @@ namespace Docks
 		if (!gui::IsWindowFocused())
 			return;
 
-		auto input = core::get_subsystem<Input>();
-		auto es = core::get_subsystem<EditState>();
+		auto es = core::get_subsystem<editor::EditState>();
+		auto input = core::get_subsystem<runtime::Input>();
 		auto engine = core::get_subsystem<runtime::Engine>();
 
 		auto& editor_camera = es->camera;
@@ -215,11 +215,11 @@ namespace Docks
 
 			if (delta_move.x != 0)
 			{
-				transform->moveLocal({ -1 * delta_move.x * movement_speed * dt, 0.0f, 0.0f });
+				transform->move_local({ -1 * delta_move.x * movement_speed * dt, 0.0f, 0.0f });
 			}
 			if (delta_move.y != 0)
 			{
-				transform->moveLocal({ 0.0f, delta_move.y * movement_speed * dt, 0.0f });
+				transform->move_local({ 0.0f, delta_move.y * movement_speed * dt, 0.0f });
 			}
 		}
 
@@ -232,51 +232,51 @@ namespace Docks
 
 			if (input->is_key_down(sf::Keyboard::W))
 			{
-				transform->moveLocal({ 0.0f, 0.0f, movement_speed * dt });
+				transform->move_local({ 0.0f, 0.0f, movement_speed * dt });
 			}
 
 			if (input->is_key_down(sf::Keyboard::S))
 			{
-				transform->moveLocal({ 0.0f, 0.0f, -movement_speed * dt });
+				transform->move_local({ 0.0f, 0.0f, -movement_speed * dt });
 			}
 
 			if (input->is_key_down(sf::Keyboard::A))
 			{
-				transform->moveLocal({ -movement_speed * dt, 0.0f, 0.0f });
+				transform->move_local({ -movement_speed * dt, 0.0f, 0.0f });
 			}
 
 			if (input->is_key_down(sf::Keyboard::D))
 			{
-				transform->moveLocal({ movement_speed * dt, 0.0f, 0.0f });
+				transform->move_local({ movement_speed * dt, 0.0f, 0.0f });
 			}
 			if (input->is_key_down(sf::Keyboard::Up))
 			{
-				transform->moveLocal({ 0.0f, 0.0f, movement_speed * dt });
+				transform->move_local({ 0.0f, 0.0f, movement_speed * dt });
 			}
 
 			if (input->is_key_down(sf::Keyboard::Down))
 			{
-				transform->moveLocal({ 0.0f, 0.0f, -movement_speed * dt });
+				transform->move_local({ 0.0f, 0.0f, -movement_speed * dt });
 			}
 
 			if (input->is_key_down(sf::Keyboard::Left))
 			{
-				transform->moveLocal({ -movement_speed * dt, 0.0f, 0.0f });
+				transform->move_local({ -movement_speed * dt, 0.0f, 0.0f });
 			}
 
 			if (input->is_key_down(sf::Keyboard::Right))
 			{
-				transform->moveLocal({ movement_speed * dt, 0.0f, 0.0f });
+				transform->move_local({ movement_speed * dt, 0.0f, 0.0f });
 			}
 
 			if (input->is_key_down(sf::Keyboard::Space))
 			{
-				transform->moveLocal({ 0.0f, movement_speed * dt, 0.0f });
+				transform->move_local({ 0.0f, movement_speed * dt, 0.0f });
 			}
 
 			if (input->is_key_down(sf::Keyboard::LControl))
 			{
-				transform->moveLocal({ 0.0f, -movement_speed * dt, 0.0f });
+				transform->move_local({ 0.0f, -movement_speed * dt, 0.0f });
 			}
 
 			float x = static_cast<float>(delta_move.x);
@@ -286,26 +286,26 @@ namespace Docks
 			float dx = x * rotation_speed;
 			float dy = y * rotation_speed;
 
-			transform->resolveTransform(true);
+			transform->resolve(true);
 			transform->rotate(0.0f, dx, 0.0f);
-			transform->rotateLocal(dy, 0.0f, 0.0f);
+			transform->rotate_local(dy, 0.0f, 0.0f);
 
 
 			float delta_wheel = input->get_mouse_wheel_scroll_delta_move();
-			transform->moveLocal({ 0.0f, 0.0f, 14.0f * movement_speed * delta_wheel * dt });
+			transform->move_local({ 0.0f, 0.0f, 14.0f * movement_speed * delta_wheel * dt });
 		}
 	}
 
 	void render_scene(ImVec2 area)
 	{
-		auto es = core::get_subsystem<EditState>();
+		auto es = core::get_subsystem<editor::EditState>();
 		auto engine = core::get_subsystem<runtime::Engine>();
-		auto& window = engine->get_window();
-		auto ecs = core::get_subsystem<core::EntityComponentSystem>();
-		auto input = core::get_subsystem<Input>();
+		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
+		auto input = core::get_subsystem<runtime::Input>();
 
+		auto& window = engine->get_window();
 		auto& editor_camera = es->camera;
-		auto& selected = es->selectionData.object;
+		auto& selected = es->selection_data.object;
 		bool has_edit_camera = editor_camera
 			&& editor_camera.has_component<CameraComponent>()
 			&& editor_camera.has_component<TransformComponent>();
@@ -323,10 +323,10 @@ namespace Docks
 		auto camera_component = editor_camera.component<CameraComponent>().lock();
 		if (size.x > 0 && size.y > 0)
 		{
-			camera_component->getCamera().setViewportPos({ static_cast<std::uint32_t>(pos.x), static_cast<std::uint32_t>(pos.y) });
-			camera_component->setViewportSize({ static_cast<std::uint32_t>(size.x), static_cast<std::uint32_t>(size.y) });
+			camera_component->get_camera().set_viewport_pos({ static_cast<std::uint32_t>(pos.x), static_cast<std::uint32_t>(pos.y) });
+			camera_component->set_viewport_size({ static_cast<std::uint32_t>(size.x), static_cast<std::uint32_t>(size.y) });
 			
-			const auto surface = camera_component->getOutputBuffer();
+			const auto surface = camera_component->get_output_buffer();
 			gui::Image(surface, size);
 
 			if (gui::IsItemClicked(1) || gui::IsItemClicked(2))
@@ -346,9 +346,9 @@ namespace Docks
 
 				if (input->is_key_pressed(sf::Keyboard::Delete))
 				{
-					if (selected && selected.is_type<core::Entity>())
+					if (selected && selected.is_type<runtime::Entity>())
 					{
-						auto sel = selected.get_value<core::Entity>();
+						auto sel = selected.get_value<runtime::Entity>();
 						if (sel != editor_camera)
 						{
 							sel.destroy();
@@ -366,10 +366,10 @@ namespace Docks
 
 			if (show_gbuffer)
 			{
-				const auto gBufferSurface = camera_component->getGBuffer();
-				for (std::uint32_t i = 0; i < gBufferSurface->getAttachmentCount(); ++i)
+				const auto gBufferSurface = camera_component->get_g_buffer();
+				for (std::uint32_t i = 0; i < gBufferSurface->get_attachment_count(); ++i)
 				{
-					const auto attachment = gBufferSurface->getAttachment(i).texture;
+					const auto attachment = gBufferSurface->get_attachment(i).texture;
 					gui::Image(attachment, size);
 
 					if (gui::IsItemClicked(1) || gui::IsItemClicked(2))

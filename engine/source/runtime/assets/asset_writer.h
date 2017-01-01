@@ -7,12 +7,12 @@ class Material;
 struct AssetWriter
 {
 	//-----------------------------------------------------------------------------
-	//  Name : saveMaterialToFile ()
+	//  Name : write_material_to_file ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void saveMaterialToFile(const fs::path& absoluteKey, const AssetHandle<Material>& asset);
+	static void write_material_to_file(const fs::path& absoluteKey, const AssetHandle<Material>& asset);
 };

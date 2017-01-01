@@ -46,88 +46,88 @@ public:
 	virtual ~Material();
 
 	//-----------------------------------------------------------------------------
-	//  Name : isValid ()
+	//  Name : is_valid ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline bool isValid() const { return !!mProgram; }
+	inline bool is_valid() const { return !!_program; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : setTexture ()
+	//  Name : set_texture ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setTexture(std::uint8_t _stage
+	void set_texture(std::uint8_t _stage
 		, const std::string& _sampler
 		, FrameBuffer* _handle
 		, uint8_t _attachment = 0
 		, std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
 
 	//-----------------------------------------------------------------------------
-	//  Name : setTexture ()
+	//  Name : set_texture ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setTexture(std::uint8_t _stage
+	void set_texture(std::uint8_t _stage
 		, const std::string& _sampler
 		, gfx::FrameBufferHandle _handle
 		, uint8_t _attachment = 0
 		, std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
 
 	//-----------------------------------------------------------------------------
-	//  Name : setTexture ()
+	//  Name : set_texture ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setTexture(std::uint8_t _stage
+	void set_texture(std::uint8_t _stage
 		, const std::string& _sampler
 		, Texture* _texture
 		, std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
 
 	//-----------------------------------------------------------------------------
-	//  Name : setTexture ()
+	//  Name : set_texture ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setTexture(std::uint8_t _stage
+	void set_texture(std::uint8_t _stage
 		, const std::string& _sampler
 		, gfx::TextureHandle _texture
 		, std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
 
 	//-----------------------------------------------------------------------------
-	//  Name : setUniform ()
+	//  Name : set_uniform ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setUniform(const std::string& _name, const void* _value, std::uint16_t _num = 1);
+	void set_uniform(const std::string& _name, const void* _value, std::uint16_t _num = 1);
 
 	//-----------------------------------------------------------------------------
-	//  Name : getProgram ()
+	//  Name : get_program ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline Program* getProgram() const { return mProgram.get(); }
+	inline Program* get_program() const { return _program.get(); }
 
 	//-----------------------------------------------------------------------------
 	//  Name : submit (virtual )
@@ -140,53 +140,53 @@ public:
 	virtual void submit() {};
 
 	//-----------------------------------------------------------------------------
-	//  Name : getCullType ()
+	//  Name : get_cull_type ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline CullType getCullType() const { return mCullType; }
+	inline CullType get_cull_type() const { return _cull_type; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : setCullType ()
+	//  Name : set_cull_type ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setCullType(CullType val) { mCullType = val; }
+	inline void set_cull_type(CullType val) { _cull_type = val; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getRenderStates ()
+	//  Name : get_render_states ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::uint64_t getRenderStates(bool applyCull = true, bool depthWrite = true, bool depthTest = true) const;
+	std::uint64_t get_render_states(bool applyCull = true, bool depthWrite = true, bool depthTest = true) const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : beginPass ()
+	//  Name : begin_pass ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void beginPass();
+	void begin_pass();
 protected:
 	/// Program that is responsible for rendering.
-	std::unique_ptr<Program> mProgram;
+	std::unique_ptr<Program> _program;
 	/// Cull type for this material.
-	CullType mCullType = CullType::CounterClockWise;
+	CullType _cull_type = CullType::CounterClockWise;
 	/// Default color texture
-	AssetHandle<Texture> mDefaultColorMap;
+	AssetHandle<Texture> _default_color_map;
 	/// Default normal texture
-	AssetHandle<Texture> mDefaultNormalMap;
+	AssetHandle<Texture> _default_normal_map;
 };
 
 
@@ -214,257 +214,257 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::color& getBaseColor() const { return mBaseColor; }
+	inline const math::color& get_base_color() const { return _base_color; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : setBaseColor ()
+	//  Name : set_base_color ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setBaseColor(const math::color& val) { mBaseColor = val; }
+	inline void set_base_color(const math::color& val) { _base_color = val; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getSpecularColor ()
+	//  Name : set_specular_color ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::color& getSpecularColor() const { return mSpecularColor; }
+	inline const math::color& get_specular_color() const { return _specular_color; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : setSpecularColor ()
+	//  Name : set_specular_color ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setSpecularColor(const math::color& val) { mSpecularColor = val; }
+	inline void set_specular_color(const math::color& val) { _specular_color = val; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getEmissiveColor ()
+	//  Name : get_emissive_color ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::color& getEmissiveColor() const { return mEmissiveColor; }
+	inline const math::color& get_emissive_color() const { return _emissive_color; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : setEmissiveColor ()
+	//  Name : set_emissive_color ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setEmissiveColor(const math::color& val) { mEmissiveColor = val; }
+	inline void set_emissive_color(const math::color& val) { _emissive_color = val; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getRoughness ()
+	//  Name : get_roughness ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline float getRoughness() const { return mSurfaceData.x; }
+	inline float get_roughness() const { return _surface_data.x; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : setRoughness ()
+	//  Name : set_roughness ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setRoughness(float rougness) { mSurfaceData.x = rougness; }
+	inline void set_roughness(float rougness) { _surface_data.x = rougness; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getMetalness ()
+	//  Name : get_metalness ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline float getMetalness() const { return mSurfaceData.y; }
+	inline float get_metalness() const { return _surface_data.y; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : setMetalness ()
+	//  Name : set_metalness ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setMetalness(float metalness) { mSurfaceData.y = metalness; }
+	inline void set_metalness(float metalness) { _surface_data.y = metalness; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getBumpiness ()
+	//  Name : get_bumpiness ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline float getBumpiness() const { return mSurfaceData.z; }
+	inline float get_bumpiness() const { return _surface_data.z; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : setBumpiness ()
+	//  Name : set_bumpiness ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setBumpiness(float bumpiness) { mSurfaceData.z = bumpiness; }
+	inline void set_bumpiness(float bumpiness) { _surface_data.z = bumpiness; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getAlphaTestValue ()
+	//  Name : get_alpha_test_value ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline float getAlphaTestValue() const { return mSurfaceData.w; }
+	inline float get_alpha_test_value() const { return _surface_data.w; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : setAlphaTestValue ()
+	//  Name : set_alpha_test_value ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setAlphaTestValue(float alphaTestValue) { mSurfaceData.w = alphaTestValue; }
+	inline void set_alpha_test_value(float alphaTestValue) { _surface_data.w = alphaTestValue; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getTiling ()
+	//  Name : set_tiling ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::vec4& getTiling() const { return mTiling; }
+	inline const math::vec4& get_tiling() const { return _tiling; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : setTiling ()
+	//  Name : set_tiling ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setTiling(const math::vec4& tiling) { mTiling = tiling; }
+	inline void set_tiling(const math::vec4& tiling) { _tiling = tiling; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getDitherThreshold ()
+	//  Name : set_dither_threshold ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::vec2& getDitherThreshold() const { return mDitherThreshold; }
+	inline const math::vec2& get_dither_threshold() const { return _dither_threshold; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : setDitherThreshold ()
+	//  Name : set_dither_threshold ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setDitherThreshold(const math::vec2& threshold) { mDitherThreshold = threshold; }
+	inline void set_dither_threshold(const math::vec2& threshold) { _dither_threshold = threshold; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getAlbedoTexture ()
+	//  Name : set_color_map ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> getColorMap() const { return mColorMap; }
+	inline AssetHandle<Texture> get_color_map() const { return _color_map; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : setAlbedoTexture ()
+	//  Name : set_color_map ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setColorMap(AssetHandle<Texture> val) { mColorMap = val; }
+	inline void set_color_map(AssetHandle<Texture> val) { _color_map = val; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getNormalTexture ()
+	//  Name : get_normal_map ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> getNormalMap() const { return mNormalMap; }
+	inline AssetHandle<Texture> get_normal_map() const { return _normal_map; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : setNormalTexture ()
+	//  Name : set_normal_map ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setNormalMap(AssetHandle<Texture> val) { mNormalMap = val; }
+	inline void set_normal_map(AssetHandle<Texture> val) { _normal_map = val; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getRoughnessTexture ()
+	//  Name : get_roughness_map ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> getRoughnessMap() const { return mRoughnessMap; }
+	inline AssetHandle<Texture> get_roughness_map() const { return _roughness_map; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : setRoughnessTexture ()
+	//  Name : set_roughness_map ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setRoughnessMap(AssetHandle<Texture> val) { mRoughnessMap = val; }
+	inline void set_roughness_map(AssetHandle<Texture> val) { _roughness_map = val; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getMetalnessTexture ()
+	//  Name : get_metalness_map ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> getMetalnessMap() const { return mMetalnessMap; }
+	inline AssetHandle<Texture> get_metalness_map() const { return _metalness_map; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : setMetalnessTexture ()
+	//  Name : set_metalness_map ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setMetalnessMap(AssetHandle<Texture> val) { mMetalnessMap = val; }
+	inline void set_metalness_map(AssetHandle<Texture> val) { _metalness_map = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : submit (virtual )
@@ -477,25 +477,25 @@ public:
 	virtual void submit();
 private:
 	/// Base color
-	math::color mBaseColor
+	math::color _base_color
 	{
 		1.0f, 1.0f, 1.0f, /// Color
 		1.0f /// Opacity
 	};
 	/// Specular color
-	math::color mSpecularColor
+	math::color _specular_color
 	{
 		0.5f, 0.5f, 0.5f, /// Color
 		1.0f /// Unused
 	};
 	/// Emissive color
-	math::color mEmissiveColor
+	math::color _emissive_color
 	{
 		0.0f, 0.0f, 0.0f, /// Color
 		0.0f /// HDR Scale
 	};
 	/// Surface data
-	math::vec4 mSurfaceData
+	math::vec4 _surface_data
 	{
 		0.5f, /// Roughness
 		0.0f, /// Metalness
@@ -503,23 +503,23 @@ private:
 		0.25f /// AlphaTestValue
 	};
 	/// Tiling data
-	math::vec4 mTiling
+	math::vec4 _tiling
 	{
 		1.0f, 1.0f, ///Primary
 		1.0f, 1.0f  ///Secondary
 	};
 	/// Dithering data
-	math::vec2 mDitherThreshold
+	math::vec2 _dither_threshold
 	{
 		0.5f, ///Alpha threshold
 		0.5f  ///Distance threshold
 	};
 	/// Color map
-	AssetHandle<Texture> mColorMap;
+	AssetHandle<Texture> _color_map;
 	/// Normal map
-	AssetHandle<Texture> mNormalMap;
+	AssetHandle<Texture> _normal_map;
 	/// Roughness map
-	AssetHandle<Texture> mRoughnessMap;
+	AssetHandle<Texture> _roughness_map;
 	/// Metalness map
-	AssetHandle<Texture> mMetalnessMap;
+	AssetHandle<Texture> _metalness_map;
 };

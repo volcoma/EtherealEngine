@@ -14,61 +14,64 @@ REFLECT(CameraComponent)
 			rttr::metadata("CanExecuteInEditor", true)
 		)
 		.property("Projection Mode",
-			&CameraComponent::getProjectionMode,
-			&CameraComponent::setProjectionMode)
+			&CameraComponent::get_projection_mode,
+			&CameraComponent::set_projection_mode)
 		.property("Field of View",
-			&CameraComponent::getFieldOfView,
-			&CameraComponent::setFieldOfView)
+			&CameraComponent::get_fov,
+			&CameraComponent::set_fov)
 		(
 			rttr::metadata("Min", 5.0f),
 			rttr::metadata("Max", 180.0f)
 		)
 		.property("Orthographic Size",
-			&CameraComponent::getOrthographicSize,
-			&CameraComponent::setOrthographicSize)
+			&CameraComponent::get_ortho_size,
+			&CameraComponent::set_ortho_size)
 		(
 			rttr::metadata("Tooltip", "This is half of the vertical size of the viewing volume. Horizontal viewing size varies depending on viewport's aspect ratio. Orthographic size is ignored when camera is not orthographic.")
 		)
 		.property_readonly("Pixels Per Unit",
-			&CameraComponent::getPixelsPerUnit)
+			&CameraComponent::get_ppu)
 		(
 			rttr::metadata("Tooltip", "Pixels per unit only usable in orthographic mode.")
 		)
 		.property_readonly("Viewport Size",
-		&CameraComponent::getViewportSize)
+		&CameraComponent::get_viewport_size)
 		.property("Near Clip Distance",
-			&CameraComponent::getNearClip,
-			&CameraComponent::setNearClip)
+			&CameraComponent::get_near_clip,
+			&CameraComponent::set_near_clip)
 		.property("Far Clip Distance",
-			&CameraComponent::getFarClip,
-			&CameraComponent::setFarClip)
+			&CameraComponent::get_far_clip,
+			&CameraComponent::set_far_clip)
 		.property("HDR",
-			&CameraComponent::getHDR,
-			&CameraComponent::setHDR)
+			&CameraComponent::get_hdr,
+			&CameraComponent::set_hdr)
 
 		;
 
 }
 
-
-SAVE(CameraComponent)
+namespace runtime
 {
-	ar(
-		cereal::make_nvp("base_type", cereal::base_class<core::Component>(&obj)),
-		cereal::make_nvp("camera", obj.mCamera),
-		cereal::make_nvp("hdr", obj.mHDR)
-		);
-}
 
-LOAD(CameraComponent)
-{
-	ar(
-		cereal::make_nvp("base_type", cereal::base_class<core::Component>(&obj)),
-		cereal::make_nvp("camera", obj.mCamera),
-		cereal::make_nvp("hdr", obj.mHDR)
+	SAVE(CameraComponent)
+	{
+		ar(
+			cereal::make_nvp("base_type", cereal::base_class<Component>(&obj)),
+			cereal::make_nvp("camera", obj._camera),
+			cereal::make_nvp("hdr", obj._hdr)
+		);
+	}
+
+	LOAD(CameraComponent)
+	{
+		ar(
+			cereal::make_nvp("base_type", cereal::base_class<Component>(&obj)),
+			cereal::make_nvp("camera", obj._camera),
+			cereal::make_nvp("hdr", obj._hdr)
 		);
 
-	obj.setHDR(obj.mHDR);
+		obj.set_hdr(obj._hdr);
+	}
 }
 
 

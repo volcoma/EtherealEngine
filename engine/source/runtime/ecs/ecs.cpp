@@ -1,6 +1,6 @@
 #include "ecs.h"
 
-namespace core
+namespace runtime
 {
 	event<void(Entity)> onEntityCreated;
 	event<void(Entity)> onEntityDestroyed;
@@ -129,7 +129,7 @@ namespace core
 		remove(id, component->runtime_id());
 	}
 
-	void EntityComponentSystem::remove(Entity::Id id, const TypeInfo::index_t family)
+	void EntityComponentSystem::remove(Entity::Id id, const core::TypeInfo::index_t family)
 	{
 		assert_valid(id);
 		const std::uint32_t index = id.index();
@@ -150,7 +150,7 @@ namespace core
 		return has_component(id, component->runtime_id());
 	}
 
-	bool EntityComponentSystem::has_component(Entity::Id id, TypeInfo::index_t family) const
+	bool EntityComponentSystem::has_component(Entity::Id id, core::TypeInfo::index_t family) const
 	{
 		assert_valid(id);
 		// We don't bother checking the component mask, as we return a nullptr anyway.
@@ -208,8 +208,8 @@ namespace core
 		entity_component_mask_[id.index()].set(family);
 
 		// Create and return handle.
-		component->mEntity = get(id);
-		component->onEntitySet();
+		component->_entity = get(id);
+		component->on_entity_set();
 		CHandle<Component> handle(ptr);
 		onComponentAdded(get(id), handle);
 		return handle;
@@ -229,7 +229,7 @@ namespace core
 				if (pool)
 				{
 					auto handle = pool->get(index);
-					handle->mEntity.remove(handle);
+					handle->_entity.remove(handle);
 				}
 
 			}

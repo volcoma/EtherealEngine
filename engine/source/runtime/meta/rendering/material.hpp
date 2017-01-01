@@ -20,8 +20,8 @@ REFLECT(Material)
 
 	rttr::registration::class_<Material>("Material")
 		.property("Cull Type",
-			&StandardMaterial::getCullType,
-			&StandardMaterial::setCullType)
+			&StandardMaterial::get_cull_type,
+			&StandardMaterial::set_cull_type)
 		;
 }
 
@@ -29,14 +29,14 @@ REFLECT(Material)
 SAVE(Material)
 {
 	ar(
-		cereal::make_nvp("cull_type", obj.mCullType)
+		cereal::make_nvp("cull_type", obj._cull_type)
 	);
 }
 
 LOAD(Material)
 {
 	ar(
-		cereal::make_nvp("cull_type", obj.mCullType)
+		cereal::make_nvp("cull_type", obj._cull_type)
 	);
 }
 
@@ -44,60 +44,60 @@ REFLECT(StandardMaterial)
 {
 	rttr::registration::class_<StandardMaterial>("StandardMaterial")
 		.property("Base Color",
-			&StandardMaterial::getBaseColor,
-			&StandardMaterial::setBaseColor)
+			&StandardMaterial::get_base_color,
+			&StandardMaterial::set_base_color)
 		.property("Specular Color",
-			&StandardMaterial::getSpecularColor,
-			&StandardMaterial::setSpecularColor)
+			&StandardMaterial::get_specular_color,
+			&StandardMaterial::set_specular_color)
 		.property("Emissive Color",
-			&StandardMaterial::getEmissiveColor,
-			&StandardMaterial::setEmissiveColor)
+			&StandardMaterial::get_emissive_color,
+			&StandardMaterial::set_emissive_color)
 		.property("Roughness",
-			&StandardMaterial::getRoughness,
-			&StandardMaterial::setRoughness)
+			&StandardMaterial::get_roughness,
+			&StandardMaterial::set_roughness)
 		(
 			rttr::metadata("Min", 0.0f),
 			rttr::metadata("Max", 1.0f)
 		)
 		.property("Metalness",
-			&StandardMaterial::getMetalness,
-			&StandardMaterial::setMetalness)
+			&StandardMaterial::get_metalness,
+			&StandardMaterial::set_metalness)
 		(
 			rttr::metadata("Min", 0.0f),
 			rttr::metadata("Max", 1.0f)
 		)
 		.property("Bumpiness",
-			&StandardMaterial::getBumpiness,
-			&StandardMaterial::setBumpiness)
+			&StandardMaterial::get_bumpiness,
+			&StandardMaterial::set_bumpiness)
 		(
 			rttr::metadata("Min", 0.0f),
 			rttr::metadata("Max", 10.0f)
 		)
 		.property("Alpha Test Value",
-			&StandardMaterial::getAlphaTestValue,
-			&StandardMaterial::setAlphaTestValue)
+			&StandardMaterial::get_alpha_test_value,
+			&StandardMaterial::set_alpha_test_value)
 		(
 			rttr::metadata("Min", 0.0f),
 			rttr::metadata("Max", 1.0f)
 		)
 		.property("Tiling",
-			&StandardMaterial::getTiling,
-			&StandardMaterial::setTiling)
+			&StandardMaterial::get_tiling,
+			&StandardMaterial::set_tiling)
 		.property("Dither Threshold",
-			&StandardMaterial::getDitherThreshold,
-			&StandardMaterial::setDitherThreshold)
+			&StandardMaterial::get_dither_threshold,
+			&StandardMaterial::set_dither_threshold)
 		.property("Color Map",
-			&StandardMaterial::getColorMap,
-			&StandardMaterial::setColorMap)
+			&StandardMaterial::get_color_map,
+			&StandardMaterial::set_color_map)
 		.property("Normal Map",
-			&StandardMaterial::getNormalMap,
-			&StandardMaterial::setNormalMap)
+			&StandardMaterial::get_normal_map,
+			&StandardMaterial::set_normal_map)
 		.property("Roughness Map",
-			&StandardMaterial::getRoughnessMap,
-			&StandardMaterial::setRoughnessMap)
+			&StandardMaterial::get_roughness_map,
+			&StandardMaterial::set_roughness_map)
 		.property("Metalness Map",
-			&StandardMaterial::getMetalnessMap,
-			&StandardMaterial::setMetalnessMap)
+			&StandardMaterial::get_metalness_map,
+			&StandardMaterial::set_metalness_map)
 		;
 }
 
@@ -106,16 +106,16 @@ SAVE(StandardMaterial)
 {
 	ar(
 		cereal::make_nvp("base_type", cereal::base_class<Material>(&obj))
-		, cereal::make_nvp("base_color", obj.mBaseColor)
-		, cereal::make_nvp("specular_color", obj.mSpecularColor)
-		, cereal::make_nvp("emissive_color", obj.mEmissiveColor)
-		, cereal::make_nvp("surface_data", obj.mSurfaceData)
-		, cereal::make_nvp("tiling", obj.mTiling)
-		, cereal::make_nvp("dither_threshold", obj.mDitherThreshold)
-		, cereal::make_nvp("color_map", obj.mColorMap)
-		, cereal::make_nvp("normal_map", obj.mNormalMap)
-		, cereal::make_nvp("roughness_map", obj.mRoughnessMap)
-		, cereal::make_nvp("metalness_map", obj.mMetalnessMap)
+		, cereal::make_nvp("base_color", obj._base_color)
+		, cereal::make_nvp("specular_color", obj._specular_color)
+		, cereal::make_nvp("emissive_color", obj._emissive_color)
+		, cereal::make_nvp("surface_data", obj._surface_data)
+		, cereal::make_nvp("tiling", obj._tiling)
+		, cereal::make_nvp("dither_threshold", obj._dither_threshold)
+		, cereal::make_nvp("color_map", obj._color_map)
+		, cereal::make_nvp("normal_map", obj._normal_map)
+		, cereal::make_nvp("roughness_map", obj._roughness_map)
+		, cereal::make_nvp("metalness_map", obj._metalness_map)
 	);
 
 }
@@ -124,16 +124,16 @@ LOAD(StandardMaterial)
 {
 	ar(
 		cereal::make_nvp("base_type", cereal::base_class<Material>(&obj))
-		, cereal::make_nvp("base_color", obj.mBaseColor)
-		, cereal::make_nvp("specular_color", obj.mSpecularColor)
-		, cereal::make_nvp("emissive_color", obj.mEmissiveColor)
-		, cereal::make_nvp("surface_data", obj.mSurfaceData)
-		, cereal::make_nvp("tiling", obj.mTiling)
-		, cereal::make_nvp("dither_threshold", obj.mDitherThreshold)
- 		, cereal::make_nvp("color_map", obj.mColorMap)
- 		, cereal::make_nvp("normal_map", obj.mNormalMap)
-		, cereal::make_nvp("roughness_map", obj.mRoughnessMap)
-		, cereal::make_nvp("metalness_map", obj.mMetalnessMap)
+		, cereal::make_nvp("base_color", obj._base_color)
+		, cereal::make_nvp("specular_color", obj._specular_color)
+		, cereal::make_nvp("emissive_color", obj._emissive_color)
+		, cereal::make_nvp("surface_data", obj._surface_data)
+		, cereal::make_nvp("tiling", obj._tiling)
+		, cereal::make_nvp("dither_threshold", obj._dither_threshold)
+ 		, cereal::make_nvp("color_map", obj._color_map)
+ 		, cereal::make_nvp("normal_map", obj._normal_map)
+		, cereal::make_nvp("roughness_map", obj._roughness_map)
+		, cereal::make_nvp("metalness_map", obj._metalness_map)
 	);
 }
 

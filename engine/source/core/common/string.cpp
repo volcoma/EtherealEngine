@@ -65,21 +65,21 @@ std::vector<std::string> string_utils::split(const std::string &text, char sep, 
 	return tokens;
 }
 
-std::string string_utils::toUpper(const std::string& str)
+std::string string_utils::to_upper(const std::string& str)
 {
 	std::string s(str);
 	std::transform(s.begin(), s.end(), s.begin(), toupper);
 	return s;
 }
 
-std::string string_utils::toLower(const std::string& str)
+std::string string_utils::to_lower(const std::string& str)
 {
 	std::string s(str);
 	std::transform(s.begin(), s.end(), s.begin(), tolower);
 	return s;
 }
 
-bool string_utils::beginsWith(const std::string& str, const std::string & value, bool ignoreCase /*= false*/)
+bool string_utils::begins_with(const std::string& str, const std::string & value, bool ignoreCase /*= false*/)
 {
 	// Validate requirements
 	if (str.length() < value.length())
@@ -95,7 +95,7 @@ bool string_utils::beginsWith(const std::string& str, const std::string & value,
 	return false;
 }
 
-bool string_utils::endsWith(const std::string& str, const std::string & value, bool ignoreCase /*= false*/)
+bool string_utils::ends_with(const std::string& str, const std::string & value, bool ignoreCase /*= false*/)
 {
 	// Validate requirements
 	if (str.size() < value.size())
@@ -178,7 +178,7 @@ std::string string_utils::format(const char* format, va_list args)
 }
 
 
-std::string string_utils::wordWrap(const std::string & value, std::string::size_type maximumLength, const std::string & linePadding /*= ""*/)
+std::string string_utils::word_wrap(const std::string & value, std::string::size_type maximumLength, const std::string & linePadding /*= ""*/)
 {
 	std::string wrapString, currentLine;
 	std::string::size_type lastSpace = std::string::size_type(-1), lineLength = std::string::size_type(0);
@@ -282,7 +282,7 @@ std::string string_utils::wordWrap(const std::string & value, std::string::size_
 	return wrapString;
 }
 
-std::string string_utils::commandLineArgs(int _argc, char* _argv[])
+std::string string_utils::command_line_args(int _argc, char* _argv[])
 {
 	std::string cmdLine = "";
 	for (int i = 1; i < _argc - 1; ++i)
@@ -291,7 +291,7 @@ std::string string_utils::commandLineArgs(int _argc, char* _argv[])
 	return cmdLine;
 }
 
-bool string_utils::parseCommandLine(const std::string & strCommandLine, std::vector<std::string> & ArgumentsOut)
+bool string_utils::parse_command_line(const std::string & strCommandLine, std::vector<std::string> & ArgumentsOut)
 {
 	// Be polite and clear output array
 	ArgumentsOut.clear();

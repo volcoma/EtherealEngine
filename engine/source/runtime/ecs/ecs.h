@@ -1,12 +1,11 @@
 #pragma once
 
-#include "subsystem.h"
-
-#include "events/event.hpp"
-#include "common/assert.hpp"
-#include "common/type_traits.hpp"
-#include "reflection/reflection.h"
-#include "serialization/serialization.h"
+#include "core/subsystem.h"
+#include "core/events/event.hpp"
+#include "core/common/assert.hpp"
+#include "core/common/type_traits.hpp"
+#include "core/reflection/reflection.h"
+#include "core/serialization/serialization.h"
 
 #include <bitset>
 #include <mutex>
@@ -26,7 +25,7 @@
 #include <type_traits>
 #include <functional>
 
-namespace core
+namespace runtime
 {
 	static const std::size_t MAX_COMPONENTS = 128;
 
@@ -229,9 +228,9 @@ virtual core::TypeInfo::index_t runtime_id() const								\
 	return core::TypeInfo::id<Component, type>();								\
 }																				\
 public:																			\
-core::CHandle<type> handle()													\
+runtime::CHandle<type> handle()													\
 {																				\
-	return getEntity().component<type>();										\
+	return get_entity().component<type>();										\
 }																				\
 virtual std::shared_ptr<Component> clone() const								\
 {																				\
@@ -292,7 +291,7 @@ virtual std::shared_ptr<Component> clone() const								\
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------	
-		virtual void touch(const std::string& context) { mDirty = true; }
+		virtual void touch(const std::string& context) { _dirty = true; }
 
 		//-----------------------------------------------------------------------------
 		//  Name : isDirty (virtual )
@@ -302,7 +301,7 @@ virtual std::shared_ptr<Component> clone() const								\
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		virtual bool isDirty() const { return mDirty; }
+		virtual bool is_dirty() const { return _dirty; }
 
 		//-----------------------------------------------------------------------------
 		//  Name : onEntitySet (virtual )
@@ -312,7 +311,7 @@ virtual std::shared_ptr<Component> clone() const								\
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		virtual void onEntitySet() {}
+		virtual void on_entity_set() {}
 
 		//-----------------------------------------------------------------------------
 		//  Name : getEntity ()
@@ -322,7 +321,7 @@ virtual std::shared_ptr<Component> clone() const								\
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		Entity getEntity() { return mEntity; }
+		Entity get_entity() { return _entity; }
 
 	protected:
 		//-----------------------------------------------------------------------------
@@ -333,11 +332,11 @@ virtual std::shared_ptr<Component> clone() const								\
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		virtual TypeInfo::index_t runtime_id() const = 0;
+		virtual core::TypeInfo::index_t runtime_id() const = 0;
 		/// Owning Entity
-		Entity mEntity;
+		Entity _entity;
 		/// Was the component touched.
-		bool mDirty = false;
+		bool _dirty = false;
 	};
 
 
@@ -349,7 +348,7 @@ virtual std::shared_ptr<Component> clone() const								\
 	/**
 	* Manages Entity::Id creation and component assignment.
 	*/
-	class EntityComponentSystem : public Subsystem
+	class EntityComponentSystem : public core::Subsystem
 	{
 	public:
 		typedef std::bitset<MAX_COMPONENTS> ComponentMask;
@@ -664,7 +663,7 @@ virtual std::shared_ptr<Component> clone() const								\
 			remove(id, core::TypeInfo::id<Component, C>());
 		}
 		void remove(Entity::Id id, std::shared_ptr<Component> component);
-		void remove(Entity::Id id, const TypeInfo::index_t family);
+		void remove(Entity::Id id, const core::TypeInfo::index_t family);
 
 		/**
 		* Check if an Entity has a component.
@@ -678,7 +677,7 @@ virtual std::shared_ptr<Component> clone() const								\
 
 		bool has_component(Entity::Id id, std::shared_ptr<Component> component) const;
 
-		bool has_component(Entity::Id id, TypeInfo::index_t family) const;
+		bool has_component(Entity::Id id, core::TypeInfo::index_t family) const;
 		/**
 		* Retrieve a Component assigned to an Entity::Id.
 		*
@@ -887,7 +886,7 @@ virtual std::shared_ptr<Component> clone() const								\
 			return accomodate_component(family);
 		}
 
-		ComponentStorage *accomodate_component(TypeInfo::index_t family)
+		ComponentStorage *accomodate_component(core::TypeInfo::index_t family)
 		{
 			if (component_pools_.size() <= family)
 			{
@@ -1046,9 +1045,9 @@ virtual std::shared_ptr<Component> clone() const								\
 
 namespace std
 {
-	template <> struct hash<core::Entity>
+	template <> struct hash<runtime::Entity>
 	{
-		std::size_t operator () (const core::Entity &entity) const
+		std::size_t operator () (const runtime::Entity &entity) const
 		{
 			return static_cast<std::size_t>(entity.id().index() ^ entity.id().version());
 		}

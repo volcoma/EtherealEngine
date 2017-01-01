@@ -6,14 +6,14 @@
 
 Program::Program(AssetHandle<Shader> computeShader)
 {
-	addShader(computeShader);
+	add_shader(computeShader);
 	populate();
 }
 
 Program::Program(AssetHandle<Shader> vertexShader, AssetHandle<Shader> fragmentShader)
 {
-	addShader(vertexShader);
-	addShader(fragmentShader);
+	add_shader(vertexShader);
+	add_shader(fragmentShader);
 	populate();
 }
 
@@ -24,48 +24,48 @@ Program::~Program()
 
 void Program::dispose()
 {
-	if (isValid())
+	if (is_valid())
 		gfx::destroyProgram(handle);
 }
 
-bool Program::isValid() const
+bool Program::is_valid() const
 {
 	return gfx::isValid(handle);
 }
 
-void Program::setTexture(std::uint8_t _stage, const std::string& _sampler, FrameBuffer* frameBuffer, uint8_t _attachment /*= 0 */, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
+void Program::set_texture(std::uint8_t _stage, const std::string& _sampler, FrameBuffer* frameBuffer, uint8_t _attachment /*= 0 */, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
 	if (!frameBuffer)
 		return;
 
-	gfx::setTexture(_stage, getUniform(_sampler)->handle, gfx::getTexture(frameBuffer->handle, _attachment), _flags);
+	gfx::setTexture(_stage, get_uniform(_sampler)->handle, gfx::getTexture(frameBuffer->handle, _attachment), _flags);
 }
-void Program::setTexture(std::uint8_t _stage, const std::string& _sampler, gfx::FrameBufferHandle frameBuffer, uint8_t _attachment /*= 0 */, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
+void Program::set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::FrameBufferHandle frameBuffer, uint8_t _attachment /*= 0 */, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
-	gfx::setTexture(_stage, getUniform(_sampler)->handle, gfx::getTexture(frameBuffer, _attachment), _flags);
+	gfx::setTexture(_stage, get_uniform(_sampler)->handle, gfx::getTexture(frameBuffer, _attachment), _flags);
 }
-void Program::setTexture(std::uint8_t _stage, const std::string& _sampler, Texture* _texture, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
+void Program::set_texture(std::uint8_t _stage, const std::string& _sampler, Texture* _texture, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
 	if (!_texture)
 		return;
 
-	gfx::setTexture(_stage, getUniform(_sampler)->handle, _texture->handle, _flags);
+	gfx::setTexture(_stage, get_uniform(_sampler)->handle, _texture->handle, _flags);
 }
 
-void Program::setTexture(std::uint8_t _stage, const std::string& _sampler, gfx::TextureHandle _texture, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
+void Program::set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::TextureHandle _texture, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
-	gfx::setTexture(_stage, getUniform(_sampler)->handle, _texture, _flags);
+	gfx::setTexture(_stage, get_uniform(_sampler)->handle, _texture, _flags);
 }
 
-void Program::setUniform(const std::string& _name, const void* _value, uint16_t _num)
+void Program::set_uniform(const std::string& _name, const void* _value, uint16_t _num)
 {
-	auto hUniform = getUniform(_name);
+	auto hUniform = get_uniform(_name);
 
 	if (hUniform)
 		gfx::setUniform(hUniform->handle, _value, _num);
 }
 
-std::shared_ptr<Uniform> Program::getUniform(const std::string& _name)
+std::shared_ptr<Uniform> Program::get_uniform(const std::string& _name)
 {
 	std::shared_ptr<Uniform> hUniform;
 	auto it = uniforms.find(_name);
@@ -77,10 +77,10 @@ std::shared_ptr<Uniform> Program::getUniform(const std::string& _name)
 	return hUniform;
 }
 
-void Program::addShader(AssetHandle<Shader> shader)
+void Program::add_shader(AssetHandle<Shader> shader)
 {
 	shaders.push_back(shader);
-	shadersCached.push_back(shader->handle.idx);
+	shaders_cached.push_back(shader->handle.idx);
 	for (auto& uniform : shader->uniforms)
 	{
 		uniforms[uniform->info.name] = uniform;
@@ -94,22 +94,22 @@ void Program::populate()
 	if (shaders.size() == 1)
 	{
 		handle = gfx::createProgram(shaders[0]->handle);
-		shadersCached[0] = shaders[0]->handle.idx;
+		shaders_cached[0] = shaders[0]->handle.idx;
 	}
 	else if (shaders.size() == 2)
 	{
 		handle = gfx::createProgram(shaders[0]->handle, shaders[1]->handle);
-		shadersCached[0] = shaders[0]->handle.idx;
-		shadersCached[1] = shaders[1]->handle.idx;
+		shaders_cached[0] = shaders[0]->handle.idx;
+		shaders_cached[1] = shaders[1]->handle.idx;
 	}
 }
 
-void Program::beginPass()
+void Program::begin_pass()
 {
 	bool repopulate = false;
-	for (std::size_t i = 0; i < shadersCached.size(); ++i)
+	for (std::size_t i = 0; i < shaders_cached.size(); ++i)
 	{
-		if (shadersCached[i] != shaders[i]->handle.idx)
+		if (shaders_cached[i] != shaders[i]->handle.idx)
 		{
 			repopulate = true;
 			break;

@@ -9,7 +9,7 @@ struct ITexture
 {
 	REFLECTABLE(ITexture)
 	virtual ~ITexture() = default;
-	virtual inline bool isRenderTarget() const { return false; }
+	virtual inline bool is_render_target() const { return false; }
 };
 
 
@@ -131,14 +131,14 @@ struct Texture : public ITexture
 	~Texture();
 
 	//-----------------------------------------------------------------------------
-	//  Name : isValid ()
+	//  Name : is_valid ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool isValid() const;
+	bool is_valid() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : dispose ()
@@ -233,24 +233,24 @@ struct Texture : public ITexture
 	);
 
 	//-----------------------------------------------------------------------------
-	//  Name : getSize ()
+	//  Name : get_size ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	uSize getSize() const;
+	uSize get_size() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : isRenderTarget ()
+	//  Name : is_render_target ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline bool isRenderTarget() const { return 0 != (flags & BGFX_TEXTURE_RT_MASK); }
+	inline bool is_render_target() const { return 0 != (flags & BGFX_TEXTURE_RT_MASK); }
 
 	/// Texture detail info.
 	gfx::TextureInfo info;

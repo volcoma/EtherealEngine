@@ -6,31 +6,31 @@
 
 void RenderWindow::onResize()
 {
-	prepareSurface();
+	prepare_surface();
 	auto size = getSize();
-	onResized(*this, size);
+	on_resized(*this, size);
 }
 
 void RenderWindow::onClose()
 {
-	onClosed(*this);
+	on_closed(*this);
 }
 
 RenderWindow::RenderWindow()
 {
-	mSurface = std::make_shared<FrameBuffer>();
+	_surface = std::make_shared<FrameBuffer>();
 }
 
 RenderWindow::RenderWindow(sf::VideoMode mode, const std::string& title, std::uint32_t style /*= sf::Style::Default*/) : sf::Window(mode, title, style)
 {
-	mSurface = std::make_shared<FrameBuffer>();
+	_surface = std::make_shared<FrameBuffer>();
 }
 
 RenderWindow::~RenderWindow()
 {
 	// force internal handle destruction
-	mSurface->dispose();
-	mSurface.reset();
+	_surface->dispose();
+	_surface.reset();
 	gfx::frame();
 	gfx::frame();
 }
@@ -40,35 +40,35 @@ bool RenderWindow::filterEvent(const sf::Event& event)
 	return sf::Window::filterEvent(event);;
 }
 
-void RenderWindow::frameBegin()
+void RenderWindow::frame_begin()
 {
 }
 
-void RenderWindow::frameUpdate(float dt)
+void RenderWindow::frame_update(float dt)
 {
 }
 
-void RenderWindow::frameEnd()
+void RenderWindow::frame_end()
 {
 	RenderPass pass("RenderWindowPass");
-	pass.bind(mSurface.get());
+	pass.bind(_surface.get());
 	pass.clear();
 }
 
-void RenderWindow::frameRender()
+void RenderWindow::frame_render()
 {
 }
 
-void RenderWindow::prepareSurface()
+void RenderWindow::prepare_surface()
 {
 	auto size = getSize();
-	if (mIsMain)
+	if (_is_main)
 	{
 		gfx::reset(size.width, size.height, 0);
 	}
 	else
 	{
-		mSurface->populate(getSystemHandle(), size.width, size.height);
+		_surface->populate(getSystemHandle(), size.width, size.height);
 	}
 
 }

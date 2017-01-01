@@ -41,39 +41,39 @@ public:
 	virtual ~RenderWindow();
 
 	/// event triggered when window is resized.
-	event<void(RenderWindow&, const uSize&)> onResized;
+	event<void(RenderWindow&, const uSize&)> on_resized;
 	/// event triggered when window is closed.
-	event<void(RenderWindow&)> onClosed;
+	event<void(RenderWindow&)> on_closed;
 
 	//-----------------------------------------------------------------------------
-	//  Name : getRenderView ()
+	//  Name : get_surface ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline std::shared_ptr<FrameBuffer> getRenderSurface() { return mSurface; }
+	inline std::shared_ptr<FrameBuffer> get_surface() { return _surface; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getRenderView ()
+	//  Name : get_surface ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline std::shared_ptr<FrameBuffer> getRenderSurface() const { return mSurface; }
+	inline std::shared_ptr<FrameBuffer> get_surface() const { return _surface; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : prepareSurface (virtual )
+	//  Name : prepare_surface (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void prepareSurface();
+	virtual void prepare_surface();
 
 	//-----------------------------------------------------------------------------
 	//  Name : frameBegin (virtual )
@@ -83,7 +83,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void frameBegin();
+	virtual void frame_begin();
 
 	//-----------------------------------------------------------------------------
 	//  Name : frameUpdate (virtual )
@@ -93,7 +93,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void frameUpdate(float dt);
+	virtual void frame_update(float dt);
 
 	//-----------------------------------------------------------------------------
 	//  Name : frameRender (virtual )
@@ -103,7 +103,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void frameRender();
+	virtual void frame_render();
 
 	//-----------------------------------------------------------------------------
 	//  Name : frameEnd (virtual )
@@ -113,7 +113,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void frameEnd();
+	virtual void frame_end();
 	
 	//-----------------------------------------------------------------------------
 	//  Name : setMain ()
@@ -123,7 +123,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setMain(bool isMain) { mIsMain = isMain; }
+	inline void set_main(bool isMain) { _is_main = isMain; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : isMain ()
@@ -133,7 +133,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline bool isMain() const { return mIsMain; }
+	inline bool is_main() const { return _is_main; }
 protected:
 	//-----------------------------------------------------------------------------
 	//  Name : filterEvent (virtual )
@@ -166,7 +166,7 @@ protected:
 	virtual void onClose();
 
 	/// Render surface for this window.
-	std::shared_ptr<FrameBuffer> mSurface;
+	std::shared_ptr<FrameBuffer> _surface;
 	///
-	bool mIsMain = false;
+	bool _is_main = false;
 };

@@ -3,7 +3,7 @@
 namespace Docks
 {
 
-	void renderStyle(ImVec2 area)
+	void render_style(ImVec2 area)
 	{
 		auto& GUIStyle = gui::getGUIStyle();
 		auto& setup = GUIStyle.setup;
@@ -46,21 +46,21 @@ namespace Docks
 
 		if (gui::Button("Save"))
 		{
-			GUIStyle.saveStyle();
+			GUIStyle.save_style();
 		}
 		gui::SameLine();
 		if (gui::Button("Reload"))
 		{
-			GUIStyle.loadStyle();
+			GUIStyle.load_style();
 		}
 		gui::SameLine();
 		if (gui::Button("Default"))
 		{
-			GUIStyle.resetStyle();
+			GUIStyle.reset_style();
 		}
 		else
 		{
-			GUIStyle.setStyleColors(setup);
+			GUIStyle.set_style_colors(setup);
 		}
 		
 		

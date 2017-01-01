@@ -1,30 +1,30 @@
 #include "docks.h"
 #include "../../edit_state.h"
+#include "runtime/ecs/ecs.h"
 #include "runtime/ecs/components/camera_component.h"
 #include "runtime/rendering/render_pass.h"
-#include "core/ecs.h"
 
 namespace Docks
 {
 	
-	void renderGame(ImVec2 area)
+	void render_game(ImVec2 area)
 	{
-		auto es = core::get_subsystem<EditState>();
+		auto es = core::get_subsystem<editor::EditState>();
 		auto& editorCamera = es->camera;
 
-		auto ecs = core::get_subsystem<core::EntityComponentSystem>();
+		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 		ecs->each<CameraComponent>([&editorCamera](
-			core::Entity e,
+			runtime::Entity e,
 			CameraComponent& cameraComponent
 			)
 		{
 			if (e == editorCamera)
 				return;
 
-			const auto surface = cameraComponent.getOutputBuffer();
+			const auto surface = cameraComponent.get_output_buffer();
 			auto size = gui::GetContentRegionAvail();
 
-			cameraComponent.setViewportSize({ static_cast<std::uint32_t>(size.x), static_cast<std::uint32_t>(size.y) });
+			cameraComponent.set_viewport_size({ static_cast<std::uint32_t>(size.x), static_cast<std::uint32_t>(size.y) });
 			gui::Image(surface, size);
 	
 		});

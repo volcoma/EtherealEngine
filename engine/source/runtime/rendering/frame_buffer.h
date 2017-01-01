@@ -119,14 +119,14 @@ struct FrameBuffer : public ITexture
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : isValid ()
+	//  Name : is_valid ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline bool isValid() const
+	inline bool is_valid() const
 	{
 		return gfx::isValid(handle);
 	}
@@ -141,9 +141,9 @@ struct FrameBuffer : public ITexture
 	//-----------------------------------------------------------------------------
 	inline void dispose()
 	{
-		mTextures.clear();
+		_textures.clear();
 
-		if (isValid())
+		if (is_valid())
 			gfx::destroyFrameBuffer(handle);
 
 		handle = { bgfx::invalidHandle };
@@ -168,8 +168,8 @@ struct FrameBuffer : public ITexture
 
 		handle = gfx::createFrameBuffer(_width, _height, _format, _textureFlags);
 
-		mRatio = gfx::BackbufferRatio::Count;
-		mCachedSize = { _width, _height };
+		_bbratio = gfx::BackbufferRatio::Count;
+		_cached_size = { _width, _height };
 	}
 
 	//-----------------------------------------------------------------------------
@@ -189,8 +189,8 @@ struct FrameBuffer : public ITexture
 		dispose();
 
 		handle = gfx::createFrameBuffer(_ratio, _format, _textureFlags);
-		mRatio = _ratio;
-		mCachedSize = { 0, 0 };
+		_bbratio = _ratio;
+		_cached_size = { 0, 0 };
 	}
 
 	//-----------------------------------------------------------------------------
@@ -245,19 +245,19 @@ struct FrameBuffer : public ITexture
 			attachment.layer = tex.layer;
 			buffer.push_back(attachment);
 		}
-		mTextures = textures;
+		_textures = textures;
 
 		handle = gfx::createFrameBuffer(static_cast<std::uint8_t>(buffer.size()), &buffer[0], false);
 
 		if (ratio == gfx::BackbufferRatio::Count)
 		{
-			mRatio = ratio;
-			mCachedSize = size;
+			_bbratio = ratio;
+			_cached_size = size;
 		}
 		else
 		{
-			mRatio = ratio;
-			mCachedSize = { 0, 0 };
+			_bbratio = ratio;
+			_cached_size = { 0, 0 };
 		}
 	}
 
@@ -280,31 +280,31 @@ struct FrameBuffer : public ITexture
 
 		handle = gfx::createFrameBuffer(_nwh, _width, _height, _depthFormat);
 
-		mCachedSize = { _width, _height };
-		mRatio = gfx::BackbufferRatio::Count;
+		_cached_size = { _width, _height };
+		_bbratio = gfx::BackbufferRatio::Count;
 	}
 
 
 	//-----------------------------------------------------------------------------
-	//  Name : getSize ()
+	//  Name : get_size ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	uSize getSize() const
+	uSize get_size() const
 	{
-		if (mRatio == gfx::BackbufferRatio::Count)
+		if (_bbratio == gfx::BackbufferRatio::Count)
 		{
-			return mCachedSize;
+			return _cached_size;
 
 		} // End if Absolute
 		else
 		{
 			std::uint16_t width;
 			std::uint16_t height;
-			gfx::getSizeFromRatio(mRatio, width, height);
+			gfx::getSizeFromRatio(_bbratio, width, height);
 			uSize size =
 			{
 				static_cast<std::uint32_t>(width),
@@ -316,33 +316,41 @@ struct FrameBuffer : public ITexture
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : getAttachment ()
+	//  Name : get_attachment ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const TextureAttachment& getAttachment(std::uint32_t index) const { return mTextures[index]; }
+	inline const TextureAttachment& get_attachment(std::uint32_t index) const { return _textures[index]; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getAttachmentCount ()
+	//  Name : get_attachment_count ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const std::size_t getAttachmentCount() const { return mTextures.size(); }
+	inline const std::size_t get_attachment_count() const { return _textures.size(); }
 
-	virtual inline bool isRenderTarget() const { return true; }
+	//-----------------------------------------------------------------------------
+	//  Name : is_render_target (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	virtual inline bool is_render_target() const { return true; }
 
 	/// Internal handle
 	gfx::FrameBufferHandle handle = { gfx::invalidHandle };
 	/// Back buffer ratio if any.
-	gfx::BackbufferRatio::Enum mRatio = gfx::BackbufferRatio::Equal;
+	gfx::BackbufferRatio::Enum _bbratio = gfx::BackbufferRatio::Equal;
 	/// Size of the surface. If {0,0} then it is controlled by backbuffer ratio
-	uSize mCachedSize = { 0, 0 };
+	uSize _cached_size = { 0, 0 };
 	/// Texture attachments to the frame buffer
-	std::vector<TextureAttachment> mTextures;
+	std::vector<TextureAttachment> _textures;
 };

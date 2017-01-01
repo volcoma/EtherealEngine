@@ -1,7 +1,7 @@
 #include "task.h"
-#include "common/assert.hpp"
+#include "core/common/assert.hpp"
 
-namespace core
+namespace runtime
 {
 
 	bool TaskSystem::initialize()
@@ -34,9 +34,9 @@ namespace core
 			thread.join();
 	}
 
-	Handle TaskSystem::create_internal(const char* name, std::function<void()> closure)
+	core::Handle TaskSystem::create_internal(const char* name, std::function<void()> closure)
 	{
-		Handle handle;
+		core::Handle handle;
 		{
 			std::unique_lock<std::mutex> L(_tasks_mutex);
 			handle = _tasks.create();
@@ -58,12 +58,12 @@ namespace core
 			return handle;
 		}
 
-		return Handle();
+		return core::Handle();
 	}
 
-	Handle TaskSystem::create_as_child_internal(Handle parent, const char* name, std::function<void()> closure)
+	core::Handle TaskSystem::create_as_child_internal(core::Handle parent, const char* name, std::function<void()> closure)
 	{
-		Handle handle;
+		core::Handle handle;
 		{
 			std::unique_lock<std::mutex> L(_tasks_mutex);
 			handle = _tasks.create();
@@ -94,10 +94,10 @@ namespace core
 			}
 			return handle;
 		}
-		return Handle();
+		return core::Handle();
 	}
 
-	void TaskSystem::run(Handle handle)
+	void TaskSystem::run(core::Handle handle)
 	{
 		Task* task = nullptr;
 		{
@@ -115,7 +115,7 @@ namespace core
 		_condition.notify_one();
 	}
 
-	void TaskSystem::run_on_main(Handle handle)
+	void TaskSystem::run_on_main(core::Handle handle)
 	{
 		Task* task = nullptr;
 		{
@@ -143,7 +143,7 @@ namespace core
 		}
 	}
 
-	bool TaskSystem::is_completed(Handle handle)
+	bool TaskSystem::is_completed(core::Handle handle)
 	{
 		Task* task = nullptr;
 		{
@@ -155,7 +155,7 @@ namespace core
 		return task->jobs.load() == 0;
 	}
 
-	void TaskSystem::wait(Handle handle)
+	void TaskSystem::wait(core::Handle handle)
 	{
 		Task* task = nullptr;
 		{
@@ -174,7 +174,7 @@ namespace core
 		}
 	}
 
-	void TaskSystem::finish(Handle handle)
+	void TaskSystem::finish(core::Handle handle)
 	{
 		Task* task = nullptr;
 		{
@@ -200,10 +200,9 @@ namespace core
 		}
 	}
 
-	bool TaskSystem::execute_one(unsigned index, bool wait, std::mutex& mtx, std::queue<Handle>& queue)
+	bool TaskSystem::execute_one(unsigned index, bool wait, std::mutex& mtx, std::queue<core::Handle>& queue)
 	{
-		Handle handle;
-
+		core::Handle handle;
 		{
 			std::unique_lock<std::mutex> L(mtx);
 			if (wait)

@@ -3,11 +3,11 @@
 
 void ConsoleLog::_sink_it(const logging::details::log_msg& msg)
 {
-	mItems.push_back({ msg.formatted.c_str(), msg.level });
-	if (mItems.size() > mMaxSize)
-		mItems.pop_front();
+	_entries.push_back({ msg.formatted.c_str(), msg.level });
+	if (_entries.size() > _max_size)
+		_entries.pop_front();
 	flush();
-	++mPendingEntries;
+	++_pending;
 }
 
 void ConsoleLog::flush()
@@ -15,18 +15,18 @@ void ConsoleLog::flush()
 
 }
 
-ConsoleLog::ItemContainer ConsoleLog::getItems()
+ConsoleLog::entries_t ConsoleLog::get_items()
 {
-	ItemContainer itemsCopy;
+	entries_t itemsCopy;
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
-		itemsCopy = mItems;
+		itemsCopy = _entries;
 	}
 	return itemsCopy;
 }
 
 void ConsoleLog::clearLog()
 {
-	mItems = ItemContainer();
-	mPendingEntries = 0;
+	_entries = entries_t();
+	_pending = 0;
 }

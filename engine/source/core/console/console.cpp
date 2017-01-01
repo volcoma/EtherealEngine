@@ -6,7 +6,7 @@
 
 Console::Console()
 {
-	registerHelpCommand();
+	register_help_command();
 }
 
 Console::~Console()
@@ -17,7 +17,7 @@ Console::~Console()
 /**
 * @brief Add an alias to the command.
 */
-void Console::registerAlias(const std::string& alias, const std::string& command)
+void Console::register_alias(const std::string& alias, const std::string& command)
 {
 	assert(commands.find(command) != commands.end());
 	assert(commands.find(alias) == commands.end());
@@ -41,10 +41,10 @@ void Console::registerAlias(const std::string& alias, const std::string& command
 * - create an history of inputs
 * - eventually make the commands lowercase / case insensitive
 */
-std::string Console::processInput(const std::string& line)
+std::string Console::process_input(const std::string& line)
 {
 	printBuffer.str(std::string()); // clear()
-	std::vector<std::string> tokens = tokenizeLine(line);
+	std::vector<std::string> tokens = tokenize_line(line);
 
 	if (tokens.size() == 0)
 		return "";
@@ -72,7 +72,7 @@ std::string Console::processInput(const std::string& line)
 * TODO:
 * - Find if there is a better way to tokenize a string.
 */
-std::vector<std::string> Console::tokenizeLine(const std::string& line)
+std::vector<std::string> Console::tokenize_line(const std::string& line)
 {
 	std::vector<std::string> out;
 	std::string currWord;
@@ -142,14 +142,14 @@ std::vector<std::string> Console::tokenizeLine(const std::string& line)
 	return out;
 }
 
-void Console::registerHelpCommand()
+void Console::register_help_command()
 {
-	registerCommand(
+	register_command(
 		"help",
 		"Prints information about using the console or a given command.",
 		{ "term" },
 		{ "" },
-		(std::function<void(std::string)>) ([this](std::string term) {helpCommand(term); })
+		(std::function<void(std::string)>) ([this](std::string term) {help_command(term); })
 	);
 }
 
@@ -157,7 +157,7 @@ void Console::registerHelpCommand()
 * TODO:
 * - if the commands will ever be case insensitive, the filter should also be
 */
-void Console::helpCommand(const std::string& term)
+void Console::help_command(const std::string& term)
 {
 	if (term.empty())
 	{
@@ -170,7 +170,7 @@ void Console::helpCommand(const std::string& term)
 	else if (term == "commands")
 	{
 		// TODO: implement the filter
-		for (const auto command : listOfCommands())
+		for (const auto command : list_of_commands())
 		{
 			print(command);
 			if (!commands[command]->description.empty())
@@ -182,7 +182,7 @@ void Console::helpCommand(const std::string& term)
 	{
 		if (commands.find(term) != commands.end())
 		{
-			print(commands[term]->getUsage());
+			print(commands[term]->get_usage());
 			if (!commands[term]->description.empty())
 				print("    " + commands[term]->description);
 		}
@@ -197,7 +197,7 @@ void Console::helpCommand(const std::string& term)
 * TODO:
 * - if the commands will ever be case insensitive, the filter should also be
 */
-std::vector<std::string> Console::listOfCommands(const std::string& filter)
+std::vector<std::string> Console::list_of_commands(const std::string& filter)
 {
 	std::vector<std::string> list{};
 	for (auto value : commands)

@@ -6,11 +6,11 @@ class ConsoleLog;
 
 namespace Docks
 {
-	void renderAssets(ImVec2 area);
-	void renderHierarcy(ImVec2 area);
-	void renderInspector(ImVec2 area);
+	void render_assets(ImVec2 area);
+	void render_hierarchy(ImVec2 area);
+	void render_inspector(ImVec2 area);
 	void render_scene(ImVec2 area);
-	void renderGame(ImVec2 area);
-	void renderStyle(ImVec2 area);
-	void renderConsole(ImVec2 area, ConsoleLog& console);
+	void render_game(ImVec2 area);
+	void render_style(ImVec2 area);
+	void render_console(ImVec2 area, ConsoleLog& console);
 }

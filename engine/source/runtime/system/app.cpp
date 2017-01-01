@@ -1,6 +1,6 @@
 #include "app.h"
 #include "engine.h"
-#include "renderer.h"
+#include "rendering/renderer.h"
 #include "assets/asset_manager.h"
 
 namespace runtime
@@ -55,7 +55,7 @@ namespace runtime
 
 	void App::terminate_with_error(const std::string& message)
 	{
-		//    LOGE(message.c_str());
+		logging::get("Log")->error() << message;
 		_exitcode = -1;
 	}
 

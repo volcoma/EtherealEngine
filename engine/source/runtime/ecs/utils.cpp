@@ -7,16 +7,16 @@ namespace ecs
 {
 	namespace utils
 	{
-		void saveEntity(const fs::path& dir, const core::Entity& data)
+		void save_entity(const fs::path& dir, const runtime::Entity& data)
 		{
 			const fs::path fullPath = fs::resolve_protocol(dir / fs::path(data.get_name()+ ".asset"));
-			saveData(fullPath, { data });
+			save_data(fullPath, { data });
 		}
 
-		bool tryLoadEntity(const fs::path& fullPath, core::Entity& outData)
+		bool try_load_entity(const fs::path& fullPath, runtime::Entity& outData)
 		{
-			std::vector<core::Entity> outDataVec;
-			if (!loadData(fullPath, outDataVec))
+			std::vector<runtime::Entity> outDataVec;
+			if (!load_data(fullPath, outDataVec))
 				return false;
 
 			if (!outDataVec.empty())
@@ -26,19 +26,19 @@ namespace ecs
 		}
 
 
-		void saveData(const fs::path& fullPath, const std::vector<core::Entity>& data)
+		void save_data(const fs::path& fullPath, const std::vector<runtime::Entity>& data)
 		{
 			std::ofstream os(fullPath, std::fstream::binary | std::fstream::trunc);
-			serializeData(os, data);
+			serialize_data(os, data);
 		}
 
-		bool loadData(const fs::path& fullPath, std::vector<core::Entity>& outData)
+		bool load_data(const fs::path& fullPath, std::vector<runtime::Entity>& outData)
 		{
 			std::ifstream is(fullPath, std::fstream::binary);
-			return deserializeData(is, outData);
+			return deserialize_data(is, outData);
 		}
 
-		void serializeData(std::ostream& stream, const std::vector<core::Entity>& data)
+		void serialize_data(std::ostream& stream, const std::vector<runtime::Entity>& data)
 		{
 			cereal::OArchive_Binary ar(stream);
 
@@ -48,7 +48,7 @@ namespace ecs
 			getSerializationMap().clear();
 		}
 
-		bool deserializeData(std::istream& stream, std::vector<core::Entity>& outData)
+		bool deserialize_data(std::istream& stream, std::vector<runtime::Entity>& outData)
 		{
 			// get length of file:
 			getSerializationMap().clear();

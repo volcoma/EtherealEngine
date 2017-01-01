@@ -10,7 +10,7 @@
 #include "../../rendering/material.h"
 
 template<typename T>
-inline void loadAsset(AssetHandle<T>& obj, const std::string& id, bool async)
+inline void load_asset(AssetHandle<T>& obj, const std::string& id, bool async)
 {
 	if (id.empty())
 	{
@@ -18,7 +18,7 @@ inline void loadAsset(AssetHandle<T>& obj, const std::string& id, bool async)
 	}
 	else
 	{
-		auto am = core::get_subsystem<AssetManager>();
+		auto am = core::get_subsystem<runtime::AssetManager>();
 		am->load<T>(id, false)
 			.then([&obj](auto asset) mutable
 		{
@@ -72,7 +72,7 @@ namespace cereal
 			cereal::make_nvp("link", obj.link)
 		);
 
-		loadAsset(obj, obj.link->id, true);
+		load_asset(obj, obj.link->id, true);
 	}
 
 	template<typename Archive>
@@ -82,7 +82,7 @@ namespace cereal
 			cereal::make_nvp("link", obj.link)
 		);
 
-		loadAsset(obj, obj.link->id, true);
+		load_asset(obj, obj.link->id, true);
 	}
 
 	template<typename Archive>
@@ -92,7 +92,7 @@ namespace cereal
 			cereal::make_nvp("link", obj.link)
 		);
 
-		loadAsset(obj, obj.link->id, false);
+		load_asset(obj, obj.link->id, false);
 	}
 }
 

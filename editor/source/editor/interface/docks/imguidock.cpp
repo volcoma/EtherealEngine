@@ -5,7 +5,7 @@
 
 namespace ImGuiDock
 {
-	Dockspace::Dockspace(GuiWindow* owner) : mOwner(owner)
+	Dockspace::Dockspace(GuiWindow* owner) : owner(owner)
 	{
 
 	}
@@ -17,10 +17,10 @@ namespace ImGuiDock
 
 	bool Dockspace::dock(Dock* dock, DockSlot dockSlot, float size, bool active)
 	{
-		return dockWith(dock, nullptr, dockSlot, size, active);
+		return dock_with(dock, nullptr, dockSlot, size, active);
 	}
 
-	bool Dockspace::dockWith(Dock* dock, Dock* dockTo, DockSlot dockSlot, float size, bool active)
+	bool Dockspace::dock_with(Dock* dock, Dock* dockTo, DockSlot dockSlot, float size, bool active)
 	{
 		if (dock == nullptr)
 			return false;
@@ -31,7 +31,7 @@ namespace ImGuiDock
 		{
 			if (dockSlot == ImGuiDock::DockSlot::Tab)
 			{
-				dockTo->container->activeDock = active ? dock : currentContainer->splits[0]->activeDock ? currentContainer->splits[0]->activeDock : dock;
+				dockTo->container->active_dock = active ? dock : currentContainer->splits[0]->active_dock ? currentContainer->splits[0]->active_dock : dock;
 				dockTo->container->docks.push_back(dock);
 				dock->container = dockTo->container;
 				return true;
@@ -66,7 +66,7 @@ namespace ImGuiDock
 		if (currentContainer->splits[0] == nullptr)
 		{
 			currentContainer->splits[0] = childContainer;
-			currentContainer->splits[0]->activeDock = active ? dock : currentContainer->splits[0]->activeDock ? currentContainer->splits[0]->activeDock : dock;
+			currentContainer->splits[0]->active_dock = active ? dock : currentContainer->splits[0]->active_dock ? currentContainer->splits[0]->active_dock : dock;
 			currentContainer->splits[0]->docks.push_back(dock);
 			currentContainer->splits[0]->parent = currentContainer;
 			currentContainer->splits[0]->size = size < 0 ? size * -1 : size;
@@ -79,46 +79,46 @@ namespace ImGuiDock
 			//Node *otherSplit = currentContainer->splits[0];
 			if (size > 0)
 			{
-				currentContainer->splits[0]->alwaysAutoResize = true;
+				currentContainer->splits[0]->always_auto_resize = true;
 				currentContainer->splits[0]->size = 0;
 				currentContainer->splits[1]->size = size;
-				currentContainer->splits[1]->alwaysAutoResize = false;
+				currentContainer->splits[1]->always_auto_resize = false;
 			}
 			else if (size == 0) {}
 			else
 			{
-				currentContainer->splits[0]->alwaysAutoResize = false;
+				currentContainer->splits[0]->always_auto_resize = false;
 				currentContainer->splits[0]->size = size * -1;
 				currentContainer->splits[1]->size = 0;
-				currentContainer->splits[1]->alwaysAutoResize = true;
+				currentContainer->splits[1]->always_auto_resize = true;
 			}
 			switch (dockSlot)
 			{
 			case ImGuiDock::DockSlot::Left:
 				currentContainer->splits[1] = currentContainer->splits[0];
 				currentContainer->splits[0] = childContainer;
-				currentContainer->verticalSplit = true;
+				currentContainer->vertical_split = true;
 				break;
 			case ImGuiDock::DockSlot::Right:
-				currentContainer->verticalSplit = true;
+				currentContainer->vertical_split = true;
 				break;
 			case ImGuiDock::DockSlot::Top:
 				currentContainer->splits[1] = currentContainer->splits[0];
 				currentContainer->splits[0] = childContainer;
-				currentContainer->verticalSplit = false;
+				currentContainer->vertical_split = false;
 				break;
 			case ImGuiDock::DockSlot::Bottom:
-				currentContainer->verticalSplit = false;
+				currentContainer->vertical_split = false;
 				break;
 			case ImGuiDock::DockSlot::Tab:
-				currentContainer->verticalSplit = false;
+				currentContainer->vertical_split = false;
 				break;
 			case ImGuiDock::DockSlot::None:
 				break;
 			default:
 				break;
 			}
-			childContainer->activeDock = active ? dock : childContainer->activeDock ? childContainer->activeDock : dock;
+			childContainer->active_dock = active ? dock : childContainer->active_dock ? childContainer->active_dock : dock;
 			childContainer->docks.push_back(dock);
 			childContainer->parent = currentContainer;
 
@@ -145,11 +145,11 @@ namespace ImGuiDock
 				{
 					if (dock->container->docks[i] == dock)
 					{
-						dock->lastSize = dock->container->activeDock->lastSize;
+						dock->last_size = dock->container->active_dock->last_size;
 						dock->container->docks.erase(dock->container->docks.begin() + i);
 						if (i != dock->container->docks.size())
-							dock->container->activeDock = dock->container->docks[i];
-						else dock->container->activeDock = dock->container->docks[i - 1];
+							dock->container->active_dock = dock->container->docks[i];
+						else dock->container->active_dock = dock->container->docks[i - 1];
 					}
 				}
 			}
@@ -167,19 +167,19 @@ namespace ImGuiDock
 								parentToDelete = node.splits[1];
 								node.splits[0] = node.splits[1]->splits[0];
 								node.splits[0]->parent = &node;
-								node.splits[0]->verticalSplit = false;
+								node.splits[0]->vertical_split = false;
 								node.splits[1] = node.splits[1]->splits[1];
 								node.splits[1]->parent = &node;
-								node.splits[1]->parent->verticalSplit = node.splits[1]->verticalSplit;
-								node.splits[1]->verticalSplit = false;
+								node.splits[1]->parent->vertical_split = node.splits[1]->vertical_split;
+								node.splits[1]->vertical_split = false;
 							}
 							else
 							{
 								node.splits[0] = node.splits[1];
 								node.splits[1] = nullptr;
 								node.splits[0]->size = 0;
-								node.splits[0]->verticalSplit = false;
-								node.splits[0]->parent->verticalSplit = false;
+								node.splits[0]->vertical_split = false;
+								node.splits[0]->parent->vertical_split = false;
 							}
 						}
 						else return false;
@@ -245,12 +245,12 @@ namespace ImGuiDock
 
 	void updateDrag(GuiWindow* window)
 	{
-		auto& dockspace = window->getDockspace();
+		auto& dockspace = window->get_dockspace();
 		auto& split = dockspace.node.splits[0];
 
-		if (split && split->activeDock)
+		if (split && split->active_dock)
 		{
-			auto& activeDock = split->activeDock;
+			auto& activeDock = split->active_dock;
 			bool mouseleft = sf::Mouse::isButtonPressed(sf::Mouse::Left);
 			if (activeDock->draging && mouseleft)
 			{
@@ -264,14 +264,14 @@ namespace ImGuiDock
 			{
 				if (activeDock->draging)
 				{
-					if (activeDock->redockTo)
+					if (activeDock->redock_to)
 					{
 						activeDock->container = nullptr;
-						activeDock->redockFrom->dockWith(
+						activeDock->redock_from->dock_with(
 							activeDock,
-							activeDock->redockTo,
-							activeDock->redockSlot, 0, true);
-						activeDock->redockTo = nullptr;
+							activeDock->redock_to,
+							activeDock->redock_slot, 0, true);
+						activeDock->redock_to = nullptr;
 
 						window->close();
 					}
@@ -285,7 +285,7 @@ namespace ImGuiDock
 		}
 	}
 
-	void Dockspace::updateAndDraw(ImVec2 dockspaceSize)
+	void Dockspace::update_and_draw(ImVec2 dockspaceSize)
 	{
 		uint32_t idgen = 0;
 
@@ -307,7 +307,7 @@ namespace ImGuiDock
 
 			if (container->splits[0] == nullptr && container != &node)
 			{
-				_renderTabBar(container, calculatedSize, cursorPos);
+				render_tab_bar(container, calculatedSize, cursorPos);
 				cursorPos.y += tabbarHeight;
 
 				ImGui::SetCursorPos(cursorPos);
@@ -315,15 +315,15 @@ namespace ImGuiDock
 				screenCursorPos.y -= tabbarHeight;
 
 				ImGui::BeginChild(idname.c_str(), calculatedSize, false, ImGuiWindowFlags_AlwaysUseWindowPadding);
-				container->activeDock->drawFunction(calculatedSize);
-				container->activeDock->lastSize = calculatedSize;
+				container->active_dock->drawFunction(calculatedSize);
+				container->active_dock->last_size = calculatedSize;
 
 				ImGui::EndChild();
 
-				GuiWindow* draggedWindow = _isAnyWindowDragging();
-				if (draggedWindow != nullptr && draggedWindow->getDockspace().node.splits[0]->activeDock != container->activeDock)
+				GuiWindow* draggedWindow = is_any_window_dragged();
+				if (draggedWindow != nullptr && draggedWindow->get_dockspace().node.splits[0]->active_dock != container->active_dock)
 				{
-					auto mousePos = sf::Mouse::getPosition(*mOwner);
+					auto mousePos = sf::Mouse::getPosition(*owner);
 					ImVec2 cursorPos = { float(mousePos.x), float(mousePos.y) };
 					if ((mousePos.x > screenCursorPos.x && mousePos.x < (screenCursorPos.x + size.x)) &&
 						(mousePos.y > screenCursorPos.y && mousePos.y < (screenCursorPos.y + size.y)))
@@ -331,18 +331,18 @@ namespace ImGuiDock
 
 						ImGui::BeginChild("##dockSlotPreview");
 						ImGui::PushClipRect(ImVec2(), ImGui::GetIO().DisplaySize, false);
-						DockSlot dockSlot = _renderDockSlotPreview(cursorPos, screenCursorPos, size);
+						DockSlot dockSlot = render_dock_slot_preview(cursorPos, screenCursorPos, size);
 						ImGui::PopClipRect();
 						ImGui::EndChild();
 						if (dockSlot != DockSlot::None)
 						{
-							Dock *draggedWindowDock = draggedWindow->getDockspace().node.splits[0]->activeDock;
-							draggedWindowDock->redockFrom = this;
-							draggedWindowDock->redockTo = container->activeDock;
-							draggedWindowDock->redockSlot = dockSlot;
-							draggedWindowDock->redockFromWindow = mOwner;
+							Dock *draggedWindowDock = draggedWindow->get_dockspace().node.splits[0]->active_dock;
+							draggedWindowDock->redock_from = this;
+							draggedWindowDock->redock_to = container->active_dock;
+							draggedWindowDock->redock_slot = dockSlot;
+							draggedWindowDock->redock_from_window = owner;
 						}
-						else draggedWindow->getDockspace().node.splits[0]->activeDock->redockTo = nullptr;
+						else draggedWindow->get_dockspace().node.splits[0]->active_dock->redock_to = nullptr;
 					}
 
 				}
@@ -366,15 +366,15 @@ namespace ImGuiDock
 					float bcontsizeY = split0->size ? size.y - split0->size - splitterButtonWidth :
 						split1->size ? split1->size : size.y / 2 - splitterButtonWidthHalf;
 
-					calculatedSize0 = ImVec2(container->verticalSplit ? acontsizeX : size.x, !container->verticalSplit ? acontsizeY : size.y);
-					calculatedSize1 = ImVec2(container->verticalSplit ? bcontsizeX : size.x, !container->verticalSplit ? bcontsizeY : size.y);
+					calculatedSize0 = ImVec2(container->vertical_split ? acontsizeX : size.x, !container->vertical_split ? acontsizeY : size.y);
+					calculatedSize1 = ImVec2(container->vertical_split ? bcontsizeX : size.x, !container->vertical_split ? bcontsizeY : size.y);
 				}
 				if (split0)
 				{
 					if (split0 == nullptr)
 						size.x = 1;
 					renderContainer(split0, calculatedSize0, calculatedCursorPos);
-					if (container->verticalSplit)
+					if (container->vertical_split)
 						calculatedCursorPos.x = calculatedSize0.x + calculatedCursorPos.x + splitterButtonWidth;
 					else
 					{
@@ -401,46 +401,46 @@ namespace ImGuiDock
 					ImGui::PushStyleColor(ImGuiCol_ButtonHovered, buttonHoveredColor);
 
 					ImGui::Button(idnamesb.c_str(), ImVec2(
-						container->verticalSplit ? splitterButtonWidth : size.x + splitterButtonWidth,
-						!container->verticalSplit ? splitterButtonWidth : size.y + splitterButtonWidth));
+						container->vertical_split ? splitterButtonWidth : size.x + splitterButtonWidth,
+						!container->vertical_split ? splitterButtonWidth : size.y + splitterButtonWidth));
 
 					ImGui::PopStyleColor(3);
 					ImGui::SetItemAllowOverlap(); // This is to allow having other buttons OVER our splitter. 
 
 					if (ImGui::IsItemActive())
 					{
-						float mouse_delta = !container->verticalSplit ? ImGui::GetIO().MouseDelta.y : ImGui::GetIO().MouseDelta.x;
+						float mouse_delta = !container->vertical_split ? ImGui::GetIO().MouseDelta.y : ImGui::GetIO().MouseDelta.x;
 						if (mouse_delta != 0.0f)
 						{
-							if (split0 && split0->alwaysAutoResize != true)
+							if (split0 && split0->always_auto_resize != true)
 							{
 								ImVec2 minSize;
-								_getMinSize(split0, minSize);
+								get_min_size(split0, minSize);
 								if (split0->size == 0)
-									split0->size = container->verticalSplit ? calculatedSize1.x : calculatedSize1.y;
-								if (split0->size + mouse_delta >= (container->verticalSplit ? minSize.x : minSize.y))
+									split0->size = container->vertical_split ? calculatedSize1.x : calculatedSize1.y;
+								if (split0->size + mouse_delta >= (container->vertical_split ? minSize.x : minSize.y))
 									split0->size += mouse_delta;
 
-								if (split0->size + mouse_delta >= (container->verticalSplit ? size.x : size.y))
-									split0->size = (container->verticalSplit ? size.x : size.y);
+								if (split0->size + mouse_delta >= (container->vertical_split ? size.x : size.y))
+									split0->size = (container->vertical_split ? size.x : size.y);
 							}
 							else
 							{
 								ImVec2 minSize;
-								_getMinSize(split1, minSize);
+								get_min_size(split1, minSize);
 								if (split1->size == 0)
-									split1->size = container->verticalSplit ? calculatedSize1.x : calculatedSize1.y;
-								if (split1->size - mouse_delta >= (container->verticalSplit ? minSize.x : minSize.y))
+									split1->size = container->vertical_split ? calculatedSize1.x : calculatedSize1.y;
+								if (split1->size - mouse_delta >= (container->vertical_split ? minSize.x : minSize.y))
 									split1->size -= mouse_delta;
 
-								if (split1->size - mouse_delta >= (container->verticalSplit ? size.x : size.y))
-									split1->size = (container->verticalSplit ? size.x : size.y);
+								if (split1->size - mouse_delta >= (container->vertical_split ? size.x : size.y))
+									split1->size = (container->vertical_split ? size.x : size.y);
 							}
 						}
 					}
 
 					if (ImGui::IsItemHovered() || ImGui::IsItemActive())
-						ImGui::SetMouseCursor(container->verticalSplit ? ImGuiMouseCursor_ResizeEW : ImGuiMouseCursor_ResizeNS);
+						ImGui::SetMouseCursor(container->vertical_split ? ImGuiMouseCursor_ResizeEW : ImGuiMouseCursor_ResizeNS);
 
 					renderContainer(split1, calculatedSize1, calculatedCursorPos);
 				}
@@ -450,49 +450,49 @@ namespace ImGuiDock
 		ImVec2 backup_pos = ImGui::GetCursorPos();
 		renderContainer(&node, dockspaceSize, backup_pos);
 		ImGui::SetCursorPos(backup_pos);
-		if (mCurrentDockTo)
+		if (_current_dock_to)
 		{
-			if (mCurrentDockAction == eUndock)
+			if (_current_dock_action == eUndock)
 			{
-				if (undock(mCurrentDockTo))
+				if (undock(_current_dock_to))
 				{
-					mCurrentDockTo->container = nullptr;
-					mCurrentDockTo->draging = true;
+					_current_dock_to->container = nullptr;
+					_current_dock_to->draging = true;
 					
 					auto guiWindow = std::make_shared<GuiWindow>(
-						sf::VideoMode((unsigned int)mCurrentDockTo->lastSize.x, (unsigned int)mCurrentDockTo->lastSize.y),
+						sf::VideoMode((unsigned int)_current_dock_to->last_size.x, (unsigned int)_current_dock_to->last_size.y),
 						"",//std::string(m_currentDockTo->title),
 						sf::Style::Resize
 						);
 
 					auto engine = core::get_subsystem<runtime::Engine>();
 					engine->register_window(guiWindow);
-					guiWindow->getDockspace().dock(mCurrentDockTo, DockSlot::Tab, 0, true);
+					guiWindow->get_dockspace().dock(_current_dock_to, DockSlot::Tab, 0, true);
 					guiWindow->setPosition(sf::Mouse::getPosition());
 					guiWindow->requestFocus();
 				}
 			}
-			else if (mCurrentDockAction == eDrag)
+			else if (_current_dock_action == eDrag)
 			{
-				if (!mCurrentDockTo->draging)
+				if (!_current_dock_to->draging)
 				{
 
 				}
-				mCurrentDockTo->draging = true;
+				_current_dock_to->draging = true;
 			}
-			else if (mCurrentDockAction == eClose)
+			else if (_current_dock_action == eClose)
 			{
-				if (mCurrentDockTo->onCloseFunction)
+				if (_current_dock_to->on_close_func)
 				{
-					if (mCurrentDockTo->onCloseFunction()) undock(mCurrentDockTo);
+					if (_current_dock_to->on_close_func()) undock(_current_dock_to);
 				}
-				else undock(mCurrentDockTo);
+				else undock(_current_dock_to);
 			}
-			mCurrentDockTo = nullptr;
-			mCurrentDockAction = eNull;
+			_current_dock_to = nullptr;
+			_current_dock_action = eNull;
 		}
 
-		updateDrag(mOwner);
+		updateDrag(owner);
 	}
 
 	void Dockspace::clear()
@@ -506,13 +506,13 @@ namespace ImGuiDock
 		node = {};
 	}
 
-	bool Dockspace::hasDock(const std::string& name)
+	bool Dockspace::has_dock(const std::string& name)
 	{
 		for (auto n : nodes)
 		{
-			if (n->activeDock)
+			if (n->active_dock)
 			{
-				if (n->activeDock->title == name)
+				if (n->active_dock->title == name)
 				{
 					return true;
 				}
@@ -521,7 +521,7 @@ namespace ImGuiDock
 		return false;
 	}
 
-	GuiWindow *Dockspace::_isAnyWindowDragging()
+	GuiWindow *Dockspace::is_any_window_dragged()
 	{
 		auto engine = core::get_subsystem<runtime::Engine>();
 		const auto& windows = engine->get_windows();
@@ -529,10 +529,10 @@ namespace ImGuiDock
 		for (auto window : windows)
 		{
 			GuiWindow* guiWindow = static_cast<GuiWindow*>(window.get());
-			auto& dockspace = guiWindow->getDockspace();
-			if (dockspace.node.splits[0] && dockspace.node.splits[0]->activeDock)
+			auto& dockspace = guiWindow->get_dockspace();
+			if (dockspace.node.splits[0] && dockspace.node.splits[0]->active_dock)
 			{
-				if (dockspace.node.splits[0]->activeDock->draging)
+				if (dockspace.node.splits[0]->active_dock->draging)
 					return guiWindow;
 			}
 			
@@ -557,7 +557,7 @@ namespace ImGuiDock
 	}
 
 
-	DockSlot Dockspace::_renderDockSlotPreview(const ImVec2& mousePos, const ImVec2& cPos, const ImVec2& cSize)
+	DockSlot Dockspace::render_dock_slot_preview(const ImVec2& mousePos, const ImVec2& cPos, const ImVec2& cSize)
 	{
 		DockSlot dockSlot = DockSlot::None;
 
@@ -613,23 +613,23 @@ namespace ImGuiDock
 		return dockSlot;
 	}
 
-	bool Dockspace::_getMinSize(Node* container, ImVec2& min)
+	bool Dockspace::get_min_size(Node* container, ImVec2& min)
 	{
 		if (container->splits[0] == nullptr)
 		{
-			if (min.x < container->activeDock->minSize.x)
-				min.x = container->activeDock->minSize.x;
-			if (min.y < container->activeDock->minSize.y)
-				min.y = container->activeDock->minSize.y;
+			if (min.x < container->active_dock->min_size.x)
+				min.x = container->active_dock->min_size.x;
+			if (min.y < container->active_dock->min_size.y)
+				min.y = container->active_dock->min_size.y;
 			return true;
 		}
 		else
 		{
-			if (_getMinSize(container->splits[0], min))
+			if (get_min_size(container->splits[0], min))
 			{
 				if (container->splits[1])
 				{
-					if (_getMinSize(container->splits[1], min))
+					if (get_min_size(container->splits[1], min))
 					{
 						return true;
 					}
@@ -640,7 +640,7 @@ namespace ImGuiDock
 		return false;
 	}
 
-	void Dockspace::_renderTabBar(Node* container, const ImVec2& size, const ImVec2& cursorPos)
+	void Dockspace::render_tab_bar(Node* container, const ImVec2& size, const ImVec2& cursorPos)
 	{
 		ImGui::SetCursorPos(cursorPos);
 
@@ -650,11 +650,11 @@ namespace ImGuiDock
 		for (auto dock : container->docks)
 		{
 			std::string dockTitle = dock->title;
-			if (dock->closeButton == true)
+			if (dock->close_button == true)
 				dockTitle += "  ";
 
 
-			if (dock == container->activeDock)
+			if (dock == container->active_dock)
 			{
 				ImGui::PushStyleColor(ImGuiCol_Button, childBg);
 				ImGui::PushStyleColor(ImGuiCol_ButtonActive, childBg);
@@ -671,7 +671,7 @@ namespace ImGuiDock
 			}
 			if (ImGui::Button(dockTitle.c_str(), ImVec2(0, 20)))
 			{
-				container->activeDock = dock;
+				container->active_dock = dock;
 			}
 			if (ImGui::IsItemActive())
 			{
@@ -680,8 +680,8 @@ namespace ImGuiDock
 				{
 					if (delta < -2 || delta > 2)
 					{
-						mCurrentDockAction = eDrag;
-						mCurrentDockTo = dock;
+						_current_dock_action = eDrag;
+						_current_dock_to = dock;
 					}
 				}
 				else
@@ -690,8 +690,8 @@ namespace ImGuiDock
 					{
 						if (dock->undockable == false)
 						{
-							mCurrentDockAction = eUndock;
-							mCurrentDockTo = dock;
+							_current_dock_action = eUndock;
+							_current_dock_to = dock;
 						}
 					}
 				}

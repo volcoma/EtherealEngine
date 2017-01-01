@@ -3,7 +3,7 @@
 
 bool Inspector_Entity::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<core::Entity>();
+	auto data = var.get_value<runtime::Entity>();
 	if (!data)
 		return false;
 	bool changed = false;
@@ -47,7 +47,7 @@ bool Inspector_Entity::inspect(rttr::variant& var, bool readOnly, std::function<
 
 		if (!opened)
 		{
-			component->getEntity().remove(component_ptr.lock());
+			component->get_entity().remove(component_ptr.lock());
 		}
 	}
 
@@ -64,7 +64,7 @@ bool Inspector_Entity::inspect(rttr::variant& var, bool readOnly, std::function<
 		filter.Draw("Filter", 180);
 		gui::Separator();
 		gui::BeginChild("ComponentMenuContent", ImVec2(gui::GetContentRegionAvailWidth(), 200.0f));
-		auto component_types = rttr::type::get<core::Component>().get_derived_classes();
+		auto component_types = rttr::type::get<runtime::Component>().get_derived_classes();
 		for (auto& component_type : component_types)
 		{
 
@@ -82,7 +82,7 @@ bool Inspector_Entity::inspect(rttr::variant& var, bool readOnly, std::function<
 					if (gui::Selectable(component_type.get_name().data()))
 					{
 						auto c = cstructor.invoke();
-						auto c_ptr = c.get_value<std::shared_ptr<core::Component>>();
+						auto c_ptr = c.get_value<std::shared_ptr<runtime::Component>>();
 						if (c_ptr)
 							data.assign(c_ptr);
 

@@ -27,5 +27,5 @@ inline runtime::App& Singleton<runtime::App>::create()
 template<>
 inline editor::EditorApp& Singleton<editor::EditorApp>::create()
 {
-	return static_cast<editor::EditorApp&>(Singleton<runtime::App>::getInstance());
+	return static_cast<editor::EditorApp&>(Singleton<runtime::App>::get_instance());
 };

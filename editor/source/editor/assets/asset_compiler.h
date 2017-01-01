@@ -1,7 +1,8 @@
 #pragma once
 #include "runtime/system/FileSystem.h"
 
-struct ShaderCompiler
+template<typename T>
+struct AssetCompiler
 {
-	void compile(const fs::path& absoluteKey);
+	void compile(const fs::path& absoluteKey) {}
 };

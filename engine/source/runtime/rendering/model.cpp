@@ -7,36 +7,36 @@
 
 Model::Model()
 {
-	auto am = core::get_subsystem<AssetManager>();
+	auto am = core::get_subsystem<runtime::AssetManager>();
 	am->load<Material>("engine_data://materials/standard", false)
 		.then([this](auto asset)
 	{
-		mMaterials.push_back(asset);
+		_materials.push_back(asset);
 	});
 }
 
-bool Model::isValid() const
+bool Model::is_valid() const
 {
-	return !mMeshLods.empty();
+	return !_mesh_lods.empty();
 }
 
-AssetHandle<Mesh> Model::getLod(std::uint32_t lod) const
+AssetHandle<Mesh> Model::get_lod(std::uint32_t lod) const
 {
-	if (mMeshLods.size() > lod)
+	if (_mesh_lods.size() > lod)
 	{
-		auto lodMesh = mMeshLods[lod];
+		auto lodMesh = _mesh_lods[lod];
 		if (lodMesh)
 			return lodMesh;
 
-		for (unsigned int i = lod; i < mMeshLods.size(); ++i)
+		for (unsigned int i = lod; i < _mesh_lods.size(); ++i)
 		{
-			auto lodMesh = mMeshLods[i];
+			auto lodMesh = _mesh_lods[i];
 			if (lodMesh)
 				return lodMesh;
 		}
 		for (unsigned int i = lod; i > 0; --i)
 		{
-			auto lodMesh = mMeshLods[i];
+			auto lodMesh = _mesh_lods[i];
 			if (lodMesh)
 				return lodMesh;
 		}
@@ -44,65 +44,65 @@ AssetHandle<Mesh> Model::getLod(std::uint32_t lod) const
 	return AssetHandle<Mesh>();
 }
 
-void Model::setLod(AssetHandle<Mesh> mesh, std::uint32_t lod)
+void Model::set_lod(AssetHandle<Mesh> mesh, std::uint32_t lod)
 {
-	if (lod >= mMeshLods.size())
-		mMeshLods.resize(lod + 1);
+	if (lod >= _mesh_lods.size())
+		_mesh_lods.resize(lod + 1);
 
-	mMeshLods[lod] = mesh;
+	_mesh_lods[lod] = mesh;
 }
 
-void Model::setMaterial(AssetHandle<Material> material, std::uint32_t index)
+void Model::set_material(AssetHandle<Material> material, std::uint32_t index)
 {
-	if (index >= mMeshLods.size())
-		mMeshLods.resize(index + 1);
+	if (index >= _mesh_lods.size())
+		_mesh_lods.resize(index + 1);
 
-	mMaterials[index] = material;
+	_materials[index] = material;
 }
 
-const std::vector<AssetHandle<Mesh>>& Model::getLods() const
+const std::vector<AssetHandle<Mesh>>& Model::get_lods() const
 {
-	return mMeshLods;
+	return _mesh_lods;
 }
 
-void Model::setLods(const std::vector<AssetHandle<Mesh>>& lods)
+void Model::set_lods(const std::vector<AssetHandle<Mesh>>& lods)
 {
-	mMeshLods = lods;
-}
-
-
-const std::vector<AssetHandle<Material>>& Model::getMaterials() const
-{
-	return mMaterials;
-}
-
-void Model::setMaterials(const std::vector<AssetHandle<Material>>& materials)
-{
-	mMaterials = materials;
+	_mesh_lods = lods;
 }
 
 
-AssetHandle<Material> Model::getMaterialForGroup(const Group& group) const
+const std::vector<AssetHandle<Material>>& Model::get_materials() const
+{
+	return _materials;
+}
+
+void Model::set_materials(const std::vector<AssetHandle<Material>>& materials)
+{
+	_materials = materials;
+}
+
+
+AssetHandle<Material> Model::get_material_for_group(const Group& group) const
 {
 	// TODO implement this
-	if (mMaterials.empty())
+	if (_materials.empty())
 		return AssetHandle<Material>();
 
-	return mMaterials[0];
+	return _materials[0];
 }
 
-void Model::setMaxDistance(float distance)
+void Model::set_lod_max_distance(float distance)
 {
-	if (distance < mMinDistance)
-		distance = mMinDistance;
+	if (distance < _min_distance)
+		distance = _min_distance;
 
-	mMaxDistance = distance;
+	_max_distance = distance;
 }
 
-void Model::setMinDistance(float distance)
+void Model::set_lod_min_distance(float distance)
 {
-	if (distance > mMaxDistance)
-		distance = mMaxDistance;
+	if (distance > _max_distance)
+		distance = _max_distance;
 
-	mMinDistance = distance;
+	_min_distance = distance;
 }

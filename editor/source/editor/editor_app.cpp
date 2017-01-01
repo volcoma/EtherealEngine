@@ -1,6 +1,6 @@
 #include "editor_app.h"
-#include "runtime/system/renderer.h"
 #include "runtime/system/engine.h"
+#include "runtime/rendering/renderer.h"
 #include "runtime/assets/asset_manager.h"
 #include "editor_window.h"
 #include "interface/gui_system.h"
@@ -17,7 +17,7 @@ namespace editor
 	{
 		auto renderer = core::get_subsystem<runtime::Renderer>();
 		auto engine = core::get_subsystem<runtime::Engine>();
-		auto am = core::get_subsystem<AssetManager>();
+		auto am = core::get_subsystem<runtime::AssetManager>();
 		sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 		desktop.width = 1280;
 		desktop.height = 720;

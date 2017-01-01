@@ -14,21 +14,8 @@ int main(int _argc, char* _argv[])
 	fs::add_path_protocol("engine_data:", engine_data.string());
 	fs::add_path_protocol("editor_data:", editor_data.string());
 
-	auto& app = Singleton<runtime::App>::getInstance();
+	auto& app = Singleton<runtime::App>::get_instance();
 	int returnCode = app.run();
-// 	
-// 	auto& app = Singleton<Application>::getInstance();
-// 	if (!app.initInstance(string_utils::commandLineArgs(_argc, _argv)))
-// 	{
-// 		// Release the framework
-// 		app.shutDown();
-// 		return -1;
-// 	}
-// 
-// 	int returnCode = app.begin();
-// 
-// 	// Shut down the application, just to be polite, before exiting.
-// 	app.shutDown();
 
 	return returnCode;
 }

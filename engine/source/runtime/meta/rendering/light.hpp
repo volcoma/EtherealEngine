@@ -12,13 +12,13 @@ REFLECT(Light)
 		(
 			rttr::metadata("Min", 0.1f)
 		)
-		.property("Inner Angle", &Light::Spot::spotInnerAngle)
+		.property("Inner Angle", &Light::Spot::spot_inner_angle)
 		(
 			rttr::metadata("Min", 1.0f),
 			rttr::metadata("Max", 85.0f),
 			rttr::metadata("Step", 0.1f)
 		)
-		.property("Outer Angle", &Light::Spot::spotOuterAngle)
+		.property("Outer Angle", &Light::Spot::spot_outer_angle)
 		(
 			rttr::metadata("Min", 1.0f),
 			rttr::metadata("Max", 90.0f),
@@ -30,27 +30,27 @@ REFLECT(Light)
 		(
 			rttr::metadata("Min", 0.1f)
 		)
-		.property("FovX adjust", &Light::Point::fovXAdjust)
+		.property("FovX adjust", &Light::Point::fov_x_adjust)
 		(
 			rttr::metadata("Min", -20.0f),
 			rttr::metadata("Max", 20.0f),
 			rttr::metadata("Step", 0.0001f)
 		)
-		.property("FovY adjust", &Light::Point::fovYAdjust)
+		.property("FovY adjust", &Light::Point::fov_y_adjust)
 		(
 			rttr::metadata("Min", -20.0f),
 			rttr::metadata("Max", 20.0f),
 			rttr::metadata("Step", 0.0001f)
 		)
-		.property("Stencil Pack", &Light::Point::stencilPack);
+		.property("Stencil Pack", &Light::Point::stencil_pack);
 
 	rttr::registration::class_<Light::Directional>("Directional")
-		.property("Splits", &Light::Directional::numSplits)
+		.property("Splits", &Light::Directional::num_splits)
 		(
 			rttr::metadata("Min", 1),
 			rttr::metadata("Max", 4)
 			)
-		.property("Distribution", &Light::Directional::splitDistribution)
+		.property("Distribution", &Light::Directional::split_distribution)
 		(
 			rttr::metadata("Min", 0.0f),
 			rttr::metadata("Max", 1.0f),

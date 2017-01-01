@@ -111,15 +111,15 @@ void renderFunc(ImDrawData *_drawData)
 
 
 				if (fbo)
-					program->setTexture(0, "s_tex", fbo);
+					program->set_texture(0, "s_tex", fbo);
 				else
-					program->setTexture(0, "s_tex", texture);
+					program->set_texture(0, "s_tex", texture);
 
 
 				gfx::setVertexBuffer(&tvb, 0, numVertices);
 				gfx::setIndexBuffer(&tib, offset, cmd->ElemCount);
 				gfx::setState(state);
-				gfx::submit(RenderPass::getPass(), program->handle);
+				gfx::submit(RenderPass::get_pass(), program->handle);
 			}
 
 			offset += cmd->ElemCount;
@@ -135,30 +135,30 @@ bool GuiSystem::initialize()
 	io.IniFilename = nullptr;
 	io.RenderDrawListsFn = renderFunc;
 
-	auto am = core::get_subsystem<AssetManager>();
+	auto am = core::get_subsystem<runtime::AssetManager>();
 
 	switch (gfx::getRendererType())
 	{
 	case gfx::RendererType::Direct3D9:
-		am->createAssetFromMemory<Shader>("vs_ocornut_imgui_embedded", &vs_ocornut_imgui_dx9[0], sizeof(vs_ocornut_imgui_dx9));
-		am->createAssetFromMemory<Shader>("fs_ocornut_imgui_embedded", &fs_ocornut_imgui_dx9[0], sizeof(fs_ocornut_imgui_dx9));
+		am->create_asset_from_memory<Shader>("vs_ocornut_imgui_embedded", &vs_ocornut_imgui_dx9[0], sizeof(vs_ocornut_imgui_dx9));
+		am->create_asset_from_memory<Shader>("fs_ocornut_imgui_embedded", &fs_ocornut_imgui_dx9[0], sizeof(fs_ocornut_imgui_dx9));
 		break;
 
 	case gfx::RendererType::Direct3D11:
 	case gfx::RendererType::Direct3D12:
-		am->createAssetFromMemory<Shader>("vs_ocornut_imgui_embedded", &vs_ocornut_imgui_dx11[0], sizeof(vs_ocornut_imgui_dx11));
-		am->createAssetFromMemory<Shader>("fs_ocornut_imgui_embedded", &fs_ocornut_imgui_dx11[0], sizeof(fs_ocornut_imgui_dx11));
+		am->create_asset_from_memory<Shader>("vs_ocornut_imgui_embedded", &vs_ocornut_imgui_dx11[0], sizeof(vs_ocornut_imgui_dx11));
+		am->create_asset_from_memory<Shader>("fs_ocornut_imgui_embedded", &fs_ocornut_imgui_dx11[0], sizeof(fs_ocornut_imgui_dx11));
 
 		break;
 	case gfx::RendererType::Metal:
-		am->createAssetFromMemory<Shader>("vs_ocornut_imgui_embedded", &vs_ocornut_imgui_mtl[0], sizeof(vs_ocornut_imgui_mtl));
-		am->createAssetFromMemory<Shader>("fs_ocornut_imgui_embedded", &fs_ocornut_imgui_mtl[0], sizeof(fs_ocornut_imgui_mtl));
+		am->create_asset_from_memory<Shader>("vs_ocornut_imgui_embedded", &vs_ocornut_imgui_mtl[0], sizeof(vs_ocornut_imgui_mtl));
+		am->create_asset_from_memory<Shader>("fs_ocornut_imgui_embedded", &fs_ocornut_imgui_mtl[0], sizeof(fs_ocornut_imgui_mtl));
 
 		break;
 	case gfx::RendererType::OpenGL:
 	case gfx::RendererType::OpenGLES:
-		am->createAssetFromMemory<Shader>("vs_ocornut_imgui_embedded", &vs_ocornut_imgui_glsl[0], sizeof(vs_ocornut_imgui_glsl));
-		am->createAssetFromMemory<Shader>("fs_ocornut_imgui_embedded", &fs_ocornut_imgui_glsl[0], sizeof(fs_ocornut_imgui_glsl));
+		am->create_asset_from_memory<Shader>("vs_ocornut_imgui_embedded", &vs_ocornut_imgui_glsl[0], sizeof(vs_ocornut_imgui_glsl));
+		am->create_asset_from_memory<Shader>("fs_ocornut_imgui_embedded", &fs_ocornut_imgui_glsl[0], sizeof(fs_ocornut_imgui_glsl));
 
 		break;
 	default:
@@ -229,7 +229,7 @@ bool GuiSystem::initialize()
 	// Store our identifier
 	io.Fonts->TexID = sFontTexture.get();
 
-	sGUIStyle.loadStyle();
+	sGUIStyle.load_style();
 
 	return true;
 }
@@ -261,7 +261,7 @@ void Image(std::shared_ptr<ITexture> texture, const ImVec2& _size, const ImVec2&
 	ImVec2 uv0 = _uv0;
 	ImVec2 uv1 = _uv1;
 
-	if (texture->isRenderTarget())
+	if (texture->is_render_target())
 	{
 		auto originBottomLeft = gfx::getCaps()->originBottomLeft;
 		if (originBottomLeft)
@@ -281,7 +281,7 @@ bool ImageButton(std::shared_ptr<ITexture> texture, const ImVec2& _size, const I
 	ImVec2 uv0 = _uv0;
 	ImVec2 uv1 = _uv1;
 
-	if (texture->isRenderTarget())
+	if (texture->is_render_target())
 	{
 		auto originBottomLeft = gfx::getCaps()->originBottomLeft;
 		if (originBottomLeft)
@@ -307,12 +307,12 @@ GUIStyle& getGUIStyle()
 
 }
 
-void GUIStyle::resetStyle()
+void GUIStyle::reset_style()
 {
-	setStyleColors(HSVSetup());
+	set_style_colors(HSVSetup());
 }
 
-void GUIStyle::setStyleColors(const HSVSetup& _setup)
+void GUIStyle::set_style_colors(const HSVSetup& _setup)
 {
 	setup = _setup;
 	ImVec4 col_text = ImColor::HSV(setup.col_text_hue, setup.col_text_sat, setup.col_text_val);
@@ -373,12 +373,12 @@ void GUIStyle::setStyleColors(const HSVSetup& _setup)
 #include "core/serialization/archives.h"
 #include "../meta/interface/gui_system.hpp"
 
-void GUIStyle::loadStyle()
+void GUIStyle::load_style()
 {
 	const fs::path absoluteKey = fs::resolve_protocol("editor_data://config/style.cfg");
 	if (!fs::exists(absoluteKey, std::error_code{}))
 	{
-		saveStyle();
+		save_style();
 	}
 	else
 	{
@@ -391,7 +391,7 @@ void GUIStyle::loadStyle()
 	}
 }
 
-void GUIStyle::saveStyle()
+void GUIStyle::save_style()
 {
 	const fs::path absoluteKey = fs::resolve_protocol("editor_data://config/style.cfg");
 	std::ofstream output(absoluteKey);

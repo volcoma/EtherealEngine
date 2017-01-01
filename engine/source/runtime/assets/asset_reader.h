@@ -11,63 +11,63 @@ struct Prefab;
 struct AssetReader
 {
 	//-----------------------------------------------------------------------------
-	//  Name : loadTextureFromFile ()
+	//  Name : load_texture_from_file ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void loadTextureFromFile(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Texture>& request);
+	static void load_texture_from_file(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Texture>& request);
 	
 	//-----------------------------------------------------------------------------
-	//  Name : loadShaderFromFile ()
+	//  Name : load_shader_from_file ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void loadShaderFromFile(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Shader>& request);
+	static void load_shader_from_file(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Shader>& request);
 	
 	//-----------------------------------------------------------------------------
-	//  Name : loadShaderFromMemory ()
+	//  Name : load_shader_from_memory ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void loadShaderFromMemory(const std::string& key, const std::uint8_t* data, std::uint32_t size, LoadRequest<Shader>& request);
+	static void load_shader_from_memory(const std::string& key, const std::uint8_t* data, std::uint32_t size, LoadRequest<Shader>& request);
 	
 	//-----------------------------------------------------------------------------
-	//  Name : loadMeshFromFile ()
+	//  Name : load_mesh_from_file ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void loadMeshFromFile(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Mesh>& request);
+	static void load_mesh_from_file(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Mesh>& request);
 	
 	//-----------------------------------------------------------------------------
-	//  Name : loadMaterialFromFile ()
+	//  Name : load_material_from_file ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void loadMaterialFromFile(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Material>& request);
+	static void load_material_from_file(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Material>& request);
 
 	//-----------------------------------------------------------------------------
-	//  Name : loadPrefabFromFile ()
+	//  Name : load_prefab_from_file ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void loadPrefabFromFile(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Prefab>& request);
+	static void load_prefab_from_file(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Prefab>& request);
 
 };

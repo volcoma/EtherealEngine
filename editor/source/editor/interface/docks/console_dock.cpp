@@ -3,7 +3,7 @@
 
 namespace Docks
 {
-	void renderConsole(ImVec2 area, ConsoleLog& console)
+	void render_console(ImVec2 area, ConsoleLog& console)
 	{
 		gui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
 		static ImGuiTextFilter filter;
@@ -29,7 +29,7 @@ namespace Docks
 		}
 		gui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1)); // Tighten spacing
 
-		ConsoleLog::ItemContainer itemsCopy = console.getItems();
+		auto itemsCopy = console.get_items();
 
 		static std::map<logging::level::level_enum, ImVec4> colorMappings
 		{
@@ -56,10 +56,10 @@ namespace Docks
 			gui::TextWrapped(itemCstr);
 			gui::PopStyleColor();
 		}
-		if (console.getPendingEntries() > 0)
+		if (console.get_pending_entries() > 0)
 			gui::SetScrollHere();
 
-		console.setPendingEntries(0);
+		console.set_pending_entries(0);
 
 		gui::PopStyleVar();
 		gui::EndChild();
@@ -78,7 +78,7 @@ namespace Docks
 		{
 			// copy from c_str to remove trailing zeros
 			std::string command = inputBuff.c_str();
-			std::string errorMsg = console.processInput(command);
+			std::string errorMsg = console.process_input(command);
 			if (errorMsg != "")
 			{
 				auto logger = logging::get("Log");

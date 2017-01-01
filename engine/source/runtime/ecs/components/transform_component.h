@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/ecs.h"
+#include "../ecs.h"
 #include "core/math/math_includes.h"
 
 //-----------------------------------------------------------------------------
@@ -13,11 +13,11 @@
 /// an object's state in a 3D setup. Provides functionality for manipulating that state.
 /// </summary>
 //-----------------------------------------------------------------------------
-class TransformComponent : public core::Component
+class TransformComponent : public runtime::Component
 {
 	COMPONENT(TransformComponent)
 	SERIALIZABLE(TransformComponent)
-	REFLECTABLE(TransformComponent, core::Component)
+	REFLECTABLE(TransformComponent, runtime::Component)
 
 public:
 	//-------------------------------------------------------------------------
@@ -58,212 +58,212 @@ public:
 	// Public Static Methods
 	//-------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------
-	//  Name : resolveTransform ()
+	//  Name : resolve ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void resolveTransform(bool force = false, float dt = 0.0f);
+	void resolve(bool force = false, float dt = 0.0f);
 
 	//-----------------------------------------------------------------------------
-	//  Name : isDirty (virtual )
+	//  Name : is_dirty (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual bool isDirty() const;
+	virtual bool is_dirty() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : onEntitySet (virtual )
+	//  Name : on_entity_set (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void onEntitySet();
+	virtual void on_entity_set();
 
 	//-----------------------------------------------------------------------------
-	//  Name : getLocalTransform ()
+	//  Name : get_local_transform ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const math::transform_t& getLocalTransform() const;
+	const math::transform_t& get_local_transform() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : getTransform ()
+	//  Name : get_transform ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const math::transform_t& getTransform();
+	const math::transform_t& get_transform();
 
 	//-----------------------------------------------------------------------------
-	//  Name : getPosition ()
+	//  Name : get_position ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const math::vec3& getPosition();
+	const math::vec3& get_position();
 
 	//-----------------------------------------------------------------------------
-	//  Name : getRotation ()
+	//  Name : get_rotation ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::quat getRotation();
+	math::quat get_rotation();
 
 	//-----------------------------------------------------------------------------
-	//  Name : getXAxis ()
+	//  Name : get_x_axis ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::vec3 getXAxis();
+	math::vec3 get_x_axis();
 
 	//-----------------------------------------------------------------------------
-	//  Name : getYAxis ()
+	//  Name : get_y_axis ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::vec3 getYAxis();
+	math::vec3 get_y_axis();
 
 	//-----------------------------------------------------------------------------
-	//  Name : getZAxis ()
+	//  Name : get_z_axis ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::vec3 getZAxis();
+	math::vec3 get_z_axis();
 
 	//-----------------------------------------------------------------------------
-	//  Name : getScale()
+	//  Name : get_scale()
 	/// <summary>
 	/// Retrieve the current scale of the node along its world space axes.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::vec3 getScale();
+	math::vec3 get_scale();
 
 	//-----------------------------------------------------------------------------
-	//  Name : getLocalPosition ()
+	//  Name : get_local_position ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const math::vec3& getLocalPosition();
+	const math::vec3& get_local_position();
 
 	//-----------------------------------------------------------------------------
-	//  Name : getLocalRotation ()
+	//  Name : get_local_rotation ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::quat getLocalRotation();
+	math::quat get_local_rotation();
 
 	//-----------------------------------------------------------------------------
-	//  Name : getLocalXAxis ()
+	//  Name : get_local_x_axis ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::vec3 getLocalXAxis();
+	math::vec3 get_local_x_axis();
 
 	//-----------------------------------------------------------------------------
-	//  Name : getLocalYAxis ()
+	//  Name : get_local_y_axis ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::vec3 getLocalYAxis();
+	math::vec3 get_local_y_axis();
 
 	//-----------------------------------------------------------------------------
-	//  Name : getLocalZAxis ()
+	//  Name : get_local_z_axis ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::vec3 getLocalZAxis();
+	math::vec3 get_local_z_axis();
 
 	//-----------------------------------------------------------------------------
-	//  Name : getLocalScale ()
+	//  Name : get_local_scale ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::vec3 getLocalScale();
+	math::vec3 get_local_scale();
 
 	//-----------------------------------------------------------------------------
-	//  Name : lookAt (virtual )
+	//  Name : look_at (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	TransformComponent& lookAt(float x, float y, float z);
+	TransformComponent& look_at(float x, float y, float z);
 
 	//-----------------------------------------------------------------------------
-	//  Name : lookAt (virtual )
+	//  Name : look_at (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	TransformComponent& lookAt(const math::vec3 & point);
+	TransformComponent& look_at(const math::vec3 & point);
 
 	//-----------------------------------------------------------------------------
-	//  Name : setPosition()
+	//  Name : set_position()
 	/// <summary>
 	/// Set the current world space position of the node.
 	/// Note : This bypasses the physics system, so should really only be used
 	/// for initialization purposes.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& setPosition(const math::vec3 & position);
+	virtual TransformComponent& set_position(const math::vec3 & position);
 
 	//-----------------------------------------------------------------------------
-	//  Name : setLocalPosition()
+	//  Name : set_local_position()
 	/// <summary>
 	/// Set the current local space position of the node.
 	/// Note : This bypasses the physics system, so should really only be used
 	/// for initialization purposes.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& setLocalPosition(const math::vec3 & position);
+	virtual TransformComponent& set_local_position(const math::vec3 & position);
 
 	//-----------------------------------------------------------------------------
 	//  Name : move()
@@ -274,13 +274,13 @@ public:
 	virtual TransformComponent& move(const math::vec3 & amount);
 
 	//-----------------------------------------------------------------------------
-	//  Name : moveLocal()
+	//  Name : move_local()
 	/// <summary>
 	/// Move the current position of the node by the specified amount relative to
 	/// its own local axes.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& moveLocal(const math::vec3 & amount);
+	virtual TransformComponent& move_local(const math::vec3 & amount);
 
 	//-----------------------------------------------------------------------------
 	//  Name : rotate (virtual )
@@ -303,274 +303,274 @@ public:
 	virtual TransformComponent& rotate(float x, float y, float z, const math::vec3 & center);
 
 	//-----------------------------------------------------------------------------
-	//  Name : rotateLocal (virtual )
+	//  Name : rotate_local (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& rotateLocal(float x, float y, float z);
+	virtual TransformComponent& rotate_local(float x, float y, float z);
 
 	//-----------------------------------------------------------------------------
-	//  Name : rotateAxis (virtual )
+	//  Name : rotate_axis (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& rotateAxis(float degrees, const math::vec3 & axis);
+	virtual TransformComponent& rotate_axis(float degrees, const math::vec3 & axis);
 
 	//-----------------------------------------------------------------------------
-	//  Name : setScale (virtual )
+	//  Name : set_scale (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& setScale(const math::vec3 & s);
+	virtual TransformComponent& set_scale(const math::vec3 & s);
 
 	//-----------------------------------------------------------------------------
-	//  Name : setLocalScale (virtual )
+	//  Name : set_local_scale (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& setLocalScale(const math::vec3 & scale);
+	virtual TransformComponent& set_local_scale(const math::vec3 & scale);
 
 	//-----------------------------------------------------------------------------
-	//  Name : setRotation (virtual )
+	//  Name : set_rotation (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& setRotation(const math::quat & rotation);
+	virtual TransformComponent& set_rotation(const math::quat & rotation);
 
 	//-----------------------------------------------------------------------------
-	//  Name : setLocalRotation (virtual )
+	//  Name : set_local_rotation (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& setLocalRotation(const math::quat & rotation);
+	virtual TransformComponent& set_local_rotation(const math::quat & rotation);
 
 	//-----------------------------------------------------------------------------
-	//  Name : resetRotation (virtual )
+	//  Name : reset_rotation (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& resetRotation();
+	virtual TransformComponent& reset_rotation();
 
 	//-----------------------------------------------------------------------------
-	//  Name : resetScale (virtual )
+	//  Name : reset_scale (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& resetScale();
+	virtual TransformComponent& reset_scale();
 
 	//-----------------------------------------------------------------------------
-	//  Name : resetLocalRotation (virtual )
+	//  Name : reset_local_rotation (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& resetLocalRotation();
+	virtual TransformComponent& reset_local_rotation();
 
 	//-----------------------------------------------------------------------------
-	//  Name : resetLocalScale (virtual )
+	//  Name : reset_local_scale (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& resetLocalScale();
+	virtual TransformComponent& reset_local_scale();
 
 	//-----------------------------------------------------------------------------
-	//  Name : resetPivot (virtual )
+	//  Name : reset_pivot (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& resetPivot();
+	virtual TransformComponent& reset_pivot();
 
 	//-----------------------------------------------------------------------------
-	//  Name : setLocalTransform (virtual )
+	//  Name : set_local_transform (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& setLocalTransform(const math::transform_t & trans);
+	virtual TransformComponent& set_local_transform(const math::transform_t & trans);
 
 	//-----------------------------------------------------------------------------
-	//  Name : setTransform (virtual )
+	//  Name : set_transform (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& setTransform(const math::transform_t & trans);
+	virtual TransformComponent& set_transform(const math::transform_t & trans);
 
 	//-----------------------------------------------------------------------------
-	//  Name : lookAt (virtual )
+	//  Name : look_at (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& lookAt(const math::vec3 & eye, const math::vec3 & at);
+	virtual TransformComponent& look_at(const math::vec3 & eye, const math::vec3 & at);
 
 	//-----------------------------------------------------------------------------
-	//  Name : lookAt (virtual )
+	//  Name : look_at (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& lookAt(const math::vec3 & eye, const math::vec3 & at, const math::vec3 & up);
+	virtual TransformComponent& look_at(const math::vec3 & eye, const math::vec3 & at, const math::vec3 & up);
 
 	//-----------------------------------------------------------------------------
-	//  Name : canAdjustPivot (virtual )
+	//  Name : can_adjust_pivot (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual bool canAdjustPivot() const;
+	virtual bool can_adjust_pivot() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : canScale (virtual )
+	//  Name : can_scale (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual bool canScale() const;
+	virtual bool can_scale() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : canRotate (virtual )
+	//  Name : can_rotate (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual bool canRotate() const;
+	virtual bool can_rotate() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : setParent (virtual )
+	//  Name : set_parent (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& setParent(core::CHandle<TransformComponent> parent, bool worldPositionStays, bool localPositionStays);
+	virtual TransformComponent& set_parent(runtime::CHandle<TransformComponent> parent, bool worldPositionStays, bool localPositionStays);
 
 	//-----------------------------------------------------------------------------
-	//  Name : setParent (virtual )
+	//  Name : set_parent (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& setParent(core::CHandle<TransformComponent> parent);
+	virtual TransformComponent& set_parent(runtime::CHandle<TransformComponent> parent);
 
 	//-----------------------------------------------------------------------------
-	//  Name : getParent ()
+	//  Name : get_parent ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const core::CHandle<TransformComponent>& getParent() const;
+	const runtime::CHandle<TransformComponent>& get_parent() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : getChildren ()
+	//  Name : get_children ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const std::vector<core::CHandle<TransformComponent>>& getChildren() const;
+	const std::vector<runtime::CHandle<TransformComponent>>& get_children() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : attachChild ()
+	//  Name : attach_child ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void attachChild(core::CHandle<TransformComponent> child);
+	void attach_child(runtime::CHandle<TransformComponent> child);
 
 	//-----------------------------------------------------------------------------
-	//  Name : removeChild ()
+	//  Name : remove_child ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void removeChild(core::CHandle<TransformComponent> child);
+	void remove_child(runtime::CHandle<TransformComponent> child);
 
 	//-----------------------------------------------------------------------------
-	//  Name : getSlowParenting ()
+	//  Name : get_slow_parenting ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool getSlowParenting() const { return mSlowParenting; }
+	bool get_slow_parenting() const { return _slow_parenting; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : setSlowParenting ()
+	//  Name : set_slow_parenting ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setSlowParenting(bool val) { mSlowParenting = val; }
+	void set_slow_parenting(bool val) { _slow_parenting = val; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getSlowParentingSpeed ()
+	//  Name : get_slow_parenting_speed ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float getSlowParentingSpeed() const { return mSlowParentingSpeed; }
+	float get_slow_parenting_speed() const { return _slow_parenting_speed; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : setSlowParentingSpeed ()
@@ -580,21 +580,21 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setSlowParentingSpeed(float val) { mSlowParentingSpeed = val; }
+	void set_slow_parenting_speed(float val) { _slow_parenting_speed = val; }
 protected:
 	//-------------------------------------------------------------------------
 	// Protected Member Variables
 	//-------------------------------------------------------------------------
 	/// Parent object.
-	core::CHandle<TransformComponent> mParent;
+	runtime::CHandle<TransformComponent> _parent;
 	/// Children object.
-	std::vector<core::CHandle<TransformComponent>> mChildren;
+	std::vector<runtime::CHandle<TransformComponent>> _children;
 	/// Local transformation relative to the parent
-	math::transform_t mLocalTransform;
+	math::transform_t _local_transform;
 	/// Cached world transformation at pivot point.
-	math::transform_t mWorldTransform;
+	math::transform_t _world_transform;
 	/// Is slow parenting enabled?
-	bool mSlowParenting = false;
+	bool _slow_parenting = false;
 	/// Slow parenting speed.
-	float mSlowParentingSpeed = 5.0f;
+	float _slow_parenting_speed = 5.0f;
 };

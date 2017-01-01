@@ -191,34 +191,34 @@ struct Light
 	REFLECTABLE(Light)
 	SERIALIZABLE(Light)
 
-	LightType lightType = LightType::Spot;
-	DepthImpl depthImpl = DepthImpl::InvZ;
-	SmImpl smImpl = SmImpl::Hard;
+	LightType light_type = LightType::Spot;
+	DepthImpl depth_impl = DepthImpl::InvZ;
+	SmImpl sm_impl = SmImpl::Hard;
 
 	struct Spot
 	{
 		float range = 10.0f;
-		float spotOuterAngle = 45.0f;
-		float spotInnerAngle = 30.0f;
+		float spot_outer_angle = 45.0f;
+		float spot_inner_angle = 30.0f;
 	};
 	
 	struct Point
 	{
 		float range = 10.0f;
-		float fovXAdjust = 0.0f;
-		float fovYAdjust = 0.0f;
-		bool stencilPack = true;
+		float fov_x_adjust = 0.0f;
+		float fov_y_adjust = 0.0f;
+		bool stencil_pack = true;
 	};
 
 	struct Directional
 	{
-		float splitDistribution = 0.6f;
-		std::uint8_t numSplits = 4;
+		float split_distribution = 0.6f;
+		std::uint8_t num_splits = 4;
 		bool stabilize = true;
 	};
 
-	Spot spotData;
-	Point pointData;
-	Directional directionalData;
+	Spot spot_data;
+	Point point_data;
+	Directional directional_data;
 
 };

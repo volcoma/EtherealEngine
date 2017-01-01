@@ -3,8 +3,10 @@
 #include "core/logging/logging.h"
 #include "runtime/system/FileSystem.h"
 #include "shaderc/shaderc.h"
+#include "runtime/rendering/shader.h"
 
-void ShaderCompiler::compile(const fs::path& absoluteKey)
+template<>
+void AssetCompiler<Shader>::compile(const fs::path& absoluteKey)
 {
 	fs::path input = absoluteKey;
 	std::string strInput = input.string();
@@ -13,9 +15,9 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 
 	static const std::string ext = ".asset";
 
-	bool vs = string_utils::beginsWith(file, "vs_");
-	bool fs = string_utils::beginsWith(file, "fs_");
-	bool cs = string_utils::beginsWith(file, "cs_");
+	bool vs = string_utils::begins_with(file, "vs_");
+	bool fs = string_utils::begins_with(file, "fs_");
+	bool cs = string_utils::begins_with(file, "cs_");
 	fs::path supported[] = { "dx9", "dx11", "glsl", "metal" };
 	
 	for (int i = 0; i < 4; ++i)

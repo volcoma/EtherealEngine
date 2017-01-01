@@ -1,9 +1,8 @@
 #include "engine.h"
-#include "renderer.h"
-#include "Input/input.h"
-#include "core/ecs.h"
-#include "core/task.h"
-#include "core/logging/logging.h"
+#include "rendering/renderer.h"
+#include "input/input.h"
+#include "ecs/ecs.h"
+#include "task.h"
 #include "ecs/systems/transform_system.h"
 #include "ecs/systems/camera_system.h"
 #include "ecs/systems/rendering_system.h"
@@ -28,8 +27,8 @@ namespace runtime
 		core::add_subsystem<Input>();
 		core::add_subsystem<Renderer>();
 		core::add_subsystem<AssetManager>();
-		core::add_subsystem<core::EntityComponentSystem>();
-		core::add_subsystem<core::TaskSystem>();
+		core::add_subsystem<EntityComponentSystem>();
+		core::add_subsystem<TaskSystem>();
 		core::add_subsystem<TransformSystem>();
 		core::add_subsystem<CameraSystem>();
 		core::add_subsystem<RenderingSystem>();
@@ -112,7 +111,7 @@ namespace runtime
 			_timestep = eplased;
 		}
 		
-		auto ts = core::get_subsystem<core::TaskSystem>();
+		auto ts = core::get_subsystem<TaskSystem>();
 		ts->execute_tasks_on_main();
 
 		auto dt = get_delta_time();
@@ -125,7 +124,7 @@ namespace runtime
 		{
 			_window = window;
 			bool focused = window->hasFocus();
-			window->frameBegin();
+			window->frame_begin();
 
 			sf::Event e;
 			while (window->pollEvent(e))
@@ -137,23 +136,23 @@ namespace runtime
 			if (focused)
 				on_frame_begin(dt);
 
-			window->frameUpdate(dt.count());
+			window->frame_update(dt.count());
 			if (focused)
 				on_frame_update(dt);
 
-			window->frameRender();
+			window->frame_render();
 			if (focused)
 				on_frame_render(dt);
 			
-			window->frameEnd();
+			window->frame_end();
 			if (focused)
 				on_frame_end(dt);
 
-			if (window->isMain())
+			if (window->is_main())
 				_running = window->isOpen();
 		}
 
-		auto renderer = core::get_subsystem<runtime::Renderer>();
+		auto renderer = core::get_subsystem<Renderer>();
 		renderer->frame_end();
 	}
 	
@@ -205,8 +204,8 @@ namespace runtime
 			}), std::end(_windows));
 		};
 
-		window->onClosed.addListener(onClosed);
-		window->prepareSurface();
+		window->on_closed.addListener(onClosed);
+		window->prepare_surface();
 		_windows.push_back(window);
 	}
 

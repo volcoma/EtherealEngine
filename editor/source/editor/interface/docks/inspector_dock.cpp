@@ -5,11 +5,11 @@
 namespace Docks
 {
 
-	void renderInspector(ImVec2 area)
+	void render_inspector(ImVec2 area)
 	{
-		auto es = core::get_subsystem<EditState>();
+		auto es = core::get_subsystem<editor::EditState>();
 		
-		auto& selected = es->selectionData.object;
+		auto& selected = es->selection_data.object;
 		if (selected)
 		{
 			inspect_var(selected);

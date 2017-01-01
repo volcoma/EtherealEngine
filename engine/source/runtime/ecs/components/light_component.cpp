@@ -6,7 +6,7 @@ LightComponent::LightComponent()
 
 LightComponent::LightComponent(const LightComponent& lightComponent)
 {
-	mLight = lightComponent.mLight;
+	_light = lightComponent._light;
 }
 
 LightComponent::~LightComponent()

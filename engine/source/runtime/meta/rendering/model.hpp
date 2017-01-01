@@ -9,31 +9,31 @@ REFLECT(Model)
 {
 	rttr::registration::class_<Model>("Model")
 		.property("Levels of Detail",
-			&Model::getLods,
-			&Model::setLods)
+			&Model::get_lods,
+			&Model::set_lods)
 		.property("Materials",
-			&Model::getMaterials,
-			&Model::setMaterials)
+			&Model::get_materials,
+			&Model::set_materials)
 		.property("Transition Time",
-			&Model::getTransitionTime,
-			&Model::setTransitionTime)
+			&Model::get_lod_transition_time,
+			&Model::set_lod_transition_time)
 		.property("Max Distance",
-			&Model::getMaxDistance,
-			&Model::setMaxDistance)
-		.property("Min Distance",
-			&Model::getMinDistance,
-			&Model::setMinDistance)
+			&Model::get_lod_max_distance,
+			&Model::set_lod_max_distance)
+		.property("Mset_lod_in Distance",
+			&Model::get_lod_min_distance,
+			&Model::set_lod_min_distance)
 		;
 }
 
 SAVE(Model)
 {
 	ar(
-		cereal::make_nvp("lods", obj.mMeshLods),
-		cereal::make_nvp("materials", obj.mMaterials),
-		cereal::make_nvp("transition_time", obj.mTransitionTime),
-		cereal::make_nvp("max_distance", obj.mMaxDistance),
-		cereal::make_nvp("min_distance", obj.mMinDistance)
+		cereal::make_nvp("lods", obj._mesh_lods),
+		cereal::make_nvp("materials", obj._materials),
+		cereal::make_nvp("transition_time", obj._transition_time),
+		cereal::make_nvp("max_distance", obj._max_distance),
+		cereal::make_nvp("min_distance", obj._min_distance)
 	);
 
 }
@@ -41,10 +41,10 @@ SAVE(Model)
 LOAD(Model)
 {
 	ar(
-		cereal::make_nvp("lods", obj.mMeshLods),
-		cereal::make_nvp("materials", obj.mMaterials),
-		cereal::make_nvp("transition_time", obj.mTransitionTime),
-		cereal::make_nvp("max_distance", obj.mMaxDistance),
-		cereal::make_nvp("min_distance", obj.mMinDistance)
+		cereal::make_nvp("lods", obj._mesh_lods),
+		cereal::make_nvp("materials", obj._materials),
+		cereal::make_nvp("transition_time", obj._transition_time),
+		cereal::make_nvp("max_distance", obj._max_distance),
+		cereal::make_nvp("min_distance", obj._min_distance)
 	);
 }

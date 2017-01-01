@@ -15,16 +15,16 @@
 #include "runtime/input/input.h"
 #include "core/logging/logging.h"
 
-std::vector<core::Entity> gatherSceneData()
+std::vector<runtime::Entity> gather_scene_data()
 {
-	auto es = core::get_subsystem<EditState>();
-	auto ts = core::get_subsystem<TransformSystem>();
+	auto es = core::get_subsystem<editor::EditState>();
+	auto ts = core::get_subsystem<runtime::TransformSystem>();
 	const auto& roots = ts->get_roots();
 	auto editorCamera = es->camera;
-	std::vector<core::Entity> entities;
+	std::vector<runtime::Entity> entities;
 	for (auto root : roots)
 	{
-		auto entity = root.lock()->getEntity();
+		auto entity = root.lock()->get_entity();
 		if (entity != editorCamera)
 			entities.push_back(entity);
 	}
@@ -33,45 +33,45 @@ std::vector<core::Entity> gatherSceneData()
 }
 
 
-void defaultScene()
+void default_scene()
 {
-	auto am = core::get_subsystem<AssetManager>();
-	auto ecs = core::get_subsystem<core::EntityComponentSystem>();
+	auto am = core::get_subsystem<runtime::AssetManager>();
+	auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 
 	{
 		auto object = ecs->create();
-		object.set_name("Main Camera");
+		object.set_name("main camera");
 		object.assign<TransformComponent>().lock()
-			->setLocalPosition({ 0.0f, 2.0f, -5.0f });
+			->set_local_position({ 0.0f, 2.0f, -5.0f });
 		object.assign<CameraComponent>();
 	}
 	{
 		auto object = ecs->create();
-		object.set_name("Light");
+		object.set_name("light");
 		object.assign<TransformComponent>().lock()
-			->setLocalPosition({ 1.0f, 6.0f, -3.0f })
-			.rotateLocal(50.0f, -30.0f, 0.0f);
+			->set_local_position({ 1.0f, 6.0f, -3.0f })
+			.rotate_local(50.0f, -30.0f, 0.0f);
 		object.assign<LightComponent>().lock()
-			->getLight().lightType = LightType::Directional;
+			->get_light().light_type = LightType::Directional;
 	}
 	{
 		auto object = ecs->create();
 		object.set_name("platform");
 		object.assign<TransformComponent>().lock()
-			->setLocalScale({ 10.0f, 0.1f, 10.0f });
+			->set_local_scale({ 10.0f, 0.1f, 10.0f });
 
 		Model model;
 		am->load<Mesh>("data://meshes/platform", false)
 			.then([&model](auto asset)
 		{
-			model.setLod(asset, 0);
+			model.set_lod(asset, 0);
 		});
 
 		//Add component and configure it.
 		object.assign<ModelComponent>().lock()
-			->setCastShadow(true)
-			.setCastReflelction(false)
-			.setModel(model);
+			->set_casts_shadow(true)
+			.set_casts_reflection(false)
+			.set_model(model);
 	}
 	{
 		auto object = ecs->create();
@@ -82,79 +82,79 @@ void defaultScene()
 		am->load<Mesh>("data://meshes/bunny", false)
 			.then([&model](auto asset)
 		{
-			model.setLod(asset, 0);
+			model.set_lod(asset, 0);
 		});
 
 		//Add component and configure it.
 		object.assign<ModelComponent>().lock()
-			->setCastShadow(true)
-			.setCastReflelction(false)
-			.setModel(model);
+			->set_casts_shadow(true)
+			.set_casts_reflection(false)
+			.set_model(model);
 	}
 }
 
-void loadEditorCamera()
+void load_editor_camera()
 {
-	auto es = core::get_subsystem<EditState>();
-	auto ecs = core::get_subsystem<core::EntityComponentSystem>();
-	core::Entity outData = ecs->create();
-	outData.set_name("Editor Camera");
+	auto es = core::get_subsystem<editor::EditState>();
+	auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
+	runtime::Entity outData = ecs->create();
+	outData.set_name("EDITOR_CAMERA");
 	outData.assign<TransformComponent>().lock()
-		->setLocalPosition({ 0.0f, 2.0f, -5.0f });
+		->set_local_position({ 0.0f, 2.0f, -5.0f });
 	outData.assign<CameraComponent>();
 	
 	es->camera = outData;
 }
 
 
-auto createNewScene()
+auto create_new_scene()
 {
-	auto es = core::get_subsystem<EditState>();
-	auto ecs = core::get_subsystem<core::EntityComponentSystem>();
+	auto es = core::get_subsystem<editor::EditState>();
+	auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 	ecs->dispose();
-	loadEditorCamera();
-	defaultScene();
+	load_editor_camera();
+	default_scene();
 	es->scene.clear();
 }
 
-auto openScene()
+auto open_scene()
 {
-	auto es = core::get_subsystem<EditState>();
-	auto ecs = core::get_subsystem<core::EntityComponentSystem>();
+	auto es = core::get_subsystem<editor::EditState>();
+	auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 	std::string path;
 	if (open_file_dialog("scene", fs::resolve_protocol("data://scenes").string(), path))
 	{
 		ecs->dispose();
-		loadEditorCamera();
+		load_editor_camera();
 
-		std::vector<core::Entity> outData;
-		if (ecs::utils::loadData(path, outData))
+		std::vector<runtime::Entity> outData;
+		if (ecs::utils::load_data(path, outData))
 		{
 			es->scene = path;
 		}
 	}
 }
 
-auto saveScene()
+auto save_scene()
 {
-	auto es = core::get_subsystem<EditState>();
+	auto es = core::get_subsystem<editor::EditState>();
 	const auto& path = es->scene;
 	if (path != "")
 	{
-		std::vector<core::Entity> entities = gatherSceneData();
-		ecs::utils::saveData(path, entities);
+		std::vector<runtime::Entity> entities = gather_scene_data();
+		ecs::utils::save_data(path, entities);
 	}
 }
 
-void saveSceneAs()
+void save_scene_as()
 {
-	auto es = core::get_subsystem<EditState>();
+	auto es = core::get_subsystem<editor::EditState>();
 
 	std::string path;
 	if (save_file_dialog("scene", fs::resolve_protocol("data://scenes").string(), path))
 	{
 		es->scene = path;		
-		saveScene();	
+		save_scene();	
 	}
 }
 
@@ -174,11 +174,11 @@ MainEditorWindow::~MainEditorWindow()
 {
 }
 
-void MainEditorWindow::frameRender()
+void MainEditorWindow::frame_render()
 {
 	if (gui::BeginMainMenuBar())
 	{
-		onMenuBar();
+		on_menubar();
 
 		float offset = gui::GetWindowHeight();
 		gui::EndMainMenuBar();
@@ -186,15 +186,15 @@ void MainEditorWindow::frameRender()
 	}
 
 	
-	onToolbar();
-	GuiWindow::frameRender();
+	on_toolbar();
+	GuiWindow::frame_render();
 }
 
-void MainEditorWindow::onMenuBar()
+void MainEditorWindow::on_menubar()
 {
-	auto es = core::get_subsystem<EditState>();
-	auto input = core::get_subsystem<Input>();
-	auto pm = core::get_subsystem<ProjectManager>();
+	auto es = core::get_subsystem<editor::EditState>();
+	auto pm = core::get_subsystem<editor::ProjectManager>();
+	auto input = core::get_subsystem<runtime::Input>();
 	const auto& current_project = pm->get_current_project();
 
 	if (input->is_key_down(sf::Keyboard::LControl))
@@ -203,22 +203,22 @@ void MainEditorWindow::onMenuBar()
 		{
 			if (input->is_key_pressed(sf::Keyboard::S))
 			{
-				saveSceneAs();
+				save_scene_as();
 			}
 		}
 		else if (input->is_key_pressed(sf::Keyboard::S))
 		{
-			saveScene();
+			save_scene();
 		}
 
 		if (input->is_key_pressed(sf::Keyboard::O))
 		{
-			openScene();
+			open_scene();
 		}
 
 		if (input->is_key_pressed(sf::Keyboard::N))
 		{
-			createNewScene();
+			create_new_scene();
 		}
 	}
 
@@ -226,11 +226,11 @@ void MainEditorWindow::onMenuBar()
 	{
 		if (gui::MenuItem("New Scene", "Ctrl+N", false, current_project != ""))
 		{
-			createNewScene();
+			create_new_scene();
 		}
 		if (gui::MenuItem("Open Scene", "Ctrl+O", false, current_project != ""))
 		{
-			openScene();
+			open_scene();
 		}
 		if (gui::MenuItem("Open Project Manager", "Ctrl+P"))
 		{
@@ -239,13 +239,13 @@ void MainEditorWindow::onMenuBar()
 
 		if (gui::MenuItem("Save", "Ctrl+S", false, es->scene != "" && current_project != ""))
 		{
-			saveScene();
+			save_scene();
 		}
-		auto ecs = core::get_subsystem<core::EntityComponentSystem>();
+		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 
 		if (gui::MenuItem("Save As..", "Ctrl+Shift+S", false, ecs->size() > 0 && current_project != ""))
 		{
-			saveSceneAs();
+			save_scene_as();
 		}
 		gui::Separator();
 
@@ -284,37 +284,37 @@ void MainEditorWindow::onMenuBar()
 
 }
 
-void MainEditorWindow::onToolbar()
+void MainEditorWindow::on_toolbar()
 {
-	auto es = core::get_subsystem<EditState>();
+	auto es = core::get_subsystem<editor::EditState>();
 	auto& icons = es->icons;
 
 	float width = gui::GetContentRegionAvailWidth();
-	if (gui::ToolbarButton(icons["translate"].get(), "Translate", es->operation == ImGuizmo::OPERATION::TRANSLATE))
+	if (gui::ToolbarButton(icons["translate"].get(), "Translate", es->operation == imguizmo::OPERATION::TRANSLATE))
 	{
-		es->operation = ImGuizmo::OPERATION::TRANSLATE;
+		es->operation = imguizmo::OPERATION::TRANSLATE;
 	}
 	gui::SameLine(0.0f);
-	if (gui::ToolbarButton(icons["rotate"].get(), "Rotate", es->operation == ImGuizmo::OPERATION::ROTATE))
+	if (gui::ToolbarButton(icons["rotate"].get(), "Rotate", es->operation == imguizmo::OPERATION::ROTATE))
 	{
-		es->operation = ImGuizmo::OPERATION::ROTATE;
+		es->operation = imguizmo::OPERATION::ROTATE;
 	}
 	gui::SameLine(0.0f);
-	if (gui::ToolbarButton(icons["scale"].get(), "Scale", es->operation == ImGuizmo::OPERATION::SCALE))
+	if (gui::ToolbarButton(icons["scale"].get(), "Scale", es->operation == imguizmo::OPERATION::SCALE))
 	{
-		es->operation = ImGuizmo::OPERATION::SCALE;
-		es->mode = ImGuizmo::MODE::LOCAL;
+		es->operation = imguizmo::OPERATION::SCALE;
+		es->mode = imguizmo::MODE::LOCAL;
 	}
 	gui::SameLine(0.0f, 50.0f);
 
-	if (gui::ToolbarButton(icons["local"].get(), "Local Coordinate System", es->mode == ImGuizmo::MODE::LOCAL))
+	if (gui::ToolbarButton(icons["local"].get(), "Local Coordinate System", es->mode == imguizmo::MODE::LOCAL))
 	{
-		es->mode = ImGuizmo::MODE::LOCAL;
+		es->mode = imguizmo::MODE::LOCAL;
 	}
 	gui::SameLine(0.0f);
-	if (gui::ToolbarButton(icons["global"].get(), "Global Coordinate System", es->mode == ImGuizmo::MODE::WORLD, es->operation != ImGuizmo::OPERATION::SCALE))
+	if (gui::ToolbarButton(icons["global"].get(), "Global Coordinate System", es->mode == imguizmo::MODE::WORLD, es->operation != imguizmo::OPERATION::SCALE))
 	{
-		es->mode = ImGuizmo::MODE::WORLD;
+		es->mode = imguizmo::MODE::WORLD;
 	}
 	gui::SameLine(0.0f);
 	if (gui::ToolbarButton(icons["grid"].get(), "Show Grid", es->showGrid))
@@ -350,10 +350,10 @@ ProjectManagerWindow::ProjectManagerWindow(sf::VideoMode mode, const std::string
 
 }
 
-void ProjectManagerWindow::frameRender()
+void ProjectManagerWindow::frame_render()
 {
-	auto es = core::get_subsystem<EditState>();
-	auto pm = core::get_subsystem<ProjectManager>();
+	auto es = core::get_subsystem<editor::EditState>();
+	auto pm = core::get_subsystem<editor::ProjectManager>();
 
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoMove |
@@ -373,7 +373,7 @@ void ProjectManagerWindow::frameRender()
 				if (gui::Selectable(path.c_str()))
 				{
 					pm->open_project(path);
-					setMain(false);
+					set_main(false);
 					close();
 				}
 			}
@@ -392,7 +392,7 @@ void ProjectManagerWindow::frameRender()
 			if (open_folder_dialog("", fs::resolve_protocol("engine://").string(), path))
 			{
 				pm->create_project(path);
-				setMain(false);
+				set_main(false);
 				close();
 			}
 		}
@@ -403,7 +403,7 @@ void ProjectManagerWindow::frameRender()
 			if (open_folder_dialog("", fs::resolve_protocol("engine://").string(), path))
 			{
 				pm->open_project(path);
-				setMain(false);
+				set_main(false);
 				close();
 			}
 		}
@@ -411,5 +411,5 @@ void ProjectManagerWindow::frameRender()
 	gui::EndGroup();
 	
 	//Call grandparent directly to skip dockspace update
-	RenderWindow::frameRender();
+	RenderWindow::frame_render();
 }

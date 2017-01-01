@@ -2,7 +2,7 @@
 #include "vertex_buffer.h"
 #include "index_buffer.h"
 
-bool Mesh::isValid() const
+bool Mesh::is_valid() const
 {
 	if (groups.empty())
 	{

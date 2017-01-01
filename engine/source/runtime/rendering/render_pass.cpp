@@ -4,29 +4,29 @@
 #include <bitset>
 
 static std::uint8_t index = 0;
-static std::uint8_t lastIndex = 0;
+static std::uint8_t last_index = 0;
 
-std::uint8_t generateId()
+std::uint8_t generate_id()
 {
 	Expects(index < 256);
 	// find the first unset bit
 	std::uint8_t idx = index++;
 
-	lastIndex = idx;
+	last_index = idx;
 	return idx;
 }
 
 
 RenderPass::RenderPass(const std::string& n)
 {
-	id = generateId();
+	id = generate_id();
 }
 
 void RenderPass::bind(FrameBuffer* fb) const
 {
 	Expects(fb != nullptr);
 
-	const auto size = fb->getSize();
+	const auto size = fb->get_size();
 
 	gfx::setViewRect(
 		id,
@@ -77,10 +77,10 @@ void RenderPass::reset()
 		gfx::resetView(i);
 	}
 	index = 0;
-	lastIndex = 0;
+	last_index = 0;
 }
 
-std::uint8_t RenderPass::getPass()
+std::uint8_t RenderPass::get_pass()
 {
-	return lastIndex;
+	return last_index;
 }

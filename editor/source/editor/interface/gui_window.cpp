@@ -1,7 +1,7 @@
 #include "gui_window.h"
 #include "runtime/rendering/render_pass.h"
 
-void handleSFMLEvent(sf::Event event)
+void handle_sfml_event(sf::Event event)
 {
 	auto& io = gui::GetIO();
 	if (event.type == sf::Event::LostFocus)
@@ -57,7 +57,7 @@ void handleSFMLEvent(sf::Event event)
 	}
 }
 
-void imguiFrameUpdate(RenderWindow& window, float dt, const uSize& viewSize)
+void imgui_frame_update(RenderWindow& window, float dt, const uSize& viewSize)
 {
 	auto& io = gui::GetIO();
 	// Setup display size (every frame to accommodate for window resizing)
@@ -119,24 +119,24 @@ void imguiFrameUpdate(RenderWindow& window, float dt, const uSize& viewSize)
 
 }
 
-void imguiFrameEnd()
+void imgui_frame_end()
 {
 	gui::End();
 	gui::Render();
 }
 
-ImGuiContext* imguiCreateContext()
+ImGuiContext* imgui_create_context()
 {
 	return gui::CreateContext();
 }
 
-void imguiDestroyContext(ImGuiContext* pContext)
+void imgui_destroy_context(ImGuiContext* pContext)
 {
 	if (pContext)
 		gui::DestroyContext(pContext);
 }
 
-void imguiFrameBegin(ImGuiContext* pContext)
+void imgui_frame_begin(ImGuiContext* pContext)
 {
 	ImGuiContext* prevContext = gui::GetCurrentContext();
 	if (prevContext)
@@ -153,54 +153,54 @@ void imguiFrameBegin(ImGuiContext* pContext)
 
 
 GuiWindow::GuiWindow() 
-: mDockspace(this)
+: _dockspace(this)
 {
-	mGuiContext = imguiCreateContext();
+	_gui_context = imgui_create_context();
 }
 
 GuiWindow::GuiWindow(sf::VideoMode mode, const std::string& title, std::uint32_t style /*= sf::Style::Default*/)
 : RenderWindow(mode, title, style)
-, mDockspace(this)
+, _dockspace(this)
 {
-	mGuiContext = imguiCreateContext();
+	_gui_context = imgui_create_context();
 }
 
 GuiWindow::~GuiWindow()
 {
-	imguiDestroyContext(mGuiContext);
+	imgui_destroy_context(_gui_context);
 }
 
 bool GuiWindow::filterEvent(const sf::Event& event)
 {
-	handleSFMLEvent(event);
+	handle_sfml_event(event);
 
 	return RenderWindow::filterEvent(event);;
 }
 
-void GuiWindow::frameBegin()
+void GuiWindow::frame_begin()
 {
-	RenderWindow::frameBegin();
+	RenderWindow::frame_begin();
 
-	imguiFrameBegin(mGuiContext);
+	imgui_frame_begin(_gui_context);
 }
 
-void GuiWindow::frameUpdate(float dt)
+void GuiWindow::frame_update(float dt)
 {
-	RenderWindow::frameUpdate(dt);
+	RenderWindow::frame_update(dt);
 
-	const auto size = mSurface->getSize();
+	const auto size = _surface->get_size();
 	
-	imguiFrameUpdate(*this, dt, size);
+	imgui_frame_update(*this, dt, size);
 }
 
-void GuiWindow::frameRender()
+void GuiWindow::frame_render()
 {
-	RenderWindow::frameRender();
-	mDockspace.updateAndDraw(gui::GetContentRegionAvail());
+	RenderWindow::frame_render();
+	_dockspace.update_and_draw(gui::GetContentRegionAvail());
 }
 
-void GuiWindow::frameEnd()
+void GuiWindow::frame_end()
 {
-	RenderWindow::frameEnd();
-	imguiFrameEnd();
+	RenderWindow::frame_end();
+	imgui_frame_end();
 }

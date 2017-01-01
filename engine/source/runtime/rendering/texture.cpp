@@ -5,14 +5,14 @@ Texture::~Texture()
 	dispose();
 }
 
-bool Texture::isValid() const
+bool Texture::is_valid() const
 {
 	return gfx::isValid(handle);
 }
 
 void Texture::dispose()
 {
-	if (isValid())
+	if (is_valid())
 		gfx::destroyTexture(handle);
 
 	handle = { bgfx::invalidHandle };
@@ -108,7 +108,7 @@ void Texture::populate(gfx::BackbufferRatio::Enum _ratio, bool _hasMips, std::ui
 	ratio = _ratio;
 }
 
-uSize Texture::getSize() const
+uSize Texture::get_size() const
 {
 	if (ratio == gfx::BackbufferRatio::Count)
 	{

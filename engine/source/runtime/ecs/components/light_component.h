@@ -2,7 +2,7 @@
 //-----------------------------------------------------------------------------
 // LightComponent Header Includes
 //-----------------------------------------------------------------------------
-#include "core/ecs.h"
+#include "../ecs.h"
 #include "../../rendering/light.h"
 //-----------------------------------------------------------------------------
 // Forward Declarations
@@ -17,11 +17,11 @@
 /// Class that contains our core Light data, used for rendering and other things.
 /// </summary>
 //-----------------------------------------------------------------------------
-class LightComponent : public core::Component
+class LightComponent : public runtime::Component
 {
 	COMPONENT(LightComponent)
 	SERIALIZABLE(LightComponent)
-	REFLECTABLE(LightComponent, core::Component)
+	REFLECTABLE(LightComponent, runtime::Component)
 public:
 	//-------------------------------------------------------------------------
 	// Constructors & Destructors
@@ -33,12 +33,29 @@ public:
 	//-------------------------------------------------------------------------
 	// Public Methods
 	//-------------------------------------------------------------------------
-	inline Light& getLight() { return mLight; }
-	inline const Light& getLight() const { return mLight; }
+	//-----------------------------------------------------------------------------
+	//  Name : getLight ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline Light& get_light() { return _light; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : get_light ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline const Light& get_light() const { return _light; }
 private:
 	//-------------------------------------------------------------------------
 	// Private Member Variables.
 	//-------------------------------------------------------------------------
 	/// The light object this component represents
-	Light mLight;
+	Light _light;
 };

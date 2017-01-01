@@ -228,9 +228,6 @@
     <ClCompile Include="..\..\source\runtime\system\filesystem.cpp">
       <Filter>Source Files\system</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\runtime\system\renderer.cpp">
-      <Filter>Source Files\system</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\runtime\system\app.cpp">
       <Filter>Source Files\system</Filter>
     </ClCompile>
@@ -239,6 +236,15 @@
     </ClCompile>
     <ClCompile Include="..\..\source\runtime\input\input.cpp">
       <Filter>Source Files\input</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\runtime\rendering\renderer.cpp">
+      <Filter>Source Files\rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\runtime\ecs\ecs.cpp">
+      <Filter>Source Files\ecs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\runtime\system\task.cpp">
+      <Filter>Source Files\system</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -479,9 +485,6 @@
     <ClInclude Include="..\..\source\runtime\system\filesystem_watcher.hpp">
       <Filter>Source Files\system</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\runtime\system\renderer.h">
-      <Filter>Source Files\system</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\runtime\system\app.h">
       <Filter>Source Files\system</Filter>
     </ClInclude>
@@ -492,6 +495,15 @@
       <Filter>Source Files\rendering</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\runtime\system\singleton.h">
+      <Filter>Source Files\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\rendering\renderer.h">
+      <Filter>Source Files\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\ecs\ecs.h">
+      <Filter>Source Files\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\system\task.h">
       <Filter>Source Files\system</Filter>
     </ClInclude>
   </ItemGroup>

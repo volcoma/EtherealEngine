@@ -97,38 +97,38 @@ namespace string_utils
 	std::vector<std::string> split(const std::string &text, char sep, bool skipEmpty = true);
 
 	//-------------------------------------------------------------------------
-	//  Name : toUpper()
+	//  Name : to_upper()
 	/// <summary>
 	/// Process the std::string, transforming all characters to upper case where
 	/// appropriate.
 	/// </summary>
 	//-------------------------------------------------------------------------
-	std::string toUpper(const std::string& str);
+	std::string to_upper(const std::string& str);
 
 	//-------------------------------------------------------------------------
-	//  Name : toLower()
+	//  Name : to_lower()
 	/// <summary>
 	/// Process the std::string, transforming all characters to lower case where
 	/// appropriate.
 	/// </summary>
 	//-------------------------------------------------------------------------
-	std::string toLower(const std::string& str);
+	std::string to_lower(const std::string& str);
 
 	//-------------------------------------------------------------------------
-	//  Name : beginsWith ()
+	//  Name : begins_with ()
 	/// <summary>
 	/// Determine if this std::string begins with the std::string provided.
 	/// </summary>
 	//-------------------------------------------------------------------------
-	bool beginsWith(const std::string& str, const std::string & value, bool ignoreCase = false);
+	bool begins_with(const std::string& str, const std::string & value, bool ignoreCase = false);
 
 	//-------------------------------------------------------------------------
-	//  Name : endsWith ()
+	//  Name : ends_with ()
 	/// <summary>
 	/// Determine if this std::string ends with the std::string provided.
 	/// </summary>
 	//-------------------------------------------------------------------------
-	bool endsWith(const std::string& str, const std::string & value, bool ignoreCase = false);
+	bool ends_with(const std::string& str, const std::string & value, bool ignoreCase = false);
 
 	//-------------------------------------------------------------------------
 	//  Name : replace ()
@@ -180,27 +180,27 @@ namespace string_utils
 	std::string format(const char* format, va_list args);
 
 	//-------------------------------------------------------------------------
-	//  Name : wordWrap ()
+	//  Name : word_wrap ()
 	/// <summary>
 	/// Wraps the std::string up to the maximum length and optionally inserts an
 	/// aribitrary padding std::string at the beginning of each new line
 	/// </summary>
 	//-------------------------------------------------------------------------
-	std::string wordWrap(const std::string & value, std::string::size_type maximumLength, const std::string & linePadding = "");
+	std::string word_wrap(const std::string & value, std::string::size_type maximumLength, const std::string & linePadding = "");
 
 	//-----------------------------------------------------------------------------
-	//  Name : commandLineArgs ()
+	//  Name : command_line_args ()
 	/// <summary>
 	/// Creates a single string command line.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::string commandLineArgs(int _argc, char* _argv[]);
+	std::string command_line_args(int _argc, char* _argv[]);
 
 	//-----------------------------------------------------------------------------
-	//  Name : parseCommandLine ()
+	//  Name : parse_command_line ()
 	/// <summary>
 	/// Split single string command line into its component parts.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool parseCommandLine(const std::string & strCommandLine, std::vector<std::string> & ArgumentsOut);
+	bool parse_command_line(const std::string & strCommandLine, std::vector<std::string> & ArgumentsOut);
 }

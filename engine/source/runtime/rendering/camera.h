@@ -32,312 +32,312 @@ public:
 	//-------------------------------------------------------------------------
 
 	//-----------------------------------------------------------------------------
-	//  Name : setProjectionMode ()
+	//  Name : set_projection_mode ()
 	/// <summary>
 	/// Sets the current projection mode for this camera (i.e. orthographic
 	/// or perspective).
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setProjectionMode(ProjectionMode mode);
+	void set_projection_mode(ProjectionMode mode);
 
 	//-----------------------------------------------------------------------------
-	//  Name : setFOV ()
+	//  Name : set_fov ()
 	/// <summary>
 	/// Sets the field of view angle of this camera (perspective only).
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setFOV(float degrees);
+	void set_fov(float degrees);
 
 	//-----------------------------------------------------------------------------
-	//  Name : setNearClip ()
+	//  Name : set_near_clip ()
 	/// <summary>
 	/// Set the near plane distance
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setNearClip(float distance);
+	void set_near_clip(float distance);
 
 	//-----------------------------------------------------------------------------
-	//  Name : setFarClip()
+	//  Name : set_far_clip()
 	/// <summary>
 	/// Set the far plane distance
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setFarClip(float distance);
+	void set_far_clip(float distance);
 
 	//-----------------------------------------------------------------------------
-	// Name : setOrthographicSize( )
+	// Name : set_orthographic_size( )
 	/// <summary>
 	/// Sets the half of the vertical size of the viewing volume in world units.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setOrthographicSize(float size);
+	void set_orthographic_size(float size);
 
 	//-----------------------------------------------------------------------------
-	//  Name : getProjectionMode ()
+	//  Name : get_projection_mode ()
 	/// <summary>
 	/// Retrieve the current projection mode for this camera.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline ProjectionMode getProjectionMode() const { return mProjectionMode; }
+	inline ProjectionMode get_projection_mode() const { return _projection_mode; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getFOV()
+	//  Name : get_fov()
 	/// <summary>
 	/// Retrieve the current field of view angle in degrees.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline float getFOV() const { return mFOV; }
+	inline float get_fov() const { return _fov; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getNearClip()
+	//  Name : get_near_clip()
 	/// <summary>
 	/// Retrieve the distance from the camera to the near clip plane.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline float getNearClip() const { return mNearClip; }
+	inline float get_near_clip() const { return _near_clip; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getFarClip()
+	//  Name : get_far_clip()
 	/// <summary>
 	/// Retrieve the distance from the camera to the far clip plane.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline float getFarClip() const { return mFarClip; }
+	inline float get_far_clip() const { return _far_clip; }
 
 	//-----------------------------------------------------------------------------
-	// Name : getOrthographicSize( )
+	// Name : get_ortho_size( )
 	/// <summary>
 	/// Get the orthographic size.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline float getOrthographicSize() const { return mOrthographicSize; }
+	inline float get_ortho_size() const { return _ortho_size; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getZoomFactor ()
+	//  Name : get_zoom_factor ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float getZoomFactor() const;
+	float get_zoom_factor() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : getPixelsPerUnit ()
+	//  Name : get_ppu ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float getPixelsPerUnit() const;
+	float get_ppu() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : setViewportSize ()
+	//  Name : set_viewport_size ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setViewportSize(const uSize& viewportSize);
+	void set_viewport_size(const uSize& viewportSize);
 
 	//-----------------------------------------------------------------------------
-	//  Name : setViewportPos ()
+	//  Name : set_viewport_pos ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void setViewportPos(const uPoint& viewportPos) { mViewportPos = viewportPos; }
+	inline void set_viewport_pos(const uPoint& viewportPos) { _viewport_pos = viewportPos; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getViewportSize ()
+	//  Name : get_viewport_size ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const uSize& getViewportSize() const { return mViewportSize; }
+	const uSize& get_viewport_size() const { return _viewport_size; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getViewportPos ()
+	//  Name : get_viewport_pos ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const uPoint& getViewportPos() const { return mViewportPos; }
+	inline const uPoint& get_viewport_pos() const { return _viewport_pos; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : setAspectRatio ()
+	//  Name : set_aspect_ratio ()
 	/// <summary>
 	/// Set the aspect ratio that should be used to generate the horizontal
 	/// FOV angle (perspective only).
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setAspectRatio(float aspect, bool locked = false);
+	void set_aspect_ratio(float aspect, bool locked = false);
 
 	//-----------------------------------------------------------------------------
-	//  Name : getAspectRatio()
+	//  Name : get_aspect_ratio()
 	/// <summary>
 	/// Retrieve the aspect ratio used to generate the horizontal FOV angle.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline float getAspectRatio() const { return mAspectRatio; }
+	inline float get_aspect_ratio() const { return _aspect_ratio; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : isAspectLocked()
+	//  Name : is_aspect_locked()
 	/// <summary>
 	/// Determine if the aspect ratio is currently being updated by the
 	/// render driver.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool isAspectLocked() const;
+	bool is_aspect_locked() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : isFrustumLocked ()
+	//  Name : is_frustum_locked ()
 	/// <summary>
 	/// Inform the caller whether or not the frustum is currently locked
 	/// This is useful as a debugging tool.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline bool isFrustumLocked() const { return mFrustumLocked; }
+	inline bool is_frustum_locked() const { return _frustum_locked; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : lockFrustum ()
+	//  Name : lock_frustum ()
 	/// <summary>
 	/// Prevent the frustum from updating.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void lockFrustum(bool locked) { mFrustumLocked = locked; }
+	inline void lock_frustum(bool locked) { _frustum_locked = locked; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getFrustum()
+	//  Name : get_frustum()
 	/// <summary>
 	/// Retrieve the current camera object frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const math::frustum& getFrustum();
+	const math::frustum& get_frustum();
 
 	//-----------------------------------------------------------------------------
-	//  Name : getClippingVolume()
+	//  Name : get_clipping_volume()
 	/// <summary>
 	/// Retrieve the frustum / volume that represents the space between the camera 
 	/// position and its near plane. This frustum represents the 'volume' that can 
 	/// end up clipping geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const math::frustum& getClippingVolume();
+	const math::frustum& get_clipping_volume();
 
 	//-----------------------------------------------------------------------------
-	//  Name : getProj ()
+	//  Name : get_projection ()
 	/// <summary>
 	/// Return the current projection matrix.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const math::transform_t& getProj();
+	const math::transform_t& get_projection();
 
 	//-----------------------------------------------------------------------------
-	//  Name : getView ()
+	//  Name : get_view ()
 	/// <summary>
 	/// Return the current view matrix.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::transform_t& getView() const { return mView; }
+	inline const math::transform_t& get_view() const { return _view; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getPreviousView ()
+	//  Name : get_last_view ()
 	/// <summary>
 	/// Retrieve a copy of the view matrix recorded with the most recent call
 	/// to recordCurrentMatrices().
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::transform_t& getPreviousView() const { return mPreviousView; }
+	inline const math::transform_t& get_last_view() const { return _last_view; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getPreviousProj ()
+	//  Name : get_last_projection ()
 	/// <summary>
 	/// Retrieve a copy of the projection matrix recorded with the most
 	/// recent call to recordCurrentMatrices().
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::transform_t& getPreviousProj() const { return mPreviousProj; }
+	inline const math::transform_t& get_last_projection() const { return _last_projection; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : recordCurrentMatrices ()
+	//  Name : record_current_matrices ()
 	/// <summary>
 	/// Make a copy of the current view / projection matrices before they
 	/// are changed. Useful for performing effects such as motion blur.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void recordCurrentMatrices();
+	void record_current_matrices();
 
 	//-----------------------------------------------------------------------------
-	//  Name : setAAData ()
+	//  Name : set_aa_data ()
 	/// <summary>
 	/// Sets the current jitter value for temporal anti-aliasing
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setAAData(const uSize& viewportSize, std::uint32_t currentSubpixelIndex, std::uint32_t temporalAASamples);
+	void set_aa_data(const uSize& viewportSize, std::uint32_t currentSubpixelIndex, std::uint32_t temporalAASamples);
 
 	//-----------------------------------------------------------------------------
-	//  Name : getAAData ()
+	//  Name : get_aa_data ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::vec4& getAAData() const { return mAAData; }
+	inline const math::vec4& get_aa_data() const { return _aa_data; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : boundsInFrustum ()
+	//  Name : bounds_in_frustum ()
 	/// <summary>
 	/// Determine whether or not the AABB specified falls within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::VolumeQuery::E boundsInFrustum(const math::bbox & bounds);
+	math::VolumeQuery::E bounds_in_frustum(const math::bbox & bounds);
 
 	//-----------------------------------------------------------------------------
-	//  Name : boundsInFrustum ()
+	//  Name : bounds_in_frustum ()
 	/// <summary>
 	/// Determine whether or not the OOBB specified is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::VolumeQuery::E boundsInFrustum(const math::bbox & bounds, const math::transform_t & t);
+	math::VolumeQuery::E bounds_in_frustum(const math::bbox & bounds, const math::transform_t & t);
 
 	//-----------------------------------------------------------------------------
-	//  Name : viewportToRay()
+	//  Name : viewport_to_ray()
 	/// <summary>
 	/// Convert the specified screen position into a ray origin and direction
 	/// vector, suitable for use during picking.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool viewportToRay(const uSize & viewportSize, const math::vec2 & point, math::vec3 & rayOriginOut, math::vec3 & rayDirectionOut);
+	bool viewport_to_ray(const uSize & viewportSize, const math::vec2 & point, math::vec3 & rayOriginOut, math::vec3 & rayDirectionOut);
 
 	//-----------------------------------------------------------------------------
-	//  Name : viewportToWorld ()
+	//  Name : viewport_to_world ()
 	/// <summary>
 	/// Given a view screen position (in screen space) this function will cast that 
 	/// ray and return the world space position on the specified plane. The value
 	/// is returned via the world parameter passed.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool viewportToWorld(const uSize & viewportSize, const math::vec2 & point, const math::plane & plane, math::vec3 & positionOut);
+	bool viewport_to_world(const uSize & viewportSize, const math::vec2 & point, const math::plane & plane, math::vec3 & positionOut);
 
 	//-----------------------------------------------------------------------------
-	//  Name : viewportToMajorAxis ()
+	//  Name : viewport_to_major_axis ()
 	/// <summary>
 	/// Given a view screen position (in screen space) this function will cast that 
 	/// ray and return the world space intersection point on one of the major axis
 	/// planes selected based on the camera look vector.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool viewportToMajorAxis(const uSize & viewportSize, const math::vec2 & point, const math::vec3 & axisOrigin, math::vec3 & positionOut, math::vec3 & majorAxisOut);
+	bool viewport_to_major_axis(const uSize & viewportSize, const math::vec2 & point, const math::vec3 & axisOrigin, math::vec3 & positionOut, math::vec3 & majorAxisOut);
 
 	//-----------------------------------------------------------------------------
 	//  Name : viewportToMajorAxis ()
@@ -347,123 +347,123 @@ public:
 	/// planes selected based on the specified normal.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool viewportToMajorAxis(const uSize & viewportSize, const math::vec2 & point, const math::vec3 & axisOrigin, const math::vec3 & alignNormal, math::vec3 & positionOut, math::vec3 & majorAxisOut);
+	bool viewport_to_major_axis(const uSize & viewportSize, const math::vec2 & point, const math::vec3 & axisOrigin, const math::vec3 & alignNormal, math::vec3 & positionOut, math::vec3 & majorAxisOut);
 
 	//-----------------------------------------------------------------------------
-	//  Name : viewportToCamera ()
+	//  Name : viewport_to_camera ()
 	/// <summary>
 	/// Given a view screen position (in screen space) this function will convert
 	/// the point into a camera space position at the near plane.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool viewportToCamera(const uSize & viewportSize, const math::vec3 & point, math::vec3 & positionOut);
+	bool viewport_to_camera(const uSize & viewportSize, const math::vec3 & point, math::vec3 & positionOut);
 
 	//-----------------------------------------------------------------------------
-	//  Name : worldToViewport()
+	//  Name : world_to_viewport()
 	/// <summary>
 	/// Transform a point from world space, into screen space. Returns false 
 	/// if the point was clipped off the screen.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool worldToViewport(const uSize & viewportSize, const math::vec3 & position, math::vec3 & pointOut, bool clipX = true, bool clipY = true, bool clipZ = true);
+	bool world_to_viewport(const uSize & viewportSize, const math::vec3 & position, math::vec3 & pointOut, bool clipX = true, bool clipY = true, bool clipZ = true);
 
 	//-----------------------------------------------------------------------------
-	//  Name : estimateZoomFactor ()
+	//  Name : estimate_zoom_factor ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float estimateZoomFactor(const uSize & viewportSize, const math::plane & plane);
+	float estimate_zoom_factor(const uSize & viewportSize, const math::plane & plane);
 
 
 	//-----------------------------------------------------------------------------
-	//  Name : estimateZoomFactor ()
-	/// <summary>
-	/// Given the current viewport type and projection mode, estimate the "zoom"
-	/// factor that can be used for scaling various operations relative to their
-	/// "scale" as it appears in the viewport.
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	float estimateZoomFactor(const uSize & viewportSize, const math::vec3 & position);
-
-	//-----------------------------------------------------------------------------
-	//  Name : estimateZoomFactor ()
+	//  Name : estimate_zoom_factor ()
 	/// <summary>
 	/// Given the current viewport type and projection mode, estimate the "zoom"
 	/// factor that can be used for scaling various operations relative to their
 	/// "scale" as it appears in the viewport.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float estimateZoomFactor(const uSize & viewportSize, const math::plane & plane, float maximumValue);
+	float estimate_zoom_factor(const uSize & viewportSize, const math::vec3 & position);
 
 	//-----------------------------------------------------------------------------
-	// Name : estimateZoomFactor ()
+	//  Name : estimate_zoom_factor ()
+	/// <summary>
+	/// Given the current viewport type and projection mode, estimate the "zoom"
+	/// factor that can be used for scaling various operations relative to their
+	/// "scale" as it appears in the viewport.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	float estimate_zoom_factor(const uSize & viewportSize, const math::plane & plane, float maximumValue);
+
+	//-----------------------------------------------------------------------------
+	// Name : estimate_zoom_factor ()
 	/// <summary>
 	/// Given the current viewport type and projection mode, estimate the "zoom"
 	/// factor that can be used for scaling various operations relative to the
 	/// "scale" of an object as it appears in the viewport at the specified position.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float estimateZoomFactor(const uSize & viewportSize, const math::vec3 & position, float maximumValue);
+	float estimate_zoom_factor(const uSize & viewportSize, const math::vec3 & position, float maximumValue);
 
 	//-----------------------------------------------------------------------------
-	// Name : estimatePickTolerance ()
+	// Name : estimate_pick_tolerance ()
 	/// <summary>
 	/// Estimate the distance (along each axis) from the specified object space 
 	/// point to use as a tolerance for picking.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::vec3 estimatePickTolerance(const uSize & viewportSize, float pixelTolerance, const math::vec3 & referencePosition, const math::transform_t & objectTransform);
+	math::vec3 estimate_pick_tolerance(const uSize & viewportSize, float pixelTolerance, const math::vec3 & referencePosition, const math::transform_t & objectTransform);
 
 	//-----------------------------------------------------------------------------
-	//  Name : lookAt ()
+	//  Name : look_at ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void lookAt(const math::vec3 & vEye, const math::vec3 & vAt);
+	void look_at(const math::vec3 & vEye, const math::vec3 & vAt);
 
 	//-----------------------------------------------------------------------------
-	//  Name : lookAt ()
+	//  Name : look_at ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void lookAt(const math::vec3 & vEye, const math::vec3 & vAt, const math::vec3 & vUp);
+	void look_at(const math::vec3 & vEye, const math::vec3 & vAt, const math::vec3 & vUp);
 
 	//-----------------------------------------------------------------------------
-	//  Name : getPosition ()
+	//  Name : get_position ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::vec3 getPosition() const;
+	math::vec3 get_position() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : zUnitAxis ()
+	//  Name : z_unit_axis ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::vec3 zUnitAxis() const;
+	math::vec3 z_unit_axis() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : getLocalBoundingBox ()
+	//  Name : get_local_bounding_box ()
 	/// <summary>
 	/// Retrieve the bounding box of this object.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual math::bbox getLocalBoundingBox();
+	virtual math::bbox get_local_bounding_box();
 
 	//-----------------------------------------------------------------------------
 	//  Name : () touch
@@ -478,45 +478,45 @@ protected:
 	// Protected Variables
 	//-------------------------------------------------------------------------
 	/// The type of projection currently selected for this camera.
-	ProjectionMode mProjectionMode = ProjectionMode::Perspective;
+	ProjectionMode _projection_mode = ProjectionMode::Perspective;
 	/// Vertical degrees angle (perspective only).
-	float mFOV = 60.0f;
+	float _fov = 60.0f;
 	/// Near clip plane Distance
-	float mNearClip = 0.1f;
+	float _near_clip = 0.1f;
 	/// Far clip plane Distance
-	float mFarClip = 1000.0f;
+	float _far_clip = 1000.0f;
 	/// Camera's half-size when in orthographic mode.
-	float mOrthographicSize = 5;
+	float _ortho_size = 5;
 	/// Viewport position
-	uPoint mViewportPos = { 0, 0 };
+	uPoint _viewport_pos = { 0, 0 };
 	/// Viewport size
-	uSize mViewportSize = { 0, 0 };
+	uSize _viewport_size = { 0, 0 };
 	/// Cached view matrix
-	math::transform_t mView;
+	math::transform_t _view;
 	/// Cached projection matrix.
-	math::transform_t mProj;
+	math::transform_t _projection;
 	/// Cached "previous" view matrix.
-	math::transform_t mPreviousView;
+	math::transform_t _last_view;
 	/// Cached "previous" projection matrix.
-	math::transform_t mPreviousProj;
+	math::transform_t _last_projection;
 	/// Details regarding the camera frustum.
-	math::frustum mFrustum;
+	math::frustum _frustum;
 	/// The near clipping volume (area of space between the camera position and the near plane).
-	math::frustum mClippingVolume;
+	math::frustum _clipping_volume;
 	/// The aspect ratio used to generate the correct horizontal degrees (perspective only)
-	float mAspectRatio = 1.0f;
+	float _aspect_ratio = 1.0f;
 	/// Anti-aliasing data.
-	math::vec4 mAAData = { 0.0f, 0.0f, 0.0f, 0.0f };
+	math::vec4 _aa_data = { 0.0f, 0.0f, 0.0f, 0.0f };
 	/// View matrix dirty ?
-	bool mViewDirty = true;
+	bool _view_dirty = true;
 	/// Projection matrix dirty ?
-	bool mProjectionDirty = true;
+	bool _projection_dirty = true;
 	/// Has the aspect ratio changed?
-	bool mAspectDirty = true;
+	bool _aspect_dirty = true;
 	/// Are the frustum planes dirty ?
-	bool mFrustumDirty = true;
+	bool _frustum_dirty = true;
 	/// Should the aspect ratio be automatically updated by the render driver?
-	bool mAspectLocked = false;
+	bool _aspect_locked = false;
 	/// Is the frustum locked?
-	bool mFrustumLocked = false;
+	bool _frustum_locked = false;
 };

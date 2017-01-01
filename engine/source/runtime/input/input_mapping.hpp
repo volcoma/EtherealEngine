@@ -66,14 +66,14 @@ public:
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : getMapping (virtual )
+	//  Name : get_mapping (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual Mapping getMapping(const sf::Event& e) = 0;
+	virtual Mapping get_mapping(const sf::Event& e) = 0;
 
 protected:
 	/// mappings
@@ -83,7 +83,7 @@ protected:
 
 struct KeyboardMapper : public InputMapper<sf::Keyboard::Key>
 {
-	virtual Mapping getMapping(const sf::Event& e)
+	virtual Mapping get_mapping(const sf::Event& e)
 	{
 		Mapping binds;
 		if (e.type == sf::Event::EventType::KeyPressed)
@@ -103,7 +103,7 @@ struct KeyboardMapper : public InputMapper<sf::Keyboard::Key>
 
 struct MouseButtonMapper : public InputMapper<sf::Mouse::Button>
 {
-	virtual Mapping getMapping(const sf::Event& e)
+	virtual Mapping get_mapping(const sf::Event& e)
 	{
 		Mapping binds;
 		if (e.type == sf::Event::EventType::MouseButtonPressed)
@@ -122,7 +122,7 @@ struct MouseButtonMapper : public InputMapper<sf::Mouse::Button>
 
 struct MouseWheelMapper : public InputMapper<sf::Mouse::Wheel>
 {
-	virtual Mapping getMapping(const sf::Event& e)
+	virtual Mapping get_mapping(const sf::Event& e)
 	{
 		Mapping binds;
 		if (e.type == sf::Event::EventType::MouseWheelScrolled)
@@ -136,7 +136,7 @@ struct MouseWheelMapper : public InputMapper<sf::Mouse::Wheel>
 
 struct TouchFingerMapper : public InputMapper<unsigned int>
 {
-	virtual Mapping getMapping(const sf::Event& e)
+	virtual Mapping get_mapping(const sf::Event& e)
 	{
 		Mapping binds;
 		if (e.type == sf::Event::EventType::TouchBegan)
@@ -194,7 +194,7 @@ struct TouchFingerMapper : public InputMapper<unsigned int>
 
 struct JoystickButtonMapper : public InputMapper<std::pair<unsigned int, unsigned int>>
 {
-	virtual Mapping getMapping(const sf::Event& e)
+	virtual Mapping get_mapping(const sf::Event& e)
 	{
 		Mapping binds;
 		if (e.type == sf::Event::EventType::JoystickButtonPressed)
@@ -213,7 +213,7 @@ struct JoystickButtonMapper : public InputMapper<std::pair<unsigned int, unsigne
 
 struct EventMapper : public InputMapper<sf::Event::EventType>
 {
-	virtual Mapping getMapping(const sf::Event& e)
+	virtual Mapping get_mapping(const sf::Event& e)
 	{
 		Mapping binds;
 		binds.actions = bindings[e.type];

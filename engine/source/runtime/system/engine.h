@@ -2,6 +2,7 @@
 
 #include "core/subsystem.h"
 #include "core/events/event.hpp"
+#include "core/logging/logging.h"
 
 #include <chrono>
 #include <vector>

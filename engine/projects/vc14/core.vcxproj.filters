@@ -1308,12 +1308,6 @@
     <ClInclude Include="..\..\source\core\common\common.h">
       <Filter>Source Files\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\ecs.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\task.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\core\subsystem.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -1449,12 +1443,6 @@
       <Filter>Source Files\memory</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\core\subsystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\core\ecs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\core\task.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\core\common\string.cpp">

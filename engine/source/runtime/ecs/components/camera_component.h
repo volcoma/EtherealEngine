@@ -2,7 +2,7 @@
 //-----------------------------------------------------------------------------
 // CameraComponent Header Includes
 //-----------------------------------------------------------------------------
-#include "core/ecs.h"
+#include "../ecs.h"
 #include "core/math/math_includes.h"
 #include "core/common/basetypes.hpp"
 
@@ -22,11 +22,11 @@ struct FrameBuffer;
 /// Class that contains our core Camera data, used for rendering and other things.
 /// </summary>
 //-----------------------------------------------------------------------------
-class CameraComponent : public core::Component
+class CameraComponent : public runtime::Component
 {
 	COMPONENT(CameraComponent)
 	SERIALIZABLE(CameraComponent)
-	REFLECTABLE(CameraComponent, core::Component)
+	REFLECTABLE(CameraComponent, runtime::Component)
 public:
 	//-------------------------------------------------------------------------
 	// Constructors & Destructors
@@ -39,213 +39,214 @@ public:
 	// Public Methods
 	//-------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------
-	//  Name : setFieldOfView ()
+	//  Name : set_fov ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	CameraComponent& setFieldOfView(float fovDegrees);
+	CameraComponent& set_fov(float fovDegrees);
 
 	//-----------------------------------------------------------------------------
-	//  Name : setNearClip ()
+	//  Name : set_near_clip ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	CameraComponent& setNearClip(float distance);
+	CameraComponent& set_near_clip(float distance);
 
 	//-----------------------------------------------------------------------------
-	//  Name : setFarClip ()
+	//  Name : set_far_clip ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	CameraComponent& setFarClip(float distance);
+	CameraComponent& set_far_clip(float distance);
 
 	//-----------------------------------------------------------------------------
-	//  Name : setProjectionMode ()
+	//  Name : set_projection_mode ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	CameraComponent& setProjectionMode(ProjectionMode mode);
+	CameraComponent& set_projection_mode(ProjectionMode mode);
 
 	//-----------------------------------------------------------------------------
-	//  Name : getFieldOfView ()
+	//  Name : get_fov ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float getFieldOfView() const;
+	float get_fov() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : getNearClip ()
+	//  Name : get_near_clip ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float getNearClip() const;
+	float get_near_clip() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : getFarClip ()
+	//  Name : get_far_clip ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float getFarClip() const;
+	float get_far_clip() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : getProjectionMode ()
+	//  Name : get_projection_mode ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	ProjectionMode getProjectionMode() const;
+	ProjectionMode get_projection_mode() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : getCamera ()
+	//  Name : get_camera ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline Camera& getCamera() { return *mCamera.get(); }
+	inline Camera& get_camera() { return *_camera.get(); }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getCamera ()
+	//  Name : get_camera ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const Camera& getCamera() const { return *mCamera.get(); }
-	//-----------------------------------------------------------------------------
-	//  Name : getRenderSurface ()
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	std::shared_ptr<FrameBuffer> getOutputBuffer() const;
+	inline const Camera& get_camera() const { return *_camera.get(); }
 
 	//-----------------------------------------------------------------------------
-	//  Name : getGBuffer ()
+	//  Name : get_output_buffer ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::shared_ptr<FrameBuffer> getGBuffer() const;
+	std::shared_ptr<FrameBuffer> get_output_buffer() const;
+
+	//-----------------------------------------------------------------------------
+	//  Name : get_g_buffer ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	std::shared_ptr<FrameBuffer> get_g_buffer() const;
 	
 	//-----------------------------------------------------------------------------
-	//  Name : updateInternal ()
+	//  Name : update ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void updateInternal(const math::transform_t& t);
+	void update(const math::transform_t& t);
 
 	//-----------------------------------------------------------------------------
-	//  Name : getHDR ()
+	//  Name : get_hdr ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool getHDR() const;
+	bool get_hdr() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : setHDR ()
+	//  Name : set_hdr ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setHDR(bool hdr);
+	void set_hdr(bool hdr);
 
 	//-----------------------------------------------------------------------------
-	//  Name : setViewportSize ()
+	//  Name : set_viewport_size ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setViewportSize(const uSize& size);
+	void set_viewport_size(const uSize& size);
 
 	//-----------------------------------------------------------------------------
-	//  Name : getViewportSize ()
+	//  Name : get_viewport_size ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const uSize& getViewportSize() const;
+	const uSize& get_viewport_size() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : setProjectionWindow ()
+	//  Name : update_projection_window ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setProjectionWindow();
+	void update_projection_window();
 
 	//-----------------------------------------------------------------------------
-	//  Name : getOrthographicSize ()
+	//  Name : get_ortho_size ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float getOrthographicSize() const;
+	float get_ortho_size() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : setPixelsPerUnit ()
+	//  Name : set_ortho_size ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setOrthographicSize(float size);
+	void set_ortho_size(float size);
 
 	//-----------------------------------------------------------------------------
-	//  Name : getPixelsPerUnit ()
+	//  Name : get_ppu ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float getPixelsPerUnit() const;
+	float get_ppu() const;
 
 private:
 	//-----------------------------------------------------------------------------
@@ -261,11 +262,11 @@ private:
 	// Private Member Variables.
 	//-------------------------------------------------------------------------
 	/// The camera object this component represents
-	std::unique_ptr<Camera> mCamera;
+	std::unique_ptr<Camera> _camera;
 	/// The render surface of this camera
-	std::shared_ptr<FrameBuffer> mOutputBuffer;
+	std::shared_ptr<FrameBuffer> _output_buffer;
 	/// The g-buffer for this camera.
-	std::shared_ptr<FrameBuffer> mGBuffer;
+	std::shared_ptr<FrameBuffer> _g_buffer;
 	/// Is the camera HDR?
-	bool mHDR = true;
+	bool _hdr = true;
 };

@@ -2,7 +2,7 @@
 
 #include <unordered_set>
 #include <string>
-#include "core/ecs.h"
+#include "../ecs.h"
 
  /**
   * Allow entities to be tagged with strings.
@@ -13,7 +13,7 @@
   * for (Entity entity : entity_manager.entities_with_components(tags))
   */
 
-class TagsComponent : public core::Component
+class TagsComponent : public runtime::Component
 {
 	COMPONENT(TagsComponent)
 	SERIALIZABLE(TagsComponent)

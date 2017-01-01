@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/ecs.h"
+#include "../ecs.h"
 #include "../../rendering/model.h"
 
 class Material;
@@ -13,7 +13,7 @@ class Material;
 /// Class that contains core data for meshes.
 /// </summary>
 //-----------------------------------------------------------------------------
-class ModelComponent : public core::Component
+class ModelComponent : public runtime::Component
 {
 	COMPONENT(ModelComponent)
 	SERIALIZABLE(ModelComponent)
@@ -33,24 +33,96 @@ public:
 	//-------------------------------------------------------------------------
 	// Public Methods
 	//-------------------------------------------------------------------------
-	ModelComponent& setCastShadow(bool castShadow);
-	ModelComponent& setCastReflelction(bool castReflection);
-	ModelComponent& setStatic(bool bStatic);
+	//-----------------------------------------------------------------------------
+	//  Name : set_casts_shadow ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	ModelComponent& set_casts_shadow(bool castShadow);
 
-	bool castsShadow() const;
-	bool castsReflection() const;
-	bool isStatic() const;
+	//-----------------------------------------------------------------------------
+	//  Name : set_casts_reflection ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	ModelComponent& set_casts_reflection(bool castReflection);
 
-	const Model& getModel() const;
-	ModelComponent& setModel(const Model& model);
+	//-----------------------------------------------------------------------------
+	//  Name : set_static ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	ModelComponent& set_static(bool bStatic);
+
+	//-----------------------------------------------------------------------------
+	//  Name : casts_shadow ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	bool casts_shadow() const;
+
+	//-----------------------------------------------------------------------------
+	//  Name : casts_reflection ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	bool casts_reflection() const;
+
+	//-----------------------------------------------------------------------------
+	//  Name : is_static ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	bool is_static() const;
+
+	//-----------------------------------------------------------------------------
+	//  Name : get_model ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	const Model& get_model() const;
+
+	//-----------------------------------------------------------------------------
+	//  Name : set_model ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	ModelComponent& set_model(const Model& model);
 
 private:
 	//-------------------------------------------------------------------------
 	// Private Member Variables.
 	//-------------------------------------------------------------------------
-
-	bool mStatic = true;
-	bool mCastShadow = true;
-	bool mCastReflection = true;
-	Model mModel;
+	///
+	bool _static = true;
+	///
+	bool _casts_shadow = true;
+	///
+	bool _casts_reflection = true;
+	///
+	Model _model;
 };

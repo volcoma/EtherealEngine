@@ -2,7 +2,7 @@
 #include <memory>
 #include <string>
 
-#include "core/task.h"
+#include "../system/task.h"
 #include "core/events/event.hpp"
 #include "asset_handle.h"
 
@@ -19,65 +19,65 @@ struct LoadRequest
 	//-----------------------------------------------------------------------------
 	void then(const delegate<void(AssetHandle<T>)>& callback)
 	{
-		if (isReady())
+		if (is_ready())
 			callback(asset);
 		else
 			callbacks.addListener(callback);
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : isReady ()
+	//  Name : is_ready ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool isReady() const
+	bool is_ready() const
 	{
 		return !!asset.link->asset;
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : waitUntilReady ()
+	//  Name : wait_until_ready ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void waitUntilReady()
+	void wait_until_ready()
 	{
-		if (loadTask.is_valid())
+		if (load_task.is_valid())
 		{
-			auto ts = core::get_subsystem<core::TaskSystem>();
-			ts->wait(loadTask);
+			auto ts = core::get_subsystem<runtime::TaskSystem>();
+			ts->wait(load_task);
 			ts->execute_tasks_on_main();
 		}
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : setTask ()
+	//  Name : set_task ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setTask(core::Handle task)
+	void set_task(core::Handle task)
 	{
-		loadTask = task;
+		load_task = task;
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : setData ()
+	//  Name : set_data ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void setData(const std::string& id, std::shared_ptr<T> data)
+	void set_data(const std::string& id, std::shared_ptr<T> data)
 	{
 		asset.link->id = id;
 		asset.link->asset = data;
@@ -91,7 +91,7 @@ struct LoadRequest
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void invokeCallbacks()
+	void invoke_callbacks()
 	{
 		callbacks(asset);
 		callbacks = {};
@@ -100,7 +100,7 @@ struct LoadRequest
 	/// Requested asset
 	AssetHandle<T> asset;
 	/// Associated task with this request
-	core::Handle loadTask;
+	core::Handle load_task;
 	/// Subscribed callbacks
 	event<void(AssetHandle<T>)> callbacks;
 };
