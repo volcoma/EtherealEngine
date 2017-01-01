@@ -193,31 +193,30 @@ void MainEditorWindow::frameRender()
 void MainEditorWindow::onMenuBar()
 {
 	auto es = core::get_subsystem<EditState>();
-	auto is = core::get_subsystem<InputSystem>();
+	auto input = core::get_subsystem<Input>();
 	auto pm = core::get_subsystem<ProjectManager>();
 	const auto& current_project = pm->get_current_project();
-	auto& input = is->get_context();
 
-	if (input.isKeyDown(sf::Keyboard::LControl))
+	if (input->is_key_down(sf::Keyboard::LControl))
 	{
-		if (input.isKeyDown(sf::Keyboard::LShift))
+		if (input->is_key_down(sf::Keyboard::LShift))
 		{
-			if (input.isKeyPressed(sf::Keyboard::S))
+			if (input->is_key_pressed(sf::Keyboard::S))
 			{
 				saveSceneAs();
 			}
 		}
-		else if (input.isKeyPressed(sf::Keyboard::S))
+		else if (input->is_key_pressed(sf::Keyboard::S))
 		{
 			saveScene();
 		}
 
-		if (input.isKeyPressed(sf::Keyboard::O))
+		if (input->is_key_pressed(sf::Keyboard::O))
 		{
 			openScene();
 		}
 
-		if (input.isKeyPressed(sf::Keyboard::N))
+		if (input->is_key_pressed(sf::Keyboard::N))
 		{
 			createNewScene();
 		}

@@ -31,7 +31,7 @@
     <ClCompile Include="..\..\source\runtime\ecs\systems\rendering_system.cpp" />
     <ClCompile Include="..\..\source\runtime\ecs\systems\transform_system.cpp" />
     <ClCompile Include="..\..\source\runtime\ecs\utils.cpp" />
-    <ClCompile Include="..\..\source\runtime\input\input_context.cpp" />
+    <ClCompile Include="..\..\source\runtime\input\input.cpp" />
     <ClCompile Include="..\..\source\runtime\rendering\camera.cpp" />
     <ClCompile Include="..\..\source\runtime\rendering\debug\bounds.cpp" />
     <ClCompile Include="..\..\source\runtime\rendering\debug\debugdraw.cpp" />
@@ -87,7 +87,6 @@
     <ClInclude Include="..\..\source\runtime\ecs\utils.h" />
     <ClInclude Include="..\..\source\runtime\input\input.h" />
     <ClInclude Include="..\..\source\runtime\input\input_mapping.hpp" />
-    <ClInclude Include="..\..\source\runtime\input\input_context.h" />
     <ClInclude Include="..\..\source\runtime\meta\assets\asset_handle.hpp" />
     <ClInclude Include="..\..\source\runtime\meta\core\basetypes.hpp" />
     <ClInclude Include="..\..\source\runtime\meta\ecs\components\camera_component.hpp" />

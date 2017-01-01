@@ -26,7 +26,7 @@
     <ClInclude Include="..\..\source\core\common\handle_object_set.hpp" />
     <ClInclude Include="..\..\source\core\common\handle_set.hpp" />
     <ClInclude Include="..\..\source\core\common\spin.hpp" />
-    <ClInclude Include="..\..\source\core\common\string_utils.h" />
+    <ClInclude Include="..\..\source\core\common\string.h" />
     <ClInclude Include="..\..\source\core\common\tuple.hpp" />
     <ClInclude Include="..\..\source\core\common\type_traits.hpp" />
     <ClInclude Include="..\..\source\core\common\utils.h" />
@@ -407,7 +407,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\core\common\handle_set.cpp" />
-    <ClCompile Include="..\..\source\core\common\string_utils.cpp" />
+    <ClCompile Include="..\..\source\core\common\string.cpp" />
     <ClCompile Include="..\..\source\core\config\cfg\Config.cpp" />
     <ClCompile Include="..\..\source\core\config\cfg\Parser.cpp" />
     <ClCompile Include="..\..\source\core\console\console.cpp" />

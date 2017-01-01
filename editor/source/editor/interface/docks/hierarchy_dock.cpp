@@ -265,9 +265,8 @@ namespace Docks
 		auto es = core::get_subsystem<EditState>();
 		auto ecs = core::get_subsystem<core::EntityComponentSystem>();
 		auto ts = core::get_subsystem<TransformSystem>();
-		auto is = core::get_subsystem<InputSystem>();
+		auto input = core::get_subsystem<Input>();
 
-		auto& input = is->get_context();
 		auto& roots = ts->get_roots();
 
 		auto& editorCamera = es->camera;
@@ -277,7 +276,7 @@ namespace Docks
 
 		if (gui::IsWindowFocused())
 		{
-			if (input.isKeyPressed(sf::Keyboard::Delete))
+			if (input->is_key_pressed(sf::Keyboard::Delete))
 			{
 				if (selected && selected.is_type<core::Entity>())
 				{
@@ -290,9 +289,9 @@ namespace Docks
 				}
 			}
 
-			if (input.isKeyPressed(sf::Keyboard::D))
+			if (input->is_key_pressed(sf::Keyboard::D))
 			{
-				if (input.isKeyDown(sf::Keyboard::LControl))
+				if (input->is_key_down(sf::Keyboard::LControl))
 				{
 					if (selected && selected.is_type<core::Entity>())
 					{

@@ -6,7 +6,7 @@
 #include "handle_object_set.hpp"
 #include "handle_set.hpp"
 #include "spin.hpp"
-#include "string_utils.h"
+#include "string.h"
 #include "tuple.hpp"
 #include "type_traits.hpp"
 #include "utils.h"

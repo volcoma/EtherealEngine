@@ -1,4 +1,4 @@
-#include "common/string_utils.h"
+#include "common/string.h"
 
 int string_utils::compare(const std::string& s1, const std::string & s2, bool ignoreCase, const char * language /*= "english"*/)
 {

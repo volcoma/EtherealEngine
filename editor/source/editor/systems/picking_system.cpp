@@ -21,7 +21,7 @@
 
 void PickingSystem::frame_render(std::chrono::duration<float> dt)
 {
-	auto is = core::get_subsystem<InputSystem>();
+	auto input = core::get_subsystem<Input>();
 	auto es = core::get_subsystem<EditState>();
 	auto engine = core::get_subsystem<runtime::Engine>();
 	auto renderer = core::get_subsystem<runtime::Renderer>();
@@ -32,7 +32,6 @@ void PickingSystem::frame_render(std::chrono::duration<float> dt)
 	if (!dockspace.hasDock("Scene"))
 		return;
 	
-	auto& input = is->get_context();
 	const auto renderFrame = renderer->get_render_frame();
 
 	auto& editorCamera = es->camera;
@@ -52,7 +51,7 @@ void PickingSystem::frame_render(std::chrono::duration<float> dt)
 	auto invViewProj = math::inverse(viewProj);
 	const auto& size = camera.getViewportSize();
 	const auto& pos = camera.getViewportPos();
-	const auto& mousePos = input.getMouseCurrentPosition();
+	const auto& mousePos = input->get_current_cursor_position();
 
 	float mouseXNDC = ((float(mousePos.x) - float(pos.x)) / (float(size.width))) * 2.0f - 1.0f;
 	float mouseYNDC = ((float(size.height) - (float(mousePos.y) - float(pos.y))) / float(size.height)) * 2.0f - 1.0f;
@@ -76,7 +75,7 @@ void PickingSystem::frame_render(std::chrono::duration<float> dt)
 		mStartReadback = false;
 	}
 
-	if(input.isMouseButtonPressed(sf::Mouse::Left))
+	if(input->is_mouse_button_pressed(sf::Mouse::Left))
 	{
 		mStartReadback = true;
 		math::vec4 mousePosNDC = { mouseXNDC, mouseYNDC, 0.0f, 1.0f };

@@ -636,9 +636,6 @@
     <ClInclude Include="..\..\source\core\common\utils.h">
       <Filter>Source Files\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\common\string_utils.h">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\core\serialization\cereal\access.hpp">
       <Filter>Source Files\serialization\cereal</Filter>
     </ClInclude>
@@ -1320,6 +1317,9 @@
     <ClInclude Include="..\..\source\core\subsystem.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\core\common\string.h">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\core\reflection\rttr\enumeration.cpp">
@@ -1424,9 +1424,6 @@
     <ClCompile Include="..\..\source\core\logging\spdlog\details\format.cc">
       <Filter>Source Files\logging\spdlog\details</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\core\common\string_utils.cpp">
-      <Filter>Source Files\common</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\core\config\cfg\Config.cpp">
       <Filter>Source Files\config\cfg</Filter>
     </ClCompile>
@@ -1459,6 +1456,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\core\task.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\common\string.cpp">
+      <Filter>Source Files\common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -23,7 +23,7 @@ extern "C" void stbi_image_free(void *retval_from_stbi_load);
 
 void AssetReader::loadTextureFromFile(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Texture>& request)
 {
-	std::shared_ptr<fs::ByteArray> read_memory = std::make_shared<fs::ByteArray>();
+	auto read_memory = std::make_shared<fs::byte_array_t>();
 
 	auto readMemory = [read_memory, absoluteKey]()
 	{
@@ -123,7 +123,7 @@ void AssetReader::loadTextureFromFile(const std::string& key, const fs::path& ab
 void AssetReader::loadShaderFromFile(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Shader>& request)
 {
 
-	std::shared_ptr<fs::ByteArray> read_memory = std::make_shared<fs::ByteArray>();
+	auto read_memory = std::make_shared<fs::byte_array_t>();
 
 	auto readMemory = [read_memory, absoluteKey]()
 	{
@@ -226,7 +226,7 @@ struct MeshData
 {
 	gfx::VertexDecl decl;
 	std::vector<Group> groups;
-	std::vector<std::pair<fs::ByteArray, fs::ByteArray>> buffersMem; // vb, ib
+	std::vector<std::pair<fs::byte_array_t, fs::byte_array_t>> buffersMem; // vb, ib
 	math::bbox aabb;
 	MeshInfo info;
 };
@@ -248,7 +248,7 @@ void AssetReader::loadMeshFromFile(const std::string& key, const fs::path& absol
 
 		FileStreamReaderSeeker _reader(absoluteKey.string());
 
-		std::pair<fs::ByteArray, fs::ByteArray> buffers;
+		std::pair<fs::byte_array_t, fs::byte_array_t> buffers;
 		std::uint32_t chunk;
 		gfx::Error err;
 		while (4 == gfx::read(&_reader, chunk, &err)

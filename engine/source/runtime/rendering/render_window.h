@@ -4,7 +4,6 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "../system/sfml/Window.hpp"
-#include "../input/input_context.h"
 #include "core/events/event.hpp"
 
 struct FrameBuffer;
@@ -65,26 +64,6 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	inline std::shared_ptr<FrameBuffer> getRenderSurface() const { return mSurface; }
-
-	//-----------------------------------------------------------------------------
-	//  Name : getInput ()
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	inline InputContext& getInput() { return mInput; }
-
-	//-----------------------------------------------------------------------------
-	//  Name : getInput ()
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	inline const InputContext& getInput() const { return mInput; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : prepareSurface (virtual )
@@ -186,8 +165,6 @@ protected:
 	//-----------------------------------------------------------------------------
 	virtual void onClose();
 
-	/// Input Context for this window.
-	InputContext mInput;
 	/// Render surface for this window.
 	std::shared_ptr<FrameBuffer> mSurface;
 	///

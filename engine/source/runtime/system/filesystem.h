@@ -7,8 +7,8 @@
 namespace fs
 {
 	using namespace std::experimental::filesystem;
-	using ProtocolMap = std::unordered_map<std::string, std::string>;
-	using ByteArray = std::vector<std::uint8_t>;
+	using protocols_t = std::unordered_map<std::string, std::string>;
+	using byte_array_t = std::vector<std::uint8_t>;
 
 	//-----------------------------------------------------------------------------
 	//  Name : add_path_protocol ()
@@ -29,16 +29,16 @@ namespace fs
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	ProtocolMap& get_path_protocols();
+	protocols_t& get_path_protocols();
 
 	//-----------------------------------------------------------------------------
 	//  Name : read_stream ()
 	/// <summary>
-	/// Load a ByteArray with the contents of the specified file, be that file in a
+	/// Load a byte_array_t with the contents of the specified file, be that file in a
 	/// package or in the main file system.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	ByteArray read_stream(std::istream& stream);
+	byte_array_t read_stream(std::istream& stream);
 
 	//-----------------------------------------------------------------------------
 	//  Name : resolve_protocol()

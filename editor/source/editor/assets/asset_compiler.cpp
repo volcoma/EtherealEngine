@@ -1,5 +1,5 @@
 #include "asset_compiler.h"
-#include "core/common/string_utils.h"
+#include "core/common/string.h"
 #include "core/logging/logging.h"
 #include "runtime/system/FileSystem.h"
 #include "shaderc/shaderc.h"

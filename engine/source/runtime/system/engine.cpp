@@ -25,7 +25,7 @@ namespace runtime
 			std::make_shared<logging::sinks::daily_file_sink_mt>("Log", "log", 23, 59),
 		});
 
-		core::add_subsystem<InputSystem>();
+		core::add_subsystem<Input>();
 		core::add_subsystem<Renderer>();
 		core::add_subsystem<AssetManager>();
 		core::add_subsystem<core::EntityComponentSystem>();
@@ -116,21 +116,23 @@ namespace runtime
 		ts->execute_tasks_on_main();
 
 		auto dt = get_delta_time();
-		auto is = core::get_subsystem<InputSystem>();
+		auto input = core::get_subsystem<Input>();
+		input->update();
+
 		//get a copy of the windows for safe iterator invalidation
 		auto windows = get_windows();
 		for (auto window : windows)
 		{
 			_window = window;
-
 			bool focused = window->hasFocus();
-
 			window->frameBegin();
 
-			is->set_context(window->getInput());
-
 			sf::Event e;
-			while (window->pollEvent(e)){}
+			while (window->pollEvent(e))
+			{
+				if (focused)
+					input->handle_event(e);
+			}
 
 			if (focused)
 				on_frame_begin(dt);

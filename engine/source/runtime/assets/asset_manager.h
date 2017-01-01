@@ -4,7 +4,7 @@
 #include <unordered_map>
 
 #include "core/common/type_traits.hpp"
-#include "core/common/string_utils.h"
+#include "core/common/string.h"
 #include "core/events/delegate.hpp"
 #include "../system/filesystem.h"
 #include "load_request.hpp"

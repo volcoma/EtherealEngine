@@ -183,9 +183,6 @@
     <ClCompile Include="..\..\source\runtime\ecs\utils.cpp">
       <Filter>Source Files\ecs</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\runtime\input\input_context.cpp">
-      <Filter>Source Files\input</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\runtime\rendering\Debug\debugdraw.cpp">
       <Filter>Source Files\rendering\debug</Filter>
     </ClCompile>
@@ -239,6 +236,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\runtime\system\engine.cpp">
       <Filter>Source Files\system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\runtime\input\input.cpp">
+      <Filter>Source Files\input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -376,9 +376,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\runtime\ecs\utils.h">
       <Filter>Source Files\ecs</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\runtime\input\input_context.h">
-      <Filter>Source Files\input</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\runtime\input\input_mapping.hpp">
       <Filter>Source Files\input</Filter>

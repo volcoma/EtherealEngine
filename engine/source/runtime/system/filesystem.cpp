@@ -1,5 +1,5 @@
 #include "filesystem.h"
-#include "core/common/string_utils.h"
+#include "core/common/string.h"
 #include "core/platform_config.h"
 
 namespace fs
@@ -18,16 +18,16 @@ namespace fs
 		return true;
 	}
 
-	ProtocolMap& get_path_protocols()
+	protocols_t& get_path_protocols()
 	{
-		static ProtocolMap mProtocols;
+		static protocols_t mProtocols;
 		return mProtocols;
 	}
 
-	ByteArray read_stream(std::istream & stream)
+	byte_array_t read_stream(std::istream & stream)
 	{
 		// Open the stream
-		ByteArray read_memory;
+		byte_array_t read_memory;
 		if (stream) {
 			// get length of file:
 			stream.seekg(0, stream.end);
@@ -82,9 +82,8 @@ namespace fs
 		return full_path;
 	}
 }
-#if defined(_WIN32)
-
-#  include <Windows.h>
+#if $on($windows)
+#include <Windows.h>
 namespace fs
 {
 	path executable_path(const char *argv0)
@@ -98,8 +97,7 @@ namespace fs
 		return path(std::string(buf));
 	}
 }
-#elif defined(__APPLE__)
-
+#elif $on($apple)
 #  include <mach-o/dyld.h>
 namespace fs
 {
@@ -118,43 +116,7 @@ namespace fs
 		return full_path;
 	}
 }
-#elif defined(sun) || defined(__sun)
-
-#  include <stdlib.h>
-namespace fs
-{
-	path executable_path(const char *argv0)
-	{
-		return path(std::string(getexecname()));
-	}
-}
-#elif defined(__FreeBSD__)
-
-#  include <sys/sysctl.h>
-namespace fs
-{
-	path executable_path(const char *argv0)
-	{
-		int mib[4] = { 0 };
-		mib[0] = CTL_KERN;
-		mib[1] = KERN_PROC;
-		mib[2] = KERN_PROC_PATHNAME;
-		mib[3] = -1;
-		char buf[1024] = { 0 };
-		size_t size = sizeof(buf);
-		sysctl(mib, 4, buf, &size, NULL, 0);
-		if (size == 0 || size == sizeof(buf))
-		{
-			return executable_path_fallback(argv0);
-		}
-		std::string path(buf, size);
-		path full_path(
-			system_complete(
-				path(path).normalize(), std::error_code{}));
-		return full_path;
-	}
-}
-#elif defined(__linux__)
+#elif $on($linux)
 
 #  include <unistd.h>
 namespace fs

@@ -15,7 +15,7 @@ bool DockingSystem::initialize()
 	_docks.emplace_back(std::make_unique<ImGuiDock::Dock>());
 
 	auto& scene = _docks[0];
-	scene->initialize("Scene", true, ImVec2(200.0f, 200.0f), &Docks::renderScene);
+	scene->initialize("Scene", true, ImVec2(200.0f, 200.0f), &Docks::render_scene);
 
 	auto& game = _docks[1];
 	game->initialize("Game", true, ImVec2(200.0f, 200.0f), &Docks::renderGame);

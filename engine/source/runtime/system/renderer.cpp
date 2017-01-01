@@ -1,7 +1,7 @@
 #include "renderer.h"
 #include "graphics/graphics.h"
 #include "core/logging/logging.h"
-#include "core/common/string_utils.h"
+#include "core/common/string.h"
 #include <cstdarg>
 #include "rendering/render_pass.h"
 

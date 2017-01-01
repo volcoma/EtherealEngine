@@ -2,7 +2,7 @@
 
 #include "core/serialization/serialization.h"
 #include "core/serialization/cereal/types/string.hpp"
-#include "core/common/string_utils.h"
+#include "core/common/string.h"
 #include "../../assets/asset_handle.h"
 #include "../../assets/asset_manager.h"
 #include "../../rendering/mesh.h"

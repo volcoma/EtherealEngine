@@ -37,14 +37,11 @@ RenderWindow::~RenderWindow()
 
 bool RenderWindow::filterEvent(const sf::Event& event)
 {
-	mInput.handleEvent(event);
 	return sf::Window::filterEvent(event);;
 }
 
 void RenderWindow::frameBegin()
 {
-
-	mInput.update();
 }
 
 void RenderWindow::frameUpdate(float dt)

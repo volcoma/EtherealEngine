@@ -1,5 +1,5 @@
 #include "inspector_coretypes.h"
-#include "core/common/string_utils.h"
+#include "core/common/string.h"
 
 bool Inspector_Bool::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {

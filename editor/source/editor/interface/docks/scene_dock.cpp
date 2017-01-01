@@ -10,9 +10,9 @@
 
 namespace Docks
 {
-	static bool showGBuffer = false;
+	static bool show_gbuffer = false;
 
-	void showStatistics(const unsigned int frameRate)
+	void show_statistics(const unsigned int frameRate)
 	{
 		ImVec2 pos = gui::GetCursorScreenPos();
 		gui::SetNextWindowPos(pos);
@@ -38,7 +38,7 @@ namespace Docks
 
 		}
 		gui::Separator();
-		gui::Checkbox("Show G-Buffer", &showGBuffer);
+		gui::Checkbox("Show G-Buffer", &show_gbuffer);
 		
 //		if (renderStats)
 //		{
@@ -61,27 +61,26 @@ namespace Docks
 
 	}
 
-	void drawSelectedCamera(const ImVec2& size)
+	void draw_selected_camera(const ImVec2& size)
 	{
-		auto is = core::get_subsystem<InputSystem>();
+		auto input = core::get_subsystem<Input>();
 		auto es = core::get_subsystem<EditState>();
-		auto& input = is->get_context();
 		auto& selected = es->selectionData.object;
-		auto& editorCamera = es->camera;
+		auto& editor_camera = es->camera;
 
 		if (selected.is_type<core::Entity>())
 		{
 			auto sel = selected.get_value<core::Entity>();
 
-			if (sel && (editorCamera != sel) && sel.has_component<CameraComponent>())
+			if (sel && (editor_camera != sel) && sel.has_component<CameraComponent>())
 			{
-				const auto selectedCamera = sel.component<CameraComponent>().lock();
-				const auto& camera = selectedCamera->getCamera();
-				const auto surface = selectedCamera->getOutputBuffer();
-				const auto viewSize = camera.getViewportSize();
+				const auto selected_camera = sel.component<CameraComponent>().lock();
+				const auto& camera = selected_camera->getCamera();
+				const auto surface = selected_camera->getOutputBuffer();
+				const auto view_size = camera.getViewportSize();
 
-				float factor = std::min(size.x / float(viewSize.width), size.y / float(viewSize.height)) / 4.0f;
-				ImVec2 bounds(viewSize.width * factor, viewSize.height * factor);
+				float factor = std::min(size.x / float(view_size.width), size.y / float(view_size.height)) / 4.0f;
+				ImVec2 bounds(view_size.width * factor, view_size.height * factor);
 				auto p = gui::GetWindowPos();
 				p.x += size.x - bounds.x - 20.0f;
 				p.y += size.y - bounds.y - 40.0f;
@@ -100,11 +99,11 @@ namespace Docks
 				}
 				gui::End();
 
-				if (input.isKeyPressed(sf::Keyboard::F) && sel.has_component<TransformComponent>())
+				if (input->is_key_pressed(sf::Keyboard::F) && sel.has_component<TransformComponent>())
 				{
-					auto transform = editorCamera.component<TransformComponent>().lock();
-					auto transformSelected = sel.component<TransformComponent>().lock();
-					transformSelected->setTransform(transform->getTransform());
+					auto transform = editor_camera.component<TransformComponent>().lock();
+					auto transform_selected = sel.component<TransformComponent>().lock();
+					transform_selected->setTransform(transform->getTransform());
 				}
 			}
 		}
@@ -112,36 +111,35 @@ namespace Docks
 	}
 
 
-	void manipulationGizmos()
+	void manipulation_gizmos()
 	{
-		auto is = core::get_subsystem<InputSystem>();
+		auto input = core::get_subsystem<Input>();
 		auto es = core::get_subsystem<EditState>();
-		auto& input = is->get_context();
 		auto& selected = es->selectionData.object;
-		auto& editorCamera = es->camera;
+		auto& editor_camera = es->camera;
 		auto& operation = es->operation;
 		auto& mode = es->mode;
 
-		if (!input.isMouseButtonDown(sf::Mouse::Right) && !gui::IsAnyItemActive() && !ImGuizmo::IsUsing())
+		if (!input->is_mouse_button_down(sf::Mouse::Right) && !gui::IsAnyItemActive() && !ImGuizmo::IsUsing())
 		{
-			if (input.isKeyPressed(sf::Keyboard::W))
+			if (input->is_key_pressed(sf::Keyboard::W))
 			{
 				operation = ImGuizmo::OPERATION::TRANSLATE;
 			}
-			if (input.isKeyPressed(sf::Keyboard::E))
+			if (input->is_key_pressed(sf::Keyboard::E))
 			{
 				operation = ImGuizmo::OPERATION::ROTATE;
 			}
-			if (input.isKeyPressed(sf::Keyboard::R))
+			if (input->is_key_pressed(sf::Keyboard::R))
 			{
 				operation = ImGuizmo::OPERATION::SCALE;
 				mode = ImGuizmo::MODE::LOCAL;
 			}
-			if (input.isKeyPressed(sf::Keyboard::T))
+			if (input->is_key_pressed(sf::Keyboard::T))
 			{
 				mode = ImGuizmo::MODE::LOCAL;
 			}
-			if (input.isKeyPressed(sf::Keyboard::Y) && operation != ImGuizmo::OPERATION::SCALE)
+			if (input->is_key_pressed(sf::Keyboard::Y) && operation != ImGuizmo::OPERATION::SCALE)
 			{
 				mode = ImGuizmo::MODE::WORLD;
 			}
@@ -150,34 +148,34 @@ namespace Docks
 		if (selected && selected.is_type<core::Entity>())
 		{
 			auto sel = selected.get_value<core::Entity>();
-			if (sel && sel != editorCamera && sel.has_component<TransformComponent>())
+			if (sel && sel != editor_camera && sel.has_component<TransformComponent>())
 			{
 				auto p = gui::GetItemRectMin();
 				auto s = gui::GetItemRectSize();
 				ImGuizmo::SetViewRect(p.x, p.y, s.x, s.y);
-				auto cameraComponent = editorCamera.component<CameraComponent>().lock();
-				auto transformComponent = sel.component<TransformComponent>().lock();
-				transformComponent->resolveTransform(true);
-				auto transform = transformComponent->getTransform();
+				auto camera_component = editor_camera.component<CameraComponent>().lock();
+				auto transform_component = sel.component<TransformComponent>().lock();
+				transform_component->resolveTransform(true);
+				auto transform = transform_component->getTransform();
 				math::transform_t delta;
 				math::transform_t inputTransform = transform;
 				float* snap = nullptr;
-				static math::vec3 translationSnap = { 1.0f, 1.0f, 1.0f };
-				static float rotationDegreeSnap = 15.0f;
-				static float scaleSnap = 0.1f;
-				if (input.isKeyDown(sf::Keyboard::LControl))
+				static math::vec3 translation_snap = { 1.0f, 1.0f, 1.0f };
+				static float rotation_degree_snap = 15.0f;
+				static float scale_snap = 0.1f;
+				if (input->is_key_down(sf::Keyboard::LControl))
 				{
 					if (operation == ImGuizmo::OPERATION::TRANSLATE)
-						snap = &translationSnap[0];
+						snap = &translation_snap[0];
 					else if (operation == ImGuizmo::OPERATION::ROTATE)
-						snap = &rotationDegreeSnap;
+						snap = &rotation_degree_snap;
 					else if (operation == ImGuizmo::OPERATION::SCALE)
-						snap = &scaleSnap;
+						snap = &scale_snap;
 				}
 
 				ImGuizmo::Manipulate(
-					cameraComponent->getCamera().getView(),
-					cameraComponent->getCamera().getProj(),
+					camera_component->getCamera().getView(),
+					camera_component->getCamera().getProj(),
 					operation,
 					mode,
 					transform,
@@ -185,174 +183,173 @@ namespace Docks
 					snap);
 
 
-				transformComponent->setTransform(transform);
+				transform_component->setTransform(transform);
 			}
 		}
 	}
 
-	void handleCameraMovement()
+	void handle_camera_movement()
 	{
 		if (!gui::IsWindowFocused())
 			return;
-		auto is = core::get_subsystem<InputSystem>();
+
+		auto input = core::get_subsystem<Input>();
 		auto es = core::get_subsystem<EditState>();
 		auto engine = core::get_subsystem<runtime::Engine>();
 
-		auto& input = is->get_context();
-		auto& editorCamera = es->camera;
+		auto& editor_camera = es->camera;
 		auto dt = engine->get_delta_time().count();
 
-		auto transform = editorCamera.component<TransformComponent>().lock();
-		float movementSpeed = 5.0f;
-		float rotationSpeed = 0.2f;
-		float boostMultiplier = 5.0f;
-		iPoint deltaMove = { input.getMouseCurrentPosition().x - input.getMousePreviousPosition().x, input.getMouseCurrentPosition().y - input.getMousePreviousPosition().y };
+		auto transform = editor_camera.component<TransformComponent>().lock();
+		float movement_speed = 5.0f;
+		float rotation_speed = 0.2f;
+		float multiplier = 5.0f;
+		iPoint delta_move = input->get_cursor_delta_move();
 
-		if (input.isMouseButtonDown(sf::Mouse::Middle))
+		if (input->is_mouse_button_down(sf::Mouse::Middle))
 		{
-			if (input.isKeyDown(sf::Keyboard::LShift))
+			if (input->is_key_down(sf::Keyboard::LShift))
 			{
-				movementSpeed *= boostMultiplier;
+				movement_speed *= multiplier;
 			}
 
-			if (deltaMove.x != 0)
+			if (delta_move.x != 0)
 			{
-				transform->moveLocal({ -1 * deltaMove.x * movementSpeed * dt, 0.0f, 0.0f });
+				transform->moveLocal({ -1 * delta_move.x * movement_speed * dt, 0.0f, 0.0f });
 			}
-			if (deltaMove.y != 0)
+			if (delta_move.y != 0)
 			{
-				transform->moveLocal({ 0.0f, deltaMove.y * movementSpeed * dt, 0.0f });
+				transform->moveLocal({ 0.0f, delta_move.y * movement_speed * dt, 0.0f });
 			}
 		}
 
-		if (input.isMouseButtonDown(sf::Mouse::Right))
+		if (input->is_mouse_button_down(sf::Mouse::Right))
 		{
-
-			if (input.isKeyDown(sf::Keyboard::LShift))
+			if (input->is_key_down(sf::Keyboard::LShift))
 			{
-				movementSpeed *= boostMultiplier;
+				movement_speed *= multiplier;
 			}
 
-			if (input.isKeyDown(sf::Keyboard::W))
+			if (input->is_key_down(sf::Keyboard::W))
 			{
-				transform->moveLocal({ 0.0f, 0.0f, movementSpeed * dt });
+				transform->moveLocal({ 0.0f, 0.0f, movement_speed * dt });
 			}
 
-			if (input.isKeyDown(sf::Keyboard::S))
+			if (input->is_key_down(sf::Keyboard::S))
 			{
-				transform->moveLocal({ 0.0f, 0.0f, -movementSpeed * dt });
+				transform->moveLocal({ 0.0f, 0.0f, -movement_speed * dt });
 			}
 
-			if (input.isKeyDown(sf::Keyboard::A))
+			if (input->is_key_down(sf::Keyboard::A))
 			{
-				transform->moveLocal({ -movementSpeed * dt, 0.0f, 0.0f });
+				transform->moveLocal({ -movement_speed * dt, 0.0f, 0.0f });
 			}
 
-			if (input.isKeyDown(sf::Keyboard::D))
+			if (input->is_key_down(sf::Keyboard::D))
 			{
-				transform->moveLocal({ movementSpeed * dt, 0.0f, 0.0f });
+				transform->moveLocal({ movement_speed * dt, 0.0f, 0.0f });
 			}
-			if (input.isKeyDown(sf::Keyboard::Up))
+			if (input->is_key_down(sf::Keyboard::Up))
 			{
-				transform->moveLocal({ 0.0f, 0.0f, movementSpeed * dt });
-			}
-
-			if (input.isKeyDown(sf::Keyboard::Down))
-			{
-				transform->moveLocal({ 0.0f, 0.0f, -movementSpeed * dt });
+				transform->moveLocal({ 0.0f, 0.0f, movement_speed * dt });
 			}
 
-			if (input.isKeyDown(sf::Keyboard::Left))
+			if (input->is_key_down(sf::Keyboard::Down))
 			{
-				transform->moveLocal({ -movementSpeed * dt, 0.0f, 0.0f });
+				transform->moveLocal({ 0.0f, 0.0f, -movement_speed * dt });
 			}
 
-			if (input.isKeyDown(sf::Keyboard::Right))
+			if (input->is_key_down(sf::Keyboard::Left))
 			{
-				transform->moveLocal({ movementSpeed * dt, 0.0f, 0.0f });
+				transform->moveLocal({ -movement_speed * dt, 0.0f, 0.0f });
 			}
 
-			if (input.isKeyDown(sf::Keyboard::Space))
+			if (input->is_key_down(sf::Keyboard::Right))
 			{
-				transform->moveLocal({ 0.0f, movementSpeed * dt, 0.0f });
+				transform->moveLocal({ movement_speed * dt, 0.0f, 0.0f });
 			}
 
-			if (input.isKeyDown(sf::Keyboard::LControl))
+			if (input->is_key_down(sf::Keyboard::Space))
 			{
-				transform->moveLocal({ 0.0f, -movementSpeed * dt, 0.0f });
+				transform->moveLocal({ 0.0f, movement_speed * dt, 0.0f });
 			}
 
-			float x = static_cast<float>(deltaMove.x);
-			float y = static_cast<float>(deltaMove.y);
+			if (input->is_key_down(sf::Keyboard::LControl))
+			{
+				transform->moveLocal({ 0.0f, -movement_speed * dt, 0.0f });
+			}
+
+			float x = static_cast<float>(delta_move.x);
+			float y = static_cast<float>(delta_move.y);
 
 			// Make each pixel correspond to a quarter of a degree.
-			float dx = x * rotationSpeed;
-			float dy = y * rotationSpeed;
+			float dx = x * rotation_speed;
+			float dy = y * rotation_speed;
 
 			transform->resolveTransform(true);
 			transform->rotate(0.0f, dx, 0.0f);
 			transform->rotateLocal(dy, 0.0f, 0.0f);
 
 
-			float DeltaWheel = input.getMouseWheelScrollDelta();
-			transform->moveLocal({ 0.0f, 0.0f, 14.0f * movementSpeed * DeltaWheel * dt });
+			float delta_wheel = input->get_mouse_wheel_scroll_delta_move();
+			transform->moveLocal({ 0.0f, 0.0f, 14.0f * movement_speed * delta_wheel * dt });
 		}
 	}
 
-	void renderScene(ImVec2 area)
+	void render_scene(ImVec2 area)
 	{
 		auto es = core::get_subsystem<EditState>();
 		auto engine = core::get_subsystem<runtime::Engine>();
-		//auto& window = app.getWindow();
+		auto& window = engine->get_window();
 		auto ecs = core::get_subsystem<core::EntityComponentSystem>();
-		auto is = core::get_subsystem<InputSystem>();
-		auto& input = is->get_context();
-		auto& editorCamera = es->camera;
+		auto input = core::get_subsystem<Input>();
+
+		auto& editor_camera = es->camera;
 		auto& selected = es->selectionData.object;
-		bool hasEditCamera = editorCamera
-			&& editorCamera.has_component<CameraComponent>()
-			&& editorCamera.has_component<TransformComponent>();
+		bool has_edit_camera = editor_camera
+			&& editor_camera.has_component<CameraComponent>()
+			&& editor_camera.has_component<TransformComponent>();
 
-		showStatistics(engine->get_fps());
+		show_statistics(engine->get_fps());
 
-		if (!hasEditCamera)
+		if (!has_edit_camera)
 			return;
 	
 		
 		auto size = gui::GetContentRegionAvail();
 		auto pos = gui::GetCursorScreenPos();
-		drawSelectedCamera(size);
+		draw_selected_camera(size);
 
-		auto cameraComponent = editorCamera.component<CameraComponent>().lock();
+		auto camera_component = editor_camera.component<CameraComponent>().lock();
 		if (size.x > 0 && size.y > 0)
 		{
-			cameraComponent->getCamera().setViewportPos({ static_cast<std::uint32_t>(pos.x), static_cast<std::uint32_t>(pos.y) });
-			cameraComponent->setViewportSize({ static_cast<std::uint32_t>(size.x), static_cast<std::uint32_t>(size.y) });
+			camera_component->getCamera().setViewportPos({ static_cast<std::uint32_t>(pos.x), static_cast<std::uint32_t>(pos.y) });
+			camera_component->setViewportSize({ static_cast<std::uint32_t>(size.x), static_cast<std::uint32_t>(size.y) });
 			
-			const auto surface = cameraComponent->getOutputBuffer();
+			const auto surface = camera_component->getOutputBuffer();
 			gui::Image(surface, size);
 
 			if (gui::IsItemClicked(1) || gui::IsItemClicked(2))
 			{
 				gui::SetWindowFocus();
-				//window.setMouseCursorVisible(false);
+				window.setMouseCursorVisible(false);
 			}
 
-			manipulationGizmos();
+			manipulation_gizmos();
+			handle_camera_movement();
 
-			handleCameraMovement();
 			if (gui::IsWindowFocused())
 			{
 				ImGui::PushStyleColor(ImGuiCol_Border, gui::GetStyle().Colors[ImGuiCol_Button]);
 				ImGui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
 				ImGui::PopStyleColor();
 
-				if (input.isKeyPressed(sf::Keyboard::Delete))
+				if (input->is_key_pressed(sf::Keyboard::Delete))
 				{
 					if (selected && selected.is_type<core::Entity>())
 					{
 						auto sel = selected.get_value<core::Entity>();
-						if (sel != editorCamera)
+						if (sel != editor_camera)
 						{
 							sel.destroy();
 							es->unselect();
@@ -364,12 +361,12 @@ namespace Docks
 
 			if (gui::IsMouseReleased(1) || gui::IsMouseReleased(2))
 			{
-				//window.setMouseCursorVisible(true);
+				window.setMouseCursorVisible(true);
 			}
 
-			if (showGBuffer)
+			if (show_gbuffer)
 			{
-				const auto gBufferSurface = cameraComponent->getGBuffer();
+				const auto gBufferSurface = camera_component->getGBuffer();
 				for (std::uint32_t i = 0; i < gBufferSurface->getAttachmentCount(); ++i)
 				{
 					const auto attachment = gBufferSurface->getAttachment(i).texture;
@@ -378,7 +375,7 @@ namespace Docks
 					if (gui::IsItemClicked(1) || gui::IsItemClicked(2))
 					{
 						gui::SetWindowFocus();
-						//window.setMouseCursorVisible(false);
+						window.setMouseCursorVisible(false);
 					}
 				}
 			}
