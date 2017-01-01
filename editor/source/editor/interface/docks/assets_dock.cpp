@@ -83,6 +83,7 @@ namespace Docks
 						editState.select(assetHandle);
 						gui::SetWindowFocus();
 					}
+	
 					gui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
 					gui::ButtonEx(assetName.c_str(), { size, gui::GetTextLineHeight() }, ImGuiButtonFlags_Disabled);
 					gui::PopStyleColor();
@@ -90,7 +91,7 @@ namespace Docks
 				gui::EndGroup();
 				if (gui::IsItemHovered())
 				{
-					if (gui::IsMouseClicked(2))
+					if (gui::IsMouseClicked(gui::drag_button))
 					{
 						editState.drag(assetHandle, assetRelativeName);
 					}
@@ -145,7 +146,7 @@ namespace Docks
 				}
 				if (gui::IsItemHovered())
 				{
-					if (gui::IsMouseClicked(2))
+					if (gui::IsMouseClicked(gui::drag_button))
 					{
 						editState.drag(assetHandle, assetRelativeName);
 					}
@@ -222,7 +223,7 @@ namespace Docks
 
 		if (gui::BeginChild("###assets_content", gui::GetContentRegionAvail(), false, flags))
 		{
-			if (gui::IsWindowHovered() && gui::IsMouseReleased(2))
+			if (gui::IsWindowHovered() && gui::IsMouseReleased(gui::drag_button))
 			{
 				auto& dragged = es->drag_data.object;
 				if (dragged && dragged.is_type<runtime::Entity>())

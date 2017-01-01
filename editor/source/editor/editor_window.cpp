@@ -317,14 +317,14 @@ void MainEditorWindow::on_toolbar()
 		es->mode = imguizmo::MODE::WORLD;
 	}
 	gui::SameLine(0.0f);
-	if (gui::ToolbarButton(icons["grid"].get(), "Show Grid", es->showGrid))
+	if (gui::ToolbarButton(icons["grid"].get(), "Show Grid", es->show_grid))
 	{
-		es->showGrid = !es->showGrid;
+		es->show_grid = !es->show_grid;
 	}
 	gui::SameLine(0.0f);
-	if (gui::ToolbarButton(icons["wireframe"].get(), "Wireframe Selection", es->wireframeSelection))
+	if (gui::ToolbarButton(icons["wireframe"].get(), "Wireframe Selection", es->wireframe_selection))
 	{
-		es->wireframeSelection = !es->wireframeSelection;
+		es->wireframe_selection = !es->wireframe_selection;
 	}
 
 	gui::SameLine(width / 2.0f - 36.0f);

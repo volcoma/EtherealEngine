@@ -4,7 +4,7 @@
 #include "interface/gizmos/imguizmo.h"
 #include "runtime/ecs/ecs.h"
 #include "runtime/assets/asset_handle.h"
-
+#include <chrono>
 
 struct Texture;
 namespace editor
@@ -27,12 +27,12 @@ namespace editor
 		void unselect();
 		void drag(rttr::variant object, const std::string& description = "");
 		void drop();
-		void frameEnd();
+		void frame_end(std::chrono::duration<float> dt);
 
 		runtime::Entity camera;
 		std::string scene;
-		bool showGrid = true;
-		bool wireframeSelection = true;
+		bool show_grid = true;
+		bool wireframe_selection = true;
 		imguizmo::OPERATION operation = imguizmo::TRANSLATE;
 		imguizmo::MODE mode = imguizmo::LOCAL;
 		DragData drag_data;

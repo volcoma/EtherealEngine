@@ -75,11 +75,11 @@ namespace Docks
 		{
 			if (isHovered)
 			{
-				if (gui::IsMouseClicked(2) && entity != editorCamera)
+				if (gui::IsMouseClicked(gui::drag_button) && entity != editorCamera)
 				{
 					es->drag(entity, entity.to_string());
 				}
-				if (gui::IsMouseReleased(2))
+				if (gui::IsMouseReleased(gui::drag_button))
 				{
 					if (dragged && entity != editorCamera)
 					{
@@ -129,7 +129,7 @@ namespace Docks
 			{
 				if (dragged && gui::IsWindowHovered() && !gui::IsAnyItemHovered())
 				{
-					if (gui::IsMouseReleased(2))
+					if (gui::IsMouseReleased(gui::drag_button))
 					{
 						if (dragged.is_type<runtime::Entity>())
 						{

@@ -5,16 +5,10 @@
 #include "runtime/rendering/material.h"
 #include "runtime/system/sfml/Window.hpp"
 #include "runtime/ecs/prefab.h"
+#include "runtime/system/engine.h"
 
 namespace editor
 {
-	void EditState::dispose()
-	{
-		drag_data = {};
-		selection_data = {};
-		icons.clear();
-	}
-
 
 	bool EditState::initialize()
 	{
@@ -109,7 +103,17 @@ namespace editor
 			icons["prefab"] = asset;
 		});
 
+		runtime::on_frame_render.addListener(this, &EditState::frame_end);
+
 		return true;
+	}
+
+	void EditState::dispose()
+	{
+		runtime::on_frame_render.removeListener(this, &EditState::frame_end);
+		drag_data = {};
+		selection_data = {};
+		icons.clear();
 	}
 
 	void EditState::select(rttr::variant object)
@@ -134,11 +138,10 @@ namespace editor
 		drag_data = {};
 	}
 
-	void EditState::frameEnd()
+	void EditState::frame_end(std::chrono::duration<float> dt)
 	{
 		if (drag_data.object)
 		{
-
 			gui::SetTooltip(drag_data.description.c_str());
 		}
 
@@ -150,7 +153,7 @@ namespace editor
 				drop();
 			}
 		}
-		if (gui::IsMouseReleased(2))
+		if (gui::IsMouseReleased(gui::drag_button))
 		{
 			drop();
 		}

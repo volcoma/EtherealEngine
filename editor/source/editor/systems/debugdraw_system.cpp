@@ -77,7 +77,7 @@ namespace editor
 
 		};
 
-		if (es->showGrid)
+		if (es->show_grid)
 		{
 			static const auto farClip = 200;
 			static const auto height = 40.0f;
@@ -191,7 +191,7 @@ namespace editor
 			// Test the bounding box of the mesh
 			if (math::frustum::testOBB(frustum, bounds, worldTransform))
 			{
-				if (es->wireframeSelection)
+				if (es->wireframe_selection)
 				{
 					const float u_params[8] =
 					{
