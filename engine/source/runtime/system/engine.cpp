@@ -26,13 +26,13 @@ namespace runtime
 		});
 
 		core::add_subsystem<InputSystem>();
+		core::add_subsystem<Renderer>();
+		core::add_subsystem<AssetManager>();
 		core::add_subsystem<core::EntityComponentSystem>();
 		core::add_subsystem<core::TaskSystem>();
-		core::add_subsystem<Renderer>();
 		core::add_subsystem<TransformSystem>();
 		core::add_subsystem<CameraSystem>();
 		core::add_subsystem<RenderingSystem>();
-		core::add_subsystem<AssetManager>();
 		// fire engine
 		_running = true;
 		_timestep = duration::zero();

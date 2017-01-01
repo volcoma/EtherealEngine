@@ -90,6 +90,7 @@ struct TStorage : Storage
 			const auto& id = pair.first;
 			if (string_utils::beginsWith(id, protocol, true))
 			{
+				pair.second.waitUntilReady();
 				container.erase(id);
 			}
 		}

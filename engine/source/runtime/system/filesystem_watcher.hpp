@@ -14,13 +14,13 @@
 //-----------------------------------------------------------------------------
 //  Name : logPath ()
 /// <summary>
-/// When Watchdog can't locate a file or parse the wild card
+/// When watcher can't locate a file or parse the wild card
 /// </summary>
 //-----------------------------------------------------------------------------
 inline void logPath(const fs::path& path)
 {
 	auto logger = logging::get("Log");
-	logger->error() << (std::string("Watchdog can't locate a file or parse the wild card at: ") + path.string());
+	logger->error() << (std::string("Watcher can't locate a file or parse the wild card at: ") + path.string());
 }
 
 namespace fs
@@ -110,7 +110,7 @@ namespace fs
 		}
 
 		//-----------------------------------------------------------------------------
-		//  Name : ~Watchdog ()
+		//  Name : ~FSWatcher ()
 		/// <summary>
 		/// 
 		/// 
@@ -124,7 +124,7 @@ namespace fs
 	protected:
 
 		//-----------------------------------------------------------------------------
-		//  Name : Watchdog ()
+		//  Name : FSWatcher ()
 		/// <summary>
 		/// 
 		/// 
@@ -202,7 +202,7 @@ namespace fs
 		//-----------------------------------------------------------------------------
 		static void watchImpl(const fs::path &path, bool initialList = true, const std::function<void(const std::vector<Entry>&)> &listCallback = std::function<void(const std::vector<Entry>&)>())
 		{
-			// create the static Watchdog instance
+			// create the static FSWatcher instance
 			static FSWatcher wd;
 			// and start its thread
 			if (!wd.mWatching)

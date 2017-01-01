@@ -232,4 +232,5 @@ bool ProjectManager::initialize()
 void ProjectManager::dispose()
 {
 	save_config();
+	fs::watcher::unwatchAll();
 }
