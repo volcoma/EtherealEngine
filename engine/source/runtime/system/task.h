@@ -26,43 +26,123 @@ namespace runtime
 	 * @brief      A Light-weight task scheduler with automatic load balancing,
 	 * the dependencies between tasks are addressed as parent-child relationships.
 	 */
+	//-----------------------------------------------------------------------------
+	// Main Class Declarations
+	//-----------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------
+	//  Name : TaskSystem (Class)
+	/// <summary>
+	/// A Light-weight task scheduler with automatic load balancing,
+	///the dependencies between tasks are addressed as parent - child relationships.
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	struct TaskSystem : public core::Subsystem
 	{
 		TaskSystem(unsigned worker = 0) : _core(worker) {}
 
-		// initialize task scheduler with specified worker count
+		//-----------------------------------------------------------------------------
+		//  Name : initialize ()
+		/// <summary>
+		/// Initialize task TaskSystem with specified worker count
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		bool initialize() override;
-		// shutdown task scheduler, this would block main thread until all the tasks finished
+
+
+		//-----------------------------------------------------------------------------
+		//  Name : dispose ()
+		/// <summary>
+		/// Shutdown task scheduler, this would block main thread until all 
+		/// the tasks finished.
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		void dispose() override;
 
-		// create_task
+		//-----------------------------------------------------------------------------
+		//  Name : create ()
+		/// <summary>
+		/// Creates task
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		core::Handle create(const char* name);
 
+		//-----------------------------------------------------------------------------
+		//  Name : create ()
+		/// <summary>
+		/// Creates task
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		template<typename F, typename ... Args>
 		core::Handle create(const char* name, F&& functor, Args&& ... args);
 
+		//-----------------------------------------------------------------------------
+		//  Name : create_as_child ()
+		/// <summary>
+		/// Creates task
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		template<typename F, typename ... Args>
 		core::Handle create_as_child(core::Handle parent, const char* name, F&& functor, Args&&... args);
 
-		// perform certain task for a fixed number of elements
+		//-----------------------------------------------------------------------------
+		//  Name : create_parallel_for ()
+		/// <summary>
+		/// Perform certain task for a fixed number of elements
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		template<typename F, typename IT>
 		core::Handle create_parallel_for(const char* name, F&& functor, IT begin, IT end, size_t step);
 
-		// run_task insert a task into a queue instead of executing it immediately
+		//-----------------------------------------------------------------------------
+		//  Name : run ()
+		/// <summary>
+		/// Insert a task into a queue instead of executing it immediately
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		void run(core::Handle);
 
-		// run_task insert a task into a queue instead of executing it immediately
+		//-----------------------------------------------------------------------------
+		//  Name : run_on_main ()
+		/// <summary>
+		/// Insert a task into a queue instead of executing it immediately.
+		/// It will be executed on the main thread.
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		void run_on_main(core::Handle);
 
+		//-----------------------------------------------------------------------------
+		//  Name : execute_tasks_on_main ()
+		/// <summary>
+		/// 
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		void execute_tasks_on_main(std::chrono::duration<float>);
 
-		// wait_task
+		//-----------------------------------------------------------------------------
+		//  Name : wait ()
+		/// <summary>
+		/// Wait for a task to complete. This will block the current thread.
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		void wait(core::Handle);
 
-		// returns true if task completed
+		//-----------------------------------------------------------------------------
+		//  Name : is_completed ()
+		/// <summary>
+		/// Returns true if task completed.
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		bool is_completed(core::Handle);
 
-		// returns main thread id
+		//-----------------------------------------------------------------------------
+		//  Name : get_main_thread ()
+		/// <summary>
+		/// Returns main thread id.
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		std::thread::id get_main_thread() const { return _thread_main; }
 
 	protected:
@@ -82,54 +162,97 @@ namespace runtime
 			char name[64] = { 0 };
 		};
 
-		// create a task
+		//-----------------------------------------------------------------------------
+		//  Name : create_internal ()
+		/// <summary>
+		/// Creates a task.
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		core::Handle create_internal(const char*, std::function<void()>);
 
-		// create_task_as_child comes with parent-child relationships:
-		// 1. a task should be able to have N child tasks;
-		// 2. waiting for a task to be completed must properly synchronize across its children
-		// as well
+
+		//-----------------------------------------------------------------------------
+		//  Name : create_as_child_internal ()
+		/// <summary>
+		/// create_as_child_internal comes with parent-child relationships:
+		/// 1. A task should be able to have N child tasks;
+		/// 2. Waiting for a task to be completed must properly synchronize across its children
+		/// as well.
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		core::Handle create_as_child_internal(core::Handle, const char*, std::function<void()>);
 
 	public:
-		// several callbacks instended for thread initialization and profilers
+		/// several callbacks instended for thread initialization and profilers
 		using thread_callback = std::function<void(unsigned)>;
 		thread_callback on_thread_start;
 		thread_callback on_thread_stop;
-		// several callbacks instended for task based profiling
+		/// several callbacks instended for task based profiling
 		using task_callback = std::function<void(unsigned, const char*)>;
 		task_callback on_task_start;
 		task_callback on_task_stop;
 
 	protected:
+		//-----------------------------------------------------------------------------
+		//  Name : thread_run ()
+		/// <summary>
+		/// Worker threads run method.
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		static void thread_run(TaskSystem&, unsigned index);
 
+		//-----------------------------------------------------------------------------
+		//  Name : finish ()
+		/// <summary>
+		/// Finishes a task.
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		void finish(core::Handle);
+
+		//-----------------------------------------------------------------------------
+		//  Name : execute_one ()
+		/// <summary>
+		/// Executes a single task from a queue.
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		bool execute_one(unsigned, bool, std::mutex&, std::queue<core::Handle>&);
+
+		//-----------------------------------------------------------------------------
+		//  Name : get_thread_index ()
+		/// <summary>
+		/// Returns this thread index. Not to be confused with std::this_thread::get_id()
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		unsigned get_thread_index() const;
 
 	protected:
-		unsigned _core;
-
+		///
+		unsigned int _core;
+		///
 		std::mutex _tasks_mutex;
+		///
 		core::DynamicHandleObjectSet<Task, 32> _tasks;
-
+		///
 		std::mutex _queue_mutex;
+		///
 		std::queue<core::Handle> _alive_tasks;
-
+		///
 		std::mutex _main_queue_mutex;
+		///
 		std::queue<core::Handle> _main_alive_tasks;
-
+		///
 		std::vector<std::thread> _workers;
+		///
 		std::thread::id _thread_main;
+		///
 		std::condition_variable _condition;
+		///
 		bool _stop;
-
+		///
 		std::unordered_map<std::thread::id, unsigned> _thread_indices;
 	};
 
-	//
-	// IMPLEMENTATIONS of JOBSYSTEM
+	// IMPLEMENTATIONS of TASKSYSTEM
 	inline core::Handle TaskSystem::create(const char* name)
 	{
 		return create_internal(name, nullptr);
