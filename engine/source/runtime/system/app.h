@@ -8,20 +8,50 @@ namespace runtime
 	{
 		App();
 
-		// setup before engine initialization. this is a chance to eg. modify the engine parameters.
+		//-----------------------------------------------------------------------------
+		//  Name : setup (virtual )
+		/// <summary>
+		/// Setup before engine initialization. this is a chance to eg. modify 
+		/// the engine parameters.
+		/// </summary>
+		//-----------------------------------------------------------------------------
+
 		virtual void setup() {}
-		// setup after engine initialization and before running the main loop
+		//-----------------------------------------------------------------------------
+		//  Name : start (virtual )
+		/// <summary>
+		///  setup after engine initialization and before running the main loop
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		virtual void start();
-		// cleanup after the main loop
+
+		//-----------------------------------------------------------------------------
+		//  Name : stop (virtual )
+		/// <summary>
+		/// Cleanup after the main loop.
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		virtual void stop() {}
 
-		// initialize the engine and run the main loop, then return the
-		// application exit code
+		//-----------------------------------------------------------------------------
+		//  Name : run ()
+		/// <summary>
+		/// Initialize the engine and run the main loop, then return the
+		/// application exit code.
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		int run();
-		// show  an error message, terminate the main loop, and set failure exit code
+
+		//-----------------------------------------------------------------------------
+		//  Name : terminate_with_error ()
+		/// <summary>
+		/// Show  an error message, terminate the main loop, and set failure exit code.
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		void terminate_with_error(const std::string&);
 
 	protected:
+		/// exit code of the application
 		int _exitcode;
 	};
 

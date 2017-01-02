@@ -147,7 +147,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		RenderWindow& get_focused_window() { return *_focused_window; }
+		RenderWindow* get_focused_window() { return _focused_window.get(); }
 
 	protected:
 		/// minimum/maximum frames per second

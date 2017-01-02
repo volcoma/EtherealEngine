@@ -21,21 +21,75 @@ namespace editor
 			rttr::variant object;
 		};
 
+		//-----------------------------------------------------------------------------
+		//  Name : initialize ()
+		/// <summary>
+		/// 
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		bool initialize();
+
+		//-----------------------------------------------------------------------------
+		//  Name : dispose ()
+		/// <summary>
+		/// 
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		void dispose();
+
+		//-----------------------------------------------------------------------------
+		//  Name : select ()
+		/// <summary>
+		/// Selects an object. Can be anything.
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		void select(rttr::variant object);
+
+		//-----------------------------------------------------------------------------
+		//  Name : unselect ()
+		/// <summary>
+		/// Clears the selection data.
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		void unselect();
+
+		//-----------------------------------------------------------------------------
+		//  Name : drag ()
+		/// <summary>
+		/// Starts dragging an object. Can be anything.
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		void drag(rttr::variant object, const std::string& description = "");
+
+		//-----------------------------------------------------------------------------
+		//  Name : drop ()
+		/// <summary>
+		/// Clears the drag data.
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		void drop();
 
+		/// editor camera
 		runtime::Entity camera;
+		/// current scene
 		std::string scene;
+		/// enable editor grid
 		bool show_grid = true;
+		/// enable wireframe selection
 		bool wireframe_selection = true;
+		/// current manipulation gizmo operation.
 		imguizmo::OPERATION operation = imguizmo::TRANSLATE;
+		/// current manipulation gizmo space.
 		imguizmo::MODE mode = imguizmo::LOCAL;
+		/// drag data containing dragged object
 		DragData drag_data;
+		/// selection data containing selected object
 		SelectionData selection_data;
+		/// editor icons lookup map
 		std::unordered_map<std::string, AssetHandle<Texture>> icons;
 	};
 

@@ -16,7 +16,6 @@
 #include "runtime/rendering/renderer.h"
 #include "runtime/input/input.h"
 #include "../edit_state.h"
-#include "../Interface/gui_window.h"
 
 namespace editor
 {
@@ -28,12 +27,7 @@ namespace editor
 		auto renderer = core::get_subsystem<runtime::Renderer>();
 		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 
-		auto& window = static_cast<GuiWindow&>(engine->get_focused_window());
-		auto& dockspace = window.get_dockspace();
-		if (!dockspace.has_dock("Scene"))
-			return;
-
-		const auto renderFrame = renderer->get_render_frame();
+		const auto render_frame = renderer->get_render_frame();
 
 		auto& editorCamera = es->camera;
 		if (!editorCamera || !editorCamera.has_component<CameraComponent>() || imguizmo::is_using())
@@ -65,6 +59,7 @@ namespace editor
 			return;
 
 
+		
 		// If the user previously clicked, and we're done reading data from GPU, look at ID buffer on CPU
 		// Whatever mesh has the most pixels in the ID buffer is the one the user clicked on.
 		if (!_reading && _start_readback)
@@ -79,7 +74,6 @@ namespace editor
 		if (input->is_mouse_button_pressed(sf::Mouse::Left))
 		{
 			_start_readback = true;
-			_reading = false;
 			math::vec4 mousePosNDC = { mouseXNDC, mouseYNDC, 0.0f, 1.0f };
 			math::vec4 mousePosNDCEnd = { mouseXNDC, mouseYNDC, 1.0f, 1.0f };
 
@@ -156,7 +150,7 @@ namespace editor
 			});
 		}
 
-		if (_reading && _reading <= renderFrame)
+		if (_reading && _reading <= render_frame)
 		{
 			_reading = 0;
 			std::map<std::uint32_t, std::uint32_t> ids;  // This contains all the IDs found in the buffer

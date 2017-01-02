@@ -5,7 +5,7 @@ class MainEditorWindow : public GuiWindow
 {
 public:
 	//-----------------------------------------------------------------------------
-	//  Name : ProjectManagerWindow ()
+	//  Name : MainEditorWindow ()
 	/// <summary>
 	/// 
 	/// 
@@ -15,7 +15,7 @@ public:
 	MainEditorWindow();
 	
 	//-----------------------------------------------------------------------------
-	//  Name : ProjectManagerWindow ()
+	//  Name : MainEditorWindow ()
 	/// <summary>
 	/// 
 	/// 

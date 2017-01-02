@@ -114,6 +114,7 @@ namespace runtime
 		auto input = core::get_subsystem<Input>();
 		auto dt = get_delta_time();
 
+		_focused_window = nullptr;
 		//get a copy of the windows for safe iterator invalidation
 		auto windows = get_windows();
 		for (auto window : windows)

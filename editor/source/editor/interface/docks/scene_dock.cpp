@@ -308,7 +308,7 @@ namespace Docks
 		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 		auto input = core::get_subsystem<runtime::Input>();
 
-		auto& window = engine->get_focused_window();
+		auto window = engine->get_focused_window();
 		auto& editor_camera = es->camera;
 		auto& selected = es->selection_data.object;
 		auto& dragged = es->drag_data.object;
@@ -339,7 +339,8 @@ namespace Docks
 			if (gui::IsItemClicked(1) || gui::IsItemClicked(2))
 			{
 				gui::SetWindowFocus();
-				window.setMouseCursorVisible(false);
+				if(window)
+					window->setMouseCursorVisible(false);
 			}
 
 			manipulation_gizmos();
@@ -368,7 +369,8 @@ namespace Docks
 
 			if (gui::IsMouseReleased(1) || gui::IsMouseReleased(2))
 			{
-				window.setMouseCursorVisible(true);
+				if (window)
+					window->setMouseCursorVisible(true);
 			}
 
 			if (show_gbuffer)
@@ -382,7 +384,7 @@ namespace Docks
 					if (gui::IsItemClicked(1) || gui::IsItemClicked(2))
 					{
 						gui::SetWindowFocus();
-						window.setMouseCursorVisible(false);
+						window->setMouseCursorVisible(false);
 					}
 				}
 			}
