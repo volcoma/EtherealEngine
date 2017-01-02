@@ -1,23 +1,23 @@
-### INFO
+## INFO
 C++ Game Engine
 
 WYSIWYG Editor
 
-### STATUS
+## STATUS
 WIP - not production ready in any way
 
-### FEATURES
+## FEATURES
 Proper rendering and lighting is pretty much non existant right now. PBR is planned.
 
 Check out the Projects tab for more information of upcomming features.
 
-### SUGGESTIONS AND ISSUES
+## SUGGESTIONS AND ISSUES
 Any suggestions and help will be appreciated.
 
-### BUILD
+## BUILD
 VS2015 solution is included in the repo. Just build it.
 
-### PLATFORMS
+## PLATFORMS
 It is written in a cross-platform manner.
 
 Platform | Supported
@@ -25,10 +25,10 @@ Platform | Supported
 Windows | yes |
 Linux | needs some work |
 
-### CODEBASE
+## CODEBASE
 c++14/c++17 Using the latest and greates features of the language.
 
-### CODE STYLE
+## CODE STYLE
 ```c++
 class SomeClass
 {
@@ -47,12 +47,12 @@ private:
 }
 ```
 
-### PREVIEW
+## PREVIEW
 ![preview](https://cloud.githubusercontent.com/assets/1499411/19988985/2a302204-a22c-11e6-98af-5f446d0c79ac.png)
 
 ![preview1](https://cloud.githubusercontent.com/assets/1499411/19989003/40535d44-a22c-11e6-9aa8-a1ddd63df18a.png)
 
-### LIBRARIES
+## LIBRARIES
 bgfx - https://github.com/bkaradzic/bgfx
 
 cereal - https://github.com/USCiLab/cereal
