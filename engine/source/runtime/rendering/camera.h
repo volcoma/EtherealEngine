@@ -317,7 +317,7 @@ public:
 	/// vector, suitable for use during picking.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool viewport_to_ray(const uSize & viewportSize, const math::vec2 & point, math::vec3 & rayOriginOut, math::vec3 & rayDirectionOut);
+	bool viewport_to_ray(const math::vec2 & point, math::vec3 & rayOriginOut, math::vec3 & rayDirectionOut);
 
 	//-----------------------------------------------------------------------------
 	//  Name : viewport_to_world ()
@@ -327,7 +327,7 @@ public:
 	/// is returned via the world parameter passed.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool viewport_to_world(const uSize & viewportSize, const math::vec2 & point, const math::plane & plane, math::vec3 & positionOut);
+	bool viewport_to_world(const math::vec2 & point, const math::plane & plane, math::vec3 & positionOut);
 
 	//-----------------------------------------------------------------------------
 	//  Name : viewport_to_major_axis ()
@@ -337,7 +337,7 @@ public:
 	/// planes selected based on the camera look vector.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool viewport_to_major_axis(const uSize & viewportSize, const math::vec2 & point, const math::vec3 & axisOrigin, math::vec3 & positionOut, math::vec3 & majorAxisOut);
+	bool viewport_to_major_axis(const math::vec2 & point, const math::vec3 & axisOrigin, math::vec3 & positionOut, math::vec3 & majorAxisOut);
 
 	//-----------------------------------------------------------------------------
 	//  Name : viewportToMajorAxis ()
@@ -347,7 +347,7 @@ public:
 	/// planes selected based on the specified normal.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool viewport_to_major_axis(const uSize & viewportSize, const math::vec2 & point, const math::vec3 & axisOrigin, const math::vec3 & alignNormal, math::vec3 & positionOut, math::vec3 & majorAxisOut);
+	bool viewport_to_major_axis(const math::vec2 & point, const math::vec3 & axisOrigin, const math::vec3 & alignNormal, math::vec3 & positionOut, math::vec3 & majorAxisOut);
 
 	//-----------------------------------------------------------------------------
 	//  Name : viewport_to_camera ()
@@ -356,7 +356,7 @@ public:
 	/// the point into a camera space position at the near plane.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool viewport_to_camera(const uSize & viewportSize, const math::vec3 & point, math::vec3 & positionOut);
+	bool viewport_to_camera(const math::vec3 & point, math::vec3 & positionOut);
 
 	//-----------------------------------------------------------------------------
 	//  Name : world_to_viewport()
@@ -365,7 +365,7 @@ public:
 	/// if the point was clipped off the screen.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool world_to_viewport(const uSize & viewportSize, const math::vec3 & position, math::vec3 & pointOut, bool clipX = true, bool clipY = true, bool clipZ = true);
+	bool world_to_viewport(const math::vec3 & position, math::vec3 & pointOut, bool clipX = true, bool clipY = true, bool clipZ = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : estimate_zoom_factor ()
@@ -375,18 +375,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float estimate_zoom_factor(const uSize & viewportSize, const math::plane & plane);
-
-
-	//-----------------------------------------------------------------------------
-	//  Name : estimate_zoom_factor ()
-	/// <summary>
-	/// Given the current viewport type and projection mode, estimate the "zoom"
-	/// factor that can be used for scaling various operations relative to their
-	/// "scale" as it appears in the viewport.
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	float estimate_zoom_factor(const uSize & viewportSize, const math::vec3 & position);
+	float estimate_zoom_factor(const math::plane & plane);
 
 	//-----------------------------------------------------------------------------
 	//  Name : estimate_zoom_factor ()
@@ -396,7 +385,17 @@ public:
 	/// "scale" as it appears in the viewport.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float estimate_zoom_factor(const uSize & viewportSize, const math::plane & plane, float maximumValue);
+	float estimate_zoom_factor(const math::vec3 & position);
+
+	//-----------------------------------------------------------------------------
+	//  Name : estimate_zoom_factor ()
+	/// <summary>
+	/// Given the current viewport type and projection mode, estimate the "zoom"
+	/// factor that can be used for scaling various operations relative to their
+	/// "scale" as it appears in the viewport.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	float estimate_zoom_factor(const math::plane & plane, float maximumValue);
 
 	//-----------------------------------------------------------------------------
 	// Name : estimate_zoom_factor ()
@@ -406,7 +405,7 @@ public:
 	/// "scale" of an object as it appears in the viewport at the specified position.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float estimate_zoom_factor(const uSize & viewportSize, const math::vec3 & position, float maximumValue);
+	float estimate_zoom_factor(const math::vec3 & position, float maximumValue);
 
 	//-----------------------------------------------------------------------------
 	// Name : estimate_pick_tolerance ()
@@ -415,7 +414,7 @@ public:
 	/// point to use as a tolerance for picking.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::vec3 estimate_pick_tolerance(const uSize & viewportSize, float pixelTolerance, const math::vec3 & referencePosition, const math::transform_t & objectTransform);
+	math::vec3 estimate_pick_tolerance(float pixelTolerance, const math::vec3 & referencePosition, const math::transform_t & objectTransform);
 
 	//-----------------------------------------------------------------------------
 	//  Name : look_at ()

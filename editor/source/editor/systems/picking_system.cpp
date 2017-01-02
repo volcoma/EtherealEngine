@@ -36,7 +36,7 @@ namespace editor
 		const auto renderFrame = renderer->get_render_frame();
 
 		auto& editorCamera = es->camera;
-		if (!editorCamera || !editorCamera.has_component<CameraComponent>() || imguizmo::is_over() || imguizmo::is_using())
+		if (!editorCamera || !editorCamera.has_component<CameraComponent>() || imguizmo::is_using())
 			return;
 
 		auto cameraComponentRef = editorCamera.component<CameraComponent>();
@@ -79,6 +79,7 @@ namespace editor
 		if (input->is_mouse_button_pressed(sf::Mouse::Left))
 		{
 			_start_readback = true;
+			_reading = false;
 			math::vec4 mousePosNDC = { mouseXNDC, mouseYNDC, 0.0f, 1.0f };
 			math::vec4 mousePosNDCEnd = { mouseXNDC, mouseYNDC, 1.0f, 1.0f };
 

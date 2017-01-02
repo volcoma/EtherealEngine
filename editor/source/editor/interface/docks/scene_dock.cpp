@@ -373,10 +373,10 @@ namespace Docks
 
 			if (show_gbuffer)
 			{
-				const auto gBufferSurface = camera_component->get_g_buffer();
-				for (std::uint32_t i = 0; i < gBufferSurface->get_attachment_count(); ++i)
+				const auto g_buffer = camera_component->get_g_buffer();
+				for (std::uint32_t i = 0; i < g_buffer->get_attachment_count(); ++i)
 				{
-					const auto attachment = gBufferSurface->get_attachment(i).texture;
+					const auto attachment = g_buffer->get_attachment(i).texture;
 					gui::Image(attachment, size);
 
 					if (gui::IsItemClicked(1) || gui::IsItemClicked(2))
@@ -395,6 +395,13 @@ namespace Docks
 			{
 				if (dragged)
 				{
+					auto cursor_pos = gui::GetMousePos();
+					math::vec3 projected_pos;
+					camera_component->get_camera().viewport_to_world(
+						math::vec2{ cursor_pos.x, cursor_pos.y },
+						math::plane::fromPointNormal(math::vec3{ 0.0f, 0.0f, 0.0f }, math::vec3{ 0.0f, 1.0f, 0.0f }),
+						projected_pos);
+
 					if (dragged.is_type<runtime::Entity>())
 					{
 						auto dragged_entity = dragged.get_value<runtime::Entity>();
@@ -407,6 +414,8 @@ namespace Docks
 					{
 						auto prefab = dragged.get_value<AssetHandle<Prefab>>();
 						auto object = prefab->instantiate();
+						object.component<TransformComponent>().lock()
+							->set_position(projected_pos);
 						es->drop();
 						es->select(object);
 
@@ -419,7 +428,8 @@ namespace Docks
 
 						auto object = ecs->create();
 						//Add component and configure it.
-						object.assign<TransformComponent>();
+						object.assign<TransformComponent>().lock()
+							->set_position(projected_pos);
 						//Add component and configure it.
 						object.assign<ModelComponent>().lock()
 							->set_casts_shadow(true)

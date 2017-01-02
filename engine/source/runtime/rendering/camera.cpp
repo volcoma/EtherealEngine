@@ -268,7 +268,7 @@ math::VolumeQuery::E Camera::bounds_in_frustum(const math::bbox &AABB, const mat
 	return math::frustum::classifyOBB(f, AABB, t);
 }
 
-bool Camera::world_to_viewport(const uSize & ViewportSize, const math::vec3 & WorldPos, math::vec3 & ViewportPos, bool bClipX /* = true */, bool bClipY /* = true */, bool bClipZ /* = true */)
+bool Camera::world_to_viewport(const math::vec3 & WorldPos, math::vec3 & point, bool bClipX /* = true */, bool bClipY /* = true */, bool bClipZ /* = true */)
 {
 	// Ensure we have an up-to-date projection and view matrix
 	auto mtxTransform = get_view() * get_projection();
@@ -288,15 +288,15 @@ bool Camera::world_to_viewport(const uSize & ViewportSize, const math::vec3 & Wo
 	vClip.z *= recipW;
 
 	// Transform to final screen space position
-	ViewportPos.x = ((vClip.x * 0.5f) + 0.5f) * (float)ViewportSize.width;
-	ViewportPos.y = ((vClip.y * -0.5f) + 0.5f) * (float)ViewportSize.height;
-	ViewportPos.z = vClip.z;
+	point.x = ((vClip.x * 0.5f) + 0.5f) * (float)_viewport_size.width + _viewport_pos.x;
+	point.y = ((vClip.y * -0.5f) + 0.5f) * (float)_viewport_size.height + _viewport_pos.y;
+	point.z = vClip.z;
 
 	// Point on screen!
 	return true;
 }
 
-bool Camera::viewport_to_ray(const uSize & ViewportSize, const math::vec2 & ViewportPos, math::vec3 & vecRayStart, math::vec3 & vecRayDir)
+bool Camera::viewport_to_ray(const math::vec2 & point, math::vec3 & vecRayStart, math::vec3 & vecRayDir)
 {
 	math::vec3 vCursor;
 
@@ -306,9 +306,9 @@ bool Camera::viewport_to_ray(const uSize & ViewportSize, const math::vec2 & View
 	math::transform_t mtxView = get_view();
 	mtxInvView = math::inverse(mtxView);
 
-	// Transform the pick position from viewport space into camera space
-	vCursor.x = (((2.0f * ViewportPos.x) / (float)ViewportSize.width) - 1) / mtxProj[0][0];
-	vCursor.y = -(((2.0f * ViewportPos.y) / (float)ViewportSize.height) - 1) / mtxProj[1][1];
+	// Transform the pick position from view port space into camera space
+	vCursor.x = (((2.0f * (point.x - _viewport_pos.x)) / (float)_viewport_size.width) - 1) / mtxProj[0][0];
+	vCursor.y = -(((2.0f * (point.y - _viewport_pos.y)) / (float)_viewport_size.height) - 1) / mtxProj[1][1];
 	vCursor.z = 1.0f;
 
 	// Transform the camera space pick ray into 3D space
@@ -336,13 +336,13 @@ bool Camera::viewport_to_ray(const uSize & ViewportSize, const math::vec2 & View
 	return true;
 }
 
-bool Camera::viewport_to_world(const uSize & ViewportSize, const math::vec2 & ViewportPos, const math::plane & Plane, math::vec3 & WorldPos)
+bool Camera::viewport_to_world(const math::vec2 & point, const math::plane & Plane, math::vec3 & WorldPos)
 {
 	math::vec3 vPickRayDir, vPickRayOrig;
 	float   fProjRayLength, fDistance;
 
 	// Convert the screen coordinates to a ray.
-	if (viewport_to_ray(ViewportSize, ViewportPos, vPickRayOrig, vPickRayDir) == false)
+	if (viewport_to_ray(point, vPickRayOrig, vPickRayDir) == false)
 		return false;
 
 	// Get the length of the 'adjacent' side of the virtual triangle formed
@@ -375,12 +375,12 @@ bool Camera::viewport_to_world(const uSize & ViewportSize, const math::vec2 & Vi
 	return true;
 }
 
-bool Camera::viewport_to_major_axis(const uSize & ViewportSize, const math::vec2 & ViewportPos, const math::vec3 & Origin, math::vec3 & WorldPos, math::vec3 & MajorAxis)
+bool Camera::viewport_to_major_axis(const math::vec2 & point, const math::vec3 & Origin, math::vec3 & WorldPos, math::vec3 & MajorAxis)
 {
-	return viewport_to_major_axis(ViewportSize, ViewportPos, Origin, z_unit_axis(), WorldPos, MajorAxis);
+	return viewport_to_major_axis(point, Origin, z_unit_axis(), WorldPos, MajorAxis);
 }
 
-bool Camera::viewport_to_major_axis(const uSize & ViewportSize, const math::vec2 & ViewportPos, const math::vec3 & Origin, const math::vec3 & Normal, math::vec3 & WorldPos, math::vec3 & MajorAxis)
+bool Camera::viewport_to_major_axis(const math::vec2 & point, const math::vec3 & Origin, const math::vec3 & Normal, math::vec3 & WorldPos, math::vec3 & MajorAxis)
 {
 	// First select the major axis plane based on the specified normal
 	MajorAxis = math::vec3(1, 0, 0); // YZ
@@ -408,25 +408,25 @@ bool Camera::viewport_to_major_axis(const uSize & ViewportSize, const math::vec2
 	  // Generate the intersection plane based on this information
 	  // and pass through to the standard viewportToWorld method
 	math::plane p = math::plane::fromPointNormal(Origin, MajorAxis);
-	return viewport_to_world(ViewportSize, ViewportPos, p, WorldPos);
+	return viewport_to_world(point, p, WorldPos);
 }
 
-bool Camera::viewport_to_camera(const uSize & ViewportSize, const math::vec3 & ViewportPos, math::vec3 & CameraPos)
+bool Camera::viewport_to_camera(const math::vec3 & point, math::vec3 & CameraPos)
 {
 	// Ensure that we have an up-to-date projection and view matrix
 	auto & mtxProj = get_projection();
 	auto & mtxView = get_view();
 
 	// Transform the pick position from screen space into camera space
-	CameraPos.x = (((2.0f * ViewportPos.x) / (float)ViewportSize.width) - 1) / mtxProj[0][0];
-	CameraPos.y = -(((2.0f * ViewportPos.y) / (float)ViewportSize.height) - 1) / mtxProj[1][1];
+	CameraPos.x = (((2.0f * (point.x - _viewport_pos.x)) / (float)_viewport_size.width) - 1) / mtxProj[0][0];
+	CameraPos.y = -(((2.0f * (point.y - _viewport_pos.y)) / (float)_viewport_size.height) - 1) / mtxProj[1][1];
 	CameraPos.z = get_near_clip();
 
 	// Success!
 	return true;
 }
 
-float Camera::estimate_zoom_factor(const uSize & ViewportSize, const math::plane & Plane)
+float Camera::estimate_zoom_factor(const math::plane & Plane)
 {
 	math::vec3 vWorld;
 
@@ -435,10 +435,10 @@ float Camera::estimate_zoom_factor(const uSize & ViewportSize, const math::plane
 		return get_zoom_factor();
 
 	// Otherwise, estimate is based on the distance from the grid plane.
-	viewport_to_world(ViewportSize, math::vec2((float)ViewportSize.width / 2, (float)ViewportSize.height / 2), Plane, vWorld);
+	viewport_to_world(math::vec2((float)_viewport_size.width / 2, (float)_viewport_size.height / 2), Plane, vWorld);
 
 	// Perform full position based estimation
-	return estimate_zoom_factor(ViewportSize, vWorld);
+	return estimate_zoom_factor(vWorld);
 }
 
 //-----------------------------------------------------------------------------
@@ -449,12 +449,12 @@ float Camera::estimate_zoom_factor(const uSize & ViewportSize, const math::plane
 /// "scale" of an object as it appears in the viewport at the specified position.
 /// </summary>
 //-----------------------------------------------------------------------------
-float Camera::estimate_zoom_factor(const uSize & ViewportSize, const math::vec3 & WorldPos)
+float Camera::estimate_zoom_factor(const math::vec3 & WorldPos)
 {
-	return estimate_zoom_factor(ViewportSize, WorldPos, std::numeric_limits<float>::max());
+	return estimate_zoom_factor(WorldPos, std::numeric_limits<float>::max());
 }
 
-float Camera::estimate_zoom_factor(const uSize & ViewportSize, const math::plane & Plane, float fMax)
+float Camera::estimate_zoom_factor(const math::plane & Plane, float fMax)
 {
 	// Just return the actual zoom factor if this is orthographic
 	if (get_projection_mode() == ProjectionMode::Orthographic)
@@ -465,13 +465,13 @@ float Camera::estimate_zoom_factor(const uSize & ViewportSize, const math::plane
 	} // End if Orthographic
 	// Otherwise, estimate is based on the distance from the grid plane.
 	math::vec3 vWorld;
-	viewport_to_world(ViewportSize, math::vec2((float)ViewportSize.width / 2, (float)ViewportSize.height / 2), Plane, vWorld);
+	viewport_to_world(math::vec2((float)_viewport_size.width / 2, (float)_viewport_size.height / 2), Plane, vWorld);
 
 	// Perform full position based estimation
-	return estimate_zoom_factor(ViewportSize, vWorld, fMax);
+	return estimate_zoom_factor(vWorld, fMax);
 }
 
-float Camera::estimate_zoom_factor(const uSize & ViewportSize, const math::vec3 & WorldPos, float fMax)
+float Camera::estimate_zoom_factor(const math::vec3 & WorldPos, float fMax)
 {
 	// Just return the actual zoom factor if this is orthographic
 	if (get_projection_mode() == ProjectionMode::Orthographic)
@@ -484,16 +484,16 @@ float Camera::estimate_zoom_factor(const uSize & ViewportSize, const math::vec3 
 	// New Zoom factor is based on the distance to this position 
 	// along the camera's look vector.
 	math::vec3 viewPos = math::transform_t::transformCoord(WorldPos, get_view());
-	float distance = viewPos.z / ((float)ViewportSize.height * (45.0f / get_fov()));
+	float distance = viewPos.z / ((float)_viewport_size.height * (45.0f / get_fov()));
 	return std::min<float>(fMax, distance);
 }
 
-math::vec3 Camera::estimate_pick_tolerance(const uSize & ViewportSize, float WireTolerance, const math::vec3 & Pos, const math::transform_t & ObjectTransform)
+math::vec3 Camera::estimate_pick_tolerance(float WireTolerance, const math::vec3 & Pos, const math::transform_t & ObjectTransform)
 {
 	// Scale tolerance based on estimated world space zoom factor.
 	math::vec3 v;
 	ObjectTransform.transformCoord(v, Pos);
-	WireTolerance *= estimate_zoom_factor(ViewportSize, v);
+	WireTolerance *= estimate_zoom_factor(v);
 
 	// Convert into object space tolerance.
 	math::vec3 ObjectWireTolerance;
