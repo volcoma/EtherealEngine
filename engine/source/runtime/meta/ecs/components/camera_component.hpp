@@ -50,28 +50,26 @@ REFLECT(CameraComponent)
 
 }
 
-namespace runtime
+
+
+SAVE(CameraComponent)
 {
+	ar(
+		cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)),
+		cereal::make_nvp("camera", obj._camera),
+		cereal::make_nvp("hdr", obj._hdr)
+	);
+}
 
-	SAVE(CameraComponent)
-	{
-		ar(
-			cereal::make_nvp("base_type", cereal::base_class<Component>(&obj)),
-			cereal::make_nvp("camera", obj._camera),
-			cereal::make_nvp("hdr", obj._hdr)
-		);
-	}
+LOAD(CameraComponent)
+{
+	ar(
+		cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)),
+		cereal::make_nvp("camera", obj._camera),
+		cereal::make_nvp("hdr", obj._hdr)
+	);
 
-	LOAD(CameraComponent)
-	{
-		ar(
-			cereal::make_nvp("base_type", cereal::base_class<Component>(&obj)),
-			cereal::make_nvp("camera", obj._camera),
-			cereal::make_nvp("hdr", obj._hdr)
-		);
-
-		obj.set_hdr(obj._hdr);
-	}
+	obj.set_hdr(obj._hdr);
 }
 
 

@@ -15,8 +15,8 @@ namespace Docks
 	{
 		auto es = core::get_subsystem<editor::EditState>();
 		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
-		auto& editorCamera = es->camera;
-		if (entity && entity != editorCamera)
+		auto& editor_camera = es->camera;
+		if (entity && entity != editor_camera)
 		{
 			if (gui::BeginPopupContextItem("Entity Context Menu"))
 			{
@@ -69,7 +69,7 @@ namespace Docks
 			return;
 
 		auto es = core::get_subsystem<editor::EditState>();
-		auto& editorCamera = es->camera;
+		auto& editor_camera = es->camera;
 		auto& dragged = es->drag_data.object;
 
 		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
@@ -79,19 +79,19 @@ namespace Docks
 			if (gui::IsItemHoveredRect())
 			{
 				if (gui::IsMouseClicked(gui::drag_button) &&
-					entity != editorCamera)
+					entity != editor_camera)
 				{
 					es->drag(entity, entity.to_string());
 				}
 				if (gui::IsMouseReleased(gui::drag_button))
 				{
-					if (dragged && entity != editorCamera)
+					if (dragged && entity != editor_camera)
 					{
 						if (dragged.is_type<runtime::Entity>())
 						{
 							
-							auto draggedEntity = dragged.get_value<runtime::Entity>();
-							draggedEntity.component<TransformComponent>().lock()
+							auto dragged_entity = dragged.get_value<runtime::Entity>();
+							dragged_entity.component<TransformComponent>().lock()
 								->set_parent(entity.component<TransformComponent>());
 
 							es->drop();
@@ -100,12 +100,12 @@ namespace Docks
 						if (dragged.is_type<AssetHandle<Prefab>>())
 						{
 							auto prefab = dragged.get_value<AssetHandle<Prefab>>();
-							auto draggedEntity = prefab->instantiate();
-							draggedEntity.component<TransformComponent>().lock()
+							auto object = prefab->instantiate();
+							object.component<TransformComponent>().lock()
 								->set_parent(entity.component<TransformComponent>());
 
 							es->drop();
-							es->select(draggedEntity);
+							es->select(object);
 						}
 						if (dragged.is_type<AssetHandle<Mesh>>())
 						{
@@ -133,16 +133,16 @@ namespace Docks
 		
 	}
 
-	bool is_parent_of(TransformComponent* trans, TransformComponent* selectedTransform)
+	bool is_parent_of(TransformComponent* trans, TransformComponent* selected_ransform)
 	{
-		if (!selectedTransform)
+		if (!selected_ransform)
 			return false;
 
-		if (trans == selectedTransform)
+		if (trans == selected_ransform)
 		{
 			return true;
 		}
-		auto parent = selectedTransform->get_parent().lock().get();
+		auto parent = selected_ransform->get_parent().lock().get();
 		return is_parent_of(trans, parent);
 	};
 
@@ -156,13 +156,13 @@ namespace Docks
 		auto es = core::get_subsystem<editor::EditState>();
 		auto& selected = es->selection_data.object;
 
-		bool isSselected = false;
+		bool is_selected = false;
 		if (selected && selected.is_type<runtime::Entity>())
 		{
-			isSselected = selected.get_value<runtime::Entity>() == entity;
+			is_selected = selected.get_value<runtime::Entity>() == entity;
 		}	
 		
-		bool isParentOfSelected = false;
+		bool is_parent_of_selected = false;
 // 		if (selected && selected.is_type<runtime::Entity>())
 // 		{
 // 			auto selectedEntity = selected.get_value<runtime::Entity>();
@@ -170,28 +170,25 @@ namespace Docks
 // 			auto entityTransformComponent = entity.component<TransformComponent>().lock().get();
 // 			isParentOfSelected = isParentOf(entityTransformComponent, selectedTransformComponent);
 // 		}	
-		bool noChildren = true;
 		std::string name = entity.to_string();
-
-
 		ImGuiTreeNodeFlags flags = 0
 			| ImGuiTreeNodeFlags_OpenOnDoubleClick
+			| ImGuiTreeNodeFlags_AllowOverlapMode
 			| ImGuiTreeNodeFlags_OpenOnArrow;
 
-		if (isSselected)
+		if (is_selected)
 			flags |= ImGuiTreeNodeFlags_Selected;
 
 
 		auto transformComponent = entity.component<TransformComponent>().lock();
+		bool no_children = true;
 		if (transformComponent)
-		{
-			noChildren = transformComponent->get_children().empty();
-		}
+			no_children = transformComponent->get_children().empty();
 
-		if (noChildren)
+		if (no_children)
 			flags |= ImGuiTreeNodeFlags_Leaf;
 
-		if(isParentOfSelected)
+		if(is_parent_of_selected)
 			gui::SetNextTreeNodeOpen(true);
 
 		bool opened = gui::TreeNodeEx(name.c_str(), flags);
@@ -204,7 +201,7 @@ namespace Docks
 		check_drag(entity);
 		if (opened)
 		{
-			if (!noChildren)
+			if (!no_children)
 			{
 				auto children = entity.component<TransformComponent>().lock()->get_children();
 				for (auto& child : children)
@@ -229,7 +226,7 @@ namespace Docks
 
 		auto& roots = ts->get_roots();
 
-		auto& editorCamera = es->camera;
+		auto& editor_camera = es->camera;
 		auto& selected = es->selection_data.object;
 		auto& dragged = es->drag_data.object;
 
@@ -242,7 +239,7 @@ namespace Docks
 				if (selected && selected.is_type<runtime::Entity>())
 				{
 					auto sel = selected.get_value<runtime::Entity>();
-					if (sel != editorCamera)
+					if (sel != editor_camera)
 					{
 						sel.destroy();
 						es->unselect();
@@ -257,7 +254,7 @@ namespace Docks
 					if (selected && selected.is_type<runtime::Entity>())
 					{
 						auto sel = selected.get_value<runtime::Entity>();
-						if (sel != editorCamera)
+						if (sel != editor_camera)
 						{
 							auto clone = ecs->create_from_copy(sel);
 							clone.component<TransformComponent>().lock()
@@ -283,8 +280,8 @@ namespace Docks
 				{
 					if (dragged.is_type<runtime::Entity>())
 					{
-						auto draggedEntity = dragged.get_value<runtime::Entity>();
-						draggedEntity.component<TransformComponent>().lock()
+						auto dragged_entity = dragged.get_value<runtime::Entity>();
+						dragged_entity.component<TransformComponent>().lock()
 							->set_parent(runtime::CHandle<TransformComponent>());
 
 						es->drop();
@@ -292,9 +289,9 @@ namespace Docks
 					if (dragged.is_type<AssetHandle<Prefab>>())
 					{
 						auto prefab = dragged.get_value<AssetHandle<Prefab>>();
-						auto draggedEntity = prefab->instantiate();
+						auto object = prefab->instantiate();
 						es->drop();
-						es->select(draggedEntity);
+						es->select(object);
 
 					}
 					if (dragged.is_type<AssetHandle<Mesh>>())
