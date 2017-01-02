@@ -58,7 +58,7 @@ struct GUIStyle
 struct ITexture;
 namespace gui
 {   
-	static const int drag_button = 2;
+	static const int drag_button = 0;
 	void begin();
 
 	// Helper function for passing ITexture to ImGui::Image.

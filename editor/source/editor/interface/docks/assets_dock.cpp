@@ -76,6 +76,7 @@ namespace Docks
 				if (gui::GetContentRegionAvailWidth() < size)
 					gui::NewLine();
 
+				
 				gui::BeginGroup();
 				{
 					if (gui::ImageButtonEx(get_asset_icon(assetHandle).link->asset, { size, size }, assetRelativeName.c_str(), alreadySelected))
@@ -89,12 +90,11 @@ namespace Docks
 					gui::PopStyleColor();
 				}
 				gui::EndGroup();
-				if (gui::IsItemHovered())
+				
+				if (gui::IsItemHoveredRect() &&
+					gui::IsMouseClicked(gui::drag_button))
 				{
-					if (gui::IsMouseClicked(gui::drag_button))
-					{
-						editState.drag(assetHandle, assetRelativeName);
-					}
+					editState.drag(assetHandle, assetRelativeName);
 				}
 				if (gui::BeginPopupContextItem(assetName.c_str()))
 				{
@@ -144,12 +144,10 @@ namespace Docks
 				{
 					editState.select(assetHandle);
 				}
-				if (gui::IsItemHovered())
+				if (gui::IsItemHoveredRect() &&
+					gui::IsMouseClicked(gui::drag_button))
 				{
-					if (gui::IsMouseClicked(gui::drag_button))
-					{
-						editState.drag(assetHandle, assetRelativeName);
-					}
+					editState.drag(assetHandle, assetRelativeName);
 				}
 				if (gui::BeginPopupContextItem(assetName.c_str()))
 				{

@@ -63,8 +63,11 @@ namespace Docks
 
 	}
 
-	void check_drag(runtime::Entity entity, bool isHovered)
+	void check_drag(runtime::Entity entity)
 	{
+		if (!gui::IsWindowHovered())
+			return;
+
 		auto es = core::get_subsystem<editor::EditState>();
 		auto& editorCamera = es->camera;
 		auto& dragged = es->drag_data.object;
@@ -73,9 +76,10 @@ namespace Docks
 
 		if (entity)
 		{
-			if (isHovered)
+			if (gui::IsItemHoveredRect())
 			{
-				if (gui::IsMouseClicked(gui::drag_button) && entity != editorCamera)
+				if (gui::IsMouseClicked(gui::drag_button) &&
+					entity != editorCamera)
 				{
 					es->drag(entity, entity.to_string());
 				}
@@ -113,49 +117,6 @@ namespace Docks
 							//Add component and configure it.
 							object.assign<TransformComponent>().lock()
 								->set_parent(entity.component<TransformComponent>());
-							//Add component and configure it.
-							object.assign<ModelComponent>().lock()
-								->set_casts_shadow(true)
-								.set_casts_reflection(false)
-								.set_model(model);
-
-							es->drop();
-							es->select(object);
-						}
-					}
-				}
-			}
-			else
-			{
-				if (dragged && gui::IsWindowHovered() && !gui::IsAnyItemHovered())
-				{
-					if (gui::IsMouseReleased(gui::drag_button))
-					{
-						if (dragged.is_type<runtime::Entity>())
-						{
-							auto draggedEntity = dragged.get_value<runtime::Entity>();
-							draggedEntity.component<TransformComponent>().lock()
-								->set_parent(runtime::CHandle<TransformComponent>());
-
-							es->drop();
-						}
-						if (dragged.is_type<AssetHandle<Prefab>>())
-						{
-							auto prefab = dragged.get_value<AssetHandle<Prefab>>();
-							auto draggedEntity = prefab->instantiate();
-							es->drop();
-							es->select(draggedEntity);
-							
-						}
-						if (dragged.is_type<AssetHandle<Mesh>>())
-						{
-							auto mesh = dragged.get_value<AssetHandle<Mesh>>();
-							Model model;
-							model.set_lod(mesh, 0);
-
-							auto object = ecs->create();
-							//Add component and configure it.
-							object.assign<TransformComponent>();
 							//Add component and configure it.
 							object.assign<ModelComponent>().lock()
 								->set_casts_shadow(true)
@@ -234,14 +195,13 @@ namespace Docks
 			gui::SetNextTreeNodeOpen(true);
 
 		bool opened = gui::TreeNodeEx(name.c_str(), flags);
-		bool hovered = gui::IsItemHovered();
 		if (gui::IsItemClicked(0))
 		{
 			es->select(entity);
 		}
 
 		check_context_menu(entity);
-		check_drag(entity, hovered);
+		check_drag(entity);
 		if (opened)
 		{
 			if (!noChildren)
@@ -271,6 +231,7 @@ namespace Docks
 
 		auto& editorCamera = es->camera;
 		auto& selected = es->selection_data.object;
+		auto& dragged = es->drag_data.object;
 
 		check_context_menu(runtime::Entity());
 
@@ -312,7 +273,51 @@ namespace Docks
 		{
 			if (!root.expired())
 				draw_entity(root.lock()->get_entity());
-		}		
+		}	
+
+		if (gui::IsWindowHovered() && !gui::IsAnyItemHovered())
+		{
+			if (gui::IsMouseReleased(gui::drag_button))
+			{
+				if (dragged)
+				{
+					if (dragged.is_type<runtime::Entity>())
+					{
+						auto draggedEntity = dragged.get_value<runtime::Entity>();
+						draggedEntity.component<TransformComponent>().lock()
+							->set_parent(runtime::CHandle<TransformComponent>());
+
+						es->drop();
+					}
+					if (dragged.is_type<AssetHandle<Prefab>>())
+					{
+						auto prefab = dragged.get_value<AssetHandle<Prefab>>();
+						auto draggedEntity = prefab->instantiate();
+						es->drop();
+						es->select(draggedEntity);
+
+					}
+					if (dragged.is_type<AssetHandle<Mesh>>())
+					{
+						auto mesh = dragged.get_value<AssetHandle<Mesh>>();
+						Model model;
+						model.set_lod(mesh, 0);
+
+						auto object = ecs->create();
+						//Add component and configure it.
+						object.assign<TransformComponent>();
+						//Add component and configure it.
+						object.assign<ModelComponent>().lock()
+							->set_casts_shadow(true)
+							.set_casts_reflection(false)
+							.set_model(model);
+
+						es->drop();
+						es->select(object);
+					}
+				}
+			}
+		}
 	}
 
 };

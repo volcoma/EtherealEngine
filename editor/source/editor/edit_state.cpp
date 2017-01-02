@@ -140,7 +140,7 @@ namespace editor
 
 	void EditState::frame_end(std::chrono::duration<float> dt)
 	{
-		if (drag_data.object)
+		if (gui::IsMouseDragging(gui::drag_button) && drag_data.object)
 		{
 			gui::SetTooltip(drag_data.description.c_str());
 		}

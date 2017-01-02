@@ -79,19 +79,19 @@ bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, s
 		auto& dragged = es->drag_data.object;
 		if (dragged && dragged.is_type<AssetHandle<Texture>>())
 		{
-			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.5f));
+			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.9f));
 			gui::RenderFrameEx(bbMinFrame, bbMaxFrame, true, 0.0f, 2.0f);
 			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
 			gui::PopStyleColor();
 
-			if (hoveredFrame || gui::IsItemHovered())
+			if (hoveredFrame || gui::IsItemHoveredRect())
 			{
 				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
 				gui::RenderFrameEx(bbMinFrame, bbMaxFrame, true, 0.0f, 2.0f);
 				gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
 				gui::PopStyleColor();
 
-				if (gui::IsMouseReleased(2))
+				if (gui::IsMouseReleased(gui::drag_button))
 				{
 					data = dragged.get_value<AssetHandle<Texture>>();
 					var = data;
@@ -146,14 +146,16 @@ bool Inspector_AssetHandle_Material::inspect(rttr::variant& var, bool readOnly, 
 		auto& dragged = es->drag_data.object;
 		if (dragged && dragged.is_type<AssetHandle<Material>>())
 		{
+			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.9f));
 			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
+			gui::PopStyleColor();
 
-			if (gui::IsItemHovered())
+			if (gui::IsItemHoveredRect())
 			{
 				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
 				gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
 				gui::PopStyleColor();
-				if (gui::IsMouseReleased(2))
+				if (gui::IsMouseReleased(gui::drag_button))
 				{
 					data = dragged.get_value<AssetHandle<Material>>();
 					var = data;
@@ -227,14 +229,16 @@ bool Inspector_AssetHandle_Mesh::inspect(rttr::variant& var, bool readOnly, std:
 		auto& dragged = es->drag_data.object;
 		if (dragged && dragged.is_type<AssetHandle<Mesh>>())
 		{
+			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.9f));
 			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
+			gui::PopStyleColor();
 
-			if (gui::IsItemHovered())
+			if (gui::IsItemHoveredRect())
 			{
 				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
 				gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
 				gui::PopStyleColor();
-				if (gui::IsMouseReleased(2))
+				if (gui::IsMouseReleased(gui::drag_button))
 				{
 					data = dragged.get_value<AssetHandle<Mesh>>();
 					var = data;
