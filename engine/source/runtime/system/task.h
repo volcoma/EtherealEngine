@@ -22,10 +22,6 @@ namespace runtime
 	// relationships between tasks;
 	// 3. Easier to gain benefits from both function and data parallelism.
 
-	/**
-	 * @brief      A Light-weight task scheduler with automatic load balancing,
-	 * the dependencies between tasks are addressed as parent-child relationships.
-	 */
 	//-----------------------------------------------------------------------------
 	// Main Class Declarations
 	//-----------------------------------------------------------------------------
@@ -33,7 +29,7 @@ namespace runtime
 	//  Name : TaskSystem (Class)
 	/// <summary>
 	/// A Light-weight task scheduler with automatic load balancing,
-	///the dependencies between tasks are addressed as parent - child relationships.
+	/// the dependencies between tasks are addressed as parent - child relationships.
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	struct TaskSystem : public core::Subsystem
