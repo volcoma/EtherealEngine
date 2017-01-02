@@ -1019,14 +1019,14 @@ virtual std::shared_ptr<Component> clone() const								\
 
 	inline std::ostream &operator << (std::ostream &out, const Entity::Id &id)
 	{
-		out << "Entity::Id(" << id.index() << "." << id.version() << ")";
+		out << "id_" << id.index() << "_" << id.version() << "";
 		return out;
 	}
 
 
 	inline std::ostream &operator << (std::ostream &out, const Entity &entity)
 	{
-		out << "Entity(" << entity.id() << ")";
+		out << "entity(" << entity.id() << ")";
 		return out;
 	}
 

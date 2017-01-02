@@ -1,12 +1,11 @@
 #include "asset_compiler.h"
 #include "core/common/string.h"
 #include "core/logging/logging.h"
-#include "runtime/system/FileSystem.h"
+#include "runtime/system/filesystem.h"
 #include "shaderc/shaderc.h"
 #include "runtime/rendering/shader.h"
 
-template<>
-void AssetCompiler<Shader>::compile(const fs::path& absoluteKey)
+void ShaderCompiler::compile(const fs::path& absoluteKey)
 {
 	fs::path input = absoluteKey;
 	std::string strInput = input.string();

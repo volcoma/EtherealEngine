@@ -90,8 +90,7 @@ namespace editor
 					{
 						auto task = ts->create("", [p]()
 						{
-							AssetCompiler<Shader> compiler;
-							compiler.compile(p);
+							ShaderCompiler::compile(p);
 						});
 						ts->run_on_main(task);
 					}
@@ -112,16 +111,6 @@ namespace editor
 		fs::add_path_protocol("app:", projectPath);
 		fs::add_path_protocol("data:", fs::resolve_protocol("app://data"));
 		fs::watcher::unwatch_all();
-		watch_assets<Texture>("data://textures", true);
-		watch_assets<Texture>("editor_data://icons", true);
-		watch_assets<Mesh>("data://meshes", true);
-		watch_assets<Prefab>("data://prefabs", true);
-		watch_assets<Material>("data://materials", false);
-		watch_assets<Shader>("engine_data://shaders", true);
-		watch_raw_shaders("engine_data://shaders");
-
-		watch_assets<Shader>("editor_data://shaders", true);
-		watch_raw_shaders("editor_data://shaders");
 		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 		auto am = core::get_subsystem<runtime::AssetManager>();
 		auto es = core::get_subsystem<EditState>();
@@ -136,6 +125,21 @@ namespace editor
 			rp.push_back(projectPath.generic_string());
 			save_config();
 		}
+
+		watch_assets<Texture>("data://textures", true);
+		watch_assets<Mesh>("data://meshes", true);
+		watch_assets<Prefab>("data://prefabs", true);
+		watch_assets<Shader>("data://shaders", true);
+		watch_raw_shaders("data://shaders");
+		watch_assets<Material>("data://materials", false);
+
+		watch_assets<Shader>("engine_data://shaders", true);
+		watch_raw_shaders("engine_data://shaders");
+
+		watch_assets<Shader>("editor_data://shaders", true);
+		watch_assets<Texture>("editor_data://icons", true);
+		watch_raw_shaders("editor_data://shaders");
+
 	}
 
 	void ProjectManager::create_project(const fs::path& projectPath)
@@ -148,6 +152,10 @@ namespace editor
 		fs::create_directory(fs::resolve_protocol("app://data/meshes"), std::error_code{});
 		fs::create_directory(fs::resolve_protocol("app://data/scenes"), std::error_code{});
 		fs::create_directory(fs::resolve_protocol("app://data/shaders/runtime"), std::error_code{});
+		fs::create_directory(fs::resolve_protocol("app://data/shaders/runtime/dx9"), std::error_code{});
+		fs::create_directory(fs::resolve_protocol("app://data/shaders/runtime/dx11"), std::error_code{});
+		fs::create_directory(fs::resolve_protocol("app://data/shaders/runtime/glsl"), std::error_code{});
+		fs::create_directory(fs::resolve_protocol("app://data/shaders/runtime/metal"), std::error_code{});
 		fs::create_directory(fs::resolve_protocol("app://data/textures/runtime"), std::error_code{});
 		fs::create_directory(fs::resolve_protocol("app://data/meshes/runtime"), std::error_code{});
 		fs::create_directory(fs::resolve_protocol("app://data/prefabs"), std::error_code{});

@@ -4,9 +4,14 @@
 #include "runtime/input/input.h"
 #include "runtime/ecs/components/transform_component.h"
 #include "runtime/ecs/components/camera_component.h"
+#include "runtime/ecs/components/model_component.h"
+#include "runtime/ecs/prefab.h"
 #include "runtime/rendering/render_pass.h"
 #include "runtime/rendering/camera.h"
 #include "runtime/rendering/render_window.h"
+#include "runtime/rendering/mesh.h"
+#include "runtime/assets/asset_handle.h"
+
 
 namespace Docks
 {
@@ -306,6 +311,8 @@ namespace Docks
 		auto& window = engine->get_window();
 		auto& editor_camera = es->camera;
 		auto& selected = es->selection_data.object;
+		auto& dragged = es->drag_data.object;
+
 		bool has_edit_camera = editor_camera
 			&& editor_camera.has_component<CameraComponent>()
 			&& editor_camera.has_component<TransformComponent>();
@@ -380,6 +387,50 @@ namespace Docks
 				}
 			}
 
+		}
+
+		if (gui::IsWindowHovered())
+		{
+			if (gui::IsMouseReleased(gui::drag_button))
+			{
+				if (dragged)
+				{
+					if (dragged.is_type<runtime::Entity>())
+					{
+						auto dragged_entity = dragged.get_value<runtime::Entity>();
+						dragged_entity.component<TransformComponent>().lock()
+							->set_parent(runtime::CHandle<TransformComponent>());
+
+						es->drop();
+					}
+					if (dragged.is_type<AssetHandle<Prefab>>())
+					{
+						auto prefab = dragged.get_value<AssetHandle<Prefab>>();
+						auto object = prefab->instantiate();
+						es->drop();
+						es->select(object);
+
+					}
+					if (dragged.is_type<AssetHandle<Mesh>>())
+					{
+						auto mesh = dragged.get_value<AssetHandle<Mesh>>();
+						Model model;
+						model.set_lod(mesh, 0);
+
+						auto object = ecs->create();
+						//Add component and configure it.
+						object.assign<TransformComponent>();
+						//Add component and configure it.
+						object.assign<ModelComponent>().lock()
+							->set_casts_shadow(true)
+							.set_casts_reflection(false)
+							.set_model(model);
+
+						es->drop();
+						es->select(object);
+					}
+				}
+			}
 		}
 	}
 

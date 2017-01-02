@@ -9,7 +9,7 @@ namespace ecs
 	{
 		void save_entity(const fs::path& dir, const runtime::Entity& data)
 		{
-			const fs::path fullPath = fs::resolve_protocol(dir / fs::path(data.get_name()+ ".asset"));
+			const fs::path fullPath = fs::resolve_protocol(dir / fs::path(data.to_string() + ".asset"));
 			save_data(fullPath, { data });
 		}
 

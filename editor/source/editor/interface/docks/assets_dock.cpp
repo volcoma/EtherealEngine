@@ -6,6 +6,7 @@
 #include "runtime/system/filesystem.h"
 #include "runtime/ecs/prefab.h"
 #include "runtime/ecs/utils.h"
+#include "runtime/input/input.h"
 #include "../../edit_state.h"
 #include <cstdio>
 
@@ -44,7 +45,7 @@ AssetHandle<Texture> get_asset_icon(AssetHandle<Material> asset)
 namespace Docks
 {
 	template<typename T>
-	bool list_items(std::shared_ptr<runtime::TStorage<T>> storage, runtime::AssetManager& manager, editor::EditState& editState)
+	bool list_items(std::shared_ptr<runtime::TStorage<T>> storage, runtime::AssetManager& manager, runtime::Input& input, editor::EditState& editState)
 	{
 		auto& selected = editState.selection_data.object;
 		//copy for safe removal from original
@@ -107,7 +108,11 @@ namespace Docks
 					}
 					gui::EndPopup();
 				}
-		
+				if (input.is_key_pressed(sf::Keyboard::Delete))
+				{
+					manager.delete_asset<T>(assetRelativeName);
+					editState.unselect();
+				}
 				gui::PopID();
 				gui::SameLine();
 
@@ -159,6 +164,12 @@ namespace Docks
 					}
 					gui::EndPopup();
 				}
+
+				if (input.is_key_pressed(sf::Keyboard::Delete))
+				{
+					manager.delete_asset<T>(assetRelativeName);
+					editState.unselect();
+				}
 			}
 		}
 		return openPopup;
@@ -168,6 +179,7 @@ namespace Docks
 	{
 		auto es = core::get_subsystem<editor::EditState>();
 		auto am = core::get_subsystem<runtime::AssetManager>();
+		auto input = core::get_subsystem<runtime::Input>();
 		auto meshes = am->get_storage<Mesh>();
 		auto textures = am->get_storage<Texture>();
 		auto materials = am->get_storage<Material>();
@@ -234,17 +246,17 @@ namespace Docks
 			
 
 			if(selectedCategory == "Meshes")
-				list_items(meshes, *am, *es);
+				list_items(meshes, *am, *input, *es);
 
 			if(selectedCategory == "Textures")
-				list_items(textures, *am, *es);
+				list_items(textures, *am, *input, *es);
 
 			if (selectedCategory == "Prefabs")
-				list_items(prefabs, *am, *es);
+				list_items(prefabs, *am, *input, *es);
 
 			if (selectedCategory == "Materials")
 			{
-				if (!list_items(materials, *am, *es))
+				if (!list_items(materials, *am, *input, *es))
 				{
 					if (gui::BeginPopupContextWindow())
 					{

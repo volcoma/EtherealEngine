@@ -8,6 +8,8 @@
 #include "runtime/input/input.h"
 #include "runtime/system/filesystem.h"
 #include "runtime/rendering/mesh.h"
+#include "runtime/assets/asset_handle.h"
+
 namespace Docks
 {
 

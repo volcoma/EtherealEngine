@@ -10,15 +10,16 @@ namespace Docks
 	void render_game(ImVec2 area)
 	{
 		auto es = core::get_subsystem<editor::EditState>();
-		auto& editorCamera = es->camera;
+		auto& editor_camera = es->camera;
+		auto& dragged = es->drag_data.object;
 
 		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
-		ecs->each<CameraComponent>([&editorCamera](
+		ecs->each<CameraComponent>([&editor_camera](
 			runtime::Entity e,
 			CameraComponent& cameraComponent
 			)
 		{
-			if (e == editorCamera)
+			if (e == editor_camera)
 				return;
 
 			const auto surface = cameraComponent.get_output_buffer();

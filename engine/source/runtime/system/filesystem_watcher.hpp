@@ -12,12 +12,12 @@
 #include "core/logging/logging.h"
 
 //-----------------------------------------------------------------------------
-//  Name : logPath ()
+//  Name : log_path ()
 /// <summary>
 /// When watcher can't locate a file or parse the wild card
 /// </summary>
 //-----------------------------------------------------------------------------
-inline void logPath(const fs::path& path)
+inline void log_path(const fs::path& path)
 {
 	auto logger = logging::get("Log");
 	logger->error() << (std::string("Watcher can't locate a file or parse the wild card at: ") + path.string());
@@ -105,7 +105,7 @@ namespace fs
 			// otherwise throw an exception
 			else
 			{
-				logPath(path);
+				log_path(path);
 			}
 		}
 
@@ -224,12 +224,12 @@ namespace fs
 						found = true;
 						return true;
 					});
-					if (!found)
-					{
-						logPath(path);
-						return;
-					}
-					else
+// 					if (!found)
+// 					{
+// 						log_path(path);
+// 						return;
+// 					}
+// 					else
 					{
 						p = pathFilter.first;
 						filter = pathFilter.second;
@@ -239,7 +239,7 @@ namespace fs
 				{
 					if (!fs::exists(path, std::error_code{}))
 					{
-						logPath(path);
+						log_path(path);
 						return;
 					}
 				}
@@ -299,7 +299,7 @@ namespace fs
 			// throw an exception if the file doesn't exist
 			if (filter.empty() && !fs::exists(p, std::error_code{}))
 			{
-				logPath(path);
+				log_path(path);
 			}
 
 
