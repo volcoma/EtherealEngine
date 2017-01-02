@@ -20,7 +20,7 @@ REFLECT(Model)
 		.property("Max Distance",
 			&Model::get_lod_max_distance,
 			&Model::set_lod_max_distance)
-		.property("Mset_lod_in Distance",
+		.property("Min Distance",
 			&Model::get_lod_min_distance,
 			&Model::set_lod_min_distance)
 		;
