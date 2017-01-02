@@ -108,7 +108,7 @@ namespace Docks
 					}
 					gui::EndPopup();
 				}
-				if (input.is_key_pressed(sf::Keyboard::Delete))
+				if (alreadySelected && input.is_key_pressed(sf::Keyboard::Delete))
 				{
 					manager.delete_asset<T>(assetRelativeName);
 					editState.unselect();
@@ -165,7 +165,7 @@ namespace Docks
 					gui::EndPopup();
 				}
 
-				if (input.is_key_pressed(sf::Keyboard::Delete))
+				if (alreadySelected && input.is_key_pressed(sf::Keyboard::Delete))
 				{
 					manager.delete_asset<T>(assetRelativeName);
 					editState.unselect();
