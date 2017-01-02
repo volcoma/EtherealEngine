@@ -18,7 +18,7 @@ namespace runtime
 		}
 	}
 
-	void TransformSystem::frame_begin(std::chrono::duration<float> dt)
+	void TransformSystem::frame_update(std::chrono::duration<float> dt)
 	{
 		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 		_roots.clear();
@@ -39,13 +39,13 @@ namespace runtime
 
 	bool TransformSystem::initialize()
 	{
-		runtime::on_frame_begin.addListener(this, &TransformSystem::frame_begin);
+		runtime::on_frame_update.connect(this, &TransformSystem::frame_update);
 
 		return true;
 	}
 
 	void TransformSystem::dispose()
 	{
-		runtime::on_frame_begin.removeListener(this, &TransformSystem::frame_begin);
+		runtime::on_frame_update.disconnect(this, &TransformSystem::frame_update);
 	}
 }

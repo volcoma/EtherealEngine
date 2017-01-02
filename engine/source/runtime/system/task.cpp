@@ -1,4 +1,5 @@
 #include "task.h"
+#include "engine.h"
 #include "core/common/assert.hpp"
 
 namespace runtime
@@ -19,11 +20,16 @@ namespace runtime
 
 		_thread_main = std::this_thread::get_id();
 		_thread_indices.insert(std::make_pair(_thread_main, 0));
+		
+		on_frame_begin.connect(this, &TaskSystem::execute_tasks_on_main);
+
 		return true;
 	}
 
 	void TaskSystem::dispose()
 	{
+		on_frame_begin.disconnect(this, &TaskSystem::execute_tasks_on_main);
+
 		{
 			std::unique_lock<std::mutex> lock(_queue_mutex);
 			_stop = true;
@@ -134,7 +140,7 @@ namespace runtime
 			execute_one(index, true, _main_queue_mutex, _main_alive_tasks);
 	}
 
-	void TaskSystem::execute_tasks_on_main()
+	void TaskSystem::execute_tasks_on_main(std::chrono::duration<float>)
 	{
 		unsigned index = get_thread_index();
 		while (!_main_alive_tasks.empty())

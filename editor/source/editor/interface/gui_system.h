@@ -18,6 +18,7 @@ struct GuiSystem : public core::Subsystem
 {
 	bool initialize();
 	void dispose();
+	void frame_begin(std::chrono::duration<float>);
 };
 
 namespace gui

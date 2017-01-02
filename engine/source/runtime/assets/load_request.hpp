@@ -22,7 +22,7 @@ struct LoadRequest
 		if (is_ready())
 			callback(asset);
 		else
-			callbacks.addListener(callback);
+			callbacks.connect(callback);
 	}
 
 	//-----------------------------------------------------------------------------
@@ -52,7 +52,7 @@ struct LoadRequest
 		{
 			auto ts = core::get_subsystem<runtime::TaskSystem>();
 			ts->wait(load_task);
-			ts->execute_tasks_on_main();
+			ts->execute_tasks_on_main({});
 		}
 	}
 

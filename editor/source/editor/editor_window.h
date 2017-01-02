@@ -35,14 +35,14 @@ public:
 	virtual ~MainEditorWindow();
 
 	//-----------------------------------------------------------------------------
-	//  Name : frame_render (virtual )
+	//  Name : on_gui (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void frame_render();
+	virtual void on_gui(std::chrono::duration<float> dt);
 
 	//-----------------------------------------------------------------------------
 	//  Name : on_menubar (virtual )
@@ -100,12 +100,12 @@ public:
 	//-----------------------------------------------------------------------------
 	virtual ~ProjectManagerWindow() = default;
 	//-----------------------------------------------------------------------------
-	//  Name : frame_render (virtual )
+	//  Name : on_gui (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void frame_render();
+	virtual void on_gui(std::chrono::duration<float> dt);
 };

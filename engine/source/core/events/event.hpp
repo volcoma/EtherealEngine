@@ -21,7 +21,7 @@ public:
 	/// Connects a slot to the signal
 	/// \param args The arguments you wish to construct the slot with to connect to the signal
 	template <typename... Args>
-	void addListener(Args&&... args)
+	void connect(Args&&... args)
 	{
 		_signal.connect(std::forward<Args>(args)...);
 	}
@@ -29,7 +29,7 @@ public:
 	/// Disconnects a slot from the signal
 	/// \param args The arguments you wish to construct a slot with
 	template <typename... Args>
-	void removeListener(Args&&... args)
+	void disconnect(Args&&... args)
 	{
 		_signal.disconnect(std::forward<Args>(args)...);
 	}
@@ -47,14 +47,14 @@ public:
 	template <typename... Args>
 	event& operator+=(Args&&... args)
 	{
-		addListener(std::forward<Args>(args)...);
+		connect(std::forward<Args>(args)...);
 		return *this;
 	}
 
 	template <typename... Args>
 	event& operator-=(Args&&... args)
 	{
-		removeListener(std::forward<Args>(args)...);
+		disconnect(std::forward<Args>(args)...);
 		return *this;
 	}
 	// comparision operators for sorting and comparing

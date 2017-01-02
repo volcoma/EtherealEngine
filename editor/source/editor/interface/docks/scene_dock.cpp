@@ -308,7 +308,7 @@ namespace Docks
 		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 		auto input = core::get_subsystem<runtime::Input>();
 
-		auto& window = engine->get_window();
+		auto& window = engine->get_focused_window();
 		auto& editor_camera = es->camera;
 		auto& selected = es->selection_data.object;
 		auto& dragged = es->drag_data.object;

@@ -35,28 +35,11 @@ RenderWindow::~RenderWindow()
 	gfx::frame();
 }
 
-bool RenderWindow::filterEvent(const sf::Event& event)
-{
-	return sf::Window::filterEvent(event);;
-}
-
-void RenderWindow::frame_begin()
-{
-}
-
-void RenderWindow::frame_update(float dt)
-{
-}
-
 void RenderWindow::frame_end()
 {
 	RenderPass pass("RenderWindowPass");
 	pass.bind(_surface.get());
 	pass.clear();
-}
-
-void RenderWindow::frame_render()
-{
 }
 
 void RenderWindow::prepare_surface()

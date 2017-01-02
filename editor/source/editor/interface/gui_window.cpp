@@ -57,13 +57,13 @@ void handle_sfml_event(sf::Event event)
 	}
 }
 
-void imgui_frame_update(RenderWindow& window, float dt, const uSize& viewSize)
+void imgui_frame_update(RenderWindow& window, std::chrono::duration<float> dt, const uSize& viewSize)
 {
 	auto& io = gui::GetIO();
 	// Setup display size (every frame to accommodate for window resizing)
 	io.DisplaySize = ImVec2(static_cast<float>(viewSize.width), static_cast<float>(viewSize.height));
 	// Setup time step
-	io.DeltaTime = dt;
+	io.DeltaTime = dt.count();
 
 	if (window.hasFocus())
 	{
@@ -136,10 +136,10 @@ void imgui_destroy_context(ImGuiContext* pContext)
 		gui::DestroyContext(pContext);
 }
 
-void imgui_frame_begin(ImGuiContext* pContext)
+void imgui_set_context(ImGuiContext* pContext)
 {
 	ImGuiContext* prevContext = gui::GetCurrentContext();
-	if (prevContext)
+	if (prevContext != nullptr && prevContext != pContext)
 	{
 		std::memcpy(&pContext->Style, &prevContext->Style, sizeof(ImGuiStyle));
 		std::memcpy(&pContext->IO.KeyMap, &prevContext->IO.KeyMap, sizeof(prevContext->IO.KeyMap));
@@ -181,26 +181,52 @@ void GuiWindow::frame_begin()
 {
 	RenderWindow::frame_begin();
 
-	imgui_frame_begin(_gui_context);
+	imgui_set_context(_gui_context);
 }
 
-void GuiWindow::frame_update(float dt)
+void GuiWindow::frame_update(std::chrono::duration<float> dt)
 {
 	RenderWindow::frame_update(dt);
 
-	const auto size = _surface->get_size();
-	
-	imgui_frame_update(*this, dt, size);
+	imgui_frame_update(*this, dt, _surface->get_size());
 }
 
-void GuiWindow::frame_render()
+void GuiWindow::frame_render(std::chrono::duration<float> dt)
 {
-	RenderWindow::frame_render();
+	RenderWindow::frame_render(dt);
+
+	imgui_set_context(_gui_context);
+
+	on_gui(dt);
+
 	_dockspace.update_and_draw(gui::GetContentRegionAvail());
 }
+
+#include "../edit_state.h"
 
 void GuiWindow::frame_end()
 {
 	RenderWindow::frame_end();
+
+	auto es = core::get_subsystem<editor::EditState>();
+
+	if (gui::IsMouseDragging(gui::drag_button) && es->drag_data.object)
+	{
+		gui::SetTooltip(es->drag_data.description.c_str());
+	}
+	
+	if (!gui::IsAnyItemHovered())
+	{
+		if (gui::IsMouseDoubleClicked(0) && !imguizmo::is_over())
+		{
+			es->unselect();
+			es->drop();
+		}
+	}
+	if (gui::IsMouseReleased(gui::drag_button))
+	{
+		es->drop();
+	}
+
 	imgui_frame_end();
 }

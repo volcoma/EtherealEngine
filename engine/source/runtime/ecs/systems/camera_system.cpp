@@ -5,7 +5,7 @@
 
 namespace runtime
 {
-	void CameraSystem::frame_begin(std::chrono::duration<float> dt)
+	void CameraSystem::frame_update(std::chrono::duration<float> dt)
 	{
 		auto ecs = core::get_subsystem<EntityComponentSystem>();
 
@@ -22,14 +22,14 @@ namespace runtime
 
 	bool CameraSystem::initialize()
 	{
-		on_frame_begin.addListener(this, &CameraSystem::frame_begin);
+		on_frame_update.connect(this, &CameraSystem::frame_update);
 
 		return true;
 	}
 
 	void CameraSystem::dispose()
 	{
-		on_frame_begin.removeListener(this, &CameraSystem::frame_begin);
+		on_frame_update.disconnect(this, &CameraSystem::frame_update);
 	}
 
 }

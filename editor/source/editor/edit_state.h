@@ -27,7 +27,6 @@ namespace editor
 		void unselect();
 		void drag(rttr::variant object, const std::string& description = "");
 		void drop();
-		void frame_end(std::chrono::duration<float> dt);
 
 		runtime::Entity camera;
 		std::string scene;

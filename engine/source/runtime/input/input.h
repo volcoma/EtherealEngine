@@ -53,15 +53,19 @@ namespace runtime
 	{
 	public:
 		Input();
+
+		bool initialize();
+		void dispose();
+
 		//-----------------------------------------------------------------------------
-		//  Name : update ()
+		//  Name : reset_state ()
 		/// <summary>
 		/// 
 		/// 
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void update();
+		void reset_state(std::chrono::duration<float>);
 
 		//-----------------------------------------------------------------------------
 		//  Name : handle_event ()
@@ -265,14 +269,14 @@ namespace runtime
 
 	private:
 		//-----------------------------------------------------------------------------
-		//  Name : key_update ()
+		//  Name : key_reset ()
 		/// <summary>
 		/// 
 		/// 
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void key_update();
+		void key_reset();
 
 		//-----------------------------------------------------------------------------
 		//  Name : key_event ()
@@ -285,17 +289,17 @@ namespace runtime
 		bool key_event(const sf::Event& event);
 
 		//-----------------------------------------------------------------------------
-		//  Name : mouseUpdate ()
+		//  Name : mouse_reset ()
 		/// <summary>
 		/// 
 		/// 
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void mouse_update();
+		void mouse_reset();
 
 		//-----------------------------------------------------------------------------
-		//  Name : mouseEvent ()
+		//  Name : mouse_event ()
 		/// <summary>
 		/// 
 		/// 
@@ -305,17 +309,17 @@ namespace runtime
 		bool mouse_event(const sf::Event& event);
 
 		//-----------------------------------------------------------------------------
-		//  Name : joystickUpdate ()
+		//  Name : joystick_reset ()
 		/// <summary>
 		/// 
 		/// 
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void joystick_update();
+		void joystick_reset();
 
 		//-----------------------------------------------------------------------------
-		//  Name : joystickEvent ()
+		//  Name : joystick_event ()
 		/// <summary>
 		/// 
 		/// 

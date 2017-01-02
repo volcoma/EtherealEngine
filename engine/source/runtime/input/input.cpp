@@ -1,4 +1,6 @@
 #include "input.h"
+#include "../system/engine.h"
+
 namespace runtime
 {
 	Input::Input()
@@ -9,13 +11,13 @@ namespace runtime
 		_last_cursor_position = _current_cursor_position;
 	}
 
-	void Input::update()
+	void Input::reset_state(std::chrono::duration<float>)
 	{
-		key_update();
+		key_reset();
 
-		mouse_update();
+		mouse_reset();
 
-		joystick_update();
+		joystick_reset();
 	}
 
 	void Input::handle_event(const sf::Event& event)
@@ -95,7 +97,7 @@ namespace runtime
 		return _joystick_axis_positions[std::pair<unsigned int, unsigned int>(joystickId, axis)];
 	}
 
-	void Input::key_update()
+	void Input::key_reset()
 	{
 		for (auto& it : _keys_pressed)
 		{
@@ -131,7 +133,7 @@ namespace runtime
 		return false;
 	}
 
-	void Input::mouse_update()
+	void Input::mouse_reset()
 	{
 		_mouse_move_event = false;
 		_last_cursor_position = _current_cursor_position;
@@ -191,7 +193,7 @@ namespace runtime
 		return false;
 	}
 
-	void Input::joystick_update()
+	void Input::joystick_reset()
 	{
 		for (auto& it : _joystick_buttons_pressed)
 		{
@@ -266,6 +268,18 @@ namespace runtime
 	iPoint Input::get_cursor_delta_move() const
 	{
 		return iPoint{ get_current_cursor_position().x - get_last_cursor_position().x, get_current_cursor_position().y - get_last_cursor_position().y };
+	}
+
+	bool Input::initialize()
+	{
+		on_frame_begin.connect(this, &Input::reset_state);
+
+		return true;
+	}
+
+	void Input::dispose()
+	{
+		on_frame_begin.disconnect(this, &Input::reset_state);
 	}
 
 }

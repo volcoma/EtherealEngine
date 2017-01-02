@@ -174,7 +174,7 @@ MainEditorWindow::~MainEditorWindow()
 {
 }
 
-void MainEditorWindow::frame_render()
+void MainEditorWindow::on_gui(std::chrono::duration<float> dt)
 {
 	if (gui::BeginMainMenuBar())
 	{
@@ -187,7 +187,7 @@ void MainEditorWindow::frame_render()
 
 	
 	on_toolbar();
-	GuiWindow::frame_render();
+	GuiWindow::on_gui(dt);
 }
 
 void MainEditorWindow::on_menubar()
@@ -350,7 +350,7 @@ ProjectManagerWindow::ProjectManagerWindow(sf::VideoMode mode, const std::string
 
 }
 
-void ProjectManagerWindow::frame_render()
+void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 {
 	auto es = core::get_subsystem<editor::EditState>();
 	auto pm = core::get_subsystem<editor::ProjectManager>();
@@ -409,7 +409,6 @@ void ProjectManagerWindow::frame_render()
 		}
 	}
 	gui::EndGroup();
-	
-	//Call grandparent directly to skip dockspace update
-	RenderWindow::frame_render();
+
+	GuiWindow::on_gui(dt);
 }

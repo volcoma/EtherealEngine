@@ -5,7 +5,7 @@
 ////////////////////////////////////////////////////////////
 #include "../system/sfml/Window.hpp"
 #include "core/events/event.hpp"
-
+#include <chrono>
 struct FrameBuffer;
 class RenderWindow : public sf::Window
 {
@@ -76,37 +76,37 @@ public:
 	virtual void prepare_surface();
 
 	//-----------------------------------------------------------------------------
-	//  Name : frameBegin (virtual )
+	//  Name : frame_begin (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void frame_begin();
+	virtual void frame_begin() {}
 
 	//-----------------------------------------------------------------------------
-	//  Name : frameUpdate (virtual )
+	//  Name : frame_update (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void frame_update(float dt);
+	virtual void frame_update(std::chrono::duration<float> dt) {}
 
 	//-----------------------------------------------------------------------------
-	//  Name : frameRender (virtual )
+	//  Name : frame_render (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void frame_render();
+	virtual void frame_render(std::chrono::duration<float> dt) {}
 
 	//-----------------------------------------------------------------------------
-	//  Name : frameEnd (virtual )
+	//  Name : frame_end (virtual )
 	/// <summary>
 	/// 
 	/// 
@@ -116,7 +116,7 @@ public:
 	virtual void frame_end();
 	
 	//-----------------------------------------------------------------------------
-	//  Name : setMain ()
+	//  Name : set_main ()
 	/// <summary>
 	/// 
 	/// 
@@ -126,7 +126,7 @@ public:
 	inline void set_main(bool isMain) { _is_main = isMain; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : isMain ()
+	//  Name : is_main ()
 	/// <summary>
 	/// 
 	/// 
@@ -135,17 +135,6 @@ public:
 	//-----------------------------------------------------------------------------
 	inline bool is_main() const { return _is_main; }
 protected:
-	//-----------------------------------------------------------------------------
-	//  Name : filterEvent (virtual )
-	/// <summary>
-	/// This function is called every time an event is received
-	/// from the internal window (through pollEvent or waitEvent).
-	/// It filters out unwanted events, and performs whatever internal
-	/// stuff the window needs before the event is returned to the
-	/// user.
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	virtual bool filterEvent(const sf::Event& event);
 
 	//-----------------------------------------------------------------------------
 	//  Name : onResize (virtual )

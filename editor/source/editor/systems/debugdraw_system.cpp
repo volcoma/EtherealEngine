@@ -226,7 +226,7 @@ namespace editor
 
 	bool DebugDrawSystem::initialize()
 	{
-		runtime::on_frame_render.addListener(this, &DebugDrawSystem::frame_render);
+		runtime::on_frame_render.connect(this, &DebugDrawSystem::frame_render);
 
 		auto am = core::get_subsystem<runtime::AssetManager>();
 		am->load<Shader>("editor_data://shaders/vs_wf_wireframe", false)
@@ -246,7 +246,7 @@ namespace editor
 	void DebugDrawSystem::dispose()
 	{
 		ddShutdown();
-		runtime::on_frame_render.removeListener(this, &DebugDrawSystem::frame_render);
+		runtime::on_frame_render.disconnect(this, &DebugDrawSystem::frame_render);
 	}
 
 }

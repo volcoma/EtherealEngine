@@ -110,50 +110,55 @@ namespace runtime
 		{
 			_timestep = eplased;
 		}
-		
-		auto ts = core::get_subsystem<TaskSystem>();
-		ts->execute_tasks_on_main();
 
-		auto dt = get_delta_time();
 		auto input = core::get_subsystem<Input>();
-		input->update();
+		auto dt = get_delta_time();
 
 		//get a copy of the windows for safe iterator invalidation
 		auto windows = get_windows();
 		for (auto window : windows)
 		{
-			_window = window;
-			bool focused = window->hasFocus();
+			if (window->hasFocus())
+			{
+				_focused_window = window;
+				break;
+			}
+		}
+
+		on_frame_begin(dt);
+
+		for (auto window : windows)
+		{
 			window->frame_begin();
+
+			bool has_focus = window->hasFocus();
 
 			sf::Event e;
 			while (window->pollEvent(e))
 			{
-				if (focused)
+				if (has_focus)
+				{
 					input->handle_event(e);
+				}
 			}
 
-			if (focused)
-				on_frame_begin(dt);
+			window->frame_update(dt);
+		}
 
-			window->frame_update(dt.count());
-			if (focused)
-				on_frame_update(dt);
+		on_frame_update(dt);
 
-			window->frame_render();
-			if (focused)
-				on_frame_render(dt);
-			
+		on_frame_render(dt);
+
+		for (auto window : windows)
+		{
+			window->frame_render(dt);
 			window->frame_end();
-			if (focused)
-				on_frame_end(dt);
 
 			if (window->is_main())
 				_running = window->isOpen();
 		}
 
-		auto renderer = core::get_subsystem<Renderer>();
-		renderer->frame_end();
+		on_frame_end(dt);
 	}
 	
 	void Engine::set_min_fps(unsigned fps)
@@ -204,7 +209,7 @@ namespace runtime
 			}), std::end(_windows));
 		};
 
-		window->on_closed.addListener(onClosed);
+		window->on_closed.connect(onClosed);
 		window->prepare_surface();
 		_windows.push_back(window);
 	}

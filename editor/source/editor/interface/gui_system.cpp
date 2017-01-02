@@ -12,6 +12,7 @@
 #include "runtime/rendering/uniform.h"
 #include "runtime/rendering/render_window.h"
 #include "runtime/assets/asset_manager.h"
+#include "runtime/system/engine.h"
 #include <unordered_map>
 
 // -------------------------------------------------------------------
@@ -231,11 +232,15 @@ bool GuiSystem::initialize()
 
 	sGUIStyle.load_style();
 
+	runtime::on_frame_begin.connect(this, &GuiSystem::frame_begin);
+
 	return true;
 }
 
 void GuiSystem::dispose()
 {
+	runtime::on_frame_begin.disconnect(this, &GuiSystem::frame_begin);
+
 	sTextures.clear();
 	sContexts.restoreInitialContext();
 	sProgram.reset();
@@ -244,6 +249,11 @@ void GuiSystem::dispose()
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->TexID = nullptr;
 	ImGui::Shutdown();
+}
+
+void GuiSystem::frame_begin(std::chrono::duration<float>)
+{
+	gui::begin();
 }
 
 namespace gui

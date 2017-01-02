@@ -44,7 +44,7 @@ namespace runtime
 
 		inline const std::vector<std::shared_ptr<RenderWindow>>& get_windows() const { return _windows; }
 
-		RenderWindow& get_window() { return *_window; }
+		RenderWindow& get_focused_window() { return *_focused_window; }
 	protected:
 		/// minimum/maximum frames per second
 		unsigned _min_fps, _max_fps, _max_inactive_fps;
@@ -63,7 +63,7 @@ namespace runtime
 		/// engine windows
 		std::vector<std::shared_ptr<RenderWindow>> _windows;
 		/// currently processed window
-		std::shared_ptr<RenderWindow> _window;
+		std::shared_ptr<RenderWindow> _focused_window;
 	};
 
 	extern event<void(std::chrono::duration<float>)> on_frame_begin;

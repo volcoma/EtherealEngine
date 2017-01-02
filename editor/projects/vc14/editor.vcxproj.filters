@@ -88,9 +88,6 @@
     <ClInclude Include="..\..\source\editor\filedialog\nfd\nfd_common.h">
       <Filter>Source Files\filedialog\ndf</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\editor\edit_state.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\editor\editor_window.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -163,6 +160,9 @@
     <ClInclude Include="..\..\source\editor\filedialog\filedialog.h">
       <Filter>Source Files\filedialog</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\editor\edit_state.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\editor\main.cpp">
@@ -185,9 +185,6 @@
     </ClCompile>
     <ClCompile Include="..\..\source\editor\interface\docks\docking.cpp">
       <Filter>Source Files\interface\docks</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\editor\edit_state.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\editor\editor_window.cpp">
       <Filter>Source Files</Filter>
@@ -263,6 +260,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\editor\systems\debugdraw_system.cpp">
       <Filter>Source Files\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\editor\edit_state.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

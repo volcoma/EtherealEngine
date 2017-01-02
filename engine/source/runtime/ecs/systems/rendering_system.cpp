@@ -177,14 +177,14 @@ namespace runtime
 
 	bool RenderingSystem::initialize()
 	{
-		onEntityDestroyed.addListener(this, &RenderingSystem::receive);
-		on_frame_render.addListener(this, &RenderingSystem::frame_render);
+		onEntityDestroyed.connect(this, &RenderingSystem::receive);
+		on_frame_render.connect(this, &RenderingSystem::frame_render);
 		return true;
 	}
 
 	void RenderingSystem::dispose()
 	{
-		onEntityDestroyed.removeListener(this, &RenderingSystem::receive);
-		on_frame_render.removeListener(this, &RenderingSystem::frame_render);
+		onEntityDestroyed.disconnect(this, &RenderingSystem::receive);
+		on_frame_render.disconnect(this, &RenderingSystem::frame_render);
 	}
 }

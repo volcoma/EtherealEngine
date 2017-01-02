@@ -179,7 +179,7 @@ namespace editor
 		desktop.width = 500;
 		desktop.height = 300;;
 		auto projectManagerWnd = std::make_shared<ProjectManagerWindow>(desktop, "Project Manager", sf::Style::Titlebar);
-		projectManagerWnd->on_closed.addListener([&mainWindow](RenderWindow& window)
+		projectManagerWnd->on_closed.connect([&mainWindow](RenderWindow& window)
 		{
 			mainWindow.setVisible(true);
 		});

@@ -54,7 +54,7 @@ namespace runtime
 		// run_task insert a task into a queue instead of executing it immediately
 		void run_on_main(core::Handle);
 
-		void execute_tasks_on_main();
+		void execute_tasks_on_main(std::chrono::duration<float>);
 
 		// wait_task
 		void wait(core::Handle);

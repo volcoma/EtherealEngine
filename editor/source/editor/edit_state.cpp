@@ -5,7 +5,6 @@
 #include "runtime/rendering/material.h"
 #include "runtime/system/sfml/Window.hpp"
 #include "runtime/ecs/prefab.h"
-#include "runtime/system/engine.h"
 
 namespace editor
 {
@@ -103,14 +102,13 @@ namespace editor
 			icons["prefab"] = asset;
 		});
 
-		runtime::on_frame_render.addListener(this, &EditState::frame_end);
 
 		return true;
 	}
 
 	void EditState::dispose()
 	{
-		runtime::on_frame_render.removeListener(this, &EditState::frame_end);
+
 		drag_data = {};
 		selection_data = {};
 		icons.clear();
@@ -124,41 +122,17 @@ namespace editor
 	void EditState::unselect()
 	{
 		selection_data = {};
-		imguizmo::enable(false);
-		imguizmo::enable(true);
 	}
 
 	void EditState::drag(rttr::variant object, const std::string& description)
 	{
 		drag_data.object = object;
 		drag_data.description = description;
-		gui::SetWindowFocus();
 	}
 
 	void EditState::drop()
 	{
 		drag_data = {};
-	}
-
-	void EditState::frame_end(std::chrono::duration<float> dt)
-	{
-		if (gui::IsMouseDragging(gui::drag_button) && drag_data.object)
-		{
-			gui::SetTooltip(drag_data.description.c_str());
-		}
-
-		if (!gui::IsAnyItemHovered())
-		{
-			if (gui::IsMouseDoubleClicked(0) && !imguizmo::is_over())
-			{
-				unselect();
-				drop();
-			}
-		}
-		if (gui::IsMouseReleased(gui::drag_button))
-		{
-			drop();
-		}
 	}
 
 }

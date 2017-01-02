@@ -50,7 +50,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void frame_update(float dt);
+	virtual void frame_update(std::chrono::duration<float> dt);
 	//-----------------------------------------------------------------------------
 	//  Name : frame_render (virtual )
 	/// <summary>
@@ -59,7 +59,18 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void frame_render();
+	virtual void frame_render(std::chrono::duration<float> dt);
+
+	//-----------------------------------------------------------------------------
+	//  Name : on_gui (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	virtual void on_gui(std::chrono::duration<float> dt) {}
+
 	//-----------------------------------------------------------------------------
 	//  Name : frame_end (virtual )
 	/// <summary>

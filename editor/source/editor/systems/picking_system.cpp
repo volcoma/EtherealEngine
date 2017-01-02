@@ -28,7 +28,7 @@ namespace editor
 		auto renderer = core::get_subsystem<runtime::Renderer>();
 		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 
-		auto& window = static_cast<GuiWindow&>(engine->get_window());
+		auto& window = static_cast<GuiWindow&>(engine->get_focused_window());
 		auto& dockspace = window.get_dockspace();
 		if (!dockspace.has_dock("Scene"))
 			return;
@@ -224,7 +224,7 @@ namespace editor
 
 	bool PickingSystem::initialize()
 	{
-		runtime::on_frame_render.addListener(this, &PickingSystem::frame_render);
+		runtime::on_frame_render.connect(this, &PickingSystem::frame_render);
 		// Set up ID buffer, which has a color target and depth buffer
 		auto pickingRT = std::make_shared<Texture>(_id_dimensions, _id_dimensions, false, 1, gfx::TextureFormat::RGBA8, 0
 			| BGFX_TEXTURE_RT
@@ -282,7 +282,7 @@ namespace editor
 
 	void PickingSystem::dispose()
 	{
-		runtime::on_frame_render.removeListener(this, &PickingSystem::frame_render);
+		runtime::on_frame_render.disconnect(this, &PickingSystem::frame_render);
 	}
 
 }

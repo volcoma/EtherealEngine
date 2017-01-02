@@ -13,7 +13,7 @@ namespace runtime
 		void dispose() override;
 
 		bool init_backend(RenderWindow& main_window);
-		void frame_end();
+		void frame_end(std::chrono::duration<float>);
 		inline std::uint32_t get_render_frame() const { return _render_frame; }
 
 	protected:

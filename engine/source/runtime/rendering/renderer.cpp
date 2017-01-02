@@ -4,6 +4,7 @@
 #include "core/common/string.h"
 #include <cstdarg>
 #include "rendering/render_pass.h"
+#include "../system/engine.h"
 
 struct GfxCallback : public gfx::CallbackI
 {
@@ -65,13 +66,17 @@ namespace runtime
 {
 	bool Renderer::initialize()
 	{	
+		on_frame_end.connect(this, &Renderer::frame_end);
+
 		return true;
 	}
 
 	void Renderer::dispose()
 	{
+		on_frame_end.disconnect(this, &Renderer::frame_end);
 		gfx::shutdown();
 	}
+
 	bool Renderer::init_backend(RenderWindow& main_window)
 	{
 		gfx::PlatformData pd
@@ -93,7 +98,7 @@ namespace runtime
 		return true;
 	}
 
-	void Renderer::frame_end()
+	void Renderer::frame_end(std::chrono::duration<float>)
 	{
 		_render_frame = gfx::frame();
 		RenderPass::reset();

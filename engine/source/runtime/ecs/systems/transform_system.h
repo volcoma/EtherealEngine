@@ -14,14 +14,14 @@ namespace runtime
 		bool initialize();
 		void dispose();
 		//-----------------------------------------------------------------------------
-		//  Name : frame_begin (virtual )
+		//  Name : frame_update (virtual )
 		/// <summary>
 		/// 
 		/// 
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void frame_begin(std::chrono::duration<float> dt);
+		void frame_update(std::chrono::duration<float> dt);
 
 		//-----------------------------------------------------------------------------
 		//  Name : getRoots ()
