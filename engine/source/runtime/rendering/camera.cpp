@@ -271,10 +271,10 @@ math::VolumeQuery::E Camera::bounds_in_frustum(const math::bbox &AABB, const mat
 bool Camera::world_to_viewport(const math::vec3 & WorldPos, math::vec3 & point, bool bClipX /* = true */, bool bClipY /* = true */, bool bClipZ /* = true */)
 {
 	// Ensure we have an up-to-date projection and view matrix
-	auto mtxTransform = get_view() * get_projection();
+	auto mtxTransform = get_projection() * get_view();
 
 	// Transform the point into clip space
-	math::vec4 vClip = { math::transform_t::transformCoord(WorldPos, mtxTransform), 0 };
+	math::vec4 vClip = { math::transform_t::transformCoord(WorldPos, mtxTransform), 1.0f };
 
 	// Was this clipped?
 	if (bClipX == true && (vClip.x < -vClip.w || vClip.x > vClip.w)) return false;

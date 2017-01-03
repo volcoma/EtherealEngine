@@ -34,7 +34,7 @@ namespace editor
 		const auto surface = cameraComponent->get_output_buffer();
 		auto& camera = cameraComponent->get_camera();
 		const auto& view = camera.get_view();
-		const auto proj = camera.get_projection();
+		const auto& proj = camera.get_projection();
 		const auto cameraPos = camera.get_position();
 
 		RenderPass pass("DebugDrawPass");
