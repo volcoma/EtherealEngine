@@ -272,3 +272,76 @@ bool Inspector_AssetHandle_Mesh::inspect(rttr::variant& var, bool readOnly, std:
 	}
 	return changed;
 }
+
+bool Inspector_AssetHandle_Prefab::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+{
+	auto data = var.get_value<AssetHandle<Prefab>>();
+
+	auto es = core::get_subsystem<editor::EditState>();
+	auto am = core::get_subsystem<runtime::AssetManager>();
+	auto& selected = es->selection_data.object;
+	if (selected && !selected.is_type<AssetHandle<Prefab>>())
+	{
+		std::string item = data ? data.id() : "none";
+		rttr::variant var_str = item;
+		if (inspect_var(var_str))
+		{
+			item = var_str.to_string();
+			if (item.empty())
+			{
+				data = AssetHandle<Prefab>();
+			}
+			else
+			{
+				am->load<Prefab>(item, false)
+					.then([&data](auto asset) mutable
+				{
+					data = asset;
+				});
+			}
+			var = data;
+			return true;
+		}
+
+		auto& dragged = es->drag_data.object;
+		if (dragged && dragged.is_type<AssetHandle<Prefab>>())
+		{
+			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.9f));
+			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
+			gui::PopStyleColor();
+
+			if (gui::IsItemHoveredRect())
+			{
+				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
+				gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
+				gui::PopStyleColor();
+				if (gui::IsMouseReleased(gui::drag_button))
+				{
+					data = dragged.get_value<AssetHandle<Prefab>>();
+					var = data;
+					return true;
+
+				}
+			}
+		}
+		return false;
+	}
+
+	bool changed = false;
+	{
+		PropertyLayout propName("Name");
+		const auto& item = data.id();
+		auto itemPath = fs::path(item);
+		auto assetName = itemPath.filename().string();
+		rttr::variant vari = assetName;
+		changed |= inspect_var(vari);
+		if (changed)
+		{
+			auto dirName = itemPath.remove_filename();
+			am->rename_asset<Prefab>(item, (dirName / fs::path(vari.get_value<std::string>())).generic_string());
+
+		}
+	}
+
+	return changed;
+}

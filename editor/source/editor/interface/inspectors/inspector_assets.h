@@ -5,6 +5,7 @@
 
 struct Texture;
 struct Mesh;
+struct Prefab;
 class Material;
 
 struct Inspector_AssetHandle_Texture : public Inspector
@@ -32,4 +33,12 @@ struct Inspector_AssetHandle_Mesh : public Inspector
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
 INSPECTOR_REFLECT(Inspector_AssetHandle_Mesh, AssetHandle<Mesh>)
+
+struct Inspector_AssetHandle_Prefab : public Inspector
+{
+	REFLECTABLE(Inspector_AssetHandle_Prefab, Inspector)
+
+	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
+};
+INSPECTOR_REFLECT(Inspector_AssetHandle_Prefab, AssetHandle<Prefab>)
 
