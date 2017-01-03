@@ -122,6 +122,8 @@ namespace editor
 	void EditState::unselect()
 	{
 		selection_data = {};
+		imguizmo::enable(false);
+		imguizmo::enable(true);
 	}
 
 	void EditState::drag(rttr::variant object, const std::string& description)

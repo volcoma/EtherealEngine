@@ -30,7 +30,10 @@ namespace editor
 		const auto render_frame = renderer->get_render_frame();
 
 		auto& editorCamera = es->camera;
-		if (!editorCamera || !editorCamera.has_component<CameraComponent>() || imguizmo::is_using())
+		if (imguizmo::is_over() && es->selection_data.object)
+			return;
+
+		if (!editorCamera || !editorCamera.has_component<CameraComponent>())
 			return;
 
 		auto cameraComponentRef = editorCamera.component<CameraComponent>();
@@ -57,21 +60,10 @@ namespace editor
 		if (!camera.viewport_to_world(cursor_pos, frustum.planes[math::VolumePlane::Side::Far], pickAt, true))
 			return;
 
-		// If the user previously clicked, and we're done reading data from GPU, look at ID buffer on CPU
-		// Whatever mesh has the most pixels in the ID buffer is the one the user clicked on.
-		if (!_reading && _start_readback)
-		{
-			RenderPass pass("PickingBufferBlit");
-			// Blit and read
-			gfx::blit(pass.id, _blit_tex->handle, 0, 0, gfx::getTexture(_surface->handle));
-			_reading = gfx::readTexture(_blit_tex->handle, _blit_data);
-			_start_readback = false;
-		}
-
 		if (input->is_mouse_button_pressed(sf::Mouse::Left))
 		{
+			_reading = 0;
 			_start_readback = true;
-		
 			auto pickView = math::lookAt(pickEye, pickAt, pickUp);
 			auto pickProj = math::perspective(math::radians(1.0f), 1.0f, nearClip, farClip);
 
@@ -133,6 +125,17 @@ namespace editor
 
 				hMesh->submit(pass.id, _program->handle, worldTransform, states);
 			});
+		}
+
+		// If the user previously clicked, and we're done reading data from GPU, look at ID buffer on CPU
+		// Whatever mesh has the most pixels in the ID buffer is the one the user clicked on.
+		if (!_reading && _start_readback)
+		{
+			RenderPass pass("PickingBufferBlit");
+			// Blit and read
+			gfx::blit(pass.id, _blit_tex->handle, 0, 0, gfx::getTexture(_surface->handle));
+			_reading = gfx::readTexture(_blit_tex->handle, _blit_data);
+			_start_readback = false;
 		}
 
 		if (_reading && _reading <= render_frame)
