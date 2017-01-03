@@ -93,17 +93,28 @@ void default_scene()
 	}
 }
 
+void save_editor_camera()
+{
+	auto es = core::get_subsystem<editor::EditState>();
+	if (es->camera)
+		ecs::utils::save_data(fs::resolve_protocol("app://settings/editor_camera.asset"), { es->camera });
+}
+
 void load_editor_camera()
 {
 	auto es = core::get_subsystem<editor::EditState>();
-	auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
-	runtime::Entity outData = ecs->create();
-	outData.set_name("EDITOR_CAMERA");
-	outData.assign<TransformComponent>().lock()
-		->set_local_position({ 0.0f, 2.0f, -5.0f });
-	outData.assign<CameraComponent>();
+	runtime::Entity object;
+	if (!ecs::utils::try_load_entity(fs::resolve_protocol("app://settings/editor_camera.asset"), object))
+	{
+		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
+		object = ecs->create();
+		object.set_name("EDITOR CAMERA");
+		object.assign<TransformComponent>().lock()
+			->set_local_position({ 0.0f, 2.0f, -5.0f });
+		object.assign<CameraComponent>();
+	}
 	
-	es->camera = outData;
+	es->camera = object;
 }
 
 
@@ -111,6 +122,7 @@ auto create_new_scene()
 {
 	auto es = core::get_subsystem<editor::EditState>();
 	auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
+	save_editor_camera();
 	ecs->dispose();
 	load_editor_camera();
 	default_scene();
@@ -124,6 +136,7 @@ auto open_scene()
 	std::string path;
 	if (open_file_dialog("scene", fs::resolve_protocol("data://scenes").string(), path))
 	{
+		save_editor_camera();
 		ecs->dispose();
 		load_editor_camera();
 
@@ -144,6 +157,8 @@ auto save_scene()
 		std::vector<runtime::Entity> entities = gather_scene_data();
 		ecs::utils::save_data(path, entities);
 	}
+
+	save_editor_camera();
 }
 
 void save_scene_as()
@@ -156,6 +171,8 @@ void save_scene_as()
 		es->scene = path;		
 		save_scene();	
 	}
+
+	save_editor_camera();
 }
 
 
@@ -172,6 +189,7 @@ MainEditorWindow::MainEditorWindow(sf::VideoMode mode, const std::string& title,
 
 MainEditorWindow::~MainEditorWindow()
 {
+	save_editor_camera();
 }
 
 void MainEditorWindow::on_gui(std::chrono::duration<float> dt)
@@ -373,6 +391,7 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 				if (gui::Selectable(path.c_str()))
 				{
 					pm->open_project(path);
+					load_editor_camera();
 					set_main(false);
 					close();
 				}
@@ -392,6 +411,7 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 			if (open_folder_dialog("", fs::resolve_protocol("engine://").string(), path))
 			{
 				pm->create_project(path);
+				load_editor_camera();
 				set_main(false);
 				close();
 			}
@@ -403,6 +423,7 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 			if (open_folder_dialog("", fs::resolve_protocol("engine://").string(), path))
 			{
 				pm->open_project(path);
+				load_editor_camera();
 				set_main(false);
 				close();
 			}

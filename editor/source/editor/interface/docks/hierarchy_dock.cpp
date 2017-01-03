@@ -271,7 +271,14 @@ namespace Docks
 		for (auto& root : roots)
 		{
 			if (!root.expired())
-				draw_entity(root.lock()->get_entity());
+			{
+				auto entity = root.lock()->get_entity();
+				draw_entity(entity);
+				if (entity == editor_camera)
+					gui::Separator();
+			}
+
+			
 		}	
 
 		if (gui::IsWindowHovered() && !gui::IsAnyItemHovered())
