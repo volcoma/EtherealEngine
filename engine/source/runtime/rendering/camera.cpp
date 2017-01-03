@@ -328,18 +328,19 @@ bool Camera::viewport_to_ray(const math::vec2 & point, math::vec3 & vecRayStart,
 		vecRayDir.z = vCursor.x * mtxInvView[0][2] + vCursor.y * mtxInvView[1][2] + vCursor.z * mtxInvView[2][2];
 
 	} // End If !IsOrthohraphic
-
-	  // Normalize the ray direction
-	vecRayDir = math::normalize(vecRayDir);
-
 	// Success!
 	return true;
 }
 
-bool Camera::viewport_to_world(const math::vec2 & point, const math::plane & Plane, math::vec3 & WorldPos)
+bool Camera::viewport_to_world(const math::vec2 & point, const math::plane & Plane, math::vec3 & WorldPos, bool clip)
 {
 	math::vec3 vPickRayDir, vPickRayOrig;
 	float   fProjRayLength, fDistance;
+
+	if (clip &&
+		((point.x < _viewport_pos.x) || (point.x > (_viewport_pos.x + _viewport_size.width)) ||
+		(point.y < _viewport_pos.y) || (point.y > (_viewport_pos.y + _viewport_size.height))))
+		return false;
 
 	// Convert the screen coordinates to a ray.
 	if (viewport_to_ray(point, vPickRayOrig, vPickRayDir) == false)
@@ -408,7 +409,7 @@ bool Camera::viewport_to_major_axis(const math::vec2 & point, const math::vec3 &
 	  // Generate the intersection plane based on this information
 	  // and pass through to the standard viewportToWorld method
 	math::plane p = math::plane::fromPointNormal(Origin, MajorAxis);
-	return viewport_to_world(point, p, WorldPos);
+	return viewport_to_world(point, p, WorldPos, false);
 }
 
 bool Camera::viewport_to_camera(const math::vec3 & point, math::vec3 & CameraPos)
@@ -435,7 +436,7 @@ float Camera::estimate_zoom_factor(const math::plane & Plane)
 		return get_zoom_factor();
 
 	// Otherwise, estimate is based on the distance from the grid plane.
-	viewport_to_world(math::vec2((float)_viewport_size.width / 2, (float)_viewport_size.height / 2), Plane, vWorld);
+	viewport_to_world(math::vec2((float)_viewport_size.width / 2, (float)_viewport_size.height / 2), Plane, vWorld, false);
 
 	// Perform full position based estimation
 	return estimate_zoom_factor(vWorld);
@@ -465,7 +466,7 @@ float Camera::estimate_zoom_factor(const math::plane & Plane, float fMax)
 	} // End if Orthographic
 	// Otherwise, estimate is based on the distance from the grid plane.
 	math::vec3 vWorld;
-	viewport_to_world(math::vec2((float)_viewport_size.width / 2, (float)_viewport_size.height / 2), Plane, vWorld);
+	viewport_to_world(math::vec2((float)_viewport_size.width / 2, (float)_viewport_size.height / 2), Plane, vWorld, false);
 
 	// Perform full position based estimation
 	return estimate_zoom_factor(vWorld, fMax);

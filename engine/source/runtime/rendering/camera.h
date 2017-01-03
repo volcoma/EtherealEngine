@@ -327,7 +327,7 @@ public:
 	/// is returned via the world parameter passed.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool viewport_to_world(const math::vec2 & point, const math::plane & plane, math::vec3 & positionOut);
+	bool viewport_to_world(const math::vec2 & point, const math::plane & plane, math::vec3 & positionOut, bool clip);
 
 	//-----------------------------------------------------------------------------
 	//  Name : viewport_to_major_axis ()

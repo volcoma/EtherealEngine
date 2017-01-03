@@ -44,22 +44,19 @@ namespace editor
 		auto farClip = camera.get_far_clip();
 		auto viewProj = proj * view;
 		auto invViewProj = math::inverse(viewProj);
-		const auto& size = camera.get_viewport_size();
-		const auto& pos = camera.get_viewport_pos();
-		const auto& mousePos = input->get_current_cursor_position();
+		const auto& mouse_pos = input->get_current_cursor_position();
+		const auto& frustum = camera.get_frustum();
+		math::vec2 cursor_pos = math::vec2{ mouse_pos.x, mouse_pos.y };
+		math::vec3 pickEye;
+		math::vec3 pickAt;
+		math::vec3 pickUp = { 0.0f, 1.0f, 0.0f };
 
-		float mouseXNDC = ((float(mousePos.x) - float(pos.x)) / (float(size.width))) * 2.0f - 1.0f;
-		float mouseYNDC = ((float(size.height) - (float(mousePos.y) - float(pos.y))) / float(size.height)) * 2.0f - 1.0f;
-
-		// Check if we are testing outside our view
-		if (mouseXNDC < -1.0f ||
-			mouseXNDC > 1.0f ||
-			mouseYNDC < -1.0f ||
-			mouseYNDC > 1.0f)
+		if (!camera.viewport_to_world(cursor_pos, frustum.planes[math::VolumePlane::Side::Near], pickEye, true))
 			return;
 
+		if (!camera.viewport_to_world(cursor_pos, frustum.planes[math::VolumePlane::Side::Far], pickAt, true))
+			return;
 
-		
 		// If the user previously clicked, and we're done reading data from GPU, look at ID buffer on CPU
 		// Whatever mesh has the most pixels in the ID buffer is the one the user clicked on.
 		if (!_reading && _start_readback)
@@ -74,19 +71,7 @@ namespace editor
 		if (input->is_mouse_button_pressed(sf::Mouse::Left))
 		{
 			_start_readback = true;
-			math::vec4 mousePosNDC = { mouseXNDC, mouseYNDC, 0.0f, 1.0f };
-			math::vec4 mousePosNDCEnd = { mouseXNDC, mouseYNDC, 1.0f, 1.0f };
-
-			// Un-project and perspective divide
-			math::vec4 rayBegin = invViewProj.matrix() * mousePosNDC;
-			rayBegin *= 1.0f / rayBegin.w;
-			math::vec4 rayEnd = invViewProj.matrix() * mousePosNDCEnd;
-			rayEnd *= 1.0f / rayEnd.w;
-
-			math::vec3 pickEye = rayBegin;
-			math::vec3 pickAt = rayEnd;
-			math::vec3 pickUp = { 0.0f, 1.0f, 0.0f };
-
+		
 			auto pickView = math::lookAt(pickEye, pickAt, pickUp);
 			auto pickProj = math::perspective(math::radians(1.0f), 1.0f, nearClip, farClip);
 
