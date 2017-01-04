@@ -3,6 +3,7 @@
 #include "core/reflection/reflection.h"
 #include "core/serialization/serialization.h"
 #include "core/serialization/cereal/types/vector.hpp"
+#include "core/logging/logging.h"
 
 REFLECT(TransformComponent)
 {
@@ -44,26 +45,21 @@ REFLECT(TransformComponent)
 
 SAVE(TransformComponent)
 {
-	ar(
-		cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)),
-		cereal::make_nvp("local_transform", obj._local_transform),
-		cereal::make_nvp("children", obj._children),
-		cereal::make_nvp("slow_parenting", obj._slow_parenting),
-		cereal::make_nvp("slow_parenting_speed", obj._slow_parenting_speed)
-		);
-
+	try_save(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)));
+	try_save(ar, cereal::make_nvp("local_transform", obj._local_transform));
+	try_save(ar, cereal::make_nvp("children", obj._children));
+	try_save(ar, cereal::make_nvp("slow_parenting", obj._slow_parenting));
+	try_save(ar, cereal::make_nvp("slow_parenting_speed", obj._slow_parenting_speed));
 }
 
 LOAD(TransformComponent)
-{
-	ar(
-		cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)),
-		cereal::make_nvp("local_transform", obj._local_transform),
-		cereal::make_nvp("children", obj._children),
-		cereal::make_nvp("slow_parenting", obj._slow_parenting),
-		cereal::make_nvp("slow_parenting_speed", obj._slow_parenting_speed)
-		);
-
+{	
+	try_load(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)));
+	try_load(ar, cereal::make_nvp("local_transform", obj._local_transform));
+	try_load(ar, cereal::make_nvp("children", obj._children));
+	try_load(ar, cereal::make_nvp("slow_parenting", obj._slow_parenting));
+	try_load(ar, cereal::make_nvp("slow_parenting_speed", obj._slow_parenting_speed));
+		
 	auto thisHandle = obj.handle();
 	for (auto child : obj._children)
 	{

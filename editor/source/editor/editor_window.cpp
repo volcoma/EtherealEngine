@@ -189,7 +189,6 @@ MainEditorWindow::MainEditorWindow(sf::VideoMode mode, const std::string& title,
 
 MainEditorWindow::~MainEditorWindow()
 {
-	save_editor_camera();
 }
 
 void MainEditorWindow::on_gui(std::chrono::duration<float> dt)

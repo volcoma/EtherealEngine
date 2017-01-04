@@ -32,3 +32,49 @@ void SAVE_FUNCTION_NAME(Archive & ar, cls const & obj)
 template<typename Archive> inline \
 void LOAD_FUNCTION_NAME(Archive & ar, cls & obj)
 
+#include "../logging/logging.h"
+template<typename Archive, typename T>
+bool try_save(Archive& ar, T const& t)
+{
+	try
+	{
+		ar(t);
+	}
+	catch (cereal::Exception e)
+	{
+		logging::get("Log")->warn() << e.what();
+		return false;
+	}
+	return true;
+}
+
+template<typename Archive, typename T>
+bool try_load(Archive& ar, T& t)
+{
+	try
+	{
+		ar(t);
+	}
+	catch (cereal::Exception e)
+	{
+		logging::get("Log")->warn() << e.what();
+		return false;
+	}
+	return true;
+}
+
+
+template<typename Archive, typename T>
+bool try_serialize(Archive& ar, T& t)
+{
+	try
+	{
+		ar(t);
+	}
+	catch (cereal::Exception e)
+	{
+		logging::get("Log")->warn() << e.what();
+		return false;
+	}
+	return true;
+}

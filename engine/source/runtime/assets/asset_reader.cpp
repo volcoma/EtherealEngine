@@ -411,11 +411,9 @@ void AssetReader::load_material_from_file(const std::string& key, const fs::path
 	auto deserialize = [matWrapper, absoluteKey, request]() mutable
 	{
 		std::ifstream stream{ absoluteKey, std::ios::in | std::ios::binary };
-		cereal::IArchive_JSON ar(stream);
+		cereal::iarchive_json_t ar(stream);
 
-		ar(
-			cereal::make_nvp("material", matWrapper->hMaterial)
-		);
+		try_load(ar, cereal::make_nvp("material", matWrapper->hMaterial));
 	};
 
 	auto createResource = [matWrapper, key, request]() mutable

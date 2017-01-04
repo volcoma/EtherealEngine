@@ -3,11 +3,13 @@
 #include "core/serialization/serialization.h"
 #include "core/serialization/cereal/types/string.hpp"
 #include "core/common/string.h"
+#include "core/logging/logging.h"
 #include "../../assets/asset_handle.h"
 #include "../../assets/asset_manager.h"
 #include "../../rendering/mesh.h"
 #include "../../rendering/texture.h"
 #include "../../rendering/material.h"
+#include "../../ecs/prefab.h"
 
 template<typename T>
 inline void load_asset(AssetHandle<T>& obj, const std::string& id, bool async)
@@ -33,44 +35,32 @@ namespace cereal
 	template<typename Archive, typename T>
 	inline void SAVE_FUNCTION_NAME(Archive & ar, AssetLink<T> const& obj)
 	{
-		ar(
-			cereal::make_nvp("id", obj.id)
-		);
+		try_save(ar, cereal::make_nvp("id", obj.id));
 	}
 
 
 	template<typename Archive, typename T>
 	inline void LOAD_FUNCTION_NAME(Archive & ar, AssetLink<T>& obj)
 	{
-		ar(
-			cereal::make_nvp("id", obj.id)
-		);
+		try_load(ar, cereal::make_nvp("id", obj.id));
 	}
 
 
 	template<typename Archive, typename T>
 	inline void SAVE_FUNCTION_NAME(Archive & ar, AssetHandle<T> const& obj)
 	{
-		ar(
-			cereal::make_nvp("link", obj.link)
-		);
+		try_save(ar, cereal::make_nvp("link", obj.link));
 	}
-
 
 	template<typename Archive, typename T>
 	inline void LOAD_FUNCTION_NAME(Archive & ar, AssetHandle<T>& obj)
 	{
-		ar(
-			cereal::make_nvp("link", obj.link)
-		);
-
+		try_load(ar, cereal::make_nvp("link", obj.link));
 	}
 	template<typename Archive>
 	inline void LOAD_FUNCTION_NAME(Archive & ar, AssetHandle<Texture>& obj)
 	{
-		ar(
-			cereal::make_nvp("link", obj.link)
-		);
+		LOAD_FUNCTION_NAME<Archive, Texture>(ar, obj);
 
 		load_asset(obj, obj.link->id, true);
 	}
@@ -78,9 +68,7 @@ namespace cereal
 	template<typename Archive>
 	inline void LOAD_FUNCTION_NAME(Archive & ar, AssetHandle<Mesh>& obj)
 	{
-		ar(
-			cereal::make_nvp("link", obj.link)
-		);
+		LOAD_FUNCTION_NAME<Archive, Mesh>(ar, obj);
 
 		load_asset(obj, obj.link->id, true);
 	}
@@ -88,9 +76,15 @@ namespace cereal
 	template<typename Archive>
 	inline void LOAD_FUNCTION_NAME(Archive & ar, AssetHandle<Material>& obj)
 	{
-		ar(
-			cereal::make_nvp("link", obj.link)
-		);
+		LOAD_FUNCTION_NAME<Archive, Material>(ar, obj);
+
+		load_asset(obj, obj.link->id, false);
+	}
+
+	template<typename Archive>
+	inline void LOAD_FUNCTION_NAME(Archive & ar, AssetHandle<Prefab>& obj)
+	{
+		LOAD_FUNCTION_NAME<Archive, Prefab>(ar, obj);
 
 		load_asset(obj, obj.link->id, false);
 	}

@@ -7,6 +7,7 @@
 void AssetWriter::write_material_to_file(const fs::path& absoluteKey, const AssetHandle<Material>& asset)
 {
 	std::ofstream output(absoluteKey);
-	cereal::OArchive_JSON ar(output);
-	ar(cereal::make_nvp("material", asset.link->asset));
+	cereal::oarchive_json_t ar(output);
+
+	try_save(ar, cereal::make_nvp("material", asset.link->asset));
 }

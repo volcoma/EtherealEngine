@@ -3,6 +3,7 @@
 #include "core/reflection/reflection.h"
 #include "core/serialization/serialization.h"
 #include "core/serialization/cereal/types/vector.hpp"
+#include "core/logging/logging.h"
 
 REFLECT(ModelComponent)
 {
@@ -30,25 +31,21 @@ REFLECT(ModelComponent)
 
 SAVE(ModelComponent)
 {
-	ar(
-		cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)),
-		cereal::make_nvp("static", obj._static),
-		cereal::make_nvp("casts_shadow", obj._casts_shadow),
-		cereal::make_nvp("casts_reflection", obj._casts_reflection),
-		cereal::make_nvp("model", obj._model)
-	);
+	try_save(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)));
+	try_save(ar, cereal::make_nvp("static", obj._static));
+	try_save(ar, cereal::make_nvp("casts_shadow", obj._casts_shadow));
+	try_save(ar, cereal::make_nvp("casts_reflection", obj._casts_reflection));
+	try_save(ar, cereal::make_nvp("model", obj._model));
 }
 
 
 LOAD(ModelComponent)
 {
-	ar(
-		cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)),
-		cereal::make_nvp("static", obj._static),
-		cereal::make_nvp("casts_shadow", obj._casts_shadow),
-		cereal::make_nvp("casts_reflection", obj._casts_reflection),
-		cereal::make_nvp("model", obj._model)
-	);
+	try_load(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)));
+	try_load(ar, cereal::make_nvp("static", obj._static));
+	try_load(ar, cereal::make_nvp("casts_shadow", obj._casts_shadow));
+	try_load(ar, cereal::make_nvp("casts_reflection", obj._casts_reflection));
+	try_load(ar, cereal::make_nvp("model", obj._model));
 }
 
 

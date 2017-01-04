@@ -1,6 +1,7 @@
 #pragma once
 #include "../../../ecs/components/camera_component.h"
 #include "core/reflection/reflection.h"
+#include "core/logging/logging.h"
 #include "../../../meta/rendering/camera.hpp"
 
 
@@ -50,26 +51,18 @@ REFLECT(CameraComponent)
 
 }
 
-
-
 SAVE(CameraComponent)
 {
-	ar(
-		cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)),
-		cereal::make_nvp("camera", obj._camera),
-		cereal::make_nvp("hdr", obj._hdr)
-	);
+	try_save(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)));
+	try_save(ar, cereal::make_nvp("camera", obj._camera));
+	try_save(ar, cereal::make_nvp("hdr", obj._hdr));
 }
 
 LOAD(CameraComponent)
 {
-	ar(
-		cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)),
-		cereal::make_nvp("camera", obj._camera),
-		cereal::make_nvp("hdr", obj._hdr)
-	);
-
-	obj.set_hdr(obj._hdr);
+	try_load(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)));
+	try_load(ar, cereal::make_nvp("camera", obj._camera));
+	try_load(ar, cereal::make_nvp("hdr", obj._hdr));
 }
 
 

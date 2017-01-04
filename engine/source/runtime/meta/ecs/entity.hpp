@@ -3,6 +3,7 @@
 #include "core/reflection/reflection.h"
 #include "core/serialization/serialization.h"
 #include "core/serialization/cereal/types/vector.hpp"
+#include "core/logging/logging.h"
 
 inline std::map<uint32_t, runtime::Entity>& getSerializationMap()
 {
@@ -17,21 +18,19 @@ namespace runtime
 
 SAVE(Entity)
 {
+
 	auto id = obj.id().index();
-	ar(
-		cereal::make_nvp("entity_id", id)
-	);
+	try_save(ar, cereal::make_nvp("entity_id", id));
+	
 	auto& serializationMap = getSerializationMap();
 	auto it = serializationMap.find(id);
 	if (it == serializationMap.end())
 	{
 		serializationMap[id] = obj;
-		ar(
-			cereal::make_nvp("name", obj.get_name()),
-			cereal::make_nvp("components", obj.all_components())
-		);
+		
+		try_save(ar, cereal::make_nvp("name", obj.get_name()));
+		try_save(ar, cereal::make_nvp("components", obj.all_components()));
 	}
-
 }
 
 LOAD(Entity)
@@ -40,9 +39,9 @@ LOAD(Entity)
 	std::string name;
 	std::vector<CHandle<Component>> components;
 
-	ar(
-		cereal::make_nvp("entity_id", id)
-	);
+	
+	try_load(ar, cereal::make_nvp("entity_id", id));
+	
 
 	auto& serializationMap = getSerializationMap();
 	auto it = serializationMap.find(id);
@@ -56,10 +55,9 @@ LOAD(Entity)
 		obj = ecs->create();
 		serializationMap[id] = obj;
 
-		ar(
-			cereal::make_nvp("name", name),
-			cereal::make_nvp("components", components)
-		);
+		try_load(ar, cereal::make_nvp("name", name));
+		try_load(ar, cereal::make_nvp("components", components));
+		
 		obj.set_name(name);
 		for (auto component : components)
 		{

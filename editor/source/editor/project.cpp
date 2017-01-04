@@ -197,11 +197,9 @@ namespace editor
 		else
 		{
 			std::ifstream output(absoluteKey);
-			cereal::IArchive_JSON ar(output);
+			cereal::iarchive_json_t ar(output);
 
-			ar(
-				cereal::make_nvp("options", _options)
-			);
+			try_load(ar, cereal::make_nvp("options", _options));
 
 			auto& items = _options.recent_project_paths;
 			auto iter = std::begin(items);
@@ -226,11 +224,9 @@ namespace editor
 		fs::create_directory(fs::resolve_protocol("editor_data://config"), std::error_code{});
 		const std::string absoluteKey = fs::resolve_protocol("editor_data://config/project.cfg").string();
 		std::ofstream output(absoluteKey);
-		cereal::OArchive_JSON ar(output);
+		cereal::oarchive_json_t ar(output);
 
-		ar(
-			cereal::make_nvp("options", _options)
-		);
+		try_save(ar, cereal::make_nvp("options", _options));
 	}
 
 	bool ProjectManager::initialize()

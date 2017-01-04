@@ -393,11 +393,9 @@ void GUIStyle::load_style()
 	else
 	{
 		std::ifstream output(absoluteKey);
-		cereal::IArchive_JSON ar(output);
+		cereal::iarchive_json_t ar(output);
 
-		ar(
-			cereal::make_nvp("style", setup)
-		);
+		try_load(ar, cereal::make_nvp("style", setup));
 	}
 }
 
@@ -405,9 +403,7 @@ void GUIStyle::save_style()
 {
 	const fs::path absoluteKey = fs::resolve_protocol("editor_data://config/style.cfg");
 	std::ofstream output(absoluteKey);
-	cereal::OArchive_JSON ar(output);
+	cereal::oarchive_json_t ar(output);
 
-	ar(
-		cereal::make_nvp("style", setup)
-	);
+	try_save(ar, cereal::make_nvp("style", setup));
 }

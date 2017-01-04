@@ -40,11 +40,10 @@ namespace ecs
 
 		void serialize_data(std::ostream& stream, const std::vector<runtime::Entity>& data)
 		{
-			cereal::OArchive_Binary ar(stream);
+			cereal::oarchive_json_t ar(stream);
 
-			ar(
-				cereal::make_nvp("data", data)
-			);
+			try_save(ar, cereal::make_nvp("data", data));
+
 			getSerializationMap().clear();
 		}
 
@@ -57,11 +56,9 @@ namespace ecs
 			stream.seekg(0, stream.beg);
 			if (length > 0)
 			{
-				cereal::IArchive_Binary ar(stream);
+				cereal::iarchive_json_t ar(stream);
 
-				ar(
-					cereal::make_nvp("data", outData)
-				);
+				try_load(ar, cereal::make_nvp("data", outData));
 
 				stream.clear();
 				stream.seekg(0);

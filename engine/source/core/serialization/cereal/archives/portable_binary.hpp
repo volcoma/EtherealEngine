@@ -143,8 +143,12 @@ namespace cereal
           writtenSize = static_cast<std::size_t>( itsStream.rdbuf()->sputn( reinterpret_cast<const char*>( data ), size ) );
 
         if(writtenSize != size)
-          throw Exception("Failed to write " + std::to_string(size) + " bytes to output stream! Wrote " + std::to_string(writtenSize));
-      }
+		{
+			static std::string ex_what;
+			ex_what = "Failed to write " + std::to_string(size) + " bytes to output stream! Wrote " + std::to_string(writtenSize);
+			throw Exception(ex_what);
+		}
+	  }
 
     private:
       std::ostream & itsStream;
@@ -242,8 +246,11 @@ namespace cereal
         auto const readSize = static_cast<std::size_t>( itsStream.rdbuf()->sgetn( reinterpret_cast<char*>( data ), size ) );
 
         if(readSize != size)
-          throw Exception("Failed to read " + std::to_string(size) + " bytes from input stream! Read " + std::to_string(readSize));
-
+		{
+			static std::string ex_what;
+			ex_what = "Failed to read " + std::to_string(size) + " bytes from input stream! Read " + std::to_string(readSize);
+			throw Exception(ex_what);
+		}
         // flip bits if needed
         if( itsConvertEndianness )
         {

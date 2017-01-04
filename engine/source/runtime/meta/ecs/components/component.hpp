@@ -1,7 +1,7 @@
 #pragma once
 #include "../../../ecs/ecs.h"
 #include "core/reflection/reflection.h"
-
+#include "core/logging/logging.h"
 
 
 REFLECT(runtime::Component)
@@ -14,15 +14,11 @@ namespace runtime
 {
 	SAVE(Component)
 	{
-		ar(
-			cereal::make_nvp("owner", obj._entity)
-		);
+		try_save(ar, cereal::make_nvp("owner", obj._entity));
 	}
 
 	LOAD(Component)
 	{
-		ar(
-			cereal::make_nvp("owner", obj._entity)
-		);
+		try_load(ar, cereal::make_nvp("owner", obj._entity));
 	}
 }

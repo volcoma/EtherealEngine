@@ -466,8 +466,12 @@ namespace cereal
         {
           next = itsNodes.top().search( expectedName );
 
-          if( next == nullptr )
-            throw Exception("XML Parsing failed - provided NVP (" + std::string(expectedName) + ") not found");
+		  if (next == nullptr)
+		  {
+		    static std::string ex_what;
+		    ex_what = "XML Parsing failed - provided NVP (" + std::string(expectedName) + ") not found";
+            throw Exception(ex_what);
+		  }
         }
 
         itsNodes.emplace( next );

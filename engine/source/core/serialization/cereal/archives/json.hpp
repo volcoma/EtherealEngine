@@ -526,8 +526,10 @@ namespace cereal
                 return;
               }
             }
+			static std::string ex_what;
+			ex_what = "JSON Parsing failed - provided NVP (" + std::string(searchName) + ") not found";
 
-            throw Exception("JSON Parsing failed - provided NVP (" + std::string(searchName) + ") not found");
+            throw Exception(ex_what);
           }
 
         private:
