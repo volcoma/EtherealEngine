@@ -15,22 +15,6 @@ bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, s
 	auto& selected = es->selection_data.object;
 
 	bool changed = false;
-	if (selected && selected.is_type<AssetHandle<Texture>>())
-	{
-		PropertyLayout propName("Name");
-		const auto& item = data.id();
-		auto itemPath = fs::path(item);
-		auto assetName = itemPath.filename().string();
-		rttr::variant vari = assetName;
-		changed |= inspect_var(vari);
-		if (changed)
-		{
-			auto dirName = itemPath.remove_filename();
-			am->rename_asset<Texture>(item, (dirName / fs::path(vari.get_value<std::string>())).generic_string());
-		}
-	}
-
-
 	float available = math::min(64.0f, gui::GetContentRegionAvailWidth() / 1.5f);
 	ImVec2 size = { available, available };
 	if (data)
@@ -171,20 +155,6 @@ bool Inspector_AssetHandle_Material::inspect(rttr::variant& var, bool readOnly, 
 	
 	bool changed = false;
 	{
-		PropertyLayout propName("Name");
-		const auto& item = data.id();
-		auto itemPath = fs::path(item);
-		auto assetName = itemPath.filename().string();
-		rttr::variant vari = assetName;
-		changed |= inspect_var(vari);
-		if (changed)
-		{
-			auto dirName = itemPath.remove_filename();
-			am->rename_asset<Material>(item, (dirName / fs::path(vari.get_value<std::string>())).generic_string());
-		}
-	}
-
-	{
 		rttr::variant vari = data.get();
 		changed |= inspect_var(vari);
 	}
@@ -251,20 +221,6 @@ bool Inspector_AssetHandle_Mesh::inspect(rttr::variant& var, bool readOnly, std:
 	}
 
 	bool changed = false;
-	{
-		PropertyLayout propName("Name");
-		const auto& item = data.id();
-		auto itemPath = fs::path(item);
-		auto assetName = itemPath.filename().string();
-		rttr::variant vari = assetName;
-		changed |= inspect_var(vari);
-		if (changed)
-		{
-			auto dirName = itemPath.remove_filename();
-			am->rename_asset<Mesh>(item, (dirName / fs::path(vari.get_value<std::string>())).generic_string());
-
-		}
-	}
 
 	{
 		rttr::variant vari = data.get()->info;
@@ -327,21 +283,5 @@ bool Inspector_AssetHandle_Prefab::inspect(rttr::variant& var, bool readOnly, st
 		return false;
 	}
 
-	bool changed = false;
-	{
-		PropertyLayout propName("Name");
-		const auto& item = data.id();
-		auto itemPath = fs::path(item);
-		auto assetName = itemPath.filename().string();
-		rttr::variant vari = assetName;
-		changed |= inspect_var(vari);
-		if (changed)
-		{
-			auto dirName = itemPath.remove_filename();
-			am->rename_asset<Prefab>(item, (dirName / fs::path(vari.get_value<std::string>())).generic_string());
-
-		}
-	}
-
-	return changed;
+	return false;
 }

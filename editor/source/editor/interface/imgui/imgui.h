@@ -653,7 +653,6 @@ enum ImGuiStyleVar_
     ImGuiStyleVar_ItemInnerSpacing,    // ImVec2
     ImGuiStyleVar_IndentSpacing,       // float
     ImGuiStyleVar_GrabMinSize,         // float
-	ImGuiStyleVar_ViewId               // uint8_t
 };
 
 enum ImGuiAlign_

@@ -87,6 +87,15 @@ namespace gui
 		, bool selected = false
 		, bool enabled = true
 	);
+
+	int ImageButtonWithLabel(std::shared_ptr<ITexture> texture
+		, ImVec2 size
+		, bool selected
+		, const char* label
+		, char* buf
+		, size_t buf_size
+		, ImGuiInputTextFlags flags = 0);
+
 	GUIStyle& getGUIStyle();
 };
 

@@ -310,6 +310,12 @@ bool ImageButtonEx(std::shared_ptr<ITexture> texture, ImVec2 size, const char* t
 	return ImGui::ImageButtonEx(texture.get(), size, tooltip, selected, enabled);
 }
 
+int ImageButtonWithLabel(std::shared_ptr<ITexture> texture, ImVec2 size, bool selected, const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags /*= 0*/)
+{
+	sTextures.push_back(texture);
+	return ImGui::ImageButtonWithLabel(texture.get(), size, selected, label, buf, buf_size, flags);
+}
+
 GUIStyle& getGUIStyle()
 {
 	return sGUIStyle;

@@ -135,19 +135,6 @@ namespace Docks
 		
 	}
 
-	bool is_parent_of(TransformComponent* trans, TransformComponent* selected_ransform)
-	{
-		if (!selected_ransform)
-			return false;
-
-		if (trans == selected_ransform)
-		{
-			return true;
-		}
-		auto parent = selected_ransform->get_parent().lock().get();
-		return is_parent_of(trans, parent);
-	};
-
 	void draw_entity(runtime::Entity entity)
 	{
 		if (!entity)
@@ -163,18 +150,9 @@ namespace Docks
 		{
 			is_selected = selected.get_value<runtime::Entity>() == entity;
 		}	
-		
-		bool is_parent_of_selected = false;
-// 		if (selected && selected.is_type<runtime::Entity>())
-// 		{
-// 			auto selectedEntity = selected.get_value<runtime::Entity>();
-// 			auto selectedTransformComponent = selectedEntity.component<TransformComponent>().lock()->getParent().lock().get();
-// 			auto entityTransformComponent = entity.component<TransformComponent>().lock().get();
-// 			isParentOfSelected = isParentOf(entityTransformComponent, selectedTransformComponent);
-// 		}	
+	
 		std::string name = entity.to_string();
 		ImGuiTreeNodeFlags flags = 0
-			| ImGuiTreeNodeFlags_OpenOnDoubleClick
 			| ImGuiTreeNodeFlags_AllowOverlapMode
 			| ImGuiTreeNodeFlags_OpenOnArrow;
 
@@ -190,17 +168,67 @@ namespace Docks
 		if (no_children)
 			flags |= ImGuiTreeNodeFlags_Leaf;
 
-		if(is_parent_of_selected)
-			gui::SetNextTreeNodeOpen(true);
-
+		static bool edit_label = false;
+	
+		auto pos = gui::GetCursorScreenPos();
 		bool opened = gui::TreeNodeEx(name.c_str(), flags);
-		if (gui::IsItemClicked(0))
+
+		if (edit_label && is_selected)
 		{
-			es->select(entity);
+			std::string inputBuff = name;
+			inputBuff.resize(64, 0);
+			inputBuff.shrink_to_fit();
+			gui::SetCursorScreenPos(pos);
+			gui::PushID(transformComponent.get());
+			gui::PushItemWidth(gui::GetContentRegionAvailWidth());
+			if (gui::InputText("",
+				&inputBuff[0],
+				inputBuff.size(),
+				ImGuiInputTextFlags_EnterReturnsTrue))
+			{
+				entity.set_name(inputBuff.c_str());
+				edit_label = false;
+			}
+			gui::PopItemWidth();
+
+			if (!gui::IsItemActive() && (gui::IsMouseClicked(0) || gui::IsMouseDragging()))
+			{
+				edit_label = false;
+			}
+			gui::PopID();		
 		}
 
-		check_context_menu(entity);
-		check_drag(entity);
+		ImGuiWindow* window = gui::GetCurrentWindow();
+		static ImGuiID id;
+
+		if (gui::IsItemHoveredRect() && !gui::IsMouseDragging(0))
+		{
+			if (gui::IsMouseClicked(0))
+			{
+				id = window->GetID(transformComponent.get());
+			}
+
+			if (gui::IsMouseReleased(0) && window->GetID(transformComponent.get()) == id)
+			{
+				if (!is_selected)
+					edit_label = false;
+
+				es->select(entity);
+			}
+
+			if (gui::IsMouseDoubleClicked(0))
+			{
+				edit_label = is_selected;
+			}
+		}
+		
+		if (!edit_label)
+		{
+			check_context_menu(entity);
+			check_drag(entity);
+		}
+	
+	
 		if (opened)
 		{
 			if (!no_children)

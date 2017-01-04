@@ -6,18 +6,8 @@ bool Inspector_Entity::inspect(rttr::variant& var, bool readOnly, std::function<
 	auto data = var.get_value<runtime::Entity>();
 	if (!data)
 		return false;
-	bool changed = false;
-	{
-		PropertyLayout propName("Name");
-		rttr::variant varName = data.to_string();
-		
-		changed |= inspect_var(varName);
 
-		if(changed)
-		{
-			data.set_name(varName.to_string());
-		}
-	}
+	bool changed = false;
 
 	auto components = data.all_components();
 	for (auto& component_ptr : components)

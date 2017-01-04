@@ -126,47 +126,116 @@ namespace ImGui
 // 			bg_color = ImGui::GetStyle().Colors[ImGuiCol_ButtonActive];
 // 		}
 
-		auto frame_padding = ImGui::GetStyle().FramePadding;
-		ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0, 0, 0, 0));
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, frame_padding);
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
+		auto frame_padding = GetStyle().FramePadding;
+		PushStyleColor(ImGuiCol_FrameBg, ImVec4(0, 0, 0, 0));
+		PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+		PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
+		PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+		PushStyleVar(ImGuiStyleVar_WindowPadding, frame_padding);
+		PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
 
 		bool ret = false;
 
 		if (!enabled)
-			ImGui::Image(texture, size, ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+			Image(texture, size, ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
 		else
 		{
-			if (ImGui::ImageButton(texture, size, ImVec2(0, 0), ImVec2(1, 1), -1, bg_color))
+			if (ImageButton(texture, size, ImVec2(0, 0), ImVec2(1, 1), -1, bg_color))
 			{
 				ret = true;
 			}
 		}
-		if (tooltip && ImGui::IsItemHovered())
+		if (tooltip && IsItemHovered())
 		{
-			ImGui::SetTooltip("%s", tooltip);
+			SetTooltip("%s", tooltip);
 		}
 
-		ImVec2 rectMin = ImGui::GetItemRectMin();
-		ImVec2 rectMax = ImGui::GetItemRectMax();
-		ImVec2 rectSize = ImGui::GetItemRectSize();
-		const float textHeight = ImGui::GetTextLineHeight();
+		ImVec2 rectMin = GetItemRectMin();
+		ImVec2 rectMax = GetItemRectMax();
+		ImVec2 rectSize = GetItemRectSize();
+		const float textHeight = GetTextLineHeight();
 		
 		if (selected)
 		{
-			ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
-			ImGui::RenderFrameEx(rectMin, rectMax, true, 0.0f, 2.0f);
-			ImGui::PopStyleColor();
+			PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
+			RenderFrameEx(rectMin, rectMax, true, 0.0f, 2.0f);
+			PopStyleColor();
 		}
 
 
 		
-		ImGui::PopStyleColor(3);
-		ImGui::PopStyleVar(3);
+		PopStyleColor(3);
+		PopStyleVar(3);
 		return ret;
+	}
+
+	int ImageButtonWithLabel(ImTextureID texture, ImVec2 size, bool selected, const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags)
+	{
+		static bool edit_label = false;
+		int return_value = 0;
+		auto pos = GetCursorScreenPos();
+		BeginGroup();
+		{
+			if(selected)
+				Image(texture, size, { 0.0f, 0.0f }, { 1.0f, 1.0f }, { 0.7f, 0.7f, 0.7f, 1.0f });
+			else
+				Image(texture, size);
+
+			
+			if(selected && edit_label)
+			{	
+				PushItemWidth(size.x);
+				if (InputText("",
+					&buf[0],
+					buf_size,
+					flags))
+				{
+					edit_label = false;
+					return_value = 2;
+				}
+				PopItemWidth();
+
+				if (!IsItemActive() && (IsMouseClicked(0) || IsMouseDragging()))
+				{
+					edit_label = false;
+				}
+			}
+			else
+			{
+				PushItemWidth(size.x);
+				LabelText("", label);
+				PopItemWidth();
+			}
+
+		}
+		EndGroup();
+
+		ImGuiWindow* window = GetCurrentWindow();
+		static ImGuiID id;
+
+		if (IsItemHoveredRect() && !IsMouseDragging(0))
+		{
+			if (IsMouseClicked(0))
+			{
+				id = window->GetID(label);
+				SetActiveID(id);
+			}
+
+			if (IsMouseReleased(0) && window->GetID(label) == id)
+			{
+				if (!selected)
+					edit_label = false;
+
+				return_value = 1;
+			}
+			
+			if (IsMouseDoubleClicked(0))
+			{
+				edit_label = selected;
+			}
+		}
+
+		return return_value;
 	}
 
 	bool BeginToolbar(const char* str_id, ImVec2 screen_pos, ImVec2 size)

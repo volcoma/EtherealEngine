@@ -11,4 +11,6 @@ namespace ImGui
 	IMGUI_API void EndToolbar();
 	IMGUI_API bool ToolbarButton(ImTextureID texture, const char* tooltip, bool selected = false, bool enabled = true);
 	IMGUI_API bool ImageButtonEx(ImTextureID texture, ImVec2 size = ImVec2(24, 24), const char* tooltip = nullptr, bool selected = false, bool enabled = true);
+	IMGUI_API int ImageButtonWithLabel(ImTextureID texture, ImVec2 size, bool selected, const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags = 0);
+
 }

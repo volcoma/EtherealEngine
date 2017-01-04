@@ -10,7 +10,7 @@
 #include "../../edit_state.h"
 #include <cstdio>
 
-static float scaleIcons = 1.0f;
+static float scale_icons = 0.7f;
 
 template<typename T>
 AssetHandle<Texture> get_asset_icon(AssetHandle<T> asset)
@@ -51,127 +51,89 @@ namespace Docks
 		//copy for safe removal from original
 		auto container = storage->container;
 		bool openPopup = false;
-		if (scaleIcons > 0.2f)
+
+		const float size = 88.0f * scale_icons;
+		for (auto& asset : container)
 		{
-			const float size = 50.0f * scaleIcons;
-			for (auto& asset : container)
+			auto& assetRelativeName = asset.first;
+			auto& assetHandle = asset.second.asset;
+			auto path = fs::path(assetRelativeName);
+
+			if (path.root_path().generic_string() != "data:/")
+				continue;
+
+			const auto assetName = path.filename().string();
+			const auto assetDir = path.remove_filename();
+
+			bool alreadySelected = false;
+			if (selected.is_type<AssetHandle<T>>())
 			{
-				auto& assetRelativeName = asset.first;
-				auto& assetHandle = asset.second.asset;
-
-				if(!string_utils::begins_with(assetRelativeName, "data://", true))
-					continue;
-				
-				const auto assetName = fs::path(assetRelativeName).filename().string();
-				bool alreadySelected = false;
-				if (selected.is_type<std::decay<decltype(assetHandle)>::type>())
+				if (selected.get_value<AssetHandle<T>>() == assetHandle)
 				{
-					if (selected.get_value<std::decay<decltype(assetHandle)>::type>() == assetHandle)
-					{
-						alreadySelected = true;
-					}
+					alreadySelected = true;
 				}
-
-				gui::PushID(assetRelativeName.c_str());
-
-				if (gui::GetContentRegionAvailWidth() < size)
-					gui::NewLine();
-
-				
-				gui::BeginGroup();
-				{
-					if (gui::ImageButtonEx(get_asset_icon(assetHandle).link->asset, { size, size }, assetRelativeName.c_str(), alreadySelected))
-					{
-						editState.select(assetHandle);
-						gui::SetWindowFocus();
-					}
-	
-					gui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-					gui::ButtonEx(assetName.c_str(), { size, gui::GetTextLineHeight() }, ImGuiButtonFlags_Disabled);
-					gui::PopStyleColor();
-				}
-				gui::EndGroup();
-				
-				if (gui::IsItemHoveredRect() &&
-					gui::IsMouseClicked(gui::drag_button))
-				{
-					editState.drag(assetHandle, assetRelativeName);
-				}
-				if (gui::BeginPopupContextItem(assetName.c_str()))
-				{
-					openPopup = true;
-					if (gui::Selectable("Delete"))
-					{
-						manager.delete_asset<T>(assetRelativeName);
-						if (alreadySelected)
-							editState.unselect();
-					}
-					gui::EndPopup();
-				}
-				if (alreadySelected && input.is_key_pressed(sf::Keyboard::Delete))
-				{
-					manager.delete_asset<T>(assetRelativeName);
-					editState.unselect();
-				}
-				gui::PopID();
-				gui::SameLine();
-
-
 			}
-			if (!storage->container.empty())
+
+			gui::PushID(assetRelativeName.c_str());
+
+			if (gui::GetContentRegionAvailWidth() < size)
 				gui::NewLine();
-		}
-		else
-		{
-			const float size = gui::GetTextLineHeight();
-			for (auto& asset : container)
+
+			std::string inputBuff = assetName;
+			inputBuff.resize(64, 0);
+
+			int action = gui::ImageButtonWithLabel(
+				get_asset_icon(assetHandle).link->asset,
+				{ size, size },
+				alreadySelected,
+				assetName.c_str(),
+				&inputBuff[0],
+				inputBuff.size(),
+				ImGuiInputTextFlags_EnterReturnsTrue);
+
+			if (action == 1)
 			{
-				auto& assetRelativeName = asset.first;
-				auto& assetHandle = asset.second.asset;
-
-				if (!string_utils::begins_with(assetRelativeName, "data://", true))
-					continue;
-
-				const auto assetName = fs::path(assetRelativeName).filename().string();
-				bool alreadySelected = false;
-				if (selected.is_type<std::decay<decltype(assetHandle)>::type>())
+				editState.select(assetHandle);
+			}
+			else if (action == 2)
+			{
+				std::string newName = std::string(inputBuff.c_str());
+				if (newName != assetName)
 				{
-					if (selected.get_value<std::decay<decltype(assetHandle)>::type>() == assetHandle)
-					{
-						alreadySelected = true;
-					}
-				}
-
-
-				gui::Image(get_asset_icon(assetHandle).link->asset, { size, size });
-				gui::SameLine();
-				if (gui::Selectable(assetName.c_str(), alreadySelected))
-				{
-					editState.select(assetHandle);
-				}
-				if (gui::IsItemHoveredRect() &&
-					gui::IsMouseClicked(gui::drag_button))
-				{
-					editState.drag(assetHandle, assetRelativeName);
-				}
-				if (gui::BeginPopupContextItem(assetName.c_str()))
-				{
-					openPopup = true;
-					if (gui::Selectable("Delete"))
-					{
-						manager.delete_asset<T>(assetRelativeName);
-						editState.unselect();
-					}
-					gui::EndPopup();
-				}
-
-				if (alreadySelected && input.is_key_pressed(sf::Keyboard::Delete))
-				{
-					manager.delete_asset<T>(assetRelativeName);
-					editState.unselect();
+					std::string newAssetRelativeName = (assetDir / newName).generic_string();
+					manager.rename_asset<T>(assetRelativeName, newAssetRelativeName);
 				}
 			}
+
+			if (gui::IsItemHoveredRect() &&
+				gui::IsMouseClicked(gui::drag_button) && !editState.drag_data.object)
+			{
+				editState.drag(assetHandle, assetRelativeName);
+			}
+			if (gui::BeginPopupContextItem(assetName.c_str()))
+			{
+				openPopup = true;
+				if (gui::Selectable("Delete"))
+				{
+					manager.delete_asset<T>(assetRelativeName);
+					if (alreadySelected)
+						editState.unselect();
+				}
+				gui::EndPopup();
+			}
+			if (alreadySelected && input.is_key_pressed(sf::Keyboard::Delete))
+			{
+				manager.delete_asset<T>(assetRelativeName);
+				editState.unselect();
+			}
+			gui::PopID();
+			gui::SameLine();
+
+
 		}
+		if (!storage->container.empty())
+			gui::NewLine();
+
 		return openPopup;
 	};
 
@@ -194,10 +156,9 @@ namespace Docks
 		{
 		
 		}
-
 		gui::SameLine();
 		gui::PushItemWidth(150.0f);
-		gui::SliderFloat("Scale Icons", &scaleIcons, 0.0f, 1.0f);
+		gui::SliderFloat("Scale Icons", &scale_icons, 0.5f, 1.0f);
 		gui::PopItemWidth();
 		gui::Separator();
 
