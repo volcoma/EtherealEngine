@@ -78,7 +78,7 @@ namespace cereal
 	{
 		LOAD_FUNCTION_NAME<Archive, Material>(ar, obj);
 
-		load_asset(obj, obj.link->id, false);
+		load_asset(obj, obj.link->id, true);
 	}
 
 	template<typename Archive>
@@ -86,7 +86,7 @@ namespace cereal
 	{
 		LOAD_FUNCTION_NAME<Archive, Prefab>(ar, obj);
 
-		load_asset(obj, obj.link->id, false);
+		load_asset(obj, obj.link->id, true);
 	}
 }
 

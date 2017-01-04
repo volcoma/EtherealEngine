@@ -49,7 +49,7 @@ bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, s
 
 	}
 	gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
-	bool hoveredFrame = gui::IsItemHovered();
+	bool hoveredFrame = gui::IsItemHoveredRect();
 	auto bbMinFrame = gui::GetItemRectMin();
 	auto bbMaxFrame = gui::GetItemBoxMax();
 	
