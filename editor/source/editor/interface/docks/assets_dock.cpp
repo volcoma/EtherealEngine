@@ -119,6 +119,7 @@ namespace Docks
 					if (alreadySelected)
 						editState.unselect();
 				}
+	
 				gui::EndPopup();
 			}
 			if (alreadySelected && input.is_key_pressed(sf::Keyboard::Delete))
