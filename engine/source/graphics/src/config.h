@@ -6,7 +6,7 @@
 #ifndef BGFX_CONFIG_H_HEADER_GUARD
 #define BGFX_CONFIG_H_HEADER_GUARD
 
-#include <bx/config.h>
+#include "../bx/config.h"
 
 #ifndef BGFX_CONFIG_DEBUG
 #	define BGFX_CONFIG_DEBUG 0

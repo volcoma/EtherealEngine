@@ -1,15 +1,50 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #ifndef SHADERC_H_HEADER_GUARD
 #define SHADERC_H_HEADER_GUARD
 
+namespace bgfx
+{
+	extern bool g_verbose;
+}
+
+// #define _BX_TRACE(_format, ...) \
+// 				BX_MACRO_BLOCK_BEGIN \
+// 					if (bgfx::g_verbose) \
+// 					{ \
+// 						fprintf(stdout, BX_FILE_LINE_LITERAL "" _format "\n", ##__VA_ARGS__); \
+// 					} \
+// 				BX_MACRO_BLOCK_END
+// 
+// #define _BX_WARN(_condition, _format, ...) \
+// 				BX_MACRO_BLOCK_BEGIN \
+// 					if (!(_condition) ) \
+// 					{ \
+// 						BX_TRACE("WARN " _format, ##__VA_ARGS__); \
+// 					} \
+// 				BX_MACRO_BLOCK_END
+// 
+// #define _BX_CHECK(_condition, _format, ...) \
+// 				BX_MACRO_BLOCK_BEGIN \
+// 					if (!(_condition) ) \
+// 					{ \
+// 						BX_TRACE("CHECK " _format, ##__VA_ARGS__); \
+// 						bx::debugBreak(); \
+// 					} \
+// 				BX_MACRO_BLOCK_END
+// 
+// #define BX_TRACE _BX_TRACE
+// #define BX_WARN  _BX_WARN
+// #define BX_CHECK _BX_CHECK
+
 #ifndef SHADERC_CONFIG_HLSL
 #	define SHADERC_CONFIG_HLSL BX_PLATFORM_WINDOWS
 #endif // SHADERC_CONFIG_HLSL
 
+//#include <alloca.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -19,15 +54,16 @@
 #include <vector>
 #include <unordered_map>
 
-#include "Graphics/bx/bx.h"
-#include "Graphics/bx/debug.h"
-#include "Graphics/bx/commandline.h"
-#include "Graphics/bx/endian.h"
-#include "Graphics/bx/uint32_t.h"
-#include "Graphics/bx/string.h"
-#include "Graphics/bx/hash.h"
-#include "Graphics/bx/crtimpl.h"
-#include "Graphics/src/vertexdecl.h"
+#include "graphics/bx/bx.h"
+#include "graphics/bx/debug.h"
+#include "graphics/bx/commandline.h"
+#include "graphics/bx/endian.h"
+#include "graphics/bx/uint32_t.h"
+#include "graphics/bx/string.h"
+#include "graphics/bx/hash.h"
+#include "graphics/bx/crtimpl.h"
+#include "graphics/src/vertexdecl.h"
+#include "graphics/src/bgfx_p.h"
 
 namespace bgfx
 {
@@ -74,9 +110,6 @@ namespace bgfx
 
 #define BGFX_UNIFORM_FRAGMENTBIT UINT8_C(0x10)
 #define BGFX_UNIFORM_SAMPLERBIT  UINT8_C(0x20)
-
-	const char* getUniformTypeName_(UniformType::Enum _enum);
-	UniformType::Enum nameToUniformTypeEnum_(const char* _name);
 
 	struct Uniform
 	{

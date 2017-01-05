@@ -203,6 +203,11 @@
     <ClInclude Include="..\..\source\shaderc\glsl-optimizer\src\util\ralloc.h" />
     <ClInclude Include="..\..\source\shaderc\shaderc.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="glslang.vcxproj">
+      <Project>{519dcd81-43c0-4769-8805-b51d2d2aac4f}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4B8A4AD9-D7C0-4978-99D7-F4E9DDE756AB}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -297,7 +302,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;__STDC__;__STDC_VERSION__=199901L;strdup=_strdup;alloca=_alloca;isascii=__isascii;NINCLUDE=64;NWORK=65536;NBUFF=65536;OLD_PREPROCESSOR=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\source\$(ProjectName);..\..\..\engine\source;..\..\source\$(ProjectName)\fcpp;..\..\source\$(ProjectName)\glsl-optimizer\include;..\..\source\$(ProjectName)\glsl-optimizer\include\c99;..\..\source\$(ProjectName)\glsl-optimizer\src;..\..\source\$(ProjectName)\glsl-optimizer\src\glsl;..\..\source\$(ProjectName)\glsl-optimizer\src\mesa</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\source\$(ProjectName);..\..\..\engine\source;..\..\source\$(ProjectName)\fcpp;..\..\source\$(ProjectName)\glsl-optimizer\include;..\..\source\$(ProjectName)\glsl-optimizer\include\c99;..\..\source\$(ProjectName)\glsl-optimizer\src;..\..\source\$(ProjectName)\glsl-optimizer\src\glsl;..\..\source\$(ProjectName)\glsl-optimizer\src\mesa;..\..\source\glslang\glslang\glslang\Public;..\..\source\glslang\glslang\glslang\Include;..\..\source\glslang\glslang</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>false</ExceptionHandling>
@@ -342,7 +347,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;__STDC__;__STDC_VERSION__=199901L;strdup=_strdup;alloca=_alloca;isascii=__isascii;NINCLUDE=64;NWORK=65536;NBUFF=65536;OLD_PREPROCESSOR=0;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\source\$(ProjectName);..\..\..\engine\source;..\..\source\$(ProjectName)\fcpp;..\..\source\$(ProjectName)\glsl-optimizer\include;..\..\source\$(ProjectName)\glsl-optimizer\include\c99;..\..\source\$(ProjectName)\glsl-optimizer\src;..\..\source\$(ProjectName)\glsl-optimizer\src\glsl;..\..\source\$(ProjectName)\glsl-optimizer\src\mesa</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\source\$(ProjectName);..\..\..\engine\source;..\..\source\$(ProjectName)\fcpp;..\..\source\$(ProjectName)\glsl-optimizer\include;..\..\source\$(ProjectName)\glsl-optimizer\include\c99;..\..\source\$(ProjectName)\glsl-optimizer\src;..\..\source\$(ProjectName)\glsl-optimizer\src\glsl;..\..\source\$(ProjectName)\glsl-optimizer\src\mesa;..\..\source\glslang\glslang\glslang\Public;..\..\source\glslang\glslang\glslang\Include;..\..\source\glslang\glslang</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>false</ExceptionHandling>
@@ -387,7 +392,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;__STDC__;__STDC_VERSION__=199901L;strdup=_strdup;alloca=_alloca;isascii=__isascii;NINCLUDE=64;NWORK=65536;NBUFF=65536;OLD_PREPROCESSOR=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\source\$(ProjectName);..\..\..\engine\source;..\..\source\$(ProjectName)\fcpp;..\..\source\$(ProjectName)\glsl-optimizer\include;..\..\source\$(ProjectName)\glsl-optimizer\include\c99;..\..\source\$(ProjectName)\glsl-optimizer\src;..\..\source\$(ProjectName)\glsl-optimizer\src\glsl;..\..\source\$(ProjectName)\glsl-optimizer\src\mesa</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\source\$(ProjectName);..\..\..\engine\source;..\..\source\$(ProjectName)\fcpp;..\..\source\$(ProjectName)\glsl-optimizer\include;..\..\source\$(ProjectName)\glsl-optimizer\include\c99;..\..\source\$(ProjectName)\glsl-optimizer\src;..\..\source\$(ProjectName)\glsl-optimizer\src\glsl;..\..\source\$(ProjectName)\glsl-optimizer\src\mesa;..\..\source\glslang\glslang\glslang\Public;..\..\source\glslang\glslang\glslang\Include;..\..\source\glslang\glslang</AdditionalIncludeDirectories>
       <StringPooling>true</StringPooling>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
@@ -431,7 +436,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;__STDC__;__STDC_VERSION__=199901L;strdup=_strdup;alloca=_alloca;isascii=__isascii;NINCLUDE=64;NWORK=65536;NBUFF=65536;OLD_PREPROCESSOR=0;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>..\..\source\$(ProjectName);..\..\..\engine\source;..\..\source\$(ProjectName)\fcpp;..\..\source\$(ProjectName)\glsl-optimizer\include;..\..\source\$(ProjectName)\glsl-optimizer\include\c99;..\..\source\$(ProjectName)\glsl-optimizer\src;..\..\source\$(ProjectName)\glsl-optimizer\src\glsl;..\..\source\$(ProjectName)\glsl-optimizer\src\mesa</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\source\$(ProjectName);..\..\..\engine\source;..\..\source\$(ProjectName)\fcpp;..\..\source\$(ProjectName)\glsl-optimizer\include;..\..\source\$(ProjectName)\glsl-optimizer\include\c99;..\..\source\$(ProjectName)\glsl-optimizer\src;..\..\source\$(ProjectName)\glsl-optimizer\src\glsl;..\..\source\$(ProjectName)\glsl-optimizer\src\mesa;..\..\source\glslang\glslang\glslang\Public;..\..\source\glslang\glslang\glslang\Include;..\..\source\glslang\glslang</AdditionalIncludeDirectories>
       <StringPooling>true</StringPooling>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>

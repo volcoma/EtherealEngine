@@ -1,10 +1,10 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "shaderc.h"
-#include "Graphics/bx/tokenizecmd.h"
+#include "graphics/bx/tokenizecmd.h"
 
 #define MAX_TAGS 256
 extern "C"
@@ -15,10 +15,6 @@ extern "C"
 namespace bgfx
 {
 	bool g_verbose = false;
-
-	#define BGFX_CHUNK_MAGIC_CSH BX_MAKEFOURCC('C', 'S', 'H', 0x2)
-	#define BGFX_CHUNK_MAGIC_FSH BX_MAKEFOURCC('F', 'S', 'H', 0x4)
-	#define BGFX_CHUNK_MAGIC_VSH BX_MAKEFOURCC('V', 'S', 'H', 0x4)
 
 	static const char* s_ARB_shader_texture_lod[] =
 	{
@@ -113,53 +109,18 @@ namespace bgfx
 		NULL
 	};
 
-	const char* s_uniformTypeName_[] =
-	{
-		"int",  "int",
-		NULL,   NULL,
-		"vec4", "float4",
-		"mat3", "float3x3",
-		"mat4", "float4x4",
-	};
-	BX_STATIC_ASSERT(BX_COUNTOF(s_uniformTypeName_) == UniformType::Count*2);
-
 	const char* interpolationDx11(const char* _glsl)
 	{
-		if (0 == strcmp(_glsl, "smooth") )
+		if (0 == strcmp(_glsl, "smooth"))
 		{
 			return "linear";
 		}
-		else if (0 == strcmp(_glsl, "flat") )
+		else if (0 == strcmp(_glsl, "flat"))
 		{
 			return "nointerpolation";
 		}
 
 		return _glsl; // centroid, noperspective
-	}
-
-	const char* getUniformTypeName_(UniformType::Enum _enum)
-	{
-		uint32_t idx = _enum & ~(BGFX_UNIFORM_FRAGMENTBIT|BGFX_UNIFORM_SAMPLERBIT);
-		if (idx < UniformType::Count)
-		{
-			return s_uniformTypeName_[idx];
-		}
-
-		return "Unknown uniform type?!";
-	}
-
-	UniformType::Enum nameToUniformTypeEnum_(const char* _name)
-	{
-		for (uint32_t ii = 0; ii < UniformType::Count*2; ++ii)
-		{
-			if (NULL != s_uniformTypeName_[ii]
-			&&  0 == strcmp(_name, s_uniformTypeName_[ii]) )
-			{
-				return UniformType::Enum(ii/2);
-			}
-		}
-
-		return UniformType::Count;
 	}
 
 	int32_t writef(bx::WriterI* _writer, const char* _format, ...)
@@ -700,7 +661,7 @@ namespace bgfx
 
 		fprintf(stderr
 			, "shaderc, bgfx shader compiler tool\n"
-			  "Copyright 2011-2016 Branimir Karadzic. All rights reserved.\n"
+			  "Copyright 2011-2017 Branimir Karadzic. All rights reserved.\n"
 			  "License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause\n\n"
 			);
 

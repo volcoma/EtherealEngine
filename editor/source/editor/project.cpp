@@ -92,7 +92,7 @@ namespace editor
 						{
 							ShaderCompiler::compile(p);
 						});
-						ts->run_on_main(task);
+						ts->run(task);
 					}
 				}
 			}

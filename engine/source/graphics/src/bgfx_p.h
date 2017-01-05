@@ -6,7 +6,7 @@
 #ifndef BGFX_P_H_HEADER_GUARD
 #define BGFX_P_H_HEADER_GUARD
 
-#include <bx/platform.h>
+#include "../bx/platform.h"
 
 #ifndef BGFX_CONFIG_DEBUG
 #	define BGFX_CONFIG_DEBUG 0
@@ -19,7 +19,7 @@
 #	define BX_CONFIG_ALLOCATOR_DEBUG 1
 #endif // BGFX_CONFIG_DEBUG
 
-#include <bgfx/bgfx.h>
+#include "../bgfx/bgfx.h"
 #include "config.h"
 
 #include <inttypes.h>
@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <alloca.h>
+//#include <alloca.h>
 
 // Check handle, cannot be bgfx::invalidHandle and must be valid.
 #define BGFX_CHECK_HANDLE(_desc, _handleAlloc, _handle) \
@@ -123,23 +123,23 @@ namespace bgfx
 				} \
 			BX_MACRO_BLOCK_END
 
-#include <bx/bx.h>
-#include <bx/debug.h>
-#include <bx/fpumath.h>
-#include <bx/float4x4_t.h>
-#include <bx/endian.h>
-#include <bx/handlealloc.h>
-#include <bx/hash.h>
-#include <bx/radixsort.h>
-#include <bx/ringbuffer.h>
-#include <bx/uint32_t.h>
-#include <bx/readerwriter.h>
-#include <bx/allocator.h>
-#include <bx/string.h>
-#include <bx/os.h>
-#include <bx/maputil.h>
+#include "../bx/bx.h"
+#include "../bx/debug.h"
+#include "../bx/fpumath.h"
+#include "../bx/float4x4_t.h"
+#include "../bx/endian.h"
+#include "../bx/handlealloc.h"
+#include "../bx/hash.h"
+#include "../bx/radixsort.h"
+#include "../bx/ringbuffer.h"
+#include "../bx/uint32_t.h"
+#include "../bx/readerwriter.h"
+#include "../bx/allocator.h"
+#include "../bx/string.h"
+#include "../bx/os.h"
+#include "../bx/maputil.h"
 
-#include <bgfx/platform.h>
+#include "../bgfx/platform.h"
 #include "image.h"
 #include "shader.h"
 
@@ -168,10 +168,10 @@ namespace bgfx
 	};
 } // namespace bgfx
 #	define TINYSTL_ALLOCATOR bgfx::TinyStlAllocator
-#	include <tinystl/string.h>
-#	include <tinystl/unordered_map.h>
-#	include <tinystl/unordered_set.h>
-#	include <tinystl/vector.h>
+#	include "../tinystl/string.h"
+#	include "../tinystl/unordered_map.h"
+#	include "../tinystl/unordered_set.h"
+#	include "../tinystl/vector.h"
 namespace stl = tinystl;
 #else
 #	include <string>
@@ -190,9 +190,9 @@ namespace stl = std;
 #	include <xtl.h>
 #endif // BX_PLATFORM_*
 
-#include <bx/cpu.h>
-#include <bx/thread.h>
-#include <bx/timer.h>
+#include "../bx/cpu.h"
+#include "../bx/thread.h"
+#include "../bx/timer.h"
 
 #include "vertexdecl.h"
 

@@ -6,7 +6,7 @@
 #ifndef BGFX_SHADER_SPIRV_H
 #define BGFX_SHADER_SPIRV_H
 
-#include <bx/readerwriter.h>
+#include "../bx/readerwriter.h"
 
 BX_ERROR_RESULT(BGFX_SHADER_SPIRV_INVALID_HEADER,      BX_MAKEFOURCC('S', 'H', 0, 1) );
 BX_ERROR_RESULT(BGFX_SHADER_SPIRV_INVALID_INSTRUCTION, BX_MAKEFOURCC('S', 'H', 0, 2) );

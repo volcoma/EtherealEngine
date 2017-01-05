@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -16,7 +16,7 @@
 #define COM_NO_WINDOWS_H
 #include <d3dcompiler.h>
 #include <d3d11shader.h>
-#include "Graphics/bx/os.h"
+#include "graphics/bx/os.h"
 
 #ifndef D3D_SVF_USED
 #	define D3D_SVF_USED 2
@@ -722,7 +722,7 @@ namespace bgfx { namespace hlsl
 
 				BX_TRACE("%s, %s, %d, %d, %d"
 					, un.name.c_str()
-					, getUniformTypeName_(un.type)
+					, getUniformTypeName(un.type)
 					, un.num
 					, un.regIndex
 					, un.regCount
