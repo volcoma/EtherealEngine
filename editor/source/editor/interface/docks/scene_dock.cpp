@@ -32,11 +32,18 @@ namespace Docks
 		gui::Text("MSPF : %.3f ms ", 1000.0f / float(frameRate));
 		gui::Separator();
 
+		auto stats = gfx::getStats();
+		double freq = double(stats->cpuTimerFreq);
+		double toMs = 1000.0 / freq;
+		gui::Text("Wait Render : %fms", stats->waitRender*toMs);
+		gui::Text("Wait Submit : %fms", stats->waitSubmit*toMs);
+		gui::Text("Draw calls: %u", stats->numDraw);
+		gui::Text("Compute calls: %u", stats->numCompute);
 
-		static bool renderStats = false;
-		if (gui::Checkbox("Render Stats", &renderStats))
+		static bool more_stats = false;
+		if (gui::Checkbox("More Stats", &more_stats))
 		{
-			if (renderStats)
+			if (more_stats)
 				gfx::setDebug(BGFX_DEBUG_STATS);
 			else
 				gfx::setDebug(BGFX_DEBUG_NONE);
@@ -44,24 +51,6 @@ namespace Docks
 		}
 		gui::Separator();
 		gui::Checkbox("Show G-Buffer", &show_gbuffer);
-		
-//		if (renderStats)
-//		{
-// 			gui::Text("Graphics");
-// 			auto stats = gfx::getStats();
-// 
-// 			double freq = double(stats->cpuTimerFreq);
-// 			double toMs = 1000.0 / freq;
-// 			gui::Text("CPU Time Begin : %u", stats->cpuTimeBegin);
-// 			gui::Text("CPU Time End : %u", stats->cpuTimeEnd);
-// 			gui::Text("CPU Time Freq : %u", stats->cpuTimerFreq);
-// 			gui::Text("GPU Time Begin : %u", stats->gpuTimeBegin);
-// 			gui::Text("GPU Time End : %u", stats->gpuTimeEnd);
-// 			gui::Text("GPU Time Freq : %u", stats->gpuTimerFreq);
-// 			gui::Text("Wait Render : %f", stats->waitRender*toMs);
-// 			gui::Text("Wait Submit : %f", stats->waitSubmit*toMs);
-//			gui::Separator();
-//		}
 		gui::End();
 
 	}

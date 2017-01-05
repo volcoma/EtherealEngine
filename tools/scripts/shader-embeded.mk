@@ -1,14 +1,14 @@
 #
-# Copyright 2011-2016 Branimir Karadzic. All rights reserved.
-# License: http:////www.opensource.org//licenses//BSD-2-Clause
+# Copyright 2011-2017 Branimir Karadzic. All rights reserved.
+# License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 #
 
 THISDIR:=$(dir $(lastword $(MAKEFILE_LIST)))
 include $(THISDIR)/tools.mk
 
-VS_FLAGS+=-i $(THISDIR) --type vertex
-FS_FLAGS+=-i $(THISDIR) --type fragment
-CS_FLAGS+=-i $(THISDIR) --type compute
+VS_FLAGS+=-i $(THISDIR)/ --type vertex
+FS_FLAGS+=-i $(THISDIR)/ --type fragment
+CS_FLAGS+=-i $(THISDIR)/ --type compute
 
 VS_SOURCES=$(wildcard vs_*.sc)
 FS_SOURCES=$(wildcard fs_*.sc)
@@ -24,7 +24,7 @@ SHADER_TMP = $(TEMP)/tmp
 
 vs_%.bin.h : vs_%.sc
 	@echo [$(<)]
-	$(SILENT) $(SHADERC) $(VS_FLAGS) --platform linux                  -f $(<) -o $(SHADER_TMP) --bin2c $(basename $(<))_glsl
+	 $(SILENT) $(SHADERC) $(VS_FLAGS) --platform linux                  -f $(<) -o $(SHADER_TMP) --bin2c $(basename $(<))_glsl
 	@cat $(SHADER_TMP) > $(@)
 	-$(SILENT) $(SHADERC) $(VS_FLAGS) --platform windows -p vs_3_0 -O 3 -f $(<) -o $(SHADER_TMP) --bin2c $(basename $(<))_dx9
 	-@cat $(SHADER_TMP) >> $(@)
@@ -32,10 +32,12 @@ vs_%.bin.h : vs_%.sc
 	-@cat $(SHADER_TMP) >> $(@)
 	-$(SILENT) $(SHADERC) $(VS_FLAGS) --platform ios     -p metal  -O 3 -f $(<) -o $(SHADER_TMP) --bin2c $(basename $(<))_mtl
 	-@cat $(SHADER_TMP) >> $(@)
+	-@echo extern const uint8_t* $(basename $(<))_pssl;>> $(@)
+	-@echo extern const uint32_t $(basename $(<))_pssl_size;>> $(@)
 
 fs_%.bin.h : fs_%.sc
 	@echo [$(<)]
-	$(SILENT) $(SHADERC) $(FS_FLAGS) --platform linux                  -f $(<) -o $(SHADER_TMP) --bin2c $(basename $(<))_glsl
+	 $(SILENT) $(SHADERC) $(FS_FLAGS) --platform linux                  -f $(<) -o $(SHADER_TMP) --bin2c $(basename $(<))_glsl
 	@cat $(SHADER_TMP) > $(@)
 	-$(SILENT) $(SHADERC) $(FS_FLAGS) --platform windows -p ps_3_0 -O 3 -f $(<) -o $(SHADER_TMP) --bin2c $(basename $(<))_dx9
 	-@cat $(SHADER_TMP) >> $(@)
@@ -43,13 +45,17 @@ fs_%.bin.h : fs_%.sc
 	-@cat $(SHADER_TMP) >> $(@)
 	-$(SILENT) $(SHADERC) $(FS_FLAGS) --platform ios     -p metal  -O 3 -f $(<) -o $(SHADER_TMP) --bin2c $(basename $(<))_mtl
 	-@cat $(SHADER_TMP) >> $(@)
+	-@echo extern const uint8_t* $(basename $(<))_pssl;>> $(@)
+	-@echo extern const uint32_t $(basename $(<))_pssl_size;>> $(@)
 
 cs_%.bin.h : cs_%.sc
 	@echo [$(<)]
-	$(SILENT) $(SHADERC) $(CS_FLAGS) --platform linux -p 430 -f $(<) -o $(SHADER_TMP) --bin2c $(basename $(<))_glsl
+	 $(SILENT) $(SHADERC) $(CS_FLAGS) --platform linux -p 430           -f $(<) -o $(SHADER_TMP) --bin2c $(basename $(<))_glsl
 	@cat $(SHADER_TMP) > $(@)
 	-$(SILENT) $(SHADERC) $(CS_FLAGS) --platform windows -p cs_5_0 -O 1 -f $(<) -o $(SHADER_TMP) --bin2c $(basename $(<))_dx11
 	-@cat $(SHADER_TMP) >> $(@)
+	-@echo extern const uint8_t* $(basename $(<))_pssl;>> $(@)
+	-@echo extern const uint32_t $(basename $(<))_pssl_size;>> $(@)
 
 .PHONY: all
 all: $(BIN)

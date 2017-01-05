@@ -91,8 +91,9 @@ ipch/
 
 
 # User data
-Examples/
+examples/
 build/
+tools/embedded_build
 
 # Don't want to ignore .objs files in Assets
 !engine_data/meshes/*.obj
