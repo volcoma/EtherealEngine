@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
@@ -10,7 +10,7 @@
 #include <stdint.h> // uint32_t
 #include <stdlib.h> // NULL
 
-#include "bgfxdefines.h"
+#include "defines.h"
 
 ///
 #define BGFX_HANDLE(_name) \
@@ -562,7 +562,7 @@ namespace bgfx
 
 		Limits limits;
 
-		/// Supported texture formats.
+		/// Supported texture format capabilities flags:
 		///   - `BGFX_CAPS_FORMAT_TEXTURE_NONE` - Texture format is not supported.
 		///   - `BGFX_CAPS_FORMAT_TEXTURE_2D` - Texture format is supported.
 		///   - `BGFX_CAPS_FORMAT_TEXTURE_2D_SRGB` - Texture as sRGB format is supported.
@@ -581,6 +581,8 @@ namespace bgfx
 		///   - `BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER_MSAA` - Texture format can be used as MSAA
 		///     frame buffer.
 		///   - `BGFX_CAPS_FORMAT_TEXTURE_MSAA` - Texture can be sampled as MSAA.
+		///   - `BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN` - Texture format supports auto-generated
+		///     mips.
 		uint16_t formats[TextureFormat::Count];
 	};
 
@@ -669,7 +671,7 @@ namespace bgfx
 	///
 	struct Transform
 	{
-		float* data;  //!< Pointer to first matrix.
+		float* data;  //!< Pointer to first 4x4 matrix.
 		uint16_t num; //!< Number of matrices.
 	};
 
@@ -690,7 +692,7 @@ namespace bgfx
 			float fov[4];               //!< Field of view (up, down, left, right).
 			float viewOffset[3];        //!< Eye view matrix translation adjustment.
 			float projection[16];       //!< Eye projection matrix
-			float pixelsPerTanAngle[2]; //!<
+			float pixelsPerTanAngle[2]; //!< Number of pixels that fit in tan(angle) = 1.
 		};
 
 		Eye eye[2];
@@ -707,17 +709,26 @@ namespace bgfx
 	///
 	struct Stats
 	{
-		uint64_t cpuTimeBegin; //!< CPU frame begin time.
-		uint64_t cpuTimeEnd;   //!< CPU frame end time.
-		uint64_t cpuTimerFreq; //!< CPU timer frequency.
+		uint64_t cpuTimeBegin;  //!< CPU frame begin time.
+		uint64_t cpuTimeEnd;    //!< CPU frame end time.
+		uint64_t cpuTimerFreq;  //!< CPU timer frequency.
 
-		uint64_t gpuTimeBegin; //!< GPU frame begin time.
-		uint64_t gpuTimeEnd;   //!< GPU frame end time.
-		uint64_t gpuTimerFreq; //!< GPU timer frequency.
+		uint64_t gpuTimeBegin;  //!< GPU frame begin time.
+		uint64_t gpuTimeEnd;    //!< GPU frame end time.
+		uint64_t gpuTimerFreq;  //!< GPU timer frequency.
 
-		int64_t waitRender;    //!< Time spent waiting for render backend thread to finish issuing
-		                       //!  draw commands to underlying graphics API.
-		int64_t waitSubmit;    //!< Time spent waiting for submit thread to advance to next frame.
+		int64_t waitRender;     //!< Time spent waiting for render backend thread to finish issuing
+		                        //!  draw commands to underlying graphics API.
+		int64_t waitSubmit;     //!< Time spent waiting for submit thread to advance to next frame.
+
+		uint32_t numDraw;       //!< Number of draw calls submitted.
+		uint32_t numCompute;    //!< Number of compute calls submitted.
+		uint32_t maxGpuLatency; //!< GPU driver latency.
+
+		uint16_t width;         //!< Backbuffer width in pixels.
+		uint16_t height;        //!< Backbuffer height in pixels.
+		uint16_t textWidth;     //!< Debug text width in characters.
+		uint16_t textHeight;    //!< Debug text height in characters.
 	};
 
 	/// Vertex declaration.
@@ -1380,46 +1391,31 @@ namespace bgfx
 	///
 	void destroyDynamicVertexBuffer(DynamicVertexBufferHandle _handle);
 
-	/// Returns true if internal transient index buffer has enough space.
+	/// Returns number of available indices.
 	///
-	/// @param[in] _num Number of indices.
+	/// @param[in] _num Number of required indices.
 	///
-	/// @attention C99 equivalent is `bgfx_check_avail_transient_index_buffer`.
+	/// @attention C99 equivalent is `bgfx_get_avail_transient_index_buffer`.
 	///
-	bool checkAvailTransientIndexBuffer(uint32_t _num);
+	uint32_t getAvailTransientIndexBuffer(uint32_t _num);
 
-	/// Returns true if internal transient vertex buffer has enough space.
+	/// Returns number of available vertices.
 	///
-	/// @param[in] _num Number of vertices.
+	/// @param[in] _num Number of required vertices.
 	/// @param[in] _decl Vertex declaration.
 	///
 	/// @attention C99 equivalent is `bgfx_check_avail_transient_vertex_buffer`.
 	///
-	bool checkAvailTransientVertexBuffer(uint32_t _num, const VertexDecl& _decl);
+	uint32_t getAvailTransientVertexBuffer(uint32_t _num, const VertexDecl& _decl);
 
-	/// Returns true if internal instance data buffer has enough space.
+	/// Returns number of available instance buffer slots.
 	///
-	/// @param[in] _num Number of instances.
+	/// @param[in] _num Number of required instances.
 	/// @param[in] _stride Stride per instance.
 	///
 	/// @attention C99 equivalent is `bgfx_check_avail_instance_data_buffer`.
 	///
-	bool checkAvailInstanceDataBuffer(uint32_t _num, uint16_t _stride);
-
-	/// Returns true if both internal transient index and vertex buffer have
-	/// enough space.
-	///
-	/// @param[in] _numVertices Number of vertices.
-	/// @param[in] _decl Vertex declaration.
-	/// @param[in] _numIndices Number of indices.
-	///
-	/// @attention C99 equivalent is `bgfx_check_avail_transient_buffers`.
-	///
-	bool checkAvailTransientBuffers(
-		  uint32_t _numVertices
-		, const VertexDecl& _decl
-		, uint32_t _numIndices
-		);
+	uint32_t getAvailInstanceDataBuffer(uint32_t _num, uint16_t _stride);
 
 	/// Allocate transient index buffer.
 	///
@@ -1562,12 +1558,31 @@ namespace bgfx
 	///
 	void destroyProgram(ProgramHandle _handle);
 
+	/// Validate texture parameters.
+	///
+	/// @param[in] _depth Depth dimension of volume texture.
+	/// @param[in] _cubeMap Indicates that texture contains cubemap.
+	/// @param[in] _numLayers Number of layers in texture array.
+	/// @param[in] _format Texture format. See: `TextureFormat::Enum`.
+	/// @param[in] _flags Texture flags. See `BGFX_TEXTURE_*`.
+	/// @returns True if texture can be successfully created.
+	///
+	/// @attention C99 equivalent is `bgfx_is_texture_valid`.
+	///
+	bool isTextureValid(
+		  uint16_t _depth
+		, bool _cubeMap
+		, uint16_t _numLayers
+		, TextureFormat::Enum _format
+		, uint32_t _flags
+		);
+
 	/// Calculate amount of memory required for texture.
 	///
 	/// @param[out] _info Resulting texture info structure.
 	/// @param[in] _width Width.
 	/// @param[in] _height Height.
-	/// @param[in] _depth Depth.
+	/// @param[in] _depth Depth dimension of volume texture.
 	/// @param[in] _cubeMap Indicates that texture contains cubemap.
 	/// @param[in] _hasMips Indicates that texture contains full mip-map chain.
 	/// @param[in] _numLayers Number of layers in texture array.
@@ -1972,22 +1987,28 @@ namespace bgfx
 	/// @returns Handle to uniform object.
 	///
 	/// @remarks
-	/// Predefined uniforms (declared in `bgfx_shader.sh`):
-	///   - `u_viewRect vec4(x, y, width, height)` - view rectangle for current
-	///     view.
-	///   - `u_viewTexel vec4(1.0/width, 1.0/height, undef, undef)` - inverse
-	///     width and height
-	///   - `u_view mat4` - view matrix
-	///   - `u_invView mat4` - inverted view matrix
-	///   - `u_proj mat4` - projection matrix
-	///   - `u_invProj mat4` - inverted projection matrix
-	///   - `u_viewProj mat4` - concatenated view projection matrix
-	///   - `u_invViewProj mat4` - concatenated inverted view projection matrix
-	///   - `u_model mat4[BGFX_CONFIG_MAX_BONES]` - array of model matrices.
-	///   - `u_modelView mat4` - concatenated model view matrix, only first
-	///     model matrix from array is used.
-	///   - `u_modelViewProj mat4` - concatenated model view projection matrix.
-	///   - `u_alphaRef float` - alpha reference value for alpha test.
+	///   1. Uniform names are unique. It's valid to call `bgfx::createUniform`
+	///      multiple times with the same uniform name. The library will always
+	///      return the same handle, but the handle reference count will be
+	///      incremented. This means that the same number of `bgfx::destroyUniform`
+	///      must be called to properly destroy the uniform.
+	///
+	///   2. Predefined uniforms (declared in `bgfx_shader.sh`):
+	///      - `u_viewRect vec4(x, y, width, height)` - view rectangle for current
+	///        view.
+	///      - `u_viewTexel vec4(1.0/width, 1.0/height, undef, undef)` - inverse
+	///        width and height
+	///      - `u_view mat4` - view matrix
+	///      - `u_invView mat4` - inverted view matrix
+	///      - `u_proj mat4` - projection matrix
+	///      - `u_invProj mat4` - inverted projection matrix
+	///      - `u_viewProj mat4` - concatenated view projection matrix
+	///      - `u_invViewProj mat4` - concatenated inverted view projection matrix
+	///      - `u_model mat4[BGFX_CONFIG_MAX_BONES]` - array of model matrices.
+	///      - `u_modelView mat4` - concatenated model view matrix, only first
+	///        model matrix from array is used.
+	///      - `u_modelViewProj mat4` - concatenated model view projection matrix.
+	///      - `u_alphaRef float` - alpha reference value for alpha test.
 	///
 	/// @attention C99 equivalent is `bgfx_create_uniform`.
 	///
@@ -2224,7 +2245,7 @@ namespace bgfx
 	///
 	/// @attention C99 equivalent is `bgfx_set_view_remap`.
 	///
-	void setViewRemap(uint8_t _id = 0, uint8_t _num = UINT8_MAX, const void* _remap = NULL);
+	void setViewOrder(uint8_t _id = 0, uint8_t _num = UINT8_MAX, const void* _remap = NULL);
 
 	/// Reset all view settings to default.
 	///
@@ -2797,7 +2818,6 @@ namespace bgfx
 	/// @attention C99 equivalent is `bgfx_save_screen_shot`.
 	///
 	void saveScreenShot(const char* _filePath);
-
 	void getSizeFromRatio(BackbufferRatio::Enum _ratio, uint16_t& _width, uint16_t& _height);
 } // namespace bgfx
 

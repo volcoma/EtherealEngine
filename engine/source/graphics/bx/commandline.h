@@ -1,7 +1,7 @@
 /*
-* Copyright 2010-2016 Branimir Karadzic. All rights reserved.
-* License: https://github.com/bkaradzic/bx#license-bsd-2-clause
-*/
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ */
 
 #ifndef BX_COMMANDLINE_H_HEADER_GUARD
 #define BX_COMMANDLINE_H_HEADER_GUARD
@@ -122,11 +122,11 @@ namespace bx
 			const char* arg = findOption(_short, _long, 1);
 			if (NULL != arg)
 			{
-				if ('0' == *arg || (0 == stricmp(arg, "false")))
+				if ('0' == *arg || (0 == stricmp(arg, "false") ) )
 				{
 					_value = false;
 				}
-				else if ('0' != *arg || (0 == stricmp(arg, "true")))
+				else if ('0' != *arg || (0 == stricmp(arg, "true") ) )
 				{
 					_value = true;
 				}
@@ -148,7 +148,7 @@ namespace bx
 					++arg;
 					if (_short == *arg)
 					{
-						if (1 == strlen(arg))
+						if (1 == strlen(arg) )
 						{
 							if (0 == _skip)
 							{
@@ -156,10 +156,10 @@ namespace bx
 								{
 									return "";
 								}
-								else if (ii + _numParams < m_argc
-									&& '-' != *m_argv[ii + 1])
+								else if (ii+_numParams < m_argc
+									 && '-' != *m_argv[ii+1] )
 								{
-									return m_argv[ii + 1];
+									return m_argv[ii+1];
 								}
 
 								return NULL;
@@ -170,8 +170,8 @@ namespace bx
 						}
 					}
 					else if (NULL != _long
-						&&  '-' == *arg
-						&& 0 == stricmp(arg + 1, _long))
+						 &&  '-' == *arg
+						 &&  0 == stricmp(arg+1, _long) )
 					{
 						if (0 == _skip)
 						{
@@ -179,10 +179,10 @@ namespace bx
 							{
 								return "";
 							}
-							else if (ii + _numParams < m_argc
-								&&  '-' != *m_argv[ii + 1])
+							else if (ii+_numParams < m_argc
+									&&  '-' != *m_argv[ii+1] )
 							{
-								return m_argv[ii + 1];
+								return m_argv[ii+1];
 							}
 
 							return NULL;

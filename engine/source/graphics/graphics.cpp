@@ -10,7 +10,7 @@ namespace gfx
 		float _texelHalf = bgfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
 		bool _originBottomLeft = bgfx::getCaps()->originBottomLeft;
 
-		if (bgfx::checkAvailTransientVertexBuffer(3, PosTexCoord0Vertex::decl))
+		if (bgfx::getAvailTransientVertexBuffer(3, PosTexCoord0Vertex::decl) == 3)
 		{
 			bgfx::TransientVertexBuffer vb;
 			bgfx::allocTransientVertexBuffer(&vb, 3, PosTexCoord0Vertex::decl);

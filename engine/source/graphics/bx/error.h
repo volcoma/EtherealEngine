@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -7,6 +7,7 @@
 #define BX_ERROR_H_HEADER_GUARD
 
 #include "bx.h"
+#include "string.h"
 
 #define BX_ERROR_SET(_ptr, _result, _msg) \
 			BX_MACRO_BLOCK_BEGIN \
@@ -48,7 +49,13 @@ namespace bx
 		{
 		}
 
-		void setError(ErrorResult _errorResult, const char* _msg)
+		void reset()
+		{
+			m_code = 0;
+			m_msg.clear();
+		}
+
+		void setError(ErrorResult _errorResult, const StringView& _msg)
 		{
 			BX_CHECK(0 != _errorResult.code, "Invalid ErrorResult passed to setError!");
 
@@ -72,14 +79,24 @@ namespace bx
 			return result;
 		}
 
-		bool operator==(ErrorResult _rhs) const
+		const StringView& getMessage() const
+		{
+			return m_msg;
+		}
+
+		bool operator==(const ErrorResult& _rhs) const
 		{
 			return _rhs.code == m_code;
 		}
 
+		bool operator!=(const ErrorResult& _rhs) const
+		{
+			return _rhs.code != m_code;
+		}
+
 	private:
-		const char* m_msg;
-		uint32_t    m_code;
+		StringView m_msg;
+		uint32_t   m_code;
 	};
 
 	///

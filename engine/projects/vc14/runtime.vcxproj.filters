@@ -61,9 +61,6 @@
     <Filter Include="Source Files\rendering">
       <UniqueIdentifier>{aaa6a591-e384-4211-b98a-552136c6070c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\rendering\debug">
-      <UniqueIdentifier>{c9524f26-16b6-4462-a709-ed88df49631e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\system">
       <UniqueIdentifier>{e39a2e55-f530-404f-aef9-d4a5584d37a7}</UniqueIdentifier>
     </Filter>
@@ -90,6 +87,9 @@
     </Filter>
     <Filter Include="Source Files\system\sfml\system">
       <UniqueIdentifier>{c64dab96-bcac-4cc6-89a3-d2de07657feb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\rendering\debugdraw">
+      <UniqueIdentifier>{c9524f26-16b6-4462-a709-ed88df49631e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -240,11 +240,11 @@
     <ClCompile Include="..\..\source\runtime\system\task.cpp">
       <Filter>Source Files\system</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\runtime\rendering\debug\bounds.cpp">
-      <Filter>Source Files\rendering\debug</Filter>
+    <ClCompile Include="..\..\source\runtime\rendering\debugdraw\bounds.cpp">
+      <Filter>Source Files\rendering\debugdraw</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\runtime\rendering\debug\debugdraw.cpp">
-      <Filter>Source Files\rendering\debug</Filter>
+    <ClCompile Include="..\..\source\runtime\rendering\debugdraw\debugdraw.cpp">
+      <Filter>Source Files\rendering\debugdraw</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -500,35 +500,44 @@
     <ClInclude Include="..\..\source\runtime\system\task.h">
       <Filter>Source Files\system</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\runtime\rendering\debug\bounds.h">
-      <Filter>Source Files\rendering\debug</Filter>
+    <ClInclude Include="..\..\source\runtime\rendering\debugdraw\bounds.h">
+      <Filter>Source Files\rendering\debugdraw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\runtime\rendering\debug\debugdraw.h">
-      <Filter>Source Files\rendering\debug</Filter>
+    <ClInclude Include="..\..\source\runtime\rendering\debugdraw\debugdraw.h">
+      <Filter>Source Files\rendering\debugdraw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\runtime\rendering\debug\fs_debugdraw_fill.bin.h">
-      <Filter>Source Files\rendering\debug</Filter>
+    <ClInclude Include="..\..\source\runtime\rendering\debugdraw\fs_debugdraw_fill.bin.h">
+      <Filter>Source Files\rendering\debugdraw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\runtime\rendering\debug\fs_debugdraw_fill_lit.bin.h">
-      <Filter>Source Files\rendering\debug</Filter>
+    <ClInclude Include="..\..\source\runtime\rendering\debugdraw\fs_debugdraw_fill_lit.bin.h">
+      <Filter>Source Files\rendering\debugdraw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\runtime\rendering\debug\fs_debugdraw_lines.bin.h">
-      <Filter>Source Files\rendering\debug</Filter>
+    <ClInclude Include="..\..\source\runtime\rendering\debugdraw\fs_debugdraw_fill_texture.bin.h">
+      <Filter>Source Files\rendering\debugdraw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\runtime\rendering\debug\fs_debugdraw_lines_stipple.bin.h">
-      <Filter>Source Files\rendering\debug</Filter>
+    <ClInclude Include="..\..\source\runtime\rendering\debugdraw\fs_debugdraw_lines.bin.h">
+      <Filter>Source Files\rendering\debugdraw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\runtime\rendering\debug\vs_debugdraw_fill.bin.h">
-      <Filter>Source Files\rendering\debug</Filter>
+    <ClInclude Include="..\..\source\runtime\rendering\debugdraw\fs_debugdraw_lines_stipple.bin.h">
+      <Filter>Source Files\rendering\debugdraw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\runtime\rendering\debug\vs_debugdraw_fill_lit.bin.h">
-      <Filter>Source Files\rendering\debug</Filter>
+    <ClInclude Include="..\..\source\runtime\rendering\debugdraw\packrect.h">
+      <Filter>Source Files\rendering\debugdraw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\runtime\rendering\debug\vs_debugdraw_lines.bin.h">
-      <Filter>Source Files\rendering\debug</Filter>
+    <ClInclude Include="..\..\source\runtime\rendering\debugdraw\vs_debugdraw_fill.bin.h">
+      <Filter>Source Files\rendering\debugdraw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\runtime\rendering\debug\vs_debugdraw_lines_stipple.bin.h">
-      <Filter>Source Files\rendering\debug</Filter>
+    <ClInclude Include="..\..\source\runtime\rendering\debugdraw\vs_debugdraw_fill_lit.bin.h">
+      <Filter>Source Files\rendering\debugdraw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\rendering\debugdraw\vs_debugdraw_fill_texture.bin.h">
+      <Filter>Source Files\rendering\debugdraw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\rendering\debugdraw\vs_debugdraw_lines.bin.h">
+      <Filter>Source Files\rendering\debugdraw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\rendering\debugdraw\vs_debugdraw_lines_stipple.bin.h">
+      <Filter>Source Files\rendering\debugdraw</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

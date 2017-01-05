@@ -12,7 +12,7 @@
 #include "runtime/rendering/program.h"
 #include "runtime/rendering/texture.h"
 #include "runtime/rendering/material.h"
-#include "runtime/rendering/debug/debugdraw.h"
+#include "runtime/rendering/debugdraw/debugdraw.h"
 #include "runtime/assets/asset_manager.h"
 #include "../edit_state.h"
 #include "runtime/system/engine.h"
@@ -71,7 +71,8 @@ namespace editor
 				ddSetState(true, false, true);
 				ddSetColor(detailGridColor);
 				math::vec3 center = { 0.0f, 0.0f, 0.0f };
-				ddDrawGrid(Axis::Y, &center, gridSize / step, float(step));
+				math::vec3 normal = { 0.0f, 1.0f, 0.0f };
+				ddDrawGrid(&normal, &center, gridSize / step, float(step));
 				ddPop();
 			}
 
@@ -216,7 +217,14 @@ namespace editor
 					ddPush();
 					ddSetColor(0xff00ff00);
 					ddSetTransform(&worldTransform);
-					ddDrawAabb(&bounds.min, &bounds.max);
+					Aabb aabb;
+					aabb.m_min[0] = bounds.min.x;
+					aabb.m_min[1] = bounds.min.y;
+					aabb.m_min[2] = bounds.min.z;
+					aabb.m_max[0] = bounds.max.x;
+					aabb.m_max[1] = bounds.max.y;
+					aabb.m_max[2] = bounds.max.z;
+					ddDraw(aabb);
 					ddPop();
 				}
 			}

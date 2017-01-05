@@ -1,7 +1,8 @@
 #pragma once
 
 #include "bgfx/bgfx.h"
-#include "bgfx/bgfxplatform.h"
+#include "bgfx/platform.h"
+#include "bgfx/embedded_shader.h"
 #include "bx/spscqueue.h"
 #include "bx/handlealloc.h"
 #include "bx/readerwriter.h"

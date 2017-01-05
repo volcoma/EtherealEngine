@@ -56,8 +56,8 @@ void renderFunc(ImDrawData *_drawData)
 		std::uint32_t numVertices = (std::uint32_t)drawList->VtxBuffer.size();
 		std::uint32_t numIndices = (std::uint32_t)drawList->IdxBuffer.size();
 
-		if (!gfx::checkAvailTransientVertexBuffer(numVertices, sDecl)
-			|| !gfx::checkAvailTransientIndexBuffer(numIndices))
+		if (!gfx::getAvailTransientVertexBuffer(numVertices, sDecl) == numVertices
+			|| !gfx::getAvailTransientIndexBuffer(numIndices) == numIndices)
 		{
 			// not enough space in transient buffer just quit drawing the rest...
 			break;

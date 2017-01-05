@@ -26,10 +26,11 @@
     <ClInclude Include="..\..\lib\ib-compress\readbitstream.h" />
     <ClInclude Include="..\..\lib\ib-compress\writebitstream.h" />
     <ClInclude Include="..\..\source\graphics\bgfx\bgfx.h" />
-    <ClInclude Include="..\..\source\graphics\bgfx\bgfxdefines.h" />
-    <ClInclude Include="..\..\source\graphics\bgfx\bgfxplatform.h" />
     <ClInclude Include="..\..\source\graphics\bgfx\c99\bgfx.h" />
-    <ClInclude Include="..\..\source\graphics\bgfx\c99\bgfxplatform.h" />
+    <ClInclude Include="..\..\source\graphics\bgfx\c99\platform.h" />
+    <ClInclude Include="..\..\source\graphics\bgfx\defines.h" />
+    <ClInclude Include="..\..\source\graphics\bgfx\embedded_shader.h" />
+    <ClInclude Include="..\..\source\graphics\bgfx\platform.h" />
     <ClInclude Include="..\..\source\graphics\bx\allocator.h" />
     <ClInclude Include="..\..\source\graphics\bx\bx.h" />
     <ClInclude Include="..\..\source\graphics\bx\cl.h" />
@@ -38,15 +39,10 @@
     <ClInclude Include="..\..\source\graphics\bx\cpu.h" />
     <ClInclude Include="..\..\source\graphics\bx\crtimpl.h" />
     <ClInclude Include="..\..\source\graphics\bx\debug.h" />
+    <ClInclude Include="..\..\source\graphics\bx\easing.h" />
     <ClInclude Include="..\..\source\graphics\bx\endian.h" />
     <ClInclude Include="..\..\source\graphics\bx\error.h" />
     <ClInclude Include="..\..\source\graphics\bx\float4x4_t.h" />
-    <ClInclude Include="..\..\source\graphics\bx\float4_langext.h" />
-    <ClInclude Include="..\..\source\graphics\bx\float4_neon.h" />
-    <ClInclude Include="..\..\source\graphics\bx\float4_ni.h" />
-    <ClInclude Include="..\..\source\graphics\bx\float4_ref.h" />
-    <ClInclude Include="..\..\source\graphics\bx\float4_sse.h" />
-    <ClInclude Include="..\..\source\graphics\bx\float4_t.h" />
     <ClInclude Include="..\..\source\graphics\bx\foreach.h" />
     <ClInclude Include="..\..\source\graphics\bx\fpumath.h" />
     <ClInclude Include="..\..\source\graphics\bx\handlealloc.h" />
@@ -120,6 +116,7 @@
     <ClInclude Include="..\..\source\graphics\src\renderer_d3d9.h" />
     <ClInclude Include="..\..\source\graphics\src\renderer_gl.h" />
     <ClInclude Include="..\..\source\graphics\src\renderer_mtl.h" />
+    <ClInclude Include="..\..\source\graphics\src\renderer_vk.h" />
     <ClInclude Include="..\..\source\graphics\src\shader.h" />
     <ClInclude Include="..\..\source\graphics\src\shader_dx9bc.h" />
     <ClInclude Include="..\..\source\graphics\src\shader_dxbc.h" />
@@ -169,7 +166,6 @@
     <ClCompile Include="..\..\source\graphics\src\vertexdecl.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\source\graphics\bx\float4_swizzle.inl" />
     <None Include="..\..\source\graphics\bx\simd128_langext.inl" />
     <None Include="..\..\source\graphics\bx\simd128_neon.inl" />
     <None Include="..\..\source\graphics\bx\simd128_ref.inl" />

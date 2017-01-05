@@ -14,7 +14,7 @@
 #include "rendering/mesh.h"
 #include "rendering/texture.h"
 #include "rendering/model.h"
-#include "rendering/debug/debugdraw.h"
+#include "rendering/debugdraw/debugdraw.h"
 #include "rendering/light.h"
 
 #include "ecs/components/transform_component.h"
