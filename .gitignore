@@ -99,3 +99,4 @@ tools/embedded_build
 !engine_data/meshes/*.obj
 !editor_data/meshes/*.obj
 !engine/source/runtime/rendering/debug
+!editor_data/config/*.cfg
