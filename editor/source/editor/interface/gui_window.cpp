@@ -214,8 +214,8 @@ void GuiWindow::frame_end()
 	{
 		gui::SetTooltip(es->drag_data.description.c_str());
 	}
-	
-	if (!gui::IsAnyItemActive())
+
+	if (!gui::IsAnyItemActive() && !gui::IsAnyItemHovered())
 	{
 		if (gui::IsMouseDoubleClicked(0) && !imguizmo::is_over())
 		{

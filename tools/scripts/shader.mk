@@ -92,17 +92,17 @@ endif
 
 $(BUILD_INTERMEDIATE_DIR)/vs_%.asset : $(SHADERS_DIR)vs_%.sc
 	@echo [$(<)]
-	$(SILENT) $(SHADERC) $(VS_FLAGS) --type vertex --depends -o $(@) -f $(<) --disasm
+	$(SILENT) $(SHADERC) $(VS_FLAGS) --type vertex -o $(@) -f $(<)
 	$(SILENT) cp $(@) $(BUILD_OUTPUT_DIR)/$(@F)
 
 $(BUILD_INTERMEDIATE_DIR)/fs_%.asset : $(SHADERS_DIR)fs_%.sc
 	@echo [$(<)]
-	$(SILENT) $(SHADERC) $(FS_FLAGS) --type fragment --depends -o $(@) -f $(<) --disasm
+	$(SILENT) $(SHADERC) $(FS_FLAGS) --type fragment -o $(@) -f $(<)
 	$(SILENT) cp $(@) $(BUILD_OUTPUT_DIR)/$(@F)
 
 $(BUILD_INTERMEDIATE_DIR)/cs_%.asset : $(SHADERS_DIR)cs_%.sc
 	@echo [$(<)]
-	$(SILENT) $(SHADERC) $(CS_FLAGS) --type compute --depends -o $(@) -f $(<) --disasm
+	$(SILENT) $(SHADERC) $(CS_FLAGS) --type compute -o $(@) -f $(<)
 	$(SILENT) cp $(@) $(BUILD_OUTPUT_DIR)/$(@F)
 
 .PHONY: all

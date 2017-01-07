@@ -2007,7 +2007,7 @@ namespace bgfx
 
 } // namespace bgfx
 
-int compileShader(int _argc, const char* _argv[])
+int compile_shader(int _argc, const char* _argv[])
 {
 	return bgfx::compileShader(_argc, _argv);
 }

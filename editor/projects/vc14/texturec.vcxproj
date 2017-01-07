@@ -1,0 +1,412 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\texturec\edtaa3\edtaa3func.cpp" />
+    <ClCompile Include="..\..\source\texturec\etc1\etc1.cpp" />
+    <ClCompile Include="..\..\source\texturec\etc2\ProcessRGB.cpp" />
+    <ClCompile Include="..\..\source\texturec\etc2\Tables.cpp" />
+    <ClCompile Include="..\..\source\texturec\iqa\source\convolve.c" />
+    <ClCompile Include="..\..\source\texturec\iqa\source\decimate.c" />
+    <ClCompile Include="..\..\source\texturec\iqa\source\math_utils.c" />
+    <ClCompile Include="..\..\source\texturec\iqa\source\mse.c" />
+    <ClCompile Include="..\..\source\texturec\iqa\source\ms_ssim.c" />
+    <ClCompile Include="..\..\source\texturec\iqa\source\psnr.c" />
+    <ClCompile Include="..\..\source\texturec\iqa\source\ssim.c" />
+    <ClCompile Include="..\..\source\texturec\libsquish\alpha.cpp" />
+    <ClCompile Include="..\..\source\texturec\libsquish\clusterfit.cpp" />
+    <ClCompile Include="..\..\source\texturec\libsquish\colourblock.cpp" />
+    <ClCompile Include="..\..\source\texturec\libsquish\colourfit.cpp" />
+    <ClCompile Include="..\..\source\texturec\libsquish\colourset.cpp" />
+    <ClCompile Include="..\..\source\texturec\libsquish\maths.cpp" />
+    <ClCompile Include="..\..\source\texturec\libsquish\rangefit.cpp" />
+    <ClCompile Include="..\..\source\texturec\libsquish\singlecolourfit.cpp" />
+    <ClCompile Include="..\..\source\texturec\libsquish\squish.cpp" />
+    <ClCompile Include="..\..\source\texturec\nvtt\bc6h\zoh.cpp" />
+    <ClCompile Include="..\..\source\texturec\nvtt\bc6h\zohone.cpp" />
+    <ClCompile Include="..\..\source\texturec\nvtt\bc6h\zohtwo.cpp" />
+    <ClCompile Include="..\..\source\texturec\nvtt\bc6h\zoh_utils.cpp" />
+    <ClCompile Include="..\..\source\texturec\nvtt\bc7\avpcl.cpp" />
+    <ClCompile Include="..\..\source\texturec\nvtt\bc7\avpcl_mode0.cpp" />
+    <ClCompile Include="..\..\source\texturec\nvtt\bc7\avpcl_mode1.cpp" />
+    <ClCompile Include="..\..\source\texturec\nvtt\bc7\avpcl_mode2.cpp" />
+    <ClCompile Include="..\..\source\texturec\nvtt\bc7\avpcl_mode3.cpp" />
+    <ClCompile Include="..\..\source\texturec\nvtt\bc7\avpcl_mode4.cpp" />
+    <ClCompile Include="..\..\source\texturec\nvtt\bc7\avpcl_mode5.cpp" />
+    <ClCompile Include="..\..\source\texturec\nvtt\bc7\avpcl_mode6.cpp" />
+    <ClCompile Include="..\..\source\texturec\nvtt\bc7\avpcl_mode7.cpp" />
+    <ClCompile Include="..\..\source\texturec\nvtt\bc7\avpcl_utils.cpp" />
+    <ClCompile Include="..\..\source\texturec\nvtt\nvmath\fitting.cpp" />
+    <ClCompile Include="..\..\source\texturec\nvtt\nvtt.cpp" />
+    <ClCompile Include="..\..\source\texturec\pvrtc\BitScale.cpp" />
+    <ClCompile Include="..\..\source\texturec\pvrtc\MortonTable.cpp" />
+    <ClCompile Include="..\..\source\texturec\pvrtc\PvrTcDecoder.cpp" />
+    <ClCompile Include="..\..\source\texturec\pvrtc\PvrTcEncoder.cpp" />
+    <ClCompile Include="..\..\source\texturec\pvrtc\PvrTcPacket.cpp" />
+    <ClCompile Include="..\..\source\texturec\texturec.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\texturec\edtaa3\edtaa3func.h" />
+    <ClInclude Include="..\..\source\texturec\etc1\etc1.h" />
+    <ClInclude Include="..\..\source\texturec\etc2\Math.hpp" />
+    <ClInclude Include="..\..\source\texturec\etc2\ProcessCommon.hpp" />
+    <ClInclude Include="..\..\source\texturec\etc2\ProcessRGB.hpp" />
+    <ClInclude Include="..\..\source\texturec\etc2\Tables.hpp" />
+    <ClInclude Include="..\..\source\texturec\etc2\Types.hpp" />
+    <ClInclude Include="..\..\source\texturec\etc2\Vector.hpp" />
+    <ClInclude Include="..\..\source\texturec\iqa\include\convolve.h" />
+    <ClInclude Include="..\..\source\texturec\iqa\include\decimate.h" />
+    <ClInclude Include="..\..\source\texturec\iqa\include\iqa.h" />
+    <ClInclude Include="..\..\source\texturec\iqa\include\iqa_os.h" />
+    <ClInclude Include="..\..\source\texturec\iqa\include\math_utils.h" />
+    <ClInclude Include="..\..\source\texturec\iqa\include\ssim.h" />
+    <ClInclude Include="..\..\source\texturec\libsquish\alpha.h" />
+    <ClInclude Include="..\..\source\texturec\libsquish\clusterfit.h" />
+    <ClInclude Include="..\..\source\texturec\libsquish\colourblock.h" />
+    <ClInclude Include="..\..\source\texturec\libsquish\colourfit.h" />
+    <ClInclude Include="..\..\source\texturec\libsquish\colourset.h" />
+    <ClInclude Include="..\..\source\texturec\libsquish\config.h" />
+    <ClInclude Include="..\..\source\texturec\libsquish\maths.h" />
+    <ClInclude Include="..\..\source\texturec\libsquish\rangefit.h" />
+    <ClInclude Include="..\..\source\texturec\libsquish\simd.h" />
+    <ClInclude Include="..\..\source\texturec\libsquish\simd_float.h" />
+    <ClInclude Include="..\..\source\texturec\libsquish\singlecolourfit.h" />
+    <ClInclude Include="..\..\source\texturec\libsquish\squish.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\bc6h\bits.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\bc6h\shapes_two.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\bc6h\tile.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\bc6h\zoh.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\bc6h\zoh_utils.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\bc7\avpcl.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\bc7\avpcl_utils.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\bc7\bits.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\bc7\endpts.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\bc7\shapes_three.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\bc7\shapes_two.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\bc7\tile.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\nvcore\array.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\nvcore\debug.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\nvcore\defsgnucdarwin.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\nvcore\defsgnuclinux.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\nvcore\defsgnucwin32.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\nvcore\defsvcwin32.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\nvcore\foreach.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\nvcore\hash.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\nvcore\memory.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\nvcore\nvcore.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\nvcore\posh.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\nvcore\stdstream.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\nvcore\stream.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\nvcore\strlib.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\nvcore\utils.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\nvmath\fitting.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\nvmath\matrix.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\nvmath\nvmath.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\nvmath\plane.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\nvmath\vector.h" />
+    <ClInclude Include="..\..\source\texturec\nvtt\nvtt.h" />
+    <ClInclude Include="..\..\source\texturec\pvrtc\AlphaBitmap.h" />
+    <ClInclude Include="..\..\source\texturec\pvrtc\Bitmap.h" />
+    <ClInclude Include="..\..\source\texturec\pvrtc\BitScale.h" />
+    <ClInclude Include="..\..\source\texturec\pvrtc\BitUtility.h" />
+    <ClInclude Include="..\..\source\texturec\pvrtc\ColorRgba.h" />
+    <ClInclude Include="..\..\source\texturec\pvrtc\Interval.h" />
+    <ClInclude Include="..\..\source\texturec\pvrtc\MortonTable.h" />
+    <ClInclude Include="..\..\source\texturec\pvrtc\Point2.h" />
+    <ClInclude Include="..\..\source\texturec\pvrtc\PvrTcDecoder.h" />
+    <ClInclude Include="..\..\source\texturec\pvrtc\PvrTcEncoder.h" />
+    <ClInclude Include="..\..\source\texturec\pvrtc\PvrTcPacket.h" />
+    <ClInclude Include="..\..\source\texturec\pvrtc\RgbaBitmap.h" />
+    <ClInclude Include="..\..\source\texturec\pvrtc\RgbBitmap.h" />
+    <ClInclude Include="..\..\source\texturec\texturec.h" />
+    <ClInclude Include="..\..\source\texturec\tinyexr\tinyexr.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\source\texturec\libsquish\singlecolourlookup.inl" />
+    <None Include="..\..\source\texturec\nvtt\nvcore\array.inl" />
+    <None Include="..\..\source\texturec\nvtt\nvmath\matrix.inl" />
+    <None Include="..\..\source\texturec\nvtt\nvmath\plane.inl" />
+    <None Include="..\..\source\texturec\nvtt\nvmath\vector.inl" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4F86D98A-2A3B-48F0-8B69-52AEDCDB9EAF}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>
+    </RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>texturec</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>
+    </CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>
+    </CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>
+    </CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>
+    </CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>..\..\bin\lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)\compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)</TargetName>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
+    <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
+    <ExcludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(MSBuild_ExecutablePath);$(VC_LibraryPath_x86);</ExcludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>..\..\bin\lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)\compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)</TargetName>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+    <ExecutablePath>$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);</ExecutablePath>
+    <ExcludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(MSBuild_ExecutablePath);$(VC_LibraryPath_x64);</ExcludePath>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>..\..\bin\lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)\compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>..\..\bin\lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)\compiled\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <ExecutablePath>$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(FxCopDir);$(PATH);</ExecutablePath>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;__STDC__;__STDC_VERSION__=199901L;strdup=_strdup;alloca=_alloca;isascii=__isascii;NINCLUDE=64;NWORK=65536;NBUFF=65536;OLD_PREPROCESSOR=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\source\$(ProjectName);..\..\..\engine\source;..\..\source\$(ProjectName)\fcpp;..\..\source\$(ProjectName)\glsl-optimizer\include;..\..\source\$(ProjectName)\glsl-optimizer\include\c99;..\..\source\$(ProjectName)\glsl-optimizer\src;..\..\source\$(ProjectName)\glsl-optimizer\src\glsl;..\..\source\$(ProjectName)\glsl-optimizer\src\mesa</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>false</ExceptionHandling>
+      <DisableSpecificWarnings>4005</DisableSpecificWarnings>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalOptions>/wd4201 /wd4324 /Ob2 /wd4996  %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;__STDC__;__STDC_VERSION__=199901L;strdup=_strdup;alloca=_alloca;isascii=__isascii;NINCLUDE=64;NWORK=65536;NBUFF=65536;OLD_PREPROCESSOR=0;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\source\$(ProjectName);..\..\..\engine\source;..\..\source\$(ProjectName)\fcpp;..\..\source\$(ProjectName)\glsl-optimizer\include;..\..\source\$(ProjectName)\glsl-optimizer\include\c99;..\..\source\$(ProjectName)\glsl-optimizer\src;..\..\source\$(ProjectName)\glsl-optimizer\src\glsl;..\..\source\$(ProjectName)\glsl-optimizer\src\mesa</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>false</ExceptionHandling>
+      <DisableSpecificWarnings>4005</DisableSpecificWarnings>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <AdditionalOptions>/wd4201 /wd4324 /Ob2 /wd4996  %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+    </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;__STDC__;__STDC_VERSION__=199901L;strdup=_strdup;alloca=_alloca;isascii=__isascii;NINCLUDE=64;NWORK=65536;NBUFF=65536;OLD_PREPROCESSOR=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\source\$(ProjectName);..\..\..\engine\source;..\..\source\$(ProjectName)\fcpp;..\..\source\$(ProjectName)\glsl-optimizer\include;..\..\source\$(ProjectName)\glsl-optimizer\include\c99;..\..\source\$(ProjectName)\glsl-optimizer\src;..\..\source\$(ProjectName)\glsl-optimizer\src\glsl;..\..\source\$(ProjectName)\glsl-optimizer\src\mesa</AdditionalIncludeDirectories>
+      <StringPooling>true</StringPooling>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <DisableSpecificWarnings>4005</DisableSpecificWarnings>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <ExceptionHandling>false</ExceptionHandling>
+      <AdditionalOptions>/wd4201 /wd4324 /Ob2 /wd4996  %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>__STDC_LIMIT_MACROS;__STDC_FORMAT_MACROS;__STDC_CONSTANT_MACROS;WIN32;_WIN32;_HAS_EXCEPTIONS=0;_HAS_ITERATOR_DEBUGGING=0;_ITERATOR_DEBUG_LEVEL=0;_SCL_SECURE=0;_SECURE_SCL=0;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;__STDC__;__STDC_VERSION__=199901L;strdup=_strdup;alloca=_alloca;isascii=__isascii;NINCLUDE=64;NWORK=65536;NBUFF=65536;OLD_PREPROCESSOR=0;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\source\$(ProjectName);..\..\..\engine\source;..\..\source\$(ProjectName)\fcpp;..\..\source\$(ProjectName)\glsl-optimizer\include;..\..\source\$(ProjectName)\glsl-optimizer\include\c99;..\..\source\$(ProjectName)\glsl-optimizer\src;..\..\source\$(ProjectName)\glsl-optimizer\src\glsl;..\..\source\$(ProjectName)\glsl-optimizer\src\mesa</AdditionalIncludeDirectories>
+      <StringPooling>true</StringPooling>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <DisableSpecificWarnings>4005</DisableSpecificWarnings>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>true</OmitFramePointers>
+      <ExceptionHandling>false</ExceptionHandling>
+      <AdditionalOptions>/wd4201 /wd4324 /Ob2 /wd4996  %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

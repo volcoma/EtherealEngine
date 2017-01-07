@@ -1,4 +1,4 @@
-RUNTIME_DIR=runtime
+RUNTIME_DIR=compiled
 BUILD_DIR=build
 
 include ../../Tools/scripts/shader.mk

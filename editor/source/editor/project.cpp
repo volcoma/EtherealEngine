@@ -18,21 +18,16 @@ class Material;
 namespace editor
 {
 	template<typename T>
-	void watch_assets(const fs::path& protocol, bool reloadAsync)
+	void watch_assets(const fs::path& protocol, const std::string& wildcard, bool initialList, bool reloadAsync)
 	{
 		auto am = core::get_subsystem<runtime::AssetManager>();
 		auto ts = core::get_subsystem<runtime::TaskSystem>();
 		auto storage = am->get_storage<T>();
 
 		const fs::path dir = fs::resolve_protocol(protocol);
-		static const std::string ext = "*.asset";
-		fs::path watchDir = dir / storage->subdir;
-		fs::create_directory(watchDir, std::error_code{});
-		watchDir /= storage->platform;
-		fs::create_directory(watchDir, std::error_code{});
-		watchDir /= ext;
+		fs::path watchDir = dir / storage->subdir / storage->platform / wildcard;
 
-		fs::watcher::watch(watchDir, true, [am, ts, protocol, reloadAsync](const std::vector<fs::watcher::Entry>& entries)
+		fs::watcher::watch(watchDir, initialList, [am, ts, protocol, reloadAsync](const std::vector<fs::watcher::Entry>& entries)
 		{
 			for (auto& entry : entries)
 			{
@@ -63,21 +58,25 @@ namespace editor
 		});
 	}
 
-	void watch_raw_shaders(const fs::path& protocol)
+	template<typename T>
+	void watch_raw_assets(const fs::path& protocol, const std::string& wildcard, bool initialList, const std::string& ignoreFile)
 	{
 		auto ts = core::get_subsystem<runtime::TaskSystem>();
 
 		const fs::path dir = fs::resolve_protocol(protocol);
-		static const std::string ext = "*.sc";
-		const fs::path watchDir = dir / ext;
+		const fs::path watchDir = dir / wildcard;
 
-		fs::watcher::watch(watchDir, false, [ts](const std::vector<fs::watcher::Entry>& entries)
+		fs::watcher::watch(watchDir, initialList, [ts, ignoreFile](const std::vector<fs::watcher::Entry>& entries)
 		{
 			for (auto& entry : entries)
 			{
 				const auto& p = entry.path;
-				if (string_utils::ends_with(p.string(), "def.sc"))
-					continue;
+
+				if (!ignoreFile.empty())
+				{
+					if(p.filename() == ignoreFile)
+						continue;
+				}
 
 				if (entry.state == fs::watcher::Entry::Removed)
 				{
@@ -90,7 +89,7 @@ namespace editor
 					{
 						auto task = ts->create("", [p]()
 						{
-							ShaderCompiler::compile(p);
+							AssetCompiler<T>::compile(p);
 						});
 						ts->run(task);
 					}
@@ -99,16 +98,15 @@ namespace editor
 		});
 	}
 
-
-	void ProjectManager::open_project(const fs::path& projectPath)
+	void ProjectManager::open_project(const fs::path& project_path, bool recompile_assets)
 	{
-		if (!fs::exists(projectPath, std::error_code{}))
+		if (!fs::exists(project_path, std::error_code{}))
 		{
 			auto logger = logging::get("Log");
-			logger->error().write("Project directory doesn't exist {0}", projectPath.string());
+			logger->error().write("Project directory doesn't exist {0}", project_path.string());
 			return;
 		}
-		fs::add_path_protocol("app:", projectPath);
+		fs::add_path_protocol("app:", project_path);
 		fs::add_path_protocol("data:", fs::resolve_protocol("app://data"));
 		fs::watcher::unwatch_all();
 		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
@@ -118,53 +116,66 @@ namespace editor
 		es->unselect();
 		es->scene.clear();
 		am->clear("data://");
-		set_current_project(projectPath.filename().string());
+		set_current_project(project_path.filename().string());
 		auto& rp = _options.recent_project_paths;
-		if (std::find(std::begin(rp), std::end(rp), projectPath.generic_string()) == std::end(rp))
+		if (std::find(std::begin(rp), std::end(rp), project_path.generic_string()) == std::end(rp))
 		{
-			rp.push_back(projectPath.generic_string());
+			rp.push_back(project_path.generic_string());
 			save_config();
 		}
 
-		watch_assets<Texture>("data://textures", true);
-		watch_assets<Mesh>("data://meshes", true);
-		watch_assets<Prefab>("data://prefabs", true);
-		watch_assets<Shader>("data://shaders", true);
-		watch_raw_shaders("data://shaders");
-		watch_assets<Material>("data://materials", false);
+		watch_assets<Texture>("data://textures", "*.asset", true, true);
+		watch_raw_assets<Texture>("data://textures", "*.png", recompile_assets, "");
+		watch_raw_assets<Texture>("data://textures", "*.tga", recompile_assets, "");
+		watch_raw_assets<Texture>("data://textures", "*.dds", recompile_assets, "");
+		watch_raw_assets<Texture>("data://textures", "*.ktx", recompile_assets, "");
+		watch_raw_assets<Texture>("data://textures", "*.pvr", recompile_assets, "");
 
-		watch_assets<Shader>("engine_data://shaders", true);
-		watch_raw_shaders("engine_data://shaders");
+		watch_assets<Shader>("data://shaders", "*.asset", true, true);
+		watch_raw_assets<Shader>("data://shaders", "*.sc", recompile_assets, "varying.def.sc");
 
-		watch_assets<Shader>("editor_data://shaders", true);
-		watch_assets<Texture>("editor_data://icons", true);
-		watch_raw_shaders("editor_data://shaders");
+		watch_assets<Mesh>("data://meshes", "*.asset", true, true);
+		watch_assets<Prefab>("data://prefabs", "*.asset", true, true);
+		watch_assets<Material>("data://materials", "*.asset", true, false);
+
+		/// for debug purposes
+// 		watch_assets<Shader>("engine_data://shaders", "*.asset", true, true);
+// 		watch_raw_assets<Shader>("engine_data://shaders", "*.sc", recompile_assets, "varying.def.sc");
+// 
+// 		watch_assets<Texture>("engine_data://textures", "*.asset", true, true);
+// 		watch_raw_assets<Texture>("engine_data://textures", "*.png", recompile_assets, "");
+// 		watch_raw_assets<Texture>("engine_data://textures", "*.tga", recompile_assets, "");
+// 		watch_raw_assets<Texture>("engine_data://textures", "*.dds", recompile_assets, "");
+// 		watch_raw_assets<Texture>("engine_data://textures", "*.ktx", recompile_assets, "");
+// 		watch_raw_assets<Texture>("engine_data://textures", "*.pvr", recompile_assets, "");
+// 
+// 		watch_assets<Texture>("editor_data://icons", "*.asset", true, true);
+// 		watch_raw_assets<Texture>("editor_data://icons", "*.png", recompile_assets, "");
+// 		watch_raw_assets<Texture>("editor_data://icons", "*.tga", recompile_assets, "");
+// 		watch_raw_assets<Texture>("editor_data://icons", "*.dds", recompile_assets, "");
+// 		watch_raw_assets<Texture>("editor_data://icons", "*.ktx", recompile_assets, "");
+// 		watch_raw_assets<Texture>("editor_data://icons", "*.pvr", recompile_assets, "");
+// 
+// 		watch_assets<Shader>("editor_data://shaders", "*.asset", true, true);
+// 		watch_raw_assets<Shader>("editor_data://shaders", "*.sc", recompile_assets, "varying.def.sc");
 
 	}
 
-	void ProjectManager::create_project(const fs::path& projectPath)
+	void ProjectManager::create_project(const fs::path& project_path)
 	{
-		fs::add_path_protocol("app:", projectPath);
+		fs::add_path_protocol("app:", project_path);
 		fs::create_directory(fs::resolve_protocol("app://data"), std::error_code{});
 		fs::create_directory(fs::resolve_protocol("app://data/shaders"), std::error_code{});
 		fs::create_directory(fs::resolve_protocol("app://data/textures"), std::error_code{});
 		fs::create_directory(fs::resolve_protocol("app://data/materials"), std::error_code{});
 		fs::create_directory(fs::resolve_protocol("app://data/meshes"), std::error_code{});
 		fs::create_directory(fs::resolve_protocol("app://data/scenes"), std::error_code{});
-		fs::create_directory(fs::resolve_protocol("app://data/shaders/runtime"), std::error_code{});
-		fs::create_directory(fs::resolve_protocol("app://data/shaders/runtime/dx9"), std::error_code{});
-		fs::create_directory(fs::resolve_protocol("app://data/shaders/runtime/dx11"), std::error_code{});
-		fs::create_directory(fs::resolve_protocol("app://data/shaders/runtime/glsl"), std::error_code{});
-		fs::create_directory(fs::resolve_protocol("app://data/shaders/runtime/metal"), std::error_code{});
-		fs::create_directory(fs::resolve_protocol("app://data/textures/runtime"), std::error_code{});
-		fs::create_directory(fs::resolve_protocol("app://data/meshes/runtime"), std::error_code{});
 		fs::create_directory(fs::resolve_protocol("app://data/prefabs"), std::error_code{});
-		fs::create_directory(fs::resolve_protocol("app://data/scenes"), std::error_code{});
 		fs::create_directory(fs::resolve_protocol("app://settings"), std::error_code{});
 
-		fs::copy(fs::resolve_protocol("engine_data://meshes/runtime"), fs::resolve_protocol("app://data/meshes/runtime"), std::error_code{});
+		fs::copy(fs::resolve_protocol("engine_data://meshes"), fs::resolve_protocol("app://data/meshes"), std::error_code{});
 
-		open_project(projectPath);
+		open_project(project_path, false);
 	}
 
 	void ProjectManager::open()

@@ -11,34 +11,6 @@ namespace bgfx
 	extern bool g_verbose;
 }
 
-// #define _BX_TRACE(_format, ...) \
-// 				BX_MACRO_BLOCK_BEGIN \
-// 					if (bgfx::g_verbose) \
-// 					{ \
-// 						fprintf(stdout, BX_FILE_LINE_LITERAL "" _format "\n", ##__VA_ARGS__); \
-// 					} \
-// 				BX_MACRO_BLOCK_END
-// 
-// #define _BX_WARN(_condition, _format, ...) \
-// 				BX_MACRO_BLOCK_BEGIN \
-// 					if (!(_condition) ) \
-// 					{ \
-// 						BX_TRACE("WARN " _format, ##__VA_ARGS__); \
-// 					} \
-// 				BX_MACRO_BLOCK_END
-// 
-// #define _BX_CHECK(_condition, _format, ...) \
-// 				BX_MACRO_BLOCK_BEGIN \
-// 					if (!(_condition) ) \
-// 					{ \
-// 						BX_TRACE("CHECK " _format, ##__VA_ARGS__); \
-// 						bx::debugBreak(); \
-// 					} \
-// 				BX_MACRO_BLOCK_END
-// 
-// #define BX_TRACE _BX_TRACE
-// #define BX_WARN  _BX_WARN
-// #define BX_CHECK _BX_CHECK
 
 #ifndef SHADERC_CONFIG_HLSL
 #	define SHADERC_CONFIG_HLSL BX_PLATFORM_WINDOWS
@@ -134,6 +106,6 @@ namespace bgfx
 
 } // namespace bgfx
 
-int compileShader(int _argc, const char* _argv[]);
+int compile_shader(int _argc, const char* _argv[]);
 
 #endif // SHADERC_H_HEADER_GUARD

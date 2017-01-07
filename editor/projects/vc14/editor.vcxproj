@@ -328,6 +328,9 @@
     <ProjectReference Include="shaderc.vcxproj">
       <Project>{4b8a4ad9-d7c0-4978-99d7-f4e9dde756ab}</Project>
     </ProjectReference>
+    <ProjectReference Include="texturec.vcxproj">
+      <Project>{4f86d98a-2a3b-48f0-8b69-52aedcdb9eaf}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\editor\assets\asset_compiler.cpp" />

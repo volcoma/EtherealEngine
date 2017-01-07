@@ -96,12 +96,18 @@ namespace editor
 		{
 			icons["wireframe"] = asset;
 		});
+
 		am->load<Texture>("editor_data://icons/prefab", false)
 			.then([this](auto asset) mutable
 		{
 			icons["prefab"] = asset;
 		});
 
+		am->load<Texture>("editor_data://icons/shader", false)
+			.then([this](auto asset) mutable
+		{
+			icons["shader"] = asset;
+		});
 
 		return true;
 	}

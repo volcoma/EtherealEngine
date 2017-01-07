@@ -1,4 +1,4 @@
-RUNTIME_DIR=runtime
+RUNTIME_DIR=
 BUILD_DIR=build
 
 include ../../Tools/scripts/texture.mk

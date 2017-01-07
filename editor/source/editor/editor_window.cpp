@@ -375,13 +375,15 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoMove |
 		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_HorizontalScrollbar |
 		ImGuiWindowFlags_NoSavedSettings;
 
+	static bool recompile_assets = true;
 	gui::Text("Recent Projects");
 	gui::Separator();
 	gui::BeginGroup();
 	{
-		if (gui::BeginChild("###projects_content", ImVec2(gui::GetContentRegionAvail().x / 1.3f, gui::GetContentRegionAvail().y), false, flags))
+		if (gui::BeginChild("###projects_content", ImVec2(gui::GetContentRegionAvail().x * 0.7f, gui::GetContentRegionAvail().y - gui::GetTextLineHeightWithSpacing()), false, flags))
 		{
 			
 			const auto& rencent_projects = pm->get_recent_projects();
@@ -389,7 +391,7 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 			{
 				if (gui::Selectable(path.c_str()))
 				{
-					pm->open_project(path);
+					pm->open_project(path, recompile_assets);
 					load_editor_camera();
 					set_main(false);
 					close();
@@ -397,11 +399,12 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 			}
 			gui::EndChild();
 		}
+		gui::Checkbox("Recompile Assets", &recompile_assets);
 	}
 	gui::EndGroup();
 
 	gui::SameLine();
-
+	
 	gui::BeginGroup();
 	{
 		if (gui::Button("NEW PROJECT"))
@@ -421,14 +424,17 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 			std::string path;
 			if (open_folder_dialog("", fs::resolve_protocol("engine://").string(), path))
 			{
-				pm->open_project(path);
+				pm->open_project(path, recompile_assets);
 				load_editor_camera();
 				set_main(false);
 				close();
 			}
 		}
+
+		
 	}
 	gui::EndGroup();
+	
 
 	GuiWindow::on_gui(dt);
 }

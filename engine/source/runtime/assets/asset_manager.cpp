@@ -11,7 +11,7 @@ namespace runtime
 			auto storage = add<Shader>();
 			storage->load_from_file = AssetReader::load_shader_from_file;
 			storage->load_from_memory = AssetReader::load_shader_from_memory;
-			storage->subdir = "runtime/";
+			storage->subdir = "compiled/";
 			switch (gfx::getRendererType())
 			{
 			case gfx::RendererType::Direct3D9:
@@ -41,13 +41,13 @@ namespace runtime
 		}
 		{
 			auto storage = add<Texture>();
-			storage->subdir = "runtime/";
+			storage->subdir = "";
 			storage->load_from_file = AssetReader::load_texture_from_file;
 			//storage->loadFromMemory = AssetReader::loadTextureFromMemory;
 		}
 		{
 			auto storage = add<Mesh>();
-			storage->subdir = "runtime/";
+			storage->subdir = "";
 			storage->load_from_file = AssetReader::load_mesh_from_file;
 			//storage->loadFromMemory = AssetReader::loadMeshFromMemory;
 		}

@@ -11,15 +11,9 @@
 #include "../system/task.h"
 #include "core/serialization/archives.h"
 #include "meta/rendering/material.hpp"
-
 #include <cstdint>
 
 #include "ib-compress/indexbufferdecompression.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb/stb_image.c"
-typedef unsigned char stbi_uc;
-extern "C" stbi_uc *stbi_load_from_memory(stbi_uc const *buffer, int len, int *x, int *y, int *comp, int req_comp);
-extern "C" void stbi_image_free(void *retval_from_stbi_load);
 
 void AssetReader::load_texture_from_file(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Texture>& request)
 {
@@ -43,58 +37,18 @@ void AssetReader::load_texture_from_file(const std::string& key, const fs::path&
 			return;
 
 		std::string ext = absoluteKey.extension().string();
-		if (ext == ".dds"
-			|| ext == ".pvr"
-			|| ext == ".ktx"
-			|| ext == ".asset")
+		
+		const gfx::Memory* mem = gfx::copy(read_memory->data(), static_cast<std::uint32_t>(read_memory->size()));
+		read_memory->clear();
+		read_memory.reset();
+
+		if (nullptr != mem)
 		{
-			const gfx::Memory* mem = gfx::copy(read_memory->data(), static_cast<std::uint32_t>(read_memory->size()));
-			read_memory->clear();
-			read_memory.reset();
-
-			if (nullptr != mem)
-			{
-				auto texture = std::make_shared<Texture>(mem, 0, 0, nullptr);
-				request.set_data(key, texture);
-				request.invoke_callbacks();
-			}
+			auto texture = std::make_shared<Texture>(mem, 0, 0, nullptr);
+			request.set_data(key, texture);
+			request.invoke_callbacks();
 		}
-		else
-		{
-			int width = 0;
-			int height = 0;
-			int comp = 0;
-
-			uint8_t* img = stbi_load_from_memory(read_memory->data()
-				, static_cast<int>(read_memory->size())
-				, &width
-				, &height
-				, &comp
-				, 4
-			);
-
-			read_memory->clear();
-			read_memory.reset();
-
-			if (nullptr != img)
-			{
-				auto texture = std::make_shared<Texture>(
-					std::uint16_t(width)
-					, std::uint16_t(height)
-					, false
-					, 1
-					, gfx::TextureFormat::RGBA8
-					, 0
-					, gfx::copy(img, width*height * 4)
-					);
-
-
-				stbi_image_free(img);
-
-				request.set_data(key, texture);
-				request.invoke_callbacks();
-			}
-		}
+		
 	};
 
 	if (async)

@@ -2,6 +2,7 @@
 #include "runtime/rendering/mesh.h"
 #include "runtime/rendering/material.h"
 #include "runtime/rendering/texture.h"
+#include "runtime/rendering/shader.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/system/filesystem.h"
 #include "runtime/ecs/prefab.h"
@@ -42,6 +43,14 @@ AssetHandle<Texture> get_asset_icon(AssetHandle<Material> asset)
 	auto es = core::get_subsystem<editor::EditState>();
 	return es->icons["material"];
 }
+
+template<>
+AssetHandle<Texture> get_asset_icon(AssetHandle<Shader> asset)
+{
+	auto es = core::get_subsystem<editor::EditState>();
+	return es->icons["shader"];
+}
+
 namespace Docks
 {
 	template<typename T>
@@ -56,12 +65,12 @@ namespace Docks
 		for (auto& asset : container)
 		{
 			auto& assetRelativeName = asset.first;
-			auto& assetHandle = asset.second.asset;
 			auto path = fs::path(assetRelativeName);
 
 			if (path.root_path().generic_string() != "data:/")
 				continue;
 
+			auto& assetHandle = asset.second.asset;
 			const auto assetName = path.filename().string();
 			const auto assetDir = path.remove_filename();
 
@@ -81,7 +90,7 @@ namespace Docks
 
 			std::string inputBuff = assetName;
 			inputBuff.resize(64, 0);
-
+			inputBuff.shrink_to_fit();
 			int action = gui::ImageButtonWithLabel(
 				get_asset_icon(assetHandle).link->asset,
 				{ size, size },
@@ -98,7 +107,7 @@ namespace Docks
 			else if (action == 2)
 			{
 				std::string newName = std::string(inputBuff.c_str());
-				if (newName != assetName)
+				if (newName != assetName && newName != "")
 				{
 					std::string newAssetRelativeName = (assetDir / newName).generic_string();
 					manager.rename_asset<T>(assetRelativeName, newAssetRelativeName);
@@ -122,7 +131,7 @@ namespace Docks
 	
 				gui::EndPopup();
 			}
-			if (alreadySelected && input.is_key_pressed(sf::Keyboard::Delete))
+			if (alreadySelected && !gui::IsAnyItemActive() && input.is_key_pressed(sf::Keyboard::Delete))
 			{
 				manager.delete_asset<T>(assetRelativeName);
 				editState.unselect();
@@ -147,6 +156,7 @@ namespace Docks
 		auto textures = am->get_storage<Texture>();
 		auto materials = am->get_storage<Material>();
 		auto prefabs = am->get_storage<Prefab>();
+		auto shaders = am->get_storage<Shader>();
 		auto& icons = es->icons;
 
 		float width = gui::GetContentRegionAvailWidth();
@@ -164,7 +174,7 @@ namespace Docks
 		gui::Separator();
 
 		static std::string selectedCategory;
-		static const std::vector<std::string> categories = { "Materials", "Textures", "Prefabs", "Meshes" };
+		static const std::vector<std::string> categories = { "Materials", "Textures", "Prefabs", "Meshes", "Shaders" };
 
 		ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |
 			ImGuiWindowFlags_NoMove |
@@ -216,6 +226,7 @@ namespace Docks
 			if (selectedCategory == "Prefabs")
 				list_items(prefabs, *am, *input, *es);
 
+
 			if (selectedCategory == "Materials")
 			{
 				if (!list_items(materials, *am, *input, *es))
@@ -234,6 +245,9 @@ namespace Docks
 				}
 				
 			}
+
+			if (selectedCategory == "Shaders")
+				list_items(shaders, *am, *input, *es);
 
 			gui::EndChild();
 		}

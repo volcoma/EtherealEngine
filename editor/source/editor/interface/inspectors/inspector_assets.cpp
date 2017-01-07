@@ -88,6 +88,7 @@ bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, s
 	}
 	
 
+	if(data)
 	{
 		rttr::variant vari = data.get()->info;
 		changed |= inspect_var(vari);

@@ -3,7 +3,7 @@
 #include "core/logging/logging.h"
 #include "runtime/system/filesystem.h"
 #include "shaderc/shaderc.h"
-#include "runtime/rendering/shader.h"
+#include "texturec/texturec.h"
 
 void ShaderCompiler::compile(const fs::path& absoluteKey)
 {
@@ -21,7 +21,7 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 	
 	for (int i = 0; i < 4; ++i)
 	{
-		fs::path output = dir / "runtime";
+		fs::path output = dir / "compiled";
 		fs::create_directory(output, std::error_code{});
 
 		output = output / supported[i];
@@ -93,7 +93,7 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 			//glsl shader compilation is not thread safe-
 			static std::mutex mtx;
 			std::lock_guard<std::mutex> lock(mtx);
-			if (compileShader(arg_count, args_array) == EXIT_FAILURE)
+			if (compile_shader(arg_count, args_array) != 0)
 			{
 				logger->error().write("Failed to compile shader: {0}", strOutput.c_str());
 			}
@@ -104,7 +104,7 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 		}
 		else
 		{
-			if (compileShader(arg_count, args_array) == EXIT_FAILURE)
+			if (compile_shader(arg_count, args_array) != 0)
 			{
 				logger->error().write("Failed to compile shader: {0}", strOutput.c_str());
 			}
@@ -116,4 +116,43 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 		
 	}
 	
+}
+
+
+void TextureCompiler::compile(const fs::path& absoluteKey)
+{
+	fs::path input = absoluteKey;
+	std::string strInput = input.string();
+	std::string file = input.filename().replace_extension().string();
+	fs::path dir = input.remove_filename();
+
+	static const std::string ext = ".asset";
+
+	fs::path output = dir;
+
+	output /= fs::path(file + ext);
+
+	std::string strOutput = output.string();
+
+	static const int arg_count = 5;
+	const char* args_array[arg_count];
+	args_array[0] = "-f";
+	args_array[1] = strInput.c_str();
+	args_array[2] = "-o";
+	args_array[3] = strOutput.c_str();
+	args_array[4] = "-m";
+// 	args_array[4] = "-t";
+// 	args_array[5] = "RGBA8";
+
+	auto logger = logging::get("Log");
+
+	if (compile_texture(arg_count, args_array) != 0)
+	{
+		logger->error().write("Failed to compile texture: {0}", strOutput.c_str());
+	}
+	else
+	{
+		logger->info().write("Successfully compiled texture: {0}", strOutput.c_str());
+	}
+
 }
