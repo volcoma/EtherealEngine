@@ -174,6 +174,8 @@ namespace ImGui
 		static bool edit_label = false;
 		int return_value = 0;
 		auto pos = GetCursorScreenPos();
+		ImGuiWindow* window = GetCurrentWindow();
+		bool inputActive = false;
 		BeginGroup();
 		{
 			if(selected)
@@ -181,9 +183,15 @@ namespace ImGui
 			else
 				Image(texture, size);
 
+			auto pos = GetCursorScreenPos();
+			PushItemWidth(size.x);
+			LabelText("", label);
+			PopItemWidth();
 			
 			if(selected && edit_label)
 			{	
+				SetCursorScreenPos(pos);
+
 				PushItemWidth(size.x);
 				if (InputText("",
 					&buf[0],
@@ -193,32 +201,29 @@ namespace ImGui
 					edit_label = false;
 					return_value = 2;
 				}
-				PopItemWidth();
+				PopItemWidth();		
 
-				if (!IsItemActive() && (IsMouseClicked(0) || IsMouseDragging()))
+				inputActive = IsItemActive();
+				if (!inputActive && (IsMouseClicked(0) || IsMouseDragging()))
 				{
 					edit_label = false;
 				}
+			
 			}
-			else
-			{
-				PushItemWidth(size.x);
-				LabelText("", label);
-				PopItemWidth();
-			}
-
 		}
 		EndGroup();
 
-		ImGuiWindow* window = GetCurrentWindow();
+		
 		static ImGuiID id;
 
 		if (IsItemHoveredRect() && !IsMouseDragging(0))
 		{
 			if (IsMouseClicked(0))
 			{
-				id = window->GetID(label);
-				SetActiveID(id);
+ 				id = window->GetID(label);
+
+				if(!inputActive)
+ 					SetActiveID(id);
 			}
 
 			if (IsMouseReleased(0) && window->GetID(label) == id)
@@ -228,12 +233,13 @@ namespace ImGui
 
 				return_value = 1;
 			}
-			
+
 			if (IsMouseDoubleClicked(0))
 			{
 				edit_label = selected;
 			}
 		}
+		
 
 		return return_value;
 	}
