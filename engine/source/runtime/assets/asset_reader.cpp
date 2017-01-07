@@ -180,9 +180,9 @@ struct MeshData
 {
 	gfx::VertexDecl decl;
 	std::vector<Group> groups;
+	MeshInfo info;
 	std::vector<std::pair<fs::byte_array_t, fs::byte_array_t>> buffersMem; // vb, ib
 	math::bbox aabb;
-	MeshInfo info;
 };
 
 
@@ -203,6 +203,8 @@ void AssetReader::load_mesh_from_file(const std::string& key, const fs::path& ab
 		FileStreamReaderSeeker _reader(absoluteKey.string());
 
 		std::pair<fs::byte_array_t, fs::byte_array_t> buffers;
+		std::uint16_t numVertices = 0;
+		std::uint32_t numIndices = 0;
 		std::uint32_t chunk;
 		gfx::Error err;
 		while (4 == gfx::read(&_reader, chunk, &err)
@@ -216,7 +218,6 @@ void AssetReader::load_mesh_from_file(const std::string& key, const fs::path& ab
 
 				std::uint16_t stride = data->decl.getStride();
 
-				std::uint16_t numVertices;
 				gfx::read(&_reader, numVertices);
 				buffers.first.resize(numVertices*stride);
 				gfx::read(&_reader, (std::uint8_t*)buffers.first.data(), (std::uint32_t)buffers.first.size());
@@ -227,7 +228,6 @@ void AssetReader::load_mesh_from_file(const std::string& key, const fs::path& ab
 
 			case BGFX_CHUNK_MAGIC_IB:
 			{
-				std::uint32_t numIndices;
 				gfx::read(&_reader, numIndices);
 				buffers.second.resize(numIndices * 2);
 				gfx::read(&_reader, (std::uint8_t*)buffers.second.data(), (std::uint32_t)buffers.second.size());
@@ -236,7 +236,6 @@ void AssetReader::load_mesh_from_file(const std::string& key, const fs::path& ab
 
 			case BGFX_CHUNK_MAGIC_IBC:
 			{
-				std::uint32_t numIndices;
 				gfx::read(&_reader, numIndices);
 
 				std::uint32_t compressedSize;
@@ -256,6 +255,11 @@ void AssetReader::load_mesh_from_file(const std::string& key, const fs::path& ab
 				uint16_t len;
 				gfx::read(&_reader, len);
 				Group group;
+				group.vertices += numVertices;
+				group.indices += numIndices;
+				group.primitives += numIndices / 3;
+				numVertices = 0;
+				numIndices = 0;
 				group.material.resize(len);
 				gfx::read(&_reader, &group.material[0], len);
 
@@ -278,13 +282,12 @@ void AssetReader::load_mesh_from_file(const std::string& key, const fs::path& ab
 					// 					read(_reader, prim.m_obb);
 
 					group.subsets.push_back(subset);
-					data->info.vertices += subset.m_numVertices;
-					data->info.indices += subset.m_numIndices;
-					data->info.primitives += subset.m_numIndices / 3;
 				}
-
+				data->info.vertices += group.vertices;
+				data->info.indices += group.indices;
+				data->info.primitives += group.primitives;
 				data->groups.emplace_back(group);
-				data->buffersMem.emplace_back(buffers);
+				data->buffersMem.emplace_back(buffers);				
 				buffers.first.clear();
 				buffers.second.clear();
 			}

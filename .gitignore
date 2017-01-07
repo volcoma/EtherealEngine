@@ -94,9 +94,9 @@ ipch/
 examples/
 build/
 tools/embedded_build
+editor_data/config/*.cfg
 
 # Don't want to ignore .objs files in Assets
 !engine_data/meshes/*.obj
 !editor_data/meshes/*.obj
 !engine/source/runtime/rendering/debug
-!editor_data/config/*.cfg

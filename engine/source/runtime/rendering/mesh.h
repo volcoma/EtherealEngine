@@ -28,6 +28,9 @@ struct Group
 {
 	std::string material;
 	std::vector<Subset> subsets;
+	std::uint32_t vertices = 0;
+	std::uint32_t indices = 0;
+	std::uint32_t primitives = 0;
 	std::shared_ptr<VertexBuffer> vertexBuffer;
 	std::shared_ptr<IndexBuffer> indexBuffer;
 };
