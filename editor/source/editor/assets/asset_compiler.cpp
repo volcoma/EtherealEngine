@@ -96,22 +96,22 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 			std::lock_guard<std::mutex> lock(mtx);
 			if (compile_shader(arg_count, args_array) != 0)
 			{
-				logger->error().write("Failed to compile shader: {0}", strOutput.c_str());
+				logger->error().write("Failed to compile SHADER: {0}", strInput);
 			}
 			else
 			{
-				logger->info().write("Successfully compiled shader: {0}", strOutput.c_str());
+				logger->info().write("Compiled SHADER: {0} -> {1}", strInput, strOutput);
 			}
 		}
 		else
 		{
 			if (compile_shader(arg_count, args_array) != 0)
 			{
-				logger->error().write("Failed to compile shader: {0}", strOutput.c_str());
+				logger->error().write("Failed to compile SHADER: {0}", strInput);
 			}
 			else
 			{
-				logger->info().write("Successfully compiled shader: {0}", strOutput.c_str());
+				logger->info().write("Compiled SHADER: {0} -> {1}", strInput, strOutput);
 			}
 		}
 		
@@ -122,9 +122,12 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 
 void TextureCompiler::compile(const fs::path& absoluteKey)
 {
+	auto logger = logging::get("Log");
 	fs::path input = absoluteKey;
 	std::string strInput = input.string();
+	std::string raw_ext = input.filename().extension().string();
 	std::string file = input.filename().replace_extension().string();
+
 	fs::path dir = input.remove_filename();
 
 	static const std::string ext = ".asset";
@@ -135,6 +138,15 @@ void TextureCompiler::compile(const fs::path& absoluteKey)
 
 	std::string strOutput = output.string();
 
+	if (raw_ext == ".dds" || raw_ext == ".pvr" || raw_ext == ".ktx")
+	{
+		fs::copy_file(strInput, strOutput, std::error_code{});
+
+		logger->info().write("Compiled TEXTURE: {0} -> {1}", strInput, strOutput);
+		return;
+	}
+
+
 	static const int arg_count = 5;
 	const char* args_array[arg_count];
 	args_array[0] = "-f";
@@ -142,18 +154,14 @@ void TextureCompiler::compile(const fs::path& absoluteKey)
 	args_array[2] = "-o";
 	args_array[3] = strOutput.c_str();
 	args_array[4] = "-m";
-//  	args_array[5] = "-t";
-//  	args_array[6] = "RGBA8";
-
-	auto logger = logging::get("Log");
 
 	if (compile_texture(arg_count, args_array) != 0)
 	{
-		logger->error().write("Failed to compile texture: {0}", strOutput.c_str());
+		logger->error().write("Failed to compile TEXTURE: {0}", strInput);
 	}
 	else
 	{
-		logger->info().write("Successfully compiled texture: {0}", strOutput.c_str());
+		logger->info().write("Compiled TEXTURE: {0} -> {1}", strInput, strOutput);
 	}
 
 }
@@ -190,11 +198,11 @@ void MeshCompiler::compile(const fs::path& absoluteKey)
 
 	if (compile_mesh(arg_count, args_array) != 0)
 	{
-		logger->error().write("Failed to compile mesh: {0}", strOutput.c_str());
+		logger->error().write("Failed to compile MESH: {0}", strInput);
 	}
 	else
 	{
-		logger->info().write("Successfully compiled mesh: {0}", strOutput.c_str());
+		logger->info().write("Compiled MESH: {0} -> {1}", strInput, strOutput);
 	}
 
 }
