@@ -135,6 +135,8 @@ namespace editor
 		watch_raw_assets<Shader>("data://shaders", "*.sc", recompile_assets, "varying.def.sc");
 
 		watch_assets<Mesh>("data://meshes", "*.asset", true, true);
+		watch_raw_assets<Mesh>("data://meshes", "*.obj", recompile_assets, "");
+
 		watch_assets<Prefab>("data://prefabs", "*.asset", true, true);
 		watch_assets<Material>("data://materials", "*.asset", true, false);
 
@@ -174,7 +176,8 @@ namespace editor
 		fs::create_directory(fs::resolve_protocol("app://settings"), std::error_code{});
 
 		fs::copy(fs::resolve_protocol("engine_data://meshes"), fs::resolve_protocol("app://data/meshes"), std::error_code{});
-
+		fs::remove(fs::resolve_protocol("app://data/meshes/_compile_.bat"), std::error_code{});
+		fs::remove(fs::resolve_protocol("app://data/meshes/makefile"), std::error_code{});
 		open_project(project_path, false);
 	}
 

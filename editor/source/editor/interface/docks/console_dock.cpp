@@ -69,6 +69,7 @@ namespace Docks
 		std::string inputBuff;
 		inputBuff.resize(64, 0);
 		inputBuff.shrink_to_fit();
+		gui::PushItemWidth(gui::GetContentRegionAvailWidth() * 0.5f);
 		if (gui::InputText(
 			"Enter Command", 
 			&inputBuff[0],
@@ -88,6 +89,9 @@ namespace Docks
 			if (gui::IsItemHovered() || (gui::IsRootWindowOrAnyChildFocused() && !gui::IsAnyItemActive() && !gui::IsMouseClicked(0)))
 				gui::SetKeyboardFocusHere(-1); // Auto focus previous widget
 		}
+
+		gui::PopItemWidth();
+
 	}
 
 };

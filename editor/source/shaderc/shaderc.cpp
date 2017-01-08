@@ -652,58 +652,58 @@ namespace bgfx
 	// 4.3    430      vhdgf+c
 	// 4.4    440
 
-	void help(const char* _error = NULL)
-	{
-		if (NULL != _error)
-		{
-			fprintf(stderr, "Error:\n%s\n\n", _error);
-		}
-
-		fprintf(stderr
-			, "shaderc, bgfx shader compiler tool\n"
-			  "Copyright 2011-2017 Branimir Karadzic. All rights reserved.\n"
-			  "License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause\n\n"
-			);
-
-		fprintf(stderr
-			, "Usage: shaderc -f <in> -o <out> --type <v/f> --platform <platform>\n"
-
-			  "\n"
-			  "Options:\n"
-			  "  -f <file path>                Input file path.\n"
-			  "  -i <include path>             Include path (for multiple paths use semicolon).\n"
-			  "  -o <file path>                Output file path.\n"
-			  "      --bin2c <file path>       Generate C header file.\n"
-			  "      --depends                 Generate makefile style depends file.\n"
-			  "      --platform <platform>     Target platform.\n"
-			  "           android\n"
-			  "           asm.js\n"
-			  "           ios\n"
-			  "           linux\n"
-			  "           nacl\n"
-			  "           osx\n"
-			  "           windows\n"
-			  "      --preprocess              Preprocess only.\n"
-			  "      --define <defines>        Add defines to preprocessor (semicolon separated).\n"
-			  "      --raw                     Do not process shader. No preprocessor, and no glsl-optimizer (GLSL only).\n"
-			  "      --type <type>             Shader type (vertex, fragment)\n"
-			  "      --varyingdef <file path>  Path to varying.def.sc file.\n"
-			  "      --verbose                 Verbose.\n"
-
-			  "\n"
-			  "Options (DX9 and DX11 only):\n"
-
-			  "\n"
-			  "      --debug                   Debug information.\n"
-			  "      --disasm                  Disassemble compiled shader.\n"
-			  "  -p, --profile <profile>       Shader model (f.e. ps_3_0).\n"
-			  "  -O <level>                    Optimization level (0, 1, 2, 3).\n"
-			  "      --Werror                  Treat warnings as errors.\n"
-
-			  "\n"
-			  "For additional information, see https://github.com/bkaradzic/bgfx\n"
-			);
-	}
+// 	void help(const char* _error = NULL)
+// 	{
+// 		if (NULL != _error)
+// 		{
+// 			fprintf(stderr, "Error:\n%s\n\n", _error);
+// 		}
+// 
+// 		fprintf(stderr
+// 			, "shaderc, bgfx shader compiler tool\n"
+// 			  "Copyright 2011-2017 Branimir Karadzic. All rights reserved.\n"
+// 			  "License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause\n\n"
+// 			);
+// 
+// 		fprintf(stderr
+// 			, "Usage: shaderc -f <in> -o <out> --type <v/f> --platform <platform>\n"
+// 
+// 			  "\n"
+// 			  "Options:\n"
+// 			  "  -f <file path>                Input file path.\n"
+// 			  "  -i <include path>             Include path (for multiple paths use semicolon).\n"
+// 			  "  -o <file path>                Output file path.\n"
+// 			  "      --bin2c <file path>       Generate C header file.\n"
+// 			  "      --depends                 Generate makefile style depends file.\n"
+// 			  "      --platform <platform>     Target platform.\n"
+// 			  "           android\n"
+// 			  "           asm.js\n"
+// 			  "           ios\n"
+// 			  "           linux\n"
+// 			  "           nacl\n"
+// 			  "           osx\n"
+// 			  "           windows\n"
+// 			  "      --preprocess              Preprocess only.\n"
+// 			  "      --define <defines>        Add defines to preprocessor (semicolon separated).\n"
+// 			  "      --raw                     Do not process shader. No preprocessor, and no glsl-optimizer (GLSL only).\n"
+// 			  "      --type <type>             Shader type (vertex, fragment)\n"
+// 			  "      --varyingdef <file path>  Path to varying.def.sc file.\n"
+// 			  "      --verbose                 Verbose.\n"
+// 
+// 			  "\n"
+// 			  "Options (DX9 and DX11 only):\n"
+// 
+// 			  "\n"
+// 			  "      --debug                   Debug information.\n"
+// 			  "      --disasm                  Disassemble compiled shader.\n"
+// 			  "  -p, --profile <profile>       Shader model (f.e. ps_3_0).\n"
+// 			  "  -O <level>                    Optimization level (0, 1, 2, 3).\n"
+// 			  "      --Werror                  Treat warnings as errors.\n"
+// 
+// 			  "\n"
+// 			  "For additional information, see https://github.com/bkaradzic/bgfx\n"
+// 			);
+// 	}
 
 	int compileShader(int _argc, const char* _argv[])
 	{
@@ -711,7 +711,7 @@ namespace bgfx
 
 		if (cmdLine.hasArg('h', "help") )
 		{
-			help();
+			//help();
 			return EXIT_FAILURE;
 		}
 
@@ -720,21 +720,21 @@ namespace bgfx
 		const char* filePath = cmdLine.findOption('f');
 		if (NULL == filePath)
 		{
-			help("Shader file name must be specified.");
+			//help("Shader file name must be specified.");
 			return EXIT_FAILURE;
 		}
 
 		const char* outFilePath = cmdLine.findOption('o');
 		if (NULL == outFilePath)
 		{
-			help("Output file name must be specified.");
+			//help("Output file name must be specified.");
 			return EXIT_FAILURE;
 		}
 
 		const char* type = cmdLine.findOption('\0', "type");
 		if (NULL == type)
 		{
-			help("Must specify shader type.");
+			//help("Must specify shader type.");
 			return EXIT_FAILURE;
 		}
 

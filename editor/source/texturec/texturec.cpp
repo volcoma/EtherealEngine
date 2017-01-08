@@ -494,44 +494,44 @@ namespace bgfx
 
 } // namespace bgfx
 
-void help(const char* _error = NULL)
-{
-	if (NULL != _error)
-	{
-		fprintf(stderr, "Error:\n%s\n\n", _error);
-	}
-
-	fprintf(stderr
-		, "texturec, bgfx texture compiler tool\n"
-		  "Copyright 2011-2017 Branimir Karadzic. All rights reserved.\n"
-		  "License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause\n\n"
-		);
-
-	fprintf(stderr
-		, "Usage: texturec -f <in> -o <out> [-t <format>]\n"
-
-		  "\n"
-		  "Supported input file types:\n"
-		  "    *.png                  Portable Network Graphics\n"
-		  "    *.tga                  Targa\n"
-		  "    *.dds                  Direct Draw Surface\n"
-		  "    *.ktx                  Khronos Texture\n"
-		  "    *.pvr                  PowerVR\n"
-
-		  "\n"
-		  "Options:\n"
-		  "  -f <file path>           Input file path.\n"
-		  "  -o <file path>           Output file path (file will be written in KTX format).\n"
-		  "  -t <format>              Output format type (BC1/2/3/4/5, ETC1, PVR14, etc.).\n"
-		  "  -m, --mips               Generate mip-maps.\n"
-		  "  -n, --normalmap          Input texture is normal map.\n"
-		  "      --sdf <edge>         Compute SDF texture.\n"
-		  "      --iqa                Image Quality Assesment\n"
-
-		  "\n"
-		  "For additional information, see https://github.com/bkaradzic/bgfx\n"
-		);
-}
+// void help(const char* _error = NULL)
+// {
+// 	if (NULL != _error)
+// 	{
+// 		fprintf(stderr, "Error:\n%s\n\n", _error);
+// 	}
+// 
+// 	fprintf(stderr
+// 		, "texturec, bgfx texture compiler tool\n"
+// 		  "Copyright 2011-2017 Branimir Karadzic. All rights reserved.\n"
+// 		  "License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause\n\n"
+// 		);
+// 
+// 	fprintf(stderr
+// 		, "Usage: texturec -f <in> -o <out> [-t <format>]\n"
+// 
+// 		  "\n"
+// 		  "Supported input file types:\n"
+// 		  "    *.png                  Portable Network Graphics\n"
+// 		  "    *.tga                  Targa\n"
+// 		  "    *.dds                  Direct Draw Surface\n"
+// 		  "    *.ktx                  Khronos Texture\n"
+// 		  "    *.pvr                  PowerVR\n"
+// 
+// 		  "\n"
+// 		  "Options:\n"
+// 		  "  -f <file path>           Input file path.\n"
+// 		  "  -o <file path>           Output file path (file will be written in KTX format).\n"
+// 		  "  -t <format>              Output format type (BC1/2/3/4/5, ETC1, PVR14, etc.).\n"
+// 		  "  -m, --mips               Generate mip-maps.\n"
+// 		  "  -n, --normalmap          Input texture is normal map.\n"
+// 		  "      --sdf <edge>         Compute SDF texture.\n"
+// 		  "      --iqa                Image Quality Assesment\n"
+// 
+// 		  "\n"
+// 		  "For additional information, see https://github.com/bkaradzic/bgfx\n"
+// 		);
+// }
 
 int compile_texture(int _argc, const char* _argv[])
 {
@@ -539,21 +539,21 @@ int compile_texture(int _argc, const char* _argv[])
 
 	if (cmdLine.hasArg('h', "help") )
 	{
-		help();
+		//help();
 		return EXIT_FAILURE;
 	}
 
 	const char* inputFileName = cmdLine.findOption('f');
 	if (NULL == inputFileName)
 	{
-		help("Input file must be specified.");
+		//help("Input file must be specified.");
 		return EXIT_FAILURE;
 	}
 
 	const char* outputFileName = cmdLine.findOption('o');
 	if (NULL == outputFileName)
 	{
-		help("Output file must be specified.");
+		//help("Output file must be specified.");
 		return EXIT_FAILURE;
 	}
 
@@ -570,7 +570,7 @@ int compile_texture(int _argc, const char* _argv[])
 	bx::CrtFileReader reader;
 	if (!bx::open(&reader, inputFileName) )
 	{
-		help("Failed to open input file.");
+		//help("Failed to open input file.");
 		return EXIT_FAILURE;
 	}
 
@@ -610,7 +610,7 @@ int compile_texture(int _argc, const char* _argv[])
 
 				if (!isValid(format) )
 				{
-					help("Invalid format specified.");
+					//help("Invalid format specified.");
 					return EXIT_FAILURE;
 				}
 			}
@@ -854,7 +854,7 @@ int compile_texture(int _argc, const char* _argv[])
 				}
 				else
 				{
-					help("Failed to open output file.");
+					//help("Failed to open output file.");
 					return EXIT_FAILURE;
 				}
 
@@ -862,13 +862,13 @@ int compile_texture(int _argc, const char* _argv[])
 			}
 			else
 			{
-				help("No output generated.");
+				//help("No output generated.");
 				return EXIT_FAILURE;
 			}
 		}
 		else
 		{
-			help("Failed to load input file.");
+			//help("Failed to load input file.");
 			return EXIT_FAILURE;
 		}
 

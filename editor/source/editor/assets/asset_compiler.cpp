@@ -4,6 +4,7 @@
 #include "runtime/system/filesystem.h"
 #include "shaderc/shaderc.h"
 #include "texturec/texturec.h"
+#include "geometryc/geometryc.h"
 
 void ShaderCompiler::compile(const fs::path& absoluteKey)
 {
@@ -141,8 +142,8 @@ void TextureCompiler::compile(const fs::path& absoluteKey)
 	args_array[2] = "-o";
 	args_array[3] = strOutput.c_str();
 	args_array[4] = "-m";
-// 	args_array[4] = "-t";
-// 	args_array[5] = "RGBA8";
+//  	args_array[5] = "-t";
+//  	args_array[6] = "RGBA8";
 
 	auto logger = logging::get("Log");
 
@@ -153,6 +154,47 @@ void TextureCompiler::compile(const fs::path& absoluteKey)
 	else
 	{
 		logger->info().write("Successfully compiled texture: {0}", strOutput.c_str());
+	}
+
+}
+
+void MeshCompiler::compile(const fs::path& absoluteKey)
+{
+	fs::path input = absoluteKey;
+	std::string strInput = input.string();
+	std::string file = input.filename().replace_extension().string();
+	fs::path dir = input.remove_filename();
+
+	static const std::string ext = ".asset";
+
+	fs::path output = dir;
+
+	output /= fs::path(file + ext);
+
+	std::string strOutput = output.string();
+
+	static const int arg_count = 10;
+	const char* args_array[arg_count];
+	args_array[0] = "-f";
+	args_array[1] = strInput.c_str();
+	args_array[2] = "-o";
+	args_array[3] = strOutput.c_str();
+	args_array[4] = "--tangent";
+	args_array[5] = "--barycentric";
+	args_array[6] = "--packnormal";
+	args_array[7] = "1";
+	args_array[8] = "--packuv";
+	args_array[9] = "1";
+	
+	auto logger = logging::get("Log");
+
+	if (compile_mesh(arg_count, args_array) != 0)
+	{
+		logger->error().write("Failed to compile mesh: {0}", strOutput.c_str());
+	}
+	else
+	{
+		logger->info().write("Successfully compiled mesh: {0}", strOutput.c_str());
 	}
 
 }

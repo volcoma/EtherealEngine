@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{6e6cbc3e-8f8c-423e-97c7-db4539d5dd67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\forsyth-too">
+      <UniqueIdentifier>{ecc4d4dc-238d-4428-b42e-913a435e3932}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ib-compress">
+      <UniqueIdentifier>{f5ca2a6e-5e73-4de6-a8ae-f911bd06b250}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\geometryc\geometryc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\geometryc\forsyth-too\forsythtriangleorderoptimizer.cpp">
+      <Filter>Source Files\forsyth-too</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\geometryc\ib-compress\indexbuffercompression.cpp">
+      <Filter>Source Files\ib-compress</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\geometryc\ib-compress\indexbufferdecompression.cpp">
+      <Filter>Source Files\ib-compress</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\geometryc\geometryc.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\geometryc\forsyth-too\forsythtriangleorderoptimizer.h">
+      <Filter>Source Files\forsyth-too</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\geometryc\ib-compress\indexbuffercompression.h">
+      <Filter>Source Files\ib-compress</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\geometryc\ib-compress\indexbuffercompressionformat.h">
+      <Filter>Source Files\ib-compress</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\geometryc\ib-compress\indexbufferdecompression.h">
+      <Filter>Source Files\ib-compress</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\geometryc\ib-compress\indexcompressionconstants.h">
+      <Filter>Source Files\ib-compress</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\geometryc\ib-compress\readbitstream.h">
+      <Filter>Source Files\ib-compress</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\geometryc\ib-compress\writebitstream.h">
+      <Filter>Source Files\ib-compress</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

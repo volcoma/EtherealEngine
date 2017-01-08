@@ -325,6 +325,9 @@
     <ProjectReference Include="..\..\..\engine\projects\vc14\runtime.vcxproj">
       <Project>{b340ce5b-cff1-4fd5-a1ed-4f74c628f525}</Project>
     </ProjectReference>
+    <ProjectReference Include="geometryc.vcxproj">
+      <Project>{6edffe68-c3fb-4ac7-8b38-8e27f5722b1d}</Project>
+    </ProjectReference>
     <ProjectReference Include="shaderc.vcxproj">
       <Project>{4b8a4ad9-d7c0-4978-99d7-f4e9dde756ab}</Project>
     </ProjectReference>
