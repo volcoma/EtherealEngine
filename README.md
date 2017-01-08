@@ -11,6 +11,11 @@ Proper rendering and lighting is pretty much non existant right now. PBR is plan
 
 Check out the Projects tab for more information of upcomming features.
 
+## ASSETS
+Supported texture formats: png, tga, dds, ktx, pvr
+
+Supported mesh formats: obj only for now.
+
 ## SUGGESTIONS AND ISSUES
 Any suggestions and help will be appreciated.
 
