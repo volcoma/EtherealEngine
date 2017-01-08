@@ -13,9 +13,12 @@ bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, s
 	auto es = core::get_subsystem<editor::EditState>();
 	auto am = core::get_subsystem<runtime::AssetManager>();
 	auto& selected = es->selection_data.object;
-
+	bool is_selected = selected && selected.is_type<AssetHandle<Texture>>();
 	bool changed = false;
 	float available = math::min(64.0f, gui::GetContentRegionAvailWidth() / 1.5f);
+	if (is_selected)
+		available = gui::GetContentRegionAvailWidth();
+
 	ImVec2 size = { available, available };
 	if (data)
 	{

@@ -400,6 +400,15 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 			gui::EndChild();
 		}
 		gui::Checkbox("Recompile Assets", &recompile_assets);
+
+		if (gui::IsItemHoveredRect())
+		{
+			gui::SetTooltip(
+			"Force to recompile all assets when a project is opened.\n"
+			"This will take some time but is recommended so that asset\n"
+			"changes can be easily detected between project startups.\n"
+			);
+		}
 	}
 	gui::EndGroup();
 
