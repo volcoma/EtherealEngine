@@ -196,7 +196,7 @@ namespace bx
 				return false;
 			}
 
-			m_file = fopen(_filePath, _append ? "ab" : "wb+");
+			m_file = fopen(_filePath, _append ? "ab" : "wb");
 
 			if (NULL == m_file)
 			{

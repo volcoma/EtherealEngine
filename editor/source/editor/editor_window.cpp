@@ -419,7 +419,7 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 		if (gui::Button("NEW PROJECT"))
 		{
 			std::string path;
-			if (pick_folder_dialog(fs::resolve_protocol("engine://").string(), path))
+			if (pick_folder_dialog("", path))
 			{
 				pm->create_project(path);
 				load_editor_camera();
@@ -431,7 +431,7 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 		if (gui::Button("OPEN OTHER"))
 		{
 			std::string path;
-			if (pick_folder_dialog(fs::resolve_protocol("engine://").string(), path))
+			if (pick_folder_dialog("", path))
 			{
 				pm->open_project(path, recompile_assets);
 				load_editor_camera();

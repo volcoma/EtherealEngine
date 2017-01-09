@@ -187,57 +187,63 @@ namespace Docks
 		if (gui::Button("Import..."))
 		{
 			std::vector<std::string> paths;
-			if (open_multiple_files_dialog("obj,png,tga,dds,ktx,pvr,sc", fs::resolve_protocol("engine://").string(), paths))
+			if (open_multiple_files_dialog("obj,png,tga,dds,ktx,pvr,sc", "", paths))
 			{
-				auto logger = logging::get("Log");
-				for (auto& path : paths)
+				auto ts = core::get_subsystem<runtime::TaskSystem>();
+
+				auto task = ts->create("Import Assets", [](const std::vector<std::string>& paths)
 				{
-					fs::path p = path;
-					fs::path ext = p.extension();
-					fs::path filename = p.filename();
-					std::error_code error;
-					if (ext == ".obj")
+					auto logger = logging::get("Log");
+					for (auto& path : paths)
 					{
-						fs::path mesh_dir = fs::resolve_protocol("data://meshes") / filename;
-						if (!fs::copy_file(p, mesh_dir, fs::copy_options::overwrite_existing, error))
+						fs::path p = string_utils::to_lower(path);
+						fs::path ext = p.extension().string();
+						fs::path filename = p.filename();
+						std::error_code error;
+						if (ext == ".obj")
 						{
-							logger->error().write("Failed to import file {0} with message {1}", p.string(), error.message());
+							fs::path dir = fs::resolve_protocol("data://meshes") / filename;
+							if (!fs::copy_file(path, dir, fs::copy_options::overwrite_existing, error))
+							{
+								logger->error().write("Failed to import file {0} with message {1}", p.string(), error.message());
+							}
+							else
+							{
+								fs::last_write_time(dir, fs::file_time_type::clock::now(), std::error_code{});
+							}
+						}
+						else if (ext == ".png" || ext == ".tga" || ext == ".dds" || ext == ".ktx" || ext == ".pvr")
+						{
+							fs::path dir = fs::resolve_protocol("data://textures") / filename;
+							if (!fs::copy_file(path, dir, fs::copy_options::overwrite_existing, error))
+							{
+								logger->error().write("Failed to import file {0} with message: {1}", p.string(), error.message());
+							}
+							else
+							{
+								fs::last_write_time(dir, fs::file_time_type::clock::now(), std::error_code{});
+							}
+						}
+						else if (ext == ".sc")
+						{
+							fs::path dir = fs::resolve_protocol("data://shaders") / filename;
+							if (!fs::copy_file(path, dir, fs::copy_options::overwrite_existing, error))
+							{
+								logger->error().write("Failed to import file {0} with message {1}", p.string(), error.message());
+							}
+							else
+							{
+								fs::last_write_time(dir, fs::file_time_type::clock::now(), std::error_code{});
+							}
 						}
 						else
 						{
-							fs::last_write_time(mesh_dir, fs::file_time_type::clock::now(), std::error_code{});
+							logger->error().write("Unsupported file format {0}", ext.string());
 						}
 					}
-					else if (ext == ".png" || ext == ".tga" || ext == ".dds" || ext == ".ktx" || ext == ".pvr")
-					{
-						fs::path mesh_dir = fs::resolve_protocol("data://textures") / filename;
-						if (!fs::copy_file(p, mesh_dir, fs::copy_options::overwrite_existing, error))
-						{
-							logger->error().write("Failed to import file {0} with message: {1}", p.string(), error.message());
-						}
-						else
-						{
-							fs::last_write_time(mesh_dir, fs::file_time_type::clock::now(), std::error_code{});
-						}
-					}
-					else if (ext == ".sc")
-					{
-						fs::path mesh_dir = fs::resolve_protocol("data://shaders") / filename;
-						if (!fs::copy_file(p, mesh_dir, fs::copy_options::overwrite_existing, error))
-						{
-							logger->error().write("Failed to import file {0} with message {1}", p.string(), error.message());
-						}
-						else
-						{
-							fs::last_write_time(mesh_dir, fs::file_time_type::clock::now(), std::error_code{});
-						}
-					}
-					else
-					{
-						logger->error().write("Unsupported file format {0}", ext.string());
-					}
-				}
-				
+
+				}, paths);
+				ts->run(task);
 			}
 		}
 		gui::SameLine();
