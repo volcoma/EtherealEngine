@@ -61,7 +61,7 @@ void default_scene()
 			->set_local_scale({ 10.0f, 0.1f, 10.0f });
 
 		Model model;
-		am->load<Mesh>("data://meshes/platform", false)
+		am->load<Mesh>("engine_data://meshes/platform", false)
 			.then([&model](auto asset)
 		{
 			model.set_lod(asset, 0);
@@ -79,7 +79,7 @@ void default_scene()
 		object.assign<TransformComponent>();
 
 		Model model;
-		am->load<Mesh>("data://meshes/bunny", false)
+		am->load<Mesh>("engine_data://meshes/bunny", false)
 			.then([&model](auto asset)
 		{
 			model.set_lod(asset, 0);

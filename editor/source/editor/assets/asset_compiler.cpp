@@ -87,7 +87,6 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 		args_array[15] = "3";
 
 		auto logger = logging::get("Log");
-		logger->info().write("Compiling {0}", strInput);
 		
 		if (i >= 2)
 		{
@@ -138,7 +137,6 @@ void TextureCompiler::compile(const fs::path& absoluteKey)
 
 	std::string strOutput = output.string();
 
-	logger->info().write("Compiling {0}", strInput);
 	if (raw_ext == ".dds" || raw_ext == ".pvr" || raw_ext == ".ktx")
 	{
 		fs::copy_file(strInput, strOutput, fs::copy_options::overwrite_existing, std::error_code{});
@@ -198,7 +196,6 @@ void MeshCompiler::compile(const fs::path& absoluteKey)
 	args_array[9] = "1";
 	
 	auto logger = logging::get("Log");
-	logger->info().write("Compiling {0}", strInput);
 	if (compile_mesh(arg_count, args_array) != 0)
 	{
 		logger->error().write("Failed compilation of {0}", strInput);

@@ -186,9 +186,6 @@ namespace editor
 		fs::create_directory(fs::resolve_protocol("app://data/prefabs"), std::error_code{});
 		fs::create_directory(fs::resolve_protocol("app://settings"), std::error_code{});
 
-		fs::copy(fs::resolve_protocol("engine_data://meshes"), fs::resolve_protocol("app://data/meshes"), std::error_code{});
-		fs::remove(fs::resolve_protocol("app://data/meshes/_compile_.bat"), std::error_code{});
-		fs::remove(fs::resolve_protocol("app://data/meshes/makefile"), std::error_code{});
 		open_project(project_path, false);
 	}
 
