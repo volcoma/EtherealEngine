@@ -383,7 +383,7 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 	gui::Separator();
 	gui::BeginGroup();
 	{
-		if (gui::BeginChild("###projects_content", ImVec2(gui::GetContentRegionAvail().x * 0.7f, gui::GetContentRegionAvail().y - gui::GetTextLineHeightWithSpacing()), false, flags))
+		if (gui::BeginChild("###projects_content", ImVec2(gui::GetContentRegionAvail().x * 0.8f, gui::GetContentRegionAvail().y - gui::GetTextLineHeightWithSpacing()), false, flags))
 		{
 			
 			const auto& rencent_projects = pm->get_recent_projects();
@@ -419,7 +419,7 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 		if (gui::Button("NEW PROJECT"))
 		{
 			std::string path;
-			if (open_folder_dialog("", fs::resolve_protocol("engine://").string(), path))
+			if (pick_folder_dialog(fs::resolve_protocol("engine://").string(), path))
 			{
 				pm->create_project(path);
 				load_editor_camera();
@@ -431,7 +431,7 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 		if (gui::Button("OPEN OTHER"))
 		{
 			std::string path;
-			if (open_folder_dialog("", fs::resolve_protocol("engine://").string(), path))
+			if (pick_folder_dialog(fs::resolve_protocol("engine://").string(), path))
 			{
 				pm->open_project(path, recompile_assets);
 				load_editor_camera();

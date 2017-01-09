@@ -108,6 +108,11 @@ namespace editor
 		{
 			icons["shader"] = asset;
 		});
+		am->load<Texture>("editor_data://icons/loading", false)
+			.then([this](auto asset) mutable
+		{
+			icons["loading"] = asset;
+		});
 
 		return true;
 	}

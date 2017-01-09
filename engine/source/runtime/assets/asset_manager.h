@@ -379,6 +379,16 @@ namespace runtime
 			storage->save_to_file(absoluteKey, asset);
 		}
 
+		template<typename T>
+		void create_asset_entry(
+			const std::string& key
+		)
+		{
+			const auto toLowerKey = string_utils::to_lower(key);
+			auto storage = get_storage<T>();
+			find_or_create_asset_impl<T>(toLowerKey, storage->container);
+		}
+
 	private:
 		//-----------------------------------------------------------------------------
 		//  Name : load_asset_from_file_impl ()

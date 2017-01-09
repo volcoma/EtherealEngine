@@ -1,6 +1,5 @@
 /*
   Native File Dialog
-
   http://www.frogtoss.com/labs
  */
 
@@ -139,4 +138,3 @@ int NFDi_IsFilterSegmentChar( char ch )
 {
     return (ch==','||ch==';'||ch=='\0');
 }
-

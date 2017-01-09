@@ -1,6 +1,5 @@
 /*
   Native File Dialog
-
   http://www.frogtoss.com/labs
 */
 
@@ -99,7 +98,6 @@ static void SetDefaultPath( GtkWidget *dialog, const char *defaultPath )
 
     /* GTK+ manual recommends not specifically setting the default path.
        We do it anyway in order to be consistent across platforms.
-
        If consistency with the native OS is preferred, this is the line
        to comment out. -ml */
     gtk_file_chooser_set_current_folder( GTK_FILE_CHOOSER(dialog), defaultPath );
@@ -221,62 +219,6 @@ nfdresult_t NFD_OpenDialog( const char *filterList,
     return result;
 }
 
-nfdresult_t NFD_OpenFolderDialog( const char *filterList,
-                            const nfdchar_t *defaultPath,
-                            nfdchar_t **outPath )
-{    
-    GtkWidget *dialog;
-    nfdresult_t result;
-
-    if ( !gtk_init_check( NULL, NULL ) )
-    {
-        NFDi_SetError(INIT_FAIL_MSG);
-        return NFD_ERROR;
-    }
-
-    dialog = gtk_file_chooser_dialog_new( "Open File",
-                                          NULL,
-                                          FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                                          "_Cancel", GTK_RESPONSE_CANCEL,
-                                          "_Open", GTK_RESPONSE_ACCEPT,
-                                          NULL );
-
-    /* Build the filter list */
-    AddFiltersToDialog(dialog, filterList);
-
-    /* Set the default path */
-    SetDefaultPath(dialog, defaultPath);
-
-    result = NFD_CANCEL;
-    if ( gtk_dialog_run( GTK_DIALOG(dialog) ) == GTK_RESPONSE_ACCEPT )
-    {
-        char *filename;
-
-        filename = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER(dialog) );
-
-        {
-            size_t len = strlen(filename);
-            *outPath = NFDi_Malloc( len + 1 );
-            memcpy( *outPath, filename, len + 1 );
-            if ( !*outPath )
-            {
-                g_free( filename );
-                gtk_widget_destroy(dialog);
-                return NFD_ERROR;
-            }
-        }
-        g_free( filename );
-
-        result = NFD_OKAY;
-    }
-
-    WaitForCleanup();
-    gtk_widget_destroy(dialog);
-    WaitForCleanup();
-
-    return result;
-}
-
 
 nfdresult_t NFD_OpenDialogMultiple( const nfdchar_t *filterList,
                                     const nfdchar_t *defaultPath,
@@ -348,6 +290,59 @@ nfdresult_t NFD_SaveDialog( const nfdchar_t *filterList,
 
     /* Build the filter list */    
     AddFiltersToDialog(dialog, filterList);
+
+    /* Set the default path */
+    SetDefaultPath(dialog, defaultPath);
+    
+    result = NFD_CANCEL;    
+    if ( gtk_dialog_run( GTK_DIALOG(dialog) ) == GTK_RESPONSE_ACCEPT )
+    {
+        char *filename;
+        filename = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER(dialog) );
+        
+        {
+            size_t len = strlen(filename);
+            *outPath = NFDi_Malloc( len + 1 );
+            memcpy( *outPath, filename, len + 1 );
+            if ( !*outPath )
+            {
+                g_free( filename );
+                gtk_widget_destroy(dialog);
+                return NFD_ERROR;
+            }
+        }
+        g_free(filename);
+
+        result = NFD_OKAY;
+    }
+
+    WaitForCleanup();
+    gtk_widget_destroy(dialog);
+    WaitForCleanup();
+    
+    return result;
+}
+
+nfdresult_t NFD_PickFolder(const nfdchar_t *defaultPath,
+    nfdchar_t **outPath)
+{
+    GtkWidget *dialog;
+    nfdresult_t result;
+
+    if (!gtk_init_check(NULL, NULL))
+    {
+        NFDi_SetError(INIT_FAIL_MSG);
+        return NFD_ERROR;
+    }
+
+    dialog = gtk_file_chooser_dialog_new( "Select folder",
+                                          NULL,
+                                          GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                                          "_Cancel", GTK_RESPONSE_CANCEL,
+                                          "_Select", GTK_RESPONSE_ACCEPT,
+                                          NULL ); 
+    gtk_file_chooser_set_do_overwrite_confirmation( GTK_FILE_CHOOSER(dialog), TRUE );
+
 
     /* Set the default path */
     SetDefaultPath(dialog, defaultPath);

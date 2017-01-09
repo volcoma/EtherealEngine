@@ -1,8 +1,6 @@
 /*
   Native File Dialog
-
   Internal, common across platforms
-
   http://www.frogtoss.com/labs
  */
 

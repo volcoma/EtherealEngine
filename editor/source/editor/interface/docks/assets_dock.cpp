@@ -9,6 +9,7 @@
 #include "runtime/ecs/utils.h"
 #include "runtime/input/input.h"
 #include "../../edit_state.h"
+#include "../../filedialog/filedialog.h"
 #include <cstdio>
 
 static float scale_icons = 0.7f;
@@ -42,6 +43,12 @@ AssetHandle<Texture> get_asset_icon(AssetHandle<Material> asset)
 {
 	auto es = core::get_subsystem<editor::EditState>();
 	return es->icons["material"];
+}
+
+AssetHandle<Texture> get_loading_icon()
+{
+	auto es = core::get_subsystem<editor::EditState>();
+	return es->icons["loading"];
 }
 
 template<>
@@ -82,6 +89,13 @@ namespace Docks
 					alreadySelected = true;
 				}
 			}
+			bool loading = !assetHandle;
+
+			AssetHandle<Texture> icon;
+			if (loading)
+				icon = get_loading_icon();
+			else
+				icon = get_asset_icon(assetHandle);
 
 			gui::PushID(assetRelativeName.c_str());
 
@@ -92,13 +106,20 @@ namespace Docks
 			inputBuff.resize(64, 0);
 			inputBuff.shrink_to_fit();
 			int action = gui::ImageButtonWithLabel(
-				get_asset_icon(assetHandle).link->asset,
+				icon.link->asset,
 				{ size, size },
 				alreadySelected,
 				assetName.c_str(),
 				&inputBuff[0],
 				inputBuff.size(),
 				ImGuiInputTextFlags_EnterReturnsTrue);
+			
+			if (loading)
+			{
+				gui::PopID();
+				gui::SameLine();
+				continue;
+			}
 
 			if (action == 1)
 			{
@@ -165,7 +186,59 @@ namespace Docks
 
 		if (gui::Button("Import..."))
 		{
-		
+			std::vector<std::string> paths;
+			if (open_multiple_files_dialog("obj,png,tga,dds,ktx,pvr,sc", fs::resolve_protocol("engine://").string(), paths))
+			{
+				auto logger = logging::get("Log");
+				for (auto& path : paths)
+				{
+					fs::path p = path;
+					fs::path ext = p.extension();
+					fs::path filename = p.filename();
+					std::error_code error;
+					if (ext == ".obj")
+					{
+						fs::path mesh_dir = fs::resolve_protocol("data://meshes") / filename;
+						if (!fs::copy_file(p, mesh_dir, fs::copy_options::overwrite_existing, error))
+						{
+							logger->error().write("Failed to import file {0} with message {1}", p.string(), error.message());
+						}
+						else
+						{
+							fs::last_write_time(mesh_dir, fs::file_time_type::clock::now(), std::error_code{});
+						}
+					}
+					else if (ext == ".png" || ext == ".tga" || ext == ".dds" || ext == ".ktx" || ext == ".pvr")
+					{
+						fs::path mesh_dir = fs::resolve_protocol("data://textures") / filename;
+						if (!fs::copy_file(p, mesh_dir, fs::copy_options::overwrite_existing, error))
+						{
+							logger->error().write("Failed to import file {0} with message: {1}", p.string(), error.message());
+						}
+						else
+						{
+							fs::last_write_time(mesh_dir, fs::file_time_type::clock::now(), std::error_code{});
+						}
+					}
+					else if (ext == ".sc")
+					{
+						fs::path mesh_dir = fs::resolve_protocol("data://shaders") / filename;
+						if (!fs::copy_file(p, mesh_dir, fs::copy_options::overwrite_existing, error))
+						{
+							logger->error().write("Failed to import file {0} with message {1}", p.string(), error.message());
+						}
+						else
+						{
+							fs::last_write_time(mesh_dir, fs::file_time_type::clock::now(), std::error_code{});
+						}
+					}
+					else
+					{
+						logger->error().write("Unsupported file format {0}", ext.string());
+					}
+				}
+				
+			}
 		}
 		gui::SameLine();
 		gui::PushItemWidth(150.0f);

@@ -388,7 +388,7 @@ namespace fs
 				{
 					// this means that the first watch won't call the callback function
 					// so we have to manually call it here if we want that behavior
-					if (_callback)
+					if (entries.size() > 0 && _callback)
 					{
 						_callback(entries);
 					}
@@ -406,7 +406,7 @@ namespace fs
 			//-----------------------------------------------------------------------------
 			void watch()
 			{
-				_root = poll_entry(_root.path);
+				
 				std::vector<Entry> entries;
 				// otherwise we check the whole parent directory
 				if (!_filter.empty())
@@ -420,6 +420,11 @@ namespace fs
 						}
 						return false;
 					});
+					if (entries.size() > 0)
+						touch(_root.path);
+
+					_root = poll_entry(_root.path);
+
 					if (_root.state != Entry::State::Unmodified)
 					{
 						for (auto& var : _entries_cached)
@@ -437,11 +442,11 @@ namespace fs
 				}
 				else
 				{
-					auto& Entry = _root;
-					if (!fs::exists(Entry.path, std::error_code{}))
+					auto& entry = _root;
+					if (!fs::exists(entry.path, std::error_code{}))
 					{
-						Entry.state = Entry::State::Removed;
-						_entries.erase(Entry.path.string());
+						entry.state = Entry::State::Removed;
+						_entries.erase(entry.path.string());
 					}
 					entries.push_back(_root);
 					_entries_cached = _entries;

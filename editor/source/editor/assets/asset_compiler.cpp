@@ -87,7 +87,7 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 		args_array[15] = "3";
 
 		auto logger = logging::get("Log");
-		
+		logger->info().write("Compiling {0}", strInput);
 		
 		if (i >= 2)
 		{
@@ -96,22 +96,22 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 			std::lock_guard<std::mutex> lock(mtx);
 			if (compile_shader(arg_count, args_array) != 0)
 			{
-				logger->error().write("Failed to compile SHADER: {0}", strInput);
+				logger->error().write("Failed compilation of {0}", strInput);
 			}
 			else
 			{
-				logger->info().write("Compiled SHADER: {0} -> {1}", strInput, strOutput);
+				logger->info().write("Successful compilation of {0} -> {1}", strInput, strOutput);
 			}
 		}
 		else
 		{
 			if (compile_shader(arg_count, args_array) != 0)
 			{
-				logger->error().write("Failed to compile SHADER: {0}", strInput);
+				logger->error().write("Failed compilation of {0}", strInput);
 			}
 			else
 			{
-				logger->info().write("Compiled SHADER: {0} -> {1}", strInput, strOutput);
+				logger->info().write("Successful compilation of {0} -> {1}", strInput, strOutput);
 			}
 		}
 		
@@ -138,11 +138,12 @@ void TextureCompiler::compile(const fs::path& absoluteKey)
 
 	std::string strOutput = output.string();
 
+	logger->info().write("Compiling {0}", strInput);
 	if (raw_ext == ".dds" || raw_ext == ".pvr" || raw_ext == ".ktx")
 	{
-		fs::copy_file(strInput, strOutput, std::error_code{});
-
-		logger->info().write("Compiled TEXTURE: {0} -> {1}", strInput, strOutput);
+		fs::copy_file(strInput, strOutput, fs::copy_options::overwrite_existing, std::error_code{});
+		fs::last_write_time(strOutput, fs::file_time_type::clock::now(), std::error_code{});
+		logger->info().write("Successful compilation of {0} -> {1}", strInput, strOutput);
 		return;
 	}
 
@@ -155,13 +156,15 @@ void TextureCompiler::compile(const fs::path& absoluteKey)
 	args_array[3] = strOutput.c_str();
 	args_array[4] = "-m";
 
+	
+
 	if (compile_texture(arg_count, args_array) != 0)
 	{
-		logger->error().write("Failed to compile TEXTURE: {0}", strInput);
+		logger->error().write("Failed compilation of {0}", strInput);
 	}
 	else
 	{
-		logger->info().write("Compiled TEXTURE: {0} -> {1}", strInput, strOutput);
+		logger->info().write("Successful compilation of {0} -> {1}", strInput, strOutput);
 	}
 
 }
@@ -195,14 +198,14 @@ void MeshCompiler::compile(const fs::path& absoluteKey)
 	args_array[9] = "1";
 	
 	auto logger = logging::get("Log");
-
+	logger->info().write("Compiling {0}", strInput);
 	if (compile_mesh(arg_count, args_array) != 0)
 	{
-		logger->error().write("Failed to compile MESH: {0}", strInput);
+		logger->error().write("Failed compilation of {0}", strInput);
 	}
 	else
 	{
-		logger->info().write("Compiled MESH: {0} -> {1}", strInput, strOutput);
+		logger->info().write("Successful compilation of {0} -> {1}", strInput, strOutput);
 	}
 
 }

@@ -47,6 +47,7 @@ namespace editor
 					//created or modified
 					if (fs::is_regular_file(p, std::error_code{}))
 					{
+						
 						auto task = ts->create("", [reloadAsync, key, am]()
 						{
 							am->load<T>(key, reloadAsync, true);
@@ -61,16 +62,18 @@ namespace editor
 	template<typename T>
 	void watch_raw_assets(const fs::path& protocol, const std::string& wildcard, bool initialList, const std::string& ignoreFile)
 	{
+		auto am = core::get_subsystem<runtime::AssetManager>();
 		auto ts = core::get_subsystem<runtime::TaskSystem>();
 
 		const fs::path dir = fs::resolve_protocol(protocol);
 		const fs::path watchDir = dir / wildcard;
 
-		fs::watcher::watch(watchDir, initialList, [ts, ignoreFile](const std::vector<fs::watcher::Entry>& entries)
+		fs::watcher::watch(watchDir, initialList, [am, ts, protocol, ignoreFile](const std::vector<fs::watcher::Entry>& entries)
 		{
 			for (auto& entry : entries)
 			{
 				const auto& p = entry.path;
+				auto key = (protocol / p.filename().replace_extension()).generic_string();
 
 				if (!ignoreFile.empty())
 				{
@@ -80,7 +83,7 @@ namespace editor
 
 				if (entry.state == fs::watcher::Entry::Removed)
 				{
-					//removed
+
 				}
 				else
 				{
@@ -91,7 +94,13 @@ namespace editor
 						{
 							AssetCompiler<T>::compile(p);
 						});
-						ts->run(task);
+						ts->run(task);	
+
+						auto task1 = ts->create("", [p, am, key]()
+						{
+							am->create_asset_entry<T>(key);
+						});
+						ts->run_on_main(task1);
 					}
 				}
 			}
@@ -124,17 +133,17 @@ namespace editor
 			save_config();
 		}
 
-		watch_assets<Texture>("data://textures", "*.asset", true, true);
+		watch_assets<Texture>("data://textures", "*.asset", !recompile_assets, true);
 		watch_raw_assets<Texture>("data://textures", "*.png", recompile_assets, "");
 		watch_raw_assets<Texture>("data://textures", "*.tga", recompile_assets, "");
 		watch_raw_assets<Texture>("data://textures", "*.dds", recompile_assets, "");
 		watch_raw_assets<Texture>("data://textures", "*.ktx", recompile_assets, "");
 		watch_raw_assets<Texture>("data://textures", "*.pvr", recompile_assets, "");
 
-		watch_assets<Shader>("data://shaders", "*.asset", true, true);
+		watch_assets<Shader>("data://shaders", "*.asset", !recompile_assets, true);
 		watch_raw_assets<Shader>("data://shaders", "*.sc", recompile_assets, "varying.def.sc");
 
-		watch_assets<Mesh>("data://meshes", "*.asset", true, true);
+		watch_assets<Mesh>("data://meshes", "*.asset", !recompile_assets, true);
 		watch_raw_assets<Mesh>("data://meshes", "*.obj", recompile_assets, "");
 
 		watch_assets<Prefab>("data://prefabs", "*.asset", true, true);
@@ -160,7 +169,9 @@ namespace editor
 // 
 // 		watch_assets<Shader>("editor_data://shaders", "*.asset", true, true);
 // 		watch_raw_assets<Shader>("editor_data://shaders", "*.sc", recompile_assets, "varying.def.sc");
-
+// 
+// 		watch_assets<Mesh>("editor_data://meshes", "*.asset", !recompile_assets, true);
+// 		watch_raw_assets<Mesh>("editor_data://meshes", "*.obj", recompile_assets, "");
 	}
 
 	void ProjectManager::create_project(const fs::path& project_path)
