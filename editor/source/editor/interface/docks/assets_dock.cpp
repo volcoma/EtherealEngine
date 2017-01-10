@@ -116,7 +116,7 @@ namespace Docks
 				icon.link->asset,
 				texture_size, item_size, uv0, uv1,
 				alreadySelected,
-				assetName.c_str(),
+				loading ? "Loading" : assetName.c_str(),
 				&inputBuff[0],
 				inputBuff.size(),
 				ImGuiInputTextFlags_EnterReturnsTrue);
