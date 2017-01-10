@@ -20,6 +20,8 @@ void Texture::dispose()
 
 void Texture::populate(const gfx::Memory* _mem, std::uint32_t _flags /*= BGFX_TEXTURE_NONE */, std::uint8_t _skip /*= 0 */, gfx::TextureInfo* _info /*= nullptr*/)
 {
+	dispose();
+
 	gfx::TextureInfo* pInfo = _info;
 	if (!pInfo)
 		pInfo = &info;
@@ -35,6 +37,8 @@ void Texture::populate(const gfx::Memory* _mem, std::uint32_t _flags /*= BGFX_TE
 
 void Texture::populate(std::uint16_t _width, std::uint16_t _height, bool _hasMips, std::uint16_t _numLayers, gfx::TextureFormat::Enum _format, std::uint32_t _flags /*= BGFX_TEXTURE_NONE */, const gfx::Memory* _mem /*= nullptr */)
 {
+	dispose();
+
 	handle = gfx::createTexture2D(_width, _height, _hasMips, _numLayers, _format, _flags, _mem);
 
 	gfx::calcTextureSize(info
@@ -53,6 +57,8 @@ void Texture::populate(std::uint16_t _width, std::uint16_t _height, bool _hasMip
 
 void Texture::populate(std::uint16_t _width, std::uint16_t _height, std::uint16_t _depth, bool _hasMips, gfx::TextureFormat::Enum _format, std::uint32_t _flags /*= BGFX_TEXTURE_NONE */, const gfx::Memory* _mem /*= nullptr */)
 {
+	dispose();
+
 	handle = gfx::createTexture3D(_width, _height, _depth, _hasMips, _format, _flags, _mem);
 
 	gfx::calcTextureSize(info
@@ -71,6 +77,8 @@ void Texture::populate(std::uint16_t _width, std::uint16_t _height, std::uint16_
 
 void Texture::populate(std::uint16_t _size, bool _hasMips, std::uint16_t _numLayers, gfx::TextureFormat::Enum _format, std::uint32_t _flags /*= BGFX_TEXTURE_NONE */, const gfx::Memory* _mem /*= nullptr */)
 {
+	dispose();
+
 	handle = gfx::createTextureCube(_size, _hasMips, _numLayers, _format, _flags, _mem);
 
 	gfx::calcTextureSize(info
@@ -89,6 +97,8 @@ void Texture::populate(std::uint16_t _size, bool _hasMips, std::uint16_t _numLay
 
 void Texture::populate(gfx::BackbufferRatio::Enum _ratio, bool _hasMips, std::uint16_t _numLayers, gfx::TextureFormat::Enum _format, std::uint32_t _flags /*= BGFX_TEXTURE_NONE */)
 {
+	dispose();
+
 	handle = gfx::createTexture2D(_ratio, _hasMips, _numLayers, _format, _flags);
 
 	std::uint16_t _width = 0;

@@ -872,6 +872,7 @@ int compile_texture(int _argc, const char* _argv[])
 			return EXIT_FAILURE;
 		}
 
+		::free(mem->data);
 		mem_release(mem);
 	}
 
