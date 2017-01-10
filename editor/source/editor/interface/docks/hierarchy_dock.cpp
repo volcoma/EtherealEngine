@@ -201,7 +201,7 @@ namespace Docks
 		ImGuiWindow* window = gui::GetCurrentWindow();
 		static ImGuiID id;
 
-		if (gui::IsItemHoveredRect() && !gui::IsMouseDragging(0))
+		if (gui::IsItemHovered() && !gui::IsMouseDragging(0))
 		{
 			if (gui::IsMouseClicked(0))
 			{

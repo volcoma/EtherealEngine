@@ -82,14 +82,25 @@ namespace gui
 		, const ImVec4& _tintCol = ImVec4(1.0f, 1.0f, 1.0f, 1.0f)
 	);
 	bool ImageButtonEx(std::shared_ptr<ITexture> texture
-		, ImVec2 size
+		, const ImVec2& size
 		, const char* tooltip = nullptr
 		, bool selected = false
 		, bool enabled = true
 	);
 
-	int ImageButtonWithLabel(std::shared_ptr<ITexture> texture
-		, ImVec2 size
+	void ImageWithAspect(std::shared_ptr<ITexture> texture
+		, const ImVec2& texture_size
+		, const ImVec2& size
+		, const ImVec2& uv0 = ImVec2(0, 0)
+		, const ImVec2& uv1 = ImVec2(1, 1)
+		, const ImVec4& tint_col = ImVec4(1, 1, 1, 1)
+		, const ImVec4& border_col = ImVec4(0, 0, 0, 0));
+
+	int ImageButtonWithAspectAndLabel(std::shared_ptr<ITexture> texture
+		, const ImVec2& texture_size
+		, const ImVec2& size
+		, const ImVec2& uv0
+		, const ImVec2& uv1
 		, bool selected
 		, const char* label
 		, char* buf

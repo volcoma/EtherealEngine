@@ -105,9 +105,16 @@ namespace Docks
 			std::string inputBuff = assetName;
 			inputBuff.resize(64, 0);
 			inputBuff.shrink_to_fit();
-			int action = gui::ImageButtonWithLabel(
+
+
+			ImVec2 texture_size = { float(icon->info.width), float(icon->info.height) };
+			ImVec2 item_size = { size, size };
+			ImVec2 uv0 = { 0.0f, 0.0f };
+			ImVec2 uv1 = { 1.0f, 1.0f };
+
+			int action = gui::ImageButtonWithAspectAndLabel(
 				icon.link->asset,
-				{ size, size },
+				texture_size, item_size, uv0, uv1,
 				alreadySelected,
 				assetName.c_str(),
 				&inputBuff[0],
@@ -140,7 +147,7 @@ namespace Docks
 			{
 				editState.drag(assetHandle, assetRelativeName);
 			}
-			if (gui::BeginPopupContextItem(assetName.c_str()))
+			if (gui::BeginPopupContextItem(assetRelativeName.c_str()))
 			{
 				openPopup = true;
 				if (gui::Selectable("Delete"))

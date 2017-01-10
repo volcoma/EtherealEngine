@@ -10,6 +10,7 @@ struct ITexture
 	REFLECTABLE(ITexture)
 	virtual ~ITexture() = default;
 	virtual inline bool is_render_target() const { return false; }
+	virtual inline uSize get_size() const { return uSize{ 0, 0 }; }
 };
 
 

@@ -7,6 +7,8 @@
 #include "runtime/system/filesystem.h"
 #include "core/serialization/archives.h"
 #include "../../edit_state.h"
+
+
 bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<AssetHandle<Texture>>();
@@ -19,13 +21,18 @@ bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, s
 	if (is_selected)
 		available = gui::GetContentRegionAvailWidth();
 
+	float max_size = available;
 	ImVec2 size = { available, available };
 	if (data)
 	{
-		gui::Image(data.link->asset, size);
+		float w = float(data.link->asset->get_size().width);
+		float h = float(data.link->asset->get_size().height);
+		
+		gui::ImageWithAspect(data.link->asset, ImVec2(w, h), size);
 	}
 	else
 	{
+		
 		ImGuiWindow* window = gui::GetCurrentWindow();
 		if (window->SkipItems)
 			return false;

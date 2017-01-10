@@ -304,16 +304,22 @@ bool ImageButton(std::shared_ptr<ITexture> texture, const ImVec2& _size, const I
 	return ImGui::ImageButton(texture.get(), _size, uv0, uv1, _framePadding, _bgCol, _tintCol);
 }
 
-bool ImageButtonEx(std::shared_ptr<ITexture> texture, ImVec2 size, const char* tooltip, bool selected, bool enabled)
+bool ImageButtonEx(std::shared_ptr<ITexture> texture, const ImVec2& size, const char* tooltip, bool selected, bool enabled)
 {
 	sTextures.push_back(texture);
 	return ImGui::ImageButtonEx(texture.get(), size, tooltip, selected, enabled);
 }
 
-int ImageButtonWithLabel(std::shared_ptr<ITexture> texture, ImVec2 size, bool selected, const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags /*= 0*/)
+void ImageWithAspect(std::shared_ptr<ITexture> texture, const ImVec2& texture_size, const ImVec2& size, const ImVec2& uv0, const ImVec2& uv1, const ImVec4& tint_col, const ImVec4& border_col)
 {
 	sTextures.push_back(texture);
-	return ImGui::ImageButtonWithLabel(texture.get(), size, selected, label, buf, buf_size, flags);
+	return ImGui::ImageWithAspect(texture.get(), texture_size, size, uv0, uv1, tint_col, border_col);
+}
+
+int ImageButtonWithAspectAndLabel(std::shared_ptr<ITexture> texture, const ImVec2& texture_size, const ImVec2& size, const ImVec2& uv0, const ImVec2& uv1, bool selected, const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags /*= 0*/)
+{
+	sTextures.push_back(texture);
+	return ImGui::ImageButtonWithAspectAndLabel(texture.get(), texture_size, size, uv0, uv1, selected, label, buf, buf_size, flags);
 }
 
 GUIStyle& getGUIStyle()

@@ -169,19 +169,62 @@ namespace ImGui
 		return ret;
 	}
 
-	int ImageButtonWithLabel(ImTextureID texture, ImVec2 size, bool selected, const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags)
+	void ImageWithAspect(ImTextureID texture, ImVec2 texture_size, ImVec2 size, const ImVec2& uv0, const ImVec2& uv1, const ImVec4& tint_col, const ImVec4& border_col)
+	{
+		float w = texture_size.x;
+		float h = texture_size.y;
+		float max_size = ImMax(size.x, size.y);
+		float aspect = w / h;
+		if (w > h)
+		{
+			float m = math::min(max_size, w);
+
+			size.x = m;
+			size.y = m / aspect;
+		}
+		else if (h > w)
+		{
+			float m = math::min(max_size, h);
+
+			size.x = m * aspect;
+			size.y = m;
+		}
+
+
+		auto pos = GetCursorScreenPos();
+		ImGuiWindow* window = GetCurrentWindow();
+
+		ImRect bb(window->DC.CursorPos, ImVec2(window->DC.CursorPos.x + max_size, window->DC.CursorPos.y + max_size));
+		ItemSize(bb);
+		ItemAdd(bb, nullptr);
+
+		auto pos2 = GetCursorScreenPos();
+
+		if (size.x > size.y)
+			pos.y += (max_size - size.y) * 0.5f;
+		if (size.x < size.y)
+			pos.x += (max_size - size.x) * 0.5f;
+
+		SetCursorScreenPos(pos);
+
+		Image(texture, size, uv0, uv1, tint_col, border_col);
+
+		SetCursorScreenPos(pos2);
+	}
+
+	int ImageButtonWithAspectAndLabel(ImTextureID texture, ImVec2 texture_size, ImVec2 size, ImVec2 uv0, ImVec2 uv1, bool selected, const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags)
 	{
 		static bool edit_label = false;
 		int return_value = 0;
-		auto pos = GetCursorScreenPos();
+		
 		ImGuiWindow* window = GetCurrentWindow();
 		bool inputActive = false;
 		BeginGroup();
 		{
 			if(selected)
-				Image(texture, size, { 0.0f, 0.0f }, { 1.0f, 1.0f }, { 0.7f, 0.7f, 0.7f, 1.0f });
+				ImageWithAspect(texture, texture_size, size, uv0, uv1, { 0.7f, 0.7f, 0.7f, 1.0f });
 			else
-				Image(texture, size);
+				ImageWithAspect(texture, texture_size, size, uv0, uv1);
 
 			auto pos = GetCursorScreenPos();
 			PushItemWidth(size.x);
@@ -191,7 +234,6 @@ namespace ImGui
 			if(selected && edit_label)
 			{	
 				SetCursorScreenPos(pos);
-
 				PushItemWidth(size.x);
 				if (InputText("",
 					&buf[0],
@@ -216,7 +258,7 @@ namespace ImGui
 		
 		static ImGuiID id;
 
-		if (IsItemHoveredRect() && !IsMouseDragging(0))
+		if (IsItemHovered() && !IsMouseDragging(0))
 		{
 			if (IsMouseClicked(0))
 			{
