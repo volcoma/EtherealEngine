@@ -158,40 +158,6 @@ struct TouchFingerMapper : public InputMapper<unsigned int>
 	}
 };
 
-
-// struct JoystickMapping
-// {
-// 	unsigned int joystickId;
-// 	unsigned int button;
-// 
-// 	bool operator==(const JoystickMapping& rhs)
-// 	{
-// 		return joystickId == rhs.joystickId && button == rhs.button;
-// 	}
-// 
-// 	bool operator==(const JoystickMapping rhs)
-// 	{
-// 		return joystickId == rhs.joystickId && button == rhs.button;
-// 	}
-// };
-
-// namespace std
-// {
-// 
-// 	template<>
-// 	struct hash<JoystickMapping>
-// 	{
-// 		inline size_t operator()(const JoystickMapping & v) const
-// 		{
-// 			size_t seed = 0;
-// 			::hash_combine(seed, v.joystickId);
-// 			::hash_combine(seed, v.button);
-// 			return seed;
-// 		}
-// 	};
-// }
-
-
 struct JoystickButtonMapper : public InputMapper<std::pair<unsigned int, unsigned int>>
 {
 	virtual Mapping get_mapping(const sf::Event& e)

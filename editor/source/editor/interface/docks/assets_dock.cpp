@@ -291,14 +291,18 @@ namespace Docks
 
 		if (gui::BeginChild("###assets_content", gui::GetContentRegionAvail(), false, flags))
 		{
-			if (gui::IsWindowHovered() && gui::IsMouseReleased(gui::drag_button))
+			if (gui::IsWindowHovered())
 			{
 				auto& dragged = es->drag_data.object;
 				if (dragged && dragged.is_type<runtime::Entity>())
 				{
-					auto entity = dragged.get_value<runtime::Entity>();
-					ecs::utils::save_entity("data://prefabs", entity);
-					es->drop();
+					gui::SetMouseCursor(ImGuiMouseCursor_Move);
+					if (gui::IsMouseReleased(gui::drag_button))
+					{
+						auto entity = dragged.get_value<runtime::Entity>();
+						ecs::utils::save_entity("data://prefabs", entity);
+						es->drop();
+					}
 				}
 			}
 			

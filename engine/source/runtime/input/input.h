@@ -22,15 +22,15 @@ namespace runtime
 		///
 		TouchFingerMapper touch_finger_mapper;
 		///
-		JoystickButtonMapper joystick_mapper;
+		JoystickButtonMapper joystick_button_mapper;
 		///
 		EventMapper event_mapper;
 		///
 		ActionMap actions;
 
-		void handleEvent(const sf::Event& event)
+		void handle_event(const sf::Event& event)
 		{
-			auto triggerCallbacks = [this](auto mapper, const sf::Event& event)
+			auto trigger_callbacks = [this](auto mapper, const sf::Event& event)
 			{
 				auto mappings = mapper.get_mapping(event);
 				for (auto& action : mappings.actions)
@@ -40,22 +40,68 @@ namespace runtime
 				}
 			};
 
-			triggerCallbacks(keyboard_mapper, event);
-			triggerCallbacks(mouse_button_mapper, event);
-			triggerCallbacks(mouse_wheel_mapper, event);
-			triggerCallbacks(touch_finger_mapper, event);
-			triggerCallbacks(joystick_mapper, event);
-			triggerCallbacks(event_mapper, event);
+			trigger_callbacks(keyboard_mapper, event);
+			trigger_callbacks(mouse_button_mapper, event);
+			trigger_callbacks(mouse_wheel_mapper, event);
+			trigger_callbacks(touch_finger_mapper, event);
+			trigger_callbacks(joystick_button_mapper, event);
+			trigger_callbacks(event_mapper, event);
 		}
+
+	
 	};
 
+// 	auto input = core::get_subsystem<runtime::Input>();
+// 	auto& mappings = input->get_mappings();
+//
+//	// You can map different type of events to the same action
+// 	mappings.event_mapper.map("some_action", sf::Event::TextEntered);
+// 	mappings.mouse_button_mapper.map("some_action", sf::Mouse::Right);
+// 	mappings.keyboard_mapper.map("some_action", sf::Keyboard::Space);
+//
+// 	//you can subscribe to a callback for a specific event and action type
+// 	mappings.actions["some_action"][ActionType::Pressed].connect([](const sf::Event& e)
+// 	{
+// 		//do some stuff
+// 	});
+// 	mappings.actions["some_action"][ActionType::Changed].connect([](const sf::Event& e)
+// 	{
+// 		//do some stuff
+// 	});
 	class Input : public core::Subsystem
 	{
 	public:
 		Input();
 
+		//-----------------------------------------------------------------------------
+		//  Name : initialize ()
+		/// <summary>
+		/// 
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		bool initialize();
+
+		//-----------------------------------------------------------------------------
+		//  Name : dispose ()
+		/// <summary>
+		/// 
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		void dispose();
+
+		//-----------------------------------------------------------------------------
+		//  Name : get_mappings ()
+		/// <summary>
+		/// 
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
+		inline ActionMapper& get_mappings() { return _action_mapper; }
 
 		//-----------------------------------------------------------------------------
 		//  Name : reset_state ()

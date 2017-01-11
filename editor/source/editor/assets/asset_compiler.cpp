@@ -97,20 +97,12 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 			{
 				logger->error().write("Failed compilation of {0}", strInput);
 			}
-			else
-			{
-				logger->info().write("Successful compilation of {0} -> {1}", strInput, strOutput);
-			}
 		}
 		else
 		{
 			if (compile_shader(arg_count, args_array) != 0)
 			{
 				logger->error().write("Failed compilation of {0}", strInput);
-			}
-			else
-			{
-				logger->info().write("Successful compilation of {0} -> {1}", strInput, strOutput);
 			}
 		}
 		
@@ -139,9 +131,14 @@ void TextureCompiler::compile(const fs::path& absoluteKey)
 
 	if (raw_ext == ".dds" || raw_ext == ".pvr" || raw_ext == ".ktx")
 	{
-		fs::copy_file(strInput, strOutput, fs::copy_options::overwrite_existing, std::error_code{});
-		fs::last_write_time(strOutput, fs::file_time_type::clock::now(), std::error_code{});
-		logger->info().write("Successful compilation of {0} -> {1}", strInput, strOutput);
+		if (!fs::copy_file(strInput, strOutput, fs::copy_options::overwrite_existing, std::error_code{}))
+		{
+			logger->error().write("Failed compilation of {0}", strInput);
+		}
+		else
+		{
+			fs::last_write_time(strOutput, fs::file_time_type::clock::now(), std::error_code{});
+		}
 		return;
 	}
 
@@ -160,11 +157,6 @@ void TextureCompiler::compile(const fs::path& absoluteKey)
 	{
 		logger->error().write("Failed compilation of {0}", strInput);
 	}
-	else
-	{
-		logger->info().write("Successful compilation of {0} -> {1}", strInput, strOutput);
-	}
-
 }
 
 void MeshCompiler::compile(const fs::path& absoluteKey)
@@ -200,9 +192,4 @@ void MeshCompiler::compile(const fs::path& absoluteKey)
 	{
 		logger->error().write("Failed compilation of {0}", strInput);
 	}
-	else
-	{
-		logger->info().write("Successful compilation of {0} -> {1}", strInput, strOutput);
-	}
-
 }

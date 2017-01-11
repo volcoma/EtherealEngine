@@ -80,26 +80,37 @@ namespace Docks
 		{
 			if (gui::IsItemHoveredRect())
 			{
+
+
 				if (gui::IsMouseClicked(gui::drag_button) &&
 					entity != editor_camera)
 				{
 					es->drag(entity, entity.to_string());
 				}
-				if (gui::IsMouseReleased(gui::drag_button))
+				
+				if (dragged && entity != editor_camera)
 				{
-					if (dragged && entity != editor_camera)
+					if (dragged.is_type<runtime::Entity>())
 					{
-						if (dragged.is_type<runtime::Entity>())
+						
+						auto dragged_entity = dragged.get_value<runtime::Entity>();
+						if (dragged_entity != entity)
 						{
-							
-							auto dragged_entity = dragged.get_value<runtime::Entity>();
-							dragged_entity.component<TransformComponent>().lock()
-								->set_parent(entity.component<TransformComponent>());
+							gui::SetMouseCursor(ImGuiMouseCursor_Move);
+							if (gui::IsMouseReleased(gui::drag_button))
+							{	
+								dragged_entity.component<TransformComponent>().lock()
+									->set_parent(entity.component<TransformComponent>());
 
-							es->drop();
+								es->drop();
+							}
 						}
+					}
 
-						if (dragged.is_type<AssetHandle<Prefab>>())
+					if (dragged.is_type<AssetHandle<Prefab>>())
+					{
+						gui::SetMouseCursor(ImGuiMouseCursor_Move);
+						if (gui::IsMouseReleased(gui::drag_button))
 						{
 							auto prefab = dragged.get_value<AssetHandle<Prefab>>();
 							auto object = prefab->instantiate();
@@ -109,10 +120,14 @@ namespace Docks
 							es->drop();
 							es->select(object);
 						}
-						if (dragged.is_type<AssetHandle<Mesh>>())
+					}
+					if (dragged.is_type<AssetHandle<Mesh>>())
+					{
+						gui::SetMouseCursor(ImGuiMouseCursor_Move);
+						if (gui::IsMouseReleased(gui::drag_button))
 						{
 							auto mesh = dragged.get_value<AssetHandle<Mesh>>();
-							Model model;		
+							Model model;
 							model.set_lod(mesh, 0);
 
 							auto object = ecs->create();

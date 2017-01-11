@@ -382,19 +382,24 @@ namespace Docks
 
 		if (gui::IsWindowHovered())
 		{
-			if (gui::IsMouseReleased(gui::drag_button))
+			if (dragged)
 			{
-				if (dragged)
+				math::vec3 projected_pos;
+
+				if (gui::IsMouseReleased(gui::drag_button))
 				{
 					auto cursor_pos = gui::GetMousePos();
-					math::vec3 projected_pos;
 					camera_component->get_camera().viewport_to_world(
 						math::vec2{ cursor_pos.x, cursor_pos.y },
 						math::plane::fromPointNormal(math::vec3{ 0.0f, 0.0f, 0.0f }, math::vec3{ 0.0f, 1.0f, 0.0f }),
 						projected_pos,
 						false);
+				}
 
-					if (dragged.is_type<runtime::Entity>())
+				if (dragged.is_type<runtime::Entity>())
+				{
+					gui::SetMouseCursor(ImGuiMouseCursor_Move);
+					if (gui::IsMouseReleased(gui::drag_button))
 					{
 						auto dragged_entity = dragged.get_value<runtime::Entity>();
 						dragged_entity.component<TransformComponent>().lock()
@@ -402,7 +407,11 @@ namespace Docks
 
 						es->drop();
 					}
-					if (dragged.is_type<AssetHandle<Prefab>>())
+				}
+				if (dragged.is_type<AssetHandle<Prefab>>())
+				{
+					gui::SetMouseCursor(ImGuiMouseCursor_Move);
+					if (gui::IsMouseReleased(gui::drag_button))
 					{
 						auto prefab = dragged.get_value<AssetHandle<Prefab>>();
 						auto object = prefab->instantiate();
@@ -410,9 +419,12 @@ namespace Docks
 							->set_position(projected_pos);
 						es->drop();
 						es->select(object);
-
 					}
-					if (dragged.is_type<AssetHandle<Mesh>>())
+				}
+				if (dragged.is_type<AssetHandle<Mesh>>())
+				{
+					gui::SetMouseCursor(ImGuiMouseCursor_Move);
+					if (gui::IsMouseReleased(gui::drag_button))
 					{
 						auto mesh = dragged.get_value<AssetHandle<Mesh>>();
 						Model model;

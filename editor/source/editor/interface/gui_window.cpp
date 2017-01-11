@@ -213,6 +213,9 @@ void GuiWindow::frame_end()
 	if (gui::IsMouseDragging(gui::drag_button) && es->drag_data.object)
 	{
 		gui::SetTooltip(es->drag_data.description.c_str());
+
+		if (gui::GetMouseCursor() == ImGuiMouseCursor_Arrow)
+			gui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);
 	}
 
 	if (!gui::IsAnyItemActive() && !gui::IsAnyItemHovered())
