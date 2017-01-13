@@ -270,7 +270,7 @@ namespace ImGui
  					SetActiveID(id);
 			}
 
-			if (IsMouseReleased(0) && window->GetID(label) == id)
+			if (!IsMouseDragging(0) && IsMouseReleased(0) && window->GetID(label) == id)
 			{
 				if (!selected)
 					edit_label = false;

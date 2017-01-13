@@ -40,6 +40,7 @@ namespace fs
 			fs::path path;
 			State state;
 			fs::file_time_type last_mod_time;
+			uintmax_t size;
 		};
 
 		//-----------------------------------------------------------------------------
@@ -470,6 +471,7 @@ namespace fs
 			{
 				// get the last modification time
 				auto time = fs::last_write_time(path, std::error_code{});
+				auto size = fs::file_size(path, std::error_code{});
 				// add a new modification time to the map
 				std::string key = path.string();
 				if (_entries.find(key) == _entries.end())
@@ -478,12 +480,14 @@ namespace fs
 					fi.path = path;
 					fi.last_mod_time = time;
 					fi.state = Entry::State::Modified;
+					fi.size = size;
 					return fi;
 				}
 				// or compare with an older one
 				auto &fi = _entries[key];
-				if (fi.last_mod_time < time)
+				if (fi.last_mod_time < time || fi.size != size)
 				{
+					fi.size = size;
 					fi.last_mod_time = time;
 					fi.state = Entry::State::Modified;
 					return fi;

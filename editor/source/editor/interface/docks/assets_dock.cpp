@@ -189,68 +189,82 @@ namespace Docks
 
 		float width = gui::GetContentRegionAvailWidth();
 		static bool bigIcons = false;
-
-
+		
 		if (gui::Button("Import..."))
 		{
 			std::vector<std::string> paths;
 			if (open_multiple_files_dialog("obj,png,tga,dds,ktx,pvr,sc", "", paths))
 			{
 				auto ts = core::get_subsystem<runtime::TaskSystem>();
-
-				auto task = ts->create("Import Assets", [](const std::vector<std::string>& paths)
+				auto logger = logging::get("Log");
+				for (auto& path : paths)
 				{
-					auto logger = logging::get("Log");
-					for (auto& path : paths)
+					fs::path p = string_utils::to_lower(path);
+					fs::path ext = p.extension().string();
+					fs::path filename = p.filename();
+
+					if (ext == ".obj")
 					{
-						fs::path p = string_utils::to_lower(path);
-						fs::path ext = p.extension().string();
-						fs::path filename = p.filename();
-						std::error_code error;
-						if (ext == ".obj")
+						auto task = ts->create("Import Asset", [](const fs::path& path, const fs::path& p, const fs::path& filename)
 						{
+							std::error_code error;
 							fs::path dir = fs::resolve_protocol("data://meshes") / filename;
 							if (!fs::copy_file(path, dir, fs::copy_options::overwrite_existing, error))
 							{
+								auto logger = logging::get("Log");
 								logger->error().write("Failed to import file {0} with message {1}", p.string(), error.message());
 							}
 							else
 							{
 								fs::last_write_time(dir, fs::file_time_type::clock::now(), std::error_code{});
 							}
-						}
-						else if (ext == ".png" || ext == ".tga" || ext == ".dds" || ext == ".ktx" || ext == ".pvr")
+						}, p, p, filename);
+
+						ts->run(task);
+					}
+					else if (ext == ".png" || ext == ".tga" || ext == ".dds" || ext == ".ktx" || ext == ".pvr")
+					{
+						auto task = ts->create("Import Asset", [](const fs::path& path, const fs::path& p, const fs::path& filename)
 						{
+							std::error_code error;
 							fs::path dir = fs::resolve_protocol("data://textures") / filename;
 							if (!fs::copy_file(path, dir, fs::copy_options::overwrite_existing, error))
 							{
-								logger->error().write("Failed to import file {0} with message: {1}", p.string(), error.message());
-							}
-							else
-							{
-								fs::last_write_time(dir, fs::file_time_type::clock::now(), std::error_code{});
-							}
-						}
-						else if (ext == ".sc")
-						{
-							fs::path dir = fs::resolve_protocol("data://shaders") / filename;
-							if (!fs::copy_file(path, dir, fs::copy_options::overwrite_existing, error))
-							{
+								auto logger = logging::get("Log");
 								logger->error().write("Failed to import file {0} with message {1}", p.string(), error.message());
 							}
 							else
 							{
 								fs::last_write_time(dir, fs::file_time_type::clock::now(), std::error_code{});
 							}
-						}
-						else
-						{
-							logger->error().write("Unsupported file format {0}", ext.string());
-						}
-					}
+						}, p, p, filename);
 
-				}, paths);
-				ts->run(task);
+						ts->run(task);
+					}
+					else if (ext == ".sc")
+					{
+						auto task = ts->create("Import Asset", [](const fs::path& path, const fs::path& p, const fs::path& filename)
+						{
+							std::error_code error;
+							fs::path dir = fs::resolve_protocol("data://shaders") / filename;
+							if (!fs::copy_file(path, dir, fs::copy_options::overwrite_existing, error))
+							{
+								auto logger = logging::get("Log");
+								logger->error().write("Failed to import file {0} with message {1}", p.string(), error.message());
+							}
+							else
+							{
+								fs::last_write_time(dir, fs::file_time_type::clock::now(), std::error_code{});
+							}
+						}, p, p, filename);
+
+						ts->run(task);
+					}
+					else
+					{
+						logger->error().write("Unsupported file format {0}", ext.string());
+					}
+				}
 			}
 		}
 		gui::SameLine();
