@@ -106,6 +106,6 @@ namespace bgfx
 
 } // namespace bgfx
 
-int compile_shader(int _argc, const char* _argv[]);
+int compile_shader(int _argc, const char* _argv[], bx::MemoryBlock& memBlock, int64_t& sz);
 
 #endif // SHADERC_H_HEADER_GUARD

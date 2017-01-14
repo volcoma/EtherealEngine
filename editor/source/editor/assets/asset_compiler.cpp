@@ -5,6 +5,14 @@
 #include "shaderc/shaderc.h"
 #include "texturec/texturec.h"
 #include "geometryc/geometryc.h"
+#include <fstream>
+#include <array>
+#include "graphics/graphics.h"
+
+#include "core/serialization/serialization.h"
+#include "core/serialization/archives.h"
+#include "core/serialization/cereal/types/unordered_map.hpp"
+#include "core/serialization/cereal/types/vector.hpp"
 
 void ShaderCompiler::compile(const fs::path& absoluteKey)
 {
@@ -18,18 +26,22 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 	bool vs = string_utils::begins_with(file, "vs_");
 	bool fs = string_utils::begins_with(file, "fs_");
 	bool cs = string_utils::begins_with(file, "cs_");
-	fs::path supported[] = { "dx9", "dx11", "glsl", "metal" };
+	std::array<gfx::RendererType::Enum, 4> supported = 
+	{ 
+		gfx::RendererType::Direct3D9,
+		gfx::RendererType::Direct3D11,
+		gfx::RendererType::OpenGL,
+		gfx::RendererType::Metal
+	};
 	
-	for (int i = 0; i < 4; ++i)
+	std::unordered_map<gfx::RendererType::Enum, fs::byte_array_t> binaries;
+	binaries.reserve(4);
+	fs::path output = dir / fs::path(file + ext);
+
+	std::string strOutput = output.string();
+	for (auto& platform : supported)
 	{
-		fs::path output = dir / "compiled";
-		fs::create_directory(output, std::error_code{});
-
-		output = output / supported[i];
-		fs::create_directory(output, std::error_code{});
-		output /= fs::path(file + ext);
-
-		std::string strOutput = output.string();
+		
 
 		static const int arg_count = 16;
 		const char* args_array[arg_count];
@@ -42,12 +54,12 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 		std::string strInclude = include.string();
 		args_array[5] = strInclude.c_str();
 		args_array[6] = "--varyingdef";
-		fs::path varying = dir / "varying.def.sc";
+		fs::path varying = dir / (file + ".io");
 		std::string strVarying = varying.string();
 		args_array[7] = strVarying.c_str();
 		args_array[8] = "--platform";
 
-		if(i < 2)
+		if(platform == gfx::RendererType::Direct3D9 || platform == gfx::RendererType::Direct3D11)
 		{
 			args_array[9] = "windows";
 			args_array[10] = "--profile";
@@ -59,7 +71,7 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 			else if (cs)
 				args_array[11] = "cs_5_0";
 		}
-		else if (i == 2)
+		else if (platform == gfx::RendererType::OpenGL)
 		{
 			args_array[9] = "linux";
 			args_array[10] = "--profile";
@@ -69,7 +81,7 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 			else if (cs)
 				args_array[11] = "430";
 		}
-		else if (i == 3)
+		else if (platform == gfx::RendererType::Metal)
 		{
 			args_array[9] = "osx";
 			args_array[10] = "--profile";
@@ -88,26 +100,48 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 
 		auto logger = logging::get("Log");
 		
-		if (i >= 2)
+		bx::CrtAllocator allocator;
+		bx::MemoryBlock memBlock(&allocator);
+		int64_t sz;
+		if (platform != gfx::RendererType::Direct3D9 && platform != gfx::RendererType::Direct3D11)
 		{
 			//glsl shader compilation is not thread safe-
 			static std::mutex mtx;
 			std::lock_guard<std::mutex> lock(mtx);
-			if (compile_shader(arg_count, args_array) != 0)
+			if (compile_shader(arg_count, args_array, memBlock, sz) != 0)
 			{
 				logger->error().write("Failed compilation of {0}", strInput);
+				return;
 			}
 		}
 		else
 		{
-			if (compile_shader(arg_count, args_array) != 0)
+			if (compile_shader(arg_count, args_array, memBlock, sz) != 0)
 			{
 				logger->error().write("Failed compilation of {0}", strInput);
+				return;
 			}
+		}
+
+		if (sz > 0)
+		{
+			auto buf = (char*)memBlock.more();
+			auto length = sz;
+			fs::byte_array_t vec;
+			std::copy(buf, buf + length, std::back_inserter(vec));
+			binaries[platform] = vec;
 		}
 		
 	}
-	
+
+	fs::path entry = dir / fs::path(file + ".buildtemp");
+	{		
+		std::ofstream soutput(entry);
+		cereal::oarchive_json_t ar(soutput, cereal::oarchive_json_t::Options::NoIndent());
+		try_save(ar, cereal::make_nvp("shader", binaries));
+	}
+	fs::copy(entry, output, fs::copy_options::overwrite_existing, std::error_code{});
+	fs::remove(entry, std::error_code{});
 }
 
 

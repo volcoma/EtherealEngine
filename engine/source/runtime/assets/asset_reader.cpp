@@ -9,7 +9,10 @@
 #include "../system/filesystem.h"
 #include "../ecs/prefab.h"
 #include "../system/task.h"
+#include "core/serialization/serialization.h"
 #include "core/serialization/archives.h"
+#include "core/serialization/cereal/types/unordered_map.hpp"
+#include "core/serialization/cereal/types/vector.hpp"
 #include "meta/rendering/material.hpp"
 #include <cstdint>
 
@@ -76,28 +79,25 @@ void AssetReader::load_texture_from_file(const std::string& key, const fs::path&
 
 void AssetReader::load_shader_from_file(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Shader>& request)
 {
-
-	auto read_memory = std::make_shared<fs::byte_array_t>();
-
-	auto readMemory = [read_memory, absoluteKey]()
+	struct Wrapper
 	{
-		if (!read_memory)
-			return;
-
-		*read_memory = fs::read_stream(std::ifstream{ absoluteKey, std::ios::in | std::ios::binary });
+		std::unordered_map<gfx::RendererType::Enum, fs::byte_array_t> binaries;
 	};
 
-	auto createResource = [read_memory, &request, key]() mutable
+	auto wrapper = std::make_shared<Wrapper>();
+	auto deserialize = [wrapper, absoluteKey, request]() mutable
 	{
-		// if someone destroyed our memory
-		if (!read_memory)
-			return;
-		// if nothing was read
-		if (read_memory->empty())
-			return;
-		const gfx::Memory* mem = gfx::copy(read_memory->data(), static_cast<std::uint32_t>(read_memory->size()));
-		read_memory->clear();
-		read_memory.reset();
+		std::ifstream stream{ absoluteKey, std::ios::in | std::ios::binary };
+		cereal::iarchive_json_t ar(stream);
+
+		try_load(ar, cereal::make_nvp("shader", wrapper->binaries));
+	};
+
+	auto createResource = [wrapper, key, request]() mutable
+	{
+		auto& read_memory = wrapper->binaries[gfx::getRendererType()];
+		const gfx::Memory* mem = gfx::copy(&read_memory[0], static_cast<std::uint32_t>(read_memory.size()));
+		wrapper->binaries.clear();
 		if (nullptr != mem)
 		{
 			auto shader = std::make_shared<Shader>();
@@ -116,17 +116,17 @@ void AssetReader::load_shader_from_file(const std::string& key, const fs::path& 
 
 			request.set_data(key, shader);
 			request.invoke_callbacks();
-
 		}
+		
 	};
 
 	if (async)
 	{
 		auto ts = core::get_subsystem<runtime::TaskSystem>();
 
-		auto task = ts->create("", [ts, readMemory, createResource]()
+		auto task = ts->create("", [ts, deserialize, createResource]() mutable
 		{
-			readMemory();
+			deserialize();
 
 			auto callback = ts->create("Create Resource", createResource);
 
@@ -137,9 +137,72 @@ void AssetReader::load_shader_from_file(const std::string& key, const fs::path& 
 	}
 	else
 	{
-		readMemory();
+		deserialize();
 		createResource();
 	}
+// 	auto read_memory = std::make_shared<fs::byte_array_t>();
+// 
+// 	auto readMemory = [read_memory, absoluteKey]()
+// 	{
+// 		if (!read_memory)
+// 			return;
+// 
+// 		*read_memory = fs::read_stream(std::ifstream{ absoluteKey, std::ios::in | std::ios::binary });
+// 	};
+// 
+// 	auto createResource = [read_memory, &request, key]() mutable
+// 	{
+// 		// if someone destroyed our memory
+// 		if (!read_memory)
+// 			return;
+// 		// if nothing was read
+// 		if (read_memory->empty())
+// 			return;
+// 		const gfx::Memory* mem = gfx::copy(read_memory->data(), static_cast<std::uint32_t>(read_memory->size()));
+// 		read_memory->clear();
+// 		read_memory.reset();
+// 		if (nullptr != mem)
+// 		{
+// 			auto shader = std::make_shared<Shader>();
+// 			shader->populate(mem);
+// 			auto uniform_count = gfx::getShaderUniforms(shader->handle);
+// 			std::vector<gfx::UniformHandle> uniforms(uniform_count);
+// 			gfx::getShaderUniforms(shader->handle, &uniforms[0], uniform_count);
+// 			shader->uniforms.reserve(uniform_count);
+// 			for (auto& uniform : uniforms)
+// 			{
+// 				std::shared_ptr<Uniform> hUniform = std::make_shared<Uniform>();
+// 				hUniform->populate(uniform);
+// 
+// 				shader->uniforms.push_back(hUniform);
+// 			}
+// 
+// 			request.set_data(key, shader);
+// 			request.invoke_callbacks();
+// 
+// 		}
+// 	};
+// 
+// 	if (async)
+// 	{
+// 		auto ts = core::get_subsystem<runtime::TaskSystem>();
+// 
+// 		auto task = ts->create("", [ts, readMemory, createResource]()
+// 		{
+// 			readMemory();
+// 
+// 			auto callback = ts->create("Create Resource", createResource);
+// 
+// 			ts->run_on_main(callback);
+// 		});
+// 		request.set_task(task);
+// 		ts->run(task);
+// 	}
+// 	else
+// 	{
+// 		readMemory();
+// 		createResource();
+// 	}
 }
 
 void AssetReader::load_shader_from_memory(const std::string& key, const std::uint8_t* data, std::uint32_t size, LoadRequest<Shader>& request)

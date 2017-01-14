@@ -33,7 +33,7 @@ struct bbox
 	//-------------------------------------------------------------------------
     plane				getPlane				( VolumePlane::Side side ) const;
     void				getPlanePoints			( VolumePlane::Side side, vec3 pointsOut[] ) const;
-    bbox&				fromPoints				( const unsigned char * pointBuffer, unsigned int pointCount, unsigned int pointStride, bool reset = true );
+    bbox&				fromPoints				( const char * pointBuffer, unsigned int pointCount, unsigned int pointStride, bool reset = true );
     bool				intersect				( const bbox & bounds ) const;
     bool				intersect				( const bbox & bounds, bool & contained ) const;
     bool				intersect				( const bbox & bounds, bbox & intersection ) const;

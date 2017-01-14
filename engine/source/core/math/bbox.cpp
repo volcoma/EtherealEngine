@@ -194,7 +194,7 @@ void bbox::getPlanePoints( VolumePlane::Side Side, vec3 PointsOut[] ) const
 /// Calculates the bounding box based on the points specified.
 /// </summary>
 //-----------------------------------------------------------------------------
-bbox& bbox::fromPoints( const unsigned char * pointBuffer, unsigned int pointCount, unsigned int pointStride, bool resetBounds /* = true */ )
+bbox& bbox::fromPoints( const char * pointBuffer, unsigned int pointCount, unsigned int pointStride, bool resetBounds /* = true */ )
 {
     // Reset the box if requested
     if ( resetBounds )

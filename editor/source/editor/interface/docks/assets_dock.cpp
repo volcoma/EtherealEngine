@@ -107,8 +107,10 @@ namespace Docks
 			inputBuff.shrink_to_fit();
 
 
-			ImVec2 texture_size = { float(icon->info.width), float(icon->info.height) };
 			ImVec2 item_size = { size, size };
+			ImVec2 texture_size = item_size;
+			if(icon)
+			 texture_size = { float(icon->info.width), float(icon->info.height) };
 			ImVec2 uv0 = { 0.0f, 0.0f };
 			ImVec2 uv1 = { 1.0f, 1.0f };
 
@@ -193,7 +195,7 @@ namespace Docks
 		if (gui::Button("Import..."))
 		{
 			std::vector<std::string> paths;
-			if (open_multiple_files_dialog("obj,png,tga,dds,ktx,pvr,sc", "", paths))
+			if (open_multiple_files_dialog("obj,png,tga,dds,ktx,pvr,sc,io,sh", "", paths))
 			{
 				auto ts = core::get_subsystem<runtime::TaskSystem>();
 				auto logger = logging::get("Log");
@@ -241,7 +243,7 @@ namespace Docks
 
 						ts->run(task);
 					}
-					else if (ext == ".sc")
+					else if (ext == ".sc" || ext == ".io" || ext == ".sh")
 					{
 						auto task = ts->create("Import Asset", [](const fs::path& path, const fs::path& p, const fs::path& filename)
 						{

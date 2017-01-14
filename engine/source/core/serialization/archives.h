@@ -1,11 +1,11 @@
 #pragma once
 
-#include "cereal/archives/xml.hpp"
-namespace cereal
-{
-	using oarchive_xml_t = XMLOutputArchive;
-	using iarchive_xml_t = XMLInputArchive;
-}
+// #include "cereal/archives/xml.hpp"
+// namespace cereal
+// {
+// 	using oarchive_xml_t = XMLOutputArchive;
+// 	using iarchive_xml_t = XMLInputArchive;
+// }
 
 #include "cereal/archives/json.hpp"
 namespace cereal
@@ -21,9 +21,9 @@ namespace cereal
 	using iarchive_binary_t = BinaryInputArchive;
 }
 
-#include "cereal/archives/portable_binary.hpp"
-namespace cereal
-{
-	using oarchive_portable_binary_t = PortableBinaryOutputArchive;
-	using iarchive_portable_binary_t = PortableBinaryInputArchive;
-}
+// #include "cereal/archives/portable_binary.hpp"
+// namespace cereal
+// {
+// 	using oarchive_portable_binary_t = PortableBinaryOutputArchive;
+// 	using iarchive_portable_binary_t = PortableBinaryInputArchive;
+// }

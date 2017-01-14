@@ -8,7 +8,7 @@ namespace fs
 {
 	using namespace std::experimental::filesystem;
 	using protocols_t = std::unordered_map<std::string, std::string>;
-	using byte_array_t = std::vector<std::uint8_t>;
+	using byte_array_t = std::vector<char>;
 
 	//-----------------------------------------------------------------------------
 	//  Name : add_path_protocol ()

@@ -133,25 +133,12 @@ namespace editor
 			save_config();
 		}
 
-		watch_assets<Texture>("data://textures", "*.asset", !recompile_assets, true);
-		watch_raw_assets<Texture>("data://textures", "*.png", recompile_assets, "");
-		watch_raw_assets<Texture>("data://textures", "*.tga", recompile_assets, "");
-		watch_raw_assets<Texture>("data://textures", "*.dds", recompile_assets, "");
-		watch_raw_assets<Texture>("data://textures", "*.ktx", recompile_assets, "");
-		watch_raw_assets<Texture>("data://textures", "*.pvr", recompile_assets, "");
-
-		watch_assets<Shader>("data://shaders", "*.asset", !recompile_assets, true);
-		watch_raw_assets<Shader>("data://shaders", "*.sc", recompile_assets, "varying.def.sc");
-
-		watch_assets<Mesh>("data://meshes", "*.asset", !recompile_assets, true);
-		watch_raw_assets<Mesh>("data://meshes", "*.obj", recompile_assets, "");
-
-		watch_assets<Prefab>("data://prefabs", "*.asset", true, true);
-		watch_assets<Material>("data://materials", "*.asset", true, false);
-
 		/// for debug purposes
 // 		watch_assets<Shader>("engine_data://shaders", "*.asset", true, true);
 // 		watch_raw_assets<Shader>("engine_data://shaders", "*.sc", recompile_assets, "varying.def.sc");
+// 
+// 		watch_assets<Mesh>("engine_data://meshes", "*.asset", !recompile_assets, true);
+// 		watch_raw_assets<Mesh>("engine_data://meshes", "*.obj", recompile_assets, "");
 // 
 // 		watch_assets<Texture>("engine_data://textures", "*.asset", true, true);
 // 		watch_raw_assets<Texture>("engine_data://textures", "*.png", recompile_assets, "");
@@ -169,9 +156,23 @@ namespace editor
 // 
 // 		watch_assets<Shader>("editor_data://shaders", "*.asset", true, true);
 // 		watch_raw_assets<Shader>("editor_data://shaders", "*.sc", recompile_assets, "varying.def.sc");
-// 
-// 		watch_assets<Mesh>("editor_data://meshes", "*.asset", !recompile_assets, true);
-// 		watch_raw_assets<Mesh>("editor_data://meshes", "*.obj", recompile_assets, "");
+
+		watch_assets<Texture>("data://textures", "*.asset", !recompile_assets, true);
+		watch_raw_assets<Texture>("data://textures", "*.png", recompile_assets, "");
+		watch_raw_assets<Texture>("data://textures", "*.tga", recompile_assets, "");
+		watch_raw_assets<Texture>("data://textures", "*.dds", recompile_assets, "");
+		watch_raw_assets<Texture>("data://textures", "*.ktx", recompile_assets, "");
+		watch_raw_assets<Texture>("data://textures", "*.pvr", recompile_assets, "");
+
+		watch_assets<Shader>("data://shaders", "*.asset", !recompile_assets, true);
+		watch_raw_assets<Shader>("data://shaders", "*.sc", recompile_assets, "varying.def.sc");
+
+		watch_assets<Mesh>("data://meshes", "*.asset", !recompile_assets, true);
+		watch_raw_assets<Mesh>("data://meshes", "*.obj", recompile_assets, "");
+
+		watch_assets<Prefab>("data://prefabs", "*.asset", true, true);
+		watch_assets<Material>("data://materials", "*.asset", true, false);
+
 	}
 
 	void ProjectManager::create_project(const fs::path& project_path)

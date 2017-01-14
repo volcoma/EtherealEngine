@@ -8,7 +8,6 @@ SAMPLER2D(s_texNormal, 1);
 uniform vec4 u_camera_wpos;
 uniform vec4 u_camera_clip_planes; //.x = near, .y = far
 
-
 // per instance
 uniform vec4 u_baseColor;
 uniform vec4 u_speculatColor;
