@@ -246,6 +246,9 @@
     <ClCompile Include="..\..\source\runtime\rendering\debugdraw\debugdraw.cpp">
       <Filter>Source Files\rendering\debugdraw</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\runtime\assets\asset_extensions.cpp">
+      <Filter>Source Files\assets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\runtime\runtime.h">
@@ -538,6 +541,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\runtime\rendering\debugdraw\vs_debugdraw_lines_stipple.bin.h">
       <Filter>Source Files\rendering\debugdraw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\assets\asset_extensions.h">
+      <Filter>Source Files\assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

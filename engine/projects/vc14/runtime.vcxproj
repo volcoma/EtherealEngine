@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\source\runtime\assets\asset_extensions.cpp" />
     <ClCompile Include="..\..\source\runtime\assets\asset_manager.cpp" />
     <ClCompile Include="..\..\source\runtime\assets\asset_writer.cpp" />
     <ClCompile Include="..\..\source\runtime\assets\asset_reader.cpp" />
@@ -72,6 +73,7 @@
     <ClCompile Include="..\..\source\runtime\system\task.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\source\runtime\assets\asset_extensions.h" />
     <ClInclude Include="..\..\source\runtime\assets\asset_handle.h" />
     <ClInclude Include="..\..\source\runtime\assets\asset_manager.h" />
     <ClInclude Include="..\..\source\runtime\assets\asset_writer.h" />

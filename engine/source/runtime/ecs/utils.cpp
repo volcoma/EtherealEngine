@@ -1,7 +1,8 @@
-#include "Utils.h"
+#include "utils.h"
 #include "core/serialization/serialization.h"
 #include "core/serialization/archives.h"
 #include "../Meta/Ecs/Entity.hpp"
+#include "../assets/asset_extensions.h"
 
 namespace ecs
 {
@@ -9,7 +10,7 @@ namespace ecs
 	{
 		void save_entity(const fs::path& dir, const runtime::Entity& data)
 		{
-			const fs::path fullPath = fs::resolve_protocol(dir / fs::path(data.to_string() + ".asset"));
+			const fs::path fullPath = dir / fs::path(data.to_string() + extensions::prefab);
 			save_data(fullPath, { data });
 		}
 

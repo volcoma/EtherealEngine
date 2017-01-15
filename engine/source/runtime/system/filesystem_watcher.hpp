@@ -33,14 +33,16 @@ namespace fs
 		{
 			enum State
 			{
+				New,
 				Modified,
 				Removed,
 				Unmodified,
 			};
 			fs::path path;
-			State state;
+			State state = Unmodified;
 			fs::file_time_type last_mod_time;
-			uintmax_t size;
+			uintmax_t size = 0;
+			fs::file_type type = fs::file_type::none;
 		};
 
 		//-----------------------------------------------------------------------------
@@ -63,9 +65,9 @@ namespace fs
 		/// Un-watches a previously registered file or directory
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		static void unwatch(const fs::path &path)
+		static void unwatch(const fs::path &path, bool recursive = false)
 		{
-			watch_impl(path);
+			unwatch_impl(path, recursive);
 		}
 
 		//-----------------------------------------------------------------------------
@@ -76,7 +78,7 @@ namespace fs
 		//-----------------------------------------------------------------------------
 		static void unwatch_all()
 		{
-			watch_impl(fs::path());
+			unwatch_impl(fs::path());
 		}
 
 		//-----------------------------------------------------------------------------
@@ -178,7 +180,7 @@ namespace fs
 					do
 					{
 						// iterate through each watcher and check for modification
-						std::lock_guard<std::mutex> lock(_mutex);
+						std::lock_guard<std::recursive_mutex> lock(_mutex);
 						auto end = _watchers.end();
 						for (auto it = _watchers.begin(); it != end; ++it)
 						{
@@ -193,6 +195,13 @@ namespace fs
 			});
 		}
 
+		static FSWatcher& get_watcher()
+		{
+			// create the static FSWatcher instance
+			static FSWatcher wd;
+			return wd;
+		}
+
 		//-----------------------------------------------------------------------------
 		//  Name : watchImpl ()
 		/// <summary>
@@ -203,8 +212,7 @@ namespace fs
 		//-----------------------------------------------------------------------------
 		static void watch_impl(const fs::path &path, bool initialList = true, const std::function<void(const std::vector<Entry>&)> &listCallback = std::function<void(const std::vector<Entry>&)>())
 		{
-			// create the static FSWatcher instance
-			static FSWatcher wd;
+			auto& wd = get_watcher();
 			// and start its thread
 			if (!wd._watching)
 				wd.start();
@@ -245,34 +253,56 @@ namespace fs
 					}
 				}
 
-				std::lock_guard<std::mutex> lock(wd._mutex);
+				std::lock_guard<std::recursive_mutex> lock(wd._mutex);
 				if (wd._watchers.find(key) == wd._watchers.end())
 				{
 					wd._watchers.emplace(make_pair(key, Watcher(p, filter, initialList, listCallback)));
 				}
 			}
-			// if there is no callback that means that we are un-watching
+			
+		}
+
+		static void unwatch_impl(const fs::path &path, bool recursive = false)
+		{
+			auto& wd = get_watcher();
+			const std::string key = path.string();
+			const fs::path dir = path.parent_path();
+
+			// if the path is empty we unwatch all files
+			if (path.empty())
+			{
+				std::lock_guard<std::recursive_mutex> lock(wd._mutex);
+				wd._watchers.clear();
+			}
+			// or the specified file or directory
 			else
 			{
-				// if the path is empty we unwatch all files
-				if (path.empty())
+				std::lock_guard<std::recursive_mutex> lock(wd._mutex);
+
+				if (recursive && wd._watchers.size() > 0)
 				{
-					std::lock_guard<std::mutex> lock(wd._mutex);
 					for (auto it = wd._watchers.begin(); it != wd._watchers.end(); )
 					{
-						it = wd._watchers.erase(it);
+						auto& watcher_key = fs::path(it->first).parent_path();
+						if (watcher_key == dir)
+						{
+							it->second.watch();
+							it = wd._watchers.erase(it);
+						}
+						else
+							++it;
 					}
 				}
-				// or the specified file or directory
 				else
 				{
-					std::lock_guard<std::mutex> lock(wd._mutex);
 					auto watcher = wd._watchers.find(key);
 					if (watcher != wd._watchers.end())
 					{
+						watcher->second.watch();
 						wd._watchers.erase(watcher);
 					}
 				}
+				
 			}
 		}
 
@@ -352,6 +382,34 @@ namespace fs
 			return pathFilter;
 		}
 
+		static std::pair<fs::path, std::string> visit_wild_card_path_cache(const std::map <std::string, Entry>& entries, const fs::path &path, bool visitEmpty, const std::function<bool(const fs::path&)> &visitor)
+		{
+			std::pair<fs::path, std::string> pathFilter = get_path_filter_pair(path);
+			if (!pathFilter.second.empty())
+			{
+				std::string full = (pathFilter.first / pathFilter.second).string();
+				size_t wildcardPos = full.find("*");
+				std::string before = full.substr(0, wildcardPos);
+				std::string after = full.substr(wildcardPos + 1);
+
+				for (auto& it : entries)
+				{
+					std::string current = it.second.path.string();
+					size_t beforePos = current.find(before);
+					size_t afterPos = current.find(after);
+					if ((beforePos != std::string::npos || before.empty())
+						&& (afterPos != std::string::npos || after.empty()))
+					{
+						if (visitor(it.second.path))
+						{
+							break;
+						}
+					}
+				}
+			}
+			return pathFilter;
+		}
+
 		class Watcher
 		{
 		public:
@@ -366,25 +424,28 @@ namespace fs
 			Watcher(const fs::path &path, const std::string &filter, bool initialList, const std::function<void(const std::vector<Entry>&)> &listCallback)
 				: _filter(filter), _callback(listCallback)
 			{
-
-				_root = poll_entry(path);
-
+				_root = path;
 				std::vector<Entry> entries;
 				// make sure we store all initial write time
 				if (!_filter.empty())
 				{
 					visit_wild_card_path(path / filter, false, [this, &entries](const fs::path &p)
 					{
-						auto entry = poll_entry(p);
+						Entry entry;
+						poll_entry(p, entry);
 						entries.push_back(entry);
 						return false;
 					});
 				}
 				else
 				{
-					entries.push_back(_root);
+					Entry entry;
+					poll_entry(_root, entry);
+					entries.push_back(entry);
 				}
+
 				_entries_cached = _entries;
+
 				if (initialList)
 				{
 					// this means that the first watch won't call the callback function
@@ -412,46 +473,41 @@ namespace fs
 				// otherwise we check the whole parent directory
 				if (!_filter.empty())
 				{
-					visit_wild_card_path(_root.path / _filter, false, [this, &entries](const fs::path &p)
+					visit_wild_card_path(_root / _filter, false, [this, &entries](const fs::path &p)
 					{
-						auto entry = poll_entry(p);
-						if (entry.state == Entry::State::Modified && _callback)
+						Entry entry;
+						poll_entry(p, entry);
+						if (entry.state != Entry::State::Unmodified && _callback)
 						{
 							entries.push_back(entry);
 						}
 						return false;
 					});
-					if (entries.size() > 0)
-						touch(_root.path);
 
-					_root = poll_entry(_root.path);
-
-					if (_root.state != Entry::State::Unmodified)
+					visit_wild_card_path_cache(_entries_cached, _root / _filter, false, [this, &entries](const fs::path &p)
 					{
-						for (auto& var : _entries_cached)
+						Entry entry;
+						poll_entry(p, entry);
+						if (entry.state == Entry::State::Removed && _callback)
 						{
-							auto& entry = var.second;
-							if (!fs::exists(entry.path, std::error_code{}))
-							{
-								entry.state = Entry::State::Removed;
-								entries.push_back(entry);
-								_entries.erase(var.first);
-							}
+							entries.push_back(entry);
 						}
-						_entries_cached = _entries;
-					}
+						return false;
+					});
+
 				}
 				else
 				{
-					auto& entry = _root;
-					if (!fs::exists(entry.path, std::error_code{}))
+					Entry entry;
+					poll_entry(_root, entry);
+
+					if (entry.state != Entry::State::Unmodified && _callback)
 					{
-						entry.state = Entry::State::Removed;
-						_entries.erase(entry.path.string());
+						entries.push_back(entry);
 					}
-					entries.push_back(_root);
-					_entries_cached = _entries;
 				}
+
+				_entries_cached = _entries;
 
 				if (entries.size() > 0 && _callback)
 				{
@@ -467,11 +523,12 @@ namespace fs
 			/// 
 			/// </summary>
 			//-----------------------------------------------------------------------------
-			Entry& poll_entry(const fs::path &path)
+			void poll_entry(const fs::path &path, Entry& entry)
 			{
 				// get the last modification time
 				auto time = fs::last_write_time(path, std::error_code{});
 				auto size = fs::file_size(path, std::error_code{});
+				fs::file_status status = fs::status(path, std::error_code{});
 				// add a new modification time to the map
 				std::string key = path.string();
 				if (_entries.find(key) == _entries.end())
@@ -479,29 +536,45 @@ namespace fs
 					auto &fi = _entries[key];
 					fi.path = path;
 					fi.last_mod_time = time;
-					fi.state = Entry::State::Modified;
+					fi.state = Entry::State::New;
 					fi.size = size;
-					return fi;
+					fi.type = status.type();
+					entry = fi;
+					return;
 				}
 				// or compare with an older one
 				auto &fi = _entries[key];
+				if (!fs::exists(fi.path, std::error_code{}))
+				{
+					auto fi_copy = fi;
+					fi_copy.state = Entry::State::Removed;
+					_entries.erase(key);
+					entry = fi_copy;
+					return;
+				}
+
+
 				if (fi.last_mod_time < time || fi.size != size)
 				{
 					fi.size = size;
 					fi.last_mod_time = time;
 					fi.state = Entry::State::Modified;
-					return fi;
+					fi.type = status.type();
+					entry = fi;
+					return;
 				}
 				else
 				{
 					fi.state = Entry::State::Unmodified;
-					return fi;
+					fi.type = status.type();
+					entry = fi;
+					return;
 				}
 			};
 
 		protected:
 			/// Path to watch
-			Entry _root;
+			fs::path _root;
 			/// Filter applied
 			std::string _filter;
 			/// Callback for list of modifications
@@ -512,7 +585,7 @@ namespace fs
 			std::map <std::string, Entry> _entries_cached;
 		};
 		/// Mutex for the file watchers
-		std::mutex _mutex;
+		std::recursive_mutex _mutex;
 		/// Atomic bool sync
 		std::atomic<bool> _watching;
 		/// Thread that polls for changes

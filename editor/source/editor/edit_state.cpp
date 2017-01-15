@@ -113,7 +113,12 @@ namespace editor
 		{
 			icons["loading"] = asset;
 		});
-
+		am->load<Texture>("editor_data://icons/folder", false)
+			.then([this](auto asset) mutable
+		{
+			icons["folder"] = asset;
+		});
+		
 		return true;
 	}
 

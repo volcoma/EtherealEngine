@@ -138,10 +138,8 @@ namespace runtime
 
 		/// Storage container
 		std::unordered_map<std::string, LoadRequest<T>> container;
-		/// Sub directory
-		fs::path subdir;
-		/// Sub directory
-		fs::path platform;
+		/// Extention
+		std::string ext;
 	};
 
 	template<typename T>
@@ -152,8 +150,7 @@ namespace runtime
 		dir.remove_filename();
 		std::string file = absoluteKey.filename().string();
 
-		static const std::string ext = ".asset";
-		absoluteKey = fs::absolute(dir / storage->subdir / storage->platform / fs::path(file + ext));
+		absoluteKey = fs::absolute(dir / fs::path(file + storage->ext));
 		return absoluteKey;
 	};
 
@@ -259,8 +256,7 @@ namespace runtime
 			const std::uint32_t& size)
 		{
 			auto storage = get_storage<T>();
-			const std::string toLowerKey = string_utils::to_lower(key);
-			return create_asset_from_memory_impl<T>(toLowerKey, data, size, storage->container, storage->load_from_memory);
+			return create_asset_from_memory_impl<T>(key, data, size, storage->container, storage->load_from_memory);
 		}
 
 		//-----------------------------------------------------------------------------
@@ -277,17 +273,15 @@ namespace runtime
 			const std::string& newRelativeKey)
 		{
 			auto storage = get_storage<T>();
-			const std::string toLowerKey = string_utils::to_lower(key);
-			const std::string toLowerNewKey = string_utils::to_lower(newRelativeKey);
 
-			auto absoluteKey = get_absolute_key(toLowerKey, storage);
-			auto absoluteNewKey = get_absolute_key(toLowerNewKey, storage);
+			auto absoluteKey = get_absolute_key(key, storage);
+			auto absoluteNewKey = get_absolute_key(newRelativeKey, storage);
 
 			fs::rename(absoluteKey, absoluteNewKey, std::error_code{});
 
-			storage->container[toLowerNewKey] = storage->container[toLowerKey];
-			storage->container[toLowerNewKey].asset.link->id = toLowerNewKey;
-			storage->container.erase(toLowerKey);
+			storage->container[newRelativeKey] = storage->container[key];
+			storage->container[newRelativeKey].asset.link->id = newRelativeKey;
+			storage->container.erase(key);
 		}
 
 		//-----------------------------------------------------------------------------
@@ -303,12 +297,11 @@ namespace runtime
 			const std::string& key)
 		{
 			auto storage = get_storage<T>();
-			const std::string toLowerKey = string_utils::to_lower(key);
-
-			auto& request = storage->container[toLowerKey];
+		
+			auto& request = storage->container[key];
 			request.asset.link->asset.reset();
 			request.asset.link->id.clear();
-			storage->container.erase(toLowerKey);
+			storage->container.erase(key);
 		}
 
 		//-----------------------------------------------------------------------------
@@ -324,14 +317,13 @@ namespace runtime
 			const std::string& key)
 		{
 			auto storage = get_storage<T>();
-			const std::string toLowerKey = string_utils::to_lower(key);
-			const fs::path absoluteKey = get_absolute_key(toLowerKey, storage);
+			const fs::path absoluteKey = get_absolute_key(key, storage);
 			fs::remove(absoluteKey, std::error_code{});
 
-			auto& request = storage->container[toLowerKey];
+			auto& request = storage->container[key];
 			request.asset.link->asset.reset();
 			request.asset.link->id.clear();
-			storage->container.erase(toLowerKey);
+			storage->container.erase(key);
 		}
 		//-----------------------------------------------------------------------------
 		//  Name : load ()
@@ -347,17 +339,16 @@ namespace runtime
 			bool async,
 			bool force = false)
 		{
-			const auto toLowerKey = string_utils::to_lower(key);
 			auto storage = get_storage<T>();
 			//if embedded resource
-			if (toLowerKey.find("embedded") != std::string::npos)
+			if (key.find("embedded") != std::string::npos)
 			{
-				return find_or_create_asset_impl<T>(toLowerKey, storage->container);
+				return find_or_create_asset_impl<T>(key, storage->container);
 			}
 			else
 			{
-				const fs::path absoluteKey = get_absolute_key(toLowerKey, storage);
-				return load_asset_from_file_impl<T>(toLowerKey, absoluteKey, async, force, storage->container, storage->load_from_file);
+				const fs::path absoluteKey = get_absolute_key(key, storage);
+				return load_asset_from_file_impl<T>(key, absoluteKey, async, force, storage->container, storage->load_from_file);
 
 			}
 		}
@@ -374,8 +365,7 @@ namespace runtime
 		void save(const AssetHandle<T>& asset)
 		{
 			auto storage = get_storage<T>();
-			const std::string toLowerKey = string_utils::to_lower(asset.id());
-			const fs::path absoluteKey = get_absolute_key(toLowerKey, storage);
+			const fs::path absoluteKey = get_absolute_key(asset.id(), storage);
 			storage->save_to_file(absoluteKey, asset);
 		}
 
@@ -384,9 +374,8 @@ namespace runtime
 			const std::string& key
 		)
 		{
-			const auto toLowerKey = string_utils::to_lower(key);
 			auto storage = get_storage<T>();
-			find_or_create_asset_impl<T>(toLowerKey, storage->container);
+			find_or_create_asset_impl<T>(key, storage->container);
 		}
 
 	private:

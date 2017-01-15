@@ -97,14 +97,14 @@ void save_editor_camera()
 {
 	auto es = core::get_subsystem<editor::EditState>();
 	if (es->camera)
-		ecs::utils::save_data(fs::resolve_protocol("app://settings/editor_camera.asset"), { es->camera });
+		ecs::utils::save_data(fs::resolve_protocol("app://settings/editor_camera.cfg"), { es->camera });
 }
 
 void load_editor_camera()
 {
 	auto es = core::get_subsystem<editor::EditState>();
 	runtime::Entity object;
-	if (!ecs::utils::try_load_entity(fs::resolve_protocol("app://settings/editor_camera.asset"), object))
+	if (!ecs::utils::try_load_entity(fs::resolve_protocol("app://settings/editor_camera.cfg"), object))
 	{
 		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 		object = ecs->create();

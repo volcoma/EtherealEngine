@@ -74,6 +74,8 @@ struct AssetHandle
 	inline void reset(std::shared_ptr<T> data = nullptr)
 	{
 		link->asset = data;
+		if (!data)
+			link->id.clear();
 	}
 
 	//-----------------------------------------------------------------------------

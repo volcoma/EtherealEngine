@@ -9,6 +9,7 @@
 #include <array>
 #include "graphics/graphics.h"
 
+#include "runtime/assets/asset_extensions.h"
 #include "core/serialization/serialization.h"
 #include "core/serialization/archives.h"
 #include "core/serialization/cereal/types/unordered_map.hpp"
@@ -20,8 +21,6 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 	std::string strInput = input.string();
 	std::string file = input.filename().replace_extension().string();
 	fs::path dir = input.remove_filename();
-
-	static const std::string ext = ".asset";
 
 	bool vs = string_utils::begins_with(file, "vs_");
 	bool fs = string_utils::begins_with(file, "fs_");
@@ -36,7 +35,7 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 	
 	std::unordered_map<gfx::RendererType::Enum, fs::byte_array_t> binaries;
 	binaries.reserve(4);
-	fs::path output = dir / fs::path(file + ext);
+	fs::path output = dir / fs::path(file + extensions::shader);
 
 	std::string strOutput = output.string();
 	for (auto& platform : supported)
@@ -50,7 +49,7 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 		args_array[2] = "-o";
 		args_array[3] = strOutput.c_str();
 		args_array[4] = "-i";
-		fs::path include = fs::resolve_protocol("engine://Tools/include");
+		fs::path include = fs::resolve_protocol("engine://tools/include");
 		std::string strInclude = include.string();
 		args_array[5] = strInclude.c_str();
 		args_array[6] = "--varyingdef";
@@ -155,11 +154,9 @@ void TextureCompiler::compile(const fs::path& absoluteKey)
 
 	fs::path dir = input.remove_filename();
 
-	static const std::string ext = ".asset";
-
 	fs::path output = dir;
 
-	output /= fs::path(file + ext);
+	output /= fs::path(file + extensions::texture);
 
 	std::string strOutput = output.string();
 
@@ -200,11 +197,9 @@ void MeshCompiler::compile(const fs::path& absoluteKey)
 	std::string file = input.filename().replace_extension().string();
 	fs::path dir = input.remove_filename();
 
-	static const std::string ext = ".asset";
-
 	fs::path output = dir;
 
-	output /= fs::path(file + ext);
+	output /= fs::path(file + extensions::mesh);
 
 	std::string strOutput = output.string();
 

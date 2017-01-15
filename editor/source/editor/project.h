@@ -2,9 +2,48 @@
 #include "core/subsystem.h"
 #include "runtime/system/filesystem.h"
 #include <deque>
+#include <mutex>
 
 namespace editor
 {
+	struct AssetFile
+	{
+		AssetFile(const fs::path& abs, const std::string& n, const std::string& ext, const fs::path& r);
+		fs::path absolute;
+		fs::path root_path;
+
+		std::string relative;
+		std::string name;
+		std::string extension;
+	};
+
+	struct AssetFolder : std::enable_shared_from_this<AssetFolder>
+	{
+		AssetFolder(AssetFolder* p, const fs::path& abs, const std::string& n, const fs::path& r, bool recompile_assets);
+		~AssetFolder();
+
+		fs::path absolute;
+		fs::path root_path;
+
+		std::string relative;
+		std::string name;
+
+		std::mutex files_mutex;
+		std::vector<AssetFile> files;
+
+		AssetFolder* parent;
+		std::mutex directories_mutex;
+		std::vector<std::shared_ptr<AssetFolder>> directories;
+
+		std::shared_ptr<AssetFolder> make_shared() { return shared_from_this(); }
+		void watch(bool recompile_assets);
+		void unwatch();
+
+		static std::shared_ptr<AssetFolder> opened;
+		static std::shared_ptr<AssetFolder> root;
+	};
+
+
 	class ProjectManager : public core::Subsystem
 	{
 	public:

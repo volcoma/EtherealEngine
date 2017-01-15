@@ -316,10 +316,10 @@ void ImageWithAspect(std::shared_ptr<ITexture> texture, const ImVec2& texture_si
 	return ImGui::ImageWithAspect(texture.get(), texture_size, size, uv0, uv1, tint_col, border_col);
 }
 
-int ImageButtonWithAspectAndLabel(std::shared_ptr<ITexture> texture, const ImVec2& texture_size, const ImVec2& size, const ImVec2& uv0, const ImVec2& uv1, bool selected, const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags /*= 0*/)
+int ImageButtonWithAspectAndLabel(std::shared_ptr<ITexture> texture, const ImVec2& texture_size, const ImVec2& size, const ImVec2& uv0, const ImVec2& uv1, bool selected, bool* edit_label, const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags /*= 0*/)
 {
 	sTextures.push_back(texture);
-	return ImGui::ImageButtonWithAspectAndLabel(texture.get(), texture_size, size, uv0, uv1, selected, label, buf, buf_size, flags);
+	return ImGui::ImageButtonWithAspectAndLabel(texture.get(), texture_size, size, uv0, uv1, selected, edit_label, label, buf, buf_size, flags);
 }
 
 GUIStyle& getGUIStyle()

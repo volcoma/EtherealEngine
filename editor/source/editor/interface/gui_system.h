@@ -102,6 +102,7 @@ namespace gui
 		, const ImVec2& uv0
 		, const ImVec2& uv1
 		, bool selected
+		, bool* edit_label
 		, const char* label
 		, char* buf
 		, size_t buf_size

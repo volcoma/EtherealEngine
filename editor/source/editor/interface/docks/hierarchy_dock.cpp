@@ -1,5 +1,6 @@
 #include "docks.h"
 #include "../../edit_state.h"
+#include "../../project.h"
 #include "runtime/ecs/prefab.h"
 #include "runtime/ecs/utils.h"
 #include "runtime/ecs/components/transform_component.h"
@@ -38,7 +39,8 @@ namespace Docks
 				}
 				if (gui::Selectable("Save As Prefab"))
 				{
-					ecs::utils::save_entity("data://prefabs/", entity);
+					editor::AssetFolder* folder = editor::AssetFolder::opened.get();
+					ecs::utils::save_entity(folder->absolute, entity);
 				}
 				if (gui::Selectable("Delete"))
 				{
