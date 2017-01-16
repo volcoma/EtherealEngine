@@ -61,7 +61,7 @@ void default_scene()
 			->set_local_scale({ 10.0f, 0.1f, 10.0f });
 
 		Model model;
-		am->load<Mesh>("engine_data://meshes/platform", false)
+		am->load<Mesh>("engine_data:/meshes/platform", false)
 			.then([&model](auto asset)
 		{
 			model.set_lod(asset, 0);
@@ -79,7 +79,7 @@ void default_scene()
 		object.assign<TransformComponent>();
 
 		Model model;
-		am->load<Mesh>("engine_data://meshes/bunny", false)
+		am->load<Mesh>("engine_data:/meshes/bunny", false)
 			.then([&model](auto asset)
 		{
 			model.set_lod(asset, 0);
@@ -97,14 +97,14 @@ void save_editor_camera()
 {
 	auto es = core::get_subsystem<editor::EditState>();
 	if (es->camera)
-		ecs::utils::save_data(fs::resolve_protocol("app://settings/editor_camera.cfg"), { es->camera });
+		ecs::utils::save_data(fs::resolve_protocol("app:/settings/editor_camera.cfg"), { es->camera });
 }
 
 void load_editor_camera()
 {
 	auto es = core::get_subsystem<editor::EditState>();
 	runtime::Entity object;
-	if (!ecs::utils::try_load_entity(fs::resolve_protocol("app://settings/editor_camera.cfg"), object))
+	if (!ecs::utils::try_load_entity(fs::resolve_protocol("app:/settings/editor_camera.cfg"), object))
 	{
 		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 		object = ecs->create();
@@ -134,7 +134,7 @@ auto open_scene()
 	auto es = core::get_subsystem<editor::EditState>();
 	auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 	std::string path;
-	if (open_file_dialog("scene", fs::resolve_protocol("data://scenes").string(), path))
+	if (open_file_dialog("scene", fs::resolve_protocol("app:/data/scenes").string(), path))
 	{
 		save_editor_camera();
 		ecs->dispose();
@@ -166,7 +166,7 @@ void save_scene_as()
 	auto es = core::get_subsystem<editor::EditState>();
 
 	std::string path;
-	if (save_file_dialog("scene", fs::resolve_protocol("data://scenes").string(), path))
+	if (save_file_dialog("scene", fs::resolve_protocol("app:/data/scenes").string(), path))
 	{
 		es->scene = path;		
 		save_scene();	

@@ -112,12 +112,7 @@ namespace editor
 		root_path = r;
 
 		fs::path a = absolute;
-		if(root_path == absolute)
-			relative = string_utils::replace(a.replace_extension().generic_string(), root_path.generic_string(), "data://");
-		else
-			relative = string_utils::replace(a.replace_extension().generic_string(), root_path.generic_string(), "data:/");
-
-
+		relative = string_utils::replace(a.replace_extension().generic_string(), root_path.generic_string(), "app:/data");
 	}
 
 
@@ -130,10 +125,7 @@ namespace editor
 		absolute = abs;
 		name = n;
 		root_path = r;
-		if (root_path == absolute)
-			relative = string_utils::replace(absolute.generic_string(), root_path.generic_string(), "data://");
-		else
-			relative = string_utils::replace(absolute.generic_string(), root_path.generic_string(), "data:/");
+		relative = string_utils::replace(absolute.generic_string(), root_path.generic_string(), "app:/data");
 
 		watch(recompile_assets);
 	}
@@ -229,7 +221,6 @@ namespace editor
 			return;
 		}
 		fs::add_path_protocol("app:", project_path);
-		fs::add_path_protocol("data:", fs::resolve_protocol("app://data"));
 		fs::watcher::unwatch_all();
 		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 		auto am = core::get_subsystem<runtime::AssetManager>();
@@ -237,7 +228,7 @@ namespace editor
 		ecs->dispose();
 		es->unselect();
 		es->scene.clear();
-		am->clear("data://");
+		am->clear("app:/data");
 		set_current_project(project_path.filename().string());
 		auto& rp = _options.recent_project_paths;
 		if (std::find(std::begin(rp), std::end(rp), project_path.generic_string()) == std::end(rp))
@@ -248,30 +239,30 @@ namespace editor
 
 		static const std::string wildcard = "*";
 		/// for debug purposes
-// 		watch_assets<Shader>("engine_data://shaders", wildcard + extensions::shader, true, true);
-// 		watch_raw_assets<Shader>("engine_data://shaders", "*.sc", recompile_assets);
+// 		watch_assets<Shader>("engine_data:/shaders", wildcard + extensions::shader, true, true);
+// 		watch_raw_assets<Shader>("engine_data:/shaders", "*.sc", recompile_assets);
 // 
-// 		watch_assets<Mesh>("engine_data://meshes", wildcard + extensions::mesh, !recompile_assets, true);
-// 		watch_raw_assets<Mesh>("engine_data://meshes", "*.obj", recompile_assets);
+// 		watch_assets<Mesh>("engine_data:/meshes", wildcard + extensions::mesh, !recompile_assets, true);
+// 		watch_raw_assets<Mesh>("engine_data:/meshes", "*.obj", recompile_assets);
 // 
-// 		watch_assets<Texture>("engine_data://textures", wildcard + extensions::texture, true, true);
-// 		watch_raw_assets<Texture>("engine_data://textures", "*.png", recompile_assets);
-// 		watch_raw_assets<Texture>("engine_data://textures", "*.tga", recompile_assets);
-// 		watch_raw_assets<Texture>("engine_data://textures", "*.dds", recompile_assets);
-// 		watch_raw_assets<Texture>("engine_data://textures", "*.ktx", recompile_assets);
-// 		watch_raw_assets<Texture>("engine_data://textures", "*.pvr", recompile_assets);
+// 		watch_assets<Texture>("engine_data:/textures", wildcard + extensions::texture, true, true);
+// 		watch_raw_assets<Texture>("engine_data:/textures", "*.png", recompile_assets);
+// 		watch_raw_assets<Texture>("engine_data:/textures", "*.tga", recompile_assets);
+// 		watch_raw_assets<Texture>("engine_data:/textures", "*.dds", recompile_assets);
+// 		watch_raw_assets<Texture>("engine_data:/textures", "*.ktx", recompile_assets);
+// 		watch_raw_assets<Texture>("engine_data:/textures", "*.pvr", recompile_assets);
 // 
-// 		watch_assets<Texture>("editor_data://icons", wildcard + extensions::texture, true, true);
-// 		watch_raw_assets<Texture>("editor_data://icons", "*.png", recompile_assets);
-// 		watch_raw_assets<Texture>("editor_data://icons", "*.tga", recompile_assets);
-// 		watch_raw_assets<Texture>("editor_data://icons", "*.dds", recompile_assets);
-// 		watch_raw_assets<Texture>("editor_data://icons", "*.ktx", recompile_assets);
-// 		watch_raw_assets<Texture>("editor_data://icons", "*.pvr", recompile_assets);
+// 		watch_assets<Texture>("editor_data:/icons", wildcard + extensions::texture, true, true);
+// 		watch_raw_assets<Texture>("editor_data:/icons", "*.png", recompile_assets);
+// 		watch_raw_assets<Texture>("editor_data:/icons", "*.tga", recompile_assets);
+// 		watch_raw_assets<Texture>("editor_data:/icons", "*.dds", recompile_assets);
+// 		watch_raw_assets<Texture>("editor_data:/icons", "*.ktx", recompile_assets);
+// 		watch_raw_assets<Texture>("editor_data:/icons", "*.pvr", recompile_assets);
 // 
-// 		watch_assets<Shader>("editor_data://shaders", wildcard + extensions::shader, true, true);
-// 		watch_raw_assets<Shader>("editor_data://shaders", "*.sc", recompile_assets);
+// 		watch_assets<Shader>("editor_data:/shaders", wildcard + extensions::shader, true, true);
+// 		watch_raw_assets<Shader>("editor_data:/shaders", "*.sc", recompile_assets);
 
-		auto& root = fs::resolve_protocol("data://");
+		auto& root = fs::resolve_protocol("app:/data");
 		AssetFolder::root = std::make_shared<AssetFolder>(nullptr, root, root.filename().string(), root, recompile_assets);
 		AssetFolder::opened = AssetFolder::root;
 
@@ -280,8 +271,8 @@ namespace editor
 	void ProjectManager::create_project(const fs::path& project_path)
 	{
 		fs::add_path_protocol("app:", project_path);
-		fs::create_directory(fs::resolve_protocol("app://data"), std::error_code{});
-		fs::create_directory(fs::resolve_protocol("app://settings"), std::error_code{});
+		fs::create_directory(fs::resolve_protocol("app:/data"), std::error_code{});
+		fs::create_directory(fs::resolve_protocol("app:/settings"), std::error_code{});
 
 		open_project(project_path, false);
 	}
@@ -308,7 +299,7 @@ namespace editor
 
 	void ProjectManager::load_config()
 	{
-		const fs::path absoluteKey = fs::resolve_protocol("editor_data://config/project.cfg");
+		const fs::path absoluteKey = fs::resolve_protocol("editor_data:/config/project.cfg");
 		if (!fs::exists(absoluteKey, std::error_code{}))
 		{
 			save_config();
@@ -340,8 +331,8 @@ namespace editor
 
 	void ProjectManager::save_config()
 	{
-		fs::create_directory(fs::resolve_protocol("editor_data://config"), std::error_code{});
-		const std::string absoluteKey = fs::resolve_protocol("editor_data://config/project.cfg").string();
+		fs::create_directory(fs::resolve_protocol("editor_data:/config"), std::error_code{});
+		const std::string absoluteKey = fs::resolve_protocol("editor_data:/config/project.cfg").string();
 		std::ofstream output(absoluteKey);
 		cereal::oarchive_json_t ar(output);
 

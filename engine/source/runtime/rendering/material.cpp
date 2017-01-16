@@ -8,13 +8,13 @@
 Material::Material()
 {
 	auto am = core::get_subsystem<runtime::AssetManager>();
-	am->load<Texture>("engine_data://textures/default_color", false)
+	am->load<Texture>("engine_data:/textures/default_color", false)
 		.then([this](auto asset) mutable
 	{
 		_default_color_map = asset;
 	});
 
-	am->load<Texture>("engine_data://textures/default_normal", false)
+	am->load<Texture>("engine_data:/textures/default_normal", false)
 		.then([this](auto asset) mutable
 	{
 		_default_normal_map = asset;
@@ -88,10 +88,10 @@ StandardMaterial::StandardMaterial()
 {
 	auto am = core::get_subsystem<runtime::AssetManager>();
 
-	am->load<Shader>("engine_data://shaders/vs_deferred_geom", false)
+	am->load<Shader>("engine_data:/shaders/vs_deferred_geom", false)
 		.then([this, am](auto vs)
 	{
-		am->load<Shader>("engine_data://shaders/fs_deferred_geom", false)
+		am->load<Shader>("engine_data:/shaders/fs_deferred_geom", false)
 			.then([this, vs](auto fs)
 		{
 			_program = std::make_unique<Program>(vs, fs);

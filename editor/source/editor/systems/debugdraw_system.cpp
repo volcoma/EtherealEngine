@@ -237,10 +237,10 @@ namespace editor
 		runtime::on_frame_render.connect(this, &DebugDrawSystem::frame_render);
 
 		auto am = core::get_subsystem<runtime::AssetManager>();
-		am->load<Shader>("editor_data://shaders/vs_wf_wireframe", false)
+		am->load<Shader>("editor_data:/shaders/vs_wf_wireframe", false)
 			.then([this, am](auto vs)
 		{
-			am->load<Shader>("editor_data://shaders/fs_wf_wireframe", false)
+			am->load<Shader>("editor_data:/shaders/fs_wf_wireframe", false)
 				.then([this, vs](auto fs)
 			{
 				_program = std::make_unique<Program>(vs, fs);

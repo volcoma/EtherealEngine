@@ -8,7 +8,7 @@
 Model::Model()
 {
 	auto am = core::get_subsystem<runtime::AssetManager>();
-	am->load<Material>("engine_data://materials/standard", false)
+	am->load<Material>("engine_data:/materials/standard", false)
 		.then([this](auto asset)
 	{
 		_materials.push_back(asset);

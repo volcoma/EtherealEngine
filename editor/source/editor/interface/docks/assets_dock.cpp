@@ -67,9 +67,9 @@ AssetHandle<Texture>& get_icon()
 }
 
 template<typename Wrapper, typename T>
-int list_item(Wrapper& entry, bool dir, const std::string& name, const std::string& relative, const fs::path& absolute, runtime::AssetManager& manager, runtime::Input& input, editor::EditState& editState)
+int list_item(Wrapper& entry, bool dir, const std::string& name, const std::string& relative, const fs::path& absolute, runtime::AssetManager& manager, runtime::Input& input, editor::EditState& edit_state)
 {
-	auto& selected = editState.selection_data.object;
+	auto& selected = edit_state.selection_data.object;
 	const float size = 88.0f * scale_icons;
 	int action = 0;
 	bool already_selected = false;
@@ -80,6 +80,29 @@ int list_item(Wrapper& entry, bool dir, const std::string& name, const std::stri
 			already_selected = true;
 		}
 	}
+
+	bool edit_label = false;
+	if (already_selected && !gui::IsAnyItemActive())
+	{
+		if (input.is_key_pressed(sf::Keyboard::F2))
+		{
+			edit_label = true;
+		}
+
+		if (input.is_key_pressed(sf::Keyboard::Delete))
+		{
+			if (dir)
+			{
+				fs::remove(absolute, std::error_code{});
+			}
+			else
+			{
+				manager.delete_asset<T>(relative);
+			}
+			edit_state.unselect();
+		}
+	}
+
 	bool loading = !entry;
 
 	AssetHandle<Texture>& icon = get_icon();
@@ -105,11 +128,12 @@ int list_item(Wrapper& entry, bool dir, const std::string& name, const std::stri
 	ImVec2 uv0 = { 0.0f, 0.0f };
 	ImVec2 uv1 = { 1.0f, 1.0f };
 
+	bool* edit = edit_label ? &edit_label : nullptr;
 	action = gui::ImageButtonWithAspectAndLabel(
 		icon.link->asset,
 		texture_size, item_size, uv0, uv1,
 		already_selected,
-		nullptr,
+		edit,
 		loading ? "Loading" : name.c_str(),
 		&inputBuff[0],
 		inputBuff.size(),
@@ -124,47 +148,45 @@ int list_item(Wrapper& entry, bool dir, const std::string& name, const std::stri
 
 	if (action == 1)
 	{
-		editState.select(entry);
+		edit_state.select(entry);
 	}
 	else if (action == 2)
 	{
-		std::string newName = std::string(inputBuff.c_str());
-		if (newName != name && newName != "")
+		std::string new_name = std::string(inputBuff.c_str());
+		if (new_name != name && new_name != "")
 		{
 			if (dir)
 			{
 				fs::path new_absolute_path = absolute;
 				new_absolute_path.remove_filename();
-				new_absolute_path /= newName;
+				new_absolute_path /= new_name;
 				fs::rename(absolute, new_absolute_path, std::error_code{});
 			}
 			else
 			{
-				const auto assetDir = fs::path(relative).remove_filename();
-				std::string newAssetRelativeName = (assetDir / newName).generic_string();
-				manager.rename_asset<T>(relative, newAssetRelativeName);
+				const auto asset_dir = fs::path(relative).remove_filename();
+				std::string new_relative = (asset_dir / new_name).generic_string();
+				manager.rename_asset<T>(relative, new_relative);
 			}
 		}
 	}
 
-	if (gui::IsItemHoveredRect() &&
-		gui::IsMouseClicked(gui::drag_button) && !editState.drag_data.object)
+	if (gui::IsItemHoveredRect())
 	{
-		editState.drag(entry, relative);
-	}
+// 		auto& dragged = edit_state.drag_data.object;
+// 		if (dragged && dir)
+// 		{
+// 			gui::SetMouseCursor(ImGuiMouseCursor_Move);
+// 		}
 
-	if (already_selected && !gui::IsAnyItemActive() && input.is_key_pressed(sf::Keyboard::Delete))
-	{
-		if (dir)
+		if (gui::IsMouseClicked(gui::drag_button) && !edit_state.drag_data.object)
 		{
-			fs::remove(absolute, std::error_code{});
+			edit_state.drag(entry, relative);
 		}
-		else
-		{
-			manager.delete_asset<T>(relative);
-		}
-		editState.unselect();
 	}
+	
+
+	
 	gui::PopID();
 	gui::SameLine();
 

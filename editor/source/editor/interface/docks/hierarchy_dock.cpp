@@ -160,8 +160,9 @@ namespace Docks
 		gui::PushID(entity.id().index());
 		gui::AlignFirstTextHeightToWidgets();
 		auto es = core::get_subsystem<editor::EditState>();
+		auto input = core::get_subsystem<runtime::Input>();
 		auto& selected = es->selection_data.object;
-
+		static bool edit_label = false;
 		bool is_selected = false;
 		if (selected && selected.is_type<runtime::Entity>())
 		{
@@ -176,6 +177,13 @@ namespace Docks
 		if (is_selected)
 			flags |= ImGuiTreeNodeFlags_Selected;
 
+		if (is_selected && !gui::IsAnyItemActive())
+		{
+			if (input->is_key_pressed(sf::Keyboard::F2))
+			{
+				edit_label = true;
+			}
+		}
 
 		auto transformComponent = entity.component<TransformComponent>().lock();
 		bool no_children = true;
@@ -185,16 +193,17 @@ namespace Docks
 		if (no_children)
 			flags |= ImGuiTreeNodeFlags_Leaf;
 
-		static bool edit_label = false;
+		
 	
 		auto pos = gui::GetCursorScreenPos();
 		bool opened = gui::TreeNodeEx(name.c_str(), flags);
 
 		if (edit_label && is_selected)
 		{
-			std::string inputBuff = name;
-			inputBuff.resize(64, 0);
-			inputBuff.shrink_to_fit();
+			static std::string inputBuff(64, 0);
+			std::memset(&inputBuff[0], 0, 64);
+			std::memcpy(&inputBuff[0], name.c_str(), name.size() < 64 ? name.size() : 64);
+
 			gui::SetCursorScreenPos(pos);
 			gui::PushID(transformComponent.get());
 			gui::PushItemWidth(gui::GetContentRegionAvailWidth());
