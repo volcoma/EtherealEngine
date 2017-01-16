@@ -25,7 +25,6 @@ namespace editor
 	{
 		auto am = core::get_subsystem<runtime::AssetManager>();
 		auto ts = core::get_subsystem<runtime::TaskSystem>();
-		auto storage = am->get_storage<T>();
 
 		const fs::path dir = fs::resolve_protocol(protocol);
 		fs::path watchDir = dir / wildcard;
@@ -37,20 +36,19 @@ namespace editor
 				auto p = entry.path;
 				auto key = (protocol / p.filename().replace_extension()).generic_string();
 
-				if (entry.state == fs::watcher::Entry::Removed)
+				if (entry.type == fs::file_type::regular)
 				{
-					auto task = ts->create("", [key, am]()
+					if (entry.state == fs::watcher::Entry::Removed)
 					{
-						am->clear_asset<T>(key);
-					});
-					ts->run_on_main(task);
-				}
-				else
-				{
-					//created or modified
-					if (fs::is_regular_file(p, std::error_code{}))
+						auto task = ts->create("", [key, am]()
+						{
+							am->clear_asset<T>(key);
+						});
+						ts->run_on_main(task);
+					}
+					else
 					{
-						
+						//created or modified
 						auto task = ts->create("", [reloadAsync, key, am]()
 						{
 							am->load<T>(key, reloadAsync, true);
@@ -58,6 +56,7 @@ namespace editor
 						ts->run_on_main(task);
 					}
 				}
+				
 			}
 		});
 	}
@@ -78,20 +77,21 @@ namespace editor
 				const auto& p = entry.path;
 				auto key = (protocol / p.filename().replace_extension()).generic_string();
 
-				if (entry.state == fs::watcher::Entry::Removed)
-				{
 
-				}
-				else
+				if (entry.type == fs::file_type::regular)
 				{
-					//created or modified
-					if (fs::is_regular_file(p, std::error_code{}))
+					if (entry.state == fs::watcher::Entry::Removed)
 					{
+
+					}
+					else
+					{
+						// created or modified
 						auto task = ts->create("", [p]()
 						{
 							AssetCompiler<T>::compile(p);
 						});
-						ts->run(task);	
+						ts->run(task);
 
 						auto task1 = ts->create("", [p, am, key]()
 						{

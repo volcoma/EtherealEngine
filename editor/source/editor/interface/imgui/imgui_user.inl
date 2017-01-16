@@ -238,6 +238,11 @@ namespace ImGui
 			LabelTextEx("", label);
 			PopItemWidth();
 			label_clicked = IsItemClicked(0);
+			if (!edit)
+			{
+				if (IsItemHovered())
+					SetTooltip(label);
+			}
 
 			if(selected && edit)
 			{	
