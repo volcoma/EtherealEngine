@@ -353,6 +353,24 @@ namespace Docks
 						}
 					}
 				}
+
+				if (input->is_key_pressed(sf::Keyboard::D))
+				{
+					if (input->is_key_down(sf::Keyboard::LControl))
+					{
+						if (selected && selected.is_type<runtime::Entity>())
+						{
+							auto sel = selected.get_value<runtime::Entity>();
+							if (sel != editor_camera)
+							{
+								auto clone = ecs->create_from_copy(sel);
+								clone.component<TransformComponent>().lock()
+									->set_parent(sel.component<TransformComponent>().lock()->get_parent(), false, true);
+								es->select(clone);
+							}
+						}
+					}
+				}
 			}
 
 
