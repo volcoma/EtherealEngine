@@ -165,6 +165,9 @@ namespace editor
 					}
 					if (entry.state == fs::watcher::Entry::Removed)
 					{
+						if (p == AssetFolder::opened->absolute)
+							AssetFolder::opened = AssetFolder::root;
+
 						std::unique_lock<std::mutex> lock(directories_mutex);
 						directories.erase(std::remove_if(std::begin(directories), std::end(directories),
 							[&entry](const std::shared_ptr<AssetFolder>& other) { return entry.path.filename().string() == other->name; }
