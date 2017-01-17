@@ -40,16 +40,20 @@ namespace editor
 				{
 					if (entry.state == fs::watcher::Entry::Removed)
 					{
-						auto task = ts->create("", [key, am]()
+						auto task = ts->create("Remove Asset", [entry, protocol, key, am]()
 						{
 							am->clear_asset<T>(key);
 						});
 						ts->run_on_main(task);
 					}
+					else if (entry.state == fs::watcher::Entry::Renamed)
+					{
+
+					}
 					else
 					{
 						//created or modified
-						auto task = ts->create("", [reloadAsync, key, am]()
+						auto task = ts->create("Load Asset", [reloadAsync, key, am]()
 						{
 							am->load<T>(key, reloadAsync, true);
 						});
@@ -82,11 +86,15 @@ namespace editor
 				{
 					if (entry.state == fs::watcher::Entry::Removed)
 					{
-
+						auto task = ts->create("Remove Asset", [entry, protocol, key, am]()
+						{
+							am->delete_asset<T>(key);
+						});
+						ts->run_on_main(task);
 					}
 					else
 					{
-						// created or modified
+						// created or modified or renamed
 						auto task = ts->create("", [p]()
 						{
 							AssetCompiler<T>::compile(p);
@@ -103,38 +111,6 @@ namespace editor
 			}
 		});
 	}
-
-	AssetFile::AssetFile(const fs::path& abs, const std::string& n, const std::string& ext, const fs::path& r)
-	{
-		absolute = abs;
-		name = n;
-		extension = ext;
-		root_path = r;
-
-		fs::path a = absolute;
-		relative = string_utils::replace(a.replace_extension().generic_string(), root_path.generic_string(), "app:/data");
-	}
-
-
-	std::shared_ptr<AssetFolder> AssetFolder::opened;
-	std::shared_ptr<AssetFolder> AssetFolder::root;
-
-	AssetFolder::AssetFolder(AssetFolder* p, const fs::path& abs, const std::string& n, const fs::path& r, bool recompile_assets)
-	{
-		parent = p;
-		absolute = abs;
-		name = n;
-		root_path = r;
-		relative = string_utils::replace(absolute.generic_string(), root_path.generic_string(), "app:/data");
-
-		watch(recompile_assets);
-	}
-
-	AssetFolder::~AssetFolder()
-	{
-		unwatch();
-	}
-
 	void AssetFolder::watch(bool recompile_assets)
 	{
 		fs::watcher::watch(absolute / fs::path("*"), true, [this, recompile_assets](const std::vector<fs::watcher::Entry>& entries)
@@ -149,13 +125,27 @@ namespace editor
 					{
 						std::unique_lock<std::mutex> lock(directories_mutex);
 						directories.emplace_back(std::make_shared<AssetFolder>(this, p, p.filename().string(), root_path, recompile_assets));
-						
+
 					}
-					if (entry.state == fs::watcher::Entry::Modified)
+					else if (entry.state == fs::watcher::Entry::Modified)
 					{
 
 					}
-					if (entry.state == fs::watcher::Entry::Removed)
+					else if (entry.state == fs::watcher::Entry::Renamed)
+					{
+						std::unique_lock<std::mutex> lock(directories_mutex);
+						auto it = std::find_if(std::begin(directories), std::end(directories),
+							[&entry](const std::shared_ptr<AssetFolder>& other) { return entry.last_path == other->absolute; }
+						);
+
+						if (it != std::end(directories))
+						{
+							auto e = *it;
+							e->populate(this, p, p.filename().string(), root_path, false);
+						}
+
+					}
+					else if (entry.state == fs::watcher::Entry::Removed)
 					{
 						if (p == AssetFolder::opened->absolute)
 							AssetFolder::opened = AssetFolder::root;
@@ -176,11 +166,27 @@ namespace editor
 						filename.replace_extension();
 						files.emplace_back(AssetFile(p, filename.string(), ext.string(), root_path));
 					}
-					if (entry.state == fs::watcher::Entry::Modified)
+					else if (entry.state == fs::watcher::Entry::Modified)
 					{
 
 					}
-					if (entry.state == fs::watcher::Entry::Removed)
+					else if (entry.state == fs::watcher::Entry::Renamed)
+					{
+						std::unique_lock<std::mutex> lock(files_mutex);
+						auto it = std::find_if(std::begin(files), std::end(files),
+							[&entry](const AssetFile& other) { return entry.last_path == other.absolute; }
+						);
+
+						if (it != std::end(files))
+						{
+							auto& e = *it;
+							fs::path filename = p.filename();
+							fs::path ext = filename.extension();
+							filename.replace_extension();
+							e.populate(p, filename.string(), ext.string(), root_path);
+						}
+					}
+					else if (entry.state == fs::watcher::Entry::Removed)
 					{
 						std::unique_lock<std::mutex> lock(files_mutex);
 						files.erase(std::remove_if(std::begin(files), std::end(files),
@@ -208,10 +214,55 @@ namespace editor
 		watch_assets<Material>(relative, wildcard + extensions::material, true, false);
 	}
 
+	AssetFile::AssetFile(const fs::path& abs, const std::string& n, const std::string& ext, const fs::path& r)
+	{
+		populate(abs, n, ext, r);
+	}
+
+
+	void AssetFile::populate(const fs::path& abs, const std::string& n, const std::string& ext, const fs::path& r)
+	{
+		absolute = abs;
+		name = n;
+		extension = ext;
+		root_path = r;
+
+		fs::path a = absolute;
+		relative = string_utils::replace(a.replace_extension().generic_string(), root_path.generic_string(), "app:/data");
+	}
+
+	std::shared_ptr<AssetFolder> AssetFolder::opened;
+	std::shared_ptr<AssetFolder> AssetFolder::root;
+
+	AssetFolder::AssetFolder(AssetFolder* p, const fs::path& abs, const std::string& n, const fs::path& r, bool recompile_assets)
+	{
+		populate(p, abs, n, r, recompile_assets);
+	}
+
+	AssetFolder::~AssetFolder()
+	{
+		unwatch();
+	}
+
+	void AssetFolder::populate(AssetFolder* p, const fs::path& abs, const std::string& n, const fs::path& r, bool recompile_assets)
+	{
+		unwatch();
+		parent = p;
+		absolute = abs;
+		name = n;
+		root_path = r;
+		relative = string_utils::replace(absolute.generic_string(), root_path.generic_string(), "app:/data");
+
+		watch(recompile_assets);
+	}
+	
+
 	void AssetFolder::unwatch()
 	{
 		fs::watcher::unwatch(absolute / fs::path("*"), true);
 	}
+
+
 	void ProjectManager::open_project(const fs::path& project_path, bool recompile_assets)
 	{
 		if (!fs::exists(project_path, std::error_code{}))

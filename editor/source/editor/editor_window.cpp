@@ -378,7 +378,7 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 		ImGuiWindowFlags_HorizontalScrollbar |
 		ImGuiWindowFlags_NoSavedSettings;
 
-	static bool recompile_assets = true;
+	static bool recompile_assets = false;
 	gui::Text("Recent Projects");
 	gui::Separator();
 	gui::BeginGroup();
@@ -405,8 +405,7 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 		{
 			gui::SetTooltip(
 			"Force to recompile all assets when a project is opened.\n"
-			"This will take some time but is recommended so that asset\n"
-			"changes can be easily detected between project startups.\n"
+			"This will create compiled versions of the raw ones which will be loaded into the app.\n"
 			);
 		}
 	}

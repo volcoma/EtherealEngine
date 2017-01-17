@@ -30,7 +30,7 @@ void AssetReader::load_texture_from_file(const std::string& key, const fs::path&
 		*read_memory = fs::read_stream(std::ifstream{ absoluteKey, std::ios::in | std::ios::binary });
 	};
 
-	auto createResource = [read_memory, key, absoluteKey, &request]() mutable
+	auto createResource = [read_memory, key, &request]() mutable
 	{
 		// if someone destroyed our memory
 		if (!read_memory)
@@ -39,8 +39,6 @@ void AssetReader::load_texture_from_file(const std::string& key, const fs::path&
 		if (read_memory->empty())
 			return;
 
-		std::string ext = absoluteKey.extension().string();
-		
 		const gfx::Memory* mem = gfx::copy(read_memory->data(), static_cast<std::uint32_t>(read_memory->size()));
 		read_memory->clear();
 		read_memory.reset();
@@ -85,7 +83,7 @@ void AssetReader::load_shader_from_file(const std::string& key, const fs::path& 
 	};
 
 	auto wrapper = std::make_shared<Wrapper>();
-	auto deserialize = [wrapper, absoluteKey, request]() mutable
+	auto deserialize = [wrapper, absoluteKey]() mutable
 	{
 		std::ifstream stream{ absoluteKey, std::ios::in | std::ios::binary };
 		cereal::iarchive_json_t ar(stream);
@@ -93,7 +91,7 @@ void AssetReader::load_shader_from_file(const std::string& key, const fs::path& 
 		try_load(ar, cereal::make_nvp("shader", wrapper->binaries));
 	};
 
-	auto createResource = [wrapper, key, request]() mutable
+	auto createResource = [wrapper, key, &request]() mutable
 	{
 		auto& read_memory = wrapper->binaries[gfx::getRendererType()];
 		const gfx::Memory* mem = gfx::copy(&read_memory[0], static_cast<std::uint32_t>(read_memory.size()));
@@ -140,69 +138,6 @@ void AssetReader::load_shader_from_file(const std::string& key, const fs::path& 
 		deserialize();
 		createResource();
 	}
-// 	auto read_memory = std::make_shared<fs::byte_array_t>();
-// 
-// 	auto readMemory = [read_memory, absoluteKey]()
-// 	{
-// 		if (!read_memory)
-// 			return;
-// 
-// 		*read_memory = fs::read_stream(std::ifstream{ absoluteKey, std::ios::in | std::ios::binary });
-// 	};
-// 
-// 	auto createResource = [read_memory, &request, key]() mutable
-// 	{
-// 		// if someone destroyed our memory
-// 		if (!read_memory)
-// 			return;
-// 		// if nothing was read
-// 		if (read_memory->empty())
-// 			return;
-// 		const gfx::Memory* mem = gfx::copy(read_memory->data(), static_cast<std::uint32_t>(read_memory->size()));
-// 		read_memory->clear();
-// 		read_memory.reset();
-// 		if (nullptr != mem)
-// 		{
-// 			auto shader = std::make_shared<Shader>();
-// 			shader->populate(mem);
-// 			auto uniform_count = gfx::getShaderUniforms(shader->handle);
-// 			std::vector<gfx::UniformHandle> uniforms(uniform_count);
-// 			gfx::getShaderUniforms(shader->handle, &uniforms[0], uniform_count);
-// 			shader->uniforms.reserve(uniform_count);
-// 			for (auto& uniform : uniforms)
-// 			{
-// 				std::shared_ptr<Uniform> hUniform = std::make_shared<Uniform>();
-// 				hUniform->populate(uniform);
-// 
-// 				shader->uniforms.push_back(hUniform);
-// 			}
-// 
-// 			request.set_data(key, shader);
-// 			request.invoke_callbacks();
-// 
-// 		}
-// 	};
-// 
-// 	if (async)
-// 	{
-// 		auto ts = core::get_subsystem<runtime::TaskSystem>();
-// 
-// 		auto task = ts->create("", [ts, readMemory, createResource]()
-// 		{
-// 			readMemory();
-// 
-// 			auto callback = ts->create("Create Resource", createResource);
-// 
-// 			ts->run_on_main(callback);
-// 		});
-// 		request.set_task(task);
-// 		ts->run(task);
-// 	}
-// 	else
-// 	{
-// 		readMemory();
-// 		createResource();
-// 	}
 }
 
 void AssetReader::load_shader_from_memory(const std::string& key, const std::uint8_t* data, std::uint32_t size, LoadRequest<Shader>& request)
@@ -363,7 +298,7 @@ void AssetReader::load_mesh_from_file(const std::string& key, const fs::path& ab
 		}
 	};
 
-	auto createResource = [data, &request, key]() mutable
+	auto createResource = [data, &request, key, absoluteKey]() mutable
 	{
 		// if someone destroyed our memory
 		if (!data)
@@ -428,7 +363,7 @@ void AssetReader::load_material_from_file(const std::string& key, const fs::path
 	auto hMaterial = std::make_shared<Material>();
 	auto matWrapper = std::make_shared<MatWrapper>();
 	matWrapper->hMaterial = hMaterial;
-	auto deserialize = [matWrapper, absoluteKey, request]() mutable
+	auto deserialize = [matWrapper, absoluteKey]() mutable
 	{
 		std::ifstream stream{ absoluteKey, std::ios::in | std::ios::binary };
 		cereal::iarchive_json_t ar(stream);
@@ -436,7 +371,7 @@ void AssetReader::load_material_from_file(const std::string& key, const fs::path
 		try_load(ar, cereal::make_nvp("material", matWrapper->hMaterial));
 	};
 
-	auto createResource = [matWrapper, key, request]() mutable
+	auto createResource = [matWrapper, key, absoluteKey, &request]() mutable
 	{
 		request.set_data(key, matWrapper->hMaterial);
 		request.invoke_callbacks();
@@ -478,7 +413,7 @@ void AssetReader::load_prefab_from_file(const std::string& key, const fs::path& 
  		*read_memory = std::istringstream(std::string(reinterpret_cast<const char*>(mem.data()), mem.size()));
 	};
 
-	auto createResource = [read_memory, key, request]() mutable
+	auto createResource = [read_memory, key, absoluteKey, &request]() mutable
 	{
 		auto prefab = std::make_shared<Prefab>();
 		prefab->data = read_memory;

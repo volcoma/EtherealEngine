@@ -270,17 +270,19 @@ namespace runtime
 		template<typename T>
 		void rename_asset(
 			const std::string& key,
-			const std::string& newRelativeKey)
+			const std::string& new_key)
 		{
 			auto storage = get_storage<T>();
 
-			auto absoluteKey = get_absolute_key(key, storage);
-			auto absoluteNewKey = get_absolute_key(newRelativeKey, storage);
+			auto absolute_key = get_absolute_key(key, storage);
+			auto absolute_new_key = get_absolute_key(new_key, storage);
+			
+			// rename compiled assets
+			fs::rename(absolute_key, absolute_new_key, std::error_code{});
 
-			fs::rename(absoluteKey, absoluteNewKey, std::error_code{});
-
-			storage->container[newRelativeKey] = storage->container[key];
-			storage->container[newRelativeKey].asset.link->id = newRelativeKey;
+			auto& request = storage->container[key];
+			storage->container[new_key] = request;
+			storage->container[new_key].asset.link->id = new_key;
 			storage->container.erase(key);
 		}
 
@@ -317,8 +319,9 @@ namespace runtime
 			const std::string& key)
 		{
 			auto storage = get_storage<T>();
-			const fs::path absoluteKey = get_absolute_key(key, storage);
-			fs::remove(absoluteKey, std::error_code{});
+			fs::path absolute_key = get_absolute_key(key, storage);
+
+			fs::remove(absolute_key, std::error_code{});
 
 			auto& request = storage->container[key];
 			request.asset.link->asset.reset();

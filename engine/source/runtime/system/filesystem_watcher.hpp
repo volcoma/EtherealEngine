@@ -36,9 +36,11 @@ namespace fs
 				New,
 				Modified,
 				Removed,
+				Renamed,
 				Unmodified,
 			};
 			fs::path path;
+			fs::path last_path;
 			State state = Unmodified;
 			fs::file_time_type last_mod_time;
 			uintmax_t size = 0;
@@ -507,6 +509,36 @@ namespace fs
 					}
 				}
 
+				auto __entries = entries;
+				for (auto& entry : __entries)
+				{
+					if (entry.state == Entry::New)
+					{
+						for (auto& other : __entries)
+						{
+							if (other.state == Entry::Removed)
+							{
+								if (entry.last_mod_time == other.last_mod_time && entry.size == other.size)
+								{
+									entries.erase(std::remove_if(std::begin(entries), std::end(entries),
+										[&other](const Entry& rhs) { return other.path == rhs.path; }
+									), std::end(entries));
+
+									auto it = std::find_if(std::begin(entries), std::end(entries), 
+										[&entry](const Entry& rhs) { return entry.path == rhs.path; }
+									);
+									if (it != std::end(entries))
+									{
+										it->state = Entry::Renamed;
+										it->last_path = other.path;
+									}
+								}
+
+							}
+						}
+					}
+				}
+
 				_entries_cached = _entries;
 
 				if (entries.size() > 0 && _callback)
@@ -535,6 +567,7 @@ namespace fs
 				{
 					auto &fi = _entries[key];
 					fi.path = path;
+					fi.last_path = path;
 					fi.last_mod_time = time;
 					fi.state = Entry::State::New;
 					fi.size = size;

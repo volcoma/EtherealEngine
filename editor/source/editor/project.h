@@ -9,6 +9,7 @@ namespace editor
 	struct AssetFile
 	{
 		AssetFile(const fs::path& abs, const std::string& n, const std::string& ext, const fs::path& r);
+		void populate(const fs::path& abs, const std::string& n, const std::string& ext, const fs::path& r);
 		fs::path absolute;
 		fs::path root_path;
 
@@ -21,7 +22,7 @@ namespace editor
 	{
 		AssetFolder(AssetFolder* p, const fs::path& abs, const std::string& n, const fs::path& r, bool recompile_assets);
 		~AssetFolder();
-
+		void populate(AssetFolder* p, const fs::path& abs, const std::string& n, const fs::path& r, bool recompile_assets);
 		fs::path absolute;
 		fs::path root_path;
 
