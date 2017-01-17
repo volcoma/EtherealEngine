@@ -114,7 +114,7 @@ namespace editor
 					1.0f
 				};
 
-				model.render_lod(
+				model.render(
 					pass.id, 
 					worldTransform,
 					true,

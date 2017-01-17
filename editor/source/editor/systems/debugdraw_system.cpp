@@ -202,7 +202,7 @@ namespace editor
 					if (!_program)
 						return;
 
-					model.render_lod(
+					model.render(
 						pass.id,
 						worldTransform,
 						false,
