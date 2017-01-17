@@ -1,6 +1,9 @@
 #include "model.h"
 #include "material.h"
 #include "mesh.h"
+#include "vertex_buffer.h"
+#include "index_buffer.h"
+#include "program.h"
 #include "core/math/math_includes.h"
 #include "../assets/asset_manager.h"
 
@@ -107,4 +110,52 @@ void Model::set_lod_min_distance(float distance)
 		distance = _max_distance;
 
 	_min_distance = distance;
+}
+
+void Model::render(std::uint8_t id, const float* mtx, bool apply_cull, bool depth_write, bool depth_test, std::uint64_t extra_states, unsigned int lod, Program* user_program, std::function<void(Program&)> setup_params) const
+{
+	const auto mesh = get_lod(lod);
+	if (!mesh)
+		return;
+
+	AssetHandle<Material> last_set_material;
+	for (std::size_t i = 0; i < mesh->groups.size(); ++i)
+	{
+		const auto& group = mesh->groups[i];
+		
+		Program* program = user_program;
+		AssetHandle<Material> mat = get_material_for_group(i);
+		if (mat)
+		{
+			if (!user_program)
+			{
+				program = mat->get_program();
+			}	
+		}
+		
+		if (program)
+		{
+			program->begin_pass();
+			setup_params(*program);
+		}
+		
+		if (mat)
+		{
+			if (!user_program)
+			{
+				mat->submit();
+			}
+
+			extra_states |= mat->get_render_states(apply_cull, depth_write, depth_test);
+		}
+
+		gfx::setTransform(mtx);
+		gfx::setState(extra_states);
+
+		gfx::setIndexBuffer(group.indexBuffer->handle);
+		gfx::setVertexBuffer(group.vertexBuffer->handle);
+		gfx::submit(id, program->handle, 0, mat == last_set_material && i < (mesh->groups.size() - 1));
+
+		last_set_material = mat;
+	}
 }

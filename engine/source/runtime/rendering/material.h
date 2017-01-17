@@ -167,7 +167,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::uint64_t get_render_states(bool applyCull = true, bool depthWrite = true, bool depthTest = true) const;
+	std::uint64_t get_render_states(bool apply_cull = true, bool depth_write = true, bool depth_test = true) const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : begin_pass ()

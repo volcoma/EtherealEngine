@@ -52,7 +52,7 @@ void Material::set_uniform(const std::string& _name, const void* _value, std::ui
 	_program->set_uniform(_name, _value, _num);
 }
 
-std::uint64_t Material::get_render_states(bool applyCull, bool depthWrite, bool depthTest) const
+std::uint64_t Material::get_render_states(bool apply_cull, bool depth_write, bool depth_test) const
 {
 	// Set render states.
 	std::uint64_t states = 0
@@ -60,13 +60,13 @@ std::uint64_t Material::get_render_states(bool applyCull, bool depthWrite, bool 
 		| BGFX_STATE_ALPHA_WRITE
 		| BGFX_STATE_MSAA;
 
-	if (depthWrite)
+	if (depth_test)
 		states |= BGFX_STATE_DEPTH_WRITE;
 
-	if (depthTest)
+	if (depth_write)
 		states |= BGFX_STATE_DEPTH_TEST_LESS;
 
-	if (applyCull)
+	if (apply_cull)
 	{
 		auto cullType = get_cull_type();
 		if (cullType == CullType::CounterClockWise)

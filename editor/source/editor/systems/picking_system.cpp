@@ -91,10 +91,6 @@ namespace editor
 
 				const auto& worldTransform = transformComponent.get_transform();
 
-				auto material = model.get_material_for_group({});
-				if (!material)
-					return;
-
 				auto hMesh = model.get_lod(0);
 				if (!hMesh)
 					return;
@@ -118,12 +114,19 @@ namespace editor
 					1.0f
 				};
 
-				_program->set_uniform("u_id", &colorId);
-
-				// Set render states.
-				auto states = material->get_render_states();
-
-				hMesh->submit(pass.id, _program->handle, worldTransform, states);
+				model.render_lod(
+					pass.id, 
+					worldTransform,
+					true,
+					true,
+					true,
+					0,
+					0,
+					_program.get(),
+					[&colorId](Program& program)
+				{
+					program.set_uniform("u_id", &colorId);
+				});
 			});
 		}
 

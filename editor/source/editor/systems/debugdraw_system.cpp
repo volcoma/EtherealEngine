@@ -202,15 +202,18 @@ namespace editor
 					if (!_program)
 						return;
 
-					_program->begin_pass();
-					_program->set_uniform("u_params", u_params, 2);
-					const auto material = model.get_material_for_group({});
-					if (!material)
-						return;
-					const std::uint64_t state = material->get_render_states(false, false, false)
-						| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
-						;
-					hMesh->submit(pass.id, _program->handle, worldTransform, state);
+					model.render_lod(
+						pass.id,
+						worldTransform,
+						false,
+						false,
+						false,
+						BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA),
+						0,
+						_program.get(), [&u_params](Program& program)
+					{
+						program.set_uniform("u_params", &u_params, 2);
+					});
 				}
 				else
 				{
