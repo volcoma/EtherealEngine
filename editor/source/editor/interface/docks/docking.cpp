@@ -46,8 +46,8 @@ bool DockingSystem::initialize()
 	dockspace.dock_with(game.get(), scene.get(), ImGuiDock::DockSlot::Tab, 300, false);
 	dockspace.dock_with(inspector.get(), scene.get(), ImGuiDock::DockSlot::Right, 300, true);
 	dockspace.dock_with(hierarchy.get(), scene.get(), ImGuiDock::DockSlot::Left, 300, true);
-	dockspace.dock(assets.get(), ImGuiDock::DockSlot::Bottom, 250, true);
-	dockspace.dock_with(console.get(), assets.get(), ImGuiDock::DockSlot::Tab, 250, true);
+	dockspace.dock(console.get(), ImGuiDock::DockSlot::Bottom, 250, true);
+	dockspace.dock_with(assets.get(), console.get(), ImGuiDock::DockSlot::Tab, 250, true);
 	dockspace.dock_with(style.get(), assets.get(), ImGuiDock::DockSlot::Right, 300, true);
 
 	auto logger = logging::get("Log");
