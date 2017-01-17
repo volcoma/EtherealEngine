@@ -81,9 +81,9 @@ namespace runtime
 				const auto currentLodIndex = lodData.current_lod_index;
 				const auto targetLodIndex = lodData.target_lod_index;
 
-				auto material = model.get_material_for_group({});
-				if (!material)
-					return;
+// 				auto material = model.get_material_for_group({});
+// 				if (!material)
+// 					return;
 
 				const auto hMeshCurr = model.get_lod(currentLodIndex);
 				if (!hMeshCurr)
@@ -131,24 +131,64 @@ namespace runtime
 					1.0f,
 					currentTime / transitionTime
 				};
-				// Set render states.
-				const auto states = material->get_render_states();
-				material->begin_pass();
-				material->set_uniform("u_camera_wpos", &camera.get_position());
-				material->set_uniform("u_camera_clip_planes", &clip_planes);
-				material->set_uniform("u_lod_params", &params);
-				material->submit();
-				hMeshCurr->submit(pass.id, material->get_program()->handle, worldTransform, states);
+				
+				AssetHandle<Material> last_set_material;
+				for (std::size_t i  = 0; i < hMeshCurr->groups.size(); ++i)
+				{
+					auto& group = hMeshCurr->groups[i];
+
+					auto material = model.get_material_for_group(i);
+					if(!material)
+						continue;
+
+					material->begin_pass();
+					material->set_uniform("u_camera_wpos", &camera.get_position());
+					material->set_uniform("u_camera_clip_planes", &clip_planes);
+					material->set_uniform("u_lod_params", &params);
+					material->submit();
+					// Set render states.
+					const auto states = material->get_render_states();
+					gfx::setTransform(&worldTransform);
+					gfx::setState(states);
+								
+
+					gfx::setIndexBuffer(group.indexBuffer->handle);
+					gfx::setVertexBuffer(group.vertexBuffer->handle);
+					gfx::submit(pass.id, material->get_program()->handle, 0, material != last_set_material);
+
+					last_set_material = material;
+				}
 
 				if (currentTime != 0.0f)
 				{
-					material->set_uniform("u_lod_params", &paramsInv);
-					material->submit();
 
 					const auto hMeshTarget = model.get_lod(targetLodIndex);
 					if (!hMeshTarget)
 						return;
-					hMeshTarget->submit(pass.id, material->get_program()->handle, worldTransform, states);
+
+
+					for (std::size_t i = 0; i < hMeshTarget->groups.size(); ++i)
+					{
+						auto& group = hMeshTarget->groups[i];
+
+						auto material = model.get_material_for_group(i);
+						if (!material)
+							continue;
+
+						// Set render states.
+						const auto states = material->get_render_states();
+						material->set_uniform("u_lod_params", &params);
+						material->submit();
+
+						gfx::setTransform(&worldTransform);
+						gfx::setState(states);
+
+						gfx::setIndexBuffer(group.indexBuffer->handle);
+						gfx::setVertexBuffer(group.vertexBuffer->handle);
+						gfx::submit(pass.id, material->get_program()->handle, 0, material != last_set_material);
+
+						last_set_material = material;
+					}
 				}
 
 			});

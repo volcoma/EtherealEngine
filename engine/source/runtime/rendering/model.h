@@ -123,7 +123,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	AssetHandle<Material> get_material_for_group(const Group& group) const;
+	AssetHandle<Material> get_material_for_group(const size_t& group) const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_lod_transition_time ()
@@ -188,6 +188,7 @@ public:
 private:
 	/// Collection of all materials for this model.
 	std::vector<AssetHandle<Material>> _materials;
+	AssetHandle<Material> _default_material;
 	/// Collection of all lods for this model.
 	std::vector<AssetHandle<Mesh>> _mesh_lods;
 	/// Duration for a transition between two lods.

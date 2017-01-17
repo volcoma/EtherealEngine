@@ -11,7 +11,7 @@ Model::Model()
 	am->load<Material>("engine_data:/materials/standard", false)
 		.then([this](auto asset)
 	{
-		_materials.push_back(asset);
+		_default_material = asset;
 	});
 }
 
@@ -50,6 +50,9 @@ void Model::set_lod(AssetHandle<Mesh> mesh, std::uint32_t lod)
 		_mesh_lods.resize(lod + 1);
 
 	_mesh_lods[lod] = mesh;
+
+	if(_materials.size() != mesh->groups.size())
+		_materials.resize(mesh->groups.size(), _default_material);
 }
 
 void Model::set_material(AssetHandle<Material> material, std::uint32_t index)
@@ -82,13 +85,12 @@ void Model::set_materials(const std::vector<AssetHandle<Material>>& materials)
 }
 
 
-AssetHandle<Material> Model::get_material_for_group(const Group& group) const
+AssetHandle<Material> Model::get_material_for_group(const size_t& group) const
 {
-	// TODO implement this
-	if (_materials.empty())
+	if (_materials.size() <= group)
 		return AssetHandle<Material>();
 
-	return _materials[0];
+	return _materials[group];
 }
 
 void Model::set_lod_max_distance(float distance)

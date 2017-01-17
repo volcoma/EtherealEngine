@@ -484,10 +484,13 @@ bool Inspector_String::inspect(rttr::variant& var, bool readOnly, std::function<
 	}
 	else
 	{
-		std::string inputBuff;
-		inputBuff.resize(64, 0);
-		std::copy(data.begin(), data.end(), inputBuff.begin());
-		if (gui::InputText("", &inputBuff[0], inputBuff.size(), ImGuiInputTextFlags_EnterReturnsTrue))
+		static std::string inputBuff(64, 0);
+		std::memset(&inputBuff[0], 0, 64);
+		std::memcpy(&inputBuff[0], data.c_str(), data.size() < 64 ? data.size() : 64);
+		if (gui::InputText("", 
+			&inputBuff[0], 
+			inputBuff.size(),
+			ImGuiInputTextFlags_EnterReturnsTrue))
 		{
 			// copy from c_str to remove trailing zeros
 			var = std::string(inputBuff.c_str());
