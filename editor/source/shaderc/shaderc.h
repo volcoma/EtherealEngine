@@ -82,6 +82,8 @@ namespace bgfx
 
 #define BGFX_UNIFORM_FRAGMENTBIT UINT8_C(0x10)
 #define BGFX_UNIFORM_SAMPLERBIT  UINT8_C(0x20)
+	const char* _getUniformTypeName(UniformType::Enum _enum);
+	UniformType::Enum _nameToUniformTypeEnum(const char* _name);
 
 	struct Uniform
 	{

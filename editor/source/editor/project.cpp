@@ -290,8 +290,8 @@ namespace editor
 
 		static const std::string wildcard = "*";
 		/// for debug purposes
-// 		watch_assets<Shader>("engine_data:/shaders", wildcard + extensions::shader, true, true);
-// 		watch_raw_assets<Shader>("engine_data:/shaders", "*.sc", recompile_assets);
+		watch_assets<Shader>("engine_data:/shaders", wildcard + extensions::shader, !recompile_assets, true);
+		watch_raw_assets<Shader>("engine_data:/shaders", "*.sc", recompile_assets);
 // 
 // 		watch_assets<Mesh>("engine_data:/meshes", wildcard + extensions::mesh, !recompile_assets, true);
 // 		watch_raw_assets<Mesh>("engine_data:/meshes", "*.obj", recompile_assets);
@@ -310,8 +310,8 @@ namespace editor
 // 		watch_raw_assets<Texture>("editor_data:/icons", "*.ktx", recompile_assets);
 // 		watch_raw_assets<Texture>("editor_data:/icons", "*.pvr", recompile_assets);
 // 
-// 		watch_assets<Shader>("editor_data:/shaders", wildcard + extensions::shader, true, true);
-// 		watch_raw_assets<Shader>("editor_data:/shaders", "*.sc", recompile_assets);
+		watch_assets<Shader>("editor_data:/shaders", wildcard + extensions::shader, !recompile_assets, true);
+		watch_raw_assets<Shader>("editor_data:/shaders", "*.sc", recompile_assets);
 
 		auto& root = fs::resolve_protocol("app:/data");
 		AssetFolder::root = std::make_shared<AssetFolder>(nullptr, root, root.filename().string(), root, recompile_assets);

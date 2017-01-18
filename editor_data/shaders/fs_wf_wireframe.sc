@@ -1,6 +1,7 @@
 $input v_bc
 
 #include "common.sh"
+
 uniform vec4 u_params[2];
 #define u_wfColor      u_params[0].xyz
 #define u_wfOpacity    u_params[0].w

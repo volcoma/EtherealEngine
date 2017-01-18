@@ -165,7 +165,7 @@ namespace bgfx { namespace glsl
 					}
 
 					Uniform un;
-					un.type = nameToUniformTypeEnum(uniformType);
+					un.type = _nameToUniformTypeEnum(uniformType);
 
 					if (UniformType::Count != un.type)
 					{
@@ -224,7 +224,7 @@ namespace bgfx { namespace glsl
 					}
 
 					Uniform un;
-					un.type = nameToUniformTypeEnum(uniformType);
+					un.type = _nameToUniformTypeEnum(uniformType);
 
 					if (UniformType::Count != un.type)
 					{
@@ -259,7 +259,7 @@ namespace bgfx { namespace glsl
 
 			BX_TRACE("%s, %s, %d, %d, %d"
 				, un.name.c_str()
-				, getUniformTypeName(un.type)
+				, _getUniformTypeName(un.type)
 				, un.num
 				, un.regIndex
 				, un.regCount

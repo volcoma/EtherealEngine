@@ -5,6 +5,7 @@ $input v_wpos, v_pos, v_wnormal, v_wtangent, v_wbitangent, v_texcoord0
 SAMPLER2D(s_texColor,  0);
 SAMPLER2D(s_texNormal, 1);
 
+// per frame
 uniform vec4 u_camera_wpos;
 uniform vec4 u_camera_clip_planes; //.x = near, .y = far
 

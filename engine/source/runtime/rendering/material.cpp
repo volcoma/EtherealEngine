@@ -101,6 +101,9 @@ StandardMaterial::StandardMaterial()
 
 void StandardMaterial::submit()
 {
+	if (!is_valid())
+		return;
+
 	_program->set_uniform("u_baseColor", &_base_color);
 	_program->set_uniform("u_specularColor", &_specular_color);
 	_program->set_uniform("u_emissiveColor", &_emissive_color);
