@@ -1,6 +1,7 @@
 $input a_position, a_bc
 $output v_bc
 
+
 #include "common.sh"
 
 void main()

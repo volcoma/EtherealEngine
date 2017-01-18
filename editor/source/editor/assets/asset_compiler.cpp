@@ -61,7 +61,7 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 		if(platform == gfx::RendererType::Direct3D9 || platform == gfx::RendererType::Direct3D11)
 		{
 			args_array[9] = "windows";
-			args_array[10] = "--profile";
+			args_array[10] = "-p";
 
 			if (vs)
 				args_array[11] = "vs_4_0";
@@ -73,7 +73,7 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 		else if (platform == gfx::RendererType::OpenGL)
 		{
 			args_array[9] = "linux";
-			args_array[10] = "--profile";
+			args_array[10] = "-p";
 
 			if (vs || fs)
 				args_array[11] = "120";
@@ -83,7 +83,7 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 		else if (platform == gfx::RendererType::Metal)
 		{
 			args_array[9] = "osx";
-			args_array[10] = "--profile";
+			args_array[10] = "-p";
 			args_array[11] = "metal";
 		}
 		args_array[12] = "--type";
