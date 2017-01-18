@@ -90,7 +90,7 @@ namespace runtime
 
 		gfx::setPlatformData(pd);
 
-		if (!gfx::init(gfx::RendererType::OpenGL, 0, 0, &sGfxCallback))
+		if (!gfx::init(gfx::RendererType::Count, 0, 0, &sGfxCallback))
 			return false;
 
 		main_window.set_main(true);
