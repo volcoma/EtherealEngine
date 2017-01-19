@@ -378,7 +378,7 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 		ImGuiWindowFlags_HorizontalScrollbar |
 		ImGuiWindowFlags_NoSavedSettings;
 
-	static bool recompile_assets = false;
+	static bool recompile_assets = true;
 	gui::Text("Recent Projects");
 	gui::Separator();
 	gui::BeginGroup();

@@ -245,14 +245,17 @@ namespace editor
 	}
 
 	void AssetFolder::populate(AssetFolder* p, const fs::path& abs, const std::string& n, const fs::path& r, bool recompile_assets)
-	{
-		unwatch();
+	{	
+		if(!absolute.empty())
+			unwatch();
+
 		parent = p;
 		absolute = abs;
 		name = n;
 		root_path = r;
 		relative = string_utils::replace(absolute.generic_string(), root_path.generic_string(), "app:/data");
 
+		
 		watch(recompile_assets);
 	}
 	
@@ -272,7 +275,7 @@ namespace editor
 			return;
 		}
 		fs::add_path_protocol("app:", project_path);
-		fs::watcher::unwatch_all();
+		
 		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 		auto am = core::get_subsystem<runtime::AssetManager>();
 		auto es = core::get_subsystem<EditState>();
@@ -287,7 +290,7 @@ namespace editor
 			rp.push_back(project_path.generic_string());
 			save_config();
 		}
-
+		fs::watcher::unwatch_all();
 		static const std::string wildcard = "*";
 		/// for debug purposes
 		watch_assets<Shader>("engine_data:/shaders", wildcard + extensions::shader, !recompile_assets, true);
@@ -314,6 +317,8 @@ namespace editor
 		watch_raw_assets<Shader>("editor_data:/shaders", "*.sc", recompile_assets);
 
 		auto& root = fs::resolve_protocol("app:/data");
+		AssetFolder::opened.reset();
+		AssetFolder::root.reset();
 		AssetFolder::root = std::make_shared<AssetFolder>(nullptr, root, root.filename().string(), root, recompile_assets);
 		AssetFolder::opened = AssetFolder::root;
 
