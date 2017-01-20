@@ -75,9 +75,9 @@ bool Inspector_Transform::inspect(rttr::variant& var, bool readOnly, std::functi
 {
 	auto data = var.get_value<math::transform_t>();
 	const char* names[] = { "X", "Y", "Z" };
-	math::vec3 position = data.getPosition();
-	math::vec3 scale = data.getScale();
-	math::quat rotation = data.getRotation();
+	math::vec3 position = data.get_position();
+	math::vec3 scale = data.get_scale();
+	math::quat rotation = data.get_rotation();
 	math::vec3 localEulerAngles = math::degrees(math::eulerAngles(rotation));
 
 	static math::quat oldQuat;
@@ -92,7 +92,7 @@ bool Inspector_Transform::inspect(rttr::variant& var, bool readOnly, std::functi
 	gui::Columns(1);
 	if (gui::Button("P"))
 	{
-		data.setPosition({ 0.0f, 0.0f, 0.0f });
+		data.set_position({ 0.0f, 0.0f, 0.0f });
 		changed = true;
 	}
 	gui::SameLine();
@@ -101,14 +101,14 @@ bool Inspector_Transform::inspect(rttr::variant& var, bool readOnly, std::functi
 	if (gui::DragFloatNEx(names, &position[0], 3, 0.05f))
 	{
 		auto delta = position - prevPos;
-		data.translateLocal(delta);
+		data.translate_local(delta);
 		changed = true;
 	}
 	gui::PopID();
 
 	if (gui::Button("R"))
 	{
-		data.setRotation(math::quat());
+		data.set_rotation(math::quat());
 		eulerAngles = { 0.0f, 0.0f, 0.0f };
 		changed = true;
 	}
@@ -118,7 +118,7 @@ bool Inspector_Transform::inspect(rttr::variant& var, bool readOnly, std::functi
 	auto degrees = eulerAngles;
 	if (gui::DragFloatNEx(names, &degrees[0], 3, 0.05f))
 	{
-		data.rotateLocal(math::radians(degrees - eulerAngles));
+		data.rotate_local(math::radians(degrees - eulerAngles));
 		eulerAngles = degrees;
 		changed = true;
 	}
@@ -127,14 +127,14 @@ bool Inspector_Transform::inspect(rttr::variant& var, bool readOnly, std::functi
 
 	if (gui::Button("S"))
 	{
-		data.setScale({ 1.0f, 1.0f, 1.0f });
+		data.set_scale({ 1.0f, 1.0f, 1.0f });
 		changed = true;
 	}
 	gui::SameLine();
 	gui::PushID("Scale");
 	if (gui::DragFloatNEx(names, &scale[0], 3, 0.05f))
 	{
-		data.setScale(scale);
+		data.set_scale(scale);
 		changed = true;
 	}
 	gui::PopID();

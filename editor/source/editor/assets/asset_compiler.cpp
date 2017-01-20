@@ -17,31 +17,28 @@
 
 void ShaderCompiler::compile(const fs::path& absoluteKey)
 {
-	fs::path input = absoluteKey;
-	std::string strInput = input.string();
-	std::string file = input.filename().replace_extension().string();
-	fs::path dir = input.remove_filename();
+	std::string strInput = absoluteKey.string();
+	std::string file = absoluteKey.stem().string();
+	fs::path dir = absoluteKey.parent_path();
+	fs::path output = dir / fs::path(file + extensions::shader);
 
-	bool vs = string_utils::begins_with(file, "vs_");
-	bool fs = string_utils::begins_with(file, "fs_");
-	bool cs = string_utils::begins_with(file, "cs_");
-	std::array<gfx::RendererType::Enum, 4> supported = 
-	{ 
+	std::array<gfx::RendererType::Enum, 4> supported =
+	{
 		gfx::RendererType::Direct3D9,
 		gfx::RendererType::Direct3D11,
 		gfx::RendererType::OpenGL,
 		gfx::RendererType::Metal
 	};
-	
+
+	bool vs = string_utils::begins_with(file, "vs_");
+	bool fs = string_utils::begins_with(file, "fs_");
+	bool cs = string_utils::begins_with(file, "cs_");
+
 	std::unordered_map<gfx::RendererType::Enum, fs::byte_array_t> binaries;
 	binaries.reserve(4);
-	fs::path output = dir / fs::path(file + extensions::shader);
-
 	std::string strOutput = output.string();
 	for (auto& platform : supported)
 	{
-		
-
 		static const int arg_count = 16;
 		const char* args_array[arg_count];
 		args_array[0] = "-f";
@@ -147,15 +144,10 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 void TextureCompiler::compile(const fs::path& absoluteKey)
 {
 	auto logger = logging::get("Log");
-	fs::path input = absoluteKey;
-	std::string strInput = input.string();
-	std::string raw_ext = input.filename().extension().string();
-	std::string file = input.filename().replace_extension().string();
-
-	fs::path dir = input.remove_filename();
-
-	fs::path output = dir;
-
+	std::string strInput = absoluteKey.string();
+	std::string raw_ext = absoluteKey.filename().extension().string();
+	std::string file = absoluteKey.stem().string();
+	fs::path output = absoluteKey.parent_path();
 	output /= fs::path(file + extensions::texture);
 
 	std::string strOutput = output.string();
@@ -192,13 +184,9 @@ void TextureCompiler::compile(const fs::path& absoluteKey)
 
 void MeshCompiler::compile(const fs::path& absoluteKey)
 {
-	fs::path input = absoluteKey;
-	std::string strInput = input.string();
-	std::string file = input.filename().replace_extension().string();
-	fs::path dir = input.remove_filename();
-
-	fs::path output = dir;
-
+	std::string strInput = absoluteKey.string();
+	std::string file = absoluteKey.stem().string();
+	fs::path output = absoluteKey.parent_path();
 	output /= fs::path(file + extensions::mesh);
 
 	std::string strOutput = output.string();

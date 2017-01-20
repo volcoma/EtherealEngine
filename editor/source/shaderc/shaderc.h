@@ -26,7 +26,7 @@ namespace bgfx
 #include <vector>
 #include <unordered_map>
 
-#include "graphics/bx/bx.h"
+
 #include "graphics/bx/debug.h"
 #include "graphics/bx/commandline.h"
 #include "graphics/bx/endian.h"

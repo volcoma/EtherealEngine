@@ -33,45 +33,46 @@ namespace math
 		//-------------------------------------------------------------------------
 		// Public Methods
 		//-------------------------------------------------------------------------
-		vec3 transformCoord(const vec3 & v) const;
-		vec3 inverseTransformCoord(const vec3 & v) const;
-		vec3 transformNormal(const vec3 & v) const;
-		vec3 inverseTransformNormal(const vec3 & v) const;
+		vec3 transform_coord(const vec3 & v) const;
+		vec3 inverse_transform_coord(const vec3 & v) const;
+		vec3 transform_normal(const vec3 & v) const;
+		vec3 inverse_transform_normal(const vec3 & v) const;
 		bool decompose(vec3 & scale, vec3 & shear, quat & rotation, vec3 & translation) const;
 		bool decompose(vec3 & scale, quat & rotation, vec3 & translation) const;
 		bool decompose(quat & rotation, vec3 & translation) const;
 		transform_t& invert();
 
-		const vec3& getPosition() const;
-		vec3 getScale() const;
-		quat getRotation() const;
-		const vec3& xAxis() const;
-		const vec3& yAxis() const;
-		const vec3& zAxis() const;
-		vec3 xUnitAxis() const;
-		vec3 yUnitAxis() const;
-		vec3 zUnitAxis() const;
-		const mat4&	 matrix() const;
+		const vec3& get_position() const;
+		vec3 get_scale() const;
+		vec3 get_shear() const;
+		quat get_rotation() const;
+		const vec3& x_axis() const;
+		const vec3& y_axis() const;
+		const vec3& z_axis() const;
+		vec3 x_unit_axis() const;
+		vec3 y_unit_axis() const;
+		vec3 z_unit_axis() const;
+		const mat4& matrix() const;
 		mat4& matrix();
 
 		// transformation Operations
-		transform_t& rotateAxis(float a, const vec3 & v);
+		transform_t& rotate_axis(float a, const vec3 & v);
 		transform_t& rotate(float x, float y, float z);
-		transform_t& rotateLocal(float x, float y, float z);
-		transform_t& rotateLocal(const vec3 & v);
+		transform_t& rotate_local(float x, float y, float z);
+		transform_t& rotate_local(const vec3 & v);
 		transform_t& scale(const vec3 & v);
 		transform_t& scale(float x, float y, float z);
 		transform_t& translate(float x, float y, float z);
 		transform_t& translate(const vec3 & v);
-		transform_t& translateLocal(float x, float y, float z);
-		transform_t& translateLocal(const vec3 & v);
-		transform_t& setPosition(float x, float y, float z);
-		transform_t& setPosition(const vec3 & v);
-		transform_t& setScale(float x, float y, float z);
-		transform_t& setScale(const vec3 & v);
-		transform_t& setShear(float xy, float xz, float yz);
-		transform_t& setRotation(const vec3 & x, const vec3 & y, const vec3 & z);
-		transform_t& setRotation(const quat & q);
+		transform_t& translate_local(float x, float y, float z);
+		transform_t& translate_local(const vec3 & v);
+		transform_t& set_position(float x, float y, float z);
+		transform_t& set_position(const vec3 & v);
+		transform_t& set_scale(float x, float y, float z);
+		transform_t& set_scale(const vec3 & v);
+		transform_t& set_shear(float xy, float xz, float yz);
+		transform_t& set_rotation(const vec3 & x, const vec3 & y, const vec3 & z);
+		transform_t& set_rotation(const quat & q);
 
 		// Full Re-Populate
 		transform_t& zero();
@@ -80,16 +81,16 @@ namespace math
 		transform_t& compose(const quat & rotation, const vec3 & translation);
 		transform_t& scaling(float x, float y, float z);
 		transform_t& rotation(float x, float y, float z);
-		transform_t& rotationAxis(float angle, const vec3 & axis);
+		transform_t& rotation_axis(float angle, const vec3 & axis);
 		transform_t& translation(float x, float y, float z);
 		transform_t& translation(const vec3 & v);
-		transform_t& lookAt(const vec3 & eye, const vec3 & at);
-		transform_t& lookAt(const vec3 & eye, const vec3 & at, const vec3 & upAlign);
+		transform_t& look_at(const vec3 & eye, const vec3 & at);
+		transform_t& look_at(const vec3 & eye, const vec3 & at, const vec3 & upAlign);
 
 		// Comparisons
 		int compare(const transform_t & t) const;
 		int compare(const transform_t & t, float tolerance) const;
-		bool isIdentity() const;
+		bool is_identity() const;
 
 		//-------------------------------------------------------------------------
 		// Public Operator Overloads
@@ -122,10 +123,10 @@ namespace math
 		//-------------------------------------------------------------------------
 		// Public Static Functions
 		//-------------------------------------------------------------------------
-		static vec3 transformCoord(const vec3 & v, const transform_t & t);
-		static vec3 inverseTransformCoord(const vec3 & v, const transform_t & t);
-		static vec3 transformNormal(const vec3 & v, const transform_t & t);
-		static vec3 inverseTransformNormal(const vec3 & v, const transform_t & t);
+		static vec3 transform_coord(const vec3 & v, const transform_t & t);
+		static vec3 inverse_transform_coord(const vec3 & v, const transform_t & t);
+		static vec3 transform_normal(const vec3 & v, const transform_t & t);
+		static vec3 inverse_transform_normal(const vec3 & v, const transform_t & t);
 		static bool decompose(vec3 & scale, vec3 & shear, quat & rotation, vec3 & translation, const transform_t & t);
 		static bool decompose(vec3 & scale, quat & rotation, vec3 & translation, const transform_t & t);
 		static bool decompose(quat & rotation, vec3 & translation, const transform_t & t);
@@ -133,7 +134,7 @@ namespace math
 		//-------------------------------------------------------------------------
 		// Public Static Variables
 		//-------------------------------------------------------------------------
-		static const transform_t Identity;
+		static const transform_t identity;
 
 	private:
 		vec3& position();

@@ -99,7 +99,7 @@ namespace editor
 				const auto& bounds = hMesh->aabb;
 
 				// Test the bounding box of the mesh
-				if (!math::frustum::testOBB(frustum, bounds, worldTransform))
+				if (!math::frustum::test_obb(frustum, bounds, worldTransform))
 					return;
 
 				auto entityIndex = e.id().index();

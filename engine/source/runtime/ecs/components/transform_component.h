@@ -490,7 +490,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& set_parent(runtime::CHandle<TransformComponent> parent, bool worldPositionStays, bool localPositionStays);
+	virtual TransformComponent& set_parent(runtime::CHandle<TransformComponent> parent, bool world_position_stays, bool local_position_stays);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_parent (virtual )

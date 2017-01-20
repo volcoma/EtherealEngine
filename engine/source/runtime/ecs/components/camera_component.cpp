@@ -31,7 +31,7 @@ void CameraComponent::init(const uSize& size)
 		;
 
 	auto surfaceFormat = gfx::TextureFormat::BGRA8;
-	auto depthFormat = gfx::TextureFormat::D24;
+	auto depthFormat = gfx::TextureFormat::D24S8;
 	if (size.width == 0 && size.height == 0)
 	{
 		//create a depth buffer to share
@@ -94,7 +94,7 @@ void CameraComponent::update(const math::transform_t& t)
 	_camera->record_current_matrices();
 
 	// Set new transform
-	_camera->look_at(t.getPosition(), t.getPosition() + t.zUnitAxis(), t.yUnitAxis());
+	_camera->look_at(t.get_position(), t.get_position() + t.z_unit_axis(), t.y_unit_axis());
 	update_projection_window();
 }
 

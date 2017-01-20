@@ -44,16 +44,16 @@ namespace math
 		using namespace VolumePlane;
 
 		// Compute planes
-		planes[Left] = AABB.getPlane(Left);
-		planes[Right] = AABB.getPlane(Right);
-		planes[Top] = AABB.getPlane(Top);
-		planes[Bottom] = AABB.getPlane(Bottom);
-		planes[Near] = AABB.getPlane(Near);
-		planes[Far] = AABB.getPlane(Far);
+		planes[Left] = AABB.get_plane(Left);
+		planes[Right] = AABB.get_plane(Right);
+		planes[Top] = AABB.get_plane(Top);
+		planes[Bottom] = AABB.get_plane(Bottom);
+		planes[Near] = AABB.get_plane(Near);
+		planes[Far] = AABB.get_plane(Far);
 
 		// Compute points
-		vec3 e = AABB.getExtents();
-		vec3 p = AABB.getCenter();
+		vec3 e = AABB.get_extents();
+		vec3 p = AABB.get_center();
 		points[LeftBottomNear] = vec3(p.x - e.x, p.y - e.y, p.z + e.z);
 		points[LeftBottomFar] = vec3(p.x - e.x, p.y - e.y, p.z + e.z);
 		points[RightBottomNear] = vec3(p.x + e.x, p.y - e.y, p.z - e.z);
@@ -142,7 +142,7 @@ namespace math
 			planes[i].data *= -1.0f;
 
 		// Normalize and compute additional information.
-		setPlanes(planes);
+		set_planes(planes);
 
 		// Compute the originating position of the frustum.
 		position = vec3(View[0][0], View[1][0], View[2][0]) * -View[3][0];
@@ -158,14 +158,14 @@ namespace math
 	/// based on the supplied planes.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void frustum::setPlanes(const plane _Planes[])
+	void frustum::set_planes(const plane _Planes[])
 	{
 		// Copy and normalize the planes
 		for (int i = 0; i < 6; i++)
 			planes[i] = plane::normalize(_Planes[i]);
 
 		// Recompute the frustum corner points.
-		recomputePoints();
+		recompute_points();
 	}
 
 	//-----------------------------------------------------------------------------
@@ -174,7 +174,7 @@ namespace math
 	/// Recompute the 8 corner points of the frustum based on the supplied planes.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void frustum::recomputePoints()
+	void frustum::recompute_points()
 	{
 
 		// Compute the 8 corner points
@@ -213,7 +213,7 @@ namespace math
 	/// Determine whether or not the box passed is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	VolumeQuery::E frustum::classifyAABB(const bbox & AABB) const
+	VolumeQuery::E frustum::classify_aabb(const bbox & AABB) const
 	{
 		VolumeQuery::E  Result = VolumeQuery::Inside;
 		vec3 NearPoint, FarPoint;
@@ -250,13 +250,13 @@ namespace math
 	/// Determine whether or not the box passed is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	VolumeQuery::E frustum::classifyOBB(frustum frustum, const bbox & AABB, const transform_t & t)
+	VolumeQuery::E frustum::classify_obb(frustum frustum, const bbox & AABB, const transform_t & t)
 	{
 		transform_t invTransform = inverse(t);
 
 		frustum.mul(invTransform);
 
-		return frustum.classifyAABB(AABB);
+		return frustum.classify_aabb(AABB);
 	}
 
 	//-----------------------------------------------------------------------------
@@ -265,7 +265,7 @@ namespace math
 	/// Determine whether or not the box passed is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	VolumeQuery::E frustum::classifyAABB(const bbox & AABB, unsigned int & FrustumBits, int & LastOutside) const
+	VolumeQuery::E frustum::classify_aabb(const bbox & AABB, unsigned int & FrustumBits, int & LastOutside) const
 	{
 		// If the 'last outside plane' index was specified, test it first!
 		vec3 NearPoint, FarPoint;
@@ -346,13 +346,13 @@ namespace math
 	/// Determine whether or not the box passed is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	VolumeQuery::E frustum::classifyOBB(frustum frustum, const bbox & AABB, const transform_t & t, unsigned int & FrustumBits, int & LastOutside)
+	VolumeQuery::E frustum::classify_obb(frustum frustum, const bbox & AABB, const transform_t & t, unsigned int & FrustumBits, int & LastOutside)
 	{
 		transform_t invTransform = inverse(t);
 
 		frustum.mul(invTransform);
 
-		return frustum.classifyAABB(AABB, FrustumBits, LastOutside);
+		return frustum.classify_aabb(AABB, FrustumBits, LastOutside);
 	}
 
 	//-----------------------------------------------------------------------------
@@ -361,7 +361,7 @@ namespace math
 	/// Determine whether or not the box passed is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool frustum::testAABB(const bbox & AABB) const
+	bool frustum::test_aabb(const bbox & AABB) const
 	{
 		// Loop through all the planes
 		vec3 NearPoint;
@@ -395,13 +395,13 @@ namespace math
 	/// Determine whether or not the box passed is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool frustum::testOBB(frustum frustum, const bbox & AABB, const transform_t & t)
+	bool frustum::test_obb(frustum frustum, const bbox & AABB, const transform_t & t)
 	{
 		transform_t invTransform = inverse(t);
 
 		frustum.mul(invTransform);
 
-		return frustum.testAABB(AABB);
+		return frustum.test_aabb(AABB);
 	}
 
 
@@ -411,13 +411,13 @@ namespace math
 	/// Determine whether or not the box passed is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool frustum::testExtrudedOBB(frustum frustum, const bbox_extruded & AABB, const transform_t & t)
+	bool frustum::test_extruded_obb(frustum frustum, const bbox_extruded & AABB, const transform_t & t)
 	{
 		transform_t invTransform = inverse(t);
 
 		frustum.mul(invTransform);
 
-		return frustum.testExtrudedAABB(AABB);
+		return frustum.test_extruded_aabb(AABB);
 	}
 
 	//-----------------------------------------------------------------------------
@@ -427,7 +427,7 @@ namespace math
 	/// specified origin by a required distance, falls within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool frustum::testExtrudedAABB(const bbox_extruded & Box) const
+	bool frustum::test_extruded_aabb(const bbox_extruded & Box) const
 	{
 		bool     bIntersect1, bIntersect2;
 		unsigned int i;
@@ -435,42 +435,42 @@ namespace math
 		//  Build an imaginary sphere around the origin, representing the volume of
 		//  max attenuation -- if this doesn't intersect the view frustum, then
 		//  this caster can be trivially rejected.
-		if (testSphere(Box.projectionPoint, Box.projectionRange) == false)
+		if (test_sphere(Box.projection_point, Box.projection_range) == false)
 			return false;
 
 		// Test frustum edges against extruded box.
 		using namespace VolumeGeometry;
-		bIntersect1 = (Box.testLine(points[LeftBottomFar], points[LeftBottomNear])) ||
-			(Box.testLine(points[LeftBottomNear], points[RightBottomNear])) ||
-			(Box.testLine(points[RightBottomNear], points[RightBottomFar])) ||
-			(Box.testLine(points[RightBottomFar], points[LeftBottomFar])) ||
-			(Box.testLine(points[RightBottomFar], points[LeftTopFar])) ||
-			(Box.testLine(points[RightBottomNear], points[RightTopNear])) ||
-			(Box.testLine(points[LeftBottomFar], points[LeftTopFar])) ||
-			(Box.testLine(points[LeftBottomNear], points[LeftTopNear])) ||
-			(Box.testLine(points[LeftTopNear], points[LeftTopFar])) ||
-			(Box.testLine(points[LeftTopFar], points[RightTopNear])) ||
-			(Box.testLine(points[RightTopFar], points[RightTopNear])) ||
-			(Box.testLine(points[RightTopNear], points[LeftTopNear]));
+		bIntersect1 = (Box.test_line(points[LeftBottomFar], points[LeftBottomNear])) ||
+			(Box.test_line(points[LeftBottomNear], points[RightBottomNear])) ||
+			(Box.test_line(points[RightBottomNear], points[RightBottomFar])) ||
+			(Box.test_line(points[RightBottomFar], points[LeftBottomFar])) ||
+			(Box.test_line(points[RightBottomFar], points[LeftTopFar])) ||
+			(Box.test_line(points[RightBottomNear], points[RightTopNear])) ||
+			(Box.test_line(points[LeftBottomFar], points[LeftTopFar])) ||
+			(Box.test_line(points[LeftBottomNear], points[LeftTopNear])) ||
+			(Box.test_line(points[LeftTopNear], points[LeftTopFar])) ||
+			(Box.test_line(points[LeftTopFar], points[RightTopNear])) ||
+			(Box.test_line(points[RightTopFar], points[RightTopNear])) ||
+			(Box.test_line(points[RightTopNear], points[LeftTopNear]));
 
 
 		// Test extruded box edges against frustum
 		bIntersect2 = false;
-		for (i = 0; (i < Box.edgeCount) && (bIntersect1 == false && bIntersect2 == false); ++i)
+		for (i = 0; (i < Box.edge_count) && (bIntersect1 == false && bIntersect2 == false); ++i)
 		{
 			vec3 vRay, vPoint1, vPoint2;
 
 			// Retrieve this silhouette edge from the extruded box
-			Box.getEdge(i, vPoint1, vPoint2);
+			Box.get_edge(i, vPoint1, vPoint2);
 
 			// Build an edge that extends for Box.ProjectionLength distance from 
 			// the projection point and test for an intersection against the frustum.
-			vRay = glm::normalize(vPoint1 - Box.projectionPoint);
-			vRay = Box.projectionPoint + (vRay * Box.projectionRange);
-			bIntersect2 |= testLine(vPoint1, vRay);
-			vRay = glm::normalize(vPoint2 - Box.projectionPoint);
-			vRay = Box.projectionPoint + (vRay * Box.projectionRange);
-			bIntersect2 |= testLine(vPoint2, vRay);
+			vRay = glm::normalize(vPoint1 - Box.projection_point);
+			vRay = Box.projection_point + (vRay * Box.projection_range);
+			bIntersect2 |= test_line(vPoint1, vRay);
+			vRay = glm::normalize(vPoint2 - Box.projection_point);
+			vRay = Box.projection_point + (vRay * Box.projection_range);
+			bIntersect2 |= test_line(vPoint2, vRay);
 
 		} // Next Extruded Edge
 
@@ -485,7 +485,7 @@ namespace math
 	/// Determine whether or not the sphere passed is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	VolumeQuery::E frustum::classifySphere(const vec3 & vecCenter, float fRadius) const
+	VolumeQuery::E frustum::classify_sphere(const vec3 & vecCenter, float fRadius) const
 	{
 		VolumeQuery::E Result = VolumeQuery::Inside;
 
@@ -514,7 +514,7 @@ namespace math
 	/// Determine whether or not the sphere passed is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool frustum::testSphere(const vec3 & vecCenter, float fRadius) const
+	bool frustum::test_sphere(const vec3 & vecCenter, float fRadius) const
 	{
 		// Test frustum planes
 		for (int i = 0; i < 6; ++i)
@@ -538,7 +538,7 @@ namespace math
 	/// provided direction vector, intersects a plane.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool frustum::sweptSphereIntersectPlane(float & t0, float & t1, const plane & plane, const vec3 & vecCenter, float fRadius, const vec3 & vecSweepDirection)
+	bool frustum::swept_sphere_intersect_plane(float & t0, float & t1, const plane & plane, const vec3 & vecCenter, float fRadius, const vec3 & vecSweepDirection)
 	{
 		float b_dot_n = plane::dotCoord(plane, vecCenter);
 		float d_dot_n = plane::dotNormal(plane, vecSweepDirection);
@@ -576,7 +576,7 @@ namespace math
 	/// provided direction vector, intersects the frustum in some way.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool frustum::testSweptSphere(const vec3 & vecCenter, float fRadius, const vec3 & vecSweepDirection) const
+	bool frustum::test_swept_sphere(const vec3 & vecCenter, float fRadius, const vec3 & vecSweepDirection) const
 	{
 		unsigned int  i, nCount = 0;
 		float   t0, t1, fDisplacedRadius;
@@ -587,7 +587,7 @@ namespace math
 		for (i = 0; i < 6; ++i)
 		{
 			// Intersects frustum plane?
-			if (sweptSphereIntersectPlane(t0, t1, planes[i], vecCenter, fRadius, vecSweepDirection) == true)
+			if (swept_sphere_intersect_plane(t0, t1, planes[i], vecCenter, fRadius, vecSweepDirection) == true)
 			{
 				// TODO: Possibly needs to be < 0?
 				if (t0 >= 0.0f)
@@ -605,7 +605,7 @@ namespace math
 		{
 			vDisplacedCenter = vecCenter + (vecSweepDirection * pDisplacements[i]);
 			fDisplacedRadius = fRadius * 1.1f; // Tolerance.
-			if (testSphere(vDisplacedCenter, fDisplacedRadius) == true)
+			if (test_sphere(vDisplacedCenter, fDisplacedRadius) == true)
 				return true;
 
 		} // Next Intersection
@@ -620,9 +620,9 @@ namespace math
 	/// Determine whether or not the specified point falls within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool frustum::testPoint(const vec3 & vecPoint) const
+	bool frustum::test_point(const vec3 & vecPoint) const
 	{
-		return testSphere(vecPoint, 0.0f);
+		return test_sphere(vecPoint, 0.0f);
 	}
 
 	//-----------------------------------------------------------------------------
@@ -631,7 +631,7 @@ namespace math
 	/// Determine whether or not the line passed is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool frustum::testLine(const vec3 & v1, const vec3 & v2) const
+	bool frustum::test_line(const vec3 & v1, const vec3 & v2) const
 	{
 		unsigned int   nCode1 = 0, nCode2 = 0;
 		float   fDist1, fDist2, t;
@@ -669,7 +669,7 @@ namespace math
 				if ((t >= 0.0f) && (t <= 1.0f))
 				{
 					vIntersect = v1 + (vDir * t);
-					if (testSphere(vIntersect, 0.01f))
+					if (test_sphere(vIntersect, 0.01f))
 						return true;
 
 				} // End if spanning
@@ -688,7 +688,7 @@ namespace math
 	/// Classify the frustum with respect to the plane
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	VolumeQuery::E frustum::classifyPlane(const plane & plane) const
+	VolumeQuery::E frustum::classify_plane(const plane & plane) const
 	{
 		unsigned int nInFrontCount = 0;
 		unsigned int nBehindCount = 0;
@@ -723,24 +723,24 @@ namespace math
 	/// Determine whether or not the frustum passed is within this one.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool frustum::testFrustum(const frustum & f) const
+	bool frustum::test_frustum(const frustum & f) const
 	{
 		using namespace VolumeGeometry;
 
 		// A -> B
 		bool bIntersect1;
-		bIntersect1 = testLine(f.points[LeftBottomFar], f.points[LeftBottomNear]) ||
-			testLine(f.points[LeftBottomNear], f.points[RightBottomNear]) ||
-			testLine(f.points[RightBottomNear], f.points[RightBottomFar]) ||
-			testLine(f.points[RightBottomFar], f.points[LeftBottomFar]) ||
-			testLine(f.points[RightBottomFar], f.points[RightTopFar]) ||
-			testLine(f.points[RightBottomNear], f.points[RightTopNear]) ||
-			testLine(f.points[LeftBottomFar], f.points[LeftTopFar]) ||
-			testLine(f.points[LeftBottomNear], f.points[LeftTopNear]) ||
-			testLine(f.points[LeftTopNear], f.points[LeftTopFar]) ||
-			testLine(f.points[LeftTopFar], f.points[RightTopFar]) ||
-			testLine(f.points[RightTopFar], f.points[RightTopNear]) ||
-			testLine(f.points[RightTopNear], f.points[LeftTopNear]);
+		bIntersect1 = test_line(f.points[LeftBottomFar], f.points[LeftBottomNear]) ||
+			test_line(f.points[LeftBottomNear], f.points[RightBottomNear]) ||
+			test_line(f.points[RightBottomNear], f.points[RightBottomFar]) ||
+			test_line(f.points[RightBottomFar], f.points[LeftBottomFar]) ||
+			test_line(f.points[RightBottomFar], f.points[RightTopFar]) ||
+			test_line(f.points[RightBottomNear], f.points[RightTopNear]) ||
+			test_line(f.points[LeftBottomFar], f.points[LeftTopFar]) ||
+			test_line(f.points[LeftBottomNear], f.points[LeftTopNear]) ||
+			test_line(f.points[LeftTopNear], f.points[LeftTopFar]) ||
+			test_line(f.points[LeftTopFar], f.points[RightTopFar]) ||
+			test_line(f.points[RightTopFar], f.points[RightTopNear]) ||
+			test_line(f.points[RightTopNear], f.points[LeftTopNear]);
 
 		// Early out
 		if (bIntersect1)
@@ -748,18 +748,18 @@ namespace math
 
 		// B -> A
 		bool bIntersect2;
-		bIntersect2 = f.testLine(points[LeftBottomFar], points[LeftBottomNear]) ||
-			f.testLine(points[LeftBottomNear], points[RightBottomNear]) ||
-			f.testLine(points[RightBottomNear], points[RightBottomFar]) ||
-			f.testLine(points[RightBottomFar], points[LeftBottomFar]) ||
-			f.testLine(points[RightBottomFar], points[LeftTopFar]) ||
-			f.testLine(points[RightBottomNear], points[RightTopNear]) ||
-			f.testLine(points[LeftBottomFar], points[LeftTopFar]) ||
-			f.testLine(points[LeftBottomNear], points[LeftTopNear]) ||
-			f.testLine(points[LeftTopNear], points[LeftTopFar]) ||
-			f.testLine(points[LeftTopFar], points[RightTopNear]) ||
-			f.testLine(points[RightTopFar], points[RightTopNear]) ||
-			f.testLine(points[RightTopNear], points[LeftTopNear]);
+		bIntersect2 = f.test_line(points[LeftBottomFar], points[LeftBottomNear]) ||
+			f.test_line(points[LeftBottomNear], points[RightBottomNear]) ||
+			f.test_line(points[RightBottomNear], points[RightBottomFar]) ||
+			f.test_line(points[RightBottomFar], points[LeftBottomFar]) ||
+			f.test_line(points[RightBottomFar], points[LeftTopFar]) ||
+			f.test_line(points[RightBottomNear], points[RightTopNear]) ||
+			f.test_line(points[LeftBottomFar], points[LeftTopFar]) ||
+			f.test_line(points[LeftBottomNear], points[LeftTopNear]) ||
+			f.test_line(points[LeftTopNear], points[LeftTopFar]) ||
+			f.test_line(points[LeftTopFar], points[RightTopNear]) ||
+			f.test_line(points[RightTopFar], points[RightTopNear]) ||
+			f.test_line(points[RightTopNear], points[LeftTopNear]);
 
 		// Return intersection result
 		return bIntersect2;
@@ -789,10 +789,10 @@ namespace math
 
 		// transform points
 		for (unsigned int i = 0; i < 8; ++i)
-			points[i] = transform_t::transformCoord(points[i], mtx);
+			points[i] = transform_t::transform_coord(points[i], mtx);
 
 		// transform originating position.
-		position = transform_t::transformCoord(position, mtx);
+		position = transform_t::transform_coord(position, mtx);
 
 		// Return reference to self.
 		return *this;

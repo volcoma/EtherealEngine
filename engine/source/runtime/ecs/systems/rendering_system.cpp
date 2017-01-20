@@ -16,27 +16,27 @@
 
 namespace runtime
 {
-	void update_lod_data(LodData& lodData, std::size_t totalLods, float minDist, float maxDist, float transTime, float distanceToCamera, float dt)
+	void update_lod_data(LodData& lod_data, std::size_t total_lods, float min_dist, float max_dist, float transition_time, float distance, float dt)
 	{
-		if (totalLods == 1)
+		if (total_lods == 1)
 			return;
 
-		totalLods -= 1;
-		if (totalLods < 0)
-			totalLods = 0;
+		total_lods -= 1;
+		if (total_lods < 0)
+			total_lods = 0;
 
-		const float factor = 1.0f - math::clamp((maxDist - distanceToCamera) / (maxDist - minDist), 0.0f, 1.0f);
-		const int lod = (int)math::lerp(0.0f, static_cast<float>(totalLods), factor);
-		if (lodData.target_lod_index != lod && lodData.target_lod_index == lodData.current_lod_index)
-			lodData.target_lod_index = lod;
+		const float factor = 1.0f - math::clamp((max_dist - distance) / (max_dist - min_dist), 0.0f, 1.0f);
+		const int lod = (int)math::lerp(0.0f, static_cast<float>(total_lods), factor);
+		if (lod_data.target_lod_index != lod && lod_data.target_lod_index == lod_data.current_lod_index)
+			lod_data.target_lod_index = lod;
 
-		if (lodData.current_lod_index != lodData.target_lod_index)
-			lodData.current_time += dt;
+		if (lod_data.current_lod_index != lod_data.target_lod_index)
+			lod_data.current_time += dt;
 
-		if (lodData.current_time >= transTime)
+		if (lod_data.current_time >= transition_time)
 		{
-			lodData.current_lod_index = lodData.target_lod_index;
-			lodData.current_time = 0.0f;
+			lod_data.current_lod_index = lod_data.target_lod_index;
+			lod_data.current_time = 0.0f;
 		}
 	}
 
@@ -45,21 +45,20 @@ namespace runtime
 		auto ecs = core::get_subsystem<EntityComponentSystem>();
 		ecs->each<CameraComponent>([this, ecs, dt](
 			Entity ce,
-			CameraComponent& cameraComponent
+			CameraComponent& camera_comp
 			)
 		{
-			const auto gBuffer = cameraComponent.get_g_buffer();
-			auto& camera = cameraComponent.get_camera();
+			const auto g_buffer = camera_comp.get_g_buffer();
+			auto& camera = camera_comp.get_camera();
 
-			RenderPass pass("GBufferFill");
-			pass.bind(gBuffer.get());
+			RenderPass pass("g_buffer_fill");
+			pass.bind(g_buffer.get());
 			pass.clear();
-			auto& cameraLods = _lod_data[ce];
-
+			auto& camera_lods = _lod_data[ce];
 
 			gfx::setViewTransform(pass.id, &camera.get_view(), &camera.get_projection());
 
-			ecs->each<TransformComponent, ModelComponent>([this, &cameraLods, &camera, dt, &pass](
+			ecs->each<TransformComponent, ModelComponent>([this, &camera_lods, &camera, dt, &pass](
 				Entity e,
 				TransformComponent& transformComponent,
 				ModelComponent& modelComponent
@@ -69,77 +68,74 @@ namespace runtime
 				if (!model.is_valid())
 					return;
 
-				const auto& worldTransform = transformComponent.get_transform();
+				const auto& world_transform = transformComponent.get_transform();
 				const auto clip_planes = math::vec2(camera.get_near_clip(), camera.get_far_clip());
 
-				auto& lodData = cameraLods[e];
-				const auto transitionTime = model.get_lod_transition_time();
-				const auto minDistance = model.get_lod_min_distance();
-				const auto maxDistance = model.get_lod_max_distance();
-				const auto lodCount = model.get_lods().size();
-				const auto currentTime = lodData.current_time;
-				const auto currentLodIndex = lodData.current_lod_index;
-				const auto targetLodIndex = lodData.target_lod_index;
+				auto& lod_data = camera_lods[e];
+				const auto transition_time = model.get_lod_transition_time();
+				const auto min_distance = model.get_lod_min_distance();
+				const auto max_distance = model.get_lod_max_distance();
+				const auto lod_count = model.get_lods().size();
+				const auto current_time = lod_data.current_time;
+				const auto current_lod_index = lod_data.current_lod_index;
+				const auto target_lod_index = lod_data.target_lod_index;
 
-// 				auto material = model.get_material_for_group({});
-// 				if (!material)
-// 					return;
-
-				const auto hMeshCurr = model.get_lod(currentLodIndex);
-				if (!hMeshCurr)
+				const auto current_mesh = model.get_lod(current_lod_index);
+				if (!current_mesh)
 					return;
 
 				const auto& frustum = camera.get_frustum();
-				const auto& bounds = hMeshCurr->aabb;
+				const auto& bounds = current_mesh->aabb;
 
 				float t = 0.0f;
-				const auto rayOrigin = camera.get_position();
-				const auto invWorld = math::inverse(worldTransform);
-				const auto objectRayOrigin = invWorld.transformCoord(rayOrigin);
-				const auto objectRayDirection = math::normalize(bounds.getCenter() - objectRayOrigin);
-				bounds.intersect(objectRayOrigin, objectRayDirection, t);
+				const auto ray_origin = camera.get_position();
+				const auto inv_world = math::inverse(world_transform);
+				const auto object_ray_origin = inv_world.transform_coord(ray_origin);
+				const auto object_ray_direction = math::normalize(bounds.get_center() - object_ray_origin);
+				bounds.intersect(object_ray_origin, object_ray_direction, t);
 
 				// Compute final object space intersection point.
-				auto intersectionPoint = objectRayOrigin + (objectRayDirection * t);
+				auto intersection_point = object_ray_origin + (object_ray_direction * t);
 
 				// transform intersection point back into world space to compute
 				// the final intersection distance.
-				intersectionPoint = worldTransform.transformCoord(intersectionPoint);
-				const float distance = math::length(intersectionPoint - rayOrigin);
+				intersection_point = world_transform.transform_coord(intersection_point);
+				const float distance = math::length(intersection_point - ray_origin);
 
 				//Compute Lods
 				update_lod_data(
-					lodData,
-					lodCount,
-					minDistance,
-					maxDistance,
-					transitionTime,
+					lod_data,
+					lod_count,
+					min_distance,
+					max_distance,
+					transition_time,
 					distance,
 					dt.count());
+
 				// Test the bounding box of the mesh
-				if (!math::frustum::testOBB(frustum, bounds, worldTransform))
+				if (!math::frustum::test_obb(frustum, bounds, world_transform))
 					return;
 
 				const auto params = math::vec3{
 					0.0f,
 					-1.0f,
-					(transitionTime - currentTime) / transitionTime
+					(transition_time - current_time) / transition_time
 				};
 
-				const auto paramsInv = math::vec3{
+				const auto params_inv = math::vec3{
 					1.0f,
 					1.0f,
-					currentTime / transitionTime
+					current_time / transition_time
 				};
 				
 				model.render(
 					pass.id,
-					worldTransform,
+					world_transform,
 					true,
 					true,
 					true,
 					0,
-					currentLodIndex,
+					current_lod_index,
 					nullptr,
 					[&camera, &clip_planes, &params](Program& program)
 				{
@@ -148,35 +144,30 @@ namespace runtime
 					program.set_uniform("u_lod_params", &params);
 				});
 
-				if (currentTime != 0.0f)
+				if (current_time != 0.0f)
 				{
-
 					model.render(
 						pass.id,
-						worldTransform,
+						world_transform,
 						true,
 						true,
 						true,
 						0, 
-						targetLodIndex,
+						target_lod_index,
 						nullptr,
-						[&camera, &clip_planes, &paramsInv](Program& program)
+						[&camera, &clip_planes, &params_inv](Program& program)
 					{
-						program.set_uniform("u_lod_params", &paramsInv);
+						program.set_uniform("u_lod_params", &params_inv);
 					});
 				}
 
 			});
 
-
-			const auto surface = cameraComponent.get_output_buffer();
-			RenderPass passBlit("OutputBufferFill");
-			passBlit.bind(surface.get());
-			gfx::blit(passBlit.id, gfx::getTexture(surface->handle), 0, 0, gfx::getTexture(gBuffer->handle));
-
-
+			const auto surface = camera_comp.get_output_buffer();
+			RenderPass pass_blit("output_buffer_fill");
+			pass_blit.bind(surface.get());
+			gfx::blit(pass_blit.id, gfx::getTexture(surface->handle), 0, 0, gfx::getTexture(g_buffer->handle));
 		});
-
 	}
 
 	void RenderingSystem::receive(Entity e)
