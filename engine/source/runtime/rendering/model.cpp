@@ -149,13 +149,16 @@ void Model::render(std::uint8_t id, const float* mtx, bool apply_cull, bool dept
 			extra_states |= mat->get_render_states(apply_cull, depth_write, depth_test);
 		}
 
-		gfx::setTransform(mtx);
-		gfx::setState(extra_states);
+		if (program)
+		{
+			gfx::setTransform(mtx);
+			gfx::setState(extra_states);
 
-		gfx::setIndexBuffer(group.index_buffer->handle);
-		gfx::setVertexBuffer(group.vertex_buffer->handle);
-		if(program)
+			gfx::setIndexBuffer(group.index_buffer->handle);
+			gfx::setVertexBuffer(group.vertex_buffer->handle);
+
 			gfx::submit(id, program->handle, 0, mat == last_set_material && i < (mesh->groups.size() - 1));
+		}		
 
 		last_set_material = mat;
 	}

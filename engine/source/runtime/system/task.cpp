@@ -115,7 +115,7 @@ namespace runtime
 
 		{
 			std::unique_lock<std::mutex> L(_queue_mutex);
-			_alive_tasks.push(handle);
+			_alive_tasks.push_back(handle);
 		}
 
 		_condition.notify_one();
@@ -133,7 +133,7 @@ namespace runtime
 
 		{
 			std::unique_lock<std::mutex> L(_main_queue_mutex);
-			_main_alive_tasks.push(handle);
+			_main_alive_tasks.push_back(handle);
 		}
 		unsigned index = get_thread_index();
 		if (index == 0)
@@ -175,7 +175,7 @@ namespace runtime
 		while (!is_completed(handle))
 		{
 			std::this_thread::yield();
-			if (!execute_one(index, false, _queue_mutex, _alive_tasks))
+			if (!execute_one(handle, index, false, _queue_mutex, _alive_tasks))
 				break;
 		}
 	}
@@ -206,7 +206,7 @@ namespace runtime
 		}
 	}
 
-	bool TaskSystem::execute_one(unsigned index, bool wait, std::mutex& mtx, std::queue<core::Handle>& queue)
+	bool TaskSystem::execute_one(unsigned index, bool wait, std::mutex& mtx, std::deque<core::Handle>& queue)
 	{
 		core::Handle handle;
 		{
@@ -221,7 +221,48 @@ namespace runtime
 				return true;
 
 			handle = queue.front();
-			queue.pop();
+			queue.pop_front();
+		}
+
+		if (auto task = _tasks.fetch(handle))
+		{
+			if (on_task_start)
+				on_task_start(index, task->name);
+
+			if (task->closure != nullptr)
+				task->closure();
+
+			finish(handle);
+
+			if (on_task_stop)
+				on_task_stop(index, task->name);
+		}
+
+		return true;
+	}
+
+	bool TaskSystem::execute_one(core::Handle handle, unsigned index, bool wait, std::mutex& mtx, std::deque<core::Handle>& queue)
+	{
+		{
+			std::unique_lock<std::mutex> L(mtx);
+			if (wait)
+				_condition.wait(L, [this, &queue] { return _stop || !queue.empty(); });
+
+			if (_stop && queue.empty())
+				return false;
+
+			if (!wait && queue.empty())
+				return true;
+			
+			auto it = std::find(std::begin(queue), std::end(queue), handle);
+			if (it != std::end(queue))
+			{
+				queue.erase(it);
+			}
+			else
+			{
+				return false;
+			}
 		}
 
 		if (auto task = _tasks.fetch(handle))

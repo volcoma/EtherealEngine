@@ -5,7 +5,7 @@
 #include "core/common/handle_object_set.hpp"
 
 #include <vector>
-#include <queue>
+#include <deque>
 #include <unordered_map>
 #include <mutex>
 #include <thread>
@@ -211,7 +211,15 @@ namespace runtime
 		/// Executes a single task from a queue.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool execute_one(unsigned, bool, std::mutex&, std::queue<core::Handle>&);
+		bool execute_one(unsigned, bool, std::mutex&, std::deque<core::Handle>&);
+
+		//-----------------------------------------------------------------------------
+		//  Name : execute_one ()
+		/// <summary>
+		/// Executes a single task from a queue.
+		/// </summary>
+		//-----------------------------------------------------------------------------
+		bool execute_one(core::Handle handle, unsigned, bool, std::mutex&, std::deque<core::Handle>&);
 
 		//-----------------------------------------------------------------------------
 		//  Name : get_thread_index ()
@@ -231,11 +239,11 @@ namespace runtime
 		///
 		std::mutex _queue_mutex;
 		///
-		std::queue<core::Handle> _alive_tasks;
+		std::deque<core::Handle> _alive_tasks;
 		///
 		std::mutex _main_queue_mutex;
 		///
-		std::queue<core::Handle> _main_alive_tasks;
+		std::deque<core::Handle> _main_alive_tasks;
 		///
 		std::vector<std::thread> _workers;
 		///
