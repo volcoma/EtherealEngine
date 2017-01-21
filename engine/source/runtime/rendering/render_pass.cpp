@@ -20,6 +20,7 @@ std::uint8_t generate_id()
 RenderPass::RenderPass(const std::string& n)
 {
 	id = generate_id();
+	gfx::setViewName(id, n.c_str());
 }
 
 void RenderPass::bind(FrameBuffer* fb) const
@@ -44,7 +45,7 @@ void RenderPass::bind(FrameBuffer* fb) const
 		std::uint16_t(size.height)
 	);
 
-
+	
 	gfx::setViewFrameBuffer(id, fb->handle);
 	gfx::touch(id);
 	

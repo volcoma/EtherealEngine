@@ -134,7 +134,7 @@ auto open_scene()
 	auto es = core::get_subsystem<editor::EditState>();
 	auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 	std::string path;
-	if (open_file_dialog("scene", fs::resolve_protocol("app:/data/scenes").string(), path))
+	if (open_file_dialog("sgr", fs::resolve_protocol("app:/data").string(), path))
 	{
 		save_editor_camera();
 		ecs->dispose();
@@ -166,9 +166,9 @@ void save_scene_as()
 	auto es = core::get_subsystem<editor::EditState>();
 
 	std::string path;
-	if (save_file_dialog("scene", fs::resolve_protocol("app:/data/scenes").string(), path))
+	if (save_file_dialog("sgr", fs::resolve_protocol("app:/data").string(), path))
 	{
-		es->scene = path;		
+		es->scene = path + ".sgr";		
 		save_scene();	
 	}
 

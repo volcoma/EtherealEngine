@@ -387,8 +387,8 @@ vec3 getTangentSpaceNormal( sampler2D bumpTexture, vec2 texCoords, float bumpine
 {
     vec3 normal = texture2D(bumpTexture, texCoords).xyz;
   	normal = normal * 2.0f - 1.0f;
-  	normal.xy *= bumpiness;
   	normal.z  = sqrt(1.0 - dot(normal.xy, normal.xy) );
+	normal.xy *= bumpiness;
     return normalize(normal);
 }
 

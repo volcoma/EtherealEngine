@@ -11,10 +11,10 @@ bool Mesh::is_valid() const
 
 	for (auto& group : groups)
 	{
-		if (!group.vertexBuffer)
+		if (!group.vertex_buffer)
 			return false;
 
-		if (!group.indexBuffer)
+		if (!group.index_buffer)
 			return false;
 	}
 	return true;
@@ -41,8 +41,8 @@ void Mesh::submit(uint8_t _id, gfx::ProgramHandle _program, const float* _mtx, u
 	{
 		const auto& group = *it;
 
-		gfx::setIndexBuffer(group.indexBuffer->handle);
-		gfx::setVertexBuffer(group.vertexBuffer->handle);
+		gfx::setIndexBuffer(group.index_buffer->handle);
+		gfx::setVertexBuffer(group.vertex_buffer->handle);
 		gfx::submit(_id, _program, 0, it != itEnd - 1);
 	}
 }

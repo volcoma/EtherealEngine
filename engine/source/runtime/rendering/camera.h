@@ -250,6 +250,14 @@ public:
 	inline const math::transform_t& get_view() const { return _view; }
 
 	//-----------------------------------------------------------------------------
+	//  Name : get_view_proj ()
+	/// <summary>
+	/// Return the current view-projection matrix.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline math::transform_t get_view_proj() { return get_projection() * get_view(); }
+
+	//-----------------------------------------------------------------------------
 	//  Name : get_last_view ()
 	/// <summary>
 	/// Retrieve a copy of the view matrix recorded with the most recent call

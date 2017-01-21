@@ -73,6 +73,7 @@
     <ClInclude Include="..\..\source\core\logging\spdlog\tweakme.h" />
     <ClInclude Include="..\..\source\core\math\bbox.h" />
     <ClInclude Include="..\..\source\core\math\bbox_extruded.h" />
+    <ClInclude Include="..\..\source\core\math\bsphere.h" />
     <ClInclude Include="..\..\source\core\math\frustum.h" />
     <ClInclude Include="..\..\source\core\math\glm\detail\func_common.hpp" />
     <ClInclude Include="..\..\source\core\math\glm\detail\func_exponential.hpp" />
@@ -413,6 +414,7 @@
     <ClCompile Include="..\..\source\core\logging\spdlog\details\format.cc" />
     <ClCompile Include="..\..\source\core\math\bbox.cpp" />
     <ClCompile Include="..\..\source\core\math\bbox_extruded.cpp" />
+    <ClCompile Include="..\..\source\core\math\bsphere.cpp" />
     <ClCompile Include="..\..\source\core\math\frustum.cpp" />
     <ClCompile Include="..\..\source\core\math\glm\detail\dummy.cpp" />
     <ClCompile Include="..\..\source\core\math\glm\detail\glm.cpp" />

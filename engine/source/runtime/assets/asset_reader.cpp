@@ -271,10 +271,10 @@ void AssetReader::load_mesh_from_file(const std::string& key, const fs::path& ab
 					subset.name.resize(len);
 					gfx::read(&_reader, const_cast<char*>(subset.name.data()), len);
 
-					gfx::read(&_reader, subset.m_startIndex);
-					gfx::read(&_reader, subset.m_numIndices);
-					gfx::read(&_reader, subset.m_startVertex);
-					gfx::read(&_reader, subset.m_numVertices);
+					gfx::read(&_reader, subset.start_index);
+					gfx::read(&_reader, subset.num_indices);
+					gfx::read(&_reader, subset.start_vertex);
+					gfx::read(&_reader, subset.num_vertices);
 					// 					read(_reader, prim.m_sphere);
 					// 					read(_reader, prim.m_aabb);
 					// 					read(_reader, prim.m_obb);
@@ -318,13 +318,13 @@ void AssetReader::load_mesh_from_file(const std::string& key, const fs::path& ab
 			auto& buffers = data->buffersMem[i];
 			const gfx::Memory* memVB = gfx::copy(buffers.first.data(), static_cast<std::uint32_t>(buffers.first.size()));
 			buffers.first.clear();
-			group.vertexBuffer = std::make_shared<VertexBuffer>();
-			group.vertexBuffer->populate(memVB, data->decl);
+			group.vertex_buffer = std::make_shared<VertexBuffer>();
+			group.vertex_buffer->populate(memVB, data->decl);
 
 			const gfx::Memory* memIB = gfx::copy(buffers.second.data(), static_cast<std::uint32_t>(buffers.second.size()));
 			buffers.second.clear();
-			group.indexBuffer = std::make_shared<IndexBuffer>();
-			group.indexBuffer->populate(memIB);
+			group.index_buffer = std::make_shared<IndexBuffer>();
+			group.index_buffer->populate(memIB);
 
 		}
 		data.reset();

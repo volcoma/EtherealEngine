@@ -4,6 +4,7 @@
 #include "plane.h"
 #include "bbox.h"
 #include "bbox_extruded.h"
+#include "bsphere.h"
 #include "frustum.h"
 #include "math_types.h"
 

@@ -26,9 +26,9 @@ void main()
 	float alphaTestValue = u_surfaceData.w;
 	vec2 texCoords = v_texcoord0.xy * u_tiling.xy;
 	vec3 viewDir = u_camera_wpos.xyz - v_wpos;
-	vec3 tangentSpaceNormal = getTangentSpaceNormal( s_texNormal, texCoords, 1.0f );
+	vec3 tangentSpaceNormal = getTangentSpaceNormal( s_texNormal, texCoords, bumpiness );
 
-	//mat3 tangentToWorldSpace = computeTangentToWorldSpaceMatrix(normalize(v_wnormal), -normalize(viewDir), texCoords.xy);
+	//mat3 tangentToWorldSpace = computeTangentToWorldSpaceMatrix(normalize(v_wnormal), -normalize(viewDir), texCoords.xy);	
 	mat3 tangentToWorldSpace = constructTangentToWorldSpaceMatrix(v_wtangent, v_wbitangent, v_wnormal);
 
 	vec3 wnormal = normalize( mul( tangentToWorldSpace, tangentSpaceNormal ).xyz );

@@ -18,10 +18,10 @@ struct MeshInfo
 struct Subset
 {
 	std::string name;
-	std::uint32_t m_startIndex = 0;
-	std::uint32_t m_numIndices = 0;
-	std::uint32_t m_startVertex = 0;
-	std::uint32_t m_numVertices = 0;
+	std::uint32_t start_index = 0;
+	std::uint32_t num_indices = 0;
+	std::uint32_t start_vertex = 0;
+	std::uint32_t num_vertices = 0;
 };
 
 struct Group
@@ -31,8 +31,8 @@ struct Group
 	std::uint32_t vertices = 0;
 	std::uint32_t indices = 0;
 	std::uint32_t primitives = 0;
-	std::shared_ptr<VertexBuffer> vertexBuffer;
-	std::shared_ptr<IndexBuffer> indexBuffer;
+	std::shared_ptr<VertexBuffer> vertex_buffer;
+	std::shared_ptr<IndexBuffer> index_buffer;
 };
 
 struct Mesh

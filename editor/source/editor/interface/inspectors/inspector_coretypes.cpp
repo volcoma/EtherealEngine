@@ -484,6 +484,7 @@ bool Inspector_String::inspect(rttr::variant& var, bool readOnly, std::function<
 	}
 	else
 	{
+		//gui::PushItemWidth(gui::GetContentRegionAvailWidth() * 0.8f);
 		static std::string inputBuff(64, 0);
 		std::memset(&inputBuff[0], 0, 64);
 		std::memcpy(&inputBuff[0], data.c_str(), data.size() < 64 ? data.size() : 64);
@@ -496,6 +497,9 @@ bool Inspector_String::inspect(rttr::variant& var, bool readOnly, std::function<
 			var = std::string(inputBuff.c_str());
 			return true;
 		}
+		//gui::PopItemWidth();
+		//gui::SameLine();
+		//gui::Button("x");
 	}
 
 	return false;

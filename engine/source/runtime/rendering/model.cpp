@@ -152,8 +152,8 @@ void Model::render(std::uint8_t id, const float* mtx, bool apply_cull, bool dept
 		gfx::setTransform(mtx);
 		gfx::setState(extra_states);
 
-		gfx::setIndexBuffer(group.indexBuffer->handle);
-		gfx::setVertexBuffer(group.vertexBuffer->handle);
+		gfx::setIndexBuffer(group.index_buffer->handle);
+		gfx::setVertexBuffer(group.vertex_buffer->handle);
 		if(program)
 			gfx::submit(id, program->handle, 0, mat == last_set_material && i < (mesh->groups.size() - 1));
 
