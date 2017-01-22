@@ -72,15 +72,14 @@ namespace editor
 		auto ts = core::get_subsystem<runtime::TaskSystem>();
 
 		const fs::path dir = fs::resolve_protocol(protocol);
-		const fs::path watchDir = dir / wildcard;
+		const fs::path watch_dir = dir / wildcard;
 
-		fs::watcher::watch(watchDir, initialList, [am, ts, protocol](const std::vector<fs::watcher::Entry>& entries)
+		fs::watcher::watch(watch_dir, initialList, [am, ts, protocol](const std::vector<fs::watcher::Entry>& entries)
 		{
 			for (auto& entry : entries)
 			{
 				const auto& p = entry.path;
 				auto key = (protocol / p.filename().replace_extension()).generic_string();
-
 
 				if (entry.type == fs::file_type::regular)
 				{
@@ -161,9 +160,8 @@ namespace editor
 					if (entry.state == fs::watcher::Entry::New)
 					{
 						std::unique_lock<std::mutex> lock(files_mutex);
-						fs::path filename = p.filename();
-						fs::path ext = filename.extension();
-						filename.replace_extension();
+						fs::path filename = p.stem();
+						fs::path ext = p.extension();
 						files.emplace_back(AssetFile(p, filename.string(), ext.string(), root_path));
 					}
 					else if (entry.state == fs::watcher::Entry::Modified)
@@ -180,9 +178,8 @@ namespace editor
 						if (it != std::end(files))
 						{
 							auto& e = *it;
-							fs::path filename = p.filename();
-							fs::path ext = filename.extension();
-							filename.replace_extension();
+							fs::path filename = p.stem();
+							fs::path ext = p.extension();
 							e.populate(p, filename.string(), ext.string(), root_path);
 						}
 					}
@@ -219,7 +216,6 @@ namespace editor
 		populate(abs, n, ext, r);
 	}
 
-
 	void AssetFile::populate(const fs::path& abs, const std::string& n, const std::string& ext, const fs::path& r)
 	{
 		absolute = abs;
@@ -254,17 +250,14 @@ namespace editor
 		name = n;
 		root_path = r;
 		relative = string_utils::replace(absolute.generic_string(), root_path.generic_string(), "app:/data");
-
 		
 		watch(recompile_assets);
 	}
-	
 
 	void AssetFolder::unwatch()
 	{
 		fs::watcher::unwatch(absolute / fs::path("*"), true);
 	}
-
 
 	void ProjectManager::open_project(const fs::path& project_path, bool recompile_assets)
 	{
@@ -274,6 +267,7 @@ namespace editor
 			logger->error().write("Project directory doesn't exist {0}", project_path.string());
 			return;
 		}
+
 		fs::add_path_protocol("app:", project_path);
 		
 		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
@@ -284,14 +278,12 @@ namespace editor
 		es->scene.clear();
 		am->clear("app:/data");
 		set_current_project(project_path.filename().string());
-		auto& rp = _options.recent_project_paths;
-		if (std::find(std::begin(rp), std::end(rp), project_path.generic_string()) == std::end(rp))
-		{
-			rp.push_back(project_path.generic_string());
-			save_config();
-		}
+		save_config();
+
 		fs::watcher::unwatch_all();
+
 		static const std::string wildcard = "*";
+
 		/// for debug purposes
 		watch_assets<Shader>("engine_data:/shaders", wildcard + extensions::shader, !recompile_assets, true);
 		watch_raw_assets<Shader>("engine_data:/shaders", "*.sc", recompile_assets);
@@ -337,32 +329,32 @@ namespace editor
 	{
 		auto engine = core::get_subsystem<runtime::Engine>();
 		const auto& windows = engine->get_windows();
-		auto& mainWindow = *windows[0];
+		auto& main_window = *windows[0];
 
-		mainWindow.setVisible(false);
+		main_window.setVisible(false);
 
 		sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 		desktop.width = 500;
 		desktop.height = 300;;
-		auto projectManagerWnd = std::make_shared<ProjectManagerWindow>(desktop, "Project Manager", sf::Style::Titlebar);
-		projectManagerWnd->on_closed.connect([&mainWindow](RenderWindow& window)
+		auto project_manager_window_shared = std::make_shared<ProjectManagerWindow>(desktop, "Project Manager", sf::Style::Titlebar);
+		project_manager_window_shared->on_closed.connect([&main_window](RenderWindow& window)
 		{
-			mainWindow.setVisible(true);
+			main_window.setVisible(true);
 		});
-		engine->register_window(projectManagerWnd);
+		engine->register_window(project_manager_window_shared);
 	}
 
 
 	void ProjectManager::load_config()
 	{
-		const fs::path absoluteKey = fs::resolve_protocol("editor_data:/config/project.cfg");
-		if (!fs::exists(absoluteKey, std::error_code{}))
+		const fs::path project_config_file = fs::resolve_protocol("editor_data:/config/project.cfg");
+		if (!fs::exists(project_config_file, std::error_code{}))
 		{
 			save_config();
 		}
 		else
 		{
-			std::ifstream output(absoluteKey);
+			std::ifstream output(project_config_file);
 			cereal::iarchive_json_t ar(output);
 
 			try_load(ar, cereal::make_nvp("options", _options));
@@ -387,9 +379,15 @@ namespace editor
 
 	void ProjectManager::save_config()
 	{
+		auto& rp = _options.recent_project_paths;
+		auto project_path = fs::resolve_protocol("app:");
+		if (std::find(std::begin(rp), std::end(rp), project_path.generic_string()) == std::end(rp))
+		{
+			rp.push_back(project_path.generic_string());
+		}
 		fs::create_directory(fs::resolve_protocol("editor_data:/config"), std::error_code{});
-		const std::string absoluteKey = fs::resolve_protocol("editor_data:/config/project.cfg").string();
-		std::ofstream output(absoluteKey);
+		const std::string project_config_file = fs::resolve_protocol("editor_data:/config/project.cfg").string();
+		std::ofstream output(project_config_file);
 		cereal::oarchive_json_t ar(output);
 
 		try_save(ar, cereal::make_nvp("options", _options));

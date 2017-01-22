@@ -141,7 +141,7 @@ namespace ImGuiDock
 		{
 			if (dock->container->docks.size() > 1)
 			{
-				for (size_t i = 0; i < dock->container->docks.size(); i++)
+				for (size_t i = 0; i < dock->container->docks.size(); ++i)
 				{
 					if (dock->container->docks[i] == dock)
 					{
@@ -216,7 +216,7 @@ namespace ImGuiDock
 						working->size = dock->container->parent->size;
 					}
 				}
-				for (size_t i = 0; i < nodes.size(); i++)
+				for (size_t i = 0; i < nodes.size(); ++i)
 				{
 					if (toDelete == nodes[i])
 					{
@@ -328,7 +328,7 @@ namespace ImGuiDock
 					if ((mousePos.x > screenCursorPos.x && mousePos.x < (screenCursorPos.x + size.x)) &&
 						(mousePos.y > screenCursorPos.y && mousePos.y < (screenCursorPos.y + size.y)))
 					{
-
+						owner->requestFocus();
 						ImGui::BeginChild("##dockSlotPreview");
 						ImGui::PushClipRect(ImVec2(), ImGui::GetIO().DisplaySize, false);
 						DockSlot dockSlot = render_dock_slot_preview(cursorPos, screenCursorPos, size);

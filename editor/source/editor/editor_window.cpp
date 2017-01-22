@@ -20,12 +20,12 @@ std::vector<runtime::Entity> gather_scene_data()
 	auto es = core::get_subsystem<editor::EditState>();
 	auto ts = core::get_subsystem<runtime::TransformSystem>();
 	const auto& roots = ts->get_roots();
-	auto editorCamera = es->camera;
+	auto editor_camera = es->camera;
 	std::vector<runtime::Entity> entities;
 	for (auto root : roots)
 	{
 		auto entity = root.lock()->get_entity();
-		if (entity != editorCamera)
+		if (entity != editor_camera)
 			entities.push_back(entity);
 	}
 
@@ -263,12 +263,6 @@ void MainEditorWindow::on_menubar()
 		if (gui::MenuItem("Save As..", "Ctrl+Shift+S", false, ecs->size() > 0 && current_project != ""))
 		{
 			save_scene_as();
-		}
-		gui::Separator();
-
-		if (gui::MenuItem("Quit", "Alt+F4"))
-		{
-			//app.quit();
 		}
 
 		gui::EndMenu();

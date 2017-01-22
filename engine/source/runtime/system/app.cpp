@@ -53,10 +53,17 @@ namespace runtime
 		return _exitcode;
 	}
 
-	void App::terminate_with_error(const std::string& message)
+	void App::quit_with_error(const std::string& message)
 	{
 		logging::get("Log")->error() << message;
-		_exitcode = -1;
+		quit(-1);
+	}
+
+	void App::quit(int exitcode)
+	{
+		auto engine = core::add_subsystem<Engine>();
+		engine->set_running(false);
+		_exitcode = exitcode;
 	}
 
 }

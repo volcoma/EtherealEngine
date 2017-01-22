@@ -14,8 +14,8 @@ int main(int _argc, char* _argv[])
 	fs::add_path_protocol("engine_data:", engine_data.string());
 	fs::add_path_protocol("editor_data:", editor_data.string());
 
-	auto& app = Singleton<runtime::App>::get_instance();
-	int returnCode = app.run();
+	auto& app = singleton<runtime::App>::get_instance();
+	int return_code = app.run();
 
-	return returnCode;
+	return return_code;
 }

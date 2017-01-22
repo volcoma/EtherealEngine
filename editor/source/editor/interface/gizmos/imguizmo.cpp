@@ -683,7 +683,7 @@ namespace imguizmo
 			{
 			case TRANSLATE:
 				colors[0] = (type == MOVE_SCREEN) ? selectionColor : _sc_color;
-				for (int i = 0; i < 3; i++)
+				for (int i = 0; i < 3; ++i)
 				{
 					colors[i + 1] = (type == (int)(MOVE_X + i)) ? selectionColor : directionColor[i];
 					colors[i + 4] = (type == (int)(MOVE_XY + i)) ? selectionColor : planeColor;
@@ -691,19 +691,19 @@ namespace imguizmo
 				break;
 			case ROTATE:
 				colors[0] = (type == ROTATE_SCREEN) ? selectionColor : _sc_color;
-				for (int i = 0; i < 3; i++)
+				for (int i = 0; i < 3; ++i)
 					colors[i + 1] = (type == (int)(ROTATE_X + i)) ? selectionColor : directionColor[i];
 				break;
 			case SCALE:
 				colors[0] = (type == SCALE_XYZ) ? selectionColor : _sc_color;
-				for (int i = 0; i < 3; i++)
+				for (int i = 0; i < 3; ++i)
 					colors[i + 1] = (type == (int)(SCALE_X + i)) ? selectionColor : directionColor[i];
 				break;
 			}
 		}
 		else
 		{
-			for (int i = 0; i < 7; i++)
+			for (int i = 0; i < 7; ++i)
 				colors[i] = inactiveColor;
 		}
 	}
@@ -774,7 +774,7 @@ namespace imguizmo
 	}
 	static void ComputeSnap(vec_t& value, float *snap)
 	{
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 3; ++i)
 		{
 			ComputeSnap(&value[i], &snap[i]);
 		}
@@ -811,7 +811,7 @@ namespace imguizmo
 
 			float angleStart = atan2f(cameraToModelNormalized[(4 - axis) % 3], cameraToModelNormalized[(3 - axis) % 3]) + ZPI * 0.5f;
 
-			for (unsigned int i = 0; i < halfCircleSegmentCount; i++)
+			for (unsigned int i = 0; i < halfCircleSegmentCount; ++i)
 			{
 				float ng = angleStart + ZPI * ((float)i / (float)halfCircleSegmentCount);
 				vec_t axisPos = makeVect(cosf(ng), sinf(ng), 0.f);
@@ -828,7 +828,7 @@ namespace imguizmo
 			ImVec2 circlePos[halfCircleSegmentCount + 1];
 
 			circlePos[0] = worldToPos(gContext.mModel.v.position, gContext.mViewProjection);
-			for (unsigned int i = 1; i < halfCircleSegmentCount; i++)
+			for (unsigned int i = 1; i < halfCircleSegmentCount; ++i)
 			{
 				float ng = gContext.mRotationAngle * ((float)(i - 1) / (float)(halfCircleSegmentCount - 1));
 				matrix_t rotateVectorMatrix;
@@ -876,7 +876,7 @@ namespace imguizmo
 		if (gContext.mbUsing)
 			scaleDisplay = gContext.mScale;
 
-		for (unsigned int i = 0; i < 3; i++)
+		for (unsigned int i = 0; i < 3; ++i)
 		{
 			vec_t dirPlaneX, dirPlaneY;
 			bool belowAxisLimit, belowPlaneLimit;
@@ -937,7 +937,7 @@ namespace imguizmo
 		drawList->AddRect(gContext.mScreenSquareMin, gContext.mScreenSquareMax, 0xFF000000, 2.f);
 	
 		// draw
-		for (unsigned int i = 0; i < 3; i++)
+		for (unsigned int i = 0; i < 3; ++i)
 		{
 			vec_t dirPlaneX, dirPlaneY;
 			bool belowAxisLimit, belowPlaneLimit;
@@ -1017,7 +1017,7 @@ namespace imguizmo
 
 		const vec_t direction[3] = { gContext.mModel.v.right, gContext.mModel.v.up, gContext.mModel.v.dir };
 		// compute
-		for (unsigned int i = 0; i < 3 && type == NONE; i++)
+		for (unsigned int i = 0; i < 3 && type == NONE; ++i)
 		{
 			vec_t dirPlaneX, dirPlaneY;
 			bool belowAxisLimit, belowPlaneLimit;
@@ -1050,7 +1050,7 @@ namespace imguizmo
 
 		const vec_t planNormals[] = { gContext.mModel.v.right, gContext.mModel.v.up, gContext.mModel.v.dir };
 
-		for (unsigned int i = 0; i < 3 && type == NONE; i++)
+		for (unsigned int i = 0; i < 3 && type == NONE; ++i)
 		{
 			// pickup plan
 			vec_t pickupPlan = BuildPlan(gContext.mModel.v.position, planNormals[i]);
@@ -1082,7 +1082,7 @@ namespace imguizmo
 		const vec_t direction[3] = { gContext.mModel.v.right, gContext.mModel.v.up, gContext.mModel.v.dir };
 
 		// compute
-		for (unsigned int i = 0; i < 3 && type == NONE; i++)
+		for (unsigned int i = 0; i < 3 && type == NONE; ++i)
 		{
 			vec_t dirPlaneX, dirPlaneY;
 			bool belowAxisLimit, belowPlaneLimit;
@@ -1249,7 +1249,7 @@ namespace imguizmo
 			}
 
 			// no 0 allowed
-			for (int i = 0; i < 3; i++)
+			for (int i = 0; i < 3; ++i)
 				gContext.mScale[i] = max(gContext.mScale[i], 0.001f);
 			// compute matrix & delta
 			matrix_t deltaMatrixScale;

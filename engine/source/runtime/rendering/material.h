@@ -354,7 +354,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::vec4& get_tiling() const { return _tiling; }
+	inline const math::vec2& get_tiling() const { return _tiling; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_tiling ()
@@ -364,7 +364,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_tiling(const math::vec4& tiling) { _tiling = tiling; }
+	inline void set_tiling(const math::vec2& tiling) { _tiling = tiling; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_dither_threshold ()
@@ -503,10 +503,10 @@ private:
 		0.25f /// AlphaTestValue
 	};
 	/// Tiling data
-	math::vec4 _tiling
+	math::vec2 _tiling
 	{
-		1.0f, 1.0f, ///Primary
-		1.0f, 1.0f  ///Secondary
+		1.0f, 1.0f ///Primary
+//		1.0f, 1.0f  ///Secondary
 	};
 	/// Dithering data
 	math::vec2 _dither_threshold

@@ -88,12 +88,22 @@ namespace runtime
 		void set_time_smoothing_step(unsigned);
 
 		//-----------------------------------------------------------------------------
+		//  Name : set_running ()
+		/// <summary>
+		/// 
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
+		inline void set_running(bool running) { _running = running; }
+
+		//-----------------------------------------------------------------------------
 		//  Name : is_running ()
 		/// <summary>
 		/// Returns if engine is exiting
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool is_running() const { return _running; }
+		inline bool is_running() const { return _running; }
 
 		//-----------------------------------------------------------------------------
 		//  Name : get_time_since_launch ()

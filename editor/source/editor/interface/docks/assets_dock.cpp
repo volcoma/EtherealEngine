@@ -67,7 +67,7 @@ AssetHandle<Texture>& get_icon()
 }
 
 template<typename Wrapper, typename T>
-int list_item(Wrapper& entry, bool dir, const std::string& name, const std::string& relative, const fs::path& absolute, runtime::AssetManager& manager, runtime::Input& input, editor::EditState& edit_state)
+int list_item(Wrapper& entry, const std::string& name, const std::string& relative, const fs::path& absolute, runtime::AssetManager& manager, runtime::Input& input, editor::EditState& edit_state)
 {
 	auto& selected = edit_state.selection_data.object;
 	const float size = 88.0f * scale_icons;
@@ -81,6 +81,11 @@ int list_item(Wrapper& entry, bool dir, const std::string& name, const std::stri
 		}
 	}
 
+	bool is_directory = false;
+
+	if (rttr::type::get<T>() == rttr::type::get<editor::AssetFolder>())
+		is_directory = true;
+
 	bool edit_label = false;
 	if (already_selected && !gui::IsAnyItemActive())
 	{
@@ -91,7 +96,7 @@ int list_item(Wrapper& entry, bool dir, const std::string& name, const std::stri
 
 		if (input.is_key_pressed(sf::Keyboard::Delete))
 		{
-			if (dir)
+			if (is_directory)
 			{
 				fs::remove(absolute, std::error_code{});
 			}
@@ -155,7 +160,7 @@ int list_item(Wrapper& entry, bool dir, const std::string& name, const std::stri
 		std::string new_name = std::string(inputBuff.c_str());
 		if (new_name != name && new_name != "")
 		{
-			if (dir)
+			if (is_directory)
 			{
 				fs::path new_absolute_path = absolute;
 				new_absolute_path.remove_filename();
@@ -173,11 +178,18 @@ int list_item(Wrapper& entry, bool dir, const std::string& name, const std::stri
 
 	if (gui::IsItemHoveredRect())
 	{
-// 		auto& dragged = edit_state.drag_data.object;
-// 		if (dragged && dir)
-// 		{
-// 			gui::SetMouseCursor(ImGuiMouseCursor_Move);
-// 		}
+		auto& dragged = edit_state.drag_data.object;
+		if (is_directory && dragged)
+		{
+			if(dragged.is_type<AssetHandle<Texture>>() ||
+			dragged.is_type<AssetHandle<Mesh>>() ||
+			dragged.is_type<AssetHandle<Shader>>() ||
+			dragged.is_type<AssetHandle<Material>>() ||
+			dragged.is_type<AssetHandle<Prefab>>())
+			{
+				gui::SetMouseCursor(ImGuiMouseCursor_Move);
+			}
+		}
 
 		if (gui::IsMouseClicked(gui::drag_button) && !edit_state.drag_data.object)
 		{
@@ -214,8 +226,7 @@ void list_dir(editor::AssetFolder* dir,
 		for (auto& entry : dir->directories)
 		{
 			int action = list_item<std::shared_ptr<editor::AssetFolder>, editor::AssetFolder>(
-				entry, 
-				true,
+				entry,
 				entry->name, 
 				entry->relative,
 				entry->absolute,
@@ -238,8 +249,7 @@ void list_dir(editor::AssetFolder* dir,
 				AssetHandle<Texture> asset = request.asset;
 
 				list_item<AssetHandle<Texture>, Texture>(
-					asset, 
-					false,
+					asset,
 					file.name,
 					file.relative,
 					file.absolute,
@@ -253,7 +263,6 @@ void list_dir(editor::AssetFolder* dir,
 
 				list_item<AssetHandle<Mesh>, Mesh>(
 					asset,
-					false,
 					file.name, 
 					file.relative, 
 					file.absolute,
@@ -266,8 +275,7 @@ void list_dir(editor::AssetFolder* dir,
 				AssetHandle<Material> asset = request.asset;
 				
 				list_item<AssetHandle<Material>, Material>(
-					asset, 
-					false,
+					asset,
 					file.name,
 					file.relative,
 					file.absolute, 
@@ -281,7 +289,6 @@ void list_dir(editor::AssetFolder* dir,
 
 				list_item<AssetHandle<Prefab>, Prefab>(
 					asset, 
-					false, 
 					file.name,
 					file.relative,
 					file.absolute, 
@@ -295,7 +302,6 @@ void list_dir(editor::AssetFolder* dir,
 
 				list_item<AssetHandle<Shader>, Shader>(
 					asset,
-					false, 
 					file.name,
 					file.relative,
 					file.absolute,

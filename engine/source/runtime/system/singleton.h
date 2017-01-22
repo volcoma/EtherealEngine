@@ -5,7 +5,7 @@
 type and ensures that merely referencing this type will
 cause it to be instantiated and initialized pre-execution.*/
 template <class T>
-class Singleton
+class singleton
 {
 public:
 	//-----------------------------------------------------------------------------
@@ -46,27 +46,27 @@ private:
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : Singleton ()
+	//  Name : singleton ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	Singleton(Singleton const & /*other*/) {}
+	singleton(singleton const & /*other*/) {}
 
 	/// Internal instance
-	static T & instance;
+	static T& instance;
 };
 
-template <class T> T & Singleton<T>::instance = Singleton<T>::create();
+template <class T> T & singleton<T>::instance = singleton<T>::create();
 
 template<void(*ctor)()>
-struct StaticInitializer
+struct static_initializer
 {
 	struct constructor { constructor() { ctor(); } };
 	static constructor initializer;
 };
 
 template<void(*ctor)()>
-typename StaticInitializer<ctor>::constructor StaticInitializer<ctor>::initializer;
+typename static_initializer<ctor>::constructor static_initializer<ctor>::initializer;

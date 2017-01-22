@@ -36,14 +36,14 @@ namespace editor
 }
 
 template<>
-inline runtime::App& Singleton<runtime::App>::create()
+inline runtime::App& singleton<runtime::App>::create()
 {
 	static editor::EditorApp app;
 	return app;
 };
 
 template<>
-inline editor::EditorApp& Singleton<editor::EditorApp>::create()
+inline editor::EditorApp& singleton<editor::EditorApp>::create()
 {
-	return static_cast<editor::EditorApp&>(Singleton<runtime::App>::get_instance());
+	return static_cast<editor::EditorApp&>(singleton<runtime::App>::get_instance());
 };

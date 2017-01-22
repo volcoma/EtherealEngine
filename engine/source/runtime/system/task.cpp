@@ -12,7 +12,7 @@ namespace runtime
 
 		_core = std::max(_core, (uint32_t)1);
 		_stop = false;
-		for (uint32_t i = 0; i < _core; i++)
+		for (uint32_t i = 0; i < _core; ++i)
 		{
 			_workers.emplace_back(thread_run, std::ref(*this), i + 1);
 			_thread_indices.insert(std::make_pair(_workers.back().get_id(), i + 1));
