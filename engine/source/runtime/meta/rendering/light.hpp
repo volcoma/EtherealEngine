@@ -82,6 +82,7 @@ REFLECT(Light)
 			);
 	rttr::registration::class_<Light>("Light")
 		.property("Color", &Light::color)
+		.property("Intensity", &Light::intensity)
 		.property("Type", &Light::light_type)
 		.property("Shadows", &Light::sm_impl)
 		.property("Depth", &Light::depth_impl)
@@ -90,10 +91,38 @@ REFLECT(Light)
 
 SAVE(Light)
 {
-
+	try_save(ar, cereal::make_nvp("light_type", obj.light_type));
+	try_save(ar, cereal::make_nvp("depth_impl", obj.depth_impl));
+	try_save(ar, cereal::make_nvp("sm_impl", obj.sm_impl));
+	try_save(ar, cereal::make_nvp("spot_range", obj.spot_data.range));
+	try_save(ar, cereal::make_nvp("spot_inner_angle", obj.spot_data.spot_inner_angle));
+	try_save(ar, cereal::make_nvp("spot_outer_angle", obj.spot_data.spot_outer_angle));
+	try_save(ar, cereal::make_nvp("point_range", obj.point_data.range));
+	try_save(ar, cereal::make_nvp("point_exponent_falloff", obj.point_data.exponent_falloff));
+	try_save(ar, cereal::make_nvp("point_fov_x_adjust", obj.point_data.fov_x_adjust));
+	try_save(ar, cereal::make_nvp("point_fov_y_adjust", obj.point_data.fov_y_adjust));
+	try_save(ar, cereal::make_nvp("point_stencil_pack", obj.point_data.stencil_pack));
+	try_save(ar, cereal::make_nvp("dir_num_splits", obj.directional_data.num_splits));
+	try_save(ar, cereal::make_nvp("dir_split_distribution", obj.directional_data.split_distribution));
+	try_save(ar, cereal::make_nvp("dir_stabilize", obj.directional_data.stabilize));
+	try_save(ar, cereal::make_nvp("color", obj.color));
 }
 
 LOAD(Light)
 {
-
+	try_load(ar, cereal::make_nvp("light_type", obj.light_type));
+	try_load(ar, cereal::make_nvp("depth_impl", obj.depth_impl));
+	try_load(ar, cereal::make_nvp("sm_impl", obj.sm_impl));
+	try_load(ar, cereal::make_nvp("spot_range", obj.spot_data.range));
+	try_load(ar, cereal::make_nvp("spot_inner_angle", obj.spot_data.spot_inner_angle));
+	try_load(ar, cereal::make_nvp("spot_outer_angle", obj.spot_data.spot_outer_angle));
+	try_load(ar, cereal::make_nvp("point_range", obj.point_data.range));
+	try_load(ar, cereal::make_nvp("point_exponent_falloff", obj.point_data.exponent_falloff));
+	try_load(ar, cereal::make_nvp("point_fov_x_adjust", obj.point_data.fov_x_adjust));
+	try_load(ar, cereal::make_nvp("point_fov_y_adjust", obj.point_data.fov_y_adjust));
+	try_load(ar, cereal::make_nvp("point_stencil_pack", obj.point_data.stencil_pack));
+	try_load(ar, cereal::make_nvp("dir_num_splits", obj.directional_data.num_splits));
+	try_load(ar, cereal::make_nvp("dir_split_distribution", obj.directional_data.split_distribution));
+	try_load(ar, cereal::make_nvp("dir_stabilize", obj.directional_data.stabilize));
+	try_load(ar, cereal::make_nvp("color", obj.color));
 }

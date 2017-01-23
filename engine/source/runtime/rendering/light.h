@@ -192,15 +192,15 @@ struct Light
 	REFLECTABLE(Light)
 	SERIALIZABLE(Light)
 
-	LightType light_type = LightType::Spot;
+	LightType light_type = LightType::Directional;
 	DepthImpl depth_impl = DepthImpl::InvZ;
 	SmImpl sm_impl = SmImpl::Hard;
 
 	struct Spot
 	{
 		float range = 10.0f;
-		float spot_outer_angle = 45.0f;
-		float spot_inner_angle = 30.0f;
+		float spot_outer_angle = 90.0f;
+		float spot_inner_angle = 60.0f;
 	};
 	
 	struct Point
@@ -223,4 +223,5 @@ struct Light
 	Point point_data;
 	Directional directional_data;
 	math::color color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	float intensity = 1.0f;
 };

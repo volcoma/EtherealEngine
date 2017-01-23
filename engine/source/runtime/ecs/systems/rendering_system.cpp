@@ -113,7 +113,10 @@ namespace runtime
 			FrameBuffer* fbo = g_buffer;
 			RenderPass geometry_pass("g_buffer_fill");
 			geometry_pass.bind(g_buffer);
-			geometry_pass.clear();
+			geometry_pass.clear(BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH | BGFX_CLEAR_STENCIL
+				, 0x00000000
+				, 1.0f
+				, 0);
 			auto& camera_lods = _lod_data[ce];
 
 			gfx::setViewTransform(geometry_pass.id, &view, &proj);
@@ -245,33 +248,25 @@ namespace runtime
 				const auto& light_direction = world_transform.z_unit_axis();
 				if (light.light_type == LightType::Directional && _directional_light_program)
  				{
-
-					float lightPosRadius[4] =
-					{
-						light_direction.x,
-						light_direction.y,
-						light_direction.z,
-						0.0f
-					};
-					float lightRgbInnerR[4] =
+					float light_color_intensity[4] =
 					{
 						light.color.value.r,
 						light.color.value.g,
 						light.color.value.b,
-						0.0f
+						light.intensity
 					};
 
 					_directional_light_program->begin_pass();
 					// Draw light.
-					_directional_light_program->set_uniform("u_light_pos_radius", lightPosRadius);
-					_directional_light_program->set_uniform("u_light_color_falloff", lightRgbInnerR);
+					_directional_light_program->set_uniform("u_light_direction", &light_direction);
+					_directional_light_program->set_uniform("u_light_color_intensity", light_color_intensity);
 					_directional_light_program->set_uniform("u_camera_position", &camera.get_position());
 					_directional_light_program->set_uniform("u_mtx", &inv_view_proj);
 
 					gfx::setViewScissor(light_pass.id, 0, 0, 0, 0);
 					_directional_light_program->set_texture(0, "s_albedo", gfx::getTexture(g_buffer->handle, 0));
 					_directional_light_program->set_texture(1, "s_normal", gfx::getTexture(g_buffer->handle, 1));
-					_directional_light_program->set_texture(2, "s_specular", gfx::getTexture(g_buffer->handle, 2));
+					_directional_light_program->set_texture(2, "s_emissive", gfx::getTexture(g_buffer->handle, 2));
 					_directional_light_program->set_texture(3, "s_depth", gfx::getTexture(g_buffer->handle, 3));
 					gfx::setState(0
 						| BGFX_STATE_RGB_WRITE
@@ -286,25 +281,27 @@ namespace runtime
 				if (light.light_type == LightType::Point && _point_light_program)
 				{
 
-					float lightPosRadius[4] =
-					{
-						light_position.x,
-						light_position.y,
-						light_position.z,
-						light.point_data.range
-					};
-					float lightRgbInnerR[4] =
+					float light_color_intensity[4] =
 					{
 						light.color.value.r,
 						light.color.value.g,
 						light.color.value.b,
+						light.intensity
+					};
+
+					float light_data[4] =
+					{
+						light.point_data.range,
 						light.point_data.exponent_falloff,
+						0.0f,
+						0.0f
 					};
 
 					_point_light_program->begin_pass();
 					// Draw light.
-					_point_light_program->set_uniform("u_light_pos_radius", lightPosRadius);
-					_point_light_program->set_uniform("u_light_color_falloff", lightRgbInnerR);
+					_point_light_program->set_uniform("u_light_position", &light_position);
+					_point_light_program->set_uniform("u_light_color_intensity", light_color_intensity);
+					_point_light_program->set_uniform("u_light_data", light_data);
 					_point_light_program->set_uniform("u_camera_position", &camera.get_position());
 					_point_light_program->set_uniform("u_mtx", &inv_view_proj);
 
@@ -313,7 +310,7 @@ namespace runtime
 					gfx::setViewScissor(light_pass.id, 0, 0, 0, 0);
 					_point_light_program->set_texture(0, "s_albedo", gfx::getTexture(g_buffer->handle, 0));
 					_point_light_program->set_texture(1, "s_normal", gfx::getTexture(g_buffer->handle, 1));
-					_point_light_program->set_texture(2, "s_specular", gfx::getTexture(g_buffer->handle, 2));
+					_point_light_program->set_texture(2, "s_emissive", gfx::getTexture(g_buffer->handle, 2));
 					_point_light_program->set_texture(3, "s_depth", gfx::getTexture(g_buffer->handle, 3));
 					gfx::setState(0
 						| BGFX_STATE_RGB_WRITE
@@ -324,6 +321,52 @@ namespace runtime
 					float half_texel = gfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
 					screen_space_quad((float)light_buffer_size.width, (float)light_buffer_size.height, half_texel, bgfx::getCaps()->originBottomLeft);
 					gfx::submit(light_pass.id, _point_light_program->handle);
+				}
+
+				if (light.light_type == LightType::Spot && _spot_light_program)
+				{
+
+					float light_color_intensity[4] =
+					{
+						light.color.value.r,
+						light.color.value.g,
+						light.color.value.b,
+						light.intensity
+					};
+
+					float light_data[4] =
+					{
+						light.spot_data.range,
+						math::cos(math::radians(light.spot_data.spot_inner_angle * 0.5f)),
+						math::cos(math::radians(light.spot_data.spot_outer_angle * 0.5f)),
+						0.0f
+					};
+
+					_spot_light_program->begin_pass();
+					// Draw light.
+					_spot_light_program->set_uniform("u_light_position", &light_position);
+					_spot_light_program->set_uniform("u_light_direction", &light_direction);
+					_spot_light_program->set_uniform("u_light_color_intensity", light_color_intensity);
+					_spot_light_program->set_uniform("u_light_data", light_data);
+					_spot_light_program->set_uniform("u_camera_position", &camera.get_position());
+					_spot_light_program->set_uniform("u_mtx", &inv_view_proj);
+
+					//const uint16_t scissorHeight = uint16_t(y1 - y0);
+					//gfx::setScissor(uint16_t(x0), m_height - scissorHeight - uint16_t(y0), uint16_t(x1 - x0), scissorHeight);
+					gfx::setViewScissor(light_pass.id, 0, 0, 0, 0);
+					_spot_light_program->set_texture(0, "s_albedo", gfx::getTexture(g_buffer->handle, 0));
+					_spot_light_program->set_texture(1, "s_normal", gfx::getTexture(g_buffer->handle, 1));
+					_spot_light_program->set_texture(2, "s_emissive", gfx::getTexture(g_buffer->handle, 2));
+					_spot_light_program->set_texture(3, "s_depth", gfx::getTexture(g_buffer->handle, 3));
+					gfx::setState(0
+						| BGFX_STATE_RGB_WRITE
+						| BGFX_STATE_ALPHA_WRITE
+						| BGFX_STATE_BLEND_ADD
+					);
+					const gfx::RendererType::Enum renderer = gfx::getRendererType();
+					float half_texel = gfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
+					screen_space_quad((float)light_buffer_size.width, (float)light_buffer_size.height, half_texel, bgfx::getCaps()->originBottomLeft);
+					gfx::submit(light_pass.id, _spot_light_program->handle);
 				}
 			});
 
@@ -360,6 +403,16 @@ namespace runtime
 				.then([this, vs](auto fs)
 			{
 				_point_light_program = std::make_unique<Program>(vs, fs);
+			});
+		});
+
+		am->load<Shader>("engine_data:/shaders/vs_deferred_spot_light", false)
+			.then([this, am](auto vs)
+		{
+			am->load<Shader>("engine_data:/shaders/fs_deferred_spot_light", false)
+				.then([this, vs](auto fs)
+			{
+				_spot_light_program = std::make_unique<Program>(vs, fs);
 			});
 		});
 

@@ -227,26 +227,6 @@ public:
 	inline void set_base_color(const math::color& val) { _base_color = val; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : set_specular_color ()
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	inline const math::color& get_specular_color() const { return _specular_color; }
-
-	//-----------------------------------------------------------------------------
-	//  Name : set_specular_color ()
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	inline void set_specular_color(const math::color& val) { _specular_color = val; }
-
-	//-----------------------------------------------------------------------------
 	//  Name : get_emissive_color ()
 	/// <summary>
 	/// 
@@ -481,12 +461,6 @@ private:
 	{
 		1.0f, 1.0f, 1.0f, /// Color
 		1.0f /// Opacity
-	};
-	/// Specular color
-	math::color _specular_color
-	{
-		0.5f, 0.5f, 0.5f, /// Color
-		1.0f /// Unused
 	};
 	/// Emissive color
 	math::color _emissive_color

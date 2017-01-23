@@ -9,6 +9,7 @@ SAMPLER2D(s_emissive, 2);
 SAMPLER2D(s_depth,  3);
 
 uniform vec4 u_light_position;
+uniform vec4 u_light_direction;
 uniform vec4 u_light_color_intensity;
 uniform vec4 u_light_data;
 uniform vec4 u_camera_position;
@@ -48,9 +49,10 @@ void main()
 	vec3 L = VectorToLight / sqrt( DistanceSqr );
 	float NoL = saturate( dot(N, L) );
 	float DistanceAttenuation = 1.0f;
-	float SpotFalloff = 1.0f;
+	
 	vec3 VectorToLightOverRadius = VectorToLight / u_light_data.x;
-	float LightRadiusMask = RadialAttenuation(VectorToLightOverRadius, u_light_data.y);
+	float LightRadiusMask = RadialAttenuation(VectorToLightOverRadius, 1.0f);
+	float SpotFalloff = SpotAttenuation( VectorToLightOverRadius, normalize(u_light_direction.xyz), vec2(u_light_data.z, 1.0f / (u_light_data.y - u_light_data.z )));
 	
 	float SurfaceShadow = 1.0f;
 	float SubsurfaceShadow = 1.0f;

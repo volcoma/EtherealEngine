@@ -57,6 +57,19 @@ float RadialAttenuation(vec3 WorldLightVector, float FalloffExponent)
 	float NormalizeDistanceSquared = dot(WorldLightVector, WorldLightVector);
 
 	return pow(1.0f - saturate(NormalizeDistanceSquared), FalloffExponent);
+
+}
+
+/** 
+ * Calculates attenuation for a spot light.
+ * WorldLightVector is the vector from the position being shaded to the light, divided by the radius of the light. 
+ * SpotDirection is the direction of the spot light.
+ * SpotAngles.x is CosOuterCone, SpotAngles.y is InvCosConeDifference. 
+ */
+float SpotAttenuation(vec3 WorldLightVector, vec3 SpotDirection, vec2 SpotAngles)
+{
+	float ConeAngleFalloff = Square(saturate((dot(normalize(WorldLightVector), -SpotDirection) - SpotAngles.x) * SpotAngles.y));
+	return ConeAngleFalloff;
 }
 
 // Find representative incoming light direction and energy modification

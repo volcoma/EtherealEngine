@@ -43,9 +43,6 @@ REFLECT(StandardMaterial)
 		.property("Base Color",
 			&StandardMaterial::get_base_color,
 			&StandardMaterial::set_base_color)
-		.property("Specular Color",
-			&StandardMaterial::get_specular_color,
-			&StandardMaterial::set_specular_color)
 		.property("Emissive Color",
 			&StandardMaterial::get_emissive_color,
 			&StandardMaterial::set_emissive_color)
@@ -109,7 +106,6 @@ SAVE(StandardMaterial)
 {
 	try_save(ar, cereal::make_nvp("base_type", cereal::base_class<Material>(&obj)));
 	try_save(ar, cereal::make_nvp("base_color", obj._base_color));
-	try_save(ar, cereal::make_nvp("specular_color", obj._specular_color));
 	try_save(ar, cereal::make_nvp("emissive_color", obj._emissive_color));
 	try_save(ar, cereal::make_nvp("surface_data", obj._surface_data));
 	try_save(ar, cereal::make_nvp("tiling", obj._tiling));
@@ -124,7 +120,6 @@ LOAD(StandardMaterial)
 {
 	try_load(ar, cereal::make_nvp("base_type", cereal::base_class<Material>(&obj)));
 	try_load(ar, cereal::make_nvp("base_color", obj._base_color));
-	try_load(ar, cereal::make_nvp("specular_color", obj._specular_color));
 	try_load(ar, cereal::make_nvp("emissive_color", obj._emissive_color));
 	try_load(ar, cereal::make_nvp("surface_data", obj._surface_data));
 	try_load(ar, cereal::make_nvp("tiling", obj._tiling));

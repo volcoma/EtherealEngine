@@ -50,9 +50,8 @@ void default_scene()
 		object.set_name("light");
 		object.assign<TransformComponent>().lock()
 			->set_local_position({ 1.0f, 6.0f, -3.0f })
-			.rotate_local(130.0f, -30.0f, 0.0f);
-		object.assign<LightComponent>().lock()
-			->get_light().light_type = LightType::Directional;
+			.rotate_local(50.0f, -30.0f, 0.0f);
+		object.assign<LightComponent>();
 	}
 	{
 		auto object = ecs->create();

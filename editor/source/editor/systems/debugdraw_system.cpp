@@ -125,24 +125,26 @@ namespace editor
 			{
 				auto adjacent = light.spot_data.range;
 				{
-					auto tan_angle = math::tan(math::radians(light.spot_data.spot_outer_angle));
+					auto tan_angle = math::tan(math::radians(light.spot_data.spot_outer_angle * 0.5f));
 					// oposite = tan * adjacent
 					auto oposite = tan_angle * adjacent;
 					ddPush();
 					ddSetColor(0xff00ff00);
 					ddSetWireframe(true);
+					ddSetLod(3);
 					math::vec3 from = transform_comp_ptr->get_position();
 					math::vec3 to = from + transform_comp_ptr->get_z_axis() * adjacent;
 					ddDrawCone(&to, &from, oposite);
 					ddPop();
 				}
 				{
-					auto tan_angle = math::tan(math::radians(light.spot_data.spot_inner_angle));
+					auto tan_angle = math::tan(math::radians(light.spot_data.spot_inner_angle * 0.5f));
 					// oposite = tan * adjacent
 					auto oposite = tan_angle * adjacent;
 					ddPush();
 					ddSetColor(0xff00ffff);
 					ddSetWireframe(true);
+					ddSetLod(3);
 					math::vec3 from = transform_comp_ptr->get_position();
 					math::vec3 to = from + transform_comp_ptr->get_z_axis() * adjacent;
 					ddDrawCone(&to, &from, oposite);

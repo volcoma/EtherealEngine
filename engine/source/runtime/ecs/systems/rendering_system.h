@@ -43,8 +43,10 @@ namespace runtime
 		std::unordered_map<Entity, std::unordered_map<Entity, LodData>> _lod_data;
 		/// Program that is responsible for rendering.
 		std::unique_ptr<Program> _directional_light_program;
-			/// Program that is responsible for rendering.
+		/// Program that is responsible for rendering.
 		std::unique_ptr<Program> _point_light_program;
+		/// Program that is responsible for rendering.
+		std::unique_ptr<Program> _spot_light_program;
 	};
 
 }

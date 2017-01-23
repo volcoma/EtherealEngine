@@ -13,7 +13,6 @@ uniform vec4 u_camera_clip_planes; //.x = near, .y = far
 
 // per instance
 uniform vec4 u_base_color;
-uniform vec4 u_specular_color;
 uniform vec4 u_emissive_color;
 uniform vec4 u_surface_data;
 uniform vec4 u_tiling;
@@ -37,13 +36,8 @@ void main()
 
 	vec3 wnormal = normalize( mul( tangent_to_world_space, tangent_space_normal ).xyz );
 	
-	vec4 base_color = texture2D(s_tex_color, texcoords) * u_base_color;
-	vec4 albedo_color = base_color;
-	albedo_color.rgb = base_color.rgb - base_color.rgb * metalness;
-	// Compute specular reflectance
-	vec3 specular_color = mix( 0.08f * u_specular_color.rgb, base_color.rgb, metalness );
+	vec4 albedo_color = texture2D(s_tex_color, texcoords) * u_base_color;
 
-	
 	float distance = length(view_direction) - u_camera_clip_planes.x * 2.0f;
 	float distance_factor = saturate(distance / u_dither_threshold.y);
 	float dither = dither5x5(gl_FragCoord.xy);
@@ -58,5 +52,5 @@ void main()
 	}
 	gl_FragData[0] = albedo_color;
 	gl_FragData[1] = vec4(encodeNormalUint(wnormal), roughness);
-	gl_FragData[2] = vec4(encodeSpecularColor(specular_color), metalness);
+	gl_FragData[2] = vec4(u_emissive_color.xyz, metalness);
 }
