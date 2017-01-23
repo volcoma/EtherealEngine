@@ -109,6 +109,8 @@ namespace runtime
 			const auto& view = camera.get_view();
 			const auto& proj = camera.get_projection();
 			const auto inv_view_proj = math::inverse(proj * view);
+
+			FrameBuffer* fbo = g_buffer;
 			RenderPass geometry_pass("g_buffer_fill");
 			geometry_pass.bind(g_buffer);
 			geometry_pass.clear();
@@ -221,11 +223,11 @@ namespace runtime
 
 			});
 
-			const auto light_buffer = camera_comp.get_light_buffer();
+			const auto light_buffer = camera_comp.get_light_buffer().get();
 			const auto light_buffer_size = light_buffer->get_size();
-			
+			fbo = light_buffer;
 			RenderPass light_pass("light_buffer_fill");
-			light_pass.bind(light_buffer.get());
+			light_pass.bind(light_buffer);
 			light_pass.clear();
 
 			const math::transform_t ortho_proj = math::ortho(0.0f, 1.0f, 1.0f, 0.0f, 0.0f, camera.get_far_clip(), gfx::getCaps()->homogeneousDepth);
@@ -326,10 +328,11 @@ namespace runtime
 			});
 
 
-			const auto surface = camera_comp.get_output_buffer();
+			const auto surface = camera_comp.get_output_buffer().get();
 			RenderPass pass_blit("output_buffer_fill");
-			pass_blit.bind(surface.get());
-			gfx::blit(pass_blit.id, gfx::getTexture(surface->handle), 0, 0, gfx::getTexture(light_buffer->handle));
+			pass_blit.bind(surface);
+			if(fbo && surface)
+				gfx::blit(pass_blit.id, gfx::getTexture(surface->handle), 0, 0, gfx::getTexture(fbo->handle));
 		});
 	}
 

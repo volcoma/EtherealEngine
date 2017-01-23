@@ -59,6 +59,6 @@ void main()
 	vec3 SurfaceMultiplier = LightColor * (NoL * SurfaceAttenuation);
 	vec3 SubsurfaceMultiplier = (LightColor * SubsurfaceAttenuation);
 	vec3 Lighting = SurfaceMultiplier * SurfaceLighting + SubsurfaceLighting * SubsurfaceMultiplier;
-	gl_FragColor.xyz = toGamma(Lighting);
+	gl_FragColor.xyz = (Lighting);
 	gl_FragColor.w = 1.0;
 }
