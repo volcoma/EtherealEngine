@@ -197,7 +197,7 @@ namespace editor
 				{
 					const float u_params[8] =
 					{
-						1.0f, 1.0f, 0.0f, 0.5f, //r,g,b,a
+						0.0f, 1.0f, 0.0f, 1.0f, //r,g,b,a
 						1.0f, 0.0f, 0.0f, 0.0f  //thickness, unused, unused, unused
 					};
 					if (!_program)

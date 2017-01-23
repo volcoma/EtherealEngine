@@ -106,16 +106,16 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 			std::lock_guard<std::mutex> lock(mtx);
 			if (compile_shader(arg_count, args_array, memBlock, sz) != 0)
 			{
-				logger->error().write("Failed compilation of {0}", strInput);
-				return;
+				logger->error().write("Failed compilation of {0} with opengl", strInput);
+				continue;;
 			}
 		}
 		else
 		{
 			if (compile_shader(arg_count, args_array, memBlock, sz) != 0)
 			{
-				logger->error().write("Failed compilation of {0}", strInput);
-				return;
+				logger->error().write("Failed compilation of {0} with d3d", strInput);
+				continue;
 			}
 		}
 

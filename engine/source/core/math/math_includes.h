@@ -40,27 +40,27 @@ namespace math
 
 	struct color
 	{
-		vec4 Value;
+		vec4 value;
 
-		color() { Value.x = Value.y = Value.z = Value.w = 0.0f; }
-		color(int r, int g, int b, int a = 255) { float sc = 1.0f / 255.0f; Value.x = (float)r * sc; Value.y = (float)g * sc; Value.z = (float)b * sc; Value.w = (float)a * sc; }
-		color(std::uint32_t rgba) { float sc = 1.0f / 255.0f; Value.x = (float)(rgba & 0xFF) * sc; Value.y = (float)((rgba >> 8) & 0xFF) * sc; Value.z = (float)((rgba >> 16) & 0xFF) * sc; Value.w = (float)(rgba >> 24) * sc; }
-		color(float r, float g, float b, float a = 1.0f) { Value.x = r; Value.y = g; Value.z = b; Value.w = a; }
-		color(const vec4& col) { Value = col; }
-		inline operator std::uint32_t() const { return Float4ToU32(Value); }
-		inline operator vec4() const { return Value; }
+		color() { value.x = value.y = value.z = value.w = 0.0f; }
+		color(int r, int g, int b, int a = 255) { float sc = 1.0f / 255.0f; value.x = (float)r * sc; value.y = (float)g * sc; value.z = (float)b * sc; value.w = (float)a * sc; }
+		color(std::uint32_t rgba) { float sc = 1.0f / 255.0f; value.x = (float)(rgba & 0xFF) * sc; value.y = (float)((rgba >> 8) & 0xFF) * sc; value.z = (float)((rgba >> 16) & 0xFF) * sc; value.w = (float)(rgba >> 24) * sc; }
+		color(float r, float g, float b, float a = 1.0f) { value.x = r; value.y = g; value.z = b; value.w = a; }
+		color(const vec4& col) { value = col; }
+		inline operator std::uint32_t() const { return float4_to_u32(value); }
+		inline operator vec4() const { return value; }
 
-		inline void SetHSV(float h, float s, float v, float a = 1.0f) { HSVtoRGB(h, s, v, Value.x, Value.y, Value.z); Value.w = a; }
+		inline void set_hsv(float h, float s, float v, float a = 1.0f) { hsv_to_rgb(h, s, v, value.x, value.y, value.z); value.w = a; }
 
-		static color HSV(float h, float s, float v, float a = 1.0f) { float r, g, b; HSVtoRGB(h, s, v, r, g, b); return color(r, g, b, a); }
+		static color hsv(float h, float s, float v, float a = 1.0f) { float r, g, b; hsv_to_rgb(h, s, v, r, g, b); return color(r, g, b, a); }
 
-		static vec4 U32ToFloat4(std::uint32_t in)
+		static vec4 u32_to_float4(std::uint32_t in)
 		{
 			float s = 1.0f / 255.0f;
 			return vec4((in & 0xFF) * s, ((in >> 8) & 0xFF) * s, ((in >> 16) & 0xFF) * s, (in >> 24) * s);
 		}
 
-		static std::uint32_t Float4ToU32(const vec4& in)
+		static std::uint32_t float4_to_u32(const vec4& in)
 		{
 			std::uint32_t out;
 			out =  ((std::uint32_t)(saturate<float, highp>(in.x) * 255.0f));
@@ -72,7 +72,7 @@ namespace math
 
 		// Convert rgb floats ([0-1],[0-1],[0-1]) to hsv floats ([0-1],[0-1],[0-1]), from Foley & van Dam p592
 		// Optimized http://lolengine.net/blog/2013/01/13/fast-rgb-to-hsv
-		static void RGBtoHSV(float r, float g, float b, float& out_h, float& out_s, float& out_v)
+		static void rgb_to_hsv(float r, float g, float b, float& out_h, float& out_s, float& out_v)
 		{
 			float K = 0.f;
 			if (g < b)
@@ -94,7 +94,7 @@ namespace math
 
 		// Convert hsv floats ([0-1],[0-1],[0-1]) to rgb floats ([0-1],[0-1],[0-1]), from Foley & van Dam p593
 		// also http://en.wikipedia.org/wiki/HSL_and_HSV
-		static void HSVtoRGB(float h, float s, float v, float& out_r, float& out_g, float& out_b)
+		static void hsv_to_rgb(float h, float s, float v, float& out_r, float& out_g, float& out_b)
 		{
 			if (s == 0.0f)
 			{

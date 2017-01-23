@@ -4,32 +4,13 @@
 bool Inspector_LightComponent::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<LightComponent*>();
-	auto& light = data->get_light();
-	bool changed = false;
-	{
-		PropertyLayout propName("Depth Impl");
-		rttr::variant v = light.depth_impl;
+	auto light = data->get_light();
 
-		changed |= inspect_var(v);
-		if (changed)
-			light.depth_impl = v.get_value<DepthImpl>();
-	}
-	{
-		PropertyLayout propName("Shadows Impl");
-		rttr::variant v = light.sm_impl;
+	rttr::variant light_var = light;
+	bool changed = inspect_var(light_var);
+	if (changed)
+		light = light_var.get_value<Light>();
 
-		changed |= inspect_var(v);
-		if (changed)
-			light.sm_impl = v.get_value<SmImpl>();
-	}
-	{
-		PropertyLayout propName("Light Impl");
-		rttr::variant v = light.light_type;
-		
-		changed |= inspect_var(v);
-		if (changed)
-			light.light_type = v.get_value<LightType>();
-	}
 	if (light.light_type == LightType::Spot)
 	{
 		rttr::variant v = light.spot_data;
@@ -54,6 +35,7 @@ bool Inspector_LightComponent::inspect(rttr::variant& var, bool readOnly, std::f
 
 	if (changed)
 	{
+		data->set_light(light);
 		var = data;
 		return true;
 	}

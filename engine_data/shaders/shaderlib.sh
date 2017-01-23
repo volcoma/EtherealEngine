@@ -39,6 +39,17 @@ vec3 decodeRGBE8(vec4 _rgbe8)
 	return rgb;
 }
 
+vec3 encodeSpecularColor(vec3 SpecularColor)
+{
+	// Allocate more precision to the darks, which is necessary with bright specular lighting and strong Fresnel
+	return sqrt(saturate(SpecularColor));
+}
+
+vec3 decodeSpecularColor(vec3 SpecularColor)
+{
+	return SpecularColor*SpecularColor;
+}
+
 vec3 encodeNormalUint(vec3 _normal)
 {
 	return _normal * 0.5 + 0.5;
@@ -466,6 +477,13 @@ float toClipSpaceDepth(float _depthTextureZ)
 	return _depthTextureZ * 2.0 - 1.0;
 #endif // BGFX_SHADER_LANGUAGE_HLSL
 }
+
+vec3 clipToWorld(mat4 _invViewProj, vec3 _clipPos)
+{
+	vec4 wpos = mul(_invViewProj, vec4(_clipPos, 1.0) );
+	return wpos.xyz / wpos.w;
+}
+
 mat3 constructTangentToWorldSpaceMatrix( vec3 T, vec3 B, vec3 N )
 {
 	mat3 TBN = mat3(

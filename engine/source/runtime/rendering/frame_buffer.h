@@ -164,12 +164,10 @@ struct FrameBuffer : public ITexture
 		, std::uint32_t _textureFlags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP
 	)
 	{
-		dispose();
-
-		handle = gfx::createFrameBuffer(_width, _height, _format, _textureFlags);
-
-		_bbratio = gfx::BackbufferRatio::Count;
-		_cached_size = { _width, _height };
+		populate(std::vector<std::shared_ptr<Texture>>
+		{
+			std::make_shared<Texture>(_width, _height, false, 1, _format, _textureFlags),
+		});
 	}
 
 	//-----------------------------------------------------------------------------
@@ -186,11 +184,10 @@ struct FrameBuffer : public ITexture
 		, std::uint32_t _textureFlags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP
 	)
 	{
-		dispose();
-
-		handle = gfx::createFrameBuffer(_ratio, _format, _textureFlags);
-		_bbratio = _ratio;
-		_cached_size = { 0, 0 };
+		populate(std::vector<std::shared_ptr<Texture>>
+		{
+			std::make_shared<Texture>(_ratio, false, 1, _format, _textureFlags),
+		});
 	}
 
 	//-----------------------------------------------------------------------------

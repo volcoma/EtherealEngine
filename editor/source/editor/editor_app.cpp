@@ -2,6 +2,7 @@
 #include "runtime/system/engine.h"
 #include "runtime/rendering/renderer.h"
 #include "runtime/assets/asset_manager.h"
+#include "runtime/ecs/systems/rendering_system.h"
 #include "editor_window.h"
 #include "interface/gui_system.h"
 #include "interface/docks/docking.h"
@@ -17,7 +18,7 @@ namespace editor
 	{
 		auto renderer = core::get_subsystem<runtime::Renderer>();
 		auto engine = core::get_subsystem<runtime::Engine>();
-		auto am = core::get_subsystem<runtime::AssetManager>();
+
 		sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 		desktop.width = 1280;
 		desktop.height = 720;
@@ -31,9 +32,7 @@ namespace editor
 			_exitcode = -1;
 
 		engine->register_window(main_window);
-
-		am->setup();
-
+		core::add_subsystem<runtime::RenderingSystem>();
 		core::add_subsystem<GuiSystem>();
 		core::add_subsystem<DockingSystem>();
 		core::add_subsystem<EditState>();

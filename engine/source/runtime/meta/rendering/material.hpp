@@ -92,9 +92,15 @@ REFLECT(StandardMaterial)
 		.property("Roughness Map",
 			&StandardMaterial::get_roughness_map,
 			&StandardMaterial::set_roughness_map)
+		(
+			rttr::metadata("Tooltip", "black/white texture. The more white the rougher the surface.")
+		)
 		.property("Metalness Map",
 			&StandardMaterial::get_metalness_map,
 			&StandardMaterial::set_metalness_map)
+		(
+			rttr::metadata("Tooltip", "black/white texture. The more white the more metallic the surface.")
+		)
 		;
 }
 

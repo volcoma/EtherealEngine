@@ -35,10 +35,10 @@ namespace cereal
 	template<typename Archive>
 	inline void SERIALIZE_FUNCTION_NAME(Archive & ar, math::color& obj)
 	{
-		try_serialize(ar, cereal::make_nvp("r", obj.Value.r));
-		try_serialize(ar, cereal::make_nvp("g", obj.Value.g));
-		try_serialize(ar, cereal::make_nvp("b", obj.Value.b));
-		try_serialize(ar, cereal::make_nvp("a", obj.Value.a));
+		try_serialize(ar, cereal::make_nvp("r", obj.value.r));
+		try_serialize(ar, cereal::make_nvp("g", obj.value.g));
+		try_serialize(ar, cereal::make_nvp("b", obj.value.b));
+		try_serialize(ar, cereal::make_nvp("a", obj.value.a));
 	}
 }
 

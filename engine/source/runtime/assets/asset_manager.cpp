@@ -6,7 +6,7 @@
 
 namespace runtime
 {
-	void AssetManager::setup()
+	bool AssetManager::initialize()
 	{
 		{
 			auto storage = add<Shader>();
@@ -38,5 +38,7 @@ namespace runtime
 			storage->ext = extensions::prefab;
 			storage->load_from_file = AssetReader::load_prefab_from_file;
 		}
+
+		return true;
 	}
 }

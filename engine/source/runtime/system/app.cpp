@@ -1,8 +1,7 @@
 #include "app.h"
 #include "engine.h"
 #include "rendering/renderer.h"
-#include "assets/asset_manager.h"
-
+#include "ecs/systems/rendering_system.h"
 namespace runtime
 {
 
@@ -14,7 +13,6 @@ namespace runtime
 	{
 		auto engine = core::get_subsystem<Engine>();
 		auto renderer = core::get_subsystem<Renderer>();
-		auto am = core::get_subsystem<AssetManager>();
 
 		sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 		desktop.width = 1280;
@@ -28,7 +26,7 @@ namespace runtime
 			_exitcode = -1;
 
 		engine->register_window(main_window);
-		am->setup();
+		core::add_subsystem<RenderingSystem>();
 	}
 
 	int App::run()

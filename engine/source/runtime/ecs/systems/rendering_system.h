@@ -4,10 +4,10 @@
 #include <vector>
 #include <memory>
 #include <chrono>
+#include "../../rendering/program.h"
 
 namespace runtime
 {
-
 	struct LodData
 	{
 		std::uint32_t current_lod_index = 0;
@@ -41,6 +41,10 @@ namespace runtime
 		void dispose() override;
 	private:
 		std::unordered_map<Entity, std::unordered_map<Entity, LodData>> _lod_data;
+		/// Program that is responsible for rendering.
+		std::unique_ptr<Program> _directional_light_program;
+			/// Program that is responsible for rendering.
+		std::unique_ptr<Program> _point_light_program;
 	};
 
 }

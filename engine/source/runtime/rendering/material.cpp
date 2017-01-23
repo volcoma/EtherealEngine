@@ -104,15 +104,20 @@ void StandardMaterial::submit()
 	if (!is_valid())
 		return;
 
-	_program->set_uniform("u_baseColor", &_base_color);
-	_program->set_uniform("u_specularColor", &_specular_color);
-	_program->set_uniform("u_emissiveColor", &_emissive_color);
-	_program->set_uniform("u_surfaceData", &_surface_data);
+	_program->set_uniform("u_base_color", &_base_color);
+	_program->set_uniform("u_specular_color", &_specular_color);
+	_program->set_uniform("u_emissive_color", &_emissive_color);
+	_program->set_uniform("u_surface_data", &_surface_data);
 	_program->set_uniform("u_tiling", &_tiling);
 	_program->set_uniform("u_dither_threshold", &_dither_threshold);
 
 	auto albedo = _color_map ? _color_map : _default_color_map;
 	auto normal = _normal_map ? _normal_map : _default_normal_map;
-	_program->set_texture(0, "s_texColor", albedo.get());
-	_program->set_texture(1, "s_texNormal", normal.get());
+	auto roughness = _roughness_map ? _roughness_map : _default_color_map;
+	auto metalness = _metalness_map ? _metalness_map : _default_color_map;
+
+	_program->set_texture(0, "s_tex_color", albedo.get());
+	_program->set_texture(1, "s_tex_normal", normal.get());
+	_program->set_texture(2, "s_tex_roughness", roughness.get());
+	_program->set_texture(3, "s_tex_metalness", metalness.get());
 }

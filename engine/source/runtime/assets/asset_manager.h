@@ -158,7 +158,7 @@ namespace runtime
 	class AssetManager : public core::Subsystem
 	{
 	public:
-		void setup();
+		bool initialize();
 		//-----------------------------------------------------------------------------
 		//  Name : add ()
 		/// <summary>

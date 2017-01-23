@@ -118,6 +118,9 @@ void Program::begin_pass()
 	bool repopulate = false;
 	for (std::size_t i = 0; i < shaders_cached.size(); ++i)
 	{
+		if(!shaders[i])
+			continue;
+
 		if (shaders_cached[i] != shaders[i]->handle.idx)
 		{
 			repopulate = true;

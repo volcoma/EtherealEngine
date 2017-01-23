@@ -157,6 +157,16 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	std::shared_ptr<FrameBuffer> get_g_buffer() const;
+
+	//-----------------------------------------------------------------------------
+	//  Name : get_light_buffer ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	std::shared_ptr<FrameBuffer> get_light_buffer() const;
 	
 	//-----------------------------------------------------------------------------
 	//  Name : update ()
@@ -267,6 +277,8 @@ private:
 	std::shared_ptr<FrameBuffer> _output_buffer;
 	/// The g-buffer for this camera.
 	std::shared_ptr<FrameBuffer> _g_buffer;
+	/// The light-buffer for this camera.
+	std::shared_ptr<FrameBuffer> _light_buffer;
 	/// Is the camera HDR?
 	bool _hdr = true;
 };

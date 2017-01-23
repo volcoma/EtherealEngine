@@ -30,6 +30,10 @@ REFLECT(Light)
 		(
 			rttr::metadata("Min", 0.1f)
 		)
+		.property("Exponent Falloff", &Light::Point::exponent_falloff)
+		(
+			rttr::metadata("Min", 0.1f)
+		)
 		.property("FovX adjust", &Light::Point::fov_x_adjust)
 		(
 			rttr::metadata("Min", -20.0f),
@@ -76,7 +80,12 @@ REFLECT(Light)
 			rttr::value("VSM", SmImpl::VSM),
 			rttr::value("ESM", SmImpl::ESM)
 			);
-	rttr::registration::class_<Light>("Light");
+	rttr::registration::class_<Light>("Light")
+		.property("Color", &Light::color)
+		.property("Type", &Light::light_type)
+		.property("Shadows", &Light::sm_impl)
+		.property("Depth", &Light::depth_impl)
+		;
 }
 
 SAVE(Light)

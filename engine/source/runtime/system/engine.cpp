@@ -31,7 +31,7 @@ namespace runtime
 		core::add_subsystem<TaskSystem>();
 		core::add_subsystem<TransformSystem>();
 		core::add_subsystem<CameraSystem>();
-		core::add_subsystem<RenderingSystem>();
+		
 		// fire engine
 		_running = true;
 		_timestep = duration::zero();

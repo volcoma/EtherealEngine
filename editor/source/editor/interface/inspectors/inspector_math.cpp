@@ -39,7 +39,7 @@ bool Inspector_Vector4::inspect(rttr::variant& var, bool readOnly, std::function
 bool Inspector_Color::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<math::color>();
-	if (gui::ColorEdit4("", &data.Value.x))
+	if (gui::ColorEdit4("", &data.value.x))
 	{
 		var = data;
 		return true;

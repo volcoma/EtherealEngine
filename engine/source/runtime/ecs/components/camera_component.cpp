@@ -6,6 +6,7 @@ CameraComponent::CameraComponent()
 {
 	_camera = std::make_unique<Camera>();
 	_g_buffer = std::make_shared<FrameBuffer>();
+	_light_buffer = std::make_shared<FrameBuffer>();
 	_output_buffer = std::make_shared<FrameBuffer>();
 	init({ 0, 0 });
 }
@@ -15,6 +16,7 @@ CameraComponent::CameraComponent(const CameraComponent& cameraComponent)
 	_camera = std::make_unique<Camera>(cameraComponent.get_camera());
 	_hdr = cameraComponent._hdr;
 	_g_buffer = std::make_shared<FrameBuffer>();
+	_light_buffer = std::make_shared<FrameBuffer>();
 	_output_buffer = std::make_shared<FrameBuffer>();
 	init({ 0, 0 });
 }
@@ -47,6 +49,8 @@ void CameraComponent::init(const uSize& size)
 			}
 		);
 
+		_light_buffer->populate(gfx::BackbufferRatio::Equal, surfaceFormat, samplerFlags);
+
 		_output_buffer->populate
 		(
 			std::vector<std::shared_ptr<Texture>>
@@ -70,6 +74,8 @@ void CameraComponent::init(const uSize& size)
 				depthBuffer
 			}
 		);
+
+		_light_buffer->populate(size.width, size.height, surfaceFormat, samplerFlags);
 
 		_output_buffer->populate
 		(
@@ -201,4 +207,9 @@ std::shared_ptr<FrameBuffer> CameraComponent::get_output_buffer() const
 std::shared_ptr<FrameBuffer> CameraComponent::get_g_buffer() const
 {
 	return _g_buffer;
+}
+
+std::shared_ptr<FrameBuffer> CameraComponent::get_light_buffer() const
+{
+	return _light_buffer;
 }

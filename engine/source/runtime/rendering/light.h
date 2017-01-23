@@ -3,6 +3,7 @@
 #include "program.h"
 #include "core/reflection/rttr/rttr_enable.h"
 #include "core/serialization/serialization.h"
+#include "core/math/math_includes.h"
 
 enum class LightType : std::uint8_t
 {
@@ -205,6 +206,7 @@ struct Light
 	struct Point
 	{
 		float range = 10.0f;
+		float exponent_falloff = 1.0f;
 		float fov_x_adjust = 0.0f;
 		float fov_y_adjust = 0.0f;
 		bool stencil_pack = true;
@@ -220,5 +222,5 @@ struct Light
 	Spot spot_data;
 	Point point_data;
 	Directional directional_data;
-
+	math::color color = { 1.0f, 1.0f, 1.0f, 1.0f };
 };

@@ -497,7 +497,7 @@ private:
 	/// Surface data
 	math::vec4 _surface_data
 	{
-		0.5f, /// Roughness
+		0.4f, /// Roughness
 		0.0f, /// Metalness
 		1.0f, /// Bumpiness
 		0.25f /// AlphaTestValue

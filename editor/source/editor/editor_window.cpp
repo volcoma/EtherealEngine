@@ -50,7 +50,7 @@ void default_scene()
 		object.set_name("light");
 		object.assign<TransformComponent>().lock()
 			->set_local_position({ 1.0f, 6.0f, -3.0f })
-			.rotate_local(50.0f, -30.0f, 0.0f);
+			.rotate_local(130.0f, -30.0f, 0.0f);
 		object.assign<LightComponent>().lock()
 			->get_light().light_type = LightType::Directional;
 	}
@@ -58,7 +58,7 @@ void default_scene()
 		auto object = ecs->create();
 		object.set_name("platform");
 		object.assign<TransformComponent>().lock()
-			->set_local_scale({ 10.0f, 0.1f, 10.0f });
+			->set_local_scale({ 10.0f, 1.0f, 10.0f });
 
 		Model model;
 		am->load<Mesh>("engine_data:/meshes/platform", false)
@@ -399,7 +399,8 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 		{
 			gui::SetTooltip(
 			"Force to recompile all assets when a project is opened.\n"
-			"This will create compiled versions of the raw ones which will be loaded into the app.\n"
+			"This will create compiled versions of the raw ones \n"
+			"which will be loaded into the app."
 			);
 		}
 	}
