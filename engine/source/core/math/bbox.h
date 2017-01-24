@@ -33,6 +33,7 @@ namespace math
 		plane get_plane(VolumePlane::Side side) const;
 		void get_plane_points(VolumePlane::Side side, vec3 points_out[]) const;
 		bbox& from_points(const char * point_buffer, unsigned int point_count, unsigned int point_stride, bool reset = true);
+		bbox& from_sphere(const vec3& center, float radius);
 		bool intersect(const bbox & bounds) const;
 		bool intersect(const bbox & bounds, bool & contained) const;
 		bool intersect(const bbox & bounds, bbox & intersection) const;

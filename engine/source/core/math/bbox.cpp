@@ -210,6 +210,14 @@ namespace math
 		return *this;
 	}
 
+	bbox& bbox::from_sphere(const vec3& center, float radius)
+	{
+		min = center - vec3(radius, radius, radius);
+		max = center + vec3(radius, radius, radius);
+
+		return *this;
+	}
+
 	//-----------------------------------------------------------------------------
 	//  Name : validate ()
 	/// <summary>

@@ -57,7 +57,7 @@ void default_scene()
 		auto object = ecs->create();
 		object.set_name("platform");
 		object.assign<TransformComponent>().lock()
-			->set_local_scale({ 10.0f, 1.0f, 10.0f });
+			->set_local_scale({ 10.0f, 0.3f, 10.0f });
 
 		Model model;
 		am->load<Mesh>("engine_data:/meshes/platform", false)

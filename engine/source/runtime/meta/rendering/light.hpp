@@ -83,6 +83,10 @@ REFLECT(Light)
 	rttr::registration::class_<Light>("Light")
 		.property("Color", &Light::color)
 		.property("Intensity", &Light::intensity)
+		(
+			rttr::metadata("Min", 0.0f),
+			rttr::metadata("Max", 10.0f)
+		)
 		.property("Type", &Light::light_type)
 		.property("Shadows", &Light::sm_impl)
 		.property("Depth", &Light::depth_impl)

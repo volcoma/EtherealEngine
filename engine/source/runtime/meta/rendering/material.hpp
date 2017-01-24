@@ -65,7 +65,7 @@ REFLECT(StandardMaterial)
 			&StandardMaterial::set_bumpiness)
 		(
 			rttr::metadata("Min", 0.0f),
-			rttr::metadata("Max", 20.0f)
+			rttr::metadata("Max", 10.0f)
 		)
 		.property("Alpha Test Value",
 			&StandardMaterial::get_alpha_test_value,

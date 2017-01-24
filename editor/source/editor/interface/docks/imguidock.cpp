@@ -328,7 +328,6 @@ namespace ImGuiDock
 					if ((mousePos.x > screenCursorPos.x && mousePos.x < (screenCursorPos.x + size.x)) &&
 						(mousePos.y > screenCursorPos.y && mousePos.y < (screenCursorPos.y + size.y)))
 					{
-						owner->requestFocus();
 						ImGui::BeginChild("##dockSlotPreview");
 						ImGui::PushClipRect(ImVec2(), ImGui::GetIO().DisplaySize, false);
 						DockSlot dockSlot = render_dock_slot_preview(cursorPos, screenCursorPos, size);
