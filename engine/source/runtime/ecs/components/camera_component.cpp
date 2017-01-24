@@ -23,7 +23,7 @@ CameraComponent::CameraComponent(const CameraComponent& cameraComponent)
 
 void CameraComponent::init(const uSize& size)
 {
-	std::uint32_t samplerFlags = 0
+	std::uint32_t sampler_flags = 0
 		| BGFX_TEXTURE_RT
 		| BGFX_TEXTURE_MIN_POINT
 		| BGFX_TEXTURE_MAG_POINT
@@ -32,57 +32,57 @@ void CameraComponent::init(const uSize& size)
 		| BGFX_TEXTURE_V_CLAMP
 		;
 
-	auto surfaceFormat = gfx::TextureFormat::BGRA8;
-	auto depthFormat = gfx::TextureFormat::D24S8;
+	auto surface_format = gfx::TextureFormat::BGRA8;
+	auto depth_format = gfx::TextureFormat::D24S8;
 	if (size.width == 0 && size.height == 0)
 	{
 		//create a depth buffer to share
-		auto depthBuffer = std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, depthFormat, samplerFlags);
+		auto depth_buffer = std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, depth_format, sampler_flags);
 		_g_buffer->populate
 		(
 			std::vector<std::shared_ptr<Texture>>
 			{
-				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surfaceFormat, samplerFlags),
-				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surfaceFormat, samplerFlags),
-				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surfaceFormat, samplerFlags),
-				depthBuffer
+				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surface_format, sampler_flags),
+				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surface_format, sampler_flags),
+				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surface_format, sampler_flags),
+				depth_buffer
 			}
 		);
 
-		_light_buffer->populate(gfx::BackbufferRatio::Equal, surfaceFormat, samplerFlags);
+		_light_buffer->populate(gfx::BackbufferRatio::Equal, surface_format, sampler_flags);
 
 		_output_buffer->populate
 		(
 			std::vector<std::shared_ptr<Texture>>
 			{
-				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surfaceFormat, samplerFlags),
-				depthBuffer
+				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surface_format, sampler_flags),
+				depth_buffer
 			}
 		);
 	}
 	else
 	{
 		//create a depth buffer to share
-		auto depthBuffer = std::make_shared<Texture>(size.width, size.height, false, 1, depthFormat, samplerFlags);
+		auto depth_buffer = std::make_shared<Texture>(size.width, size.height, false, 1, depth_format, sampler_flags);
 		_g_buffer->populate
 		(
 			std::vector<std::shared_ptr<Texture>>
 			{
-				std::make_shared<Texture>(size.width, size.height, false, 1, surfaceFormat, samplerFlags),
-				std::make_shared<Texture>(size.width, size.height, false, 1, surfaceFormat, samplerFlags),
-				std::make_shared<Texture>(size.width, size.height, false, 1, surfaceFormat, samplerFlags),
-				depthBuffer
+				std::make_shared<Texture>(size.width, size.height, false, 1, surface_format, sampler_flags),
+				std::make_shared<Texture>(size.width, size.height, false, 1, surface_format, sampler_flags),
+				std::make_shared<Texture>(size.width, size.height, false, 1, surface_format, sampler_flags),
+				depth_buffer
 			}
 		);
 
-		_light_buffer->populate(size.width, size.height, surfaceFormat, samplerFlags);
+		_light_buffer->populate(size.width, size.height, surface_format, sampler_flags);
 
 		_output_buffer->populate
 		(
 			std::vector<std::shared_ptr<Texture>>
 			{
-				std::make_shared<Texture>(size.width, size.height, false, 1, surfaceFormat, samplerFlags),
-				depthBuffer
+				std::make_shared<Texture>(size.width, size.height, false, 1, surface_format, sampler_flags),
+				depth_buffer
 			}
 		);
 	}
@@ -116,8 +116,8 @@ void CameraComponent::set_hdr(bool hdr)
 
 void CameraComponent::set_viewport_size(const uSize& size)
 {
-	auto oldSize = _output_buffer->get_size();
-	if (size != oldSize)
+	auto old_size = _output_buffer->get_size();
+	if (size != old_size)
 	{
 		init(size);
 	}
