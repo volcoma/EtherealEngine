@@ -116,6 +116,7 @@ namespace math
 
 		// Binary operators
 		transform_t operator *(const transform_t & t) const;
+		vec4 operator *(const vec4& v) const;
 		transform_t operator *(float f) const;
 		transform_t operator +(const transform_t & t) const;
 		transform_t operator -(const transform_t & t) const;

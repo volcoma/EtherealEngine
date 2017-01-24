@@ -108,7 +108,8 @@ namespace runtime
 			auto& camera = camera_comp.get_camera();
 			const auto& view = camera.get_view();
 			const auto& proj = camera.get_projection();
-			const auto inv_view_proj = math::inverse(proj * view);
+			const auto view_proj = proj * view;
+			const auto inv_view_proj = math::inverse(view_proj);
 
 			FrameBuffer* fbo = g_buffer;
 			RenderPass geometry_pass("g_buffer_fill");
@@ -236,7 +237,7 @@ namespace runtime
 			const math::transform_t ortho_proj = math::ortho(0.0f, 1.0f, 1.0f, 0.0f, 0.0f, camera.get_far_clip(), gfx::getCaps()->homogeneousDepth);
 			gfx::setViewTransform(light_pass.id, nullptr, &ortho_proj);
 
-			ecs->each<TransformComponent, LightComponent>([this, &camera, dt, &light_pass, &light_buffer_size, &inv_view_proj, g_buffer](
+			ecs->each<TransformComponent, LightComponent>([this, &camera, dt, &light_pass, &light_buffer_size, &view, &proj, &view_proj, &inv_view_proj, g_buffer](
 				Entity e,
 				TransformComponent& transform_comp_ref,
 				LightComponent& light_comp_ref
@@ -246,6 +247,11 @@ namespace runtime
 				const auto& world_transform = transform_comp_ref.get_transform();
 				const auto& light_position = world_transform.get_position();
 				const auto& light_direction = world_transform.z_unit_axis();
+
+				iRect rect(0, 0, light_buffer_size.width, light_buffer_size.height);
+				if (light_comp_ref.compute_projected_sphere_rect(rect, light_position, light_direction, view, proj) == 0)
+					return;
+
 				if (light.light_type == LightType::Directional && _directional_light_program)
  				{
 					float light_color_intensity[4] =
@@ -256,18 +262,18 @@ namespace runtime
 						light.intensity
 					};
 
-					_directional_light_program->begin_pass();
 					// Draw light.
+					_directional_light_program->begin_pass();
 					_directional_light_program->set_uniform("u_light_direction", &light_direction);
 					_directional_light_program->set_uniform("u_light_color_intensity", light_color_intensity);
 					_directional_light_program->set_uniform("u_camera_position", &camera.get_position());
 					_directional_light_program->set_uniform("u_mtx", &inv_view_proj);
-
-					gfx::setViewScissor(light_pass.id, 0, 0, 0, 0);
 					_directional_light_program->set_texture(0, "s_albedo", gfx::getTexture(g_buffer->handle, 0));
 					_directional_light_program->set_texture(1, "s_normal", gfx::getTexture(g_buffer->handle, 1));
 					_directional_light_program->set_texture(2, "s_emissive", gfx::getTexture(g_buffer->handle, 2));
 					_directional_light_program->set_texture(3, "s_depth", gfx::getTexture(g_buffer->handle, 3));
+
+					gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
 					gfx::setState(0
 						| BGFX_STATE_RGB_WRITE
 						| BGFX_STATE_ALPHA_WRITE
@@ -297,21 +303,19 @@ namespace runtime
 						0.0f
 					};
 
-					_point_light_program->begin_pass();
 					// Draw light.
+					_point_light_program->begin_pass();
 					_point_light_program->set_uniform("u_light_position", &light_position);
 					_point_light_program->set_uniform("u_light_color_intensity", light_color_intensity);
 					_point_light_program->set_uniform("u_light_data", light_data);
 					_point_light_program->set_uniform("u_camera_position", &camera.get_position());
 					_point_light_program->set_uniform("u_mtx", &inv_view_proj);
-
-					//const uint16_t scissorHeight = uint16_t(y1 - y0);
-					//gfx::setScissor(uint16_t(x0), m_height - scissorHeight - uint16_t(y0), uint16_t(x1 - x0), scissorHeight);
-					gfx::setViewScissor(light_pass.id, 0, 0, 0, 0);
 					_point_light_program->set_texture(0, "s_albedo", gfx::getTexture(g_buffer->handle, 0));
 					_point_light_program->set_texture(1, "s_normal", gfx::getTexture(g_buffer->handle, 1));
 					_point_light_program->set_texture(2, "s_emissive", gfx::getTexture(g_buffer->handle, 2));
 					_point_light_program->set_texture(3, "s_depth", gfx::getTexture(g_buffer->handle, 3));
+
+					gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
 					gfx::setState(0
 						| BGFX_STATE_RGB_WRITE
 						| BGFX_STATE_ALPHA_WRITE
@@ -321,6 +325,7 @@ namespace runtime
 					float half_texel = gfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
 					screen_space_quad((float)light_buffer_size.width, (float)light_buffer_size.height, half_texel, bgfx::getCaps()->originBottomLeft);
 					gfx::submit(light_pass.id, _point_light_program->handle);
+					
 				}
 
 				if (light.light_type == LightType::Spot && _spot_light_program)
@@ -342,22 +347,20 @@ namespace runtime
 						0.0f
 					};
 
-					_spot_light_program->begin_pass();
 					// Draw light.
+					_spot_light_program->begin_pass();
 					_spot_light_program->set_uniform("u_light_position", &light_position);
 					_spot_light_program->set_uniform("u_light_direction", &light_direction);
 					_spot_light_program->set_uniform("u_light_color_intensity", light_color_intensity);
 					_spot_light_program->set_uniform("u_light_data", light_data);
 					_spot_light_program->set_uniform("u_camera_position", &camera.get_position());
 					_spot_light_program->set_uniform("u_mtx", &inv_view_proj);
-
-					//const uint16_t scissorHeight = uint16_t(y1 - y0);
-					//gfx::setScissor(uint16_t(x0), m_height - scissorHeight - uint16_t(y0), uint16_t(x1 - x0), scissorHeight);
-					gfx::setViewScissor(light_pass.id, 0, 0, 0, 0);
 					_spot_light_program->set_texture(0, "s_albedo", gfx::getTexture(g_buffer->handle, 0));
 					_spot_light_program->set_texture(1, "s_normal", gfx::getTexture(g_buffer->handle, 1));
 					_spot_light_program->set_texture(2, "s_emissive", gfx::getTexture(g_buffer->handle, 2));
 					_spot_light_program->set_texture(3, "s_depth", gfx::getTexture(g_buffer->handle, 3));
+
+					gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
 					gfx::setState(0
 						| BGFX_STATE_RGB_WRITE
 						| BGFX_STATE_ALPHA_WRITE

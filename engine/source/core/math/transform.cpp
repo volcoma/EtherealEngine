@@ -180,6 +180,15 @@ namespace math
 		return tOut;
 	}
 
+	vec4 transform_t::operator* (const vec4 & v) const
+	{
+
+		vec4 tOut;
+		tOut = _matrix * v;
+
+		return tOut;
+	}
+
 	//-----------------------------------------------------------------------------
 	//  Name : operator * (transform)
 	/// <summary>

@@ -4,6 +4,7 @@
 //-----------------------------------------------------------------------------
 #include "../ecs.h"
 #include "../../rendering/light.h"
+#include "core/common/basetypes.hpp"
 //-----------------------------------------------------------------------------
 // Forward Declarations
 //-----------------------------------------------------------------------------
@@ -52,6 +53,23 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	inline void set_light(const Light& light) { _light = light; }
+
+
+	//-----------------------------------------------------------------------------
+	//  Name : compute_projected_sphere_rect ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	int compute_projected_sphere_rect(
+		iRect& rect,
+		const math::vec3& light_position,
+		const math::vec3& light_direction,
+		const math::transform_t& view,
+		const math::transform_t& proj);
+
 private:
 	//-------------------------------------------------------------------------
 	// Private Member Variables.

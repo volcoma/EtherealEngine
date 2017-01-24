@@ -201,6 +201,15 @@ math::vec3 Camera::get_position() const
 	return math::inverse(_view).get_position();
 }
 
+math::vec3 Camera::x_unit_axis() const
+{
+	return math::inverse(_view).x_unit_axis();
+}
+math::vec3 Camera::y_unit_axis() const
+{
+	return math::inverse(_view).y_unit_axis();
+}
+
 math::vec3 Camera::z_unit_axis() const
 {
 	return math::inverse(_view).z_unit_axis();
@@ -268,13 +277,13 @@ math::VolumeQuery::E Camera::bounds_in_frustum(const math::bbox &AABB, const mat
 	return math::frustum::classify_obb(f, AABB, t);
 }
 
-bool Camera::world_to_viewport(const math::vec3 & WorldPos, math::vec3 & point, bool bClipX /* = true */, bool bClipY /* = true */, bool bClipZ /* = true */)
+bool Camera::world_to_viewport(const uPoint& viewport_pos, const uSize& viewport_size, const math::vec3& pos, math::vec3 & point, bool bClipX /* = true */, bool bClipY /* = true */, bool bClipZ /* = true */)
 {
 	// Ensure we have an up-to-date projection and view matrix
-	auto mtxTransform = get_projection() * get_view();
+	auto view_proj = get_view_proj();
 
 	// Transform the point into clip space
-	math::vec4 vClip = { math::transform_t::transform_coord(WorldPos, mtxTransform), 1.0f };
+	math::vec4 vClip = view_proj.matrix() * math::vec4{ pos.x, pos.y, pos.z, 1.0f };
 
 	// Was this clipped?
 	if (bClipX == true && (vClip.x < -vClip.w || vClip.x > vClip.w)) return false;
@@ -288,8 +297,9 @@ bool Camera::world_to_viewport(const math::vec3 & WorldPos, math::vec3 & point, 
 	vClip.z *= recipW;
 
 	// Transform to final screen space position
-	point.x = ((vClip.x * 0.5f) + 0.5f) * (float)_viewport_size.width + _viewport_pos.x;
-	point.y = ((vClip.y * -0.5f) + 0.5f) * (float)_viewport_size.height + _viewport_pos.y;
+	point.x = ((vClip.x * 0.5f) + 0.5f) * (float)viewport_size.width + _viewport_pos.x;
+	point.y = ((vClip.y * -0.5f) + 0.5f) * (float)viewport_size.height + _viewport_pos.y;
+	
 	point.z = vClip.z;
 
 	// Point on screen!
