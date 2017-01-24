@@ -199,8 +199,8 @@ struct Light
 	struct Spot
 	{
 		float range = 10.0f;
-		float spot_outer_angle = 90.0f;
-		float spot_inner_angle = 60.0f;
+		float spot_outer_angle = 60.0f;
+		float spot_inner_angle = 30.0f;
 	};
 	
 	struct Point

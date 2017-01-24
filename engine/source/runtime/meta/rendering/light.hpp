@@ -32,7 +32,8 @@ REFLECT(Light)
 		)
 		.property("Exponent Falloff", &Light::Point::exponent_falloff)
 		(
-			rttr::metadata("Min", 0.1f)
+			rttr::metadata("Min", 0.1f),
+			rttr::metadata("Max", 10.0f)
 		)
 		.property("FovX adjust", &Light::Point::fov_x_adjust)
 		(
