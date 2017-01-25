@@ -65,7 +65,7 @@ void RenderPass::clear() const
 {
 	gfx::setViewClear(id
 		, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH | BGFX_CLEAR_STENCIL
-		, 0x2D2D2DFF
+		, 0x000000FF
 		, 1.0f
 		, 0
 	);

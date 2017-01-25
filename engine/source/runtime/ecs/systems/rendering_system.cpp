@@ -114,10 +114,7 @@ namespace runtime
 			FrameBuffer* fbo = g_buffer;
 			RenderPass geometry_pass("g_buffer_fill");
 			geometry_pass.bind(g_buffer);
-			geometry_pass.clear(BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH | BGFX_CLEAR_STENCIL
-				, 0x00000000
-				, 1.0f
-				, 0);
+			geometry_pass.clear();
 			auto& camera_lods = _lod_data[ce];
 
 			gfx::setViewTransform(geometry_pass.id, &view, &proj);
@@ -375,10 +372,27 @@ namespace runtime
 
 
 			const auto surface = camera_comp.get_output_buffer().get();
+			const auto output_size = surface->get_size();
 			RenderPass pass_blit("output_buffer_fill");
 			pass_blit.bind(surface);
-			if(fbo && surface)
-				gfx::blit(pass_blit.id, gfx::getTexture(surface->handle), 0, 0, gfx::getTexture(fbo->handle));
+			gfx::setScissor(0, 0, output_size.width, output_size.height);
+			gfx::setViewTransform(pass_blit.id, nullptr, &ortho_proj);
+			if (fbo && surface && _gamma_correction_program)
+			{
+				_gamma_correction_program->begin_pass();
+				_gamma_correction_program->set_texture(0, "s_input", gfx::getTexture(fbo->handle));
+				
+				gfx::setState(0
+					| BGFX_STATE_RGB_WRITE
+					| BGFX_STATE_ALPHA_WRITE
+				);
+				const gfx::RendererType::Enum renderer = gfx::getRendererType();
+				float half_texel = gfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
+				screen_space_quad((float)output_size.width, (float)output_size.height, half_texel, bgfx::getCaps()->originBottomLeft);
+				gfx::submit(pass_blit.id, _gamma_correction_program->handle);
+
+				//gfx::blit(pass_blit.id, gfx::getTexture(surface->handle), 0, 0, gfx::getTexture(fbo->handle));
+			}
 		});
 	}
 
@@ -426,6 +440,16 @@ namespace runtime
 				.then([this, vs](auto fs)
 			{
 				_directional_light_program = std::make_unique<Program>(vs, fs);
+			});
+		});
+
+		am->load<Shader>("engine_data:/shaders/vs_gamma_correction", false)
+			.then([this, am](auto vs)
+		{
+			am->load<Shader>("engine_data:/shaders/fs_gamma_correction", false)
+				.then([this, vs](auto fs)
+			{
+				_gamma_correction_program = std::make_unique<Program>(vs, fs);
 			});
 		});
 

@@ -29,10 +29,10 @@ void CameraComponent::init(const uSize& size)
 		| BGFX_TEXTURE_MAG_POINT
 		| BGFX_TEXTURE_MIP_POINT
 		| BGFX_TEXTURE_U_CLAMP
-		| BGFX_TEXTURE_V_CLAMP
+		| BGFX_TEXTURE_V_CLAMP 
 		;
 
-	auto surface_format = gfx::TextureFormat::BGRA8;
+	auto surface_format = gfx::TextureFormat::RGBA8;
 	auto depth_format = gfx::TextureFormat::D24S8;
 	if (size.width == 0 && size.height == 0)
 	{
@@ -49,7 +49,7 @@ void CameraComponent::init(const uSize& size)
 			}
 		);
 
-		_light_buffer->populate(gfx::BackbufferRatio::Equal, surface_format, sampler_flags);
+		_light_buffer->populate(gfx::BackbufferRatio::Equal, gfx::TextureFormat::RGBA16F, sampler_flags);
 
 		_output_buffer->populate
 		(
@@ -75,7 +75,7 @@ void CameraComponent::init(const uSize& size)
 			}
 		);
 
-		_light_buffer->populate(size.width, size.height, surface_format, sampler_flags);
+		_light_buffer->populate(size.width, size.height, gfx::TextureFormat::RGBA16F, sampler_flags);
 
 		_output_buffer->populate
 		(

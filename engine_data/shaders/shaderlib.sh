@@ -478,6 +478,14 @@ float toClipSpaceDepth(float _depthTextureZ)
 #endif // BGFX_SHADER_LANGUAGE_HLSL
 }
 
+vec3 clipTransform(vec3 clip)
+{
+#if BGFX_SHADER_LANGUAGE_HLSL || BGFX_SHADER_LANGUAGE_METAL
+	clip.y = -clip.y;
+#endif // BGFX_SHADER_LANGUAGE_HLSL || BGFX_SHADER_LANGUAGE_METAL
+	return clip;
+}
+
 vec3 clipToWorld(mat4 _invViewProj, vec3 _clipPos)
 {
 	vec4 wpos = mul(_invViewProj, vec4(_clipPos, 1.0) );

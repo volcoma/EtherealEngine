@@ -47,6 +47,8 @@ namespace runtime
 		std::unique_ptr<Program> _point_light_program;
 		/// Program that is responsible for rendering.
 		std::unique_ptr<Program> _spot_light_program;
+		/// Program that is responsible for rendering.
+		std::unique_ptr<Program> _gamma_correction_program;
 	};
 
 }
