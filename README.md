@@ -7,8 +7,6 @@ WYSIWYG Editor
 WIP - not production ready in any way
 
 ## FEATURES
-Proper rendering and lighting is pretty much non existant right now. PBR is planned.
-
 Check out the Projects tab for more information of upcomming features.
 
 ## ASSETS
