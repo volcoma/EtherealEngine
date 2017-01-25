@@ -55,7 +55,17 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 		args_array[7] = strVarying.c_str();
 		args_array[8] = "--platform";
 
-		if(platform == gfx::RendererType::Direct3D9 || platform == gfx::RendererType::Direct3D11)
+		if(platform == gfx::RendererType::Direct3D9)
+		{
+			args_array[9] = "windows";
+			args_array[10] = "-p";
+
+			if (vs)
+				args_array[11] = "vs_3_0";
+			else if (fs)
+				args_array[11] = "ps_3_0";
+		}
+		else if (platform == gfx::RendererType::Direct3D11)
 		{
 			args_array[9] = "windows";
 			args_array[10] = "-p";
