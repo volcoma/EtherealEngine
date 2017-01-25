@@ -20,8 +20,7 @@ void main()
 	vec4 data2 = texture2D(s_emissive, v_texcoord0);
 	float deviceDepth = texture2D(s_depth, v_texcoord0).x;
 	float depth = toClipSpaceDepth(deviceDepth);
-	if(depth > 0.99999f)
-		return;
+	
 	vec3 clip = vec3(v_texcoord0 * 2.0 - 1.0, depth);
 	clip = clipTransform(clip);
 	vec3 wpos = clipToWorld(u_mtx, clip);

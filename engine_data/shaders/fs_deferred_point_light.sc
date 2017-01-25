@@ -43,7 +43,7 @@ void main()
 	vec3 N = decodeNormalUint(data1.xyz);
 	vec3 V = normalize(u_camera_position.xyz - wpos);
 	vec3 L = VectorToLight / sqrt( DistanceSqr );
-	float NoL = saturate( dot(N, L) );
+	float NoL = abs( dot(N, L) );
 	float DistanceAttenuation = 1.0f;
 	float SpotFalloff = 1.0f;
 	vec3 VectorToLightOverRadius = VectorToLight / u_light_data.x;
