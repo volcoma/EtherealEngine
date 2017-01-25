@@ -233,8 +233,9 @@ namespace runtime
 
 			const math::transform_t ortho_proj = math::ortho(0.0f, 1.0f, 1.0f, 0.0f, 0.0f, camera.get_far_clip(), gfx::getCaps()->homogeneousDepth);
 			gfx::setViewTransform(light_pass.id, nullptr, &ortho_proj);
-
-			ecs->each<TransformComponent, LightComponent>([this, &camera, dt, &light_pass, &light_buffer_size, &view, &proj, &view_proj, &inv_view_proj, g_buffer](
+			const gfx::RendererType::Enum renderer = gfx::getRendererType();
+			float half_texel = gfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
+			ecs->each<TransformComponent, LightComponent>([half_texel, this, &camera, dt, &light_pass, &light_buffer_size, &view, &proj, &view_proj, &inv_view_proj, g_buffer](
 				Entity e,
 				TransformComponent& transform_comp_ref,
 				LightComponent& light_comp_ref
@@ -276,8 +277,7 @@ namespace runtime
 						| BGFX_STATE_ALPHA_WRITE
 						| BGFX_STATE_BLEND_ADD
 					);
-					const gfx::RendererType::Enum renderer = gfx::getRendererType();
-					float half_texel = gfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
+					
 					screen_space_quad((float)light_buffer_size.width, (float)light_buffer_size.height, half_texel, bgfx::getCaps()->originBottomLeft);
 					gfx::submit(light_pass.id, _directional_light_program->handle);
 				}
@@ -318,8 +318,6 @@ namespace runtime
 						| BGFX_STATE_ALPHA_WRITE
 						| BGFX_STATE_BLEND_ADD
 					);
-					const gfx::RendererType::Enum renderer = gfx::getRendererType();
-					float half_texel = gfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
 					screen_space_quad((float)light_buffer_size.width, (float)light_buffer_size.height, half_texel, bgfx::getCaps()->originBottomLeft);
 					gfx::submit(light_pass.id, _point_light_program->handle);
 					
@@ -363,8 +361,7 @@ namespace runtime
 						| BGFX_STATE_ALPHA_WRITE
 						| BGFX_STATE_BLEND_ADD
 					);
-					const gfx::RendererType::Enum renderer = gfx::getRendererType();
-					float half_texel = gfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
+
 					screen_space_quad((float)light_buffer_size.width, (float)light_buffer_size.height, half_texel, bgfx::getCaps()->originBottomLeft);
 					gfx::submit(light_pass.id, _spot_light_program->handle);
 				}
@@ -386,12 +383,8 @@ namespace runtime
 					| BGFX_STATE_RGB_WRITE
 					| BGFX_STATE_ALPHA_WRITE
 				);
-				const gfx::RendererType::Enum renderer = gfx::getRendererType();
-				float half_texel = gfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
 				screen_space_quad((float)output_size.width, (float)output_size.height, half_texel, bgfx::getCaps()->originBottomLeft);
 				gfx::submit(pass_blit.id, _gamma_correction_program->handle);
-
-				//gfx::blit(pass_blit.id, gfx::getTexture(surface->handle), 0, 0, gfx::getTexture(fbo->handle));
 			}
 		});
 	}
