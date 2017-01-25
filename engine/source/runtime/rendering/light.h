@@ -198,9 +198,18 @@ struct Light
 
 	struct Spot
 	{
+		void set_range(float r);
+		float get_range() const { return range; }
+
+		void set_outer_angle(float angle);
+		float get_outer_angle() const { return outer_angle; }
+
+		void set_inner_angle(float angle);
+		float get_inner_angle() const { return inner_angle; }
+
 		float range = 10.0f;
-		float spot_outer_angle = 60.0f;
-		float spot_inner_angle = 30.0f;
+		float outer_angle = 60.0f;
+		float inner_angle = 30.0f;
 	};
 	
 	struct Point

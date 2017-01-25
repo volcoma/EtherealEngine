@@ -341,9 +341,9 @@ namespace runtime
 
 					float light_data[4] =
 					{
-						light.spot_data.range,
-						math::cos(math::radians(light.spot_data.spot_inner_angle * 0.5f)),
-						math::cos(math::radians(light.spot_data.spot_outer_angle * 0.5f)),
+						light.spot_data.get_range(),
+						math::cos(math::radians(light.spot_data.get_inner_angle() * 0.5f)),
+						math::cos(math::radians(light.spot_data.get_outer_angle() * 0.5f)),
 						0.0f
 					};
 

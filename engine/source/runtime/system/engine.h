@@ -46,6 +46,26 @@ namespace runtime
 		void dispose() override;
 
 		//-----------------------------------------------------------------------------
+		//  Name : destroy_windows ()
+		/// <summary>
+		/// 
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
+		void destroy_windows();
+
+		//-----------------------------------------------------------------------------
+		//  Name : start ()
+		/// <summary>
+		/// 
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
+		bool start(std::shared_ptr<RenderWindow> main_window);
+
+		//-----------------------------------------------------------------------------
 		//  Name : run_one_frame ()
 		/// <summary>
 		/// Perform on frame with specified fps, this will call update/render internally

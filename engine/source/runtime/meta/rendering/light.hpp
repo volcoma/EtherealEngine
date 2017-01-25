@@ -8,17 +8,23 @@
 REFLECT(Light)
 {
 	rttr::registration::class_<Light::Spot>("Spot")
-		.property("Range", &Light::Spot::range)
+		.property("Range",
+			&Light::Spot::get_range,
+			&Light::Spot::set_range)
 		(
 			rttr::metadata("Min", 0.1f)
 		)
-		.property("Inner Angle", &Light::Spot::spot_inner_angle)
+		.property("Inner Angle",
+			&Light::Spot::get_inner_angle,
+			&Light::Spot::set_inner_angle)
 		(
 			rttr::metadata("Min", 1.0f),
 			rttr::metadata("Max", 85.0f),
 			rttr::metadata("Step", 0.1f)
 		)
-		.property("Outer Angle", &Light::Spot::spot_outer_angle)
+		.property("Outer Angle",
+			&Light::Spot::get_outer_angle,
+			&Light::Spot::set_outer_angle)
 		(
 			rttr::metadata("Min", 1.0f),
 			rttr::metadata("Max", 90.0f),
@@ -100,8 +106,8 @@ SAVE(Light)
 	try_save(ar, cereal::make_nvp("depth_impl", obj.depth_impl));
 	try_save(ar, cereal::make_nvp("sm_impl", obj.sm_impl));
 	try_save(ar, cereal::make_nvp("spot_range", obj.spot_data.range));
-	try_save(ar, cereal::make_nvp("spot_inner_angle", obj.spot_data.spot_inner_angle));
-	try_save(ar, cereal::make_nvp("spot_outer_angle", obj.spot_data.spot_outer_angle));
+	try_save(ar, cereal::make_nvp("spot_inner_angle", obj.spot_data.inner_angle));
+	try_save(ar, cereal::make_nvp("spot_outer_angle", obj.spot_data.outer_angle));
 	try_save(ar, cereal::make_nvp("point_range", obj.point_data.range));
 	try_save(ar, cereal::make_nvp("point_exponent_falloff", obj.point_data.exponent_falloff));
 	try_save(ar, cereal::make_nvp("point_fov_x_adjust", obj.point_data.fov_x_adjust));
@@ -119,8 +125,8 @@ LOAD(Light)
 	try_load(ar, cereal::make_nvp("depth_impl", obj.depth_impl));
 	try_load(ar, cereal::make_nvp("sm_impl", obj.sm_impl));
 	try_load(ar, cereal::make_nvp("spot_range", obj.spot_data.range));
-	try_load(ar, cereal::make_nvp("spot_inner_angle", obj.spot_data.spot_inner_angle));
-	try_load(ar, cereal::make_nvp("spot_outer_angle", obj.spot_data.spot_outer_angle));
+	try_load(ar, cereal::make_nvp("spot_inner_angle", obj.spot_data.inner_angle));
+	try_load(ar, cereal::make_nvp("spot_outer_angle", obj.spot_data.outer_angle));
 	try_load(ar, cereal::make_nvp("point_range", obj.point_data.range));
 	try_load(ar, cereal::make_nvp("point_exponent_falloff", obj.point_data.exponent_falloff));
 	try_load(ar, cereal::make_nvp("point_fov_x_adjust", obj.point_data.fov_x_adjust));

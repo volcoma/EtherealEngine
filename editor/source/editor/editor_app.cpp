@@ -16,7 +16,6 @@ namespace editor
 
 	void EditorApp::start()
 	{
-		auto renderer = core::get_subsystem<runtime::Renderer>();
 		auto engine = core::get_subsystem<runtime::Engine>();
 
 		sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
@@ -24,15 +23,12 @@ namespace editor
 		desktop.height = 720;
 		auto main_window = std::make_shared<MainEditorWindow>(
 			desktop,
-			"App",
+			"Editor",
 			sf::Style::Default);
 
-
-		if (!renderer->init_backend(*main_window))
+		if (!engine->start(main_window))
 			_exitcode = -1;
 
-		engine->register_window(main_window);
-		core::add_subsystem<runtime::RenderingSystem>();
 		core::add_subsystem<GuiSystem>();
 		core::add_subsystem<DockingSystem>();
 		core::add_subsystem<EditState>();

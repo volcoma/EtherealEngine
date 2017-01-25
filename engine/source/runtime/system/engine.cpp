@@ -23,14 +23,6 @@ namespace runtime
 			std::make_shared<logging::sinks::platform_sink_mt>(),
 			std::make_shared<logging::sinks::daily_file_sink_mt>("Log", "log", 23, 59),
 		});
-
-		core::add_subsystem<Input>();
-		core::add_subsystem<Renderer>();
-		core::add_subsystem<AssetManager>();
-		core::add_subsystem<EntityComponentSystem>();
-		core::add_subsystem<TaskSystem>();
-		core::add_subsystem<TransformSystem>();
-		core::add_subsystem<CameraSystem>();
 		
 		// fire engine
 		_running = true;
@@ -53,6 +45,25 @@ namespace runtime
 	{
 		
 	}
+
+
+	bool Engine::start(std::shared_ptr<RenderWindow> main_window)
+	{
+		auto renderer = core::add_subsystem<Renderer>();
+		if (!renderer->init_backend(*main_window))
+			return false;
+		register_window(main_window);
+		core::add_subsystem<Input>();
+		core::add_subsystem<AssetManager>();
+		core::add_subsystem<EntityComponentSystem>();
+		core::add_subsystem<TaskSystem>();
+		core::add_subsystem<TransformSystem>();
+		core::add_subsystem<CameraSystem>();
+		core::add_subsystem<RenderingSystem>();
+
+		return true;
+	}
+
 
 	void Engine::run_one_frame()
 	{
@@ -208,11 +219,20 @@ namespace runtime
 			{
 				return (&wnd == other.get());
 			}), std::end(_windows));
+
+			if (&wnd == _focused_window.get())
+				_focused_window.reset();
 		};
 
 		window->on_closed.connect(onClosed);
 		window->prepare_surface();
 		_windows.push_back(window);
+	}
+
+	void Engine::destroy_windows()
+	{
+		_windows.clear();
+		_focused_window.reset();
 	}
 
 }

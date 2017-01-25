@@ -46,7 +46,7 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 		args_array[2] = "-o";
 		args_array[3] = strOutput.c_str();
 		args_array[4] = "-i";
-		fs::path include = fs::resolve_protocol("engine:/tools/include");
+		fs::path include = fs::resolve_protocol("engine_data:/shaders");
 		std::string strInclude = include.string();
 		args_array[5] = strInclude.c_str();
 		args_array[6] = "--varyingdef";

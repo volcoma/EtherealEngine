@@ -9,10 +9,14 @@ namespace runtime
 	{}
 
 
+	void App::setup()
+	{
+		auto engine = core::add_subsystem<Engine>();
+	}
+
 	void App::start()
 	{
 		auto engine = core::get_subsystem<Engine>();
-		auto renderer = core::get_subsystem<Renderer>();
 
 		sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 		desktop.width = 1280;
@@ -21,12 +25,16 @@ namespace runtime
 			desktop,
 			"App",
 			sf::Style::Default);
+		
 
-		if (!renderer->init_backend(*main_window))
+		if(!engine->start(main_window))
 			_exitcode = -1;
+	}
 
-		engine->register_window(main_window);
-		core::add_subsystem<RenderingSystem>();
+	void App::stop()
+	{
+		auto engine = core::get_subsystem<Engine>();
+		engine->destroy_windows();
 	}
 
 	int App::run()
@@ -37,11 +45,11 @@ namespace runtime
 		if (_exitcode != 0)
 			return _exitcode;
 
-		auto engine = core::add_subsystem<Engine>();
 		start();
 		if (_exitcode != 0)
 			return _exitcode;
 
+		auto engine = core::get_subsystem<Engine>();
 		while (engine->is_running())
 			engine->run_one_frame();
 

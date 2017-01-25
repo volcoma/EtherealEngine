@@ -123,9 +123,9 @@ namespace editor
 			const auto& light = light_comp_ptr->get_light();
 			if (light.light_type == LightType::Spot)
 			{
-				auto adjacent = light.spot_data.range;
+				auto adjacent = light.spot_data.get_range();
 				{
-					auto tan_angle = math::tan(math::radians(light.spot_data.spot_outer_angle * 0.5f));
+					auto tan_angle = math::tan(math::radians(light.spot_data.get_outer_angle() * 0.5f));
 					// oposite = tan * adjacent
 					auto oposite = tan_angle * adjacent;
 					ddPush();
@@ -138,7 +138,7 @@ namespace editor
 					ddPop();
 				}
 				{
-					auto tan_angle = math::tan(math::radians(light.spot_data.spot_inner_angle * 0.5f));
+					auto tan_angle = math::tan(math::radians(light.spot_data.get_inner_angle() * 0.5f));
 					// oposite = tan * adjacent
 					auto oposite = tan_angle * adjacent;
 					ddPush();
