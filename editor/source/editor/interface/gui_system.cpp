@@ -19,29 +19,29 @@
 
 class UIContexts
 {
-private:
-	ImGuiContext* mInitialContext = nullptr;
 public:
-	void setInitialContext(ImGuiContext* context)
+	void set_initial_context(ImGuiContext* context)
 	{
-		mInitialContext = context;
+		_initial_context = context;
 	}
 
-	void restoreInitialContext()
+	void restore_initial_context()
 	{
-		if(mInitialContext)
-			gui::SetCurrentContext(mInitialContext);
+		if(_initial_context)
+			gui::SetCurrentContext(_initial_context);
 	}
+private:
+	ImGuiContext* _initial_context = nullptr;
 };
 
 
-static GUIStyle sGUIStyle;
-static UIContexts sContexts;
+static GUIStyle s_gui_style;
+static UIContexts s_contexts;
 
-static gfx::VertexDecl				sDecl;
-static std::unique_ptr<Program>		sProgram;
-static AssetHandle<Texture>			sFontTexture;
-static std::vector<std::shared_ptr<ITexture>> sTextures;
+static gfx::VertexDecl				s_decl;
+static std::unique_ptr<Program>		s_program;
+static AssetHandle<Texture>			s_font_texture;
+static std::vector<std::shared_ptr<ITexture>> s_textures;
 
 
 void renderFunc(ImDrawData *_drawData)
@@ -56,14 +56,14 @@ void renderFunc(ImDrawData *_drawData)
 		std::uint32_t numVertices = (std::uint32_t)drawList->VtxBuffer.size();
 		std::uint32_t numIndices = (std::uint32_t)drawList->IdxBuffer.size();
 
-		if (!gfx::getAvailTransientVertexBuffer(numVertices, sDecl) == numVertices
+		if (!gfx::getAvailTransientVertexBuffer(numVertices, s_decl) == numVertices
 			|| !gfx::getAvailTransientIndexBuffer(numIndices) == numIndices)
 		{
 			// not enough space in transient buffer just quit drawing the rest...
 			break;
 		}
 
-		gfx::allocTransientVertexBuffer(&tvb, numVertices, sDecl);
+		gfx::allocTransientVertexBuffer(&tvb, numVertices, s_decl);
 		gfx::allocTransientIndexBuffer(&tib, numIndices);
 
 		ImDrawVert* verts = (ImDrawVert*)tvb.data;
@@ -88,9 +88,9 @@ void renderFunc(ImDrawData *_drawData)
 					| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
 					;
 
-				Texture* texture = sFontTexture.get();
+				Texture* texture = s_font_texture.get();
 				FrameBuffer* fbo = nullptr;
-				Program* program = sProgram.get();
+				Program* program = s_program.get();
 				if (!program)
 					return;
 
@@ -131,7 +131,7 @@ void renderFunc(ImDrawData *_drawData)
 
 bool GuiSystem::initialize()
 {
-	sContexts.setInitialContext(ImGui::GetCurrentContext());
+	s_contexts.set_initial_context(ImGui::GetCurrentContext());
 	ImGuiIO& io = ImGui::GetIO();
 	io.IniFilename = nullptr;
 	io.RenderDrawListsFn = renderFunc;
@@ -172,11 +172,11 @@ bool GuiSystem::initialize()
 		am->load<Shader>("fs_ocornut_imgui_embedded", false)
 			.then([vs](auto fs)
 		{
-			sProgram = std::make_unique<Program>(vs, fs);
+			s_program = std::make_unique<Program>(vs, fs);
 		});
 	});
 
-	sDecl
+	s_decl
 		.begin()
 		.add(gfx::Attrib::Position, 2, gfx::AttribType::Float)
 		.add(gfx::Attrib::TexCoord0, 2, gfx::AttribType::Float)
@@ -217,7 +217,7 @@ bool GuiSystem::initialize()
 	io.Fonts->AddFontFromMemoryTTF((void*)s_robotoMonoRegularTtf, sizeof(s_robotoMonoRegularTtf), _fontSize - 3.0f, &config);
 	io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
 
-	sFontTexture = std::make_shared<Texture>(
+	s_font_texture = std::make_shared<Texture>(
 		static_cast<std::uint16_t>(width)
 		, static_cast<std::uint16_t>(height)
 		, false
@@ -228,9 +228,9 @@ bool GuiSystem::initialize()
 		);
 
 	// Store our identifier
-	io.Fonts->TexID = sFontTexture.get();
+	io.Fonts->TexID = s_font_texture.get();
 
-	sGUIStyle.load_style();
+	s_gui_style.load_style();
 
 	runtime::on_frame_begin.connect(this, &GuiSystem::frame_begin);
 
@@ -241,10 +241,10 @@ void GuiSystem::dispose()
 {
 	runtime::on_frame_begin.disconnect(this, &GuiSystem::frame_begin);
 
-	sTextures.clear();
-	sContexts.restoreInitialContext();
-	sProgram.reset();
-	sFontTexture.reset();
+	s_textures.clear();
+	s_contexts.restore_initial_context();
+	s_program.reset();
+	s_font_texture.reset();
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->TexID = nullptr;
@@ -253,20 +253,15 @@ void GuiSystem::dispose()
 
 void GuiSystem::frame_begin(std::chrono::duration<float>)
 {
-	gui::begin();
+	s_textures.clear();
 }
 
 namespace gui
 {
 
-void begin()
-{
-	sTextures.clear();
-}
-
 void Image(std::shared_ptr<ITexture> texture, const ImVec2& _size, const ImVec2& _uv0 /*= ImVec2(0.0f, 0.0f) */, const ImVec2& _uv1 /*= ImVec2(1.0f, 1.0f) */, const ImVec4& _tintCol /*= ImVec4(1.0f, 1.0f, 1.0f, 1.0f) */, const ImVec4& _borderCol /*= ImVec4(0.0f, 0.0f, 0.0f, 0.0f) */)
 {
-	sTextures.push_back(texture);
+	s_textures.push_back(texture);
 
 	ImVec2 uv0 = _uv0;
 	ImVec2 uv1 = _uv1;
@@ -286,7 +281,7 @@ void Image(std::shared_ptr<ITexture> texture, const ImVec2& _size, const ImVec2&
 
 bool ImageButton(std::shared_ptr<ITexture> texture, const ImVec2& _size, const ImVec2& _uv0 /*= ImVec2(0.0f, 0.0f) */, const ImVec2& _uv1 /*= ImVec2(1.0f, 1.0f) */, int _framePadding /*= -1 */, const ImVec4& _bgCol /*= ImVec4(0.0f, 0.0f, 0.0f, 0.0f) */, const ImVec4& _tintCol /*= ImVec4(1.0f, 1.0f, 1.0f, 1.0f) */)
 {
-	sTextures.push_back(texture);
+	s_textures.push_back(texture);
 
 	ImVec2 uv0 = _uv0;
 	ImVec2 uv1 = _uv1;
@@ -306,25 +301,25 @@ bool ImageButton(std::shared_ptr<ITexture> texture, const ImVec2& _size, const I
 
 bool ImageButtonEx(std::shared_ptr<ITexture> texture, const ImVec2& size, const char* tooltip, bool selected, bool enabled)
 {
-	sTextures.push_back(texture);
+	s_textures.push_back(texture);
 	return ImGui::ImageButtonEx(texture.get(), size, tooltip, selected, enabled);
 }
 
 void ImageWithAspect(std::shared_ptr<ITexture> texture, const ImVec2& texture_size, const ImVec2& size, const ImVec2& uv0, const ImVec2& uv1, const ImVec4& tint_col, const ImVec4& border_col)
 {
-	sTextures.push_back(texture);
+	s_textures.push_back(texture);
 	return ImGui::ImageWithAspect(texture.get(), texture_size, size, uv0, uv1, tint_col, border_col);
 }
 
 int ImageButtonWithAspectAndLabel(std::shared_ptr<ITexture> texture, const ImVec2& texture_size, const ImVec2& size, const ImVec2& uv0, const ImVec2& uv1, bool selected, bool* edit_label, const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags /*= 0*/)
 {
-	sTextures.push_back(texture);
+	s_textures.push_back(texture);
 	return ImGui::ImageButtonWithAspectAndLabel(texture.get(), texture_size, size, uv0, uv1, selected, edit_label, label, buf, buf_size, flags);
 }
 
-GUIStyle& getGUIStyle()
+GUIStyle& get_gui_style()
 {
-	return sGUIStyle;
+	return s_gui_style;
 }
 
 }

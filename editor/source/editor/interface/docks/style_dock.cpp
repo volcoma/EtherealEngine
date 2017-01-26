@@ -5,8 +5,8 @@ namespace Docks
 
 	void render_style(ImVec2 area)
 	{
-		auto& GUIStyle = gui::getGUIStyle();
-		auto& setup = GUIStyle.setup;
+		auto& style = gui::get_gui_style();
+		auto& setup = style.setup;
 		ImVec4 rgb;
 
 		auto& col_main_hue = setup.col_main_hue;
@@ -46,21 +46,21 @@ namespace Docks
 
 		if (gui::Button("Save"))
 		{
-			GUIStyle.save_style();
+			style.save_style();
 		}
 		gui::SameLine();
 		if (gui::Button("Reload"))
 		{
-			GUIStyle.load_style();
+			style.load_style();
 		}
 		gui::SameLine();
 		if (gui::Button("Default"))
 		{
-			GUIStyle.reset_style();
+			style.reset_style();
 		}
 		else
 		{
-			GUIStyle.set_style_colors(setup);
+			style.set_style_colors(setup);
 		}
 		
 		

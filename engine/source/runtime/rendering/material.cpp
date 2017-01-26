@@ -105,6 +105,7 @@ void StandardMaterial::submit()
 		return;
 
 	_program->set_uniform("u_base_color", &_base_color);
+	_program->set_uniform("u_subsurface_color", &_subsurface_color);
 	_program->set_uniform("u_emissive_color", &_emissive_color);
 	_program->set_uniform("u_surface_data", &_surface_data);
 	_program->set_uniform("u_tiling", &_tiling);

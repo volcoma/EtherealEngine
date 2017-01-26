@@ -46,6 +46,7 @@ void CameraComponent::init(const uSize& size)
 				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags),
 				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags),
 				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags),
+				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags),
 				depth_buffer
 			}
 		);
@@ -69,6 +70,7 @@ void CameraComponent::init(const uSize& size)
 		(
 			std::vector<std::shared_ptr<Texture>>
 			{
+				std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags),
 				std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags),
 				std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags),
 				std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags),

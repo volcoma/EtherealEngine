@@ -300,10 +300,11 @@ namespace runtime
 				_directional_light_program->set_uniform("u_light_color_intensity", light_color_intensity);
 				_directional_light_program->set_uniform("u_camera_position", &camera.get_position());
 				_directional_light_program->set_uniform("u_mtx", &inv_view_proj);
-				_directional_light_program->set_texture(0, "s_albedo", gfx::getTexture(g_buffer->handle, 0));
-				_directional_light_program->set_texture(1, "s_normal", gfx::getTexture(g_buffer->handle, 1));
-				_directional_light_program->set_texture(2, "s_emissive", gfx::getTexture(g_buffer->handle, 2));
-				_directional_light_program->set_texture(3, "s_depth", gfx::getTexture(g_buffer->handle, 3));
+				_directional_light_program->set_texture(0, "s_tex0", gfx::getTexture(g_buffer->handle, 0));
+				_directional_light_program->set_texture(1, "s_tex1", gfx::getTexture(g_buffer->handle, 1));
+				_directional_light_program->set_texture(2, "s_tex2", gfx::getTexture(g_buffer->handle, 2));
+				_directional_light_program->set_texture(3, "s_tex3", gfx::getTexture(g_buffer->handle, 3));
+				_directional_light_program->set_texture(4, "s_tex4", gfx::getTexture(g_buffer->handle, 4));
 
 				gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
 				gfx::setState(0
@@ -341,10 +342,11 @@ namespace runtime
 				_point_light_program->set_uniform("u_light_data", light_data);
 				_point_light_program->set_uniform("u_camera_position", &camera.get_position());
 				_point_light_program->set_uniform("u_mtx", &inv_view_proj);
-				_point_light_program->set_texture(0, "s_albedo", gfx::getTexture(g_buffer->handle, 0));
-				_point_light_program->set_texture(1, "s_normal", gfx::getTexture(g_buffer->handle, 1));
-				_point_light_program->set_texture(2, "s_emissive", gfx::getTexture(g_buffer->handle, 2));
-				_point_light_program->set_texture(3, "s_depth", gfx::getTexture(g_buffer->handle, 3));
+				_point_light_program->set_texture(0, "s_tex0", gfx::getTexture(g_buffer->handle, 0));
+				_point_light_program->set_texture(1, "s_tex1", gfx::getTexture(g_buffer->handle, 1));
+				_point_light_program->set_texture(2, "s_tex2", gfx::getTexture(g_buffer->handle, 2));
+				_point_light_program->set_texture(3, "s_tex3", gfx::getTexture(g_buffer->handle, 3));
+				_point_light_program->set_texture(4, "s_tex4", gfx::getTexture(g_buffer->handle, 4));
 
 				gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
 				gfx::setState(0
@@ -384,10 +386,11 @@ namespace runtime
 				_spot_light_program->set_uniform("u_light_data", light_data);
 				_spot_light_program->set_uniform("u_camera_position", &camera.get_position());
 				_spot_light_program->set_uniform("u_mtx", &inv_view_proj);
-				_spot_light_program->set_texture(0, "s_albedo", gfx::getTexture(g_buffer->handle, 0));
-				_spot_light_program->set_texture(1, "s_normal", gfx::getTexture(g_buffer->handle, 1));
-				_spot_light_program->set_texture(2, "s_emissive", gfx::getTexture(g_buffer->handle, 2));
-				_spot_light_program->set_texture(3, "s_depth", gfx::getTexture(g_buffer->handle, 3));
+				_spot_light_program->set_texture(0, "s_tex0", gfx::getTexture(g_buffer->handle, 0));
+				_spot_light_program->set_texture(1, "s_tex1", gfx::getTexture(g_buffer->handle, 1));
+				_spot_light_program->set_texture(2, "s_tex2", gfx::getTexture(g_buffer->handle, 2));
+				_spot_light_program->set_texture(3, "s_tex3", gfx::getTexture(g_buffer->handle, 3));
+				_spot_light_program->set_texture(4, "s_tex4", gfx::getTexture(g_buffer->handle, 4));
 
 				gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
 				gfx::setState(0

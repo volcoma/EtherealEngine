@@ -459,7 +459,7 @@ vec3 StandardShading( vec3 DiffuseColor, vec3 SpecularColor, vec3 LobeRoughness,
 	return Diffuse_Color * LobeEnergy[2] + (D * Vis) * F;
 }
 	
-vec3 SubsurfaceShadingSubsurface( vec3 SubsurfaceColor, float Opacity, float AO, vec3 L, vec3 V, vec3 N )
+vec3 SubsurfaceShading( vec3 SubsurfaceColor, float Opacity, float AO, vec3 L, vec3 V, vec3 N )
 {
 	vec3 H = normalize(V + L);
 	// to get an effect when you see through the material

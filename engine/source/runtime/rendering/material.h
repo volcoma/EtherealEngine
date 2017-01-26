@@ -207,7 +207,7 @@ public:
 	StandardMaterial();
 
 	//-----------------------------------------------------------------------------
-	//  Name : getBaseColor ()
+	//  Name : get_base_color ()
 	/// <summary>
 	/// 
 	/// 
@@ -225,6 +225,26 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	inline void set_base_color(const math::color& val) { _base_color = val; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : get_subsurface_color ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline const math::color& get_subsurface_color() const { return _subsurface_color; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : set_subsurface_color ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline void set_subsurface_color(const math::color& val) { _subsurface_color = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_emissive_color ()
@@ -461,6 +481,12 @@ private:
 	{
 		1.0f, 1.0f, 1.0f, /// Color
 		1.0f /// Opacity
+	};
+	/// Emissive color
+	math::color _subsurface_color
+	{
+		0.0f, 0.0f, 0.0f, /// Color
+		0.5f /// Opacity
 	};
 	/// Emissive color
 	math::color _emissive_color

@@ -13,6 +13,7 @@ uniform vec4 u_camera_clip_planes; //.x = near, .y = far
 
 // per instance
 uniform vec4 u_base_color;
+uniform vec4 u_subsurface_color;
 uniform vec4 u_emissive_color;
 uniform vec4 u_surface_data;
 uniform vec4 u_tiling;
@@ -35,7 +36,6 @@ void main()
 	mat3 tangent_to_world_space = constructTangentToWorldSpaceMatrix(v_wtangent, v_wbitangent, v_wnormal);
 
 	vec3 wnormal = normalize( mul( tangent_to_world_space, tangent_space_normal ).xyz );
-	
 	vec4 albedo_color = texture2D(s_tex_color, texcoords) * u_base_color;
 
 	float distance = length(view_direction) - u_camera_clip_planes.x * 2.0f;
@@ -52,5 +52,6 @@ void main()
 	}
 	gl_FragData[0] = albedo_color;
 	gl_FragData[1] = vec4(encodeNormalUint(wnormal), roughness);
-	gl_FragData[2] = vec4(u_emissive_color.xyz, metalness);
+	gl_FragData[2] = vec4(u_emissive_color.xyz.xyz, metalness);
+	gl_FragData[3] = u_subsurface_color;
 }
