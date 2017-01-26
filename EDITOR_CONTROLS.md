@@ -15,3 +15,5 @@ Assets and Entities can be deleted by selecting them and pressing the Delete key
 Assets can be linked somewhere by dragging and dropping them there.
 
 Entities can be parented by dragging and dropping them onto each other.
+
+Hold Ctrl when manipulating an object to enable snapping.
