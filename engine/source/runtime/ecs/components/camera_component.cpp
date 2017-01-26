@@ -33,7 +33,7 @@ void CameraComponent::init(const uSize& size)
 		;
 
 	auto surface_format = gfx::TextureFormat::RGBA8;
-	auto depth_format = gfx::TextureFormat::D24S8;
+	auto depth_format = gfx::TextureFormat::D24;
 	if (size.width == 0 && size.height == 0)
 	{
 		//create a depth buffer to share
