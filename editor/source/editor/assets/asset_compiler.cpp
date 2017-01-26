@@ -142,8 +142,8 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 
 	fs::path entry = dir / fs::path(file + ".buildtemp");
 	{		
-		std::ofstream soutput(entry);
-		cereal::oarchive_json_t ar(soutput, cereal::oarchive_json_t::Options::NoIndent());
+		std::ofstream soutput(entry, std::ios::out | std::ios::binary);
+		cereal::oarchive_binary_t ar(soutput);
 		try_save(ar, cereal::make_nvp("shader", binaries));
 	}
 	fs::copy(entry, output, fs::copy_options::overwrite_existing, std::error_code{});

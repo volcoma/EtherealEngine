@@ -86,7 +86,7 @@ void AssetReader::load_shader_from_file(const std::string& key, const fs::path& 
 	auto deserialize = [wrapper, absoluteKey]() mutable
 	{
 		std::ifstream stream{ absoluteKey, std::ios::in | std::ios::binary };
-		cereal::iarchive_json_t ar(stream);
+		cereal::iarchive_binary_t ar(stream);
 
 		try_load(ar, cereal::make_nvp("shader", wrapper->binaries));
 	};
