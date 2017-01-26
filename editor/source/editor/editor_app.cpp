@@ -32,10 +32,6 @@ namespace editor
 		core::add_subsystem<EditState>();
 		core::add_subsystem<PickingSystem>();
 		core::add_subsystem<DebugDrawSystem>();
-
-		auto pm = core::add_subsystem<ProjectManager>();
-		pm->open();
+		core::add_subsystem<ProjectManager>();
 	}
-
-
 }

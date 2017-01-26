@@ -396,6 +396,7 @@ namespace editor
 	bool ProjectManager::initialize()
 	{
 		load_config();
+		open();
 		return true;
 	}
 

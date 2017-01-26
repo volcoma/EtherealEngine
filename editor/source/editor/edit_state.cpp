@@ -124,7 +124,6 @@ namespace editor
 
 	void EditState::dispose()
 	{
-
 		drag_data = {};
 		selection_data = {};
 		icons.clear();
