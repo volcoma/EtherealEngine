@@ -1,5 +1,6 @@
 #include "docks.h"
 #include "../../edit_state.h"
+#include "../../project.h"
 #include "runtime/system/engine.h"
 #include "runtime/input/input.h"
 #include "runtime/ecs/components/transform_component.h"
@@ -154,22 +155,19 @@ namespace Docks
 				math::transform_t delta;
 				math::transform_t inputTransform = transform;
 				float* snap = nullptr;
-				static math::vec3 translation_snap = { 1.0f, 1.0f, 1.0f };
-				static float rotation_degree_snap = 15.0f;
-				static float scale_snap = 0.1f;
 				if (input->is_key_down(sf::Keyboard::LControl))
 				{
 					if (operation == imguizmo::OPERATION::TRANSLATE)
-						snap = &translation_snap[0];
+						snap = &es->snap_data.translation_snap[0];
 					else if (operation == imguizmo::OPERATION::ROTATE)
-						snap = &rotation_degree_snap;
+						snap = &es->snap_data.rotation_degree_snap;
 					else if (operation == imguizmo::OPERATION::SCALE)
-						snap = &scale_snap;
+						snap = &es->snap_data.scale_snap;
 				}
 
 				imguizmo::manipulate(
 					camera_component->get_camera().get_view(),
-					camera_component->get_camera().get_last_projection(),
+					camera_component->get_camera().get_projection(),
 					operation,
 					mode,
 					transform,

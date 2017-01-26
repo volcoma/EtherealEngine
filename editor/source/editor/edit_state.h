@@ -20,7 +20,15 @@ namespace editor
 		{
 			rttr::variant object;
 		};
-
+		struct SnapData
+		{
+			///
+			math::vec3 translation_snap = { 1.0f, 1.0f, 1.0f };
+			///
+			float rotation_degree_snap = 15.0f;
+			///
+			float scale_snap = 0.1f;
+		};
 		//-----------------------------------------------------------------------------
 		//  Name : initialize ()
 		/// <summary>
@@ -89,6 +97,8 @@ namespace editor
 		DragData drag_data;
 		/// selection data containing selected object
 		SelectionData selection_data;
+		/// snap data containging various snap options
+		SnapData snap_data;
 		/// editor icons lookup map
 		std::unordered_map<std::string, AssetHandle<Texture>> icons;
 	};

@@ -38,7 +38,7 @@ namespace editor
 
 		RenderPass pass("debug_draw_pass");
 		pass.bind(surface.get());
-		gfx::setViewTransform(pass.id, &view, &proj);
+		pass.set_view_proj(view, proj);
 		ddRAII dd(pass.id);
 
 		auto draw_grid = [](std::uint32_t grid_color, float height, float height_intervals, std::uint32_t grid_size, std::uint32_t size_intervals, std::uint32_t iteration, std::uint32_t max_iterations)
@@ -108,7 +108,7 @@ namespace editor
 			const auto selected_camera_comp = selected_entity.component<CameraComponent>();
 			const auto selected_camera_comp_ptr = selected_camera_comp.lock().get();
 			auto& selected_camera = selected_camera_comp_ptr->get_camera();
-			const auto view_proj = selected_camera.get_view_proj();
+			const auto view_proj = selected_camera.get_view_projection();
 			ddPush();
 			ddSetColor(0xffffffff);
 			ddSetTransform(nullptr);

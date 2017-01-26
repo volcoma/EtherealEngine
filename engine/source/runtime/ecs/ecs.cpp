@@ -2,10 +2,10 @@
 
 namespace runtime
 {
-	event<void(Entity)> onEntityCreated;
-	event<void(Entity)> onEntityDestroyed;
-	event<void(Entity, CHandle<Component>)> onComponentAdded;
-	event<void(Entity, CHandle<Component>)> onComponentRemoved;
+	event<void(Entity)> on_entity_created;
+	event<void(Entity)> on_entity_destroyed;
+	event<void(Entity, CHandle<Component>)> on_component_added;
+	event<void(Entity, CHandle<Component>)> on_component_removed;
 
 	ComponentStorage::ComponentStorage(std::size_t size)
 	{
@@ -137,7 +137,7 @@ namespace runtime
 		// Find the pool for this component family.
 		ComponentStorage *pool = component_pools_[family];
 		CHandle<Component> handle(pool->get(id.index()));
-		onComponentRemoved(get(id), handle);
+		on_component_removed(get(id), handle);
 		// Remove component bit.
 		entity_component_mask_[id.index()].reset(family);
 
@@ -211,7 +211,7 @@ namespace runtime
 		component->_entity = get(id);
 		component->on_entity_set();
 		CHandle<Component> handle(ptr);
-		onComponentAdded(get(id), handle);
+		on_component_added(get(id), handle);
 		return handle;
 	}
 
@@ -235,7 +235,7 @@ namespace runtime
 			}
 		}
 
-		onEntityDestroyed(get(id));
+		on_entity_destroyed(get(id));
 		entity_component_mask_[index].reset();
 		entity_version_[index]++;
 		free_list_.push_back(index);

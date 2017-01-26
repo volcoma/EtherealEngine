@@ -340,10 +340,10 @@ virtual std::shared_ptr<Component> clone() const								\
 	};
 
 
-	extern event<void(Entity)> onEntityCreated;
-	extern event<void(Entity)> onEntityDestroyed;
-	extern event<void(Entity, CHandle<Component>)> onComponentAdded;
-	extern event<void(Entity, CHandle<Component>)> onComponentRemoved;
+	extern event<void(Entity)> on_entity_created;
+	extern event<void(Entity)> on_entity_destroyed;
+	extern event<void(Entity, CHandle<Component>)> on_component_added;
+	extern event<void(Entity, CHandle<Component>)> on_component_removed;
 	
 	/**
 	* Manages Entity::Id creation and component assignment.
@@ -601,7 +601,7 @@ virtual std::shared_ptr<Component> clone() const								\
 				version = entity_version_[index];
 			}
 			Entity entity(this, Entity::Id(index, version));
-			onEntityCreated(entity);
+			on_entity_created(entity);
 			return entity;
 		}
 

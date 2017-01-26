@@ -3,7 +3,7 @@
 #include "project.h"
 
 #include "filedialog/filedialog.h"
-#include "runtime/ecs/systems/transform_system.h"
+#include "runtime/ecs/systems/scene_graph.h"
 #include "runtime/ecs/components/model_component.h"
 #include "runtime/ecs/components/transform_component.h"
 #include "runtime/ecs/components/camera_component.h"
@@ -18,8 +18,8 @@
 std::vector<runtime::Entity> gather_scene_data()
 {
 	auto es = core::get_subsystem<editor::EditState>();
-	auto ts = core::get_subsystem<runtime::TransformSystem>();
-	const auto& roots = ts->get_roots();
+	auto sg = core::get_subsystem<runtime::SceneGraph>();
+	const auto& roots = sg->get_roots();
 	auto editor_camera = es->camera;
 	std::vector<runtime::Entity> entities;
 	for (auto root : roots)
@@ -380,7 +380,7 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 		if (gui::BeginChild("###projects_content", ImVec2(gui::GetContentRegionAvail().x * 0.8f, gui::GetContentRegionAvail().y - gui::GetTextLineHeightWithSpacing()), false, flags))
 		{
 			
-			const auto& rencent_projects = pm->get_recent_projects();
+			const auto& rencent_projects = pm->get_options().recent_project_paths;
 			for (auto& path : rencent_projects)
 			{
 				if (gui::Selectable(path.c_str()))

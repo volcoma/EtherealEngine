@@ -71,6 +71,17 @@ void RenderPass::clear() const
 	);
 }
 
+void RenderPass::set_view_proj(const math::transform_t& v, const math::transform_t& p)
+{
+	gfx::setViewTransform(id, &v, &p);
+}
+
+void RenderPass::set_view_proj_ortho_full()
+{
+	static const math::transform_t p = math::ortho(0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f, gfx::getCaps()->homogeneousDepth);
+	gfx::setViewTransform(id, {}, &p);
+}
+
 void RenderPass::reset()
 {
 	for (std::uint8_t i = 0; i < index; ++i)

@@ -75,9 +75,7 @@ namespace editor
 				, 1.0f
 				, 0);
 
-
-			// View rect and transforms for picking pass
-			gfx::setViewTransform(pass.id, &pickView, &pickProj);
+			pass.set_view_proj(pickView, pickProj);
 
 			ecs->each<TransformComponent, ModelComponent>([this, &pass, &camera](
 				runtime::Entity e,

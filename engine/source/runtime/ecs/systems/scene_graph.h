@@ -8,7 +8,7 @@ class TransformComponent;
 
 namespace runtime
 {
-	class TransformSystem : public core::Subsystem
+	class SceneGraph : public core::Subsystem
 	{
 	public:
 		bool initialize();

@@ -280,7 +280,7 @@ math::VolumeQuery::E Camera::bounds_in_frustum(const math::bbox &AABB, const mat
 bool Camera::world_to_viewport(const uPoint& viewport_pos, const uSize& viewport_size, const math::vec3& pos, math::vec3 & point, bool bClipX /* = true */, bool bClipY /* = true */, bool bClipZ /* = true */)
 {
 	// Ensure we have an up-to-date projection and view matrix
-	auto view_proj = get_view_proj();
+	auto view_proj = get_view_projection();
 
 	// Transform the point into clip space
 	math::vec4 vClip = view_proj.matrix() * math::vec4{ pos.x, pos.y, pos.z, 1.0f };

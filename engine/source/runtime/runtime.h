@@ -22,9 +22,9 @@
 #include "ecs/components/model_component.h"
 #include "ecs/components/light_component.h"
 
-#include "ecs/systems/transform_system.h"
+#include "ecs/systems/scene_graph.h"
 #include "ecs/systems/camera_system.h"
-#include "ecs/systems/rendering_system.h"
+#include "ecs/systems/deferred_rendering.h"
 
 #include "meta/math/vector.hpp"
 #include "meta/math/transform.hpp"

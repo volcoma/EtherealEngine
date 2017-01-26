@@ -1,7 +1,7 @@
 #include "app.h"
 #include "engine.h"
-#include "rendering/renderer.h"
-#include "ecs/systems/rendering_system.h"
+#include "rendering/render_window.h"
+
 namespace runtime
 {
 

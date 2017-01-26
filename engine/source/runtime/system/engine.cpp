@@ -3,9 +3,9 @@
 #include "input/input.h"
 #include "ecs/ecs.h"
 #include "task.h"
-#include "ecs/systems/transform_system.h"
+#include "ecs/systems/scene_graph.h"
 #include "ecs/systems/camera_system.h"
-#include "ecs/systems/rendering_system.h"
+#include "ecs/systems/deferred_rendering.h"
 #include "rendering/render_window.h"
 #include "assets/asset_manager.h"
 
@@ -57,9 +57,9 @@ namespace runtime
 		core::add_subsystem<AssetManager>();
 		core::add_subsystem<EntityComponentSystem>();
 		core::add_subsystem<TaskSystem>();
-		core::add_subsystem<TransformSystem>();
+		core::add_subsystem<SceneGraph>();
 		core::add_subsystem<CameraSystem>();
-		core::add_subsystem<RenderingSystem>();
+		core::add_subsystem<DeferredRendering>();
 
 		return true;
 	}

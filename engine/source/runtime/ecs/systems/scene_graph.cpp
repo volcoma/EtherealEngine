@@ -1,4 +1,4 @@
-#include "transform_system.h"
+#include "scene_graph.h"
 #include "../components/transform_component.h"
 #include "../../system/engine.h"
 namespace runtime
@@ -18,7 +18,7 @@ namespace runtime
 		}
 	}
 
-	void TransformSystem::frame_update(std::chrono::duration<float> dt)
+	void SceneGraph::frame_update(std::chrono::duration<float> dt)
 	{
 		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 		_roots.clear();
@@ -37,15 +37,15 @@ namespace runtime
 		}
 	}
 
-	bool TransformSystem::initialize()
+	bool SceneGraph::initialize()
 	{
-		runtime::on_frame_update.connect(this, &TransformSystem::frame_update);
+		runtime::on_frame_update.connect(this, &SceneGraph::frame_update);
 
 		return true;
 	}
 
-	void TransformSystem::dispose()
+	void SceneGraph::dispose()
 	{
-		runtime::on_frame_update.disconnect(this, &TransformSystem::frame_update);
+		runtime::on_frame_update.disconnect(this, &SceneGraph::frame_update);
 	}
 }

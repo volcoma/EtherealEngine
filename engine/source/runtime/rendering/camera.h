@@ -250,12 +250,12 @@ public:
 	inline const math::transform_t& get_view() const { return _view; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : get_view_proj ()
+	//  Name : get_view_projection ()
 	/// <summary>
 	/// Return the current view-projection matrix.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline math::transform_t get_view_proj() { return get_projection() * get_view(); }
+	inline math::transform_t get_view_projection() { return get_projection() * get_view(); }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_last_view ()

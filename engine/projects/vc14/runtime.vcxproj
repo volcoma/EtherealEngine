@@ -30,8 +30,8 @@
     <ClCompile Include="..\..\source\runtime\ecs\ecs.cpp" />
     <ClCompile Include="..\..\source\runtime\ecs\prefab.cpp" />
     <ClCompile Include="..\..\source\runtime\ecs\systems\camera_system.cpp" />
-    <ClCompile Include="..\..\source\runtime\ecs\systems\rendering_system.cpp" />
-    <ClCompile Include="..\..\source\runtime\ecs\systems\transform_system.cpp" />
+    <ClCompile Include="..\..\source\runtime\ecs\systems\deferred_rendering.cpp" />
+    <ClCompile Include="..\..\source\runtime\ecs\systems\scene_graph.cpp" />
     <ClCompile Include="..\..\source\runtime\ecs\utils.cpp" />
     <ClCompile Include="..\..\source\runtime\input\input.cpp" />
     <ClCompile Include="..\..\source\runtime\rendering\camera.cpp" />
@@ -87,8 +87,8 @@
     <ClInclude Include="..\..\source\runtime\ecs\ecs.h" />
     <ClInclude Include="..\..\source\runtime\ecs\prefab.h" />
     <ClInclude Include="..\..\source\runtime\ecs\systems\camera_system.h" />
-    <ClInclude Include="..\..\source\runtime\ecs\systems\rendering_system.h" />
-    <ClInclude Include="..\..\source\runtime\ecs\systems\transform_system.h" />
+    <ClInclude Include="..\..\source\runtime\ecs\systems\deferred_rendering.h" />
+    <ClInclude Include="..\..\source\runtime\ecs\systems\scene_graph.h" />
     <ClInclude Include="..\..\source\runtime\ecs\utils.h" />
     <ClInclude Include="..\..\source\runtime\input\input.h" />
     <ClInclude Include="..\..\source\runtime\input\input_mapping.hpp" />

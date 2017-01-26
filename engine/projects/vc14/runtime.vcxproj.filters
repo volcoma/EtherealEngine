@@ -168,12 +168,6 @@
     <ClCompile Include="..\..\source\runtime\ecs\systems\camera_system.cpp">
       <Filter>Source Files\ecs\systems</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\runtime\ecs\systems\rendering_system.cpp">
-      <Filter>Source Files\ecs\systems</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\runtime\ecs\systems\transform_system.cpp">
-      <Filter>Source Files\ecs\systems</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\runtime\ecs\prefab.cpp">
       <Filter>Source Files\ecs</Filter>
     </ClCompile>
@@ -248,6 +242,12 @@
     </ClCompile>
     <ClCompile Include="..\..\source\runtime\assets\asset_extensions.cpp">
       <Filter>Source Files\assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\runtime\ecs\systems\deferred_rendering.cpp">
+      <Filter>Source Files\ecs\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\runtime\ecs\systems\scene_graph.cpp">
+      <Filter>Source Files\ecs\systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -369,12 +369,6 @@
       <Filter>Source Files\ecs\components</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\runtime\ecs\systems\camera_system.h">
-      <Filter>Source Files\ecs\systems</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\runtime\ecs\systems\rendering_system.h">
-      <Filter>Source Files\ecs\systems</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\runtime\ecs\systems\transform_system.h">
       <Filter>Source Files\ecs\systems</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\runtime\ecs\prefab.h">
@@ -544,6 +538,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\runtime\assets\asset_extensions.h">
       <Filter>Source Files\assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\ecs\systems\deferred_rendering.h">
+      <Filter>Source Files\ecs\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\ecs\systems\scene_graph.h">
+      <Filter>Source Files\ecs\systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

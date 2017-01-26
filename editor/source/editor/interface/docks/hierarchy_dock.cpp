@@ -5,7 +5,7 @@
 #include "runtime/ecs/utils.h"
 #include "runtime/ecs/components/transform_component.h"
 #include "runtime/ecs/components/model_component.h"
-#include "runtime/ecs/systems/transform_system.h"
+#include "runtime/ecs/systems/scene_graph.h"
 #include "runtime/input/input.h"
 #include "runtime/system/filesystem.h"
 #include "runtime/rendering/mesh.h"
@@ -277,10 +277,10 @@ namespace Docks
 	{
 		auto es = core::get_subsystem<editor::EditState>();
 		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
-		auto ts = core::get_subsystem<runtime::TransformSystem>();
+		auto sg = core::get_subsystem<runtime::SceneGraph>();
 		auto input = core::get_subsystem<runtime::Input>();
 
-		auto& roots = ts->get_roots();
+		auto& roots = sg->get_roots();
 
 		auto& editor_camera = es->camera;
 		auto& selected = es->selection_data.object;

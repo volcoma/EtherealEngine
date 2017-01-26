@@ -32,8 +32,9 @@ void CameraComponent::init(const uSize& size)
 		| BGFX_TEXTURE_V_CLAMP 
 		;
 
-	auto surface_format = gfx::TextureFormat::RGBA8;
-	auto depth_format = gfx::TextureFormat::D24;
+	auto g_buffer_format = gfx::TextureFormat::RGBA8;
+	auto depth_format = gfx::TextureFormat::D32;
+	auto light_buffer_format = gfx::TextureFormat::RGBA16F;
 	if (size.width == 0 && size.height == 0)
 	{
 		//create a depth buffer to share
@@ -42,20 +43,20 @@ void CameraComponent::init(const uSize& size)
 		(
 			std::vector<std::shared_ptr<Texture>>
 			{
-				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surface_format, sampler_flags),
-				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surface_format, sampler_flags),
-				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surface_format, sampler_flags),
+				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags),
+				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags),
+				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags),
 				depth_buffer
 			}
 		);
 
-		_light_buffer->populate(gfx::BackbufferRatio::Equal, gfx::TextureFormat::RGBA16F, sampler_flags);
+		_light_buffer->populate(gfx::BackbufferRatio::Equal, light_buffer_format, sampler_flags);
 
 		_output_buffer->populate
 		(
 			std::vector<std::shared_ptr<Texture>>
 			{
-				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, surface_format, sampler_flags),
+				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags),
 				depth_buffer
 			}
 		);
@@ -68,20 +69,20 @@ void CameraComponent::init(const uSize& size)
 		(
 			std::vector<std::shared_ptr<Texture>>
 			{
-				std::make_shared<Texture>(size.width, size.height, false, 1, surface_format, sampler_flags),
-				std::make_shared<Texture>(size.width, size.height, false, 1, surface_format, sampler_flags),
-				std::make_shared<Texture>(size.width, size.height, false, 1, surface_format, sampler_flags),
+				std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags),
+				std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags),
+				std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags),
 				depth_buffer
 			}
 		);
 
-		_light_buffer->populate(size.width, size.height, gfx::TextureFormat::RGBA16F, sampler_flags);
+		_light_buffer->populate(size.width, size.height, light_buffer_format, sampler_flags);
 
 		_output_buffer->populate
 		(
 			std::vector<std::shared_ptr<Texture>>
 			{
-				std::make_shared<Texture>(size.width, size.height, false, 1, surface_format, sampler_flags),
+				std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags),
 				depth_buffer
 			}
 		);
