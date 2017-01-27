@@ -1,6 +1,7 @@
 $input v_wpos, v_pos, v_wnormal, v_wtangent, v_wbitangent, v_texcoord0
 
 #include "common.sh"
+#include "lighting.sh"
 
 SAMPLER2D(s_tex_color,  0);
 SAMPLER2D(s_tex_normal, 1);
@@ -50,8 +51,22 @@ void main()
 	{
 		discard;
 	}
-	gl_FragData[0] = albedo_color;
-	gl_FragData[1] = vec4(encodeNormalUint(wnormal), roughness);
-	gl_FragData[2] = vec4(u_emissive_color.xyz.xyz, metalness);
-	gl_FragData[3] = u_subsurface_color;
+	
+	GBufferData buffer;
+	buffer.base_color = albedo_color.xyz;
+	buffer.ambient_occlusion = 1.0f;
+	buffer.world_normal = wnormal;
+	buffer.roughness = roughness;
+	buffer.emissive_color = u_emissive_color.xyz;
+	buffer.metalness = metalness;
+	buffer.subsurface_color = u_subsurface_color.xyz;
+	buffer.subsurface_opacity = u_subsurface_color.w;
+	
+	vec4 result[4];
+	encodeGBuffer(buffer, result);
+	
+	gl_FragData[0] = result[0];
+	gl_FragData[1] = result[1];
+	gl_FragData[2] = result[2];
+	gl_FragData[3] = result[3];
 }

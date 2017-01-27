@@ -1,6 +1,59 @@
 #ifndef __LIGHTING_SH__
 #define __LIGHTING_SH__
 
+struct GBufferData
+{
+	vec3 base_color;
+	
+	float ambient_occlusion;
+	
+	vec3 world_normal;
+	
+	float roughness;
+	
+	vec3 emissive_color;
+	
+	float metalness;
+	
+	vec3 subsurface_color;
+	
+	float subsurface_opacity;
+	
+	float depth;
+};
+
+void encodeGBuffer(in GBufferData data, inout vec4 result[4])
+{
+	result[0] = vec4(data.base_color, data.ambient_occlusion);
+	result[1] = vec4(encodeNormalUint(data.world_normal), data.roughness);
+	result[2] = vec4(data.emissive_color, data.metalness);
+	result[3] = vec4(data.subsurface_color, data.subsurface_opacity);
+}
+
+GBufferData decodeGBuffer(vec2 texcoord, sampler2D tex0, sampler2D tex1, sampler2D tex2, sampler2D tex3, sampler2D tex4)
+{
+	GBufferData data;
+	
+	vec4 data0 = texture2D(tex0, texcoord);
+	vec4 data1 = texture2D(tex1, texcoord);
+	vec4 data2 = texture2D(tex2, texcoord);
+	vec4 data3 = texture2D(tex3, texcoord);
+	float deviceDepth = texture2D(tex4, texcoord).x;
+
+	data.base_color = data0.xyz;
+	data.ambient_occlusion = data0.w;
+	data.world_normal = decodeNormalUint(data1.xyz);
+	data.roughness = data1.w;
+	data.emissive_color = data2.xyz;
+	data.metalness = data2.w;
+	data.subsurface_color = data3.xyz;
+	data.subsurface_opacity = data3.w;
+	data.depth = toClipSpaceDepth(deviceDepth);
+	
+	return data;
+}
+
+
 float BiasedNDotL(float NDotLWithoutSaturate )
 {
 	return saturate(NDotLWithoutSaturate * 1.08f - 0.08f);
