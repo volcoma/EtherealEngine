@@ -1314,6 +1314,9 @@
     <ClInclude Include="..\..\source\core\common\string.h">
       <Filter>Source Files\common</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\core\common\pathname_tag_tree.h">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\core\reflection\rttr\enumeration.cpp">
@@ -1446,6 +1449,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\core\common\string.cpp">
+      <Filter>Source Files\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\common\pathname_tag_tree.cpp">
       <Filter>Source Files\common</Filter>
     </ClCompile>
   </ItemGroup>

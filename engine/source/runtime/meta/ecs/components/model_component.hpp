@@ -7,7 +7,7 @@
 
 REFLECT(ModelComponent)
 {
-	rttr::registration::class_<ModelComponent>("ModelComponent")
+	rttr::registration::class_<ModelComponent>("Component/Model")
 		.constructor<>()
 		(
 			rttr::policy::ctor::as_std_shared_ptr,
