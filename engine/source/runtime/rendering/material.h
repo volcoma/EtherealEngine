@@ -486,7 +486,7 @@ private:
 	math::color _subsurface_color
 	{
 		0.0f, 0.0f, 0.0f, /// Color
-		0.5f /// Opacity
+		0.8f /// Opacity
 	};
 	/// Emissive color
 	math::color _emissive_color
