@@ -142,7 +142,7 @@ vec3 AreaLightSpecular( float SourceRadius, float SourceLength, vec3 LightDirect
 // 0: Lambert
 // 1: Burley
 // 2: Oren-Nayar
-#define PHYSICAL_DIFFUSE	2
+#define PHYSICAL_DIFFUSE	0
 
 // Microfacet distribution function
 // 0: Blinn
