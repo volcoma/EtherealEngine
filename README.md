@@ -59,6 +59,9 @@ private:
 
 ![preview6](https://cloud.githubusercontent.com/assets/1499411/22198950/78759b82-e161-11e6-9681-219d15f1482f.png)
 
+## LICENSE
+[LINK](LICENSE.md)
+
 ## LIBRARIES
 bgfx - https://github.com/bkaradzic/bgfx
 
