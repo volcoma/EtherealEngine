@@ -96,18 +96,18 @@ namespace bgfx
 
 	typedef std::vector<Uniform> UniformArray;
 
-	void printCode(const char* _code, int32_t _line = 0, int32_t _start = 0, int32_t _end = INT32_MAX, int32_t _column = -1);
+	void printCode(std::string& err, const char* _code, int32_t _line = 0, int32_t _start = 0, int32_t _end = INT32_MAX, int32_t _column = -1);
 	void strReplace(char* _str, const char* _find, const char* _replace);
 	int32_t writef(bx::WriterI* _writer, const char* _format, ...);
 	void writeFile(const char* _filePath, const void* _data, int32_t _size);
 
-	bool compileGLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer);
-	bool compileHLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer);
-	bool compilePSSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer);
-	bool compileSPIRVShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer);
+	bool compileGLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, std::string& err);
+	bool compileHLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, std::string& err);
+	bool compilePSSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, std::string& err);
+	bool compileSPIRVShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, std::string& err);
 
 } // namespace bgfx
 
-int compile_shader(int _argc, const char* _argv[], bx::MemoryBlock& memBlock, int64_t& sz);
+int compile_shader(int _argc, const char* _argv[], bx::MemoryBlock& memBlock, int64_t& sz, std::string& err);
 
 #endif // SHADERC_H_HEADER_GUARD

@@ -109,24 +109,24 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 		bx::CrtAllocator allocator;
 		bx::MemoryBlock memBlock(&allocator);
 		int64_t sz;
+		std::string err;
+		int result = 0;
 		if (platform != gfx::RendererType::Direct3D9 && platform != gfx::RendererType::Direct3D11)
 		{
 			//glsl shader compilation is not thread safe-
 			static std::mutex mtx;
 			std::lock_guard<std::mutex> lock(mtx);
-			if (compile_shader(arg_count, args_array, memBlock, sz) != 0)
-			{
-				logger->error().write("Failed compilation of {0} with opengl", strInput);
-				continue;;
-			}
+			result = compile_shader(arg_count, args_array, memBlock, sz, err);
 		}
 		else
 		{
-			if (compile_shader(arg_count, args_array, memBlock, sz) != 0)
-			{
-				logger->error().write("Failed compilation of {0} with d3d", strInput);
-				continue;
-			}
+			result = compile_shader(arg_count, args_array, memBlock, sz, err);
+		}
+
+		if (result != 0)
+		{
+			logger->error().write("Failed compilation of {0} for {1} with error \n{2}", strInput, gfx::getRendererName(platform), err);
+			continue;
 		}
 
 		if (sz > 0)

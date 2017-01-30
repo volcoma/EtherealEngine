@@ -374,8 +374,9 @@ namespace bgfx
 		strReplace(_str, "\r",   "\n");
 	}
 
-	void printCode(const char* _code, int32_t _line, int32_t _start, int32_t _end, int32_t _column)
+	void printCode(std::string& err, const char* _code, int32_t _line, int32_t _start, int32_t _end, int32_t _column)
 	{
+		//bx::stringPrintf(err, "Code:\n---\n");
 		fprintf(stderr, "Code:\n---\n");
 
 		LineReader lr(_code);
@@ -385,16 +386,21 @@ namespace bgfx
 			{
 				if (_line == line)
 				{
+					//bx::stringPrintf(err, "\n");
 					fprintf(stderr, "\n");
+					//bx::stringPrintf(err, ">>> %3d: %s", line, lr.getLine().c_str());
 					fprintf(stderr, ">>> %3d: %s", line, lr.getLine().c_str() );
 					if (-1 != _column)
 					{
+						//bx::stringPrintf(err, ">>> %3d: %*s\n", _column, _column, "^");
 						fprintf(stderr, ">>> %3d: %*s\n", _column, _column, "^");
 					}
+					//bx::stringPrintf(err, "\n");
 					fprintf(stderr, "\n");
 				}
 				else
 				{
+					//bx::stringPrintf(err, "    %3d: %s", line, lr.getLine().c_str());
 					fprintf(stderr, "    %3d: %s", line, lr.getLine().c_str() );
 				}
 			}
@@ -404,6 +410,7 @@ namespace bgfx
 			}
 		}
 
+		//bx::stringPrintf(err, "---\n");
 		fprintf(stderr, "---\n");
 	}
 
@@ -740,7 +747,7 @@ namespace bgfx
 // 			);
 // 	}
 
-	int compileShader(int _argc, const char* _argv[], bx::MemoryBlock& memBlock, int64_t& sz)
+	int compileShader(int _argc, const char* _argv[], bx::MemoryBlock& memBlock, int64_t& sz, std::string& err)
 	{
 		bx::CommandLine cmdLine(_argc, _argv);
 
@@ -1000,6 +1007,7 @@ namespace bgfx
 			break;
 
 		default:
+			bx::stringPrintf(err, "Unknown type: %s?!", type);
 			fprintf(stderr, "Unknown type: %s?!", type);
 			return EXIT_FAILURE;
 		}
@@ -1009,6 +1017,7 @@ namespace bgfx
 		bx::CrtFileReader reader;
 		if (!bx::open(&reader, filePath) )
 		{
+			bx::stringPrintf(err, "Unable to open file '%s'.\n", filePath);
 			fprintf(stderr, "Unable to open file '%s'.\n", filePath);
 		}
 		else
@@ -1026,6 +1035,7 @@ namespace bgfx
 			}
 			else
 			{
+				bx::stringPrintf(err, "ERROR: Failed to parse varying def file: \"%s\" No input/output semantics will be generated in the code!\n", varyingdef);
 				fprintf(stderr, "ERROR: Failed to parse varying def file: \"%s\" No input/output semantics will be generated in the code!\n", varyingdef);
 			}
 
@@ -1234,11 +1244,11 @@ namespace bgfx
 				}
 				else if (0 != pssl)
 				{
-					compiled = compilePSSLShader(cmdLine, 0, input, writer);
+					compiled = compilePSSLShader(cmdLine, 0, input, writer, err);
 				}
 				else
 				{
-					compiled = compileHLSLShader(cmdLine, d3d, input, writer);
+					compiled = compileHLSLShader(cmdLine, d3d, input, writer, err);
 				}
 
 				//bx::close(writer);
@@ -1250,6 +1260,7 @@ namespace bgfx
 				char* entry = strstr(input, "void main()");
 				if (NULL == entry)
 				{
+					bx::stringPrintf(err, "Shader entry point 'void main()' is not found.\n");
 					fprintf(stderr, "Shader entry point 'void main()' is not found.\n");
 				}
 				else
@@ -1402,15 +1413,15 @@ namespace bgfx
 							}
 							else if (0 != spirv)
 							{
-								compiled = compileSPIRVShader(cmdLine, 0, preprocessor.m_preprocessed, writer);
+								compiled = compileSPIRVShader(cmdLine, 0, preprocessor.m_preprocessed, writer, err);
 							}
 							else if (0 != pssl)
 							{
-								compiled = compilePSSLShader(cmdLine, 0, preprocessor.m_preprocessed, writer);
+								compiled = compilePSSLShader(cmdLine, 0, preprocessor.m_preprocessed, writer, err);
 							}
 							else
 							{
-								compiled = compileHLSLShader(cmdLine, d3d, preprocessor.m_preprocessed, writer);
+								compiled = compileHLSLShader(cmdLine, d3d, preprocessor.m_preprocessed, writer, err);
 							}
 							sz = writer->seek(0, bx::Whence::End);
 							//bx::close(writer);
@@ -1439,6 +1450,7 @@ namespace bgfx
 				char* entry = strstr(input, "void main()");
 				if (NULL == entry)
 				{
+					bx::stringPrintf(err, "Shader entry point 'void main()' is not found.\n");
 					fprintf(stderr, "Shader entry point 'void main()' is not found.\n");
 				}
 				else
@@ -1649,6 +1661,7 @@ namespace bgfx
 								}
 								else
 								{
+									bx::stringPrintf(err, "PrimitiveID builtin is not supported by this D3D9 HLSL.\n");
 									fprintf(stderr, "PrimitiveID builtin is not supported by this D3D9 HLSL.\n");
 									return EXIT_FAILURE;
 								}
@@ -1984,7 +1997,7 @@ namespace bgfx
 									, metal ? BX_MAKEFOURCC('M', 'T', 'L', 0) : essl
 									, code
 									, writer
-									);
+									, err);
 							}
 							else if (0 != spirv)
 							{
@@ -1992,7 +2005,7 @@ namespace bgfx
 									, 0
 									, preprocessor.m_preprocessed
 									, writer
-									);
+									, err);
 							}
 							else if (0 != pssl)
 							{
@@ -2000,7 +2013,7 @@ namespace bgfx
 									, 0
 									, preprocessor.m_preprocessed
 									, writer
-									);
+									, err);
 							}
 							else
 							{
@@ -2008,7 +2021,7 @@ namespace bgfx
 									, d3d
 									, preprocessor.m_preprocessed
 									, writer
-									);
+									, err);
 							}
 							sz = writer->seek(0, bx::Whence::End);
 							//bx::close(writer);
@@ -2043,13 +2056,14 @@ namespace bgfx
 
 		remove(outFilePath);
 
+		bx::stringPrintf(err, "Failed to build shader.\n");
 		fprintf(stderr, "Failed to build shader.\n");
 		return EXIT_FAILURE;
 	}
 
 } // namespace bgfx
 
-int compile_shader(int _argc, const char* _argv[], bx::MemoryBlock& memBlock, int64_t& sz)
+int compile_shader(int _argc, const char* _argv[], bx::MemoryBlock& memBlock, int64_t& sz, std::string& err)
 {
-	return bgfx::compileShader(_argc, _argv, memBlock, sz);
+	return bgfx::compileShader(_argc, _argv, memBlock, sz, err);
 }

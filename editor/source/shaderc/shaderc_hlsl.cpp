@@ -543,11 +543,12 @@ namespace bgfx { namespace hlsl
 		return true;
 	}
 
-	static bool compile(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, bool _firstPass)
+	static bool compile(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, bool _firstPass, std::string& err)
 	{
 		const char* profile = _cmdLine.findOption('p', "profile");
 		if (NULL == profile)
 		{
+			bx::stringPrintf(err, "Error: Shader profile must be specified.\n");
 			fprintf(stderr, "Error: Shader profile must be specified.\n");
 			return false;
 		}
@@ -635,7 +636,8 @@ namespace bgfx { namespace hlsl
 				end   = start + 20;
 			}
 
-			printCode(_code.c_str(), line, start, end, column);
+			printCode(err, _code.c_str(), line, start, end, column);
+			bx::stringPrintf(err, "Error: D3DCompile failed 0x%08x %s\n", (uint32_t)hr, log);
 			fprintf(stderr, "Error: D3DCompile failed 0x%08x %s\n", (uint32_t)hr, log);
 			errorMsg->Release();
 			return false;
@@ -650,6 +652,7 @@ namespace bgfx { namespace hlsl
 		{
 			if (!getReflectionDataD3D9(code, uniforms) )
 			{
+				bx::stringPrintf(err, "Error: Unable to get D3D9 reflection data.\n");
 				fprintf(stderr, "Error: Unable to get D3D9 reflection data.\n");
 				goto error;
 			}
@@ -659,6 +662,7 @@ namespace bgfx { namespace hlsl
 			UniformNameList unusedUniforms;
 			if (!getReflectionDataD3D11(code, profile[0] == 'v', uniforms, numAttrs, attrs, size, unusedUniforms) )
 			{
+				bx::stringPrintf(err, "Error: Unable to get D3D11 reflection data.\n");
 				fprintf(stderr, "Error: Unable to get D3D11 reflection data.\n");
 				goto error;
 			}
@@ -699,7 +703,7 @@ namespace bgfx { namespace hlsl
 				}
 
 				// recompile with the unused uniforms converted to statics
-				return compile(_cmdLine, _version, output.c_str(), _writer, false);
+				return compile(_cmdLine, _version, output.c_str(), _writer, false, err);
 			}
 		}
 
@@ -797,9 +801,9 @@ namespace bgfx { namespace hlsl
 
 } // namespace hlsl
 
-	bool compileHLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer)
+	bool compileHLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, std::string& err)
 	{
-		return hlsl::compile(_cmdLine, _version, _code, _writer, true);
+		return hlsl::compile(_cmdLine, _version, _code, _writer, true, err);
 	}
 
 } // namespace bgfx
@@ -808,9 +812,9 @@ namespace bgfx { namespace hlsl
 
 namespace bgfx
 {
-	bool compileHLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer)
+	bool compileHLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, std::string& err)
 	{
-		BX_UNUSED(_cmdLine, _version, _code, _writer);
+		BX_UNUSED(_cmdLine, _version, _code, _writer, err);
 		fprintf(stderr, "HLSL compiler is not supported on this platform.\n");
 		return false;
 	}

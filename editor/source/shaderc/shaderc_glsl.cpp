@@ -8,7 +8,7 @@
 
 namespace bgfx { namespace glsl
 {
-	static bool compile(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer)
+	static bool compile(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, std::string& err)
 	{
 		char ch = char(tolower(_cmdLine.findOption('\0', "type")[0]) );
 		const glslopt_shader_type type = ch == 'f'
@@ -59,7 +59,8 @@ namespace bgfx { namespace glsl
 				end   = start + 20;
 			}
 
-			printCode(_code.c_str(), line, start, end, column);
+			printCode(err, _code.c_str(), line, start, end, column);
+			bx::stringPrintf(err, "Error: %s\n", log);
 			fprintf(stderr, "Error: %s\n", log);
 			glslopt_cleanup(ctx);
 			return false;
@@ -286,9 +287,9 @@ namespace bgfx { namespace glsl
 
 } // namespace glsl
 
-	bool compileGLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer)
+	bool compileGLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, std::string& err)
 	{
-		return glsl::compile(_cmdLine, _version, _code, _writer);
+		return glsl::compile(_cmdLine, _version, _code, _writer, err);
 	}
 
 } // namespace bgfx
