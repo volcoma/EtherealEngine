@@ -10,3 +10,5 @@ std::string extensions::shader = ".shc";
 std::string extensions::material = ".mtl";
 
 std::string extensions::prefab = ".pfb";
+
+std::string extensions::scene = ".sgr";

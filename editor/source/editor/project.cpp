@@ -12,6 +12,7 @@
 #include "meta/project.hpp"
 struct Mesh;
 struct Prefab;
+struct Scene;
 struct Texture;
 struct Shader;
 class Material;
@@ -208,6 +209,7 @@ namespace editor
 		watch_raw_assets<Mesh>(relative, "*.obj", recompile_assets);
 
 		watch_assets<Prefab>(relative, wildcard + extensions::prefab, true, true);
+		watch_assets<Scene>(relative, wildcard + extensions::scene, true, true);
 		watch_assets<Material>(relative, wildcard + extensions::material, true, false);
 	}
 

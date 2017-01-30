@@ -29,6 +29,7 @@
     <ClCompile Include="..\..\source\runtime\ecs\components\transform_component.cpp" />
     <ClCompile Include="..\..\source\runtime\ecs\ecs.cpp" />
     <ClCompile Include="..\..\source\runtime\ecs\prefab.cpp" />
+    <ClCompile Include="..\..\source\runtime\ecs\scene.cpp" />
     <ClCompile Include="..\..\source\runtime\ecs\systems\camera_system.cpp" />
     <ClCompile Include="..\..\source\runtime\ecs\systems\deferred_rendering.cpp" />
     <ClCompile Include="..\..\source\runtime\ecs\systems\scene_graph.cpp" />
@@ -86,6 +87,7 @@
     <ClInclude Include="..\..\source\runtime\ecs\components\transform_component.h" />
     <ClInclude Include="..\..\source\runtime\ecs\ecs.h" />
     <ClInclude Include="..\..\source\runtime\ecs\prefab.h" />
+    <ClInclude Include="..\..\source\runtime\ecs\scene.h" />
     <ClInclude Include="..\..\source\runtime\ecs\systems\camera_system.h" />
     <ClInclude Include="..\..\source\runtime\ecs\systems\deferred_rendering.h" />
     <ClInclude Include="..\..\source\runtime\ecs\systems\scene_graph.h" />

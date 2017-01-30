@@ -7,6 +7,7 @@
 #include "runtime/assets/asset_extensions.h"
 #include "runtime/system/filesystem.h"
 #include "runtime/ecs/prefab.h"
+#include "runtime/ecs/scene.h"
 #include "runtime/ecs/utils.h"
 #include "runtime/input/input.h"
 #include "../../edit_state.h"
@@ -34,6 +35,14 @@ AssetHandle<Texture> get_asset_icon(AssetHandle<Prefab> asset)
 	auto es = core::get_subsystem<editor::EditState>();
 	return es->icons["prefab"];
 }
+
+template<>
+AssetHandle<Texture> get_asset_icon(AssetHandle<Scene> asset)
+{
+	auto es = core::get_subsystem<editor::EditState>();
+	return es->icons["scene"];
+}
+
 template<>
 AssetHandle<Texture> get_asset_icon(AssetHandle<Mesh> asset)
 {
@@ -98,7 +107,7 @@ int list_item(Wrapper& entry, const std::string& name, const std::string& relati
 		{
 			if (is_directory)
 			{
-				fs::remove(absolute, std::error_code{});
+				fs::remove_all(absolute, std::error_code{});
 			}
 			else
 			{
@@ -185,7 +194,8 @@ int list_item(Wrapper& entry, const std::string& name, const std::string& relati
 			dragged.is_type<AssetHandle<Mesh>>() ||
 			dragged.is_type<AssetHandle<Shader>>() ||
 			dragged.is_type<AssetHandle<Material>>() ||
-			dragged.is_type<AssetHandle<Prefab>>())
+			dragged.is_type<AssetHandle<Prefab>>() ||
+			dragged.is_type<AssetHandle<Scene>>())
 			{
 				gui::SetMouseCursor(ImGuiMouseCursor_Move);
 			}
@@ -211,7 +221,8 @@ void list_dir(editor::AssetFolder* dir,
 	std::shared_ptr<runtime::TStorage<Texture>> textures, 
 	std::shared_ptr<runtime::TStorage<Shader>> shaders, 
 	std::shared_ptr<runtime::TStorage<Material>> materials,
-	std::shared_ptr<runtime::TStorage<Prefab>> prefabs)
+	std::shared_ptr<runtime::TStorage<Prefab>> prefabs,
+	std::shared_ptr<runtime::TStorage<Scene>> scenes)
 {
 	if (!dir)
 		return;
@@ -294,6 +305,35 @@ void list_dir(editor::AssetFolder* dir,
 					file.absolute, 
 					*am, *input, *es);
 			}
+			if (file.extension == extensions::scene)
+			{
+
+				auto& request = scenes->container[file.relative];
+				AssetHandle<Scene> asset = request.asset;
+
+				int action = list_item<AssetHandle<Scene>, Scene>(
+					asset,
+					file.name,
+					file.relative,
+					file.absolute,
+					*am, *input, *es);
+
+				if (action == 3)
+				{
+					if (asset)
+					{
+						auto es = core::get_subsystem<editor::EditState>();
+						auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
+
+						ecs->dispose();
+						es->load_editor_camera();
+						asset->instantiate();
+						es->scene = fs::resolve_protocol(asset.id()).string() + extensions::scene;
+
+					}
+					
+				}
+			}
 			if (file.extension == extensions::shader)
 			{
 
@@ -349,6 +389,7 @@ namespace Docks
 		auto textures = am->get_storage<Texture>();
 		auto materials = am->get_storage<Material>();
 		auto prefabs = am->get_storage<Prefab>();
+		auto scenes = am->get_storage<Scene>();
 		auto shaders = am->get_storage<Shader>();
 
 		float width = gui::GetContentRegionAvailWidth();
@@ -505,7 +546,7 @@ namespace Docks
 			get_icon() = AssetHandle<Texture>();
 
 			auto current_folder = editor::AssetFolder::opened;	
-			list_dir(current_folder.get(), meshes, textures, shaders, materials, prefabs);
+			list_dir(current_folder.get(), meshes, textures, shaders, materials, prefabs, scenes);
 			get_icon() = AssetHandle<Texture>();
 			gui::EndChild();
 		}

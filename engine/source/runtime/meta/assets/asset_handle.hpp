@@ -10,6 +10,7 @@
 #include "../../rendering/texture.h"
 #include "../../rendering/material.h"
 #include "../../ecs/prefab.h"
+#include "../../ecs/scene.h"
 
 template<typename T>
 inline void load_asset(AssetHandle<T>& obj, const std::string& id, bool async)
@@ -85,6 +86,14 @@ namespace cereal
 	inline void LOAD_FUNCTION_NAME(Archive & ar, AssetHandle<Prefab>& obj)
 	{
 		LOAD_FUNCTION_NAME<Archive, Prefab>(ar, obj);
+
+		load_asset(obj, obj.link->id, true);
+	}
+
+	template<typename Archive>
+	inline void LOAD_FUNCTION_NAME(Archive & ar, AssetHandle<Scene>& obj)
+	{
+		LOAD_FUNCTION_NAME<Archive, Scene>(ar, obj);
 
 		load_asset(obj, obj.link->id, true);
 	}

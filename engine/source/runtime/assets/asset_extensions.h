@@ -8,4 +8,5 @@ struct extensions
 	static std::string shader;
 	static std::string material;
 	static std::string prefab;
+	static std::string scene;
 };

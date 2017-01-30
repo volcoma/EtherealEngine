@@ -1,5 +1,5 @@
-#include "Prefab.h"
-#include "Utils.h"
+#include "prefab.h"
+#include "utils.h"
 
 runtime::Entity Prefab::instantiate()
 {

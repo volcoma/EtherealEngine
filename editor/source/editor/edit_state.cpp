@@ -5,6 +5,9 @@
 #include "runtime/rendering/material.h"
 #include "runtime/system/sfml/Window.hpp"
 #include "runtime/ecs/prefab.h"
+#include "runtime/ecs/utils.h"
+#include "runtime/ecs/components/transform_component.h"
+#include "runtime/ecs/components/camera_component.h"
 
 namespace editor
 {
@@ -103,6 +106,12 @@ namespace editor
 			icons["prefab"] = asset;
 		});
 
+		am->load<Texture>("editor_data:/icons/scene", false)
+			.then([this](auto asset) mutable
+		{
+			icons["scene"] = asset;
+		});
+
 		am->load<Texture>("editor_data:/icons/shader", false)
 			.then([this](auto asset) mutable
 		{
@@ -120,6 +129,30 @@ namespace editor
 		});
 		
 		return true;
+	}
+
+	void EditState::save_editor_camera()
+	{
+		auto es = core::get_subsystem<editor::EditState>();
+		if (es->camera)
+			ecs::utils::save_data(fs::resolve_protocol("app:/settings/editor_camera.cfg"), { es->camera });
+	}
+
+	void EditState::load_editor_camera()
+	{
+		auto es = core::get_subsystem<editor::EditState>();
+		runtime::Entity object;
+		if (!ecs::utils::try_load_entity(fs::resolve_protocol("app:/settings/editor_camera.cfg"), object))
+		{
+			auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
+			object = ecs->create();
+			object.set_name("EDITOR CAMERA");
+			object.assign<TransformComponent>().lock()
+				->set_local_position({ 0.0f, 2.0f, -5.0f });
+			object.assign<CameraComponent>();
+		}
+
+		es->camera = object;
 	}
 
 	void EditState::dispose()

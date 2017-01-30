@@ -249,6 +249,9 @@
     <ClCompile Include="..\..\source\runtime\ecs\systems\scene_graph.cpp">
       <Filter>Source Files\ecs\systems</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\runtime\ecs\scene.cpp">
+      <Filter>Source Files\ecs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\runtime\runtime.h">
@@ -544,6 +547,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\runtime\ecs\systems\scene_graph.h">
       <Filter>Source Files\ecs\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\ecs\scene.h">
+      <Filter>Source Files\ecs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -443,3 +443,48 @@ void AssetReader::load_prefab_from_file(const std::string& key, const fs::path& 
 		createResource();
 	}
 }
+
+void AssetReader::load_scene_from_file(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Scene>& request)
+{
+
+	std::shared_ptr<std::istringstream> read_memory = std::make_shared<std::istringstream>();
+
+	auto readMemory = [read_memory, absoluteKey]()
+	{
+		if (!read_memory)
+			return;
+
+		auto mem = fs::read_stream(std::fstream{ absoluteKey, std::fstream::in | std::fstream::out | std::ios::binary });
+		*read_memory = std::istringstream(std::string(reinterpret_cast<const char*>(mem.data()), mem.size()));
+	};
+
+	auto createResource = [read_memory, key, absoluteKey, &request]() mutable
+	{
+		auto scene = std::make_shared<Scene>();
+		scene->data = read_memory;
+		request.set_data(key, scene);
+		request.invoke_callbacks();
+	};
+
+
+	if (async)
+	{
+		auto ts = core::get_subsystem<runtime::TaskSystem>();
+
+		auto task = ts->create("", [ts, readMemory, createResource]() mutable
+		{
+			readMemory();
+
+			auto callback = ts->create("Create Resource", createResource);
+
+			ts->run_on_main(callback);
+		});
+		request.set_task(task);
+		ts->run(task);
+	}
+	else
+	{
+		readMemory();
+		createResource();
+	}
+}

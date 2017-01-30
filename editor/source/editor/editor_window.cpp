@@ -12,6 +12,7 @@
 #include "runtime/system/filesystem.h"
 #include "runtime/rendering/render_pass.h"
 #include "runtime/assets/asset_manager.h"
+#include "runtime/assets/asset_extensions.h"
 #include "runtime/input/input.h"
 #include "core/logging/logging.h"
 
@@ -93,38 +94,13 @@ void default_scene()
 	}
 }
 
-void save_editor_camera()
-{
-	auto es = core::get_subsystem<editor::EditState>();
-	if (es->camera)
-		ecs::utils::save_data(fs::resolve_protocol("app:/settings/editor_camera.cfg"), { es->camera });
-}
-
-void load_editor_camera()
-{
-	auto es = core::get_subsystem<editor::EditState>();
-	runtime::Entity object;
-	if (!ecs::utils::try_load_entity(fs::resolve_protocol("app:/settings/editor_camera.cfg"), object))
-	{
-		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
-		object = ecs->create();
-		object.set_name("EDITOR CAMERA");
-		object.assign<TransformComponent>().lock()
-			->set_local_position({ 0.0f, 2.0f, -5.0f });
-		object.assign<CameraComponent>();
-	}
-	
-	es->camera = object;
-}
-
-
 auto create_new_scene()
 {
 	auto es = core::get_subsystem<editor::EditState>();
 	auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
-	save_editor_camera();
+	es->save_editor_camera();
 	ecs->dispose();
-	load_editor_camera();
+	es->load_editor_camera();
 	default_scene();
 	es->scene.clear();
 }
@@ -134,11 +110,11 @@ auto open_scene()
 	auto es = core::get_subsystem<editor::EditState>();
 	auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 	std::string path;
-	if (open_file_dialog("sgr", fs::resolve_protocol("app:/data").string(), path))
+	if (open_file_dialog(extensions::scene.substr(1), fs::resolve_protocol("app:/data").string(), path))
 	{
-		save_editor_camera();
+		es->save_editor_camera();
 		ecs->dispose();
-		load_editor_camera();
+		es->load_editor_camera();
 
 		std::vector<runtime::Entity> outData;
 		if (ecs::utils::load_data(path, outData))
@@ -158,7 +134,7 @@ auto save_scene()
 		ecs::utils::save_data(path, entities);
 	}
 
-	save_editor_camera();
+	es->save_editor_camera();
 }
 
 void save_scene_as()
@@ -166,13 +142,13 @@ void save_scene_as()
 	auto es = core::get_subsystem<editor::EditState>();
 
 	std::string path;
-	if (save_file_dialog("sgr", fs::resolve_protocol("app:/data").string(), path))
+	if (save_file_dialog(extensions::scene.substr(1), fs::resolve_protocol("app:/data").string(), path))
 	{
-		es->scene = path + ".sgr";		
+		es->scene = path + extensions::scene;
 		save_scene();	
 	}
 
-	save_editor_camera();
+	es->save_editor_camera();
 }
 
 
@@ -386,7 +362,7 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 				if (gui::Selectable(path.c_str()))
 				{
 					pm->open_project(path, recompile_assets);
-					load_editor_camera();
+					es->load_editor_camera();
 					set_main(false);
 					close();
 				}
@@ -416,7 +392,7 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 			if (pick_folder_dialog("", path))
 			{
 				pm->create_project(path);
-				load_editor_camera();
+				es->load_editor_camera();
 				set_main(false);
 				close();
 			}
@@ -428,7 +404,7 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 			if (pick_folder_dialog("", path))
 			{
 				pm->open_project(path, recompile_assets);
-				load_editor_camera();
+				es->load_editor_camera();
 				set_main(false);
 				close();
 			}

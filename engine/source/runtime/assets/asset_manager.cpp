@@ -38,6 +38,11 @@ namespace runtime
 			storage->ext = extensions::prefab;
 			storage->load_from_file = AssetReader::load_prefab_from_file;
 		}
+		{
+			auto storage = add<Scene>();
+			storage->ext = extensions::scene;
+			storage->load_from_file = AssetReader::load_scene_from_file;
+		}
 
 		return true;
 	}
