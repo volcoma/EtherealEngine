@@ -3,22 +3,14 @@
 
 struct GBufferData
 {
-	vec3 base_color;
-	
-	float ambient_occlusion;
-	
-	vec3 world_normal;
-	
-	float roughness;
-	
-	vec3 emissive_color;
-	
-	float metalness;
-	
-	vec3 subsurface_color;
-	
-	float subsurface_opacity;
-	
+	vec3 base_color;	
+	float ambient_occlusion;	
+	vec3 world_normal;	
+	float roughness;	
+	vec3 emissive_color;	
+	float metalness;	
+	vec3 subsurface_color;	
+	float subsurface_opacity;	
 	float depth;
 };
 

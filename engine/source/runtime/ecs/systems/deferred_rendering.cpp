@@ -16,67 +16,6 @@
 
 namespace runtime
 {
-	float get_half_texel()
-	{
-		const gfx::RendererType::Enum renderer = gfx::getRendererType();
-		float half_texel = gfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
-		return half_texel;
-	}
-	void screen_space_quad(float texture_width, float texture_height, float texture_half, bool origin_bottom_left, float width = 1.0f, float height = 1.0f)
-	{
-		if (3 == gfx::getAvailTransientVertexBuffer(3, gfx::PosTexCoord0Vertex::decl))
-		{
-			gfx::TransientVertexBuffer vb;
-			gfx::allocTransientVertexBuffer(&vb, 3, gfx::PosTexCoord0Vertex::decl);
-			gfx::PosTexCoord0Vertex* vertex = (gfx::PosTexCoord0Vertex*)vb.data;
-
-			const float minx = -width;
-			const float maxx = width;
-			const float miny = 0.0f;
-			const float maxy = height*2.0f;
-
-			const float texel_half_w = texture_half / texture_width;
-			const float texel_half_h = texture_half / texture_height;
-			const float minu = -1.0f + texel_half_w;
-			const float maxu = 1.0f + texel_half_h;
-
-			const float zz = 0.0f;
-
-			float minv = texel_half_h;
-			float maxv = 2.0f + texel_half_h;
-
-			if (origin_bottom_left)
-			{
-				float temp = minv;
-				minv = maxv;
-				maxv = temp;
-
-				minv -= 1.0f;
-				maxv -= 1.0f;
-			}
-
-			vertex[0].x = minx;
-			vertex[0].y = miny;
-			vertex[0].z = zz;
-			vertex[0].u = minu;
-			vertex[0].v = minv;
-
-			vertex[1].x = maxx;
-			vertex[1].y = miny;
-			vertex[1].z = zz;
-			vertex[1].u = maxu;
-			vertex[1].v = minv;
-
-			vertex[2].x = maxx;
-			vertex[2].y = maxy;
-			vertex[2].z = zz;
-			vertex[2].u = maxu;
-			vertex[2].v = maxv;
-
-			gfx::setVertexBuffer(&vb);
-		}
-	}
-
 	void update_lod_data(LodData& lod_data, std::size_t total_lods, float min_dist, float max_dist, float transition_time, float distance, float dt)
 	{
 		if (total_lods == 1)
@@ -313,7 +252,7 @@ namespace runtime
 					| BGFX_STATE_BLEND_ADD
 				);
 
-				screen_space_quad((float)light_buffer_size.width, (float)light_buffer_size.height, get_half_texel(), bgfx::getCaps()->originBottomLeft);
+				gfx::screen_quad((float)light_buffer_size.width, (float)light_buffer_size.height);
 				gfx::submit(light_pass.id, _directional_light_program->handle);
 			}
 			if (light.light_type == LightType::Point && _point_light_program)
@@ -354,7 +293,7 @@ namespace runtime
 					| BGFX_STATE_ALPHA_WRITE
 					| BGFX_STATE_BLEND_ADD
 				);
-				screen_space_quad((float)light_buffer_size.width, (float)light_buffer_size.height, get_half_texel(), bgfx::getCaps()->originBottomLeft);
+				gfx::screen_quad((float)light_buffer_size.width, (float)light_buffer_size.height);
 				gfx::submit(light_pass.id, _point_light_program->handle);
 
 			}
@@ -399,7 +338,7 @@ namespace runtime
 					| BGFX_STATE_BLEND_ADD
 				);
 
-				screen_space_quad((float)light_buffer_size.width, (float)light_buffer_size.height, get_half_texel(), bgfx::getCaps()->originBottomLeft);
+				gfx::screen_quad((float)light_buffer_size.width, (float)light_buffer_size.height);
 				gfx::submit(light_pass.id, _spot_light_program->handle);
 			}
 		});
@@ -429,7 +368,7 @@ namespace runtime
 				| BGFX_STATE_RGB_WRITE
 				| BGFX_STATE_ALPHA_WRITE
 			);
-			screen_space_quad((float)output_size.width, (float)output_size.height, get_half_texel(), bgfx::getCaps()->originBottomLeft);
+			gfx::screen_quad((float)output_size.width, (float)output_size.height);
 			gfx::submit(pass_blit.id, _gamma_correction_program->handle);
 		}
 

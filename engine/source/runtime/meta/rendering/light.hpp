@@ -116,6 +116,7 @@ SAVE(Light)
 	try_save(ar, cereal::make_nvp("dir_num_splits", obj.directional_data.num_splits));
 	try_save(ar, cereal::make_nvp("dir_split_distribution", obj.directional_data.split_distribution));
 	try_save(ar, cereal::make_nvp("dir_stabilize", obj.directional_data.stabilize));
+	try_save(ar, cereal::make_nvp("intensity", obj.intensity));
 	try_save(ar, cereal::make_nvp("color", obj.color));
 }
 
@@ -135,5 +136,6 @@ LOAD(Light)
 	try_load(ar, cereal::make_nvp("dir_num_splits", obj.directional_data.num_splits));
 	try_load(ar, cereal::make_nvp("dir_split_distribution", obj.directional_data.split_distribution));
 	try_load(ar, cereal::make_nvp("dir_stabilize", obj.directional_data.stabilize));
+	try_load(ar, cereal::make_nvp("intensity", obj.intensity));
 	try_load(ar, cereal::make_nvp("color", obj.color));
 }

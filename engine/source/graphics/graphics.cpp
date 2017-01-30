@@ -4,34 +4,33 @@ namespace gfx
 {
 	bgfx::VertexDecl PosTexCoord0Vertex::decl;
 
-	void stretchRect(float _destWidth, float _destHeight, float _width /*= 1.0f*/, float _height /*= 1.0f*/)
+	void screen_quad(float dest_width, float dest_height, float width, float height)
 	{
-		const bgfx::RendererType::Enum renderer = bgfx::getRendererType();
-		float _texelHalf = bgfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
-		bool _originBottomLeft = bgfx::getCaps()->originBottomLeft;
+		float texture_half = get_half_texel();
+		bool origin_bottom_left = is_origin_bottom_left();
 
-		if (bgfx::getAvailTransientVertexBuffer(3, PosTexCoord0Vertex::decl) == 3)
+		if (3 == gfx::getAvailTransientVertexBuffer(3, gfx::PosTexCoord0Vertex::decl))
 		{
-			bgfx::TransientVertexBuffer vb;
-			bgfx::allocTransientVertexBuffer(&vb, 3, PosTexCoord0Vertex::decl);
-			PosTexCoord0Vertex* vertex = (PosTexCoord0Vertex*)vb.data;
+			gfx::TransientVertexBuffer vb;
+			gfx::allocTransientVertexBuffer(&vb, 3, gfx::PosTexCoord0Vertex::decl);
+			gfx::PosTexCoord0Vertex* vertex = (gfx::PosTexCoord0Vertex*)vb.data;
 
-			const float minx = -_width;
-			const float maxx = _width;
+			const float minx = -width;
+			const float maxx = width;
 			const float miny = 0.0f;
-			const float maxy = _height*2.0f;
+			const float maxy = height*2.0f;
 
-			const float texelHalfW = _texelHalf / _destWidth;
-			const float texelHalfH = _texelHalf / _destHeight;
-			const float minu = -1.0f + texelHalfW;
-			const float maxu = 1.0f + texelHalfH;
+			const float texel_half_w = texture_half / dest_width;
+			const float texel_half_h = texture_half / dest_height;
+			const float minu = -1.0f + texel_half_w;
+			const float maxu = 1.0f + texel_half_h;
 
 			const float zz = 0.0f;
 
-			float minv = texelHalfH;
-			float maxv = 2.0f + texelHalfH;
+			float minv = texel_half_h;
+			float maxv = 2.0f + texel_half_h;
 
-			if (_originBottomLeft)
+			if (origin_bottom_left)
 			{
 				float temp = minv;
 				minv = maxv;
@@ -59,7 +58,7 @@ namespace gfx
 			vertex[2].u = maxu;
 			vertex[2].v = maxv;
 
-			bgfx::setVertexBuffer(&vb);
+			gfx::setVertexBuffer(&vb);
 		}
 	}
 

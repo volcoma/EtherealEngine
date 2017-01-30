@@ -33,6 +33,17 @@ namespace gfx
 		static bgfx::VertexDecl decl;
 	};
 
+	inline float get_half_texel()
+	{
+		const RendererType::Enum renderer = getRendererType();
+		float half_texel = RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
+		return half_texel;
+	}
+
+	inline bool is_origin_bottom_left()
+	{
+		return getCaps()->originBottomLeft;
+	}
 
 	inline void shutdown()
 	{
@@ -58,7 +69,7 @@ namespace gfx
 		return initted;
 	}	
 
-	void stretchRect(float _destWidth, float _destHeight, float _width = 1.0f, float _height = 1.0f);
+	void screen_quad(float dest_width, float dest_height, float width = 1.0f, float height = 1.0f);
 }
 
 

@@ -268,8 +268,7 @@ void Image(std::shared_ptr<ITexture> texture, const ImVec2& _size, const ImVec2&
 
 	if (texture->is_render_target())
 	{
-		auto originBottomLeft = gfx::getCaps()->originBottomLeft;
-		if (originBottomLeft)
+		if (gfx::is_origin_bottom_left())
 		{
 			uv0 = { 0.0f, 1.0f };
 			uv1 = { 1.0f, 0.0f };
@@ -288,8 +287,7 @@ bool ImageButton(std::shared_ptr<ITexture> texture, const ImVec2& _size, const I
 
 	if (texture->is_render_target())
 	{
-		auto originBottomLeft = gfx::getCaps()->originBottomLeft;
-		if (originBottomLeft)
+		if (gfx::is_origin_bottom_left())
 		{
 			uv0 = { 0.0f, 1.0f };
 			uv1 = { 1.0f, 0.0f };
