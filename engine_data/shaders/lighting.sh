@@ -100,8 +100,22 @@ float PhongShadingPow(float X, float Y)
 float RadialAttenuation(vec3 WorldLightVector, float FalloffExponent)
 {
 	float NormalizeDistanceSquared = dot(WorldLightVector, WorldLightVector);
-
+	
+#if 1
 	return pow(1.0f - saturate(NormalizeDistanceSquared), FalloffExponent);
+#else	
+	// light less than x % is considered 0
+	const float CutoffPercentage = 30.0f;  
+	    
+	float CutoffFraction = CutoffPercentage * 0.01f;  
+
+	// those could be computed on C++ side
+	float PreCompX = 1.0f - CutoffFraction;
+	float PreCompY = CutoffFraction;
+	float PreCompZ = CutoffFraction / PreCompX;
+
+	return (1.0f / ( saturate(NormalizeDistanceSquared) * PreCompX + PreCompY) - 1.0f) * PreCompZ;
+#endif
 
 }
 
