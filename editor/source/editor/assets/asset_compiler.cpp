@@ -201,7 +201,7 @@ void MeshCompiler::compile(const fs::path& absoluteKey)
 
 	std::string strOutput = output.string();
 
-	static const int arg_count = 10;
+	static const int arg_count = 11;
 	const char* args_array[arg_count];
 	args_array[0] = "-f";
 	args_array[1] = strInput.c_str();
@@ -209,11 +209,12 @@ void MeshCompiler::compile(const fs::path& absoluteKey)
 	args_array[3] = strOutput.c_str();
 	args_array[4] = "--tangent";
 	args_array[5] = "--barycentric";
-	args_array[6] = "--packnormal";
-	args_array[7] = "1";
-	args_array[8] = "--packuv";
-	args_array[9] = "1";
-	
+	args_array[6] = "--flipv";
+	args_array[7] = "--packnormal";
+	args_array[8] = "1";
+	args_array[9] = "--packuv";
+	args_array[10] = "1";
+
 	auto logger = logging::get("Log");
 	if (compile_mesh(arg_count, args_array) != 0)
 	{

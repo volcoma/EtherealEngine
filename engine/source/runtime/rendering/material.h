@@ -458,6 +458,26 @@ public:
 	inline void set_metalness_map(AssetHandle<Texture> val) { _metalness_map = val; }
 
 	//-----------------------------------------------------------------------------
+	//  Name : get_metalness_map ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline AssetHandle<Texture> get_ao_map() const { return _ao_map; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : set_metalness_map ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline void set_ao_map(AssetHandle<Texture> val) { _ao_map = val; }
+
+	//-----------------------------------------------------------------------------
 	//  Name : submit (virtual )
 	/// <summary>
 	/// 
@@ -513,4 +533,6 @@ private:
 	AssetHandle<Texture> _roughness_map;
 	/// Metalness map
 	AssetHandle<Texture> _metalness_map;
+	/// AO map
+	AssetHandle<Texture> _ao_map;
 };

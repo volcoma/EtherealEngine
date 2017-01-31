@@ -7,6 +7,7 @@ SAMPLER2D(s_tex_color,  0);
 SAMPLER2D(s_tex_normal, 1);
 SAMPLER2D(s_tex_roughness, 2);
 SAMPLER2D(s_tex_metalness, 3);
+SAMPLER2D(s_tex_ao, 4);
 
 // per frame
 uniform vec4 u_camera_wpos;
@@ -27,6 +28,7 @@ void main()
 	
 	float roughness = texture2D(s_tex_roughness, texcoords).x * clamp(u_surface_data.x, 0.05f, 1.0f);
 	float metalness = texture2D(s_tex_metalness, texcoords).x * u_surface_data.y;
+	float ambient_occlusion = texture2D(s_tex_ao, texcoords).x;
 	float bumpiness = u_surface_data.z;
 	float alpha_test_value = u_surface_data.w;
 	
@@ -51,8 +53,8 @@ void main()
 	}
 	
 	GBufferData buffer;
-	buffer.base_color = albedo_color.xyz;
-	buffer.ambient_occlusion = 1.0f;
+	buffer.base_color = albedo_color.xyz * ambient_occlusion;
+	buffer.ambient_occlusion = ambient_occlusion;
 	buffer.world_normal = wnormal;
 	buffer.roughness = roughness;
 	buffer.emissive_color = u_emissive_color.xyz;

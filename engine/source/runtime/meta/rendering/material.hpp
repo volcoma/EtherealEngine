@@ -101,6 +101,12 @@ REFLECT(StandardMaterial)
 		(
 			rttr::metadata("Tooltip", "black/white texture. The more white the more metallic the surface.")
 		)
+		.property("AO Map",
+			&StandardMaterial::get_ao_map,
+			&StandardMaterial::set_ao_map)
+		(
+			rttr::metadata("Tooltip", "black/white texture.")
+		)
 		;
 }
 
@@ -118,6 +124,7 @@ SAVE(StandardMaterial)
 	try_save(ar, cereal::make_nvp("normal_map", obj._normal_map));
 	try_save(ar, cereal::make_nvp("roughness_map", obj._roughness_map));
 	try_save(ar, cereal::make_nvp("metalness_map", obj._metalness_map));
+	try_save(ar, cereal::make_nvp("ao_map", obj._ao_map));
 }
 
 LOAD(StandardMaterial)
@@ -133,6 +140,7 @@ LOAD(StandardMaterial)
 	try_load(ar, cereal::make_nvp("normal_map", obj._normal_map));
 	try_load(ar, cereal::make_nvp("roughness_map", obj._roughness_map));
 	try_load(ar, cereal::make_nvp("metalness_map", obj._metalness_map));
+	try_load(ar, cereal::make_nvp("ao_map", obj._ao_map));
 }
 
 #include "core/serialization/archives.h"

@@ -80,7 +80,7 @@ void default_scene()
 			->set_local_position({ 0.0f, 0.1f, 0.0f });
 
 		Model model;
-		am->load<Mesh>("engine_data:/meshes/bunny", false)
+		am->load<Mesh>("engine_data:/meshes/orb", false)
 			.then([&model](auto asset)
 		{
 			model.set_lod(asset, 0);

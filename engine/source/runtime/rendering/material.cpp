@@ -109,9 +109,11 @@ void StandardMaterial::submit()
 	auto normal = _normal_map ? _normal_map : _default_normal_map;
 	auto roughness = _roughness_map ? _roughness_map : _default_color_map;
 	auto metalness = _metalness_map ? _metalness_map : _default_color_map;
+	auto ao = _ao_map ? _ao_map : _default_color_map;
 
 	_program->set_texture(0, "s_tex_color", albedo.get());
 	_program->set_texture(1, "s_tex_normal", normal.get());
 	_program->set_texture(2, "s_tex_roughness", roughness.get());
 	_program->set_texture(3, "s_tex_metalness", metalness.get());
+	_program->set_texture(4, "s_tex_ao", ao.get());
 }

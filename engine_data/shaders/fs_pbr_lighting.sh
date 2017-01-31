@@ -31,8 +31,10 @@ vec4 pbr_light(vec2 texcoord0)
 	vec3 albedo_color = data.base_color - data.base_color * data.metalness;
 #if DIRECTIONAL_LIGHT
 	vec3 vector_to_light = -u_light_direction.xyz;
+	vec3 ambient_color = vec3(0.0f, 0.0f, 0.0f);//albedo_color * 0.05f;
 #else
 	vec3 vector_to_light = u_light_position.xyz - world_position;
+	vec3 ambient_color = vec3(0.0f, 0.0f, 0.0f);
 #endif
 	float distance_sqr = dot( vector_to_light, vector_to_light );
 	vec3 N = data.world_normal;
@@ -65,8 +67,10 @@ vec4 pbr_light(vec2 texcoord0)
 	vec3 subsurface_lighting = SubsurfaceShading(data.subsurface_color, data.subsurface_opacity, data.ambient_occlusion, L, V, N);
 	vec3 surface_multiplier = light_color * (NoL * surface_attenuation);
 	vec3 subsurface_multiplier = (light_color * subsurface_attenuation);
-	vec3 lighting = surface_multiplier * surface_lighting + subsurface_lighting * subsurface_multiplier + data.emissive_color;
-
+	//Add small constant ambient
+	vec3 indirect_lighting = ambient_color / PI;
+	vec3 lighting = surface_multiplier * surface_lighting + (subsurface_lighting + indirect_lighting) * subsurface_multiplier + data.emissive_color;
+	
 	vec4 result;
 	result.xyz = lighting;
 	result.w = 1.0f;
