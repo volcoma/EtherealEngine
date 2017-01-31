@@ -368,12 +368,12 @@ namespace runtime
 		}
 
 		template<typename T>
-		void create_asset_entry(
+		LoadRequest<T>& find_or_create_asset_entry(
 			const std::string& key
 		)
 		{
 			auto storage = get_storage<T>();
-			find_or_create_asset_impl<T>(key, storage->container);
+			return find_or_create_asset_impl<T>(key, storage->container);
 		}
 
 	private:

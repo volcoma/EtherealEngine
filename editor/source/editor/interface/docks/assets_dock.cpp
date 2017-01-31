@@ -216,13 +216,7 @@ int list_item(Wrapper& entry, const std::string& name, const std::string& relati
 };
 
 
-void list_dir(editor::AssetFolder* dir, 
-	std::shared_ptr<runtime::TStorage<Mesh>> meshes, 
-	std::shared_ptr<runtime::TStorage<Texture>> textures, 
-	std::shared_ptr<runtime::TStorage<Shader>> shaders, 
-	std::shared_ptr<runtime::TStorage<Material>> materials,
-	std::shared_ptr<runtime::TStorage<Prefab>> prefabs,
-	std::shared_ptr<runtime::TStorage<Scene>> scenes)
+void list_dir(editor::AssetFolder* dir)
 {
 	if (!dir)
 		return;
@@ -255,9 +249,7 @@ void list_dir(editor::AssetFolder* dir,
 		{
 			if (file.extension == extensions::texture)
 			{
-
-				auto& request = textures->container[file.relative];
-				AssetHandle<Texture> asset = request.asset;
+				AssetHandle<Texture> asset = am->find_or_create_asset_entry<Texture>(file.relative).asset;
 
 				list_item<AssetHandle<Texture>, Texture>(
 					asset,
@@ -269,8 +261,7 @@ void list_dir(editor::AssetFolder* dir,
 			if (file.extension == extensions::mesh)
 			{
 
-				auto& request = meshes->container[file.relative];
-				AssetHandle<Mesh> asset = request.asset;
+				AssetHandle<Mesh> asset = am->find_or_create_asset_entry<Mesh>(file.relative).asset;
 
 				list_item<AssetHandle<Mesh>, Mesh>(
 					asset,
@@ -281,9 +272,7 @@ void list_dir(editor::AssetFolder* dir,
 			}
 			if (file.extension == extensions::material)
 			{
-
-				auto& request = materials->container[file.relative];
-				AssetHandle<Material> asset = request.asset;
+				AssetHandle<Material> asset = am->find_or_create_asset_entry<Material>(file.relative).asset;
 				
 				list_item<AssetHandle<Material>, Material>(
 					asset,
@@ -294,9 +283,7 @@ void list_dir(editor::AssetFolder* dir,
 			}
 			if (file.extension == extensions::prefab)
 			{
-
-				auto& request = prefabs->container[file.relative];
-				AssetHandle<Prefab> asset = request.asset;
+				AssetHandle<Prefab> asset = am->find_or_create_asset_entry<Prefab>(file.relative).asset;
 
 				list_item<AssetHandle<Prefab>, Prefab>(
 					asset, 
@@ -307,9 +294,7 @@ void list_dir(editor::AssetFolder* dir,
 			}
 			if (file.extension == extensions::scene)
 			{
-
-				auto& request = scenes->container[file.relative];
-				AssetHandle<Scene> asset = request.asset;
+				AssetHandle<Scene> asset = am->find_or_create_asset_entry<Scene>(file.relative).asset;
 
 				int action = list_item<AssetHandle<Scene>, Scene>(
 					asset,
@@ -336,9 +321,7 @@ void list_dir(editor::AssetFolder* dir,
 			}
 			if (file.extension == extensions::shader)
 			{
-
-				auto& request = shaders->container[file.relative];
-				AssetHandle<Shader> asset = request.asset;
+				AssetHandle<Shader> asset = am->find_or_create_asset_entry<Shader>(file.relative).asset;
 
 				list_item<AssetHandle<Shader>, Shader>(
 					asset,
@@ -401,14 +384,7 @@ namespace Docks
 	void render_assets(ImVec2 area)
 	{
 		auto es = core::get_subsystem<editor::EditState>();
-		auto am = core::get_subsystem<runtime::AssetManager>();
 		auto input = core::get_subsystem<runtime::Input>();
-		auto meshes = am->get_storage<Mesh>();
-		auto textures = am->get_storage<Texture>();
-		auto materials = am->get_storage<Material>();
-		auto prefabs = am->get_storage<Prefab>();
-		auto scenes = am->get_storage<Scene>();
-		auto shaders = am->get_storage<Shader>();
 
 		float width = gui::GetContentRegionAvailWidth();
 
@@ -564,7 +540,7 @@ namespace Docks
 			get_icon() = AssetHandle<Texture>();
 
 			auto current_folder = editor::AssetFolder::opened;	
-			list_dir(current_folder.get(), meshes, textures, shaders, materials, prefabs, scenes);
+			list_dir(current_folder.get());
 			get_icon() = AssetHandle<Texture>();
 			gui::EndChild();
 		}

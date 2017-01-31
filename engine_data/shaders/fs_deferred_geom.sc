@@ -43,11 +43,9 @@ void main()
 	float distance_factor = saturate(distance / u_dither_threshold.y);
 	float dither = dither5x5(gl_FragCoord.xy);
 
-	if(
-	(albedo_color.a + (dither * (1.0f - alpha_test_value)) < 1.0f)
-	|| (distance_factor + dither < 1.0f)
-	|| (u_lod_params.x - dither * u_lod_params.y) > u_lod_params.z
-	)
+	if((albedo_color.a + (dither * (1.0f - alpha_test_value)) < 1.0f) || 
+	(distance_factor + dither < 1.0f) || 
+	(u_lod_params.x - dither * u_lod_params.y) > u_lod_params.z)
 	{
 		discard;
 	}

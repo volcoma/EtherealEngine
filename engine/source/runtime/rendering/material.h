@@ -169,15 +169,6 @@ public:
 	//-----------------------------------------------------------------------------
 	std::uint64_t get_render_states(bool apply_cull = true, bool depth_write = true, bool depth_test = true) const;
 
-	//-----------------------------------------------------------------------------
-	//  Name : begin_pass ()
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void begin_pass();
 protected:
 	/// Program that is responsible for rendering.
 	std::unique_ptr<Program> _program;

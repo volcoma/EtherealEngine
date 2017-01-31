@@ -175,7 +175,7 @@ struct Program
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void begin_pass();
+	bool begin_pass();
 
 	/// Shaders that created this program.
 	std::vector<AssetHandle<Shader>> shaders;

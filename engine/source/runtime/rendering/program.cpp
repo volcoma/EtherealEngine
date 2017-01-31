@@ -26,6 +26,8 @@ void Program::dispose()
 {
 	if (is_valid())
 		gfx::destroyProgram(handle);
+	
+	handle = { gfx::invalidHandle };
 }
 
 bool Program::is_valid() const
@@ -100,12 +102,12 @@ void Program::populate()
 {
 	dispose();
 
-	if (shaders.size() == 1)
+	if (shaders.size() == 1 && shaders[0] && shaders[0]->is_valid())
 	{
 		handle = gfx::createProgram(shaders[0]->handle);
 		shaders_cached[0] = shaders[0]->handle.idx;
 	}
-	else if (shaders.size() == 2)
+	else if (shaders.size() == 2 && shaders[0] && shaders[0]->is_valid() && shaders[1] && shaders[1]->is_valid())
 	{
 		handle = gfx::createProgram(shaders[0]->handle, shaders[1]->handle);
 		shaders_cached[0] = shaders[0]->handle.idx;
@@ -113,7 +115,7 @@ void Program::populate()
 	}
 }
 
-void Program::begin_pass()
+bool Program::begin_pass()
 {
 	bool repopulate = false;
 	for (std::size_t i = 0; i < shaders_cached.size(); ++i)
@@ -130,4 +132,6 @@ void Program::begin_pass()
 
 	if (repopulate)
 		populate();
+
+	return is_valid();
 }

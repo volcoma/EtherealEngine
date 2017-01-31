@@ -103,7 +103,7 @@ namespace editor
 
 						auto task1 = ts->create("", [p, am, key]()
 						{
-							am->create_asset_entry<T>(key);
+							am->find_or_create_asset_entry<T>(key);
 						});
 						ts->run_on_main(task1);
 					}

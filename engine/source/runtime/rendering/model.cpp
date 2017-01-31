@@ -118,6 +118,8 @@ void Model::render(std::uint8_t id, const float* mtx, bool apply_cull, bool dept
 	if (!mesh)
 		return;
 
+	bool valid_program = false;
+
 	AssetHandle<Material> last_set_material;
 	for (std::size_t i = 0; i < mesh->groups.size(); ++i)
 	{
@@ -135,22 +137,23 @@ void Model::render(std::uint8_t id, const float* mtx, bool apply_cull, bool dept
 		
 		if (program)
 		{
-			program->begin_pass();
-			setup_params(*program);
+			valid_program = program->begin_pass();
+			if(valid_program)
+				setup_params(*program);
 		}
-		
-		if (mat)
+
+		if (valid_program)
 		{
-			if (!user_program)
+			if (mat)
 			{
-				mat->submit();
+				if (!user_program)
+				{
+					mat->submit();
+				}
+
+				extra_states |= mat->get_render_states(apply_cull, depth_write, depth_test);
 			}
 
-			extra_states |= mat->get_render_states(apply_cull, depth_write, depth_test);
-		}
-
-		if (program)
-		{
 			gfx::setTransform(mtx);
 			gfx::setState(extra_states);
 
@@ -158,8 +161,8 @@ void Model::render(std::uint8_t id, const float* mtx, bool apply_cull, bool dept
 			gfx::setVertexBuffer(group.vertex_buffer->handle);
 
 			gfx::submit(id, program->handle, 0, mat == last_set_material && i < (mesh->groups.size() - 1));
-		}		
-
+		}
+			
 		last_set_material = mat;
 	}
 }

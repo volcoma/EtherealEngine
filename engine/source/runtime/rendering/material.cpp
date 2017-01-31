@@ -78,12 +78,6 @@ std::uint64_t Material::get_render_states(bool apply_cull, bool depth_write, boo
 	return states;
 }
 
-void Material::begin_pass()
-{
-	if (is_valid())
-		_program->begin_pass();
-}
-
 StandardMaterial::StandardMaterial()
 {
 	auto am = core::get_subsystem<runtime::AssetManager>();
