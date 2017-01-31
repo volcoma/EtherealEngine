@@ -337,11 +337,13 @@ namespace Docks
 
 		if (gui::IsWindowHovered() && !gui::IsAnyItemHovered())
 		{
-			if (gui::IsMouseReleased(gui::drag_button))
+			
+			if (dragged)
 			{
-				if (dragged)
+				if (dragged.is_type<runtime::Entity>())
 				{
-					if (dragged.is_type<runtime::Entity>())
+					gui::SetMouseCursor(ImGuiMouseCursor_Move);
+					if (gui::IsMouseReleased(gui::drag_button))
 					{
 						auto dragged_entity = dragged.get_value<runtime::Entity>();
 						dragged_entity.component<TransformComponent>().lock()
@@ -349,15 +351,22 @@ namespace Docks
 
 						es->drop();
 					}
-					if (dragged.is_type<AssetHandle<Prefab>>())
+				}
+				if (dragged.is_type<AssetHandle<Prefab>>())
+				{
+					gui::SetMouseCursor(ImGuiMouseCursor_Move);
+					if (gui::IsMouseReleased(gui::drag_button))
 					{
 						auto prefab = dragged.get_value<AssetHandle<Prefab>>();
 						auto object = prefab->instantiate();
 						es->drop();
 						es->select(object);
-
 					}
-					if (dragged.is_type<AssetHandle<Mesh>>())
+				}
+				if (dragged.is_type<AssetHandle<Mesh>>())
+				{
+					gui::SetMouseCursor(ImGuiMouseCursor_Move);
+					if (gui::IsMouseReleased(gui::drag_button))
 					{
 						auto mesh = dragged.get_value<AssetHandle<Mesh>>();
 						Model model;
@@ -376,7 +385,7 @@ namespace Docks
 						es->select(object);
 					}
 				}
-			}
+			}		
 		}
 	}
 

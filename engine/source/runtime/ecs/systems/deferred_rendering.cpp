@@ -108,31 +108,34 @@ namespace runtime
 			const auto& frustum = camera.get_frustum();
 			const auto& bounds = current_mesh->aabb;
 
-			float t = 0.0f;
-			const auto ray_origin = camera.get_position();
-			const auto inv_world = math::inverse(world_transform);
-			const auto object_ray_origin = inv_world.transform_coord(ray_origin);
-			const auto object_ray_direction = math::normalize(bounds.get_center() - object_ray_origin);
-			bounds.intersect(object_ray_origin, object_ray_direction, t);
+			if (model.get_lods().size() > 1)
+			{
+				float t = 0.0f;
+				const auto ray_origin = camera.get_position();
+				const auto inv_world = math::inverse(world_transform);
+				const auto object_ray_origin = inv_world.transform_coord(ray_origin);
+				const auto object_ray_direction = math::normalize(bounds.get_center() - object_ray_origin);
+				bounds.intersect(object_ray_origin, object_ray_direction, t);
 
-			// Compute final object space intersection point.
-			auto intersection_point = object_ray_origin + (object_ray_direction * t);
+				// Compute final object space intersection point.
+				auto intersection_point = object_ray_origin + (object_ray_direction * t);
 
-			// transform intersection point back into world space to compute
-			// the final intersection distance.
-			intersection_point = world_transform.transform_coord(intersection_point);
-			const float distance = math::length(intersection_point - ray_origin);
+				// transform intersection point back into world space to compute
+				// the final intersection distance.
+				intersection_point = world_transform.transform_coord(intersection_point);
+				const float distance = math::length(intersection_point - ray_origin);
 
-			//Compute Lods
-			update_lod_data(
-				lod_data,
-				lod_count,
-				min_distance,
-				max_distance,
-				transition_time,
-				distance,
-				dt.count());
-
+				//Compute Lods
+				update_lod_data(
+					lod_data,
+					lod_count,
+					min_distance,
+					max_distance,
+					transition_time,
+					distance,
+					dt.count());
+			}
+			
 			// Test the bounding box of the mesh
 			if (!math::frustum::test_obb(frustum, bounds, world_transform))
 				return;
@@ -208,7 +211,7 @@ namespace runtime
 		light_pass.clear();
 		light_pass.set_view_proj_ortho_full();
 
-		ecs->each<TransformComponent, LightComponent>([this, &camera, dt, &light_pass, &light_buffer_size, &view, &proj, &view_proj, &inv_view_proj, g_buffer](
+		ecs->each<TransformComponent, LightComponent>([this, &camera, &light_pass, &light_buffer_size, &view, &proj, &inv_view_proj, g_buffer](
 			Entity e,
 			TransformComponent& transform_comp_ref,
 			LightComponent& light_comp_ref
