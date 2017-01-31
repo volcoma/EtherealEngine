@@ -58,9 +58,6 @@ struct GfxCallback : public gfx::CallbackI
 	}
 
 };
-static GfxCallback sGfxCallback;
-
-
 
 namespace runtime
 {
@@ -90,7 +87,8 @@ namespace runtime
 
 		gfx::setPlatformData(pd);
 
-		if (!gfx::init(gfx::RendererType::Count, 0, 0, &sGfxCallback))
+		static GfxCallback callback;
+		if (!gfx::init(gfx::RendererType::Count, 0, 0, &callback))
 			return false;
 
 		main_window.set_main(true);
