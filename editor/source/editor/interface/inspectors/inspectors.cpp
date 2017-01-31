@@ -6,33 +6,33 @@ struct InspectorRegistry
 {
 	InspectorRegistry()
 	{
-		auto inspectorTypes = rttr::type::get<Inspector>().get_derived_classes();
-		for (auto& inspectorType : inspectorTypes)
+		auto inspector_types = rttr::type::get<Inspector>().get_derived_classes();
+		for (auto& inspector_type : inspector_types)
 		{
-			auto inspectedTypeVar = inspectorType.get_metadata(INSPECTED_TYPE);
-			if (inspectedTypeVar)
+			auto inspected_type_var = inspector_type.get_metadata(INSPECTED_TYPE);
+			if (inspected_type_var)
 			{
-				auto inspectedType = inspectedTypeVar.get_value<rttr::type>();
-				auto inspectorVar = inspectorType.create();
-				if (inspectorVar)
+				auto inspected_type = inspected_type_var.get_value<rttr::type>();
+				auto inspector_var = inspector_type.create();
+				if (inspector_var)
 				{
-					auto inspector = inspectorVar.get_value<std::shared_ptr<Inspector>>();
-					typeMap[inspectedType] = inspector;
+					auto inspector = inspector_var.get_value<std::shared_ptr<Inspector>>();
+					type_map[inspected_type] = inspector;
 				}
 			}
 		}
 	}
-	std::unordered_map<rttr::type, std::shared_ptr<Inspector>> typeMap;
+	std::unordered_map<rttr::type, std::shared_ptr<Inspector>> type_map;
 };
 
-std::shared_ptr<Inspector> getInspector(rttr::type type)
+std::shared_ptr<Inspector> get_inspector(rttr::type type)
 {
 	static InspectorRegistry registry;
-	auto inspector = registry.typeMap[type];
+	auto inspector = registry.type_map[type];
 	return inspector;
 }
 
-bool inspect_var(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspect_var(rttr::variant& var, bool read_only, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	rttr::instance object = var;
 	auto type = object.get_derived_type();
@@ -42,16 +42,16 @@ bool inspect_var(rttr::variant& var, bool readOnly, std::function<rttr::variant(
 	bool changed = false;
 	if (properties.empty())
 	{
-		auto inspector = getInspector(type);
+		auto inspector = get_inspector(type);
 		if (inspector)
 		{
-			changed |= inspector->inspect(var, readOnly, get_metadata);
+			changed |= inspector->inspect(var, read_only, get_metadata);
 		}
 		else
 		{
 			if (type.is_enumeration())
 			{
-				changed |= inspect_enum(var, type.get_enumeration(), readOnly);
+				changed |= inspect_enum(var, type.get_enumeration(), read_only);
 			}
 		}
 
@@ -60,14 +60,14 @@ bool inspect_var(rttr::variant& var, bool readOnly, std::function<rttr::variant(
 	{
 		for (auto& prop : properties)
 		{
-			auto propVar = prop.get_value(object);
-			auto propName = prop.get_name();
-			bool rdOnly = prop.is_readonly();
-			bool isArray = prop.is_array();
-			bool isEnum = prop.is_enumeration();
-			rttr::instance propObject = propVar;
-			bool hasInspector = !!getInspector(propObject.get_derived_type());
-			bool details = !hasInspector && !isEnum;
+			auto prop_var = prop.get_value(object);
+			auto prop_name = prop.get_name();
+			bool is_readonly = prop.is_readonly();
+			bool is_array = prop.is_array();
+			bool is_enum = prop.is_enumeration();
+			rttr::instance prop_object = prop_var;
+			bool has_inspector = !!get_inspector(prop_object.get_derived_type());
+			bool details = !has_inspector && !is_enum;
 			PropertyLayout layout(prop);
 			bool open = true;
 			if (details)
@@ -77,31 +77,30 @@ bool inspect_var(rttr::variant& var, bool readOnly, std::function<rttr::variant(
 
 			if (open)
 			{
-				auto getMeta = [&prop](const rttr::variant& name) -> rttr::variant
+				auto get_meta = [&prop](const rttr::variant& name) -> rttr::variant
 				{
 					return prop.get_metadata(name);
 				};
-				if (isArray)
+				if (is_array)
 				{
-					changed |= inspect_array(propVar, rdOnly);
+					changed |= inspect_array(prop_var, is_readonly);
 				}
-				else if (isEnum)
+				else if (is_enum)
 				{
-					changed |= inspect_enum(propVar, prop.get_enumeration(), rdOnly);
+					changed |= inspect_enum(prop_var, prop.get_enumeration(), is_readonly);
 				}
 				else
 				{
-					changed |= inspect_var(propVar, rdOnly, getMeta);
+					changed |= inspect_var(prop_var, is_readonly, get_meta);
 				}
 
 				if(details)
 					gui::TreePop();
 			}
 			
-
-			if (changed && !rdOnly)
+			if (changed && !is_readonly)
 			{
-				prop.set_value(object, propVar);
+				prop.set_value(object, prop_var);
 			}
 		}
 
@@ -110,21 +109,21 @@ bool inspect_var(rttr::variant& var, bool readOnly, std::function<rttr::variant(
 	return changed;
 }
 
-bool inspect_array(rttr::variant& var, bool readOnly)
+bool inspect_array(rttr::variant& var, bool read_only)
 {
 	auto array_view = var.create_array_view();
 	auto size = array_view.get_size();
 	bool changed = false;
-	auto intSize = static_cast<int>(size);
+	auto int_size = static_cast<int>(size);
 
 	if (array_view.is_dynamic())
 	{
 		PropertyLayout layout("Size");
-		if (gui::InputInt("", &intSize))
+		if (gui::InputInt("", &int_size))
 		{
-			if (intSize < 0)
-				intSize = 0;
-			size = static_cast<std::size_t>(intSize);
+			if (int_size < 0)
+				int_size = 0;
+			size = static_cast<std::size_t>(int_size);
 			changed |= array_view.set_size(size);
 		}
 	}
@@ -148,15 +147,16 @@ bool inspect_array(rttr::variant& var, bool readOnly)
 }
 
 
-bool inspect_enum(rttr::variant& var, rttr::enumeration& data, bool readOnly)
+bool inspect_enum(rttr::variant& var, rttr::enumeration& data, bool read_only)
 {
 	auto strings = data.get_names();
 	std::vector<const char*> cstrings{};
+	cstrings.reserve(strings.size());
 
 	for (const auto& string : strings)
 		cstrings.push_back(string.data());
 
-	if (readOnly)
+	if (read_only)
 	{
 		int listbox_item_current = var.to_int();
 		gui::TextUnformatted(cstrings[listbox_item_current]);
