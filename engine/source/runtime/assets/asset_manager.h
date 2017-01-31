@@ -138,20 +138,15 @@ namespace runtime
 
 		/// Storage container
 		std::unordered_map<std::string, LoadRequest<T>> container;
-		/// Extention
+		/// Extension
 		std::string ext;
 	};
 
 	template<typename T>
-	inline fs::path get_absolute_key(const std::string& toLowerKey, T storage)
+	inline fs::path get_absolute_key(const std::string& to_lower_key, T storage)
 	{
-		fs::path absoluteKey = fs::resolve_protocol(toLowerKey);
-		fs::path dir = absoluteKey;
-		dir.remove_filename();
-		std::string file = absoluteKey.filename().string();
-
-		absoluteKey = fs::absolute(dir / fs::path(file + storage->ext));
-		return absoluteKey;
+		fs::path absolute_key = fs::absolute(fs::resolve_protocol(to_lower_key).string() + storage->ext);
+		return absolute_key;
 	};
 
 

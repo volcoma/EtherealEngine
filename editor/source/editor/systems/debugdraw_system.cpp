@@ -187,11 +187,11 @@ namespace editor
 			if (!model.is_valid())
 				return;
 
-			const auto hMesh = model.get_lod(0);
-			if (!hMesh)
+			const auto mesh = model.get_lod(0);
+			if (!mesh)
 				return;
 			const auto& frustum = camera.get_frustum();
-			const auto& bounds = hMesh->aabb;
+			const auto& bounds = mesh->aabb;
 			// Test the bounding box of the mesh
 			if (math::frustum::test_obb(frustum, bounds, world_transform))
 			{

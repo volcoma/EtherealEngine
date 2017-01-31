@@ -352,27 +352,45 @@ void list_dir(editor::AssetFolder* dir,
 	
 	if (gui::BeginPopupContextWindow())
 	{
-		if (gui::Selectable("Create Folder"))
-		{
-			editor::AssetFolder* folder = editor::AssetFolder::opened.get();
 
-			int i = 0;
-			fs::path parent_dir = folder->absolute;
-			while (!fs::create_directory(parent_dir / string_utils::format("New Folder (%d)", i), std::error_code{}))
+		if (gui::BeginMenu("Create"))
+		{
+			if (gui::MenuItem("Folder"))
 			{
-				++i;
+				editor::AssetFolder* folder = editor::AssetFolder::opened.get();
+
+				int i = 0;
+				fs::path parent_dir = folder->absolute;
+				while (!fs::create_directory(parent_dir / string_utils::format("New Folder (%d)", i), std::error_code{}))
+				{
+					++i;
+				}
 			}
+
+			gui::Separator();
+
+			if (gui::MenuItem("Material"))
+			{
+				editor::AssetFolder* folder = editor::AssetFolder::opened.get();
+
+				AssetHandle<Material> asset;
+				fs::path parent_dir = folder->relative;
+				asset.link->id = (parent_dir / string_utils::format("New Material (%s)", fs::path(std::tmpnam(nullptr)).filename().string().c_str())).generic_string();
+				asset.link->asset = std::make_shared<StandardMaterial>();
+				am->save<Material>(asset);
+			}
+
+			gui::EndMenu();
 		}
-		if (gui::Selectable("Create Material"))
+
+		gui::Separator();
+
+		if (gui::Selectable("Open In Explorer"))
 		{
 			editor::AssetFolder* folder = editor::AssetFolder::opened.get();
-
-			AssetHandle<Material> asset;
-			fs::path parent_dir = folder->relative;
-			asset.link->id = (parent_dir / string_utils::format("New Material (%s)", fs::path(std::tmpnam(nullptr)).filename().string().c_str())).generic_string();
-			asset.link->asset = std::make_shared<StandardMaterial>();
-			am->save<Material>(asset);
+			fs::show_in_graphical_env(folder->absolute);
 		}
+
 		gui::EndPopup();
 	}
 

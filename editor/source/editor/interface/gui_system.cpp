@@ -202,10 +202,9 @@ bool GuiSystem::initialize()
 	io.KeyMap[ImGuiKey_Y] = sf::Keyboard::Y;
 	io.KeyMap[ImGuiKey_Z] = sf::Keyboard::Z;
 
-	std::uint8_t* data;
-	std::int32_t width;
-	std::int32_t height;
-	float _fontSize = 15;
+	std::uint8_t* data = nullptr;
+	std::int32_t width = 0;
+	std::int32_t height = 0;
 
 	ImFontConfig config;
 	config.FontDataOwnedByAtlas = false;
@@ -213,8 +212,8 @@ bool GuiSystem::initialize()
 	config.MergeGlyphCenterV = true;
 
 	io.Fonts->AddFontDefault(&config);
-	io.Fonts->AddFontFromMemoryTTF((void*)s_robotoRegularTtf, sizeof(s_robotoRegularTtf), _fontSize, &config);
-	io.Fonts->AddFontFromMemoryTTF((void*)s_robotoMonoRegularTtf, sizeof(s_robotoMonoRegularTtf), _fontSize - 3.0f, &config);
+	io.Fonts->AddFontFromMemoryTTF((void*)s_robotoRegularTtf, sizeof(s_robotoRegularTtf), 17, &config);
+	io.Fonts->AddFontFromMemoryTTF((void*)s_robotoMonoRegularTtf, sizeof(s_robotoMonoRegularTtf), 14.0f, &config);
 	io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
 
 	s_font_texture = std::make_shared<Texture>(
@@ -228,7 +227,7 @@ bool GuiSystem::initialize()
 		);
 
 	// Store our identifier
-	io.Fonts->TexID = s_font_texture.get();
+	io.Fonts->SetTexID(s_font_texture.get());
 
 	s_gui_style.load_style();
 
