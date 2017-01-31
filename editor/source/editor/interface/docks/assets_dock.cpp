@@ -112,6 +112,19 @@ int list_item(Wrapper& entry, const std::string& name, const std::string& relati
 			else
 			{
 				manager.delete_asset<T>(relative);
+
+				if (editor::AssetFolder::opened)
+				{
+					auto& files = editor::AssetFolder::opened->files;
+
+					for (auto& file : files)
+					{
+						if (file.relative == relative)
+						{
+							fs::remove(file.absolute, std::error_code{});
+						}
+					}
+				}
 			}
 			edit_state.unselect();
 		}
@@ -249,7 +262,7 @@ void list_dir(editor::AssetFolder* dir)
 		{
 			if (file.extension == extensions::texture)
 			{
-				AssetHandle<Texture> asset = am->find_or_create_asset_entry<Texture>(file.relative).asset;
+				auto asset = am->find_or_create_asset_entry<Texture>(file.relative).asset;
 
 				list_item<AssetHandle<Texture>, Texture>(
 					asset,
@@ -261,7 +274,7 @@ void list_dir(editor::AssetFolder* dir)
 			if (file.extension == extensions::mesh)
 			{
 
-				AssetHandle<Mesh> asset = am->find_or_create_asset_entry<Mesh>(file.relative).asset;
+				auto asset = am->find_or_create_asset_entry<Mesh>(file.relative).asset;
 
 				list_item<AssetHandle<Mesh>, Mesh>(
 					asset,
@@ -272,7 +285,7 @@ void list_dir(editor::AssetFolder* dir)
 			}
 			if (file.extension == extensions::material)
 			{
-				AssetHandle<Material> asset = am->find_or_create_asset_entry<Material>(file.relative).asset;
+				auto asset = am->find_or_create_asset_entry<Material>(file.relative).asset;
 				
 				list_item<AssetHandle<Material>, Material>(
 					asset,
@@ -283,7 +296,7 @@ void list_dir(editor::AssetFolder* dir)
 			}
 			if (file.extension == extensions::prefab)
 			{
-				AssetHandle<Prefab> asset = am->find_or_create_asset_entry<Prefab>(file.relative).asset;
+				auto asset = am->find_or_create_asset_entry<Prefab>(file.relative).asset;
 
 				list_item<AssetHandle<Prefab>, Prefab>(
 					asset, 
@@ -294,7 +307,7 @@ void list_dir(editor::AssetFolder* dir)
 			}
 			if (file.extension == extensions::scene)
 			{
-				AssetHandle<Scene> asset = am->find_or_create_asset_entry<Scene>(file.relative).asset;
+				auto asset = am->find_or_create_asset_entry<Scene>(file.relative).asset;
 
 				int action = list_item<AssetHandle<Scene>, Scene>(
 					asset,
@@ -321,7 +334,7 @@ void list_dir(editor::AssetFolder* dir)
 			}
 			if (file.extension == extensions::shader)
 			{
-				AssetHandle<Shader> asset = am->find_or_create_asset_entry<Shader>(file.relative).asset;
+				auto asset = am->find_or_create_asset_entry<Shader>(file.relative).asset;
 
 				list_item<AssetHandle<Shader>, Shader>(
 					asset,
@@ -343,8 +356,7 @@ void list_dir(editor::AssetFolder* dir)
 				editor::AssetFolder* folder = editor::AssetFolder::opened.get();
 
 				int i = 0;
-				fs::path parent_dir = folder->absolute;
-				while (!fs::create_directory(parent_dir / string_utils::format("New Folder (%d)", i), std::error_code{}))
+				while (!fs::create_directory(folder->absolute / string_utils::format("New Folder (%d)", i), std::error_code{}))
 				{
 					++i;
 				}
