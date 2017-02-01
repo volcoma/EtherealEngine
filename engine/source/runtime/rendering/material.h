@@ -458,7 +458,7 @@ public:
 	inline void set_metalness_map(AssetHandle<Texture> val) { _metalness_map = val; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : get_metalness_map ()
+	//  Name : get_ao_map ()
 	/// <summary>
 	/// 
 	/// 
@@ -468,7 +468,7 @@ public:
 	inline AssetHandle<Texture> get_ao_map() const { return _ao_map; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : set_metalness_map ()
+	//  Name : set_ao_map ()
 	/// <summary>
 	/// 
 	/// 
