@@ -91,10 +91,4 @@ ipch/
 *.sap
 
 # User data
-examples/
 editor_data/config/*.cfg
-!editor/*/lib/*/*.lib
-
-# Don't want to ignore .objs files in Assets
-!engine_data/meshes/*.obj
-!editor_data/meshes/*.obj
