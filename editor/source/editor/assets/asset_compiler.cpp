@@ -214,7 +214,7 @@ void MeshCompiler::compile(const fs::path& absoluteKey)
 	args_array[8] = "1";
 	args_array[9] = "--packuv";
 	args_array[10] = "1";
-
+	
 	auto logger = logging::get("Log");
 	if (compile_mesh(arg_count, args_array) != 0)
 	{

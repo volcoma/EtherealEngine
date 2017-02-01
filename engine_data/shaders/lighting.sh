@@ -71,6 +71,30 @@ vec4 Square( vec4 x )
 	return x*x;
 }
 
+float Pow5( float x )
+{
+	float xx = x*x;
+	return xx * xx * x;
+}
+
+vec2 Pow5( vec2 x )
+{
+	vec2 xx = x*x;
+	return xx * xx * x;
+}
+
+vec3 Pow5( vec3 x )
+{
+	vec3 xx = x*x;
+	return xx * xx * x;
+}
+
+vec4 Pow5( vec4 x )
+{
+	vec4 xx = x*x;
+	return xx * xx * x;
+}
+
 float UnClampedPow(float X, float Y)
 {
 	return pow(X, Y);
@@ -242,31 +266,23 @@ vec3 Diffuse_Lambert( vec3 DiffuseColor )
 // [Lagrade et al. 2014, "Moving Frostbite to Physically Based Rendering"]
 vec3 Diffuse_Burley( vec3 DiffuseColor, float Roughness, float NoV, float NoL, float VoH )
 {
-	float FD90 = ( 0.5f + 2.0f * VoH * VoH ) * Roughness;
-	
-	float InvNov = 1.0f- NoV;
-	float NoVPow5 = InvNov * InvNov;
-	NoVPow5 = NoVPow5 * NoVPow5 * InvNov;
-    
-	float InvNoL = 1.0f - NoL;
-	float NoLPow5 = InvNoL * InvNoL;
-	NoLPow5 = NoLPow5 * NoLPow5 * InvNoL;
-    
-	float FdV = 1.0f + (FD90 - 1.0f) * NoVPow5;
-	float FdL = 1.0f + (FD90 - 1.0f) * NoLPow5;
-	return DiffuseColor * ( 1.0f / PI * FdV * FdL ) * ( 1.0f - 0.3333f * Roughness );
+	float FD90 = 0.5f + 2.0f * VoH * VoH * Roughness;
+	float FdV = 1.0f + (FD90 - 1.0f) * Pow5( 1.0f - NoV );
+	float FdL = 1.0f + (FD90 - 1.0f) * Pow5( 1.0f - NoL );
+	return DiffuseColor * ( (1.0f / PI) * FdV * FdL );
 }
 
 // [Gotanda 2012, "Beyond a Simple Physically Based Blinn-Phong Model in Real-Time"]
 vec3 Diffuse_OrenNayar( vec3 DiffuseColor, float Roughness, float NoV, float NoL, float VoH )
 {
-	float VoL = 2.0f * VoH - 1.0f;
-	float m = Roughness * Roughness;
-	float m2 = m * m;
-	float C1 = 1.0f - 0.5f * m2 / (m2 + 0.33f);
+	float a = Roughness * Roughness;
+	float s = a;// / ( 1.29 + 0.5 * a );
+	float s2 = s * s;
+	float VoL = 2.0f * VoH * VoH - 1.0f;		// double angle identity
 	float Cosri = VoL - NoV * NoL;
-	float C2 = 0.45f * m2 / (m2 + 0.09f) * Cosri * ( Cosri >= 0.0f ? min( 1.0f, NoL / NoV ) : NoL );
-	return DiffuseColor / PI * ( NoL * C1 + C2 );
+	float C1 = 1.0f - 0.5f * s2 / (s2 + 0.33f);
+	float C2 = 0.45f * s2 / (s2 + 0.09f) * Cosri * ( Cosri >= 0.0f ? rcp( max( NoL, NoV ) ) : 1.0f );
+	return DiffuseColor / PI * ( C1 + C2 ) * ( 1 + Roughness * 0.5f );
 }
 
 vec3 Diffuse( vec3 DiffuseColor, float Roughness, float NoV, float NoL, float VoH )
@@ -427,13 +443,46 @@ vec3 F_None( vec3 SpecularColor )
 // [Lagarde 2012, "Spherical Gaussian approximation for Blinn-Phong, Phong and Fresnel"]
 vec3 F_Schlick( vec3 SpecularColor, float VoH )
 {
-	float Fc = pow( 1.0f - VoH, 5.0f );							// 1 sub, 3 mul
-	//float Fc = exp2( (-5.55473f * VoH - 6.98316f) * VoH );	// 1 mad, 1 mul, 1 exp
-	//return Fc + (1.0f - Fc) * SpecularColor;					// 1 add, 3 mad
+	float Fc = Pow5( 1.0f - VoH );					// 1 sub, 3 mul
+	//return Fc + (1 - Fc) * SpecularColor;		// 1 add, 3 mad
 	
 	// Anything less than 2% is physically impossible and is instead considered to be shadowing
 	return saturate( 50.0f * SpecularColor.g ) * Fc + (1.0f - Fc) * SpecularColor;
 }
+
+vec3 Fresnel_CookTorrance( vec3 SpecularColor, vec3 VoH )
+{
+    vec3 n = (1.0f + sqrt(SpecularColor)) / (1.0f - sqrt(SpecularColor));
+    vec3 g = sqrt(n * n + VoH * VoH - 1.0f);
+
+    vec3 part1 = (g - VoH)/(g + VoH);
+    vec3 part2 = ((g + VoH) * VoH - 1.0f)/((g - VoH) * VoH + 1.0f);
+
+    return max(vec3(0.0f, 0.0f, 0.0f), 0.5f * part1 * part1 * ( 1.0f + part2 * part2));
+}
+
+vec3 F_Fresnel( vec3 SpecularColor, float VoH )
+{
+
+	vec3 SpecularColorSqrt = sqrt( clamp( vec3(0.0f, 0.0f, 0.0f), vec3(0.99f, 0.99f, 0.99f), SpecularColor ) );
+	vec3 n = ( 1.0f + SpecularColorSqrt ) / ( 1.0f - SpecularColorSqrt );
+	vec3 g = sqrt( n*n + VoH*VoH - 1.0f );
+	return 0.5f * Square( (g - VoH) / (g + VoH) ) * ( 1.0f + Square( ((g+VoH)*VoH - 1.0f) / ((g-VoH)*VoH + 1.0f) ) );
+}
+
+vec3 Fresnel( vec3 SpecularColor, float VoH )
+{
+#if   PHYSICAL_SPEC_F == 0
+	return F_None( SpecularColor );
+#elif PHYSICAL_SPEC_F == 1
+	return F_Schlick( SpecularColor, VoH );
+#elif PHYSICAL_SPEC_F == 2
+	return Fresnel_CookTorrance( SpecularColor, VoH );
+#elif PHYSICAL_SPEC_F == 3
+	return F_Fresnel( SpecularColor, VoH );
+#endif
+}
+
 
 vec3 F_Roughness(vec3 SpecularColor, float Roughness, vec3 VoH)
 {
@@ -469,37 +518,6 @@ vec3 EnvBRDF_GGX( vec3 SpecularColor, float Roughness, float NoV )
     return SpecularColor * scale + bias;
 }
 
-vec3 Fresnel_CookTorrance( vec3 SpecularColor, vec3 VoH )
-{
-    vec3 n = (1.0f + sqrt(SpecularColor)) / (1.0f - sqrt(SpecularColor));
-    vec3 g = sqrt(n * n + VoH * VoH - 1.0f);
-
-    vec3 part1 = (g - VoH)/(g + VoH);
-    vec3 part2 = ((g + VoH) * VoH - 1.0f)/((g - VoH) * VoH + 1.0f);
-
-    return max(vec3(0.0f, 0.0f, 0.0f), 0.5f * part1 * part1 * ( 1.0f + part2 * part2));
-}
-
-vec3 F_Fresnel( vec3 SpecularColor, float VoH )
-{
-	vec3 SpecularColorSqrt = sqrt( clamp( vec3(0.0f, 0.0f, 0.0f), vec3(0.99f, 0.99f, 0.99f), SpecularColor ) );
-	vec3 n = ( 1.0f + SpecularColorSqrt ) / ( 1.0f - SpecularColorSqrt );
-	vec3 g = sqrt( n*n + VoH*VoH - 1.0f );
-	return 0.5f * Square( (g - VoH) / (g + VoH) ) * ( 1.0f + Square( ((g+VoH)*VoH - 1.0f) / ((g-VoH)*VoH + 1.0f) ) );
-}
-
-vec3 Fresnel( vec3 SpecularColor, float VoH )
-{
-#if   PHYSICAL_SPEC_F == 0
-	return F_None( SpecularColor );
-#elif PHYSICAL_SPEC_F == 1
-	return F_Schlick( SpecularColor, VoH );
-#elif PHYSICAL_SPEC_F == 2
-	return Fresnel_CookTorrance( SpecularColor, VoH );
-#elif PHYSICAL_SPEC_F == 3
-	return F_Fresnel( SpecularColor, VoH );
-#endif
-}
 	
 vec3 StandardShading( vec3 DiffuseColor, vec3 SpecularColor, vec3 LobeRoughness, vec3 LobeEnergy, vec3 L, vec3 V, vec3 N )
 {
@@ -508,11 +526,11 @@ vec3 StandardShading( vec3 DiffuseColor, vec3 SpecularColor, vec3 LobeRoughness,
 	float NoV = saturate( abs( dot(N, V) ) + 1e-5 );
 	float NoH = saturate( dot(N, H) );
 	float VoH = saturate( dot(V, H) );
+	
 	// Generalized microfacet specular
 	float D = Distribution( LobeRoughness[1], NoH ) * LobeEnergy[1];
 	float Vis = Visibility( LobeRoughness[1], NoV, NoL, VoH, NoH );
 	vec3 F = Fresnel( SpecularColor, VoH );
-
 	vec3 Diffuse_Color = Diffuse( DiffuseColor, LobeRoughness[1], NoV, NoL, VoH );
 
 	return Diffuse_Color * LobeEnergy[2] + (D * Vis) * F;
