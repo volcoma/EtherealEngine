@@ -15,6 +15,11 @@
 #include "core/serialization/cereal/types/unordered_map.hpp"
 #include "core/serialization/cereal/types/vector.hpp"
 
+#include "core/math/math_includes.h"
+#include "assimp/Importer.hpp"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
+
 void ShaderCompiler::compile(const fs::path& absoluteKey)
 {
 	std::string strInput = absoluteKey.string();
@@ -191,6 +196,7 @@ void TextureCompiler::compile(const fs::path& absoluteKey)
 		logger->error().write("Failed compilation of {0}", strInput);
 	}
 }
+
 
 void MeshCompiler::compile(const fs::path& absoluteKey)
 {
