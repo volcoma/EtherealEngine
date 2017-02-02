@@ -103,54 +103,52 @@ namespace experimental
 		//-------------------------------------------------------------------------
 		// Structure describing an individual "piece" of the mesh, often grouped
 		// by material, but can be any arbitrary collection of triangles.
-		struct MeshSubset
+		struct Subset
 		{
 			/// The unique user assigned "data group" that can be used to separate subsets.
-			std::uint32_t dataGroupId = 0;    
+			std::uint32_t data_group_id = 0;
 			/// The beginning vertex for this batch.
-			std::int32_t vertexStart = -1;    
+			std::int32_t vertex_start = -1;
 			/// Number of vertices included in this batch.
-			std::int32_t vertexCount = 0;    
+			std::int32_t vertex_count = 0;
 			/// The initial face, from the index buffer, to render in this batch
-			std::int32_t faceStart = -1;      
+			std::int32_t face_start = -1;
 			/// Number of faces to render in this batch.
-			std::int32_t faceCount = 0;      
+			std::int32_t face_count = 0;
 		};
 
 		// Structure describing data for a single triangle in the mesh.
 		struct Triangle
 		{
-			std::uint32_t dataGroupId = 0;
+			std::uint32_t data_group_id = 0;
 			std::uint32_t indices[3];
 			std::uint8_t flags = 0;
 		};
 
 		using TriangleArray = std::vector<Triangle>;
-		using SubsetArray = std::vector<MeshSubset*>;
+		using SubsetArray = std::vector<Subset*>;
 		using UInt32Array = std::vector<uint32_t>;
 
 		// Mesh Construction Structures
 		struct LoadData
 		{
 			/// The format of the vertex data currently being used to prepare the mesh.
-			gfx::VertexDecl	vertexFormat;
+			gfx::VertexDecl	vertex_format;
 			/// Final vertex buffer currently being prepared.
-			std::vector<std::uint8_t> vertexData;
+			std::vector<std::uint8_t> vertex_data;
 			/// Total number of vertices currently stored here.
-			std::uint32_t vertexCount = 0;
+			std::uint32_t vertex_count = 0;
 			/// This is used to store the current face / triangle data.
-			TriangleArray triangleData;
+			TriangleArray triangle_data;
 			/// Total number of triangles currently stored here.
-			std::uint32_t triangleCount = 0;
+			std::uint32_t triangle_count = 0;
 		};
-
-
 
 		//-------------------------------------------------------------------------
 		// Constructors & Destructors
 		//-------------------------------------------------------------------------
 		Mesh();
-		virtual ~Mesh();
+		~Mesh();
 
 		//-------------------------------------------------------------------------
 		// Public Methods
@@ -159,33 +157,40 @@ namespace experimental
 		void dispose();
 		void draw();
 		void draw(std::uint32_t faceCount);
-		void drawSubset(std::uint32_t nDataGroupId);
+		void draw_subset(std::uint32_t nDataGroupId);
 
 		// Mesh creation methods
-		bool prepareMesh(const gfx::VertexDecl& vertexFormat, bool rollBackPrepare = false);
-		bool prepareMesh(const gfx::VertexDecl& vertexFormat, void * vertices, std::uint32_t vertexCount, const TriangleArray & faces, bool hardwareCopy = true, bool weld = true, bool optimize = true);
-		bool setVertexSource(void * source, std::uint32_t vertexCount, const gfx::VertexDecl& sourceFormat);
-		bool addPrimitives(const TriangleArray & triangles);
+		bool prepare_mesh(const gfx::VertexDecl& vertexFormat, bool rollBackPrepare = false);
+		bool prepare_mesh(const gfx::VertexDecl& vertexFormat, void * vertices, std::uint32_t vertexCount, const TriangleArray & faces, bool hardwareCopy = true, bool weld = true, bool optimize = true);
+		bool set_vertex_source(void * source, std::uint32_t vertexCount, const gfx::VertexDecl& sourceFormat);
+		bool add_primitives(const TriangleArray & triangles);
 
-		bool createBox(const gfx::VertexDecl& format, float width, float height, float depth, std::uint32_t widthSegments, std::uint32_t heightSegments, std::uint32_t depthSegments, bool inverted, MeshCreateOrigin::E origin, bool hardwareCopy = true);
-		bool createBox(const gfx::VertexDecl& format, float width, float height, float depth, std::uint32_t widthSegments, std::uint32_t heightSegments, std::uint32_t depthSegments, float texUScale, float texVScale, bool inverted, MeshCreateOrigin::E origin, bool hardwareCopy = true);
-		bool endPrepare(bool hardwareCopy = true, bool weld = true, bool optimize = true);
+		bool create_cube(const gfx::VertexDecl& format, float width, float height, float depth, std::uint32_t widthSegments, std::uint32_t heightSegments, std::uint32_t depthSegments, bool inverted, MeshCreateOrigin::E origin, bool hardwareCopy = true);
+		bool create_cube(const gfx::VertexDecl& format, float width, float height, float depth, std::uint32_t widthSegments, std::uint32_t heightSegments, std::uint32_t depthSegments, float texUScale, float texVScale, bool inverted, MeshCreateOrigin::E origin, bool hardwareCopy = true);
+		bool create_sphere(const gfx::VertexDecl& format, float radius, std::uint32_t stacks, std::uint32_t slices, bool inverted, MeshCreateOrigin::E origin, bool hardwareCopy = true);
+		bool create_cylinder(const gfx::VertexDecl& format, float radius, float height, std::uint32_t stacks, std::uint32_t slices, bool inverted, MeshCreateOrigin::E origin, bool hardwareCopy = true);
+		bool create_capsule(const gfx::VertexDecl& format, float radius, float height, std::uint32_t stacks, std::uint32_t slices, bool inverted, MeshCreateOrigin::E origin, bool hardwareCopy = true);
+		bool create_cone(const gfx::VertexDecl& format, float radius, float radiusTip, float height, std::uint32_t stacks, std::uint32_t slices, bool inverted, MeshCreateOrigin::E origin, bool hardwareCopy = true);
+		bool create_torus(const gfx::VertexDecl& format, float outerRadius, float innerRadius, std::uint32_t bands, std::uint32_t sides, bool inverted, MeshCreateOrigin::E origin, bool hardwareCopy = true);
+
+		bool end_prepare(bool hardwareCopy = true, bool weld = true, bool optimize = true);
 
 		// Utility functions
-		bool scaleMeshData(float scale);
-		bool generateAdjacency(UInt32Array & adjacency);
+		bool generate_adjacency(UInt32Array & adjacency);
 
 		// Object access methods
-		std::uint32_t getFaceCount() const;
-		std::uint32_t getVertexCount() const;
-		gfx::VertexDecl& getVertexFormat();
-		const MeshSubset* getSubset(std::uint32_t dataGroupId = 0) const;
+		std::uint32_t get_face_count() const;
+		std::uint32_t get_vertex_count() const;
+		std::uint8_t* get_system_vb();
+		std::uint32_t* get_system_ib();
+		const gfx::VertexDecl& get_vertex_format() const;
+		const Subset* get_subset(std::uint32_t dataGroupId = 0) const;
 		//-------------------------------------------------------------------------
 		// Public Inline Methods
 		//-------------------------------------------------------------------------
-		inline const math::bbox& getBoundingBox() const { return mBoundingBox; }
-		inline MeshStatus::E getPrepareStatus() const { return mPrepareStatus; }
-		inline std::size_t getSubsetCount() const { return mMeshSubsets.size(); }
+		inline const math::bbox& get_bounds() const { return _bbox; }
+		inline MeshStatus::E get_status() const { return _prepare_status; }
+		inline std::size_t get_subset_count() const { return _mesh_subsets.size(); }
 
 	protected:
 		//-------------------------------------------------------------------------
@@ -205,29 +210,31 @@ namespace experimental
 			};
 
 			/// The source vertex data currently being used to prepare the mesh.
-			std::uint8_t* vertexSource = nullptr;
+			std::uint8_t* vertex_source = nullptr;
 			/// Do we own the source data?
-			bool ownsSource = false;
+			bool owns_source = false;
 			/// The format of the vertex data currently being used to prepare the mesh.
-			gfx::VertexDecl	sourceFormat;
+			gfx::VertexDecl	source_format;
 			/// Records the location in the vertex buffer that each vertex has been placed during data insertion.
-			UInt32Array vertexRecords;
+			UInt32Array vertex_records;
 			/// Final vertex buffer currently being prepared.
-			ByteArray vertexData;
+			ByteArray vertex_data;
 			/// Provides additional descriptive information about the vertices in the above buffer (i.e. source provided a normal, etc.)
-			ByteArray vertexFlags;
+			ByteArray vertex_flags;
 			/// This is used to store the current face / triangle data.
-			TriangleArray triangleData;
+			TriangleArray triangle_data;
 			/// Total number of triangles currently stored here.
-			std::uint32_t triangleCount = 0;
+			std::uint32_t triangle_count = 0;
 			/// Total number of vertices currently stored here.
-			std::uint32_t vertexCount = 0;
+			std::uint32_t vertex_count = 0;
 			/// Vertex normals should be computed (at least for any vertices where none were supplied).
-			bool computeNormals = false;
+			bool compute_normals = false;
 			/// Vertex binormals should be computed (at least for any vertices where none were supplied).
-			bool computeBinormals = false;
+			bool compute_binormals = false;
 			/// Vertex binormals should be computed (at least for any vertices where none were supplied).
-			bool computeTangents = false;
+			bool compute_tangents = false;
+			/// Vertex barycentric should be computed (at least for any vertices where none were supplied).
+			bool compute_barycentric = false;
 
 		}; // End Struct PreparationData
 
@@ -235,20 +242,20 @@ namespace experimental
 		struct OptimizerVertexInfo
 		{
 			/// The position of the vertex in the pseudo-cache
-			std::int32_t cachePosition = -1;
+			std::int32_t cache_position = -1;
 			/// The score associated with this vertex
-			float vertexScore = 0.0f;
+			float vertex_score = 0.0f;
 			/// Total number of triangles that reference this vertex that have not yet been added
-			std::uint32_t unusedTriangleReferences = 0;
+			std::uint32_t unused_triangle_references = 0;
 			/// List of all of the triangles referencing this vertex
-			UInt32Array triangleReferences;
+			UInt32Array triangle_references;
 
 		}; // End Struct OptimizerVertexInfo
 
 		struct OptimizerTriangleInfo
 		{
 			/// The sum of all three child vertex scores.
-			float triangleScore = 0.0f;
+			float triangle_score = 0.0f;
 			/// Has the triangle been added to the draw list already?
 			bool added = false;
 
@@ -266,91 +273,103 @@ namespace experimental
 		struct MeshSubsetKey
 		{
 			/// The data group identifier for this subset.
-			std::uint32_t dataGroupId = 0;
+			std::uint32_t data_group_id = 0;
 
 			// Constructors
 			MeshSubsetKey() :
-				dataGroupId(0) {}
+				data_group_id(0) {}
 			MeshSubsetKey(std::uint32_t _dataGroupId) :
-				dataGroupId(_dataGroupId) {}
+				data_group_id(_dataGroupId) {}
 
 		}; // End Struct MeshSubsetKey
 
-		using SubsetKeyMap = std::map<MeshSubsetKey, MeshSubset*>;
+		using SubsetKeyMap = std::map<MeshSubsetKey, Subset*>;
 		using SubsetKeyArray = std::vector<MeshSubsetKey>;
-
+		// Simple structure to allow us to leverage the hierarchical properties of a map
+		// to accelerate the weld operation.
+		struct WeldKey
+		{
+			// Pointer to the vertex for easy access.
+			std::uint8_t* vertex;
+			// Format of the above vertex for easy access.
+			gfx::VertexDecl format;
+			// The tolerance we're using to weld (transport only, these should be the same for every key).
+			float tolerance;
+		};
 		//-------------------------------------------------------------------------
 		// Friend List
 		//-------------------------------------------------------------------------
 		friend bool operator < (const AdjacentEdgeKey& key1, const AdjacentEdgeKey& key2);
 		friend bool operator < (const MeshSubsetKey& key1, const MeshSubsetKey& key2);
-
+		friend bool operator < (const WeldKey& key1, const WeldKey& key2);
 		//-------------------------------------------------------------------------
 		// Protected Methods
 		//-------------------------------------------------------------------------
-		bool generateVertexComponents(bool weld);
-		bool generateVertexNormals(std::uint32_t* adjacency, UInt32Array* remapArray = nullptr);
-		bool generateVertexTangents();
-		bool weldVertices(UInt32Array* vertexRemap = nullptr);
-		bool sortMeshData(bool optimize, bool buildHardwareBuffers);
+		bool generate_vertex_components(bool weld);
+		bool generate_vertex_normals(std::uint32_t* adjacency, UInt32Array* remapArray = nullptr);
+		bool generate_vertex_barycentrics(std::uint32_t* adjacency);
+		bool generate_vertex_tangents();
+		bool weld_vertices(float tolerance = 0.000001f, UInt32Array* vertexRemap = nullptr);
+		bool sort_mesh_data(bool optimize, bool buildHardwareBuffers);
 
 		//-------------------------------------------------------------------------
 		// Protected Static Functions
 		//-------------------------------------------------------------------------
-		static void buildOptimizedIndexBuffer(const MeshSubset* subset, std::uint32_t* sourceBuffer, std::uint32_t* destinationBuffer, std::uint32_t minimumVertex, std::uint32_t maximumVertex);
-		static float findVertexOptimizerScore(const OptimizerVertexInfo* vertexInfo);
-		static bool subsetSortPredicate(const MeshSubset* lhs, const MeshSubset * rhs);
+		static void build_optimized_index_buffer(const Subset* subset, std::uint32_t* sourceBuffer, std::uint32_t* destinationBuffer, std::uint32_t minimumVertex, std::uint32_t maximumVertex);
+		static float find_vertex_optimizer_score(const OptimizerVertexInfo* vertexInfo);
 
 		//-------------------------------------------------------------------------
 		// Protected Variables
 		//-------------------------------------------------------------------------
 		// Resource loading properties.
 		/// Should we force the re-generation of tangent space vectors?
-		bool mForceTangentGen;
+		bool _force_tangent_generation;
 		/// Should we force the re-generation of vertex normals?
-		bool mForceNormalGen;
+		bool _force_normal_generation;
+		/// Should we force the re-generation of vertex barycentric coords?
+		bool _force_barycentric_generation;
 		/// Allows derived classes to disable / enable the automatic re-sort operation that happens during several operations such as setFaceMaterial(), etc.
-		bool mDisableFinalSort;
+		bool _disable_final_sort;
 
 		// Mesh data
 		/// The vertex data as it exists during data insertion (prior to the actual build) and also used as the system memory copy.
-		std::uint8_t* mSystemVB = nullptr;
+		std::uint8_t* _system_vb = nullptr;
 		/// Vertex format used for the mesh internal vertex data.
-		gfx::VertexDecl mVertexFormat;
+		gfx::VertexDecl _vertex_format;
 		/// The final system memory copy of the index buffer.
-		std::uint32_t*	mSystemIB = nullptr;
+		std::uint32_t* _system_ib = nullptr;
 		/// Material and data group information for each triangle.
-		SubsetKeyArray mTriangleData;
+		SubsetKeyArray _triangle_data;
 		/// After constructing the mesh, this will contain the actual hardware vertex buffer resource
-		std::shared_ptr<VertexBuffer> mHardwareVB = std::make_shared<VertexBuffer>();
+		std::shared_ptr<VertexBuffer> _hardware_vb = std::make_shared<VertexBuffer>();
 		/// After constructing the mesh, this will contain the actual hardware index buffer resource
-		std::shared_ptr<IndexBuffer> mHardwareIB = std::make_shared<IndexBuffer>();
+		std::shared_ptr<IndexBuffer> _hardware_ib = std::make_shared<IndexBuffer>();
 
 		// Mesh data look up tables
 		/// The actual list of subsets maintained by this mesh.
-		SubsetArray mMeshSubsets;
+		SubsetArray _mesh_subsets;
 		/// A map containing lookup information which maps data groups to subsets batched by material.
-		DataGroupSubsetMap mDataGroups;
+		DataGroupSubsetMap _data_groups;
 		/// Quick binary tree lookup of existing subsets based on material AND data group id.
-		SubsetKeyMap mSubsetLookup;
+		SubsetKeyMap _subset_lookup;
 
 		// Mesh properties
 		/// Does the mesh use a hardware vertex/index buffer?
-		bool mHardwareMesh;
+		bool _hardware_mesh;
 		/// Was the mesh optimized when it was prepared?
-		bool mOptimizedMesh;
+		bool _optimize_mesh;
 		/// Axis aligned bounding box describing object dimensions (in object space)
-		math::bbox mBoundingBox;
+		math::bbox _bbox;
 		/// Total number of faces in the prepared mesh.
-		std::uint32_t mFaceCount;
+		std::uint32_t _face_count;
 		/// Total number of vertices in the prepared mesh.
-		std::uint32_t mVertexCount;
+		std::uint32_t _vertex_count;
 
 		// Mesh data preparation
 		/// Preparation status of the mesh (i.e. has it been constructed yet).
-		MeshStatus::E mPrepareStatus;
+		MeshStatus::E _prepare_status;
 		/// Input data used for constructing the final mesh.
-		PreparationData mPrepareData;
+		PreparationData _preparation_data;
 	};
 
 	//-----------------------------------------------------------------------------
@@ -358,4 +377,5 @@ namespace experimental
 	//-----------------------------------------------------------------------------
 	inline bool operator < (const Mesh::AdjacentEdgeKey& key1, const Mesh::AdjacentEdgeKey& key2);
 	inline bool operator < (const Mesh::MeshSubsetKey& key1, const Mesh::MeshSubsetKey& key2);
+	inline bool operator < (const Mesh::WeldKey& key1, const Mesh::WeldKey& key2);
 }
