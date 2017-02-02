@@ -16,3 +16,4 @@ data/*
 !Release
 !bin/
 !Bin/
+!x64/

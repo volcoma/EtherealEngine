@@ -2,18 +2,19 @@
 
 namespace gfx
 {
-	bgfx::VertexDecl PosTexCoord0Vertex::decl;
+	VertexDecl PosTexCoord0Vertex::decl;
+	VertexDecl MeshVertex::decl;
 
 	void screen_quad(float dest_width, float dest_height, float width, float height)
 	{
 		float texture_half = get_half_texel();
 		bool origin_bottom_left = is_origin_bottom_left();
 
-		if (3 == gfx::getAvailTransientVertexBuffer(3, gfx::PosTexCoord0Vertex::decl))
+		if (3 == getAvailTransientVertexBuffer(3, PosTexCoord0Vertex::decl))
 		{
-			gfx::TransientVertexBuffer vb;
-			gfx::allocTransientVertexBuffer(&vb, 3, gfx::PosTexCoord0Vertex::decl);
-			gfx::PosTexCoord0Vertex* vertex = (gfx::PosTexCoord0Vertex*)vb.data;
+			TransientVertexBuffer vb;
+			allocTransientVertexBuffer(&vb, 3, PosTexCoord0Vertex::decl);
+			PosTexCoord0Vertex* vertex = (PosTexCoord0Vertex*)vb.data;
 
 			const float minx = -width;
 			const float maxx = width;
@@ -58,7 +59,7 @@ namespace gfx
 			vertex[2].u = maxu;
 			vertex[2].v = maxv;
 
-			gfx::setVertexBuffer(&vb);
+			setVertexBuffer(&vb);
 		}
 	}
 

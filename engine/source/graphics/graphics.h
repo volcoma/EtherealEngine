@@ -33,6 +33,27 @@ namespace gfx
 		static bgfx::VertexDecl decl;
 	};
 
+	struct MeshVertex
+	{
+		float x, y, z;
+		float nx, ny, nz;
+		float tx, ty, tz;
+		float u, v;
+
+		static void init()
+		{
+			decl
+				.begin()
+				.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+				.add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float, true)
+				.add(bgfx::Attrib::Tangent, 4, bgfx::AttribType::Float, true)
+				.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+				.end();
+		}
+
+		static bgfx::VertexDecl decl;
+	};
+
 	inline float get_half_texel()
 	{
 		const RendererType::Enum renderer = getRendererType();
@@ -64,6 +85,7 @@ namespace gfx
 		if (initted)
 		{
 			PosTexCoord0Vertex::init();
+			MeshVertex::init();
 		}
 
 		return initted;
