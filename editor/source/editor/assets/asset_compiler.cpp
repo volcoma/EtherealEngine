@@ -4,7 +4,6 @@
 #include "runtime/system/filesystem.h"
 #include "shaderc/shaderc.h"
 #include "texturec/texturec.h"
-#include "geometryc/geometryc.h"
 #include <fstream>
 #include <array>
 #include "graphics/graphics.h"
@@ -15,10 +14,8 @@
 #include "core/serialization/cereal/types/unordered_map.hpp"
 #include "core/serialization/cereal/types/vector.hpp"
 
-#include "core/math/math_includes.h"
-#include "assimp/Importer.hpp"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
+#include "mesh_importer.h"
+#include "runtime/meta/rendering/mesh.hpp"
 
 void ShaderCompiler::compile(const fs::path& absoluteKey)
 {
@@ -198,32 +195,24 @@ void TextureCompiler::compile(const fs::path& absoluteKey)
 }
 
 
+
 void MeshCompiler::compile(const fs::path& absoluteKey)
 {
 	std::string strInput = absoluteKey.string();
 	std::string file = absoluteKey.stem().string();
-	fs::path output = absoluteKey.parent_path();
-	output /= fs::path(file + extensions::mesh);
+	fs::path dir = absoluteKey.parent_path();
+	fs::path output = dir / fs::path(file + extensions::mesh);
 
-	std::string strOutput = output.string();
+	Mesh::LoadData data;
+	importer::load_mesh_data_from_file(strInput, data);
 
-	static const int arg_count = 11;
-	const char* args_array[arg_count];
-	args_array[0] = "-f";
-	args_array[1] = strInput.c_str();
-	args_array[2] = "-o";
-	args_array[3] = strOutput.c_str();
-	args_array[4] = "--tangent";
-	args_array[5] = "--barycentric";
-	args_array[6] = "--flipv";
-	args_array[7] = "--packnormal";
-	args_array[8] = "1";
-	args_array[9] = "--packuv";
-	args_array[10] = "1";
-	
-	auto logger = logging::get("Log");
-	if (compile_mesh(arg_count, args_array) != 0)
+	fs::path entry = dir / fs::path(file + ".buildtemp");
 	{
-		logger->error().write("Failed compilation of {0}", strInput);
+		std::ofstream soutput(entry, std::ios::out | std::ios::binary);
+		cereal::oarchive_binary_t ar(soutput);
+		try_save(ar, cereal::make_nvp("mesh", data));
 	}
+	fs::copy(entry, output, fs::copy_options::overwrite_existing, std::error_code{});
+	fs::remove(entry, std::error_code{});
+
 }

@@ -4,7 +4,7 @@
 #include "runtime/assets/asset_handle.h"
 
 struct Texture;
-struct Mesh;
+class Mesh;
 struct Prefab;
 class Material;
 

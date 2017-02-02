@@ -191,11 +191,11 @@ namespace editor
 			if (!mesh)
 				return;
 			const auto& frustum = camera.get_frustum();
-			const auto& bounds = mesh->aabb;
+			const auto& bounds = mesh->get_bounds();
 			// Test the bounding box of the mesh
 			if (math::frustum::test_obb(frustum, bounds, world_transform))
 			{
-				if (es->wireframe_selection)
+				if(false)//if (es->wireframe_selection)
 				{
 					const float u_params[8] =
 					{

@@ -14,9 +14,8 @@
 #include "core/serialization/cereal/types/unordered_map.hpp"
 #include "core/serialization/cereal/types/vector.hpp"
 #include "meta/rendering/material.hpp"
+#include "meta/rendering/mesh.hpp"
 #include <cstdint>
-
-#include "ib-compress/indexbufferdecompression.h"
 
 void AssetReader::load_texture_from_file(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Texture>& request)
 {
@@ -174,171 +173,52 @@ void AssetReader::load_shader_from_memory(const std::string& key, const std::uin
 
 }
 
-struct MeshData
-{
-	gfx::VertexDecl decl;
-	std::vector<Group> groups;
-	MeshInfo info;
-	std::vector<std::pair<fs::byte_array_t, fs::byte_array_t>> buffersMem; // vb, ib
-	math::bbox aabb;
-};
-
-
 void AssetReader::load_mesh_from_file(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Mesh>& request)
 {
-#define BGFX_CHUNK_MAGIC_VB  BX_MAKEFOURCC('V', 'B', ' ', 0x1)
-#define BGFX_CHUNK_MAGIC_IB  BX_MAKEFOURCC('I', 'B', ' ', 0x0)
-#define BGFX_CHUNK_MAGIC_IBC BX_MAKEFOURCC('I', 'B', 'C', 0x0)
-#define BGFX_CHUNK_MAGIC_PRI BX_MAKEFOURCC('P', 'R', 'I', 0x0)
-
-	std::shared_ptr<MeshData> data = std::make_shared<MeshData>();
-
-	auto readMemory = [data, absoluteKey]()
+	struct Wrapper
 	{
-		if (!data)
-			return;
-
-		FileStreamReaderSeeker _reader(absoluteKey.string());
-
-		std::pair<fs::byte_array_t, fs::byte_array_t> buffers;
-		std::uint16_t numVertices = 0;
-		std::uint32_t numIndices = 0;
-		std::uint32_t chunk;
-		gfx::Error err;
-		while (4 == gfx::read(&_reader, chunk, &err)
-			&& err.isOk())
-		{
-			switch (chunk)
-			{
-			case BGFX_CHUNK_MAGIC_VB:
-			{
-				gfx::read(&_reader, data->decl);
-
-				std::uint16_t stride = data->decl.getStride();
-
-				gfx::read(&_reader, numVertices);
-				buffers.first.resize(numVertices*stride);
-				gfx::read(&_reader, (std::uint8_t*)buffers.first.data(), (std::uint32_t)buffers.first.size());
-				
-				data->aabb.from_points(buffers.first.data(), numVertices, stride, false);
-			}
-			break;
-
-			case BGFX_CHUNK_MAGIC_IB:
-			{
-				gfx::read(&_reader, numIndices);
-				buffers.second.resize(numIndices * 2);
-				gfx::read(&_reader, (std::uint8_t*)buffers.second.data(), (std::uint32_t)buffers.second.size());
-			}
-			break;
-
-			case BGFX_CHUNK_MAGIC_IBC:
-			{
-				gfx::read(&_reader, numIndices);
-
-				std::uint32_t compressedSize;
-				gfx::read(&_reader, compressedSize);
-
-				std::vector<uint8_t> compressedIndices(compressedSize);
-				gfx::read(&_reader, &compressedIndices[0], compressedSize);
-
-				buffers.second.resize(numIndices * 2);
-				ReadBitstream rbs(compressedIndices.data(), compressedSize);
-				DecompressIndexBuffer((uint16_t*)buffers.second.data(), numIndices / 3, rbs);
-			}
-			break;
-
-			case BGFX_CHUNK_MAGIC_PRI:
-			{
-				uint16_t len;
-				gfx::read(&_reader, len);
-				Group group;
-				group.vertices += numVertices;
-				group.indices += numIndices;
-				group.primitives += numIndices / 3;
-				numVertices = 0;
-				numIndices = 0;
-				group.material.resize(len);
-				gfx::read(&_reader, &group.material[0], len);
-
-				uint16_t num;
-				gfx::read(&_reader, num);
-
-				for (std::uint32_t ii = 0; ii < num; ++ii)
-				{
-					Subset subset;
-					gfx::read(&_reader, len);
-					subset.name.resize(len);
-					gfx::read(&_reader, const_cast<char*>(subset.name.data()), len);
-
-					gfx::read(&_reader, subset.start_index);
-					gfx::read(&_reader, subset.num_indices);
-					gfx::read(&_reader, subset.start_vertex);
-					gfx::read(&_reader, subset.num_vertices);
-					// 					read(_reader, prim.m_sphere);
-					// 					read(_reader, prim.m_aabb);
-					// 					read(_reader, prim.m_obb);
-
-					group.subsets.push_back(subset);
-				}
-				data->info.vertices += group.vertices;
-				data->info.indices += group.indices;
-				data->info.primitives += group.primitives;
-				data->groups.emplace_back(group);
-				data->buffersMem.emplace_back(buffers);				
-				buffers.first.clear();
-				buffers.second.clear();
-			}
-			break;
-
-			default:
-				gfx::skip(&_reader, 0);
-				break;
-			}
-		}
+		std::shared_ptr<Mesh> mesh;
 	};
 
-	auto createResource = [data, &request, key, absoluteKey]() mutable
+	auto wrapper = std::make_shared<Wrapper>();
+	auto deserialize = [wrapper, absoluteKey]() mutable
 	{
-		// if someone destroyed our memory
-		if (!data)
-			return;
-		// if nothing was read
-		if (data->buffersMem.empty())
-			return;
-
-		auto mesh = std::make_shared<Mesh>();
-		mesh->decl = data->decl;
-		mesh->groups = data->groups;
-		mesh->aabb = data->aabb;
-		mesh->info = data->info;
-		for (std::size_t i = 0; i < mesh->groups.size(); ++i)
+		Mesh::LoadData data;
 		{
-			auto& group = mesh->groups[i];
-			auto& buffers = data->buffersMem[i];
-			const gfx::Memory* memVB = gfx::copy(buffers.first.data(), static_cast<std::uint32_t>(buffers.first.size()));
-			buffers.first.clear();
-			group.vertex_buffer = std::make_shared<VertexBuffer>();
-			group.vertex_buffer->populate(memVB, data->decl);
+			std::ifstream stream{ absoluteKey, std::ios::in | std::ios::binary };
+			cereal::iarchive_binary_t ar(stream);
 
-			const gfx::Memory* memIB = gfx::copy(buffers.second.data(), static_cast<std::uint32_t>(buffers.second.size()));
-			buffers.second.clear();
-			group.index_buffer = std::make_shared<IndexBuffer>();
-			group.index_buffer->populate(memIB);
-
+			try_load(ar, cereal::make_nvp("mesh", data));
 		}
-		data.reset();
-		request.set_data(key, mesh);
-		request.invoke_callbacks();
+		
+		wrapper->mesh = std::make_shared<Mesh>();
+		wrapper->mesh->prepare_mesh(data.vertex_format, false);
+		wrapper->mesh->set_vertex_source(&data.vertex_data[0], data.vertex_count, data.vertex_format);
+		wrapper->mesh->add_primitives(data.triangle_data);
+		wrapper->mesh->end_prepare(true, false, false, false);
+	};
+
+	auto createResource = [wrapper, key, &request]() mutable
+	{
+		// Build the mesh
+		wrapper->mesh->build_vb();
+		wrapper->mesh->build_ib();
+
+		if (wrapper->mesh->get_status() == MeshStatus::Prepared)
+		{
+			request.set_data(key, wrapper->mesh);
+			request.invoke_callbacks();
+		}
+		wrapper.reset();
 	};
 
 	if (async)
 	{
 		auto ts = core::get_subsystem<runtime::TaskSystem>();
 
-		auto task = ts->create("", [ts, readMemory, createResource]()
+		auto task = ts->create("", [ts, deserialize, createResource]() mutable
 		{
-			readMemory();
+			deserialize();
 
 			auto callback = ts->create("Create Resource", createResource);
 
@@ -349,7 +229,7 @@ void AssetReader::load_mesh_from_file(const std::string& key, const fs::path& ab
 	}
 	else
 	{
-		readMemory();
+		deserialize();
 		createResource();
 	}
 }
@@ -375,6 +255,7 @@ void AssetReader::load_material_from_file(const std::string& key, const fs::path
 	{
 		request.set_data(key, matWrapper->hMaterial);
 		request.invoke_callbacks();
+		matWrapper.reset();
 	};
 
 	if (async)

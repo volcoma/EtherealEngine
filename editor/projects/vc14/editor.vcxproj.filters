@@ -163,6 +163,9 @@
     <ClInclude Include="..\..\source\editor\edit_state.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\editor\assets\mesh_importer.h">
+      <Filter>Source Files\assets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\editor\main.cpp">
@@ -263,6 +266,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\editor\edit_state.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\editor\assets\mesh_importer.cpp">
+      <Filter>Source Files\assets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

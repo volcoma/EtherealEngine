@@ -4,7 +4,7 @@
 
 struct Texture;
 struct Shader;
-struct Mesh;
+class Mesh;
 class Material;
 struct Prefab;
 struct Scene;

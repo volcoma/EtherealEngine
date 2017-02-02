@@ -3,7 +3,7 @@
 
 struct Shader;
 struct Texture;
-struct Mesh;
+class Mesh;
 
 struct ShaderCompiler
 {

@@ -278,6 +278,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\res\resource.h" />
     <ClInclude Include="..\..\source\editor\assets\asset_compiler.h" />
+    <ClInclude Include="..\..\source\editor\assets\mesh_importer.h" />
     <ClInclude Include="..\..\source\editor\console\console_log.h" />
     <ClInclude Include="..\..\source\editor\editor_window.h" />
     <ClInclude Include="..\..\source\editor\editor_app.h" />
@@ -317,9 +318,6 @@
     <ProjectReference Include="..\..\..\engine\projects\vc14\runtime.vcxproj">
       <Project>{b340ce5b-cff1-4fd5-a1ed-4f74c628f525}</Project>
     </ProjectReference>
-    <ProjectReference Include="geometryc.vcxproj">
-      <Project>{6edffe68-c3fb-4ac7-8b38-8e27f5722b1d}</Project>
-    </ProjectReference>
     <ProjectReference Include="shaderc.vcxproj">
       <Project>{4b8a4ad9-d7c0-4978-99d7-f4e9dde756ab}</Project>
     </ProjectReference>
@@ -329,6 +327,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\editor\assets\asset_compiler.cpp" />
+    <ClCompile Include="..\..\source\editor\assets\mesh_importer.cpp" />
     <ClCompile Include="..\..\source\editor\console\console_log.cpp" />
     <ClCompile Include="..\..\source\editor\editor_window.cpp" />
     <ClCompile Include="..\..\source\editor\editor_app.cpp" />

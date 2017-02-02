@@ -10,7 +10,7 @@
 #include "runtime/system/engine.h"
 #include "core/serialization/archives.h"
 #include "meta/project.hpp"
-struct Mesh;
+class Mesh;
 struct Prefab;
 struct Scene;
 struct Texture;
@@ -207,6 +207,10 @@ namespace editor
 
 		watch_assets<Mesh>(relative, wildcard + extensions::mesh, !recompile_assets, true);
 		watch_raw_assets<Mesh>(relative, "*.obj", recompile_assets);
+		watch_raw_assets<Mesh>(relative, "*.fbx", recompile_assets);
+		watch_raw_assets<Mesh>(relative, "*.dae", recompile_assets);
+		watch_raw_assets<Mesh>(relative, "*.blend", recompile_assets);
+		watch_raw_assets<Mesh>(relative, "*.3ds", recompile_assets);
 
 		watch_assets<Prefab>(relative, wildcard + extensions::prefab, true, true);
 		watch_assets<Scene>(relative, wildcard + extensions::scene, true, true);
@@ -289,9 +293,13 @@ namespace editor
 		/// for debug purposes
 		watch_assets<Shader>("engine_data:/shaders", wildcard + extensions::shader, !recompile_assets, true);
 		watch_raw_assets<Shader>("engine_data:/shaders", "*.sc", recompile_assets);
-// 
-// 		watch_assets<Mesh>("engine_data:/meshes", wildcard + extensions::mesh, !recompile_assets, true);
-// 		watch_raw_assets<Mesh>("engine_data:/meshes", "*.obj", recompile_assets);
+
+//  	watch_assets<Mesh>("engine_data:/meshes", wildcard + extensions::mesh, !recompile_assets, true);
+//  	watch_raw_assets<Mesh>("engine_data:/meshes", "*.obj", recompile_assets);
+// 		watch_raw_assets<Mesh>("engine_data:/meshes", "*.fbx", recompile_assets);
+// 		watch_raw_assets<Mesh>("engine_data:/meshes", "*.dae", recompile_assets);
+// 		watch_raw_assets<Mesh>("engine_data:/meshes", "*.blend", recompile_assets);
+// 		watch_raw_assets<Mesh>("engine_data:/meshes", "*.3ds", recompile_assets);
 // 
 // 		watch_assets<Texture>("engine_data:/textures", wildcard + extensions::texture, true, true);
 // 		watch_raw_assets<Texture>("engine_data:/textures", "*.png", recompile_assets);

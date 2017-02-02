@@ -106,7 +106,7 @@ namespace runtime
 				return;
 
 			const auto& frustum = camera.get_frustum();
-			const auto& bounds = current_mesh->aabb;
+			const auto& bounds = current_mesh->get_bounds();
 
 			if (model.get_lods().size() > 1)
 			{

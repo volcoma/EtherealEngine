@@ -7,7 +7,7 @@
 #include <vector>
 
 struct Group;
-struct Mesh;
+class Mesh;
 struct Program;
 class Material;
 

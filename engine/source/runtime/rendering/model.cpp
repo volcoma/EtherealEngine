@@ -54,8 +54,8 @@ void Model::set_lod(AssetHandle<Mesh> mesh, std::uint32_t lod)
 
 	_mesh_lods[lod] = mesh;
 
-	if(_materials.size() != mesh->groups.size())
-		_materials.resize(mesh->groups.size(), _default_material);
+	if(_materials.size() != mesh->get_subset_count())
+		_materials.resize(mesh->get_subset_count(), _default_material);
 }
 
 void Model::set_material(AssetHandle<Material> material, std::uint32_t index)
@@ -114,6 +114,7 @@ void Model::set_lod_min_distance(float distance)
 
 void Model::render(std::uint8_t id, const float* mtx, bool apply_cull, bool depth_write, bool depth_test, std::uint64_t extra_states, unsigned int lod, Program* user_program, std::function<void(Program&)> setup_params) const
 {
+
 	const auto mesh = get_lod(lod);
 	if (!mesh)
 		return;
@@ -121,10 +122,8 @@ void Model::render(std::uint8_t id, const float* mtx, bool apply_cull, bool dept
 	bool valid_program = false;
 
 	AssetHandle<Material> last_set_material;
-	for (std::size_t i = 0; i < mesh->groups.size(); ++i)
+	for (std::size_t i = 0; i < mesh->get_subset_count(); ++i)
 	{
-		const auto& group = mesh->groups[i];
-		
 		Program* program = user_program;
 		AssetHandle<Material> mat = get_material_for_group(i);
 		if (mat)
@@ -157,10 +156,11 @@ void Model::render(std::uint8_t id, const float* mtx, bool apply_cull, bool dept
 			gfx::setTransform(mtx);
 			gfx::setState(extra_states);
 
-			gfx::setIndexBuffer(group.index_buffer->handle);
-			gfx::setVertexBuffer(group.vertex_buffer->handle);
+			mesh->draw_subset(std::uint32_t(i));
+// 			gfx::setIndexBuffer(group.index_buffer->handle);
+// 			gfx::setVertexBuffer(group.vertex_buffer->handle);
 
-			gfx::submit(id, program->handle, 0, mat == last_set_material && i < (mesh->groups.size() - 1));
+			gfx::submit(id, program->handle, 0, mat == last_set_material && i < (mesh->get_subset_count() - 1));
 		}
 			
 		last_set_material = mat;

@@ -1,4 +1,4 @@
-$input a_position, a_normal, a_tangent, a_texcoord0
+$input a_position, a_normal, a_tangent, a_bitangent, a_texcoord0
 $output v_wpos, v_pos, v_wnormal, v_wtangent, v_wbitangent, v_texcoord0
 
 #include "common.sh"
@@ -15,7 +15,7 @@ void main()
 	vec4 tangent = a_tangent * 2.0 - 1.0;
 	vec3 wtangent = normalize(mul(u_model[0], vec4(tangent.xyz, 0.0) ).xyz);
 
-	vec4 bitangent  = vec4( ( cross( normal.xyz, tangent.xyz ) * tangent.w ), 0.0f );
+	vec4 bitangent = a_bitangent * 2.0 - 1.0;
 	vec3 wbitangent = normalize(mul(u_model[0], vec4(bitangent.xyz, 0.0) ).xyz);
 
 	v_wpos = wpos;

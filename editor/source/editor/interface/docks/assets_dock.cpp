@@ -413,7 +413,7 @@ namespace Docks
 		if (gui::Button("Import..."))
 		{
 			std::vector<std::string> paths;
-			if (open_multiple_files_dialog("obj,png,tga,dds,ktx,pvr,sc,io,sh", "", paths))
+			if (open_multiple_files_dialog("obj,fbx,dae,blend,3ds,png,tga,dds,ktx,pvr,sc,io,sh", "", paths))
 			{
 				auto ts = core::get_subsystem<runtime::TaskSystem>();
 				auto logger = logging::get("Log");
@@ -426,7 +426,7 @@ namespace Docks
 					fs::path ext = p.extension().string();
 					fs::path filename = p.filename();
 
-					if (ext == ".obj")
+					if (ext == ".obj" || ext == ".fbx" || ext == ".dae" || ext == ".blend" || ext == ".3ds")
 					{
 						auto task = ts->create("Import Asset", [opened_dir](const fs::path& path, const fs::path& p, const fs::path& filename)
 						{

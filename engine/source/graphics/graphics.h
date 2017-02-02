@@ -43,6 +43,7 @@ namespace gfx
 				.add(bgfx::Attrib::Color1, 4, bgfx::AttribType::Uint8, true)
 				.add(bgfx::Attrib::Normal, 4, bgfx::AttribType::Uint8, true, true)
 				.add(bgfx::Attrib::Tangent, 4, bgfx::AttribType::Uint8, true, true)
+				.add(bgfx::Attrib::Bitangent, 4, bgfx::AttribType::Uint8, true, true)
 				.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
 				.end();
 		}

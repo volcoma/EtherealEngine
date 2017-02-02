@@ -77,7 +77,8 @@ void default_scene()
 		auto object = ecs->create();
 		object.set_name("object");
 		object.assign<TransformComponent>().lock()
-			->set_local_position({ 0.0f, 0.1f, 0.0f });
+			->set_local_position({ 0.0f, 0.1f, 0.0f })
+			.rotate_local(0.0f, 180.0f, 0.0f);
 
 		Model model;
 		am->load<Mesh>("engine_data:/meshes/orb", false)
