@@ -35,18 +35,14 @@ namespace gfx
 
 	struct MeshVertex
 	{
-		float x, y, z;
-		float nx, ny, nz;
-		float tx, ty, tz;
-		float u, v;
-
 		static void init()
 		{
 			decl
 				.begin()
 				.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-				.add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float, true)
-				.add(bgfx::Attrib::Tangent, 4, bgfx::AttribType::Float, true)
+				.add(bgfx::Attrib::Color1, 4, bgfx::AttribType::Uint8, true)
+				.add(bgfx::Attrib::Normal, 4, bgfx::AttribType::Uint8, true, true)
+				.add(bgfx::Attrib::Tangent, 4, bgfx::AttribType::Uint8, true, true)
 				.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
 				.end();
 		}

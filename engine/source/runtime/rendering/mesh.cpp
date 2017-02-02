@@ -169,7 +169,7 @@ namespace experimental
 				memcpy(&mPrepareData.vertexData[0], mSystemVB, mPrepareData.vertexData.size());
 			else
 				gfx::vertexConvert(pVertexFormat, &mPrepareData.vertexData[0], mVertexFormat, mSystemVB, mVertexCount);
-		
+
 			// Clear out the vertex buffer
 			checked_array_delete(mSystemVB);
 			mVertexCount = 0;
@@ -218,7 +218,7 @@ namespace experimental
 			for (std::uint32_t i = 0; i < mPrepareData.vertexCount; ++i)
 				mPrepareData.vertexFlags[i] = nVertexFlags;
 
-			  // Clean up heap allocated subset structures
+			// Clean up heap allocated subset structures
 			for (itSubset = mMeshSubsets.begin(); itSubset != mMeshSubsets.end(); ++itSubset)
 				checked_delete(*itSubset);
 
@@ -419,10 +419,10 @@ namespace experimental
 				math::vec3 * pVertex3 = (math::vec3*)(pSrcVertices + (SrcTri.indices[2] * nVertexStride) + nPositionOffset);
 
 				// Skip triangle if it is degenerate.
-				//if (MathUtility::compareVectors(*pVertex1, *pVertex2, EPSILON_1UM) == 0 || MathUtility::compareVectors(*pVertex1, *pVertex3, EPSILON_1UM) == 0 ||
-				//	MathUtility::compareVectors(*pVertex2, *pVertex3, EPSILON_1UM) == 0)
-				//	continue;
-
+				if ((math::epsilonEqual(*pVertex1, *pVertex2, math::epsilon<float>()) == math::tvec3<bool>{true, true, true}) ||
+					(math::epsilonEqual(*pVertex1, *pVertex3, math::epsilon<float>()) == math::tvec3<bool>{true, true, true}) ||
+					(math::epsilonEqual(*pVertex2, *pVertex3, math::epsilon<float>()) == math::tvec3<bool>{true, true, true}))
+					continue;
 			} // End if has position.
 
 			  // Prepare a triangle structure ready for population
@@ -463,7 +463,7 @@ namespace experimental
 					mPrepareData.vertexFlags.push_back(nVertexFlags);
 
 					// Clear any invalid normals (completely messes up HDR if ANY NaNs make it this far)
-					if (nNormalOffset >= 0 && bSourceHasNormal == true)
+					if (nNormalOffset > 0 && bSourceHasNormal == true)
 					{
 						math::vec3 * pNormal = (math::vec3*)(pDst + nNormalOffset);
 						if (_isnan(pNormal->x) || _isnan(pNormal->y) || _isnan(pNormal->z))
@@ -620,14 +620,17 @@ namespace experimental
 
 					// Store vertex components
 					if (nPositionOffset >= 0)
-						*((math::vec3*)(pCurrentVertex + nPositionOffset)) = vOutputPos;
-					if (nNormalOffset >= 0)
-						*((math::vec3*)(pCurrentVertex + nNormalOffset)) = vNormal;
-					if (nTexCoordOffset >= 0)
-						*((math::vec2*)(pCurrentVertex + nTexCoordOffset)) = math::vec2(vCurrentTex.x * fTexUScale, vCurrentTex.y * fTexVScale);
+						gfx::vertexPack(&vOutputPos[0], false, gfx::Attrib::Position, pFormat, pCurrentVertex);
+					//*((math::vec3*)(pCurrentVertex + nPositionOffset)) = vOutputPos;
+					if (nNormalOffset > 0)
+						gfx::vertexPack(&vNormal[0], true, gfx::Attrib::Normal, pFormat, pCurrentVertex);
+					//*((math::vec3*)(pCurrentVertex + nNormalOffset)) = vNormal;
+					if (nTexCoordOffset > 0)
+						gfx::vertexPack(&math::vec2(vCurrentTex.x * fTexUScale, vCurrentTex.y * fTexVScale)[0], true, gfx::Attrib::TexCoord0, pFormat, pCurrentVertex);
+					//*((math::vec2*)(pCurrentVertex + nTexCoordOffset)) = math::vec2(vCurrentTex.x * fTexUScale, vCurrentTex.y * fTexVScale);
 
-					// Set flags for this vertex (we want to generate tangents 
-					// and binormals if we need them).
+				// Set flags for this vertex (we want to generate tangents 
+				// and binormals if we need them).
 					*pCurrentFlags++ = PreparationData::SourceContainsNormal;
 
 					// Grow the object space bounding box for this mesh
@@ -726,6 +729,7 @@ namespace experimental
 		} // Next Face
 
 		  // We need to generate binormals / tangents?
+		mPrepareData.computeNormals = true;
 		mPrepareData.computeBinormals = mVertexFormat.has(gfx::Attrib::Bitangent);
 		mPrepareData.computeTangents = mVertexFormat.has(gfx::Attrib::Tangent);
 
@@ -773,14 +777,26 @@ namespace experimental
 		for (std::uint32_t i = 0; i < mPrepareData.triangleCount; ++i)
 		{
 			Triangle & Tri = mPrepareData.triangleData[i];
-			const math::vec3 & v1 = *(math::vec3*)(pSrcVertices + (Tri.indices[0] * nVertexStride));
-			const math::vec3 & v2 = *(math::vec3*)(pSrcVertices + (Tri.indices[1] * nVertexStride));
-			const math::vec3 & v3 = *(math::vec3*)(pSrcVertices + (Tri.indices[2] * nVertexStride));
-		
+			math::vec3 v1;
+			float vf1[4];
+			gfx::vertexUnpack(vf1, gfx::Attrib::Position, mVertexFormat, pSrcVertices, Tri.indices[0]);
+			math::vec3 v2;
+			float vf2[4];
+			gfx::vertexUnpack(vf2, gfx::Attrib::Position, mVertexFormat, pSrcVertices, Tri.indices[1]);
+			math::vec3 v3;
+			float vf3[4];
+			gfx::vertexUnpack(vf3, gfx::Attrib::Position, mVertexFormat, pSrcVertices, Tri.indices[2]);
+			memcpy(&v1[0], vf1, 3 * sizeof(float));
+			memcpy(&v2[0], vf2, 3 * sizeof(float));
+			memcpy(&v3[0], vf3, 3 * sizeof(float));
+			//const math::vec3 & v1 = *(math::vec3*)(pSrcVertices + (Tri.indices[0] * nVertexStride));
+			//const math::vec3 & v2 = *(math::vec3*)(pSrcVertices + (Tri.indices[1] * nVertexStride));
+			//const math::vec3 & v3 = *(math::vec3*)(pSrcVertices + (Tri.indices[2] * nVertexStride));	
+
 			math::vec3 c = math::cross(v2 - v1, v3 - v1);
 			if (math::length2(c) < (4.0f * 0.000001f * 0.000001f))
 				Tri.flags |= TriangleFlags::Degenerate;
-		
+
 		} // Next triangle
 
 		  // Process the vertex data in order to generate any additional components that may be necessary
@@ -1381,7 +1397,7 @@ namespace experimental
 	//-----------------------------------------------------------------------------
 	void Mesh::draw()
 	{
-		  // Should we get involved in the rendering process?
+		// Should we get involved in the rendering process?
 		std::int32_t nFaceStart = 0, nFaceCount = 0, nVertexStart = 0, nVertexCount = 0;
 
 		for (size_t i = 0; i < mMeshSubsets.size(); ++i)
@@ -1406,7 +1422,7 @@ namespace experimental
 		if (itSubset == mSubsetLookup.end())
 			return;
 
-		  // Process and draw all subsets of the mesh that use the specified material.
+		// Process and draw all subsets of the mesh that use the specified material.
 		std::int32_t nSubsetVertStart, nSubsetVertEnd;
 		std::int32_t nFaceStart = 0, nFaceCount = 0, nVertexStart = 0, nVertexEnd = 0, nVertexCount = 0;
 
@@ -1458,22 +1474,6 @@ namespace experimental
 		gfx::setIndexBuffer(mHardwareIB->handle, 0, (std::uint32_t)nNumFaces * 3);
 	}
 
-	//-----------------------------------------------------------------------------
-	//  Name : renderMeshData () (Private)
-	/// <summary>
-	/// Given the specified subset values, simply render the selected batch
-	/// of primitives the required number of times based on their material.
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void Mesh::renderMeshData(std::uint32_t nFaceStart, std::uint32_t nFaceCount, std::uint32_t nVertexStart, std::uint32_t nVertexCount)
-	{
-		// Hardware or software rendering?
-		if (mHardwareMesh)
-		{
-
-		} // End if has hardware copy
-
-	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : generateVertexComponents () (Private)
@@ -1808,8 +1808,8 @@ namespace experimental
 		std::uint16_t nVertexStride = mVertexFormat.getStride();
 
 		// Final format requests tangents?
-		bool bRequiresBinormal = (nBinormalOffset >= 0);
-		bool bRequiresTangent = (nTangentOffset >= 0);
+		bool bRequiresBinormal = (nBinormalOffset > 0);
+		bool bRequiresTangent = (nTangentOffset > 0);
 		if (!mForceTangentGen && !bRequiresBinormal && !bRequiresTangent)
 			return true;
 
@@ -1838,15 +1838,39 @@ namespace experimental
 			i3 = Tri.indices[2];
 
 			// Retrieve references to the positions of the three vertices in the triangle.
-			const math::vec3 & E = *(math::vec3*)(pSrcVertices + (i1 * nVertexStride) + nPositionOffset);
-			const math::vec3 & F = *(math::vec3*)(pSrcVertices + (i2 * nVertexStride) + nPositionOffset);
-			const math::vec3 & G = *(math::vec3*)(pSrcVertices + (i3 * nVertexStride) + nPositionOffset);
+			math::vec3 E;
+			float fE[4];
+			gfx::vertexUnpack(fE, gfx::Attrib::Position, mVertexFormat, pSrcVertices, i1);
+			math::vec3 F;
+			float fF[4];
+			gfx::vertexUnpack(fF, gfx::Attrib::Position, mVertexFormat, pSrcVertices, i2);
+			math::vec3 G;
+			float fG[4];
+			gfx::vertexUnpack(fG, gfx::Attrib::Position, mVertexFormat, pSrcVertices, i3);
+			memcpy(&E[0], fE, 3 * sizeof(float));
+			memcpy(&F[0], fF, 3 * sizeof(float));
+			memcpy(&G[0], fG, 3 * sizeof(float));
+			//const math::vec3 & E = *(math::vec3*)(pSrcVertices + (i1 * nVertexStride) + nPositionOffset);
+			//const math::vec3 & F = *(math::vec3*)(pSrcVertices + (i2 * nVertexStride) + nPositionOffset);
+			//const math::vec3 & G = *(math::vec3*)(pSrcVertices + (i3 * nVertexStride) + nPositionOffset);
 
 			// Retrieve references to the base texture coordinates of the three vertices in the triangle.
 			// TODO: Allow customization of which tex coordinates to generate from.
-			const math::vec2 & Et = *(math::vec2*)(pSrcVertices + (i1 * nVertexStride) + nTexCoordOffset);
-			const math::vec2 & Ft = *(math::vec2*)(pSrcVertices + (i2 * nVertexStride) + nTexCoordOffset);
-			const math::vec2 & Gt = *(math::vec2*)(pSrcVertices + (i3 * nVertexStride) + nTexCoordOffset);
+			math::vec2 Et;
+			float fEt[4];
+			gfx::vertexUnpack(&fEt[0], gfx::Attrib::TexCoord0, mVertexFormat, pSrcVertices, i1);
+			math::vec2 Ft;
+			float fFt[4];
+			gfx::vertexUnpack(&fFt[0], gfx::Attrib::TexCoord0, mVertexFormat, pSrcVertices, i2);
+			math::vec2 Gt;
+			float fGt[4];
+			gfx::vertexUnpack(&fGt[0], gfx::Attrib::TexCoord0, mVertexFormat, pSrcVertices, i3);
+			memcpy(&Et[0], fEt, 2 * sizeof(float));
+			memcpy(&Ft[0], fFt, 2 * sizeof(float));
+			memcpy(&Gt[0], fGt, 2 * sizeof(float));
+			//const math::vec2 & Et = *(math::vec2*)(pSrcVertices + (i1 * nVertexStride) + nTexCoordOffset);
+			//const math::vec2 & Ft = *(math::vec2*)(pSrcVertices + (i2 * nVertexStride) + nTexCoordOffset);
+			//const math::vec2 & Gt = *(math::vec2*)(pSrcVertices + (i3 * nVertexStride) + nTexCoordOffset);
 
 			// Compute the known variables P & Q, where "P = F-E" and "Q = G-E"
 			// based on our original discussion of the tangent vector
@@ -1903,7 +1927,10 @@ namespace experimental
 
 			// Retrieve the normal vector from the vertex and the computed
 			// tangent vector.
-			vNormal = *(math::vec3*)(pSrcVertices + nNormalOffset);
+			float normal[4];
+			gfx::vertexUnpack(normal, gfx::Attrib::Normal, mVertexFormat, pSrcVertices);
+			memcpy(&vNormal[0], normal, 3 * sizeof(float));
+			//vNormal = *(math::vec3*)(pSrcVertices + nNormalOffset);
 			T = pTangents[i];
 
 			// GramSchmidt orthogonalize
@@ -1912,30 +1939,31 @@ namespace experimental
 
 			// Store tangent if required
 			if (mForceTangentGen || (!bHasTangent && bRequiresTangent))
-				*(math::vec3*)(pSrcVertices + nTangentOffset) = T;
+				gfx::vertexPack(&math::vec4(T, 1.0f)[0], true, gfx::Attrib::Tangent, mVertexFormat, pSrcVertices);
 
 			// Compute and store binormal if required
-			//if (mForceTangentGen || (!bHasBinormal && bRequiresBinormal))
-			//{
-			//	// Calculate the new orthogonal binormal
-			//	B = math::cross(vNormal, T);
-			//	B = math::normalize(B);
-			//
-			//	// Compute the "handedness" of the tangent and binormal. This
-			//	// ensures the inverted / mirrored texture coordinates still have
-			//	// an accurate matrix.
-			//	vCross = math::cross(vNormal, T);
-			//	if (math::dot(vCross, pBinormals[i]) < 0.0f)
-			//	{
-			//		// Flip the binormal
-			//		B = -B;
-			//
-			//	} // End if coordinates inverted
-			//
-			//	  // Store.
-			//	*(math::vec3*)(pSrcVertices + nBinormalOffset) = B;
-			//
-			//} // End if requires binormal   
+			if (mForceTangentGen || (!bHasBinormal && bRequiresBinormal))
+			{
+				// Calculate the new orthogonal binormal
+				B = math::cross(vNormal, T);
+				B = math::normalize(B);
+
+				// Compute the "handedness" of the tangent and binormal. This
+				// ensures the inverted / mirrored texture coordinates still have
+				// an accurate matrix.
+				vCross = math::cross(vNormal, T);
+				if (math::dot(vCross, pBinormals[i]) < 0.0f)
+				{
+					// Flip the binormal
+					B = -B;
+
+				} // End if coordinates inverted
+
+				  // Store.
+				gfx::vertexPack(&math::vec4(B, 1.0f)[0], true, gfx::Attrib::Bitangent, mVertexFormat, pSrcVertices);
+				//*(math::vec3*)(pSrcVertices + nBinormalOffset) = B;
+
+			} // End if requires binormal   
 
 		} // Next vertex
 
@@ -2160,92 +2188,92 @@ namespace experimental
 	//-----------------------------------------------------------------------------
 	bool Mesh::weldVertices(UInt32Array * pVertexRemap /* = nullptr */)
 	{
-//		gfx::weldVertices()
-// 		WeldKey Key;
-// 		std::map< WeldKey, std::uint32_t > VertexTree;
-// 		std::map< WeldKey, std::uint32_t >::const_iterator itKey;
-// 		ByteArray NewVertexData, NewVertexFlags;
-// 		std::uint32_t nNewVertexCount = 0;
-// 
-// 		// Allocate enough space to build the remap array for the existing vertices
-// 		if (pVertexRemap)
-// 			pVertexRemap->resize(mPrepareData.vertexCount);
-// 		std::uint32_t * pCollapseMap = new std::uint32_t[mPrepareData.vertexCount];
-// 
-// 		// Retrieve useful data offset information.
-// 		std::uint16_t nVertexStride = mVertexFormat.getStride();
-// 
-// 		// For each vertex to be welded.
-// 		for (std::uint32_t i = 0; i < mPrepareData.vertexCount; ++i)
-// 		{
-// 			// Build a new key structure for inserting
-// 			Key.vertex = (&mPrepareData.vertexData[0]) + (i * nVertexStride);
-// 			Key.format = mVertexFormat;
-// 			Key.tolerance = 0.000001f;
-// 
-// 			// Does a vertex with matching details already exist in the tree.
-// 			itKey = VertexTree.find(Key);
-// 			if (itKey == VertexTree.end())
-// 			{
-// 				// No matching vertex. Insert into the tree (value = NEW index of vertex).
-// 				VertexTree[Key] = nNewVertexCount;
-// 				pCollapseMap[i] = nNewVertexCount;
-// 				if (pVertexRemap)
-// 					(*pVertexRemap)[i] = nNewVertexCount;
-// 
-// 				// Store the vertex in the new buffer
-// 				NewVertexData.resize((nNewVertexCount + 1) * nVertexStride);
-// 				memcpy(&NewVertexData[nNewVertexCount * nVertexStride], Key.vertex, nVertexStride);
-// 				NewVertexFlags.push_back(mPrepareData.vertexFlags[i]);
-// 				nNewVertexCount++;
-// 
-// 			} // End if no matching vertex
-// 			else
-// 			{
-// 				// A vertex already existed at this location.
-// 				// Just mark the 'collapsed' index for this vertex in the remap array.
-// 				pCollapseMap[i] = itKey->second;
-// 				if (pVertexRemap)
-// 					(*pVertexRemap)[i] = 0xFFFFFFFF;
-// 
-// 			} // End if vertex already existed
-// 
-// 		} // Next Vertex
-// 
-// 		  // If nothing was welded, just bail
-// 		if (mPrepareData.vertexCount == nNewVertexCount)
-// 		{
-// 			checked_array_delete(pCollapseMap);
-// 
-// 			if (pVertexRemap)
-// 				pVertexRemap->clear();
-// 			return true;
-// 
-// 		} // End if nothing to do
-// 
-// 		  // Otherwise, replace the old preparation vertices and remap
-// 		mPrepareData.vertexData.clear();
-// 		mPrepareData.vertexData.resize(NewVertexData.size());
-// 		memcpy(&mPrepareData.vertexData[0], &NewVertexData[0], NewVertexData.size());
-// 		mPrepareData.vertexFlags.clear();
-// 		mPrepareData.vertexFlags.resize(NewVertexFlags.size());
-// 		memcpy(&mPrepareData.vertexFlags[0], &NewVertexFlags[0], NewVertexFlags.size());
-// 		mPrepareData.vertexCount = nNewVertexCount;
-// 
-// 		// Now remap all the triangle indices
-// 		for (std::uint32_t i = 0; i < mPrepareData.triangleCount; ++i)
-// 		{
-// 			Triangle & Tri = mPrepareData.triangleData[i];
-// 			Tri.indices[0] = pCollapseMap[Tri.indices[0]];
-// 			Tri.indices[1] = pCollapseMap[Tri.indices[1]];
-// 			Tri.indices[2] = pCollapseMap[Tri.indices[2]];
-// 
-// 		} // Next Triangle
-// 
-// 		  // Clean up
-// 		checked_array_delete(pCollapseMap);
+		//		gfx::weldVertices()
+		// 		WeldKey Key;
+		// 		std::map< WeldKey, std::uint32_t > VertexTree;
+		// 		std::map< WeldKey, std::uint32_t >::const_iterator itKey;
+		// 		ByteArray NewVertexData, NewVertexFlags;
+		// 		std::uint32_t nNewVertexCount = 0;
+		// 
+		// 		// Allocate enough space to build the remap array for the existing vertices
+		// 		if (pVertexRemap)
+		// 			pVertexRemap->resize(mPrepareData.vertexCount);
+		// 		std::uint32_t * pCollapseMap = new std::uint32_t[mPrepareData.vertexCount];
+		// 
+		// 		// Retrieve useful data offset information.
+		// 		std::uint16_t nVertexStride = mVertexFormat.getStride();
+		// 
+		// 		// For each vertex to be welded.
+		// 		for (std::uint32_t i = 0; i < mPrepareData.vertexCount; ++i)
+		// 		{
+		// 			// Build a new key structure for inserting
+		// 			Key.vertex = (&mPrepareData.vertexData[0]) + (i * nVertexStride);
+		// 			Key.format = mVertexFormat;
+		// 			Key.tolerance = 0.000001f;
+		// 
+		// 			// Does a vertex with matching details already exist in the tree.
+		// 			itKey = VertexTree.find(Key);
+		// 			if (itKey == VertexTree.end())
+		// 			{
+		// 				// No matching vertex. Insert into the tree (value = NEW index of vertex).
+		// 				VertexTree[Key] = nNewVertexCount;
+		// 				pCollapseMap[i] = nNewVertexCount;
+		// 				if (pVertexRemap)
+		// 					(*pVertexRemap)[i] = nNewVertexCount;
+		// 
+		// 				// Store the vertex in the new buffer
+		// 				NewVertexData.resize((nNewVertexCount + 1) * nVertexStride);
+		// 				memcpy(&NewVertexData[nNewVertexCount * nVertexStride], Key.vertex, nVertexStride);
+		// 				NewVertexFlags.push_back(mPrepareData.vertexFlags[i]);
+		// 				nNewVertexCount++;
+		// 
+		// 			} // End if no matching vertex
+		// 			else
+		// 			{
+		// 				// A vertex already existed at this location.
+		// 				// Just mark the 'collapsed' index for this vertex in the remap array.
+		// 				pCollapseMap[i] = itKey->second;
+		// 				if (pVertexRemap)
+		// 					(*pVertexRemap)[i] = 0xFFFFFFFF;
+		// 
+		// 			} // End if vertex already existed
+		// 
+		// 		} // Next Vertex
+		// 
+		// 		  // If nothing was welded, just bail
+		// 		if (mPrepareData.vertexCount == nNewVertexCount)
+		// 		{
+		// 			checked_array_delete(pCollapseMap);
+		// 
+		// 			if (pVertexRemap)
+		// 				pVertexRemap->clear();
+		// 			return true;
+		// 
+		// 		} // End if nothing to do
+		// 
+		// 		  // Otherwise, replace the old preparation vertices and remap
+		// 		mPrepareData.vertexData.clear();
+		// 		mPrepareData.vertexData.resize(NewVertexData.size());
+		// 		memcpy(&mPrepareData.vertexData[0], &NewVertexData[0], NewVertexData.size());
+		// 		mPrepareData.vertexFlags.clear();
+		// 		mPrepareData.vertexFlags.resize(NewVertexFlags.size());
+		// 		memcpy(&mPrepareData.vertexFlags[0], &NewVertexFlags[0], NewVertexFlags.size());
+		// 		mPrepareData.vertexCount = nNewVertexCount;
+		// 
+		// 		// Now remap all the triangle indices
+		// 		for (std::uint32_t i = 0; i < mPrepareData.triangleCount; ++i)
+		// 		{
+		// 			Triangle & Tri = mPrepareData.triangleData[i];
+		// 			Tri.indices[0] = pCollapseMap[Tri.indices[0]];
+		// 			Tri.indices[1] = pCollapseMap[Tri.indices[1]];
+		// 			Tri.indices[2] = pCollapseMap[Tri.indices[2]];
+		// 
+		// 		} // Next Triangle
+		// 
+		// 		  // Clean up
+		// 		checked_array_delete(pCollapseMap);
 
-		// Success!
+				// Success!
 		return true;
 	}
 

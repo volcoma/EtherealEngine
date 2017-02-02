@@ -389,7 +389,8 @@ namespace Docks
 					if (gui::IsItemClicked(1) || gui::IsItemClicked(2))
 					{
 						gui::SetWindowFocus();
-						window->setMouseCursorVisible(false);
+						if(window)
+							window->setMouseCursorVisible(false);
 					}
 				}
 			}
