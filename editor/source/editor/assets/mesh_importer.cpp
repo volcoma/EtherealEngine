@@ -7,24 +7,24 @@
 #include "assimp/postprocess.h"
 #include "runtime/rendering/mesh.h"
 
-void process_vertices(aiMesh* mesh, Mesh::LoadData& loadData)
+void process_vertices(aiMesh* mesh, Mesh::LoadData& load_data)
 {
 	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = loadData.vertex_format.has(gfx::Attrib::Position);
-	bool has_normal = loadData.vertex_format.has(gfx::Attrib::Normal);
-	bool has_bitangent = loadData.vertex_format.has(gfx::Attrib::Bitangent);
-	bool has_tangent = loadData.vertex_format.has(gfx::Attrib::Tangent);
-	bool has_texcoord0 = loadData.vertex_format.has(gfx::Attrib::TexCoord0);
-	bool has_texcoord1 = loadData.vertex_format.has(gfx::Attrib::TexCoord1);
-	auto nVertexStride = loadData.vertex_format.getStride();
+	bool has_position = load_data.vertex_format.has(gfx::Attrib::Position);
+	bool has_normal = load_data.vertex_format.has(gfx::Attrib::Normal);
+	bool has_bitangent = load_data.vertex_format.has(gfx::Attrib::Bitangent);
+	bool has_tangent = load_data.vertex_format.has(gfx::Attrib::Tangent);
+	bool has_texcoord0 = load_data.vertex_format.has(gfx::Attrib::TexCoord0);
+	bool has_texcoord1 = load_data.vertex_format.has(gfx::Attrib::TexCoord1);
+	auto vertex_stride = load_data.vertex_format.getStride();
 
-	std::uint32_t nCurrentVertex = loadData.vertex_count;
-	loadData.vertex_count += mesh->mNumVertices;
-	loadData.vertex_data.resize(loadData.vertex_count * nVertexStride);
+	std::uint32_t current_vertex = load_data.vertex_count;
+	load_data.vertex_count += mesh->mNumVertices;
+	load_data.vertex_data.resize(load_data.vertex_count * vertex_stride);
 
-	std::uint8_t* pCurrentVertex = &loadData.vertex_data[0] + nCurrentVertex * nVertexStride;
+	std::uint8_t* current_vertex_ptr = &load_data.vertex_data[0] + current_vertex * vertex_stride;
 
-	for (size_t i = 0; i < mesh->mNumVertices; ++i, pCurrentVertex += nVertexStride)
+	for (size_t i = 0; i < mesh->mNumVertices; ++i, current_vertex_ptr += vertex_stride)
 	{
 		//position
 		if (mesh->mVertices)
@@ -33,7 +33,7 @@ void process_vertices(aiMesh* mesh, Mesh::LoadData& loadData)
 			std::memcpy(position, &mesh->mVertices[i], sizeof(math::vec3));
 
 			if (has_position)
-				gfx::vertexPack(position, false, gfx::Attrib::Position, loadData.vertex_format, pCurrentVertex);
+				gfx::vertexPack(position, false, gfx::Attrib::Position, load_data.vertex_format, current_vertex_ptr);
 		}
 
 		//tex coords
@@ -43,7 +43,7 @@ void process_vertices(aiMesh* mesh, Mesh::LoadData& loadData)
 			std::memcpy(textureCoords, &mesh->mTextureCoords[0][i], sizeof(math::vec2));
 
 			if (has_texcoord0)
-				gfx::vertexPack(textureCoords, true, gfx::Attrib::TexCoord0, loadData.vertex_format, pCurrentVertex);
+				gfx::vertexPack(textureCoords, true, gfx::Attrib::TexCoord0, load_data.vertex_format, current_vertex_ptr);
 	
 		}
 
@@ -54,7 +54,7 @@ void process_vertices(aiMesh* mesh, Mesh::LoadData& loadData)
 			std::memcpy(normal, &mesh->mNormals[i], sizeof(math::vec3));
 
 			if (has_normal)
-				gfx::vertexPack(normal, true, gfx::Attrib::Normal, loadData.vertex_format, pCurrentVertex);
+				gfx::vertexPack(normal, true, gfx::Attrib::Normal, load_data.vertex_format, current_vertex_ptr);
 
 		}
 
@@ -65,27 +65,33 @@ void process_vertices(aiMesh* mesh, Mesh::LoadData& loadData)
 			std::memcpy(tangent, &mesh->mTangents[i], sizeof(math::vec3));
 
 			if (has_tangent)
-				gfx::vertexPack(tangent, true, gfx::Attrib::Tangent, loadData.vertex_format, pCurrentVertex);
+				gfx::vertexPack(tangent, true, gfx::Attrib::Tangent, load_data.vertex_format, current_vertex_ptr);
 
 		}
 
-		//binormals
+		//bitangents
 		if (mesh->mBitangents)
 		{
 			float bitangent[4];
 			std::memcpy(bitangent, &mesh->mBitangents[i], sizeof(math::vec3));
 
+			//negate bitangent;
+			bitangent[0] = -bitangent[0];
+			bitangent[1] = -bitangent[1];
+			bitangent[2] = -bitangent[2];
+			bitangent[3] = -bitangent[3];
+
 			if (has_bitangent)
-				gfx::vertexPack(bitangent, true, gfx::Attrib::Bitangent, loadData.vertex_format, pCurrentVertex);
+				gfx::vertexPack(bitangent, true, gfx::Attrib::Bitangent, load_data.vertex_format, current_vertex_ptr);
 
 		}
 
 	}
 }
 
-void process_faces(aiMesh* mesh, Mesh::LoadData& loadData)
+void process_faces(aiMesh* mesh, Mesh::LoadData& load_data)
 {
-	loadData.triangle_count += mesh->mNumFaces;
+	load_data.triangle_count += mesh->mNumFaces;
 
 	for (size_t i = 0; i < mesh->mNumFaces; ++i)
 	{
@@ -97,81 +103,80 @@ void process_faces(aiMesh* mesh, Mesh::LoadData& loadData)
 
 		for (size_t j = 0; j < 3; ++j)
 		{
-			triangle.indices[j] = face.mIndices[j] + loadData.vertex_count;
+			triangle.indices[j] = face.mIndices[j] + load_data.vertex_count;
 		}
 
-		loadData.triangle_data.push_back(triangle);
+		load_data.triangle_data.push_back(triangle);
 
 	}
 }
-//-----------------------------------------------------------------------------
-//  Name : ProcessSubset ()
-/// <summary>
-/// 
-/// 
-/// 
-/// </summary>
-//-----------------------------------------------------------------------------
-void process_mesh(aiMesh* mesh, Mesh::LoadData& loadData)
+
+void process_mesh(aiMesh* mesh, Mesh::LoadData& load_data)
 {
-	process_faces(mesh, loadData);
-	process_vertices(mesh, loadData);
+	process_faces(mesh, load_data);
+	process_vertices(mesh, load_data);
 }
 
-void process_material(aiMaterial* mat, Mesh::LoadData& loadData)
+void process_material(aiMaterial* mat, Mesh::LoadData& load_data)
 {
 
 }
 
-void process_meshes(const aiScene* scene, Mesh::LoadData& loadData)
+void process_meshes(const aiScene* scene, Mesh::LoadData& load_data)
 {
 	for (size_t i = 0; i < scene->mNumMeshes; ++i)
 	{
 		aiMesh* mesh = scene->mMeshes[i];
-		process_mesh(mesh, loadData);
+		process_mesh(mesh, load_data);
 	}
 }
 
-void process_materials(const aiScene* scene, Mesh::LoadData& loadData)
+void process_materials(const aiScene* scene, Mesh::LoadData& load_data)
 {
 	for (size_t i = 0; i < scene->mNumMaterials; ++i)
 	{
 		aiMaterial* mat = scene->mMaterials[i];
-		process_material(mat, loadData);
+		process_material(mat, load_data);
 	}
 }
 
-//-----------------------------------------------------------------------------
-//  Name : process_imported_scene ()
-/// <summary>
-/// 
-/// 
-/// 
-/// </summary>
-//-----------------------------------------------------------------------------
-void process_imported_scene(const aiScene* scene, Mesh::LoadData& loadData)
+void process_imported_scene(const aiScene* scene, Mesh::LoadData& load_data)
 {
-
-	loadData.vertex_format = gfx::MeshVertex::decl;
-	process_meshes(scene, loadData);
-	process_materials(scene, loadData);
+	load_data.vertex_format = gfx::MeshVertex::decl;
+	process_meshes(scene, load_data);
+	process_materials(scene, load_data);
 }
 
 
-bool importer::load_mesh_data_from_file(const std::string& path, Mesh::LoadData& loadData)
+bool importer::load_mesh_data_from_file(const std::string& path, Mesh::LoadData& load_data)
 {
-	Assimp::Importer Importer;
-	const aiScene* pScene = Importer.ReadFile(
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile(
 		path
 		, aiProcess_ConvertToLeftHanded
-		| aiProcessPreset_TargetRealtime_MaxQuality
+		| aiProcess_CalcTangentSpace
+		| aiProcess_GenSmoothNormals
+		| aiProcess_JoinIdenticalVertices
+		| aiProcess_ImproveCacheLocality
+		| aiProcess_LimitBoneWeights
+		| aiProcess_RemoveRedundantMaterials
+		| aiProcess_SplitLargeMeshes
+		| aiProcess_Triangulate
+		| aiProcess_GenUVCoords
+		| aiProcess_SortByPType
+		| aiProcess_FindDegenerates
+		| aiProcess_FindInvalidData
+		| aiProcess_FindInstances
+		| aiProcess_ValidateDataStructure
+		| aiProcess_OptimizeMeshes
+		//| aiProcessPreset_TargetRealtime_MaxQuality
 	);
 
 
-	if (!pScene)
+	if (!scene)
 		return false;
 
-	process_imported_scene(pScene, loadData);
+	process_imported_scene(scene, load_data);
 
 	return true;
 }

@@ -33,9 +33,10 @@ void main()
 	float alpha_test_value = u_surface_data.w;
 	
 	vec3 view_direction = u_camera_wpos.xyz - v_wpos;
+	
 	vec3 tangent_space_normal = getTangentSpaceNormal( s_tex_normal, texcoords, bumpiness );
 
-	//mat3 tangent_to_world_space = computeTangentToWorldSpaceMatrix(normalize(v_wnormal), normalize(view_direction), texcoords.xy);	
+	//mat3 tangent_to_world_space = computeTangentToWorldSpaceMatrix(normalize(v_wnormal), normalize(view_direction), texcoords.xy);
 	mat3 tangent_to_world_space = constructTangentToWorldSpaceMatrix(normalize(v_wtangent), normalize(v_wbitangent), normalize(v_wnormal));
 
 	vec3 wnormal = normalize( mul( tangent_to_world_space, tangent_space_normal ).xyz );

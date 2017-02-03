@@ -53,11 +53,12 @@ namespace core
 			//"duplicated subsystem: %s.", typeid(S).name());
 
 		auto sys = new (std::nothrow) S(std::forward<Args>(args)...);
+		_orders.push_back(index);
+		_subsystems.insert(std::make_pair(index, sys));
+
 		Expects(sys->initialize());
 			//"failed to initialize subsystem: %s.", typeid(S).name());
 
-		_orders.push_back(index);
-		_subsystems.insert(std::make_pair(index, sys));
 		return sys;
 	}
 

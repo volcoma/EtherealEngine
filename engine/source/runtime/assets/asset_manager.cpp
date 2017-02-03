@@ -5,6 +5,7 @@
 #include "graphics/graphics.h"
 
 #include "../rendering/mesh.h"
+#include "../rendering/material.h"
 
 namespace runtime
 {
@@ -52,6 +53,12 @@ namespace runtime
 			storage->ext = extensions::material;
 			storage->load_from_file = AssetReader::load_material_from_file;
 			storage->save_to_file = AssetWriter::write_material_to_file;
+			{
+				auto id = "embedded:/standard";
+				auto& request = find_or_create_asset_entry<Material>(id);
+				auto mat = std::make_shared<StandardMaterial>();
+				request.set_data(id, mat);
+			}
 		}
 		{
 			auto storage = add<Prefab>();
