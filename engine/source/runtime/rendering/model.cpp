@@ -74,6 +74,16 @@ const std::vector<AssetHandle<Mesh>>& Model::get_lods() const
 void Model::set_lods(const std::vector<AssetHandle<Mesh>>& lods)
 {
 	_mesh_lods = lods;
+
+	if (_mesh_lods.size() > 0)
+	{
+		auto& mesh = _mesh_lods[0];
+		if (mesh)
+		{
+			if (_materials.size() != mesh->get_subset_count())
+				_materials.resize(mesh->get_subset_count(), _default_material);
+		}		
+	}
 }
 
 
