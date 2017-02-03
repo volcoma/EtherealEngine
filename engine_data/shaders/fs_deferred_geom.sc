@@ -28,7 +28,7 @@ void main()
 	
 	float roughness = texture2D(s_tex_roughness, texcoords).x * clamp(u_surface_data.x, 0.05f, 1.0f);
 	float metalness = texture2D(s_tex_metalness, texcoords).x * u_surface_data.y;
-	float ambient_occlusion = texture2D(s_tex_ao, texcoords).x;
+	float ambient_occlusion = texture2D(s_tex_ao, v_texcoord0.xy).x;
 	float bumpiness = u_surface_data.z;
 	float alpha_test_value = u_surface_data.w;
 	
