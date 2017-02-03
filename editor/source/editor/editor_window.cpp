@@ -57,11 +57,10 @@ void default_scene()
 	{
 		auto object = ecs->create();
 		object.set_name("platform");
-		object.assign<TransformComponent>().lock()
-			->set_local_scale({ 10.0f, 1.0f, 10.0f });
+		object.assign<TransformComponent>();
 
 		Model model;
-		am->load<Mesh>("engine_data:/meshes/platform", false)
+		am->load<Mesh>("embedded:/plane", false)
 			.then([&model](auto asset)
 		{
 			model.set_lod(asset, 0);
@@ -77,11 +76,11 @@ void default_scene()
 		auto object = ecs->create();
 		object.set_name("object");
 		object.assign<TransformComponent>().lock()
-			->set_local_position({ 0.0f, 0.1f, 0.0f })
+			->set_local_position({ 0.0f, 0.5f, 0.0f })
 			.rotate_local(0.0f, 180.0f, 0.0f);
 
 		Model model;
-		am->load<Mesh>("engine_data:/meshes/orb", false)
+		am->load<Mesh>("embedded:/sphere", false)
 			.then([&model](auto asset)
 		{
 			model.set_lod(asset, 0);

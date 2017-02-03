@@ -196,7 +196,7 @@ namespace runtime
 		std::shared_ptr<TStorage<S>> get_storage()
 		{
 			auto it = storages.find(core::TypeInfo::id<Storage, TStorage<S>>());
-			assert(it != storages.end());
+			//assert(it != storages.end());
 			return it == storages.end()
 				? std::shared_ptr<TStorage<S>>()
 				: std::shared_ptr<TStorage<S>>(std::static_pointer_cast<TStorage<S>>(it->second));

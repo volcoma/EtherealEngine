@@ -4,6 +4,8 @@
 #include "asset_extensions.h"
 #include "graphics/graphics.h"
 
+#include "../rendering/mesh.h"
+
 namespace runtime
 {
 	bool AssetManager::initialize()
@@ -18,20 +20,38 @@ namespace runtime
 			auto storage = add<Texture>();
 			storage->ext = extensions::texture;
 			storage->load_from_file = AssetReader::load_texture_from_file;
-			//storage->loadFromMemory = AssetReader::loadTextureFromMemory;
 		}
 		{
 			auto storage = add<Mesh>();
 			storage->ext = extensions::mesh;
 			storage->load_from_file = AssetReader::load_mesh_from_file;
-			//storage->loadFromMemory = AssetReader::loadMeshFromMemory;
+			{
+				auto id = "embedded:/sphere";
+				auto& request = find_or_create_asset_entry<Mesh>(id);
+				auto mesh = std::make_shared<Mesh>();
+				mesh->create_sphere(gfx::MeshVertex::decl, 0.5f, 20, 20, false, MeshCreateOrigin::Center);
+				request.set_data(id, mesh);
+			}
+			{
+				auto id = "embedded:/cube";
+				auto& request = find_or_create_asset_entry<Mesh>(id);
+				auto mesh = std::make_shared<Mesh>();
+				mesh->create_cube(gfx::MeshVertex::decl, 1.0f, 1.0f, 1.0f, 1, 1, 1, false, MeshCreateOrigin::Center);
+				request.set_data(id, mesh);
+			}
+			{
+				auto id = "embedded:/plane";
+				auto& request = find_or_create_asset_entry<Mesh>(id);
+				auto mesh = std::make_shared<Mesh>();
+				mesh->create_cube(gfx::MeshVertex::decl, 10.0f, 0.01f, 10.0f, 1, 1, 1, false, MeshCreateOrigin::Center);
+				request.set_data(id, mesh);
+			}
 		}
 		{
 			auto storage = add<Material>();
 			storage->ext = extensions::material;
 			storage->load_from_file = AssetReader::load_material_from_file;
 			storage->save_to_file = AssetWriter::write_material_to_file;
-			//storage->loadFromMemory = AssetReader::loadMaterialFromMemory;
 		}
 		{
 			auto storage = add<Prefab>();

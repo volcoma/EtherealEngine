@@ -63,6 +63,13 @@ public:
 		std::int32_t face_count = 0;
 	};
 
+	struct Info
+	{
+		std::uint32_t vertices = 0;
+		std::uint32_t primitives = 0;
+		std::uint32_t subsets = 0;
+	};
+
 	// Structure describing data for a single triangle in the mesh.
 	struct Triangle
 	{

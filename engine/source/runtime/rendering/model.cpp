@@ -119,11 +119,10 @@ void Model::render(std::uint8_t id, const float* mtx, bool apply_cull, bool dept
 	if (!mesh)
 		return;
 
-	bool valid_program = false;
-
 	AssetHandle<Material> last_set_material;
 	for (std::size_t i = 0; i < mesh->get_subset_count(); ++i)
 	{
+		bool valid_program = false;
 		Program* program = user_program;
 		AssetHandle<Material> mat = get_material_for_group(i);
 		if (mat)

@@ -80,7 +80,7 @@ namespace editor
 			for (auto& entry : entries)
 			{
 				const auto& p = entry.path;
-				auto key = (protocol / p.filename().replace_extension()).generic_string();
+				auto key = (protocol / p.stem()).generic_string();
 
 				if (entry.type == fs::file_type::regular)
 				{
@@ -100,12 +100,6 @@ namespace editor
 							AssetCompiler<T>::compile(p);
 						});
 						ts->run(task);
-
-						auto task1 = ts->create("", [p, am, key]()
-						{
-							am->find_or_create_asset_entry<T>(key);
-						});
-						ts->run_on_main(task1);
 					}
 				}
 			}

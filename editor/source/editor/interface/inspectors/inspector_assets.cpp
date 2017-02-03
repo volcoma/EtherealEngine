@@ -236,11 +236,15 @@ bool Inspector_AssetHandle_Mesh::inspect(rttr::variant& var, bool readOnly, std:
 
 	bool changed = false;
 
-// 	if (data)
-// 	{
-// 		rttr::variant vari = data.get()->info;
-// 		changed |= inspect_var(vari);
-// 	}
+	if (data)
+	{
+		Mesh::Info info;
+		info.vertices = data->get_vertex_count();
+		info.primitives = data->get_face_count();
+		info.subsets = static_cast<std::uint32_t>(data->get_subset_count());
+		rttr::variant vari = info;
+		changed |= inspect_var(vari);
+	}
 	return changed;
 }
 

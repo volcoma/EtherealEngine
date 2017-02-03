@@ -3,17 +3,17 @@
 #include "core/reflection/reflection.h"
 #include "../../rendering/mesh.h"
 
-//REFLECT(MeshInfo)
-//{
-//	rttr::registration::class_<MeshInfo>("MeshInfo")
-//		.property_readonly("Vertices",
-//			&MeshInfo::vertices)
-//		.property_readonly("Indices",
-//			&MeshInfo::indices)
-//		.property_readonly("Primitives",
-//			&MeshInfo::primitives)
-//		;
-//}
+REFLECT(Mesh::Info)
+{
+	rttr::registration::class_<Mesh::Info>("Info")
+		.property_readonly("Vertices",
+			&Mesh::Info::vertices)
+		.property_readonly("Primitives",
+			&Mesh::Info::primitives)
+		.property_readonly("Subsets",
+			&Mesh::Info::subsets)
+		;
+}
 
 namespace bgfx
 {
