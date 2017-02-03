@@ -12,7 +12,7 @@ Check out the Projects tab for more information of upcomming features.
 ## ASSETS
 Supported texture formats: png, tga, dds, ktx, pvr
 
-Supported mesh formats: obj only for now.
+Supported mesh formats: obj, fbx, dae, 3ds, blend
 
 ## SUGGESTIONS AND ISSUES
 Any suggestions and help will be appreciated.
