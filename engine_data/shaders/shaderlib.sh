@@ -492,6 +492,23 @@ vec3 clipToWorld(mat4 _invViewProj, vec3 _clipPos)
 	return wpos.xyz / wpos.w;
 }
 
+mat3 invert_3x3( mat3 M ) 
+{
+	float det = dot( cross(M[0], M[1]), M[2] );
+	mat3 T = transpose(M);
+	return mat3( cross(T[1], T[2]), cross(T[2], T[0]), cross(T[0], T[1]) ) / det;
+}
+
+mat3 invert_3x3( mat4 M4 ) 
+{
+#if BGFX_SHADER_LANGUAGE_HLSL
+	mat3 M = (mat3)M4;
+#else
+	mat3 M = mat3(M4);
+#endif
+	return invert_3x3(M);
+}
+
 mat3 constructTangentToWorldSpaceMatrix( vec3 T, vec3 B, vec3 N )
 {
 	mat3 TBN = mat3(
@@ -504,6 +521,12 @@ mat3 constructTangentToWorldSpaceMatrix( vec3 T, vec3 B, vec3 N )
 #endif
 	return TBN;
 }
+
+mat3 calculateInverseTranspose( mat4 m )
+{
+	return transpose(invert_3x3(m));
+}
+
 #if BGFX_SHADER_TYPE_FRAGMENT
 mat3 computeTangentToWorldSpaceMatrix( vec3 N, vec3 p, vec2 uv )
 {
