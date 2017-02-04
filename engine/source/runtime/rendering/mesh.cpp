@@ -2701,15 +2701,15 @@ void Mesh::draw_subset(std::uint32_t nDataGroupId)
 //-----------------------------------------------------------------------------
 //  Name : draw ()
 /// <summary>
-/// Draw the mesh (face count = nNumFaces).
+/// Draw the mesh (face count = num_faces).
 /// Note : Used during volume rendering.
 /// </summary>
 //-----------------------------------------------------------------------------
-void Mesh::draw(std::uint32_t nNumFaces)
+void Mesh::draw(std::uint32_t num_faces)
 {
 	// Set vertex and index buffer source streams
 	gfx::setVertexBuffer(_hardware_vb->handle, 0, (std::uint32_t)_vertex_count);
-	gfx::setIndexBuffer(_hardware_ib->handle, 0, (std::uint32_t)nNumFaces * 3);
+	gfx::setIndexBuffer(_hardware_ib->handle, 0, (std::uint32_t)num_faces * 3);
 }
 
 
@@ -2810,11 +2810,11 @@ bool Mesh::generate_vertex_normals(std::uint32_t* pAdjacency, UInt32Array * pRem
 
 	// Get access to useful data offset information.
 	std::uint16_t position_offset = _vertex_format.getOffset(gfx::Attrib::Position);
-	std::uint16_t nNormalOffset = _vertex_format.getOffset(gfx::Attrib::Normal);
+	std::uint16_t normal_offset = _vertex_format.getOffset(gfx::Attrib::Normal);
 	std::uint16_t vertex_stride = _vertex_format.getStride();
 
 	// Final format requests vertex normals?
-	if (nNormalOffset < 0)
+	if (normal_offset < 0)
 		return true;
 
 	// Size the remap array accordingly and populate it with the default mapping.
@@ -2976,7 +2976,7 @@ bool Mesh::generate_vertex_normals(std::uint32_t* pAdjacency, UInt32Array * pRem
 			// If the normal we are about to store is significantly different from any normal
 			// already stored in this vertex (excepting the case where it is <0,0,0>), we need
 			// to split the vertex into two.
-			math::vec3 * pRefNormal = (math::vec3*)(src_vertices_ptr + (index * vertex_stride) + nNormalOffset);
+			math::vec3 * pRefNormal = (math::vec3*)(src_vertices_ptr + (index * vertex_stride) + normal_offset);
 			if (pRefNormal->x == 0.0f && pRefNormal->y == 0.0f && pRefNormal->z == 0.0f)
 			{
 				*pRefNormal = vec_normal;
@@ -3012,7 +3012,7 @@ bool Mesh::generate_vertex_normals(std::uint32_t* pAdjacency, UInt32Array * pRem
 					// Store the new normal and finally record the fact that we have
 					// added a new vertex.
 					index = _preparation_data.vertex_count++;
-					pRefNormal = (math::vec3*)(src_vertices_ptr + (index * vertex_stride) + nNormalOffset);
+					pRefNormal = (math::vec3*)(src_vertices_ptr + (index * vertex_stride) + normal_offset);
 					*pRefNormal = vec_normal;
 
 					// Update the index
@@ -3053,49 +3053,46 @@ bool Mesh::generate_vertex_barycentrics(std::uint32_t* adjacency)
 //-----------------------------------------------------------------------------
 bool Mesh::generate_vertex_tangents()
 {
-	math::vec3* pTangents = nullptr, *pBinormals = nullptr;
-	std::uint32_t i, i1, i2, i3, nNumFaces, nNumVerts;
+	math::vec3* tangents = nullptr, *bitangents = nullptr;
+	std::uint32_t i, i1, i2, i3, num_faces, num_verts;
 	math::vec3 P, Q, T, B, vCross, vNormal;
 	float s1, t1, s2, t2, r;
 	math::plane Plane;
 
 	// Get access to useful data offset information.
-	std::uint16_t position_offset = _vertex_format.getOffset(gfx::Attrib::Position);
-	std::uint16_t nNormalOffset = _vertex_format.getOffset(gfx::Attrib::Normal);
-	std::uint16_t nBinormalOffset = _vertex_format.getOffset(gfx::Attrib::Bitangent);
-	std::uint16_t nTangentOffset = _vertex_format.getOffset(gfx::Attrib::Tangent);
-	std::uint16_t nTexCoordOffset = _vertex_format.getOffset(gfx::Attrib::TexCoord0);
 	std::uint16_t vertex_stride = _vertex_format.getStride();
 
-	// Final format requests tangents?
-	bool bRequiresBinormal = (nBinormalOffset > 0);
-	bool bRequiresTangent = (nTangentOffset > 0);
-	if (!_force_tangent_generation && !bRequiresBinormal && !bRequiresTangent)
-		return true;
-
+	
+	bool has_normals = _vertex_format.has(gfx::Attrib::Normal);
 	// This will fail if we don't already have normals however.
-	if (nNormalOffset < 0)
+	if (!has_normals)
 		return false;
+
+	// Final format requests tangents?
+	bool requires_tangents = _vertex_format.has(gfx::Attrib::Tangent);
+	bool requires_bitangents = _vertex_format.has(gfx::Attrib::Bitangent);
+	if (!_force_tangent_generation && !requires_bitangents && !requires_tangents)
+		return true;
 
 	// Allocate storage space for the tangent and binormal vectors
 	// that we will effectively need to average for shared vertices.
-	nNumFaces = _preparation_data.triangle_count;
-	nNumVerts = _preparation_data.vertex_count;
-	pTangents = new math::vec3[nNumVerts];
-	pBinormals = new math::vec3[nNumVerts];
-	memset(pTangents, 0, sizeof(math::vec3) * nNumVerts);
-	memset(pBinormals, 0, sizeof(math::vec3) * nNumVerts);
+	num_faces = _preparation_data.triangle_count;
+	num_verts = _preparation_data.vertex_count;
+	tangents = new math::vec3[num_verts];
+	bitangents = new math::vec3[num_verts];
+	memset(tangents, 0, sizeof(math::vec3) * num_verts);
+	memset(bitangents, 0, sizeof(math::vec3) * num_verts);
 
 	// Iterate through each triangle in the mesh
 	std::uint8_t * src_vertices_ptr = &_preparation_data.vertex_data[0];
-	for (i = 0; i < nNumFaces; ++i)
+	for (i = 0; i < num_faces; ++i)
 	{
-		Triangle & Tri = _preparation_data.triangle_data[i];
+		Triangle& tri = _preparation_data.triangle_data[i];
 
 		// Compute the three indices for the triangle
-		i1 = Tri.indices[0];
-		i2 = Tri.indices[1];
-		i3 = Tri.indices[2];
+		i1 = tri.indices[0];
+		i2 = tri.indices[1];
+		i3 = tri.indices[2];
 
 		// Retrieve references to the positions of the three vertices in the triangle.
 		math::vec3 E;
@@ -3161,22 +3158,22 @@ bool Mesh::generate_vertex_tangents()
 
 		// Add the tangent and binormal vectors (summed average) to
 		// any previous values computed for each vertex.
-		pTangents[i1] += T;
-		pTangents[i2] += T;
-		pTangents[i3] += T;
-		pBinormals[i1] += B;
-		pBinormals[i2] += B;
-		pBinormals[i3] += B;
+		tangents[i1] += T;
+		tangents[i2] += T;
+		tangents[i3] += T;
+		bitangents[i1] += B;
+		bitangents[i2] += B;
+		bitangents[i3] += B;
 
 	} // Next Triangle 
 
 	  // Generate final tangent vectors 
-	for (i = 0; i < nNumVerts; i++, src_vertices_ptr += vertex_stride)
+	for (i = 0; i < num_verts; i++, src_vertices_ptr += vertex_stride)
 	{
 		// Skip if the original imported data already provided a binormal / tangent.
-		bool bHasBinormal = ((_preparation_data.vertex_flags[i] & PreparationData::SourceContainsBinormal) != 0);
-		bool bHasTangent = ((_preparation_data.vertex_flags[i] & PreparationData::SourceContainsTangent) != 0);
-		if (!_force_tangent_generation && bHasBinormal && bHasTangent)
+		bool has_bitangent = ((_preparation_data.vertex_flags[i] & PreparationData::SourceContainsBinormal) != 0);
+		bool has_tangent = ((_preparation_data.vertex_flags[i] & PreparationData::SourceContainsTangent) != 0);
+		if (!_force_tangent_generation && has_bitangent && has_tangent)
 			continue;
 
 		// Retrieve the normal vector from the vertex and the computed
@@ -3185,18 +3182,18 @@ bool Mesh::generate_vertex_tangents()
 		gfx::vertexUnpack(normal, gfx::Attrib::Normal, _vertex_format, src_vertices_ptr);
 		memcpy(&vNormal[0], normal, 3 * sizeof(float));
 
-		T = pTangents[i];
+		T = tangents[i];
 
 		// GramSchmidt orthogonalize
 		T = T - (vNormal * math::dot(vNormal, T));
 		T = math::normalize(T);
 
 		// Store tangent if required
-		if (_force_tangent_generation || (!bHasTangent && bRequiresTangent))
+		if (_force_tangent_generation || (!has_tangent && requires_tangents))
 			gfx::vertexPack(&math::vec4(T, 1.0f)[0], true, gfx::Attrib::Tangent, _vertex_format, src_vertices_ptr);
 
 		// Compute and store binormal if required
-		if (_force_tangent_generation || (!bHasBinormal && bRequiresBinormal))
+		if (_force_tangent_generation || (!has_bitangent && requires_bitangents))
 		{
 			// Calculate the new orthogonal binormal
 			B = math::cross(vNormal, T);
@@ -3206,7 +3203,7 @@ bool Mesh::generate_vertex_tangents()
 			// ensures the inverted / mirrored texture coordinates still have
 			// an accurate matrix.
 			vCross = math::cross(vNormal, T);
-			if (math::dot(vCross, pBinormals[i]) < 0.0f)
+			if (math::dot(vCross, bitangents[i]) < 0.0f)
 			{
 				// Flip the binormal
 				B = -B;
@@ -3221,8 +3218,8 @@ bool Mesh::generate_vertex_tangents()
 	} // Next vertex
 
 	  // Cleanup 
-	checked_array_delete(pTangents);
-	checked_array_delete(pBinormals);
+	checked_array_delete(tangents);
+	checked_array_delete(bitangents);
 
 	// Return success 
 	return true;

@@ -154,7 +154,21 @@ bool importer::load_mesh_data_from_file(const std::string& path, Mesh::LoadData&
 	const aiScene* scene = importer.ReadFile(
 		path
 		, aiProcess_ConvertToLeftHanded
-		| aiProcessPreset_TargetRealtime_MaxQuality
+		| aiProcess_CalcTangentSpace
+		| aiProcess_GenSmoothNormals
+		| aiProcess_JoinIdenticalVertices
+		| aiProcess_ImproveCacheLocality
+		| aiProcess_LimitBoneWeights
+		| aiProcess_RemoveRedundantMaterials
+		| aiProcess_SplitLargeMeshes
+		| aiProcess_Triangulate
+		| aiProcess_GenUVCoords
+		| aiProcess_SortByPType
+		| aiProcess_FindDegenerates
+		| aiProcess_FindInvalidData
+		| aiProcess_FindInstances
+		| aiProcess_ValidateDataStructure 
+		| aiProcess_OptimizeMeshes
 	);
 
 

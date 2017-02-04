@@ -419,7 +419,7 @@ float dither16x16(vec2 fragCoord)
 
 int x = int(mod(fragCoord.x, 16));
 int y = int(mod(fragCoord.y, 16));
-static const int bayer_matrix[16][16] = {
+CONST(int) bayer_matrix[16][16] = {
   {   0,192, 48,240, 12,204, 60,252,  3,195, 51,243, 15,207, 63,255 },
   { 128, 64,176,112,140, 76,188,124,131, 67,179,115,143, 79,191,127 },
   {  32,224, 16,208, 44,236, 28,220, 35,227, 19,211, 47,239, 31,223 },
@@ -452,7 +452,7 @@ int x = int(mod(fragCoord.x, 8));
 int y = int(mod(fragCoord.y, 8));
 
 
-static const int bayer_matrix[8][8] = {
+CONST(int) bayer_matrix[8][8] = {
 { 0, 32, 8, 40, 2, 34, 10, 42}, /* 8x8 Bayer ordered dithering */
 {48, 16, 56, 24, 50, 18, 58, 26}, /* pattern. Each input pixel */
 {12, 44, 4, 36, 14, 46, 6, 38}, /* is scaled to the 0..63 range */
