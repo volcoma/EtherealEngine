@@ -16,15 +16,15 @@ void process_vertices(aiMesh* mesh, Mesh::LoadData& load_data)
 	bool has_tangent = load_data.vertex_format.has(gfx::Attrib::Tangent);
 	bool has_texcoord0 = load_data.vertex_format.has(gfx::Attrib::TexCoord0);
 	bool has_texcoord1 = load_data.vertex_format.has(gfx::Attrib::TexCoord1);
-	auto vertex_stride = load_data.vertex_format.getStride();
+	auto nVertexStride = load_data.vertex_format.getStride();
 
-	std::uint32_t current_vertex = load_data.vertex_count;
+	std::uint32_t nCurrentVertex = load_data.vertex_count;
 	load_data.vertex_count += mesh->mNumVertices;
-	load_data.vertex_data.resize(load_data.vertex_count * vertex_stride);
+	load_data.vertex_data.resize(load_data.vertex_count * nVertexStride);
 
-	std::uint8_t* current_vertex_ptr = &load_data.vertex_data[0] + current_vertex * vertex_stride;
+	std::uint8_t* current_vertex_ptr = &load_data.vertex_data[0] + nCurrentVertex * nVertexStride;
 
-	for (size_t i = 0; i < mesh->mNumVertices; ++i, current_vertex_ptr += vertex_stride)
+	for (size_t i = 0; i < mesh->mNumVertices; ++i, current_vertex_ptr += nVertexStride)
 	{
 		//position
 		if (mesh->mVertices)
@@ -69,7 +69,7 @@ void process_vertices(aiMesh* mesh, Mesh::LoadData& load_data)
 
 		}
 
-		//bitangents
+		//binormals
 		if (mesh->mBitangents)
 		{
 			float bitangent[4];
@@ -154,22 +154,7 @@ bool importer::load_mesh_data_from_file(const std::string& path, Mesh::LoadData&
 	const aiScene* scene = importer.ReadFile(
 		path
 		, aiProcess_ConvertToLeftHanded
-		| aiProcess_CalcTangentSpace
-		| aiProcess_GenSmoothNormals
-		| aiProcess_JoinIdenticalVertices
-		| aiProcess_ImproveCacheLocality
-		| aiProcess_LimitBoneWeights
-		| aiProcess_RemoveRedundantMaterials
-		| aiProcess_SplitLargeMeshes
-		| aiProcess_Triangulate
-		| aiProcess_GenUVCoords
-		| aiProcess_SortByPType
-		| aiProcess_FindDegenerates
-		| aiProcess_FindInvalidData
-		| aiProcess_FindInstances
-		| aiProcess_ValidateDataStructure
-		| aiProcess_OptimizeMeshes
-		//| aiProcessPreset_TargetRealtime_MaxQuality
+		| aiProcessPreset_TargetRealtime_MaxQuality
 	);
 
 

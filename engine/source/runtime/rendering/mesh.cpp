@@ -2691,7 +2691,7 @@ void Mesh::draw_subset(std::uint32_t nDataGroupId)
 	if (face_count > 0)
 	{
 		// Set vertex and index buffer source streams
-		gfx::setVertexBuffer(_hardware_vb->handle, (std::uint32_t)nVertexStart, (std::uint32_t)vertex_count);
+		gfx::setVertexBuffer(_hardware_vb->handle, (std::uint32_t)0, (std::uint32_t)vertex_count);
 		gfx::setIndexBuffer(_hardware_ib->handle, (std::uint32_t)nFaceStart * 3, (std::uint32_t)face_count * 3);
 
 	}
@@ -3184,7 +3184,7 @@ bool Mesh::generate_vertex_tangents()
 		float normal[4];
 		gfx::vertexUnpack(normal, gfx::Attrib::Normal, _vertex_format, src_vertices_ptr);
 		memcpy(&vNormal[0], normal, 3 * sizeof(float));
-		//vNormal = *(math::vec3*)(src_vertices_ptr + nNormalOffset);
+
 		T = pTangents[i];
 
 		// GramSchmidt orthogonalize
@@ -3215,7 +3215,6 @@ bool Mesh::generate_vertex_tangents()
 
 			  // Store.
 			gfx::vertexPack(&math::vec4(B, 1.0f)[0], true, gfx::Attrib::Bitangent, _vertex_format, src_vertices_ptr);
-			//*(math::vec3*)(src_vertices_ptr + nBinormalOffset) = B;
 
 		} // End if requires binormal   
 

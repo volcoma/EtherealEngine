@@ -413,7 +413,7 @@ namespace Docks
 		if (gui::Button("Import..."))
 		{
 			std::vector<std::string> paths;
-			if (open_multiple_files_dialog("obj,fbx,dae,blend,3ds,png,tga,dds,ktx,pvr,sc,io,sh", "", paths))
+			if (open_multiple_files_dialog("obj,fbx,dae,blend,3ds,mtl,png,tga,dds,ktx,pvr,sc,io,sh", "", paths))
 			{
 				auto ts = core::get_subsystem<runtime::TaskSystem>();
 				auto logger = logging::get("Log");
@@ -426,67 +426,22 @@ namespace Docks
 					fs::path ext = p.extension().string();
 					fs::path filename = p.filename();
 
-					if (ext == ".obj" || ext == ".fbx" || ext == ".dae" || ext == ".blend" || ext == ".3ds")
+					auto task = ts->create("Import Asset", [opened_dir](const fs::path& path, const fs::path& p, const fs::path& filename)
 					{
-						auto task = ts->create("Import Asset", [opened_dir](const fs::path& path, const fs::path& p, const fs::path& filename)
+						std::error_code error;
+						fs::path dir = opened_dir / filename;
+						if (!fs::copy_file(path, dir, fs::copy_options::overwrite_existing, error))
 						{
-							std::error_code error;
-							fs::path dir = opened_dir / filename;
-							if (!fs::copy_file(path, dir, fs::copy_options::overwrite_existing, error))
-							{
-								auto logger = logging::get("Log");
-								logger->error().write("Failed to import file {0} with message {1}", p.string(), error.message());
-							}
-							else
-							{
-								fs::last_write_time(dir, fs::file_time_type::clock::now(), std::error_code{});
-							}
-						}, p, p, filename);
-
-						ts->run(task);
-					}
-					else if (ext == ".png" || ext == ".tga" || ext == ".dds" || ext == ".ktx" || ext == ".pvr")
-					{
-						auto task = ts->create("Import Asset", [opened_dir](const fs::path& path, const fs::path& p, const fs::path& filename)
+							auto logger = logging::get("Log");
+							logger->error().write("Failed to import file {0} with message {1}", p.string(), error.message());
+						}
+						else
 						{
-							std::error_code error;
-							fs::path dir = opened_dir / filename;
-							if (!fs::copy_file(path, dir, fs::copy_options::overwrite_existing, error))
-							{
-								auto logger = logging::get("Log");
-								logger->error().write("Failed to import file {0} with message {1}", p.string(), error.message());
-							}
-							else
-							{
-								fs::last_write_time(dir, fs::file_time_type::clock::now(), std::error_code{});
-							}
-						}, p, p, filename);
+							fs::last_write_time(dir, fs::file_time_type::clock::now(), std::error_code{});
+						}
+					}, p, p, filename);
 
-						ts->run(task);
-					}
-					else if (ext == ".sc" || ext == ".io" || ext == ".sh")
-					{
-						auto task = ts->create("Import Asset", [opened_dir](const fs::path& path, const fs::path& p, const fs::path& filename)
-						{
-							std::error_code error;
-							fs::path dir = opened_dir / filename;
-							if (!fs::copy_file(path, dir, fs::copy_options::overwrite_existing, error))
-							{
-								auto logger = logging::get("Log");
-								logger->error().write("Failed to import file {0} with message {1}", p.string(), error.message());
-							}
-							else
-							{
-								fs::last_write_time(dir, fs::file_time_type::clock::now(), std::error_code{});
-							}
-						}, p, p, filename);
-
-						ts->run(task);
-					}
-					else
-					{
-						logger->error().write("Unsupported file format {0}", ext.string());
-					}
+					ts->run(task);
 				}
 			}
 		}

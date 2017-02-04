@@ -166,9 +166,6 @@ void Model::render(std::uint8_t id, const float* mtx, bool apply_cull, bool dept
 			gfx::setState(extra_states);
 
 			mesh->draw_subset(std::uint32_t(i));
-// 			gfx::setIndexBuffer(group.index_buffer->handle);
-// 			gfx::setVertexBuffer(group.vertex_buffer->handle);
-
 			gfx::submit(id, program->handle, 0, mat == last_set_material && i < (mesh->get_subset_count() - 1));
 		}
 			
