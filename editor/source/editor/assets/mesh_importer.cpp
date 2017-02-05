@@ -42,7 +42,7 @@ void process_vertices(aiMesh* mesh, Mesh::LoadData& load_data)
 	for (size_t i = 0; i < mesh->mNumVertices; ++i, current_vertex_ptr += nVertexStride)
 	{
 		//position
-		if (mesh->mVertices)
+		if (mesh->mVertices && has_position)
 		{
 			float position[4];
 			std::memcpy(position, &mesh->mVertices[i], sizeof(math::vec3));
@@ -52,7 +52,7 @@ void process_vertices(aiMesh* mesh, Mesh::LoadData& load_data)
 		}
 
 		//tex coords
-		if (mesh->mTextureCoords[0])
+		if (mesh->mTextureCoords[0] && has_texcoord0)
 		{
 			float textureCoords[4];
 			std::memcpy(textureCoords, &mesh->mTextureCoords[0][i], sizeof(math::vec2));
@@ -63,7 +63,7 @@ void process_vertices(aiMesh* mesh, Mesh::LoadData& load_data)
 		}
 
 		////normals
-		if (mesh->mNormals)
+		if (mesh->mNormals && has_normal)
 		{
 			float normal[4];
 			std::memcpy(normal, &mesh->mNormals[i], sizeof(math::vec3));
@@ -74,7 +74,7 @@ void process_vertices(aiMesh* mesh, Mesh::LoadData& load_data)
 		}
 
 		//tangents
-		if (mesh->mTangents)
+		if (mesh->mTangents && has_tangent)
 		{
 			float tangent[4];
 			std::memcpy(tangent, &mesh->mTangents[i], sizeof(math::vec3));
@@ -85,16 +85,10 @@ void process_vertices(aiMesh* mesh, Mesh::LoadData& load_data)
 		}
 
 		//binormals
-		if (mesh->mBitangents)
+		if (mesh->mBitangents && has_bitangent)
 		{
 			float bitangent[4];
 			std::memcpy(bitangent, &mesh->mBitangents[i], sizeof(math::vec3));
-
-			//negate bitangent;
-			bitangent[0] = -bitangent[0];
-			bitangent[1] = -bitangent[1];
-			bitangent[2] = -bitangent[2];
-			bitangent[3] = -bitangent[3];
 
 			if (has_bitangent)
 				gfx::vertexPack(bitangent, true, gfx::Attrib::Bitangent, load_data.vertex_format, current_vertex_ptr);
@@ -301,7 +295,7 @@ bool importer::load_mesh_data_from_file(const std::string& path, Mesh::LoadData&
 	const aiScene* scene = importer.ReadFile(
 		path
 		, aiProcess_ConvertToLeftHanded
-		| aiProcess_CalcTangentSpace
+		//| aiProcess_CalcTangentSpace
 		| aiProcess_GenSmoothNormals
 		| aiProcess_JoinIdenticalVertices
 		| aiProcess_ImproveCacheLocality
