@@ -195,6 +195,8 @@ void AssetReader::load_mesh_from_file(const std::string& key, const fs::path& ab
 		wrapper->mesh->prepare_mesh(data.vertex_format, false);
 		wrapper->mesh->set_vertex_source(&data.vertex_data[0], data.vertex_count, data.vertex_format);
 		wrapper->mesh->add_primitives(data.triangle_data);
+		wrapper->mesh->bind_skin(data.skin_data);
+		wrapper->mesh->bind_armature(data.root_node);
 		wrapper->mesh->end_prepare(true, false, false, false);
 	};
 

@@ -58,6 +58,12 @@ namespace gfx
 		return half_texel;
 	}
 
+	inline std::uint32_t get_max_blend_transforms()
+	{
+		//BGFX_CONFIG_MAX_BONES
+		return 128;
+	}
+
 	inline bool is_origin_bottom_left()
 	{
 		return getCaps()->originBottomLeft;

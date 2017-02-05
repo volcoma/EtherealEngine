@@ -2,6 +2,8 @@
 
 #include "graphics/graphics.h"
 #include "core/math/math_includes.h"
+#include "core/reflection/reflection.h"
+#include "core/serialization/serialization.h"
 #include <vector>
 #include <map>
 #include <memory>
@@ -40,6 +42,150 @@ namespace MeshCreateOrigin
 	};
 
 }; // End Namespace : MeshCreateOrigin
+
+
+using UInt32Array = std::vector<uint32_t>;
+using Int32Array = std::vector<std::int32_t>;
+using FloatArray = std::vector<float>;
+//-----------------------------------------------------------------------------
+// Main Class Declarations
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//  Name : SkinBindData (Class)
+/// <summary>
+/// Structure describing how a skinned mesh should be bound to any bones
+/// that influence its vertices.
+/// </summary>
+//-----------------------------------------------------------------------------
+class SkinBindData
+{
+	REFLECTABLE(SkinBindData)
+	SERIALIZABLE(SkinBindData)
+public:
+	//-------------------------------------------------------------------------
+	// Public Typedefs, Structures & Enumerations
+	//-------------------------------------------------------------------------
+	// Describes how a bone influences a specific vertex.
+	struct VertexInfluence
+	{
+		std::uint32_t vertex_index = 0;
+		float weight = 0.0f;
+
+		// Constructors
+		VertexInfluence() {}
+		VertexInfluence(std::uint32_t _index, float _weight) :
+			vertex_index(_index), weight(_weight) {}
+	};
+	using VertexInfluenceArray = std::vector<VertexInfluence>;
+
+	// Describes the vertices that are connected to the referenced bone, and how much influence it has on them.
+	struct BoneInfluence
+	{
+		/// Unique identifier of the bone from which transformation information should be taken.
+		std::string bone_id;
+		/// The "bind pose" or "offset" transform that describes how the bone was positioned in relation to the original vertex data.
+		math::transform_t bind_pose_transform;
+		/// List of vertices influenced by the referenced bone.
+		VertexInfluenceArray influences;
+	};
+	using BoneArray = std::vector<BoneInfluence>;
+
+	// Contains per-vertex influence and weight information.
+	struct VertexData
+	{
+		// List of bones that influence this vertex.
+		Int32Array influences;
+		// List of weights that describe how this vertex is influenced.
+		FloatArray weights;
+		// Index of the palette to which this vertex has been assigned.
+		std::int32_t palette;
+		// The index of the original vertex stored in the mesh.
+		std::uint32_t original_vertex;
+	};
+	using BindVertexArray = std::vector<VertexData>;
+
+	//-------------------------------------------------------------------------
+	// Public Methods
+	//-------------------------------------------------------------------------
+	void add_bone(const BoneInfluence& bone);
+	void remove_empty_bones();
+	void build_vertex_table(std::uint32_t vertex_count, const UInt32Array & vertex_remap, BindVertexArray & table);
+	void remapVertices(const UInt32Array & remap);
+
+	const BoneArray& get_bones() const;
+	BoneArray& get_bones();
+	bool has_bones() const;
+	void clear_vertex_influences();
+	void clear();
+	const BoneInfluence* find_bone_by_id(const std::string& name) const;
+private:
+	//-------------------------------------------------------------------------
+	// Private Variables
+	//-------------------------------------------------------------------------
+	/// List of bones that influence the skin mesh vertices.
+	BoneArray _bones;
+
+}; // End Class SkinBindData
+
+//-----------------------------------------------------------------------------
+//  Name : BonePalette (Class)
+/// <summary>
+/// Outlines a collection of bones that influence a given set of faces / 
+/// vertices in the mesh.
+/// </summary>
+//-----------------------------------------------------------------------------
+class BonePalette
+{
+public:
+	//-------------------------------------------------------------------------
+	// Public Typedefs, Structures & Enumerations
+	//-------------------------------------------------------------------------
+	using BoneIndexMap = std::map<std::uint32_t, std::uint32_t>;
+	//-------------------------------------------------------------------------
+	// Constructors & Destructors
+	//-------------------------------------------------------------------------
+	BonePalette(std::uint32_t paletteSize);
+	BonePalette(const BonePalette & init);
+	~BonePalette();
+
+	//-------------------------------------------------------------------------
+	// Public Methods
+	//-------------------------------------------------------------------------
+	void apply(const std::vector<math::transform_t> & boneTransforms, const SkinBindData * const bindData, bool computeInverseTranspose);
+	void compute_palette_fit(BoneIndexMap & input, std::int32_t& currentSpace, std::int32_t& commonBones, std::int32_t& additionalBones);
+	void assign_bones(BoneIndexMap & bones, UInt32Array & faces);
+	void assign_bones(const UInt32Array & bones);
+	std::uint32_t translate_bone_to_palette(std::uint32_t boneIndex) const;
+
+	// Accessor methods
+	std::int32_t get_maximum_blend_index() const;
+	std::uint32_t get_maximum_size() const;
+	std::uint32_t get_data_group() const;
+	UInt32Array& get_influenced_faces();
+	const UInt32Array& get_bones() const;
+	void set_maximum_blend_index(int index);
+	void set_data_group(std::uint32_t group);
+	void clear_influenced_faces();
+
+protected:
+	//-------------------------------------------------------------------------
+	// Protected Variables
+	//-------------------------------------------------------------------------
+	// Sorted list of bones in this palette. References the elements in the standard list.
+	BoneIndexMap _bones_lut;
+	// Main palette of indices that reference the bones outlined in the main skin binding data.
+	UInt32Array _bones;
+	// List of faces assigned to this palette.
+	UInt32Array _faces;
+	// The data group identifier used to separate the mesh data into subsets relevant to this bone palette.
+	std::uint32_t _data_group_id;
+	// The maximum size of this palette.
+	std::uint32_t _maximum_size;
+	// The maximum vertex blend index for this palette (i.e. if every vertex was only influenced by one bone, this variable would contain a value of 0).
+	std::int32_t _maximum_blend_index;
+
+}; // End Class BonePalette
+
 
 class Mesh
 {
@@ -80,11 +226,37 @@ public:
 
 	using TriangleArray = std::vector<Triangle>;
 	using SubsetArray = std::vector<Subset*>;
-	using UInt32Array = std::vector<uint32_t>;
+	using BonePaletteArray = std::vector<BonePalette>;
+
+	struct ArmatureNode
+	{
+		std::string name;
+		math::transform_t transform;
+		std::vector<std::unique_ptr<ArmatureNode>> children;
+
+	};
 
 	// Mesh Construction Structures
 	struct LoadData
 	{
+		struct Mat
+		{
+			enum TextureType
+			{
+				BaseColor,
+				Emissive,
+				Normal,
+				AO,
+				Roughness,
+				Metalness,
+				Count
+			};
+
+			math::color base_color = { 0.0f, 0.0f, 0.0f, 0.0f };
+			math::color emissive_color = { 0.0f, 0.0f, 0.0f, 0.0f };
+			std::vector<std::string> textures = std::vector<std::string>(TextureType::Count);
+		};
+		
 		/// The format of the vertex data currently being used to prepare the mesh.
 		gfx::VertexDecl	vertex_format;
 		/// Final vertex buffer currently being prepared.
@@ -95,6 +267,12 @@ public:
 		TriangleArray triangle_data;
 		/// Total number of triangles currently stored here.
 		std::uint32_t triangle_count = 0;
+		/// Skin data for this import
+		SkinBindData skin_data;
+		/// Imported nodes
+		std::unique_ptr<ArmatureNode> root_node = nullptr;
+		/// Use TextureType as index
+		std::vector<Mat> materials;
 	};
 
 	//-------------------------------------------------------------------------
@@ -116,8 +294,9 @@ public:
 	bool prepare_mesh(const gfx::VertexDecl& vertexFormat, bool rollBackPrepare = false);
 	bool prepare_mesh(const gfx::VertexDecl& vertexFormat, void * vertices, std::uint32_t vertexCount, const TriangleArray & faces, bool hardwareCopy = true, bool weld = true, bool optimize = true);
 	bool set_vertex_source(void * source, std::uint32_t vertexCount, const gfx::VertexDecl& sourceFormat);
-	bool add_primitives(const TriangleArray & triangles);
-
+	bool add_primitives(const TriangleArray& triangles);
+	bool bind_skin(const SkinBindData& bindData);
+	bool bind_armature(std::unique_ptr<ArmatureNode>& root);
 	bool create_cube(const gfx::VertexDecl& format, float width, float height, float depth, std::uint32_t widthSegments, std::uint32_t heightSegments, std::uint32_t depthSegments, bool inverted, MeshCreateOrigin::E origin, bool hardwareCopy = true);
 	bool create_cube(const gfx::VertexDecl& format, float width, float height, float depth, std::uint32_t widthSegments, std::uint32_t heightSegments, std::uint32_t depthSegments, float texUScale, float texVScale, bool inverted, MeshCreateOrigin::E origin, bool hardwareCopy = true);
 	bool create_sphere(const gfx::VertexDecl& format, float radius, std::uint32_t stacks, std::uint32_t slices, bool inverted, MeshCreateOrigin::E origin, bool hardwareCopy = true);
@@ -140,6 +319,8 @@ public:
 	std::uint8_t* get_system_vb();
 	std::uint32_t* get_system_ib();
 	const gfx::VertexDecl& get_vertex_format() const;
+	const SkinBindData&	get_skin_bind_data() const;
+	const BonePaletteArray& get_bone_palettes() const;
 	const Subset* get_subset(std::uint32_t dataGroupId = 0) const;
 	//-------------------------------------------------------------------------
 	// Public Inline Methods
@@ -241,6 +422,7 @@ protected:
 
 	using SubsetKeyMap = std::map<MeshSubsetKey, Subset*>;
 	using SubsetKeyArray = std::vector<MeshSubsetKey>;
+
 	// Simple structure to allow us to leverage the hierarchical properties of a map
 	// to accelerate the weld operation.
 	struct WeldKey
@@ -252,12 +434,32 @@ protected:
 		// The tolerance we're using to weld (transport only, these should be the same for every key).
 		float tolerance;
 	};
+
+	struct FaceInfluences
+	{
+		BonePalette::BoneIndexMap bones;          // List of unique bones that influence a given number of faces.
+	};
+
+	// Simple structure to allow us to leverage the hierarchical properties of a map
+	// to accelerate the bone index combination process.
+	struct BoneCombinationKey
+	{
+		FaceInfluences* influences = nullptr;
+
+		// Constructor
+		BoneCombinationKey(FaceInfluences * _influences) :
+			influences(_influences) {}
+
+	};
+	using BoneCombinationMap = std::map<BoneCombinationKey, UInt32Array*>;
+
 	//-------------------------------------------------------------------------
 	// Friend List
 	//-------------------------------------------------------------------------
 	friend bool operator < (const AdjacentEdgeKey& key1, const AdjacentEdgeKey& key2);
 	friend bool operator < (const MeshSubsetKey& key1, const MeshSubsetKey& key2);
 	friend bool operator < (const WeldKey& key1, const WeldKey& key2);
+	friend bool operator < (const BoneCombinationKey& key1, const BoneCombinationKey& key2);
 	//-------------------------------------------------------------------------
 	// Protected Methods
 	//-------------------------------------------------------------------------
@@ -326,6 +528,14 @@ protected:
 	MeshStatus::E _prepare_status;
 	/// Input data used for constructing the final mesh.
 	PreparationData _preparation_data;
+
+	// Skin binding information
+	/// Data that describes how the mesh should be bound as a skin with supplied bone matrices.
+	SkinBindData _skin_bind_data;
+	/// List of each of the unique combinations of bones to use during rendering.
+	BonePaletteArray _bone_palettes;
+	/// List of each of armature nodes
+	std::unique_ptr<ArmatureNode> _root = nullptr;
 };
 
 //-----------------------------------------------------------------------------
@@ -334,3 +544,4 @@ protected:
 inline bool operator < (const Mesh::AdjacentEdgeKey& key1, const Mesh::AdjacentEdgeKey& key2);
 inline bool operator < (const Mesh::MeshSubsetKey& key1, const Mesh::MeshSubsetKey& key2);
 inline bool operator < (const Mesh::WeldKey& key1, const Mesh::WeldKey& key2);
+inline bool operator < (const Mesh::BoneCombinationKey& key1, const Mesh::BoneCombinationKey& key2);
