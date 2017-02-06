@@ -3,7 +3,7 @@
 #include "../assets/asset_handle.h"
 #include "core/reflection/reflection.h"
 #include "core/serialization/serialization.h"
-
+#include "core/math/math_includes.h"
 #include <vector>
 
 struct Group;
@@ -194,7 +194,7 @@ public:
 	/// materials are used instead. Extra states can be added to the material ones.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void render(std::uint8_t id, const float* mtx, bool apply_cull, bool depth_write, bool depth_test, std::uint64_t extra_states, unsigned int lod, Program* user_program, std::function<void(Program&)> setup_params) const;
+	void render(std::uint8_t id, const math::transform_t& mtx, bool apply_cull, bool depth_write, bool depth_test, std::uint64_t extra_states, unsigned int lod, Program* user_program, std::function<void(Program&)> setup_params) const;
 
 private:
 	/// Collection of all materials for this model.

@@ -358,7 +358,7 @@ bool Mesh::bind_skin(const SkinBindData& bind_data)
 		if (!has_weights)
 			new_format.add(bgfx::Attrib::Weight, 4, bgfx::AttribType::Float);
 		if (!has_indices)
-			new_format.add(bgfx::Attrib::Indices, 4, bgfx::AttribType::Int16, false, true);
+			new_format.add(bgfx::Attrib::Indices, 4, bgfx::AttribType::Uint8, false, true);
 
 		new_format.end();
 		// Add to format database.
@@ -433,7 +433,10 @@ bool Mesh::bind_skin(const SkinBindData& bind_data)
 
 		} // Next Influence
 		for (size_t j = max_bones; j < 4; ++j)
+		{
+
 			blend_indices |= (std::uint32_t)(0xFF << (8 * j));
+		}
 
 		//vec4 a_weight : BLENDWEIGHT;
 		//ivec4 a_indices : BLENDINDICES;
@@ -4283,59 +4286,55 @@ BonePalette::~BonePalette()
 /// drawing the skinned mesh.
 /// </summary>
 //-----------------------------------------------------------------------------
-void BonePalette::apply(const std::vector<math::transform_t> & boneTransforms, const SkinBindData * const pBindData, bool bComputeInverseTranspose)
+std::vector<math::transform_t> BonePalette::get_skinning_matrices(const math::transform_t& root_transform, const std::vector<math::transform_t>& node_transforms, const SkinBindData& bind_data, bool compute_inverse_transpose) const
 {
 	// Retrieve the main list of bones from the skin bind data that will
 	// be referenced by the palette's bone index list.
-	const SkinBindData::BoneArray & BindList = pBindData->get_bones();
-	if (boneTransforms.empty())
-		return;
+	const auto& bind_list = bind_data.get_bones();
+	if (node_transforms.empty())
+		return node_transforms;
 
-	// 	RenderDriver& driver = Singleton<RenderDriver>::getInstance();
-	// 	const std::uint32_t maxBlendTransforms = driver.getCapabilities()->getMaxBlendTransforms();
-	// 	Matrix4x4::Array Transforms;
-	// 	Transforms.resize(maxBlendTransforms);
-	// 	// Compute transformation matrix for each bone in the palette
-	// 	if (bComputeInverseTranspose)
-	// 	{
-	// 		Matrix4x4::Array ITTransforms;
-	// 		ITTransforms.resize(maxBlendTransforms);
-	// 
-	// 		for (size_t i = 0; i < mBones.size(); ++i)
-	// 		{
-	// 			auto& pBoneTransform = boneTransforms[mBones[i]];
-	// 			const SkinBindData::BoneInfluence* pBoneData = BindList[mBones[i]];
-	// 
-	// 			Transforms[i] = (pBoneData->bindPoseTransform * pBoneTransform).matrix();
-	// 
-	// 			// Compute inverse transpose
-	// 			ITTransforms[i] = Transforms[i];
-	// 			(Vector4&)ITTransforms[i]._41 = Vector4(0, 0, 0, 1);
-	// 			ITTransforms[i] = Matrix4x4::inverse(ITTransforms[i]);
-	// 			ITTransforms[i] = Matrix4x4::transpose(ITTransforms[i]);
-	// 
-	// 		} // Next Bone
-	// 
-	// 		  // Set to the device
-	// 		driver.setVertexBlendData(&Transforms[0], &ITTransforms[0], (std::uint32_t)mBones.size(), mMaximumBlendIndex);
-	// 
-	// 	} // End if bComputeInverseTranspose
-	// 	else
-	// 	{
-	// 
-	// 		for (size_t i = 0; i < mBones.size(); ++i)
-	// 		{
-	// 			auto& pBoneTransform = boneTransforms[mBones[i]];
-	// 			const SkinBindData::BoneInfluence* pBoneData = BindList[mBones[i]];
-	// 
-	// 			Transforms[i] = (pBoneData->bindPoseTransform * pBoneTransform).matrix();
-	// 
-	// 		} // Next Bone
-	// 
-	// 		  // Set to the device
-	// 		driver.setVertexBlendData(&Transforms[0], nullptr, (std::uint32_t)mBones.size(), mMaximumBlendIndex);
-	// 
-	// 	} // End if !bComputeInverseTranspose
+	const std::uint32_t max_blend_transforms = gfx::get_max_blend_transforms();
+	std::vector<math::transform_t> transforms;
+	transforms.resize(max_blend_transforms);
+	// Compute transformation matrix for each bone in the palette
+	if (compute_inverse_transpose)
+	{
+		std::vector<math::transform_t> inverse_transpospose_transforms;
+		inverse_transpospose_transforms.resize(max_blend_transforms);
+	
+		for (size_t i = 0; i < _bones.size(); ++i)
+		{
+			auto& bone_transform = node_transforms[_bones[i]];
+			const auto& bone_data = bind_list[_bones[i]];
+
+			transforms[i] = root_transform * bone_transform * bone_data.bind_pose_transform;
+	
+			// Compute inverse transpose
+			inverse_transpospose_transforms[i] = transforms[i];
+			inverse_transpospose_transforms[i] = math::inverse(inverse_transpospose_transforms[i]);
+			inverse_transpospose_transforms[i] = math::transpose(inverse_transpospose_transforms[i]);
+	
+		} // Next Bone
+	
+		return inverse_transpospose_transforms;
+
+	} // End if compute_inverse_transpose
+	else
+	{
+	
+		for (size_t i = 0; i < _bones.size(); ++i)
+		{
+			auto& bone_transform = node_transforms[_bones[i]];
+			const auto& bone_data = bind_list[_bones[i]];
+	
+			transforms[i] = root_transform * bone_transform * bone_data.bind_pose_transform;
+	
+		} // Next Bone
+	
+		return transforms;
+	
+	} // End if !compute_inverse_transpose
 
 }
 

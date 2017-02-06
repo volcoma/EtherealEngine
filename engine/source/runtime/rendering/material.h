@@ -53,7 +53,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline bool is_valid() const { return !!_program; }
+	inline bool is_valid() const { return !!get_program(); }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_texture ()
@@ -127,7 +127,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline Program* get_program() const { return _program.get(); }
+	Program* get_program() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : submit (virtual )
@@ -169,9 +169,12 @@ public:
 	//-----------------------------------------------------------------------------
 	std::uint64_t get_render_states(bool apply_cull = true, bool depth_write = true, bool depth_test = true) const;
 
+	bool skinned = false;
 protected:
 	/// Program that is responsible for rendering.
 	std::unique_ptr<Program> _program;
+	/// Program that is responsible for rendering.
+	std::unique_ptr<Program> _program_skinned;
 	/// Cull type for this material.
 	CullType _cull_type = CullType::CounterClockWise;
 	/// Default color texture

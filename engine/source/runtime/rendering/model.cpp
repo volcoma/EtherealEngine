@@ -122,31 +122,31 @@ void Model::set_lod_min_distance(float distance)
 	_min_distance = distance;
 }
 
-void Model::render(std::uint8_t id, const float* mtx, bool apply_cull, bool depth_write, bool depth_test, std::uint64_t extra_states, unsigned int lod, Program* user_program, std::function<void(Program&)> setup_params) const
+void Model::render(std::uint8_t id, const math::transform_t& mtx, bool apply_cull, bool depth_write, bool depth_test, std::uint64_t extra_states, unsigned int lod, Program* user_program, std::function<void(Program&)> setup_params) const
 {
-
 	const auto mesh = get_lod(lod);
 	if (!mesh)
 		return;
 
 	AssetHandle<Material> last_set_material;
-	for (std::size_t i = 0; i < mesh->get_subset_count(); ++i)
+	auto render_subset = [this, &mesh, &last_set_material](std::uint8_t id, bool skinned, std::uint32_t group_id, const float* mtx, std::uint32_t count, bool apply_cull, bool depth_write, bool depth_test, std::uint64_t extra_states, Program* user_program, std::function<void(Program&)> setup_params)
 	{
 		bool valid_program = false;
 		Program* program = user_program;
-		AssetHandle<Material> mat = get_material_for_group(i);
+		AssetHandle<Material> mat = get_material_for_group(group_id);
 		if (mat)
 		{
+			mat->skinned = false;
 			if (!user_program)
 			{
 				program = mat->get_program();
-			}	
+			}
 		}
-		
+
 		if (program)
 		{
 			valid_program = program->begin_pass();
-			if(valid_program)
+			if (valid_program)
 				setup_params(*program);
 		}
 
@@ -155,20 +155,50 @@ void Model::render(std::uint8_t id, const float* mtx, bool apply_cull, bool dept
 			if (mat)
 			{
 				if (!user_program)
-				{
+				{	
 					mat->submit();
 				}
 
 				extra_states |= mat->get_render_states(apply_cull, depth_write, depth_test);
 			}
 
-			gfx::setTransform(mtx);
+			gfx::setTransform(mtx, count);
 			gfx::setState(extra_states);
 
-			mesh->draw_subset(std::uint32_t(i));
-			gfx::submit(id, program->handle, 0, mat == last_set_material && i < (mesh->get_subset_count() - 1));
+			mesh->draw_subset(group_id);
+			gfx::submit(id, program->handle, 0, mat == last_set_material && group_id < (mesh->get_subset_count() - 1));
 		}
-			
+
 		last_set_material = mat;
+	};
+
+	const auto& skin_data = mesh->get_skin_bind_data();
+
+	// Has skinning data?
+	if (skin_data.has_bones())
+	{
+		// Build an array containing all of the bones that are required
+		// by the binding data in the skinned mesh.
+		std::vector<math::transform_t> node_transforms(gfx::get_max_blend_transforms());// (boneEntities.size());
+		// Process each palette in the skin with a matching attribute.
+		const auto& palettes = mesh->get_bone_palettes();
+		for (const auto& palette : palettes)
+		{
+			// Apply the bone palette.
+			auto skinning_matrices = palette.get_skinning_matrices(mtx, node_transforms, skin_data, false);
+			auto max_blend_index = palette.get_maximum_blend_index();
+			auto data_group = palette.get_data_group();
+
+			render_subset(id, true, data_group, (float*)&skinning_matrices[0], std::uint32_t(skinning_matrices.size()), apply_cull, depth_write, depth_test, extra_states, user_program, setup_params);
+	
+		} // Next Palette
 	}
+	else
+	{
+		for (std::size_t i = 0; i < mesh->get_subset_count(); ++i)
+		{
+			render_subset(id, false, std::uint32_t(i), mtx, 1, apply_cull, depth_write, depth_test, extra_states, user_program, setup_params);
+		}
+	}
+
 }

@@ -151,7 +151,7 @@ public:
 	//-------------------------------------------------------------------------
 	// Public Methods
 	//-------------------------------------------------------------------------
-	void apply(const std::vector<math::transform_t> & boneTransforms, const SkinBindData * const bindData, bool computeInverseTranspose);
+	std::vector<math::transform_t> get_skinning_matrices(const math::transform_t& root_transform, const std::vector<math::transform_t>& node_transforms, const SkinBindData& bind_data, bool compute_inverse_transpose) const;
 	void compute_palette_fit(BoneIndexMap & input, std::int32_t& currentSpace, std::int32_t& commonBones, std::int32_t& additionalBones);
 	void assign_bones(BoneIndexMap & bones, UInt32Array & faces);
 	void assign_bones(const UInt32Array & bones);
