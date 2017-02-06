@@ -191,7 +191,7 @@ void AssetReader::load_mesh_from_file(const std::string& key, const fs::path& ab
 
 			try_load(ar, cereal::make_nvp("mesh", data));
 		}	
-		wrapper->mesh->prepare_mesh(data.vertex_format, false);
+		wrapper->mesh->prepare_mesh(data.vertex_format);
 		wrapper->mesh->set_vertex_source(&data.vertex_data[0], data.vertex_count, data.vertex_format);
 		wrapper->mesh->add_primitives(data.triangle_data);
 		wrapper->mesh->bind_skin(data.skin_data);
