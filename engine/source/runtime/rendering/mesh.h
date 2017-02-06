@@ -7,9 +7,25 @@
 #include <vector>
 #include <map>
 #include <memory>
+#define RMC_DEFINE_DATA                     \
+    std::vector<math::vec3> vertices;		\
+	std::vector<math::vec3> normals;		\
+	std::vector<math::vec4> tangents;		\
+	std::vector<math::vec4> bitangents;		\
+	std::vector<math::vec2> texcoords0;		\
+	std::vector<math::vec2> texcoords1;		\
+	std::vector<std::uint32_t> indices;
+
+#define RMC_RESIZE_NTTT                     \
+    normals.resize( vertices.size() );      \
+    tangents.resize( vertices.size( ) );    \
+	bitangents.resize( vertices.size( ) );    \
+    texcoords0.resize( vertices.size( ) );  \
+    texcoords1.resize( vertices.size( ) );
+
+
 struct VertexBuffer;
 struct IndexBuffer;
-
 
 namespace TriangleFlags
 {
@@ -679,10 +695,57 @@ public:
 		bool hardware_copy = true);
 
 	//-----------------------------------------------------------------------------
+	//  Name : create_teapot ()
+	/// <summary>
+	/// Create teapot geometry.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	bool create_teapot(const gfx::VertexDecl& format, bool hardware_copy = true);
+
+	//-----------------------------------------------------------------------------
+	//  Name : create_tetrahedron ()
+	/// <summary>
+	/// Create tetrahedron geometry.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	bool create_tetrahedron(const gfx::VertexDecl& format, bool hardware_copy = true);
+
+	//-----------------------------------------------------------------------------
+	//  Name : create_octahedron ()
+	/// <summary>
+	/// Create octahedron geometry.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	bool create_octahedron(const gfx::VertexDecl& format, bool hardware_copy = true);
+
+	//-----------------------------------------------------------------------------
+	//  Name : create_icosahedron ()
+	/// <summary>
+	/// Create icosahedron geometry.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	bool create_icosahedron(const gfx::VertexDecl& format, bool hardware_copy = true);
+
+	//-----------------------------------------------------------------------------
+	//  Name : create_dodecahedron ()
+	/// <summary>
+	/// Create dodecahedron geometry.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	bool create_dodecahedron(const gfx::VertexDecl& format, bool hardware_copy = true);
+
+	//-----------------------------------------------------------------------------
+	//  Name : create_dodecahedron ()
+	/// <summary>
+	/// Create icosphere geometry.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	bool create_icosphere(const gfx::VertexDecl& format, int tesselation_level, bool hardware_copy = true);
+	//-----------------------------------------------------------------------------
 	//  Name : end_prepare ()
 	/// <summary>
 	/// All data has been added to the mesh and we should now build the
-	/// renderable data for the mesh.
+	/// render data for the mesh.
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	bool end_prepare(bool hardware_copy = true, bool weld = true, bool optimize = true, bool build_buffers = true);

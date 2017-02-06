@@ -50,19 +50,19 @@ bool DockingSystem::initialize()
 	dockspace.dock_with(assets.get(), console.get(), ImGuiDock::DockSlot::Tab, 250, true);
 	dockspace.dock_with(style.get(), assets.get(), ImGuiDock::DockSlot::Right, 300, true);
 
-	auto logger = logging::get("Log");
+	auto logger = logging::get(APPLOG);
 	logger->add_sink(_console_log);
 
-	std::function<void()> logVersion = [logger]()
+	std::function<void()> log_version = []()
 	{
-		logger->info() << "Version 1.0";
+		APPLOG_INFO("Version 1.0");
 	};
 	_console_log->register_command(
 		"version",
 		"Returns the current version of the Editor.",
 		{},
 		{},
-		logVersion
+		log_version
 	);
 
 	return true;

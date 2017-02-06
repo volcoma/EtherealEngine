@@ -82,8 +82,7 @@ namespace Docks
 			std::string errorMsg = console.process_input(command);
 			if (errorMsg != "")
 			{
-				auto logger = logging::get("Log");
-				logger->notice() << errorMsg;
+				APPLOG_NOTICE(errorMsg.c_str());
 			}
 			// Demonstrate keeping auto focus on the input box
 			if (gui::IsItemHovered() || (gui::IsRootWindowOrAnyChildFocused() && !gui::IsAnyItemActive() && !gui::IsMouseClicked(0)))

@@ -19,8 +19,7 @@
 //-----------------------------------------------------------------------------
 inline void log_path(const fs::path& path)
 {
-	auto logger = logging::get("Log");
-	logger->error() << (std::string("Watcher can't locate a file or parse the wild card at: ") + path.string());
+	APPLOG_ERROR((std::string("Watcher can't locate a file or parse the wild card at: ") + path.string()).c_str());
 }
 
 namespace fs

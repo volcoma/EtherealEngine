@@ -450,13 +450,14 @@ vec3 F_Schlick( vec3 SpecularColor, float VoH )
 	return saturate( 50.0f * SpecularColor.g ) * Fc + (1.0f - Fc) * SpecularColor;
 }
 
-vec3 Fresnel_CookTorrance( vec3 SpecularColor, vec3 VoH )
+vec3 Fresnel_CookTorrance( vec3 SpecularColor, float VoH )
 {
+	vec3 VdotH = vec3(VoH, VoH, VoH);
     vec3 n = (1.0f + sqrt(SpecularColor)) / (1.0f - sqrt(SpecularColor));
-    vec3 g = sqrt(n * n + VoH * VoH - 1.0f);
+    vec3 g = sqrt(n * n + VdotH * VdotH - 1.0f);
 
-    vec3 part1 = (g - VoH)/(g + VoH);
-    vec3 part2 = ((g + VoH) * VoH - 1.0f)/((g - VoH) * VoH + 1.0f);
+    vec3 part1 = (g - VdotH)/(g + VdotH);
+    vec3 part2 = ((g + VdotH) * VdotH - 1.0f)/((g - VdotH) * VdotH + 1.0f);
 
     return max(vec3(0.0f, 0.0f, 0.0f), 0.5f * part1 * part1 * ( 1.0f + part2 * part2));
 }

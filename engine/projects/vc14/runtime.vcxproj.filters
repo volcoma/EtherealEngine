@@ -252,6 +252,9 @@
     <ClCompile Include="..\..\source\runtime\ecs\scene.cpp">
       <Filter>Source Files\ecs</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\runtime\rendering\mesh_tools.cpp">
+      <Filter>Source Files\rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\runtime\runtime.h">
@@ -550,6 +553,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\runtime\ecs\scene.h">
       <Filter>Source Files\ecs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\rendering\mesh_tools.h">
+      <Filter>Source Files\rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -61,7 +61,7 @@ namespace runtime
 
 	void App::quit_with_error(const std::string& message)
 	{
-		logging::get("Log")->error() << message;
+		APPLOG_ERROR(message.c_str());
 		quit(-1);
 	}
 

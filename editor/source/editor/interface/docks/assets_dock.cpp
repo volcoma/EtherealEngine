@@ -416,7 +416,6 @@ namespace Docks
 			if (open_multiple_files_dialog("obj,fbx,dae,blend,3ds,mtl,png,tga,dds,ktx,pvr,sc,io,sh", "", paths))
 			{
 				auto ts = core::get_subsystem<runtime::TaskSystem>();
-				auto logger = logging::get("Log");
 				editor::AssetFolder* folder = editor::AssetFolder::opened.get();
 
 				fs::path opened_dir = folder->absolute;
@@ -432,8 +431,7 @@ namespace Docks
 						fs::path dir = opened_dir / filename;
 						if (!fs::copy_file(path, dir, fs::copy_options::overwrite_existing, error))
 						{
-							auto logger = logging::get("Log");
-							logger->error().write("Failed to import file {0} with message {1}", p.string(), error.message());
+							APPLOG_ERROR("Failed to import file {0} with message {1}", p.string(), error.message());
 						}
 						else
 						{

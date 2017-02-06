@@ -63,35 +63,37 @@ void process_vertices(aiMesh* mesh, Mesh::LoadData& load_data)
 		}
 
 		////normals
+		math::vec4 normal;
 		if (mesh->mNormals && has_normal)
 		{
-			float normal[4];
-			std::memcpy(normal, &mesh->mNormals[i], sizeof(math::vec3));
+			std::memcpy(math::value_ptr(normal), &mesh->mNormals[i], sizeof(math::vec3));
 
 			if (has_normal)
-				gfx::vertexPack(normal, true, gfx::Attrib::Normal, load_data.vertex_format, current_vertex_ptr);
+				gfx::vertexPack(math::value_ptr(normal), true, gfx::Attrib::Normal, load_data.vertex_format, current_vertex_ptr);
 
 		}
 
+		math::vec4 tangent;
 		//tangents
 		if (mesh->mTangents && has_tangent)
 		{
-			float tangent[4];
-			std::memcpy(tangent, &mesh->mTangents[i], sizeof(math::vec3));
-
+			std::memcpy(math::value_ptr(tangent), &mesh->mTangents[i], sizeof(math::vec3));
+			tangent.w = 1.0f;
 			if (has_tangent)
-				gfx::vertexPack(tangent, true, gfx::Attrib::Tangent, load_data.vertex_format, current_vertex_ptr);
+				gfx::vertexPack(math::value_ptr(tangent), true, gfx::Attrib::Tangent, load_data.vertex_format, current_vertex_ptr);
 
 		}
 
 		//binormals
+		math::vec4 bitangent;
 		if (mesh->mBitangents && has_bitangent)
 		{
-			float bitangent[4];
-			std::memcpy(bitangent, &mesh->mBitangents[i], sizeof(math::vec3));
+			std::memcpy(math::value_ptr(bitangent), &mesh->mBitangents[i], sizeof(math::vec3));
+			float handedness = math::dot(math::vec3(bitangent), math::normalize(math::cross(math::vec3(normal), math::vec3(tangent))));
+			tangent.w = handedness;
 
 			if (has_bitangent)
-				gfx::vertexPack(bitangent, true, gfx::Attrib::Bitangent, load_data.vertex_format, current_vertex_ptr);
+				gfx::vertexPack(math::value_ptr(bitangent), true, gfx::Attrib::Bitangent, load_data.vertex_format, current_vertex_ptr);
 
 		}
 
@@ -292,10 +294,14 @@ void process_imported_scene(const aiScene* scene, Mesh::LoadData& load_data)
 bool importer::load_mesh_data_from_file(const std::string& path, Mesh::LoadData& load_data)
 {
 	Assimp::Importer importer;
+
+	importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, aiComponent_CAMERAS | aiComponent_LIGHTS);
+	importer.SetPropertyBool("GLOB_MEASURE_TIME", true);
+
 	const aiScene* scene = importer.ReadFile(
 		path
 		, aiProcess_ConvertToLeftHanded
-		//| aiProcess_CalcTangentSpace
+		| aiProcess_CalcTangentSpace
 		| aiProcess_GenSmoothNormals
 		| aiProcess_JoinIdenticalVertices
 		| aiProcess_ImproveCacheLocality
@@ -314,8 +320,11 @@ bool importer::load_mesh_data_from_file(const std::string& path, Mesh::LoadData&
 
 
 	if (!scene)
+	{
+		APPLOG_ERROR(importer.GetErrorString());
 		return false;
-
+	}
+	APPLOG_INFO("Imported {0}", path);
 	process_imported_scene(scene, load_data);
 
 	return true;

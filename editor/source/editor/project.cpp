@@ -263,8 +263,7 @@ namespace editor
 	{
 		if (!fs::exists(project_path, std::error_code{}))
 		{
-			auto logger = logging::get("Log");
-			logger->error().write("Project directory doesn't exist {0}", project_path.string());
+			APPLOG_ERROR("Project directory doesn't exist {0}", project_path.string());
 			return;
 		}
 

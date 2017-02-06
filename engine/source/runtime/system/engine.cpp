@@ -18,7 +18,7 @@ namespace runtime
 
 	bool Engine::initialize()
 	{
-		auto logger = logging::create("Log",
+		auto logger = logging::create(APPLOG,
 		{
 			std::make_shared<logging::sinks::platform_sink_mt>(),
 			std::make_shared<logging::sinks::daily_file_sink_mt>("Log", "log", 23, 59),

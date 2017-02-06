@@ -4,7 +4,7 @@
 #include "core/memory/checked_delete.h"
 #include "core/logging/logging.h"
 #include <algorithm>
-
+#include "mesh_tools.h"
 
 //-----------------------------------------------------------------------------
 // Local Module Level Namespaces.
@@ -679,8 +679,7 @@ bool Mesh::set_vertex_source(void* source_ptr, std::uint32_t vertex_count, const
 	// We can only do this if we are in the process of preparing the mesh
 	if (_prepare_status != MeshStatus::Preparing)
 	{
-		auto logger = logging::get("Log");
-		logger->error().write("Attempting to set a mesh vertex source without first calling 'prepareMesh' is not allowed.\n");
+		APPLOG_ERROR("Attempting to set a mesh vertex source without first calling 'prepareMesh' is not allowed.\n");
 		return false;
 
 	} // End if not preparing
@@ -748,8 +747,7 @@ bool Mesh::add_primitives(const TriangleArray & aTriangles)
 	// We can only do this if we are in the process of preparing the mesh
 	if (_prepare_status != MeshStatus::Preparing)
 	{
-		auto logger = logging::get("Log");
-		logger->error().write("Attempting to add primitives to a mesh without first calling 'prepareMesh' is not allowed.\n");
+		APPLOG_ERROR("Attempting to add primitives to a mesh without first calling 'prepareMesh' is not allowed.\n");
 		return false;
 
 	} // End if not preparing
@@ -1798,6 +1796,426 @@ bool Mesh::create_torus(const gfx::VertexDecl& format, float outer_radius, float
 	return end_prepare(hardware_copy, false, false);
 }
 
+bool Mesh::create_teapot(const gfx::VertexDecl& format, bool hardware_copy /*= true*/)
+{
+	// Clear out old data.
+	dispose();
+
+	// We are in the process of preparing.
+	_prepare_status = MeshStatus::Preparing;
+	_vertex_format = format;
+
+	// Determine the correct offset to any relevant elements in the vertex
+	bool has_position = _vertex_format.has(gfx::Attrib::Position);
+	bool has_texcoord0 = _vertex_format.has(gfx::Attrib::TexCoord0);
+	bool has_texcoord1 = _vertex_format.has(gfx::Attrib::TexCoord1);
+	bool has_normals = _vertex_format.has(gfx::Attrib::Normal);
+	bool has_tangents = _vertex_format.has(gfx::Attrib::Tangent);
+	bool has_bitangents = _vertex_format.has(gfx::Attrib::Bitangent);
+	std::uint16_t vertex_stride = _vertex_format.getStride();
+
+	RMC_DEFINE_DATA
+	TriangleMeshTools::create_teapot(vertices, indices);
+	RMC_RESIZE_NTTT
+	
+	TriangleMeshTools::generate_normals(normals, vertices, indices, false);
+	TriangleMeshTools::fill_dummy_ttt(vertices, normals, tangents, texcoords0, texcoords1);
+	TriangleMeshTools::generate_tangents(tangents, bitangents, vertices, normals, texcoords0, indices);
+	// Compute the number of faces and vertices that will be required for this box
+	_preparation_data.triangle_count = std::uint32_t(indices.size()) / 3;
+	_preparation_data.vertex_count = std::uint32_t(vertices.size());
+
+	// Allocate enough space for the new vertex and triangle data
+	_preparation_data.vertex_data.resize(_preparation_data.vertex_count * vertex_stride);
+	_preparation_data.vertex_flags.resize(_preparation_data.vertex_count);
+	_preparation_data.triangle_data.resize(_preparation_data.triangle_count);
+
+	std::uint8_t * current_vertex_ptr = &_preparation_data.vertex_data[0];
+	for (std::size_t i = 0; i < vertices.size(); ++i)
+	{
+		// Store vertex components
+		if (has_position)
+			gfx::vertexPack(&vertices[i][0], false, gfx::Attrib::Position, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_normals)
+			gfx::vertexPack(&normals[i][0], true, gfx::Attrib::Normal, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_texcoord0)
+			gfx::vertexPack(&texcoords0[i][0], true, gfx::Attrib::TexCoord0, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_texcoord1)
+			gfx::vertexPack(&texcoords1[i][0], true, gfx::Attrib::TexCoord1, format, current_vertex_ptr, std::uint32_t(i));		
+		if (has_tangents)
+			gfx::vertexPack(&tangents[i][0], true, gfx::Attrib::Tangent, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_bitangents)
+			gfx::vertexPack(&bitangents[i][0], true, gfx::Attrib::Bitangent, format, current_vertex_ptr, std::uint32_t(i));
+
+		_bbox.add_point(vertices[i]);
+	}
+
+	for (std::size_t i = 0; i < indices.size(); i += 3)
+	{
+		Triangle& tri = _preparation_data.triangle_data[i / 3];
+		tri.indices[0] = indices[i + 0];
+		tri.indices[1] = indices[i + 1];
+		tri.indices[2] = indices[i + 2];
+	}
+
+	// We need to generate binormals / tangents?
+// 	_preparation_data.compute_binormals = has_bitangents;
+// 	_preparation_data.compute_tangents = has_tangents;
+// 	_preparation_data.compute_tangents = has_normals;
+	// Finish up
+	return end_prepare(hardware_copy, false, false);
+}
+
+bool Mesh::create_tetrahedron(const gfx::VertexDecl& format, bool hardware_copy /*= true*/)
+{
+	// Clear out old data.
+	dispose();
+
+	// We are in the process of preparing.
+	_prepare_status = MeshStatus::Preparing;
+	_vertex_format = format;
+
+	// Determine the correct offset to any relevant elements in the vertex
+	bool has_position = _vertex_format.has(gfx::Attrib::Position);
+	bool has_texcoord0 = _vertex_format.has(gfx::Attrib::TexCoord0);
+	bool has_texcoord1 = _vertex_format.has(gfx::Attrib::TexCoord1);
+	bool has_normals = _vertex_format.has(gfx::Attrib::Normal);
+	bool has_tangents = _vertex_format.has(gfx::Attrib::Tangent);
+	bool has_bitangents = _vertex_format.has(gfx::Attrib::Bitangent);
+	std::uint16_t vertex_stride = _vertex_format.getStride();
+
+	RMC_DEFINE_DATA
+	TriangleMeshTools::create_tetrahedron(vertices, indices, false);
+	RMC_RESIZE_NTTT
+
+	TriangleMeshTools::generate_normals(normals, vertices, indices, false);
+	TriangleMeshTools::fill_dummy_ttt(vertices, normals, tangents, texcoords0, texcoords1);
+	TriangleMeshTools::generate_tangents(tangents, bitangents, vertices, normals, texcoords0, indices);
+	// Compute the number of faces and vertices that will be required for this box
+	_preparation_data.triangle_count = std::uint32_t(indices.size()) / 3;
+	_preparation_data.vertex_count = std::uint32_t(vertices.size());
+
+	// Allocate enough space for the new vertex and triangle data
+	_preparation_data.vertex_data.resize(_preparation_data.vertex_count * vertex_stride);
+	_preparation_data.vertex_flags.resize(_preparation_data.vertex_count);
+	_preparation_data.triangle_data.resize(_preparation_data.triangle_count);
+
+	std::uint8_t * current_vertex_ptr = &_preparation_data.vertex_data[0];
+	for (std::size_t i = 0; i < vertices.size(); ++i)
+	{
+		// Store vertex components
+		if (has_position)
+			gfx::vertexPack(&vertices[i][0], false, gfx::Attrib::Position, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_normals)
+			gfx::vertexPack(&normals[i][0], true, gfx::Attrib::Normal, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_texcoord0)
+			gfx::vertexPack(&texcoords0[i][0], true, gfx::Attrib::TexCoord0, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_texcoord1)
+			gfx::vertexPack(&texcoords1[i][0], true, gfx::Attrib::TexCoord1, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_tangents)
+			gfx::vertexPack(&tangents[i][0], true, gfx::Attrib::Tangent, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_bitangents)
+			gfx::vertexPack(&bitangents[i][0], true, gfx::Attrib::Bitangent, format, current_vertex_ptr, std::uint32_t(i));
+
+		_bbox.add_point(vertices[i]);
+	}
+
+	for (std::size_t i = 0; i < indices.size(); i += 3)
+	{
+		Triangle& tri = _preparation_data.triangle_data[i / 3];
+		tri.indices[0] = indices[i + 0];
+		tri.indices[1] = indices[i + 1];
+		tri.indices[2] = indices[i + 2];
+	}
+
+	// We need to generate binormals / tangents?
+	// 	_preparation_data.compute_binormals = has_bitangents;
+	// 	_preparation_data.compute_tangents = has_tangents;
+	// 	_preparation_data.compute_tangents = has_normals;
+	// Finish up
+	return end_prepare(hardware_copy, false, false);
+}
+
+bool Mesh::create_octahedron(const gfx::VertexDecl& format, bool hardware_copy /*= true*/)
+{
+	// Clear out old data.
+	dispose();
+
+	// We are in the process of preparing.
+	_prepare_status = MeshStatus::Preparing;
+	_vertex_format = format;
+
+	// Determine the correct offset to any relevant elements in the vertex
+	bool has_position = _vertex_format.has(gfx::Attrib::Position);
+	bool has_texcoord0 = _vertex_format.has(gfx::Attrib::TexCoord0);
+	bool has_texcoord1 = _vertex_format.has(gfx::Attrib::TexCoord1);
+	bool has_normals = _vertex_format.has(gfx::Attrib::Normal);
+	bool has_tangents = _vertex_format.has(gfx::Attrib::Tangent);
+	bool has_bitangents = _vertex_format.has(gfx::Attrib::Bitangent);
+	std::uint16_t vertex_stride = _vertex_format.getStride();
+
+	RMC_DEFINE_DATA
+	TriangleMeshTools::create_octahedron(vertices, indices, false);
+	RMC_RESIZE_NTTT
+
+	TriangleMeshTools::generate_normals(normals, vertices, indices, false);
+	TriangleMeshTools::fill_dummy_ttt(vertices, normals, tangents, texcoords0, texcoords1);
+	TriangleMeshTools::generate_tangents(tangents, bitangents, vertices, normals, texcoords0, indices);
+	// Compute the number of faces and vertices that will be required for this box
+	_preparation_data.triangle_count = std::uint32_t(indices.size()) / 3;
+	_preparation_data.vertex_count = std::uint32_t(vertices.size());
+
+	// Allocate enough space for the new vertex and triangle data
+	_preparation_data.vertex_data.resize(_preparation_data.vertex_count * vertex_stride);
+	_preparation_data.vertex_flags.resize(_preparation_data.vertex_count);
+	_preparation_data.triangle_data.resize(_preparation_data.triangle_count);
+
+	std::uint8_t * current_vertex_ptr = &_preparation_data.vertex_data[0];
+	for (std::size_t i = 0; i < vertices.size(); ++i)
+	{
+		// Store vertex components
+		if (has_position)
+			gfx::vertexPack(&vertices[i][0], false, gfx::Attrib::Position, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_normals)
+			gfx::vertexPack(&normals[i][0], true, gfx::Attrib::Normal, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_texcoord0)
+			gfx::vertexPack(&texcoords0[i][0], true, gfx::Attrib::TexCoord0, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_texcoord1)
+			gfx::vertexPack(&texcoords1[i][0], true, gfx::Attrib::TexCoord1, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_tangents)
+			gfx::vertexPack(&tangents[i][0], true, gfx::Attrib::Tangent, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_bitangents)
+			gfx::vertexPack(&bitangents[i][0], true, gfx::Attrib::Bitangent, format, current_vertex_ptr, std::uint32_t(i));
+
+		_bbox.add_point(vertices[i]);
+	}
+
+	for (std::size_t i = 0; i < indices.size(); i += 3)
+	{
+		Triangle& tri = _preparation_data.triangle_data[i / 3];
+		tri.indices[0] = indices[i + 0];
+		tri.indices[1] = indices[i + 1];
+		tri.indices[2] = indices[i + 2];
+	}
+
+	// We need to generate binormals / tangents?
+	// 	_preparation_data.compute_binormals = has_bitangents;
+	// 	_preparation_data.compute_tangents = has_tangents;
+	// 	_preparation_data.compute_tangents = has_normals;
+	// Finish up
+	return end_prepare(hardware_copy, false, false);
+}
+
+bool Mesh::create_icosahedron(const gfx::VertexDecl& format, bool hardware_copy /*= true*/)
+{
+	// Clear out old data.
+	dispose();
+
+	// We are in the process of preparing.
+	_prepare_status = MeshStatus::Preparing;
+	_vertex_format = format;
+
+	// Determine the correct offset to any relevant elements in the vertex
+	bool has_position = _vertex_format.has(gfx::Attrib::Position);
+	bool has_texcoord0 = _vertex_format.has(gfx::Attrib::TexCoord0);
+	bool has_texcoord1 = _vertex_format.has(gfx::Attrib::TexCoord1);
+	bool has_normals = _vertex_format.has(gfx::Attrib::Normal);
+	bool has_tangents = _vertex_format.has(gfx::Attrib::Tangent);
+	bool has_bitangents = _vertex_format.has(gfx::Attrib::Bitangent);
+	std::uint16_t vertex_stride = _vertex_format.getStride();
+
+	RMC_DEFINE_DATA
+	TriangleMeshTools::create_icosahedron(vertices, indices, false);
+	RMC_RESIZE_NTTT
+
+	TriangleMeshTools::generate_normals(normals, vertices, indices, false);
+	TriangleMeshTools::fill_dummy_ttt(vertices, normals, tangents, texcoords0, texcoords1);
+	TriangleMeshTools::generate_tangents(tangents, bitangents, vertices, normals, texcoords0, indices);
+	// Compute the number of faces and vertices that will be required for this box
+	_preparation_data.triangle_count = std::uint32_t(indices.size()) / 3;
+	_preparation_data.vertex_count = std::uint32_t(vertices.size());
+
+	// Allocate enough space for the new vertex and triangle data
+	_preparation_data.vertex_data.resize(_preparation_data.vertex_count * vertex_stride);
+	_preparation_data.vertex_flags.resize(_preparation_data.vertex_count);
+	_preparation_data.triangle_data.resize(_preparation_data.triangle_count);
+
+	std::uint8_t * current_vertex_ptr = &_preparation_data.vertex_data[0];
+	for (std::size_t i = 0; i < vertices.size(); ++i)
+	{
+		// Store vertex components
+		if (has_position)
+			gfx::vertexPack(&vertices[i][0], false, gfx::Attrib::Position, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_normals)
+			gfx::vertexPack(&normals[i][0], true, gfx::Attrib::Normal, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_texcoord0)
+			gfx::vertexPack(&texcoords0[i][0], true, gfx::Attrib::TexCoord0, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_texcoord1)
+			gfx::vertexPack(&texcoords1[i][0], true, gfx::Attrib::TexCoord1, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_tangents)
+			gfx::vertexPack(&tangents[i][0], true, gfx::Attrib::Tangent, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_bitangents)
+			gfx::vertexPack(&bitangents[i][0], true, gfx::Attrib::Bitangent, format, current_vertex_ptr, std::uint32_t(i));
+
+		_bbox.add_point(vertices[i]);
+	}
+
+	for (std::size_t i = 0; i < indices.size(); i += 3)
+	{
+		Triangle& tri = _preparation_data.triangle_data[i / 3];
+		tri.indices[0] = indices[i + 0];
+		tri.indices[1] = indices[i + 1];
+		tri.indices[2] = indices[i + 2];
+	}
+
+	// We need to generate binormals / tangents?
+	// 	_preparation_data.compute_binormals = has_bitangents;
+	// 	_preparation_data.compute_tangents = has_tangents;
+	// 	_preparation_data.compute_tangents = has_normals;
+	// Finish up
+	return end_prepare(hardware_copy, false, false);
+}
+
+bool Mesh::create_dodecahedron(const gfx::VertexDecl& format, bool hardware_copy /*= true*/)
+{
+	// Clear out old data.
+	dispose();
+
+	// We are in the process of preparing.
+	_prepare_status = MeshStatus::Preparing;
+	_vertex_format = format;
+
+	// Determine the correct offset to any relevant elements in the vertex
+	bool has_position = _vertex_format.has(gfx::Attrib::Position);
+	bool has_texcoord0 = _vertex_format.has(gfx::Attrib::TexCoord0);
+	bool has_texcoord1 = _vertex_format.has(gfx::Attrib::TexCoord1);
+	bool has_normals = _vertex_format.has(gfx::Attrib::Normal);
+	bool has_tangents = _vertex_format.has(gfx::Attrib::Tangent);
+	bool has_bitangents = _vertex_format.has(gfx::Attrib::Bitangent);
+	std::uint16_t vertex_stride = _vertex_format.getStride();
+
+	RMC_DEFINE_DATA
+	TriangleMeshTools::create_dodecahedron(vertices, indices, false);
+	RMC_RESIZE_NTTT
+
+	TriangleMeshTools::generate_normals(normals, vertices, indices, false);
+	TriangleMeshTools::fill_dummy_ttt(vertices, normals, tangents, texcoords0, texcoords1);
+	TriangleMeshTools::generate_tangents(tangents, bitangents, vertices, normals, texcoords0, indices);
+	// Compute the number of faces and vertices that will be required for this box
+	_preparation_data.triangle_count = std::uint32_t(indices.size()) / 3;
+	_preparation_data.vertex_count = std::uint32_t(vertices.size());
+
+	// Allocate enough space for the new vertex and triangle data
+	_preparation_data.vertex_data.resize(_preparation_data.vertex_count * vertex_stride);
+	_preparation_data.vertex_flags.resize(_preparation_data.vertex_count);
+	_preparation_data.triangle_data.resize(_preparation_data.triangle_count);
+
+	std::uint8_t * current_vertex_ptr = &_preparation_data.vertex_data[0];
+	for (std::size_t i = 0; i < vertices.size(); ++i)
+	{
+		// Store vertex components
+		if (has_position)
+			gfx::vertexPack(&vertices[i][0], false, gfx::Attrib::Position, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_normals)
+			gfx::vertexPack(&normals[i][0], true, gfx::Attrib::Normal, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_texcoord0)
+			gfx::vertexPack(&texcoords0[i][0], true, gfx::Attrib::TexCoord0, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_texcoord1)
+			gfx::vertexPack(&texcoords1[i][0], true, gfx::Attrib::TexCoord1, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_tangents)
+			gfx::vertexPack(&tangents[i][0], true, gfx::Attrib::Tangent, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_bitangents)
+			gfx::vertexPack(&bitangents[i][0], true, gfx::Attrib::Bitangent, format, current_vertex_ptr, std::uint32_t(i));
+
+		_bbox.add_point(vertices[i]);
+	}
+
+	for (std::size_t i = 0; i < indices.size(); i += 3)
+	{
+		Triangle& tri = _preparation_data.triangle_data[i / 3];
+		tri.indices[0] = indices[i + 0];
+		tri.indices[1] = indices[i + 1];
+		tri.indices[2] = indices[i + 2];
+	}
+
+	// We need to generate binormals / tangents?
+	// 	_preparation_data.compute_binormals = has_bitangents;
+	// 	_preparation_data.compute_tangents = has_tangents;
+	// 	_preparation_data.compute_tangents = has_normals;
+	// Finish up
+	return end_prepare(hardware_copy, false, false);
+}
+
+bool Mesh::create_icosphere(const gfx::VertexDecl& format, int tesselation_level, bool hardware_copy /*= true*/)
+{
+	// Clear out old data.
+	dispose();
+
+	// We are in the process of preparing.
+	_prepare_status = MeshStatus::Preparing;
+	_vertex_format = format;
+
+	// Determine the correct offset to any relevant elements in the vertex
+	bool has_position = _vertex_format.has(gfx::Attrib::Position);
+	bool has_texcoord0 = _vertex_format.has(gfx::Attrib::TexCoord0);
+	bool has_texcoord1 = _vertex_format.has(gfx::Attrib::TexCoord1);
+	bool has_normals = _vertex_format.has(gfx::Attrib::Normal);
+	bool has_tangents = _vertex_format.has(gfx::Attrib::Tangent);
+	bool has_bitangents = _vertex_format.has(gfx::Attrib::Bitangent);
+	std::uint16_t vertex_stride = _vertex_format.getStride();
+
+	RMC_DEFINE_DATA
+	TriangleMeshTools::create_icosphere(vertices, indices, tesselation_level, false);
+	RMC_RESIZE_NTTT
+	
+	TriangleMeshTools::generate_normals(normals, vertices, indices, false);
+	TriangleMeshTools::fill_dummy_ttt(vertices, normals, tangents, texcoords0, texcoords1);
+	TriangleMeshTools::generate_tangents(tangents, bitangents, vertices, normals, texcoords0, indices);
+	// Compute the number of faces and vertices that will be required for this box
+	_preparation_data.triangle_count = std::uint32_t(indices.size()) / 3;
+	_preparation_data.vertex_count = std::uint32_t(vertices.size());
+
+	// Allocate enough space for the new vertex and triangle data
+	_preparation_data.vertex_data.resize(_preparation_data.vertex_count * vertex_stride);
+	_preparation_data.vertex_flags.resize(_preparation_data.vertex_count);
+	_preparation_data.triangle_data.resize(_preparation_data.triangle_count);
+
+	std::uint8_t * current_vertex_ptr = &_preparation_data.vertex_data[0];
+	for (std::size_t i = 0; i < vertices.size(); ++i)
+	{
+		// Store vertex components
+		if (has_position)
+			gfx::vertexPack(&vertices[i][0], false, gfx::Attrib::Position, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_normals)
+			gfx::vertexPack(&normals[i][0], true, gfx::Attrib::Normal, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_texcoord0)
+			gfx::vertexPack(&texcoords0[i][0], true, gfx::Attrib::TexCoord0, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_texcoord1)
+			gfx::vertexPack(&texcoords1[i][0], true, gfx::Attrib::TexCoord1, format, current_vertex_ptr, std::uint32_t(i));		
+		if (has_tangents)
+			gfx::vertexPack(&tangents[i][0], true, gfx::Attrib::Tangent, format, current_vertex_ptr, std::uint32_t(i));
+		if (has_bitangents)
+			gfx::vertexPack(&bitangents[i][0], true, gfx::Attrib::Bitangent, format, current_vertex_ptr, std::uint32_t(i));
+
+		_bbox.add_point(vertices[i]);
+	}
+
+	for (std::size_t i = 0; i < indices.size(); i += 3)
+	{
+		Triangle& tri = _preparation_data.triangle_data[i / 3];
+		tri.indices[0] = indices[i + 0];
+		tri.indices[1] = indices[i + 1];
+		tri.indices[2] = indices[i + 2];
+	}
+
+	// We need to generate binormals / tangents?
+// 	_preparation_data.compute_binormals = has_bitangents;
+// 	_preparation_data.compute_tangents = has_tangents;
+// 	_preparation_data.compute_tangents = has_normals;
+	// Finish up
+	return end_prepare(hardware_copy, false, false);
+}
+
 bool Mesh::create_cone(const gfx::VertexDecl& format, float radius, float radius_tip, float height, std::uint32_t stacks, std::uint32_t slices, bool inverted, MeshCreateOrigin::E origin, bool hardware_copy /* = true */)
 {
 	math::vec3 vec_position, vec_normal;
@@ -2310,7 +2728,6 @@ bool Mesh::create_cube(const gfx::VertexDecl& format, float width, float height,
 	  // We need to generate binormals / tangents?
 	_preparation_data.compute_binormals = _vertex_format.has(gfx::Attrib::Bitangent);
 	_preparation_data.compute_tangents = _vertex_format.has(gfx::Attrib::Tangent);
-
 	// Finish up
 	return end_prepare(hardware_copy, false, false);
 }
@@ -2321,8 +2738,7 @@ bool Mesh::end_prepare(bool hardware_copy /* = true */, bool weld /* = true */, 
 	// Were we previously preparing?
 	if (_prepare_status != MeshStatus::Preparing)
 	{
-		auto logger = logging::get("Log");
-		logger->error().write("Attempting to call 'end_prepare' on a mesh without first calling 'prepareMesh' is not allowed.\n");
+		APPLOG_ERROR("Attempting to call 'end_prepare' on a mesh without first calling 'prepareMesh' is not allowed.\n");
 		return false;
 
 	} // End if previously preparing
@@ -3034,8 +3450,7 @@ bool Mesh::generate_vertex_components(bool weld)
 		UInt32Array adjacency;
 		if (!generate_adjacency(adjacency))
 		{
-			auto logger = logging::get("Log");
-			logger->error().write("Failed to generate adjacency buffer mesh containing {0} faces.\n", _preparation_data.triangle_count);
+			APPLOG_ERROR("Failed to generate adjacency buffer mesh containing {0} faces.\n", _preparation_data.triangle_count);
 			return false;
 
 		} // End if failed to generate
@@ -3044,8 +3459,7 @@ bool Mesh::generate_vertex_components(bool weld)
 			// Generate any vertex barycentric coords that have not been provided
 			if (!generate_vertex_barycentrics(&adjacency.front()))
 			{
-				auto logger = logging::get("Log");
-				logger->error().write("Failed to generate vertex barycentric coords for mesh containing {0} faces.\n", _preparation_data.triangle_count);
+				APPLOG_ERROR("Failed to generate vertex barycentric coords for mesh containing {0} faces.\n", _preparation_data.triangle_count);
 				return false;
 
 			} // End if failed to generate
@@ -3055,8 +3469,7 @@ bool Mesh::generate_vertex_components(bool weld)
 		// Generate any vertex normals that have not been provided
 		if (!generate_vertex_normals(&adjacency.front()))
 		{
-			auto logger = logging::get("Log");
-			logger->error().write("Failed to generate vertex normals for mesh containing {0} faces.\n", _preparation_data.triangle_count);
+			APPLOG_ERROR("Failed to generate vertex normals for mesh containing {0} faces.\n", _preparation_data.triangle_count);
 			return false;
 
 		} // End if failed to generate
@@ -3068,8 +3481,7 @@ bool Mesh::generate_vertex_components(bool weld)
 	{
 		if (!weld_vertices())
 		{
-			auto logger = logging::get("Log");
-			logger->error().write("Failed to weld vertices for mesh containing {0} faces.\n", _preparation_data.triangle_count);
+			APPLOG_ERROR("Failed to weld vertices for mesh containing {0} faces.\n", _preparation_data.triangle_count);
 			return false;
 
 		} // End if failed to weld
@@ -3085,8 +3497,7 @@ bool Mesh::generate_vertex_components(bool weld)
 			// Generate any vertex tangents that have not been provided
 			if (!generate_vertex_tangents())
 			{
-				auto logger = logging::get("Log");
-				logger->error().write("Failed to generate vertex tangents for mesh containing {0} faces.\n", _preparation_data.triangle_count);
+				APPLOG_ERROR("Failed to generate vertex tangents for mesh containing {0} faces.\n", _preparation_data.triangle_count);
 				return false;
 
 			} // End if failed to generate
@@ -3108,11 +3519,11 @@ bool Mesh::generate_vertex_normals(std::uint32_t* adjacency_ptr, UInt32Array* re
 
 	// Get access to useful data offset information.
 	std::uint16_t position_offset = _vertex_format.getOffset(gfx::Attrib::Position);
-	std::uint16_t normal_offset = _vertex_format.getOffset(gfx::Attrib::Normal);
+	bool has_normals = _vertex_format.has(gfx::Attrib::Normal);
 	std::uint16_t vertex_stride = _vertex_format.getStride();
 
 	// Final format requests vertex normals?
-	if (normal_offset < 0)
+	if (!has_normals)
 		return true;
 
 	// Size the remap array accordingly and populate it with the default mapping.
@@ -3274,18 +3685,22 @@ bool Mesh::generate_vertex_normals(std::uint32_t* adjacency_ptr, UInt32Array* re
 			// If the normal we are about to store is significantly different from any normal
 			// already stored in this vertex (excepting the case where it is <0,0,0>), we need
 			// to split the vertex into two.
-			math::vec3* ref_normal_ptr = (math::vec3*)(src_vertices_ptr + (index * vertex_stride) + normal_offset);
-			if (ref_normal_ptr->x == 0.0f && ref_normal_ptr->y == 0.0f && ref_normal_ptr->z == 0.0f)
+			float fn[4];
+			gfx::vertexUnpack(fn, gfx::Attrib::Normal, _vertex_format, src_vertices_ptr, index);
+			math::vec3 ref_normal;
+			ref_normal[0] = fn[0];
+			ref_normal[1] = fn[1];
+			ref_normal[2] = fn[2];
+			if (ref_normal.x == 0.0f && ref_normal.y == 0.0f && ref_normal.z == 0.0f)
 			{
-				*ref_normal_ptr = vec_normal;
-
+				gfx::vertexPack(math::value_ptr(vec_normal), true, gfx::Attrib::Normal, _vertex_format, src_vertices_ptr, index);
 			} // End if no normal stored here yet
 			else
 			{
 				// Split and store in a new vertex if it is different (enough)
-				if (math::abs(ref_normal_ptr->x - vec_normal.x) >= 1e-3f ||
-					math::abs(ref_normal_ptr->y - vec_normal.y) >= 1e-3f ||
-					math::abs(ref_normal_ptr->z - vec_normal.z) >= 1e-3f)
+				if (math::abs(ref_normal.x - vec_normal.x) >= 1e-3f ||
+					math::abs(ref_normal.y - vec_normal.y) >= 1e-3f ||
+					math::abs(ref_normal.z - vec_normal.z) >= 1e-3f)
 				{
 					// Make room for new vertex data.
 					_preparation_data.vertex_data.resize(_preparation_data.vertex_data.size() + vertex_stride);
@@ -3310,8 +3725,7 @@ bool Mesh::generate_vertex_normals(std::uint32_t* adjacency_ptr, UInt32Array* re
 					// Store the new normal and finally record the fact that we have
 					// added a new vertex.
 					index = _preparation_data.vertex_count++;
-					ref_normal_ptr = (math::vec3*)(src_vertices_ptr + (index * vertex_stride) + normal_offset);
-					*ref_normal_ptr = vec_normal;
+					gfx::vertexPack(math::value_ptr(vec_normal), true, gfx::Attrib::Normal, _vertex_format, src_vertices_ptr, index);
 
 					// Update the index
 					tri.indices[j] = index;
@@ -3364,7 +3778,7 @@ bool Mesh::generate_vertex_tangents()
 	if (!_force_tangent_generation && !requires_bitangents && !requires_tangents)
 		return true;
 
-	// Allocate storage space for the tangent and binormal vectors
+	// Allocate storage space for the tangent and bitangent vectors
 	// that we will effectively need to average for shared vertices.
 	num_faces = _preparation_data.triangle_count;
 	num_verts = _preparation_data.vertex_count;
@@ -3446,7 +3860,7 @@ bool Mesh::generate_vertex_tangents()
 		B.y = r * (s1 * Q.y - s2 * P.y);
 		B.z = r * (s1 * Q.z - s2 * P.z);
 
-		// Add the tangent and binormal vectors (summed average) to
+		// Add the tangent and bitangent vectors (summed average) to
 		// any previous values computed for each vertex.
 		tangents[i1] += T;
 		tangents[i2] += T;
@@ -3460,7 +3874,7 @@ bool Mesh::generate_vertex_tangents()
 	  // Generate final tangent vectors 
 	for (i = 0; i < num_verts; i++, src_vertices_ptr += vertex_stride)
 	{
-		// Skip if the original imported data already provided a binormal / tangent.
+		// Skip if the original imported data already provided a bitangent / tangent.
 		bool has_bitangent = ((_preparation_data.vertex_flags[i] & PreparationData::SourceContainsBinormal) != 0);
 		bool has_tangent = ((_preparation_data.vertex_flags[i] & PreparationData::SourceContainsTangent) != 0);
 		if (!_force_tangent_generation && has_bitangent && has_tangent)
@@ -3482,20 +3896,20 @@ bool Mesh::generate_vertex_tangents()
 		if (_force_tangent_generation || (!has_tangent && requires_tangents))
 			gfx::vertexPack(&math::vec4(T, 1.0f)[0], true, gfx::Attrib::Tangent, _vertex_format, src_vertices_ptr);
 
-		// Compute and store binormal if required
+		// Compute and store bitangent if required
 		if (_force_tangent_generation || (!has_bitangent && requires_bitangents))
 		{
-			// Calculate the new orthogonal binormal
+			// Calculate the new orthogonal bitangent
 			B = math::cross(normal_vec, T);
 			B = math::normalize(B);
 
-			// Compute the "handedness" of the tangent and binormal. This
+			// Compute the "handedness" of the tangent and bitangent. This
 			// ensures the inverted / mirrored texture coordinates still have
 			// an accurate matrix.
 			cross_vec = math::cross(normal_vec, T);
 			if (math::dot(cross_vec, bitangents[i]) < 0.0f)
 			{
-				// Flip the binormal
+				// Flip the bitangent
 				B = -B;
 
 			} // End if coordinates inverted
@@ -3503,7 +3917,7 @@ bool Mesh::generate_vertex_tangents()
 			  // Store.
 			gfx::vertexPack(&math::vec4(B, 1.0f)[0], true, gfx::Attrib::Bitangent, _vertex_format, src_vertices_ptr);
 
-		} // End if requires binormal   
+		} // End if requires bitangent   
 
 	} // Next vertex
 

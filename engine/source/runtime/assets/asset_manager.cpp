@@ -47,6 +47,79 @@ namespace runtime
 				mesh->create_cube(gfx::MeshVertex::decl, 10.0f, 0.01f, 10.0f, 1, 1, 1, false, MeshCreateOrigin::Center);
 				request.set_data(id, mesh);
 			}
+			{
+				auto id = "embedded:/cylinder";
+				auto& request = find_or_create_asset_entry<Mesh>(id);
+				auto mesh = std::make_shared<Mesh>();
+				mesh->create_cylinder(gfx::MeshVertex::decl, 0.5f, 2.0f, 20, 20, false, MeshCreateOrigin::Center);
+				request.set_data(id, mesh);
+			}
+			{
+				auto id = "embedded:/capsule";
+				auto& request = find_or_create_asset_entry<Mesh>(id);
+				auto mesh = std::make_shared<Mesh>();
+				mesh->create_capsule(gfx::MeshVertex::decl, 0.5f, 2.0f, 20, 20, false, MeshCreateOrigin::Center);
+				request.set_data(id, mesh);
+			}
+			{
+				auto id = "embedded:/cone";
+				auto& request = find_or_create_asset_entry<Mesh>(id);
+				auto mesh = std::make_shared<Mesh>();
+				mesh->create_cone(gfx::MeshVertex::decl, 0.5f, 0.0f, 2, 20, 20, false, MeshCreateOrigin::Bottom);
+				request.set_data(id, mesh);
+			}
+			{
+				auto id = "embedded:/torus";
+				auto& request = find_or_create_asset_entry<Mesh>(id);
+				auto mesh = std::make_shared<Mesh>();
+				mesh->create_torus(gfx::MeshVertex::decl, 1.0f, 0.5f, 20, 20, false, MeshCreateOrigin::Center);
+				request.set_data(id, mesh);
+			}
+			{
+				auto id = "embedded:/teapot";
+				auto& request = find_or_create_asset_entry<Mesh>(id);
+				auto mesh = std::make_shared<Mesh>();
+				mesh->create_teapot(gfx::MeshVertex::decl);
+				request.set_data(id, mesh);
+			}
+			{
+				auto id = "embedded:/tetrahedron";
+				auto& request = find_or_create_asset_entry<Mesh>(id);
+				auto mesh = std::make_shared<Mesh>();
+				mesh->create_tetrahedron(gfx::MeshVertex::decl);
+				request.set_data(id, mesh);
+			}
+			{
+				auto id = "embedded:/octahedron";
+				auto& request = find_or_create_asset_entry<Mesh>(id);
+				auto mesh = std::make_shared<Mesh>();
+				mesh->create_octahedron(gfx::MeshVertex::decl);
+				request.set_data(id, mesh);
+			}
+			{
+				auto id = "embedded:/icosahedron";
+				auto& request = find_or_create_asset_entry<Mesh>(id);
+				auto mesh = std::make_shared<Mesh>();
+				mesh->create_icosahedron(gfx::MeshVertex::decl);
+				request.set_data(id, mesh);
+			}
+			{
+				auto id = "embedded:/dodecahedron";
+				auto& request = find_or_create_asset_entry<Mesh>(id);
+				auto mesh = std::make_shared<Mesh>();
+				mesh->create_dodecahedron(gfx::MeshVertex::decl);
+				request.set_data(id, mesh);
+			}
+
+			for(int i = 0; i < 6; ++i)
+			{
+				auto id = std::string("embedded:/icosphere") + std::to_string(i);
+				auto& request = find_or_create_asset_entry<Mesh>(id);
+				auto mesh = std::make_shared<Mesh>();
+				mesh->create_icosphere(gfx::MeshVertex::decl, i);
+				request.set_data(id, mesh);
+			}
+			
 		}
 		{
 			auto storage = add<Material>();

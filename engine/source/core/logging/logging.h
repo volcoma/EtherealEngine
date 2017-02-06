@@ -42,4 +42,12 @@ namespace spdlog
 namespace logging
 {
 	using namespace spdlog;
+
+#define APPLOG "Log"
+#define APPLOG_INFO(...) spdlog::get("Log")->info().write(__VA_ARGS__)
+#define APPLOG_TRACE(...) spdlog::get("Log")->trace().write(__VA_ARGS__)
+#define APPLOG_ERROR(...) spdlog::get("Log")->error().write(__VA_ARGS__)
+#define APPLOG_WARNING(...) spdlog::get("Log")->warn().write(__VA_ARGS__)
+#define APPLOG_NOTICE(...) spdlog::get("Log")->notice().write(__VA_ARGS__)
+
 }

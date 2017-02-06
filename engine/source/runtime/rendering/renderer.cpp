@@ -14,15 +14,12 @@ struct GfxCallback : public gfx::CallbackI
 
 	virtual void traceVargs(const char* _filePath, std::uint16_t _line, const char* _format, std::va_list _argList) BX_OVERRIDE
 	{
-		auto logger = logging::get("Log");
-		logger->trace() << string_utils::format(_format, _argList).c_str();
+		APPLOG_TRACE(string_utils::format(_format, _argList).c_str());
 	}
 
 	virtual void fatal(gfx::Fatal::Enum _code, const char* _str) BX_OVERRIDE
 	{
-		auto logger = logging::get("Log");
-
-		logger->error() << _str;
+		APPLOG_ERROR(_str);
 	}
 
 	virtual uint32_t cacheReadSize(uint64_t /*_id*/) BX_OVERRIDE

@@ -38,6 +38,7 @@
     <ClCompile Include="..\..\source\runtime\rendering\camera.cpp" />
     <ClCompile Include="..\..\source\runtime\rendering\debugdraw\bounds.cpp" />
     <ClCompile Include="..\..\source\runtime\rendering\debugdraw\debugdraw.cpp" />
+    <ClCompile Include="..\..\source\runtime\rendering\mesh_tools.cpp" />
     <ClCompile Include="..\..\source\runtime\rendering\index_buffer.cpp" />
     <ClCompile Include="..\..\source\runtime\rendering\light.cpp" />
     <ClCompile Include="..\..\source\runtime\rendering\material.cpp" />
@@ -126,6 +127,7 @@
     <ClInclude Include="..\..\source\runtime\rendering\debugdraw\vs_debugdraw_lines.bin.h" />
     <ClInclude Include="..\..\source\runtime\rendering\debugdraw\vs_debugdraw_lines_stipple.bin.h" />
     <ClInclude Include="..\..\source\runtime\rendering\frame_buffer.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\mesh_tools.h" />
     <ClInclude Include="..\..\source\runtime\rendering\index_buffer.h" />
     <ClInclude Include="..\..\source\runtime\rendering\light.h" />
     <ClInclude Include="..\..\source\runtime\rendering\material.h" />

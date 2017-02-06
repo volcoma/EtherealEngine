@@ -17,11 +17,11 @@
 #include "mesh_importer.h"
 #include "runtime/meta/rendering/mesh.hpp"
 
-void ShaderCompiler::compile(const fs::path& absoluteKey)
+void ShaderCompiler::compile(const fs::path& absolute_key)
 {
-	std::string strInput = absoluteKey.string();
-	std::string file = absoluteKey.stem().string();
-	fs::path dir = absoluteKey.parent_path();
+	std::string str_input = absolute_key.string();
+	std::string file = absolute_key.stem().string();
+	fs::path dir = absolute_key.parent_path();
 	fs::path output = dir / fs::path(file + extensions::shader);
 
 	std::array<gfx::RendererType::Enum, 4> supported =
@@ -38,23 +38,23 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 
 	std::unordered_map<gfx::RendererType::Enum, fs::byte_array_t> binaries;
 	binaries.reserve(4);
-	std::string strOutput = output.string();
+	std::string str_output = output.string();
 	for (auto& platform : supported)
 	{
 		static const int arg_count = 16;
 		const char* args_array[arg_count];
 		args_array[0] = "-f";
-		args_array[1] = strInput.c_str();
+		args_array[1] = str_input.c_str();
 		args_array[2] = "-o";
-		args_array[3] = strOutput.c_str();
+		args_array[3] = str_output.c_str();
 		args_array[4] = "-i";
 		fs::path include = fs::resolve_protocol("engine_data:/shaders");
-		std::string strInclude = include.string();
-		args_array[5] = strInclude.c_str();
+		std::string str_include = include.string();
+		args_array[5] = str_include.c_str();
 		args_array[6] = "--varyingdef";
 		fs::path varying = dir / (file + ".io");
-		std::string strVarying = varying.string();
-		args_array[7] = strVarying.c_str();
+		std::string str_varying = varying.string();
+		args_array[7] = str_varying.c_str();
 		args_array[8] = "--platform";
 
 		if(platform == gfx::RendererType::Direct3D9)
@@ -106,10 +106,8 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 		args_array[14] = "-O";
 		args_array[15] = "3";
 
-		auto logger = logging::get("Log");
-		
 		bx::CrtAllocator allocator;
-		bx::MemoryBlock memBlock(&allocator);
+		bx::MemoryBlock mem_block(&allocator);
 		int64_t sz;
 		std::string err;
 		int result = 0;
@@ -118,22 +116,22 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 			//glsl shader compilation is not thread safe-
 			static std::mutex mtx;
 			std::lock_guard<std::mutex> lock(mtx);
-			result = compile_shader(arg_count, args_array, memBlock, sz, err);
+			result = compile_shader(arg_count, args_array, mem_block, sz, err);
 		}
 		else
 		{
-			result = compile_shader(arg_count, args_array, memBlock, sz, err);
+			result = compile_shader(arg_count, args_array, mem_block, sz, err);
 		}
 
 		if (result != 0)
 		{
-			logger->error().write("Failed compilation of {0} for {1} with error \n{2}", strInput, gfx::getRendererName(platform), err);
+			APPLOG_ERROR("Failed compilation of {0} for {1} with error \n{2}", str_input, gfx::getRendererName(platform), err);
 			continue;
 		}
 
 		if (sz > 0)
 		{
-			auto buf = (char*)memBlock.more();
+			auto buf = (char*)mem_block.more();
 			auto length = sz;
 			fs::byte_array_t vec;
 			std::copy(buf, buf + length, std::back_inserter(vec));
@@ -153,26 +151,25 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 }
 
 
-void TextureCompiler::compile(const fs::path& absoluteKey)
+void TextureCompiler::compile(const fs::path& absolute_key)
 {
-	auto logger = logging::get("Log");
-	std::string strInput = absoluteKey.string();
-	std::string raw_ext = absoluteKey.filename().extension().string();
-	std::string file = absoluteKey.stem().string();
-	fs::path output = absoluteKey.parent_path();
+	std::string str_input = absolute_key.string();
+	std::string raw_ext = absolute_key.filename().extension().string();
+	std::string file = absolute_key.stem().string();
+	fs::path output = absolute_key.parent_path();
 	output /= fs::path(file + extensions::texture);
 
-	std::string strOutput = output.string();
+	std::string str_output = output.string();
 
 	if (raw_ext == ".dds" || raw_ext == ".pvr" || raw_ext == ".ktx")
 	{
-		if (!fs::copy_file(strInput, strOutput, fs::copy_options::overwrite_existing, std::error_code{}))
+		if (!fs::copy_file(str_input, str_output, fs::copy_options::overwrite_existing, std::error_code{}))
 		{
-			logger->error().write("Failed compilation of {0}", strInput);
+			APPLOG_ERROR("Failed compilation of {0}", str_input);
 		}
 		else
 		{
-			fs::last_write_time(strOutput, fs::file_time_type::clock::now(), std::error_code{});
+			fs::last_write_time(str_output, fs::file_time_type::clock::now(), std::error_code{});
 		}
 		return;
 	}
@@ -181,30 +178,30 @@ void TextureCompiler::compile(const fs::path& absoluteKey)
 	static const int arg_count = 5;
 	const char* args_array[arg_count];
 	args_array[0] = "-f";
-	args_array[1] = strInput.c_str();
+	args_array[1] = str_input.c_str();
 	args_array[2] = "-o";
-	args_array[3] = strOutput.c_str();
+	args_array[3] = str_output.c_str();
 	args_array[4] = "-m";
-
-	
 
 	if (compile_texture(arg_count, args_array) != 0)
 	{
-		logger->error().write("Failed compilation of {0}", strInput);
+		APPLOG_ERROR("Failed compilation of {0}", str_input);
 	}
 }
 
-
-
-void MeshCompiler::compile(const fs::path& absoluteKey)
+void MeshCompiler::compile(const fs::path& absolute_key)
 {
-	std::string strInput = absoluteKey.string();
-	std::string file = absoluteKey.stem().string();
-	fs::path dir = absoluteKey.parent_path();
+	std::string str_input = absolute_key.string();
+	std::string file = absolute_key.stem().string();
+	fs::path dir = absolute_key.parent_path();
 	fs::path output = dir / fs::path(file + extensions::mesh);
 
 	Mesh::LoadData data;
-	importer::load_mesh_data_from_file(strInput, data);
+	if (!importer::load_mesh_data_from_file(str_input, data))
+	{
+		APPLOG_ERROR("Failed compilation of {0}", str_input);
+		return;
+	}
 
 	fs::path entry = dir / fs::path(file + ".buildtemp");
 	{

@@ -10,7 +10,7 @@ runtime::CHandle<TransformComponent> create_from_component(runtime::CHandle<Tran
 		auto entity = ecs->create_from_copy(component.lock()->get_entity());
 		return entity.component<TransformComponent>();
 	}
-	logging::get("Log")->error("trying to clone a null component");
+	APPLOG_ERROR("trying to clone a null component");
 	return runtime::CHandle<TransformComponent>();
 }
 
