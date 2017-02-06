@@ -136,7 +136,7 @@ void Model::render(std::uint8_t id, const math::transform_t& mtx, bool apply_cul
 		AssetHandle<Material> mat = get_material_for_group(group_id);
 		if (mat)
 		{
-			mat->skinned = false;
+			mat->skinned = skinned;
 			if (!user_program)
 			{
 				program = mat->get_program();
@@ -175,7 +175,7 @@ void Model::render(std::uint8_t id, const math::transform_t& mtx, bool apply_cul
 	const auto& skin_data = mesh->get_skin_bind_data();
 
 	// Has skinning data?
-	if (skin_data.has_bones())
+	if (false)// skin_data.has_bones())
 	{
 		// Build an array containing all of the bones that are required
 		// by the binding data in the skinned mesh.
