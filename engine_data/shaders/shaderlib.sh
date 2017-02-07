@@ -39,16 +39,6 @@ vec3 decodeRGBE8(vec4 _rgbe8)
 	return rgb;
 }
 
-vec3 encodeSpecularColor(vec3 SpecularColor)
-{
-	// Allocate more precision to the darks, which is necessary with bright specular lighting and strong Fresnel
-	return sqrt(saturate(SpecularColor));
-}
-
-vec3 decodeSpecularColor(vec3 SpecularColor)
-{
-	return SpecularColor*SpecularColor;
-}
 
 vec3 encodeNormalUint(vec3 _normal)
 {
@@ -58,17 +48,6 @@ vec3 encodeNormalUint(vec3 _normal)
 vec3 decodeNormalUint(vec3 _encodedNormal)
 {
 	return _encodedNormal * 2.0 - 1.0;
-}
-
-vec2 encodeNormalSphereMap(vec3 _normal)
-{
-	return normalize(_normal.xy) * sqrt(_normal.z * 0.5 + 0.5);
-}
-
-vec3 decodeNormalSphereMap(vec2 _encodedNormal)
-{
-	float zz = dot(_encodedNormal, _encodedNormal) * 2.0 - 1.0;
-	return vec3(normalize(_encodedNormal.xy) * sqrt(1.0 - zz*zz), zz);
 }
 
 vec2 octahedronWrap(vec2 _val)

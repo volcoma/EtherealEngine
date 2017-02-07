@@ -14,10 +14,13 @@ struct GBufferData
 	float depth;
 };
 
+
+
 void encodeGBuffer(in GBufferData data, inout vec4 result[4])
 {
 	result[0] = vec4(data.base_color, data.ambient_occlusion);
-	result[1] = vec4(encodeNormalUint(data.world_normal), data.roughness);
+	result[1] = vec4(encodeNormalOctahedron(data.world_normal), 0.0f, data.roughness);
+	//result[1] = vec4(encodeNormalUint(data.world_normal), data.roughness);
 	result[2] = vec4(data.emissive_color, data.metalness);
 	result[3] = vec4(data.subsurface_color, data.subsurface_opacity);
 }
@@ -34,7 +37,8 @@ GBufferData decodeGBuffer(vec2 texcoord, sampler2D tex0, sampler2D tex1, sampler
 
 	data.base_color = data0.xyz;
 	data.ambient_occlusion = data0.w;
-	data.world_normal = decodeNormalUint(data1.xyz);
+	data.world_normal = decodeNormalOctahedron(data1.xy);
+	//data.world_normal = decodeNormalUint(data1.xyz);
 	data.roughness = data1.w;
 	data.emissive_color = data2.xyz;
 	data.metalness = data2.w;

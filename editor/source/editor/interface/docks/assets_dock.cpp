@@ -200,28 +200,12 @@ int list_item(Wrapper& entry, const std::string& name, const std::string& relati
 
 	if (gui::IsItemHoveredRect())
 	{
-		auto& dragged = edit_state.drag_data.object;
-		if (is_directory && dragged)
-		{
-			if(dragged.is_type<AssetHandle<Texture>>() ||
-			dragged.is_type<AssetHandle<Mesh>>() ||
-			dragged.is_type<AssetHandle<Shader>>() ||
-			dragged.is_type<AssetHandle<Material>>() ||
-			dragged.is_type<AssetHandle<Prefab>>() ||
-			dragged.is_type<AssetHandle<Scene>>())
-			{
-				gui::SetMouseCursor(ImGuiMouseCursor_Move);
-			}
-		}
-
 		if (gui::IsMouseClicked(gui::drag_button) && !edit_state.drag_data.object)
 		{
 			edit_state.drag(entry, relative);
 		}
 	}
-	
-
-	
+		
 	gui::PopID();
 	gui::SameLine();
 
