@@ -54,9 +54,9 @@ private:
 [LINK](LICENSE.md)
 
 ## PREVIEW
-![preview](https://cloud.githubusercontent.com/assets/1499411/19988985/2a302204-a22c-11e6-98af-5f446d0c79ac.png)
+![proceduralsky](https://cloud.githubusercontent.com/assets/1499411/22755670/d6cf794e-ee4c-11e6-92cd-e29ae30eefc8.png)
 
-![preview1](https://cloud.githubusercontent.com/assets/1499411/19989003/40535d44-a22c-11e6-9aa8-a1ddd63df18a.png)
+![proceduralsky1](https://cloud.githubusercontent.com/assets/1499411/22755669/d6cd60fa-ee4c-11e6-9ff2-ebf0e3535e39.png)
 
 ![preview5](https://cloud.githubusercontent.com/assets/1499411/22198936/6a085efe-e161-11e6-8d76-3ba179e7c76b.png)
 
