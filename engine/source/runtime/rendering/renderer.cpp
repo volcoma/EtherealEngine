@@ -85,7 +85,7 @@ namespace runtime
 		gfx::setPlatformData(pd);
 
 		static GfxCallback callback;
-		if (!gfx::init(gfx::RendererType::OpenGL, 0, 0, &callback))
+		if (!gfx::init(gfx::RendererType::Count, 0, 0, &callback))
 			return false;
 
 		if (gfx::getRendererType() == gfx::RendererType::Direct3D9)
