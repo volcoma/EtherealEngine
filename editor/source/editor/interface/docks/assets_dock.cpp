@@ -6,6 +6,7 @@
 #include "runtime/assets/asset_manager.h"
 #include "runtime/assets/asset_extensions.h"
 #include "runtime/system/filesystem.h"
+#include "runtime/system/filesystem_watcher.hpp"
 #include "runtime/ecs/prefab.h"
 #include "runtime/ecs/scene.h"
 #include "runtime/ecs/utils.h"
@@ -128,6 +129,10 @@ int list_item(Wrapper& entry, const std::string& name, const std::string& relati
 			}
 			edit_state.unselect();
 		}
+// 		if (input.is_key_pressed(sf::Keyboard::R))
+// 		{
+// 			fs::watcher::touch(absolute);
+// 		}
 	}
 
 	bool loading = !entry;
@@ -204,7 +209,9 @@ int list_item(Wrapper& entry, const std::string& name, const std::string& relati
 		{
 			edit_state.drag(entry, relative);
 		}
+
 	}
+
 		
 	gui::PopID();
 	gui::SameLine();
@@ -332,7 +339,6 @@ void list_dir(editor::AssetFolder* dir)
 	
 	if (gui::BeginPopupContextWindow())
 	{
-
 		if (gui::BeginMenu("Create"))
 		{
 			if (gui::MenuItem("Folder"))
@@ -372,7 +378,7 @@ void list_dir(editor::AssetFolder* dir)
 
 		gui::EndPopup();
 	}
-
+	
 }
 
 namespace Docks

@@ -376,7 +376,7 @@ namespace bgfx
 
 	void printCode(std::string& err, const char* _code, int32_t _line, int32_t _start, int32_t _end, int32_t _column)
 	{
-		//bx::stringPrintf(err, "Code:\n---\n");
+		bx::stringPrintf(err, "Code:\n---\n");
 		fprintf(stderr, "Code:\n---\n");
 
 		LineReader lr(_code);
@@ -386,21 +386,21 @@ namespace bgfx
 			{
 				if (_line == line)
 				{
-					//bx::stringPrintf(err, "\n");
+					bx::stringPrintf(err, "\n");
 					fprintf(stderr, "\n");
-					//bx::stringPrintf(err, ">>> %3d: %s", line, lr.getLine().c_str());
+					bx::stringPrintf(err, ">>> %3d: %s", line, lr.getLine().c_str());
 					fprintf(stderr, ">>> %3d: %s", line, lr.getLine().c_str() );
 					if (-1 != _column)
 					{
-						//bx::stringPrintf(err, ">>> %3d: %*s\n", _column, _column, "^");
+						bx::stringPrintf(err, ">>> %3d: %*s\n", _column, _column, "^");
 						fprintf(stderr, ">>> %3d: %*s\n", _column, _column, "^");
 					}
-					//bx::stringPrintf(err, "\n");
+					bx::stringPrintf(err, "\n");
 					fprintf(stderr, "\n");
 				}
 				else
 				{
-					//bx::stringPrintf(err, "    %3d: %s", line, lr.getLine().c_str());
+					bx::stringPrintf(err, "    %3d: %s", line, lr.getLine().c_str());
 					fprintf(stderr, "    %3d: %s", line, lr.getLine().c_str() );
 				}
 			}
@@ -410,7 +410,7 @@ namespace bgfx
 			}
 		}
 
-		//bx::stringPrintf(err, "---\n");
+		bx::stringPrintf(err, "---\n");
 		fprintf(stderr, "---\n");
 	}
 

@@ -51,7 +51,10 @@ namespace runtime
 	{
 		auto renderer = core::add_subsystem<Renderer>();
 		if (!renderer->init_backend(*main_window))
+		{
+			APPLOG_ERROR("Could not initialize rendering backend!");
 			return false;
+		}
 		register_window(main_window);
 		core::add_subsystem<Input>();
 		core::add_subsystem<AssetManager>();

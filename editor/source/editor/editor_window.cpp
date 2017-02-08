@@ -144,7 +144,10 @@ void save_scene_as()
 	std::string path;
 	if (save_file_dialog(extensions::scene.substr(1), fs::resolve_protocol("app:/data").string(), path))
 	{
-		es->scene = path + extensions::scene;
+		es->scene = path;	
+		if(!fs::path(path).has_extension())
+			es->scene += extensions::scene;
+
 		save_scene();	
 	}
 

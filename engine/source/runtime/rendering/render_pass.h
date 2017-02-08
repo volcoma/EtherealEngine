@@ -60,7 +60,7 @@ struct RenderPass
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void set_view_proj(const math::transform_t& v, const math::transform_t& p);
-	void set_view_proj_ortho_full();
+	void set_view_proj_ortho_full(float depth);
 	//-----------------------------------------------------------------------------
 	//  Name : reset ()
 	/// <summary>

@@ -94,7 +94,8 @@ namespace gfx
 		return initted;
 	}	
 
-	void screen_quad(float dest_width, float dest_height, float width = 1.0f, float height = 1.0f);
+	std::uint64_t screen_quad(float dest_width, float dest_height, float depth = 0.0f, float width = 1.0f, float height = 1.0f);
+	std::uint64_t clip_quad(float depth = 0.0f, float width = 1.0f, float height = 1.0f);
 }
 
 

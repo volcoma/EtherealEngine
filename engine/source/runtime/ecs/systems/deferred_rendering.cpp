@@ -56,8 +56,9 @@ namespace runtime
 
 			output = lighting_pass(output, camera_comp, dt);
 
-			output = tonemapping_pass(output, camera_comp);
+			output = atmospherics_pass(output, camera_comp, dt);
 
+			output = tonemapping_pass(output, camera_comp);
 		});
 	}
 
@@ -208,8 +209,8 @@ namespace runtime
 
 		RenderPass light_pass("light_buffer_fill");
 		light_pass.bind(light_buffer.get());
-		light_pass.clear();
-		light_pass.set_view_proj_ortho_full();
+		light_pass.clear(BGFX_CLEAR_COLOR, 0, 0.0f, 0);
+		light_pass.set_view_proj_ortho_full(1.0f);
 
 		ecs->each<TransformComponent, LightComponent>([this, &camera, &light_pass, &light_buffer_size, &view, &proj, &inv_view_proj, g_buffer](
 			Entity e,
@@ -249,14 +250,15 @@ namespace runtime
 				_directional_light_program->set_texture(4, "s_tex4", gfx::getTexture(g_buffer->handle, 4));
 
 				gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
-				gfx::setState(0
+				auto topology = gfx::screen_quad((float)light_buffer_size.width, (float)light_buffer_size.height, 1.0f);			
+				gfx::setState(topology
 					| BGFX_STATE_RGB_WRITE
 					| BGFX_STATE_ALPHA_WRITE
 					| BGFX_STATE_BLEND_ADD
 				);
 
-				gfx::screen_quad((float)light_buffer_size.width, (float)light_buffer_size.height);
 				gfx::submit(light_pass.id, _directional_light_program->handle);
+				gfx::setState(BGFX_STATE_DEFAULT);
 			}
 			if (light.light_type == LightType::Point && _point_light_program)
 			{
@@ -291,14 +293,14 @@ namespace runtime
 				_point_light_program->set_texture(4, "s_tex4", gfx::getTexture(g_buffer->handle, 4));
 
 				gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
-				gfx::setState(0
+				auto topology = gfx::screen_quad((float)light_buffer_size.width, (float)light_buffer_size.height, 1.0f);
+				gfx::setState(topology
 					| BGFX_STATE_RGB_WRITE
 					| BGFX_STATE_ALPHA_WRITE
 					| BGFX_STATE_BLEND_ADD
 				);
-				gfx::screen_quad((float)light_buffer_size.width, (float)light_buffer_size.height);
 				gfx::submit(light_pass.id, _point_light_program->handle);
-
+				gfx::setState(BGFX_STATE_DEFAULT);
 			}
 
 			if (light.light_type == LightType::Spot && _spot_light_program)
@@ -335,18 +337,76 @@ namespace runtime
 				_spot_light_program->set_texture(4, "s_tex4", gfx::getTexture(g_buffer->handle, 4));
 
 				gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
-				gfx::setState(0
+				auto topology = gfx::screen_quad((float)light_buffer_size.width, (float)light_buffer_size.height, 1.0f);
+				gfx::setState(topology
 					| BGFX_STATE_RGB_WRITE
 					| BGFX_STATE_ALPHA_WRITE
 					| BGFX_STATE_BLEND_ADD
 				);
-
-				gfx::screen_quad((float)light_buffer_size.width, (float)light_buffer_size.height);
 				gfx::submit(light_pass.id, _spot_light_program->handle);
+				gfx::setState(BGFX_STATE_DEFAULT);
 			}
 		});
 
 		return light_buffer;
+	}
+
+	std::shared_ptr<FrameBuffer> DeferredRendering::atmospherics_pass(
+		std::shared_ptr<FrameBuffer> input,
+		CameraComponent& camera_comp,
+		std::chrono::duration<float> dt)
+	{
+		auto ecs = core::get_subsystem<EntityComponentSystem>();
+		input = camera_comp.get_light_buffer_with_depth();
+		auto& camera = camera_comp.get_camera();
+		const auto& view = camera.get_view();
+		const auto& proj = camera.get_projection();
+		const auto surface = input.get();
+		const auto output_size = surface->get_size();
+		RenderPass pass("atmospherics_fill");
+		pass.bind(surface);
+		pass.set_view_proj(view, proj);
+
+		if (surface && _atmospherics_program)
+		{
+			ecs->each<TransformComponent, LightComponent>([this, &output_size, &pass, &camera](
+				Entity e,
+				TransformComponent& transform_comp_ref,
+				LightComponent& light_comp_ref
+				)
+			{
+				auto& light = light_comp_ref.get_light();
+				const auto& world_transform = transform_comp_ref.get_transform();
+				const auto& light_direction = world_transform.z_unit_axis();
+
+				if (light.light_type == LightType::Directional)
+				{
+					float u_camera_data[4] =
+					{
+						camera.get_near_clip(),
+						camera.get_far_clip(),
+						0.0f,
+						0.0f,
+					};
+
+					_atmospherics_program->begin_pass();
+					_atmospherics_program->set_uniform("u_light_direction", &light_direction);
+					_atmospherics_program->set_uniform("u_camera_data", u_camera_data);
+
+					auto topology = gfx::clip_quad(1.0f);
+					gfx::setState(topology
+						| BGFX_STATE_RGB_WRITE
+						| BGFX_STATE_ALPHA_WRITE
+						| BGFX_STATE_DEPTH_TEST_LEQUAL
+						| BGFX_STATE_BLEND_ADD
+					);
+					gfx::submit(pass.id, _atmospherics_program->handle);
+					gfx::setState(BGFX_STATE_DEFAULT);
+				}
+			});
+		}
+
+		return input;
 	}
 
 	std::shared_ptr<FrameBuffer> DeferredRendering::tonemapping_pass(
@@ -358,24 +418,25 @@ namespace runtime
 
 		const auto surface = camera_comp.get_output_buffer().get();
 		const auto output_size = surface->get_size();
+		auto& camera = camera_comp.get_camera();
 		RenderPass pass_blit("output_buffer_fill");
 		pass_blit.bind(surface);
-		pass_blit.set_view_proj_ortho_full();
+		pass_blit.set_view_proj_ortho_full(1.0f);
 
 		if (surface && _gamma_correction_program)
 		{
 			_gamma_correction_program->begin_pass();
 			_gamma_correction_program->set_texture(0, "s_input", gfx::getTexture(input->handle));
-
-			gfx::setState(0
+			auto topology = gfx::screen_quad((float)output_size.width, (float)output_size.height, 1.0f);
+			gfx::setState(topology
 				| BGFX_STATE_RGB_WRITE
 				| BGFX_STATE_ALPHA_WRITE
 			);
-			gfx::screen_quad((float)output_size.width, (float)output_size.height);
 			gfx::submit(pass_blit.id, _gamma_correction_program->handle);
+			gfx::setState(BGFX_STATE_DEFAULT);
 		}
 
-		return nullptr;
+		return camera_comp.get_output_buffer();
 	}
 
 	void DeferredRendering::receive(Entity e)
@@ -392,7 +453,7 @@ namespace runtime
 		on_frame_render.connect(this, &DeferredRendering::frame_render);
 
 		auto am = core::get_subsystem<runtime::AssetManager>();
-		am->load<Shader>("engine_data:/shaders/vs_deferred_point_light", false)
+		am->load<Shader>("engine_data:/shaders/vs_screen_quad", false)
 			.then([this, am](auto vs)
 		{
 			am->load<Shader>("engine_data:/shaders/fs_deferred_point_light", false)
@@ -402,7 +463,7 @@ namespace runtime
 			});
 		});
 
-		am->load<Shader>("engine_data:/shaders/vs_deferred_spot_light", false)
+		am->load<Shader>("engine_data:/shaders/vs_screen_quad", false)
 			.then([this, am](auto vs)
 		{
 			am->load<Shader>("engine_data:/shaders/fs_deferred_spot_light", false)
@@ -412,7 +473,7 @@ namespace runtime
 			});
 		});
 
-		am->load<Shader>("engine_data:/shaders/vs_deferred_directional_light", false)
+		am->load<Shader>("engine_data:/shaders/vs_screen_quad", false)
 			.then([this, am](auto vs)
 		{
 			am->load<Shader>("engine_data:/shaders/fs_deferred_directional_light", false)
@@ -422,13 +483,23 @@ namespace runtime
 			});
 		});
 
-		am->load<Shader>("engine_data:/shaders/vs_gamma_correction", false)
+		am->load<Shader>("engine_data:/shaders/vs_screen_quad", false)
 			.then([this, am](auto vs)
 		{
 			am->load<Shader>("engine_data:/shaders/fs_gamma_correction", false)
 				.then([this, vs](auto fs)
 			{
 				_gamma_correction_program = std::make_unique<Program>(vs, fs);
+			});
+		});
+
+		am->load<Shader>("engine_data:/shaders/vs_atmospherics", false)
+			.then([this, am](auto vs)
+		{
+			am->load<Shader>("engine_data:/shaders/fs_atmospherics", false)
+				.then([this, vs](auto fs)
+			{
+				_atmospherics_program = std::make_unique<Program>(vs, fs);
 			});
 		});
 

@@ -28,7 +28,10 @@ namespace runtime
 		
 
 		if(!engine->start(main_window))
+		{
 			_exitcode = -1;
+			return;
+		}
 	}
 
 	void App::stop()
@@ -43,11 +46,17 @@ namespace runtime
 
 		setup();
 		if (_exitcode != 0)
+		{
+			core::details::dispose();
 			return _exitcode;
+		}
 
 		start();
 		if (_exitcode != 0)
+		{
+			core::details::dispose();
 			return _exitcode;
+		}
 
 		auto engine = core::get_subsystem<Engine>();
 		while (engine->is_running())

@@ -85,8 +85,14 @@ namespace runtime
 		gfx::setPlatformData(pd);
 
 		static GfxCallback callback;
-		if (!gfx::init(gfx::RendererType::Count, 0, 0, &callback))
+		if (!gfx::init(gfx::RendererType::OpenGL, 0, 0, &callback))
 			return false;
+
+		if (gfx::getRendererType() == gfx::RendererType::Direct3D9)
+		{
+			APPLOG_ERROR("Does not support dx9. Minimum supported is dx11.");
+			return false;
+		}
 
 		main_window.set_main(true);
 

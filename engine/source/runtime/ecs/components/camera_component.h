@@ -169,6 +169,16 @@ public:
 	std::shared_ptr<FrameBuffer> get_light_buffer() const;
 	
 	//-----------------------------------------------------------------------------
+	//  Name : get_light_buffer_with_depth ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	std::shared_ptr<FrameBuffer> get_light_buffer_with_depth() const;
+
+	//-----------------------------------------------------------------------------
 	//  Name : update ()
 	/// <summary>
 	/// 
@@ -279,6 +289,8 @@ private:
 	std::shared_ptr<FrameBuffer> _g_buffer;
 	/// The light-buffer for this camera.
 	std::shared_ptr<FrameBuffer> _light_buffer;
+	/// The light-buffer for this camera.
+	std::shared_ptr<FrameBuffer> _light_buffer_with_depth;
 	/// Is the camera HDR?
 	bool _hdr = true;
 };

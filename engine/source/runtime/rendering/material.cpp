@@ -65,10 +65,10 @@ std::uint64_t Material::get_render_states(bool apply_cull, bool depth_write, boo
 		| BGFX_STATE_ALPHA_WRITE
 		| BGFX_STATE_MSAA;
 
-	if (depth_test)
+	if (depth_write)
 		states |= BGFX_STATE_DEPTH_WRITE;
 
-	if (depth_write)
+	if (depth_test)
 		states |= BGFX_STATE_DEPTH_TEST_LESS;
 
 	if (apply_cull)

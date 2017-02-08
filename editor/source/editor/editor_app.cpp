@@ -25,7 +25,10 @@ namespace editor
 			sf::Style::Default);
 
 		if (!engine->start(main_window))
+		{
 			_exitcode = -1;
+			return;
+		}
 
 		core::add_subsystem<GuiSystem>();
 		core::add_subsystem<DockingSystem>();

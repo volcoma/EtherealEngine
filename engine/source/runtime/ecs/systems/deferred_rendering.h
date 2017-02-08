@@ -89,6 +89,19 @@ namespace runtime
 			std::chrono::duration<float> dt);
 
 		//-----------------------------------------------------------------------------
+		//  Name : atmospherics_pass ()
+		/// <summary>
+		/// 
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
+		std::shared_ptr<FrameBuffer> atmospherics_pass(
+			std::shared_ptr<FrameBuffer> input,
+			CameraComponent& camera_comp,
+			std::chrono::duration<float> dt);
+
+		//-----------------------------------------------------------------------------
 		//  Name : tonemapping_pass ()
 		/// <summary>
 		/// 
@@ -109,6 +122,8 @@ namespace runtime
 		std::unique_ptr<Program> _spot_light_program;
 		/// Program that is responsible for rendering.
 		std::unique_ptr<Program> _gamma_correction_program;
+		/// Program that is responsible for rendering.
+		std::unique_ptr<Program> _atmospherics_program;
 	};
 
 }

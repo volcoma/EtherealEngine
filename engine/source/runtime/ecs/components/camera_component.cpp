@@ -7,6 +7,7 @@ CameraComponent::CameraComponent()
 	_camera = std::make_unique<Camera>();
 	_g_buffer = std::make_shared<FrameBuffer>();
 	_light_buffer = std::make_shared<FrameBuffer>();
+	_light_buffer_with_depth = std::make_shared<FrameBuffer>();
 	_output_buffer = std::make_shared<FrameBuffer>();
 	init({ 0, 0 });
 }
@@ -17,6 +18,7 @@ CameraComponent::CameraComponent(const CameraComponent& cameraComponent)
 	_hdr = cameraComponent._hdr;
 	_g_buffer = std::make_shared<FrameBuffer>();
 	_light_buffer = std::make_shared<FrameBuffer>();
+	_light_buffer_with_depth = std::make_shared<FrameBuffer>();
 	_output_buffer = std::make_shared<FrameBuffer>();
 	init({ 0, 0 });
 }
@@ -35,60 +37,47 @@ void CameraComponent::init(const uSize& size)
 	auto g_buffer_format = gfx::TextureFormat::RGBA8;
 	auto depth_format = gfx::TextureFormat::D32;
 	auto light_buffer_format = gfx::TextureFormat::RGBA16F;
+
+	std::shared_ptr<Texture> depth_buffer;
+	std::shared_ptr<Texture> light_buffer;
+	std::shared_ptr<Texture> g_buffer_0;
+	std::shared_ptr<Texture> g_buffer_1;
+	std::shared_ptr<Texture> g_buffer_2;
+	std::shared_ptr<Texture> g_buffer_3;
+	std::shared_ptr<Texture> output_buffer;
+
 	if (size.width == 0 && size.height == 0)
 	{
 		//create a depth buffer to share
-		auto depth_buffer = std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, depth_format, sampler_flags);
-		_g_buffer->populate
-		(
-			std::vector<std::shared_ptr<Texture>>
-			{
-				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags),
-				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags),
-				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags),
-				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags),
-				depth_buffer
-			}
-		);
+		g_buffer_0 = std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags);
+		g_buffer_1 = std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags);
+		g_buffer_2 = std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags);
+		g_buffer_3 = std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags);
+		depth_buffer = std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, depth_format, sampler_flags);
+		light_buffer = std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, light_buffer_format, sampler_flags);
+		output_buffer = std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags);
 
-		_light_buffer->populate(gfx::BackbufferRatio::Equal, light_buffer_format, sampler_flags);
-
-		_output_buffer->populate
-		(
-			std::vector<std::shared_ptr<Texture>>
-			{
-				std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags),
-				depth_buffer
-			}
-		);
+		_g_buffer->populate({ g_buffer_0, g_buffer_1, g_buffer_2, g_buffer_3, depth_buffer });
+		_light_buffer->populate({ light_buffer });
+		_light_buffer_with_depth->populate({ light_buffer, depth_buffer });
+		_output_buffer->populate({ output_buffer, depth_buffer });
 	}
 	else
 	{
 		//create a depth buffer to share
-		auto depth_buffer = std::make_shared<Texture>(size.width, size.height, false, 1, depth_format, sampler_flags);
-		_g_buffer->populate
-		(
-			std::vector<std::shared_ptr<Texture>>
-			{
-				std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags),
-				std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags),
-				std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags),
-				std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags),
-				depth_buffer
-			}
-		);
-
-		_light_buffer->populate(size.width, size.height, light_buffer_format, sampler_flags);
-
-		_output_buffer->populate
-		(
-			std::vector<std::shared_ptr<Texture>>
-			{
-				std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags),
-				depth_buffer
-			}
-		);
+		g_buffer_0 = std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags);
+		g_buffer_1 = std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags);
+		g_buffer_2 = std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags);
+		g_buffer_3 = std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags);
+		depth_buffer = std::make_shared<Texture>(size.width, size.height, false, 1, depth_format, sampler_flags);
+		light_buffer = std::make_shared<Texture>(size.width, size.height, false, 1, light_buffer_format, sampler_flags);	
+		output_buffer = std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags);		
 	}
+
+	_g_buffer->populate({ g_buffer_0, g_buffer_1, g_buffer_2, g_buffer_3, depth_buffer });
+	_light_buffer->populate({ light_buffer });
+	_light_buffer_with_depth->populate({ light_buffer, depth_buffer });
+	_output_buffer->populate({ output_buffer, depth_buffer });
 
 	update_projection_window();
 }
@@ -215,4 +204,9 @@ std::shared_ptr<FrameBuffer> CameraComponent::get_g_buffer() const
 std::shared_ptr<FrameBuffer> CameraComponent::get_light_buffer() const
 {
 	return _light_buffer;
+}
+
+std::shared_ptr<FrameBuffer> CameraComponent::get_light_buffer_with_depth() const
+{
+	return _light_buffer_with_depth;
 }
