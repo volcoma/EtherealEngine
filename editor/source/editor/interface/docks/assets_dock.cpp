@@ -486,7 +486,8 @@ namespace Docks
 					if (gui::IsMouseReleased(gui::drag_button))
 					{
 						auto entity = dragged.get_value<runtime::Entity>();
-						ecs::utils::save_entity(folder->absolute, entity);
+						if(entity)
+							ecs::utils::save_entity(folder->absolute, entity);
 						es->drop();
 					}
 				}

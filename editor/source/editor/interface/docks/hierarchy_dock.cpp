@@ -93,10 +93,9 @@ namespace Docks
 				if (dragged && entity != editor_camera)
 				{
 					if (dragged.is_type<runtime::Entity>())
-					{
-						
+					{				
 						auto dragged_entity = dragged.get_value<runtime::Entity>();
-						if (dragged_entity != entity)
+						if (dragged_entity && dragged_entity != entity)
 						{
 							gui::SetMouseCursor(ImGuiMouseCursor_Move);
 							if (gui::IsMouseReleased(gui::drag_button))
@@ -295,7 +294,7 @@ namespace Docks
 				if (selected && selected.is_type<runtime::Entity>())
 				{
 					auto sel = selected.get_value<runtime::Entity>();
-					if (sel != editor_camera)
+					if (sel && sel != editor_camera)
 					{
 						sel.destroy();
 						es->unselect();
@@ -310,7 +309,7 @@ namespace Docks
 					if (selected && selected.is_type<runtime::Entity>())
 					{
 						auto sel = selected.get_value<runtime::Entity>();
-						if (sel != editor_camera)
+						if (sel && sel != editor_camera)
 						{
 							auto clone = ecs->create_from_copy(sel);
 							clone.component<TransformComponent>().lock()
@@ -346,8 +345,11 @@ namespace Docks
 					if (gui::IsMouseReleased(gui::drag_button))
 					{
 						auto dragged_entity = dragged.get_value<runtime::Entity>();
-						dragged_entity.component<TransformComponent>().lock()
-							->set_parent(runtime::CHandle<TransformComponent>());
+						if (dragged_entity)
+						{
+							dragged_entity.component<TransformComponent>().lock()
+								->set_parent(runtime::CHandle<TransformComponent>());
+						}		
 
 						es->drop();
 					}
