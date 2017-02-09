@@ -381,18 +381,11 @@ namespace runtime
 
 				if (light.light_type == LightType::Directional)
 				{
-					float u_camera_data[4] =
-					{
-						camera.get_near_clip(),
-						camera.get_far_clip(),
-						0.0f,
-						0.0f,
-					};
-
 					_atmospherics_program->begin_pass();
 					_atmospherics_program->set_uniform("u_light_direction", &light_direction);
-					_atmospherics_program->set_uniform("u_camera_data", u_camera_data);
 
+					iRect rect(0, 0, output_size.width, output_size.height);
+					gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
 					auto topology = gfx::clip_quad(1.0f);
 					gfx::setState(topology
 						| BGFX_STATE_RGB_WRITE
@@ -427,6 +420,8 @@ namespace runtime
 		{
 			_gamma_correction_program->begin_pass();
 			_gamma_correction_program->set_texture(0, "s_input", gfx::getTexture(input->handle));
+			iRect rect(0, 0, output_size.width, output_size.height);
+			gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
 			auto topology = gfx::screen_quad((float)output_size.width, (float)output_size.height, 1.0f);
 			gfx::setState(topology
 				| BGFX_STATE_RGB_WRITE
