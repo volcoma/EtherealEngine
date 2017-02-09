@@ -52,10 +52,12 @@ vec3 absorb(vec3 kr, float dist, vec3 color, float factor)
 	return color - color * pow(kr, vec3(f, f, f));
 }
 
+
 void main()
 {
 	const vec3 u_kr = vec3(0.18867780436772762f, 0.4978442963618773f, 0.6616065586417131f);
-	const float u_rayleigh_brightness = 5.3f;
+	const vec3 u_ground_color = vec3(0.63f, 0.6f, 0.57f);	
+	const float u_rayleigh_brightness = 3.3f;
 	const float u_mie_brightness = 0.1f;
 	const float u_spot_brightness = 10.0f;
 	const float u_scatter_strength = 0.028;
@@ -78,7 +80,7 @@ void main()
 	
 	float eye_depth = atmospheric_depth(eye_pos, eye_dir);
 	float step_length = eye_depth / float(u_step_count);
-	float eye_extinction = horizon_extinction(eye_pos, eye_dir, u_surface_height - 0.025f);
+	float eye_extinction = horizon_extinction(eye_pos, eye_dir, u_surface_height - 0.05f);
 
 	vec3 rayleigh_collected = vec3(0.0f, 0.0f, 0.0f);
 	vec3 mie_collected = vec3(0.0f, 0.0f, 0.0f);
@@ -87,7 +89,7 @@ void main()
 	{
 		float sample_distance = step_length * float(i);
 		vec3 pos = eye_pos + eye_dir * sample_distance;
-		float extinction = horizon_extinction(pos, -u_light_direction.xyz, u_surface_height - 0.05f);
+		float extinction = horizon_extinction(pos, -u_light_direction.xyz, u_surface_height - 0.35f);
 		float sample_depth = atmospheric_depth(pos, -u_light_direction.xyz);
 		vec3 influx = absorb(u_kr, sample_depth, vec3(u_intensity, u_intensity, u_intensity), u_scatter_strength) * extinction;
 		
@@ -99,7 +101,9 @@ void main()
 	mie_collected = (mie_collected * eye_extinction * pow(eye_depth, u_mie_collection_power)) / float(u_step_count);
 
 	vec3 color = vec3(spot * mie_collected + mie_factor * mie_collected + rayleigh_factor * rayleigh_collected);
-
+	float light_angle = dot(-normalize(-u_light_direction.xyz), eye_pos);
+	vec3 ground_color = u_ground_color * (saturate(-light_angle)) * 0.1f;
+	color = mix(color, ground_color, saturate(-eye_dir.y/0.06f + 0.4f));
 	gl_FragColor.rgb = color;
 	gl_FragColor.a = dot( color, vec3( 0.2125, 0.7154, 0.0721 ) );
 }
