@@ -1,85 +1,20 @@
 #include "camera_component.h"
 #include "../../rendering/camera.h"
-#include "../../rendering/render_pass.h"
+#include "graphics/graphics.h"
 
 CameraComponent::CameraComponent()
 {
 	_camera = std::make_unique<Camera>();
-	_g_buffer = std::make_shared<FrameBuffer>();
-	_light_buffer = std::make_shared<FrameBuffer>();
-	_light_buffer_with_depth = std::make_shared<FrameBuffer>();
-	_output_buffer = std::make_shared<FrameBuffer>();
-	init({ 0, 0 });
+	auto stats = gfx::getStats();
+	_camera->set_viewport_size({ stats->width, stats->height });
 }
 
 CameraComponent::CameraComponent(const CameraComponent& cameraComponent)
 {
 	_camera = std::make_unique<Camera>(cameraComponent.get_camera());
 	_hdr = cameraComponent._hdr;
-	_g_buffer = std::make_shared<FrameBuffer>();
-	_light_buffer = std::make_shared<FrameBuffer>();
-	_light_buffer_with_depth = std::make_shared<FrameBuffer>();
-	_output_buffer = std::make_shared<FrameBuffer>();
-	init({ 0, 0 });
-}
-
-void CameraComponent::init(const uSize& size)
-{
-	std::uint32_t sampler_flags = 0
-		| BGFX_TEXTURE_RT
-		| BGFX_TEXTURE_MIN_POINT
-		| BGFX_TEXTURE_MAG_POINT
-		| BGFX_TEXTURE_MIP_POINT
-		| BGFX_TEXTURE_U_CLAMP
-		| BGFX_TEXTURE_V_CLAMP 
-		;
-
-	auto g_buffer_format = gfx::TextureFormat::RGBA8;
-	auto depth_format = gfx::TextureFormat::D32;
-	auto light_buffer_format = gfx::TextureFormat::RGBA16F;
-
-	std::shared_ptr<Texture> depth_buffer;
-	std::shared_ptr<Texture> light_buffer;
-	std::shared_ptr<Texture> g_buffer_0;
-	std::shared_ptr<Texture> g_buffer_1;
-	std::shared_ptr<Texture> g_buffer_2;
-	std::shared_ptr<Texture> g_buffer_3;
-	std::shared_ptr<Texture> output_buffer;
-
-	if (size.width == 0 && size.height == 0)
-	{
-		//create a depth buffer to share
-		g_buffer_0 = std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags);
-		g_buffer_1 = std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags);
-		g_buffer_2 = std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags);
-		g_buffer_3 = std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags);
-		depth_buffer = std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, depth_format, sampler_flags);
-		light_buffer = std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, light_buffer_format, sampler_flags);
-		output_buffer = std::make_shared<Texture>(gfx::BackbufferRatio::Equal, false, 1, g_buffer_format, sampler_flags);
-
-		_g_buffer->populate({ g_buffer_0, g_buffer_1, g_buffer_2, g_buffer_3, depth_buffer });
-		_light_buffer->populate({ light_buffer });
-		_light_buffer_with_depth->populate({ light_buffer, depth_buffer });
-		_output_buffer->populate({ output_buffer, depth_buffer });
-	}
-	else
-	{
-		//create a depth buffer to share
-		g_buffer_0 = std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags);
-		g_buffer_1 = std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags);
-		g_buffer_2 = std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags);
-		g_buffer_3 = std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags);
-		depth_buffer = std::make_shared<Texture>(size.width, size.height, false, 1, depth_format, sampler_flags);
-		light_buffer = std::make_shared<Texture>(size.width, size.height, false, 1, light_buffer_format, sampler_flags);	
-		output_buffer = std::make_shared<Texture>(size.width, size.height, false, 1, g_buffer_format, sampler_flags);		
-	}
-
-	_g_buffer->populate({ g_buffer_0, g_buffer_1, g_buffer_2, g_buffer_3, depth_buffer });
-	_light_buffer->populate({ light_buffer });
-	_light_buffer_with_depth->populate({ light_buffer, depth_buffer });
-	_output_buffer->populate({ output_buffer, depth_buffer });
-
-	update_projection_window();
+	auto stats = gfx::getStats();
+	_camera->set_viewport_size({ stats->width, stats->height });
 }
 
 CameraComponent::~CameraComponent()
@@ -88,12 +23,19 @@ CameraComponent::~CameraComponent()
 
 void CameraComponent::update(const math::transform_t& t)
 {
+	// Release the unused fbos and textures
+	_render_view.release_unused_resources();
 	// First update so the camera can cache the previous matrices
 	_camera->record_current_matrices();
-
 	// Set new transform
 	_camera->look_at(t.get_position(), t.get_position() + t.z_unit_axis(), t.y_unit_axis());
-	update_projection_window();
+
+	const auto& viewport_size = _camera->get_viewport_size();
+	if (viewport_size.width == 0 && viewport_size.height == 0)
+	{
+		auto stats = gfx::getStats();
+		_camera->set_viewport_size({ stats->width, stats->height });
+	}
 }
 
 bool CameraComponent::get_hdr() const
@@ -108,13 +50,7 @@ void CameraComponent::set_hdr(bool hdr)
 
 void CameraComponent::set_viewport_size(const uSize& size)
 {
-	auto old_size = _output_buffer->get_size();
-	if (size != old_size)
-	{
-		init(size);
-	}
-
-	update_projection_window();
+	_camera->set_viewport_size(size);
 }
 
 const uSize& CameraComponent::get_viewport_size() const
@@ -122,12 +58,6 @@ const uSize& CameraComponent::get_viewport_size() const
 	return _camera->get_viewport_size();
 }
 
-void CameraComponent::update_projection_window()
-{
-	auto size = _output_buffer->get_size();
-
-	_camera->set_viewport_size(size);
-}
 
 float CameraComponent::get_ortho_size() const
 {
@@ -168,8 +98,6 @@ CameraComponent& CameraComponent::set_projection_mode(ProjectionMode mode)
 {
 	_camera->set_projection_mode(mode);
 
-	update_projection_window();
-
 	return *this;
 }
 
@@ -189,24 +117,4 @@ float CameraComponent::get_far_clip() const
 ProjectionMode CameraComponent::get_projection_mode() const
 {
 	return _camera->get_projection_mode();
-}
-
-std::shared_ptr<FrameBuffer> CameraComponent::get_output_buffer() const
-{
-	return _output_buffer;
-}
-
-std::shared_ptr<FrameBuffer> CameraComponent::get_g_buffer() const
-{
-	return _g_buffer;
-}
-
-std::shared_ptr<FrameBuffer> CameraComponent::get_light_buffer() const
-{
-	return _light_buffer;
-}
-
-std::shared_ptr<FrameBuffer> CameraComponent::get_light_buffer_with_depth() const
-{
-	return _light_buffer_with_depth;
 }

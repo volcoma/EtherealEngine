@@ -69,6 +69,49 @@ namespace gfx
 		return getCaps()->originBottomLeft;
 	}
 
+	inline bool is_format_supported(std::uint16_t flags, TextureFormat::Enum format)
+	{
+		const std::uint32_t formatCaps = getCaps()->formats[format];
+		return 0 != (formatCaps & flags);
+	}
+
+	namespace FormatSearchFlags
+	{
+		enum E
+		{
+			OneChannel = 0x1,
+			TwoChannels = 0x2,
+			FourChannels = 0x8,
+			RequireAlpha = 0x10,
+			RequireStencil = 0x20,
+			PreferCompressed = 0x40,
+
+			AllowPaddingChannels = 0x100,
+			RequireDepth = 0x200,
+
+			HalfPrecisionFloat = 0x1000,
+			FullPrecisionFloat = 0x2000,
+			FloatingPoint = 0xF000,
+		};
+
+	}; // End Namespace : FormatSearchFlags
+
+	TextureFormat::Enum get_best_format(std::uint16_t type, std::uint32_t search_flags);
+
+	inline std::uint32_t get_default_rt_sampler_flags()
+	{
+		static std::uint32_t sampler_flags = 0
+			| BGFX_TEXTURE_RT
+			| BGFX_TEXTURE_MIN_POINT
+			| BGFX_TEXTURE_MAG_POINT
+			| BGFX_TEXTURE_MIP_POINT
+			| BGFX_TEXTURE_U_CLAMP
+			| BGFX_TEXTURE_V_CLAMP
+			;
+
+		return sampler_flags;
+	}
+
 	inline void shutdown()
 	{
 		if (initted)

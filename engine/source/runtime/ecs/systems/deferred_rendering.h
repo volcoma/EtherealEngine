@@ -6,7 +6,8 @@
 #include <chrono>
 #include "../../rendering/program.h"
 
-class CameraComponent;
+class Camera;
+class RenderView;
 
 namespace runtime
 {
@@ -60,6 +61,22 @@ namespace runtime
 		//-----------------------------------------------------------------------------
 		void dispose() override;
 
+
+		//-----------------------------------------------------------------------------
+		//  Name : scene_pass ()
+		/// <summary>
+		/// 
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
+		std::shared_ptr<FrameBuffer> deferred_render_full(
+			Camera& camera,
+			RenderView& render_view,
+			EntityComponentSystem& ecs,
+			std::unordered_map<Entity, LodData>& camera_lods,
+			std::chrono::duration<float> dt);
+
 		//-----------------------------------------------------------------------------
 		//  Name : g_buffer_pass ()
 		/// <summary>
@@ -70,9 +87,10 @@ namespace runtime
 		//-----------------------------------------------------------------------------
 		std::shared_ptr<FrameBuffer> g_buffer_pass(
 			std::shared_ptr<FrameBuffer> input,
-			CameraComponent& camera_comp,
-			std::unordered_map<Entity,
-			LodData>& camera_lods, 
+			Camera& camera,
+			RenderView& render_view,
+			EntityComponentSystem& ecs,
+			std::unordered_map<Entity, LodData>& camera_lods, 
 			std::chrono::duration<float> dt);
 
 		//-----------------------------------------------------------------------------
@@ -85,7 +103,9 @@ namespace runtime
 		//-----------------------------------------------------------------------------
 		std::shared_ptr<FrameBuffer> lighting_pass(
 			std::shared_ptr<FrameBuffer> input,
-			CameraComponent& camera_comp, 
+			Camera& camera, 
+			RenderView& render_view,
+			EntityComponentSystem& ecs,
 			std::chrono::duration<float> dt);
 
 		//-----------------------------------------------------------------------------
@@ -98,7 +118,9 @@ namespace runtime
 		//-----------------------------------------------------------------------------
 		std::shared_ptr<FrameBuffer> atmospherics_pass(
 			std::shared_ptr<FrameBuffer> input,
-			CameraComponent& camera_comp,
+			Camera& camera,
+			RenderView& render_view,
+			EntityComponentSystem& ecs,
 			std::chrono::duration<float> dt);
 
 		//-----------------------------------------------------------------------------
@@ -111,7 +133,8 @@ namespace runtime
 		//-----------------------------------------------------------------------------
 		std::shared_ptr<FrameBuffer> tonemapping_pass(
 			std::shared_ptr<FrameBuffer> input,
-			CameraComponent& camera_comp);
+			Camera& camera,
+			RenderView& render_view);
 	private:
 		std::unordered_map<Entity, std::unordered_map<Entity, LodData>> _lod_data;
 		/// Program that is responsible for rendering.

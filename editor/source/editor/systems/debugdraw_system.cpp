@@ -30,10 +30,12 @@ namespace editor
 
 		const auto camera_comp = editor_camera.component<CameraComponent>();
 		const auto camera_comp_ptr = camera_comp.lock().get();
-		const auto surface = camera_comp_ptr->get_output_buffer();
+		auto& render_view = camera_comp_ptr->get_render_view();
 		auto& camera = camera_comp_ptr->get_camera();
 		const auto& view = camera.get_view();
 		const auto& proj = camera.get_projection();
+		const auto& viewport_size = camera.get_viewport_size();
+		const auto surface = render_view.get_output_fbo(viewport_size);
 		const auto camera_posiiton = camera.get_position();
 
 		RenderPass pass("debug_draw_pass");

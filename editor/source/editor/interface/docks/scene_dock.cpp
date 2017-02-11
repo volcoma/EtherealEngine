@@ -71,11 +71,12 @@ namespace Docks
 			{
 				const auto selected_camera = sel.component<CameraComponent>().lock();
 				const auto& camera = selected_camera->get_camera();
-				const auto surface = selected_camera->get_output_buffer();
-				const auto view_size = camera.get_viewport_size();
+				auto& render_view = selected_camera->get_render_view();
+				const auto& viewport_size = camera.get_viewport_size();
+				const auto surface = render_view.get_output_fbo(viewport_size);
 
-				float factor = std::min(size.x / float(view_size.width), size.y / float(view_size.height)) / 4.0f;
-				ImVec2 bounds(view_size.width * factor, view_size.height * factor);
+				float factor = std::min(size.x / float(viewport_size.width), size.y / float(viewport_size.height)) / 4.0f;
+				ImVec2 bounds(viewport_size.width * factor, viewport_size.height * factor);
 				auto p = gui::GetWindowPos();
 				p.x += size.x - bounds.x - 20.0f;
 				p.y += size.y - bounds.y - 40.0f;
@@ -319,8 +320,11 @@ namespace Docks
 		{
 			camera_component->get_camera().set_viewport_pos({ static_cast<std::uint32_t>(pos.x), static_cast<std::uint32_t>(pos.y) });
 			camera_component->set_viewport_size({ static_cast<std::uint32_t>(size.x), static_cast<std::uint32_t>(size.y) });
-			
-			const auto surface = camera_component->get_output_buffer();
+
+			const auto& camera = camera_component->get_camera();
+			auto& render_view = camera_component->get_render_view();
+			const auto& viewport_size = camera.get_viewport_size();
+			const auto surface = render_view.get_output_fbo(viewport_size);
 			gui::Image(surface, size);
 
 			if (gui::IsItemClicked(1) || gui::IsItemClicked(2))
@@ -380,10 +384,10 @@ namespace Docks
 
 			if (show_gbuffer)
 			{
-				const auto g_buffer = camera_component->get_g_buffer();
-				for (std::uint32_t i = 0; i < g_buffer->get_attachment_count(); ++i)
+				auto g_buffer_fbo = render_view.get_g_buffer_fbo(viewport_size).get();
+				for (std::uint32_t i = 0; i < g_buffer_fbo->get_attachment_count(); ++i)
 				{
-					const auto attachment = g_buffer->get_attachment(i).texture;
+					const auto attachment = g_buffer_fbo->get_attachment(i).texture;
 					gui::Image(attachment, size);
 
 					if (gui::IsItemClicked(1) || gui::IsItemClicked(2))

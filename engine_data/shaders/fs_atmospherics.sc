@@ -3,7 +3,6 @@ $input v_texcoord0, v_weye_dir
 #include "common.sh"
 
 uniform vec4 u_light_direction;
-uniform vec4 u_camera_data;
 
 float atmospheric_depth(vec3 pos, vec3 dir) 
 {

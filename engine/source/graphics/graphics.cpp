@@ -5,6 +5,284 @@ namespace gfx
 	VertexDecl PosTexCoord0Vertex::decl;
 	VertexDecl MeshVertex::decl;
 
+	TextureFormat::Enum get_best_format(std::uint16_t type_flags, std::uint32_t search_flags)
+	{
+		//( "DX11", "Go back over the list and find good formats for DX11" )
+		bool is_depth = ((search_flags & FormatSearchFlags::RequireDepth) != 0);
+		// Get best format for the target case.
+
+		if (!is_depth)
+		{
+			//( "Try some of the new compressed formats (two channel, one channel, floating point, etc.)" )
+
+			// Does the user prefer compressed textures in this case?
+			// We will select compressed formats only in the
+			// four channel non-floating point cases.
+			if ((search_flags & FormatSearchFlags::PreferCompressed) &&
+				(search_flags & FormatSearchFlags::FourChannels) &&
+				!(search_flags & FormatSearchFlags::FloatingPoint))
+			{
+				// Alpha is required?
+				if ((search_flags & FormatSearchFlags::RequireAlpha))
+				{
+					if (is_format_supported(type_flags, TextureFormat::BC2))
+						return TextureFormat::BC2;
+					if (is_format_supported(type_flags, TextureFormat::BC3))
+						return TextureFormat::BC3;
+
+				} // End if alpha required
+				else
+				{
+					if (is_format_supported(type_flags, TextureFormat::BC1))
+						return TextureFormat::BC1;
+
+				} // End if no alpha required
+
+			} // End if prefer compressed formats
+
+			// Standard formats, and fallback for compression unsupported case
+			bool accept_padding = ((search_flags & FormatSearchFlags::AllowPaddingChannels) != 0);
+			bool requires_alpha = ((search_flags & FormatSearchFlags::RequireAlpha) != 0);
+			if ((search_flags & FormatSearchFlags::FloatingPoint))
+			{
+				// Floating point formats ONLY!
+				bool accept_half = ((search_flags & FormatSearchFlags::HalfPrecisionFloat) != 0);
+				bool accept_full = ((search_flags & FormatSearchFlags::FullPrecisionFloat) != 0);
+
+				// How many channels?
+				if ((search_flags & FormatSearchFlags::FourChannels))
+				{
+					if (accept_full && is_format_supported(type_flags, TextureFormat::RGBA32F))
+						return TextureFormat::RGBA32F;
+					else if (accept_half && is_format_supported(type_flags, TextureFormat::RGBA16F))
+						return TextureFormat::RGBA16F;
+
+				} // End if FourChannel
+				else if ((search_flags & FormatSearchFlags::TwoChannels))
+				{
+					if (!requires_alpha)
+					{
+						if (accept_full && is_format_supported(type_flags, TextureFormat::RG32F))
+							return TextureFormat::RG32F;
+						else if (accept_half && is_format_supported(type_flags, TextureFormat::RG16F))
+							return TextureFormat::RG16F;
+						else if (accept_padding && accept_half && is_format_supported(type_flags, TextureFormat::RGBA16F))
+							return TextureFormat::RGBA16F;
+						else if (accept_padding && accept_full && is_format_supported(type_flags, TextureFormat::RGBA32F))
+							return TextureFormat::RGBA32F;
+
+					} // End if !requires_alpha
+					else
+					{
+						if (accept_padding && accept_half && is_format_supported(type_flags, TextureFormat::RGBA16F))
+							return TextureFormat::RGBA16F;
+						else if (accept_padding && accept_full && is_format_supported(type_flags, TextureFormat::RGBA32F))
+							return TextureFormat::RGBA32F;
+
+					} // End if requires_alpha
+
+				} // End if TwoChannel
+				else if ((search_flags & FormatSearchFlags::OneChannel))
+				{
+					if (!requires_alpha)
+					{
+						if (accept_full && is_format_supported(type_flags, TextureFormat::R32F))
+							return TextureFormat::R32F;
+						else if (accept_half && is_format_supported(type_flags, TextureFormat::R16F))
+							return TextureFormat::R16F;
+						else if (accept_padding && accept_half && is_format_supported(type_flags, TextureFormat::RG16F))
+							return TextureFormat::RG16F;
+						else if (accept_padding && accept_full && is_format_supported(type_flags, TextureFormat::RG32F))
+							return TextureFormat::RG32F;
+						else if (accept_padding && accept_half && is_format_supported(type_flags, TextureFormat::RGBA16F))
+							return TextureFormat::RGBA16F;
+						else if (accept_padding && accept_full && is_format_supported(type_flags, TextureFormat::RGBA32F))
+							return TextureFormat::RGBA32F;
+
+					} // End if !requires_alpha
+					else
+					{
+						if (accept_padding && accept_half && is_format_supported(type_flags, TextureFormat::RGBA16F))
+							return TextureFormat::RGBA16F;
+						else if (accept_padding && accept_full && is_format_supported(type_flags, TextureFormat::RGBA32F))
+							return TextureFormat::RGBA32F;
+
+					} // End if requires_alpha
+
+				} // End if OneChannel
+
+			} // End if float
+			else
+			{
+				// How many channels?
+				if ((search_flags & FormatSearchFlags::FourChannels))
+				{
+					if (!requires_alpha)
+					{
+						if (is_format_supported(type_flags, TextureFormat::RGBA8))
+							return TextureFormat::RGBA8;
+						else if (is_format_supported(type_flags, TextureFormat::BGRA8))
+							return TextureFormat::BGRA8;
+						else if (is_format_supported(type_flags, TextureFormat::RGB10A2))
+							return TextureFormat::RGB10A2;
+						else if (is_format_supported(type_flags, TextureFormat::RGBA16))
+							return TextureFormat::RGBA16;
+						else if (is_format_supported(type_flags, TextureFormat::R5G6B5))
+							return TextureFormat::R5G6B5;
+						else if (is_format_supported(type_flags, TextureFormat::RGB5A1))
+							return TextureFormat::RGB5A1;
+
+					} // End if !requires_alpha
+					else
+					{
+						if (is_format_supported(type_flags, TextureFormat::RGBA8))
+							return TextureFormat::RGBA8;
+						else if (is_format_supported(type_flags, TextureFormat::RGBA16))
+							return TextureFormat::RGBA16;
+						else if (is_format_supported(type_flags, TextureFormat::RGB10A2))
+							return TextureFormat::RGB10A2;
+						else if (is_format_supported(type_flags, TextureFormat::RGB5A1))
+							return TextureFormat::RGB5A1;
+
+					} // End if requires_alpha
+
+				} // End if FourChannel
+				else if ((search_flags & FormatSearchFlags::TwoChannels))
+				{
+					if (!requires_alpha)
+					{
+						if (is_format_supported(type_flags, TextureFormat::RG16))
+							return TextureFormat::RG16;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::RGB8))
+							return TextureFormat::RGB8;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::BGRA8))
+							return TextureFormat::BGRA8;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::RGBA8))
+							return TextureFormat::RGBA8;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::RGB10A2))
+							return TextureFormat::RGB10A2;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::RGBA16))
+							return TextureFormat::RGBA16;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::R5G6B5))
+							return TextureFormat::R5G6B5;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::RGB5A1))
+							return TextureFormat::RGB5A1;
+
+					} // End if !requires_alpha
+					else
+					{
+						if (accept_padding && is_format_supported(type_flags, TextureFormat::BGRA8))
+							return TextureFormat::BGRA8;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::RGBA8))
+							return TextureFormat::RGBA8;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::RGBA16))
+							return TextureFormat::RGBA16;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::RGB10A2))
+							return TextureFormat::RGB10A2;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::RGB5A1))
+							return TextureFormat::RGB5A1;
+
+					} // End if requires_alpha
+
+				} // End if TwoChannel
+				else if ((search_flags & FormatSearchFlags::OneChannel))
+				{
+					if (!requires_alpha)
+					{
+						if (is_format_supported(type_flags, TextureFormat::R8))
+							return TextureFormat::R8;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::RG16))
+							return TextureFormat::RG16;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::RGB8))
+							return TextureFormat::RGB8;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::BGRA8))
+							return TextureFormat::BGRA8;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::RGBA8))
+							return TextureFormat::RGBA8;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::RGB10A2))
+							return TextureFormat::RGB10A2;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::RGBA16))
+							return TextureFormat::RGBA16;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::R5G6B5))
+							return TextureFormat::R5G6B5;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::RGB5A1))
+							return TextureFormat::RGB5A1;
+
+					} // End if !requires_alpha
+					else
+					{
+						if (is_format_supported(type_flags, TextureFormat::A8))
+							return TextureFormat::A8;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::BGRA8))
+							return TextureFormat::BGRA8;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::RGBA8))
+							return TextureFormat::RGBA8;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::RGBA16))
+							return TextureFormat::RGBA16;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::RGB10A2))
+							return TextureFormat::RGB10A2;
+						else if (accept_padding && is_format_supported(type_flags, TextureFormat::RGB5A1))
+							return TextureFormat::RGB5A1;
+
+					} // End if requires_alpha
+
+				} // End if OneChannel
+
+			} // End if !float
+
+		} // End if color formats
+		else
+		{
+			bool requires_stencil = ((search_flags & FormatSearchFlags::RequireStencil) != 0);
+			if ((search_flags & FormatSearchFlags::FloatingPoint))
+			{
+				// Floating point formats ONLY!
+				bool accept_half = ((search_flags & FormatSearchFlags::HalfPrecisionFloat) != 0);
+				bool accept_full = ((search_flags & FormatSearchFlags::FullPrecisionFloat) != 0);
+				if (!requires_stencil)
+				{
+					if (accept_full && is_format_supported(type_flags, TextureFormat::D32F))
+						return TextureFormat::D32F;
+					else if (accept_full && is_format_supported(type_flags, TextureFormat::D24F))
+						return TextureFormat::D24F;
+
+				} // End if !requires_stencil
+				else
+				{
+					// no floating point that supports stencil
+					//if (accept_full && is_format_supported(type_flags, TextureFormat::D24S8))
+					//	return TextureFormat::D24S8;
+
+				} // End if requires_stencil
+
+			} // End if float
+			else
+			{
+				if (!requires_stencil)
+				{
+					if (is_format_supported(type_flags, TextureFormat::D32))
+						return TextureFormat::D32;
+					else if (is_format_supported(type_flags, TextureFormat::D24))
+						return TextureFormat::D24;
+					else if (is_format_supported(type_flags, TextureFormat::D16))
+						return TextureFormat::D16;
+
+				} // End if !requires_stencil
+				else
+				{
+					if (is_format_supported(type_flags, TextureFormat::D24S8))
+						return TextureFormat::D24S8;
+
+				} // End if requires_stencil
+
+			} // End if !float
+
+		} // End if depth formats
+
+		// Unsupported format.
+		return TextureFormat::Unknown;
+	}
+
 	std::uint64_t screen_quad(float dest_width, float dest_height, float depth, float width, float height)
 	{
 		float texture_half = get_half_texel();
@@ -130,5 +408,7 @@ namespace gfx
 
 		return BGFX_STATE_PT_TRISTRIP;
 	}
+
+	
 
 }

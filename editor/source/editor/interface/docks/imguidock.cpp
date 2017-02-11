@@ -461,7 +461,7 @@ namespace ImGuiDock
 					auto guiWindow = std::make_shared<GuiWindow>(
 						sf::VideoMode((unsigned int)_current_dock_to->last_size.x, (unsigned int)_current_dock_to->last_size.y),
 						"",//std::string(m_currentDockTo->title),
-						sf::Style::Resize
+						sf::Style::Default
 						);
 
 					auto engine = core::get_subsystem<runtime::Engine>();
