@@ -204,7 +204,7 @@ namespace fs
 		}
 
 		//-----------------------------------------------------------------------------
-		//  Name : watchImpl ()
+		//  Name : watch_impl ()
 		/// <summary>
 		/// 
 		/// 
@@ -308,7 +308,7 @@ namespace fs
 		}
 
 		//-----------------------------------------------------------------------------
-		//  Name : getPathFilterPair ()
+		//  Name : get_path_filter_pair ()
 		/// <summary>
 		/// 
 		/// 
@@ -340,7 +340,7 @@ namespace fs
 		}
 
 		//-----------------------------------------------------------------------------
-		//  Name : visitWildCardPath ()
+		//  Name : visit_wild_card_path ()
 		/// <summary>
 		/// 
 		/// 
@@ -547,7 +547,7 @@ namespace fs
 			}
 
 			//-----------------------------------------------------------------------------
-			//  Name : hasChanged ()
+			//  Name : poll_entry ()
 			/// <summary>
 			/// 
 			/// 

@@ -134,8 +134,8 @@ const math::transform_t & Camera::get_projection()
 		if (_projection_dirty)
 		{
 			// Generate the updated perspective projection matrix
-			float fFOVRadians = math::radians<float>(get_fov());
-			_projection = math::perspective(fFOVRadians, _aspect_ratio, _near_clip, _far_clip, gfx::getCaps()->homogeneousDepth);
+			float fov_radians = math::radians<float>(get_fov());
+			_projection = math::perspective(fov_radians, _aspect_ratio, _near_clip, _far_clip, gfx::is_homogeneous_depth());
 			_projection[2][0] += _aa_data.z;
 			_projection[2][1] += _aa_data.w;
 			// Matrix has been updated
@@ -159,7 +159,7 @@ const math::transform_t & Camera::get_projection()
 		if (_projection_dirty || _aspect_dirty)
 		{
 			// Generate the updated orthographic projection matrix
-			float fZoom = get_zoom_factor();
+			float zoom = get_zoom_factor();
 			const fRect rect =
 			{
 				-(float)_viewport_size.width / 2.0f,
@@ -167,7 +167,7 @@ const math::transform_t & Camera::get_projection()
 				(float)_viewport_size.width / 2.0f,
 				-(float)_viewport_size.height / 2.0f
 			};
-			_projection = math::ortho(rect.left * fZoom, rect.right * fZoom, rect.bottom * fZoom, rect.top * fZoom, get_near_clip(), get_far_clip(), gfx::getCaps()->homogeneousDepth);
+			_projection = math::ortho(rect.left * zoom, rect.right * zoom, rect.bottom * zoom, rect.top * zoom, get_near_clip(), get_far_clip(), gfx::is_homogeneous_depth());
 			_projection[2][0] += _aa_data.z;
 			_projection[2][1] += _aa_data.w;
 			// Matrix has been updated
@@ -220,7 +220,7 @@ const math::frustum & Camera::get_frustum()
 	// Recalculate frustum if necessary
 	if (_frustum_dirty == true && _frustum_locked == false)
 	{
-		_frustum.update(get_view(), get_projection(), gfx::getCaps()->homogeneousDepth);
+		_frustum.update(get_view(), get_projection(), gfx::is_homogeneous_depth());
 		_frustum_dirty = false;
 
 		// Also build the frustum / volume that represents the space between the

@@ -69,6 +69,11 @@ namespace gfx
 		return getCaps()->originBottomLeft;
 	}
 
+	inline bool is_homogeneous_depth()
+	{
+		return gfx::getCaps()->homogeneousDepth;
+	}
+
 	inline bool is_format_supported(std::uint16_t flags, TextureFormat::Enum format)
 	{
 		const std::uint32_t formatCaps = getCaps()->formats[format];

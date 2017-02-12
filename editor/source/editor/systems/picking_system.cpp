@@ -61,7 +61,7 @@ namespace editor
 			_reading = 0;
 			_start_readback = true;
 			auto pick_view = math::lookAt(pick_eye, pick_at, pick_up);
-			auto pick_proj = math::perspective(math::radians(1.0f), 1.0f, near_clip, far_clip);
+			auto pick_proj = math::perspective(math::radians(1.0f), 1.0f, near_clip, far_clip, gfx::is_homogeneous_depth());
 
 			RenderPass pass("picking_buffer_fill");
 			pass.bind(_surface.get());

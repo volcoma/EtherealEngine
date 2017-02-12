@@ -111,10 +111,28 @@ namespace editor
 			const auto selected_camera_comp_ptr = selected_camera_comp.lock().get();
 			auto& selected_camera = selected_camera_comp_ptr->get_camera();
 			const auto view_proj = selected_camera.get_view_projection();
+			const auto bounds = selected_camera.get_local_bounding_box();
 			ddPush();
 			ddSetColor(0xffffffff);
-			ddSetTransform(nullptr);
-			ddDrawFrustum(&view_proj);
+			
+			if (selected_camera.get_projection_mode() == ProjectionMode::Perspective)
+			{
+				ddSetTransform(nullptr);
+				ddDrawFrustum(&view_proj);
+			}
+			else
+			{
+				Aabb aabb;
+				aabb.m_min[0] = bounds.min.x;
+				aabb.m_min[1] = bounds.min.y;
+				aabb.m_min[2] = bounds.min.z;
+				aabb.m_max[0] = bounds.max.x;
+				aabb.m_max[1] = bounds.max.y;
+				aabb.m_max[2] = bounds.max.z;
+				ddSetTransform(&world_transform);
+				ddDraw(aabb);
+			}
+			
 			ddPop();
 		}
 
