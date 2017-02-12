@@ -109,6 +109,21 @@ namespace runtime
 			std::chrono::duration<float> dt);
 
 		//-----------------------------------------------------------------------------
+		//  Name : reflection_probe ()
+		/// <summary>
+		/// 
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
+		std::shared_ptr<FrameBuffer> reflection_probe_pass(
+			std::shared_ptr<FrameBuffer> input,
+			Camera& camera,
+			RenderView& render_view,
+			EntityComponentSystem& ecs,
+			std::chrono::duration<float> dt);
+
+		//-----------------------------------------------------------------------------
 		//  Name : atmospherics_pass ()
 		/// <summary>
 		/// 
@@ -143,6 +158,8 @@ namespace runtime
 		std::unique_ptr<Program> _point_light_program;
 		/// Program that is responsible for rendering.
 		std::unique_ptr<Program> _spot_light_program;
+		/// Program that is responsible for rendering.
+		std::unique_ptr<Program> _sphere_ref_probe_program;
 		/// Program that is responsible for rendering.
 		std::unique_ptr<Program> _gamma_correction_program;
 		/// Program that is responsible for rendering.

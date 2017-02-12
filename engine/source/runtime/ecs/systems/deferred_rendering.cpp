@@ -152,6 +152,8 @@ namespace runtime
 
 		output = lighting_pass(output, camera, render_view, ecs, dt);
 
+
+
 		output = atmospherics_pass(output, camera, render_view, ecs, dt);
 
 		output = tonemapping_pass(output, camera, render_view);
@@ -316,7 +318,7 @@ namespace runtime
 		light_pass.bind(l_buffer_fbo.get());
 		light_pass.clear(BGFX_CLEAR_COLOR, 0, 0.0f, 0);
 		light_pass.set_view_proj_ortho_full(1.0f);
-
+		//light_pass.set_view_proj(view, proj);
 		ecs.each<TransformComponent, LightComponent>([this, &camera, &light_pass, &light_buffer_size, &view, &proj, &inv_view_proj, g_buffer_fbo](
 			Entity e,
 			TransformComponent& transform_comp_ref,
@@ -355,7 +357,8 @@ namespace runtime
 				_directional_light_program->set_texture(4, "s_tex4", gfx::getTexture(g_buffer_fbo->handle, 4));
 
 				gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
-				auto topology = gfx::screen_quad((float)light_buffer_size.width, (float)light_buffer_size.height, 1.0f);			
+				auto topology = gfx::screen_quad((float)light_buffer_size.width, (float)light_buffer_size.height, 1.0f);
+				//auto topology = gfx::clip_quad(1.0f);
 				gfx::setState(topology
 					| BGFX_STATE_RGB_WRITE
 					| BGFX_STATE_ALPHA_WRITE
@@ -399,6 +402,7 @@ namespace runtime
 
 				gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
 				auto topology = gfx::screen_quad((float)light_buffer_size.width, (float)light_buffer_size.height, 1.0f);
+				//auto topology = gfx::clip_quad(1.0f);
 				gfx::setState(topology
 					| BGFX_STATE_RGB_WRITE
 					| BGFX_STATE_ALPHA_WRITE
@@ -443,6 +447,7 @@ namespace runtime
 
 				gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
 				auto topology = gfx::screen_quad((float)light_buffer_size.width, (float)light_buffer_size.height, 1.0f);
+				//auto topology = gfx::clip_quad(1.0f);
 				gfx::setState(topology
 					| BGFX_STATE_RGB_WRITE
 					| BGFX_STATE_ALPHA_WRITE
@@ -454,6 +459,77 @@ namespace runtime
 		});
 
 		return l_buffer_fbo;
+	}
+
+	std::shared_ptr<FrameBuffer> DeferredRendering::reflection_probe_pass(
+		std::shared_ptr<FrameBuffer> input,
+		Camera& camera,
+		RenderView& render_view,
+		EntityComponentSystem& ecs,
+		std::chrono::duration<float> dt)
+	{
+		const auto& view = camera.get_view();
+		const auto& proj = camera.get_projection();
+		const auto view_proj = proj * view;
+		const auto inv_view_proj = math::inverse(view_proj);
+
+		const auto& viewport_size = camera.get_viewport_size();
+		auto g_buffer_fbo = render_view.get_g_buffer_fbo(viewport_size).get();
+		const auto light_buffer_size = input->get_size();
+		RenderPass light_pass("reflection_probes_pass");
+		light_pass.bind(input.get());
+		light_pass.set_view_proj_ortho_full(1.0f);
+
+		ecs.each<TransformComponent, ReflectionProbeComponent>([this, &camera, &light_pass, &light_buffer_size, &view, &proj, &inv_view_proj, g_buffer_fbo](
+			Entity e,
+			TransformComponent& transform_comp_ref,
+			ReflectionProbeComponent& probe_comp_ref
+			)
+		{
+			auto& probe = probe_comp_ref.get_probe();
+			const auto& world_transform = transform_comp_ref.get_transform();
+			const auto& probe_position = world_transform.get_position();
+
+			iRect rect(0, 0, light_buffer_size.width, light_buffer_size.height);
+			if (probe_comp_ref.compute_projected_sphere_rect(rect, probe_position, view, proj) == 0)
+				return;
+
+			if (probe.probe_type == ProbeType::Sphere && _sphere_ref_probe_program)
+			{
+
+				float probe_data[4] =
+				{
+					probe.extents.x,
+					probe.extents.x,
+					probe.extents.x,
+					probe.transition_distance
+				};
+
+				// Draw light.
+				_sphere_ref_probe_program->begin_pass();
+				_sphere_ref_probe_program->set_uniform("u_probe_position", &probe_position);
+				_sphere_ref_probe_program->set_uniform("u_probe_data", probe_data);
+				_sphere_ref_probe_program->set_uniform("u_camera_position", &camera.get_position());
+				_sphere_ref_probe_program->set_uniform("u_mtx", &inv_view_proj);
+				_sphere_ref_probe_program->set_texture(0, "s_tex0", gfx::getTexture(g_buffer_fbo->handle, 0));
+				_sphere_ref_probe_program->set_texture(1, "s_tex1", gfx::getTexture(g_buffer_fbo->handle, 1));
+				_sphere_ref_probe_program->set_texture(2, "s_tex2", gfx::getTexture(g_buffer_fbo->handle, 2));
+				_sphere_ref_probe_program->set_texture(3, "s_tex3", gfx::getTexture(g_buffer_fbo->handle, 3));
+				_sphere_ref_probe_program->set_texture(4, "s_tex4", gfx::getTexture(g_buffer_fbo->handle, 4));
+
+				gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
+				auto topology = gfx::screen_quad((float)light_buffer_size.width, (float)light_buffer_size.height, 1.0f);
+				gfx::setState(topology
+					| BGFX_STATE_RGB_WRITE
+					| BGFX_STATE_ALPHA_WRITE
+					| BGFX_STATE_BLEND_ADD
+				);
+				gfx::submit(light_pass.id, _point_light_program->handle);
+				gfx::setState(BGFX_STATE_DEFAULT);
+			}
+		});
+
+		return input;
 	}
 
 	std::shared_ptr<FrameBuffer> DeferredRendering::atmospherics_pass(
@@ -529,9 +605,12 @@ namespace runtime
 		const auto& viewport_size = camera.get_viewport_size();
 		const auto surface = render_view.get_output_fbo(viewport_size);
 		const auto output_size = surface->get_size();
+		const auto& view = camera.get_view();
+		const auto& proj = camera.get_projection();
 		RenderPass pass_blit("output_buffer_fill");
 		pass_blit.bind(surface.get());
 		pass_blit.set_view_proj_ortho_full(1.0f);
+		//pass_blit.set_view_proj(view, proj);
 
 		if (surface && _gamma_correction_program)
 		{
@@ -540,6 +619,7 @@ namespace runtime
 			iRect rect(0, 0, output_size.width, output_size.height);
 			gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
 			auto topology = gfx::screen_quad((float)output_size.width, (float)output_size.height, 1.0f);
+			//auto topology = gfx::clip_quad(1.0f);
 			gfx::setState(topology
 				| BGFX_STATE_RGB_WRITE
 				| BGFX_STATE_ALPHA_WRITE
