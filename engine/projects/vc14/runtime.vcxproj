@@ -26,6 +26,7 @@
     <ClCompile Include="..\..\source\runtime\ecs\components\camera_component.cpp" />
     <ClCompile Include="..\..\source\runtime\ecs\components\light_component.cpp" />
     <ClCompile Include="..\..\source\runtime\ecs\components\model_component.cpp" />
+    <ClCompile Include="..\..\source\runtime\ecs\components\reflection_probe_component.cpp" />
     <ClCompile Include="..\..\source\runtime\ecs\components\transform_component.cpp" />
     <ClCompile Include="..\..\source\runtime\ecs\ecs.cpp" />
     <ClCompile Include="..\..\source\runtime\ecs\prefab.cpp" />
@@ -44,6 +45,7 @@
     <ClCompile Include="..\..\source\runtime\rendering\material.cpp" />
     <ClCompile Include="..\..\source\runtime\rendering\mesh.cpp" />
     <ClCompile Include="..\..\source\runtime\rendering\model.cpp" />
+    <ClCompile Include="..\..\source\runtime\rendering\reflection_probe.cpp" />
     <ClCompile Include="..\..\source\runtime\rendering\program.cpp" />
     <ClCompile Include="..\..\source\runtime\rendering\renderer.cpp" />
     <ClCompile Include="..\..\source\runtime\rendering\render_pass.cpp" />
@@ -84,6 +86,7 @@
     <ClInclude Include="..\..\source\runtime\ecs\components\camera_component.h" />
     <ClInclude Include="..\..\source\runtime\ecs\components\light_component.h" />
     <ClInclude Include="..\..\source\runtime\ecs\components\model_component.h" />
+    <ClInclude Include="..\..\source\runtime\ecs\components\reflection_probe_component.h" />
     <ClInclude Include="..\..\source\runtime\ecs\components\tags_component.h" />
     <ClInclude Include="..\..\source\runtime\ecs\components\transform_component.h" />
     <ClInclude Include="..\..\source\runtime\ecs\ecs.h" />
@@ -101,6 +104,7 @@
     <ClInclude Include="..\..\source\runtime\meta\ecs\components\component.hpp" />
     <ClInclude Include="..\..\source\runtime\meta\ecs\components\light_component.hpp" />
     <ClInclude Include="..\..\source\runtime\meta\ecs\components\model_component.hpp" />
+    <ClInclude Include="..\..\source\runtime\meta\ecs\components\reflection_probe_component.hpp" />
     <ClInclude Include="..\..\source\runtime\meta\ecs\components\transform_component.hpp" />
     <ClInclude Include="..\..\source\runtime\meta\ecs\entity.hpp" />
     <ClInclude Include="..\..\source\runtime\meta\math\transform.hpp" />
@@ -111,6 +115,7 @@
     <ClInclude Include="..\..\source\runtime\meta\rendering\mesh.hpp" />
     <ClInclude Include="..\..\source\runtime\meta\rendering\model.hpp" />
     <ClInclude Include="..\..\source\runtime\meta\rendering\program.hpp" />
+    <ClInclude Include="..\..\source\runtime\meta\rendering\reflection_probe.hpp" />
     <ClInclude Include="..\..\source\runtime\meta\rendering\texture.hpp" />
     <ClInclude Include="..\..\source\runtime\rendering\camera.h" />
     <ClInclude Include="..\..\source\runtime\rendering\debugdraw\bounds.h" />
@@ -133,6 +138,7 @@
     <ClInclude Include="..\..\source\runtime\rendering\material.h" />
     <ClInclude Include="..\..\source\runtime\rendering\mesh.h" />
     <ClInclude Include="..\..\source\runtime\rendering\model.h" />
+    <ClInclude Include="..\..\source\runtime\rendering\reflection_probe.h" />
     <ClInclude Include="..\..\source\runtime\rendering\program.h" />
     <ClInclude Include="..\..\source\runtime\rendering\renderer.h" />
     <ClInclude Include="..\..\source\runtime\rendering\render_pass.h" />

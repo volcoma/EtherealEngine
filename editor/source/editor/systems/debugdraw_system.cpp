@@ -3,6 +3,7 @@
 #include "runtime/ecs/components/camera_component.h"
 #include "runtime/ecs/components/model_component.h"
 #include "runtime/ecs/components/light_component.h"
+#include "runtime/ecs/components/reflection_probe_component.h"
 #include "runtime/rendering/render_pass.h"
 #include "runtime/rendering/camera.h"
 #include "runtime/rendering/mesh.h"
@@ -195,6 +196,41 @@ namespace editor
 				math::vec3 from2 = to1;
 				math::vec3 to2 = from2 + transform_comp_ptr->get_z_axis() * 1.5f;;
 				ddDrawCone(&from2, &to2, 0.5f);
+				ddPop();
+			}
+		}
+
+		if (selected_entity.has_component<ReflectionProbeComponent>())
+		{
+			const auto probe_comp = selected_entity.component<ReflectionProbeComponent>();
+			const auto probe_comp_ptr = probe_comp.lock().get();
+			const auto& probe = probe_comp_ptr->get_probe();
+			if (probe.probe_type == ProbeType::Box)
+			{
+				ddPush();
+				ddSetColor(0xff00ff00);
+				ddSetWireframe(true);
+				ddSetTransform(&world_transform);
+				Aabb aabb;
+				aabb.m_min[0] = -probe.extents.x;
+				aabb.m_min[1] = -probe.extents.y;
+				aabb.m_min[2] = -probe.extents.z;
+				aabb.m_max[0] = probe.extents.x;
+				aabb.m_max[1] = probe.extents.y;
+				aabb.m_max[2] = probe.extents.z;
+				ddDraw(aabb);
+				ddPop();
+			}
+			else
+			{
+				auto radius = probe.extents.x;
+				ddPush();
+				ddSetColor(0xff00ff00);
+				ddSetWireframe(true);
+				math::vec3 center = transform_comp_ptr->get_position();
+				ddDrawCircle(Axis::X, center.x, center.y, center.z, radius);
+				ddDrawCircle(Axis::Y, center.x, center.y, center.z, radius);
+				ddDrawCircle(Axis::Z, center.x, center.y, center.z, radius);
 				ddPop();
 			}
 		}

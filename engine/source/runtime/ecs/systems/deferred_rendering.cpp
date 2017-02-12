@@ -3,6 +3,7 @@
 #include "../components/camera_component.h"
 #include "../components/model_component.h"
 #include "../components/light_component.h"
+#include "../components/reflection_probe_component.h"
 #include "../../rendering/render_pass.h"
 #include "../../rendering/camera.h"
 #include "../../rendering/mesh.h"
@@ -16,6 +17,50 @@
 
 namespace runtime
 {
+
+	Camera get_face_camera(std::uint32_t face, const math::transform_t& transform)
+	{
+		Camera camera;
+		camera.set_fov(90.0f);
+		camera.set_aspect_ratio(1.0f, true);
+		camera.set_near_clip(0.01f);
+		camera.set_far_clip(256.0f);
+
+
+		// Configurable axis vectors used to construct view matrices. In the 
+		// case of the omni light, we align all frustums to the world axes.
+		static const math::vec3 X(1, 0, 0);
+		static const math::vec3 Y(0, 1, 0);
+		static const math::vec3 Z(0, 0, 1);
+
+		math::transform_t t;
+		// Generate the correct view matrix for the frustum
+		switch (face)
+		{
+		case 0: //pFrustumCamera->LookAt( vecPos, (vecPos + X), Y ); break;
+			t.set_rotation(-Z, +Y, +X); break;
+		case 1: // pFrustumCamera->LookAt( vecPos, (vecPos - X), Y ); break;
+			t.set_rotation(+Z, +Y, -X); break;
+		case 2: // pFrustumCamera->LookAt( vecPos, (vecPos + Y), -Z ); break;
+			t.set_rotation(+X, -Z, +Y); break;
+		case 3: // pFrustumCamera->LookAt( vecPos, (vecPos - Y), Z ); break;
+			t.set_rotation(+X, +Z, -Y); break;
+		case 4: // pFrustumCamera->LookAt( vecPos, (vecPos + Z), Y ); break;
+			t.set_rotation(+X, +Y, +Z); break;
+		case 5: // pFrustumCamera->LookAt( vecPos, (vecPos - Z), Y ); break;
+			t.set_rotation(-X, +Y, -Z); break;
+
+		} // End Switch
+
+		t = transform * t;
+		// First update so the camera can cache the previous matrices
+		camera.record_current_matrices();
+		// Set new transform
+		camera.look_at(t.get_position(), t.get_position() + t.z_unit_axis(), t.y_unit_axis());
+
+		return camera;
+	}
+
 	void update_lod_data(LodData& lod_data, std::size_t total_lods, float min_dist, float max_dist, float transition_time, float distance, float dt)
 	{
 		if (total_lods == 1)
@@ -43,6 +88,43 @@ namespace runtime
 	void DeferredRendering::frame_render(std::chrono::duration<float> dt)
 	{
 		auto& ecs = *core::get_subsystem<EntityComponentSystem>();
+
+		//ecs.each<TransformComponent, ReflectionProbeComponent>([this, &ecs, dt](
+		//	Entity ce,
+		//	TransformComponent& transform_comp,
+		//	ReflectionProbeComponent& reflection_probe_comp
+		//	)
+		//{
+		//	const auto& world_tranform = transform_comp.get_transform();
+		//	const auto& probe = reflection_probe_comp.get_probe();
+		//	auto& render_view = reflection_probe_comp.get_render_view();
+		//
+		//	static auto buffer_format = gfx::get_best_format(
+		//		BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER |
+		//		BGFX_CAPS_FORMAT_TEXTURE_CUBE |
+		//		BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN,
+		//		gfx::FormatSearchFlags::FourChannels |
+		//		gfx::FormatSearchFlags::RequireAlpha);
+		//
+		//	static auto flags = gfx::get_default_rt_sampler_flags() | BGFX_TEXTURE_BLIT_DST;
+		//
+		//	std::uint16_t size = 512;
+		//	auto cubemap = render_view.get_texture("CUBEMAP", size, true, 1, buffer_format, flags);
+		//
+		//	for (std::uint32_t i = 0; i < 6; ++i)
+		//	{
+		//		auto camera = get_face_camera(i, world_tranform);
+		//		camera.set_viewport_size({ size, size });
+		//		std::shared_ptr<FrameBuffer> output = nullptr;
+		//		output = atmospherics_pass(output, camera, render_view, ecs, dt);
+		//		output = tonemapping_pass(output, camera, render_view);
+		//
+		//		RenderPass pass("cubemap_fill");
+		//		gfx::blit(pass.id, cubemap->handle, 0, 0, 0, i, gfx::getTexture(output->handle));
+		//	}
+		//	
+		//});
+
 		ecs.each<CameraComponent>([this, &ecs, dt](
 			Entity ce,
 			CameraComponent& camera_comp

@@ -6,11 +6,11 @@
 #include "core/math/math_includes.h"
 #include "core/common/basetypes.hpp"
 #include "../../rendering/render_pass.h"
+#include "../../rendering/camera.h"
 //-----------------------------------------------------------------------------
 // Forward Declarations
 //-----------------------------------------------------------------------------
-enum class ProjectionMode : std::uint32_t;
-class Camera;
+
 
 //-----------------------------------------------------------------------------
 // Main Class Declarations
@@ -125,7 +125,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline Camera& get_camera() { return *_camera.get(); }
+	inline Camera& get_camera() { return _camera; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_camera ()
@@ -135,7 +135,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const Camera& get_camera() const { return *_camera.get(); }
+	inline const Camera& get_camera() const { return _camera; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : update ()
@@ -231,8 +231,8 @@ private:
 	// Private Member Variables.
 	//-------------------------------------------------------------------------
 	/// The camera object this component represents
-	std::unique_ptr<Camera> _camera;
-
+	Camera _camera;
+	/// The render view for this component
 	RenderView _render_view;
 	/// Is the camera HDR?
 	bool _hdr = true;

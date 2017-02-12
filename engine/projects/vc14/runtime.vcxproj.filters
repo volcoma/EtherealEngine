@@ -255,6 +255,12 @@
     <ClCompile Include="..\..\source\runtime\rendering\mesh_tools.cpp">
       <Filter>Source Files\rendering</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\runtime\ecs\components\reflection_probe_component.cpp">
+      <Filter>Source Files\ecs\components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\runtime\rendering\reflection_probe.cpp">
+      <Filter>Source Files\rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\runtime\runtime.h">
@@ -556,6 +562,18 @@
     </ClInclude>
     <ClInclude Include="..\..\source\runtime\rendering\mesh_tools.h">
       <Filter>Source Files\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\ecs\components\reflection_probe_component.h">
+      <Filter>Source Files\ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\rendering\reflection_probe.h">
+      <Filter>Source Files\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\meta\ecs\components\reflection_probe_component.hpp">
+      <Filter>Source Files\meta\ecs\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\meta\rendering\reflection_probe.hpp">
+      <Filter>Source Files\meta\rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

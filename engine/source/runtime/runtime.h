@@ -34,6 +34,7 @@
 #include "meta/ecs/components/camera_component.hpp"
 #include "meta/ecs/components/model_component.hpp"
 #include "meta/ecs/components/light_component.hpp"
+#include "meta/ecs/components/reflection_probe_component.hpp"
 #include "meta/ecs/entity.hpp"
 
 #include "meta/rendering/material.hpp"
