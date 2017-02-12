@@ -66,7 +66,7 @@ void main()
 	const float u_mie_collection_power = 0.39f;
 	const float u_mie_distribution = 0.63f;
 	const float u_surface_height = 0.99f; // < 1
-	const float u_intensity = 1.0f;
+	const float u_intensity = 1.8f;
 	const int u_step_count = 2;
 
 	vec3 eye_dir = normalize(v_weye_dir);

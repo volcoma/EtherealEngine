@@ -554,6 +554,13 @@ namespace bgfx { namespace hlsl
 		}
 
 		s_compiler = load();
+		if (!s_compiler)
+		{
+			bx::stringPrintf(err, "Could not load d3dcompiler dll.\n");
+			fprintf(stderr, "Could not load d3dcompiler dll.\n");
+			return false;
+		}
+		
 
 		bool result = false;
 		bool debug = _cmdLine.hasArg('\0', "debug");
