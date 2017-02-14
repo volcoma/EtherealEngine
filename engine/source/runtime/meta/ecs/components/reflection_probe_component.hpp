@@ -14,7 +14,6 @@ REFLECT(ReflectionProbeComponent)
 			rttr::policy::ctor::as_std_shared_ptr,
 			rttr::metadata("CanExecuteInEditor", true)
 		)
-		.property("Probe", &ReflectionProbeComponent::get_probe, &ReflectionProbeComponent::set_probe)
 		;
 
 }

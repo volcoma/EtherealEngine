@@ -357,26 +357,22 @@ namespace gfx
 			const float minx = -width;
 			const float maxx = width;
 			const float miny = -height;
-			const float maxy = height*2.0f;
+			const float maxy = height;
 
 			const float texel_half_w = texture_half;
 			const float texel_half_h = texture_half;
-			const float minu = -1.0f + texel_half_w;
-			const float maxu = 1.0f + texel_half_h;
+			const float minu = 0.0f;
+			const float maxu = 1.0f;
 
 			const float zz = depth;
 
-			float minv = texel_half_h;
-			float maxv = 2.0f + texel_half_h;
+			float minv = 1.0f;
+			float maxv = 0.0f;
 
 			if (origin_bottom_left)
 			{
-				float temp = minv;
-				minv = maxv;
-				maxv = temp;
-
-				minv -= 1.0f;
-				maxv -= 1.0f;
+				minv = 1.0f - minv;
+				maxv = 1.0f - maxv;
 			}
 
 			vertex[0].x = minx;

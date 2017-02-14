@@ -24,15 +24,15 @@ int ReflectionProbeComponent::compute_projected_sphere_rect(iRect& rect, const m
 			rect.top,
 			rect.bottom,
 			position,
-			_probe.extents.x,
+			_probe.sphere_data.range,
 			view,
 			proj);
 	}
 	else if (_probe.probe_type == ProbeType::Box)
 	{
-		float w2 = math::pow(_probe.extents.x * 2.0f, 2.0f);
-		float h2 = math::pow(_probe.extents.y * 2.0f, 2.0f);
-		float l2 = math::pow(_probe.extents.z * 2.0f, 2.0f);
+		float w2 = math::pow(_probe.box_data.extents.x * 2.0f, 2.0f);
+		float h2 = math::pow(_probe.box_data.extents.y * 2.0f, 2.0f);
+		float l2 = math::pow(_probe.box_data.extents.z * 2.0f, 2.0f);
 		float d2 = w2 + h2 + l2;
 		float d = math::sqrt(d2);
 
@@ -50,4 +50,19 @@ int ReflectionProbeComponent::compute_projected_sphere_rect(iRect& rect, const m
 	{
 		return 1;
 	}
+}
+
+std::shared_ptr<Texture> ReflectionProbeComponent::get_cubemap()
+{
+	static auto buffer_format = gfx::get_best_format(
+		BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER |
+		BGFX_CAPS_FORMAT_TEXTURE_CUBE |
+		BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN,
+		gfx::FormatSearchFlags::FourChannels |
+		gfx::FormatSearchFlags::RequireAlpha);
+
+	static auto flags = gfx::get_default_rt_sampler_flags() | BGFX_TEXTURE_BLIT_DST;
+
+	std::uint16_t size = 256;
+	return _render_view.get_texture("CUBEMAP", size, true, 1, buffer_format, flags);
 }

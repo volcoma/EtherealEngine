@@ -18,7 +18,18 @@ struct ReflectionProbe
 	REFLECTABLE(ReflectionProbe)
 	SERIALIZABLE(ReflectionProbe)
 
+	struct Box
+	{
+		math::vec3 extents = { 5.0, 5.0f, 5.0f };
+		float transition_distance = 1.0f;
+	};
+
+	struct Sphere
+	{
+		float range = 5.0f;
+	};
+
 	ProbeType probe_type = ProbeType::Box;
-	math::vec3 extents = { 5.0, 5.0f, 5.0f };
-	float transition_distance = 1.0f;
+	Box box_data;
+	Sphere sphere_data;
 };

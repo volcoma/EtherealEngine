@@ -107,9 +107,6 @@ namespace gfx
 	{
 		static std::uint32_t sampler_flags = 0
 			| BGFX_TEXTURE_RT
-			| BGFX_TEXTURE_MIN_POINT
-			| BGFX_TEXTURE_MAG_POINT
-			| BGFX_TEXTURE_MIP_POINT
 			| BGFX_TEXTURE_U_CLAMP
 			| BGFX_TEXTURE_V_CLAMP
 			;
@@ -141,7 +138,6 @@ namespace gfx
 
 		return initted;
 	}	
-
 	std::uint64_t screen_quad(float dest_width, float dest_height, float depth = 0.0f, float width = 1.0f, float height = 1.0f);
 	std::uint64_t clip_quad(float depth = 0.0f, float width = 1.0f, float height = 1.0f);
 }

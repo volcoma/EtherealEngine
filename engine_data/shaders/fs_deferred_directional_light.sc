@@ -1,4 +1,5 @@
 $input v_texcoord0
+
 #define DIRECTIONAL_LIGHT 1
 
 #include "fs_pbr_lighting.sh"

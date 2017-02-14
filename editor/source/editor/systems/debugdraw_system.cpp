@@ -212,18 +212,18 @@ namespace editor
 				ddSetWireframe(true);
 				ddSetTransform(&world_transform);
 				Aabb aabb;
-				aabb.m_min[0] = -probe.extents.x;
-				aabb.m_min[1] = -probe.extents.y;
-				aabb.m_min[2] = -probe.extents.z;
-				aabb.m_max[0] = probe.extents.x;
-				aabb.m_max[1] = probe.extents.y;
-				aabb.m_max[2] = probe.extents.z;
+				aabb.m_min[0] = -probe.box_data.extents.x;
+				aabb.m_min[1] = -probe.box_data.extents.y;
+				aabb.m_min[2] = -probe.box_data.extents.z;
+				aabb.m_max[0] = probe.box_data.extents.x;
+				aabb.m_max[1] = probe.box_data.extents.y;
+				aabb.m_max[2] = probe.box_data.extents.z;
 				ddDraw(aabb);
 				ddPop();
 			}
 			else
 			{
-				auto radius = probe.extents.x;
+				auto radius = probe.sphere_data.range;
 				ddPush();
 				ddSetColor(0xff00ff00);
 				ddSetWireframe(true);

@@ -55,7 +55,6 @@ public:
 	//-----------------------------------------------------------------------------
 	inline void set_probe(const ReflectionProbe& probe) { _probe = probe; }
 
-
 	//-----------------------------------------------------------------------------
 	//  Name : compute_projected_sphere_rect ()
 	/// <summary>
@@ -79,6 +78,8 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	inline RenderView& get_render_view() { return _render_view; }
+
+	std::shared_ptr<Texture> get_cubemap();
 private:
 	//-------------------------------------------------------------------------
 	// Private Member Variables.

@@ -19,8 +19,8 @@ struct GBufferData
 void encodeGBuffer(in GBufferData data, inout vec4 result[4])
 {
 	result[0] = vec4(data.base_color, data.ambient_occlusion);
-	result[1] = vec4(encodeNormalOctahedron(data.world_normal), 0.0f, data.roughness);
-	//result[1] = vec4(encodeNormalUint(data.world_normal), data.roughness);
+	//result[1] = vec4(encodeNormalOctahedron(data.world_normal), 0.0f, data.roughness);
+	result[1] = vec4(encodeNormalUint(data.world_normal), data.roughness);
 	result[2] = vec4(data.emissive_color, data.metalness);
 	result[3] = vec4(data.subsurface_color, data.subsurface_opacity);
 }
@@ -37,8 +37,8 @@ GBufferData decodeGBuffer(vec2 texcoord, sampler2D tex0, sampler2D tex1, sampler
 
 	data.base_color = data0.xyz;
 	data.ambient_occlusion = data0.w;
-	data.world_normal = decodeNormalOctahedron(data1.xy);
-	//data.world_normal = decodeNormalUint(data1.xyz);
+	//data.world_normal = decodeNormalOctahedron(data1.xy);
+	data.world_normal = decodeNormalUint(data1.xyz);
 	data.roughness = data1.w;
 	data.emissive_color = data2.xyz;
 	data.metalness = data2.w;
@@ -495,7 +495,7 @@ vec3 F_Roughness(vec3 SpecularColor, float Roughness, vec3 VoH)
 	return (SpecularColor + (max(vec3(1.0f-Roughness, 1.0f-Roughness, 1.0f-Roughness), SpecularColor) - SpecularColor) * pow((1.0f - VoH), vec3(5.0f, 5.0f, 5.0f)));
 }
 
-vec3 EnvBRDF_GGX( vec3 SpecularColor, float Roughness, float NoV )
+vec3 EnvironmentLightingDFG_GGX_Fresnel_SmithSchlickGGX( vec3 SpecularColor, float Roughness, float NoV )
 {
 	float alphaR = Roughness*Roughness;
     float x = 1.0f - alphaR;
@@ -523,8 +523,13 @@ vec3 EnvBRDF_GGX( vec3 SpecularColor, float Roughness, float NoV )
     return SpecularColor * scale + bias;
 }
 
+struct SurfaceShading
+{
+	vec3 direct;
+	vec3 indirect;
+};
 	
-vec3 StandardShading( vec3 DiffuseColor, vec3 SpecularColor, vec3 LobeRoughness, vec3 LobeEnergy, vec3 L, vec3 V, vec3 N )
+SurfaceShading StandardShading( vec3 DiffuseColor, vec3 IndirectDiffuse, vec3 SpecularColor, vec3 IndirectSpecular, vec3 LobeRoughness, vec3 LobeEnergy, float metalness, float occlusion, vec3 L, vec3 V, vec3 N )
 {
 	vec3 H = normalize(V + L);
 	float NoL = saturate( dot(N, L) );
@@ -537,9 +542,16 @@ vec3 StandardShading( vec3 DiffuseColor, vec3 SpecularColor, vec3 LobeRoughness,
 	float Vis = Visibility( LobeRoughness[1], NoV, NoL, VoH, NoH );
 	vec3 F = Fresnel( SpecularColor, VoH );
 	vec3 Diffuse_Color = Diffuse( DiffuseColor, LobeRoughness[1], NoV, NoL, VoH );
-
-	return Diffuse_Color * LobeEnergy[2] + (D * Vis) * F;
+	
+	float OneMinusReflectivity = 0.04f - metalness * 0.04f;
+	float GrazingTerm = saturate((1.0f - LobeRoughness[1]) + (1-OneMinusReflectivity));
+	float specular_occlusion = saturate( Square( NoV + occlusion ) - 1.0f + occlusion );
+	SurfaceShading shading;
+	shading.indirect = DiffuseColor * IndirectDiffuse + IndirectSpecular * EnvironmentLightingDFG_GGX_Fresnel_SmithSchlickGGX(SpecularColor, LobeRoughness[1], NoV) * specular_occlusion;
+	shading.direct = Diffuse_Color * LobeEnergy[2] + (D * Vis) * F;
+	return shading;
 }
+
 	
 vec3 SubsurfaceShading( vec3 SubsurfaceColor, float Opacity, float AO, vec3 L, vec3 V, vec3 N )
 {
@@ -569,6 +581,20 @@ vec3 SubsurfaceShadingTwoSided( vec3 SubsurfaceColor, vec3 L, vec3 V, vec3 N )
 	float d = ( VoL * a2 - VoL ) * VoL + 1.0f;	// 2 mad
 	float GGX = (a2 / PI) / (d * d);		// 2 mul, 1 rcp
 	return NoL * GGX * SubsurfaceColor;
-}	
+}
+
+float ComputeReflectionCaptureMipFromRoughness(float Roughness, float maxMipLevels)
+{
+	const float REFLECTION_CAPTURE_ROUGHEST_MIP = 1.0f;
+	const float REFLECTION_CAPTURE_ROUGHNESS_MIP_SCALE = 1.5f;
+	// Heuristic that maps roughness to mip level
+	// This is done in a way such that a certain mip level will always have the same roughness, regardless of how many mips are in the texture
+	// Using more mips in the cubemap just allows sharper reflections to be supported
+	// Note: this must match the logic in FilterReflectionEnvironment that generates the mip filter samples!
+	float LevelFrom1x1 = REFLECTION_CAPTURE_ROUGHEST_MIP - REFLECTION_CAPTURE_ROUGHNESS_MIP_SCALE * log2(Roughness);
+	//// Note: must match GReflectionCaptureSize
+	float HardcodedNumCaptureArrayMips = maxMipLevels;
+	return HardcodedNumCaptureArrayMips - 1 - LevelFrom1x1;
+}
 	
 #endif // __LIGHTING_SH__

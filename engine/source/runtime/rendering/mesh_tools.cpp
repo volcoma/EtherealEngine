@@ -335,8 +335,8 @@ static void tessellate_sphere(std::vector<math::vec3>& out_vertices, std::vector
 void TriangleMeshTools::create_icosphere(
 	std::vector<math::vec3>& out_vertices,
 	std::vector<std::uint32_t> & out_indices,
-	int tessellation_level, 
-	bool share_vertices, 
+	int tessellation_level,
+	bool share_vertices,
 	bool y_up)
 {
 	std::vector<math::vec3> temp0_vertices;
@@ -377,10 +377,10 @@ void TriangleMeshTools::create_cylinder(
 	std::vector<std::uint32_t>& out_indices,
 	float height,
 	float radius_bottom,
-	float radius_top, 
+	float radius_top,
 	int tessellation,
 	bool open_top_bottom,
-	bool share_vertices, 
+	bool share_vertices,
 	bool y_up)
 {
 	// has to have at least 3 sides!

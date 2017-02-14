@@ -4,10 +4,14 @@
 #include <vector>
 #include <memory>
 #include <chrono>
+#include <tuple>
 #include "../../rendering/program.h"
+#include "../components/transform_component.h"
+#include "../components/model_component.h"
 
 class Camera;
 class RenderView;
+
 
 namespace runtime
 {
@@ -18,11 +22,25 @@ namespace runtime
 		float current_time = 0.0f;
 	};
 
+	using Element = std::tuple<Entity, CHandle<TransformComponent>, CHandle<ModelComponent>>;
+	using VisibilitySetModels = std::vector<Element>;
+
 	class DeferredRendering : public core::Subsystem
 	{
 	public:
+		
+
 		//-----------------------------------------------------------------------------
-		//  Name : frameRender (virtual )
+		//  Name : gather_visible_models ()
+		/// <summary>
+		/// 
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
+		VisibilitySetModels gather_visible_models(EntityComponentSystem& ecs, Camera* camera, bool dirty_only = false, bool static_only = true);
+		//-----------------------------------------------------------------------------
+		//  Name : frame_render (virtual )
 		/// <summary>
 		/// 
 		/// 
@@ -89,7 +107,7 @@ namespace runtime
 			std::shared_ptr<FrameBuffer> input,
 			Camera& camera,
 			RenderView& render_view,
-			EntityComponentSystem& ecs,
+			VisibilitySetModels& visibility_set,
 			std::unordered_map<Entity, LodData>& camera_lods, 
 			std::chrono::duration<float> dt);
 
@@ -106,7 +124,8 @@ namespace runtime
 			Camera& camera, 
 			RenderView& render_view,
 			EntityComponentSystem& ecs,
-			std::chrono::duration<float> dt);
+			std::chrono::duration<float> dt,
+			bool bind_indirect_specular);
 
 		//-----------------------------------------------------------------------------
 		//  Name : reflection_probe ()
@@ -158,6 +177,8 @@ namespace runtime
 		std::unique_ptr<Program> _point_light_program;
 		/// Program that is responsible for rendering.
 		std::unique_ptr<Program> _spot_light_program;
+		/// Program that is responsible for rendering.
+		std::unique_ptr<Program> _box_ref_probe_program;
 		/// Program that is responsible for rendering.
 		std::unique_ptr<Program> _sphere_ref_probe_program;
 		/// Program that is responsible for rendering.
