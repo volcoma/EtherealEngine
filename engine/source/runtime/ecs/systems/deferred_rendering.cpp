@@ -23,7 +23,7 @@ namespace runtime
 		camera.set_fov(90.0f);
 		camera.set_aspect_ratio(1.0f, true);
 		camera.set_near_clip(0.01f);
-		camera.set_far_clip(range);
+		camera.set_far_clip(256.0f);
 
 
 		// Configurable axis vectors used to construct view matrices. In the 
