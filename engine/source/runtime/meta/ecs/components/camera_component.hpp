@@ -8,7 +8,7 @@
 REFLECT(CameraComponent)
 {
 
-	rttr::registration::class_<CameraComponent>("CameraComponent")
+	rttr::registration::class_<CameraComponent>("Component/Camera")
 		.constructor<>()
 		(
 			rttr::policy::ctor::as_std_shared_ptr
