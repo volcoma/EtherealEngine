@@ -91,6 +91,7 @@ struct function_traits<R(T::*)(Args...) const>
 	typedef R(*pointer)(Args...);
 	typedef R return_type;
 	static constexpr std::size_t arg_count = sizeof...(Args);
+	typedef std::tuple<Args...> args_tuple;
 	typedef const std::function<R(Args...)> function;
 };
 
@@ -104,35 +105,34 @@ template<typename F>
 class function_wrapper_t : public function_wrapper
 {
 public:
-	function_wrapper_t(F&& f) : func(f) {}
+	function_wrapper_t(F&& f) : _function(f) {}
 	~function_wrapper_t() {}
-	const void* get_ptr() const { return &func; }
+	const void* get_ptr() const { return &_function; }
 
 private:
-	F func;
+	typename function_traits<F>::function _function;
 };
 
 template <typename F>
-std::unique_ptr<function_wrapper> create_wrapper(F& f)
+std::unique_ptr<function_wrapper> create_wrapper(F&& f)
 {
-	typedef function_wrapper_t<typename function_traits<F>::function> wrapper_type_t;
-	return std::unique_ptr<wrapper_type_t>(new wrapper_type_t(f));
+	return std::unique_ptr<function_wrapper_t<typename F>>(new function_wrapper_t<typename F>(std::forward<F>(f)));
 }
 
 class event_dispatcher
 {
 public:
 	template<typename F>
-	void connect(std::string name, F&& f)
+	void connect(const std::string& name, F&& f)
 	{
 		static_assert(std::is_same<void, typename function_traits<F>::return_type>::value,
 			"Signals cannot have a return type different from void");
 
-		_list[name].emplace_back(create_wrapper(f));
+		_list[name].emplace_back(create_wrapper(std::forward<F>(f)));
 	}
 
 	template<typename ... Args>
-	void dispatch(std::string name, Args... args)
+	void dispatch(const std::string& name, Args... args)
 	{
 		auto& funcs = _list[name];
 

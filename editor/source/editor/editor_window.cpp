@@ -8,6 +8,7 @@
 #include "runtime/ecs/components/transform_component.h"
 #include "runtime/ecs/components/camera_component.h"
 #include "runtime/ecs/components/light_component.h"
+#include "runtime/ecs/components/reflection_probe_component.h"
 #include "runtime/ecs/utils.h"
 #include "runtime/system/filesystem.h"
 #include "runtime/rendering/render_pass.h"
@@ -56,6 +57,31 @@ void default_scene()
 	}
 	{
 		auto object = ecs->create();
+		object.set_name("global probe");
+		object.assign<TransformComponent>().lock()
+			->set_local_position({ 0.0f, 1.0f, 0.0f });
+
+		ReflectionProbe probe;
+		probe.method = ReflectMethod::Environment;
+		probe.probe_type = ProbeType::Sphere;
+		probe.sphere_data.range = 1000.0f;
+		object.assign<ReflectionProbeComponent>().lock()
+			->set_probe(probe);
+	}
+	{
+		auto object = ecs->create();
+		object.set_name("local probe");
+		object.assign<TransformComponent>().lock()
+			->set_local_position({ 0.0f, 1.0f, 0.0f });
+
+		ReflectionProbe probe;
+		probe.method = ReflectMethod::Static;
+		probe.probe_type = ProbeType::Box;
+		object.assign<ReflectionProbeComponent>().lock()
+			->set_probe(probe);
+	}
+	{
+		auto object = ecs->create();
 		object.set_name("platform");
 		object.assign<TransformComponent>();
 
@@ -69,7 +95,7 @@ void default_scene()
 		//Add component and configure it.
 		object.assign<ModelComponent>().lock()
 			->set_casts_shadow(true)
-			.set_casts_reflection(false)
+			.set_casts_reflection(true)
 			.set_model(model);
 	}
 	{

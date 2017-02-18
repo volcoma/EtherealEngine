@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/subsystem.h"
+#include "core/subsystem/subsystem.h"
 #include "../rendering/render_window.h"
 #include <memory>
 #include <vector>

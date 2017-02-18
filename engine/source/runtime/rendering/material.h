@@ -2,7 +2,7 @@
 
 #include "../assets/asset_handle.h"
 #include "core/math/math_includes.h"
-#include <vector>
+#include <unordered_map>
 
 #include "core/reflection/rttr/rttr_enable.h"
 #include "core/serialization/serialization.h"
@@ -388,7 +388,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> get_color_map() const { return _color_map; }
+	inline AssetHandle<Texture> get_color_map() { return _maps["color"]; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_color_map ()
@@ -398,7 +398,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_color_map(AssetHandle<Texture> val) { _color_map = val; }
+	inline void set_color_map(AssetHandle<Texture> val) { _maps["color"] = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_normal_map ()
@@ -408,7 +408,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> get_normal_map() const { return _normal_map; }
+	inline AssetHandle<Texture> get_normal_map() { return _maps["roughness"]; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_normal_map ()
@@ -418,7 +418,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_normal_map(AssetHandle<Texture> val) { _normal_map = val; }
+	inline void set_normal_map(AssetHandle<Texture> val) { _maps["normal"] = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_roughness_map ()
@@ -428,7 +428,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> get_roughness_map() const { return _roughness_map; }
+	inline AssetHandle<Texture> get_roughness_map() { return _maps["roughness"]; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_roughness_map ()
@@ -438,7 +438,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_roughness_map(AssetHandle<Texture> val) { _roughness_map = val; }
+	inline void set_roughness_map(AssetHandle<Texture> val) { _maps["roughness"] = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_metalness_map ()
@@ -448,7 +448,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> get_metalness_map() const { return _metalness_map; }
+	inline AssetHandle<Texture> get_metalness_map() { return _maps["metalness"]; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_metalness_map ()
@@ -458,7 +458,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_metalness_map(AssetHandle<Texture> val) { _metalness_map = val; }
+	inline void set_metalness_map(AssetHandle<Texture> val) { _maps["metalness"] = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_ao_map ()
@@ -468,7 +468,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> get_ao_map() const { return _ao_map; }
+	inline AssetHandle<Texture> get_ao_map() { return _maps["ao"]; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_ao_map ()
@@ -478,7 +478,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_ao_map(AssetHandle<Texture> val) { _ao_map = val; }
+	inline void set_ao_map(AssetHandle<Texture> val) { _maps["ao"] = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : submit (virtual )
@@ -511,7 +511,7 @@ private:
 	/// Surface data
 	math::vec4 _surface_data
 	{
-		0.4f, /// Roughness
+		0.3f, /// Roughness
 		0.0f, /// Metalness
 		1.0f, /// Bumpiness
 		0.25f /// AlphaTestValue
@@ -520,7 +520,6 @@ private:
 	math::vec2 _tiling
 	{
 		1.0f, 1.0f ///Primary
-//		1.0f, 1.0f  ///Secondary
 	};
 	/// Dithering data
 	math::vec2 _dither_threshold
@@ -528,14 +527,7 @@ private:
 		0.5f, ///Alpha threshold
 		0.5f  ///Distance threshold
 	};
-	/// Color map
-	AssetHandle<Texture> _color_map;
-	/// Normal map
-	AssetHandle<Texture> _normal_map;
-	/// Roughness map
-	AssetHandle<Texture> _roughness_map;
-	/// Metalness map
-	AssetHandle<Texture> _metalness_map;
-	/// AO map
-	AssetHandle<Texture> _ao_map;
+
+	/// Texture maps
+	std::unordered_map<std::string, AssetHandle<Texture>> _maps;
 };

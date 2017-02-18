@@ -10,8 +10,7 @@ REFLECT(ModelComponent)
 	rttr::registration::class_<ModelComponent>("ModelComponent")
 		.constructor<>()
 		(
-			rttr::policy::ctor::as_std_shared_ptr,
-			rttr::metadata("CanExecuteInEditor", true)
+			rttr::policy::ctor::as_std_shared_ptr
 		)
 		.property("Static",
 			&ModelComponent::is_static,

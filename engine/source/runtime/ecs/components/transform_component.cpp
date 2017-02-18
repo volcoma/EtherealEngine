@@ -585,9 +585,7 @@ TransformComponent& TransformComponent::set_local_transform(const math::transfor
 	if (_local_transform.compare(trans, 0.0001f) == 0)
 		return *this;
 
-	static const std::string strContext = "local_transform";
-
-	touch(strContext);
+	touch();
 
 	_local_transform = trans;
 
@@ -596,9 +594,7 @@ TransformComponent& TransformComponent::set_local_transform(const math::transfor
 
 void TransformComponent::resolve(bool force, float dt)
 {
-	bool dirty = is_dirty();
-
-	if (force || dirty)
+	if (force || is_dirty())
 	{
 		if (!_parent.expired())
 		{
@@ -621,8 +617,6 @@ void TransformComponent::resolve(bool force, float dt)
 			_world_transform = _local_transform;
 		}
 	}
-
-	_dirty = false;
 }
 
 bool TransformComponent::is_dirty() const

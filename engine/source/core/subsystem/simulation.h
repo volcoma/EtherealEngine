@@ -1,26 +1,27 @@
 #pragma once
 
-#include "core/subsystem/subsystem.h"
-#include "core/events/event.hpp"
-#include "core/logging/logging.h"
-
+#include "subsystem.h"
 #include <chrono>
 #include <vector>
 
-class RenderWindow;
-namespace runtime
+
+namespace core
 {
 	//-----------------------------------------------------------------------------
 	// Main Class Declarations
 	//-----------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------
-	//  Name : Engine (Class)
+	//  Name : Simulation (Class)
 	/// <summary>
-	/// Ethereal engine, creates the other subsystems.
+	/// Class responsible for timers.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	struct Engine : public core::Subsystem
+	struct Simulation : public core::Subsystem
 	{
+		using timepoint = std::chrono::time_point<std::chrono::high_resolution_clock>;
+		using clock = std::chrono::high_resolution_clock;
+		using duration = std::chrono::high_resolution_clock::duration;
+
 		//-----------------------------------------------------------------------------
 		//  Name : initialize ()
 		/// <summary>
@@ -42,93 +43,99 @@ namespace runtime
 		void dispose() override;
 
 		//-----------------------------------------------------------------------------
-		//  Name : destroy_windows ()
-		/// <summary>
-		/// 
-		/// 
-		/// 
-		/// </summary>
-		//-----------------------------------------------------------------------------
-		void destroy_windows();
-
-		//-----------------------------------------------------------------------------
-		//  Name : start ()
-		/// <summary>
-		/// 
-		/// 
-		/// 
-		/// </summary>
-		//-----------------------------------------------------------------------------
-		bool start(std::shared_ptr<RenderWindow> main_window);
-
-		//-----------------------------------------------------------------------------
 		//  Name : run_one_frame ()
 		/// <summary>
-		/// Perform on frame with specified fps, this will call update/render internally
+		/// Perform on frame computations with specified fps
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		void run_one_frame();
 
 		//-----------------------------------------------------------------------------
-		//  Name : set_running ()
+		//  Name : get_frame ()
 		/// <summary>
 		/// 
 		/// 
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		inline void set_running(bool running) { _running = running; }
+		inline const std::uint64_t& get_frame() const { return _frame; }
+	
+		//-----------------------------------------------------------------------------
+		//  Name : set_min_fps ()
+		/// <summary>
+		/// Set minimum frames per second. If fps goes lower than this, time will appear to slow.
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
+		void set_min_fps(unsigned);
 
 		//-----------------------------------------------------------------------------
-		//  Name : is_running ()
+		//  Name : set_max_fps ()
 		/// <summary>
-		/// Returns if engine is exiting
+		/// Set maximum frames per second. The engine will sleep if fps is higher than this.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		inline bool is_running() const { return _running; }
+		void set_max_fps(unsigned);
+	
+		//-----------------------------------------------------------------------------
+		//  Name : set_max_inactive_fps ()
+		/// <summary>
+		/// Set maximum frames per second when the application does not have input focus.
+		/// </summary>
+		//-----------------------------------------------------------------------------
+		void set_max_inactive_fps(unsigned);
+		
+		//-----------------------------------------------------------------------------
+		//  Name : set_time_smoothing_step ()
+		/// <summary>
+		/// Set how many frames to average for timestep smoothing.
+		/// </summary>
+		//-----------------------------------------------------------------------------
+		void set_time_smoothing_step(unsigned);
 
 		//-----------------------------------------------------------------------------
-		//  Name : register_window ()
+		//  Name : get_time_since_launch ()
 		/// <summary>
-		/// 
-		/// 
-		/// 
+		/// Returns duration since launch.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void register_window(std::shared_ptr<RenderWindow> window);
-
+		duration get_time_since_launch() const;
+		
 		//-----------------------------------------------------------------------------
-		//  Name : get_windows ()
+		//  Name : get_fps ()
 		/// <summary>
-		/// 
-		/// 
-		/// 
+		/// Returns frames per second.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		inline const std::vector<std::shared_ptr<RenderWindow>>& get_windows() const { return _windows; }
-
+		unsigned get_fps() const;
+	
 		//-----------------------------------------------------------------------------
-		//  Name : get_focused_window ()
+		//  Name : get_delta_time ()
 		/// <summary>
-		/// 
-		/// 
-		/// 
+		/// Returns the delta time in seconds.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		RenderWindow* get_focused_window() { return _focused_window.get(); }
+		std::chrono::duration<float> get_delta_time() const;
 
 	protected:
-		/// exiting flag
-		bool _running = false;
-		/// engine windows
-		std::vector<std::shared_ptr<RenderWindow>> _windows;
-		/// currently processed window
-		std::shared_ptr<RenderWindow> _focused_window;
+		/// minimum/maximum frames per second
+		unsigned int _min_fps = 0;
+		///
+		unsigned int _max_fps = 0;
+		///
+		unsigned int _max_inactive_fps = 0;
+		/// previous time steps for smoothing in seconds
+		std::vector<duration> _previous_timesteps;
+		/// next frame time step in seconds
+		duration _timestep = duration::zero();
+		/// current frame
+		std::uint64_t _frame = 0;
+		/// how many frames to average for the smoothed time step
+		unsigned int _smoothing_step = 11;
+		/// frame update timer
+		timepoint _last_frame_timepoint = clock::now();
+		/// time point when we launched
+		timepoint _launch_timepoint = clock::now();
 	};
-
-	/// engine events
-	extern event<void(std::chrono::duration<float>)> on_frame_begin;
-	extern event<void(std::chrono::duration<float>)> on_frame_update;
-	extern event<void(std::chrono::duration<float>)> on_frame_render;
-	extern event<void(std::chrono::duration<float>)> on_frame_end;
 }

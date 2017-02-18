@@ -1,6 +1,7 @@
 #include "docks.h"
 #include "../../edit_state.h"
 #include "../../project.h"
+#include "core/subsystem/simulation.h"
 #include "runtime/system/engine.h"
 #include "runtime/input/input.h"
 #include "runtime/ecs/components/transform_component.h"
@@ -188,10 +189,10 @@ namespace Docks
 
 		auto es = core::get_subsystem<editor::EditState>();
 		auto input = core::get_subsystem<runtime::Input>();
-		auto engine = core::get_subsystem<runtime::Engine>();
+		auto sim = core::get_subsystem<core::Simulation>();
 
 		auto& editor_camera = es->camera;
-		auto dt = engine->get_delta_time().count();
+		auto dt = sim->get_delta_time().count();
 
 		auto transform = editor_camera.component<TransformComponent>().lock();
 		float movement_speed = 5.0f;
@@ -295,6 +296,7 @@ namespace Docks
 		auto engine = core::get_subsystem<runtime::Engine>();
 		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 		auto input = core::get_subsystem<runtime::Input>();
+		auto sim = core::get_subsystem<core::Simulation>();
 
 		auto window = engine->get_focused_window();
 		auto& editor_camera = es->camera;
@@ -305,7 +307,7 @@ namespace Docks
 			&& editor_camera.has_component<CameraComponent>()
 			&& editor_camera.has_component<TransformComponent>();
 
-		show_statistics(engine->get_fps());
+		show_statistics(sim->get_fps());
 
 		if (!has_edit_camera)
 			return;

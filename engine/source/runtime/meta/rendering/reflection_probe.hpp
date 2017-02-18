@@ -12,6 +12,11 @@ REFLECT(ReflectionProbe)
 			rttr::value("Box", ProbeType::Box),
 			rttr::value("Sphere", ProbeType::Sphere)
 		);
+	rttr::registration::enumeration<ReflectMethod>("ReflectMethod")
+		(
+			rttr::value("Environment", ReflectMethod::Environment),
+			rttr::value("Static", ReflectMethod::Static)
+		);
 	rttr::registration::class_<ReflectionProbe::Box>("Box")
 		.property("Extents", &ReflectionProbe::Box::extents)
 		.property("Transition Distance", &ReflectionProbe::Box::transition_distance)
@@ -21,12 +26,14 @@ REFLECT(ReflectionProbe)
 		;
 	rttr::registration::class_<ReflectionProbe>("ReflectionProbe")
 		.property("Type", &ReflectionProbe::probe_type)
+		.property("Method", &ReflectionProbe::method)
 		;
 }
 
 SAVE(ReflectionProbe)
 {
 	try_save(ar, cereal::make_nvp("probe_type", obj.probe_type));
+	try_save(ar, cereal::make_nvp("method", obj.method));
 	try_save(ar, cereal::make_nvp("extents", obj.box_data.extents));
 	try_save(ar, cereal::make_nvp("transition_distance", obj.box_data.transition_distance));
 	try_save(ar, cereal::make_nvp("range", obj.sphere_data.range));
@@ -35,6 +42,7 @@ SAVE(ReflectionProbe)
 LOAD(ReflectionProbe)
 {
 	try_load(ar, cereal::make_nvp("probe_type", obj.probe_type));
+	try_load(ar, cereal::make_nvp("method", obj.method));
 	try_load(ar, cereal::make_nvp("extents", obj.box_data.extents));
 	try_load(ar, cereal::make_nvp("transition_distance", obj.box_data.transition_distance));
 	try_load(ar, cereal::make_nvp("range", obj.sphere_data.range));

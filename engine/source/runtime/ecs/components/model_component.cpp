@@ -22,9 +22,10 @@ ModelComponent& ModelComponent::set_casts_shadow(bool castShadow)
 	if (_casts_shadow == castShadow)
 		return *this;
 
-	static const std::string strContext = "CastsShadow";
-	touch(strContext);
+	touch();
+
 	_casts_shadow = castShadow;
+
 	return *this;
 }
 
@@ -33,8 +34,8 @@ ModelComponent& ModelComponent::set_static(bool bStatic)
 	if (_static == bStatic)
 		return *this;
 
-	static const std::string strContext = "Static";
-	touch(strContext);
+	touch();
+
 	_static = bStatic;
 	return *this;
 }
@@ -44,8 +45,8 @@ ModelComponent& ModelComponent::set_casts_reflection(bool castReflection)
 	if (_casts_reflection == castReflection)
 		return *this;
 
-	static const std::string strContext = "CastReflection";
-	touch(strContext);
+	touch();
+
 	_casts_reflection = castReflection;
 	return *this;
 }
@@ -69,8 +70,8 @@ ModelComponent& ModelComponent::set_model(const Model& model)
 {
 	_model = model;
 
-	static const std::string strContext = "ModelChange";
-	touch(strContext);
+	touch();
+
 	return *this;
 }
 

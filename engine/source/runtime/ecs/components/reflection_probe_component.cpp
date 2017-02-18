@@ -66,3 +66,13 @@ std::shared_ptr<Texture> ReflectionProbeComponent::get_cubemap()
 	std::uint16_t size = 256;
 	return _render_view.get_texture("CUBEMAP", size, true, 1, buffer_format, flags);
 }
+
+void ReflectionProbeComponent::set_probe(const ReflectionProbe& probe)
+{
+	if (probe == _probe)
+		return;
+
+	touch();
+
+	_probe = probe;
+}

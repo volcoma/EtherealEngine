@@ -402,7 +402,8 @@
     <ClInclude Include="..\..\source\core\serialization\cereal\types\valarray.hpp" />
     <ClInclude Include="..\..\source\core\serialization\cereal\types\vector.hpp" />
     <ClInclude Include="..\..\source\core\serialization\serialization.h" />
-    <ClInclude Include="..\..\source\core\subsystem.h" />
+    <ClInclude Include="..\..\source\core\subsystem\simulation.h" />
+    <ClInclude Include="..\..\source\core\subsystem\subsystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\core\common\handle_set.cpp" />
@@ -449,7 +450,8 @@
     <ClCompile Include="..\..\source\core\reflection\rttr\type.cpp" />
     <ClCompile Include="..\..\source\core\reflection\rttr\variant.cpp" />
     <ClCompile Include="..\..\source\core\reflection\rttr\variant_array_view.cpp" />
-    <ClCompile Include="..\..\source\core\subsystem.cpp" />
+    <ClCompile Include="..\..\source\core\subsystem\simulation.cpp" />
+    <ClCompile Include="..\..\source\core\subsystem\subsystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\source\core\math\glm\detail\func_common.inl" />

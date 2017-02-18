@@ -120,11 +120,17 @@ void StandardMaterial::submit()
 	get_program()->set_uniform("u_tiling", &_tiling);
 	get_program()->set_uniform("u_dither_threshold", &_dither_threshold);
 
-	auto albedo = _color_map ? _color_map : _default_color_map;
-	auto normal = _normal_map ? _normal_map : _default_normal_map;
-	auto roughness = _roughness_map ? _roughness_map : _default_color_map;
-	auto metalness = _metalness_map ? _metalness_map : _default_color_map;
-	auto ao = _ao_map ? _ao_map : _default_color_map;
+	const auto& color_map = _maps["color"];
+	const auto& normal_map = _maps["normal"];
+	const auto& roughness_map = _maps["roughness"];
+	const auto& metalness_map = _maps["metalness"];
+	const auto& ao_map = _maps["ao"];
+
+	auto albedo = color_map ? color_map : _default_color_map;
+	auto normal = normal_map ? normal_map : _default_normal_map;
+	auto roughness = roughness_map ? roughness_map : _default_color_map;
+	auto metalness = metalness_map ? metalness_map : _default_color_map;
+	auto ao = ao_map ? ao_map : _default_color_map;
 
 	get_program()->set_texture(0, "s_tex_color", albedo.get());
 	get_program()->set_texture(1, "s_tex_normal", normal.get());

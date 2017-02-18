@@ -1,7 +1,7 @@
 #pragma once
 
 #include <unordered_map>
-#include "core/subsystem.h"
+#include "core/subsystem/subsystem.h"
 #include "input_mapping.hpp"
 
 #include "core/common/basetypes.hpp"

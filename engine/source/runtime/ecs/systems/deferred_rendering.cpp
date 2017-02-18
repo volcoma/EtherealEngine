@@ -17,7 +17,7 @@
 
 namespace runtime
 {
-	Camera get_face_camera(std::uint32_t face, float range,  const math::transform_t& transform)
+	Camera get_face_camera(std::uint32_t face,  const math::transform_t& transform)
 	{
 		Camera camera;
 		camera.set_fov(90.0f);
@@ -103,8 +103,8 @@ namespace runtime
 	bool should_rebuild_reflections(VisibilitySetModels& visibility_set, const ReflectionProbe& probe)
 	{
 
-// 		if (pProbe->getAffectMethod() != AffectMethod::All)
-// 			return false;
+ 		if (probe.method == ReflectMethod::Environment)
+ 			return false;
 
 		for (auto& element : visibility_set)
 		{
@@ -132,13 +132,9 @@ namespace runtime
 
 			bool result = false;
 
-			float range = probe.sphere_data.range;
-			if(probe.probe_type == ProbeType::Box)
-				math::max(probe.box_data.extents.x, probe.box_data.extents.y, probe.box_data.extents.z);
-
 			for (std::uint32_t i = 0; i < 6; ++i)
 			{			
-				const auto& frustum = get_face_camera(i, range, world_transform).get_frustum();
+				const auto& frustum = get_face_camera(i, world_transform).get_frustum();
 				result |= math::frustum::test_obb(frustum, bounds, world_transform);
 			}
 
@@ -149,7 +145,7 @@ namespace runtime
 		return false;
 	}
 
-	VisibilitySetModels DeferredRendering::gather_visible_models(EntityComponentSystem& ecs, Camera* camera, bool dirty_only/* = false*/, bool static_only /*= true*/)
+	VisibilitySetModels DeferredRendering::gather_visible_models(EntityComponentSystem& ecs, Camera* camera, bool dirty_only/* = false*/, bool static_only /*= true*/, bool require_reflection_caster /*= false*/)
 	{
 		VisibilitySetModels result;
 		CHandle<TransformComponent> transform_comp_handle;
@@ -160,6 +156,11 @@ namespace runtime
 			auto transform_comp_ptr = transform_comp_handle.lock();
 
 			if (static_only && !model_comp_ptr->is_static())
+			{
+				continue;
+			}
+
+			if (require_reflection_caster && !model_comp_ptr->casts_reflection())
 			{
 				continue;
 			}
@@ -224,7 +225,7 @@ namespace runtime
 		//////////////////////////////////////////////////////////////////////////
 		// Reflection Probe Generation
 		//////////////////////////////////////////////////////////////////////////
-		auto dirty_models = gather_visible_models(ecs, nullptr, true, true);
+		auto dirty_models = gather_visible_models(ecs, nullptr, true, true, true);
 		ecs.each<TransformComponent, ReflectionProbeComponent>([this, &ecs, dt, &dirty_models](
 			Entity ce,
 			TransformComponent& transform_comp,
@@ -235,25 +236,28 @@ namespace runtime
 			const auto& probe = reflection_probe_comp.get_probe();
 			auto& render_view = reflection_probe_comp.get_render_view();
 			auto cubemap = reflection_probe_comp.get_cubemap();
+			bool should_rebuild = true;
 
 			if (!transform_comp.is_dirty() && !reflection_probe_comp.is_dirty())
 			{
 				// If reflections shouldn't be rebuilt - continue.
-				if (!should_rebuild_reflections(dirty_models, probe))
-					return;
+				should_rebuild = should_rebuild_reflections(dirty_models, probe);
 			}
 
-			float range = probe.sphere_data.range;
-			if (probe.probe_type == ProbeType::Box)
-				math::max(probe.box_data.extents.x, probe.box_data.extents.y, probe.box_data.extents.z);
+			if (!should_rebuild)
+				return;
 
 			//iterate trough each cube face
 			for (std::uint32_t i = 0; i < 6; ++i)
 			{
-				auto camera = get_face_camera(i, range, world_tranform);
+				auto camera = get_face_camera(i, world_tranform);
 				camera.set_viewport_size(cubemap->get_size());
 				auto& camera_lods = _lod_data[ce];
-				auto visibility_set = gather_visible_models(ecs, &camera, true, true);
+				VisibilitySetModels visibility_set;
+
+				if(probe.method != ReflectMethod::Environment)
+					visibility_set = gather_visible_models(ecs, &camera, !should_rebuild, true, true);
+
 				std::shared_ptr<FrameBuffer> output = nullptr;		
 				output = g_buffer_pass(output, camera, render_view, visibility_set, camera_lods, dt);	
 				output = lighting_pass(output, camera, render_view, ecs, dt, false);	
@@ -296,7 +300,7 @@ namespace runtime
 	{
 		std::shared_ptr<FrameBuffer> output = nullptr;
 
-		auto visibility_set = gather_visible_models(ecs, &camera, false, false);
+		auto visibility_set = gather_visible_models(ecs, &camera, false, false, false);
 
 		output = g_buffer_pass(output, camera, render_view, visibility_set, camera_lods, dt);
 

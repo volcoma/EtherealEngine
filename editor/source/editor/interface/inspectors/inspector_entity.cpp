@@ -60,25 +60,19 @@ bool Inspector_Entity::inspect(rttr::variant& var, bool readOnly, std::function<
 
 			// If any constructors registered
 			auto cstructor = component_type.get_constructor();
-			auto meta = cstructor.get_metadata("CanExecuteInEditor");
-			if (cstructor && meta)
+			if (cstructor)
 			{
-				bool invoke_in_editor = meta.to_bool();
-				if (invoke_in_editor)
+				if (!filter.PassFilter(component_type.get_name().data()))
+					continue;
+
+				if (gui::Selectable(component_type.get_name().data()))
 				{
-					if (!filter.PassFilter(component_type.get_name().data()))
-						continue;
+					auto c = cstructor.invoke();
+					auto c_ptr = c.get_value<std::shared_ptr<runtime::Component>>();
+					if (c_ptr)
+						data.assign(c_ptr);
 
-					if (gui::Selectable(component_type.get_name().data()))
-					{
-						auto c = cstructor.invoke();
-						auto c_ptr = c.get_value<std::shared_ptr<runtime::Component>>();
-						if (c_ptr)
-							data.assign(c_ptr);
-
-						gui::CloseCurrentPopup();
-					}
-
+					gui::CloseCurrentPopup();
 				}
 			}
 		}

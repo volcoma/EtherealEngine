@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/subsystem.h"
+#include "core/subsystem/subsystem.h"
 #include "core/common/spin.hpp"
 #include "core/common/handle_object_set.hpp"
 

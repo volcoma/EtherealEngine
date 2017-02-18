@@ -63,8 +63,7 @@ LOAD(Entity)
 		{
 			auto component_shared = component.lock();
 			obj.assign(component_shared);
-			static const std::string context = "deserialized";
-			component_shared->touch(context);
+			component_shared->touch();
 		}
 	}
 

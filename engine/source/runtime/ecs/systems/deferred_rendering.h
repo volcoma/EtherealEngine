@@ -38,7 +38,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		VisibilitySetModels gather_visible_models(EntityComponentSystem& ecs, Camera* camera, bool dirty_only = false, bool static_only = true);
+		VisibilitySetModels gather_visible_models(EntityComponentSystem& ecs, Camera* camera, bool dirty_only = false, bool static_only = true, bool require_reflection_caster = false);
 		//-----------------------------------------------------------------------------
 		//  Name : frame_render (virtual )
 		/// <summary>

@@ -11,10 +11,8 @@ REFLECT(ReflectionProbeComponent)
 	rttr::registration::class_<ReflectionProbeComponent>("ReflectionProbeComponent")
 		.constructor<>()
 		(
-			rttr::policy::ctor::as_std_shared_ptr,
-			rttr::metadata("CanExecuteInEditor", true)
-		)
-		;
+			rttr::policy::ctor::as_std_shared_ptr
+		);
 
 }
 

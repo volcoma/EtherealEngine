@@ -11,8 +11,7 @@ REFLECT(CameraComponent)
 	rttr::registration::class_<CameraComponent>("CameraComponent")
 		.constructor<>()
 		(
-			rttr::policy::ctor::as_std_shared_ptr,
-			rttr::metadata("CanExecuteInEditor", true)
+			rttr::policy::ctor::as_std_shared_ptr
 		)
 		.property("Projection Mode",
 			&CameraComponent::get_projection_mode,

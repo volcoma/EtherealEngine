@@ -10,10 +10,8 @@ REFLECT(LightComponent)
 	rttr::registration::class_<LightComponent>("LightComponent")
 		.constructor<>()
 		(
-			rttr::policy::ctor::as_std_shared_ptr,
-			rttr::metadata("CanExecuteInEditor", true)
-		)
-		;
+			rttr::policy::ctor::as_std_shared_ptr
+		);
 }
 
 

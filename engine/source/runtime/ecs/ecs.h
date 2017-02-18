@@ -1,6 +1,7 @@
 #pragma once
 
-#include "core/subsystem.h"
+#include "core/subsystem/subsystem.h"
+#include "core/subsystem/simulation.h"
 #include "core/events/event.hpp"
 #include "core/common/assert.hpp"
 #include "core/common/type_traits.hpp"
@@ -251,7 +252,7 @@ virtual std::shared_ptr<Component> clone() const								\
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		Component() = default;
+		Component() { touch(); }
 
 		//-----------------------------------------------------------------------------
 		//  Name : Component ()
@@ -261,7 +262,7 @@ virtual std::shared_ptr<Component> clone() const								\
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		Component(const Component& component) = default;
+		Component(const Component& component) { touch(); }
 
 		//-----------------------------------------------------------------------------
 		//  Name : ~Component (virtual )
@@ -291,7 +292,7 @@ virtual std::shared_ptr<Component> clone() const								\
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------	
-		virtual void touch(const std::string& context) { _dirty = true; }
+		virtual void touch() { _last_touched = core::get_subsystem<core::Simulation>()->get_frame() + 1; }
 
 		//-----------------------------------------------------------------------------
 		//  Name : isDirty (virtual )
@@ -301,7 +302,7 @@ virtual std::shared_ptr<Component> clone() const								\
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		virtual bool is_dirty() const { return _dirty; }
+		virtual bool is_dirty() const { return _last_touched >= core::get_subsystem<core::Simulation>()->get_frame(); }
 
 		//-----------------------------------------------------------------------------
 		//  Name : onEntitySet (virtual )
@@ -336,7 +337,7 @@ virtual std::shared_ptr<Component> clone() const								\
 		/// Owning Entity
 		Entity _entity;
 		/// Was the component touched.
-		bool _dirty = false;
+		std::uint64_t _last_touched = 0;
 	};
 
 
