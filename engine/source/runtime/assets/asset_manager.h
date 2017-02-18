@@ -138,30 +138,22 @@ namespace runtime
 
 		/// Storage container
 		std::unordered_map<std::string, LoadRequest<T>> container;
-		/// Sub directory
-		fs::path subdir;
-		/// Sub directory
-		fs::path platform;
+		/// Extension
+		std::string ext;
 	};
 
 	template<typename T>
-	inline fs::path get_absolute_key(const std::string& toLowerKey, T storage)
+	inline fs::path get_absolute_key(const std::string& to_lower_key, T storage)
 	{
-		fs::path absoluteKey = fs::resolve_protocol(toLowerKey);
-		fs::path dir = absoluteKey;
-		dir.remove_filename();
-		std::string file = absoluteKey.filename().string();
-
-		static const std::string ext = ".asset";
-		absoluteKey = fs::absolute(dir / storage->subdir / storage->platform / fs::path(file + ext));
-		return absoluteKey;
+		fs::path absolute_key = fs::absolute(fs::resolve_protocol(to_lower_key).string() + storage->ext);
+		return absolute_key;
 	};
 
 
 	class AssetManager : public core::Subsystem
 	{
 	public:
-		void setup();
+		bool initialize();
 		//-----------------------------------------------------------------------------
 		//  Name : add ()
 		/// <summary>
@@ -204,7 +196,7 @@ namespace runtime
 		std::shared_ptr<TStorage<S>> get_storage()
 		{
 			auto it = storages.find(core::TypeInfo::id<Storage, TStorage<S>>());
-			assert(it != storages.end());
+			//assert(it != storages.end());
 			return it == storages.end()
 				? std::shared_ptr<TStorage<S>>()
 				: std::shared_ptr<TStorage<S>>(std::static_pointer_cast<TStorage<S>>(it->second));
@@ -259,8 +251,7 @@ namespace runtime
 			const std::uint32_t& size)
 		{
 			auto storage = get_storage<T>();
-			const std::string toLowerKey = string_utils::to_lower(key);
-			return create_asset_from_memory_impl<T>(toLowerKey, data, size, storage->container, storage->load_from_memory);
+			return create_asset_from_memory_impl<T>(key, data, size, storage->container, storage->load_from_memory);
 		}
 
 		//-----------------------------------------------------------------------------
@@ -274,20 +265,20 @@ namespace runtime
 		template<typename T>
 		void rename_asset(
 			const std::string& key,
-			const std::string& newRelativeKey)
+			const std::string& new_key)
 		{
 			auto storage = get_storage<T>();
-			const std::string toLowerKey = string_utils::to_lower(key);
-			const std::string toLowerNewKey = string_utils::to_lower(newRelativeKey);
 
-			auto absoluteKey = get_absolute_key(toLowerKey, storage);
-			auto absoluteNewKey = get_absolute_key(toLowerNewKey, storage);
+			auto absolute_key = get_absolute_key(key, storage);
+			auto absolute_new_key = get_absolute_key(new_key, storage);
+			
+			// rename compiled assets
+			fs::rename(absolute_key, absolute_new_key, std::error_code{});
 
-			fs::rename(absoluteKey, absoluteNewKey, std::error_code{});
-
-			storage->container[toLowerNewKey] = storage->container[toLowerKey];
-			storage->container[toLowerNewKey].asset.link->id = toLowerNewKey;
-			storage->container.erase(toLowerKey);
+			auto& request = storage->container[key];
+			storage->container[new_key] = request;
+			storage->container[new_key].asset.link->id = new_key;
+			storage->container.erase(key);
 		}
 
 		//-----------------------------------------------------------------------------
@@ -303,12 +294,11 @@ namespace runtime
 			const std::string& key)
 		{
 			auto storage = get_storage<T>();
-			const std::string toLowerKey = string_utils::to_lower(key);
-
-			auto& request = storage->container[toLowerKey];
+		
+			auto& request = storage->container[key];
 			request.asset.link->asset.reset();
 			request.asset.link->id.clear();
-			storage->container.erase(toLowerKey);
+			storage->container.erase(key);
 		}
 
 		//-----------------------------------------------------------------------------
@@ -324,14 +314,14 @@ namespace runtime
 			const std::string& key)
 		{
 			auto storage = get_storage<T>();
-			const std::string toLowerKey = string_utils::to_lower(key);
-			const fs::path absoluteKey = get_absolute_key(toLowerKey, storage);
-			fs::remove(absoluteKey, std::error_code{});
+			fs::path absolute_key = get_absolute_key(key, storage);
 
-			auto& request = storage->container[toLowerKey];
+			fs::remove(absolute_key, std::error_code{});
+
+			auto& request = storage->container[key];
 			request.asset.link->asset.reset();
 			request.asset.link->id.clear();
-			storage->container.erase(toLowerKey);
+			storage->container.erase(key);
 		}
 		//-----------------------------------------------------------------------------
 		//  Name : load ()
@@ -347,17 +337,16 @@ namespace runtime
 			bool async,
 			bool force = false)
 		{
-			const auto toLowerKey = string_utils::to_lower(key);
 			auto storage = get_storage<T>();
 			//if embedded resource
-			if (toLowerKey.find("embedded") != std::string::npos)
+			if (key.find("embedded") != std::string::npos)
 			{
-				return find_or_create_asset_impl<T>(toLowerKey, storage->container);
+				return find_or_create_asset_impl<T>(key, storage->container);
 			}
 			else
 			{
-				const fs::path absoluteKey = get_absolute_key(toLowerKey, storage);
-				return load_asset_from_file_impl<T>(toLowerKey, absoluteKey, async, force, storage->container, storage->load_from_file);
+				const fs::path absoluteKey = get_absolute_key(key, storage);
+				return load_asset_from_file_impl<T>(key, absoluteKey, async, force, storage->container, storage->load_from_file);
 
 			}
 		}
@@ -374,19 +363,17 @@ namespace runtime
 		void save(const AssetHandle<T>& asset)
 		{
 			auto storage = get_storage<T>();
-			const std::string toLowerKey = string_utils::to_lower(asset.id());
-			const fs::path absoluteKey = get_absolute_key(toLowerKey, storage);
+			const fs::path absoluteKey = get_absolute_key(asset.id(), storage);
 			storage->save_to_file(absoluteKey, asset);
 		}
 
 		template<typename T>
-		void create_asset_entry(
+		LoadRequest<T>& find_or_create_asset_entry(
 			const std::string& key
 		)
 		{
-			const auto toLowerKey = string_utils::to_lower(key);
 			auto storage = get_storage<T>();
-			find_or_create_asset_impl<T>(toLowerKey, storage->container);
+			return find_or_create_asset_impl<T>(key, storage->container);
 		}
 
 	private:

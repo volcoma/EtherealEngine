@@ -74,12 +74,13 @@ bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, s
 		if (dragged && dragged.is_type<AssetHandle<Texture>>())
 		{
 			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.9f));
-			gui::RenderFrameEx(bbMinFrame, bbMaxFrame, true, 0.0f, 2.0f);
+			gui::RenderFrameEx(bbMinFrame, bbMaxFrame, true, 0.0f, 1.0f);
 			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
 			gui::PopStyleColor();
 
 			if (hoveredFrame || gui::IsItemHoveredRect())
 			{
+				gui::SetMouseCursor(ImGuiMouseCursor_Move);
 				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
 				gui::RenderFrameEx(bbMinFrame, bbMaxFrame, true, 0.0f, 2.0f);
 				gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
@@ -147,6 +148,7 @@ bool Inspector_AssetHandle_Material::inspect(rttr::variant& var, bool readOnly, 
 
 			if (gui::IsItemHoveredRect())
 			{
+				gui::SetMouseCursor(ImGuiMouseCursor_Move);
 				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
 				gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
 				gui::PopStyleColor();
@@ -216,6 +218,7 @@ bool Inspector_AssetHandle_Mesh::inspect(rttr::variant& var, bool readOnly, std:
 
 			if (gui::IsItemHoveredRect())
 			{
+				gui::SetMouseCursor(ImGuiMouseCursor_Move);
 				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
 				gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
 				gui::PopStyleColor();
@@ -235,7 +238,11 @@ bool Inspector_AssetHandle_Mesh::inspect(rttr::variant& var, bool readOnly, std:
 
 	if (data)
 	{
-		rttr::variant vari = data.get()->info;
+		Mesh::Info info;
+		info.vertices = data->get_vertex_count();
+		info.primitives = data->get_face_count();
+		info.subsets = static_cast<std::uint32_t>(data->get_subset_count());
+		rttr::variant vari = info;
 		changed |= inspect_var(vari);
 	}
 	return changed;
@@ -280,6 +287,7 @@ bool Inspector_AssetHandle_Prefab::inspect(rttr::variant& var, bool readOnly, st
 
 			if (gui::IsItemHoveredRect())
 			{
+				gui::SetMouseCursor(ImGuiMouseCursor_Move);
 				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
 				gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
 				gui::PopStyleColor();

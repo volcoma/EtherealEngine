@@ -1,10 +1,11 @@
 #include "docks.h"
 #include "../../edit_state.h"
+#include "../../project.h"
 #include "runtime/ecs/prefab.h"
 #include "runtime/ecs/utils.h"
 #include "runtime/ecs/components/transform_component.h"
 #include "runtime/ecs/components/model_component.h"
-#include "runtime/ecs/systems/transform_system.h"
+#include "runtime/ecs/systems/scene_graph.h"
 #include "runtime/input/input.h"
 #include "runtime/system/filesystem.h"
 #include "runtime/rendering/mesh.h"
@@ -38,7 +39,8 @@ namespace Docks
 				}
 				if (gui::Selectable("Save As Prefab"))
 				{
-					ecs::utils::save_entity("data://prefabs/", entity);
+					editor::AssetFolder* folder = editor::AssetFolder::opened.get();
+					ecs::utils::save_entity(folder->absolute, entity);
 				}
 				if (gui::Selectable("Delete"))
 				{
@@ -80,26 +82,36 @@ namespace Docks
 		{
 			if (gui::IsItemHoveredRect())
 			{
+
+
 				if (gui::IsMouseClicked(gui::drag_button) &&
 					entity != editor_camera)
 				{
 					es->drag(entity, entity.to_string());
 				}
-				if (gui::IsMouseReleased(gui::drag_button))
+				
+				if (dragged && entity != editor_camera)
 				{
-					if (dragged && entity != editor_camera)
-					{
-						if (dragged.is_type<runtime::Entity>())
+					if (dragged.is_type<runtime::Entity>())
+					{				
+						auto dragged_entity = dragged.get_value<runtime::Entity>();
+						if (dragged_entity && dragged_entity != entity)
 						{
-							
-							auto dragged_entity = dragged.get_value<runtime::Entity>();
-							dragged_entity.component<TransformComponent>().lock()
-								->set_parent(entity.component<TransformComponent>());
+							gui::SetMouseCursor(ImGuiMouseCursor_Move);
+							if (gui::IsMouseReleased(gui::drag_button))
+							{	
+								dragged_entity.component<TransformComponent>().lock()
+									->set_parent(entity.component<TransformComponent>());
 
-							es->drop();
+								es->drop();
+							}
 						}
+					}
 
-						if (dragged.is_type<AssetHandle<Prefab>>())
+					if (dragged.is_type<AssetHandle<Prefab>>())
+					{
+						gui::SetMouseCursor(ImGuiMouseCursor_Move);
+						if (gui::IsMouseReleased(gui::drag_button))
 						{
 							auto prefab = dragged.get_value<AssetHandle<Prefab>>();
 							auto object = prefab->instantiate();
@@ -109,10 +121,14 @@ namespace Docks
 							es->drop();
 							es->select(object);
 						}
-						if (dragged.is_type<AssetHandle<Mesh>>())
+					}
+					if (dragged.is_type<AssetHandle<Mesh>>())
+					{
+						gui::SetMouseCursor(ImGuiMouseCursor_Move);
+						if (gui::IsMouseReleased(gui::drag_button))
 						{
 							auto mesh = dragged.get_value<AssetHandle<Mesh>>();
-							Model model;		
+							Model model;
 							model.set_lod(mesh, 0);
 
 							auto object = ecs->create();
@@ -143,8 +159,9 @@ namespace Docks
 		gui::PushID(entity.id().index());
 		gui::AlignFirstTextHeightToWidgets();
 		auto es = core::get_subsystem<editor::EditState>();
+		auto input = core::get_subsystem<runtime::Input>();
 		auto& selected = es->selection_data.object;
-
+		static bool edit_label = false;
 		bool is_selected = false;
 		if (selected && selected.is_type<runtime::Entity>())
 		{
@@ -159,6 +176,13 @@ namespace Docks
 		if (is_selected)
 			flags |= ImGuiTreeNodeFlags_Selected;
 
+		if (is_selected && !gui::IsAnyItemActive())
+		{
+			if (input->is_key_pressed(sf::Keyboard::F2))
+			{
+				edit_label = true;
+			}
+		}
 
 		auto transformComponent = entity.component<TransformComponent>().lock();
 		bool no_children = true;
@@ -168,16 +192,17 @@ namespace Docks
 		if (no_children)
 			flags |= ImGuiTreeNodeFlags_Leaf;
 
-		static bool edit_label = false;
+		
 	
 		auto pos = gui::GetCursorScreenPos();
 		bool opened = gui::TreeNodeEx(name.c_str(), flags);
 
 		if (edit_label && is_selected)
 		{
-			std::string inputBuff = name;
-			inputBuff.resize(64, 0);
-			inputBuff.shrink_to_fit();
+			static std::string inputBuff(64, 0);
+			std::memset(&inputBuff[0], 0, 64);
+			std::memcpy(&inputBuff[0], name.c_str(), name.size() < 64 ? name.size() : 64);
+
 			gui::SetCursorScreenPos(pos);
 			gui::PushID(transformComponent.get());
 			gui::PushItemWidth(gui::GetContentRegionAvailWidth());
@@ -251,10 +276,10 @@ namespace Docks
 	{
 		auto es = core::get_subsystem<editor::EditState>();
 		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
-		auto ts = core::get_subsystem<runtime::TransformSystem>();
+		auto sg = core::get_subsystem<runtime::SceneGraph>();
 		auto input = core::get_subsystem<runtime::Input>();
 
-		auto& roots = ts->get_roots();
+		auto& roots = sg->get_roots();
 
 		auto& editor_camera = es->camera;
 		auto& selected = es->selection_data.object;
@@ -269,7 +294,7 @@ namespace Docks
 				if (selected && selected.is_type<runtime::Entity>())
 				{
 					auto sel = selected.get_value<runtime::Entity>();
-					if (sel != editor_camera)
+					if (sel && sel != editor_camera)
 					{
 						sel.destroy();
 						es->unselect();
@@ -284,7 +309,7 @@ namespace Docks
 					if (selected && selected.is_type<runtime::Entity>())
 					{
 						auto sel = selected.get_value<runtime::Entity>();
-						if (sel != editor_camera)
+						if (sel && sel != editor_camera)
 						{
 							auto clone = ecs->create_from_copy(sel);
 							clone.component<TransformComponent>().lock()
@@ -311,27 +336,39 @@ namespace Docks
 
 		if (gui::IsWindowHovered() && !gui::IsAnyItemHovered())
 		{
-			if (gui::IsMouseReleased(gui::drag_button))
+			
+			if (dragged)
 			{
-				if (dragged)
+				if (dragged.is_type<runtime::Entity>())
 				{
-					if (dragged.is_type<runtime::Entity>())
+					gui::SetMouseCursor(ImGuiMouseCursor_Move);
+					if (gui::IsMouseReleased(gui::drag_button))
 					{
 						auto dragged_entity = dragged.get_value<runtime::Entity>();
-						dragged_entity.component<TransformComponent>().lock()
-							->set_parent(runtime::CHandle<TransformComponent>());
+						if (dragged_entity)
+						{
+							dragged_entity.component<TransformComponent>().lock()
+								->set_parent(runtime::CHandle<TransformComponent>());
+						}		
 
 						es->drop();
 					}
-					if (dragged.is_type<AssetHandle<Prefab>>())
+				}
+				if (dragged.is_type<AssetHandle<Prefab>>())
+				{
+					gui::SetMouseCursor(ImGuiMouseCursor_Move);
+					if (gui::IsMouseReleased(gui::drag_button))
 					{
 						auto prefab = dragged.get_value<AssetHandle<Prefab>>();
 						auto object = prefab->instantiate();
 						es->drop();
 						es->select(object);
-
 					}
-					if (dragged.is_type<AssetHandle<Mesh>>())
+				}
+				if (dragged.is_type<AssetHandle<Mesh>>())
+				{
+					gui::SetMouseCursor(ImGuiMouseCursor_Move);
+					if (gui::IsMouseReleased(gui::drag_button))
 					{
 						auto mesh = dragged.get_value<AssetHandle<Mesh>>();
 						Model model;
@@ -350,7 +387,7 @@ namespace Docks
 						es->select(object);
 					}
 				}
-			}
+			}		
 		}
 	}
 

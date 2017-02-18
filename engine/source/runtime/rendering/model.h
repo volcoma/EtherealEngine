@@ -3,12 +3,14 @@
 #include "../assets/asset_handle.h"
 #include "core/reflection/reflection.h"
 #include "core/serialization/serialization.h"
-
+#include "core/math/math_includes.h"
 #include <vector>
 
 struct Group;
-struct Mesh;
+class Mesh;
+struct Program;
 class Material;
+
 class Model
 {
 public:
@@ -123,7 +125,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	AssetHandle<Material> get_material_for_group(const Group& group) const;
+	AssetHandle<Material> get_material_for_group(const size_t& group) const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_lod_transition_time ()
@@ -185,9 +187,20 @@ public:
 	//-----------------------------------------------------------------------------
 	void set_lod_min_distance(float distance);
 
+	//-----------------------------------------------------------------------------
+	//  Name : render ()
+	/// <summary>
+	/// Draws a mesh with a given program. If program is nullptr then the
+	/// materials are used instead. Extra states can be added to the material ones.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	void render(std::uint8_t id, const math::transform_t& mtx, bool apply_cull, bool depth_write, bool depth_test, std::uint64_t extra_states, unsigned int lod, Program* user_program, std::function<void(Program&)> setup_params) const;
+
 private:
 	/// Collection of all materials for this model.
 	std::vector<AssetHandle<Material>> _materials;
+	/// Default material
+	AssetHandle<Material> _default_material;
 	/// Collection of all lods for this model.
 	std::vector<AssetHandle<Mesh>> _mesh_lods;
 	/// Duration for a transition between two lods.

@@ -65,6 +65,7 @@ bld/
 *.tmp
 *.tmp_proj
 *.log
+*.tlog
 *.vspscc
 *.vssscc
 .builds
@@ -89,14 +90,5 @@ ipch/
 *.vspx
 *.sap
 
-
 # User data
-examples/
-build/
-tools/embedded_build
 editor_data/config/*.cfg
-
-# Don't want to ignore .objs files in Assets
-!engine_data/meshes/*.obj
-!editor_data/meshes/*.obj
-!engine/source/runtime/rendering/debug

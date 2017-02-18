@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/subsystem.h"
+#include "core/subsystem/subsystem.h"
 #include "runtime/assets/asset_handle.h"
 #include "runtime/rendering/program.h"
 #include <chrono>

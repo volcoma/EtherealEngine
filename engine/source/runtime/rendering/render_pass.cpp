@@ -20,6 +20,7 @@ std::uint8_t generate_id()
 RenderPass::RenderPass(const std::string& n)
 {
 	id = generate_id();
+	gfx::setViewName(id, n.c_str());
 }
 
 void RenderPass::bind(FrameBuffer* fb) const
@@ -44,7 +45,7 @@ void RenderPass::bind(FrameBuffer* fb) const
 		std::uint16_t(size.height)
 	);
 
-
+	
 	gfx::setViewFrameBuffer(id, fb->handle);
 	gfx::touch(id);
 	
@@ -64,10 +65,21 @@ void RenderPass::clear() const
 {
 	gfx::setViewClear(id
 		, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH | BGFX_CLEAR_STENCIL
-		, 0x2D2D2DFF
+		, 0x000000FF
 		, 1.0f
 		, 0
 	);
+}
+
+void RenderPass::set_view_proj(const math::transform_t& v, const math::transform_t& p)
+{
+	gfx::setViewTransform(id, &v, &p);
+}
+
+void RenderPass::set_view_proj_ortho_full(float depth)
+{
+	static const math::transform_t p = math::ortho(0.0f, 1.0f, 1.0f, 0.0f, 0.0f, depth, gfx::is_homogeneous_depth());
+	gfx::setViewTransform(id, {}, &p);
 }
 
 void RenderPass::reset()

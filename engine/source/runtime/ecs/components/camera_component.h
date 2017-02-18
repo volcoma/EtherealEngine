@@ -5,13 +5,12 @@
 #include "../ecs.h"
 #include "core/math/math_includes.h"
 #include "core/common/basetypes.hpp"
-
+#include "../../rendering/render_pass.h"
+#include "../../rendering/camera.h"
 //-----------------------------------------------------------------------------
 // Forward Declarations
 //-----------------------------------------------------------------------------
-enum class ProjectionMode : std::uint32_t;
-class Camera;
-struct FrameBuffer;
+
 
 //-----------------------------------------------------------------------------
 // Main Class Declarations
@@ -126,7 +125,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline Camera& get_camera() { return *_camera.get(); }
+	inline Camera& get_camera() { return _camera; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_camera ()
@@ -136,28 +135,8 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const Camera& get_camera() const { return *_camera.get(); }
+	inline const Camera& get_camera() const { return _camera; }
 
-	//-----------------------------------------------------------------------------
-	//  Name : get_output_buffer ()
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	std::shared_ptr<FrameBuffer> get_output_buffer() const;
-
-	//-----------------------------------------------------------------------------
-	//  Name : get_g_buffer ()
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	std::shared_ptr<FrameBuffer> get_g_buffer() const;
-	
 	//-----------------------------------------------------------------------------
 	//  Name : update ()
 	/// <summary>
@@ -209,16 +188,6 @@ public:
 	const uSize& get_viewport_size() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : update_projection_window ()
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void update_projection_window();
-
-	//-----------------------------------------------------------------------------
 	//  Name : get_ortho_size ()
 	/// <summary>
 	/// 
@@ -248,25 +217,23 @@ public:
 	//-----------------------------------------------------------------------------
 	float get_ppu() const;
 
-private:
 	//-----------------------------------------------------------------------------
-	//  Name : init ()
+	//  Name : get_render_view ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void init(const uSize& size);
+	inline RenderView& get_render_view() { return _render_view; }
+private:
 	//-------------------------------------------------------------------------
 	// Private Member Variables.
 	//-------------------------------------------------------------------------
 	/// The camera object this component represents
-	std::unique_ptr<Camera> _camera;
-	/// The render surface of this camera
-	std::shared_ptr<FrameBuffer> _output_buffer;
-	/// The g-buffer for this camera.
-	std::shared_ptr<FrameBuffer> _g_buffer;
+	Camera _camera;
+	/// The render view for this component
+	RenderView _render_view;
 	/// Is the camera HDR?
 	bool _hdr = true;
 };

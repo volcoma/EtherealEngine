@@ -4,53 +4,62 @@
 #include "runtime/system/filesystem.h"
 #include "shaderc/shaderc.h"
 #include "texturec/texturec.h"
-#include "geometryc/geometryc.h"
+#include <fstream>
+#include <array>
+#include "graphics/graphics.h"
 
-void ShaderCompiler::compile(const fs::path& absoluteKey)
+#include "runtime/assets/asset_extensions.h"
+#include "core/serialization/serialization.h"
+#include "core/serialization/archives.h"
+#include "core/serialization/cereal/types/unordered_map.hpp"
+#include "core/serialization/cereal/types/vector.hpp"
+
+#include "mesh_importer.h"
+#include "runtime/meta/rendering/mesh.hpp"
+
+void ShaderCompiler::compile(const fs::path& absolute_key)
 {
-	fs::path input = absoluteKey;
-	std::string strInput = input.string();
-	std::string file = input.filename().replace_extension().string();
-	fs::path dir = input.remove_filename();
+	std::string str_input = absolute_key.string();
+	std::string file = absolute_key.stem().string();
+	fs::path dir = absolute_key.parent_path();
+	fs::path output = dir / fs::path(file + extensions::shader);
 
-	static const std::string ext = ".asset";
+	std::array<gfx::RendererType::Enum, 3> supported =
+	{
+		gfx::RendererType::Direct3D11,
+		gfx::RendererType::OpenGL,
+		gfx::RendererType::Metal
+	};
 
 	bool vs = string_utils::begins_with(file, "vs_");
 	bool fs = string_utils::begins_with(file, "fs_");
 	bool cs = string_utils::begins_with(file, "cs_");
-	fs::path supported[] = { "dx9", "dx11", "glsl", "metal" };
-	
-	for (int i = 0; i < 4; ++i)
+
+	std::unordered_map<gfx::RendererType::Enum, fs::byte_array_t> binaries;
+	binaries.reserve(4);
+	std::string str_output = output.string();
+	for (auto& platform : supported)
 	{
-		fs::path output = dir / "compiled";
-		fs::create_directory(output, std::error_code{});
-
-		output = output / supported[i];
-		fs::create_directory(output, std::error_code{});
-		output /= fs::path(file + ext);
-
-		std::string strOutput = output.string();
-
 		static const int arg_count = 16;
 		const char* args_array[arg_count];
 		args_array[0] = "-f";
-		args_array[1] = strInput.c_str();
+		args_array[1] = str_input.c_str();
 		args_array[2] = "-o";
-		args_array[3] = strOutput.c_str();
+		args_array[3] = str_output.c_str();
 		args_array[4] = "-i";
-		fs::path include = fs::resolve_protocol("engine://Tools/include");
-		std::string strInclude = include.string();
-		args_array[5] = strInclude.c_str();
+		fs::path include = fs::resolve_protocol("engine_data:/shaders");
+		std::string str_include = include.string();
+		args_array[5] = str_include.c_str();
 		args_array[6] = "--varyingdef";
-		fs::path varying = dir / "varying.def.sc";
-		std::string strVarying = varying.string();
-		args_array[7] = strVarying.c_str();
+		fs::path varying = dir / (file + ".io");
+		std::string str_varying = varying.string();
+		args_array[7] = str_varying.c_str();
 		args_array[8] = "--platform";
 
-		if(i < 2)
+		if (platform == gfx::RendererType::Direct3D11)
 		{
 			args_array[9] = "windows";
-			args_array[10] = "--profile";
+			args_array[10] = "-p";
 
 			if (vs)
 				args_array[11] = "vs_4_0";
@@ -59,20 +68,20 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 			else if (cs)
 				args_array[11] = "cs_5_0";
 		}
-		else if (i == 2)
+		else if (platform == gfx::RendererType::OpenGL)
 		{
 			args_array[9] = "linux";
-			args_array[10] = "--profile";
+			args_array[10] = "-p";
 
 			if (vs || fs)
 				args_array[11] = "120";
 			else if (cs)
 				args_array[11] = "430";
 		}
-		else if (i == 3)
+		else if (platform == gfx::RendererType::Metal)
 		{
 			args_array[9] = "osx";
-			args_array[10] = "--profile";
+			args_array[10] = "-p";
 			args_array[11] = "metal";
 		}
 		args_array[12] = "--type";
@@ -86,62 +95,71 @@ void ShaderCompiler::compile(const fs::path& absoluteKey)
 		args_array[14] = "-O";
 		args_array[15] = "3";
 
-		auto logger = logging::get("Log");
-		
-		if (i >= 2)
+		bx::CrtAllocator allocator;
+		bx::MemoryBlock mem_block(&allocator);
+		int64_t sz;
+		std::string err;
+		int result = 0;
+		if (platform != gfx::RendererType::Direct3D11)
 		{
 			//glsl shader compilation is not thread safe-
 			static std::mutex mtx;
 			std::lock_guard<std::mutex> lock(mtx);
-			if (compile_shader(arg_count, args_array) != 0)
-			{
-				logger->error().write("Failed compilation of {0}", strInput);
-			}
-			else
-			{
-				logger->info().write("Successful compilation of {0} -> {1}", strInput, strOutput);
-			}
+			result = compile_shader(arg_count, args_array, mem_block, sz, err);
 		}
 		else
 		{
-			if (compile_shader(arg_count, args_array) != 0)
-			{
-				logger->error().write("Failed compilation of {0}", strInput);
-			}
-			else
-			{
-				logger->info().write("Successful compilation of {0} -> {1}", strInput, strOutput);
-			}
+			result = compile_shader(arg_count, args_array, mem_block, sz, err);
+		}
+
+		if (result != 0)
+		{
+			APPLOG_ERROR("Failed compilation of {0} for {1} with error \n{2}", str_input, gfx::getRendererName(platform), err);
+			continue;
+		}
+
+		if (sz > 0)
+		{
+			auto buf = (char*)mem_block.more();
+			auto length = sz;
+			fs::byte_array_t vec;
+			std::copy(buf, buf + length, std::back_inserter(vec));
+			binaries[platform] = vec;
 		}
 		
 	}
-	
+
+	fs::path entry = dir / fs::path(file + ".buildtemp");
+	{		
+		std::ofstream soutput(entry, std::ios::out | std::ios::binary);
+		cereal::oarchive_binary_t ar(soutput);
+		try_save(ar, cereal::make_nvp("shader", binaries));
+	}
+	fs::copy(entry, output, fs::copy_options::overwrite_existing, std::error_code{});
+	fs::remove(entry, std::error_code{});
 }
 
 
-void TextureCompiler::compile(const fs::path& absoluteKey)
+void TextureCompiler::compile(const fs::path& absolute_key)
 {
-	auto logger = logging::get("Log");
-	fs::path input = absoluteKey;
-	std::string strInput = input.string();
-	std::string raw_ext = input.filename().extension().string();
-	std::string file = input.filename().replace_extension().string();
+	std::string str_input = absolute_key.string();
+	std::string raw_ext = absolute_key.filename().extension().string();
+	std::string file = absolute_key.stem().string();
+	fs::path output = absolute_key.parent_path();
+	output /= fs::path(file + extensions::texture);
 
-	fs::path dir = input.remove_filename();
-
-	static const std::string ext = ".asset";
-
-	fs::path output = dir;
-
-	output /= fs::path(file + ext);
-
-	std::string strOutput = output.string();
+	std::string str_output = output.string();
 
 	if (raw_ext == ".dds" || raw_ext == ".pvr" || raw_ext == ".ktx")
 	{
-		fs::copy_file(strInput, strOutput, fs::copy_options::overwrite_existing, std::error_code{});
-		fs::last_write_time(strOutput, fs::file_time_type::clock::now(), std::error_code{});
-		logger->info().write("Successful compilation of {0} -> {1}", strInput, strOutput);
+		if (!fs::copy_file(str_input, str_output, fs::copy_options::overwrite_existing, std::error_code{}))
+		{
+			APPLOG_ERROR("Failed compilation of {0}", str_input);
+		}
+		else
+		{
+			fs::last_write_time(str_output, fs::file_time_type::clock::now(), std::error_code{});
+		}
 		return;
 	}
 
@@ -149,60 +167,38 @@ void TextureCompiler::compile(const fs::path& absoluteKey)
 	static const int arg_count = 5;
 	const char* args_array[arg_count];
 	args_array[0] = "-f";
-	args_array[1] = strInput.c_str();
+	args_array[1] = str_input.c_str();
 	args_array[2] = "-o";
-	args_array[3] = strOutput.c_str();
+	args_array[3] = str_output.c_str();
 	args_array[4] = "-m";
-
-	
 
 	if (compile_texture(arg_count, args_array) != 0)
 	{
-		logger->error().write("Failed compilation of {0}", strInput);
+		APPLOG_ERROR("Failed compilation of {0}", str_input);
 	}
-	else
-	{
-		logger->info().write("Successful compilation of {0} -> {1}", strInput, strOutput);
-	}
-
 }
 
-void MeshCompiler::compile(const fs::path& absoluteKey)
+void MeshCompiler::compile(const fs::path& absolute_key)
 {
-	fs::path input = absoluteKey;
-	std::string strInput = input.string();
-	std::string file = input.filename().replace_extension().string();
-	fs::path dir = input.remove_filename();
+	std::string str_input = absolute_key.string();
+	std::string file = absolute_key.stem().string();
+	fs::path dir = absolute_key.parent_path();
+	fs::path output = dir / fs::path(file + extensions::mesh);
 
-	static const std::string ext = ".asset";
-
-	fs::path output = dir;
-
-	output /= fs::path(file + ext);
-
-	std::string strOutput = output.string();
-
-	static const int arg_count = 10;
-	const char* args_array[arg_count];
-	args_array[0] = "-f";
-	args_array[1] = strInput.c_str();
-	args_array[2] = "-o";
-	args_array[3] = strOutput.c_str();
-	args_array[4] = "--tangent";
-	args_array[5] = "--barycentric";
-	args_array[6] = "--packnormal";
-	args_array[7] = "1";
-	args_array[8] = "--packuv";
-	args_array[9] = "1";
-	
-	auto logger = logging::get("Log");
-	if (compile_mesh(arg_count, args_array) != 0)
+	Mesh::LoadData data;
+	if (!importer::load_mesh_data_from_file(str_input, data))
 	{
-		logger->error().write("Failed compilation of {0}", strInput);
+		APPLOG_ERROR("Failed compilation of {0}", str_input);
+		return;
 	}
-	else
+
+	fs::path entry = dir / fs::path(file + ".buildtemp");
 	{
-		logger->info().write("Successful compilation of {0} -> {1}", strInput, strOutput);
+		std::ofstream soutput(entry, std::ios::out | std::ios::binary);
+		cereal::oarchive_binary_t ar(soutput);
+		try_save(ar, cereal::make_nvp("mesh", data));
 	}
+	fs::copy(entry, output, fs::copy_options::overwrite_existing, std::error_code{});
+	fs::remove(entry, std::error_code{});
 
 }

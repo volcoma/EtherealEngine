@@ -1,30 +1,9 @@
 #pragma once
 
-#include "core/subsystem.h"
+#include "core/subsystem/subsystem.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 #include <memory>
-
-//-----------------------------------------------------------------------------
-// Main Class Declarations
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//  Name : GuiSystem (Class)
-/// <summary>
-/// Class for the management of interface elements.
-/// </summary>
-//-----------------------------------------------------------------------------
-struct GuiSystem : public core::Subsystem
-{
-	bool initialize();
-	void dispose();
-	void frame_begin(std::chrono::duration<float>);
-};
-
-namespace gui
-{
-	using namespace ImGui;
-}
 
 struct GUIStyle
 {
@@ -55,12 +34,27 @@ struct GUIStyle
 
 	HSVSetup setup;
 };
+//-----------------------------------------------------------------------------
+// Main Class Declarations
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//  Name : GuiSystem (Class)
+/// <summary>
+/// Class for the management of interface elements.
+/// </summary>
+//-----------------------------------------------------------------------------
+struct GuiSystem : public core::Subsystem
+{
+	bool initialize();
+	void dispose();
+	void frame_begin(std::chrono::duration<float>);
+};
 
 struct ITexture;
 namespace gui
 {   
+	using namespace ImGui;
 	static const int drag_button = 0;
-	void begin();
 
 	// Helper function for passing ITexture to ImGui::Image.
 	void Image(std::shared_ptr<ITexture> texture
@@ -102,11 +96,12 @@ namespace gui
 		, const ImVec2& uv0
 		, const ImVec2& uv1
 		, bool selected
+		, bool* edit_label
 		, const char* label
 		, char* buf
 		, size_t buf_size
 		, ImGuiInputTextFlags flags = 0);
 
-	GUIStyle& getGUIStyle();
+	GUIStyle& get_gui_style();
 };
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/subsystem.h"
+#include "core/subsystem/subsystem.h"
 
 namespace runtime
 {
@@ -16,7 +16,7 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 
-		virtual void setup() {}
+		virtual void setup();
 		//-----------------------------------------------------------------------------
 		//  Name : start (virtual )
 		/// <summary>
@@ -31,7 +31,7 @@ namespace runtime
 		/// Cleanup after the main loop.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		virtual void stop() {}
+		virtual void stop();
 
 		//-----------------------------------------------------------------------------
 		//  Name : run ()
@@ -43,16 +43,23 @@ namespace runtime
 		int run();
 
 		//-----------------------------------------------------------------------------
-		//  Name : terminate_with_error ()
+		//  Name : quit_with_error ()
 		/// <summary>
-		/// Show  an error message, terminate the main loop, and set failure exit code.
+		/// Show an error message, terminate the main loop, and set failure exit code.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void terminate_with_error(const std::string&);
+		void quit_with_error(const std::string&);
 
+		//-----------------------------------------------------------------------------
+		//  Name : quit ()
+		/// <summary>
+		/// Terminate the main loop and exit the app.
+		/// </summary>
+		//-----------------------------------------------------------------------------
+		void quit(int exitcode = 0);
 	protected:
 		/// exit code of the application
-		int _exitcode;
+		int _exitcode = 0;
 	};
 
 }

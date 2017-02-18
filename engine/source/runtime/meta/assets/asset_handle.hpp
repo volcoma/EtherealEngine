@@ -10,24 +10,7 @@
 #include "../../rendering/texture.h"
 #include "../../rendering/material.h"
 #include "../../ecs/prefab.h"
-
-template<typename T>
-inline void load_asset(AssetHandle<T>& obj, const std::string& id, bool async)
-{
-	if (id.empty())
-	{
-		obj = AssetHandle<T>();
-	}
-	else
-	{
-		auto am = core::get_subsystem<runtime::AssetManager>();
-		am->load<T>(id, false)
-			.then([&obj](auto asset) mutable
-		{
-			obj = asset;
-		});
-	}
-}
+#include "../../ecs/scene.h"
 
 namespace cereal
 {
@@ -56,57 +39,19 @@ namespace cereal
 	inline void LOAD_FUNCTION_NAME(Archive & ar, AssetHandle<T>& obj)
 	{
 		try_load(ar, cereal::make_nvp("link", obj.link));
-	}
-	template<typename Archive>
-	inline void LOAD_FUNCTION_NAME(Archive & ar, AssetHandle<Texture>& obj)
-	{
-		LOAD_FUNCTION_NAME<Archive, Texture>(ar, obj);
 
-		load_asset(obj, obj.link->id, true);
-	}
-
-	template<typename Archive>
-	inline void LOAD_FUNCTION_NAME(Archive & ar, AssetHandle<Mesh>& obj)
-	{
-		LOAD_FUNCTION_NAME<Archive, Mesh>(ar, obj);
-
-		load_asset(obj, obj.link->id, true);
-	}
-
-	template<typename Archive>
-	inline void LOAD_FUNCTION_NAME(Archive & ar, AssetHandle<Material>& obj)
-	{
-		LOAD_FUNCTION_NAME<Archive, Material>(ar, obj);
-
-		load_asset(obj, obj.link->id, true);
-	}
-
-	template<typename Archive>
-	inline void LOAD_FUNCTION_NAME(Archive & ar, AssetHandle<Prefab>& obj)
-	{
-		LOAD_FUNCTION_NAME<Archive, Prefab>(ar, obj);
-
-		load_asset(obj, obj.link->id, true);
-	}
-}
-
-namespace rttr
-{
-
-	template<typename T>
-	struct wrapper_mapper<AssetHandle<T>>
-	{
-		using wrapped_type = decltype(std::declval<AssetHandle<T>>().get());
-		using type = AssetHandle<T>;
-
-		inline static wrapped_type get(const type& obj)
+		if (obj.link->id.empty())
 		{
-			return obj.get();
+			obj = AssetHandle<T>();
 		}
-
-		inline static type create(const wrapped_type& value)
+		else
 		{
-			return AssetHandle<T>(value);
+			auto am = core::get_subsystem<runtime::AssetManager>();
+			am->load<T>(obj.link->id, false)
+				.then([&obj](auto asset) mutable
+			{
+				obj = asset;
+			});
 		}
-	};
+	}
 }

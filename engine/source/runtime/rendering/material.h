@@ -2,7 +2,7 @@
 
 #include "../assets/asset_handle.h"
 #include "core/math/math_includes.h"
-#include <vector>
+#include <unordered_map>
 
 #include "core/reflection/rttr/rttr_enable.h"
 #include "core/serialization/serialization.h"
@@ -53,7 +53,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline bool is_valid() const { return !!_program; }
+	inline bool is_valid() const { return !!get_program(); }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_texture ()
@@ -127,7 +127,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline Program* get_program() const { return _program.get(); }
+	Program* get_program() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : submit (virtual )
@@ -167,20 +167,14 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::uint64_t get_render_states(bool applyCull = true, bool depthWrite = true, bool depthTest = true) const;
+	std::uint64_t get_render_states(bool apply_cull = true, bool depth_write = true, bool depth_test = true) const;
 
-	//-----------------------------------------------------------------------------
-	//  Name : begin_pass ()
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void begin_pass();
+	bool skinned = false;
 protected:
 	/// Program that is responsible for rendering.
 	std::unique_ptr<Program> _program;
+	/// Program that is responsible for rendering.
+	std::unique_ptr<Program> _program_skinned;
 	/// Cull type for this material.
 	CullType _cull_type = CullType::CounterClockWise;
 	/// Default color texture
@@ -207,7 +201,7 @@ public:
 	StandardMaterial();
 
 	//-----------------------------------------------------------------------------
-	//  Name : getBaseColor ()
+	//  Name : get_base_color ()
 	/// <summary>
 	/// 
 	/// 
@@ -227,24 +221,24 @@ public:
 	inline void set_base_color(const math::color& val) { _base_color = val; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : set_specular_color ()
+	//  Name : get_subsurface_color ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::color& get_specular_color() const { return _specular_color; }
+	inline const math::color& get_subsurface_color() const { return _subsurface_color; }
 
 	//-----------------------------------------------------------------------------
-	//  Name : set_specular_color ()
+	//  Name : set_subsurface_color ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_specular_color(const math::color& val) { _specular_color = val; }
+	inline void set_subsurface_color(const math::color& val) { _subsurface_color = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_emissive_color ()
@@ -354,7 +348,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::vec4& get_tiling() const { return _tiling; }
+	inline const math::vec2& get_tiling() const { return _tiling; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_tiling ()
@@ -364,7 +358,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_tiling(const math::vec4& tiling) { _tiling = tiling; }
+	inline void set_tiling(const math::vec2& tiling) { _tiling = tiling; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_dither_threshold ()
@@ -394,7 +388,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> get_color_map() const { return _color_map; }
+	inline AssetHandle<Texture> get_color_map() { return _maps["color"]; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_color_map ()
@@ -404,7 +398,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_color_map(AssetHandle<Texture> val) { _color_map = val; }
+	inline void set_color_map(AssetHandle<Texture> val) { _maps["color"] = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_normal_map ()
@@ -414,7 +408,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> get_normal_map() const { return _normal_map; }
+	inline AssetHandle<Texture> get_normal_map() { return _maps["roughness"]; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_normal_map ()
@@ -424,7 +418,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_normal_map(AssetHandle<Texture> val) { _normal_map = val; }
+	inline void set_normal_map(AssetHandle<Texture> val) { _maps["normal"] = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_roughness_map ()
@@ -434,7 +428,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> get_roughness_map() const { return _roughness_map; }
+	inline AssetHandle<Texture> get_roughness_map() { return _maps["roughness"]; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_roughness_map ()
@@ -444,7 +438,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_roughness_map(AssetHandle<Texture> val) { _roughness_map = val; }
+	inline void set_roughness_map(AssetHandle<Texture> val) { _maps["roughness"] = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_metalness_map ()
@@ -454,7 +448,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> get_metalness_map() const { return _metalness_map; }
+	inline AssetHandle<Texture> get_metalness_map() { return _maps["metalness"]; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_metalness_map ()
@@ -464,7 +458,27 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_metalness_map(AssetHandle<Texture> val) { _metalness_map = val; }
+	inline void set_metalness_map(AssetHandle<Texture> val) { _maps["metalness"] = val; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : get_ao_map ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline AssetHandle<Texture> get_ao_map() { return _maps["ao"]; }
+
+	//-----------------------------------------------------------------------------
+	//  Name : set_ao_map ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline void set_ao_map(AssetHandle<Texture> val) { _maps["ao"] = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : submit (virtual )
@@ -482,11 +496,11 @@ private:
 		1.0f, 1.0f, 1.0f, /// Color
 		1.0f /// Opacity
 	};
-	/// Specular color
-	math::color _specular_color
+	/// Emissive color
+	math::color _subsurface_color
 	{
-		0.5f, 0.5f, 0.5f, /// Color
-		1.0f /// Unused
+		0.0f, 0.0f, 0.0f, /// Color
+		0.8f /// Opacity
 	};
 	/// Emissive color
 	math::color _emissive_color
@@ -497,16 +511,15 @@ private:
 	/// Surface data
 	math::vec4 _surface_data
 	{
-		0.5f, /// Roughness
+		0.3f, /// Roughness
 		0.0f, /// Metalness
 		1.0f, /// Bumpiness
 		0.25f /// AlphaTestValue
 	};
 	/// Tiling data
-	math::vec4 _tiling
+	math::vec2 _tiling
 	{
-		1.0f, 1.0f, ///Primary
-		1.0f, 1.0f  ///Secondary
+		1.0f, 1.0f ///Primary
 	};
 	/// Dithering data
 	math::vec2 _dither_threshold
@@ -514,12 +527,7 @@ private:
 		0.5f, ///Alpha threshold
 		0.5f  ///Distance threshold
 	};
-	/// Color map
-	AssetHandle<Texture> _color_map;
-	/// Normal map
-	AssetHandle<Texture> _normal_map;
-	/// Roughness map
-	AssetHandle<Texture> _roughness_map;
-	/// Metalness map
-	AssetHandle<Texture> _metalness_map;
+
+	/// Texture maps
+	std::unordered_map<std::string, AssetHandle<Texture>> _maps;
 };

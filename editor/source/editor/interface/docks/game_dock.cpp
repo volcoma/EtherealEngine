@@ -3,6 +3,7 @@
 #include "runtime/ecs/ecs.h"
 #include "runtime/ecs/components/camera_component.h"
 #include "runtime/rendering/render_pass.h"
+#include "runtime/rendering/camera.h"
 
 namespace Docks
 {
@@ -16,17 +17,23 @@ namespace Docks
 		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 		ecs->each<CameraComponent>([&editor_camera](
 			runtime::Entity e,
-			CameraComponent& cameraComponent
+			CameraComponent& camera_comp
 			)
 		{
 			if (e == editor_camera)
 				return;
 
-			const auto surface = cameraComponent.get_output_buffer();
 			auto size = gui::GetContentRegionAvail();
+			if (size.x > 0.0f && size.y > 0.0f)
+			{
+				camera_comp.set_viewport_size({ static_cast<std::uint32_t>(size.x), static_cast<std::uint32_t>(size.y) });
+				const auto& camera = camera_comp.get_camera();
+				auto& render_view = camera_comp.get_render_view();
+				const auto& viewport_size = camera.get_viewport_size();
+				const auto surface = render_view.get_output_fbo(viewport_size);
 
-			cameraComponent.set_viewport_size({ static_cast<std::uint32_t>(size.x), static_cast<std::uint32_t>(size.y) });
-			gui::Image(surface, size);
+				gui::Image(surface, size);
+			}		
 	
 		});
 	}

@@ -5,10 +5,10 @@ void Tooltip(const rttr::property& prop)
 	if (gui::IsItemHovered())
 	{
 		gui::SetMouseCursor(ImGuiMouseCursor_Help);
-		auto tooltipVar = prop.get_metadata("Tooltip");
-		if (tooltipVar)
+		auto tooltip = prop.get_metadata("Tooltip");
+		if (tooltip)
 		{
-			gui::SetTooltip(tooltipVar.to_string().c_str());
+			gui::SetTooltip(tooltip.to_string().c_str());
 		}
 	}
 }
@@ -29,10 +29,8 @@ PropertyLayout::PropertyLayout(const rttr::property& prop, bool columns /*= true
 	gui::PushItemWidth(gui::GetContentRegionAvailWidth());
 }
 
-
 PropertyLayout::PropertyLayout(const std::string& name, bool columns /*= true*/)
 {
-
 	if (columns)
 		gui::Columns(2, nullptr, false);
 

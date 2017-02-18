@@ -10,8 +10,7 @@ REFLECT(TransformComponent)
 	rttr::registration::class_<TransformComponent>("Component/Transform")
 		.constructor<>()
 		(
-			rttr::policy::ctor::as_std_shared_ptr,
-			rttr::metadata("CanExecuteInEditor", true)
+			rttr::policy::ctor::as_std_shared_ptr
 		)
 		.property("Local",
 			&TransformComponent::get_local_transform,
@@ -60,10 +59,10 @@ LOAD(TransformComponent)
 	try_load(ar, cereal::make_nvp("slow_parenting", obj._slow_parenting));
 	try_load(ar, cereal::make_nvp("slow_parenting_speed", obj._slow_parenting_speed));
 		
-	auto thisHandle = obj.handle();
+	auto handle = obj.handle();
 	for (auto child : obj._children)
 	{
-		child.lock()->_parent = thisHandle;
+		child.lock()->_parent = handle;
 	}
 }
 

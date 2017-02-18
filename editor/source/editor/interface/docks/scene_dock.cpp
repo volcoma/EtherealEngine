@@ -1,5 +1,7 @@
 #include "docks.h"
 #include "../../edit_state.h"
+#include "../../project.h"
+#include "core/subsystem/simulation.h"
 #include "runtime/system/engine.h"
 #include "runtime/input/input.h"
 #include "runtime/ecs/components/transform_component.h"
@@ -70,11 +72,12 @@ namespace Docks
 			{
 				const auto selected_camera = sel.component<CameraComponent>().lock();
 				const auto& camera = selected_camera->get_camera();
-				const auto surface = selected_camera->get_output_buffer();
-				const auto view_size = camera.get_viewport_size();
+				auto& render_view = selected_camera->get_render_view();
+				const auto& viewport_size = camera.get_viewport_size();
+				const auto surface = render_view.get_output_fbo(viewport_size);
 
-				float factor = std::min(size.x / float(view_size.width), size.y / float(view_size.height)) / 4.0f;
-				ImVec2 bounds(view_size.width * factor, view_size.height * factor);
+				float factor = std::min(size.x / float(viewport_size.width), size.y / float(viewport_size.height)) / 4.0f;
+				ImVec2 bounds(viewport_size.width * factor, viewport_size.height * factor);
 				auto p = gui::GetWindowPos();
 				p.x += size.x - bounds.x - 20.0f;
 				p.y += size.y - bounds.y - 40.0f;
@@ -154,22 +157,19 @@ namespace Docks
 				math::transform_t delta;
 				math::transform_t inputTransform = transform;
 				float* snap = nullptr;
-				static math::vec3 translation_snap = { 1.0f, 1.0f, 1.0f };
-				static float rotation_degree_snap = 15.0f;
-				static float scale_snap = 0.1f;
 				if (input->is_key_down(sf::Keyboard::LControl))
 				{
 					if (operation == imguizmo::OPERATION::TRANSLATE)
-						snap = &translation_snap[0];
+						snap = &es->snap_data.translation_snap[0];
 					else if (operation == imguizmo::OPERATION::ROTATE)
-						snap = &rotation_degree_snap;
+						snap = &es->snap_data.rotation_degree_snap;
 					else if (operation == imguizmo::OPERATION::SCALE)
-						snap = &scale_snap;
+						snap = &es->snap_data.scale_snap;
 				}
 
 				imguizmo::manipulate(
 					camera_component->get_camera().get_view(),
-					camera_component->get_camera().get_last_projection(),
+					camera_component->get_camera().get_projection(),
 					operation,
 					mode,
 					transform,
@@ -189,10 +189,10 @@ namespace Docks
 
 		auto es = core::get_subsystem<editor::EditState>();
 		auto input = core::get_subsystem<runtime::Input>();
-		auto engine = core::get_subsystem<runtime::Engine>();
+		auto sim = core::get_subsystem<core::Simulation>();
 
 		auto& editor_camera = es->camera;
-		auto dt = engine->get_delta_time().count();
+		auto dt = sim->get_delta_time().count();
 
 		auto transform = editor_camera.component<TransformComponent>().lock();
 		float movement_speed = 5.0f;
@@ -296,6 +296,7 @@ namespace Docks
 		auto engine = core::get_subsystem<runtime::Engine>();
 		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 		auto input = core::get_subsystem<runtime::Input>();
+		auto sim = core::get_subsystem<core::Simulation>();
 
 		auto window = engine->get_focused_window();
 		auto& editor_camera = es->camera;
@@ -306,7 +307,7 @@ namespace Docks
 			&& editor_camera.has_component<CameraComponent>()
 			&& editor_camera.has_component<TransformComponent>();
 
-		show_statistics(engine->get_fps());
+		show_statistics(sim->get_fps());
 
 		if (!has_edit_camera)
 			return;
@@ -321,8 +322,11 @@ namespace Docks
 		{
 			camera_component->get_camera().set_viewport_pos({ static_cast<std::uint32_t>(pos.x), static_cast<std::uint32_t>(pos.y) });
 			camera_component->set_viewport_size({ static_cast<std::uint32_t>(size.x), static_cast<std::uint32_t>(size.y) });
-			
-			const auto surface = camera_component->get_output_buffer();
+
+			const auto& camera = camera_component->get_camera();
+			auto& render_view = camera_component->get_render_view();
+			const auto& viewport_size = camera.get_viewport_size();
+			const auto surface = render_view.get_output_fbo(viewport_size);
 			gui::Image(surface, size);
 
 			if (gui::IsItemClicked(1) || gui::IsItemClicked(2))
@@ -346,10 +350,28 @@ namespace Docks
 					if (selected && selected.is_type<runtime::Entity>())
 					{
 						auto sel = selected.get_value<runtime::Entity>();
-						if (sel != editor_camera)
+						if (sel && sel != editor_camera)
 						{
 							sel.destroy();
 							es->unselect();
+						}
+					}
+				}
+
+				if (input->is_key_pressed(sf::Keyboard::D))
+				{
+					if (input->is_key_down(sf::Keyboard::LControl))
+					{
+						if (selected && selected.is_type<runtime::Entity>())
+						{
+							auto sel = selected.get_value<runtime::Entity>();
+							if (sel && sel != editor_camera)
+							{
+								auto clone = ecs->create_from_copy(sel);
+								clone.component<TransformComponent>().lock()
+									->set_parent(sel.component<TransformComponent>().lock()->get_parent(), false, true);
+								es->select(clone);
+							}
 						}
 					}
 				}
@@ -364,16 +386,17 @@ namespace Docks
 
 			if (show_gbuffer)
 			{
-				const auto g_buffer = camera_component->get_g_buffer();
-				for (std::uint32_t i = 0; i < g_buffer->get_attachment_count(); ++i)
+				auto g_buffer_fbo = render_view.get_g_buffer_fbo(viewport_size).get();
+				for (std::uint32_t i = 0; i < g_buffer_fbo->get_attachment_count(); ++i)
 				{
-					const auto attachment = g_buffer->get_attachment(i).texture;
+					const auto attachment = g_buffer_fbo->get_attachment(i).texture;
 					gui::Image(attachment, size);
 
 					if (gui::IsItemClicked(1) || gui::IsItemClicked(2))
 					{
 						gui::SetWindowFocus();
-						window->setMouseCursorVisible(false);
+						if(window)
+							window->setMouseCursorVisible(false);
 					}
 				}
 			}
@@ -382,27 +405,40 @@ namespace Docks
 
 		if (gui::IsWindowHovered())
 		{
-			if (gui::IsMouseReleased(gui::drag_button))
+			if (dragged)
 			{
-				if (dragged)
+				math::vec3 projected_pos;
+
+				if (gui::IsMouseReleased(gui::drag_button))
 				{
 					auto cursor_pos = gui::GetMousePos();
-					math::vec3 projected_pos;
 					camera_component->get_camera().viewport_to_world(
 						math::vec2{ cursor_pos.x, cursor_pos.y },
 						math::plane::fromPointNormal(math::vec3{ 0.0f, 0.0f, 0.0f }, math::vec3{ 0.0f, 1.0f, 0.0f }),
 						projected_pos,
 						false);
+				}
 
-					if (dragged.is_type<runtime::Entity>())
+				if (dragged.is_type<runtime::Entity>())
+				{
+					gui::SetMouseCursor(ImGuiMouseCursor_Move);
+					if (gui::IsMouseReleased(gui::drag_button))
 					{
 						auto dragged_entity = dragged.get_value<runtime::Entity>();
-						dragged_entity.component<TransformComponent>().lock()
-							->set_parent(runtime::CHandle<TransformComponent>());
+						if (dragged_entity)
+						{
+							dragged_entity.component<TransformComponent>().lock()
+								->set_parent(runtime::CHandle<TransformComponent>());
+						}
+						
 
 						es->drop();
 					}
-					if (dragged.is_type<AssetHandle<Prefab>>())
+				}
+				if (dragged.is_type<AssetHandle<Prefab>>())
+				{
+					gui::SetMouseCursor(ImGuiMouseCursor_Move);
+					if (gui::IsMouseReleased(gui::drag_button))
 					{
 						auto prefab = dragged.get_value<AssetHandle<Prefab>>();
 						auto object = prefab->instantiate();
@@ -410,9 +446,12 @@ namespace Docks
 							->set_position(projected_pos);
 						es->drop();
 						es->select(object);
-
 					}
-					if (dragged.is_type<AssetHandle<Mesh>>())
+				}
+				if (dragged.is_type<AssetHandle<Mesh>>())
+				{
+					gui::SetMouseCursor(ImGuiMouseCursor_Move);
+					if (gui::IsMouseReleased(gui::drag_button))
 					{
 						auto mesh = dragged.get_value<AssetHandle<Mesh>>();
 						Model model;

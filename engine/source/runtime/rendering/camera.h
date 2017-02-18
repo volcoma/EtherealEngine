@@ -250,6 +250,14 @@ public:
 	inline const math::transform_t& get_view() const { return _view; }
 
 	//-----------------------------------------------------------------------------
+	//  Name : get_view_projection ()
+	/// <summary>
+	/// Return the current view-projection matrix.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline math::transform_t get_view_projection() { return get_projection() * get_view(); }
+
+	//-----------------------------------------------------------------------------
 	//  Name : get_last_view ()
 	/// <summary>
 	/// Retrieve a copy of the view matrix recorded with the most recent call
@@ -365,7 +373,7 @@ public:
 	/// if the point was clipped off the screen.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool world_to_viewport(const math::vec3 & position, math::vec3 & pointOut, bool clipX = true, bool clipY = true, bool clipZ = true);
+	bool world_to_viewport(const uPoint& viewport_pos, const uSize& viewport_size, const math::vec3& pos, math::vec3 & point, bool clipX = true, bool clipY = true, bool clipZ = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : estimate_zoom_factor ()
@@ -445,6 +453,26 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	math::vec3 get_position() const;
+
+	//-----------------------------------------------------------------------------
+	//  Name : x_unit_axis ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	math::vec3 x_unit_axis() const;
+
+	//-----------------------------------------------------------------------------
+	//  Name : y_unit_axis ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	math::vec3 y_unit_axis() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : z_unit_axis ()

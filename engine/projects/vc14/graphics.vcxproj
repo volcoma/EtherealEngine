@@ -19,12 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\lib\ib-compress\indexbuffercompression.h" />
-    <ClInclude Include="..\..\lib\ib-compress\indexbuffercompressionformat.h" />
-    <ClInclude Include="..\..\lib\ib-compress\indexbufferdecompression.h" />
-    <ClInclude Include="..\..\lib\ib-compress\indexcompressionconstants.h" />
-    <ClInclude Include="..\..\lib\ib-compress\readbitstream.h" />
-    <ClInclude Include="..\..\lib\ib-compress\writebitstream.h" />
     <ClInclude Include="..\..\source\graphics\bgfx\bgfx.h" />
     <ClInclude Include="..\..\source\graphics\bgfx\c99\bgfx.h" />
     <ClInclude Include="..\..\source\graphics\bgfx\c99\platform.h" />
@@ -138,8 +132,6 @@
     <ClInclude Include="..\..\source\graphics\tinystl\vector.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\lib\ib-compress\indexbuffercompression.cpp" />
-    <ClCompile Include="..\..\lib\ib-compress\indexbufferdecompression.cpp" />
     <ClCompile Include="..\..\source\graphics\graphics.cpp" />
     <ClCompile Include="..\..\source\graphics\src\bgfx.cpp" />
     <ClCompile Include="..\..\source\graphics\src\debug_renderdoc.cpp" />

@@ -96,6 +96,10 @@ namespace fs
 		}
 		return path(std::string(buf));
 	}
+	void show_in_graphical_env(const path& _path)
+	{
+		ShellExecuteA(NULL, NULL, _path.string().c_str(), NULL, NULL, SW_SHOWNORMAL);
+	}
 }
 #elif $on($apple)
 #  include <mach-o/dyld.h>
@@ -114,6 +118,10 @@ namespace fs
 			system_complete(
 				path(std::string(buf)).normalize(), std::error_code{}));
 		return full_path;
+	}
+	void show_in_graphical_env(const path& _path)
+	{
+
 	}
 }
 #elif $on($linux)
@@ -135,6 +143,10 @@ namespace fs
 				path(path).normalize(), std::error_code{}));
 		return full_path;
 	}
+	void show_in_graphical_env(const path& _path)
+	{
+
+	}
 }
 #else
 namespace fs
@@ -143,5 +155,11 @@ namespace fs
 	{
 		return executable_path_fallback(argv0);
 	}
+
+	void show_in_graphical_env(const path& _path)
+	{
+
+	}
+
 }
 #endif

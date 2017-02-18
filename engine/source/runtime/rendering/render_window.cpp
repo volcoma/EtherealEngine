@@ -31,8 +31,6 @@ RenderWindow::~RenderWindow()
 	// force internal handle destruction
 	_surface->dispose();
 	_surface.reset();
-	gfx::frame();
-	gfx::frame();
 }
 
 void RenderWindow::frame_end()

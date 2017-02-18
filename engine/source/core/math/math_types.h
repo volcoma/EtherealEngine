@@ -1,6 +1,6 @@
 #pragma once
 
-namespace glm
+namespace math
 {
 //-----------------------------------------------------------------------------
 // Common Global Enumerations

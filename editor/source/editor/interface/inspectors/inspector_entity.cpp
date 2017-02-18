@@ -260,7 +260,7 @@ bool Inspector_Entity::inspect(rttr::variant& var, bool readOnly, std::function<
 		filter.Draw("Filter", 180);
 		gui::Separator();
 		gui::BeginChild("ComponentMenuContent", ImVec2(gui::GetContentRegionAvailWidth(), 200.0f));
-		
+
 		_component->_type->inspect(filter, data);
 
 		gui::EndChild();

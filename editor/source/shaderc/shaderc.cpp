@@ -109,6 +109,16 @@ namespace bgfx
 		NULL
 	};
 
+	const char* s_uniformTypeNames[] =
+	{
+		"int",  "int",
+		NULL,   NULL,
+		"vec4", "float4",
+		"mat3", "float3x3",
+		"mat4", "float4x4",
+	};
+	BX_STATIC_ASSERT(BX_COUNTOF(s_uniformTypeNames) == UniformType::Count * 2);
+
 	const char* interpolationDx11(const char* _glsl)
 	{
 		if (0 == strcmp(_glsl, "smooth"))
@@ -121,6 +131,31 @@ namespace bgfx
 		}
 
 		return _glsl; // centroid, noperspective
+	}
+
+	const char* _getUniformTypeName(UniformType::Enum _enum)
+	{
+		uint32_t idx = _enum & ~(BGFX_UNIFORM_FRAGMENTBIT | BGFX_UNIFORM_SAMPLERBIT);
+		if (idx < UniformType::Count)
+		{
+			return s_uniformTypeNames[idx];
+		}
+
+		return "Unknown uniform type?!";
+	}
+
+	UniformType::Enum _nameToUniformTypeEnum(const char* _name)
+	{
+		for (uint32_t ii = 0; ii < UniformType::Count * 2; ++ii)
+		{
+			if (NULL != s_uniformTypeNames[ii]
+				&& 0 == strcmp(_name, s_uniformTypeNames[ii]))
+			{
+				return UniformType::Enum(ii / 2);
+			}
+		}
+
+		return UniformType::Count;
 	}
 
 	int32_t writef(bx::WriterI* _writer, const char* _format, ...)
@@ -339,8 +374,9 @@ namespace bgfx
 		strReplace(_str, "\r",   "\n");
 	}
 
-	void printCode(const char* _code, int32_t _line, int32_t _start, int32_t _end, int32_t _column)
+	void printCode(std::string& err, const char* _code, int32_t _line, int32_t _start, int32_t _end, int32_t _column)
 	{
+		bx::stringPrintf(err, "Code:\n---\n");
 		fprintf(stderr, "Code:\n---\n");
 
 		LineReader lr(_code);
@@ -350,16 +386,21 @@ namespace bgfx
 			{
 				if (_line == line)
 				{
+					bx::stringPrintf(err, "\n");
 					fprintf(stderr, "\n");
+					bx::stringPrintf(err, ">>> %3d: %s", line, lr.getLine().c_str());
 					fprintf(stderr, ">>> %3d: %s", line, lr.getLine().c_str() );
 					if (-1 != _column)
 					{
+						bx::stringPrintf(err, ">>> %3d: %*s\n", _column, _column, "^");
 						fprintf(stderr, ">>> %3d: %*s\n", _column, _column, "^");
 					}
+					bx::stringPrintf(err, "\n");
 					fprintf(stderr, "\n");
 				}
 				else
 				{
+					bx::stringPrintf(err, "    %3d: %s", line, lr.getLine().c_str());
 					fprintf(stderr, "    %3d: %s", line, lr.getLine().c_str() );
 				}
 			}
@@ -369,6 +410,7 @@ namespace bgfx
 			}
 		}
 
+		bx::stringPrintf(err, "---\n");
 		fprintf(stderr, "---\n");
 	}
 
@@ -705,7 +747,7 @@ namespace bgfx
 // 			);
 // 	}
 
-	int compileShader(int _argc, const char* _argv[])
+	int compileShader(int _argc, const char* _argv[], bx::MemoryBlock& memBlock, int64_t& sz, std::string& err)
 	{
 		bx::CommandLine cmdLine(_argc, _argv);
 
@@ -965,6 +1007,7 @@ namespace bgfx
 			break;
 
 		default:
+			bx::stringPrintf(err, "Unknown type: %s?!", type);
 			fprintf(stderr, "Unknown type: %s?!", type);
 			return EXIT_FAILURE;
 		}
@@ -974,6 +1017,7 @@ namespace bgfx
 		bx::CrtFileReader reader;
 		if (!bx::open(&reader, filePath) )
 		{
+			bx::stringPrintf(err, "Unable to open file '%s'.\n", filePath);
 			fprintf(stderr, "Unable to open file '%s'.\n", filePath);
 		}
 		else
@@ -991,6 +1035,7 @@ namespace bgfx
 			}
 			else
 			{
+				bx::stringPrintf(err, "ERROR: Failed to parse varying def file: \"%s\" No input/output semantics will be generated in the code!\n", varyingdef);
 				fprintf(stderr, "ERROR: Failed to parse varying def file: \"%s\" No input/output semantics will be generated in the code!\n", varyingdef);
 			}
 
@@ -1151,22 +1196,24 @@ namespace bgfx
 
 			if (raw)
 			{
-				bx::CrtFileWriter* writer = NULL;
+// 				bx::CrtFileWriter* writer = NULL;
+// 
+// 				if (NULL != bin2c)
+// 				{
+// 					writer = new Bin2cWriter(bin2c);
+// 				}
+// 				else
+// 				{
+// 					writer = new bx::CrtFileWriter;
+// 				}
 
-				if (NULL != bin2c)
-				{
-					writer = new Bin2cWriter(bin2c);
-				}
-				else
-				{
-					writer = new bx::CrtFileWriter;
-				}
+				bx::MemoryWriter* writer = new bx::MemoryWriter(&memBlock);
 
-				if (!bx::open(writer, outFilePath) )
-				{
-					fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
-					return EXIT_FAILURE;
-				}
+// 				if (!bx::open(writer, outFilePath) )
+// 				{
+// 					fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
+// 					return EXIT_FAILURE;
+// 				}
 
 				if ('f' == shaderType)
 				{
@@ -1197,14 +1244,15 @@ namespace bgfx
 				}
 				else if (0 != pssl)
 				{
-					compiled = compilePSSLShader(cmdLine, 0, input, writer);
+					compiled = compilePSSLShader(cmdLine, 0, input, writer, err);
 				}
 				else
 				{
-					compiled = compileHLSLShader(cmdLine, d3d, input, writer);
+					compiled = compileHLSLShader(cmdLine, d3d, input, writer, err);
 				}
 
-				bx::close(writer);
+				//bx::close(writer);
+				sz = writer->seek(0, bx::Whence::End);
 				delete writer;
 			}
 			else if ('c' == shaderType) // Compute
@@ -1212,6 +1260,7 @@ namespace bgfx
 				char* entry = strstr(input, "void main()");
 				if (NULL == entry)
 				{
+					bx::stringPrintf(err, "Shader entry point 'void main()' is not found.\n");
 					fprintf(stderr, "Shader entry point 'void main()' is not found.\n");
 				}
 				else
@@ -1297,37 +1346,39 @@ namespace bgfx
 
 						if (preprocessOnly)
 						{
-							bx::CrtFileWriter writer;
+							bx::MemoryWriter writer(&memBlock);
+							//bx::CrtFileWriter writer;
 
-							if (!bx::open(&writer, outFilePath) )
-							{
-								fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
-								return EXIT_FAILURE;
-							}
+// 							if (!bx::open(&writer, outFilePath) )
+// 							{
+// 								fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
+// 								return EXIT_FAILURE;
+// 							}
 
 							bx::write(&writer, preprocessor.m_preprocessed.c_str(), (int32_t)preprocessor.m_preprocessed.size() );
-							bx::close(&writer);
-
+							//bx::close(&writer);
+							sz = writer.seek(0, bx::Whence::End);
 							return EXIT_SUCCESS;
 						}
 
 						{
-							bx::CrtFileWriter* writer = NULL;
-
-							if (NULL != bin2c)
-							{
-								writer = new Bin2cWriter(bin2c);
-							}
-							else
-							{
-								writer = new bx::CrtFileWriter;
-							}
-
-							if (!bx::open(writer, outFilePath) )
-							{
-								fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
-								return EXIT_FAILURE;
-							}
+// 							bx::CrtFileWriter* writer = NULL;
+// 
+// 							if (NULL != bin2c)
+// 							{
+// 								writer = new Bin2cWriter(bin2c);
+// 							}
+// 							else
+// 							{
+// 								writer = new bx::CrtFileWriter;
+// 							}
+// 
+// 							if (!bx::open(writer, outFilePath) )
+// 							{
+// 								fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
+// 								return EXIT_FAILURE;
+// 							}
+							bx::MemoryWriter* writer = new bx::MemoryWriter(&memBlock);
 
 							bx::write(writer, BGFX_CHUNK_MAGIC_CSH);
 							bx::write(writer, outputHash);
@@ -1362,18 +1413,18 @@ namespace bgfx
 							}
 							else if (0 != spirv)
 							{
-								compiled = compileSPIRVShader(cmdLine, 0, preprocessor.m_preprocessed, writer);
+								compiled = compileSPIRVShader(cmdLine, 0, preprocessor.m_preprocessed, writer, err);
 							}
 							else if (0 != pssl)
 							{
-								compiled = compilePSSLShader(cmdLine, 0, preprocessor.m_preprocessed, writer);
+								compiled = compilePSSLShader(cmdLine, 0, preprocessor.m_preprocessed, writer, err);
 							}
 							else
 							{
-								compiled = compileHLSLShader(cmdLine, d3d, preprocessor.m_preprocessed, writer);
+								compiled = compileHLSLShader(cmdLine, d3d, preprocessor.m_preprocessed, writer, err);
 							}
-
-							bx::close(writer);
+							sz = writer->seek(0, bx::Whence::End);
+							//bx::close(writer);
 							delete writer;
 						}
 
@@ -1381,14 +1432,14 @@ namespace bgfx
 						{
 							if (depends)
 							{
-								std::string ofp = outFilePath;
-								ofp += ".d";
-								bx::CrtFileWriter writer;
-								if (bx::open(&writer, ofp.c_str() ) )
-								{
-									writef(&writer, "%s : %s\n", outFilePath, preprocessor.m_depends.c_str() );
-									bx::close(&writer);
-								}
+// 								std::string ofp = outFilePath;
+// 								ofp += ".d";
+// 								bx::CrtFileWriter writer;
+// 								if (bx::open(&writer, ofp.c_str() ) )
+// 								{
+// 									writef(&writer, "%s : %s\n", outFilePath, preprocessor.m_depends.c_str() );
+// 									bx::close(&writer);
+// 								}
 							}
 						}
 					}
@@ -1399,6 +1450,7 @@ namespace bgfx
 				char* entry = strstr(input, "void main()");
 				if (NULL == entry)
 				{
+					bx::stringPrintf(err, "Shader entry point 'void main()' is not found.\n");
 					fprintf(stderr, "Shader entry point 'void main()' is not found.\n");
 				}
 				else
@@ -1609,6 +1661,7 @@ namespace bgfx
 								}
 								else
 								{
+									bx::stringPrintf(err, "PrimitiveID builtin is not supported by this D3D9 HLSL.\n");
 									fprintf(stderr, "PrimitiveID builtin is not supported by this D3D9 HLSL.\n");
 									return EXIT_FAILURE;
 								}
@@ -1726,13 +1779,14 @@ namespace bgfx
 
 						if (preprocessOnly)
 						{
-							bx::CrtFileWriter writer;
-
-							if (!bx::open(&writer, outFilePath) )
-							{
-								fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
-								return EXIT_FAILURE;
-							}
+// 							bx::CrtFileWriter writer;
+// 
+// 							if (!bx::open(&writer, outFilePath) )
+// 							{
+// 								fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
+// 								return EXIT_FAILURE;
+// 							}
+							bx::MemoryWriter writer = bx::MemoryWriter(&memBlock);
 
 							if (0 != glsl)
 							{
@@ -1746,28 +1800,29 @@ namespace bgfx
 								}
 							}
 							bx::write(&writer, preprocessor.m_preprocessed.c_str(), (int32_t)preprocessor.m_preprocessed.size() );
-							bx::close(&writer);
-
+							//bx::close(&writer);
+							sz = writer.seek(0, bx::Whence::End);
 							return EXIT_SUCCESS;
 						}
 
 						{
-							bx::CrtFileWriter* writer = NULL;
-
-							if (NULL != bin2c)
-							{
-								writer = new Bin2cWriter(bin2c);
-							}
-							else
-							{
-								writer = new bx::CrtFileWriter;
-							}
-
-							if (!bx::open(writer, outFilePath) )
-							{
-								fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
-								return EXIT_FAILURE;
-							}
+// 							bx::CrtFileWriter* writer = NULL;
+// 
+// 							if (NULL != bin2c)
+// 							{
+// 								writer = new Bin2cWriter(bin2c);
+// 							}
+// 							else
+// 							{
+// 								writer = new bx::CrtFileWriter;
+// 							}
+// 
+// 							if (!bx::open(writer, outFilePath) )
+// 							{
+// 								fprintf(stderr, "Unable to open output file '%s'.", outFilePath);
+// 								return EXIT_FAILURE;
+// 							}
+							bx::MemoryWriter* writer = new bx::MemoryWriter(&memBlock);
 
 							if ('f' == shaderType)
 							{
@@ -1942,7 +1997,7 @@ namespace bgfx
 									, metal ? BX_MAKEFOURCC('M', 'T', 'L', 0) : essl
 									, code
 									, writer
-									);
+									, err);
 							}
 							else if (0 != spirv)
 							{
@@ -1950,7 +2005,7 @@ namespace bgfx
 									, 0
 									, preprocessor.m_preprocessed
 									, writer
-									);
+									, err);
 							}
 							else if (0 != pssl)
 							{
@@ -1958,7 +2013,7 @@ namespace bgfx
 									, 0
 									, preprocessor.m_preprocessed
 									, writer
-									);
+									, err);
 							}
 							else
 							{
@@ -1966,10 +2021,10 @@ namespace bgfx
 									, d3d
 									, preprocessor.m_preprocessed
 									, writer
-									);
+									, err);
 							}
-
-							bx::close(writer);
+							sz = writer->seek(0, bx::Whence::End);
+							//bx::close(writer);
 							delete writer;
 						}
 
@@ -1977,14 +2032,14 @@ namespace bgfx
 						{
 							if (depends)
 							{
-								std::string ofp = outFilePath;
-								ofp += ".d";
-								bx::CrtFileWriter writer;
-								if (bx::open(&writer, ofp.c_str() ) )
-								{
-									writef(&writer, "%s : %s\n", outFilePath, preprocessor.m_depends.c_str() );
-									bx::close(&writer);
-								}
+// 								std::string ofp = outFilePath;
+// 								ofp += ".d";
+// 								bx::CrtFileWriter writer;
+// 								if (bx::open(&writer, ofp.c_str() ) )
+// 								{
+// 									writef(&writer, "%s : %s\n", outFilePath, preprocessor.m_depends.c_str() );
+// 									bx::close(&writer);
+// 								}
 							}
 						}
 					}
@@ -2001,13 +2056,14 @@ namespace bgfx
 
 		remove(outFilePath);
 
+		bx::stringPrintf(err, "Failed to build shader.\n");
 		fprintf(stderr, "Failed to build shader.\n");
 		return EXIT_FAILURE;
 	}
 
 } // namespace bgfx
 
-int compile_shader(int _argc, const char* _argv[])
+int compile_shader(int _argc, const char* _argv[], bx::MemoryBlock& memBlock, int64_t& sz, std::string& err)
 {
-	return bgfx::compileShader(_argc, _argv);
+	return bgfx::compileShader(_argc, _argv, memBlock, sz, err);
 }

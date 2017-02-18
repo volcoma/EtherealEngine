@@ -39,6 +39,7 @@ vec3 decodeRGBE8(vec4 _rgbe8)
 	return rgb;
 }
 
+
 vec3 encodeNormalUint(vec3 _normal)
 {
 	return _normal * 0.5 + 0.5;
@@ -47,17 +48,6 @@ vec3 encodeNormalUint(vec3 _normal)
 vec3 decodeNormalUint(vec3 _encodedNormal)
 {
 	return _encodedNormal * 2.0 - 1.0;
-}
-
-vec2 encodeNormalSphereMap(vec3 _normal)
-{
-	return normalize(_normal.xy) * sqrt(_normal.z * 0.5 + 0.5);
-}
-
-vec3 decodeNormalSphereMap(vec2 _encodedNormal)
-{
-	float zz = dot(_encodedNormal, _encodedNormal) * 2.0 - 1.0;
-	return vec3(normalize(_encodedNormal.xy) * sqrt(1.0 - zz*zz), zz);
 }
 
 vec2 octahedronWrap(vec2 _val)
@@ -387,8 +377,13 @@ vec3 getTangentSpaceNormal( sampler2D bumpTexture, vec2 texCoords, float bumpine
 {
     vec3 normal = texture2D(bumpTexture, texCoords).xyz;
   	normal = normal * 2.0f - 1.0f;
-  	normal.xy *= bumpiness;
+
+#ifdef NORMAL_MAP_2CHANNEL
   	normal.z  = sqrt(1.0 - dot(normal.xy, normal.xy) );
+#elif NORMAL_MAP_Y_UP
+	normal.y = -normal.y;
+#endif
+	normal.xy *= bumpiness;
     return normalize(normal);
 }
 
@@ -408,7 +403,7 @@ float dither16x16(vec2 fragCoord)
 
 int x = int(mod(fragCoord.x, 16));
 int y = int(mod(fragCoord.y, 16));
-static const int bayer_matrix[16][16] = {
+CONST(int) bayer_matrix[16][16] = {
   {   0,192, 48,240, 12,204, 60,252,  3,195, 51,243, 15,207, 63,255 },
   { 128, 64,176,112,140, 76,188,124,131, 67,179,115,143, 79,191,127 },
   {  32,224, 16,208, 44,236, 28,220, 35,227, 19,211, 47,239, 31,223 },
@@ -441,7 +436,7 @@ int x = int(mod(fragCoord.x, 8));
 int y = int(mod(fragCoord.y, 8));
 
 
-static const int bayer_matrix[8][8] = {
+CONST(int) bayer_matrix[8][8] = {
 { 0, 32, 8, 40, 2, 34, 10, 42}, /* 8x8 Bayer ordered dithering */
 {48, 16, 56, 24, 50, 18, 58, 26}, /* pattern. Each input pixel */
 {12, 44, 4, 36, 14, 46, 6, 38}, /* is scaled to the 0..63 range */
@@ -466,6 +461,38 @@ float toClipSpaceDepth(float _depthTextureZ)
 	return _depthTextureZ * 2.0 - 1.0;
 #endif // BGFX_SHADER_LANGUAGE_HLSL
 }
+
+vec3 clipTransform(vec3 clip)
+{
+#if BGFX_SHADER_LANGUAGE_HLSL || BGFX_SHADER_LANGUAGE_METAL
+	clip.y = -clip.y;
+#endif // BGFX_SHADER_LANGUAGE_HLSL || BGFX_SHADER_LANGUAGE_METAL
+	return clip;
+}
+
+vec3 clipToWorld(mat4 _invViewProj, vec3 _clipPos)
+{
+	vec4 wpos = mul(_invViewProj, vec4(_clipPos, 1.0) );
+	return wpos.xyz / wpos.w;
+}
+
+mat3 invert_3x3( mat3 M ) 
+{
+	float det = dot( cross(M[0], M[1]), M[2] );
+	mat3 T = transpose(M);
+	return mat3( cross(T[1], T[2]), cross(T[2], T[0]), cross(T[0], T[1]) ) / det;
+}
+
+mat3 invert_3x3( mat4 M4 ) 
+{
+#if BGFX_SHADER_LANGUAGE_HLSL
+	mat3 M = (mat3)M4;
+#else
+	mat3 M = mat3(M4);
+#endif
+	return invert_3x3(M);
+}
+
 mat3 constructTangentToWorldSpaceMatrix( vec3 T, vec3 B, vec3 N )
 {
 	mat3 TBN = mat3(
@@ -478,6 +505,12 @@ mat3 constructTangentToWorldSpaceMatrix( vec3 T, vec3 B, vec3 N )
 #endif
 	return TBN;
 }
+
+mat3 calculateInverseTranspose( mat4 m )
+{
+	return transpose(invert_3x3(m));
+}
+
 #if BGFX_SHADER_TYPE_FRAGMENT
 mat3 computeTangentToWorldSpaceMatrix( vec3 N, vec3 p, vec2 uv )
 {

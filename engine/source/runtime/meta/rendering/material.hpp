@@ -1,7 +1,7 @@
 #pragma once
 #include "core/reflection/reflection.h"
 #include "core/serialization/serialization.h"
-#include "core/serialization/cereal/types/vector.hpp"
+#include "core/serialization/cereal/types/unordered_map.hpp"
 #include "core/serialization/cereal/types/string.hpp"
 #include "core/serialization/cereal/types/utility.hpp"
 #include "core/logging/logging.h"
@@ -43,9 +43,9 @@ REFLECT(StandardMaterial)
 		.property("Base Color",
 			&StandardMaterial::get_base_color,
 			&StandardMaterial::set_base_color)
-		.property("Specular Color",
-			&StandardMaterial::get_specular_color,
-			&StandardMaterial::set_specular_color)
+		.property("Subsurface Color",
+			&StandardMaterial::get_subsurface_color,
+			&StandardMaterial::set_subsurface_color)
 		.property("Emissive Color",
 			&StandardMaterial::get_emissive_color,
 			&StandardMaterial::set_emissive_color)
@@ -92,9 +92,21 @@ REFLECT(StandardMaterial)
 		.property("Roughness Map",
 			&StandardMaterial::get_roughness_map,
 			&StandardMaterial::set_roughness_map)
+		(
+			rttr::metadata("Tooltip", "black/white texture. The more white the rougher the surface.")
+		)
 		.property("Metalness Map",
 			&StandardMaterial::get_metalness_map,
 			&StandardMaterial::set_metalness_map)
+		(
+			rttr::metadata("Tooltip", "black/white texture. The more white the more metallic the surface.")
+		)
+		.property("AO Map",
+			&StandardMaterial::get_ao_map,
+			&StandardMaterial::set_ao_map)
+		(
+			rttr::metadata("Tooltip", "black/white texture.")
+		)
 		;
 }
 
@@ -103,30 +115,24 @@ SAVE(StandardMaterial)
 {
 	try_save(ar, cereal::make_nvp("base_type", cereal::base_class<Material>(&obj)));
 	try_save(ar, cereal::make_nvp("base_color", obj._base_color));
-	try_save(ar, cereal::make_nvp("specular_color", obj._specular_color));
+	try_save(ar, cereal::make_nvp("subsurface_color", obj._subsurface_color));
 	try_save(ar, cereal::make_nvp("emissive_color", obj._emissive_color));
 	try_save(ar, cereal::make_nvp("surface_data", obj._surface_data));
 	try_save(ar, cereal::make_nvp("tiling", obj._tiling));
 	try_save(ar, cereal::make_nvp("dither_threshold", obj._dither_threshold));
-	try_save(ar, cereal::make_nvp("color_map", obj._color_map));
-	try_save(ar, cereal::make_nvp("normal_map", obj._normal_map));
-	try_save(ar, cereal::make_nvp("roughness_map", obj._roughness_map));
-	try_save(ar, cereal::make_nvp("metalness_map", obj._metalness_map));
+	try_save(ar, cereal::make_nvp("maps", obj._maps));
 }
 
 LOAD(StandardMaterial)
 {
 	try_load(ar, cereal::make_nvp("base_type", cereal::base_class<Material>(&obj)));
 	try_load(ar, cereal::make_nvp("base_color", obj._base_color));
-	try_load(ar, cereal::make_nvp("specular_color", obj._specular_color));
+	try_load(ar, cereal::make_nvp("subsurface_color", obj._subsurface_color));
 	try_load(ar, cereal::make_nvp("emissive_color", obj._emissive_color));
 	try_load(ar, cereal::make_nvp("surface_data", obj._surface_data));
 	try_load(ar, cereal::make_nvp("tiling", obj._tiling));
 	try_load(ar, cereal::make_nvp("dither_threshold", obj._dither_threshold));
-	try_load(ar, cereal::make_nvp("color_map", obj._color_map));
-	try_load(ar, cereal::make_nvp("normal_map", obj._normal_map));
-	try_load(ar, cereal::make_nvp("roughness_map", obj._roughness_map));
-	try_load(ar, cereal::make_nvp("metalness_map", obj._metalness_map));
+	try_load(ar, cereal::make_nvp("maps", obj._maps));
 }
 
 #include "core/serialization/archives.h"

@@ -134,8 +134,8 @@ const math::transform_t & Camera::get_projection()
 		if (_projection_dirty)
 		{
 			// Generate the updated perspective projection matrix
-			float fFOVRadians = math::radians<float>(get_fov());
-			_projection = math::perspective(fFOVRadians, _aspect_ratio, _near_clip, _far_clip, gfx::getCaps()->homogeneousDepth);
+			float fov_radians = math::radians<float>(get_fov());
+			_projection = math::perspective(fov_radians, _aspect_ratio, _near_clip, _far_clip, gfx::is_homogeneous_depth());
 			_projection[2][0] += _aa_data.z;
 			_projection[2][1] += _aa_data.w;
 			// Matrix has been updated
@@ -159,7 +159,7 @@ const math::transform_t & Camera::get_projection()
 		if (_projection_dirty || _aspect_dirty)
 		{
 			// Generate the updated orthographic projection matrix
-			float fZoom = get_zoom_factor();
+			float zoom = get_zoom_factor();
 			const fRect rect =
 			{
 				-(float)_viewport_size.width / 2.0f,
@@ -167,7 +167,7 @@ const math::transform_t & Camera::get_projection()
 				(float)_viewport_size.width / 2.0f,
 				-(float)_viewport_size.height / 2.0f
 			};
-			_projection = math::ortho(rect.left * fZoom, rect.right * fZoom, rect.bottom * fZoom, rect.top * fZoom, get_near_clip(), get_far_clip(), gfx::getCaps()->homogeneousDepth);
+			_projection = math::ortho(rect.left * zoom, rect.right * zoom, rect.bottom * zoom, rect.top * zoom, get_near_clip(), get_far_clip(), gfx::is_homogeneous_depth());
 			_projection[2][0] += _aa_data.z;
 			_projection[2][1] += _aa_data.w;
 			// Matrix has been updated
@@ -184,26 +184,35 @@ const math::transform_t & Camera::get_projection()
 
 void Camera::look_at(const math::vec3 & vEye, const math::vec3 & vAt)
 {
-	_view.lookAt(vEye, vAt);
+	_view.look_at(vEye, vAt);
 
 	touch();
 }
 
 void Camera::look_at(const math::vec3 & vEye, const math::vec3 & vAt, const math::vec3 & vUp)
 {
-	_view.lookAt(vEye, vAt, vUp);
+	_view.look_at(vEye, vAt, vUp);
 
 	touch();
 }
 
 math::vec3 Camera::get_position() const
 {
-	return math::inverse(_view).getPosition();
+	return math::inverse(_view).get_position();
+}
+
+math::vec3 Camera::x_unit_axis() const
+{
+	return math::inverse(_view).x_unit_axis();
+}
+math::vec3 Camera::y_unit_axis() const
+{
+	return math::inverse(_view).y_unit_axis();
 }
 
 math::vec3 Camera::z_unit_axis() const
 {
-	return math::inverse(_view).zUnitAxis();
+	return math::inverse(_view).z_unit_axis();
 }
 
 const math::frustum & Camera::get_frustum()
@@ -211,7 +220,7 @@ const math::frustum & Camera::get_frustum()
 	// Recalculate frustum if necessary
 	if (_frustum_dirty == true && _frustum_locked == false)
 	{
-		_frustum.update(get_view(), get_projection(), gfx::getCaps()->homogeneousDepth);
+		_frustum.update(get_view(), get_projection(), gfx::is_homogeneous_depth());
 		_frustum_dirty = false;
 
 		// Also build the frustum / volume that represents the space between the
@@ -256,7 +265,7 @@ math::VolumeQuery::E Camera::bounds_in_frustum(const math::bbox & AABB)
 	const math::frustum& f = get_frustum();
 
 	// Request that frustum classifies
-	return f.classifyAABB(AABB);
+	return f.classify_aabb(AABB);
 }
 
 math::VolumeQuery::E Camera::bounds_in_frustum(const math::bbox &AABB, const math::transform_t & t)
@@ -265,16 +274,16 @@ math::VolumeQuery::E Camera::bounds_in_frustum(const math::bbox &AABB, const mat
 	const math::frustum & f = get_frustum();
 
 	// Request that frustum classifies
-	return math::frustum::classifyOBB(f, AABB, t);
+	return math::frustum::classify_obb(f, AABB, t);
 }
 
-bool Camera::world_to_viewport(const math::vec3 & WorldPos, math::vec3 & point, bool bClipX /* = true */, bool bClipY /* = true */, bool bClipZ /* = true */)
+bool Camera::world_to_viewport(const uPoint& viewport_pos, const uSize& viewport_size, const math::vec3& pos, math::vec3 & point, bool bClipX /* = true */, bool bClipY /* = true */, bool bClipZ /* = true */)
 {
 	// Ensure we have an up-to-date projection and view matrix
-	auto mtxTransform = get_projection() * get_view();
+	auto view_proj = get_view_projection();
 
 	// Transform the point into clip space
-	math::vec4 vClip = { math::transform_t::transformCoord(WorldPos, mtxTransform), 1.0f };
+	math::vec4 vClip = view_proj.matrix() * math::vec4{ pos.x, pos.y, pos.z, 1.0f };
 
 	// Was this clipped?
 	if (bClipX == true && (vClip.x < -vClip.w || vClip.x > vClip.w)) return false;
@@ -288,8 +297,9 @@ bool Camera::world_to_viewport(const math::vec3 & WorldPos, math::vec3 & point, 
 	vClip.z *= recipW;
 
 	// Transform to final screen space position
-	point.x = ((vClip.x * 0.5f) + 0.5f) * (float)_viewport_size.width + _viewport_pos.x;
-	point.y = ((vClip.y * -0.5f) + 0.5f) * (float)_viewport_size.height + _viewport_pos.y;
+	point.x = ((vClip.x * 0.5f) + 0.5f) * (float)viewport_size.width + _viewport_pos.x;
+	point.y = ((vClip.y * -0.5f) + 0.5f) * (float)viewport_size.height + _viewport_pos.y;
+	
 	point.z = vClip.z;
 
 	// Point on screen!
@@ -315,14 +325,14 @@ bool Camera::viewport_to_ray(const math::vec2 & point, math::vec3 & vecRayStart,
 	if (get_projection_mode() == ProjectionMode::Orthographic)
 	{
 		// Obtain the ray from the cursor position
-		vecRayStart = math::transform_t::transformCoord(vCursor, mtxInvView);
+		vecRayStart = math::transform_t::transform_coord(vCursor, mtxInvView);
 		vecRayDir = (math::vec3&)mtxInvView[2];
 
 	} // End If IsOrthohraphic
 	else
 	{
 		// Obtain the ray from the cursor position
-		vecRayStart = mtxInvView.getPosition();
+		vecRayStart = mtxInvView.get_position();
 		vecRayDir.x = vCursor.x * mtxInvView[0][0] + vCursor.y * mtxInvView[1][0] + vCursor.z * mtxInvView[2][0];
 		vecRayDir.y = vCursor.x * mtxInvView[0][1] + vCursor.y * mtxInvView[1][1] + vCursor.z * mtxInvView[2][1];
 		vecRayDir.z = vCursor.x * mtxInvView[0][2] + vCursor.y * mtxInvView[1][2] + vCursor.z * mtxInvView[2][2];
@@ -484,7 +494,7 @@ float Camera::estimate_zoom_factor(const math::vec3 & WorldPos, float fMax)
 
 	// New Zoom factor is based on the distance to this position 
 	// along the camera's look vector.
-	math::vec3 viewPos = math::transform_t::transformCoord(WorldPos, get_view());
+	math::vec3 viewPos = math::transform_t::transform_coord(WorldPos, get_view());
 	float distance = viewPos.z / ((float)_viewport_size.height * (45.0f / get_fov()));
 	return std::min<float>(fMax, distance);
 }
@@ -493,12 +503,12 @@ math::vec3 Camera::estimate_pick_tolerance(float WireTolerance, const math::vec3
 {
 	// Scale tolerance based on estimated world space zoom factor.
 	math::vec3 v;
-	ObjectTransform.transformCoord(v, Pos);
+	ObjectTransform.transform_coord(v, Pos);
 	WireTolerance *= estimate_zoom_factor(v);
 
 	// Convert into object space tolerance.
 	math::vec3 ObjectWireTolerance;
-	math::vec3 vAxisScale = ObjectTransform.getScale();
+	math::vec3 vAxisScale = ObjectTransform.get_scale();
 	ObjectWireTolerance.x = WireTolerance / vAxisScale.x;
 	ObjectWireTolerance.y = WireTolerance / vAxisScale.y;
 	ObjectWireTolerance.z = WireTolerance / vAxisScale.z;

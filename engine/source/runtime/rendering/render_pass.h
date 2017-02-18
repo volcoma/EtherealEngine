@@ -1,6 +1,7 @@
 #pragma once
 #include "frame_buffer.h"
 #include "core/common/basetypes.hpp"
+#include "core/math/math_includes.h"
 #include <vector>
 #include <unordered_map>
 #include <string>
@@ -50,6 +51,16 @@ struct RenderPass
 	//-----------------------------------------------------------------------------
 	void clear() const;
 
+	//-----------------------------------------------------------------------------
+	//  Name : set_view_proj ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	void set_view_proj(const math::transform_t& v, const math::transform_t& p);
+	void set_view_proj_ortho_full(float depth);
 	//-----------------------------------------------------------------------------
 	//  Name : reset ()
 	/// <summary>

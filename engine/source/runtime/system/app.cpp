@@ -1,7 +1,6 @@
 #include "app.h"
 #include "engine.h"
-#include "rendering/renderer.h"
-#include "assets/asset_manager.h"
+#include "rendering/render_window.h"
 
 namespace runtime
 {
@@ -10,11 +9,14 @@ namespace runtime
 	{}
 
 
+	void App::setup()
+	{
+		auto engine = core::add_subsystem<Engine>();
+	}
+
 	void App::start()
 	{
 		auto engine = core::get_subsystem<Engine>();
-		auto renderer = core::get_subsystem<Renderer>();
-		auto am = core::get_subsystem<AssetManager>();
 
 		sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 		desktop.width = 1280;
@@ -23,12 +25,19 @@ namespace runtime
 			desktop,
 			"App",
 			sf::Style::Default);
+		
 
-		if (!renderer->init_backend(*main_window))
+		if(!engine->start(main_window))
+		{
 			_exitcode = -1;
+			return;
+		}
+	}
 
-		engine->register_window(main_window);
-		am->setup();
+	void App::stop()
+	{
+		auto engine = core::get_subsystem<Engine>();
+		engine->destroy_windows();
 	}
 
 	int App::run()
@@ -37,13 +46,19 @@ namespace runtime
 
 		setup();
 		if (_exitcode != 0)
+		{
+			core::details::dispose();
 			return _exitcode;
+		}
 
-		auto engine = core::add_subsystem<Engine>();
 		start();
 		if (_exitcode != 0)
+		{
+			core::details::dispose();
 			return _exitcode;
+		}
 
+		auto engine = core::get_subsystem<Engine>();
 		while (engine->is_running())
 			engine->run_one_frame();
 
@@ -53,10 +68,17 @@ namespace runtime
 		return _exitcode;
 	}
 
-	void App::terminate_with_error(const std::string& message)
+	void App::quit_with_error(const std::string& message)
 	{
-		logging::get("Log")->error() << message;
-		_exitcode = -1;
+		APPLOG_ERROR(message.c_str());
+		quit(-1);
+	}
+
+	void App::quit(int exitcode)
+	{
+		auto engine = core::add_subsystem<Engine>();
+		engine->set_running(false);
+		_exitcode = exitcode;
 	}
 
 }

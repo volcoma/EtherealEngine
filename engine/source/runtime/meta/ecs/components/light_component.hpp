@@ -10,21 +10,21 @@ REFLECT(LightComponent)
 	rttr::registration::class_<LightComponent>("Component/Light")
 		.constructor<>()
 		(
-			rttr::policy::ctor::as_std_shared_ptr,
-			rttr::metadata("CanExecuteInEditor", true)
-			)
-		;
+			rttr::policy::ctor::as_std_shared_ptr
+		);
 }
 
 
 SAVE(LightComponent)
 {
 	try_save(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)));
+	try_save(ar, cereal::make_nvp("light", obj._light));
 }
 
 LOAD(LightComponent)
 {
 	try_load(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)));
+	try_load(ar, cereal::make_nvp("light", obj._light));
 }
 
 

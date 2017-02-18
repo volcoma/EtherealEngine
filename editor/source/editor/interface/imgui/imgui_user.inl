@@ -212,13 +212,18 @@ namespace ImGui
 		SetCursorScreenPos(pos2);
 	}
 
-	int ImageButtonWithAspectAndLabel(ImTextureID texture, ImVec2 texture_size, ImVec2 size, ImVec2 uv0, ImVec2 uv1, bool selected, const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags)
+	int ImageButtonWithAspectAndLabel(ImTextureID texture, ImVec2 texture_size, ImVec2 size, ImVec2 uv0, ImVec2 uv1, bool selected, bool* edit_label, const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags)
 	{
-		static bool edit_label = false;
+		static bool edit = false;
+
+		if (edit_label != nullptr)
+			edit = *edit_label;
+
 		int return_value = 0;
 		
 		ImGuiWindow* window = GetCurrentWindow();
 		bool inputActive = false;
+		bool label_clicked = false;
 		BeginGroup();
 		{
 			if(selected)
@@ -232,8 +237,14 @@ namespace ImGui
 			PushItemWidth(size.x);
 			LabelTextEx("", label);
 			PopItemWidth();
-			
-			if(selected && edit_label)
+			label_clicked = IsItemClicked(0);
+			if (!edit)
+			{
+				if (IsItemHovered())
+					SetTooltip(label);
+			}
+
+			if(selected && edit)
 			{	
 				SetCursorScreenPos(pos);
 				PushItemWidth(size.x);
@@ -242,7 +253,7 @@ namespace ImGui
 					buf_size,
 					flags))
 				{
-					edit_label = false;
+					edit = false;
 					return_value = 2;
 				}
 				PopItemWidth();		
@@ -250,7 +261,7 @@ namespace ImGui
 				inputActive = IsItemActive();
 				if (!inputActive && (IsMouseClicked(0) || IsMouseDragging()))
 				{
-					edit_label = false;
+					edit = false;
 				}
 			
 			}
@@ -270,17 +281,22 @@ namespace ImGui
  					SetActiveID(id);
 			}
 
-			if (IsMouseReleased(0) && window->GetID(label) == id)
+			if (!IsMouseDragging(0) && IsMouseReleased(0) && window->GetID(label) == id)
 			{
 				if (!selected)
-					edit_label = false;
+					edit = false;
 
 				return_value = 1;
 			}
 
+			if (selected && label_clicked)
+			{
+				edit = selected;
+			}
+
 			if (IsMouseDoubleClicked(0))
 			{
-				edit_label = selected;
+				return_value = 3;
 			}
 		}
 		

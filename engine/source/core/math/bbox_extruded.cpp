@@ -94,11 +94,11 @@ bbox_extruded::bbox_extruded( const bbox & AABB, const vec3 & vecOrigin, float f
 //-----------------------------------------------------------------------------
 void bbox_extruded::reset()
 {
-    sourceMin       = vec3( 0, 0, 0 );
-	sourceMax       = vec3( 0, 0, 0 );
-    projectionPoint = vec3( 0, 0, 0 );
-    projectionRange = 0.0f;
-	edgeCount       = 0;
+    source_min       = vec3( 0, 0, 0 );
+	source_max       = vec3( 0, 0, 0 );
+    projection_point = vec3( 0, 0, 0 );
+    projection_range = 0.0f;
+	edge_count       = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -119,44 +119,44 @@ void bbox_extruded::extrude( const bbox & AABB, const vec3 & vecOrigin, float fR
         Bounds.mul( *pTransform );
 
     // Make a copy of the values used to generate this box
-    sourceMin       = Bounds.min;
-    sourceMax       = Bounds.max;
-    projectionPoint = vecOrigin;
-    projectionRange = fRange;
+    source_min       = Bounds.min;
+    source_max       = Bounds.max;
+    projection_point = vecOrigin;
+    projection_range = fRange;
 
     // Simple comparisons of the bounding box against the projection origin quickly determine which
     // halfspaces the box exists in. From this, look up values from the precomputed table that
     // define which edges of the bounding box are silhouettes.
 	unsigned int nHalfSpace = 0;
-    if ( sourceMin.x <= vecOrigin.x ) nHalfSpace |= 0x1;
-	if ( sourceMax.x >= vecOrigin.x ) nHalfSpace |= 0x2;
-	if ( sourceMin.y <= vecOrigin.y ) nHalfSpace |= 0x4;
-	if ( sourceMax.y >= vecOrigin.y ) nHalfSpace |= 0x8;
-	if ( sourceMin.z <= vecOrigin.z ) nHalfSpace |= 0x10;
-	if ( sourceMax.z >= vecOrigin.z ) nHalfSpace |= 0x20;
+    if ( source_min.x <= vecOrigin.x ) nHalfSpace |= 0x1;
+	if ( source_max.x >= vecOrigin.x ) nHalfSpace |= 0x2;
+	if ( source_min.y <= vecOrigin.y ) nHalfSpace |= 0x4;
+	if ( source_max.y >= vecOrigin.y ) nHalfSpace |= 0x8;
+	if ( source_min.z <= vecOrigin.z ) nHalfSpace |= 0x10;
+	if ( source_max.z >= vecOrigin.z ) nHalfSpace |= 0x20;
 
     // Lookup the appropriate silhouette edges
     unsigned int nRemap = HalfSpaceRemap[nHalfSpace];
-    for ( edgeCount = 0; (SilhouetteLUT[nRemap][edgeCount][0] != INVALID) && (edgeCount < 6); )
+    for ( edge_count = 0; (SilhouetteLUT[nRemap][edge_count][0] != INVALID) && (edge_count < 6); )
     {
         vec3 vPoint1, vPoint2;
 		
         // Lookup correct points to use
-        unsigned int nPoint1 = SilhouetteLUT[nRemap][edgeCount][0];
-		unsigned int nPoint2 = SilhouetteLUT[nRemap][edgeCount][1];
+        unsigned int nPoint1 = SilhouetteLUT[nRemap][edge_count][0];
+		unsigned int nPoint2 = SilhouetteLUT[nRemap][edge_count][1];
 		
         // Select the actual point coordinates
-        vPoint1.x = (nPoint1 & MIN_X) ? sourceMin.x : sourceMax.x;
-		vPoint1.y = (nPoint1 & MIN_Y) ? sourceMin.y : sourceMax.y;
-		vPoint1.z = (nPoint1 & MIN_Z) ? sourceMin.z : sourceMax.z;
-		vPoint2.x = (nPoint2 & MIN_X) ? sourceMin.x : sourceMax.x;
-		vPoint2.y = (nPoint2 & MIN_Y) ? sourceMin.y : sourceMax.y;
-		vPoint2.z = (nPoint2 & MIN_Z) ? sourceMin.z : sourceMax.z;
+        vPoint1.x = (nPoint1 & MIN_X) ? source_min.x : source_max.x;
+		vPoint1.y = (nPoint1 & MIN_Y) ? source_min.y : source_max.y;
+		vPoint1.z = (nPoint1 & MIN_Z) ? source_min.z : source_max.z;
+		vPoint2.x = (nPoint2 & MIN_X) ? source_min.x : source_max.x;
+		vPoint2.y = (nPoint2 & MIN_Y) ? source_min.y : source_max.y;
+		vPoint2.z = (nPoint2 & MIN_Z) ? source_min.z : source_max.z;
 		
         // Record the edge data we used
-		silhouetteEdges[edgeCount][0] = nPoint1;
-		silhouetteEdges[edgeCount][1] = nPoint2;
-		extrudedPlanes[edgeCount++] = plane::fromPoints( vecOrigin, vPoint1, vPoint2 );
+		silhouette_edges[edge_count][0] = nPoint1;
+		silhouette_edges[edge_count][1] = nPoint2;
+		extruded_planes[edge_count++] = plane::fromPoints( vecOrigin, vPoint1, vPoint2 );
 
     } // Next Potential
 
@@ -168,23 +168,23 @@ void bbox_extruded::extrude( const bbox & AABB, const vec3 & vecOrigin, float fR
 /// Retrieve the specified edge points.
 /// </summary>
 //-----------------------------------------------------------------------------
-bool bbox_extruded::getEdge( unsigned int nEdge, vec3 & vPoint1, vec3 & vPoint2 ) const
+bool bbox_extruded::get_edge( unsigned int nEdge, vec3 & vPoint1, vec3 & vPoint2 ) const
 {
     // Valid index?
-    if ( nEdge >= edgeCount )
+    if ( nEdge >= edge_count )
         return false;
 
     // Lookup correct points to use
-    unsigned int nPoint1 = silhouetteEdges[nEdge][0];
-	unsigned int nPoint2 = silhouetteEdges[nEdge][1];
+    unsigned int nPoint1 = silhouette_edges[nEdge][0];
+	unsigned int nPoint2 = silhouette_edges[nEdge][1];
 	
     // Select the actual point coordinates
-    vPoint1.x = (nPoint1 & MIN_X) ? sourceMin.x : sourceMax.x;
-	vPoint1.y = (nPoint1 & MIN_Y) ? sourceMin.y : sourceMax.y;
-	vPoint1.z = (nPoint1 & MIN_Z) ? sourceMin.z : sourceMax.z;
-	vPoint2.x = (nPoint2 & MIN_X) ? sourceMin.x : sourceMax.x;
-	vPoint2.y = (nPoint2 & MIN_Y) ? sourceMin.y : sourceMax.y;
-	vPoint2.z = (nPoint2 & MIN_Z) ? sourceMin.z : sourceMax.z;
+    vPoint1.x = (nPoint1 & MIN_X) ? source_min.x : source_max.x;
+	vPoint1.y = (nPoint1 & MIN_Y) ? source_min.y : source_max.y;
+	vPoint1.z = (nPoint1 & MIN_Z) ? source_min.z : source_max.z;
+	vPoint2.x = (nPoint2 & MIN_X) ? source_min.x : source_max.x;
+	vPoint2.y = (nPoint2 & MIN_Y) ? source_min.y : source_max.y;
+	vPoint2.z = (nPoint2 & MIN_Z) ? source_min.z : source_max.z;
 
     // Success!
     return true;
@@ -196,7 +196,7 @@ bool bbox_extruded::getEdge( unsigned int nEdge, vec3 & vPoint1, vec3 & vPoint2 
 /// Determine whether or not the line passed is within the box.
 /// </summary>
 //-----------------------------------------------------------------------------
-bool bbox_extruded::testLine( const vec3 & v1, const vec3 & v2 ) const
+bool bbox_extruded::test_line( const vec3 & v1, const vec3 & v2 ) const
 {
     unsigned int nCode1 = 0, nCode2 = 0;
     float   fDist1, fDist2, t;
@@ -205,11 +205,11 @@ bool bbox_extruded::testLine( const vec3 & v1, const vec3 & v2 ) const
     unsigned int  i;
 
     // Test each plane
-    for ( i = 0; i < edgeCount; ++i )
+    for ( i = 0; i < edge_count; ++i )
     {
         // Classify each point of the line against the plane.
-        fDist1 = plane::dotCoord( extrudedPlanes[i], v1 );
-        fDist2 = plane::dotCoord( extrudedPlanes[i], v2 );
+        fDist1 = plane::dotCoord( extruded_planes[i], v1 );
+        fDist2 = plane::dotCoord( extruded_planes[i], v2 );
         nSide1 = (fDist1 >= 0) ? 1 : 0;
         nSide2 = (fDist2 >= 0) ? 1 : 0;
 
@@ -228,13 +228,13 @@ bool bbox_extruded::testLine( const vec3 & v1, const vec3 & v2 ) const
         {
             // Compute the point at which the line intersects this plane.
             vDir = v2 - v1;
-            t    = -plane::dotCoord( extrudedPlanes[i], v1 ) / plane::dotNormal( extrudedPlanes[i], vDir );
+            t    = -plane::dotCoord( extruded_planes[i], v1 ) / plane::dotNormal( extruded_planes[i], vDir );
             
             // Truly spanning?
             if ( (t >= 0.0f) && (t <= 1.0f) )
             {
                 vIntersect = v1 + (vDir * t);
-                if ( testSphere( vIntersect, 0.01f ) )
+                if ( test_sphere( vIntersect, 0.01f ) )
                     return true;
             
             } // End if spanning
@@ -253,14 +253,14 @@ bool bbox_extruded::testLine( const vec3 & v1, const vec3 & v2 ) const
 /// Determine whether or not the sphere passed is within the box.
 /// </summary>
 //-----------------------------------------------------------------------------
-bool bbox_extruded::testSphere( const vec3 & vecCenter, float fRadius ) const
+bool bbox_extruded::test_sphere( const vec3 & vecCenter, float fRadius ) const
 {
     unsigned int i;
 
     // Test box planes
-    for ( i = 0; i < edgeCount; ++i )
+    for ( i = 0; i < edge_count; ++i )
     {
-        float fDot = plane::dotCoord( extrudedPlanes[i], vecCenter );
+        float fDot = plane::dotCoord( extruded_planes[i], vecCenter );
 
         // Sphere entirely in front of plane
         if ( fDot >= fRadius )

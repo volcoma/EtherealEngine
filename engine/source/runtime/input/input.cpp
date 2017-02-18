@@ -22,7 +22,7 @@ namespace runtime
 
 	void Input::handle_event(const sf::Event& event)
 	{
-		_action_mapper.handleEvent(event);
+		_action_mapper.handle_event(event);
 
 		if (key_event(event)) return;
 

@@ -24,9 +24,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{BB779DD1
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "texturec", "texturec.vcxproj", "{4F86D98A-2A3B-48F0-8B69-52AEDCDB9EAF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "geometryc", "geometryc.vcxproj", "{6EDFFE68-C3FB-4AC7-8B38-8E27F5722B1D}"
-EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
 		Debug|x64 = Debug|x64
@@ -90,14 +91,6 @@ Global
 		{4F86D98A-2A3B-48F0-8B69-52AEDCDB9EAF}.Release|Win32.Build.0 = Release|Win32
 		{4F86D98A-2A3B-48F0-8B69-52AEDCDB9EAF}.Release|x64.ActiveCfg = Release|x64
 		{4F86D98A-2A3B-48F0-8B69-52AEDCDB9EAF}.Release|x64.Build.0 = Release|x64
-		{6EDFFE68-C3FB-4AC7-8B38-8E27F5722B1D}.Debug|Win32.ActiveCfg = Debug|Win32
-		{6EDFFE68-C3FB-4AC7-8B38-8E27F5722B1D}.Debug|Win32.Build.0 = Debug|Win32
-		{6EDFFE68-C3FB-4AC7-8B38-8E27F5722B1D}.Debug|x64.ActiveCfg = Debug|x64
-		{6EDFFE68-C3FB-4AC7-8B38-8E27F5722B1D}.Debug|x64.Build.0 = Debug|x64
-		{6EDFFE68-C3FB-4AC7-8B38-8E27F5722B1D}.Release|Win32.ActiveCfg = Release|Win32
-		{6EDFFE68-C3FB-4AC7-8B38-8E27F5722B1D}.Release|Win32.Build.0 = Release|Win32
-		{6EDFFE68-C3FB-4AC7-8B38-8E27F5722B1D}.Release|x64.ActiveCfg = Release|x64
-		{6EDFFE68-C3FB-4AC7-8B38-8E27F5722B1D}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -110,6 +103,5 @@ Global
 		{139958CC-CFD4-41F0-A663-B130E403D9A6} = {E130AA8C-3AFD-43BF-8EDC-195A6C71E165}
 		{519DCD81-43C0-4769-8805-B51D2D2AAC4F} = {BB779DD1-A6C8-4DAD-82A2-60D719AF3860}
 		{4F86D98A-2A3B-48F0-8B69-52AEDCDB9EAF} = {BB779DD1-A6C8-4DAD-82A2-60D719AF3860}
-		{6EDFFE68-C3FB-4AC7-8B38-8E27F5722B1D} = {BB779DD1-A6C8-4DAD-82A2-60D719AF3860}
 	EndGlobalSection
 EndGlobal

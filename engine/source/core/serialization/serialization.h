@@ -42,7 +42,7 @@ bool try_save(Archive& ar, T const& t)
 	}
 	catch (cereal::Exception e)
 	{
-		logging::get("Log")->warn() << e.what();
+		APPLOG_WARNING(e.what());
 		return false;
 	}
 	return true;
@@ -57,7 +57,7 @@ bool try_load(Archive& ar, T& t)
 	}
 	catch (cereal::Exception e)
 	{
-		logging::get("Log")->warn() << e.what();
+		APPLOG_WARNING(e.what());
 		return false;
 	}
 	return true;
@@ -73,7 +73,7 @@ bool try_serialize(Archive& ar, T& t)
 	}
 	catch (cereal::Exception e)
 	{
-		logging::get("Log")->warn() << e.what();
+		APPLOG_WARNING(e.what());
 		return false;
 	}
 	return true;

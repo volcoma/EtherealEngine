@@ -3,29 +3,31 @@
 #include "project.h"
 
 #include "filedialog/filedialog.h"
-#include "runtime/ecs/systems/transform_system.h"
+#include "runtime/ecs/systems/scene_graph.h"
 #include "runtime/ecs/components/model_component.h"
 #include "runtime/ecs/components/transform_component.h"
 #include "runtime/ecs/components/camera_component.h"
 #include "runtime/ecs/components/light_component.h"
+#include "runtime/ecs/components/reflection_probe_component.h"
 #include "runtime/ecs/utils.h"
 #include "runtime/system/filesystem.h"
 #include "runtime/rendering/render_pass.h"
 #include "runtime/assets/asset_manager.h"
+#include "runtime/assets/asset_extensions.h"
 #include "runtime/input/input.h"
 #include "core/logging/logging.h"
 
 std::vector<runtime::Entity> gather_scene_data()
 {
 	auto es = core::get_subsystem<editor::EditState>();
-	auto ts = core::get_subsystem<runtime::TransformSystem>();
-	const auto& roots = ts->get_roots();
-	auto editorCamera = es->camera;
+	auto sg = core::get_subsystem<runtime::SceneGraph>();
+	const auto& roots = sg->get_roots();
+	auto editor_camera = es->camera;
 	std::vector<runtime::Entity> entities;
 	for (auto root : roots)
 	{
 		auto entity = root.lock()->get_entity();
-		if (entity != editorCamera)
+		if (entity != editor_camera)
 			entities.push_back(entity);
 	}
 
@@ -51,17 +53,40 @@ void default_scene()
 		object.assign<TransformComponent>().lock()
 			->set_local_position({ 1.0f, 6.0f, -3.0f })
 			.rotate_local(50.0f, -30.0f, 0.0f);
-		object.assign<LightComponent>().lock()
-			->get_light().light_type = LightType::Directional;
+		object.assign<LightComponent>();
+	}
+	{
+		auto object = ecs->create();
+		object.set_name("global probe");
+		object.assign<TransformComponent>().lock()
+			->set_local_position({ 0.0f, 0.1f, 0.0f });
+
+		ReflectionProbe probe;
+		probe.method = ReflectMethod::Environment;
+		probe.probe_type = ProbeType::Sphere;
+		probe.sphere_data.range = 1000.0f;
+		object.assign<ReflectionProbeComponent>().lock()
+			->set_probe(probe);
+	}
+	{
+		auto object = ecs->create();
+		object.set_name("local probe");
+		object.assign<TransformComponent>().lock()
+			->set_local_position({ 0.0f, 0.1f, 0.0f });
+
+		ReflectionProbe probe;
+		probe.method = ReflectMethod::Static;
+		probe.probe_type = ProbeType::Box;
+		object.assign<ReflectionProbeComponent>().lock()
+			->set_probe(probe);
 	}
 	{
 		auto object = ecs->create();
 		object.set_name("platform");
-		object.assign<TransformComponent>().lock()
-			->set_local_scale({ 10.0f, 0.1f, 10.0f });
+		object.assign<TransformComponent>();
 
 		Model model;
-		am->load<Mesh>("engine_data://meshes/platform", false)
+		am->load<Mesh>("embedded:/plane", false)
 			.then([&model](auto asset)
 		{
 			model.set_lod(asset, 0);
@@ -70,16 +95,18 @@ void default_scene()
 		//Add component and configure it.
 		object.assign<ModelComponent>().lock()
 			->set_casts_shadow(true)
-			.set_casts_reflection(false)
+			.set_casts_reflection(true)
 			.set_model(model);
 	}
 	{
 		auto object = ecs->create();
 		object.set_name("object");
-		object.assign<TransformComponent>();
+		object.assign<TransformComponent>().lock()
+			->set_local_position({ 0.0f, 0.5f, 0.0f })
+			.rotate_local(0.0f, 180.0f, 0.0f);
 
 		Model model;
-		am->load<Mesh>("engine_data://meshes/bunny", false)
+		am->load<Mesh>("embedded:/sphere", false)
 			.then([&model](auto asset)
 		{
 			model.set_lod(asset, 0);
@@ -93,38 +120,13 @@ void default_scene()
 	}
 }
 
-void save_editor_camera()
-{
-	auto es = core::get_subsystem<editor::EditState>();
-	if (es->camera)
-		ecs::utils::save_data(fs::resolve_protocol("app://settings/editor_camera.asset"), { es->camera });
-}
-
-void load_editor_camera()
-{
-	auto es = core::get_subsystem<editor::EditState>();
-	runtime::Entity object;
-	if (!ecs::utils::try_load_entity(fs::resolve_protocol("app://settings/editor_camera.asset"), object))
-	{
-		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
-		object = ecs->create();
-		object.set_name("EDITOR CAMERA");
-		object.assign<TransformComponent>().lock()
-			->set_local_position({ 0.0f, 2.0f, -5.0f });
-		object.assign<CameraComponent>();
-	}
-	
-	es->camera = object;
-}
-
-
 auto create_new_scene()
 {
 	auto es = core::get_subsystem<editor::EditState>();
 	auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
-	save_editor_camera();
+	es->save_editor_camera();
 	ecs->dispose();
-	load_editor_camera();
+	es->load_editor_camera();
 	default_scene();
 	es->scene.clear();
 }
@@ -134,11 +136,11 @@ auto open_scene()
 	auto es = core::get_subsystem<editor::EditState>();
 	auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
 	std::string path;
-	if (open_file_dialog("scene", fs::resolve_protocol("data://scenes").string(), path))
+	if (open_file_dialog(extensions::scene.substr(1), fs::resolve_protocol("app:/data").string(), path))
 	{
-		save_editor_camera();
+		es->save_editor_camera();
 		ecs->dispose();
-		load_editor_camera();
+		es->load_editor_camera();
 
 		std::vector<runtime::Entity> outData;
 		if (ecs::utils::load_data(path, outData))
@@ -158,7 +160,7 @@ auto save_scene()
 		ecs::utils::save_data(path, entities);
 	}
 
-	save_editor_camera();
+	es->save_editor_camera();
 }
 
 void save_scene_as()
@@ -166,13 +168,16 @@ void save_scene_as()
 	auto es = core::get_subsystem<editor::EditState>();
 
 	std::string path;
-	if (save_file_dialog("scene", fs::resolve_protocol("data://scenes").string(), path))
+	if (save_file_dialog(extensions::scene.substr(1), fs::resolve_protocol("app:/data").string(), path))
 	{
-		es->scene = path;		
+		es->scene = path;	
+		if(!fs::path(path).has_extension())
+			es->scene += extensions::scene;
+
 		save_scene();	
 	}
 
-	save_editor_camera();
+	es->save_editor_camera();
 }
 
 
@@ -263,12 +268,6 @@ void MainEditorWindow::on_menubar()
 		if (gui::MenuItem("Save As..", "Ctrl+Shift+S", false, ecs->size() > 0 && current_project != ""))
 		{
 			save_scene_as();
-		}
-		gui::Separator();
-
-		if (gui::MenuItem("Quit", "Alt+F4"))
-		{
-			//app.quit();
 		}
 
 		gui::EndMenu();
@@ -386,13 +385,13 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 		if (gui::BeginChild("###projects_content", ImVec2(gui::GetContentRegionAvail().x * 0.8f, gui::GetContentRegionAvail().y - gui::GetTextLineHeightWithSpacing()), false, flags))
 		{
 			
-			const auto& rencent_projects = pm->get_recent_projects();
+			const auto& rencent_projects = pm->get_options().recent_project_paths;
 			for (auto& path : rencent_projects)
 			{
 				if (gui::Selectable(path.c_str()))
 				{
 					pm->open_project(path, recompile_assets);
-					load_editor_camera();
+					es->load_editor_camera();
 					set_main(false);
 					close();
 				}
@@ -405,8 +404,8 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 		{
 			gui::SetTooltip(
 			"Force to recompile all assets when a project is opened.\n"
-			"This will take some time but is recommended so that asset\n"
-			"changes can be easily detected between project startups.\n"
+			"This will create compiled versions of the raw ones \n"
+			"which will be loaded into the app."
 			);
 		}
 	}
@@ -422,7 +421,7 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 			if (pick_folder_dialog("", path))
 			{
 				pm->create_project(path);
-				load_editor_camera();
+				es->load_editor_camera();
 				set_main(false);
 				close();
 			}
@@ -434,7 +433,7 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 			if (pick_folder_dialog("", path))
 			{
 				pm->open_project(path, recompile_assets);
-				load_editor_camera();
+				es->load_editor_camera();
 				set_main(false);
 				close();
 			}

@@ -3,6 +3,7 @@
 #include "program.h"
 #include "core/reflection/rttr/rttr_enable.h"
 #include "core/serialization/serialization.h"
+#include "core/math/math_includes.h"
 
 enum class LightType : std::uint8_t
 {
@@ -191,20 +192,30 @@ struct Light
 	REFLECTABLE(Light)
 	SERIALIZABLE(Light)
 
-	LightType light_type = LightType::Spot;
+	LightType light_type = LightType::Directional;
 	DepthImpl depth_impl = DepthImpl::InvZ;
 	SmImpl sm_impl = SmImpl::Hard;
 
 	struct Spot
 	{
+		void set_range(float r);
+		float get_range() const { return range; }
+
+		void set_outer_angle(float angle);
+		float get_outer_angle() const { return outer_angle; }
+
+		void set_inner_angle(float angle);
+		float get_inner_angle() const { return inner_angle; }
+
 		float range = 10.0f;
-		float spot_outer_angle = 45.0f;
-		float spot_inner_angle = 30.0f;
+		float outer_angle = 60.0f;
+		float inner_angle = 30.0f;
 	};
 	
 	struct Point
 	{
 		float range = 10.0f;
+		float exponent_falloff = 1.0f;
 		float fov_x_adjust = 0.0f;
 		float fov_y_adjust = 0.0f;
 		bool stencil_pack = true;
@@ -220,5 +231,6 @@ struct Light
 	Spot spot_data;
 	Point point_data;
 	Directional directional_data;
-
+	math::color color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	float intensity = 1.0f;
 };

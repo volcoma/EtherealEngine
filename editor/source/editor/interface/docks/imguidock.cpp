@@ -141,7 +141,7 @@ namespace ImGuiDock
 		{
 			if (dock->container->docks.size() > 1)
 			{
-				for (size_t i = 0; i < dock->container->docks.size(); i++)
+				for (size_t i = 0; i < dock->container->docks.size(); ++i)
 				{
 					if (dock->container->docks[i] == dock)
 					{
@@ -216,7 +216,7 @@ namespace ImGuiDock
 						working->size = dock->container->parent->size;
 					}
 				}
-				for (size_t i = 0; i < nodes.size(); i++)
+				for (size_t i = 0; i < nodes.size(); ++i)
 				{
 					if (toDelete == nodes[i])
 					{
@@ -328,7 +328,6 @@ namespace ImGuiDock
 					if ((mousePos.x > screenCursorPos.x && mousePos.x < (screenCursorPos.x + size.x)) &&
 						(mousePos.y > screenCursorPos.y && mousePos.y < (screenCursorPos.y + size.y)))
 					{
-
 						ImGui::BeginChild("##dockSlotPreview");
 						ImGui::PushClipRect(ImVec2(), ImGui::GetIO().DisplaySize, false);
 						DockSlot dockSlot = render_dock_slot_preview(cursorPos, screenCursorPos, size);
@@ -462,7 +461,7 @@ namespace ImGuiDock
 					auto guiWindow = std::make_shared<GuiWindow>(
 						sf::VideoMode((unsigned int)_current_dock_to->last_size.x, (unsigned int)_current_dock_to->last_size.y),
 						"",//std::string(m_currentDockTo->title),
-						sf::Style::Resize
+						sf::Style::Default
 						);
 
 					auto engine = core::get_subsystem<runtime::Engine>();

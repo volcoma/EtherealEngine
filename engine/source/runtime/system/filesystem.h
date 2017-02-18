@@ -8,14 +8,14 @@ namespace fs
 {
 	using namespace std::experimental::filesystem;
 	using protocols_t = std::unordered_map<std::string, std::string>;
-	using byte_array_t = std::vector<std::uint8_t>;
+	using byte_array_t = std::vector<char>;
 
 	//-----------------------------------------------------------------------------
 	//  Name : add_path_protocol ()
 	/// <summary>
 	/// Allows us to map a protocol to a specific directory. A path protocol
 	/// gives the caller the ability to prepend an identifier to their file
-	/// name i.e. "engine_data://textures/tex.png" and have it return the
+	/// name i.e. "engine_data:/textures/tex.png" and have it return the
 	/// relevant mapped path.
 	/// </summary>
 	//-----------------------------------------------------------------------------
@@ -58,5 +58,13 @@ namespace fs
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	path executable_path(const char *argv0);
+
+	//-----------------------------------------------------------------------------
+	//  Name : show_in_graphical_env ()
+	/// <summary>
+	/// Shows a path in the graphical environment e.g Explorer, Finder... etc.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	void show_in_graphical_env(const path& _path);
 };
 

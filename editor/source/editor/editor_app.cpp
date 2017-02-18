@@ -1,7 +1,6 @@
 #include "editor_app.h"
 #include "runtime/system/engine.h"
-#include "runtime/rendering/renderer.h"
-#include "runtime/assets/asset_manager.h"
+#include "runtime/rendering/render_window.h"
 #include "editor_window.h"
 #include "interface/gui_system.h"
 #include "interface/docks/docking.h"
@@ -15,34 +14,27 @@ namespace editor
 
 	void EditorApp::start()
 	{
-		auto renderer = core::get_subsystem<runtime::Renderer>();
 		auto engine = core::get_subsystem<runtime::Engine>();
-		auto am = core::get_subsystem<runtime::AssetManager>();
+
 		sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 		desktop.width = 1280;
 		desktop.height = 720;
 		auto main_window = std::make_shared<MainEditorWindow>(
 			desktop,
-			"App",
+			"Editor",
 			sf::Style::Default);
 
-
-		if (!renderer->init_backend(*main_window))
+		if (!engine->start(main_window))
+		{
 			_exitcode = -1;
-
-		engine->register_window(main_window);
-
-		am->setup();
+			return;
+		}
 
 		core::add_subsystem<GuiSystem>();
 		core::add_subsystem<DockingSystem>();
 		core::add_subsystem<EditState>();
 		core::add_subsystem<PickingSystem>();
 		core::add_subsystem<DebugDrawSystem>();
-
-		auto pm = core::add_subsystem<ProjectManager>();
-		pm->open();
+		core::add_subsystem<ProjectManager>();
 	}
-
-
 }

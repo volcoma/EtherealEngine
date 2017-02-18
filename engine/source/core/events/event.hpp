@@ -74,4 +74,76 @@ private:
 	signal_type _signal;
 };
 
+
+#include <memory>
+#include <string>
+#include <vector>
+#include <unordered_map>
+#include <functional>
+
+template <typename F>
+struct function_traits : public function_traits<decltype(&F::operator())>
+{};
+
+template <typename T, typename R, typename... Args>
+struct function_traits<R(T::*)(Args...) const>
+{
+	typedef R(*pointer)(Args...);
+	typedef R return_type;
+	static constexpr std::size_t arg_count = sizeof...(Args);
+	typedef std::tuple<Args...> args_tuple;
+	typedef const std::function<R(Args...)> function;
+};
+
+struct function_wrapper
+{
+	virtual ~function_wrapper() {}
+	virtual const void* get_ptr() const= 0;
+};
+
+template<typename F>
+class function_wrapper_t : public function_wrapper
+{
+public:
+	function_wrapper_t(F&& f) : _function(f) {}
+	~function_wrapper_t() {}
+	const void* get_ptr() const { return &_function; }
+
+private:
+	typename function_traits<F>::function _function;
+};
+
+template <typename F>
+std::unique_ptr<function_wrapper> create_wrapper(F&& f)
+{
+	return std::unique_ptr<function_wrapper_t<typename F>>(new function_wrapper_t<typename F>(std::forward<F>(f)));
+}
+
+class event_dispatcher
+{
+public:
+	template<typename F>
+	void connect(const std::string& name, F&& f)
+	{
+		static_assert(std::is_same<void, typename function_traits<F>::return_type>::value,
+			"Signals cannot have a return type different from void");
+
+		_list[name].emplace_back(create_wrapper(std::forward<F>(f)));
+	}
+
+	template<typename ... Args>
+	void dispatch(const std::string& name, Args... args)
+	{
+		auto& funcs = _list[name];
+
+		for (auto& func : funcs)
+		{
+			auto& f = *reinterpret_cast<const std::function<void(Args...)>*>(func->get_ptr());
+			f(std::forward<Args>(args) ...);
+		}
+	}
+private:
+	std::unordered_map<std::string, std::vector<std::unique_ptr<function_wrapper>>> _list;
+};
+
 #endif // EVENT_HPP

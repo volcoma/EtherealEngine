@@ -163,6 +163,9 @@
     <Filter Include="Source Files\memory">
       <UniqueIdentifier>{eb5e947b-b7b2-4cb7-82e2-e4bf8b05c2c7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\subsystem">
+      <UniqueIdentifier>{9e636e3c-0ad8-436c-989d-93b13cd57df6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\core\events\delegate.hpp">
@@ -1308,14 +1311,20 @@
     <ClInclude Include="..\..\source\core\common\common.h">
       <Filter>Source Files\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\subsystem.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\core\common\string.h">
       <Filter>Source Files\common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\core\common\pathname_tag_tree.h">
       <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\math\bsphere.h">
+      <Filter>Source Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\subsystem\subsystem.h">
+      <Filter>Source Files\subsystem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\subsystem\simulation.h">
+      <Filter>Source Files\subsystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1445,14 +1454,20 @@
     <ClCompile Include="..\..\source\core\memory\tracey.cpp">
       <Filter>Source Files\memory</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\core\subsystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\core\common\string.cpp">
       <Filter>Source Files\common</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\core\common\pathname_tag_tree.cpp">
       <Filter>Source Files\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\math\bsphere.cpp">
+      <Filter>Source Files\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\subsystem\subsystem.cpp">
+      <Filter>Source Files\subsystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\subsystem\simulation.cpp">
+      <Filter>Source Files\subsystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -55,29 +55,8 @@
     <Filter Include="Source Files\renderdoc">
       <UniqueIdentifier>{138504d2-7572-4fc3-a891-ab6402838906}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\ib-compress">
-      <UniqueIdentifier>{b838dbe8-fafa-4499-b3b4-32045b36a60f}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Lib\ib-compress\indexbuffercompression.h">
-      <Filter>Source Files\ib-compress</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Lib\ib-compress\indexbuffercompressionformat.h">
-      <Filter>Source Files\ib-compress</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Lib\ib-compress\indexbufferdecompression.h">
-      <Filter>Source Files\ib-compress</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Lib\ib-compress\indexcompressionconstants.h">
-      <Filter>Source Files\ib-compress</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Lib\ib-compress\readbitstream.h">
-      <Filter>Source Files\ib-compress</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Lib\ib-compress\writebitstream.h">
-      <Filter>Source Files\ib-compress</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\graphics\compat\freebsd\alloca.h">
       <Filter>Source Files\compat\freebsd</Filter>
     </ClInclude>
@@ -413,12 +392,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Lib\ib-compress\indexbufferdecompression.cpp">
-      <Filter>Source Files\ib-compress</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Lib\ib-compress\indexbuffercompression.cpp">
-      <Filter>Source Files\ib-compress</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\graphics\graphics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

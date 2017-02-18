@@ -14,15 +14,12 @@ struct GfxCallback : public gfx::CallbackI
 
 	virtual void traceVargs(const char* _filePath, std::uint16_t _line, const char* _format, std::va_list _argList) BX_OVERRIDE
 	{
-		auto logger = logging::get("Log");
-		logger->trace() << string_utils::format(_format, _argList).c_str();
+		APPLOG_TRACE(string_utils::format(_format, _argList).c_str());
 	}
 
 	virtual void fatal(gfx::Fatal::Enum _code, const char* _str) BX_OVERRIDE
 	{
-		auto logger = logging::get("Log");
-
-		logger->error() << _str;
+		APPLOG_ERROR(_str);
 	}
 
 	virtual uint32_t cacheReadSize(uint64_t /*_id*/) BX_OVERRIDE
@@ -58,9 +55,6 @@ struct GfxCallback : public gfx::CallbackI
 	}
 
 };
-static GfxCallback sGfxCallback;
-
-
 
 namespace runtime
 {
@@ -90,8 +84,15 @@ namespace runtime
 
 		gfx::setPlatformData(pd);
 
-		if (!gfx::init(gfx::RendererType::Count, 0, 0, &sGfxCallback))
+		static GfxCallback callback;
+		if (!gfx::init(gfx::RendererType::Count, 0, 0, &callback))
 			return false;
+
+		if (gfx::getRendererType() == gfx::RendererType::Direct3D9)
+		{
+			APPLOG_ERROR("Does not support dx9. Minimum supported is dx11.");
+			return false;
+		}
 
 		main_window.set_main(true);
 
