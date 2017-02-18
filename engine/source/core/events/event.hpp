@@ -114,16 +114,16 @@ private:
 };
 
 template <typename F>
-std::unique_ptr<function_wrapper> create_wrapper(F&& f)
+std::unique_ptr<function_wrapper> create_wrapper(F f)
 {
-	return std::unique_ptr<function_wrapper_t<typename F>>(new function_wrapper_t<typename F>(std::forward<F>(f)));
+	return std::unique_ptr<function_wrapper_t<decltype(f)>>(new function_wrapper_t<decltype(f)>(std::forward<F>(f)));
 }
 
 class event_dispatcher
 {
 public:
 	template<typename F>
-	void connect(const std::string& name, F&& f)
+	void connect(const std::string& name, F f)
 	{
 		static_assert(std::is_same<void, typename function_traits<F>::return_type>::value,
 			"Signals cannot have a return type different from void");
