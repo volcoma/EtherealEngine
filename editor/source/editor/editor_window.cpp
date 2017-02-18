@@ -59,7 +59,7 @@ void default_scene()
 		auto object = ecs->create();
 		object.set_name("global probe");
 		object.assign<TransformComponent>().lock()
-			->set_local_position({ 0.0f, 1.0f, 0.0f });
+			->set_local_position({ 0.0f, 0.1f, 0.0f });
 
 		ReflectionProbe probe;
 		probe.method = ReflectMethod::Environment;
@@ -72,7 +72,7 @@ void default_scene()
 		auto object = ecs->create();
 		object.set_name("local probe");
 		object.assign<TransformComponent>().lock()
-			->set_local_position({ 0.0f, 1.0f, 0.0f });
+			->set_local_position({ 0.0f, 0.1f, 0.0f });
 
 		ReflectionProbe probe;
 		probe.method = ReflectMethod::Static;
