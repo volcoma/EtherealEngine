@@ -17,7 +17,7 @@ struct Inspector_Entity::component
 	{
 		PathNameTagTree _tree;
 		PathNameTagTree::iterator _itor;
-		std::vector<rttr::type*> _list;
+		std::vector<rttr::type> _list;
 
 		type();
 
@@ -68,13 +68,6 @@ void Inspector_Entity::component::instance::setup(const std::vector<runtime::CHa
 }
 void Inspector_Entity::component::instance::inspect(bool& changed)
 {
-	struct TreeScoped
-	{
-		TreeScoped(const char* id) { gui::TreePush(id); }
-		~TreeScoped() { gui::TreePop(); }
-	};
-
-
 	bool opened = true;
 
 	auto it = _tree.create_iterator();
@@ -95,8 +88,7 @@ void Inspector_Entity::component::instance::inspect(bool& changed)
 					if (gui::CollapsingHeader(name, &opened))
 					{
 						gui::PushStyleVar(ImGuiStyleVar_IndentSpacing, 8.0f);
-						TreeScoped t(name);
-						gui::PopStyleVar();
+						gui::TreePush(name);
 
 						if (it.step_in())
 						{
@@ -104,9 +96,11 @@ void Inspector_Entity::component::instance::inspect(bool& changed)
 						}
 						else
 						{
-							rttr::variant componentVar = _list[it.tag()].lock().get();
-							changed |= inspect_var(componentVar);
+							rttr::variant var = _list[it.tag()].lock().get();
+							changed |= inspect_var(var);
 
+							gui::TreePop();
+							gui::PopStyleVar();
 						}
 					}
 
@@ -133,6 +127,7 @@ void Inspector_Entity::component::instance::inspect(bool& changed)
 					auto component = component_ptr.lock().get();
 
 					component->get_entity().remove(component_ptr.lock());
+
 				}
 			}
 
@@ -141,7 +136,9 @@ void Inspector_Entity::component::instance::inspect(bool& changed)
 
 		if (it.step_out())
 		{
-			it.step();
+			opened = it.step();
+			gui::TreePop();
+			gui::PopStyleVar();
 		}
 	}
 }
@@ -170,7 +167,7 @@ Inspector_Entity::component::type::type() :
 		}
 
 		_tree.set(name, _list.size());
-		_list.push_back(&info);
+		_list.push_back(info);
 			
 	}
 	_tree.setup_iterator(_itor);
@@ -205,16 +202,11 @@ void Inspector_Entity::component::type::inspect(ImGuiTextFilter& filter, runtime
 
 		if (filter.PassFilter(name.c_str()))
 		{
-			if (!_itor.is_leaf())
-			{
-				name += "   >";
-			}
-
 			if (gui::Selectable(name.c_str()))
 			{
 				if (_itor.is_leaf())
 				{
-					auto cstructor = component_type->get_constructor();
+					auto cstructor = component_type.get_constructor();
 
 					auto c = cstructor.invoke();
 					auto c_ptr = c.get_value<std::shared_ptr<runtime::Component>>();
