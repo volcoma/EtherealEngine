@@ -180,14 +180,13 @@ Inspector_Entity::component::type::type() :
 void Inspector_Entity::component::type::inspect(ImGuiTextFilter& filter, runtime::Entity data)
 {
 	gui::Separator();
-	std::string path = "<";
-
-
-	if (gui::ButtonEx(path.data(), ImVec2(0, 0), _itor.steps() > 1 ? 0 : ImGuiButtonFlags_Disabled))
+	
+	if (gui::ButtonEx("<", ImVec2(0, 0), _itor.steps() > 1 ? 0 : ImGuiButtonFlags_Disabled))
 	{
 		_itor.step_out();
 	}
 	gui::Separator();
+
 
 	if (_itor.step_stack_pop())
 	{
