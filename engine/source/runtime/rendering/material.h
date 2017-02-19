@@ -525,7 +525,7 @@ private:
 	math::vec2 _dither_threshold
 	{
 		0.5f, ///Alpha threshold
-		0.5f  ///Distance threshold
+		0.0f  ///Distance threshold
 	};
 
 	/// Texture maps
