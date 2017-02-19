@@ -7,9 +7,12 @@
 
 REFLECT(TransformComponent)
 {
-	rttr::registration::class_<TransformComponent>("Component/Transform")
-		.constructor<>()
+	rttr::registration::class_<TransformComponent>("TransformComponent")
 		(
+			rttr::metadata("Id", "Transform")
+		)
+		.constructor<>()
+		(		
 			rttr::policy::ctor::as_std_shared_ptr
 		)
 		.property("Local",

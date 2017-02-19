@@ -7,9 +7,13 @@
 
 REFLECT(LightComponent)
 {
-	rttr::registration::class_<LightComponent>("Component/Light")
-		.constructor<>()
+	rttr::registration::class_<LightComponent>("LightComponent")
 		(
+			rttr::metadata("Category", "Lighting"),
+			rttr::metadata("Id", "Light")
+		)
+		.constructor<>()
+		(			
 			rttr::policy::ctor::as_std_shared_ptr
 		);
 }

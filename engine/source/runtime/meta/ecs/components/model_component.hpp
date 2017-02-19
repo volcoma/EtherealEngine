@@ -7,9 +7,13 @@
 
 REFLECT(ModelComponent)
 {
-	rttr::registration::class_<ModelComponent>("Component/Model")
-		.constructor<>()
+	rttr::registration::class_<ModelComponent>("ModelComponent")
 		(
+			rttr::metadata("Category", "Rendering"),
+			rttr::metadata("Id", "Model")
+		)
+		.constructor<>()
+		(		
 			rttr::policy::ctor::as_std_shared_ptr
 		)
 		.property("Static",

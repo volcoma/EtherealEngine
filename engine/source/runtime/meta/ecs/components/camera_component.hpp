@@ -8,9 +8,13 @@
 REFLECT(CameraComponent)
 {
 
-	rttr::registration::class_<CameraComponent>("Component/Camera")
-		.constructor<>()
+	rttr::registration::class_<CameraComponent>("CameraComponent")
 		(
+			rttr::metadata("Category", "Rendering"),
+			rttr::metadata("Id", "Camera")
+		)
+		.constructor<>()
+		(	
 			rttr::policy::ctor::as_std_shared_ptr
 		)
 		.property("Projection Mode",
