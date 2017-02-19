@@ -9,6 +9,7 @@ REFLECT(TransformComponent)
 {
 	rttr::registration::class_<TransformComponent>("TransformComponent")
 		(
+			rttr::metadata("Category", "Default"),
 			rttr::metadata("Id", "Transform")
 		)
 		.constructor<>()
