@@ -46,28 +46,39 @@ bool PathNameTagTree::set(std::string pathname, size_t tag)
 {
 	size_t i = pathname.find_first_of(_sep_char, 0);
 
-	if (i == std::string::npos)
-	{
-		return false;
-	}
-
 	node* n = &_root_node;
 	
 	std::deque<node*> back_trace;
 
-	for (std::string::iterator it = pathname.begin(); it != pathname.end();)
+	if (i == std::string::npos)
 	{
-		const char* name = get_name(pathname, it, i);
+		const char* name = pathname.c_str();
 
 		if (n->_nodes.empty())
 		{
 			n->_tag = 0;
 		}
 
-		back_trace.push_back(n);
-
 		n = &n->_nodes[name];
 	}
+	else
+	{
+		for (std::string::iterator it = pathname.begin(); it != pathname.end();)
+		{
+			const char* name = get_name(pathname, it, i);
+
+			if (n->_nodes.empty())
+			{
+				n->_tag = 0;
+			}
+
+			back_trace.push_back(n);
+
+			n = &n->_nodes[name];
+		}
+	}
+
+	
 
 	bool invalid_tag = tag == _invalid_tag;
 

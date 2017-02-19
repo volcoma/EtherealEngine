@@ -59,10 +59,11 @@ void Inspector_Entity::component::instance::setup(const std::vector<runtime::CHa
 				std::string category = meta_category.to_string();
 				name = category + "/" + name;
 			}
-
+			else
+			{
+				name = "Default/" + name;
+			}
 			_tree.set(name, i++);
-
-			
 		}
 	}
 }
@@ -165,7 +166,10 @@ Inspector_Entity::component::type::type() :
 			std::string category = meta_category.to_string();
 			name = category + "/" + name;
 		}
-
+		else
+		{
+			name = "Default/" + name;
+		}
 		_tree.set(name, _list.size());
 		_list.push_back(info);
 			
@@ -202,6 +206,10 @@ void Inspector_Entity::component::type::inspect(ImGuiTextFilter& filter, runtime
 
 		if (filter.PassFilter(name.c_str()))
 		{
+			if (!_itor.is_leaf())
+			{
+				name += "/";
+			}
 			if (gui::Selectable(name.c_str()))
 			{
 				if (_itor.is_leaf())
