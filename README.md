@@ -43,10 +43,13 @@ public:
   /// </summary>
   //-----------------------------------------------------------------------------
   void some_method();
+public:
+  /// this is a member comment
+  int some_public_member = 0;
   
 private:
   /// this is a member comment
-  int _some_member = 0;
+  int _some_private_member = 0;
 }
 ```
 
