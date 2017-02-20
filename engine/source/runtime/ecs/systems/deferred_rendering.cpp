@@ -697,9 +697,11 @@ namespace runtime
 		EntityComponentSystem& ecs,
 		std::chrono::duration<float> dt)
 	{
+		auto far_clip_cache = camera.get_far_clip();
+		camera.set_far_clip(1000.0f);
 		const auto& view = camera.get_view();
 		const auto& proj = camera.get_projection();
-
+		camera.set_far_clip(far_clip_cache);
 		const auto& viewport_size = camera.get_viewport_size();
 	
 		static auto light_buffer_format = gfx::get_best_format(
@@ -719,7 +721,7 @@ namespace runtime
 
 		if (surface && _atmospherics_program)
 		{
-			ecs.each<TransformComponent, LightComponent>([this, &output_size, &pass, &camera](
+			ecs.each<TransformComponent, LightComponent>([this, &output_size, &pass](
 				Entity e,
 				TransformComponent& transform_comp_ref,
 				LightComponent& light_comp_ref
