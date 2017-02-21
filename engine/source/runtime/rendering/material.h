@@ -408,7 +408,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> get_normal_map() { return _maps["roughness"]; }
+	inline AssetHandle<Texture> get_normal_map() { return _maps["normal"]; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_normal_map ()
