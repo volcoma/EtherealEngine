@@ -403,7 +403,7 @@ namespace Docks
 		if (gui::Button("Import..."))
 		{
 			std::vector<std::string> paths;
-			if (open_multiple_files_dialog("obj,fbx,dae,blend,3ds,mtl,png,tga,dds,ktx,pvr,sc,io,sh", "", paths))
+			if (open_multiple_files_dialog("obj,fbx,dae,blend,3ds,mtl,png,jpg,tga,dds,ktx,pvr,sc,io,sh", "", paths))
 			{
 				auto ts = core::get_subsystem<runtime::TaskSystem>();
 				editor::AssetFolder* folder = editor::AssetFolder::opened.get();

@@ -191,6 +191,7 @@ namespace editor
 		static const std::string wildcard = "*";
 		watch_assets<Texture>(relative, wildcard + extensions::texture, !recompile_assets, true);
 		watch_raw_assets<Texture>(relative, "*.png", recompile_assets);
+		watch_raw_assets<Texture>(relative, "*.jpg", recompile_assets);
 		watch_raw_assets<Texture>(relative, "*.tga", recompile_assets);
 		watch_raw_assets<Texture>(relative, "*.dds", recompile_assets);
 		watch_raw_assets<Texture>(relative, "*.ktx", recompile_assets);
