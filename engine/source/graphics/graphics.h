@@ -141,38 +141,3 @@ namespace gfx
 	std::uint64_t screen_quad(float dest_width, float dest_height, float depth = 0.0f, float width = 1.0f, float height = 1.0f);
 	std::uint64_t clip_quad(float depth = 0.0f, float width = 1.0f, float height = 1.0f);
 }
-
-
-#include <fstream>
-
-struct FileStreamReaderSeeker : public bx::ReaderSeekerI
-{
-	FileStreamReaderSeeker(const std::string& path)
-	{
-		mStream = std::ifstream{ path, std::ios::in | std::ios::binary };
-	}
-	virtual ~FileStreamReaderSeeker()
-	{
-	}
-
-	virtual std::int64_t seek(std::int64_t _offset = 0, bx::Whence::Enum _whence = bx::Whence::Current)
-	{
-		std::ifstream::seekdir way = std::ifstream::cur;
-		if (_whence == bx::Whence::Begin)
-			way = std::ifstream::beg;
-		if (_whence == bx::Whence::End)
-			way = std::ifstream::end;
-
-		mStream.seekg(_offset, way);
-		return static_cast<std::int64_t>(mStream.tellg());
-	}
-
-	virtual std::int32_t read(void* _data, std::int32_t _size, bx::Error* _err)
-	{
-		mStream.read((char*)_data, _size);
-
-		return static_cast<std::int32_t>(mStream.gcount());
-	}
-
-	std::ifstream mStream;
-};
