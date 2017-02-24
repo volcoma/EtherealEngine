@@ -87,6 +87,7 @@ vec3 GetLookupVectorForBoxCapture(vec3 ReflectionVector, vec3 WorldPosition, vec
 	#if BGFX_SHADER_LANGUAGE_GLSL
 		ProjectedCaptureVector.y = -ProjectedCaptureVector.y;
 	#endif
+	
 	return ProjectedCaptureVector;
 }
 

@@ -682,7 +682,7 @@ namespace runtime
 				program->set_texture(4, "s_tex4", gfx::getTexture(g_buffer_fbo->handle, 4));
 				program->set_texture(5, "s_tex_cube", cubemap->handle);
 				gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
-				auto topology = gfx::clip_quad(1.0f, 1.0f, 1.0f, true);
+				auto topology = gfx::clip_quad(1.0f);
 				gfx::setState(topology
 					| BGFX_STATE_RGB_WRITE
 					| BGFX_STATE_ALPHA_WRITE
