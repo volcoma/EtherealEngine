@@ -34,39 +34,45 @@ namespace runtime
 
 		math::transform_t t;
 		// Generate the correct view matrix for the frustum
-
-		switch (face)
+		if (!gfx::is_origin_bottom_left())
 		{
-		case 0:
-			t.set_rotation(-Z, +Y, +X); break;
-		case 1:
-			t.set_rotation(+Z, +Y, -X); break;
-		case 2:
-			t.set_rotation(+X, -Z, +Y); break;
-		case 3:
-			t.set_rotation(+X, +Z, -Y); break;
-		case 4:
-			t.set_rotation(+X, +Y, +Z); break;
-		case 5:
-			t.set_rotation(-X, +Y, -Z); break;
+			switch (face)
+			{
+			case 1:
+				t.look_at({}, +X, +Y); break;
+			case 0:
+				t.look_at({}, -X, +Y); break;
+			case 3:
+				t.look_at({}, +Y, -Z); break;
+			case 2:
+				t.look_at({}, -Y, +Z); break;
+			case 4:
+				t.look_at({}, +Z, +Y); break;
+			case 5:
+				t.look_at({}, -Z, +Y); break;
+			}
 		}
+		else
+		{
+			switch (face)
+			{
+			case 1:
+				t.look_at({}, +X, +Y); break;
+			case 0:
+				t.look_at({}, -X, +Y); break;
+			case 2:
+				t.look_at({}, +Y, -Z); break;
+			case 3:
+				t.look_at({}, -Y, +Z); break;
+			case 4:
+				t.look_at({}, +Z, +Y); break;
+			case 5:
+				t.look_at({}, -Z, +Y); break;
+			}
 
-		//switch (face)
-		//{
-		//case 0:
-		//	t.set_rotation(+Z, -Y, -X); break;
-		//case 1:
-		//	t.set_rotation(+Z, -Y, +X); break;
-		//case 2:
-		//	t.set_rotation(+X, +Z, +Y); break;
-		//case 3:
-		//	t.set_rotation(+X, -Z, -Y); break;
-		//case 4:
-		//	t.set_rotation(+X, -Y, +Z); break;
-		//case 5:
-		//	t.set_rotation(-X, -Y, -Z); break;
-		//}
-
+		}
+		
+	
 		t = transform * t;
 		// First update so the camera can cache the previous matrices
 		camera.record_current_matrices();
@@ -676,7 +682,7 @@ namespace runtime
 				program->set_texture(4, "s_tex4", gfx::getTexture(g_buffer_fbo->handle, 4));
 				program->set_texture(5, "s_tex_cube", cubemap->handle);
 				gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
-				auto topology = gfx::clip_quad(1.0f);
+				auto topology = gfx::clip_quad(1.0f, 1.0f, 1.0f, true);
 				gfx::setState(topology
 					| BGFX_STATE_RGB_WRITE
 					| BGFX_STATE_ALPHA_WRITE

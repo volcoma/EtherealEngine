@@ -46,6 +46,9 @@ vec3 GetLookupVectorForSphereCapture(vec3 ReflectionVector, vec3 WorldPosition, 
 		float x = saturate( 2.5f * NormalizedDistanceToCapture - 1.5f );
 		DistanceAlpha = 1.0f - x*x*(3.0f - 2.0f*x);
 	}
+	#if BGFX_SHADER_LANGUAGE_GLSL
+		ProjectedCaptureVector.y = -ProjectedCaptureVector.y;
+	#endif
 	return ProjectedCaptureVector;
 }
 
@@ -80,7 +83,7 @@ void main()
 		vec3 ProjectedCaptureVector = GetLookupVectorForSphereCapture(R, world_position, u_probe_position_and_radius, NormalizedDistanceToCapture, CaptureOffsetAndAverageBrightness.xyz, DistanceAlpha);
 		float lod = u_cube_mips * roughness;
 		
-		color.xyz = toLinear(textureCubeLod(s_tex_cube, ProjectedCaptureVector*data.depth, lod)).xyz * DistanceAlpha;			
+		color.xyz = toLinear(textureCubeLod(s_tex_cube, ProjectedCaptureVector, lod)).xyz * DistanceAlpha;			
 	}
 	
 	color.a = DistanceAlpha;

@@ -84,6 +84,9 @@ vec3 GetLookupVectorForBoxCapture(vec3 ReflectionVector, vec3 WorldPosition, vec
 	// Setup a fade based on receiver distance to the box, hides the box influence shape
 	DistanceAlpha = 1.0f - smoothstep(0.0f, 0.7f * BoxScales.w, BoxDistance);
 
+	#if BGFX_SHADER_LANGUAGE_GLSL
+		ProjectedCaptureVector.y = -ProjectedCaptureVector.y;
+	#endif
 	return ProjectedCaptureVector;
 }
 
@@ -118,7 +121,6 @@ void main()
 	{
 		vec4 CaptureOffsetAndAverageBrightness = vec4(0.0f, 0.0, 0.0f, 0.0f);
 		vec3 ProjectedCaptureVector = GetLookupVectorForBoxCapture(R, world_position, u_probe_position_and_radius, u_inv_world, u_probe_extents, CaptureOffsetAndAverageBrightness.xyz, DistanceAlpha);
-		
 		if(DistanceAlpha >= 0.0f)
 		{
 			float lod = u_cube_mips * roughness;
