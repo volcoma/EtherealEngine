@@ -491,7 +491,7 @@ namespace runtime
 			LightComponent& light_comp_ref
 			)
 		{
-			auto& light = light_comp_ref.get_light();
+			const auto& light = light_comp_ref.get_light();
 			const auto& world_transform = transform_comp_ref.get_transform();
 			const auto& light_position = world_transform.get_position();
 			const auto& light_direction = world_transform.z_unit_axis();
@@ -560,9 +560,7 @@ namespace runtime
 				program->set_texture(2, "s_tex2", gfx::getTexture(g_buffer_fbo->handle, 2));
 				program->set_texture(3, "s_tex3", gfx::getTexture(g_buffer_fbo->handle, 3));
 				program->set_texture(4, "s_tex4", gfx::getTexture(g_buffer_fbo->handle, 4));
-
-				if(bind_indirect_specular)
-					program->set_texture(5, "s_tex5", refl_buffer->handle);
+				program->set_texture(5, "s_tex5", refl_buffer->handle);
 
 				gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
 				auto topology = gfx::clip_quad(1.0f);
@@ -615,7 +613,7 @@ namespace runtime
 			ReflectionProbeComponent& probe_comp_ref
 			)
 		{
-			auto& probe = probe_comp_ref.get_probe();
+			const auto& probe = probe_comp_ref.get_probe();
 			const auto& world_transform = transform_comp_ref.get_transform();
 			const auto& probe_position = world_transform.get_position();
 
@@ -733,7 +731,7 @@ namespace runtime
 				LightComponent& light_comp_ref
 				)
 			{
-				auto& light = light_comp_ref.get_light();
+				const auto& light = light_comp_ref.get_light();
 				const auto& world_transform = transform_comp_ref.get_transform();
 				const auto& light_direction = world_transform.z_unit_axis();
 

@@ -53,11 +53,11 @@ bool Inspector_Quaternion::inspect(rttr::variant& var, bool readOnly, std::funct
 	auto data = var.get_value<math::quat>();
 	const char* names[] = { "X", "Y", "Z" };
 
-	auto eulerAngles = math::eulerAngles(data);
-	auto degrees = math::degrees(eulerAngles);
+	auto euler_angles = math::eulerAngles(data);
+	auto degrees = math::degrees(euler_angles);
 	if (gui::DragFloatNEx(names, &degrees[0], 3, 0.05f))
 	{
-		auto delta = math::radians(degrees) - eulerAngles;
+		auto delta = math::radians(degrees) - euler_angles;
 
 		math::quat qx = math::angleAxis(delta.x, math::vec3{ 1.0f, 0.0f, 0.0f });
 		math::quat qy = math::angleAxis(delta.y, math::vec3{ 0.0f, 1.0f, 0.0f });
@@ -78,16 +78,16 @@ bool Inspector_Transform::inspect(rttr::variant& var, bool readOnly, std::functi
 	math::vec3 position = data.get_position();
 	math::vec3 scale = data.get_scale();
 	math::quat rotation = data.get_rotation();
-	math::vec3 localEulerAngles = math::degrees(math::eulerAngles(rotation));
+	math::vec3 local_euler_angles = math::degrees(math::eulerAngles(rotation));
 
-	static math::quat oldQuat;
-	static math::vec3 eulerAngles;
+	static math::quat old_quat;
+	static math::vec3 euler_angles;
 	bool changed = false;
-	bool equal = math::epsilonEqual(math::abs(math::dot(oldQuat, rotation)), 1.0f, math::epsilon<float>());
+	bool equal = math::epsilonEqual(math::abs(math::dot(old_quat, rotation)), 1.0f, math::epsilon<float>());
 	if (!equal && !gui::IsMouseDragging() || imguizmo::is_using())
 	{
-		eulerAngles = localEulerAngles;
-		oldQuat = rotation;
+		euler_angles = local_euler_angles;
+		old_quat = rotation;
 	}
 	gui::Columns(1);
 	if (gui::Button("P"))
@@ -109,17 +109,17 @@ bool Inspector_Transform::inspect(rttr::variant& var, bool readOnly, std::functi
 	if (gui::Button("R"))
 	{
 		data.set_rotation(math::quat());
-		eulerAngles = { 0.0f, 0.0f, 0.0f };
+		euler_angles = { 0.0f, 0.0f, 0.0f };
 		changed = true;
 	}
 	gui::SameLine();
 	gui::PushID("Rotation");
 
-	auto degrees = eulerAngles;
+	auto degrees = euler_angles;
 	if (gui::DragFloatNEx(names, &degrees[0], 3, 0.05f))
 	{
-		data.rotate_local(math::radians(degrees - eulerAngles));
-		eulerAngles = degrees;
+		data.rotate_local(math::radians(degrees - euler_angles));
+		euler_angles = degrees;
 		changed = true;
 	}
 	

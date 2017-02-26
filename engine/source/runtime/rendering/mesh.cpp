@@ -6,6 +6,22 @@
 #include <algorithm>
 #include "mesh_tools.h"
 
+
+#define RMC_DEFINE_DATA                     \
+    std::vector<math::vec3> vertices;		\
+	std::vector<math::vec3> normals;		\
+	std::vector<math::vec4> tangents;		\
+	std::vector<math::vec4> bitangents;		\
+	std::vector<math::vec2> texcoords0;		\
+	std::vector<math::vec2> texcoords1;		\
+	std::vector<std::uint32_t> indices;
+
+#define RMC_RESIZE_NTTT                     \
+    normals.resize( vertices.size() );      \
+    tangents.resize( vertices.size( ) );    \
+	bitangents.resize( vertices.size( ) );  \
+    texcoords0.resize( vertices.size( ) );  \
+    texcoords1.resize( vertices.size( ) );
 //-----------------------------------------------------------------------------
 // Local Module Level Namespaces.
 //-----------------------------------------------------------------------------

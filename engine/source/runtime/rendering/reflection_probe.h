@@ -33,22 +33,26 @@ struct ReflectionProbe
 		float range = 5.0f;
 	};
 
-	bool operator==(const ReflectionProbe& pr) const
-	{
-		return probe_type == pr.probe_type &&
-			method == pr.method &&
-			box_data.extents == pr.box_data.extents &&
-			box_data.transition_distance == pr.box_data.transition_distance &&
-			sphere_data.range == pr.sphere_data.range;
-	}
-
-	bool operator!=(const ReflectionProbe& pr) const
-	{
-		return !operator==(pr);
-	}
-
+	/// The probe type
 	ProbeType probe_type = ProbeType::Box;
+	/// Reflection Method
 	ReflectMethod method = ReflectMethod::Environment;
+	/// Data describing box projection
 	Box box_data;
+	/// Data describing sphere projection
 	Sphere sphere_data;
 };
+
+inline bool operator==(const ReflectionProbe& pr1, const ReflectionProbe& pr2)
+{
+	return pr1.probe_type == pr2.probe_type &&
+		pr1.method == pr2.method &&
+		pr1.box_data.extents == pr2.box_data.extents &&
+		pr1.box_data.transition_distance == pr2.box_data.transition_distance &&
+		pr1.sphere_data.range == pr2.sphere_data.range;
+}
+
+inline bool operator!=(const ReflectionProbe& pr1, const ReflectionProbe& pr2)
+{
+	return !(pr1==pr2);
+}

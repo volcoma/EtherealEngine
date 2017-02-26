@@ -7,21 +7,7 @@
 #include <vector>
 #include <map>
 #include <memory>
-#define RMC_DEFINE_DATA                     \
-    std::vector<math::vec3> vertices;		\
-	std::vector<math::vec3> normals;		\
-	std::vector<math::vec4> tangents;		\
-	std::vector<math::vec4> bitangents;		\
-	std::vector<math::vec2> texcoords0;		\
-	std::vector<math::vec2> texcoords1;		\
-	std::vector<std::uint32_t> indices;
 
-#define RMC_RESIZE_NTTT                     \
-    normals.resize( vertices.size() );      \
-    tangents.resize( vertices.size( ) );    \
-	bitangents.resize( vertices.size( ) );    \
-    texcoords0.resize( vertices.size( ) );  \
-    texcoords1.resize( vertices.size( ) );
 
 
 struct VertexBuffer;
@@ -60,7 +46,7 @@ namespace MeshCreateOrigin
 }; // End Namespace : MeshCreateOrigin
 
 
-using UInt32Array = std::vector<uint32_t>;
+using UInt32Array = std::vector<std::uint32_t>;
 using Int32Array = std::vector<std::int32_t>;
 using FloatArray = std::vector<float>;
 //-----------------------------------------------------------------------------
@@ -76,7 +62,7 @@ using FloatArray = std::vector<float>;
 class SkinBindData
 {
 	REFLECTABLE(SkinBindData)
-		SERIALIZABLE(SkinBindData)
+	SERIALIZABLE(SkinBindData)
 public:
 	//-------------------------------------------------------------------------
 	// Public Typedefs, Structures & Enumerations
