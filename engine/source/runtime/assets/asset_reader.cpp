@@ -61,7 +61,7 @@ void AssetReader::load_texture_from_file(const std::string& key, const fs::path&
 
 			auto callback = ts->create("Create Resource", create_resource_func);
 
-			ts->run_on_main(callback);
+			ts->run(callback, true);
 		});
 		request.set_task(task);
 		ts->run(task);
@@ -127,7 +127,7 @@ void AssetReader::load_shader_from_file(const std::string& key, const fs::path& 
 
 			auto callback = ts->create("Create Resource", create_resource_func);
 
-			ts->run_on_main(callback);
+			ts->run(callback, true);
 		});
 		request.set_task(task);
 		ts->run(task);
@@ -223,7 +223,7 @@ void AssetReader::load_mesh_from_file(const std::string& key, const fs::path& ab
 
 			auto callback = ts->create("Create Resource", create_resource_func);
 
-			ts->run_on_main(callback);
+			ts->run(callback, true);
 		});
 		request.set_task(task);
 		ts->run(task);
@@ -269,7 +269,7 @@ void AssetReader::load_material_from_file(const std::string& key, const fs::path
 
 			auto callback = ts->create("Create Resource", create_resource_func);
 
-			ts->run_on_main(callback);
+			ts->run(callback, true);
 		});
 		request.set_task(task);
 		ts->run(task);
@@ -314,7 +314,7 @@ void AssetReader::load_prefab_from_file(const std::string& key, const fs::path& 
 
 			auto callback = ts->create("Create Resource", create_resource_func);
 
-			ts->run_on_main(callback);
+			ts->run(callback, true);
 		});
 		request.set_task(task);
 		ts->run(task);
@@ -359,7 +359,7 @@ void AssetReader::load_scene_from_file(const std::string& key, const fs::path& a
 
 			auto callback = ts->create("Create Resource", create_resource_func);
 
-			ts->run_on_main(callback);
+			ts->run(callback, true);
 		});
 		request.set_task(task);
 		ts->run(task);

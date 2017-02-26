@@ -16,7 +16,6 @@ uniform vec4 u_data1;
 uniform vec4 u_data2;
 uniform mat4 u_inv_world;
 
-
 #define u_probe_position_and_radius u_data0
 #define u_cube_mips u_data1.x
 #define u_probe_extents u_data2
@@ -91,7 +90,6 @@ vec3 GetLookupVectorForBoxCapture(vec3 ReflectionVector, vec3 WorldPosition, vec
 	return ProjectedCaptureVector;
 }
 
-
 void main()
 {
 	GBufferData data = decodeGBuffer(v_texcoord0, s_tex0, s_tex1, s_tex2, s_tex3, s_tex4);
@@ -103,20 +101,19 @@ void main()
 	vec3 N = data.world_normal;
 	vec3 V = -normalize(v_weye_dir);
 	
-
 	float NoV = saturate( dot(N, V) );
 	vec3 R = reflect(-V, N);
 	
-	float ambient_occlusion = data.ambient_occlusion;
 	float roughness = data.roughness;
-
 	roughness = roughness*(1.7f - 0.7f * roughness);
+	
 	float DistanceAlpha = 0.0f;	
 
 	vec3 CaptureVector = world_position - u_probe_position_and_radius.xyz;
 	float CaptureVectorLength = sqrt(dot(CaptureVector, CaptureVector));		
 
 	vec4 color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	
 	BRANCH
 	if (CaptureVectorLength < u_probe_position_and_radius.w)
 	{

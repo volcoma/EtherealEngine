@@ -31,7 +31,7 @@ namespace runtime
 		on_frame_begin.disconnect(this, &TaskSystem::execute_tasks_on_main);
 
 		{
-			std::unique_lock<std::mutex> lock(_queue_mutex);
+			std::unique_lock<std::mutex> lock(_other_thread_tasks.mutex);
 			_stop = true;
 		}
 
@@ -40,7 +40,7 @@ namespace runtime
 			thread.join();
 	}
 
-	core::Handle TaskSystem::create_internal(const char* name, std::function<void()> closure)
+	core::Handle TaskSystem::create_internal(const std::string& name, std::function<void()> closure)
 	{
 		core::Handle handle;
 		{
@@ -58,7 +58,7 @@ namespace runtime
 			{
 				task->closure = closure;
 				task->jobs.store(1);
-				strncpy(task->name, name, std::min(sizeof(task->name), strlen(name)));
+				task->name = name;
 			}
 
 			return handle;
@@ -67,7 +67,7 @@ namespace runtime
 		return core::Handle();
 	}
 
-	core::Handle TaskSystem::create_as_child_internal(core::Handle parent, const char* name, std::function<void()> closure)
+	core::Handle TaskSystem::create_as_child_internal(core::Handle parent, const std::string& name, std::function<void()> closure)
 	{
 		core::Handle handle;
 		{
@@ -85,7 +85,7 @@ namespace runtime
 			{
 				task->closure = closure;
 				task->jobs.store(1);
-				strncpy(task->name, name, std::min(sizeof(task->name), strlen(name)));
+				task->name = name;
 			}
 			Task* ptask = nullptr;
 			{
@@ -103,7 +103,7 @@ namespace runtime
 		return core::Handle();
 	}
 
-	void TaskSystem::run(core::Handle handle)
+	void TaskSystem::run(core::Handle handle, bool on_main_thread)
 	{
 		Task* task = nullptr;
 		{
@@ -111,41 +111,34 @@ namespace runtime
 			task = _tasks.fetch(handle);
 		}
 		Expects(task != nullptr && task->jobs.load() > 0);
-		//"invalid task handle to run.");
 
+		if (on_main_thread)
 		{
-			std::unique_lock<std::mutex> L(_queue_mutex);
-			_alive_tasks.push_back(handle);
+			{
+				std::unique_lock<std::mutex> L(_main_thread_tasks.mutex);
+				_main_thread_tasks.tasks.push_back(handle);
+			}
+			unsigned index = get_thread_index();
+			if (index == 0)
+				execute_one(index, true, _main_thread_tasks.mutex, _main_thread_tasks.tasks);
 		}
-
-		_condition.notify_one();
-	}
-
-	void TaskSystem::run_on_main(core::Handle handle)
-	{
-		Task* task = nullptr;
+		else
 		{
-			std::unique_lock<std::mutex> L(_tasks_mutex);
-			task = _tasks.fetch(handle);
+			{
+				std::unique_lock<std::mutex> L(_other_thread_tasks.mutex);
+				_other_thread_tasks.tasks.push_back(handle);
+			}
+			_condition.notify_one();
 		}
-		Expects(task != nullptr && task->jobs.load() > 0);
-		//"invalid task handle to run.");
-
-		{
-			std::unique_lock<std::mutex> L(_main_queue_mutex);
-			_main_alive_tasks.push_back(handle);
-		}
-		unsigned index = get_thread_index();
-		if (index == 0)
-			execute_one(index, true, _main_queue_mutex, _main_alive_tasks);
+		
 	}
 
 	void TaskSystem::execute_tasks_on_main(std::chrono::duration<float>)
 	{
 		unsigned index = get_thread_index();
-		while (!_main_alive_tasks.empty())
+		while (!_main_thread_tasks.tasks.empty())
 		{
-			execute_one(index, true, _main_queue_mutex, _main_alive_tasks);
+			execute_one(index, true, _main_thread_tasks.mutex, _main_thread_tasks.tasks);
 		}
 	}
 
@@ -175,7 +168,7 @@ namespace runtime
 		while (!is_completed(handle))
 		{
 			std::this_thread::yield();
-			if (!execute_one(handle, index, false, _queue_mutex, _alive_tasks))
+			if (!execute_one(handle, index, false, _other_thread_tasks.mutex, _other_thread_tasks.tasks))
 				break;
 		}
 	}
@@ -229,7 +222,7 @@ namespace runtime
 			if (on_task_start)
 				on_task_start(index, task->name);
 
-			if (task->closure != nullptr)
+			if (task->closure)
 				task->closure();
 
 			finish(handle);
@@ -270,7 +263,7 @@ namespace runtime
 			if (on_task_start)
 				on_task_start(index, task->name);
 
-			if (task->closure != nullptr)
+			if (task->closure)
 				task->closure();
 
 			finish(handle);
@@ -296,7 +289,7 @@ namespace runtime
 
 		for (;; )
 		{
-			if (!scheduler.execute_one(index, true, scheduler._queue_mutex, scheduler._alive_tasks))
+			if (!scheduler.execute_one(index, true, scheduler._other_thread_tasks.mutex, scheduler._other_thread_tasks.tasks))
 				break;
 		}
 

@@ -41,7 +41,7 @@ namespace Docks
 		gui::Text("Wait Submit : %fms", stats->waitSubmit*toMs);
 		gui::Text("Draw calls: %u", stats->numDraw);
 		gui::Text("Compute calls: %u", stats->numCompute);
-
+		gui::Text("Render passes: %u", RenderPass::get_pass());
 		static bool more_stats = false;
 		if (gui::Checkbox("More Stats", &more_stats))
 		{

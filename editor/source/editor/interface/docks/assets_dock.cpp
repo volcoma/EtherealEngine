@@ -395,7 +395,7 @@ namespace Docks
 			if (input->is_key_pressed(sf::Keyboard::BackSpace))
 			{
 				if (editor::AssetFolder::opened && editor::AssetFolder::opened->parent)
-					editor::AssetFolder::opened = editor::AssetFolder::opened->parent->make_shared();
+					editor::AssetFolder::opened = editor::AssetFolder::opened->parent->shared_from_this();
 			}
 		}
 			
@@ -463,7 +463,7 @@ namespace Docks
 
 			if (gui::Button((*rit)->name.c_str()))
 			{
-				editor::AssetFolder::opened = (*rit)->make_shared();
+				editor::AssetFolder::opened = (*rit)->shared_from_this();
 				break;
 			}
 			if (rit != hierarchy.rend() - 1)

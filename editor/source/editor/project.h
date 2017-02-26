@@ -33,8 +33,6 @@ namespace editor
 
 		void populate(AssetFolder* p, const fs::path& abs, const std::string& n, const fs::path& r, bool recompile_assets);
 
-		inline std::shared_ptr<AssetFolder> make_shared() { return shared_from_this(); }
-
 		void watch(bool recompile_assets);
 
 		void unwatch();
