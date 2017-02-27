@@ -45,7 +45,7 @@ namespace editor
 						{
 							am->clear_asset<T>(key);
 						});
-						ts->run_on_main(task);
+						ts->run(task, true);
 					}
 					else if (entry.state == fs::watcher::Entry::Renamed)
 					{
@@ -58,7 +58,7 @@ namespace editor
 						{
 							am->load<T>(key, reloadAsync, true);
 						});
-						ts->run_on_main(task);
+						ts->run(task, true);
 					}
 				}
 				
@@ -90,7 +90,7 @@ namespace editor
 						{
 							am->delete_asset<T>(key);
 						});
-						ts->run_on_main(task);
+						ts->run(task, true);
 					}
 					else
 					{
