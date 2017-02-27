@@ -676,9 +676,14 @@ public:
 			BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER,
 			gfx::FormatSearchFlags::FourChannels |
 			gfx::FormatSearchFlags::RequireAlpha);
+		static auto normal_format = gfx::get_best_format(
+			BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER,
+			gfx::FormatSearchFlags::FourChannels |
+			gfx::FormatSearchFlags::RequireAlpha |
+			gfx::FormatSearchFlags::HalfPrecisionFloat);
 		auto depth_buffer = get_depth_stencil_buffer(viewport_size);
 		auto buffer0 = get_texture("GBUFFER0", viewport_size.width, viewport_size.height, false, 1, format);
-		auto buffer1 = get_texture("GBUFFER1", viewport_size.width, viewport_size.height, false, 1, format);
+		auto buffer1 = get_texture("GBUFFER1", viewport_size.width, viewport_size.height, false, 1, normal_format);
 		auto buffer2 = get_texture("GBUFFER2", viewport_size.width, viewport_size.height, false, 1, format);
 		auto buffer3 = get_texture("GBUFFER3", viewport_size.width, viewport_size.height, false, 1, format);
 		return get_fbo("GBUFFER", { buffer0, buffer1, buffer2, buffer3, depth_buffer });
