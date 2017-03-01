@@ -2818,7 +2818,6 @@ namespace bgfx
 	/// @attention C99 equivalent is `bgfx_save_screen_shot`.
 	///
 	void saveScreenShot(const char* _filePath);
-	void getSizeFromRatio(BackbufferRatio::Enum _ratio, uint16_t& _width, uint16_t& _height);
 } // namespace bgfx
 
 #endif // BGFX_H_HEADER_GUARD

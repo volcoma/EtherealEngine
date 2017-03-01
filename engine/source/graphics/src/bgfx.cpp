@@ -3863,13 +3863,6 @@ error:
 		s_ctx->saveScreenShot(_filePath);
 	}
 
-	void getSizeFromRatio(BackbufferRatio::Enum _ratio, uint16_t& _width, uint16_t& _height)
-	{
-		Resolution& resolution = s_ctx->m_resolution;
-		_width = static_cast<uint16_t>(resolution.m_width);
-		_height = static_cast<uint16_t>(resolution.m_height);
-		getTextureSizeFromRatio(_ratio, _width, _height);
-	}
 } // namespace bgfx
 
 #include <bgfx/c99/bgfx.h>

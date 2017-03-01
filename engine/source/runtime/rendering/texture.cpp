@@ -103,7 +103,7 @@ void Texture::populate(gfx::BackbufferRatio::Enum _ratio, bool _hasMips, std::ui
 
 	std::uint16_t _width = 0;
 	std::uint16_t _height = 0;
-	gfx::getSizeFromRatio(_ratio, _width, _height);
+	gfx::get_size_from_ratio(_ratio, _width, _height);
 	gfx::calcTextureSize(info
 		, _width
 		, _height
@@ -134,7 +134,7 @@ uSize Texture::get_size() const
 	{
 		std::uint16_t width;
 		std::uint16_t height;
-		gfx::getSizeFromRatio(ratio, width, height);
+		gfx::get_size_from_ratio(ratio, width, height);
 		uSize size =
 		{
 			static_cast<std::uint32_t>(width),

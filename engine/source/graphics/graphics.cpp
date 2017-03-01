@@ -407,4 +407,26 @@ namespace gfx
 
 	
 
+	void get_size_from_ratio(BackbufferRatio::Enum _ratio, uint16_t& _width, uint16_t& _height)
+	{
+		auto stats = gfx::getStats();
+		_width = stats->width;
+		_height = stats->height;
+		switch (_ratio)
+		{
+		case BackbufferRatio::Half:      _width /= 2; _height /= 2; break;
+		case BackbufferRatio::Quarter:   _width /= 4; _height /= 4; break;
+		case BackbufferRatio::Eighth:    _width /= 8; _height /= 8; break;
+		case BackbufferRatio::Sixteenth: _width /= 16; _height /= 16; break;
+		case BackbufferRatio::Double:    _width *= 2; _height *= 2; break;
+
+		default:
+			break;
+		}
+
+		_width = bx::uint16_max(1, _width);
+		_height = bx::uint16_max(1, _height);
+		
+	}
+
 }
