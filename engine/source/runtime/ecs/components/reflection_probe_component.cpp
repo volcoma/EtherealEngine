@@ -64,7 +64,13 @@ std::shared_ptr<Texture> ReflectionProbeComponent::get_cubemap()
 	static auto flags = gfx::get_default_rt_sampler_flags() | BGFX_TEXTURE_BLIT_DST;
 
 	std::uint16_t size = 256;
-	return _render_view.get_texture("CUBEMAP", size, true, 1, buffer_format, flags);
+	return _render_view[0].get_texture("CUBEMAP", size, true, 1, buffer_format, flags);
+}
+
+
+std::shared_ptr<FrameBuffer> ReflectionProbeComponent::get_cubemap_fbo()
+{
+	return _render_view[0].get_fbo("CUBEMAP", {get_cubemap()});
 }
 
 void ReflectionProbeComponent::set_probe(const ReflectionProbe& probe)

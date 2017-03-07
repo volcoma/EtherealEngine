@@ -26,6 +26,7 @@
     <ClInclude Include="..\..\source\core\common\handle_object_set.hpp" />
     <ClInclude Include="..\..\source\core\common\handle_set.hpp" />
     <ClInclude Include="..\..\source\core\common\pathname_tag_tree.h" />
+    <ClInclude Include="..\..\source\core\common\spimpl.hpp" />
     <ClInclude Include="..\..\source\core\common\spin.hpp" />
     <ClInclude Include="..\..\source\core\common\string.h" />
     <ClInclude Include="..\..\source\core\common\tuple.hpp" />

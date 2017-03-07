@@ -9,6 +9,7 @@
 #include "common/basetypes.hpp"
 #include "common/utils.h"
 #include "common/string.h"
+#include "common/spimpl.hpp"
 #include "platform_config.h"
 #include "math/math_includes.h"
 #include "serialization/serialization.h"

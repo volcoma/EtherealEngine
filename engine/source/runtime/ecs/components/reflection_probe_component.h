@@ -77,7 +77,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline RenderView& get_render_view() { return _render_view; }
+	inline RenderView& get_render_view(size_t idx) { return _render_view[idx]; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_cubemap ()
@@ -88,6 +88,16 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	std::shared_ptr<Texture> get_cubemap();
+
+	//-----------------------------------------------------------------------------
+	//  Name : get_cubemap_fbo ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	std::shared_ptr<FrameBuffer> get_cubemap_fbo();
 private:
 	//-------------------------------------------------------------------------
 	// Private Member Variables.
@@ -95,5 +105,5 @@ private:
 	/// The probe object this component represents
 	ReflectionProbe _probe;
 	/// The render view for this component
-	RenderView _render_view;
+	RenderView _render_view[6];
 };

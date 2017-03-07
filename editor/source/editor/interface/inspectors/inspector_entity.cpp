@@ -262,7 +262,7 @@ bool Inspector_Entity::inspect(rttr::variant& var, bool readOnly, std::function<
 			data.set_name(varName.to_string());
 		}
 	}
-	
+	ImGui::Separator();
 	_component->_instance.setup(data.all_components());
 
 	_component->_instance.inspect(changed);

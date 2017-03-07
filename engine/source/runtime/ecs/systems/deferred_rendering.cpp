@@ -228,9 +228,13 @@ namespace runtime
 	{
 		auto& ecs = *core::get_subsystem<EntityComponentSystem>();
 
-		//////////////////////////////////////////////////////////////////////////
-		// Reflection Probe Generation
-		//////////////////////////////////////////////////////////////////////////
+		build_reflections_pass(ecs, dt);
+		build_shadows_pass(ecs, dt);
+		camera_pass(ecs, dt);		
+	}
+
+	void DeferredRendering::build_reflections_pass(EntityComponentSystem& ecs, std::chrono::duration<float> dt)
+	{
 		auto dirty_models = gather_visible_models(ecs, nullptr, true, true, true);
 		ecs.each<TransformComponent, ReflectionProbeComponent>([this, &ecs, dt, &dirty_models](
 			Entity ce,
@@ -240,8 +244,8 @@ namespace runtime
 		{
 			const auto& world_tranform = transform_comp.get_transform();
 			const auto& probe = reflection_probe_comp.get_probe();
-			auto& render_view = reflection_probe_comp.get_render_view();
-			auto cubemap = reflection_probe_comp.get_cubemap();
+			
+			auto cubemap_fbo = reflection_probe_comp.get_cubemap_fbo();
 			bool should_rebuild = true;
 
 			if (!transform_comp.is_dirty() && !reflection_probe_comp.is_dirty())
@@ -257,32 +261,38 @@ namespace runtime
 			for (std::uint32_t i = 0; i < 6; ++i)
 			{
 				auto camera = get_face_camera(i, world_tranform);
-				camera.set_viewport_size(cubemap->get_size());
+				auto& render_view = reflection_probe_comp.get_render_view(i);
+				camera.set_viewport_size(cubemap_fbo->get_size());
 				auto& camera_lods = _lod_data[ce];
 				VisibilitySetModels visibility_set;
 
-				if(probe.method != ReflectMethod::Environment)
+				if (probe.method != ReflectMethod::Environment)
 					visibility_set = gather_visible_models(ecs, &camera, !should_rebuild, true, true);
 
-				std::shared_ptr<FrameBuffer> output = nullptr;		
-				output = g_buffer_pass(output, camera, render_view, visibility_set, camera_lods, dt);	
-				output = lighting_pass(output, camera, render_view, ecs, dt, false);	
-				output = atmospherics_pass(output, camera, render_view, ecs, dt);	
+				std::shared_ptr<FrameBuffer> output = nullptr;
+				output = g_buffer_pass(output, camera, render_view, visibility_set, camera_lods, dt);
+				output = lighting_pass(output, camera, render_view, ecs, dt, false);
+				output = atmospherics_pass(output, camera, render_view, ecs, dt);
 				output = tonemapping_pass(output, camera, render_view);
-		
+
 				RenderPass pass("cubemap_fill");
-				gfx::blit(pass.id, cubemap->handle, 0, 0, 0, i, gfx::getTexture(output->handle));
+				gfx::blit(pass.id, gfx::getTexture(cubemap_fbo->handle), 0, 0, 0, i, gfx::getTexture(output->handle));
 			}
-		
-			auto cubemap_fbo = render_view.get_fbo("CUBEMAP", { cubemap });
+
 			RenderPass pass("cubemap_generate_mips");
 			pass.bind(cubemap_fbo.get());
-			
+
 		});
-		
-		//////////////////////////////////////////////////////////////////////////
-		// Camera Render
-		//////////////////////////////////////////////////////////////////////////
+	}
+
+	void DeferredRendering::build_shadows_pass(EntityComponentSystem& ecs, std::chrono::duration<float> dt)
+	{
+
+	}
+
+
+	void DeferredRendering::camera_pass(EntityComponentSystem& ecs, std::chrono::duration<float> dt)
+	{
 		ecs.each<CameraComponent>([this, &ecs, dt](
 			Entity ce,
 			CameraComponent& camera_comp
