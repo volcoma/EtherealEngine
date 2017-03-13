@@ -1,4 +1,4 @@
-#include "docks.h"
+#include "assets_dock.h"
 #include "runtime/rendering/mesh.h"
 #include "runtime/rendering/material.h"
 #include "runtime/rendering/texture.h"
@@ -15,8 +15,6 @@
 #include "../../project.h"
 #include "../../filedialog/filedialog.h"
 #include <cstdio>
-
-static float scale_icons = 0.7f;
 
 template<typename T>
 AssetHandle<Texture> get_asset_icon(T asset)
@@ -77,10 +75,17 @@ AssetHandle<Texture>& get_icon()
 }
 
 template<typename Wrapper, typename T>
-int list_item(Wrapper& entry, const std::string& name, const std::string& relative, const fs::path& absolute, runtime::AssetManager& manager, runtime::Input& input, editor::EditState& edit_state)
+int list_item(Wrapper& entry,
+	const std::string& name,
+	const std::string& relative,
+	const fs::path& absolute,
+	const float size,
+	std::weak_ptr<editor::AssetFolder> opened_folder,
+	runtime::AssetManager& manager,
+	runtime::Input& input, 
+	editor::EditState& edit_state)
 {
 	auto& selected = edit_state.selection_data.object;
-	const float size = 88.0f * scale_icons;
 	int action = 0;
 	bool already_selected = false;
 	if (selected.is_type<Wrapper>())
@@ -114,9 +119,10 @@ int list_item(Wrapper& entry, const std::string& name, const std::string& relati
 			{
 				manager.delete_asset<T>(relative);
 
-				if (editor::AssetFolder::opened)
+				if (!opened_folder.expired())
 				{
-					auto& files = editor::AssetFolder::opened->files;
+					auto opened_folder_shared = opened_folder.lock();
+					auto& files = opened_folder_shared->files;
 
 					for (auto& file : files)
 					{
@@ -129,10 +135,10 @@ int list_item(Wrapper& entry, const std::string& name, const std::string& relati
 			}
 			edit_state.unselect();
 		}
-// 		if (input.is_key_pressed(sf::Keyboard::R))
-// 		{
-// 			fs::watcher::touch(absolute);
-// 		}
+		// 		if (input.is_key_pressed(sf::Keyboard::R))
+		// 		{
+		// 			fs::watcher::touch(absolute);
+		// 		}
 	}
 
 	bool loading = !entry;
@@ -143,7 +149,7 @@ int list_item(Wrapper& entry, const std::string& name, const std::string& relati
 		icon = get_loading_icon();
 	else
 		icon = get_asset_icon(entry);
-	
+
 	gui::PushID(relative.c_str());
 
 	if (gui::GetContentRegionAvailWidth() < size)
@@ -212,7 +218,7 @@ int list_item(Wrapper& entry, const std::string& name, const std::string& relati
 
 	}
 
-		
+
 	gui::PopID();
 	gui::SameLine();
 
@@ -220,12 +226,13 @@ int list_item(Wrapper& entry, const std::string& name, const std::string& relati
 };
 
 
-void list_dir(editor::AssetFolder* dir)
+void list_dir(std::weak_ptr<editor::AssetFolder>& opened_folder, const float size)
 {
-	if (!dir)
+	if (opened_folder.expired())
 		return;
 
-
+	editor::AssetFolder* dir = opened_folder.lock().get();
+	
 	auto es = core::get_subsystem<editor::EditState>();
 	auto am = core::get_subsystem<runtime::AssetManager>();
 	auto input = core::get_subsystem<runtime::Input>();
@@ -236,13 +243,15 @@ void list_dir(editor::AssetFolder* dir)
 		{
 			int action = list_item<std::shared_ptr<editor::AssetFolder>, editor::AssetFolder>(
 				entry,
-				entry->name, 
+				entry->name,
 				entry->relative,
 				entry->absolute,
+				size,
+				opened_folder,
 				*am, *input, *es);
 			if (action == 3)
 			{
-				editor::AssetFolder::opened = entry;
+				opened_folder = entry;
 			}
 		}
 	}
@@ -260,6 +269,8 @@ void list_dir(editor::AssetFolder* dir)
 					file.name,
 					file.relative,
 					file.absolute,
+					size,
+					opened_folder,
 					*am, *input, *es);
 			}
 			if (file.extension == extensions::mesh)
@@ -269,20 +280,24 @@ void list_dir(editor::AssetFolder* dir)
 
 				list_item<AssetHandle<Mesh>, Mesh>(
 					asset,
-					file.name, 
-					file.relative, 
+					file.name,
+					file.relative,
 					file.absolute,
+					size,
+					opened_folder,
 					*am, *input, *es);
 			}
 			if (file.extension == extensions::material)
 			{
 				auto asset = am->find_or_create_asset_entry<Material>(file.relative).asset;
-				
+
 				list_item<AssetHandle<Material>, Material>(
 					asset,
 					file.name,
 					file.relative,
-					file.absolute, 
+					file.absolute,
+					size,
+					opened_folder,
 					*am, *input, *es);
 			}
 			if (file.extension == extensions::prefab)
@@ -290,10 +305,12 @@ void list_dir(editor::AssetFolder* dir)
 				auto asset = am->find_or_create_asset_entry<Prefab>(file.relative).asset;
 
 				list_item<AssetHandle<Prefab>, Prefab>(
-					asset, 
+					asset,
 					file.name,
 					file.relative,
-					file.absolute, 
+					file.absolute,
+					size,
+					opened_folder,
 					*am, *input, *es);
 			}
 			if (file.extension == extensions::scene)
@@ -305,6 +322,8 @@ void list_dir(editor::AssetFolder* dir)
 					file.name,
 					file.relative,
 					file.absolute,
+					size,
+					opened_folder,
 					*am, *input, *es);
 
 				if (action == 3)
@@ -320,7 +339,7 @@ void list_dir(editor::AssetFolder* dir)
 						es->scene = fs::resolve_protocol(asset.id()).string() + extensions::scene;
 
 					}
-					
+
 				}
 			}
 			if (file.extension == extensions::shader)
@@ -332,37 +351,47 @@ void list_dir(editor::AssetFolder* dir)
 					file.name,
 					file.relative,
 					file.absolute,
+					size,
+					opened_folder,
 					*am, *input, *es);
 			}
 		}
 	}
-	
+
 	if (gui::BeginPopupContextWindow())
 	{
 		if (gui::BeginMenu("Create"))
 		{
 			if (gui::MenuItem("Folder"))
 			{
-				editor::AssetFolder* folder = editor::AssetFolder::opened.get();
-
-				int i = 0;
-				while (!fs::create_directory(folder->absolute / string_utils::format("New Folder (%d)", i), std::error_code{}))
+				auto opened_folder_shared = opened_folder.lock();
+				editor::AssetFolder* folder = opened_folder_shared.get();
+				if (folder)
 				{
-					++i;
+					int i = 0;
+					while (!fs::create_directory(folder->absolute / string_utils::format("New Folder (%d)", i), std::error_code{}))
+					{
+						++i;
+					}
 				}
+				
 			}
 
 			gui::Separator();
 
 			if (gui::MenuItem("Material"))
 			{
-				editor::AssetFolder* folder = editor::AssetFolder::opened.get();
-
-				AssetHandle<Material> asset;
-				fs::path parent_dir = folder->relative;
-				asset.link->id = (parent_dir / string_utils::format("New Material (%s)", fs::path(std::tmpnam(nullptr)).filename().string().c_str())).generic_string();
-				asset.link->asset = std::make_shared<StandardMaterial>();
-				am->save<Material>(asset);
+				auto opened_folder_shared = opened_folder.lock();
+				editor::AssetFolder* folder = opened_folder_shared.get();
+				if (folder)
+				{
+					AssetHandle<Material> asset;
+					fs::path parent_dir = folder->relative;
+					asset.link->id = (parent_dir / string_utils::format("New Material (%s)", fs::path(std::tmpnam(nullptr)).filename().string().c_str())).generic_string();
+					asset.link->asset = std::make_shared<StandardMaterial>();
+					am->save<Material>(asset);
+				}
+				
 			}
 
 			gui::EndMenu();
@@ -372,135 +401,138 @@ void list_dir(editor::AssetFolder* dir)
 
 		if (gui::Selectable("Open In Explorer"))
 		{
-			editor::AssetFolder* folder = editor::AssetFolder::opened.get();
-			fs::show_in_graphical_env(folder->absolute);
+			auto opened_folder_shared = opened_folder.lock();
+			editor::AssetFolder* folder = opened_folder_shared.get();
+			if(folder)
+				fs::show_in_graphical_env(folder->absolute);
 		}
 
 		gui::EndPopup();
 	}
-	
+
 }
 
-namespace Docks
+void AssetsDock::render(ImVec2 area)
 {
-	void render_assets(ImVec2 area)
+	auto project = core::get_subsystem<editor::ProjectManager>();
+
+	if (opened_folder.expired())
+		opened_folder = project->get_root_directory();
+
+	auto es = core::get_subsystem<editor::EditState>();
+	auto input = core::get_subsystem<runtime::Input>();
+
+	float width = gui::GetContentRegionAvailWidth();
+
+	if (!gui::IsAnyItemActive())
 	{
-		auto es = core::get_subsystem<editor::EditState>();
-		auto input = core::get_subsystem<runtime::Input>();
-
-		float width = gui::GetContentRegionAvailWidth();
-
-		if (!gui::IsAnyItemActive())
+		if (input->is_key_pressed(sf::Keyboard::BackSpace) && !opened_folder.expired())
 		{
-			if (input->is_key_pressed(sf::Keyboard::BackSpace))
-			{
-				if (editor::AssetFolder::opened && editor::AssetFolder::opened->parent)
-					editor::AssetFolder::opened = editor::AssetFolder::opened->parent->shared_from_this();
-			}
+			auto opened_folder_shared = opened_folder.lock();
+
+			if (opened_folder_shared->parent)
+				opened_folder = opened_folder_shared->parent->shared_from_this();
 		}
-			
-
-		if (gui::Button("Import..."))
-		{
-			std::vector<std::string> paths;
-			if (open_multiple_files_dialog("obj,fbx,dae,blend,3ds,mtl,png,jpg,tga,dds,ktx,pvr,sc,io,sh", "", paths))
-			{
-				auto ts = core::get_subsystem<runtime::TaskSystem>();
-				editor::AssetFolder* folder = editor::AssetFolder::opened.get();
-
-				fs::path opened_dir = folder->absolute;
-				for (auto& path : paths)
-				{
-					fs::path p = path;
-					fs::path ext = p.extension().string();
-					fs::path filename = p.filename();
-
-					auto task = ts->create("Import Asset", [opened_dir](const fs::path& path, const fs::path& p, const fs::path& filename)
-					{
-						std::error_code error;
-						fs::path dir = opened_dir / filename;
-						if (!fs::copy_file(path, dir, fs::copy_options::overwrite_existing, error))
-						{
-							APPLOG_ERROR("Failed to import file {0} with message {1}", p.string(), error.message());
-						}
-						else
-						{
-							fs::last_write_time(dir, fs::file_time_type::clock::now(), std::error_code{});
-						}
-					}, p, p, filename);
-
-					ts->run(task);
-				}
-			}
-		}
-		gui::SameLine();
-		gui::PushItemWidth(80.0f);
-		gui::SliderFloat("", &scale_icons, 0.5f, 1.0f);
-		if (gui::IsItemHovered())
-		{
-			gui::SetTooltip("Scale Icons");
-		}
-		gui::PopItemWidth();
-		gui::SameLine();
-
-		std::vector<editor::AssetFolder*> hierarchy;
-		editor::AssetFolder* folder = editor::AssetFolder::opened.get();
-
-		editor::AssetFolder* f = folder;
-		while (f)
-		{
-			hierarchy.push_back(f);
-			f = f->parent;
-		}
-
-		for (auto rit = hierarchy.rbegin(); rit != hierarchy.rend(); ++rit)
-		{
-			if (rit != hierarchy.rbegin())
-			{
-				gui::Text(">");
-				gui::SameLine();
-			}
-
-			if (gui::Button((*rit)->name.c_str()))
-			{
-				editor::AssetFolder::opened = (*rit)->shared_from_this();
-				break;
-			}
-			if (rit != hierarchy.rend() - 1)
-				gui::SameLine();
-		}
-		gui::Separator();
-
-		ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |
-			ImGuiWindowFlags_NoMove |
-			ImGuiWindowFlags_NoResize |
-			ImGuiWindowFlags_NoSavedSettings;
-		if (gui::BeginChild("###assets_content", gui::GetContentRegionAvail(), false, flags))
-		{
-			if (gui::IsWindowHovered())
-			{
-				auto& dragged = es->drag_data.object;
-				if (dragged && dragged.is_type<runtime::Entity>())
-				{
-					gui::SetMouseCursor(ImGuiMouseCursor_Move);
-					if (gui::IsMouseReleased(gui::drag_button))
-					{
-						auto entity = dragged.get_value<runtime::Entity>();
-						if(entity)
-							ecs::utils::save_entity(folder->absolute, entity);
-						es->drop();
-					}
-				}
-			}
-			
-			get_icon() = AssetHandle<Texture>();
-
-			auto current_folder = editor::AssetFolder::opened;	
-			list_dir(current_folder.get());
-			get_icon() = AssetHandle<Texture>();
-			gui::EndChild();
-		}
-
 	}
 
-};
+
+	if (gui::Button("Import..."))
+	{
+		std::vector<std::string> paths;
+		if (open_multiple_files_dialog("obj,fbx,dae,blend,3ds,mtl,png,jpg,tga,dds,ktx,pvr,sc,io,sh", "", paths))
+		{
+			auto ts = core::get_subsystem<runtime::TaskSystem>();
+
+			auto opened_folder_shared = opened_folder.lock();
+
+			fs::path opened_dir = opened_folder_shared->absolute;
+			for (auto& path : paths)
+			{
+				fs::path p = path;
+				fs::path ext = p.extension().string();
+				fs::path filename = p.filename();
+
+				auto task = ts->create("Import Asset", [opened_dir](const fs::path& path, const fs::path& p, const fs::path& filename)
+				{
+					std::error_code error;
+					fs::path dir = opened_dir / filename;
+					if (!fs::copy_file(path, dir, fs::copy_options::overwrite_existing, error))
+					{
+						APPLOG_ERROR("Failed to import file {0} with message {1}", p.string(), error.message());
+					}
+					else
+					{
+						fs::last_write_time(dir, fs::file_time_type::clock::now(), std::error_code{});
+					}
+				}, p, p, filename);
+
+				ts->run(task);
+			}
+		}
+	}
+	gui::SameLine();
+	gui::PushItemWidth(80.0f);
+	gui::SliderFloat("", &scale_icons, 0.5f, 1.0f);
+	if (gui::IsItemHovered())
+	{
+		gui::SetTooltip("Scale Icons");
+	}
+	gui::PopItemWidth();
+	gui::SameLine();
+
+	std::vector<editor::AssetFolder*> hierarchy;
+	editor::AssetFolder* folder = opened_folder.lock().get();
+	editor::AssetFolder* f = folder;
+	while (f)
+	{
+		hierarchy.push_back(f);
+		f = f->parent;
+	}
+
+	for (auto rit = hierarchy.rbegin(); rit != hierarchy.rend(); ++rit)
+	{
+		if (rit != hierarchy.rbegin())
+		{
+			gui::Text(">");
+			gui::SameLine();
+		}
+
+		if (gui::Button((*rit)->name.c_str()))
+		{
+			opened_folder = (*rit)->shared_from_this();
+			break;
+		}
+		if (rit != hierarchy.rend() - 1)
+			gui::SameLine();
+	}
+	gui::Separator();
+
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |
+		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoSavedSettings;
+	if (gui::BeginChild("assets_content", gui::GetContentRegionAvail(), false, flags))
+	{
+		if (gui::IsWindowHovered())
+		{
+			auto& dragged = es->drag_data.object;
+			if (dragged && dragged.is_type<runtime::Entity>())
+			{
+				gui::SetMouseCursor(ImGuiMouseCursor_Move);
+				if (gui::IsMouseReleased(gui::drag_button))
+				{
+					auto entity = dragged.get_value<runtime::Entity>();
+					if (entity)
+						ecs::utils::save_entity(folder->absolute, entity);
+					es->drop();
+				}
+			}
+		}
+
+		get_icon() = AssetHandle<Texture>();
+		list_dir(opened_folder, 88.0f * scale_icons);
+		get_icon() = AssetHandle<Texture>();
+		gui::EndChild();
+	}
+
+}

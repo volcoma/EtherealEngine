@@ -11,6 +11,7 @@
 #include "runtime/ecs/components/reflection_probe_component.h"
 #include "runtime/ecs/utils.h"
 #include "runtime/system/filesystem.h"
+#include "runtime/system/engine.h"
 #include "runtime/rendering/render_pass.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/assets/asset_extensions.h"
@@ -296,7 +297,10 @@ void MainEditorWindow::on_menubar()
 		}
 		gui::EndMenu();
 	}
-
+	if (gui::BeginMenu("Windows"))
+	{
+		gui::EndMenu();
+	}
 }
 
 void MainEditorWindow::on_toolbar()

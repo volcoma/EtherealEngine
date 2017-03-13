@@ -33,18 +33,15 @@ namespace ImGuiDock
 
 	struct Dock
 	{
-		Dock* initialize(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize, std::function<void(ImVec2)> ddrawFunction)
+		void initialize(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize, std::function<void(ImVec2)> ddrawFunction)
 		{
 			title = dtitle;
 			close_button = dcloseButton;
 			min_size = dminSize;
-			drawFunction = ddrawFunction;
-			return this;
+			draw_function = ddrawFunction;
 		};
-		~Dock()
-		{
-			title.clear();
-		}
+
+		virtual ~Dock() {}
 
 		//Container *parent = nullptr;
 		Node* container = nullptr;
@@ -61,7 +58,7 @@ namespace ImGuiDock
 		ImVec2 min_size;
 
 		std::string title;
-		std::function<void(ImVec2)> drawFunction;
+		std::function<void(ImVec2)> draw_function;
 		std::function<bool(void)> on_close_func;
 	};
 
@@ -84,6 +81,7 @@ namespace ImGuiDock
 		friend class ::GuiWindow;
 
 		DockSlot render_dock_slot_preview(const ImVec2& mousePos, const ImVec2& cPos, const ImVec2& cSize);
+		void render_container(uint32_t& idgen, Node* container, ImVec2 size, ImVec2 cursor_pos);
 		void render_tab_bar(Node* container, const ImVec2& size, const ImVec2& cursorPos);
 		bool get_min_size(Node* container, ImVec2& min);
 		GuiWindow* is_any_window_dragged();

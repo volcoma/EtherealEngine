@@ -31,48 +31,48 @@ namespace runtime
 		math::vec3 X(1, 0, 0);
 		math::vec3 Y(0, 1, 0);
 		math::vec3 Z(0, 0, 1);
-
+		math::vec3 Zero(0, 0, 0);
 		math::transform_t t;
 		// Generate the correct view matrix for the frustum
 		if (!gfx::is_origin_bottom_left())
 		{
 			switch (face)
 			{
-			case 1:
-				t.look_at({}, +X, +Y); break;
 			case 0:
-				t.look_at({}, -X, +Y); break;
-			case 3:
-				t.look_at({}, +Y, -Z); break;
+				t.set_rotation(-Z, +Y, +X); break;
+			case 1:
+				t.set_rotation(+Z, +Y, -X); break;
 			case 2:
-				t.look_at({}, -Y, +Z); break;
+				t.set_rotation(+X, -Z, +Y); break;
+			case 3:
+				t.set_rotation(+X, +Z, -Y); break;
 			case 4:
-				t.look_at({}, +Z, +Y); break;
+				t.set_rotation(+X, +Y, +Z); break;
 			case 5:
-				t.look_at({}, -Z, +Y); break;
+				t.set_rotation(-X, +Y, -Z); break;
 			}
 		}
 		else
 		{
 			switch (face)
 			{
-			case 1:
-				t.look_at({}, +X, +Y); break;
 			case 0:
-				t.look_at({}, -X, +Y); break;
-			case 2:
-				t.look_at({}, +Y, -Z); break;
+				t.set_rotation(-Z, +Y, +X); break;
+			case 1:
+				t.set_rotation(+Z, +Y, -X); break;
 			case 3:
-				t.look_at({}, -Y, +Z); break;
+				t.set_rotation(+X, -Z, +Y); break;
+			case 2:
+				t.set_rotation(+X, +Z, -Y); break;
 			case 4:
-				t.look_at({}, +Z, +Y); break;
+				t.set_rotation(+X, +Y, +Z); break;
 			case 5:
-				t.look_at({}, -Z, +Y); break;
+				t.set_rotation(-X, +Y, -Z); break;
 			}
 
 		}
 		
-	
+		
 		t = transform * t;
 		// First update so the camera can cache the previous matrices
 		camera.record_current_matrices();

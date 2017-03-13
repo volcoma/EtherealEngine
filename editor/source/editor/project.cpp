@@ -141,9 +141,6 @@ namespace editor
 					}
 					else if (entry.state == fs::watcher::Entry::Removed)
 					{
-						if (p == AssetFolder::opened->absolute)
-							AssetFolder::opened = AssetFolder::root;
-
 						std::unique_lock<std::mutex> lock(directories_mutex);
 						directories.erase(std::remove_if(std::begin(directories), std::end(directories),
 							[&entry](const std::shared_ptr<AssetFolder>& other) { return entry.path.filename().string() == other->name; }
@@ -189,24 +186,30 @@ namespace editor
 			}
 		});
 		static const std::string wildcard = "*";
+
+
 		watch_assets<Texture>(relative, wildcard + extensions::texture, !recompile_assets, true);
-		watch_raw_assets<Texture>(relative, "*.png", recompile_assets);
-		watch_raw_assets<Texture>(relative, "*.jpg", recompile_assets);
-		watch_raw_assets<Texture>(relative, "*.tga", recompile_assets);
-		watch_raw_assets<Texture>(relative, "*.dds", recompile_assets);
-		watch_raw_assets<Texture>(relative, "*.ktx", recompile_assets);
-		watch_raw_assets<Texture>(relative, "*.pvr", recompile_assets);
+		static const std::array<std::string, 6>  raw_texture_formats = 
+		{ 
+			"*.png", "*.jpg", "*.tga", "*.dds", "*.ktx", "*.pvr" 
+		};
+		for (const auto& format : raw_texture_formats)
+		{
+			watch_raw_assets<Texture>(relative, format, recompile_assets);
+		}
 
 		watch_assets<Shader>(relative, wildcard + extensions::shader, !recompile_assets, true);
 		watch_raw_assets<Shader>(relative, "*.sc", recompile_assets);
 
 		watch_assets<Mesh>(relative, wildcard + extensions::mesh, !recompile_assets, true);
-		watch_raw_assets<Mesh>(relative, "*.obj", recompile_assets);
-		watch_raw_assets<Mesh>(relative, "*.fbx", recompile_assets);
-		watch_raw_assets<Mesh>(relative, "*.dae", recompile_assets);
-		watch_raw_assets<Mesh>(relative, "*.blend", recompile_assets);
-		watch_raw_assets<Mesh>(relative, "*.3ds", recompile_assets);
-
+		static const std::array<std::string, 5>  raw_mesh_formats =
+		{
+			"*.obj", "*.fbx", "*.dae", "*.blend", "*.3ds"
+		};
+		for (const auto& format : raw_mesh_formats)
+		{
+			watch_raw_assets<Mesh>(relative, format, recompile_assets);
+		}
 		watch_assets<Prefab>(relative, wildcard + extensions::prefab, true, true);
 		watch_assets<Scene>(relative, wildcard + extensions::scene, true, true);
 		watch_assets<Material>(relative, wildcard + extensions::material, true, false);
@@ -227,9 +230,6 @@ namespace editor
 		fs::path a = absolute;
 		relative = string_utils::replace(a.replace_extension().generic_string(), root_path.generic_string(), "app:/data");
 	}
-
-	std::shared_ptr<AssetFolder> AssetFolder::opened;
-	std::shared_ptr<AssetFolder> AssetFolder::root;
 
 	AssetFolder::AssetFolder(AssetFolder* p, const fs::path& abs, const std::string& n, const fs::path& r, bool recompile_assets)
 	{
@@ -285,8 +285,8 @@ namespace editor
 		static const std::string wildcard = "*";
 
 		/// for debug purposes
-//		watch_assets<Shader>("engine_data:/shaders", wildcard + extensions::shader, !recompile_assets, true);
-//		watch_raw_assets<Shader>("engine_data:/shaders", "*.sc", recompile_assets);
+// 		watch_assets<Shader>("engine_data:/shaders", wildcard + extensions::shader, !recompile_assets, true);
+// 		watch_raw_assets<Shader>("engine_data:/shaders", "*.sc", recompile_assets);
 //		watch_assets<Shader>("editor_data:/shaders", wildcard + extensions::shader, !recompile_assets, true);
 //		watch_raw_assets<Shader>("editor_data:/shaders", "*.sc", recompile_assets);
 
@@ -313,11 +313,8 @@ namespace editor
 // 
 
 		auto& root = fs::resolve_protocol("app:/data");
-		AssetFolder::opened.reset();
-		AssetFolder::root.reset();
-		AssetFolder::root = std::make_shared<AssetFolder>(nullptr, root, root.filename().string(), root, recompile_assets);
-		AssetFolder::opened = AssetFolder::root;
-
+		root_directory.reset();
+		root_directory = std::make_shared<AssetFolder>(nullptr, root, root.filename().string(), root, recompile_assets);
 	}
 
 	void ProjectManager::create_project(const fs::path& project_path)
@@ -408,8 +405,7 @@ namespace editor
 	{
 		save_config();
 		fs::watcher::unwatch_all();
-		AssetFolder::opened.reset();
-		AssetFolder::root.reset();
+		root_directory.reset();
 	}
 
 }

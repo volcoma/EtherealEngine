@@ -236,6 +236,9 @@ namespace ImGui
 			auto pos = GetCursorScreenPos();
 			PushItemWidth(size.x);
 			LabelTextEx("", label);
+// 			PushTextWrapPos(pos.x + size.x);
+// 			Text(label);
+// 			PopTextWrapPos();
 			PopItemWidth();
 			label_clicked = IsItemClicked(0);
 			if (!edit)
@@ -248,6 +251,7 @@ namespace ImGui
 			{	
 				SetCursorScreenPos(pos);
 				PushItemWidth(size.x);
+				
 				if (InputText("",
 					&buf[0],
 					buf_size,
@@ -256,8 +260,8 @@ namespace ImGui
 					edit = false;
 					return_value = 2;
 				}
+				
 				PopItemWidth();		
-
 				inputActive = IsItemActive();
 				if (!inputActive && (IsMouseClicked(0) || IsMouseDragging()))
 				{

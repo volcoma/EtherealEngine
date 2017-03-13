@@ -109,9 +109,6 @@
     <ClInclude Include="..\..\source\editor\meta\interface\gui_system.hpp">
       <Filter>Source Files\meta\interface</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\editor\interface\docks\docks.h">
-      <Filter>Source Files\interface\docks</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\editor\interface\Inspectors\inspectors.h">
       <Filter>Source Files\interface\inspectors</Filter>
     </ClInclude>
@@ -165,6 +162,27 @@
     </ClInclude>
     <ClInclude Include="..\..\source\editor\assets\mesh_importer.h">
       <Filter>Source Files\assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\editor\interface\docks\game_dock.h">
+      <Filter>Source Files\interface\docks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\editor\interface\docks\hierarchy_dock.h">
+      <Filter>Source Files\interface\docks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\editor\interface\docks\inspector_dock.h">
+      <Filter>Source Files\interface\docks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\editor\interface\docks\scene_dock.h">
+      <Filter>Source Files\interface\docks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\editor\interface\docks\style_dock.h">
+      <Filter>Source Files\interface\docks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\editor\interface\docks\assets_dock.h">
+      <Filter>Source Files\interface\docks</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\editor\interface\docks\console_dock.h">
+      <Filter>Source Files\interface\docks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

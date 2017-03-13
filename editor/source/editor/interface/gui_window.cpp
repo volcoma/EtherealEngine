@@ -65,7 +65,15 @@ void imgui_frame_update(RenderWindow& window, std::chrono::duration<float> dt, c
 	// Setup time step
 	io.DeltaTime = dt.count();
 
-	if (window.hasFocus())
+	auto window_pos = window.getPosition();
+	auto window_size = window.getSize();
+	iRect rect;
+	rect.left = window_pos.x;
+	rect.top = window_pos.y;
+	rect.right = window_size.width;
+	rect.bottom = window_size.height;
+	auto mouse_pos = sf::Mouse::getPosition(window);
+	if (window.hasFocus() && rect.containsPoint(mouse_pos))
 	{
 		switch (gui::GetMouseCursor())
 		{
@@ -99,7 +107,6 @@ void imgui_frame_update(RenderWindow& window, std::chrono::duration<float> dt, c
 		default: break;
 		}
 	}
-	
 
 	// Start the frame	
 	gui::NewFrame();
@@ -116,7 +123,6 @@ void imgui_frame_update(RenderWindow& window, std::chrono::duration<float> dt, c
 		;
 
 	gui::Begin("###workspace", 0, flags);
-
 }
 
 void imgui_frame_end()

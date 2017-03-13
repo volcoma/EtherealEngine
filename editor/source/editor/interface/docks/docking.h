@@ -9,7 +9,7 @@
 struct DockingSystem : public core::Subsystem
 {
 	bool initialize();
-
+	void dispose();
 private:
 	std::vector<std::unique_ptr<ImGuiDock::Dock>> _docks;
 	std::shared_ptr<ConsoleLog> _console_log = std::make_shared<ConsoleLog>();

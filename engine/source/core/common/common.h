@@ -12,4 +12,4 @@
 #include "utils.h"
 #include "variant.hpp"
 #include "pathname_tag_tree.h"
-
+#include "spimpl.hpp"

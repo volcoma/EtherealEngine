@@ -1,42 +1,31 @@
 #include "docking.h"
-#include "docks.h"
 #include "runtime/system/engine.h"
 #include "../gui_window.h"
 #include "core/logging/logging.h"
-
+#include "scene_dock.h"
+#include "game_dock.h"
+#include "hierarchy_dock.h"
+#include "inspector_dock.h"
+#include "assets_dock.h"
+#include "console_dock.h"
+#include "style_dock.h"
 bool DockingSystem::initialize()
 {
-	_docks.emplace_back(std::make_unique<ImGuiDock::Dock>());
-	_docks.emplace_back(std::make_unique<ImGuiDock::Dock>());
-	_docks.emplace_back(std::make_unique<ImGuiDock::Dock>());
-	_docks.emplace_back(std::make_unique<ImGuiDock::Dock>());
-	_docks.emplace_back(std::make_unique<ImGuiDock::Dock>());
-	_docks.emplace_back(std::make_unique<ImGuiDock::Dock>());
-	_docks.emplace_back(std::make_unique<ImGuiDock::Dock>());
+	_docks.emplace_back(std::make_unique<SceneDock>("Scene", true, ImVec2(200.0f, 200.0f)));
+	_docks.emplace_back(std::make_unique<GameDock>("Game", true, ImVec2(200.0f, 200.0f)));
+	_docks.emplace_back(std::make_unique<HierarchyDock>("Hierarchy", true, ImVec2(300.0f, 200.0f)));
+	_docks.emplace_back(std::make_unique<InspectorDock>("Inspector", true, ImVec2(300.0f, 200.0f)));
+	_docks.emplace_back(std::make_unique<AssetsDock>("Assets", true, ImVec2(200.0f, 200.0f)));
+	_docks.emplace_back(std::make_unique<ConsoleDock>("Console", true, ImVec2(200.0f, 200.0f), _console_log));
+	_docks.emplace_back(std::make_unique<StyleDock>("Style", true, ImVec2(300.0f, 200.0f)));
 
 	auto& scene = _docks[0];
-	scene->initialize("Scene", true, ImVec2(200.0f, 200.0f), &Docks::render_scene);
-
 	auto& game = _docks[1];
-	game->initialize("Game", true, ImVec2(200.0f, 200.0f), &Docks::render_game);
-
 	auto& hierarchy = _docks[2];
-	hierarchy->initialize("Hierarchy", true, ImVec2(300.0f, 200.0f), &Docks::render_hierarchy);
-
 	auto& inspector = _docks[3];
-	inspector->initialize("Inspector", true, ImVec2(300.0f, 200.0f), &Docks::render_inspector);
-
 	auto& assets = _docks[4];
-	assets->initialize("Assets", true, ImVec2(200.0f, 200.0f), &Docks::render_assets);
-
 	auto& console = _docks[5];
-	console->initialize("Console", true, ImVec2(200.0f, 200.0f), [this](ImVec2 area)
-	{
-		Docks::render_console(area, *_console_log.get());
-	});
-
 	auto& style = _docks[6];
-	style->initialize("Style", true, ImVec2(300.0f, 200.0f), &Docks::render_style);
 
 	auto engine = core::get_subsystem<runtime::Engine>();
 	const auto& windows = engine->get_windows();
@@ -66,4 +55,10 @@ bool DockingSystem::initialize()
 	);
 
 	return true;
+}
+
+void DockingSystem::dispose()
+{
+	_docks.clear();
+	_console_log.reset();
 }

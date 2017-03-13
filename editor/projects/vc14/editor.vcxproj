@@ -287,9 +287,15 @@
     <ClInclude Include="..\..\source\editor\filedialog\nfd\common.h" />
     <ClInclude Include="..\..\source\editor\filedialog\nfd\nfd.h" />
     <ClInclude Include="..\..\source\editor\filedialog\nfd\nfd_common.h" />
+    <ClInclude Include="..\..\source\editor\interface\docks\assets_dock.h" />
+    <ClInclude Include="..\..\source\editor\interface\docks\console_dock.h" />
     <ClInclude Include="..\..\source\editor\interface\docks\docking.h" />
-    <ClInclude Include="..\..\source\editor\interface\docks\docks.h" />
+    <ClInclude Include="..\..\source\editor\interface\docks\game_dock.h" />
+    <ClInclude Include="..\..\source\editor\interface\docks\hierarchy_dock.h" />
     <ClInclude Include="..\..\source\editor\interface\docks\imguidock.h" />
+    <ClInclude Include="..\..\source\editor\interface\docks\inspector_dock.h" />
+    <ClInclude Include="..\..\source\editor\interface\docks\scene_dock.h" />
+    <ClInclude Include="..\..\source\editor\interface\docks\style_dock.h" />
     <ClInclude Include="..\..\source\editor\interface\gizmos\imguizmo.h" />
     <ClInclude Include="..\..\source\editor\interface\gui_system.h" />
     <ClInclude Include="..\..\source\editor\interface\gui_window.h" />

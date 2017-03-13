@@ -54,10 +54,6 @@ namespace editor
 		std::mutex directories_mutex;
 		///
 		std::vector<std::shared_ptr<AssetFolder>> directories;
-		///
-		static std::shared_ptr<AssetFolder> opened;
-		///
-		static std::shared_ptr<AssetFolder> root;
 	};
 
 
@@ -171,11 +167,22 @@ namespace editor
 		inline Options& get_options() { return _options; }
 
 
-
+		//-----------------------------------------------------------------------------
+		//  Name : get_root_directory ()
+		/// <summary>
+		/// 
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
+		inline std::weak_ptr<AssetFolder> get_root_directory() { return root_directory; }
 	private:
 		/// Project options
 		Options _options;
 		/// Current project name
 		std::string _project_name;
+		///
+		std::shared_ptr<AssetFolder> root_directory = nullptr;
+
 	};
 }

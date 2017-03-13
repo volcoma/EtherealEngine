@@ -1,18 +1,14 @@
-#include "docks.h"
+#include "inspector_dock.h"
 #include "../../edit_state.h"
 #include "../inspectors/inspectors.h"
 
-namespace Docks
+void InspectorDock::render(ImVec2 area)
 {
+	auto es = core::get_subsystem<editor::EditState>();
 
-	void render_inspector(ImVec2 area)
+	auto& selected = es->selection_data.object;
+	if (selected)
 	{
-		auto es = core::get_subsystem<editor::EditState>();
-		
-		auto& selected = es->selection_data.object;
-		if (selected)
-		{
-			inspect_var(selected);
-		}
+		inspect_var(selected);
 	}
-};
+}
