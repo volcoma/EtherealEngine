@@ -57,13 +57,12 @@ private:
 [LINK](LICENSE.md)
 
 ## PREVIEW
+![prev](https://cloud.githubusercontent.com/assets/1499411/23671477/0a2016fa-0374-11e7-8456-0521c78c5f12.png)
+
 ![proceduralsky](https://cloud.githubusercontent.com/assets/1499411/22755670/d6cf794e-ee4c-11e6-92cd-e29ae30eefc8.png)
 
 ![proceduralsky1](https://cloud.githubusercontent.com/assets/1499411/22755669/d6cd60fa-ee4c-11e6-9ff2-ebf0e3535e39.png)
 
-![preview5](https://cloud.githubusercontent.com/assets/1499411/22198936/6a085efe-e161-11e6-8d76-3ba179e7c76b.png)
-
-![preview6](https://cloud.githubusercontent.com/assets/1499411/22198950/78759b82-e161-11e6-9681-219d15f1482f.png)
 
 ## LIBRARIES
 bgfx - https://github.com/bkaradzic/bgfx
