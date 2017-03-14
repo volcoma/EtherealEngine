@@ -9,6 +9,10 @@
 template<typename T>
 struct LoadRequest
 {
+	~LoadRequest()
+	{
+		wait_until_ready();
+	}
 	//-----------------------------------------------------------------------------
 	//  Name : then ()
 	/// <summary>
@@ -52,6 +56,8 @@ struct LoadRequest
 		{
 			auto ts = core::get_subsystem<runtime::TaskSystem>();
 			ts->wait(load_task);
+			// all resource loading tasks create a subtask on the main thread.
+			// this way we can be avoid circle wait.
 			ts->execute_tasks_on_main({});
 		}
 	}

@@ -58,6 +58,7 @@ namespace math
 		// transformation Operations
 		transform_t& rotate_axis(float a, const vec3 & v);
 		transform_t& rotate(float x, float y, float z);
+		transform_t& rotate(const vec3 & v);
 		transform_t& rotate_local(float x, float y, float z);
 		transform_t& rotate_local(const vec3 & v);
 		transform_t& scale(const vec3 & v);

@@ -175,7 +175,7 @@ int list_item(Wrapper& entry,
 		loading ? "Loading" : name.c_str(),
 		&inputBuff[0],
 		inputBuff.size(),
-		ImGuiInputTextFlags_EnterReturnsTrue);
+		ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll);
 
 	if (loading)
 	{

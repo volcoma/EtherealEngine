@@ -166,10 +166,11 @@ namespace runtime
 
 		unsigned index = get_thread_index();
 		while (!is_completed(handle))
-		{
-			std::this_thread::yield();
-			if (!execute_one(handle, index, false, _other_thread_tasks.mutex, _other_thread_tasks.tasks))
-				break;
+		{		
+			if(index != 0)
+				std::this_thread::yield();
+			
+			execute_one(handle, index, false, _other_thread_tasks.mutex, _other_thread_tasks.tasks);
 		}
 	}
 

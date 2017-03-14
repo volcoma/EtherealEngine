@@ -13,6 +13,15 @@ void Tooltip(const rttr::property& prop)
 	}
 }
 
+void Tooltip(const std::string& tooltip)
+{
+	if (gui::IsItemHovered())
+	{
+		gui::SetMouseCursor(ImGuiMouseCursor_Help);
+		gui::SetTooltip(tooltip.c_str());	
+	}
+}
+
 PropertyLayout::PropertyLayout(const rttr::property& prop, bool columns /*= true*/)
 {
 	
@@ -35,6 +44,21 @@ PropertyLayout::PropertyLayout(const std::string& name, bool columns /*= true*/)
 		gui::Columns(2, nullptr, false);
 
 	gui::TextUnformatted(name.c_str());
+	if (columns)
+		gui::SetColumnOffset(1, 140.0f);
+	gui::NextColumn();
+
+	gui::PushID(name.c_str());
+	gui::PushItemWidth(gui::GetContentRegionAvailWidth());
+}
+
+PropertyLayout::PropertyLayout(const std::string& name, const std::string& tooltip, bool columns /*= true*/)
+{
+	if (columns)
+		gui::Columns(2, nullptr, false);
+
+	gui::TextUnformatted(name.c_str());
+	Tooltip(tooltip);
 	if (columns)
 		gui::SetColumnOffset(1, 140.0f);
 	gui::NextColumn();

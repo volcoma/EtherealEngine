@@ -40,21 +40,18 @@ bool inspect_var(rttr::variant& var, bool read_only, std::function<rttr::variant
 	auto properties = type.get_properties();
 
 	bool changed = false;
-	if (properties.empty())
-	{
-		auto inspector = get_inspector(type);
-		if (inspector)
-		{
-			changed |= inspector->inspect(var, read_only, get_metadata);
-		}
-		else
-		{
-			if (type.is_enumeration())
-			{
-				changed |= inspect_enum(var, type.get_enumeration(), read_only);
-			}
-		}
 
+	auto inspector = get_inspector(type);
+	if (inspector)
+	{
+		changed |= inspector->inspect(var, read_only, get_metadata);
+	}
+	else if (properties.empty())
+	{
+		if (type.is_enumeration())
+		{
+			changed |= inspect_enum(var, type.get_enumeration(), read_only);
+		}
 	}
 	else
 	{

@@ -735,6 +735,11 @@ namespace math
 		// Return reference to self in order to allow consecutive operations (i.e. a.rotate(...).scale(...))
 		return *this;
 	}
+	transform_t & transform_t::rotate(const vec3 & v)
+	{
+		return rotate(v.x, v.y, v.z);
+	}
+
 	transform_t & transform_t::rotate_local(float x, float y, float z)
 	{
 		// No - op?

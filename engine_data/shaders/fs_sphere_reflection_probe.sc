@@ -62,7 +62,6 @@ void main()
 
 	vec3 N = data.world_normal;
 	vec3 V = -normalize(v_weye_dir);
-	float NoV = saturate( dot(N, V) );
 	vec3 R = reflect(-V, N);
 	
 	float roughness = data.roughness;

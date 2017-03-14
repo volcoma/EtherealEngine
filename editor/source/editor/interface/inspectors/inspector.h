@@ -19,6 +19,8 @@ struct PropertyLayout
 
 	PropertyLayout(const std::string& name, bool columns = true);
 
+	PropertyLayout(const std::string& name, const std::string& tooltip, bool columns = true);
+
 	~PropertyLayout();
 };
 

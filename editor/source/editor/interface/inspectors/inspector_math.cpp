@@ -1,5 +1,6 @@
 #include "inspector_math.h"
 #include "../gizmos/imguizmo.h"
+
 bool Inspector_Vector2::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<math::vec2>();
@@ -80,6 +81,8 @@ bool Inspector_Transform::inspect(rttr::variant& var, bool readOnly, std::functi
 	math::quat rotation = data.get_rotation();
 	math::vec3 local_euler_angles = math::degrees(math::eulerAngles(rotation));
 
+	const bool is_global = true;
+
 	static math::quat old_quat;
 	static math::vec3 euler_angles;
 	bool changed = false;
@@ -101,7 +104,10 @@ bool Inspector_Transform::inspect(rttr::variant& var, bool readOnly, std::functi
 	if (gui::DragFloatNEx(names, &position[0], 3, 0.05f))
 	{
 		auto delta = position - prevPos;
-		data.translate_local(delta);
+		if (is_global)
+			data.translate(delta);
+		else
+			data.translate_local(delta);
 		changed = true;
 	}
 	gui::PopID();
@@ -118,7 +124,11 @@ bool Inspector_Transform::inspect(rttr::variant& var, bool readOnly, std::functi
 	auto degrees = euler_angles;
 	if (gui::DragFloatNEx(names, &degrees[0], 3, 0.05f))
 	{
-		data.rotate_local(math::radians(degrees - euler_angles));
+		if(is_global)
+			data.rotate(math::radians(degrees - euler_angles));
+		else
+			data.rotate_local(math::radians(degrees - euler_angles));
+
 		euler_angles = degrees;
 		changed = true;
 	}
