@@ -9,10 +9,6 @@
 template<typename T>
 struct LoadRequest
 {
-	~LoadRequest()
-	{
-		wait_until_ready();
-	}
 	//-----------------------------------------------------------------------------
 	//  Name : then ()
 	/// <summary>
