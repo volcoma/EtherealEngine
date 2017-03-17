@@ -178,6 +178,7 @@ public:
     virtual void setVisible(bool visible) = 0;
 	virtual void maximize() = 0;
 	virtual void minimize() = 0;
+	virtual void restore() = 0;
 	virtual void setAlpha(float alpha01) = 0;
     ////////////////////////////////////////////////////////////
     /// \brief Show or hide the mouse cursor

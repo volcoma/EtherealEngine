@@ -64,48 +64,10 @@ public:
 	//-----------------------------------------------------------------------------
 	virtual void on_toolbar();
 
+	virtual void render_dockspace();
 
+	virtual void on_start_page();
+	void show_start_page(bool show) { _show_start_page = show; }
 private:
-	bool _open_project_manager = false;
-};
-
-class ProjectManagerWindow : public GuiWindow
-{
-public:
-	//-----------------------------------------------------------------------------
-	//  Name : ProjectManagerWindow ()
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	ProjectManagerWindow() = default;
-	//-----------------------------------------------------------------------------
-	//  Name : ProjectManagerWindow ()
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	ProjectManagerWindow(sf::VideoMode mode, const std::string& title, std::uint32_t style = sf::Style::Default);
-	//-----------------------------------------------------------------------------
-	//  Name : ~ProjectManagerWindow (virtual )
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	virtual ~ProjectManagerWindow() = default;
-	//-----------------------------------------------------------------------------
-	//  Name : on_gui (virtual )
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	virtual void on_gui(std::chrono::duration<float> dt);
+	bool _show_start_page = true;
 };

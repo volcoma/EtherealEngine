@@ -209,13 +209,16 @@ void Window::setSize(const uSize& size)
 {
     if (m_impl)
     {
-        m_impl->setSize(size);
+		if (m_size != size)
+		{
+			m_impl->setSize(size);
 
-        // Cache the new size
-        m_size = size;
+			// Cache the new size
+			m_size = size;
 
-        // Notify the derived class
-        onResize();
+			// Notify the derived class
+			onResize();
+		}       
     }
 }
 
@@ -252,7 +255,13 @@ void Window::minimize()
 	if (m_impl)
 		m_impl->minimize();
 }
+void Window::restore()
+{
+	if (m_impl)
+		m_impl->restore();
 
+	requestFocus();
+}
 void Window::setAlpha(float alpha01)
 {
 	if (m_impl)

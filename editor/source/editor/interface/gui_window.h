@@ -71,6 +71,8 @@ public:
 	//-----------------------------------------------------------------------------
 	virtual void on_gui(std::chrono::duration<float> dt) {}
 
+	virtual void render_dockspace();
+
 	//-----------------------------------------------------------------------------
 	//  Name : frame_end (virtual )
 	/// <summary>

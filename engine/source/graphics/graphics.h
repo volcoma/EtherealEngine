@@ -13,9 +13,7 @@ namespace gfx
 
 	using namespace bgfx;
 	using namespace bx;
-	static bool initted = false;
-
-
+	
 	struct PosTexCoord0Vertex
 	{
 		float x, y, z;
@@ -114,30 +112,17 @@ namespace gfx
 		return sampler_flags;
 	}
 
-	inline void shutdown()
-	{
-		if (initted)
-			bgfx::shutdown();
-	}
+	void shutdown();
 
-	inline bool init(
+	bool init(
 		RendererType::Enum _type = RendererType::Count
 		, uint16_t _vendorId = BGFX_PCI_ID_NONE
 		, uint16_t _deviceId = 0
 		, CallbackI* _callback = NULL
 		, bx::AllocatorI* _reallocator = NULL
-	)
-	{
-		initted = bgfx::init(_type, _vendorId, _deviceId, _callback, _reallocator);
+	);
 
-		if (initted)
-		{
-			PosTexCoord0Vertex::init();
-			MeshVertex::init();
-		}
-
-		return initted;
-	}	
+	bool is_initted();
 	std::uint64_t screen_quad(float dest_width, float dest_height, float depth = 0.0f, float width = 1.0f, float height = 1.0f);
 	std::uint64_t clip_quad(float depth = 0.0f, float width = 1.0f, float height = 1.0f);
 

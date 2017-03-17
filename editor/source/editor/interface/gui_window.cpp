@@ -205,10 +205,15 @@ void GuiWindow::frame_render(std::chrono::duration<float> dt)
 
 	on_gui(dt);
 
-	_dockspace.update_and_draw(gui::GetContentRegionAvail());
+	render_dockspace();
 }
 
 #include "../edit_state.h"
+
+void GuiWindow::render_dockspace()
+{
+	_dockspace.update_and_draw(gui::GetContentRegionAvail());
+}
 
 void GuiWindow::frame_end()
 {

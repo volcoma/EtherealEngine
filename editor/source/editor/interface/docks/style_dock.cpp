@@ -1,5 +1,14 @@
 #include "style_dock.h"
 
+StyleDock::StyleDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize)
+{
+	initialize(dtitle, dcloseButton, dminSize, std::bind(&StyleDock::render, this, std::placeholders::_1));
+	auto& style = gui::get_gui_style();
+	style.load_style();
+	auto& setup = style.setup;
+	style.set_style_colors(setup);
+}
+
 
 void StyleDock::render(ImVec2 area)
 {

@@ -327,6 +327,7 @@ public:
     void setVisible(bool visible);
 	void maximize();
 	void minimize();
+	void restore();
 	void setAlpha(float alpha01);
     ////////////////////////////////////////////////////////////
     /// \brief Show or hide the mouse cursor

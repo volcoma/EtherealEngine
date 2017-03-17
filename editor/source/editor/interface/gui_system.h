@@ -48,6 +48,8 @@ struct GuiSystem : public core::Subsystem
 	bool initialize();
 	void dispose();
 	void frame_begin(std::chrono::duration<float>);
+
+	
 };
 
 struct ITexture;
@@ -55,7 +57,8 @@ namespace gui
 {   
 	using namespace ImGui;
 	static const int drag_button = 0;
-
+	
+	ImFont* GetFont(const std::string& id);
 	// Helper function for passing ITexture to ImGui::Image.
 	void Image(std::shared_ptr<ITexture> texture
 		, const ImVec2& _size

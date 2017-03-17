@@ -138,6 +138,7 @@ namespace priv
 		virtual void setVisible(bool visible);
 		virtual void maximize();
 		virtual void minimize();
+		virtual void restore();
 		virtual void setAlpha(float alpha01);
 		////////////////////////////////////////////////////////////
 		/// \brief Show or hide the mouse cursor

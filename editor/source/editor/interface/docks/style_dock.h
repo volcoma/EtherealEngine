@@ -4,10 +4,7 @@
 
 struct StyleDock : public ImGuiDock::Dock
 {
-	StyleDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize)
-	{
-		initialize(dtitle, dcloseButton, dminSize, std::bind(&StyleDock::render, this, std::placeholders::_1));
-	}
+	StyleDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize);
 
 	void render(ImVec2 area);
 };

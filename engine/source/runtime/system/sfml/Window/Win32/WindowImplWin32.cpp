@@ -371,7 +371,10 @@ void WindowImplWin32::minimize()
 {
 	ShowWindow(m_handle, SW_MINIMIZE);
 }
-
+void WindowImplWin32::restore()
+{
+	ShowWindow(m_handle, SW_RESTORE);
+}
 ////////////////////////////////////////////////////////////
 void WindowImplWin32::setMouseCursorVisible(bool visible)
 {

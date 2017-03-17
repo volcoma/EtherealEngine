@@ -42,6 +42,7 @@ static gfx::VertexDecl				s_decl;
 static std::unique_ptr<Program>		s_program;
 static AssetHandle<Texture>			s_font_texture;
 static std::vector<std::shared_ptr<ITexture>> s_textures;
+static std::unordered_map<std::string, ImFont*> s_fonts;
 
 
 void renderFunc(ImDrawData *_drawData)
@@ -211,9 +212,10 @@ bool GuiSystem::initialize()
 	config.MergeMode = false;
 	config.MergeGlyphCenterV = true;
 
-	io.Fonts->AddFontDefault(&config);
-	io.Fonts->AddFontFromMemoryTTF((void*)s_robotoRegularTtf, sizeof(s_robotoRegularTtf), 17, &config);
-	io.Fonts->AddFontFromMemoryTTF((void*)s_robotoMonoRegularTtf, sizeof(s_robotoMonoRegularTtf), 14.0f, &config);
+	s_fonts["default"] = io.Fonts->AddFontDefault(&config);
+	s_fonts["roboto_regular"] = io.Fonts->AddFontFromMemoryTTF((void*)s_robotoRegularTtf, sizeof(s_robotoRegularTtf), 17, &config);
+	s_fonts["roboto_regular_mono"] = io.Fonts->AddFontFromMemoryTTF((void*)s_robotoMonoRegularTtf, sizeof(s_robotoMonoRegularTtf), 14.0f, &config);
+	s_fonts["roboto_big"] = io.Fonts->AddFontFromMemoryTTF((void*)s_robotoRegularTtf, sizeof(s_robotoRegularTtf), 35, &config);
 	io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
 
 	s_font_texture = std::make_shared<Texture>(
@@ -245,6 +247,7 @@ void GuiSystem::dispose()
 	s_program.reset();
 	s_font_texture.reset();
 
+	s_fonts.clear();
 	ImGuiIO& io = ImGui::GetIO();
 	io.Fonts->TexID = nullptr;
 	ImGui::Shutdown();
@@ -258,7 +261,16 @@ void GuiSystem::frame_begin(std::chrono::duration<float>)
 namespace gui
 {
 
-void Image(std::shared_ptr<ITexture> texture, const ImVec2& _size, const ImVec2& _uv0 /*= ImVec2(0.0f, 0.0f) */, const ImVec2& _uv1 /*= ImVec2(1.0f, 1.0f) */, const ImVec4& _tintCol /*= ImVec4(1.0f, 1.0f, 1.0f, 1.0f) */, const ImVec4& _borderCol /*= ImVec4(0.0f, 0.0f, 0.0f, 0.0f) */)
+	ImFont* GetFont(const std::string& id)
+	{
+		auto it = s_fonts.find(id);
+		if (it != s_fonts.end())
+			return it->second;
+
+		return nullptr;
+	}
+
+	void Image(std::shared_ptr<ITexture> texture, const ImVec2& _size, const ImVec2& _uv0 /*= ImVec2(0.0f, 0.0f) */, const ImVec2& _uv1 /*= ImVec2(1.0f, 1.0f) */, const ImVec4& _tintCol /*= ImVec4(1.0f, 1.0f, 1.0f, 1.0f) */, const ImVec4& _borderCol /*= ImVec4(0.0f, 0.0f, 0.0f, 0.0f) */)
 {
 	s_textures.push_back(texture);
 
@@ -284,7 +296,7 @@ bool ImageButton(std::shared_ptr<ITexture> texture, const ImVec2& _size, const I
 	ImVec2 uv0 = _uv0;
 	ImVec2 uv1 = _uv1;
 
-	if (texture->is_render_target())
+	if (texture && texture->is_render_target())
 	{
 		if (gfx::is_origin_bottom_left())
 		{

@@ -82,7 +82,7 @@ namespace ImGuiDock
 
 		DockSlot render_dock_slot_preview(const ImVec2& mousePos, const ImVec2& cPos, const ImVec2& cSize);
 		void render_container(uint32_t& idgen, Node* container, ImVec2 size, ImVec2 cursor_pos);
-		void render_tab_bar(Node* container, const ImVec2& size, const ImVec2& cursorPos);
+		void render_tab_bar(Node* container, const ImVec2& size, const ImVec2& cursorPos, float tabbar_height);
 		bool get_min_size(Node* container, ImVec2& min);
 		GuiWindow* is_any_window_dragged();
 

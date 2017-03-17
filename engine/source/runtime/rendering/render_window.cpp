@@ -42,9 +42,12 @@ void RenderWindow::frame_end()
 
 void RenderWindow::prepare_surface()
 {
+	if (!gfx::is_initted())
+		return;
+
 	auto size = getSize();
 	if (_is_main)
-	{
+	{		
 		gfx::reset(size.width, size.height, 0);
 	}
 	else

@@ -187,6 +187,7 @@ namespace editor
 		});
 		static const std::string wildcard = "*";
 
+		watch_assets<Material>(relative, wildcard + extensions::material, true, false);
 
 		watch_assets<Texture>(relative, wildcard + extensions::texture, !recompile_assets, true);
 		static const std::array<std::string, 6>  raw_texture_formats = 
@@ -212,7 +213,7 @@ namespace editor
 		}
 		watch_assets<Prefab>(relative, wildcard + extensions::prefab, true, true);
 		watch_assets<Scene>(relative, wildcard + extensions::scene, true, true);
-		watch_assets<Material>(relative, wildcard + extensions::material, true, false);
+		
 	}
 
 	AssetFile::AssetFile(const fs::path& abs, const std::string& n, const std::string& ext, const fs::path& r)
@@ -326,26 +327,6 @@ namespace editor
 		open_project(project_path, false);
 	}
 
-	void ProjectManager::open()
-	{
-		auto engine = core::get_subsystem<runtime::Engine>();
-		const auto& windows = engine->get_windows();
-		auto& main_window = *windows[0];
-
-		main_window.setVisible(false);
-
-		sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-		desktop.width = 500;
-		desktop.height = 300;;
-		auto project_manager_window_shared = std::make_shared<ProjectManagerWindow>(desktop, "Project Manager", sf::Style::Titlebar);
-		project_manager_window_shared->on_closed.connect([&main_window](RenderWindow& window)
-		{
-			main_window.setVisible(true);
-		});
-		engine->register_window(project_manager_window_shared);
-	}
-
-
 	void ProjectManager::load_config()
 	{
 		const fs::path project_config_file = fs::resolve_protocol("editor_data:/config/project.cfg");
@@ -397,7 +378,6 @@ namespace editor
 	bool ProjectManager::initialize()
 	{
 		load_config();
-		open();
 		return true;
 	}
 

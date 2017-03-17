@@ -183,13 +183,11 @@ void save_scene_as()
 
 MainEditorWindow::MainEditorWindow()
 {
-	maximize();
 }
 
 MainEditorWindow::MainEditorWindow(sf::VideoMode mode, const std::string& title, std::uint32_t style /*= sf::Style::Default*/)
 	:GuiWindow(mode, title, style)
 {
-	maximize();
 }
 
 MainEditorWindow::~MainEditorWindow()
@@ -198,17 +196,18 @@ MainEditorWindow::~MainEditorWindow()
 
 void MainEditorWindow::on_gui(std::chrono::duration<float> dt)
 {
-	if (gui::BeginMainMenuBar())
+	if (_show_start_page)
 	{
-		on_menubar();
-
-		float offset = gui::GetWindowHeight();
-		gui::EndMainMenuBar();
-		gui::SetCursorPosY(gui::GetCursorPosY() + offset);
+		gui::PushFont(gui::GetFont("roboto_big"));
+		on_start_page();
+		gui::PopFont();
 	}
-
+	else
+	{	
+		on_menubar();
+		on_toolbar();
+	}
 	
-	on_toolbar();
 	GuiWindow::on_gui(dt);
 }
 
@@ -243,63 +242,70 @@ void MainEditorWindow::on_menubar()
 			create_new_scene();
 		}
 	}
-
-	if (gui::BeginMenu("File"))
+	if (gui::BeginMainMenuBar())
 	{
-		if (gui::MenuItem("New Scene", "Ctrl+N", false, current_project != ""))
-		{
-			create_new_scene();
-		}
-		if (gui::MenuItem("Open Scene", "Ctrl+O", false, current_project != ""))
-		{
-			open_scene();
-		}
-		if (gui::MenuItem("Open Project Manager", "Ctrl+P"))
-		{
-			pm->open();
-		}
 
-		if (gui::MenuItem("Save", "Ctrl+S", false, es->scene != "" && current_project != ""))
+		if (gui::BeginMenu("File"))
 		{
-			save_scene();
-		}
-		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
+			if (gui::MenuItem("New Scene", "Ctrl+N", false, current_project != ""))
+			{
+				create_new_scene();
+			}
+			if (gui::MenuItem("Open Scene", "Ctrl+O", false, current_project != ""))
+			{
+				open_scene();
+			}
+			if (gui::MenuItem("Show Start Page", "Ctrl+P"))
+			{
+				_show_start_page = true;						
+				restore();
+			}
 
-		if (gui::MenuItem("Save As..", "Ctrl+Shift+S", false, ecs->size() > 0 && current_project != ""))
+			if (gui::MenuItem("Save", "Ctrl+S", false, es->scene != "" && current_project != ""))
+			{
+				save_scene();
+			}
+			auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
+
+			if (gui::MenuItem("Save As..", "Ctrl+Shift+S", false, ecs->size() > 0 && current_project != ""))
+			{
+				save_scene_as();
+			}
+
+			gui::EndMenu();
+		}
+		if (gui::BeginMenu("Edit"))
 		{
-			save_scene_as();
-		}
+			if (gui::MenuItem("Undo", "CTRL+Z"))
+			{
 
-		gui::EndMenu();
-	}
-	if (gui::BeginMenu("Edit"))
-	{
-		if (gui::MenuItem("Undo", "CTRL+Z"))
+			}
+			if (gui::MenuItem("Redo", "CTRL+Y", false, false))
+			{
+
+			}
+			gui::Separator();
+			if (gui::MenuItem("Cut", "CTRL+X"))
+			{
+
+			}
+			if (gui::MenuItem("Copy", "CTRL+C"))
+			{
+
+			}
+			if (gui::MenuItem("Paste", "CTRL+V"))
+			{
+
+			}
+			gui::EndMenu();
+		}
+		if (gui::BeginMenu("Windows"))
 		{
-
+			gui::EndMenu();
 		}
-		if (gui::MenuItem("Redo", "CTRL+Y", false, false))
-		{
-
-		}
-		gui::Separator();
-		if (gui::MenuItem("Cut", "CTRL+X"))
-		{
-
-		}
-		if (gui::MenuItem("Copy", "CTRL+C"))
-		{
-
-		}
-		if (gui::MenuItem("Paste", "CTRL+V"))
-		{
-
-		}
-		gui::EndMenu();
-	}
-	if (gui::BeginMenu("Windows"))
-	{
-		gui::EndMenu();
+		float offset = gui::GetWindowHeight();
+		gui::EndMainMenuBar();
+		gui::SetCursorPosY(gui::GetCursorPosY() + offset);
 	}
 }
 
@@ -363,13 +369,13 @@ void MainEditorWindow::on_toolbar()
 	}
 }
 
-ProjectManagerWindow::ProjectManagerWindow(sf::VideoMode mode, const std::string& title, std::uint32_t style /*= sf::Style::Default*/)
-	: GuiWindow(mode, title, style)
+void MainEditorWindow::render_dockspace()
 {
-
+	if (!_show_start_page)
+		GuiWindow::render_dockspace();
 }
 
-void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
+void MainEditorWindow::on_start_page()
 {
 	auto es = core::get_subsystem<editor::EditState>();
 	auto pm = core::get_subsystem<editor::ProjectManager>();
@@ -385,9 +391,9 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 	gui::Separator();
 	gui::BeginGroup();
 	{
-		if (gui::BeginChild("###projects_content", ImVec2(gui::GetContentRegionAvail().x * 0.8f, gui::GetContentRegionAvail().y - gui::GetTextLineHeightWithSpacing()), false, flags))
+		if (gui::BeginChild("projects_content", ImVec2(gui::GetContentRegionAvail().x * 0.7f, gui::GetContentRegionAvail().y - gui::GetTextLineHeightWithSpacing()), false, flags))
 		{
-			
+
 			const auto& rencent_projects = pm->get_options().recent_project_paths;
 			for (auto& path : rencent_projects)
 			{
@@ -395,57 +401,54 @@ void ProjectManagerWindow::on_gui(std::chrono::duration<float> dt)
 				{
 					pm->open_project(path, recompile_assets);
 					es->load_editor_camera();
-					set_main(false);
-					close();
+					maximize();
+					_show_start_page = false;
 				}
 			}
-			gui::EndChild();
 		}
+		gui::EndChild();
 		gui::Checkbox("Recompile Assets", &recompile_assets);
 
 		if (gui::IsItemHoveredRect())
 		{
 			gui::SetTooltip(
-			"Force to recompile all assets when a project is opened.\n"
-			"This will create compiled versions of the raw ones \n"
-			"which will be loaded into the app."
+				"Force to recompile all assets when a project is opened.\n"
+				"This will create compiled versions of the raw ones \n"
+				"which will be loaded into the app."
 			);
 		}
 	}
 	gui::EndGroup();
 
 	gui::SameLine();
-	
+
 	gui::BeginGroup();
 	{
-		if (gui::Button("NEW PROJECT"))
+		if (gui::Button("NEW PROJECT", ImVec2(gui::GetContentRegionAvailWidth(), 0.0f)))
 		{
 			std::string path;
 			if (pick_folder_dialog("", path))
 			{
 				pm->create_project(path);
 				es->load_editor_camera();
-				set_main(false);
-				close();
+				maximize();
+				_show_start_page = false;
 			}
 		}
 
-		if (gui::Button("OPEN OTHER"))
+		if (gui::Button("OPEN OTHER", ImVec2(gui::GetContentRegionAvailWidth(), 0.0f)))
 		{
 			std::string path;
 			if (pick_folder_dialog("", path))
 			{
 				pm->open_project(path, recompile_assets);
 				es->load_editor_camera();
-				set_main(false);
-				close();
+				maximize();
+				_show_start_page = false;
 			}
 		}
 
-		
+
 	}
 	gui::EndGroup();
-	
-
-	GuiWindow::on_gui(dt);
 }

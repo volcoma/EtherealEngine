@@ -286,8 +286,8 @@ namespace ImGuiDock
 	}
 
 	void Dockspace::render_container(uint32_t& idgen, Node* container, ImVec2 size, ImVec2 cursor_pos)
-	{
-		const float tabbar_height = 20;
+	{	
+		const float tabbar_height = ImGui::GetTextLineHeightWithSpacing();
 		ImVec2 calculated_size = size;
 		ImVec2 calculated_cursor_pos = cursor_pos;
 
@@ -303,7 +303,7 @@ namespace ImGuiDock
 
 		if (container->splits[0] == nullptr && container != &node)
 		{
-			render_tab_bar(container, calculated_size, cursor_pos);
+			render_tab_bar(container, calculated_size, cursor_pos, tabbar_height);
 			cursor_pos.y += tabbar_height;
 
 			ImGui::SetCursorPos(cursor_pos);
@@ -640,7 +640,7 @@ namespace ImGuiDock
 		return false;
 	}
 
-	void Dockspace::render_tab_bar(Node* container, const ImVec2& size, const ImVec2& cursor_pos)
+	void Dockspace::render_tab_bar(Node* container, const ImVec2& size, const ImVec2& cursor_pos, float tabbar_height)
 	{
 		ImGui::SetCursorPos(cursor_pos);
 
@@ -669,7 +669,7 @@ namespace ImGuiDock
 				ImGui::PushStyleColor(ImGuiCol_ButtonActive, buttonColorActive);
 				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, buttonColorHovered);
 			}
-			if (ImGui::Button(dockTitle.c_str(), ImVec2(0, 20)))
+			if (ImGui::Button(dockTitle.c_str(), ImVec2(0, tabbar_height)))
 			{
 				container->active_dock = dock;
 			}
