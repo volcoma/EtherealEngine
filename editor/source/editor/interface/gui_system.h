@@ -9,17 +9,17 @@ struct GUIStyle
 {
 	struct HSVSetup
 	{
-		float col_main_hue = 145.0f / 255.0f;
-		float col_main_sat = 255.0f / 255.0f;
-		float col_main_val = 205.0f / 255.0f;
+		float col_main_hue = 0.0f / 255.0f;
+		float col_main_sat = 0.0f / 255.0f;
+		float col_main_val = 80.0f / 255.0f;
 
-		float col_area_hue = 145.0f / 255.0f;
+		float col_area_hue = 0.0f / 255.0f;
 		float col_area_sat = 0.0f / 255.0f;
-		float col_area_val = 65.0f / 255.0f;
+		float col_area_val = 50.0f / 255.0f;
 
-		float col_back_hue = 145.0f / 255.0f;
+		float col_back_hue = 0.0f / 255.0f;
 		float col_back_sat = 0.0f / 255.0f;
-		float col_back_val = 45.0f / 255.0f;
+		float col_back_val = 35.0f / 255.0f;
 
 		float col_text_hue = 0.0f / 255.0f;
 		float col_text_sat = 0.0f / 255.0f;
@@ -47,9 +47,7 @@ struct GuiSystem : public core::Subsystem
 {
 	bool initialize();
 	void dispose();
-	void frame_begin(std::chrono::duration<float>);
-
-	
+	void frame_begin(std::chrono::duration<float>);	
 };
 
 struct ITexture;
