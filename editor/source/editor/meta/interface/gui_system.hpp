@@ -18,7 +18,7 @@ SAVE(GUIStyle::HSVSetup)
 	try_save(ar, cereal::make_nvp("col_text_hue", obj.col_text_hue));
 	try_save(ar, cereal::make_nvp("col_text_sat", obj.col_text_sat));
 	try_save(ar, cereal::make_nvp("col_text_val", obj.col_text_val));
-	try_save(ar, cereal::make_nvp("frame_rounding", obj.frameRounding));
+	try_save(ar, cereal::make_nvp("frame_rounding", obj.frame_rounding));
 }
 
 LOAD(GUIStyle::HSVSetup)
@@ -35,5 +35,5 @@ LOAD(GUIStyle::HSVSetup)
 	try_load(ar, cereal::make_nvp("col_text_hue", obj.col_text_hue));
 	try_load(ar, cereal::make_nvp("col_text_sat", obj.col_text_sat));
 	try_load(ar, cereal::make_nvp("col_text_val", obj.col_text_val));
-	try_load(ar, cereal::make_nvp("frame_rounding", obj.frameRounding));
+	try_load(ar, cereal::make_nvp("frame_rounding", obj.frame_rounding));
 }

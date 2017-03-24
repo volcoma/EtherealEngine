@@ -24,7 +24,7 @@ struct GUIStyle
 		float col_text_hue = 0.0f / 255.0f;
 		float col_text_sat = 0.0f / 255.0f;
 		float col_text_val = 255.0f / 255.0f;
-		float frameRounding = 0.0f;
+		float frame_rounding = 0.0f;
 	};
 
 	void reset_style();
@@ -50,15 +50,15 @@ struct GuiSystem : public core::Subsystem
 	void frame_begin(std::chrono::duration<float>);	
 };
 
-struct ITexture;
+struct Texture;
 namespace gui
 {   
 	using namespace ImGui;
 	static const int drag_button = 0;
 	
 	ImFont* GetFont(const std::string& id);
-	// Helper function for passing ITexture to ImGui::Image.
-	void Image(std::shared_ptr<ITexture> texture
+	// Helper function for passing Texture to ImGui::Image.
+	void Image(std::shared_ptr<Texture> texture
 		, const ImVec2& _size
 		, const ImVec2& _uv0 = ImVec2(0.0f, 0.0f)
 		, const ImVec2& _uv1 = ImVec2(1.0f, 1.0f)
@@ -67,8 +67,8 @@ namespace gui
 	);
 
 
-	// Helper function for passing ITexture to ImGui::ImageButton.
-	bool ImageButton(std::shared_ptr<ITexture> texture
+	// Helper function for passing Texture to ImGui::ImageButton.
+	bool ImageButton(std::shared_ptr<Texture> texture
 		, const ImVec2& _size
 		, const ImVec2& _uv0 = ImVec2(0.0f, 0.0f)
 		, const ImVec2& _uv1 = ImVec2(1.0f, 1.0f)
@@ -76,14 +76,14 @@ namespace gui
 		, const ImVec4& _bgCol = ImVec4(0.0f, 0.0f, 0.0f, 0.0f)
 		, const ImVec4& _tintCol = ImVec4(1.0f, 1.0f, 1.0f, 1.0f)
 	);
-	bool ImageButtonEx(std::shared_ptr<ITexture> texture
+	bool ImageButtonEx(std::shared_ptr<Texture> texture
 		, const ImVec2& size
 		, const char* tooltip = nullptr
 		, bool selected = false
 		, bool enabled = true
 	);
 
-	void ImageWithAspect(std::shared_ptr<ITexture> texture
+	void ImageWithAspect(std::shared_ptr<Texture> texture
 		, const ImVec2& texture_size
 		, const ImVec2& size
 		, const ImVec2& uv0 = ImVec2(0, 0)
@@ -91,7 +91,7 @@ namespace gui
 		, const ImVec4& tint_col = ImVec4(1, 1, 1, 1)
 		, const ImVec4& border_col = ImVec4(0, 0, 0, 0));
 
-	int ImageButtonWithAspectAndLabel(std::shared_ptr<ITexture> texture
+	int ImageButtonWithAspectAndLabel(std::shared_ptr<Texture> texture
 		, const ImVec2& texture_size
 		, const ImVec2& size
 		, const ImVec2& uv0

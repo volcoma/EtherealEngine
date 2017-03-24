@@ -17,12 +17,7 @@ namespace Docks
 
 struct GameDock : public ImGuiDock::Dock
 {
-	GameDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize)
-	{
-		
-		initialize(dtitle, dcloseButton, dminSize, std::bind(&GameDock::render, this, std::placeholders::_1));
-	}
+	GameDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize);
 
-
-	void render(ImVec2 area);
+	void render(const ImVec2& area);
 };

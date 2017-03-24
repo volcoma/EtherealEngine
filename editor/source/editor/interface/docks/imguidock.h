@@ -33,7 +33,7 @@ namespace ImGuiDock
 
 	struct Dock
 	{
-		void initialize(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize, std::function<void(ImVec2)> ddrawFunction)
+		void initialize(const std::string& dtitle, bool dcloseButton, const ImVec2& dminSize, std::function<void(const ImVec2&)> ddrawFunction)
 		{
 			title = dtitle;
 			close_button = dcloseButton;
@@ -58,7 +58,7 @@ namespace ImGuiDock
 		ImVec2 min_size;
 
 		std::string title;
-		std::function<void(ImVec2)> draw_function;
+		std::function<void(const ImVec2&)> draw_function;
 		std::function<bool(void)> on_close_func;
 	};
 

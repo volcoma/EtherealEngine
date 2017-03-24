@@ -412,7 +412,7 @@ void list_dir(std::weak_ptr<editor::AssetFolder>& opened_folder, const float siz
 
 }
 
-void AssetsDock::render(ImVec2 area)
+void AssetsDock::render(const ImVec2& area)
 {
 	auto project = core::get_subsystem<editor::ProjectManager>();
 
@@ -535,4 +535,10 @@ void AssetsDock::render(ImVec2 area)
 		gui::EndChild();
 	}
 
+}
+
+AssetsDock::AssetsDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize)
+{
+
+	initialize(dtitle, dcloseButton, dminSize, std::bind(&AssetsDock::render, this, std::placeholders::_1));
 }

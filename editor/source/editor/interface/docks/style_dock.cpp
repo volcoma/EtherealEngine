@@ -10,7 +10,7 @@ StyleDock::StyleDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSi
 }
 
 
-void StyleDock::render(ImVec2 area)
+void StyleDock::render(const ImVec2& area)
 {
 	auto& style = gui::get_gui_style();
 	auto& setup = style.setup;
@@ -31,7 +31,7 @@ void StyleDock::render(ImVec2 area)
 	auto& col_text_hue = setup.col_text_hue;
 	auto& col_text_sat = setup.col_text_sat;
 	auto& col_text_val = setup.col_text_val;
-	auto& frameRounding = setup.frameRounding;
+	auto& frameRounding = setup.frame_rounding;
 
 	gui::ColorConvertHSVtoRGB(col_main_hue, col_main_sat, col_main_val, rgb.x, rgb.y, rgb.z);
 	if (gui::ColorEdit3("Main", &rgb.x, ImGuiColorEditFlags_HSV))

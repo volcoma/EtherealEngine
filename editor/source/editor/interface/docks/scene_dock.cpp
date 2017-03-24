@@ -90,7 +90,7 @@ void draw_selected_camera(const ImVec2& size)
 				ImGuiWindowFlags_NoResize |
 				ImGuiWindowFlags_AlwaysAutoResize))
 			{
-				gui::Image(surface, bounds);
+				gui::Image(surface->get_attachment(0).texture, bounds);
 			}
 			gui::End();
 
@@ -288,7 +288,7 @@ void handle_camera_movement()
 	}
 }
 
-void SceneDock::render(ImVec2 area)
+void SceneDock::render(const ImVec2& area)
 {
 	auto es = core::get_subsystem<editor::EditState>();
 	auto engine = core::get_subsystem<runtime::Engine>();
@@ -325,7 +325,7 @@ void SceneDock::render(ImVec2 area)
 		auto& render_view = camera_component->get_render_view();
 		const auto& viewport_size = camera.get_viewport_size();
 		const auto surface = render_view.get_output_fbo(viewport_size);
-		gui::Image(surface, size);
+		gui::Image(surface->get_attachment(0).texture, size);
 
 		if (gui::IsItemClicked(1) || gui::IsItemClicked(2))
 		{
@@ -471,4 +471,10 @@ void SceneDock::render(ImVec2 area)
 			}
 		}
 	}
+}
+
+SceneDock::SceneDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize)
+{
+
+	initialize(dtitle, dcloseButton, dminSize, std::bind(&SceneDock::render, this, std::placeholders::_1));
 }

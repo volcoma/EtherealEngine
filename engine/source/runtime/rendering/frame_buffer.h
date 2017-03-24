@@ -13,10 +13,8 @@ struct TextureAttachment
 	uint16_t layer = 0;
 };
 
-struct FrameBuffer : public ITexture
+struct FrameBuffer
 {
-	REFLECTABLE(FrameBuffer, ITexture)
-
 	//-----------------------------------------------------------------------------
 	//  Name : FrameBuffer ()
 	/// <summary>
@@ -331,16 +329,6 @@ struct FrameBuffer : public ITexture
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	inline const std::size_t get_attachment_count() const { return _textures.size(); }
-
-	//-----------------------------------------------------------------------------
-	//  Name : is_render_target (virtual )
-	/// <summary>
-	/// 
-	/// 
-	/// 
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	virtual inline bool is_render_target() const { return true; }
 
 	/// Internal handle
 	gfx::FrameBufferHandle handle = { gfx::invalidHandle };

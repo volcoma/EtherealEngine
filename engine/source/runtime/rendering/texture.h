@@ -2,21 +2,10 @@
 
 #include "graphics/graphics.h"
 #include <memory>
-
 #include "core/common/basetypes.hpp"
-#include "core/reflection/reflection.h"
-struct ITexture
-{
-	REFLECTABLE(ITexture)
-	virtual ~ITexture() = default;
-	virtual inline bool is_render_target() const { return false; }
-	virtual inline uSize get_size() const { return uSize{ 0, 0 }; }
-};
 
-
-struct Texture : public ITexture
+struct Texture
 {
-	REFLECTABLE(Texture, ITexture)
 
 	//-----------------------------------------------------------------------------
 	//  Name : Texture ()

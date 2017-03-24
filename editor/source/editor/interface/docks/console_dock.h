@@ -11,7 +11,7 @@ struct ConsoleDock : public ImGuiDock::Dock
 		initialize(dtitle, dcloseButton, dminSize, std::bind(&ConsoleDock::render, this, std::placeholders::_1));
 	}
 
-	void render(ImVec2 area);
+	void render(const ImVec2& area);
 
 private:
 	std::shared_ptr<ConsoleLog> _console_log;

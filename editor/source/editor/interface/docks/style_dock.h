@@ -6,5 +6,5 @@ struct StyleDock : public ImGuiDock::Dock
 {
 	StyleDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize);
 
-	void render(ImVec2 area);
+	void render(const ImVec2& area);
 };

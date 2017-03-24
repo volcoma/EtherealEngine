@@ -234,16 +234,10 @@ namespace fs
 						found = true;
 						return true;
 					});
-// 					if (!found)
-// 					{
-// 						log_path(path);
-// 						return;
-// 					}
-// 					else
-					{
-						p = pathFilter.first;
-						filter = pathFilter.second;
-					}
+
+					p = pathFilter.first;
+					filter = pathFilter.second;
+			
 				}
 				else
 				{

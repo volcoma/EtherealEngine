@@ -5,7 +5,7 @@
 #include "runtime/rendering/render_pass.h"
 #include "runtime/rendering/camera.h"
 
-void GameDock::render(ImVec2 area)
+void GameDock::render(const ImVec2& area)
 {
 	auto es = core::get_subsystem<editor::EditState>();
 	auto& editor_camera = es->camera;
@@ -29,9 +29,15 @@ void GameDock::render(ImVec2 area)
 			const auto& viewport_size = camera.get_viewport_size();
 			const auto surface = render_view.get_output_fbo(viewport_size);
 
-			gui::Image(surface, size);
+			gui::Image(surface->get_attachment(0).texture, size);
 		}
 
 	});
+}
+
+GameDock::GameDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize)
+{
+
+	initialize(dtitle, dcloseButton, dminSize, std::bind(&GameDock::render, this, std::placeholders::_1));
 }
 

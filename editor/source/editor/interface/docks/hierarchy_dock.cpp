@@ -264,7 +264,7 @@ void draw_entity(runtime::Entity entity)
 	gui::PopID();
 }
 
-void HierarchyDock::render(ImVec2 area)
+void HierarchyDock::render(const ImVec2& area)
 {
 	auto es = core::get_subsystem<editor::EditState>();
 	auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
@@ -381,5 +381,11 @@ void HierarchyDock::render(ImVec2 area)
 			}
 		}
 	}
+}
+
+HierarchyDock::HierarchyDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize)
+{
+
+	initialize(dtitle, dcloseButton, dminSize, std::bind(&HierarchyDock::render, this, std::placeholders::_1));
 }
 

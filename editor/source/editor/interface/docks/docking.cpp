@@ -9,14 +9,17 @@
 #include "assets_dock.h"
 #include "console_dock.h"
 #include "style_dock.h"
+#include "../../console/console_log.h"
+
 bool DockingSystem::initialize()
 {
+	std::shared_ptr<ConsoleLog> console_log = std::make_shared<ConsoleLog>();
 	_docks.emplace_back(std::make_unique<SceneDock>("Scene", true, ImVec2(200.0f, 200.0f)));
 	_docks.emplace_back(std::make_unique<GameDock>("Game", true, ImVec2(200.0f, 200.0f)));
 	_docks.emplace_back(std::make_unique<HierarchyDock>("Hierarchy", true, ImVec2(300.0f, 200.0f)));
 	_docks.emplace_back(std::make_unique<InspectorDock>("Inspector", true, ImVec2(300.0f, 200.0f)));
 	_docks.emplace_back(std::make_unique<AssetsDock>("Assets", true, ImVec2(200.0f, 200.0f)));
-	_docks.emplace_back(std::make_unique<ConsoleDock>("Console", true, ImVec2(200.0f, 200.0f), _console_log));
+	_docks.emplace_back(std::make_unique<ConsoleDock>("Console", true, ImVec2(200.0f, 200.0f), console_log));
 	_docks.emplace_back(std::make_unique<StyleDock>("Style", true, ImVec2(300.0f, 200.0f)));
 
 	auto& scene = _docks[0];
@@ -40,13 +43,13 @@ bool DockingSystem::initialize()
 	dockspace.dock_with(style.get(), assets.get(), ImGuiDock::DockSlot::Right, 300, true);
 
 	auto logger = logging::get(APPLOG);
-	logger->add_sink(_console_log);
+	logger->add_sink(console_log);
 
 	std::function<void()> log_version = []()
 	{
 		APPLOG_INFO("Version 1.0");
 	};
-	_console_log->register_command(
+	console_log->register_command(
 		"version",
 		"Returns the current version of the Editor.",
 		{},
@@ -60,5 +63,4 @@ bool DockingSystem::initialize()
 void DockingSystem::dispose()
 {
 	_docks.clear();
-	_console_log.reset();
 }

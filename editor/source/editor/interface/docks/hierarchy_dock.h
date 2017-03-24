@@ -4,10 +4,7 @@
 
 struct HierarchyDock : public ImGuiDock::Dock
 {
-	HierarchyDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize)
-	{	
-		initialize(dtitle, dcloseButton, dminSize, std::bind(&HierarchyDock::render, this, std::placeholders::_1));
-	}
+	HierarchyDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize);
 
-	void render(ImVec2 area);
+	void render(const ImVec2& area);
 };

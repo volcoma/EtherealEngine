@@ -41,7 +41,7 @@ static UIContexts s_contexts;
 static gfx::VertexDecl				s_decl;
 static std::unique_ptr<Program>		s_program;
 static AssetHandle<Texture>			s_font_texture;
-static std::vector<std::shared_ptr<ITexture>> s_textures;
+static std::vector<std::shared_ptr<Texture>> s_textures;
 static std::unordered_map<std::string, ImFont*> s_fonts;
 
 
@@ -90,18 +90,13 @@ void renderFunc(ImDrawData *_drawData)
 					;
 
 				Texture* texture = s_font_texture.get();
-				FrameBuffer* fbo = nullptr;
 				Program* program = s_program.get();
 				if (!program)
 					return;
 
 				if (nullptr != cmd->TextureId)
 				{
-					ITexture* bind = (ITexture*)cmd->TextureId;
-					if (rttr::type::get(*bind) == rttr::type::get<Texture>())
-						texture = (Texture*)bind;
-					else if (rttr::type::get(*bind) == rttr::type::get<FrameBuffer>())
-						fbo = (FrameBuffer*)bind;
+					texture = (Texture*)cmd->TextureId;
 				}
 
 				const std::uint16_t xx = std::uint16_t(std::max(cmd->ClipRect.x, 0.0f));
@@ -111,12 +106,7 @@ void renderFunc(ImDrawData *_drawData)
 					, std::uint16_t(std::min(cmd->ClipRect.w, 65535.0f) - yy)
 				);
 
-
-				if (fbo)
-					program->set_texture(0, "s_tex", fbo);
-				else
-					program->set_texture(0, "s_tex", texture);
-
+				program->set_texture(0, "s_tex", texture);
 
 				gfx::setVertexBuffer(&tvb, 0, numVertices);
 				gfx::setIndexBuffer(&tib, offset, cmd->ElemCount);
@@ -270,14 +260,14 @@ namespace gui
 		return nullptr;
 	}
 
-	void Image(std::shared_ptr<ITexture> texture, const ImVec2& _size, const ImVec2& _uv0 /*= ImVec2(0.0f, 0.0f) */, const ImVec2& _uv1 /*= ImVec2(1.0f, 1.0f) */, const ImVec4& _tintCol /*= ImVec4(1.0f, 1.0f, 1.0f, 1.0f) */, const ImVec4& _borderCol /*= ImVec4(0.0f, 0.0f, 0.0f, 0.0f) */)
+	void Image(std::shared_ptr<Texture> texture, const ImVec2& _size, const ImVec2& _uv0 /*= ImVec2(0.0f, 0.0f) */, const ImVec2& _uv1 /*= ImVec2(1.0f, 1.0f) */, const ImVec4& _tintCol /*= ImVec4(1.0f, 1.0f, 1.0f, 1.0f) */, const ImVec4& _borderCol /*= ImVec4(0.0f, 0.0f, 0.0f, 0.0f) */)
 {
 	s_textures.push_back(texture);
 
 	ImVec2 uv0 = _uv0;
 	ImVec2 uv1 = _uv1;
 
-	if (texture->is_render_target())
+	if (texture && texture->is_render_target())
 	{
 		if (gfx::is_origin_bottom_left())
 		{
@@ -289,7 +279,7 @@ namespace gui
 	ImGui::Image(texture.get(), _size, uv0, uv1, _tintCol, _borderCol);
 }
 
-bool ImageButton(std::shared_ptr<ITexture> texture, const ImVec2& _size, const ImVec2& _uv0 /*= ImVec2(0.0f, 0.0f) */, const ImVec2& _uv1 /*= ImVec2(1.0f, 1.0f) */, int _framePadding /*= -1 */, const ImVec4& _bgCol /*= ImVec4(0.0f, 0.0f, 0.0f, 0.0f) */, const ImVec4& _tintCol /*= ImVec4(1.0f, 1.0f, 1.0f, 1.0f) */)
+bool ImageButton(std::shared_ptr<Texture> texture, const ImVec2& _size, const ImVec2& _uv0 /*= ImVec2(0.0f, 0.0f) */, const ImVec2& _uv1 /*= ImVec2(1.0f, 1.0f) */, int _framePadding /*= -1 */, const ImVec4& _bgCol /*= ImVec4(0.0f, 0.0f, 0.0f, 0.0f) */, const ImVec4& _tintCol /*= ImVec4(1.0f, 1.0f, 1.0f, 1.0f) */)
 {
 	s_textures.push_back(texture);
 
@@ -308,19 +298,19 @@ bool ImageButton(std::shared_ptr<ITexture> texture, const ImVec2& _size, const I
 	return ImGui::ImageButton(texture.get(), _size, uv0, uv1, _framePadding, _bgCol, _tintCol);
 }
 
-bool ImageButtonEx(std::shared_ptr<ITexture> texture, const ImVec2& size, const char* tooltip, bool selected, bool enabled)
+bool ImageButtonEx(std::shared_ptr<Texture> texture, const ImVec2& size, const char* tooltip, bool selected, bool enabled)
 {
 	s_textures.push_back(texture);
 	return ImGui::ImageButtonEx(texture.get(), size, tooltip, selected, enabled);
 }
 
-void ImageWithAspect(std::shared_ptr<ITexture> texture, const ImVec2& texture_size, const ImVec2& size, const ImVec2& uv0, const ImVec2& uv1, const ImVec4& tint_col, const ImVec4& border_col)
+void ImageWithAspect(std::shared_ptr<Texture> texture, const ImVec2& texture_size, const ImVec2& size, const ImVec2& uv0, const ImVec2& uv1, const ImVec4& tint_col, const ImVec4& border_col)
 {
 	s_textures.push_back(texture);
 	return ImGui::ImageWithAspect(texture.get(), texture_size, size, uv0, uv1, tint_col, border_col);
 }
 
-int ImageButtonWithAspectAndLabel(std::shared_ptr<ITexture> texture, const ImVec2& texture_size, const ImVec2& size, const ImVec2& uv0, const ImVec2& uv1, bool selected, bool* edit_label, const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags /*= 0*/)
+int ImageButtonWithAspectAndLabel(std::shared_ptr<Texture> texture, const ImVec2& texture_size, const ImVec2& size, const ImVec2& uv0, const ImVec2& uv1, bool selected, bool* edit_label, const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags /*= 0*/)
 {
 	s_textures.push_back(texture);
 	return ImGui::ImageButtonWithAspectAndLabel(texture.get(), texture_size, size, uv0, uv1, selected, edit_label, label, buf, buf_size, flags);
@@ -345,7 +335,7 @@ void GUIStyle::set_style_colors(const HSVSetup& _setup)
 	ImVec4 col_main = ImColor::HSV(setup.col_main_hue, setup.col_main_sat, setup.col_main_val);
 	ImVec4 col_back = ImColor::HSV(setup.col_back_hue, setup.col_back_sat, setup.col_back_val);
 	ImVec4 col_area = ImColor::HSV(setup.col_area_hue, setup.col_area_sat, setup.col_area_val);
-	float rounding = setup.frameRounding;
+	float rounding = setup.frame_rounding;
 
 	ImGuiStyle& style = gui::GetStyle();
 	style.FrameRounding = rounding;
