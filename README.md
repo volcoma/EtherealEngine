@@ -1,4 +1,4 @@
-|## INFO
+## INFO
 C++ Game Engine
 
 WYSIWYG Editor
