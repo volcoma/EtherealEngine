@@ -135,10 +135,6 @@ int list_item(Wrapper& entry,
 			}
 			edit_state.unselect();
 		}
-		// 		if (input.is_key_pressed(sf::Keyboard::R))
-		// 		{
-		// 			fs::watcher::touch(absolute);
-		// 		}
 	}
 
 	bool loading = !entry;
@@ -231,7 +227,7 @@ void list_dir(std::weak_ptr<editor::AssetFolder>& opened_folder, const float siz
 	if (opened_folder.expired())
 		return;
 
-	editor::AssetFolder* dir = opened_folder.lock().get();
+	auto dir = opened_folder.lock().get();
 	
 	auto es = core::get_subsystem<editor::EditState>();
 	auto am = core::get_subsystem<runtime::AssetManager>();

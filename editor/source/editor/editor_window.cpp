@@ -198,7 +198,7 @@ void MainEditorWindow::on_gui(std::chrono::duration<float> dt)
 {
 	if (_show_start_page)
 	{
-		gui::PushFont(gui::GetFont("roboto_big"));
+		gui::PushFont(gui::GetFont("consolas_big"));
 		on_start_page();
 		gui::PopFont();
 	}
@@ -259,6 +259,10 @@ void MainEditorWindow::on_menubar()
 			{
 				_show_start_page = true;						
 				restore();
+				auto& io = gui::GetIO();
+				io.MouseDown[0] = false;
+				io.MouseDown[1] = false;
+				io.MouseDown[2] = false;
 			}
 
 			if (gui::MenuItem("Save", "Ctrl+S", false, es->scene != "" && current_project != ""))
@@ -387,6 +391,7 @@ void MainEditorWindow::on_start_page()
 		ImGuiWindowFlags_NoSavedSettings;
 
 	static bool recompile_assets = true;
+	gui::AlignFirstTextHeightToWidgets();
 	gui::Text("Recent Projects");
 	gui::Separator();
 	gui::BeginGroup();

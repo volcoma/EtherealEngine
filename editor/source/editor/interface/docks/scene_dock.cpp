@@ -27,18 +27,25 @@ void show_statistics(const unsigned int frameRate)
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_AlwaysAutoResize);
 
+	gui::AlignFirstTextHeightToWidgets();
 	gui::Text("FPS  : %u", frameRate);
 	gui::Separator();
+	gui::AlignFirstTextHeightToWidgets();
 	gui::Text("MSPF : %.3f ms ", 1000.0f / float(frameRate));
 	gui::Separator();
 
 	auto stats = gfx::getStats();
 	double freq = double(stats->cpuTimerFreq);
 	double toMs = 1000.0 / freq;
+	gui::AlignFirstTextHeightToWidgets();
 	gui::Text("Wait Render : %fms", stats->waitRender*toMs);
+	gui::AlignFirstTextHeightToWidgets();
 	gui::Text("Wait Submit : %fms", stats->waitSubmit*toMs);
+	gui::AlignFirstTextHeightToWidgets();
 	gui::Text("Draw calls: %u", stats->numDraw);
+	gui::AlignFirstTextHeightToWidgets();
 	gui::Text("Compute calls: %u", stats->numCompute);
+	gui::AlignFirstTextHeightToWidgets();
 	gui::Text("Render passes: %u", RenderPass::get_pass());
 	static bool more_stats = false;
 	if (gui::Checkbox("More Stats", &more_stats))

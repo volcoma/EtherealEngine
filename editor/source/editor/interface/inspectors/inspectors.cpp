@@ -156,6 +156,7 @@ bool inspect_enum(rttr::variant& var, rttr::enumeration& data, bool read_only)
 	if (read_only)
 	{
 		int listbox_item_current = var.to_int();
+		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(cstrings[listbox_item_current]);
 	}
 	else

@@ -1,6 +1,7 @@
 #include "gui_system.h"
 #include "embedded/roboto_regular.ttf.h"
 #include "embedded/robotomono_regular.ttf.h"
+#include "embedded/consolas.ttf.h"
 #include "embedded/vs_ocornut_imgui.bin.h"
 #include "embedded/fs_ocornut_imgui.bin.h"
 
@@ -206,6 +207,10 @@ bool GuiSystem::initialize()
 	s_fonts["roboto_regular"] = io.Fonts->AddFontFromMemoryTTF((void*)s_robotoRegularTtf, sizeof(s_robotoRegularTtf), 17, &config);
 	s_fonts["roboto_regular_mono"] = io.Fonts->AddFontFromMemoryTTF((void*)s_robotoMonoRegularTtf, sizeof(s_robotoMonoRegularTtf), 14.0f, &config);
 	s_fonts["roboto_big"] = io.Fonts->AddFontFromMemoryTTF((void*)s_robotoRegularTtf, sizeof(s_robotoRegularTtf), 35, &config);
+	s_fonts["consolas"] = io.Fonts->AddFontFromMemoryTTF((void*)s_consolas_embedded, sizeof(s_consolas_embedded), 17, &config);
+	s_fonts["consolas_big"] = io.Fonts->AddFontFromMemoryTTF((void*)s_consolas_embedded, sizeof(s_consolas_embedded), 35, &config);
+
+	
 	io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
 
 	s_font_texture = std::make_shared<Texture>(
@@ -220,10 +225,11 @@ bool GuiSystem::initialize()
 
 	// Store our identifier
 	io.Fonts->SetTexID(s_font_texture.get());
-
+	io.FontAllowUserScaling = true;
 	s_gui_style.load_style();
 
 	runtime::on_frame_begin.connect(this, &GuiSystem::frame_begin);
+
 
 	return true;
 }

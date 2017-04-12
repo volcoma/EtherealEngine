@@ -24,9 +24,10 @@ void ShaderCompiler::compile(const fs::path& absolute_key)
 	fs::path dir = absolute_key.parent_path();
 	fs::path output = dir / fs::path(file + extensions::shader);
 
-	std::array<gfx::RendererType::Enum, 3> supported =
+	std::array<gfx::RendererType::Enum, 4> supported =
 	{
 		gfx::RendererType::Direct3D11,
+		gfx::RendererType::Direct3D12,
 		gfx::RendererType::OpenGL,
 		gfx::RendererType::Metal
 	};
@@ -100,7 +101,7 @@ void ShaderCompiler::compile(const fs::path& absolute_key)
 		int64_t sz;
 		std::string err;
 		int result = 0;
-		if (platform != gfx::RendererType::Direct3D11)
+		if (platform > gfx::RendererType::Direct3D12)
 		{
 			//glsl shader compilation is not thread safe-
 			static std::mutex mtx;

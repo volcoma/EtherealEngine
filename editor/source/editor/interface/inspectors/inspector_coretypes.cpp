@@ -7,6 +7,7 @@ bool Inspector_Bool::inspect(rttr::variant& var, bool readOnly, std::function<rt
 
 	if (readOnly)
 	{
+		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(data ? "true" : "false");
 	}
 	else
@@ -27,6 +28,7 @@ bool Inspector_Float::inspect(rttr::variant& var, bool readOnly, std::function<r
 	auto data = var.to_float();
 	if (readOnly)
 	{
+		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(std::to_string(data).c_str());
 	}
 	else
@@ -82,6 +84,7 @@ bool Inspector_Double::inspect(rttr::variant& var, bool readOnly, std::function<
 	auto data = static_cast<float>(var.to_double());
 	if (readOnly)
 	{
+		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(std::to_string(data).c_str());
 	}
 	else
@@ -134,6 +137,7 @@ bool Inspector_Int8::inspect(rttr::variant& var, bool readOnly, std::function<rt
 	auto data = static_cast<int>(var.to_int8());
 	if (readOnly)
 	{
+		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(std::to_string(data).c_str());
 	}
 	else
@@ -177,6 +181,7 @@ bool Inspector_Int16::inspect(rttr::variant& var, bool readOnly, std::function<r
 	auto data = static_cast<int>(var.to_int16());
 	if (readOnly)
 	{
+		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(std::to_string(data).c_str());
 	}
 	else
@@ -220,6 +225,7 @@ bool Inspector_Int32::inspect(rttr::variant& var, bool readOnly, std::function<r
 	auto data = static_cast<int>(var.to_int32());
 	if (readOnly)
 	{
+		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(std::to_string(data).c_str());
 	}
 	else
@@ -263,6 +269,7 @@ bool Inspector_Int64::inspect(rttr::variant& var, bool readOnly, std::function<r
 	auto data = static_cast<int>(var.to_int64());
 	if (readOnly)
 	{
+		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(std::to_string(data).c_str());
 	}
 	else
@@ -307,6 +314,7 @@ bool Inspector_UInt8::inspect(rttr::variant& var, bool readOnly, std::function<r
 	auto data = static_cast<int>(var.to_uint8());
 	if (readOnly)
 	{
+		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(std::to_string(data).c_str());
 	}
 	else
@@ -350,6 +358,7 @@ bool Inspector_UInt16::inspect(rttr::variant& var, bool readOnly, std::function<
 	auto data = static_cast<int>(var.to_uint16());
 	if (readOnly)
 	{
+		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(std::to_string(data).c_str());
 	}
 	else
@@ -393,6 +402,7 @@ bool Inspector_UInt32::inspect(rttr::variant& var, bool readOnly, std::function<
 	auto data = static_cast<int>(var.to_uint32());
 	if (readOnly)
 	{
+		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(std::to_string(data).c_str());
 	}
 	else
@@ -436,6 +446,7 @@ bool Inspector_UInt64::inspect(rttr::variant& var, bool readOnly, std::function<
 	auto data = static_cast<int>(var.to_uint64());
 	if (readOnly)
 	{
+		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(std::to_string(data).c_str());
 	}
 	else
@@ -480,6 +491,7 @@ bool Inspector_String::inspect(rttr::variant& var, bool readOnly, std::function<
 	auto data = var.get_value<std::string>();
 	if (readOnly)
 	{
+		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(data.c_str());
 	}
 	else

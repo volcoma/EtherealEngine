@@ -57,6 +57,23 @@ void handle_sfml_event(sf::Event event)
 	}
 }
 
+sf::Window::Cursor map_cursor(ImGuiMouseCursor cursor)
+{
+	static std::map<ImGuiMouseCursor_, sf::Window::Cursor> cursor_map = {
+		{ ImGuiMouseCursor_Arrow, sf::Window::Arrow },
+		{ ImGuiMouseCursor_Move, sf::Window::Hand },
+		{ ImGuiMouseCursor_NotAllowed, sf::Window::NotAllowed },
+		{ ImGuiMouseCursor_Help, sf::Window::Help },
+		{ ImGuiMouseCursor_TextInput, sf::Window::Text },
+		{ ImGuiMouseCursor_ResizeNS, sf::Window::SizeVertical },
+		{ ImGuiMouseCursor_ResizeEW, sf::Window::SizeHorizontal },
+		{ ImGuiMouseCursor_ResizeNESW, sf::Window::SizeBottomLeftTopRight },
+		{ ImGuiMouseCursor_ResizeNWSE, sf::Window::SizeTopLeftBottomRight }
+	};
+
+	return cursor_map[static_cast<ImGuiMouseCursor_>(cursor)];
+}
+
 void imgui_frame_update(RenderWindow& window, std::chrono::duration<float> dt, const uSize& viewSize)
 {
 	auto& io = gui::GetIO();
@@ -73,40 +90,9 @@ void imgui_frame_update(RenderWindow& window, std::chrono::duration<float> dt, c
 	rect.right = window_size.width;
 	rect.bottom = window_size.height;
 	auto mouse_pos = sf::Mouse::getPosition(window);
+
 	if (window.hasFocus() && rect.containsPoint(mouse_pos))
-	{
-		switch (gui::GetMouseCursor())
-		{
-		case ImGuiMouseCursor_Arrow:
-			window.setMouseCursor(sf::Window::Arrow);
-			break;
-		case ImGuiMouseCursor_Move:
-			window.setMouseCursor(sf::Window::Hand);
-			break;
-		case ImGuiMouseCursor_NotAllowed:
-			window.setMouseCursor(sf::Window::NotAllowed);
-			break;
-		case ImGuiMouseCursor_Help:
-			window.setMouseCursor(sf::Window::Help);
-			break;
-		case ImGuiMouseCursor_TextInput:			// When hovering over InputText, etc.
-			window.setMouseCursor(sf::Window::Text);
-			break;
-		case ImGuiMouseCursor_ResizeNS:				// Unused
-			window.setMouseCursor(sf::Window::SizeVertical);
-			break;
-		case ImGuiMouseCursor_ResizeEW:				// When hovering over a column
-			window.setMouseCursor(sf::Window::SizeHorizontal);
-			break;
-		case ImGuiMouseCursor_ResizeNESW:			// Unused
-			window.setMouseCursor(sf::Window::SizeBottomLeftTopRight);
-			break;
-		case ImGuiMouseCursor_ResizeNWSE:			// When hovering over the bottom-right corner of a window
-			window.setMouseCursor(sf::Window::SizeTopLeftBottomRight);
-			break;
-		default: break;
-		}
-	}
+		window.setMouseCursor(map_cursor(gui::GetMouseCursor()));
 
 	// Start the frame	
 	gui::NewFrame();
@@ -151,6 +137,7 @@ void imgui_set_context(ImGuiContext* pContext)
 		std::memcpy(&pContext->IO.KeyMap, &prevContext->IO.KeyMap, sizeof(prevContext->IO.KeyMap));
 		std::memcpy(&pContext->MouseCursorData, &prevContext->MouseCursorData, sizeof(pContext->MouseCursorData));
 		pContext->IO.IniFilename = prevContext->IO.IniFilename;
+		pContext->IO.FontAllowUserScaling = prevContext->IO.FontAllowUserScaling;
 		pContext->IO.RenderDrawListsFn = prevContext->IO.RenderDrawListsFn;
 		pContext->Initialized = prevContext->Initialized;
 	}
@@ -206,6 +193,7 @@ void GuiWindow::frame_render(std::chrono::duration<float> dt)
 	on_gui(dt);
 
 	render_dockspace();
+
 }
 
 #include "../edit_state.h"

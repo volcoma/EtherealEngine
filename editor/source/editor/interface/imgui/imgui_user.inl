@@ -235,10 +235,14 @@ namespace ImGui
 
 			auto pos = GetCursorScreenPos();
 			PushItemWidth(size.x);
-			LabelTextEx("", label);
-// 			PushTextWrapPos(pos.x + size.x);
-// 			Text(label);
-// 			PopTextWrapPos();
+//			LabelTextEx("", label);
+			if (!(selected && edit))
+			{
+				PushTextWrapPos(pos.x + size.x * 0.9f);
+				Text(label);
+				PopTextWrapPos();
+			}
+			
 			PopItemWidth();
 			label_clicked = IsItemClicked(0);
 			if (!edit)

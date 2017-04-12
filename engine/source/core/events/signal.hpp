@@ -4,7 +4,6 @@
 
 #include <vector>
 #include <utility>
-#include <mutex>
 #include <algorithm>
 
 template <class Slot>
