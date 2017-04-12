@@ -9,6 +9,7 @@ WIP - not production ready in any way
 ## FEATURES
 Check out the Projects tab for more information of upcomming features.
 
+
 ## ASSETS
 Supported texture formats: png, tga, dds, ktx, pvr
 
@@ -20,19 +21,25 @@ Any suggestions and help will be appreciated.
 ## BUILD
 VS2015 solution is included in the repo. Just build it.
 
+
 ## PLATFORMS
 It is written in a cross-platform manner.
 
 Platform | Supported
---- | --- | ---
-Windows | yes |
-Linux | needs some work |
+-------- | ---------
+Windows  | yes
+Linux | needs some work 
 
 ## CODEBASE
 c++14/c++17 Using the latest and greates features of the language.
 
 ## CODE STYLE
 ```c++
+#include "some_header.h"
+#include "some_other_header_impl.hpp"
+
+namespace nsp
+{
 class SomeClass
 {
 public:
@@ -43,6 +50,15 @@ public:
   /// </summary>
   //-----------------------------------------------------------------------------
   void some_method();
+  
+  //-----------------------------------------------------------------------------
+  //  Name : some_templated_method ()
+  /// <summary>
+  /// This is a method comment description.
+  /// </summary>
+  //-----------------------------------------------------------------------------
+  template<typename T>
+  void some_templated_method();
 public:
   /// this is a member comment
   int some_public_member = 0;
@@ -50,6 +66,12 @@ public:
 private:
   /// this is a member comment
   int _some_private_member = 0;
+}
+
+template<typename T>
+inline void SomeClass::some_templated_method()
+{
+// If the class is fully templated it is acceptable to put this inside the class
 }
 ```
 
