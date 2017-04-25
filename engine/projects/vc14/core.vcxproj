@@ -19,9 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\source\core\common\any.hpp" />
     <ClInclude Include="..\..\source\core\common\assert.hpp" />
     <ClInclude Include="..\..\source\core\common\basetypes.hpp" />
     <ClInclude Include="..\..\source\core\common\common.h" />
+    <ClInclude Include="..\..\source\core\common\experimental\signal_dispatcher.hpp" />
     <ClInclude Include="..\..\source\core\common\handle.hpp" />
     <ClInclude Include="..\..\source\core\common\handle_object_set.hpp" />
     <ClInclude Include="..\..\source\core\common\handle_set.hpp" />

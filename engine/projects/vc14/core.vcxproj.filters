@@ -166,6 +166,9 @@
     <Filter Include="Source Files\subsystem">
       <UniqueIdentifier>{9e636e3c-0ad8-436c-989d-93b13cd57df6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\common\experimental">
+      <UniqueIdentifier>{aafbfad0-2f57-4bbc-9d68-af97f54f65f7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\core\events\delegate.hpp">
@@ -1328,6 +1331,12 @@
     </ClInclude>
     <ClInclude Include="..\..\source\core\common\spimpl.hpp">
       <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\common\any.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\common\experimental\signal_dispatcher.hpp">
+      <Filter>Source Files\common\experimental</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
