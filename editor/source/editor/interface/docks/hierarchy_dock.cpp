@@ -187,6 +187,7 @@ void draw_entity(runtime::Entity entity)
 
 
 	auto pos = gui::GetCursorScreenPos();
+	gui::AlignFirstTextHeightToWidgets();
 	bool opened = gui::TreeNodeEx(name.c_str(), flags);
 
 	if (edit_label && is_selected)

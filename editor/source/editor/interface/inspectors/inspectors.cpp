@@ -69,6 +69,7 @@ bool inspect_var(rttr::variant& var, bool read_only, std::function<rttr::variant
 			bool open = true;
 			if (details)
 			{
+				gui::AlignFirstTextHeightToWidgets();
 				open = gui::TreeNode("details");
 			}
 

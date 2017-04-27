@@ -2,10 +2,6 @@
 #define DELEGATE_HPP
 #pragma once
 
-// #include <functional>
-// template<typename T>
-// using delegate = std::function<T>;
-
 #include <memory>
 template <typename T> class delegate;
 template<class R, class ...A>

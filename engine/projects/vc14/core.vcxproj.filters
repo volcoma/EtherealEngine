@@ -166,9 +166,6 @@
     <Filter Include="Source Files\subsystem">
       <UniqueIdentifier>{9e636e3c-0ad8-436c-989d-93b13cd57df6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\common\experimental">
-      <UniqueIdentifier>{aafbfad0-2f57-4bbc-9d68-af97f54f65f7}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\core\events\delegate.hpp">
@@ -513,9 +510,6 @@
     <ClInclude Include="..\..\source\core\random\random.h">
       <Filter>Source Files\random</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\common\basetypes.hpp">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\core\platform_config.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -638,9 +632,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\core\logging\logging.h">
       <Filter>Source Files\logging</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\common\utils.h">
-      <Filter>Source Files\common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\core\serialization\cereal\access.hpp">
       <Filter>Source Files\serialization\cereal</Filter>
@@ -1275,30 +1266,6 @@
     <ClInclude Include="..\..\source\core\math\glm\gtc\matrix_transform_ex.hpp">
       <Filter>Source Files\math\glm\gtc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\common\spin.hpp">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\common\tuple.hpp">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\common\type_traits.hpp">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\common\variant.hpp">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\common\handle.hpp">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\common\handle_object_set.hpp">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\common\handle_set.hpp">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\common\assert.hpp">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\core\memory\checked_delete.h">
       <Filter>Source Files\memory</Filter>
     </ClInclude>
@@ -1310,15 +1277,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\core\memory\tracey.hpp">
       <Filter>Source Files\memory</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\common\common.h">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\common\string.h">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\common\pathname_tag_tree.h">
-      <Filter>Source Files\common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\core\math\bsphere.h">
       <Filter>Source Files\math</Filter>
@@ -1332,11 +1290,65 @@
     <ClInclude Include="..\..\source\core\common\spimpl.hpp">
       <Filter>Source Files\common</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\core\common\spin.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\common\string.h">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\common\tuple.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\common\type_traits.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\common\utils.h">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\common\variant.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\common\variant_cast.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\common\variant_io.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\common\variant_visitor.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\source\core\common\any.hpp">
       <Filter>Source Files\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\common\experimental\signal_dispatcher.hpp">
-      <Filter>Source Files\common\experimental</Filter>
+    <ClInclude Include="..\..\source\core\common\assert.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\common\basetypes.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\common\common.h">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\common\handle.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\common\handle_object_set.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\common\handle_set.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\common\pathname_tag_tree.h">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\common\recursive_wrapper.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\common\function_traits.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\events\binder.hpp">
+      <Filter>Source Files\events</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1457,20 +1469,11 @@
     <ClCompile Include="..\..\source\core\console\console.cpp">
       <Filter>Source Files\console</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\core\common\handle_set.cpp">
-      <Filter>Source Files\common</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\core\memory\memory_pool.cpp">
       <Filter>Source Files\memory</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\core\memory\tracey.cpp">
       <Filter>Source Files\memory</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\core\common\string.cpp">
-      <Filter>Source Files\common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\core\common\pathname_tag_tree.cpp">
-      <Filter>Source Files\common</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\core\math\bsphere.cpp">
       <Filter>Source Files\math</Filter>
@@ -1480,6 +1483,15 @@
     </ClCompile>
     <ClCompile Include="..\..\source\core\subsystem\simulation.cpp">
       <Filter>Source Files\subsystem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\common\string.cpp">
+      <Filter>Source Files\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\common\handle_set.cpp">
+      <Filter>Source Files\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\common\pathname_tag_tree.cpp">
+      <Filter>Source Files\common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
