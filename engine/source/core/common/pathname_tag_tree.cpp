@@ -59,7 +59,7 @@ bool PathNameTagTree::set(std::string pathname, size_t tag)
 			n->_tag = 0;
 		}
 
-		n = &n->_nodes[name];
+		n = n->_nodes[name].get_pointer();
 	}
 	else
 	{
@@ -74,7 +74,7 @@ bool PathNameTagTree::set(std::string pathname, size_t tag)
 
 			back_trace.push_back(n);
 
-			n = &n->_nodes[name];
+			n = n->_nodes[name].get_pointer();
 		}
 	}
 
@@ -202,7 +202,7 @@ PathNameTagTree::node* PathNameTagTree::get_node(std::string& pathname, bool& en
 				return nullptr;
 			}
 
-			n = &it_node->second;
+			n = it_node->second.get_pointer();
 
 			if (i == std::string::npos)
 			{
@@ -273,7 +273,7 @@ bool PathNameTagTree::iterator::step()
 }
 bool PathNameTagTree::iterator::step_in()
 {
-	return do_step(&_steps.back().first->second);
+	return do_step(_steps.back().first->second.get_pointer());
 }
 
 bool PathNameTagTree::iterator::step_out()
@@ -326,7 +326,7 @@ bool PathNameTagTree::iterator::do_step(node* n)
 
 const bool PathNameTagTree::iterator::is_leaf()
 {
-	return _steps.back().first->second._nodes.empty();
+	return _steps.back().first->second.get()._nodes.empty();
 }
 const std::string& PathNameTagTree::iterator::name()
 {
@@ -334,5 +334,5 @@ const std::string& PathNameTagTree::iterator::name()
 }
 const size_t& PathNameTagTree::iterator::tag()
 {
-	return _steps.back().first->second._tag;
+	return _steps.back().first->second.get()._tag;
 }

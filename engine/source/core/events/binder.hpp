@@ -1,3 +1,6 @@
+#ifndef _BINDER_HPP_
+#define _BINDER_HPP_
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -5,13 +8,12 @@
 #include <functional>
 #include <tuple>
 #include <cassert>
-#include <typeindex>
 #include <algorithm>
 #include <type_traits>
 #include "../common/any.hpp"
 #include "../common/optional.hpp"
 #include "../common/function_traits.hpp"
-#include "../events/delegate.hpp"
+#include "delegate.hpp"
 
 using any_t = nonstd::any;
 #define any_cast_t nonstd::any_cast
@@ -95,69 +97,82 @@ template<typename T>
 bool implicit_cast(const any_t& operand, T& result)
 {
 	const auto& from = operand.type();
-	const auto& to = typeid(T);
+	const auto& to = rtti::type_id<T>();
 
 	if (from == to)
 	{
 		result = any_cast_t<T>(operand);
 		return true;
 	}
-	else if (from == typeid(std::int8_t) && implicit_cast_impl<std::int8_t, T>(operand, result))
+	else if (from == rtti::type_id<std::int8_t>() &&
+		implicit_cast_impl<std::int8_t, T>(operand, result))
 	{
 		return true;
 	}
-	else if (from == typeid(std::int16_t) && implicit_cast_impl<std::int16_t, T>(operand, result))
+	else if (from == rtti::type_id<std::int16_t>() &&
+		implicit_cast_impl<std::int16_t, T>(operand, result))
 	{
 		return true;
 	}
-	else if (from == typeid(std::int32_t) && implicit_cast_impl<std::int32_t, T>(operand, result))
+	else if (from == rtti::type_id<std::int32_t>() &&
+		implicit_cast_impl<std::int32_t, T>(operand, result))
 	{
 		return true;
 	}
-	else if (from == typeid(std::int64_t) && implicit_cast_impl<std::int64_t, T>(operand, result))
+	else if (from == rtti::type_id<std::int64_t>() &&
+		implicit_cast_impl<std::int64_t, T>(operand, result))
 	{
 		return true;
 	}
-	else if (from == typeid(std::uint8_t) && implicit_cast_impl<std::uint8_t, T>(operand, result))
+	else if (from == rtti::type_id<std::uint8_t>() &&
+		implicit_cast_impl<std::uint8_t, T>(operand, result))
 	{
 		return true;
 	}
-	else if (from == typeid(std::uint16_t) && implicit_cast_impl<std::uint16_t, T>(operand, result))
+	else if (from == rtti::type_id<std::uint16_t>() &&
+		implicit_cast_impl<std::uint16_t, T>(operand, result))
 	{
 		return true;
 	}
-	else if (from == typeid(std::uint32_t) && implicit_cast_impl<std::uint32_t, T>(operand, result))
+	else if (from == rtti::type_id<std::uint32_t>() &&
+		implicit_cast_impl<std::uint32_t, T>(operand, result))
 	{
 		return true;
 	}
-	else if (from == typeid(std::uint64_t) && implicit_cast_impl<std::uint64_t, T>(operand, result))
+	else if (from == rtti::type_id<std::uint64_t>() &&
+		implicit_cast_impl<std::uint64_t, T>(operand, result))
 	{
 		return true;
 	}
-	else if (from == typeid(float) && implicit_cast_impl<float, T>(operand, result))
+	else if (from == rtti::type_id<float>() &&
+		implicit_cast_impl<float, T>(operand, result))
 	{
 		return true;
 	}
-	else if (from == typeid(double) && implicit_cast_impl<double, T>(operand, result))
+	else if (from == rtti::type_id<double>() &&
+		implicit_cast_impl<double, T>(operand, result))
 	{
 		return true;
 	}
-	else if (from == typeid(const char*) && implicit_cast_impl<const char*, T>(operand, result))
+	else if (from == rtti::type_id<const char*>() &&
+		implicit_cast_impl<const char*, T>(operand, result))
 	{
 		return true;
 	}
-	else if (from == typeid(char) && implicit_cast_impl<char, T>(operand, result))
+	else if (from == rtti::type_id<char>() &&
+		implicit_cast_impl<char, T>(operand, result))
 	{
 		return true;
 	}
-	else if (from == typeid(unsigned char) && implicit_cast_impl<unsigned char, T>(operand, result))
+	else if (from == rtti::type_id<unsigned char>() &&
+		implicit_cast_impl<unsigned char, T>(operand, result))
 	{
 		return true;
 	}
-	else if (from == typeid(std::nullptr_t))
+	else if (from == rtti::type_id<std::nullptr_t>() &&
+		implicit_cast_impl<std::nullptr_t, T>(operand, result))
 	{
-		if (to != typeid(std::string))
-			return implicit_cast_impl<std::nullptr_t, T>(operand, result);
+		return true;
 	}
 
 	return false;
@@ -211,7 +226,7 @@ public:
 
 	virtual bool owns(const any_t& any_delegate) const
 	{
-		if (any_delegate.type() == typeid(delegate_t))
+		if (any_delegate.type() == rtti::type_id<delegate_t>())
 		{
 			auto del = any_cast_t<delegate_t>(any_delegate);
 			return del == _function;
@@ -242,55 +257,69 @@ class signals_t
 {
 	struct info_t
 	{
+		std::uint32_t priority = 0;
 		optional_t<sentinel_t> sentinel;
 		std::unique_ptr<function_wrapper> function;
 	};
 
 public:
 	template<typename F>
-	void connect(const id_t& id, F f)
+	void connect(const id_t& id, F f, std::uint32_t priority = 0)
 	{
 		static_assert(std::is_same<void, typename function_traits_t<F>::result_type>::value,
 			"signals cannot have a return type different from void");
 
 		info_t info;
+		info.priority = priority;
 		info.function = create_wrapper(std::forward<F>(f));
-		_list[id].emplace_back(std::move(info));
+		auto& container = _list[id];
+		container.emplace_back(std::move(info));
+		sort(container);
 	}
 
 	template<typename C, typename F>
-	void connect(const id_t& id, C * const object_ptr, F f)
+	void connect(const id_t& id, C * const object_ptr, F f, std::uint32_t priority = 0)
 	{
 		static_assert(std::is_same<void, typename function_traits_t<F>::result_type>::value,
 			"signals cannot have a return type different from void");
 
 		info_t info;
+		info.priority = priority;
 		info.function = create_wrapper(object_ptr, std::forward<F>(f));
-		_list[id].emplace_back(std::move(info));
+		auto& container = _list[id];
+		container.emplace_back(std::move(info));
+		sort(container);
 	}
 
 	template<typename F>
-	void connect(const id_t& id, const sentinel_t& sentinel, F f)
+	void connect(const id_t& id, const sentinel_t& sentinel, F f, std::uint32_t priority = 0)
 	{
 		static_assert(std::is_same<void, typename function_traits_t<F>::result_type>::value,
 			"signals cannot have a return type different from void");
 
 		info_t info;
+		info.priority = priority;
 		info.sentinel = sentinel;
 		info.function = create_wrapper(std::forward<F>(f));
-		_list[id].emplace_back(std::move(info));
+		auto& container = _list[id];
+		container.emplace_back(std::move(info));
+		sort(container);
 	}
 
 	template<typename C, typename F>
-	void connect(const id_t& id, const sentinel_t& sentinel, C * const object_ptr, F f)
+	void connect(const id_t& id, const sentinel_t& sentinel, C * const object_ptr, F f, std::uint32_t priority = 0)
 	{
 		static_assert(std::is_same<void, typename function_traits_t<F>::result_type>::value,
 			"signals cannot have a return type different from void");
 
 		info_t info;
+		info.priority = priority;
 		info.sentinel = sentinel;
 		info.function = create_wrapper(object_ptr, std::forward<F>(f));
-		_list[id].emplace_back(std::move(info));
+
+		auto& container = _list[id];
+		container.emplace_back(std::move(info));
+		sort(container);
 	}
 
 	template<typename C, typename F>
@@ -316,12 +345,7 @@ public:
 	{
 		auto& container = _list[id];
 
-		//remove expired subscribers
-		container.erase(std::remove_if(std::begin(container), std::end(container),
-			[](const auto& info)
-		{
-			return info.sentinel.has_value() && info.sentinel.value().expired();
-		}), std::end(container));
+		check_sentinels(container);
 
 		auto any_args = fill_args(std::forward<Args>(args) ...);
 		//Iterate this way to allow modification
@@ -338,6 +362,23 @@ public:
 	}
 
 private:
+	void sort(std::vector<info_t>& container)
+	{
+		std::sort(std::begin(container), std::end(container), [](const auto& info1, const auto& info2) {
+			return info1.priority > info2.priority;
+		});
+	}
+
+	void check_sentinels(std::vector<info_t>& container)
+	{
+		//remove expired subscribers
+		container.erase(std::remove_if(std::begin(container), std::end(container),
+			[](const auto& info)
+		{
+			return info.sentinel.has_value() && info.sentinel.value().expired();
+		}), std::end(container));
+	}
+
 	/// signal / slots
 	std::unordered_map<id_t, std::vector<info_t>> _list;
 
@@ -461,3 +502,5 @@ struct binder_t
 	signals_t<id_t, sentinel_t> signals;
 	functions_t<id_t, sentinel_t> functions;
 };
+
+#endif

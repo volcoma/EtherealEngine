@@ -3,13 +3,14 @@
 #include <string>
 #include <deque>
 #include <stack>
+#include "recursive_wrapper.hpp"
 
 class PathNameTagTree
 {
-	struct node;
+
 	struct node
 	{
-		typedef std::map<std::string, node> map_t;
+		typedef std::map<std::string, nonstd::recursive_wrapper<node>> map_t;
 		map_t _nodes;
 		size_t _tag;
 

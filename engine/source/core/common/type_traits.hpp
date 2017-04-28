@@ -1,35 +1,18 @@
-#pragma once
+#ifndef _NONSTD_TYPE_TRAITS_
+#define _NONSTD_TYPE_TRAITS_
 
 #include <type_traits>
+#include <cstddef>
 
 namespace nonstd
 {
-
-	// static max generator
-	template<size_t S, size_t ... Args> struct static_max;
-
-	template<size_t S> struct static_max<S>
-	{
-		static const size_t value = S;
-	};
-
-	template<size_t S1, size_t S2, size_t ... Args> struct static_max<S1, S2, Args...>
-	{
-		static const size_t value = S1 > S2 ? static_max<S1, Args...>::value : static_max<S2, Args...>::value;
-	};
-
-	// static all true
-	template<bool...> struct boolean_value_pack;
-	template<bool... Values> using AllTrue = std::is_same<
-		boolean_value_pack<Values..., true>,
-		boolean_value_pack<true, Values...>>;
 
 	// incremental id of type
 	struct type_info_polymorphic
 	{
 		using index_t = size_t;
 
-		template<typename Base, typename Derived> 
+		template<typename Base, typename Derived>
 		static index_t id()
 		{
 			static_assert(std::is_base_of<Base, Derived>::value, "D should be derived from B.");
@@ -47,24 +30,93 @@ namespace nonstd
 
 	template<typename B>
 	type_info_polymorphic::index_t type_info_polymorphic::counter<B>::value = 0;
+}
 
-	struct type_info
+///////////////////////////////////////////////////////
+#define __try_using_rtti__ 1
+///////////////////////////////////////////////////////
+
+#ifdef _MSC_VER
+#ifndef __cpp_rtti
+#define __cpp_rtti _CPPRTTI 
+#endif // !__cpp_rtti
+#endif
+
+#define __cpp_rtti_enabled__ __try_using_rtti__ && __cpp_rtti
+#if __cpp_rtti_enabled__
+#include <typeindex>
+#endif
+
+namespace rtti
+{
+	class type_index_t;
+	namespace detail
 	{
-		using index_t = size_t;
+		template<typename T>
+		const type_index_t& type_id_impl();
+	}
 
-		template<typename T> 
-		static index_t id()
+	class type_index_t
+	{
+#if __cpp_rtti_enabled__
+		using construct_t = const std::type_info;
+#else
+		using construct_t = const type_index_t&();
+#endif
+		construct_t* _info = nullptr;
+		type_index_t(construct_t* info) noexcept : _info{ info } {}
+
+		template<typename T>
+		friend const type_index_t& detail::type_id_impl();
+	public:
+		bool operator==(const type_index_t& o) const noexcept
 		{
-			static index_t sid = get_counter()++;
-			return sid;
+			return hash_code() == o.hash_code();
 		}
-	protected:
-
-		static index_t& get_counter()
+		bool operator!=(const type_index_t& o) const noexcept
 		{
-			static index_t value = 0;
-			return value;
-		};
+			return hash_code() != o.hash_code();
+		}
+		bool operator<(const type_index_t& o) const noexcept
+		{
+			return hash_code() < o.hash_code();
+		}
+		bool operator>(const type_index_t& o) const noexcept
+		{
+			return hash_code() > o.hash_code();
+		}
+
+		std::size_t hash_code() const noexcept
+		{
+#if __cpp_rtti_enabled__
+			return std::type_index(*_info).hash_code();
+#else
+			return reinterpret_cast<std::size_t>(_info);
+#endif
+		}
 	};
 
+	namespace detail
+	{
+		template<typename T>
+		const type_index_t& type_id_impl()
+		{
+#if __cpp_rtti_enabled__
+			static type_id_t id(&typeid(T));
+#else
+			static type_index_t id(&type_id_impl<T>);
+#endif
+			return id;
+		}
+	}
+
+	template<typename T>
+	const type_index_t& type_id()
+	{
+		//this is required to copy the behavior of typeid(T)
+		return detail::type_id_impl<typename std::remove_cv<T>::type>();
+	}
+
 }
+
+#endif

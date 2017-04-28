@@ -1,10 +1,10 @@
 #ifndef LINB_ANY_HPP
 #define LINB_ANY_HPP
 
-#pragma once
 #include <typeinfo>
 #include <type_traits>
 #include <stdexcept>
+#include "type_traits.hpp"
 
 namespace nonstd
 {
@@ -114,10 +114,10 @@ namespace nonstd
 			return this->vtable == nullptr;
 		}
 
-		/// If *this has a contained object of type T, typeid(T); otherwise typeid(void).
-		const std::type_info& type() const noexcept
+		/// If *this has a contained object of type T, nonstd::type_info::id<T>(); otherwise nonstd::type_info::id<void>().
+		const rtti::type_index_t& type() const noexcept
 		{
-			return empty() ? typeid(void) : this->vtable->type();
+			return empty() ? rtti::type_id<void>() : this->vtable->type();
 		}
 
 		/// Exchange the states of *this and rhs.
@@ -165,7 +165,7 @@ namespace nonstd
 			// Note: The caller is responssible for doing .vtable = nullptr after destructful operations
 			// such as destroy() and/or move().
 			/// The type of the object this vtable is for.
-			const std::type_info& (*type)() noexcept;
+			const rtti::type_index_t& (*type)() noexcept;
 
 			/// Destroys the object in the union.
 			/// The state of the union after this call is unspecified, caller must ensure not to use src anymore.
@@ -187,9 +187,9 @@ namespace nonstd
 		template<typename T>
 		struct vtable_dynamic
 		{
-			static const std::type_info& type() noexcept
+			static const rtti::type_index_t& type() noexcept
 			{
-				return typeid(T);
+				return rtti::type_id<T>();
 			}
 
 			static void destroy(storage_union& storage) noexcept
@@ -220,9 +220,9 @@ namespace nonstd
 		template<typename T>
 		struct vtable_stack
 		{
-			static const std::type_info& type() noexcept
+			static const rtti::type_index_t& type() noexcept
 			{
-				return typeid(T);
+				return rtti::type_id<T>();
 			}
 
 			static void destroy(storage_union& storage) noexcept
@@ -280,7 +280,7 @@ namespace nonstd
 		friend T* any_cast(any* operand) noexcept;
 
 		/// Same effect as is_same(this->type(), t);
-		bool is_typed(const std::type_info& t) const
+		bool is_typed(const rtti::type_index_t& t) const
 		{
 			return is_same(this->type(), t);
 		}
@@ -292,13 +292,9 @@ namespace nonstd
 		/// only a valid approach when there's no interaction with outside sources
 		/// (other shared libraries and such).
 
-		static bool is_same(const std::type_info& a, const std::type_info& b)
+		static bool is_same(const rtti::type_index_t& a, const rtti::type_index_t& b)
 		{
-#ifdef ANY_IMPL_FAST_TYPE_INFO_COMPARE
-			return &a == &b;
-#else
 			return a == b;
-#endif
 		}
 
 		/// Casts (with no type_info checks) the storage pointer as const T*.
@@ -407,23 +403,23 @@ namespace nonstd
 		return detail::any_cast_move_if_true<ValueType>(p, can_move());
 	}
 
-	/// If operand != nullptr && operand->type() == typeid(ValueType), a pointer to the object
+	/// If operand != nullptr && operand->type() == rtti::type_id<ValueType>(), a pointer to the object
 	/// contained by operand, otherwise nullptr.
 	template<typename T>
 	inline const T* any_cast(const any* operand) noexcept
 	{
-		if (operand == nullptr || !operand->is_typed(typeid(T)))
+		if (operand == nullptr || !operand->is_typed(rtti::type_id<T>()))
 			return nullptr;
 		else
 			return operand->cast<T>();
 	}
 
-	/// If operand != nullptr && operand->type() == typeid(ValueType), a pointer to the object
+	/// If operand != nullptr && operand->type() == rtti::type_id<ValueType>(), a pointer to the object
 	/// contained by operand, otherwise nullptr.
 	template<typename T>
 	inline T* any_cast(any* operand) noexcept
 	{
-		if (operand == nullptr || !operand->is_typed(typeid(T)))
+		if (operand == nullptr || !operand->is_typed(rtti::type_id<T>()))
 			return nullptr;
 		else
 			return operand->cast<T>();
