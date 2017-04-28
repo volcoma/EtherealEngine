@@ -102,7 +102,7 @@ namespace rtti
 		const type_index_t& type_id_impl()
 		{
 #if __cpp_rtti_enabled__
-			static type_id_t id(&typeid(T));
+			static type_index_t id(&typeid(T));
 #else
 			static type_index_t id(&type_id_impl<T>);
 #endif
