@@ -59,7 +59,6 @@
 #define VARIANT_VERSION (VARIANT_MAJOR_VERSION * 100000) + (VARIANT_MINOR_VERSION * 100) + (VARIANT_PATCH_VERSION)
 
 namespace nonstd {
-namespace util {
 
 // XXX This should derive from std::logic_error instead of std::runtime_error.
 //     See https://github.com/nonstd/variant/issues/48 for details.
@@ -1010,16 +1009,17 @@ ResultType const& get_unchecked(T const& var)
 {
     return var.template get_unchecked<ResultType>();
 }
-} // namespace util
 } // namespace nonstd
 
 // hashable iff underlying types are hashable
-namespace std {
+namespace std 
+{
 template <typename... Types>
-struct hash< ::nonstd::util::variant<Types...>> {
-    std::size_t operator()(const ::nonstd::util::variant<Types...>& v) const noexcept
+struct hash<nonstd::variant<Types...>> 
+{
+	std::size_t operator()(const ::nonstd::variant<Types...>& v) const noexcept
     {
-        return ::nonstd::util::apply_visitor(::nonstd::util::detail::hasher{}, v);
+        return nonstd::apply_visitor(nonstd::detail::hasher{}, v);
     }
 };
 }

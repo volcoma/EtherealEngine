@@ -1,21 +1,32 @@
-#pragma once
-
-#include "../common/any.hpp"
-#include "../common/function_traits.hpp"
-#include "delegate.hpp"
-
-#include <memory> 
-#include <string> 
-#include <vector> 
-#include <unordered_map> 
-#include <functional> 
+#include <memory>
+#include <string>
+#include <vector>
+#include <unordered_map>
+#include <functional>
 #include <tuple>
 #include <cassert>
 #include <typeindex>
 #include <algorithm>
+#include <type_traits>
+#include "../common/any.hpp"
+#include "../common/optional.hpp"
+#include "../common/function_traits.hpp"
+#include "../events/delegate.hpp"
 
-using any_t = nonstd::util::any;
-#define any_cast_t nonstd::util::any_cast
+using any_t = nonstd::any;
+#define any_cast_t nonstd::any_cast
+
+template<typename T>
+using optional_t = nonstd::optional<T>;
+
+template <typename T>
+using function_traits_t = typename nonstd::function_traits<T>;
+
+template <typename T>
+using fn_result_of_t = typename nonstd::fn_result_of<T>;
+
+template <typename T>
+using special_decay_t = typename nonstd::special_decay_t<T>;
 
 template<typename TupleType, typename FunctionType>
 void for_each(TupleType&&, FunctionType
@@ -47,12 +58,12 @@ auto apply(F&& f, Tuple&& t)
 	return apply_impl(std::forward<F>(f), std::forward<Tuple>(t), Indices());
 }
 
-template<typename F, typename Tuple, typename std::enable_if<!std::is_same<typename core::fn_result_of<F>, void>::value>::type* = nullptr>
+template<typename F, typename Tuple, typename std::enable_if<!std::is_same<fn_result_of_t<F>, void>::value>::type* = nullptr>
 any_t call(F&& f, Tuple&& t)
 {
 	return apply(std::forward<F>(f), std::forward<Tuple>(t));
 }
-template<typename F, typename Tuple, typename std::enable_if<std::is_same<typename core::fn_result_of<F>, void>::value>::type* = nullptr>
+template<typename F, typename Tuple, typename std::enable_if<std::is_same<fn_result_of_t<F>, void>::value>::type* = nullptr>
 any_t call(F&& f, Tuple&& t)
 {
 	any_t result;
@@ -67,75 +78,89 @@ std::vector<any_t> fill_args(Args&&... args)
 }
 
 template<typename From, typename To, typename std::enable_if<!std::is_convertible<From, To>::value>::type* = nullptr>
-To implicit_cast_impl(const any_t& operand)
+bool implicit_cast_impl(const any_t& operand, To& result)
 {
-	return To{};
+	return false;
 }
 
 template<typename From, typename To, typename std::enable_if<std::is_convertible<From, To>::value>::type* = nullptr>
-To implicit_cast_impl(const any_t& operand)
+bool implicit_cast_impl(const any_t& operand, To& result)
 {
 	auto val = any_cast_t<From>(operand);
-	return static_cast<To>(val);
+	result = static_cast<To>(val);
+	return true;
 }
 
 template<typename T>
-T implicit_cast(const any_t& operand)
+bool implicit_cast(const any_t& operand, T& result)
 {
 	const auto& from = operand.type();
 	const auto& to = typeid(T);
-	if (from == typeid(std::int8_t))
+
+	if (from == to)
 	{
-		return implicit_cast_impl<std::int8_t, T>(operand);
+		result = any_cast_t<T>(operand);
+		return true;
 	}
-	else if (from == typeid(std::int16_t))
+	else if (from == typeid(std::int8_t) && implicit_cast_impl<std::int8_t, T>(operand, result))
 	{
-		return implicit_cast_impl<std::int16_t, T>(operand);
+		return true;
 	}
-	else if (from == typeid(std::int32_t))
+	else if (from == typeid(std::int16_t) && implicit_cast_impl<std::int16_t, T>(operand, result))
 	{
-		return implicit_cast_impl<std::int32_t, T>(operand);
+		return true;
 	}
-	else if (from == typeid(std::int64_t))
+	else if (from == typeid(std::int32_t) && implicit_cast_impl<std::int32_t, T>(operand, result))
 	{
-		return implicit_cast_impl<std::int64_t, T>(operand);
+		return true;
 	}
-	else if (from == typeid(std::uint8_t))
+	else if (from == typeid(std::int64_t) && implicit_cast_impl<std::int64_t, T>(operand, result))
 	{
-		return implicit_cast_impl<std::uint8_t, T>(operand);
+		return true;
 	}
-	else if (from == typeid(std::uint16_t))
+	else if (from == typeid(std::uint8_t) && implicit_cast_impl<std::uint8_t, T>(operand, result))
 	{
-		return implicit_cast_impl<std::uint16_t, T>(operand);
+		return true;
 	}
-	else if (from == typeid(std::uint32_t))
+	else if (from == typeid(std::uint16_t) && implicit_cast_impl<std::uint16_t, T>(operand, result))
 	{
-		return implicit_cast_impl<std::uint32_t, T>(operand);
+		return true;
 	}
-	else if (from == typeid(std::uint64_t))
+	else if (from == typeid(std::uint32_t) && implicit_cast_impl<std::uint32_t, T>(operand, result))
 	{
-		return implicit_cast_impl<std::uint64_t, T>(operand);
+		return true;
 	}
-	else if (from == typeid(float))
+	else if (from == typeid(std::uint64_t) && implicit_cast_impl<std::uint64_t, T>(operand, result))
 	{
-		return implicit_cast_impl<float, T>(operand);
+		return true;
 	}
-	else if (from == typeid(double))
+	else if (from == typeid(float) && implicit_cast_impl<float, T>(operand, result))
 	{
-		return implicit_cast_impl<double, T>(operand);
+		return true;
 	}
-	else if (from == typeid(const char*))
+	else if (from == typeid(double) && implicit_cast_impl<double, T>(operand, result))
 	{
-		return implicit_cast_impl<const char*, T>(operand);
+		return true;
+	}
+	else if (from == typeid(const char*) && implicit_cast_impl<const char*, T>(operand, result))
+	{
+		return true;
+	}
+	else if (from == typeid(char) && implicit_cast_impl<char, T>(operand, result))
+	{
+		return true;
+	}
+	else if (from == typeid(unsigned char) && implicit_cast_impl<unsigned char, T>(operand, result))
+	{
+		return true;
 	}
 	else if (from == typeid(std::nullptr_t))
 	{
 		if (to != typeid(std::string))
-			return implicit_cast_impl<std::nullptr_t, T>(operand);
+			return implicit_cast_impl<std::nullptr_t, T>(operand, result);
 	}
 
-	assert(from == to && "cannot implicitly cast types");
-	return any_cast_t<T>(operand);
+	return false;
 }
 
 struct function_wrapper
@@ -149,7 +174,7 @@ template<typename F>
 class function_wrapper_t : public function_wrapper
 {
 public:
-	using delegate_t = delegate<typename core::function_traits<F>::function_type>;
+	using delegate_t = delegate<typename function_traits_t<F>::function_type>;
 
 	template<typename C>
 	function_wrapper_t(C * const object_ptr, F f)
@@ -162,26 +187,23 @@ public:
 
 	virtual any_t invoke(const std::vector<any_t>& params) const
 	{
-		core::function_traits<F>::tuple_type_decayed args;
-		const auto arity = core::function_traits<F>::arity;
+		typename function_traits_t<F>::tuple_type_decayed args;
+		//const auto arity = function_traits_t<F>::arity;
+		//assert(arity <= params.size() && "less parameters are not allowed");
 		std::size_t i = 0;
 		for_each(args, [&](auto& arg)
 		{
-			using arg_type = core::special_decay_t<decltype(arg)>;
+			using arg_type = special_decay_t<decltype(arg)>;
 
 			if (i >= params.size())
 			{
-				arg = arg_type{};
 				i++;
 				return;
 			}
 
 			const auto& param = params[i++];
-			const auto& t1 = param.type();
-			const auto& t2 = typeid(arg_type);
-
-			arg = implicit_cast<arg_type>(param);
-
+			bool can_cast = implicit_cast(param, arg);
+			assert(can_cast && "cannot implicitly convert types");
 		});
 
 		return call(_function, args);
@@ -215,101 +237,227 @@ std::unique_ptr<function_wrapper> create_wrapper(C * const object_ptr, F f)
 	return std::unique_ptr<function_wrapper_t<F>>(new function_wrapper_t<F>(object_ptr, std::forward<F>(f)));
 }
 
-class signal_binder
+template<typename id_t = std::string, typename sentinel_t = std::weak_ptr<void>>
+class signals_t
 {
+	struct info_t
+	{
+		optional_t<sentinel_t> sentinel;
+		std::unique_ptr<function_wrapper> function;
+	};
+
 public:
 	template<typename F>
-	void connect(const std::string& name, F f)
+	void connect(const id_t& id, F f)
 	{
-		static_assert(std::is_same<void, typename core::function_traits<F>::result_type>::value,
-			"Signals cannot have a return type different from void");
+		static_assert(std::is_same<void, typename function_traits_t<F>::result_type>::value,
+			"signals cannot have a return type different from void");
 
-		_list[name].emplace_back(create_wrapper(std::forward<F>(f)));
+		info_t info;
+		info.function = create_wrapper(std::forward<F>(f));
+		_list[id].emplace_back(std::move(info));
 	}
 
 	template<typename C, typename F>
-	void connect(const std::string& name, C * const object_ptr, F f)
+	void connect(const id_t& id, C * const object_ptr, F f)
 	{
-		static_assert(std::is_same<void, typename core::function_traits<F>::result_type>::value,
-			"Signals cannot have a return type different from void");
+		static_assert(std::is_same<void, typename function_traits_t<F>::result_type>::value,
+			"signals cannot have a return type different from void");
 
-		_list[name].emplace_back(create_wrapper(object_ptr, std::forward<F>(f)));
+		info_t info;
+		info.function = create_wrapper(object_ptr, std::forward<F>(f));
+		_list[id].emplace_back(std::move(info));
+	}
+
+	template<typename F>
+	void connect(const id_t& id, const sentinel_t& sentinel, F f)
+	{
+		static_assert(std::is_same<void, typename function_traits_t<F>::result_type>::value,
+			"signals cannot have a return type different from void");
+
+		info_t info;
+		info.sentinel = sentinel;
+		info.function = create_wrapper(std::forward<F>(f));
+		_list[id].emplace_back(std::move(info));
 	}
 
 	template<typename C, typename F>
-	void disconnect(const std::string& name, C * const object_ptr, F f)
+	void connect(const id_t& id, const sentinel_t& sentinel, C * const object_ptr, F f)
 	{
-		static_assert(std::is_same<void, typename core::function_traits<F>::result_type>::value,
-			"Signals cannot have a return type different from void");
+		static_assert(std::is_same<void, typename function_traits_t<F>::result_type>::value,
+			"signals cannot have a return type different from void");
 
-		auto& funcs = _list[name];
+		info_t info;
+		info.sentinel = sentinel;
+		info.function = create_wrapper(object_ptr, std::forward<F>(f));
+		_list[id].emplace_back(std::move(info));
+	}
 
-		auto slot = function_wrapper_t<F>::delegate_t(object_ptr, f);
-		funcs.erase(std::remove_if(std::begin(funcs), std::end(funcs),
-			[&slot](const auto& other) { return other->owns(slot); }
-		), std::end(funcs));
+	template<typename C, typename F>
+	void disconnect(const id_t& id, C * const object_ptr, F f)
+	{
+		static_assert(std::is_same<void, typename function_traits_t<F>::result_type>::value,
+			"signals cannot have a return type different from void");
+
+		auto& container = _list[id];
+
+		auto slot = typename function_wrapper_t<F>::delegate_t(object_ptr, f);
+		container.erase(std::remove_if(std::begin(container), std::end(container),
+			[&slot](const auto& info) { return info.function->owns(slot); }
+		), std::end(container));
 
 		//If it was the last one, remove the whole container
-		if (funcs.empty())
-			_list.erase(name);
+		if (container.empty())
+			_list.erase(id);
 	}
 
 	template<typename ... Args>
-	void emit(const std::string& name, Args&&... args)
+	void emit(const id_t& id, Args&&... args)
 	{
-		const auto& funcs = _list[name];
+		auto& container = _list[id];
 
-		//Iterate this way to allow modification
-		for (size_t i = 0, count = funcs.size(); i < count; ++i)
+		//remove expired subscribers
+		container.erase(std::remove_if(std::begin(container), std::end(container),
+			[](const auto& info)
 		{
-			const auto& func = funcs[i];
-			func->invoke(fill_args(std::forward<Args>(args) ...));
+			return info.sentinel.has_value() && info.sentinel.value().expired();
+		}), std::end(container));
+
+		auto any_args = fill_args(std::forward<Args>(args) ...);
+		//Iterate this way to allow modification
+		for (size_t i = 0; i < container.size(); ++i)
+		{
+			const auto& info = container[i];
+			info.function->invoke(any_args);
 		}
 	}
+
+	void clear()
+	{
+		_list.clear();
+	}
+
 private:
 	/// signal / slots
-	std::unordered_map<std::string, std::vector<std::unique_ptr<function_wrapper>>> _list;
+	std::unordered_map<id_t, std::vector<info_t>> _list;
 
 };
 
-class delegate_binder
+template<typename id_t = std::string, typename sentinel_t = std::weak_ptr<void>>
+class functions_t
 {
+	struct info_t
+	{
+		optional_t<sentinel_t> sentinel;
+		std::unique_ptr<function_wrapper> function;
+	};
 public:
 	template<typename F>
-	void bind(const std::string& name, F f)
+	void bind(const id_t& id, F f)
 	{
-		_list[name] = create_wrapper(std::forward<F>(f));
+		info_t info;
+		info.function = create_wrapper(std::forward<F>(f));
+		_list[id] = std::move(info);
 	}
 
 	template<typename C, typename F>
-	void bind(const std::string& name, C * const object_ptr, F f)
+	void bind(const id_t& id, C * const object_ptr, F f)
 	{
-		_list[name] = create_wrapper(object_ptr, std::forward<F>(f));
+		info_t info;
+		info.function = create_wrapper(object_ptr, std::forward<F>(f));
+		_list[id] = std::move(info);
 	}
 
-	void unbind(const std::string& name)
+	template<typename F>
+	void bind(const id_t& id, const sentinel_t& sentinel, F f)
 	{
-		_list.erase(name);
+		info_t info;
+		info.sentinel = sentinel;
+		info.function = create_wrapper(std::forward<F>(f));
+		_list[id] = std::move(info);
+	}
+
+	template<typename C, typename F>
+	void bind(const id_t& id, const sentinel_t& sentinel, C * const object_ptr, F f)
+	{
+		info_t info;
+		info.sentinel = sentinel;
+		info.function = create_wrapper(object_ptr, std::forward<F>(f));
+		_list[id] = std::move(info);
+	}
+
+	void unbind(const id_t& id)
+	{
+		_list.erase(id);
 	}
 
 	template<typename R, typename ... Args, typename std::enable_if<!std::is_same<R, void>::value>::type* = nullptr>
-	R call(const std::string& name, Args&&... args)
+	R invoke(const id_t& id, Args&&... args)
 	{
-		const auto& func = _list[name];
-		auto result = func->invoke(fill_args(std::forward<Args>(args) ...));
+		static_assert(!std::is_reference<R>::value, "unsupported return by reference (use return by value)");
 
-		assert(result.type() == typeid(R) && "invalid return type");
-		return any_cast_t<R>(result);
+		R res{};
+
+		auto it = _list.find(id);
+		if (it == _list.end())
+			return res;
+
+		const auto& info = it->second;
+
+		// check if subscriber expired
+		if (info.sentinel.has_value() && info.sentinel.value().expired())
+		{
+			_list.erase(it);
+			return res;
+		}
+
+		if (info.function != nullptr)
+		{
+			auto result = info.function->invoke(fill_args(std::forward<Args>(args) ...));
+			bool can_cast = implicit_cast<R>(result, res);
+			assert(can_cast && "cannot implicitly convert types");
+		}
+		return res;
 	}
 	template<typename R, typename ... Args, typename std::enable_if<std::is_same<R, void>::value>::type* = nullptr>
-	R call(const std::string& name, Args&&... args)
+	R invoke(const id_t& id, Args&&... args)
 	{
-		const auto& func = _list[name];
-		func->invoke(fill_args(std::forward<Args>(args) ...));
+		static_assert(!std::is_reference<R>::value, "unsupported return by reference (use return by value)");
+
+		auto it = _list.find(id);
+		if (it == _list.end())
+			return;
+
+		const auto& info = it->second;
+
+		// check if subscriber expired
+		if (info.sentinel.has_value() && info.sentinel.value().expired())
+		{
+			_list.erase(it);
+			return;
+		}
+
+		if (info.function != nullptr)
+		{
+			info.function->invoke(fill_args(std::forward<Args>(args) ...));
+		}
+	}
+
+	void clear()
+	{
+		_list.clear();
 	}
 
 private:
 	/// signal / slots
-	std::unordered_map<std::string, std::unique_ptr<function_wrapper>> _list;
+	std::unordered_map<id_t, info_t> _list;
 
+};
+
+
+template<typename id_t = std::string, typename sentinel_t = std::weak_ptr<void>>
+struct binder_t
+{
+	signals_t<id_t, sentinel_t> signals;
+	functions_t<id_t, sentinel_t> functions;
 };

@@ -4,7 +4,6 @@
 #include <type_traits>
 
 namespace nonstd {
-namespace util {
 
 namespace detail {
 
@@ -58,28 +57,28 @@ template <class T, class V>
 typename detail::dynamic_caster<T>::result_type
 dynamic_variant_cast(V& v)
 {
-    return nonstd::util::apply_visitor(detail::dynamic_caster<T>(), v);
+    return nonstd::apply_visitor(detail::dynamic_caster<T>(), v);
 }
 
 template <class T, class V>
 typename detail::dynamic_caster<const T>::result_type
 dynamic_variant_cast(const V& v)
 {
-    return nonstd::util::apply_visitor(detail::dynamic_caster<const T>(), v);
+    return nonstd::apply_visitor(detail::dynamic_caster<const T>(), v);
 }
 
 template <class T, class V>
 T& static_variant_cast(V& v)
 {
-    return nonstd::util::apply_visitor(detail::static_caster<T>(), v);
+    return nonstd::apply_visitor(detail::static_caster<T>(), v);
 }
 
 template <class T, class V>
 const T& static_variant_cast(const V& v)
 {
-    return nonstd::util::apply_visitor(detail::static_caster<const T>(), v);
+    return nonstd:apply_visitor(detail::static_caster<const T>(), v);
 }
-}
+
 }
 
 #endif // VARIANT_CAST_HPP

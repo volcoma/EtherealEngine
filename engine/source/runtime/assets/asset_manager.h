@@ -165,7 +165,7 @@ namespace runtime
 		template <typename S>
 		void add(std::shared_ptr<TStorage<S>> system)
 		{
-			storages.insert(std::make_pair(core::TypeInfo::id<Storage, TStorage<S>>(), system));
+			storages.insert(std::make_pair(nonstd::type_info_polymorphic::id<Storage, TStorage<S>>(), system));
 		}
 
 		//-----------------------------------------------------------------------------
@@ -195,7 +195,7 @@ namespace runtime
 		template <typename S>
 		std::shared_ptr<TStorage<S>> get_storage()
 		{
-			auto it = storages.find(core::TypeInfo::id<Storage, TStorage<S>>());
+			auto it = storages.find(nonstd::type_info_polymorphic::id<Storage, TStorage<S>>());
 			//assert(it != storages.end());
 			return it == storages.end()
 				? std::shared_ptr<TStorage<S>>()
@@ -482,7 +482,7 @@ namespace runtime
 		}
 
 		/// Different storages
-		std::unordered_map<core::TypeInfo::index_t, std::shared_ptr<Storage>> storages;
+		std::unordered_map<nonstd::type_info_polymorphic::index_t, std::shared_ptr<Storage>> storages;
 	};
 
 }

@@ -112,9 +112,9 @@ namespace core
 
 	protected:
 		/// 
-		std::vector<TypeInfo::index_t> _orders;
+		std::vector<nonstd::type_info_polymorphic::index_t> _orders;
 		///
-		std::unordered_map<TypeInfo::index_t, Subsystem*> _subsystems;
+		std::unordered_map<nonstd::type_info_polymorphic::index_t, Subsystem*> _subsystems;
 	};
 
 	//
@@ -122,7 +122,7 @@ namespace core
 	template<typename S, typename ... Args>
 	S* SubsystemContext::add_subsystem(Args&& ... args)
 	{
-		auto index = TypeInfo::id<Subsystem, S>();
+		auto index = nonstd::type_info_polymorphic::id<Subsystem, S>();
 		Expects(!has_subsystems<S>());
 			//"duplicated subsystem: %s.", typeid(S).name());
 
@@ -139,7 +139,7 @@ namespace core
 	template<typename S>
 	S* SubsystemContext::get_subsystem()
 	{
-		auto index = TypeInfo::id<Subsystem, S>();
+		auto index = nonstd::type_info_polymorphic::id<Subsystem, S>();
 
 		auto found = _subsystems.find(index);
 		if (found != _subsystems.end())
@@ -151,7 +151,7 @@ namespace core
 	template<typename S>
 	void SubsystemContext::remove_subsystem()
 	{
-		auto index = TypeInfo::id<Subsystem, S>();
+		auto index = nonstd::type_info_polymorphic::id<Subsystem, S>();
 
 		auto found = _subsystems.find(index);
 		if (found != _subsystems.end())
@@ -166,7 +166,7 @@ namespace core
 	template<typename S>
 	bool SubsystemContext::has_subsystems() const
 	{
-		auto index = TypeInfo::id<Subsystem, S>();
+		auto index = nonstd::type_info_polymorphic::id<Subsystem, S>();
 		return _subsystems.find(index) != _subsystems.end();
 	}
 

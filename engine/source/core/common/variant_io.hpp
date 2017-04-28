@@ -6,7 +6,7 @@
 #include "variant.hpp"
 
 namespace nonstd {
-namespace util {
+
 
 namespace detail {
 // operator<< helper
@@ -39,7 +39,7 @@ operator<<(std::basic_ostream<CharT, Traits>& out, variant<Types...> const& rhs)
     apply_visitor(visitor, rhs);
     return out;
 }
-} // namespace util
+
 } // namespace nonstd
 
 #endif // _UTIL_VARIANT_IO_HPP

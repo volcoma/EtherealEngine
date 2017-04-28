@@ -1350,6 +1350,9 @@
     <ClInclude Include="..\..\source\core\events\binder.hpp">
       <Filter>Source Files\events</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\core\common\optional.hpp">
+      <Filter>Source Files\common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\core\reflection\rttr\enumeration.cpp">

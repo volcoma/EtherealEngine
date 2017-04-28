@@ -27,6 +27,7 @@
     <ClInclude Include="..\..\source\core\common\handle.hpp" />
     <ClInclude Include="..\..\source\core\common\handle_object_set.hpp" />
     <ClInclude Include="..\..\source\core\common\handle_set.hpp" />
+    <ClInclude Include="..\..\source\core\common\optional.hpp" />
     <ClInclude Include="..\..\source\core\common\pathname_tag_tree.h" />
     <ClInclude Include="..\..\source\core\common\recursive_wrapper.hpp" />
     <ClInclude Include="..\..\source\core\common\spimpl.hpp" />

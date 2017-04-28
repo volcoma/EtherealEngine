@@ -2,7 +2,6 @@
 #define _UTIL_VARIANT_VISITOR_HPP
 
 namespace nonstd {
-namespace util {
 
 template <typename... Fns>
 struct visitor;
@@ -32,7 +31,6 @@ visitor<Fns...> make_visitor(Fns... fns)
     return visitor<Fns...>(fns...);
 }
 
-} // namespace util
 } // namespace nonstd
 
 #endif // _UTIL_VARIANT_VISITOR_HPP

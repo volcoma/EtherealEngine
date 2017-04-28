@@ -224,9 +224,9 @@ namespace runtime
 
 #define COMPONENT(type)															\
 private:																		\
-virtual core::TypeInfo::index_t runtime_id() const								\
+virtual nonstd::type_info_polymorphic::index_t runtime_id() const				\
 {																				\
-	return core::TypeInfo::id<Component, type>();								\
+	return nonstd::type_info_polymorphic::id<Component, type>();				\
 }																				\
 public:																			\
 runtime::CHandle<type> handle()													\
@@ -333,7 +333,7 @@ virtual std::shared_ptr<Component> clone() const								\
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		virtual core::TypeInfo::index_t runtime_id() const = 0;
+		virtual nonstd::type_info_polymorphic::index_t runtime_id() const = 0;
 		/// Owning Entity
 		Entity _entity;
 		/// Was the component touched.
@@ -661,10 +661,10 @@ virtual std::shared_ptr<Component> clone() const								\
 		template <typename C>
 		void remove(Entity::Id id)
 		{
-			remove(id, core::TypeInfo::id<Component, C>());
+			remove(id, nonstd::type_info_polymorphic::id<Component, C>());
 		}
 		void remove(Entity::Id id, std::shared_ptr<Component> component);
-		void remove(Entity::Id id, const core::TypeInfo::index_t family);
+		void remove(Entity::Id id, const nonstd::type_info_polymorphic::index_t family);
 
 		/**
 		* Check if an Entity has a component.
@@ -672,13 +672,13 @@ virtual std::shared_ptr<Component> clone() const								\
 		template <typename C>
 		bool has_component(Entity::Id id) const
 		{
-			return has_component(id, core::TypeInfo::id<Component, C>());
+			return has_component(id, nonstd::type_info_polymorphic::id<Component, C>());
 		}
 
 
 		bool has_component(Entity::Id id, std::shared_ptr<Component> component) const;
 
-		bool has_component(Entity::Id id, core::TypeInfo::index_t family) const;
+		bool has_component(Entity::Id id, nonstd::type_info_polymorphic::index_t family) const;
 		/**
 		* Retrieve a Component assigned to an Entity::Id.
 		*
@@ -688,7 +688,7 @@ virtual std::shared_ptr<Component> clone() const								\
 		CHandle<C> component(Entity::Id id)
 		{
 			assert_valid(id);
-			auto family = core::TypeInfo::id<Component, C>();
+			auto family = nonstd::type_info_polymorphic::id<Component, C>();
 			// We don't bother checking the component mask, as we return a nullptr anyway.
 			if (family >= component_pools_.size())
 				return CHandle<C>();
@@ -707,7 +707,7 @@ virtual std::shared_ptr<Component> clone() const								\
 		const CHandle<C> component(Entity::Id id) const
 		{
 			assert_valid(id);
-			auto family = core::TypeInfo::id<Component, C>();
+			auto family = nonstd::type_info_polymorphic::id<Component, C>();
 			// We don't bother checking the component mask, as we return a nullptr anyway.
 			if (family >= component_pools_.size())
 				return CHandle<C>();
@@ -847,7 +847,7 @@ virtual std::shared_ptr<Component> clone() const								\
 		ComponentMask component_mask()
 		{
 			ComponentMask mask;
-			mask.set(core::TypeInfo::id<Component, C>());
+			mask.set(nonstd::type_info_polymorphic::id<Component, C>());
 			return mask;
 		}
 
@@ -883,11 +883,11 @@ virtual std::shared_ptr<Component> clone() const								\
 		template <typename C>
 		ComponentStorage *accomodate_component()
 		{
-			auto family = core::TypeInfo::id<Component, C>();
+			auto family = nonstd::type_info_polymorphic::id<Component, C>();
 			return accomodate_component(family);
 		}
 
-		ComponentStorage *accomodate_component(core::TypeInfo::index_t family)
+		ComponentStorage *accomodate_component(nonstd::type_info_polymorphic::index_t family)
 		{
 			if (component_pools_.size() <= family)
 			{

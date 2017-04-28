@@ -5,7 +5,6 @@
 #include <utility>
 
 namespace nonstd {
-namespace util {
 
 template <typename T>
 class recursive_wrapper
@@ -105,7 +104,6 @@ inline void swap(recursive_wrapper<T>& lhs, recursive_wrapper<T>& rhs) noexcept
 {
     lhs.swap(rhs);
 }
-} // namespace util
 } // namespace nonstd
 
 #endif // _UTIL_RECURSIVE_WRAPPER_HPP

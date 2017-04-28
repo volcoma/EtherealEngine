@@ -5,7 +5,7 @@
 #include <functional>
 #include <tuple>
 
-namespace core
+namespace nonstd
 {
 	template <class T>
 	struct unwrap_refwrapper
@@ -136,5 +136,7 @@ namespace core
 	template <typename Functor>
 	using fn_result_of = typename function_traits<Functor>::result_type;
 }
+
+
 
 #endif // FUNCTION_TRAITS_HPP_INCLUDED

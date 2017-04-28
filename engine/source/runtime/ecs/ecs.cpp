@@ -129,7 +129,7 @@ namespace runtime
 		remove(id, component->runtime_id());
 	}
 
-	void EntityComponentSystem::remove(Entity::Id id, const core::TypeInfo::index_t family)
+	void EntityComponentSystem::remove(Entity::Id id, const nonstd::type_info_polymorphic::index_t family)
 	{
 		assert_valid(id);
 		const std::uint32_t index = id.index();
@@ -150,7 +150,7 @@ namespace runtime
 		return has_component(id, component->runtime_id());
 	}
 
-	bool EntityComponentSystem::has_component(Entity::Id id, core::TypeInfo::index_t family) const
+	bool EntityComponentSystem::has_component(Entity::Id id, nonstd::type_info_polymorphic::index_t family) const
 	{
 		assert_valid(id);
 		// We don't bother checking the component mask, as we return a nullptr anyway.
