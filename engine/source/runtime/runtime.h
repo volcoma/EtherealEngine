@@ -25,23 +25,3 @@
 #include "ecs/systems/scene_graph.h"
 #include "ecs/systems/camera_system.h"
 #include "ecs/systems/deferred_rendering.h"
-
-#include "meta/math/vector.hpp"
-#include "meta/math/transform.hpp"
-
-#include "meta/ecs/components/component.hpp"
-#include "meta/ecs/components/transform_component.hpp"
-#include "meta/ecs/components/camera_component.hpp"
-#include "meta/ecs/components/model_component.hpp"
-#include "meta/ecs/components/light_component.hpp"
-#include "meta/ecs/components/reflection_probe_component.hpp"
-#include "meta/ecs/entity.hpp"
-
-#include "meta/rendering/material.hpp"
-#include "meta/rendering/model.hpp"
-#include "meta/rendering/program.hpp"
-#include "meta/rendering/texture.hpp"
-#include "meta/rendering/mesh.hpp"
-#include "meta/rendering/camera.hpp"
-
-#include "meta/core/basetypes.hpp"

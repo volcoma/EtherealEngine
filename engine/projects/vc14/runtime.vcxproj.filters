@@ -261,6 +261,9 @@
     <ClCompile Include="..\..\source\runtime\rendering\reflection_probe.cpp">
       <Filter>Source Files\rendering</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\runtime\meta\meta.cpp">
+      <Filter>Source Files\meta</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\runtime\runtime.h">
@@ -574,6 +577,9 @@
     </ClInclude>
     <ClInclude Include="..\..\source\runtime\meta\rendering\reflection_probe.hpp">
       <Filter>Source Files\meta\rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\runtime\meta\meta.h">
+      <Filter>Source Files\meta</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

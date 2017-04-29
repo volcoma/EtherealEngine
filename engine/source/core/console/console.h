@@ -10,6 +10,7 @@
 #include <vector>
 #include <set>
 #include <unordered_map>
+#include "../common/type_traits.hpp"
 
 class Console
 {
@@ -276,15 +277,15 @@ struct Console::NameArguments<T, Args...>
 	static inline std::string get(const std::vector<std::string>& argumentNames, unsigned int nextName, unsigned int requiredArguments)
 	{
 		std::string nameT;
-		if (typeid(T) == typeid(int))
+		if (rtti::type_id<T>() == rtti::type_id<int>())
 		{
 			nameT = "<int";
 		}
-		else if (typeid(T) == typeid(float))
+		else if (rtti::type_id<T>() == rtti::type_id<float>())
 		{
 			nameT = "<float";
 		}
-		else if (typeid(T) == typeid(std::string))
+		else if (rtti::type_id<T>() == rtti::type_id<std::string>())
 		{
 			nameT = "<string";
 		}

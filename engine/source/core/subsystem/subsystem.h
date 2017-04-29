@@ -123,16 +123,14 @@ namespace core
 	S* SubsystemContext::add_subsystem(Args&& ... args)
 	{
 		auto index = nonstd::type_info_polymorphic::id<Subsystem, S>();
-		Expects(!has_subsystems<S>());
-			//"duplicated subsystem: %s.", typeid(S).name());
-
+		Expects(!has_subsystems<S>() && "duplicated subsystem");
+	
 		auto sys = new (std::nothrow) S(std::forward<Args>(args)...);
 		_orders.push_back(index);
 		_subsystems.insert(std::make_pair(index, sys));
 
-		Expects(sys->initialize());
-			//"failed to initialize subsystem: %s.", typeid(S).name());
-
+		Expects(sys->initialize() && "failed to initialize subsystem.");
+		
 		return sys;
 	}
 

@@ -30,6 +30,17 @@ namespace nonstd
 
 	template<typename B>
 	type_info_polymorphic::index_t type_info_polymorphic::counter<B>::value = 0;
+
+
+	static bool check_all_true() { return true; }
+
+	template<typename... BoolArgs>
+	static bool check_all_true(bool arg1, BoolArgs... args) { return arg1 & check_all_true(args...); }
+
+	template <bool...> struct bool_pack;
+	template <bool... v>
+	using all_true = std::is_same<bool_pack<true, v...>, bool_pack<v..., true>>;
+
 }
 
 ///////////////////////////////////////////////////////
@@ -113,7 +124,7 @@ namespace rtti
 	template<typename T>
 	const type_index_t& type_id()
 	{
-		//this is required to copy the behavior of typeid(T)
+		//this is required to copy the behavior of typeid operator
 		return detail::type_id_impl<typename std::remove_cv<T>::type>();
 	}
 

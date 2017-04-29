@@ -36,6 +36,7 @@
     <ClCompile Include="..\..\source\runtime\ecs\systems\scene_graph.cpp" />
     <ClCompile Include="..\..\source\runtime\ecs\utils.cpp" />
     <ClCompile Include="..\..\source\runtime\input\input.cpp" />
+    <ClCompile Include="..\..\source\runtime\meta\meta.cpp" />
     <ClCompile Include="..\..\source\runtime\rendering\camera.cpp" />
     <ClCompile Include="..\..\source\runtime\rendering\debugdraw\bounds.cpp" />
     <ClCompile Include="..\..\source\runtime\rendering\debugdraw\debugdraw.cpp" />
@@ -109,6 +110,7 @@
     <ClInclude Include="..\..\source\runtime\meta\ecs\entity.hpp" />
     <ClInclude Include="..\..\source\runtime\meta\math\transform.hpp" />
     <ClInclude Include="..\..\source\runtime\meta\math\vector.hpp" />
+    <ClInclude Include="..\..\source\runtime\meta\meta.h" />
     <ClInclude Include="..\..\source\runtime\meta\rendering\camera.hpp" />
     <ClInclude Include="..\..\source\runtime\meta\rendering\light.hpp" />
     <ClInclude Include="..\..\source\runtime\meta\rendering\material.hpp" />

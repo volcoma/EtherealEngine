@@ -24,54 +24,32 @@ using optional_t = nonstd::optional<T>;
 template <typename T>
 using function_traits_t = typename nonstd::function_traits<T>;
 
+template<typename T, size_t Index>
+using param_types_decayed_t = typename nonstd::param_types_decayed<T, Index>::type;
+
 template <typename T>
 using fn_result_of_t = typename nonstd::fn_result_of<T>;
+
+template<typename T, typename Check>
+using fn_result_is_t = std::is_same<typename nonstd::fn_result_of<T>, Check>;
 
 template <typename T>
 using special_decay_t = typename nonstd::special_decay_t<T>;
 
-template<typename TupleType, typename FunctionType>
-void for_each(TupleType&&, FunctionType
-	, std::integral_constant<size_t, std::tuple_size<typename std::remove_reference<TupleType>::type >::value>) {}
+template< bool B, class T, class F >
+using conditional_t = typename std::conditional<B, T, F>::type;
 
-template<std::size_t I, typename TupleType, typename FunctionType
-	, typename = typename std::enable_if<I != std::tuple_size<typename std::remove_reference<TupleType>::type>::value>::type >
-	void for_each(TupleType&& t, FunctionType f, std::integral_constant<size_t, I>)
-{
-	f(std::get<I>(t));
-	for_each(std::forward<TupleType>(t), f, std::integral_constant<size_t, I + 1>());
-}
 
-template<typename TupleType, typename FunctionType>
-void for_each(TupleType&& t, FunctionType f)
+struct void_func
 {
-	for_each(std::forward<TupleType>(t), f, std::integral_constant<size_t, 0>());
-}
+	using type = void_func;
+};
 
-template<typename F, typename Tuple, std::size_t ... I>
-auto apply_impl(F&& f, Tuple&& t, std::index_sequence<I...>)
+struct return_func
 {
-	return std::forward<F>(f)(std::get<I>(std::forward<Tuple>(t))...);
-}
-template<typename F, typename Tuple>
-auto apply(F&& f, Tuple&& t)
-{
-	using Indices = std::make_index_sequence<std::tuple_size<std::decay_t<Tuple>>::value>;
-	return apply_impl(std::forward<F>(f), std::forward<Tuple>(t), Indices());
-}
+	using type = return_func;
+};
 
-template<typename F, typename Tuple, typename std::enable_if<!std::is_same<fn_result_of_t<F>, void>::value>::type* = nullptr>
-any_t call(F&& f, Tuple&& t)
-{
-	return apply(std::forward<F>(f), std::forward<Tuple>(t));
-}
-template<typename F, typename Tuple, typename std::enable_if<std::is_same<fn_result_of_t<F>, void>::value>::type* = nullptr>
-any_t call(F&& f, Tuple&& t)
-{
-	any_t result;
-	apply(std::forward<F>(f), std::forward<Tuple>(t));
-	return result;
-}
 
 template <typename... Args>
 std::vector<any_t> fill_args(Args&&... args)
@@ -88,89 +66,78 @@ bool implicit_cast_impl(const any_t& operand, To& result)
 template<typename From, typename To, typename std::enable_if<std::is_convertible<From, To>::value>::type* = nullptr>
 bool implicit_cast_impl(const any_t& operand, To& result)
 {
-	auto val = any_cast_t<From>(operand);
-	result = static_cast<To>(val);
-	return true;
+	if (operand.type() == rtti::type_id<From>())
+	{
+		auto val = any_cast_t<From>(operand);
+		result = static_cast<To>(val);
+		return true;
+	}
+	
+	return false;
 }
 
-template<typename T>
-bool implicit_cast(const any_t& operand, T& result)
+template<typename To>
+bool try_implicit_cast(const any_t& operand, To& result)
 {
-	const auto& from = operand.type();
-	const auto& to = rtti::type_id<T>();
-
-	if (from == to)
+	if (operand.type() == rtti::type_id<To>())
 	{
-		result = any_cast_t<T>(operand);
+		auto val = any_cast_t<To>(operand);
+		result = static_cast<To>(val);
 		return true;
 	}
-	else if (from == rtti::type_id<std::int8_t>() &&
-		implicit_cast_impl<std::int8_t, T>(operand, result))
+	else if (implicit_cast_impl<std::int8_t>(operand, result))
 	{
 		return true;
 	}
-	else if (from == rtti::type_id<std::int16_t>() &&
-		implicit_cast_impl<std::int16_t, T>(operand, result))
+	else if (implicit_cast_impl<std::int16_t>(operand, result))
 	{
 		return true;
 	}
-	else if (from == rtti::type_id<std::int32_t>() &&
-		implicit_cast_impl<std::int32_t, T>(operand, result))
+	else if (implicit_cast_impl<std::int32_t>(operand, result))
 	{
 		return true;
 	}
-	else if (from == rtti::type_id<std::int64_t>() &&
-		implicit_cast_impl<std::int64_t, T>(operand, result))
+	else if (implicit_cast_impl<std::int64_t>(operand, result))
 	{
 		return true;
 	}
-	else if (from == rtti::type_id<std::uint8_t>() &&
-		implicit_cast_impl<std::uint8_t, T>(operand, result))
+	else if (implicit_cast_impl<std::uint8_t>(operand, result))
 	{
 		return true;
 	}
-	else if (from == rtti::type_id<std::uint16_t>() &&
-		implicit_cast_impl<std::uint16_t, T>(operand, result))
+	else if (implicit_cast_impl<std::uint16_t>(operand, result))
 	{
 		return true;
 	}
-	else if (from == rtti::type_id<std::uint32_t>() &&
-		implicit_cast_impl<std::uint32_t, T>(operand, result))
+	else if (implicit_cast_impl<std::uint32_t>(operand, result))
 	{
 		return true;
 	}
-	else if (from == rtti::type_id<std::uint64_t>() &&
-		implicit_cast_impl<std::uint64_t, T>(operand, result))
+	else if (implicit_cast_impl<std::uint64_t>(operand, result))
 	{
 		return true;
 	}
-	else if (from == rtti::type_id<float>() &&
-		implicit_cast_impl<float, T>(operand, result))
+	else if (implicit_cast_impl<float>(operand, result))
 	{
 		return true;
 	}
-	else if (from == rtti::type_id<double>() &&
-		implicit_cast_impl<double, T>(operand, result))
+	else if (implicit_cast_impl<double>(operand, result))
 	{
 		return true;
 	}
-	else if (from == rtti::type_id<const char*>() &&
-		implicit_cast_impl<const char*, T>(operand, result))
+	else if (implicit_cast_impl<const char*>(operand, result))
 	{
 		return true;
 	}
-	else if (from == rtti::type_id<char>() &&
-		implicit_cast_impl<char, T>(operand, result))
+	else if (implicit_cast_impl<char>(operand, result))
 	{
 		return true;
 	}
-	else if (from == rtti::type_id<unsigned char>() &&
-		implicit_cast_impl<unsigned char, T>(operand, result))
+	else if (implicit_cast_impl<unsigned char>(operand, result))
 	{
 		return true;
 	}
-	else if (from == rtti::type_id<std::nullptr_t>() &&
-		implicit_cast_impl<std::nullptr_t, T>(operand, result))
+	else if (implicit_cast_impl<std::nullptr_t>(operand, result))
 	{
 		return true;
 	}
@@ -178,16 +145,71 @@ bool implicit_cast(const any_t& operand, T& result)
 	return false;
 }
 
+template<typename T>
+bool can_implicit_cast(const any_t& operand)
+{
+	T result;
+	return try_implicit_cast<T>(operand, result);
+}
+
+template<typename T>
+T implicit_cast(const any_t& operand)
+{
+	T result;
+	try_implicit_cast<T>(operand, result);
+	return result;
+}
+
+
 struct function_wrapper
 {
 	virtual ~function_wrapper() = default;
+
 	virtual any_t invoke(const std::vector<any_t>& params) const = 0;
+
 	virtual bool owns(const any_t& delegate) const = 0;
 };
 
-template<typename F>
-class function_wrapper_t : public function_wrapper
+template<typename F, typename IndexSequence>
+class function_wrapper_t;
+
+
+template<typename F, size_t... ArgCount>
+class function_wrapper_t<F, std::index_sequence<ArgCount...>> : public function_wrapper
 {
+	template<std::size_t... Arg_Idx>
+	any_t invoke_variadic_impl(std::index_sequence<Arg_Idx...>, const std::vector<any_t>& arg_list) const
+	{
+		static const auto deduction_helper = conditional_t<fn_result_is_t<F, void>::value, void_func, return_func>::type();
+		return invoke(deduction_helper, ((Arg_Idx < arg_list.size()) ? arg_list[Arg_Idx] : param_types_decayed_t<F, Arg_Idx>()) ...);
+	}
+
+	template<typename... Args>
+	any_t invoke(const void_func&, const Args&...args) const
+	{
+		bool all_params_are_convertible = nonstd::check_all_true(can_implicit_cast<param_types_decayed_t<F, ArgCount>>(args)...);
+		assert(all_params_are_convertible && "cannot convert all the parameters");
+		if (all_params_are_convertible)
+		{
+			_function(implicit_cast<param_types_decayed_t<F, ArgCount>>(args)...);
+		}
+
+		return any_t{};
+	}
+
+
+	template<typename... Args>
+	any_t invoke(const return_func&, const Args&...args) const
+	{
+		bool all_params_are_convertible = nonstd::check_all_true(can_implicit_cast<param_types_decayed_t<F, ArgCount>>(args)...);
+		assert(all_params_are_convertible && "cannot convert all the parameters");
+		if (all_params_are_convertible)
+		{
+			return _function(implicit_cast<param_types_decayed_t<F, ArgCount>>(args)...);
+		}
+		return any_t{};
+	}
+
 public:
 	using delegate_t = delegate<typename function_traits_t<F>::function_type>;
 
@@ -202,26 +224,7 @@ public:
 
 	virtual any_t invoke(const std::vector<any_t>& params) const
 	{
-		typename function_traits_t<F>::tuple_type_decayed args;
-		//const auto arity = function_traits_t<F>::arity;
-		//assert(arity <= params.size() && "less parameters are not allowed");
-		std::size_t i = 0;
-		for_each(args, [&](auto& arg)
-		{
-			using arg_type = special_decay_t<decltype(arg)>;
-
-			if (i >= params.size())
-			{
-				i++;
-				return;
-			}
-
-			const auto& param = params[i++];
-			bool can_cast = implicit_cast(param, arg);
-			assert(can_cast && "cannot implicitly convert types");
-		});
-
-		return call(_function, args);
+		return invoke_variadic_impl(std::make_index_sequence<function_traits_t<F>::arity>(), params);
 	}
 
 	virtual bool owns(const any_t& any_delegate) const
@@ -237,19 +240,25 @@ public:
 private:
 
 	delegate_t _function;
+
 };
 
 
 template <typename F>
 std::unique_ptr<function_wrapper> create_wrapper(F f)
 {
-	return std::unique_ptr<function_wrapper_t<F>>(new function_wrapper_t<F>(std::forward<F>(f)));
+
+	using arg_index_sequence = std::make_index_sequence< function_traits_t<F>::arity >;
+	using wrapper = function_wrapper_t<F, arg_index_sequence>;
+	return std::unique_ptr<wrapper>(new wrapper(std::forward<F>(f)));
 }
 
 template <typename C, typename F>
 std::unique_ptr<function_wrapper> create_wrapper(C * const object_ptr, F f)
 {
-	return std::unique_ptr<function_wrapper_t<F>>(new function_wrapper_t<F>(object_ptr, std::forward<F>(f)));
+	using arg_index_sequence = std::make_index_sequence< function_traits_t<F>::arity >;
+	using wrapper = function_wrapper_t<F, arg_index_sequence>;
+	return std::unique_ptr<wrapper>(new wrapper(object_ptr, std::forward<F>(f)));
 }
 
 template<typename id_t = std::string, typename sentinel_t = std::weak_ptr<void>>
@@ -436,7 +445,6 @@ public:
 	R invoke(const id_t& id, Args&&... args)
 	{
 		static_assert(!std::is_reference<R>::value, "unsupported return by reference (use return by value)");
-
 		R res{};
 
 		auto it = _list.find(id);
@@ -455,16 +463,15 @@ public:
 		if (info.function != nullptr)
 		{
 			auto result = info.function->invoke(fill_args(std::forward<Args>(args) ...));
-			bool can_cast = implicit_cast<R>(result, res);
-			assert(can_cast && "cannot implicitly convert types");
+			bool can_cast = try_implicit_cast<R>(result, res);
+			assert(can_cast && "cannot implicitly convert return type");
 		}
 		return res;
 	}
+
 	template<typename R, typename ... Args, typename std::enable_if<std::is_same<R, void>::value>::type* = nullptr>
 	R invoke(const id_t& id, Args&&... args)
 	{
-		static_assert(!std::is_reference<R>::value, "unsupported return by reference (use return by value)");
-
 		auto it = _list.find(id);
 		if (it == _list.end())
 			return;

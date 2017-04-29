@@ -31,27 +31,13 @@ namespace nonstd
 	template <typename R, typename... Args>
 	struct function_traits<R(Args...)>
 	{
-		typedef R result_type;
-		typedef result_type return_type;
+		using result_type = R;
+		using return_type =  result_type;
 		typedef result_type function_type(Args...);
-		enum
-		{
-			arity = sizeof...(Args)
-		};
+		static const std::size_t arity = sizeof...(Args);
 
-		typedef std::tuple<Args...> tuple_type;
-		template <size_t i>
-		struct arg
-		{
-			typedef typename std::tuple_element<i, tuple_type>::type type;
-		};
-
-		typedef std::tuple<special_decay_t<Args>...> tuple_type_decayed;
-		template <size_t i>
-		struct arg_decayed
-		{
-			typedef typename std::tuple_element<i, tuple_type_decayed>::type type;
-		};
+		using arg_types = std::tuple<Args...>;
+		using arg_types_decayed = std::tuple<special_decay_t<Args>...>;
 	};
 
 	template <typename R, typename... Args>
@@ -133,8 +119,114 @@ namespace nonstd
 	* This seems to be slightly better than the standard library version as of now.
 	* */
 
-	template <typename Functor>
-	using fn_result_of = typename function_traits<Functor>::result_type;
+	template <typename F>
+	using fn_result_of = typename function_traits<F>::result_type;
+
+	/////////////////////////////////////////////////////////////////////////////////////
+	// use it like e.g:
+	// param_types<F, 0>::type
+
+	template<typename F, size_t Index>
+	struct param_types
+	{
+		using type = typename std::tuple_element<Index, typename function_traits<F>::arg_types>::type;
+	};
+
+	template<typename F, size_t Index>
+	struct param_types_decayed
+	{
+		using type = typename std::tuple_element<Index, typename function_traits<F>::arg_types_decayed>::type;
+	};
+	
+	/////////////////////////////////////////////////////////////////////////////////////
+	namespace detail {
+
+		template <class T>
+		struct is_reference_wrapper : std::false_type {};
+		template <class U>
+		struct is_reference_wrapper<std::reference_wrapper<U>> : std::true_type {};
+		template <class T>
+		constexpr bool is_reference_wrapper_v = is_reference_wrapper<T>::value;
+
+		template<class Base, class T, class Derived, class... Args>
+		auto INVOKE(T Base::*pmf, Derived&& ref, Args&&...args)
+			noexcept(noexcept((std::forward<Derived>(ref).*pmf)(std::forward<Args>(args)...)))
+			-> std::enable_if_t<std::is_function_v<T> &&
+							std::is_base_of_v<Base, std::decay_t<Derived>>,
+			decltype((std::forward<Derived>(ref).*pmf)(std::forward<Args>(args)...))>
+		{
+			return (std::forward<Derived>(ref).*pmf)(std::forward<Args>(args)...);
+		}
+
+		template<class Base, class T, class RefWrap, class... Args>
+		auto INVOKE(T Base::*pmf, RefWrap&& ref, Args&&...args)
+			noexcept(noexcept((ref.get().*pmf)(std::forward<Args>(args)...)))
+			-> std::enable_if_t<std::is_function_v<T> &&
+							is_reference_wrapper_v<std::decay_t<RefWrap>>,
+			decltype((ref.get().*pmf)(std::forward<Args>(args)...))>
+		{
+			return (ref.get().*pmf)(std::forward<Args>(args)...);
+		}
+
+		template<class Base, class T, class Pointer, class... Args>
+		auto INVOKE(T Base::*pmf, Pointer&& ptr, Args&&...args)
+			noexcept(noexcept(((*std::forward<Pointer>(ptr)).*pmf)(std::forward<Args>(args)...)))
+			-> std::enable_if_t<std::is_function_v<T> &&
+							!is_reference_wrapper_v<std::decay_t<Pointer>> &&
+							!std::is_base_of_v<Base, std::decay_t<Pointer>>,
+			decltype(((*std::forward<Pointer>(ptr)).*pmf)(std::forward<Args>(args)...))>
+		{
+			return ((*std::forward<Pointer>(ptr)).*pmf)(std::forward<Args>(args)...);
+		}
+
+		template<class Base, class T, class Derived>
+		auto INVOKE(T Base::*pmf, Derived&& ref)
+			noexcept(noexcept(std::forward<Derived>(ref).*pmf))
+			-> std::enable_if_t<!std::is_function_v<T> &&
+							std::is_base_of_v<Base, std::decay_t<Derived>>,
+			decltype(std::forward<Derived>(ref).*pmf)>
+		{
+			return std::forward<Derived>(ref).*pmf;
+		}
+
+		template<class Base, class T, class RefWrap>
+		auto INVOKE(T Base::*pmf, RefWrap&& ref)
+			noexcept(noexcept(ref.get().*pmf))
+			-> std::enable_if_t<!std::is_function_v<T> &&
+							is_reference_wrapper_v<std::decay_t<RefWrap>>,
+			decltype(ref.get().*pmf)>
+		{
+			return ref.get().*pmf;
+		}
+
+		template<class Base, class T, class Pointer>
+		auto INVOKE(T Base::*pmd, Pointer&& ptr)
+			noexcept(noexcept((*std::forward<Pointer>(ptr)).*pmd))
+			-> std::enable_if_t<!std::is_function_v<T> &&
+							!is_reference_wrapper_v<std::decay_t<Pointer>> &&
+							!std::is_base_of_v<Base, std::decay_t<Pointer>>,
+			decltype((*std::forward<Pointer>(ptr)).*pmd)>
+		{
+			return ((*std::forward<Pointer>(ptr)).*pmd);
+		}
+
+		template<class F, class... Args>
+		auto INVOKE(F&& f, Args&&...args)
+			noexcept(noexcept(std::forward<F>(f)(std::forward<Args>(args)...)))
+			-> std::enable_if_t<!std::is_member_pointer_v<std::decay_t<F>>,
+			decltype(std::forward<F>(f)(std::forward<Args>(args)...))>
+		{
+			return std::forward<F>(f)(std::forward<Args>(args)...);
+		}
+	}
+
+	template< class F, class... ArgTypes >
+	auto invoke(F&& f, ArgTypes&&... args)
+		noexcept(noexcept(detail::INVOKE(std::forward<F>(f), std::forward<ArgTypes>(args)...)))
+		->decltype(detail::INVOKE(std::forward<F>(f), std::forward<ArgTypes>(args)...))
+	{
+		return detail::INVOKE(std::forward<F>(f), std::forward<ArgTypes>(args)...);
+	}
 }
 
 
