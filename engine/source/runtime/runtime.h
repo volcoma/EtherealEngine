@@ -25,3 +25,5 @@
 #include "ecs/systems/scene_graph.h"
 #include "ecs/systems/camera_system.h"
 #include "ecs/systems/deferred_rendering.h"
+
+#include "meta/meta.h"

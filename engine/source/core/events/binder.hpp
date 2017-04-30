@@ -187,7 +187,7 @@ class function_wrapper_t<F, std::index_sequence<ArgCount...>> : public function_
 	template<typename... Args>
 	any_t invoke(const void_func&, const Args&...args) const
 	{
-		bool all_params_are_convertible = nonstd::check_all_true(can_implicit_cast<param_types_decayed_t<F, ArgCount>>(args)...);
+		const bool all_params_are_convertible = nonstd::check_all_true(can_implicit_cast<param_types_decayed_t<F, ArgCount>>(args)...);
 		assert(all_params_are_convertible && "cannot convert all the parameters");
 		if (all_params_are_convertible)
 		{
@@ -201,7 +201,7 @@ class function_wrapper_t<F, std::index_sequence<ArgCount...>> : public function_
 	template<typename... Args>
 	any_t invoke(const return_func&, const Args&...args) const
 	{
-		bool all_params_are_convertible = nonstd::check_all_true(can_implicit_cast<param_types_decayed_t<F, ArgCount>>(args)...);
+		const bool all_params_are_convertible = nonstd::check_all_true(can_implicit_cast<param_types_decayed_t<F, ArgCount>>(args)...);
 		assert(all_params_are_convertible && "cannot convert all the parameters");
 		if (all_params_are_convertible)
 		{
