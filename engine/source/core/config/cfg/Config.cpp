@@ -1,5 +1,5 @@
 
-#include "Config.h"
+#include "config.h"
 
 #include <stdexcept>
 #include <sstream>

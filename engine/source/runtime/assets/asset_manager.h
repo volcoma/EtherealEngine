@@ -3,7 +3,7 @@
 #include <functional>
 #include <unordered_map>
 
-#include "core/common/type_traits.hpp"
+#include "core/nonstd/type_traits.hpp"
 #include "core/common/string.h"
 #include "core/events/delegate.hpp"
 #include "../system/filesystem.h"

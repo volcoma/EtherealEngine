@@ -166,6 +166,9 @@
     <Filter Include="Source Files\subsystem">
       <UniqueIdentifier>{9e636e3c-0ad8-436c-989d-93b13cd57df6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\nonstd">
+      <UniqueIdentifier>{2cc78274-1dd0-45cb-837d-5fe8d04030f1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\core\events\delegate.hpp">
@@ -873,12 +876,6 @@
     <ClInclude Include="..\..\source\core\serialization\archives.h">
       <Filter>Source Files\serialization</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\config\cfg\Config.h">
-      <Filter>Source Files\config\cfg</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\config\cfg\Parser.h">
-      <Filter>Source Files\config\cfg</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\core\config\cfg.h">
       <Filter>Source Files\config</Filter>
     </ClInclude>
@@ -1296,28 +1293,7 @@
     <ClInclude Include="..\..\source\core\common\string.h">
       <Filter>Source Files\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\common\tuple.hpp">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\common\type_traits.hpp">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\core\common\utils.h">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\common\variant.hpp">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\common\variant_cast.hpp">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\common\variant_io.hpp">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\common\variant_visitor.hpp">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\common\any.hpp">
       <Filter>Source Files\common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\core\common\assert.hpp">
@@ -1341,17 +1317,47 @@
     <ClInclude Include="..\..\source\core\common\pathname_tag_tree.h">
       <Filter>Source Files\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\common\recursive_wrapper.hpp">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\common\function_traits.hpp">
-      <Filter>Source Files\common</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\core\events\binder.hpp">
       <Filter>Source Files\events</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\common\optional.hpp">
-      <Filter>Source Files\common</Filter>
+    <ClInclude Include="..\..\source\core\nonstd\any.hpp">
+      <Filter>Source Files\nonstd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\nonstd\function_traits.hpp">
+      <Filter>Source Files\nonstd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\nonstd\optional.hpp">
+      <Filter>Source Files\nonstd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\nonstd\recursive_wrapper.hpp">
+      <Filter>Source Files\nonstd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\nonstd\tuple.hpp">
+      <Filter>Source Files\nonstd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\nonstd\type_traits.hpp">
+      <Filter>Source Files\nonstd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\nonstd\variant.hpp">
+      <Filter>Source Files\nonstd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\nonstd\variant_cast.hpp">
+      <Filter>Source Files\nonstd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\nonstd\variant_io.hpp">
+      <Filter>Source Files\nonstd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\nonstd\variant_visitor.hpp">
+      <Filter>Source Files\nonstd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\nonstd\nonstd.h">
+      <Filter>Source Files\nonstd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\config\cfg\config.h">
+      <Filter>Source Files\config\cfg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\config\cfg\parser.h">
+      <Filter>Source Files\config\cfg</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1457,12 +1463,6 @@
     <ClCompile Include="..\..\source\core\logging\spdlog\details\format.cc">
       <Filter>Source Files\logging\spdlog\details</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\core\config\cfg\Config.cpp">
-      <Filter>Source Files\config\cfg</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\core\config\cfg\Parser.cpp">
-      <Filter>Source Files\config\cfg</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\core\math\glm\detail\dummy.cpp">
       <Filter>Source Files\math\glm\detail</Filter>
     </ClCompile>
@@ -1495,6 +1495,12 @@
     </ClCompile>
     <ClCompile Include="..\..\source\core\common\pathname_tag_tree.cpp">
       <Filter>Source Files\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\config\cfg\config.cpp">
+      <Filter>Source Files\config\cfg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\core\config\cfg\parser.cpp">
+      <Filter>Source Files\config\cfg</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

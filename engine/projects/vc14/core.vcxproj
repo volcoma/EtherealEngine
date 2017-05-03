@@ -19,30 +19,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\core\common\any.hpp" />
     <ClInclude Include="..\..\source\core\common\assert.hpp" />
     <ClInclude Include="..\..\source\core\common\basetypes.hpp" />
     <ClInclude Include="..\..\source\core\common\common.h" />
-    <ClInclude Include="..\..\source\core\common\function_traits.hpp" />
     <ClInclude Include="..\..\source\core\common\handle.hpp" />
     <ClInclude Include="..\..\source\core\common\handle_object_set.hpp" />
     <ClInclude Include="..\..\source\core\common\handle_set.hpp" />
-    <ClInclude Include="..\..\source\core\common\optional.hpp" />
     <ClInclude Include="..\..\source\core\common\pathname_tag_tree.h" />
-    <ClInclude Include="..\..\source\core\common\recursive_wrapper.hpp" />
     <ClInclude Include="..\..\source\core\common\spimpl.hpp" />
     <ClInclude Include="..\..\source\core\common\spin.hpp" />
     <ClInclude Include="..\..\source\core\common\string.h" />
-    <ClInclude Include="..\..\source\core\common\tuple.hpp" />
-    <ClInclude Include="..\..\source\core\common\type_traits.hpp" />
     <ClInclude Include="..\..\source\core\common\utils.h" />
-    <ClInclude Include="..\..\source\core\common\variant.hpp" />
-    <ClInclude Include="..\..\source\core\common\variant_cast.hpp" />
-    <ClInclude Include="..\..\source\core\common\variant_io.hpp" />
-    <ClInclude Include="..\..\source\core\common\variant_visitor.hpp" />
     <ClInclude Include="..\..\source\core\config\cfg.h" />
-    <ClInclude Include="..\..\source\core\config\cfg\Config.h" />
-    <ClInclude Include="..\..\source\core\config\cfg\Parser.h" />
+    <ClInclude Include="..\..\source\core\config\cfg\config.h" />
+    <ClInclude Include="..\..\source\core\config\cfg\parser.h" />
     <ClInclude Include="..\..\source\core\console\console.h" />
     <ClInclude Include="..\..\source\core\core.h" />
     <ClInclude Include="..\..\source\core\events\binder.hpp" />
@@ -221,6 +211,17 @@
     <ClInclude Include="..\..\source\core\memory\memory.h" />
     <ClInclude Include="..\..\source\core\memory\memory_pool.hpp" />
     <ClInclude Include="..\..\source\core\memory\tracey.hpp" />
+    <ClInclude Include="..\..\source\core\nonstd\any.hpp" />
+    <ClInclude Include="..\..\source\core\nonstd\function_traits.hpp" />
+    <ClInclude Include="..\..\source\core\nonstd\nonstd.h" />
+    <ClInclude Include="..\..\source\core\nonstd\optional.hpp" />
+    <ClInclude Include="..\..\source\core\nonstd\recursive_wrapper.hpp" />
+    <ClInclude Include="..\..\source\core\nonstd\tuple.hpp" />
+    <ClInclude Include="..\..\source\core\nonstd\type_traits.hpp" />
+    <ClInclude Include="..\..\source\core\nonstd\variant.hpp" />
+    <ClInclude Include="..\..\source\core\nonstd\variant_cast.hpp" />
+    <ClInclude Include="..\..\source\core\nonstd\variant_io.hpp" />
+    <ClInclude Include="..\..\source\core\nonstd\variant_visitor.hpp" />
     <ClInclude Include="..\..\source\core\platform_config.h" />
     <ClInclude Include="..\..\source\core\random\random.h" />
     <ClInclude Include="..\..\source\core\reflection\reflection.h" />
@@ -419,8 +420,8 @@
     <ClCompile Include="..\..\source\core\common\handle_set.cpp" />
     <ClCompile Include="..\..\source\core\common\pathname_tag_tree.cpp" />
     <ClCompile Include="..\..\source\core\common\string.cpp" />
-    <ClCompile Include="..\..\source\core\config\cfg\Config.cpp" />
-    <ClCompile Include="..\..\source\core\config\cfg\Parser.cpp" />
+    <ClCompile Include="..\..\source\core\config\cfg\config.cpp" />
+    <ClCompile Include="..\..\source\core\config\cfg\parser.cpp" />
     <ClCompile Include="..\..\source\core\console\console.cpp" />
     <ClCompile Include="..\..\source\core\core.cpp" />
     <ClCompile Include="..\..\source\core\logging\spdlog\details\format.cc" />

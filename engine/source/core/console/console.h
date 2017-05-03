@@ -10,7 +10,7 @@
 #include <vector>
 #include <set>
 #include <unordered_map>
-#include "../common/type_traits.hpp"
+#include "../nonstd/type_traits.hpp"
 
 class Console
 {
@@ -84,8 +84,7 @@ private:
 	std::stringstream printBuffer;
 	void print(std::string output) { printBuffer << output << "\n"; }
 
-public:
-	// TODO: make this private (or move to a StringUtils class)
+private:
 	static std::vector<std::string> tokenize_line(const std::string& line);
 
 };

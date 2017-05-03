@@ -4,7 +4,7 @@
 #include "core/subsystem/simulation.h"
 #include "core/events/event.hpp"
 #include "core/common/assert.hpp"
-#include "core/common/type_traits.hpp"
+#include "core/nonstd/type_traits.hpp"
 #include "core/reflection/reflection.h"
 #include "core/serialization/serialization.h"
 

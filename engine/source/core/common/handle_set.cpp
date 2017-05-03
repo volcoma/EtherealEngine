@@ -13,16 +13,16 @@ namespace core
 			index_t index = _freeslots.back();
 			_freeslots.pop_back();
 
-			Expects(_versions[index] < Handle::invalid - 1);
-// 				"too much versions,"
-// 				"please considering change the representation of Handle::index_t.");
+			Expects(_versions[index] < Handle::invalid - 1 &&
+ 				"too much versions,"
+ 				"please considering change the representation of Handle::index_t.");
 			return Handle(index, ++_versions[index]);
 		}
 
 		_versions.push_back(1);
-		Expects(_versions.size() < Handle::invalid);
-// 			"too much handles,"
-// 			"please considering change the representation of Handle::index_t.");
+		Expects(_versions.size() < Handle::invalid &&
+ 			"too much handles,"
+ 			"please considering change the representation of Handle::index_t.");
 		return Handle(static_cast<index_t>(_versions.size() - 1), 1);
 	}
 

@@ -55,11 +55,10 @@
 #       define NONSTD_OPTIONAL_EXPLICIT_OP_BOOL
 #       define NONSTD_OPTIONAL_TEMPLATE_FUNCS_DEFAULT_PARAMS
 #   endif
-#   if __GNUC__ >= 5
+#   if __GNUC__ >= 5 && __cplusplus >= 201402L
 #       define NONSTD_OPTIONAL_CONSTEXPR
 #   endif
 #endif
-
 
 // Define NONSTD_OPTIONAL_NOEXCEPT to get noexcept specifications
 #ifdef NONSTD_OPTIONAL_NOEXCEPT

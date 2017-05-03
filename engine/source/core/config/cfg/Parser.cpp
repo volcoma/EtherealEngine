@@ -1,6 +1,6 @@
 
-#include "Parser.h"
-#include "Config.h"
+#include "parser.h"
+#include "config.h"
 
 #include <stdexcept>
 #include <sstream>
