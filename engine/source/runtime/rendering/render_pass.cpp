@@ -22,13 +22,13 @@ std::uint8_t generate_id()
 }
 
 
-RenderPass::RenderPass(const std::string& n)
+render_pass::render_pass(const std::string& n)
 {
 	id = generate_id();
 	gfx::setViewName(id, n.c_str());
 }
 
-void RenderPass::bind(FrameBuffer* fb) const
+void render_pass::bind(frame_buffer* fb) const
 {
 	Expects(fb != nullptr);
 
@@ -56,7 +56,7 @@ void RenderPass::bind(FrameBuffer* fb) const
 	
 }
 
-void RenderPass::clear(std::uint16_t _flags, std::uint32_t _rgba /*= 0x000000ff */, float _depth /*= 1.0f */, std::uint8_t _stencil /*= 0*/) const
+void render_pass::clear(std::uint16_t _flags, std::uint32_t _rgba /*= 0x000000ff */, float _depth /*= 1.0f */, std::uint8_t _stencil /*= 0*/) const
 {
 	gfx::setViewClear(id
 		, _flags
@@ -66,7 +66,7 @@ void RenderPass::clear(std::uint16_t _flags, std::uint32_t _rgba /*= 0x000000ff 
 	);
 }
 
-void RenderPass::clear() const
+void render_pass::clear() const
 {
 	gfx::setViewClear(id
 		, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH | BGFX_CLEAR_STENCIL
@@ -76,18 +76,18 @@ void RenderPass::clear() const
 	);
 }
 
-void RenderPass::set_view_proj(const math::transform_t& v, const math::transform_t& p)
+void render_pass::set_view_proj(const math::transform& v, const math::transform& p)
 {
 	gfx::setViewTransform(id, &v, &p);
 }
 
-void RenderPass::set_view_proj_ortho_full(float depth)
+void render_pass::set_view_proj_ortho_full(float depth)
 {
-	static const math::transform_t p = math::ortho(0.0f, 1.0f, 1.0f, 0.0f, 0.0f, depth, gfx::is_homogeneous_depth());
+	static const math::transform p = math::ortho(0.0f, 1.0f, 1.0f, 0.0f, 0.0f, depth, gfx::is_homogeneous_depth());
 	gfx::setViewTransform(id, {}, &p);
 }
 
-void RenderPass::reset()
+void render_pass::reset()
 {
 	for (std::uint8_t i = 0; i < index; ++i)
 	{
@@ -97,7 +97,7 @@ void RenderPass::reset()
 	last_index = 0;
 }
 
-std::uint8_t RenderPass::get_pass()
+std::uint8_t render_pass::get_pass()
 {
 	return last_index;
 }

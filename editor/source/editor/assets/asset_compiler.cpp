@@ -16,8 +16,11 @@
 
 #include "mesh_importer.h"
 #include "runtime/meta/rendering/mesh.hpp"
+#include "runtime/rendering/shader.h"
+#include "runtime/rendering/texture.h"
 
-void ShaderCompiler::compile(const fs::path& absolute_key)
+
+void shader_compiler::compile(const fs::path& absolute_key)
 {
 	std::string str_input = absolute_key.string();
 	std::string file = absolute_key.stem().string();
@@ -141,7 +144,7 @@ void ShaderCompiler::compile(const fs::path& absolute_key)
 }
 
 
-void TextureCompiler::compile(const fs::path& absolute_key)
+void texture_compiler::compile(const fs::path& absolute_key)
 {
 	std::string str_input = absolute_key.string();
 	std::string raw_ext = absolute_key.filename().extension().string();
@@ -179,14 +182,14 @@ void TextureCompiler::compile(const fs::path& absolute_key)
 	}
 }
 
-void MeshCompiler::compile(const fs::path& absolute_key)
+void mesh_compiler::compile(const fs::path& absolute_key)
 {
 	std::string str_input = absolute_key.string();
 	std::string file = absolute_key.stem().string();
 	fs::path dir = absolute_key.parent_path();
 	fs::path output = dir / fs::path(file + extensions::mesh);
 
-	Mesh::LoadData data;
+	mesh::load_data data;
 	if (!importer::load_mesh_data_from_file(str_input, data))
 	{
 		APPLOG_ERROR("Failed compilation of {0}", str_input);

@@ -12,10 +12,10 @@ namespace core
 	// its useful for a variety of cases:
 	// 1. reducing system call overhead when requesting multiple small memory blocks;
 	// 2. improving cache efficiency by keeping memory contiguous;
-	struct MemoryPool
+	struct memory_pool
 	{
-		MemoryPool(size_t block_size, size_t chunk_size);
-		virtual ~MemoryPool();
+		memory_pool(size_t block_size, size_t chunk_size);
+		virtual ~memory_pool();
 
 		// accquire a unused block of memory
 		void* malloc();
@@ -42,20 +42,21 @@ namespace core
 		size_t _chunk_entries_size;
 	};
 
-	template<typename T, size_t Growth> struct MemoryPoolT : public MemoryPool
+	template<typename T, size_t Growth> 
+	struct memory_pool_t : public memory_pool
 	{
 		using aligned_storage_t = typename std::aligned_storage<sizeof(T), alignof(T)>::type;
 
-		MemoryPoolT() : MemoryPool(sizeof(aligned_storage_t), Growth)
+		memory_pool_t() : memory_pool(sizeof(aligned_storage_t), Growth)
 		{}
 	};
 
-	inline size_t MemoryPool::size() const
+	inline size_t memory_pool::size() const
 	{
 		return capacity() - _available;
 	}
 
-	inline size_t MemoryPool::capacity() const
+	inline size_t memory_pool::capacity() const
 	{
 		return _chunks.size() * _chunk_entries_size;
 	}

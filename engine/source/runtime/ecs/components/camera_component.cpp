@@ -1,13 +1,13 @@
 #include "camera_component.h"
 #include "graphics/graphics.h"
 
-CameraComponent::CameraComponent()
+camera_component::camera_component()
 {
 	auto stats = gfx::getStats();
 	_camera.set_viewport_size({ stats->width, stats->height });
 }
 
-CameraComponent::CameraComponent(const CameraComponent& cameraComponent)
+camera_component::camera_component(const camera_component& cameraComponent)
 {
 	_camera = cameraComponent.get_camera();
 	_hdr = cameraComponent._hdr;
@@ -15,11 +15,11 @@ CameraComponent::CameraComponent(const CameraComponent& cameraComponent)
 	_camera.set_viewport_size({ stats->width, stats->height });
 }
 
-CameraComponent::~CameraComponent()
+camera_component::~camera_component()
 {
 }
 
-void CameraComponent::update(const math::transform_t& t)
+void camera_component::update(const math::transform& t)
 {
 	// Release the unused fbos and textures
 	_render_view.release_unused_resources();
@@ -36,83 +36,83 @@ void CameraComponent::update(const math::transform_t& t)
 	}
 }
 
-bool CameraComponent::get_hdr() const
+bool camera_component::get_hdr() const
 {
 	return _hdr;
 }
 
-void CameraComponent::set_hdr(bool hdr)
+void camera_component::set_hdr(bool hdr)
 {
 	_hdr = hdr;
 }
 
-void CameraComponent::set_viewport_size(const uSize& size)
+void camera_component::set_viewport_size(const usize& size)
 {
 	_camera.set_viewport_size(size);
 }
 
-const uSize& CameraComponent::get_viewport_size() const
+const usize& camera_component::get_viewport_size() const
 {
 	return _camera.get_viewport_size();
 }
 
 
-float CameraComponent::get_ortho_size() const
+float camera_component::get_ortho_size() const
 {
 	return _camera.get_ortho_size();
 }
 
-void CameraComponent::set_ortho_size(float size)
+void camera_component::set_ortho_size(float size)
 {
 	_camera.set_orthographic_size(size);
 }
 
-float CameraComponent::get_ppu() const
+float camera_component::get_ppu() const
 {
 	return _camera.get_ppu();
 }
 
-CameraComponent& CameraComponent::set_fov(float fovDegrees)
+camera_component& camera_component::set_fov(float fovDegrees)
 {
 	_camera.set_fov(fovDegrees);
 
 	return *this;
 }
 
-CameraComponent& CameraComponent::set_near_clip(float distance)
+camera_component& camera_component::set_near_clip(float distance)
 {
 	_camera.set_near_clip(distance);
 
 	return *this;
 }
-CameraComponent& CameraComponent::set_far_clip(float distance)
+camera_component& camera_component::set_far_clip(float distance)
 {
 	_camera.set_far_clip(distance);
 
 	return *this;
 }
 
-CameraComponent& CameraComponent::set_projection_mode(ProjectionMode mode)
+camera_component& camera_component::set_projection_mode(projection_mode mode)
 {
 	_camera.set_projection_mode(mode);
 
 	return *this;
 }
 
-float CameraComponent::get_fov() const
+float camera_component::get_fov() const
 {
 	return _camera.get_fov();
 }
-float CameraComponent::get_near_clip() const
+float camera_component::get_near_clip() const
 {
 	return _camera.get_near_clip();
 }
-float CameraComponent::get_far_clip() const
+float camera_component::get_far_clip() const
 {
 	return _camera.get_far_clip();
 }
 
-ProjectionMode CameraComponent::get_projection_mode() const
+projection_mode camera_component::get_projection_mode() const
 {
 	return _camera.get_projection_mode();
 }

@@ -26,19 +26,19 @@ namespace math
 		// Constructors & Destructors
 		//-------------------------------------------------------------------------
 		frustum();
-		frustum(const transform_t & view, const transform_t & proj, bool _oglNDC);
+		frustum(const transform & view, const transform & proj, bool _oglNDC);
 		frustum(const bbox & sourceBounds);
 
 		//-------------------------------------------------------------------------
 		// Public Methods
 		//-------------------------------------------------------------------------
-		void update(const transform_t & view, const transform_t & proj, bool _oglNDC);
+		void update(const transform & view, const transform & proj, bool _oglNDC);
 		void set_planes(const plane newPlanes[]);
 		void recompute_points();
-		VolumeQuery::E classify_aabb(const bbox & bounds) const;
-		VolumeQuery::E classify_aabb(const bbox & bounds, unsigned int & frustumBits, int & lastOutside) const;
-		VolumeQuery::E classify_sphere(const vec3 & center, float radius) const;
-		VolumeQuery::E classify_plane(const plane & plane) const;
+		volume_query classify_aabb(const bbox & bounds) const;
+		volume_query classify_aabb(const bbox & bounds, unsigned int & frustumBits, int & lastOutside) const;
+		volume_query classify_sphere(const vec3 & center, float radius) const;
+		volume_query classify_plane(const plane & plane) const;
 		bool test_point(const vec3 & point) const;
 		bool test_aabb(const bbox & bounds) const;
 
@@ -47,15 +47,15 @@ namespace math
 		bool test_swept_sphere(const vec3 & center, float radius, const vec3 & sweepDirection) const;
 		bool test_frustum(const frustum & frustum) const;
 		bool test_line(const vec3 & v1, const vec3 & v2) const;
-		frustum& mul(const transform_t & t);
+		frustum& mul(const transform & t);
 		//-------------------------------------------------------------------------
 		// Public Static Functions
 		//-------------------------------------------------------------------------
-		static frustum mul(frustum f, const transform_t & t);
-		static bool test_obb(frustum f, const bbox & bounds, const transform_t & t);
-		static bool test_extruded_obb(frustum f, const bbox_extruded & bounds, const transform_t & t);
-		static VolumeQuery::E classify_obb(frustum f, const bbox & bounds, const transform_t & t);
-		static VolumeQuery::E classify_obb(frustum f, const bbox & bounds, const transform_t & t, unsigned int & frustumBits, int & lastOutside);
+		static frustum mul(frustum f, const transform & t);
+		static bool test_obb(frustum f, const bbox & bounds, const transform & t);
+		static bool test_extruded_obb(frustum f, const bbox_extruded & bounds, const transform & t);
+		static volume_query classify_obb(frustum f, const bbox & bounds, const transform & t);
+		static volume_query classify_obb(frustum f, const bbox & bounds, const transform & t, unsigned int & frustumBits, int & lastOutside);
 		//-------------------------------------------------------------------------
 		// Public Operators
 		//-------------------------------------------------------------------------

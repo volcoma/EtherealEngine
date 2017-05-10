@@ -40,7 +40,7 @@ c++14/c++17 Using the latest and greates features of the language.
 
 namespace nsp
 {
-class SomeClass
+class some_class
 {
 public:
   //-----------------------------------------------------------------------------
@@ -69,7 +69,7 @@ private:
 }
 
 template<typename T>
-inline void SomeClass::some_templated_method()
+inline void some_class::some_templated_method()
 {
 // If the class is fully templated it is acceptable to put this inside the class
 }

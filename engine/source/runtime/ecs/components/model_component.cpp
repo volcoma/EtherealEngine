@@ -1,11 +1,11 @@
 #include "model_component.h"
 
-ModelComponent::ModelComponent()
+model_component::model_component()
 {
 
 }
 
-ModelComponent::ModelComponent(const ModelComponent& component)
+model_component::model_component(const model_component& component)
 	: _model(component._model)
 	, _static(component._static)
 	, _casts_shadow(component._casts_shadow)
@@ -13,11 +13,11 @@ ModelComponent::ModelComponent(const ModelComponent& component)
 {
 }
 
-ModelComponent::~ModelComponent()
+model_component::~model_component()
 {
 }
 
-ModelComponent& ModelComponent::set_casts_shadow(bool castShadow)
+model_component& model_component::set_casts_shadow(bool castShadow)
 {
 	if (_casts_shadow == castShadow)
 		return *this;
@@ -29,7 +29,7 @@ ModelComponent& ModelComponent::set_casts_shadow(bool castShadow)
 	return *this;
 }
 
-ModelComponent& ModelComponent::set_static(bool bStatic)
+model_component& model_component::set_static(bool bStatic)
 {
 	if (_static == bStatic)
 		return *this;
@@ -40,7 +40,7 @@ ModelComponent& ModelComponent::set_static(bool bStatic)
 	return *this;
 }
 
-ModelComponent& ModelComponent::set_casts_reflection(bool castReflection)
+model_component& model_component::set_casts_reflection(bool castReflection)
 {
 	if (_casts_reflection == castReflection)
 		return *this;
@@ -51,22 +51,22 @@ ModelComponent& ModelComponent::set_casts_reflection(bool castReflection)
 	return *this;
 }
 
-bool ModelComponent::casts_shadow() const
+bool model_component::casts_shadow() const
 {
 	return _casts_shadow;
 }
 
-bool ModelComponent::is_static() const
+bool model_component::is_static() const
 {
 	return _static;
 }
 
-const Model& ModelComponent::get_model() const
+const model& model_component::get_model() const
 {
 	return _model;
 }
 
-ModelComponent& ModelComponent::set_model(const Model& model)
+model_component& model_component::set_model(const model& model)
 {
 	_model = model;
 
@@ -75,7 +75,7 @@ ModelComponent& ModelComponent::set_model(const Model& model)
 	return *this;
 }
 
-bool ModelComponent::casts_reflection() const
+bool model_component::casts_reflection() const
 {
 	return _casts_reflection;
 }

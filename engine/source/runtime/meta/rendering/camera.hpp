@@ -5,17 +5,17 @@
 #include "../../rendering/camera.h"
 #include "../core/basetypes.hpp"
 
-REFLECT(Camera)
+REFLECT(camera)
 {
-	rttr::registration::enumeration<ProjectionMode>("ProjectionMode")
+	rttr::registration::enumeration<projection_mode>("projection_mode")
 		(
-			rttr::value("Perspective", ProjectionMode::Perspective),
-			rttr::value("Orthographic", ProjectionMode::Orthographic)
+			rttr::value("Perspective", projection_mode::perspective),
+			rttr::value("Orthographic", projection_mode::orthographic)
 			);
-	rttr::registration::class_<Camera>("Camera");
+	rttr::registration::class_<camera>("camera");
 }
 
-SAVE(Camera)
+SAVE(camera)
 {
 	try_save(ar, cereal::make_nvp("projection_mode", obj._projection_mode));
 	try_save(ar, cereal::make_nvp("field_of_view", obj._fov));
@@ -29,7 +29,7 @@ SAVE(Camera)
 	try_save(ar, cereal::make_nvp("frustum_locked", obj._frustum_locked));
 }
 
-LOAD(Camera)
+LOAD(camera)
 {
 	try_load(ar, cereal::make_nvp("projection_mode", obj._projection_mode));
 	try_load(ar, cereal::make_nvp("field_of_view", obj._fov));

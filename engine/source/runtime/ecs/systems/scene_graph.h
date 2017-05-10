@@ -4,11 +4,11 @@
 #include <vector>
 #include <chrono>
 
-class TransformComponent;
+class transform_component;
 
 namespace runtime
 {
-	class SceneGraph : public core::Subsystem
+	class scene_graph : public core::subsystem
 	{
 	public:
 		bool initialize();
@@ -31,9 +31,9 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		const std::vector<CHandle<TransformComponent>>& get_roots() const { return _roots; }
+		const std::vector<chandle<transform_component>>& get_roots() const { return _roots; }
 	private:
-		/// Scene roots
-		std::vector<CHandle<TransformComponent>> _roots;
+		/// scene roots
+		std::vector<chandle<transform_component>> _roots;
 	};
 }

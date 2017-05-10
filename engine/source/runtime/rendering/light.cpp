@@ -1,6 +1,6 @@
 #include "light.h"
 
-void Light::Spot::set_range(float r)
+void light::spot::set_range(float r)
 {
 	if (r < 0)
 		r = 0;
@@ -8,7 +8,7 @@ void Light::Spot::set_range(float r)
 	range = r;
 }
 
-void Light::Spot::set_outer_angle(float angle)
+void light::spot::set_outer_angle(float angle)
 {
 	if (angle < inner_angle)
 		angle = inner_angle;
@@ -16,7 +16,7 @@ void Light::Spot::set_outer_angle(float angle)
 	outer_angle = angle;
 }
 
-void Light::Spot::set_inner_angle(float angle)
+void light::spot::set_inner_angle(float angle)
 {
 	if (angle > outer_angle)
 		angle = outer_angle;

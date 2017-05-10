@@ -2,9 +2,9 @@
 #include "../../edit_state.h"
 #include "../inspectors/inspectors.h"
 
-void InspectorDock::render(const ImVec2& area)
+void inspector_dock::render(const ImVec2& area)
 {
-	auto es = core::get_subsystem<editor::EditState>();
+	auto es = core::get_subsystem<editor::editor_state>();
 
 	auto& selected = es->selection_data.object;
 	if (selected)
@@ -13,8 +13,8 @@ void InspectorDock::render(const ImVec2& area)
 	}
 }
 
-InspectorDock::InspectorDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize)
+inspector_dock::inspector_dock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize)
 {
 
-	initialize(dtitle, dcloseButton, dminSize, std::bind(&InspectorDock::render, this, std::placeholders::_1));
+	initialize(dtitle, dcloseButton, dminSize, std::bind(&inspector_dock::render, this, std::placeholders::_1));
 }

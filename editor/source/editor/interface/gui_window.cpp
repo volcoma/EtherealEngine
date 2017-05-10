@@ -1,5 +1,6 @@
 #include "gui_window.h"
 #include "runtime/rendering/render_pass.h"
+#include "../edit_state.h"
 
 void handle_sfml_event(sf::Event event)
 {
@@ -74,31 +75,31 @@ sf::Window::Cursor map_cursor(ImGuiMouseCursor cursor)
 	return cursor_map[static_cast<ImGuiMouseCursor_>(cursor)];
 }
 
-void imgui_frame_update(RenderWindow& window, std::chrono::duration<float> dt, const uSize& viewSize)
+void imgui_frame_update(render_window& window, std::chrono::duration<float> dt, const usize& view_size)
 {
 	auto& io = gui::GetIO();
 	// Setup display size (every frame to accommodate for window resizing)
-	io.DisplaySize = ImVec2(static_cast<float>(viewSize.width), static_cast<float>(viewSize.height));
+	io.DisplaySize = ImVec2(static_cast<float>(view_size.width), static_cast<float>(view_size.height));
 	// Setup time step
 	io.DeltaTime = dt.count();
 
 	auto window_pos = window.getPosition();
 	auto window_size = window.getSize();
-	iRect rect;
+	irect rect;
 	rect.left = window_pos.x;
 	rect.top = window_pos.y;
 	rect.right = window_size.width;
 	rect.bottom = window_size.height;
 	auto mouse_pos = sf::Mouse::getPosition(window);
 
-	if (window.hasFocus() && rect.containsPoint(mouse_pos))
+	if (window.hasFocus() && rect.contains(mouse_pos))
 		window.setMouseCursor(map_cursor(gui::GetMouseCursor()));
 
 	// Start the frame	
 	gui::NewFrame();
 
 	gui::SetNextWindowPos(ImVec2(0, 0));
-	gui::SetNextWindowSize(ImVec2(static_cast<float>(viewSize.width), static_cast<float>(viewSize.height)));
+	gui::SetNextWindowSize(ImVec2(static_cast<float>(view_size.width), static_cast<float>(view_size.height)));
 	ImGuiWindowFlags flags =
 		ImGuiWindowFlags_NoTitleBar
 		| ImGuiWindowFlags_NoResize
@@ -145,69 +146,66 @@ void imgui_set_context(ImGuiContext* pContext)
 }
 
 
-GuiWindow::GuiWindow() 
+gui_window::gui_window() 
 : _dockspace(this)
 {
 	_gui_context = imgui_create_context();
 }
 
-GuiWindow::GuiWindow(sf::VideoMode mode, const std::string& title, std::uint32_t style /*= sf::Style::Default*/)
-: RenderWindow(mode, title, style)
+gui_window::gui_window(sf::VideoMode mode, const std::string& title, std::uint32_t style /*= sf::Style::Default*/)
+: render_window(mode, title, style)
 , _dockspace(this)
 {
 	_gui_context = imgui_create_context();
 }
 
-GuiWindow::~GuiWindow()
+gui_window::~gui_window()
 {
 	imgui_destroy_context(_gui_context);
 }
 
-bool GuiWindow::filterEvent(const sf::Event& event)
+bool gui_window::filterEvent(const sf::Event& event)
 {
 	handle_sfml_event(event);
 
-	return RenderWindow::filterEvent(event);;
+	return render_window::filterEvent(event);;
 }
 
-void GuiWindow::frame_begin()
+void gui_window::frame_begin()
 {
-	RenderWindow::frame_begin();
+	render_window::frame_begin();
 
 	imgui_set_context(_gui_context);
 }
 
-void GuiWindow::frame_update(std::chrono::duration<float> dt)
+void gui_window::frame_update(std::chrono::duration<float> dt)
 {
-	RenderWindow::frame_update(dt);
+	render_window::frame_update(dt);
 
 	imgui_frame_update(*this, dt, _surface->get_size());
 }
 
-void GuiWindow::frame_render(std::chrono::duration<float> dt)
+void gui_window::frame_render(std::chrono::duration<float> dt)
 {
-	RenderWindow::frame_render(dt);
+	render_window::frame_render(dt);
 
 	imgui_set_context(_gui_context);
 
 	on_gui(dt);
 
 	render_dockspace();
-
 }
 
-#include "../edit_state.h"
-
-void GuiWindow::render_dockspace()
+void gui_window::render_dockspace()
 {
 	_dockspace.update_and_draw(gui::GetContentRegionAvail());
 }
 
-void GuiWindow::frame_end()
+void gui_window::frame_end()
 {
-	RenderWindow::frame_end();
+	render_window::frame_end();
 
-	auto es = core::get_subsystem<editor::EditState>();
+	auto es = core::get_subsystem<editor::editor_state>();
 
 	if (gui::IsMouseDragging(gui::drag_button) && es->drag_data.object)
 	{

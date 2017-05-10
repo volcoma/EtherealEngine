@@ -1,25 +1,25 @@
 #pragma once
 
 #include "core/subsystem/subsystem.h"
-#include "core/events/event.hpp"
+#include "core/signals/signal.hpp"
 #include "core/logging/logging.h"
 
 #include <chrono>
 #include <vector>
 
-class RenderWindow;
+class render_window;
 namespace runtime
 {
 	//-----------------------------------------------------------------------------
 	// Main Class Declarations
 	//-----------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------
-	//  Name : Engine (Class)
+	//  Name : engine (Class)
 	/// <summary>
 	/// Ethereal engine, creates the other subsystems.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	struct Engine : public core::Subsystem
+	struct engine : public core::subsystem
 	{
 		//-----------------------------------------------------------------------------
 		//  Name : initialize ()
@@ -59,7 +59,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool start(std::shared_ptr<RenderWindow> main_window);
+		bool start(std::shared_ptr<render_window> main_window);
 
 		//-----------------------------------------------------------------------------
 		//  Name : run_one_frame ()
@@ -95,7 +95,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void register_window(std::shared_ptr<RenderWindow> window);
+		void register_window(std::shared_ptr<render_window> window);
 
 		//-----------------------------------------------------------------------------
 		//  Name : get_windows ()
@@ -105,7 +105,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		inline const std::vector<std::shared_ptr<RenderWindow>>& get_windows() const { return _windows; }
+		inline const std::vector<std::shared_ptr<render_window>>& get_windows() const { return _windows; }
 
 		//-----------------------------------------------------------------------------
 		//  Name : get_focused_window ()
@@ -115,20 +115,20 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		RenderWindow* get_focused_window() { return _focused_window.get(); }
+		render_window* get_focused_window() { return _focused_window.get(); }
 
 	protected:
 		/// exiting flag
 		bool _running = false;
 		/// engine windows
-		std::vector<std::shared_ptr<RenderWindow>> _windows;
+		std::vector<std::shared_ptr<render_window>> _windows;
 		/// currently processed window
-		std::shared_ptr<RenderWindow> _focused_window;
+		std::shared_ptr<render_window> _focused_window;
 	};
 
 	/// engine events
-	extern event<void(std::chrono::duration<float>)> on_frame_begin;
-	extern event<void(std::chrono::duration<float>)> on_frame_update;
-	extern event<void(std::chrono::duration<float>)> on_frame_render;
-	extern event<void(std::chrono::duration<float>)> on_frame_end;
+	extern signal<void(std::chrono::duration<float>)> on_frame_begin;
+	extern signal<void(std::chrono::duration<float>)> on_frame_update;
+	extern signal<void(std::chrono::duration<float>)> on_frame_render;
+	extern signal<void(std::chrono::duration<float>)> on_frame_end;
 }

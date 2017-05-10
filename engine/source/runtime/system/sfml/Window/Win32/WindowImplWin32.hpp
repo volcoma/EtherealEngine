@@ -85,7 +85,7 @@ namespace priv
 		/// \return Position of the window, in pixels
 		///
 		////////////////////////////////////////////////////////////
-		virtual iPoint getPosition() const;
+		virtual ipoint getPosition() const;
 
 		////////////////////////////////////////////////////////////
 		/// \brief Change the position of the window on screen
@@ -93,7 +93,7 @@ namespace priv
 		/// \param position New position of the window, in pixels
 		///
 		////////////////////////////////////////////////////////////
-		virtual void setPosition(const iPoint& position);
+		virtual void setPosition(const ipoint& position);
 
 		////////////////////////////////////////////////////////////
 		/// \brief Get the client size of the window
@@ -101,7 +101,7 @@ namespace priv
 		/// \return Size of the window, in pixels
 		///
 		////////////////////////////////////////////////////////////
-		virtual uSize getSize() const;
+		virtual usize getSize() const;
 
 		////////////////////////////////////////////////////////////
 		/// \brief Change the size of the rendering region of the window
@@ -109,7 +109,7 @@ namespace priv
 		/// \param size New size, in pixels
 		///
 		////////////////////////////////////////////////////////////
-		virtual void setSize(const uSize& size);
+		virtual void setSize(const usize& size);
 
 		////////////////////////////////////////////////////////////
 		/// \brief Change the title of the window
@@ -295,7 +295,7 @@ namespace priv
 		HCURSOR  m_loadedCursor;     ///< The system cursor selected to be displayed into the window
 		HICON    m_icon;             ///< Custom icon assigned to the window
 		bool     m_keyRepeatEnabled; ///< Automatic key-repeat state for keydown events
-		uSize	 m_lastSize;         ///< The last handled size of the window
+		usize	 m_lastSize;         ///< The last handled size of the window
 		bool     m_resizing;         ///< Is the window being resized?
 		std::uint16_t   m_surrogate;        ///< First half of the surrogate pair, in case we're receiving a Unicode character in two events
 		bool     m_mouseInside;      ///< Mouse is inside the window?

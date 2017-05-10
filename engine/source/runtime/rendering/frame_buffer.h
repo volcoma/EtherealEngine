@@ -3,37 +3,37 @@
 #include "texture.h"
 #include "graphics/graphics.h"
 
-struct TextureAttachment
+struct fbo_attachment
 {
 	/// Texture handle.
-	std::shared_ptr<Texture> texture;
+	std::shared_ptr<texture> texture;
 	/// Mip level.
 	uint16_t mip = 0;
 	/// Cubemap side or depth layer/slice.
 	uint16_t layer = 0;
 };
 
-struct FrameBuffer
+struct frame_buffer
 {
 	//-----------------------------------------------------------------------------
-	//  Name : FrameBuffer ()
+	//  Name : frame_buffer ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	FrameBuffer() = default;
+	frame_buffer() = default;
 
 	//-----------------------------------------------------------------------------
-	//  Name : FrameBuffer ()
+	//  Name : frame_buffer ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	FrameBuffer(
+	frame_buffer(
 		std::uint16_t _width
 		, std::uint16_t _height
 		, gfx::TextureFormat::Enum _format
@@ -44,14 +44,14 @@ struct FrameBuffer
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : FrameBuffer ()
+	//  Name : frame_buffer ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	FrameBuffer(
+	frame_buffer(
 		gfx::BackbufferRatio::Enum _ratio
 		, gfx::TextureFormat::Enum _format
 		, std::uint32_t _textureFlags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP
@@ -61,40 +61,40 @@ struct FrameBuffer
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : FrameBuffer ()
+	//  Name : frame_buffer ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	FrameBuffer(const std::vector<std::shared_ptr<Texture>>& textures)
+	frame_buffer(const std::vector<std::shared_ptr<texture>>& textures)
 	{
 		populate(textures);
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : FrameBuffer ()
+	//  Name : frame_buffer ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	FrameBuffer(const std::vector<TextureAttachment>& textures)
+	frame_buffer(const std::vector<fbo_attachment>& textures)
 	{
 		populate(textures);
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : FrameBuffer ()
+	//  Name : frame_buffer ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	FrameBuffer(
+	frame_buffer(
 		void* _nwh
 		, std::uint16_t _width
 		, std::uint16_t _height
@@ -104,14 +104,14 @@ struct FrameBuffer
 		populate(_nwh, _width, _height, _depthFormat);
 	}
 	//-----------------------------------------------------------------------------
-	//  Name : ~FrameBuffer ()
+	//  Name : ~frame_buffer ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	~FrameBuffer()
+	~frame_buffer()
 	{
 		dispose();
 	}
@@ -162,9 +162,9 @@ struct FrameBuffer
 		, std::uint32_t _textureFlags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP
 	)
 	{
-		populate(std::vector<std::shared_ptr<Texture>>
+		populate(std::vector<std::shared_ptr<texture>>
 		{
-			std::make_shared<Texture>(_width, _height, false, 1, _format, _textureFlags),
+			std::make_shared<texture>(_width, _height, false, 1, _format, _textureFlags),
 		});
 	}
 
@@ -182,9 +182,9 @@ struct FrameBuffer
 		, std::uint32_t _textureFlags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP
 	)
 	{
-		populate(std::vector<std::shared_ptr<Texture>>
+		populate(std::vector<std::shared_ptr<texture>>
 		{
-			std::make_shared<Texture>(_ratio, false, 1, _format, _textureFlags),
+			std::make_shared<texture>(_ratio, false, 1, _format, _textureFlags),
 		});
 	}
 
@@ -196,15 +196,15 @@ struct FrameBuffer
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void populate(const std::vector<std::shared_ptr<Texture>>& textures)
+	void populate(const std::vector<std::shared_ptr<texture>>& textures)
 	{
 		dispose();
 
-		std::vector<TextureAttachment> texDescs;
+		std::vector<fbo_attachment> texDescs;
 		texDescs.reserve(textures.size());
 		for (auto& tex : textures)
 		{
-			TextureAttachment texDesc;
+			fbo_attachment texDesc;
 			texDesc.texture = tex;
 			texDescs.push_back(texDesc);
 		}
@@ -220,7 +220,7 @@ struct FrameBuffer
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void populate(const std::vector<TextureAttachment>& textures)
+	void populate(const std::vector<fbo_attachment>& textures)
 	{
 
 		dispose();
@@ -228,7 +228,7 @@ struct FrameBuffer
 		std::vector<gfx::Attachment> buffer;
 		buffer.reserve(textures.size());
 
-		uSize size;
+		usize size;
 		gfx::BackbufferRatio::Enum ratio = gfx::BackbufferRatio::Enum::Count;
 		for (auto& tex : textures)
 		{
@@ -288,7 +288,7 @@ struct FrameBuffer
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	uSize get_size() const
+	usize get_size() const
 	{
 		if (_bbratio == gfx::BackbufferRatio::Count)
 		{
@@ -300,7 +300,7 @@ struct FrameBuffer
 			std::uint16_t width;
 			std::uint16_t height;
 			gfx::get_size_from_ratio(_bbratio, width, height);
-			uSize size =
+			usize size =
 			{
 				static_cast<std::uint32_t>(width),
 				static_cast<std::uint32_t>(height)
@@ -318,7 +318,7 @@ struct FrameBuffer
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const TextureAttachment& get_attachment(std::uint32_t index) const { return _textures[index]; }
+	inline const fbo_attachment& get_attachment(std::uint32_t index) const { return _textures[index]; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_attachment_count ()
@@ -335,9 +335,9 @@ struct FrameBuffer
 	/// Back buffer ratio if any.
 	gfx::BackbufferRatio::Enum _bbratio = gfx::BackbufferRatio::Equal;
 	/// Size of the surface. If {0,0} then it is controlled by backbuffer ratio
-	uSize _cached_size = { 0, 0 };
+	usize _cached_size = { 0, 0 };
 	/// Texture attachments to the frame buffer
-	std::vector<TextureAttachment> _textures;
+	std::vector<fbo_attachment> _textures;
 };
 
 
@@ -345,7 +345,7 @@ struct FrameBuffer
 #include <chrono>
 #include "core/common/utils.h"
 
-struct TextureKey
+struct texture_key
 {
 	/// User id
 	std::string id;
@@ -357,17 +357,17 @@ struct TextureKey
 	gfx::BackbufferRatio::Enum ratio = gfx::BackbufferRatio::Count;
 };
 
-struct FboKey
+struct fbo_key
 {
 	/// User id
 	std::string id;
 
-	std::vector<std::shared_ptr<Texture>> textures;
+	std::vector<std::shared_ptr<texture>> textures;
 	
 };
 
 
-inline bool operator==(const TextureKey& key1, const TextureKey& key2)
+inline bool operator==(const texture_key& key1, const texture_key& key2)
 {
 	return key1.id == key2.id &&
 		key1.flags == key2.flags &&
@@ -383,7 +383,7 @@ inline bool operator==(const TextureKey& key1, const TextureKey& key2)
 		key1.info.cubeMap == key2.info.cubeMap;
 }
 
-inline bool operator==(const FboKey& key1, const FboKey& key2)
+inline bool operator==(const fbo_key& key1, const fbo_key& key2)
 {
 	bool result = key1.id == key2.id && key1.textures.size() == key2.textures.size();
 	if (!result)
@@ -401,9 +401,9 @@ inline bool operator==(const FboKey& key1, const FboKey& key2)
 }
 namespace std
 {
-	template<> struct hash<TextureKey>
+	template<> struct hash<texture_key>
 	{
-		typedef TextureKey argument_type;
+		typedef texture_key argument_type;
 		typedef std::size_t result_type;
 		result_type operator()(argument_type const& s) const
 		{
@@ -427,9 +427,9 @@ namespace std
 
 namespace std
 {
-	template<> struct hash<FboKey>
+	template<> struct hash<fbo_key>
 	{
-		typedef FboKey argument_type;
+		typedef fbo_key argument_type;
 		typedef std::size_t result_type;
 		result_type operator()(argument_type const& s) const
 		{
@@ -444,10 +444,10 @@ namespace std
 		}
 	};
 }
-class RenderView
+class render_view
 {
 public:
-	std::shared_ptr<Texture> get_texture(
+	std::shared_ptr<texture> get_texture(
 		const std::string& id
 		, std::uint16_t _width
 		, std::uint16_t _height
@@ -458,7 +458,7 @@ public:
 		, const gfx::Memory* _mem = nullptr
 	)
 	{
-		TextureKey key;
+		texture_key key;
 		gfx::calcTextureSize(key.info
 			, _width
 			, _height
@@ -473,7 +473,7 @@ public:
 		key.flags = _flags;
 		key.ratio = gfx::BackbufferRatio::Count;
 
-		std::shared_ptr<Texture> tex;
+		std::shared_ptr<texture> tex;
 		auto it = _textures.find(key);
 		if (it != _textures.end())
 		{
@@ -482,14 +482,14 @@ public:
 		}
 		else
 		{
-			tex = std::make_shared<Texture>(_width, _height, _hasMips, _numLayers, _format, _flags, _mem);
-			_textures[key] = std::pair<std::shared_ptr<Texture>, bool>(tex, true);
+			tex = std::make_shared<texture>(_width, _height, _hasMips, _numLayers, _format, _flags, _mem);
+			_textures[key] = std::pair<std::shared_ptr<texture>, bool>(tex, true);
 		}
 
 		return tex;
 	}
 
-	std::shared_ptr<Texture> get_texture(
+	std::shared_ptr<texture> get_texture(
 		const std::string& id
 		, gfx::BackbufferRatio::Enum _ratio
 		, bool _hasMips
@@ -498,7 +498,7 @@ public:
 		, std::uint32_t _flags = gfx::get_default_rt_sampler_flags()
 	)
 	{
-		TextureKey key;
+		texture_key key;
 		std::uint16_t _width = 0;
 		std::uint16_t _height = 0;
 		gfx::get_size_from_ratio(_ratio, _width, _height);
@@ -516,7 +516,7 @@ public:
 		key.flags = _flags;
 		key.ratio = _ratio;
 
-		std::shared_ptr<Texture> tex;
+		std::shared_ptr<texture> tex;
 		auto it = _textures.find(key);
 		if (it != _textures.end())
 		{
@@ -525,14 +525,14 @@ public:
 		}
 		else
 		{
-			tex = std::make_shared<Texture>(_ratio, _hasMips, _numLayers, _format, _flags);
-			_textures[key] = std::pair<std::shared_ptr<Texture>, bool>(tex, true);
+			tex = std::make_shared<texture>(_ratio, _hasMips, _numLayers, _format, _flags);
+			_textures[key] = std::pair<std::shared_ptr<texture>, bool>(tex, true);
 		}
 
 		return tex;
 	}
 
-	std::shared_ptr<Texture> get_texture(
+	std::shared_ptr<texture> get_texture(
 		const std::string& id
 		, std::uint16_t _width
 		, std::uint16_t _height
@@ -543,7 +543,7 @@ public:
 		, const gfx::Memory* _mem = nullptr
 	)
 	{
-		TextureKey key;
+		texture_key key;
 		gfx::calcTextureSize(key.info
 			, _width
 			, _height
@@ -558,7 +558,7 @@ public:
 		key.flags = _flags;
 		key.ratio = gfx::BackbufferRatio::Count;
 
-		std::shared_ptr<Texture> tex;
+		std::shared_ptr<texture> tex;
 		auto it = _textures.find(key);
 		if (it != _textures.end())
 		{
@@ -567,14 +567,14 @@ public:
 		}
 		else
 		{
-			tex = std::make_shared<Texture>(_width, _height, _depth, _hasMips, _format, _flags, _mem);
-			_textures[key] = std::pair<std::shared_ptr<Texture>, bool>(tex, true);
+			tex = std::make_shared<texture>(_width, _height, _depth, _hasMips, _format, _flags, _mem);
+			_textures[key] = std::pair<std::shared_ptr<texture>, bool>(tex, true);
 		}
 
 		return tex;
 	}
 
-	std::shared_ptr<Texture> get_texture(
+	std::shared_ptr<texture> get_texture(
 		const std::string& id
 		, std::uint16_t _size
 		, bool _hasMips
@@ -584,7 +584,7 @@ public:
 		, const gfx::Memory* _mem = nullptr
 	)
 	{
-		TextureKey key;
+		texture_key key;
 		gfx::calcTextureSize(key.info
 			, _size
 			, _size
@@ -599,7 +599,7 @@ public:
 		key.flags = _flags;
 		key.ratio = gfx::BackbufferRatio::Count;
 
-		std::shared_ptr<Texture> tex;
+		std::shared_ptr<texture> tex;
 		auto it = _textures.find(key);
 		if (it != _textures.end())
 		{
@@ -608,21 +608,21 @@ public:
 		}
 		else
 		{
-			tex = std::make_shared<Texture>(_size, _hasMips, _numLayers, _format, _flags, _mem);
-			_textures[key] = std::pair<std::shared_ptr<Texture>, bool>(tex, true);
+			tex = std::make_shared<texture>(_size, _hasMips, _numLayers, _format, _flags, _mem);
+			_textures[key] = std::pair<std::shared_ptr<texture>, bool>(tex, true);
 		}
 
 		return tex;
 	}
 	
-	std::shared_ptr<FrameBuffer> get_fbo(
+	std::shared_ptr<frame_buffer> get_fbo(
 		const std::string& id,
-		const std::vector<std::shared_ptr<Texture>>& bind_textures)
+		const std::vector<std::shared_ptr<texture>>& bind_textures)
 	{
-		FboKey key;
+		fbo_key key;
 		key.id = id;
 		key.textures = bind_textures;
-		std::shared_ptr<FrameBuffer> tex;
+		std::shared_ptr<frame_buffer> tex;
 		auto it = _fbos.find(key);
 		if (it != _fbos.end())
 		{
@@ -631,44 +631,44 @@ public:
 		}
 		else
 		{
-			tex = std::make_shared<FrameBuffer>(bind_textures);
-			_fbos[key] = std::pair<std::shared_ptr<FrameBuffer>, bool>(tex, true);
+			tex = std::make_shared<frame_buffer>(bind_textures);
+			_fbos[key] = std::pair<std::shared_ptr<frame_buffer>, bool>(tex, true);
 		}
 
 		return tex;
 	}
 
-	std::shared_ptr<Texture> get_depth_stencil_buffer(const uSize& viewport_size)
+	std::shared_ptr<texture> get_depth_stencil_buffer(const usize& viewport_size)
 	{
 		static auto format = gfx::get_best_format(
 			BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER,
-			gfx::FormatSearchFlags::RequireDepth |
-			gfx::FormatSearchFlags::RequireStencil);
+			gfx::format_search_flags::RequireDepth |
+			gfx::format_search_flags::RequireStencil);
 		return get_texture("DEPTH", viewport_size.width, viewport_size.height, false, 1, format);
 	}
-	std::shared_ptr<Texture> get_output_buffer(const uSize& viewport_size)
+	std::shared_ptr<texture> get_output_buffer(const usize& viewport_size)
 	{
 		static auto format = gfx::get_best_format(
 			BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER,
-			gfx::FormatSearchFlags::FourChannels |
-			gfx::FormatSearchFlags::RequireAlpha);
+			gfx::format_search_flags::FourChannels |
+			gfx::format_search_flags::RequireAlpha);
 		return get_texture("OUTPUT", viewport_size.width, viewport_size.height, false, 1, format);
 	}
-	std::shared_ptr<FrameBuffer> get_output_fbo(const uSize& viewport_size)
+	std::shared_ptr<frame_buffer> get_output_fbo(const usize& viewport_size)
 	{
 		return get_fbo("OUTPUT", { get_output_buffer(viewport_size), get_depth_stencil_buffer(viewport_size) });
 	}
-	std::shared_ptr<FrameBuffer> get_g_buffer_fbo(const uSize& viewport_size)
+	std::shared_ptr<frame_buffer> get_g_buffer_fbo(const usize& viewport_size)
 	{
 		static auto format = gfx::get_best_format(
 			BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER,
-			gfx::FormatSearchFlags::FourChannels |
-			gfx::FormatSearchFlags::RequireAlpha);
+			gfx::format_search_flags::FourChannels |
+			gfx::format_search_flags::RequireAlpha);
 		static auto normal_format = gfx::get_best_format(
 			BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER,
-			gfx::FormatSearchFlags::FourChannels |
-			gfx::FormatSearchFlags::RequireAlpha |
-			gfx::FormatSearchFlags::HalfPrecisionFloat);
+			gfx::format_search_flags::FourChannels |
+			gfx::format_search_flags::RequireAlpha |
+			gfx::format_search_flags::HalfPrecisionFloat);
 		auto depth_buffer = get_depth_stencil_buffer(viewport_size);
 		auto buffer0 = get_texture("GBUFFER0", viewport_size.width, viewport_size.height, false, 1, format);
 		auto buffer1 = get_texture("GBUFFER1", viewport_size.width, viewport_size.height, false, 1, normal_format);
@@ -708,6 +708,6 @@ public:
 	}
 
 private:
-	std::unordered_map<TextureKey, std::pair<std::shared_ptr<Texture>, bool>> _textures;
-	std::unordered_map<FboKey, std::pair<std::shared_ptr<FrameBuffer>, bool>> _fbos;
+	std::unordered_map<texture_key, std::pair<std::shared_ptr<texture>, bool>> _textures;
+	std::unordered_map<fbo_key, std::pair<std::shared_ptr<frame_buffer>, bool>> _fbos;
 };

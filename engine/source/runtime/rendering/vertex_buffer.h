@@ -2,17 +2,17 @@
 
 #include "graphics/graphics.h"
 
-struct VertexBuffer
+struct vertex_buffer
 {
 	//-----------------------------------------------------------------------------
-	//  Name : ~VertexBuffer ()
+	//  Name : ~vertex_buffer ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	~VertexBuffer();
+	~vertex_buffer();
 
 	//-----------------------------------------------------------------------------
 	//  Name : dispose ()

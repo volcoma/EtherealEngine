@@ -11,11 +11,11 @@
 
 namespace cfg
 {
-    Config::Config() {}
+    config::config() {}
 
-    Config::~Config() {}
+    config::~config() {}
         
-    bool Config::has_value(const std::string& section, const std::string& name) const
+    bool config::has_value(const std::string& section, const std::string& name) const
     {
         auto si = values.find(section);
         if (si != values.end())
@@ -29,7 +29,7 @@ namespace cfg
         return false;
     }
 
-    const std::string Config::get(const std::string& section, const std::string& name) const
+    const std::string& config::get(const std::string& section, const std::string& name) const
     {
         auto si = values.find(section);
         if (si != values.end())
@@ -60,7 +60,15 @@ namespace cfg
 		return std::regex_match(token, std::regex("((\\+|-)?[[:digit:]]+)(\\.(([[:digit:]]+)?))?"));
 	}
 
-    void Config::set(const std::string& section, const std::string& name, const std::string& value)
+	const std::string& config::get_value(const std::string& section, const std::string& name, const std::string& defaultValue)
+	{
+		if (!has_value(section, name))
+			return defaultValue;
+
+		return get(section, name);
+	}
+
+	void config::set(const std::string& section, const std::string& name, const std::string& value)
     {
         if (isalnum(section) == false)
         {
@@ -130,7 +138,7 @@ namespace cfg
         return buff.str();
     }
 
-    void Config::save(const std::string& file)
+    void config::save(const std::string& file)
     {
         std::ofstream out(file, std::fstream::out | std::fstream::trunc);
 
@@ -149,7 +157,7 @@ namespace cfg
         }
     }
 
-    void Config::load(const std::string& file)
+    void config::load(const std::string& file)
     {
         std::ifstream in(file);
 
@@ -158,7 +166,7 @@ namespace cfg
             throw std::runtime_error("Failed to open " + file + " for reading.");
         }
 
-        Parser parser(*this);
+        parser parser(*this);
         parser.parse(in, file);
     }
 }

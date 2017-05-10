@@ -2,17 +2,17 @@
 
 #include "graphics/graphics.h"
 
-struct IndexBuffer
+struct index_buffer
 {
 	//-----------------------------------------------------------------------------
-	//  Name : ~IndexBuffer ()
+	//  Name : ~index_buffer ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	~IndexBuffer();
+	~index_buffer();
 	//-----------------------------------------------------------------------------
 	//  Name : dispose ()
 	/// <summary>

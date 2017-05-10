@@ -58,20 +58,20 @@ struct GfxCallback : public gfx::CallbackI
 
 namespace runtime
 {
-	bool Renderer::initialize()
+	bool renderer::initialize()
 	{	
-		on_frame_end.connect(this, &Renderer::frame_end);
+		on_frame_end.connect(this, &renderer::frame_end);
 
 		return true;
 	}
 
-	void Renderer::dispose()
+	void renderer::dispose()
 	{
-		on_frame_end.disconnect(this, &Renderer::frame_end);
+		on_frame_end.disconnect(this, &renderer::frame_end);
 		gfx::shutdown();
 	}
 
-	bool Renderer::init_backend(RenderWindow& main_window)
+	bool renderer::init_backend(render_window& main_window)
 	{
 		gfx::PlatformData pd
 		{
@@ -99,10 +99,10 @@ namespace runtime
 		return true;
 	}
 
-	void Renderer::frame_end(std::chrono::duration<float>)
+	void renderer::frame_end(std::chrono::duration<float>)
 	{
 		_render_frame = gfx::frame();
-		RenderPass::reset();
+		render_pass::reset();
 	}
 
 }

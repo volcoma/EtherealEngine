@@ -7,35 +7,35 @@
 #include <vector>
 
 struct Group;
-class Mesh;
-struct Program;
-class Material;
+class mesh;
+struct program;
+class material;
 
-class Model
+class model
 {
 public:
-	REFLECTABLE(Model)
-	SERIALIZABLE(Model)
+	REFLECTABLE(model)
+	SERIALIZABLE(model)
 
 	//-----------------------------------------------------------------------------
-	//  Name : Model ()
+	//  Name : model ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	Model();
+	model();
 
 	//-----------------------------------------------------------------------------
-	//  Name : ~Model (virtual )
+	//  Name : ~model (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual ~Model() = default;
+	virtual ~model() = default;
 
 	//-----------------------------------------------------------------------------
 	//  Name : is_valid ()
@@ -55,7 +55,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	AssetHandle<Mesh> get_lod(std::uint32_t lod) const;
+	asset_handle<mesh> get_lod(std::uint32_t lod) const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_lod ()
@@ -65,7 +65,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_lod(AssetHandle<Mesh> mesh, std::uint32_t lod);
+	void set_lod(asset_handle<mesh> mesh, std::uint32_t lod);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_material ()
@@ -75,7 +75,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_material(AssetHandle<Material> material, std::uint32_t index);
+	void set_material(asset_handle<material> material, std::uint32_t index);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_lods ()
@@ -85,7 +85,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const std::vector<AssetHandle<Mesh>>& get_lods() const;
+	const std::vector<asset_handle<mesh>>& get_lods() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_lods ()
@@ -95,7 +95,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_lods(const std::vector<AssetHandle<Mesh>>& lods);
+	void set_lods(const std::vector<asset_handle<mesh>>& lods);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_materials ()
@@ -105,7 +105,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const std::vector<AssetHandle<Material>>& get_materials() const;
+	const std::vector<asset_handle<material>>& get_materials() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_materials ()
@@ -115,7 +115,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_materials(const std::vector<AssetHandle<Material>>& materials);
+	void set_materials(const std::vector<asset_handle<material>>& materials);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_material_for_group ()
@@ -125,7 +125,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	AssetHandle<Material> get_material_for_group(const size_t& group) const;
+	asset_handle<material> get_material_for_group(const size_t& group) const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_lod_transition_time ()
@@ -194,15 +194,15 @@ public:
 	/// materials are used instead. Extra states can be added to the material ones.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void render(std::uint8_t id, const math::transform_t& mtx, bool apply_cull, bool depth_write, bool depth_test, std::uint64_t extra_states, unsigned int lod, Program* user_program, std::function<void(Program&)> setup_params) const;
+	void render(std::uint8_t id, const math::transform& mtx, bool apply_cull, bool depth_write, bool depth_test, std::uint64_t extra_states, unsigned int lod, program* user_program, std::function<void(program&)> setup_params) const;
 
 private:
 	/// Collection of all materials for this model.
-	std::vector<AssetHandle<Material>> _materials;
+	std::vector<asset_handle<material>> _materials;
 	/// Default material
-	AssetHandle<Material> _default_material;
+	asset_handle<material> _default_material;
 	/// Collection of all lods for this model.
-	std::vector<AssetHandle<Mesh>> _mesh_lods;
+	std::vector<asset_handle<mesh>> _mesh_lods;
 	/// Duration for a transition between two lods.
 	float _transition_time = 1.0f;
 	/// Maximum distance at which lod should have reached maximum value

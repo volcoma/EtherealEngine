@@ -4,46 +4,46 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "../system/sfml/Window.hpp"
-#include "core/events/event.hpp"
+#include "core/signals/signal.hpp"
 #include <chrono>
-struct FrameBuffer;
-class RenderWindow : public sf::Window
+struct frame_buffer;
+class render_window : public sf::Window
 {
 public:
 	//-----------------------------------------------------------------------------
-	//  Name : RenderWindow ()
+	//  Name : render_window ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	RenderWindow();
+	render_window();
 
 	//-----------------------------------------------------------------------------
-	//  Name : RenderWindow ()
+	//  Name : render_window ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	RenderWindow(sf::VideoMode mode, const std::string& title, std::uint32_t style = sf::Style::Default);
+	render_window(sf::VideoMode mode, const std::string& title, std::uint32_t style = sf::Style::Default);
 
 	//-----------------------------------------------------------------------------
-	//  Name : ~RenderWindow (virtual )
+	//  Name : ~render_window (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual ~RenderWindow();
+	virtual ~render_window();
 
 	/// event triggered when window is resized.
-	event<void(RenderWindow&, const uSize&)> on_resized;
+	signal<void(render_window&, const usize&)> on_resized;
 	/// event triggered when window is closed.
-	event<void(RenderWindow&)> on_closed;
+	signal<void(render_window&)> on_closed;
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_surface ()
@@ -53,7 +53,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline std::shared_ptr<FrameBuffer> get_surface() { return _surface; }
+	inline std::shared_ptr<frame_buffer> get_surface() { return _surface; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_surface ()
@@ -63,7 +63,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline std::shared_ptr<FrameBuffer> get_surface() const { return _surface; }
+	inline std::shared_ptr<frame_buffer> get_surface() const { return _surface; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : prepare_surface (virtual )
@@ -155,7 +155,7 @@ protected:
 	virtual void onClose();
 
 	/// Render surface for this window.
-	std::shared_ptr<FrameBuffer> _surface;
+	std::shared_ptr<frame_buffer> _surface;
 	///
 	bool _is_main = false;
 };

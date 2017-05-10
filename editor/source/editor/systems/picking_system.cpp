@@ -19,13 +19,13 @@
 
 namespace editor
 {
-	void PickingSystem::frame_render(std::chrono::duration<float> dt)
+	void picking_system::frame_render(std::chrono::duration<float> dt)
 	{
-		auto es = core::get_subsystem<EditState>();
-		auto input = core::get_subsystem<runtime::Input>();
-		auto engine = core::get_subsystem<runtime::Engine>();
-		auto renderer = core::get_subsystem<runtime::Renderer>();
-		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
+		auto es = core::get_subsystem<editor_state>();
+		auto input = core::get_subsystem<runtime::input>();
+		auto engine = core::get_subsystem<runtime::engine>();
+		auto renderer = core::get_subsystem<runtime::renderer>();
+		auto ecs = core::get_subsystem<runtime::entity_component_system>();
 
 		const auto render_frame = renderer->get_render_frame();
 
@@ -33,10 +33,10 @@ namespace editor
 		if (imguizmo::is_over() && es->selection_data.object)
 			return;
 
-		if (!editor_camera || !editor_camera.has_component<CameraComponent>())
+		if (!editor_camera || !editor_camera.has_component<camera_component>())
 			return;
 
-		auto camera_comp = editor_camera.component<CameraComponent>();
+		auto camera_comp = editor_camera.get_component<camera_component>();
 		auto camera_comp_ptr = camera_comp.lock().get();
 		auto& camera = camera_comp_ptr->get_camera();
 		auto near_clip = camera.get_near_clip();
@@ -50,10 +50,10 @@ namespace editor
 		math::vec3 pick_at;
 		math::vec3 pick_up = { 0.0f, 1.0f, 0.0f };
 
-		if (!camera.viewport_to_world(cursor_pos, frustum.planes[math::VolumePlane::Side::Near], pick_eye, true))
+		if (!camera.viewport_to_world(cursor_pos, frustum.planes[math::volume_plane::near_plane], pick_eye, true))
 			return;
 
-		if (!camera.viewport_to_world(cursor_pos, frustum.planes[math::VolumePlane::Side::Far], pick_at, true))
+		if (!camera.viewport_to_world(cursor_pos, frustum.planes[math::volume_plane::far_plane], pick_at, true))
 			return;
 
 		if (input->is_mouse_button_pressed(sf::Mouse::Left))
@@ -63,7 +63,7 @@ namespace editor
 			auto pick_view = math::lookAt(pick_eye, pick_at, pick_up);
 			auto pick_proj = math::perspective(math::radians(1.0f), 1.0f, near_clip, far_clip, gfx::is_homogeneous_depth());
 
-			RenderPass pass("picking_buffer_fill");
+			render_pass pass("picking_buffer_fill");
 			pass.bind(_surface.get());
 			// ID buffer clears to black, which represents clicking on nothing (background)
 			pass.clear(BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
@@ -73,10 +73,10 @@ namespace editor
 
 			pass.set_view_proj(pick_view, pick_proj);
 
-			ecs->each<TransformComponent, ModelComponent>([this, &pass, &camera](
-				runtime::Entity e,
-				TransformComponent& transform_comp_ref,
-				ModelComponent& model_comp_ref
+			ecs->each<transform_component, model_component>([this, &pass, &camera](
+				runtime::entity e,
+				transform_component& transform_comp_ref,
+				model_component& model_comp_ref
 				)
 			{
 				auto& model = model_comp_ref.get_model();
@@ -117,9 +117,9 @@ namespace editor
 					0,
 					0,
 					_program.get(),
-					[&color_id](Program& program)
+					[&color_id](program& p)
 				{
-					program.set_uniform("u_id", &color_id);
+					p.set_uniform("u_id", &color_id);
 				});
 			});
 		}
@@ -128,7 +128,7 @@ namespace editor
 		// Whatever mesh has the most pixels in the ID buffer is the one the user clicked on.
 		if (!_reading && _start_readback)
 		{
-			RenderPass pass("picking_buffer_blit");
+			render_pass pass("picking_buffer_blit");
 			// Blit and read
 			gfx::blit(pass.id, _blit_tex->handle, 0, 0, gfx::getTexture(_surface->handle));
 			_reading = gfx::readTexture(_blit_tex->handle, _blit_data);
@@ -201,11 +201,11 @@ namespace editor
 		}
 	}
 
-	bool PickingSystem::initialize()
+	bool picking_system::initialize()
 	{
-		runtime::on_frame_render.connect(this, &PickingSystem::frame_render);
+		runtime::on_frame_render.connect(this, &picking_system::frame_render);
 		// Set up ID buffer, which has a color target and depth buffer
-		auto picking_rt = std::make_shared<Texture>(_id_dimensions, _id_dimensions, false, 1, gfx::TextureFormat::RGBA8, 0
+		auto picking_rt = std::make_shared<texture>(_id_dimensions, _id_dimensions, false, 1, gfx::TextureFormat::RGBA8, 0
 			| BGFX_TEXTURE_RT
 			| BGFX_TEXTURE_MIN_POINT
 			| BGFX_TEXTURE_MAG_POINT
@@ -214,7 +214,7 @@ namespace editor
 			| BGFX_TEXTURE_V_CLAMP
 			);
 
-		auto picking_rt_depth = std::make_shared<Texture>(_id_dimensions, _id_dimensions, false, 1, gfx::TextureFormat::D24S8, 0
+		auto picking_rt_depth = std::make_shared<texture>(_id_dimensions, _id_dimensions, false, 1, gfx::TextureFormat::D24S8, 0
 			| BGFX_TEXTURE_RT
 			| BGFX_TEXTURE_MIN_POINT
 			| BGFX_TEXTURE_MAG_POINT
@@ -223,9 +223,9 @@ namespace editor
 			| BGFX_TEXTURE_V_CLAMP
 			);
 
-		_surface = std::make_shared<FrameBuffer>
+		_surface = std::make_shared<frame_buffer>
 		(
-			std::vector<std::shared_ptr<Texture>>
+			std::vector<std::shared_ptr<texture>>
 			{
 				picking_rt,
 				picking_rt_depth
@@ -236,7 +236,7 @@ namespace editor
 		// Impossible to read directly from a render target, you *must* blit to a CPU texture
 		// first. Algorithm Overview: Render on GPU -> Blit to CPU texture -> Read from CPU
 		// texture.
-		_blit_tex = std::make_shared<Texture>(_id_dimensions, _id_dimensions, false, 1, gfx::TextureFormat::RGBA8, 0
+		_blit_tex = std::make_shared<texture>(_id_dimensions, _id_dimensions, false, 1, gfx::TextureFormat::RGBA8, 0
 			| BGFX_TEXTURE_BLIT_DST
 			| BGFX_TEXTURE_READ_BACK
 			| BGFX_TEXTURE_MIN_POINT
@@ -246,22 +246,22 @@ namespace editor
 			| BGFX_TEXTURE_V_CLAMP
 			);
 
-		auto am = core::get_subsystem<runtime::AssetManager>();
-		am->load<Shader>("editor_data:/shaders/vs_picking_id", false)
+		auto am = core::get_subsystem<runtime::asset_manager>();
+		am->load<shader>("editor_data:/shaders/vs_picking_id", false)
 			.then([this, am](auto vs)
 		{
-			am->load<Shader>("editor_data:/shaders/fs_picking_id", false)
+			am->load<shader>("editor_data:/shaders/fs_picking_id", false)
 				.then([this, vs](auto fs)
 			{
-				_program = std::make_unique<Program>(vs, fs);
+				_program = std::make_unique<program>(vs, fs);
 			});
 		});
 		return true;
 	}
 
-	void PickingSystem::dispose()
+	void picking_system::dispose()
 	{
-		runtime::on_frame_render.disconnect(this, &PickingSystem::frame_render);
+		runtime::on_frame_render.disconnect(this, &picking_system::frame_render);
 	}
 
 }

@@ -8,11 +8,11 @@ namespace fs
 	bool add_path_protocol(const path& protocol, const path& dir)
 	{
 		// Protocol matching is case insensitive, convert to lower case
-		std::string strNewProtocol = string_utils::to_lower(protocol.string());
+		auto protocol_lower = string_utils::to_lower(protocol.string());
 
 		auto& protocols = get_path_protocols();
 		// Add to the list
-		protocols[strNewProtocol] = dir.string();
+		protocols[protocol_lower] = dir.string();
 
 		// Success!
 		return true;
@@ -53,12 +53,12 @@ namespace fs
 		// Matching path protocol in our list?
 		auto& protocols = get_path_protocols();
 
-		auto itProtocol = protocols.find(root);
+		auto it = protocols.find(root);
 
-		if (itProtocol == std::end(protocols))
+		if (it == std::end(protocols))
 			return path{};
 
-		const auto resolvedPath = itProtocol->second;
+		const auto resolvedPath = it->second;
 		auto result = resolvedPath / relativePath;
 		return result;
 	}
@@ -102,7 +102,7 @@ namespace fs
 	}
 }
 #elif $on($apple)
-#  include <mach-o/dyld.h>
+#include <mach-o/dyld.h>
 namespace fs
 {
 	path executable_path(const char *argv0)
@@ -126,7 +126,7 @@ namespace fs
 }
 #elif $on($linux)
 
-#  include <unistd.h>
+#include <unistd.h>
 namespace fs
 {
 	path executable_path(const char *argv0)

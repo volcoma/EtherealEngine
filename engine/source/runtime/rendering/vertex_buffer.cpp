@@ -1,11 +1,11 @@
 #include "vertex_buffer.h"
 
-VertexBuffer::~VertexBuffer()
+vertex_buffer::~vertex_buffer()
 {
 	dispose();
 }
 
-void VertexBuffer::dispose()
+void vertex_buffer::dispose()
 {
 	if (is_valid())
 		gfx::destroyVertexBuffer(handle);
@@ -13,12 +13,12 @@ void VertexBuffer::dispose()
 	handle = { bgfx::invalidHandle };
 }
 
-bool VertexBuffer::is_valid() const
+bool vertex_buffer::is_valid() const
 {
 	return gfx::isValid(handle);
 }
 
-void VertexBuffer::populate(const gfx::Memory* _mem, const gfx::VertexDecl& _decl, std::uint16_t _flags /*= BGFX_BUFFER_NONE*/)
+void vertex_buffer::populate(const gfx::Memory* _mem, const gfx::VertexDecl& _decl, std::uint16_t _flags /*= BGFX_BUFFER_NONE*/)
 {
 	dispose();
 

@@ -1,11 +1,10 @@
 #pragma once
 
 #include "runtime/system/app.h"
-#include "runtime/system/singleton.h"
 
 namespace editor
 {
-	struct EditorApp : public runtime::App
+	struct editor_app : public runtime::app
 	{
 		//-----------------------------------------------------------------------------
 		//  Name : start (virtual )
@@ -17,16 +16,3 @@ namespace editor
 	};
 
 }
-
-template<>
-inline runtime::App& singleton<runtime::App>::create()
-{
-	static editor::EditorApp app;
-	return app;
-};
-
-template<>
-inline editor::EditorApp& singleton<editor::EditorApp>::create()
-{
-	return static_cast<editor::EditorApp&>(singleton<runtime::App>::get_instance());
-};

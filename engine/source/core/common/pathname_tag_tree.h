@@ -5,9 +5,8 @@
 #include <stack>
 #include "../nonstd/recursive_wrapper.hpp"
 
-class PathNameTagTree
+class path_name_tag_tree
 {
-
 	struct node
 	{
 		typedef std::map<std::string, nonstd::recursive_wrapper<node>> map_t;
@@ -20,7 +19,7 @@ class PathNameTagTree
 public:
 	class iterator;
 public:
-	PathNameTagTree(const char sep_char, const size_t invalid_tag);
+	path_name_tag_tree(const char sep_char, const size_t invalid_tag);
 
 	void reset();
 
@@ -44,7 +43,7 @@ private:
 	node _root_node;
 };
 
-class PathNameTagTree::iterator
+class path_name_tag_tree::iterator
 {
 private:
 	typedef std::pair<node::map_t::iterator, node*> step_t;

@@ -18,13 +18,13 @@
 #include "runtime/input/input.h"
 #include "core/logging/logging.h"
 
-std::vector<runtime::Entity> gather_scene_data()
+std::vector<runtime::entity> gather_scene_data()
 {
-	auto es = core::get_subsystem<editor::EditState>();
-	auto sg = core::get_subsystem<runtime::SceneGraph>();
+	auto es = core::get_subsystem<editor::editor_state>();
+	auto sg = core::get_subsystem<runtime::scene_graph>();
 	const auto& roots = sg->get_roots();
 	auto editor_camera = es->camera;
-	std::vector<runtime::Entity> entities;
+	std::vector<runtime::entity> entities;
 	for (auto root : roots)
 	{
 		auto entity = root.lock()->get_entity();
@@ -38,63 +38,63 @@ std::vector<runtime::Entity> gather_scene_data()
 
 void default_scene()
 {
-	auto am = core::get_subsystem<runtime::AssetManager>();
-	auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
+	auto am = core::get_subsystem<runtime::asset_manager>();
+	auto ecs = core::get_subsystem<runtime::entity_component_system>();
 
 	{
 		auto object = ecs->create();
 		object.set_name("main camera");
-		object.assign<TransformComponent>().lock()
+		object.assign<transform_component>().lock()
 			->set_local_position({ 0.0f, 2.0f, -5.0f });
-		object.assign<CameraComponent>();
+		object.assign<camera_component>();
 	}
 	{
 		auto object = ecs->create();
 		object.set_name("light");
-		object.assign<TransformComponent>().lock()
+		object.assign<transform_component>().lock()
 			->set_local_position({ 1.0f, 6.0f, -3.0f })
 			.rotate_local(50.0f, -30.0f, 0.0f);
-		object.assign<LightComponent>();
+		object.assign<light_component>();
 	}
 	{
 		auto object = ecs->create();
 		object.set_name("global probe");
-		object.assign<TransformComponent>().lock()
+		object.assign<transform_component>().lock()
 			->set_local_position({ 0.0f, 0.1f, 0.0f });
 
-		ReflectionProbe probe;
-		probe.method = ReflectMethod::Environment;
-		probe.probe_type = ProbeType::Sphere;
+		reflection_probe probe;
+		probe.method = reflect_method::environment;
+		probe.probe_type = probe_type::sphere;
 		probe.sphere_data.range = 1000.0f;
-		object.assign<ReflectionProbeComponent>().lock()
+		object.assign<reflection_probe_component>().lock()
 			->set_probe(probe);
 	}
 	{
 		auto object = ecs->create();
 		object.set_name("local probe");
-		object.assign<TransformComponent>().lock()
+		object.assign<transform_component>().lock()
 			->set_local_position({ 0.0f, 0.1f, 0.0f });
 
-		ReflectionProbe probe;
-		probe.method = ReflectMethod::Static;
-		probe.probe_type = ProbeType::Box;
-		object.assign<ReflectionProbeComponent>().lock()
+		reflection_probe probe;
+		probe.method = reflect_method::static_only;
+		probe.probe_type = probe_type::box;
+		object.assign<reflection_probe_component>().lock()
 			->set_probe(probe);
 	}
 	{
 		auto object = ecs->create();
 		object.set_name("platform");
-		object.assign<TransformComponent>();
+		object.assign<transform_component>();
 
-		Model model;
-		am->load<Mesh>("embedded:/plane", false)
+		model model;
+		am->load<mesh>("embedded:/plane", false)
 			.then([&model](auto asset)
 		{
 			model.set_lod(asset, 0);
 		});
 
 		//Add component and configure it.
-		object.assign<ModelComponent>().lock()
+		object.assign<model_component>().lock()
 			->set_casts_shadow(true)
 			.set_casts_reflection(true)
 			.set_model(model);
@@ -102,18 +102,18 @@ void default_scene()
 	{
 		auto object = ecs->create();
 		object.set_name("object");
-		object.assign<TransformComponent>().lock()
+		object.assign<transform_component>().lock()
 			->set_local_position({ 0.0f, 0.5f, 0.0f });
 
-		Model model;
-		am->load<Mesh>("embedded:/sphere", false)
+		model model;
+		am->load<mesh>("embedded:/sphere", false)
 			.then([&model](auto asset)
 		{
 			model.set_lod(asset, 0);
 		});
 
 		//Add component and configure it.
-		object.assign<ModelComponent>().lock()
+		object.assign<model_component>().lock()
 			->set_casts_shadow(true)
 			.set_casts_reflection(false)
 			.set_model(model);
@@ -122,8 +122,8 @@ void default_scene()
 
 auto create_new_scene()
 {
-	auto es = core::get_subsystem<editor::EditState>();
-	auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
+	auto es = core::get_subsystem<editor::editor_state>();
+	auto ecs = core::get_subsystem<runtime::entity_component_system>();
 	es->save_editor_camera();
 	ecs->dispose();
 	es->load_editor_camera();
@@ -133,8 +133,8 @@ auto create_new_scene()
 
 auto open_scene()
 {
-	auto es = core::get_subsystem<editor::EditState>();
-	auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
+	auto es = core::get_subsystem<editor::editor_state>();
+	auto ecs = core::get_subsystem<runtime::entity_component_system>();
 	std::string path;
 	if (open_file_dialog(extensions::scene.substr(1), fs::resolve_protocol("app:/data").string(), path))
 	{
@@ -142,7 +142,7 @@ auto open_scene()
 		ecs->dispose();
 		es->load_editor_camera();
 
-		std::vector<runtime::Entity> outData;
+		std::vector<runtime::entity> outData;
 		if (ecs::utils::load_data(path, outData))
 		{
 			es->scene = path;
@@ -152,11 +152,11 @@ auto open_scene()
 
 auto save_scene()
 {
-	auto es = core::get_subsystem<editor::EditState>();
+	auto es = core::get_subsystem<editor::editor_state>();
 	const auto& path = es->scene;
 	if (path != "")
 	{
-		std::vector<runtime::Entity> entities = gather_scene_data();
+		std::vector<runtime::entity> entities = gather_scene_data();
 		ecs::utils::save_data(path, entities);
 	}
 
@@ -165,7 +165,7 @@ auto save_scene()
 
 void save_scene_as()
 {
-	auto es = core::get_subsystem<editor::EditState>();
+	auto es = core::get_subsystem<editor::editor_state>();
 
 	std::string path;
 	if (save_file_dialog(extensions::scene.substr(1), fs::resolve_protocol("app:/data").string(), path))
@@ -181,20 +181,20 @@ void save_scene_as()
 }
 
 
-MainEditorWindow::MainEditorWindow()
+main_editor_window::main_editor_window()
 {
 }
 
-MainEditorWindow::MainEditorWindow(sf::VideoMode mode, const std::string& title, std::uint32_t style /*= sf::Style::Default*/)
-	:GuiWindow(mode, title, style)
+main_editor_window::main_editor_window(sf::VideoMode mode, const std::string& title, std::uint32_t style /*= sf::Style::Default*/)
+	:gui_window(mode, title, style)
 {
 }
 
-MainEditorWindow::~MainEditorWindow()
+main_editor_window::~main_editor_window()
 {
 }
 
-void MainEditorWindow::on_gui(std::chrono::duration<float> dt)
+void main_editor_window::on_gui(std::chrono::duration<float> dt)
 {
 	if (_show_start_page)
 	{
@@ -208,14 +208,14 @@ void MainEditorWindow::on_gui(std::chrono::duration<float> dt)
 		on_toolbar();
 	}
 	
-	GuiWindow::on_gui(dt);
+	gui_window::on_gui(dt);
 }
 
-void MainEditorWindow::on_menubar()
+void main_editor_window::on_menubar()
 {
-	auto es = core::get_subsystem<editor::EditState>();
-	auto pm = core::get_subsystem<editor::ProjectManager>();
-	auto input = core::get_subsystem<runtime::Input>();
+	auto es = core::get_subsystem<editor::editor_state>();
+	auto pm = core::get_subsystem<editor::project_manager>();
+	auto input = core::get_subsystem<runtime::input>();
 	const auto& current_project = pm->get_current_project();
 
 	if (input->is_key_down(sf::Keyboard::LControl))
@@ -269,7 +269,7 @@ void MainEditorWindow::on_menubar()
 			{
 				save_scene();
 			}
-			auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
+			auto ecs = core::get_subsystem<runtime::entity_component_system>();
 
 			if (gui::MenuItem("Save As..", "Ctrl+Shift+S", false, ecs->size() > 0 && current_project != ""))
 			{
@@ -313,37 +313,37 @@ void MainEditorWindow::on_menubar()
 	}
 }
 
-void MainEditorWindow::on_toolbar()
+void main_editor_window::on_toolbar()
 {
-	auto es = core::get_subsystem<editor::EditState>();
+	auto es = core::get_subsystem<editor::editor_state>();
 	auto& icons = es->icons;
 
 	float width = gui::GetContentRegionAvailWidth();
-	if (gui::ToolbarButton(icons["translate"].get(), "Translate", es->operation == imguizmo::OPERATION::TRANSLATE))
+	if (gui::ToolbarButton(icons["translate"].get(), "Translate", es->operation == imguizmo::operation::translate))
 	{
-		es->operation = imguizmo::OPERATION::TRANSLATE;
+		es->operation = imguizmo::operation::translate;
 	}
 	gui::SameLine(0.0f);
-	if (gui::ToolbarButton(icons["rotate"].get(), "Rotate", es->operation == imguizmo::OPERATION::ROTATE))
+	if (gui::ToolbarButton(icons["rotate"].get(), "Rotate", es->operation == imguizmo::operation::rotate))
 	{
-		es->operation = imguizmo::OPERATION::ROTATE;
+		es->operation = imguizmo::operation::rotate;
 	}
 	gui::SameLine(0.0f);
-	if (gui::ToolbarButton(icons["scale"].get(), "Scale", es->operation == imguizmo::OPERATION::SCALE))
+	if (gui::ToolbarButton(icons["scale"].get(), "Scale", es->operation == imguizmo::operation::scale))
 	{
-		es->operation = imguizmo::OPERATION::SCALE;
-		es->mode = imguizmo::MODE::LOCAL;
+		es->operation = imguizmo::operation::scale;
+		es->mode = imguizmo::mode::local;
 	}
 	gui::SameLine(0.0f, 50.0f);
 
-	if (gui::ToolbarButton(icons["local"].get(), "Local Coordinate System", es->mode == imguizmo::MODE::LOCAL))
+	if (gui::ToolbarButton(icons["local"].get(), "Local Coordinate System", es->mode == imguizmo::mode::local))
 	{
-		es->mode = imguizmo::MODE::LOCAL;
+		es->mode = imguizmo::mode::local;
 	}
 	gui::SameLine(0.0f);
-	if (gui::ToolbarButton(icons["global"].get(), "Global Coordinate System", es->mode == imguizmo::MODE::WORLD, es->operation != imguizmo::OPERATION::SCALE))
+	if (gui::ToolbarButton(icons["global"].get(), "Global Coordinate System", es->mode == imguizmo::mode::world, es->operation != imguizmo::operation::scale))
 	{
-		es->mode = imguizmo::MODE::WORLD;
+		es->mode = imguizmo::mode::world;
 	}
 	gui::SameLine(0.0f);
 	if (gui::ToolbarButton(icons["grid"].get(), "Show Grid", es->show_grid))
@@ -373,16 +373,16 @@ void MainEditorWindow::on_toolbar()
 	}
 }
 
-void MainEditorWindow::render_dockspace()
+void main_editor_window::render_dockspace()
 {
 	if (!_show_start_page)
-		GuiWindow::render_dockspace();
+		gui_window::render_dockspace();
 }
 
-void MainEditorWindow::on_start_page()
+void main_editor_window::on_start_page()
 {
-	auto es = core::get_subsystem<editor::EditState>();
-	auto pm = core::get_subsystem<editor::ProjectManager>();
+	auto es = core::get_subsystem<editor::editor_state>();
+	auto pm = core::get_subsystem<editor::project_manager>();
 
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoMove |

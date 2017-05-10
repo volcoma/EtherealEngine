@@ -3,42 +3,42 @@
 #include "inspector.h"
 #include "runtime/assets/asset_handle.h"
 
-struct Texture;
-class Mesh;
-struct Prefab;
-class Material;
+struct texture;
+class mesh;
+struct prefab;
+class material;
 
-struct Inspector_AssetHandle_Texture : public Inspector
+struct inspector_asset_handle_texture : public inspector
 {
-	REFLECTABLE(Inspector_AssetHandle_Texture, Inspector)
+	REFLECTABLE(inspector_asset_handle_texture, inspector)
 
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_AssetHandle_Texture, AssetHandle<Texture>)
+INSPECTOR_REFLECT(inspector_asset_handle_texture, asset_handle<texture>)
 
 
-struct Inspector_AssetHandle_Material : public Inspector
+struct inspector_asset_handle_material : public inspector
 {
-	REFLECTABLE(Inspector_AssetHandle_Material, Inspector)
+	REFLECTABLE(inspector_asset_handle_material, inspector)
 
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_AssetHandle_Material, AssetHandle<Material>)
+INSPECTOR_REFLECT(inspector_asset_handle_material, asset_handle<material>)
 
 
-struct Inspector_AssetHandle_Mesh : public Inspector
+struct inspector_asset_handle_mesh : public inspector
 {
-	REFLECTABLE(Inspector_AssetHandle_Mesh, Inspector)
+	REFLECTABLE(inspector_asset_handle_mesh, inspector)
 
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_AssetHandle_Mesh, AssetHandle<Mesh>)
+INSPECTOR_REFLECT(inspector_asset_handle_mesh, asset_handle<mesh>)
 
-struct Inspector_AssetHandle_Prefab : public Inspector
+struct inspector_asset_handle_prefab : public inspector
 {
-	REFLECTABLE(Inspector_AssetHandle_Prefab, Inspector)
+	REFLECTABLE(inspector_asset_handle_prefab, inspector)
 
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_AssetHandle_Prefab, AssetHandle<Prefab>)
+INSPECTOR_REFLECT(inspector_asset_handle_prefab, asset_handle<prefab>)
 

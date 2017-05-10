@@ -24,27 +24,24 @@ namespace std
 	};
 }
 
-enum class ActionType : unsigned int
+enum class action_type : unsigned int
 {
-	NotMapped,
-	Pressed,
-	Changed,
-	Released,
-	Count,
+	not_mapped,
+	pressed,
+	changed,
+	released
 };
 
-struct Mapping
+struct input_mapping
 {
-	ActionType type = ActionType::NotMapped;
+	action_type type = action_type::not_mapped;
 	std::vector<std::string> actions;
 };
 
 template<typename T>
-class InputMapper
+class input_mapper
 {
 public:
-	~InputMapper() = default;
-
 	//-----------------------------------------------------------------------------
 	//  Name : map ()
 	/// <summary>
@@ -55,7 +52,7 @@ public:
 	//-----------------------------------------------------------------------------
 	void map(const std::string& action, T input)
 	{
-		bindings[input].push_back(action);
+		_bindings[input].push_back(action);
 	}
 
 	//-----------------------------------------------------------------------------
@@ -66,117 +63,117 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual Mapping get_mapping(const sf::Event& e) = 0;
+	virtual input_mapping get_mapping(const sf::Event& e) = 0;
 
 protected:
 	/// mappings
-	std::unordered_map<T, std::vector<std::string>> bindings;
+	std::unordered_map<T, std::vector<std::string>> _bindings;
 };
 
 
-struct KeyboardMapper : public InputMapper<sf::Keyboard::Key>
+struct keyboard_mapper : public input_mapper<sf::Keyboard::Key>
 {
-	virtual Mapping get_mapping(const sf::Event& e)
+	virtual input_mapping get_mapping(const sf::Event& e)
 	{
-		Mapping binds;
+		input_mapping binds;
 		if (e.type == sf::Event::EventType::KeyPressed)
 		{
-			binds.actions = bindings[e.key.code];
-			binds.type = ActionType::Pressed;
+			binds.actions = _bindings[e.key.code];
+			binds.type = action_type::pressed;
 		}
 		if (e.type == sf::Event::EventType::KeyReleased)
 		{
-			binds.actions = bindings[e.key.code];
-			binds.type = ActionType::Released;
+			binds.actions = _bindings[e.key.code];
+			binds.type = action_type::released;
 		}
 		return binds;
 	}
 
 };
 
-struct MouseButtonMapper : public InputMapper<sf::Mouse::Button>
+struct mouse_button_mapper : public input_mapper<sf::Mouse::Button>
 {
-	virtual Mapping get_mapping(const sf::Event& e)
+	virtual input_mapping get_mapping(const sf::Event& e)
 	{
-		Mapping binds;
+		input_mapping binds;
 		if (e.type == sf::Event::EventType::MouseButtonPressed)
 		{
-			binds.actions = bindings[e.mouseButton.button];
-			binds.type = ActionType::Pressed;
+			binds.actions = _bindings[e.mouseButton.button];
+			binds.type = action_type::pressed;
 		}
 		if (e.type == sf::Event::EventType::MouseButtonReleased)
 		{
-			binds.actions = bindings[e.mouseButton.button];
-			binds.type = ActionType::Released;
+			binds.actions = _bindings[e.mouseButton.button];
+			binds.type = action_type::released;
 		}
 		return binds;
 	}
 };
 
-struct MouseWheelMapper : public InputMapper<sf::Mouse::Wheel>
+struct mouse_wheel_mapper : public input_mapper<sf::Mouse::Wheel>
 {
-	virtual Mapping get_mapping(const sf::Event& e)
+	virtual input_mapping get_mapping(const sf::Event& e)
 	{
-		Mapping binds;
+		input_mapping binds;
 		if (e.type == sf::Event::EventType::MouseWheelScrolled)
 		{
-			binds.actions = bindings[e.mouseWheelScroll.wheel];
-			binds.type = ActionType::Changed;
+			binds.actions = _bindings[e.mouseWheelScroll.wheel];
+			binds.type = action_type::changed;
 		}
 		return binds;
 	}
 };
 
-struct TouchFingerMapper : public InputMapper<unsigned int>
+struct touch_finger_mapper : public input_mapper<unsigned int>
 {
-	virtual Mapping get_mapping(const sf::Event& e)
+	virtual input_mapping get_mapping(const sf::Event& e)
 	{
-		Mapping binds;
+		input_mapping binds;
 		if (e.type == sf::Event::EventType::TouchBegan)
 		{
-			binds.actions = bindings[e.touch.finger];
-			binds.type = ActionType::Pressed;
+			binds.actions = _bindings[e.touch.finger];
+			binds.type = action_type::pressed;
 		}
 		if (e.type == sf::Event::EventType::TouchMoved)
 		{
-			binds.actions = bindings[e.touch.finger];
-			binds.type = ActionType::Changed;
+			binds.actions = _bindings[e.touch.finger];
+			binds.type = action_type::changed;
 		}
 		if (e.type == sf::Event::EventType::TouchEnded)
 		{
-			binds.actions = bindings[e.touch.finger];
-			binds.type = ActionType::Released;
+			binds.actions = _bindings[e.touch.finger];
+			binds.type = action_type::released;
 		}
 		return binds;
 	}
 };
 
-struct JoystickButtonMapper : public InputMapper<std::pair<unsigned int, unsigned int>>
+struct joystick_button_mapper : public input_mapper<std::pair<unsigned int, unsigned int>>
 {
-	virtual Mapping get_mapping(const sf::Event& e)
+	virtual input_mapping get_mapping(const sf::Event& e)
 	{
-		Mapping binds;
+		input_mapping binds;
 		if (e.type == sf::Event::EventType::JoystickButtonPressed)
 		{
-			binds.actions = bindings[{e.joystickButton.joystickId, e.joystickButton.button}];
-			binds.type = ActionType::Pressed;
+			binds.actions = _bindings[{e.joystickButton.joystickId, e.joystickButton.button}];
+			binds.type = action_type::pressed;
 		}
 		if (e.type == sf::Event::EventType::JoystickButtonReleased)
 		{
-			binds.actions = bindings[{e.joystickButton.joystickId, e.joystickButton.button}];
-			binds.type = ActionType::Released;
+			binds.actions = _bindings[{e.joystickButton.joystickId, e.joystickButton.button}];
+			binds.type = action_type::released;
 		}
 		return binds;
 	}
 };
 
-struct EventMapper : public InputMapper<sf::Event::EventType>
+struct event_mapper : public input_mapper<sf::Event::EventType>
 {
-	virtual Mapping get_mapping(const sf::Event& e)
+	virtual input_mapping get_mapping(const sf::Event& e)
 	{
-		Mapping binds;
-		binds.actions = bindings[e.type];
-		binds.type = ActionType::Changed;
+		input_mapping binds;
+		binds.actions = _bindings[e.type];
+		binds.type = action_type::changed;
 		return binds;
 	}
 };

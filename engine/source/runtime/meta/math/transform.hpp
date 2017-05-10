@@ -80,7 +80,7 @@ namespace cereal
 	}
 
 	template<typename Archive>
-	inline void SERIALIZE_FUNCTION_NAME(Archive & ar, math::transform_t& obj)
+	inline void SERIALIZE_FUNCTION_NAME(Archive & ar, math::transform& obj)
 	{
 		try_serialize(ar, cereal::make_nvp("col_0", obj[0]));
 		try_serialize(ar, cereal::make_nvp("col_1", obj[1]));

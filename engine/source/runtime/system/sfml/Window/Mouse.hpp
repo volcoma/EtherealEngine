@@ -87,7 +87,7 @@ public:
     /// \return Current position of the mouse
     ///
     ////////////////////////////////////////////////////////////
-    static iPoint getPosition();
+    static ipoint getPosition();
 
     ////////////////////////////////////////////////////////////
     /// \brief Get the current position of the mouse in window coordinates
@@ -100,7 +100,7 @@ public:
     /// \return Current position of the mouse
     ///
     ////////////////////////////////////////////////////////////
-    static iPoint getPosition(const Window& relativeTo);
+    static ipoint getPosition(const Window& relativeTo);
 
     ////////////////////////////////////////////////////////////
     /// \brief Set the current position of the mouse in desktop coordinates
@@ -111,7 +111,7 @@ public:
     /// \param position New position of the mouse
     ///
     ////////////////////////////////////////////////////////////
-    static void setPosition(const iPoint& position);
+    static void setPosition(const ipoint& position);
 
     ////////////////////////////////////////////////////////////
     /// \brief Set the current position of the mouse in window coordinates
@@ -123,7 +123,7 @@ public:
     /// \param relativeTo Reference window
     ///
     ////////////////////////////////////////////////////////////
-    static void setPosition(const iPoint& position, const Window& relativeTo);
+    static void setPosition(const ipoint& position, const Window& relativeTo);
 };
 
 } // namespace sf

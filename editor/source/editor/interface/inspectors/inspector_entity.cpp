@@ -2,37 +2,37 @@
 #include "inspectors.h"
 
 
-struct Inspector_Entity::component
+struct inspector_entity::component
 {
 	struct instance
 	{
-		PathNameTagTree _tree;
-		std::vector<runtime::CHandle<runtime::Component>> _list;
+		path_name_tag_tree _tree;
+		std::vector<runtime::chandle<runtime::component>> _list;
 		instance();
-		void setup(const std::vector<runtime::CHandle<runtime::Component>>& list);
+		void setup(const std::vector<runtime::chandle<runtime::component>>& list);
 		void inspect(bool& changed);
 	};
 
 	struct type
 	{
-		PathNameTagTree _tree;
-		PathNameTagTree::iterator _itor;
+		path_name_tag_tree _tree;
+		path_name_tag_tree::iterator _itor;
 		std::vector<rttr::type> _list;
 
 		type();
 
-		void inspect(ImGuiTextFilter& filter, runtime::Entity data);
+		void inspect(ImGuiTextFilter& filter, runtime::entity data);
 	};
 
 	instance _instance;
 	type _type;
 };
 
-Inspector_Entity::component::instance::instance() :
+inspector_entity::component::instance::instance() :
 	_tree('/', -1)
 { }
 
-void Inspector_Entity::component::instance::setup(const std::vector<runtime::CHandle<runtime::Component>>& list)
+void inspector_entity::component::instance::setup(const std::vector<runtime::chandle<runtime::component>>& list)
 {
 	_list = list;
 	_tree.reset();
@@ -67,7 +67,7 @@ void Inspector_Entity::component::instance::setup(const std::vector<runtime::CHa
 		}
 	}
 }
-void Inspector_Entity::component::instance::inspect(bool& changed)
+void inspector_entity::component::instance::inspect(bool& changed)
 {
 	bool opened = true;
 
@@ -145,10 +145,10 @@ void Inspector_Entity::component::instance::inspect(bool& changed)
 }
 
 
-Inspector_Entity::component::type::type() :
+inspector_entity::component::type::type() :
 	_tree('/', -1)
 {
-	auto types = rttr::type::get<runtime::Component>().get_derived_classes();
+	auto types = rttr::type::get<runtime::component>().get_derived_classes();
 	for (auto& info : types)
 	{
 		auto meta_category = info.get_metadata("Category");
@@ -177,7 +177,7 @@ Inspector_Entity::component::type::type() :
 	_tree.setup_iterator(_itor);
 }
 
-void Inspector_Entity::component::type::inspect(ImGuiTextFilter& filter, runtime::Entity data)
+void inspector_entity::component::type::inspect(ImGuiTextFilter& filter, runtime::entity data)
 {
 	gui::Separator();
 	
@@ -216,7 +216,7 @@ void Inspector_Entity::component::type::inspect(ImGuiTextFilter& filter, runtime
 					auto cstructor = component_type.get_constructor();
 
 					auto c = cstructor.invoke();
-					auto c_ptr = c.get_value<std::shared_ptr<runtime::Component>>();
+					auto c_ptr = c.get_value<std::shared_ptr<runtime::component>>();
 					if (c_ptr)
 						data.assign(c_ptr);
 
@@ -233,26 +233,26 @@ void Inspector_Entity::component::type::inspect(ImGuiTextFilter& filter, runtime
 	}
 }
 
-Inspector_Entity::Inspector_Entity() 
+inspector_entity::inspector_entity() 
 	: _component(std::make_unique<component>())
 { }
 
-Inspector_Entity::Inspector_Entity(const Inspector_Entity& other)
+inspector_entity::inspector_entity(const inspector_entity& other)
 	: _component(std::make_unique<component>())
 { }
 
-Inspector_Entity::~Inspector_Entity()
+inspector_entity::~inspector_entity()
 {
 }
 
-bool Inspector_Entity::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_entity::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<runtime::Entity>();
+	auto data = var.get_value<runtime::entity>();
 	if (!data)
 		return false;
 	bool changed = false;
 	{
-		PropertyLayout propName("Name");
+		property_layout propName("Name");
 		rttr::variant varName = data.to_string();
 		
 		changed |= inspect_var(varName);

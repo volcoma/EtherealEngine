@@ -5,7 +5,7 @@
 
 #include "core/nonstd/type_traits.hpp"
 #include "core/common/string.h"
-#include "core/events/delegate.hpp"
+#include "core/signals/signal.hpp"
 #include "../system/filesystem.h"
 #include "load_request.hpp"
 
@@ -13,19 +13,19 @@ namespace runtime
 {
 	/// aliases
 	template<typename T>
-	using RequestContainer = std::unordered_map<std::string, LoadRequest<T>>;
+	using request_container_t = std::unordered_map<std::string, load_request<T>>;
 
-	struct Storage
+	struct base_storage
 	{
 		//-----------------------------------------------------------------------------
-		//  Name : ~Storage (virtual )
+		//  Name : ~base_storage (virtual )
 		/// <summary>
 		/// 
 		/// 
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		virtual ~Storage() = default;
+		virtual ~base_storage() = default;
 
 		//-----------------------------------------------------------------------------
 		//  Name : clear (virtual )
@@ -50,17 +50,17 @@ namespace runtime
 	};
 
 	template<typename T>
-	struct TStorage : Storage
+	struct asset_storage : public base_storage
 	{
 		//-----------------------------------------------------------------------------
-		//  Name : ~TStorage ()
+		//  Name : ~storage ()
 		/// <summary>
 		/// 
 		/// 
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		~TStorage() = default;
+		~asset_storage() = default;
 
 		//-----------------------------------------------------------------------------
 		//  Name : clear ()
@@ -97,47 +97,17 @@ namespace runtime
 			}
 		}
 
-		//-----------------------------------------------------------------------------
-		//  Name : load_from_memory_default ()
-		/// <summary>
-		/// 
-		/// 
-		/// 
-		/// </summary>
-		//-----------------------------------------------------------------------------
-		static void load_from_memory_default(const fs::path&, const std::uint8_t*, std::uint32_t, LoadRequest<T>&) {}
-
-		//-----------------------------------------------------------------------------
-		//  Name : load_from_file_default ()
-		/// <summary>
-		/// 
-		/// 
-		/// 
-		/// </summary>
-		//-----------------------------------------------------------------------------
-		static void load_from_file_default(const fs::path&, const fs::path&, bool, LoadRequest<T>&) {}
-
-		//-----------------------------------------------------------------------------
-		//  Name : save_to_file_default ()
-		/// <summary>
-		/// 
-		/// 
-		/// 
-		/// </summary>
-		//-----------------------------------------------------------------------------
-		static void save_to_file_default(const fs::path&, const AssetHandle<T>&) {}
-
 		/// key, data, size, outRequest
-		delegate<void(const std::string&, const std::uint8_t*, std::uint32_t, LoadRequest<T>&)> load_from_memory = load_from_memory_default;
+		delegate<void(const std::string&, const std::uint8_t*, std::uint32_t, load_request<T>&)> load_from_memory = [](const fs::path&, const std::uint8_t*, std::uint32_t, load_request<T>&) {};
 
 		/// key, absolutKey, async, outReqeust
-		delegate<void(const std::string&, const fs::path&, bool, LoadRequest<T>&)> load_from_file = load_from_file_default;
+		delegate<void(const std::string&, const fs::path&, bool, load_request<T>&)> load_from_file = [](const fs::path&, const fs::path&, bool, load_request<T>&) {};
 
 		/// absolutKey, asset
-		delegate<void(const fs::path&, const AssetHandle<T>&)> save_to_file = save_to_file_default;
+		delegate<void(const fs::path&, const asset_handle<T>&)> save_to_file = [](const fs::path&, const asset_handle<T>&) {};
 
 		/// Storage container
-		std::unordered_map<std::string, LoadRequest<T>> container;
+		std::unordered_map<std::string, load_request<T>> container;
 		/// Extension
 		std::string ext;
 	};
@@ -150,7 +120,7 @@ namespace runtime
 	};
 
 
-	class AssetManager : public core::Subsystem
+	class asset_manager : public core::subsystem
 	{
 	public:
 		bool initialize();
@@ -163,9 +133,9 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template <typename S>
-		void add(std::shared_ptr<TStorage<S>> system)
+		void add(std::shared_ptr<asset_storage<S>> system)
 		{
-			storages.insert(std::make_pair(nonstd::type_info_polymorphic::id<Storage, TStorage<S>>(), system));
+			storages.insert(std::make_pair(rtti::type_id<asset_storage<S>>().hash_code(), system));
 		}
 
 		//-----------------------------------------------------------------------------
@@ -177,9 +147,9 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template <typename S, typename ... Args>
-		std::shared_ptr<TStorage<S>> add(Args && ... args)
+		std::shared_ptr<asset_storage<S>> add(Args && ... args)
 		{
-			auto s = std::make_shared<TStorage<S>>(std::forward<Args>(args) ...);
+			auto s = std::make_shared<asset_storage<S>>(std::forward<Args>(args) ...);
 			add(s);
 			return s;
 		}
@@ -193,13 +163,13 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template <typename S>
-		std::shared_ptr<TStorage<S>> get_storage()
+		std::shared_ptr<asset_storage<S>> get_storage()
 		{
-			auto it = storages.find(nonstd::type_info_polymorphic::id<Storage, TStorage<S>>());
+			auto it = storages.find(rtti::type_id<asset_storage<S>>().hash_code());
 			//assert(it != storages.end());
 			return it == storages.end()
-				? std::shared_ptr<TStorage<S>>()
-				: std::shared_ptr<TStorage<S>>(std::static_pointer_cast<TStorage<S>>(it->second));
+				? std::shared_ptr<asset_storage<S>>()
+				: std::shared_ptr<asset_storage<S>>(std::static_pointer_cast<asset_storage<S>>(it->second));
 		}
 
 		//-----------------------------------------------------------------------------
@@ -245,7 +215,7 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template<typename T>
-		LoadRequest<T>& create_asset_from_memory(
+		load_request<T>& create_asset_from_memory(
 			const std::string& key,
 			const std::uint8_t* data,
 			const std::uint32_t& size)
@@ -332,7 +302,7 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template<typename T>
-		LoadRequest<T>& load(
+		load_request<T>& load(
 			const std::string& key,
 			bool async,
 			bool force = false)
@@ -360,7 +330,7 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template<typename T>
-		void save(const AssetHandle<T>& asset)
+		void save(const asset_handle<T>& asset)
 		{
 			auto storage = get_storage<T>();
 			const fs::path absoluteKey = get_absolute_key(asset.id(), storage);
@@ -368,7 +338,7 @@ namespace runtime
 		}
 
 		template<typename T>
-		LoadRequest<T>& find_or_create_asset_entry(
+		load_request<T>& find_or_create_asset_entry(
 			const std::string& key
 		)
 		{
@@ -386,12 +356,12 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template<typename T, typename F>
-		LoadRequest<T>& load_asset_from_file_impl(
+		load_request<T>& load_asset_from_file_impl(
 			const std::string& key,
 			const fs::path& absoluteKey,
 			bool async,
 			bool force,
-			RequestContainer<T>& container,
+			request_container_t<T>& container,
 			F&& loadFunc
 		)
 		{
@@ -414,7 +384,7 @@ namespace runtime
 			}
 			else if (!fs::exists(absoluteKey, std::error_code{}))
 			{
-				static LoadRequest<T> emptyRequest;
+				static load_request<T> emptyRequest;
 				return emptyRequest;
 			}
 			else
@@ -436,11 +406,11 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template<typename T, typename F>
-		LoadRequest<T>& create_asset_from_memory_impl(
+		load_request<T>& create_asset_from_memory_impl(
 			const std::string& key,
 			const std::uint8_t* data,
 			const std::uint32_t& size,
-			RequestContainer<T>& container,
+			request_container_t<T>& container,
 			F&& loadFunc
 		)
 		{
@@ -472,9 +442,9 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template<typename T>
-		LoadRequest<T>& find_or_create_asset_impl(
+		load_request<T>& find_or_create_asset_impl(
 			const std::string& key,
-			RequestContainer<T>& container
+			request_container_t<T>& container
 		)
 		{
 			auto& request = container[key];
@@ -482,7 +452,7 @@ namespace runtime
 		}
 
 		/// Different storages
-		std::unordered_map<nonstd::type_info_polymorphic::index_t, std::shared_ptr<Storage>> storages;
+		std::unordered_map<std::size_t, std::shared_ptr<base_storage>> storages;
 	};
 
 }

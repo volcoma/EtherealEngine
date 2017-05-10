@@ -4,7 +4,7 @@
 #include <chrono>
 namespace runtime
 {
-	class CameraSystem : public core::Subsystem
+	class camera_system : public core::subsystem
 	{
 	public:
 		bool initialize();

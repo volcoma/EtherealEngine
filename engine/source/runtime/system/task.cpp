@@ -5,7 +5,7 @@
 namespace runtime
 {
 
-	bool TaskSystem::initialize()
+	bool task_system::initialize()
 	{
 		if (_core == 0)
 			_core = std::thread::hardware_concurrency() - 1;
@@ -21,14 +21,14 @@ namespace runtime
 		_thread_main = std::this_thread::get_id();
 		_thread_indices.insert(std::make_pair(_thread_main, 0));
 		
-		on_frame_begin.connect(this, &TaskSystem::execute_tasks_on_main);
+		on_frame_begin.connect(this, &task_system::execute_tasks_on_main);
 
 		return true;
 	}
 
-	void TaskSystem::dispose()
+	void task_system::dispose()
 	{
-		on_frame_begin.disconnect(this, &TaskSystem::execute_tasks_on_main);
+		on_frame_begin.disconnect(this, &task_system::execute_tasks_on_main);
 
 		{
 			std::unique_lock<std::mutex> lock(_other_thread_tasks.mutex);
@@ -40,16 +40,16 @@ namespace runtime
 			thread.join();
 	}
 
-	core::Handle TaskSystem::create_internal(const std::string& name, std::function<void()> closure)
+	core::handle task_system::create_internal(const std::string& name, std::function<void()> closure)
 	{
-		core::Handle handle;
+		core::handle handle;
 		{
 			std::unique_lock<std::mutex> L(_tasks_mutex);
 			handle = _tasks.create();
 		}
 		if (handle)
 		{
-			Task* task = nullptr;
+			task_t* task = nullptr;
 			{
 				std::unique_lock<std::mutex> L(_tasks_mutex);
 				task = _tasks.fetch(handle);
@@ -64,19 +64,19 @@ namespace runtime
 			return handle;
 		}
 
-		return core::Handle();
+		return core::handle();
 	}
 
-	core::Handle TaskSystem::create_as_child_internal(core::Handle parent, const std::string& name, std::function<void()> closure)
+	core::handle task_system::create_as_child_internal(core::handle parent, const std::string& name, std::function<void()> closure)
 	{
-		core::Handle handle;
+		core::handle handle;
 		{
 			std::unique_lock<std::mutex> L(_tasks_mutex);
 			handle = _tasks.create();
 		}
 		if (handle)
 		{
-			Task* task = nullptr;
+			task_t* task = nullptr;
 			{
 				std::unique_lock<std::mutex> L(_tasks_mutex);
 				task = _tasks.fetch(handle);
@@ -87,7 +87,7 @@ namespace runtime
 				task->jobs.store(1);
 				task->name = name;
 			}
-			Task* ptask = nullptr;
+			task_t* ptask = nullptr;
 			{
 				std::unique_lock<std::mutex> L(_tasks_mutex);
 				ptask = _tasks.fetch(parent);
@@ -100,12 +100,12 @@ namespace runtime
 			}
 			return handle;
 		}
-		return core::Handle();
+		return core::handle();
 	}
 
-	void TaskSystem::run(core::Handle handle, bool on_main_thread)
+	void task_system::run(core::handle handle, bool on_main_thread)
 	{
-		Task* task = nullptr;
+		task_t* task = nullptr;
 		{
 			std::unique_lock<std::mutex> L(_tasks_mutex);
 			task = _tasks.fetch(handle);
@@ -133,7 +133,7 @@ namespace runtime
 		
 	}
 
-	void TaskSystem::execute_tasks_on_main(std::chrono::duration<float>)
+	void task_system::execute_tasks_on_main(std::chrono::duration<float>)
 	{
 		unsigned index = get_thread_index();
 		while (!_main_thread_tasks.tasks.empty())
@@ -142,9 +142,9 @@ namespace runtime
 		}
 	}
 
-	bool TaskSystem::is_completed(core::Handle handle)
+	bool task_system::is_completed(core::handle handle)
 	{
-		Task* task = nullptr;
+		task_t* task = nullptr;
 		{
 			std::unique_lock<std::mutex> L(_tasks_mutex);
 			task = _tasks.fetch(handle);
@@ -154,9 +154,9 @@ namespace runtime
 		return task->jobs.load() == 0;
 	}
 
-	void TaskSystem::wait(core::Handle handle)
+	void task_system::wait(core::handle handle)
 	{
-		Task* task = nullptr;
+		task_t* task = nullptr;
 		{
 			std::unique_lock<std::mutex> L(_tasks_mutex);
 			task = _tasks.fetch(handle);
@@ -174,9 +174,9 @@ namespace runtime
 		}
 	}
 
-	void TaskSystem::finish(core::Handle handle)
+	void task_system::finish(core::handle handle)
 	{
-		Task* task = nullptr;
+		task_t* task = nullptr;
 		{
 			std::unique_lock<std::mutex> L(_tasks_mutex);
 			task = _tasks.fetch(handle);
@@ -200,9 +200,9 @@ namespace runtime
 		}
 	}
 
-	bool TaskSystem::execute_one(unsigned index, bool wait, std::mutex& mtx, std::deque<core::Handle>& queue)
+	bool task_system::execute_one(unsigned index, bool wait, std::mutex& mtx, std::deque<core::handle>& queue)
 	{
-		core::Handle handle;
+		core::handle handle;
 		{
 			std::unique_lock<std::mutex> L(mtx);
 			if (wait)
@@ -235,7 +235,7 @@ namespace runtime
 		return true;
 	}
 
-	bool TaskSystem::execute_one(core::Handle handle, unsigned index, bool wait, std::mutex& mtx, std::deque<core::Handle>& queue)
+	bool task_system::execute_one(core::handle handle, unsigned index, bool wait, std::mutex& mtx, std::deque<core::handle>& queue)
 	{
 		{
 			std::unique_lock<std::mutex> L(mtx);
@@ -276,14 +276,14 @@ namespace runtime
 		return true;
 	}
 
-	unsigned TaskSystem::get_thread_index() const
+	unsigned task_system::get_thread_index() const
 	{
 		auto found = _thread_indices.find(std::this_thread::get_id());
 		if (found != _thread_indices.end()) return found->second;
 		return 0xFFFFFFFF;
 	}
 
-	void TaskSystem::thread_run(TaskSystem& scheduler, unsigned index)
+	void task_system::thread_run(task_system& scheduler, unsigned index)
 	{
 		if (scheduler.on_thread_start)
 			scheduler.on_thread_start(index);

@@ -3,7 +3,7 @@
 #include "core/math/math_includes.h"
 #include "core/common/assert.hpp"
 
-struct TriangleMeshTools
+struct triangle_mesh_tools
 {
 	// all of these produce shapes with center in (0, 0, 0) and each vertex magnitude of 1 (normalized), except where specified otherwise
 	// front faces are counter-clockwise

@@ -5,8 +5,8 @@
 #include <fstream>
 
 
-struct Scene
+struct scene
 {
-	std::vector<runtime::Entity> instantiate();
+	std::vector<runtime::entity> instantiate();
 	std::shared_ptr<std::istream> data;
 };

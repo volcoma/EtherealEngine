@@ -1,22 +1,22 @@
 #include "light_component.h"
 
-LightComponent::LightComponent()
+light_component::light_component()
 {
 }
 
-LightComponent::LightComponent(const LightComponent& lightComponent)
+light_component::light_component(const light_component& lightComponent)
 {
 	_light = lightComponent._light;
 }
 
-LightComponent::~LightComponent()
+light_component::~light_component()
 {
 
 }
 
-int LightComponent::compute_projected_sphere_rect(iRect& rect, const math::vec3& light_position, const math::vec3& light_direction, const math::transform_t& view, const math::transform_t& proj)
+int light_component::compute_projected_sphere_rect(irect& rect, const math::vec3& light_position, const math::vec3& light_direction, const math::transform& view, const math::transform& proj)
 {
-	if (_light.light_type == LightType::Point)
+	if (_light.light_type == light_type::point)
 	{
 		return math::compute_projected_sphere_rect(
 			rect.left,
@@ -28,7 +28,7 @@ int LightComponent::compute_projected_sphere_rect(iRect& rect, const math::vec3&
 			view,
 			proj);
 	}
-	else if (_light.light_type == LightType::Spot)
+	else if (_light.light_type == light_type::spot)
 	{
 		float range = _light.spot_data.get_range();
 		float clamped_inner_cone_angle = math::radians(math::clamp(_light.spot_data.get_inner_angle(), 0.0f, 89.0f));

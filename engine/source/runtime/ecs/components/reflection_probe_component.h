@@ -1,6 +1,6 @@
 #pragma once
 //-----------------------------------------------------------------------------
-// ReflectionProbeComponent Header Includes
+// reflection_probe_component Header Includes
 //-----------------------------------------------------------------------------
 #include "../ecs.h"
 #include "../../rendering/reflection_probe.h"
@@ -14,23 +14,23 @@
 // Main Class Declarations
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-//  Name : ReflectionProbeComponent (Class)
+//  Name : reflection_probe_component (Class)
 /// <summary>
-/// Class that contains our core Light data, used for rendering and other things.
+/// Class that contains our core light data, used for rendering and other things.
 /// </summary>
 //-----------------------------------------------------------------------------
-class ReflectionProbeComponent : public runtime::Component
+class reflection_probe_component : public runtime::component
 {
-	COMPONENT(ReflectionProbeComponent)
-	SERIALIZABLE(ReflectionProbeComponent)
-	REFLECTABLE(ReflectionProbeComponent, runtime::Component)
+	COMPONENT(reflection_probe_component)
+	SERIALIZABLE(reflection_probe_component)
+	REFLECTABLE(reflection_probe_component, runtime::component)
 public:
 	//-------------------------------------------------------------------------
 	// Constructors & Destructors
 	//-------------------------------------------------------------------------
-	ReflectionProbeComponent();
-	ReflectionProbeComponent(const ReflectionProbeComponent& camera);
-	virtual ~ReflectionProbeComponent();
+	reflection_probe_component();
+	reflection_probe_component(const reflection_probe_component& camera);
+	virtual ~reflection_probe_component();
 
 	//-------------------------------------------------------------------------
 	// Public Methods
@@ -43,7 +43,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const ReflectionProbe& get_probe() const { return _probe; }
+	inline const reflection_probe& get_probe() const { return _probe; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_probe ()
@@ -53,7 +53,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_probe(const ReflectionProbe& probe);
+	void set_probe(const reflection_probe& probe);
 
 	//-----------------------------------------------------------------------------
 	//  Name : compute_projected_sphere_rect ()
@@ -64,10 +64,10 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	int compute_projected_sphere_rect(
-		iRect& rect,
+		irect& rect,
 		const math::vec3& position,
-		const math::transform_t& view,
-		const math::transform_t& proj);
+		const math::transform& view,
+		const math::transform& proj);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_render_view ()
@@ -77,7 +77,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline RenderView& get_render_view(size_t idx) { return _render_view[idx]; }
+	inline render_view& get_render_view(size_t idx) { return _render_view[idx]; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_cubemap ()
@@ -87,7 +87,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::shared_ptr<Texture> get_cubemap();
+	std::shared_ptr<texture> get_cubemap();
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_cubemap_fbo ()
@@ -97,13 +97,13 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::shared_ptr<FrameBuffer> get_cubemap_fbo();
+	std::shared_ptr<frame_buffer> get_cubemap_fbo();
 private:
 	//-------------------------------------------------------------------------
 	// Private Member Variables.
 	//-------------------------------------------------------------------------
 	/// The probe object this component represents
-	ReflectionProbe _probe;
+	reflection_probe _probe;
 	/// The render view for this component
-	RenderView _render_view[6];
+	render_view _render_view[6];
 };

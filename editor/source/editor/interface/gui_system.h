@@ -5,9 +5,9 @@
 #include "imgui/imgui_internal.h"
 #include <memory>
 
-struct GUIStyle
+struct gui_style
 {
-	struct HSVSetup
+	struct hsv_setup
 	{
 		float col_main_hue = 0.0f / 255.0f;
 		float col_main_sat = 0.0f / 255.0f;
@@ -28,11 +28,11 @@ struct GUIStyle
 	};
 
 	void reset_style();
-	void set_style_colors(const HSVSetup& _setup);
+	void set_style_colors(const hsv_setup& _setup);
 	void load_style();
 	void save_style();
 
-	HSVSetup setup;
+	hsv_setup setup;
 };
 //-----------------------------------------------------------------------------
 // Main Class Declarations
@@ -43,14 +43,14 @@ struct GUIStyle
 /// Class for the management of interface elements.
 /// </summary>
 //-----------------------------------------------------------------------------
-struct GuiSystem : public core::Subsystem
+struct GuiSystem : public core::subsystem
 {
 	bool initialize();
 	void dispose();
 	void frame_begin(std::chrono::duration<float>);	
 };
 
-struct Texture;
+struct texture;
 namespace gui
 {   
 	using namespace ImGui;
@@ -58,7 +58,7 @@ namespace gui
 	
 	ImFont* GetFont(const std::string& id);
 	// Helper function for passing Texture to ImGui::Image.
-	void Image(std::shared_ptr<Texture> texture
+	void Image(std::shared_ptr<texture> texture
 		, const ImVec2& _size
 		, const ImVec2& _uv0 = ImVec2(0.0f, 0.0f)
 		, const ImVec2& _uv1 = ImVec2(1.0f, 1.0f)
@@ -68,7 +68,7 @@ namespace gui
 
 
 	// Helper function for passing Texture to ImGui::ImageButton.
-	bool ImageButton(std::shared_ptr<Texture> texture
+	bool ImageButton(std::shared_ptr<texture> texture
 		, const ImVec2& _size
 		, const ImVec2& _uv0 = ImVec2(0.0f, 0.0f)
 		, const ImVec2& _uv1 = ImVec2(1.0f, 1.0f)
@@ -76,14 +76,14 @@ namespace gui
 		, const ImVec4& _bgCol = ImVec4(0.0f, 0.0f, 0.0f, 0.0f)
 		, const ImVec4& _tintCol = ImVec4(1.0f, 1.0f, 1.0f, 1.0f)
 	);
-	bool ImageButtonEx(std::shared_ptr<Texture> texture
+	bool ImageButtonEx(std::shared_ptr<texture> texture
 		, const ImVec2& size
 		, const char* tooltip = nullptr
 		, bool selected = false
 		, bool enabled = true
 	);
 
-	void ImageWithAspect(std::shared_ptr<Texture> texture
+	void ImageWithAspect(std::shared_ptr<texture> texture
 		, const ImVec2& texture_size
 		, const ImVec2& size
 		, const ImVec2& uv0 = ImVec2(0, 0)
@@ -91,7 +91,7 @@ namespace gui
 		, const ImVec4& tint_col = ImVec4(1, 1, 1, 1)
 		, const ImVec4& border_col = ImVec4(0, 0, 0, 0));
 
-	int ImageButtonWithAspectAndLabel(std::shared_ptr<Texture> texture
+	int ImageButtonWithAspectAndLabel(std::shared_ptr<texture> texture
 		, const ImVec2& texture_size
 		, const ImVec2& size
 		, const ImVec2& uv0
@@ -103,6 +103,6 @@ namespace gui
 		, size_t buf_size
 		, ImGuiInputTextFlags flags = 0);
 
-	GUIStyle& get_gui_style();
+	gui_style& get_gui_style();
 };
 

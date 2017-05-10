@@ -4,12 +4,12 @@
 #include <string>
 #include <map>
 
-Console::Console()
+console::console()
 {
 	register_help_command();
 }
 
-Console::~Console()
+console::~console()
 {
 	commands.clear();
 }
@@ -17,7 +17,7 @@ Console::~Console()
 /**
 * @brief Add an alias to the command.
 */
-void Console::register_alias(const std::string& alias, const std::string& command)
+void console::register_alias(const std::string& alias, const std::string& command)
 {
 	assert(commands.find(command) != commands.end());
 	assert(commands.find(alias) == commands.end());
@@ -41,7 +41,7 @@ void Console::register_alias(const std::string& alias, const std::string& comman
 * - create an history of inputs
 * - eventually make the commands lowercase / case insensitive
 */
-std::string Console::process_input(const std::string& line)
+std::string console::process_input(const std::string& line)
 {
 	printBuffer.str(std::string()); // clear()
 	std::vector<std::string> tokens = tokenize_line(line);
@@ -72,7 +72,7 @@ std::string Console::process_input(const std::string& line)
 * TODO:
 * - Find if there is a better way to tokenize a string.
 */
-std::vector<std::string> Console::tokenize_line(const std::string& line)
+std::vector<std::string> console::tokenize_line(const std::string& line)
 {
 	std::vector<std::string> out;
 	std::string currWord;
@@ -142,7 +142,7 @@ std::vector<std::string> Console::tokenize_line(const std::string& line)
 	return out;
 }
 
-void Console::register_help_command()
+void console::register_help_command()
 {
 	register_command(
 		"help",
@@ -157,13 +157,13 @@ void Console::register_help_command()
 * TODO:
 * - if the commands will ever be case insensitive, the filter should also be
 */
-void Console::help_command(const std::string& term)
+void console::help_command(const std::string& term)
 {
 	if (term.empty())
 	{
 		// TODO by Michael: print version number
 		print("Welcome to the console of (this engine).");
-		print("Command syntax:          \"command_name parameter1 parameter2 ...\"");
+		print("command syntax:          \"command_name parameter1 parameter2 ...\"");
 		print("Type \"help commands [filter]\" to find a command.");
 		print("Type \"help command_name\" to display detailed information.");
 	}
@@ -197,7 +197,7 @@ void Console::help_command(const std::string& term)
 * TODO:
 * - if the commands will ever be case insensitive, the filter should also be
 */
-std::vector<std::string> Console::list_of_commands(const std::string& filter)
+std::vector<std::string> console::list_of_commands(const std::string& filter)
 {
 	std::vector<std::string> list{};
 	for (auto value : commands)

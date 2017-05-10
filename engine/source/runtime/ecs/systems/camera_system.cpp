@@ -5,14 +5,14 @@
 
 namespace runtime
 {
-	void CameraSystem::frame_update(std::chrono::duration<float> dt)
+	void camera_system::frame_update(std::chrono::duration<float> dt)
 	{
-		auto ecs = core::get_subsystem<EntityComponentSystem>();
+		auto ecs = core::get_subsystem<entity_component_system>();
 
-		ecs->each<TransformComponent, CameraComponent>([this](
-			Entity e,
-			TransformComponent& transformComponent,
-			CameraComponent& cameraComponent
+		ecs->each<transform_component, camera_component>([this](
+			entity e,
+			transform_component& transformComponent,
+			camera_component& cameraComponent
 			)
 		{
 			cameraComponent.update(transformComponent.get_transform());
@@ -20,16 +20,16 @@ namespace runtime
 
 	}
 
-	bool CameraSystem::initialize()
+	bool camera_system::initialize()
 	{
-		on_frame_update.connect(this, &CameraSystem::frame_update);
+		on_frame_update.connect(this, &camera_system::frame_update);
 
 		return true;
 	}
 
-	void CameraSystem::dispose()
+	void camera_system::dispose()
 	{
-		on_frame_update.disconnect(this, &CameraSystem::frame_update);
+		on_frame_update.disconnect(this, &camera_system::frame_update);
 	}
 
 }

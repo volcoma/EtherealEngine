@@ -10,20 +10,20 @@ void convert_to_y_up(std::vector<math::vec3>& out_vertices)
 	}
 }
 
-void TriangleMeshTools::create_plane(std::vector<math::vec3>& out_vertices, std::vector<std::uint32_t>& out_indices, float size_x, float size_y, bool y_up)
+void triangle_mesh_tools::create_plane(std::vector<math::vec3>& out_vertices, std::vector<std::uint32_t>& out_indices, float size_x, float size_y, bool y_up)
 {
 	const math::vec3 v0 = math::vec3(-size_x, -size_y, 0.0f);
 	const math::vec3 v1 = math::vec3(size_x, -size_y, 0.0f);
 	const math::vec3 v2 = math::vec3(size_x, size_y, 0.0f);
 	const math::vec3 v3 = math::vec3(-size_x, size_y, 0.0f);
 
-	TriangleMeshTools::add_quad(out_vertices, out_indices, v0, v3, v1, v2);
+	triangle_mesh_tools::add_quad(out_vertices, out_indices, v0, v3, v1, v2);
 
 	if (y_up)
 		convert_to_y_up(out_vertices);
 }
 
-void TriangleMeshTools::create_tetrahedron(std::vector<math::vec3>& out_vertices, std::vector<std::uint32_t>& out_indices, bool share_vertices, bool y_up)
+void triangle_mesh_tools::create_tetrahedron(std::vector<math::vec3>& out_vertices, std::vector<std::uint32_t>& out_indices, bool share_vertices, bool y_up)
 {
 	const float a = 1.41421f / 3.0f;
 	const float b = 2.4494f / 3.0f;
@@ -35,28 +35,28 @@ void TriangleMeshTools::create_tetrahedron(std::vector<math::vec3>& out_vertices
 
 	if (share_vertices)
 	{
-		const int i0 = TriangleMeshTools::add_vertex(out_vertices, v0);
-		const int i1 = TriangleMeshTools::add_vertex(out_vertices, v1);
-		const int i2 = TriangleMeshTools::add_vertex(out_vertices, v2);
-		const int i3 = TriangleMeshTools::add_vertex(out_vertices, v3);
-		TriangleMeshTools::add_triangle(out_indices, i0, i1, i2);
-		TriangleMeshTools::add_triangle(out_indices, i0, i2, i3);
-		TriangleMeshTools::add_triangle(out_indices, i0, i3, i1);
-		TriangleMeshTools::add_triangle(out_indices, i1, i3, i2);
+		const int i0 = triangle_mesh_tools::add_vertex(out_vertices, v0);
+		const int i1 = triangle_mesh_tools::add_vertex(out_vertices, v1);
+		const int i2 = triangle_mesh_tools::add_vertex(out_vertices, v2);
+		const int i3 = triangle_mesh_tools::add_vertex(out_vertices, v3);
+		triangle_mesh_tools::add_triangle(out_indices, i0, i1, i2);
+		triangle_mesh_tools::add_triangle(out_indices, i0, i2, i3);
+		triangle_mesh_tools::add_triangle(out_indices, i0, i3, i1);
+		triangle_mesh_tools::add_triangle(out_indices, i1, i3, i2);
 	}
 	else
 	{
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v0, v1, v2);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v0, v2, v3);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v0, v3, v1);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v1, v3, v2);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v0, v1, v2);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v0, v2, v3);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v0, v3, v1);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v1, v3, v2);
 	}
 
 	if (y_up)
 		convert_to_y_up(out_vertices);
 }
 
-void TriangleMeshTools::create_cube(std::vector<math::vec3>& out_vertices, std::vector<std::uint32_t>& out_indices, bool share_vertices, float edge_half_length, bool y_up)
+void triangle_mesh_tools::create_cube(std::vector<math::vec3>& out_vertices, std::vector<std::uint32_t>& out_indices, bool share_vertices, float edge_half_length, bool y_up)
 {
 	const math::vec3 v0 = math::vec3(-1.0f, -1.0f, -1.0f) * edge_half_length;
 	const math::vec3 v1 = math::vec3(1.0f, -1.0f, -1.0f) * edge_half_length;
@@ -69,36 +69,36 @@ void TriangleMeshTools::create_cube(std::vector<math::vec3>& out_vertices, std::
 
 	if (share_vertices)
 	{
-		const int i0 = TriangleMeshTools::add_vertex(out_vertices, v0);
-		const int i1 = TriangleMeshTools::add_vertex(out_vertices, v1);
-		const int i2 = TriangleMeshTools::add_vertex(out_vertices, v2);
-		const int i3 = TriangleMeshTools::add_vertex(out_vertices, v3);
-		const int i4 = TriangleMeshTools::add_vertex(out_vertices, v4);
-		const int i5 = TriangleMeshTools::add_vertex(out_vertices, v5);
-		const int i6 = TriangleMeshTools::add_vertex(out_vertices, v6);
-		const int i7 = TriangleMeshTools::add_vertex(out_vertices, v7);
+		const int i0 = triangle_mesh_tools::add_vertex(out_vertices, v0);
+		const int i1 = triangle_mesh_tools::add_vertex(out_vertices, v1);
+		const int i2 = triangle_mesh_tools::add_vertex(out_vertices, v2);
+		const int i3 = triangle_mesh_tools::add_vertex(out_vertices, v3);
+		const int i4 = triangle_mesh_tools::add_vertex(out_vertices, v4);
+		const int i5 = triangle_mesh_tools::add_vertex(out_vertices, v5);
+		const int i6 = triangle_mesh_tools::add_vertex(out_vertices, v6);
+		const int i7 = triangle_mesh_tools::add_vertex(out_vertices, v7);
 
-		TriangleMeshTools::add_quad(out_indices, i0, i3, i1, i2);
-		TriangleMeshTools::add_quad(out_indices, i0, i1, i4, i5);
-		TriangleMeshTools::add_quad(out_indices, i0, i4, i3, i7);
-		TriangleMeshTools::add_quad(out_indices, i6, i5, i2, i1);
-		TriangleMeshTools::add_quad(out_indices, i6, i7, i5, i4);
-		TriangleMeshTools::add_quad(out_indices, i6, i2, i7, i3);
+		triangle_mesh_tools::add_quad(out_indices, i0, i3, i1, i2);
+		triangle_mesh_tools::add_quad(out_indices, i0, i1, i4, i5);
+		triangle_mesh_tools::add_quad(out_indices, i0, i4, i3, i7);
+		triangle_mesh_tools::add_quad(out_indices, i6, i5, i2, i1);
+		triangle_mesh_tools::add_quad(out_indices, i6, i7, i5, i4);
+		triangle_mesh_tools::add_quad(out_indices, i6, i2, i7, i3);
 	}
 	else
 	{
-		TriangleMeshTools::add_quad(out_vertices, out_indices, v0, v3, v1, v2);
-		TriangleMeshTools::add_quad(out_vertices, out_indices, v0, v1, v4, v5);
-		TriangleMeshTools::add_quad(out_vertices, out_indices, v0, v4, v3, v7);
-		TriangleMeshTools::add_quad(out_vertices, out_indices, v6, v5, v2, v1);
-		TriangleMeshTools::add_quad(out_vertices, out_indices, v6, v7, v5, v4);
-		TriangleMeshTools::add_quad(out_vertices, out_indices, v6, v2, v7, v3);
+		triangle_mesh_tools::add_quad(out_vertices, out_indices, v0, v3, v1, v2);
+		triangle_mesh_tools::add_quad(out_vertices, out_indices, v0, v1, v4, v5);
+		triangle_mesh_tools::add_quad(out_vertices, out_indices, v0, v4, v3, v7);
+		triangle_mesh_tools::add_quad(out_vertices, out_indices, v6, v5, v2, v1);
+		triangle_mesh_tools::add_quad(out_vertices, out_indices, v6, v7, v5, v4);
+		triangle_mesh_tools::add_quad(out_vertices, out_indices, v6, v2, v7, v3);
 	}
 	if (y_up)
 		convert_to_y_up(out_vertices);
 }
 
-void TriangleMeshTools::create_octahedron(std::vector<math::vec3>& out_vertices, std::vector<std::uint32_t>& out_indices, bool share_vertices, bool y_up)
+void triangle_mesh_tools::create_octahedron(std::vector<math::vec3>& out_vertices, std::vector<std::uint32_t>& out_indices, bool share_vertices, bool y_up)
 {
 	const math::vec3 v0 = math::vec3(1.0f, 0.0f, 0.0f);
 	const math::vec3 v1 = math::vec3(-1.0f, 0.0f, 0.0f);
@@ -109,38 +109,38 @@ void TriangleMeshTools::create_octahedron(std::vector<math::vec3>& out_vertices,
 
 	if (share_vertices)
 	{
-		const int i0 = TriangleMeshTools::add_vertex(out_vertices, v0);
-		const int i1 = TriangleMeshTools::add_vertex(out_vertices, v1);
-		const int i2 = TriangleMeshTools::add_vertex(out_vertices, v2);
-		const int i3 = TriangleMeshTools::add_vertex(out_vertices, v3);
-		const int i4 = TriangleMeshTools::add_vertex(out_vertices, v4);
-		const int i5 = TriangleMeshTools::add_vertex(out_vertices, v5);
+		const int i0 = triangle_mesh_tools::add_vertex(out_vertices, v0);
+		const int i1 = triangle_mesh_tools::add_vertex(out_vertices, v1);
+		const int i2 = triangle_mesh_tools::add_vertex(out_vertices, v2);
+		const int i3 = triangle_mesh_tools::add_vertex(out_vertices, v3);
+		const int i4 = triangle_mesh_tools::add_vertex(out_vertices, v4);
+		const int i5 = triangle_mesh_tools::add_vertex(out_vertices, v5);
 
-		TriangleMeshTools::add_triangle(out_indices, i4, i0, i2);
-		TriangleMeshTools::add_triangle(out_indices, i4, i2, i1);
-		TriangleMeshTools::add_triangle(out_indices, i4, i1, i3);
-		TriangleMeshTools::add_triangle(out_indices, i4, i3, i0);
-		TriangleMeshTools::add_triangle(out_indices, i5, i2, i0);
-		TriangleMeshTools::add_triangle(out_indices, i5, i1, i2);
-		TriangleMeshTools::add_triangle(out_indices, i5, i3, i1);
-		TriangleMeshTools::add_triangle(out_indices, i5, i0, i3);
+		triangle_mesh_tools::add_triangle(out_indices, i4, i0, i2);
+		triangle_mesh_tools::add_triangle(out_indices, i4, i2, i1);
+		triangle_mesh_tools::add_triangle(out_indices, i4, i1, i3);
+		triangle_mesh_tools::add_triangle(out_indices, i4, i3, i0);
+		triangle_mesh_tools::add_triangle(out_indices, i5, i2, i0);
+		triangle_mesh_tools::add_triangle(out_indices, i5, i1, i2);
+		triangle_mesh_tools::add_triangle(out_indices, i5, i3, i1);
+		triangle_mesh_tools::add_triangle(out_indices, i5, i0, i3);
 	}
 	else
 	{
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v4, v0, v2);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v4, v2, v1);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v4, v1, v3);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v4, v3, v0);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v5, v2, v0);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v5, v1, v2);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v5, v3, v1);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v5, v0, v3);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v4, v0, v2);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v4, v2, v1);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v4, v1, v3);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v4, v3, v0);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v5, v2, v0);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v5, v1, v2);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v5, v3, v1);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v5, v0, v3);
 	}
 	if (y_up)
 		convert_to_y_up(out_vertices);
 }
 
-void TriangleMeshTools::create_icosahedron(std::vector<math::vec3>& out_vertices, std::vector<std::uint32_t>& out_indices, bool share_vertices, bool y_up)
+void triangle_mesh_tools::create_icosahedron(std::vector<math::vec3>& out_vertices, std::vector<std::uint32_t>& out_indices, bool share_vertices, bool y_up)
 {
 	const float t = (1.0f + 2.236067977f) / 2.0f;
 	const float s = math::sqrt(1.0f + t*t);
@@ -162,75 +162,75 @@ void TriangleMeshTools::create_icosahedron(std::vector<math::vec3>& out_vertices
 	{
 		out_vertices.reserve(out_vertices.size() + 12);
 
-		const int i0 = TriangleMeshTools::add_vertex(out_vertices, v0);
-		const int i1 = TriangleMeshTools::add_vertex(out_vertices, v1);
-		const int i2 = TriangleMeshTools::add_vertex(out_vertices, v2);
-		const int i3 = TriangleMeshTools::add_vertex(out_vertices, v3);
-		const int i5 = TriangleMeshTools::add_vertex(out_vertices, v5);
-		const int i6 = TriangleMeshTools::add_vertex(out_vertices, v6);
-		const int i7 = TriangleMeshTools::add_vertex(out_vertices, v7);
-		const int i4 = TriangleMeshTools::add_vertex(out_vertices, v4);
-		const int i8 = TriangleMeshTools::add_vertex(out_vertices, v8);
-		const int i9 = TriangleMeshTools::add_vertex(out_vertices, v9);
-		const int i10 = TriangleMeshTools::add_vertex(out_vertices, v10);
-		const int i11 = TriangleMeshTools::add_vertex(out_vertices, v11);
+		const int i0 = triangle_mesh_tools::add_vertex(out_vertices, v0);
+		const int i1 = triangle_mesh_tools::add_vertex(out_vertices, v1);
+		const int i2 = triangle_mesh_tools::add_vertex(out_vertices, v2);
+		const int i3 = triangle_mesh_tools::add_vertex(out_vertices, v3);
+		const int i5 = triangle_mesh_tools::add_vertex(out_vertices, v5);
+		const int i6 = triangle_mesh_tools::add_vertex(out_vertices, v6);
+		const int i7 = triangle_mesh_tools::add_vertex(out_vertices, v7);
+		const int i4 = triangle_mesh_tools::add_vertex(out_vertices, v4);
+		const int i8 = triangle_mesh_tools::add_vertex(out_vertices, v8);
+		const int i9 = triangle_mesh_tools::add_vertex(out_vertices, v9);
+		const int i10 = triangle_mesh_tools::add_vertex(out_vertices, v10);
+		const int i11 = triangle_mesh_tools::add_vertex(out_vertices, v11);
 
-		TriangleMeshTools::add_triangle(out_indices, i0, i8, i4);
-		TriangleMeshTools::add_triangle(out_indices, i0, i5, i10);
-		TriangleMeshTools::add_triangle(out_indices, i2, i4, i9);
-		TriangleMeshTools::add_triangle(out_indices, i2, i11, i5);
-		TriangleMeshTools::add_triangle(out_indices, i1, i6, i8);
-		TriangleMeshTools::add_triangle(out_indices, i1, i10, i7);
-		TriangleMeshTools::add_triangle(out_indices, i3, i9, i6);
-		TriangleMeshTools::add_triangle(out_indices, i3, i7, i11);
-		TriangleMeshTools::add_triangle(out_indices, i0, i10, i8);
-		TriangleMeshTools::add_triangle(out_indices, i1, i8, i10);
-		TriangleMeshTools::add_triangle(out_indices, i2, i9, i11);
-		TriangleMeshTools::add_triangle(out_indices, i3, i11, i9);
-		TriangleMeshTools::add_triangle(out_indices, i4, i2, i0);
-		TriangleMeshTools::add_triangle(out_indices, i5, i0, i2);
-		TriangleMeshTools::add_triangle(out_indices, i6, i1, i3);
-		TriangleMeshTools::add_triangle(out_indices, i7, i3, i1);
-		TriangleMeshTools::add_triangle(out_indices, i8, i6, i4);
-		TriangleMeshTools::add_triangle(out_indices, i9, i4, i6);
-		TriangleMeshTools::add_triangle(out_indices, i10, i5, i7);
-		TriangleMeshTools::add_triangle(out_indices, i11, i7, i5);
+		triangle_mesh_tools::add_triangle(out_indices, i0, i8, i4);
+		triangle_mesh_tools::add_triangle(out_indices, i0, i5, i10);
+		triangle_mesh_tools::add_triangle(out_indices, i2, i4, i9);
+		triangle_mesh_tools::add_triangle(out_indices, i2, i11, i5);
+		triangle_mesh_tools::add_triangle(out_indices, i1, i6, i8);
+		triangle_mesh_tools::add_triangle(out_indices, i1, i10, i7);
+		triangle_mesh_tools::add_triangle(out_indices, i3, i9, i6);
+		triangle_mesh_tools::add_triangle(out_indices, i3, i7, i11);
+		triangle_mesh_tools::add_triangle(out_indices, i0, i10, i8);
+		triangle_mesh_tools::add_triangle(out_indices, i1, i8, i10);
+		triangle_mesh_tools::add_triangle(out_indices, i2, i9, i11);
+		triangle_mesh_tools::add_triangle(out_indices, i3, i11, i9);
+		triangle_mesh_tools::add_triangle(out_indices, i4, i2, i0);
+		triangle_mesh_tools::add_triangle(out_indices, i5, i0, i2);
+		triangle_mesh_tools::add_triangle(out_indices, i6, i1, i3);
+		triangle_mesh_tools::add_triangle(out_indices, i7, i3, i1);
+		triangle_mesh_tools::add_triangle(out_indices, i8, i6, i4);
+		triangle_mesh_tools::add_triangle(out_indices, i9, i4, i6);
+		triangle_mesh_tools::add_triangle(out_indices, i10, i5, i7);
+		triangle_mesh_tools::add_triangle(out_indices, i11, i7, i5);
 	}
 	else
 	{
 		out_vertices.reserve(out_vertices.size() + 60);
 
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v0, v8, v4);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v0, v5, v10);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v2, v4, v9);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v2, v11, v5);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v0, v8, v4);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v0, v5, v10);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v2, v4, v9);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v2, v11, v5);
 
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v1, v6, v8);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v1, v10, v7);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v3, v9, v6);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v3, v7, v11);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v1, v6, v8);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v1, v10, v7);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v3, v9, v6);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v3, v7, v11);
 
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v0, v10, v8);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v1, v8, v10);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v2, v9, v11);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v3, v11, v9);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v0, v10, v8);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v1, v8, v10);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v2, v9, v11);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v3, v11, v9);
 
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v4, v2, v0);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v5, v0, v2);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v6, v1, v3);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v7, v3, v1);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v4, v2, v0);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v5, v0, v2);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v6, v1, v3);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v7, v3, v1);
 
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v8, v6, v4);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v9, v4, v6);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v10, v5, v7);
-		TriangleMeshTools::add_triangle(out_vertices, out_indices, v11, v7, v5);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v8, v6, v4);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v9, v4, v6);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v10, v5, v7);
+		triangle_mesh_tools::add_triangle(out_vertices, out_indices, v11, v7, v5);
 	}
 
 	if (y_up)
 		convert_to_y_up(out_vertices);
 }
 
-void TriangleMeshTools::create_dodecahedron(std::vector<math::vec3>& out_vertices, std::vector<std::uint32_t>& out_indices, bool share_vertices, bool y_up)
+void triangle_mesh_tools::create_dodecahedron(std::vector<math::vec3>& out_vertices, std::vector<std::uint32_t>& out_indices, bool share_vertices, bool y_up)
 {
 	const float a = 1.0f / 1.7320508f;
 	const float b = math::sqrt((3.0f - 2.23606797f) / 6.0f);
@@ -263,35 +263,35 @@ void TriangleMeshTools::create_dodecahedron(std::vector<math::vec3>& out_vertice
 	{
 		int ni[20];
 		for (int i = 0; i < 20; i++)
-			ni[i] = TriangleMeshTools::add_vertex(out_vertices, nv[i]);
+			ni[i] = triangle_mesh_tools::add_vertex(out_vertices, nv[i]);
 
-		TriangleMeshTools::add_pentagon(out_indices, ni[0], ni[8], ni[9], ni[4], ni[16]);
-		TriangleMeshTools::add_pentagon(out_indices, ni[0], ni[12], ni[13], ni[1], ni[8]);
-		TriangleMeshTools::add_pentagon(out_indices, ni[0], ni[16], ni[17], ni[2], ni[12]);
-		TriangleMeshTools::add_pentagon(out_indices, ni[8], ni[1], ni[18], ni[5], ni[9]);
-		TriangleMeshTools::add_pentagon(out_indices, ni[12], ni[2], ni[10], ni[3], ni[13]);
-		TriangleMeshTools::add_pentagon(out_indices, ni[16], ni[4], ni[14], ni[6], ni[17]);
-		TriangleMeshTools::add_pentagon(out_indices, ni[9], ni[5], ni[15], ni[14], ni[4]);
-		TriangleMeshTools::add_pentagon(out_indices, ni[6], ni[11], ni[10], ni[2], ni[17]);
-		TriangleMeshTools::add_pentagon(out_indices, ni[3], ni[19], ni[18], ni[1], ni[13]);
-		TriangleMeshTools::add_pentagon(out_indices, ni[7], ni[15], ni[5], ni[18], ni[19]);
-		TriangleMeshTools::add_pentagon(out_indices, ni[7], ni[11], ni[6], ni[14], ni[15]);
-		TriangleMeshTools::add_pentagon(out_indices, ni[7], ni[19], ni[3], ni[10], ni[11]);
+		triangle_mesh_tools::add_pentagon(out_indices, ni[0], ni[8], ni[9], ni[4], ni[16]);
+		triangle_mesh_tools::add_pentagon(out_indices, ni[0], ni[12], ni[13], ni[1], ni[8]);
+		triangle_mesh_tools::add_pentagon(out_indices, ni[0], ni[16], ni[17], ni[2], ni[12]);
+		triangle_mesh_tools::add_pentagon(out_indices, ni[8], ni[1], ni[18], ni[5], ni[9]);
+		triangle_mesh_tools::add_pentagon(out_indices, ni[12], ni[2], ni[10], ni[3], ni[13]);
+		triangle_mesh_tools::add_pentagon(out_indices, ni[16], ni[4], ni[14], ni[6], ni[17]);
+		triangle_mesh_tools::add_pentagon(out_indices, ni[9], ni[5], ni[15], ni[14], ni[4]);
+		triangle_mesh_tools::add_pentagon(out_indices, ni[6], ni[11], ni[10], ni[2], ni[17]);
+		triangle_mesh_tools::add_pentagon(out_indices, ni[3], ni[19], ni[18], ni[1], ni[13]);
+		triangle_mesh_tools::add_pentagon(out_indices, ni[7], ni[15], ni[5], ni[18], ni[19]);
+		triangle_mesh_tools::add_pentagon(out_indices, ni[7], ni[11], ni[6], ni[14], ni[15]);
+		triangle_mesh_tools::add_pentagon(out_indices, ni[7], ni[19], ni[3], ni[10], ni[11]);
 	}
 	else
 	{
-		TriangleMeshTools::add_pentagon(out_vertices, out_indices, nv[0], nv[8], nv[9], nv[4], nv[16]);
-		TriangleMeshTools::add_pentagon(out_vertices, out_indices, nv[0], nv[12], nv[13], nv[1], nv[8]);
-		TriangleMeshTools::add_pentagon(out_vertices, out_indices, nv[0], nv[16], nv[17], nv[2], nv[12]);
-		TriangleMeshTools::add_pentagon(out_vertices, out_indices, nv[8], nv[1], nv[18], nv[5], nv[9]);
-		TriangleMeshTools::add_pentagon(out_vertices, out_indices, nv[12], nv[2], nv[10], nv[3], nv[13]);
-		TriangleMeshTools::add_pentagon(out_vertices, out_indices, nv[16], nv[4], nv[14], nv[6], nv[17]);
-		TriangleMeshTools::add_pentagon(out_vertices, out_indices, nv[9], nv[5], nv[15], nv[14], nv[4]);
-		TriangleMeshTools::add_pentagon(out_vertices, out_indices, nv[6], nv[11], nv[10], nv[2], nv[17]);
-		TriangleMeshTools::add_pentagon(out_vertices, out_indices, nv[3], nv[19], nv[18], nv[1], nv[13]);
-		TriangleMeshTools::add_pentagon(out_vertices, out_indices, nv[7], nv[15], nv[5], nv[18], nv[19]);
-		TriangleMeshTools::add_pentagon(out_vertices, out_indices, nv[7], nv[11], nv[6], nv[14], nv[15]);
-		TriangleMeshTools::add_pentagon(out_vertices, out_indices, nv[7], nv[19], nv[3], nv[10], nv[11]);
+		triangle_mesh_tools::add_pentagon(out_vertices, out_indices, nv[0], nv[8], nv[9], nv[4], nv[16]);
+		triangle_mesh_tools::add_pentagon(out_vertices, out_indices, nv[0], nv[12], nv[13], nv[1], nv[8]);
+		triangle_mesh_tools::add_pentagon(out_vertices, out_indices, nv[0], nv[16], nv[17], nv[2], nv[12]);
+		triangle_mesh_tools::add_pentagon(out_vertices, out_indices, nv[8], nv[1], nv[18], nv[5], nv[9]);
+		triangle_mesh_tools::add_pentagon(out_vertices, out_indices, nv[12], nv[2], nv[10], nv[3], nv[13]);
+		triangle_mesh_tools::add_pentagon(out_vertices, out_indices, nv[16], nv[4], nv[14], nv[6], nv[17]);
+		triangle_mesh_tools::add_pentagon(out_vertices, out_indices, nv[9], nv[5], nv[15], nv[14], nv[4]);
+		triangle_mesh_tools::add_pentagon(out_vertices, out_indices, nv[6], nv[11], nv[10], nv[2], nv[17]);
+		triangle_mesh_tools::add_pentagon(out_vertices, out_indices, nv[3], nv[19], nv[18], nv[1], nv[13]);
+		triangle_mesh_tools::add_pentagon(out_vertices, out_indices, nv[7], nv[15], nv[5], nv[18], nv[19]);
+		triangle_mesh_tools::add_pentagon(out_vertices, out_indices, nv[7], nv[11], nv[6], nv[14], nv[15]);
+		triangle_mesh_tools::add_pentagon(out_vertices, out_indices, nv[7], nv[19], nv[3], nv[10], nv[11]);
 	}
 
 	if (y_up)
@@ -317,22 +317,22 @@ static void tessellate_sphere(std::vector<math::vec3>& out_vertices, std::vector
 		if (share_vertices)
 		{
 			// very inefficient way but couldn't think of anything better: feel free to improve!
-			TriangleMeshTools::add_triangle_merge_same_position_vertices(out_vertices, out_indices, v1, v2, v3, base_out_vertex);
-			TriangleMeshTools::add_triangle_merge_same_position_vertices(out_vertices, out_indices, a, v1, v3, base_out_vertex);
-			TriangleMeshTools::add_triangle_merge_same_position_vertices(out_vertices, out_indices, b, v2, v1, base_out_vertex);
-			TriangleMeshTools::add_triangle_merge_same_position_vertices(out_vertices, out_indices, c, v3, v2, base_out_vertex);
+			triangle_mesh_tools::add_triangle_merge_same_position_vertices(out_vertices, out_indices, v1, v2, v3, base_out_vertex);
+			triangle_mesh_tools::add_triangle_merge_same_position_vertices(out_vertices, out_indices, a, v1, v3, base_out_vertex);
+			triangle_mesh_tools::add_triangle_merge_same_position_vertices(out_vertices, out_indices, b, v2, v1, base_out_vertex);
+			triangle_mesh_tools::add_triangle_merge_same_position_vertices(out_vertices, out_indices, c, v3, v2, base_out_vertex);
 		}
 		else
 		{
-			TriangleMeshTools::add_triangle(out_vertices, out_indices, v1, v2, v3);
-			TriangleMeshTools::add_triangle(out_vertices, out_indices, a, v1, v3);
-			TriangleMeshTools::add_triangle(out_vertices, out_indices, b, v2, v1);
-			TriangleMeshTools::add_triangle(out_vertices, out_indices, c, v3, v2);
+			triangle_mesh_tools::add_triangle(out_vertices, out_indices, v1, v2, v3);
+			triangle_mesh_tools::add_triangle(out_vertices, out_indices, a, v1, v3);
+			triangle_mesh_tools::add_triangle(out_vertices, out_indices, b, v2, v1);
+			triangle_mesh_tools::add_triangle(out_vertices, out_indices, c, v3, v2);
 		}
 	}
 }
 
-void TriangleMeshTools::create_icosphere(
+void triangle_mesh_tools::create_icosphere(
 	std::vector<math::vec3>& out_vertices,
 	std::vector<std::uint32_t> & out_indices,
 	int tessellation_level,
@@ -372,7 +372,7 @@ void TriangleMeshTools::create_icosphere(
 
 }
 
-void TriangleMeshTools::create_cylinder(
+void triangle_mesh_tools::create_cylinder(
 	std::vector<math::vec3>& out_vertices,
 	std::vector<std::uint32_t>& out_indices,
 	float height,
@@ -420,8 +420,8 @@ void TriangleMeshTools::create_cylinder(
 
 	if (share_top_bottom_vertices)
 	{
-		iT = TriangleMeshTools::add_vertex(out_vertices, vT);
-		iB = TriangleMeshTools::add_vertex(out_vertices, vB);
+		iT = triangle_mesh_tools::add_vertex(out_vertices, vT);
+		iB = triangle_mesh_tools::add_vertex(out_vertices, vB);
 	}
 
 	for (int i = 0; i < tessellation; i++)
@@ -435,8 +435,8 @@ void TriangleMeshTools::create_cylinder(
 
 		if (share_vertices)
 		{
-			iTs.push_back(TriangleMeshTools::add_vertex(out_vertices, vTs[i]));
-			iBs.push_back(TriangleMeshTools::add_vertex(out_vertices, vBs[i]));
+			iTs.push_back(triangle_mesh_tools::add_vertex(out_vertices, vTs[i]));
+			iBs.push_back(triangle_mesh_tools::add_vertex(out_vertices, vBs[i]));
 		}
 	}
 
@@ -445,13 +445,13 @@ void TriangleMeshTools::create_cylinder(
 		int next = (i + 1) % tessellation;
 		if (!share_vertices)
 		{
-			TriangleMeshTools::add_triangle(out_vertices, out_indices, vTs[i], vBs[i], vTs[next]);
-			TriangleMeshTools::add_triangle(out_vertices, out_indices, vTs[next], vBs[i], vBs[next]);
+			triangle_mesh_tools::add_triangle(out_vertices, out_indices, vTs[i], vBs[i], vTs[next]);
+			triangle_mesh_tools::add_triangle(out_vertices, out_indices, vTs[next], vBs[i], vBs[next]);
 		}
 		else
 		{
-			TriangleMeshTools::add_triangle(out_indices, iTs[i], iBs[i], iTs[next]);
-			TriangleMeshTools::add_triangle(out_indices, iTs[next], iBs[i], iBs[next]);
+			triangle_mesh_tools::add_triangle(out_indices, iTs[i], iBs[i], iTs[next]);
+			triangle_mesh_tools::add_triangle(out_indices, iTs[next], iBs[i], iBs[next]);
 		}
 
 
@@ -461,18 +461,18 @@ void TriangleMeshTools::create_cylinder(
 			if (radius_top > 0.0f)
 			{
 				if (!share_top_bottom_vertices)
-					TriangleMeshTools::add_triangle(out_vertices, out_indices, vTs[i], vTs[next], vT);
+					triangle_mesh_tools::add_triangle(out_vertices, out_indices, vTs[i], vTs[next], vT);
 				else
-					TriangleMeshTools::add_triangle(out_indices, iTs[i], iTs[next], iT);
+					triangle_mesh_tools::add_triangle(out_indices, iTs[i], iTs[next], iT);
 			}
 
 			// bottom cap
 			if (radius_bottom > 0.0f)
 			{
 				if (!share_top_bottom_vertices)
-					TriangleMeshTools::add_triangle(out_vertices, out_indices, vBs[next], vBs[i], vB);
+					triangle_mesh_tools::add_triangle(out_vertices, out_indices, vBs[next], vBs[i], vB);
 				else
-					TriangleMeshTools::add_triangle(out_indices, iBs[next], iBs[i], iB);
+					triangle_mesh_tools::add_triangle(out_indices, iBs[next], iBs[i], iB);
 			}
 		}
 	}
@@ -5112,7 +5112,7 @@ static std::uint32_t teapot_indices[NUMTEAPOTINDICES] =
 	1039, 1177, 1176,
 };
 
-void TriangleMeshTools::create_teapot(std::vector<math::vec3>& out_vertices, std::vector<std::uint32_t>& out_indices, bool y_up)
+void triangle_mesh_tools::create_teapot(std::vector<math::vec3>& out_vertices, std::vector<std::uint32_t>& out_indices, bool y_up)
 {
 	out_vertices.resize(NUMTEAPOTVERTICES);
 	out_indices.resize(NUMTEAPOTINDICES);

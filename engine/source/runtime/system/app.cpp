@@ -5,42 +5,42 @@
 namespace runtime
 {
 
-	App::App() : _exitcode(0)
+	app::app() : _exitcode(0)
 	{}
 
 
-	void App::setup()
+	void app::setup()
 	{
-		auto engine = core::add_subsystem<Engine>();
+		core::add_subsystem<engine>();
 	}
 
-	void App::start()
+	void app::start()
 	{
-		auto engine = core::get_subsystem<Engine>();
+		auto eng = core::get_subsystem<engine>();
 
 		sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 		desktop.width = 1280;
 		desktop.height = 720;
-		auto main_window = std::make_shared<RenderWindow>(
+		auto main_window = std::make_shared<render_window>(
 			desktop,
 			"App",
 			sf::Style::Default);
 		
 
-		if(!engine->start(main_window))
+		if(!eng->start(main_window))
 		{
 			_exitcode = -1;
 			return;
 		}
 	}
 
-	void App::stop()
+	void app::stop()
 	{
-		auto engine = core::get_subsystem<Engine>();
-		engine->destroy_windows();
+		auto eng = core::get_subsystem<engine>();
+		eng->destroy_windows();
 	}
 
-	int App::run()
+	int app::run()
 	{
 		core::details::initialize();
 
@@ -58,9 +58,9 @@ namespace runtime
 			return _exitcode;
 		}
 
-		auto engine = core::get_subsystem<Engine>();
-		while (engine->is_running())
-			engine->run_one_frame();
+		auto eng = core::get_subsystem<engine>();
+		while (eng->is_running())
+			eng->run_one_frame();
 
 		stop();
 
@@ -68,16 +68,16 @@ namespace runtime
 		return _exitcode;
 	}
 
-	void App::quit_with_error(const std::string& message)
+	void app::quit_with_error(const std::string& message)
 	{
 		APPLOG_ERROR(message.c_str());
 		quit(-1);
 	}
 
-	void App::quit(int exitcode)
+	void app::quit(int exitcode)
 	{
-		auto engine = core::add_subsystem<Engine>();
-		engine->set_running(false);
+		auto eng = core::add_subsystem<engine>();
+		eng->set_running(false);
 		_exitcode = exitcode;
 	}
 

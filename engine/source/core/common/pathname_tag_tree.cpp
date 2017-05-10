@@ -1,48 +1,48 @@
 #include "pathname_tag_tree.h"
 #include <deque>
 
-PathNameTagTree::node::node() :
+path_name_tag_tree::node::node() :
 	_nodes(),
 	_tag(-1)
 { }
-PathNameTagTree::node::node(const node& krs) :
+path_name_tag_tree::node::node(const node& krs) :
 	_nodes(krs._nodes),
 	_tag(krs._tag)
 { }
 
-PathNameTagTree::PathNameTagTree(const char sep_char, const size_t invalid_tag) :
+path_name_tag_tree::path_name_tag_tree(const char sep_char, const size_t invalid_tag) :
 	_invalid_tag(invalid_tag),
 	_sep_char(sep_char)
 {
 	_root_node._tag = _invalid_tag;
 }
 
-void PathNameTagTree::reset()
+void path_name_tag_tree::reset()
 {
 	_root_node._nodes.clear();
 	_root_node._tag = _invalid_tag;
 }
 
-bool PathNameTagTree::set(const char* pathname)
+bool path_name_tag_tree::set(const char* pathname)
 {
 	return set(pathname, _invalid_tag);
 }
 
-bool PathNameTagTree::set(size_t tag)
+bool path_name_tag_tree::set(size_t tag)
 {
 	_root_node._tag = tag;
 
 	return tag != _invalid_tag;
 }
 
-bool PathNameTagTree::get(size_t& tag)
+bool path_name_tag_tree::get(size_t& tag)
 {
 	tag = _root_node._tag;
 
 	return tag != _invalid_tag;
 }
 
-bool PathNameTagTree::set(std::string pathname, size_t tag)
+bool path_name_tag_tree::set(std::string pathname, size_t tag)
 {
 	size_t i = pathname.find_first_of(_sep_char, 0);
 
@@ -113,17 +113,17 @@ bool PathNameTagTree::set(std::string pathname, size_t tag)
 	return true;
 }
 
-PathNameTagTree::iterator PathNameTagTree::create_iterator(std::string pathname)
+path_name_tag_tree::iterator path_name_tag_tree::create_iterator(std::string pathname)
 {
 	return iterator(&get_node_ref(pathname));
 }
 
-void PathNameTagTree::setup_iterator(iterator& it, std::string pathname)
+void path_name_tag_tree::setup_iterator(iterator& it, std::string pathname)
 {
 	it.setup(&get_node_ref(pathname));
 }
 
-bool PathNameTagTree::get(std::string pathname, size_t& tag)
+bool path_name_tag_tree::get(std::string pathname, size_t& tag)
 {
 	node* n = get_node_ptr(pathname);
 
@@ -132,7 +132,7 @@ bool PathNameTagTree::get(std::string pathname, size_t& tag)
 	return tag != _invalid_tag;
 }
 
-const char* PathNameTagTree::get_name(std::string& pathname, std::string::iterator& it, size_t& i)
+const char* path_name_tag_tree::get_name(std::string& pathname, std::string::iterator& it, size_t& i)
 {
 	size_t o = it - pathname.begin();
 
@@ -159,7 +159,7 @@ const char* PathNameTagTree::get_name(std::string& pathname, std::string::iterat
 	return &pathname[o];
 }
 
-PathNameTagTree::node* PathNameTagTree::get_node_ptr(std::string& pathname)
+path_name_tag_tree::node* path_name_tag_tree::get_node_ptr(std::string& pathname)
 {
 	bool b;
 
@@ -170,7 +170,7 @@ PathNameTagTree::node* PathNameTagTree::get_node_ptr(std::string& pathname)
 	return nullptr;
 }
 
-PathNameTagTree::node& PathNameTagTree::get_node_ref(std::string& pathname)
+path_name_tag_tree::node& path_name_tag_tree::get_node_ref(std::string& pathname)
 {
 	bool b;
 
@@ -179,7 +179,7 @@ PathNameTagTree::node& PathNameTagTree::get_node_ref(std::string& pathname)
 	return n ? *n : _root_node;
 }
 
-PathNameTagTree::node* PathNameTagTree::get_node(std::string& pathname, bool& endpoint)
+path_name_tag_tree::node* path_name_tag_tree::get_node(std::string& pathname, bool& endpoint)
 {
 	endpoint = false;
 
@@ -216,21 +216,21 @@ PathNameTagTree::node* PathNameTagTree::get_node(std::string& pathname, bool& en
 	return n;
 }
 
-PathNameTagTree::iterator::iterator() { }
-PathNameTagTree::iterator::iterator(void* p)
+path_name_tag_tree::iterator::iterator() { }
+path_name_tag_tree::iterator::iterator(void* p)
 {
 	setup(p);
 }
-PathNameTagTree::iterator::iterator(const iterator& krc) :
+path_name_tag_tree::iterator::iterator(const iterator& krc) :
 	_steps(krc._steps)
 { }
 
-void PathNameTagTree::iterator::setup(void* p)
+void path_name_tag_tree::iterator::setup(void* p)
 {
 	do_step((node*)p);
 }
 
-bool PathNameTagTree::iterator::step_stack_push()
+bool path_name_tag_tree::iterator::step_stack_push()
 {
 	if (_steps.empty())
 	{
@@ -242,7 +242,7 @@ bool PathNameTagTree::iterator::step_stack_push()
 	return true;
 }
 
-bool PathNameTagTree::iterator::step_stack_pop(bool replace)
+bool path_name_tag_tree::iterator::step_stack_pop(bool replace)
 {
 	if (_stack.empty())
 	{
@@ -263,7 +263,7 @@ bool PathNameTagTree::iterator::step_stack_pop(bool replace)
 	return true;
 }
 
-bool PathNameTagTree::iterator::step()
+bool path_name_tag_tree::iterator::step()
 {
 	auto& it = _steps.back();
 
@@ -271,12 +271,12 @@ bool PathNameTagTree::iterator::step()
 
 	return it.first != it.second->_nodes.end();
 }
-bool PathNameTagTree::iterator::step_in()
+bool path_name_tag_tree::iterator::step_in()
 {
 	return do_step(_steps.back().first->second.get_pointer());
 }
 
-bool PathNameTagTree::iterator::step_out()
+bool path_name_tag_tree::iterator::step_out()
 {
 	if (_steps.empty())
 	{
@@ -287,7 +287,7 @@ bool PathNameTagTree::iterator::step_out()
 
 	return _steps.size() > 0;
 }
-bool PathNameTagTree::iterator::step_reset() 
+bool path_name_tag_tree::iterator::step_reset() 
 {
 	if (_steps.empty())
 	{
@@ -301,17 +301,17 @@ bool PathNameTagTree::iterator::step_reset()
 	return true;
 }
 
-bool PathNameTagTree::iterator::steping()
+bool path_name_tag_tree::iterator::steping()
 {
 	auto& it = _steps.back();
 
 	return it.first != it.second->_nodes.end();
 }
-size_t PathNameTagTree::iterator::steps()
+size_t path_name_tag_tree::iterator::steps()
 {
 	return _steps.size();
 }
-bool PathNameTagTree::iterator::do_step(node* n)
+bool path_name_tag_tree::iterator::do_step(node* n)
 {
 	if (n->_nodes.empty())
 	{
@@ -324,15 +324,15 @@ bool PathNameTagTree::iterator::do_step(node* n)
 }
 
 
-const bool PathNameTagTree::iterator::is_leaf()
+const bool path_name_tag_tree::iterator::is_leaf()
 {
 	return _steps.back().first->second.get()._nodes.empty();
 }
-const std::string& PathNameTagTree::iterator::name()
+const std::string& path_name_tag_tree::iterator::name()
 {
 	return _steps.back().first->first;
 }
-const size_t& PathNameTagTree::iterator::tag()
+const size_t& path_name_tag_tree::iterator::tag()
 {
 	return _steps.back().first->second.get()._tag;
 }

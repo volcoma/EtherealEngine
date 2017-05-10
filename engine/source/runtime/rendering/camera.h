@@ -4,28 +4,28 @@
 #include "core/reflection/rttr/rttr_enable.h"
 #include "core/serialization/serialization.h"
 
-enum class ProjectionMode : std::uint32_t
+enum class projection_mode : std::uint32_t
 {
-	Perspective = 0,
-	Orthographic = 1
+	perspective = 0,
+	orthographic = 1
 };
 
 //-----------------------------------------------------------------------------
 // Main Class Declarations
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-//  Name : Camera (Class)
+//  Name : camera (Class)
 /// <summary>
 /// Class representing a camera. Contains functionality for manipulating and
 /// updating a camera. It should not be used as a standalone class - see
-/// CameraComponent and the Entity system.
+/// camera_component and the entity system.
 /// </summary>
 //-----------------------------------------------------------------------------
-class Camera
+class camera
 {
 public:
-	REFLECTABLE(Camera)
-	SERIALIZABLE(Camera)
+	REFLECTABLE(camera)
+	SERIALIZABLE(camera)
 
 	//-------------------------------------------------------------------------
 	// Public Methods
@@ -38,7 +38,7 @@ public:
 	/// or perspective).
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_projection_mode(ProjectionMode mode);
+	void set_projection_mode(projection_mode mode);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_fov ()
@@ -78,7 +78,7 @@ public:
 	/// Retrieve the current projection mode for this camera.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline ProjectionMode get_projection_mode() const { return _projection_mode; }
+	inline projection_mode get_projection_mode() const { return _projection_mode; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_fov()
@@ -140,7 +140,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_viewport_size(const uSize& viewportSize);
+	void set_viewport_size(const usize& viewportSize);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_viewport_pos ()
@@ -150,7 +150,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_viewport_pos(const uPoint& viewportPos) { _viewport_pos = viewportPos; }
+	inline void set_viewport_pos(const upoint& viewportPos) { _viewport_pos = viewportPos; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_viewport_size ()
@@ -160,7 +160,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const uSize& get_viewport_size() const { return _viewport_size; }
+	const usize& get_viewport_size() const { return _viewport_size; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_viewport_pos ()
@@ -170,7 +170,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const uPoint& get_viewport_pos() const { return _viewport_pos; }
+	inline const upoint& get_viewport_pos() const { return _viewport_pos; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_aspect_ratio ()
@@ -239,7 +239,7 @@ public:
 	/// Return the current projection matrix.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const math::transform_t& get_projection();
+	const math::transform& get_projection();
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_view ()
@@ -247,7 +247,7 @@ public:
 	/// Return the current view matrix.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::transform_t& get_view() const { return _view; }
+	inline const math::transform& get_view() const { return _view; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_view ()
@@ -255,7 +255,7 @@ public:
 	/// Return the current view matrix.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline math::transform_t& get_view() { return _view; }
+	inline math::transform& get_view() { return _view; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_view_projection ()
@@ -263,7 +263,7 @@ public:
 	/// Return the current view-projection matrix.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline math::transform_t get_view_projection() { return get_projection() * get_view(); }
+	inline math::transform get_view_projection() { return get_projection() * get_view(); }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_last_view ()
@@ -272,7 +272,7 @@ public:
 	/// to recordCurrentMatrices().
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::transform_t& get_last_view() const { return _last_view; }
+	inline const math::transform& get_last_view() const { return _last_view; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_last_projection ()
@@ -281,7 +281,7 @@ public:
 	/// recent call to recordCurrentMatrices().
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::transform_t& get_last_projection() const { return _last_projection; }
+	inline const math::transform& get_last_projection() const { return _last_projection; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : record_current_matrices ()
@@ -298,7 +298,7 @@ public:
 	/// Sets the current jitter value for temporal anti-aliasing
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_aa_data(const uSize& viewportSize, std::uint32_t currentSubpixelIndex, std::uint32_t temporalAASamples);
+	void set_aa_data(const usize& viewportSize, std::uint32_t currentSubpixelIndex, std::uint32_t temporalAASamples);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_aa_data ()
@@ -316,7 +316,7 @@ public:
 	/// Determine whether or not the AABB specified falls within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::VolumeQuery::E bounds_in_frustum(const math::bbox & bounds);
+	math::volume_query bounds_in_frustum(const math::bbox & bounds);
 
 	//-----------------------------------------------------------------------------
 	//  Name : bounds_in_frustum ()
@@ -324,7 +324,7 @@ public:
 	/// Determine whether or not the OOBB specified is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::VolumeQuery::E bounds_in_frustum(const math::bbox & bounds, const math::transform_t & t);
+	math::volume_query bounds_in_frustum(const math::bbox & bounds, const math::transform & t);
 
 	//-----------------------------------------------------------------------------
 	//  Name : viewport_to_ray()
@@ -381,7 +381,7 @@ public:
 	/// if the point was clipped off the screen.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool world_to_viewport(const uPoint& viewport_pos, const uSize& viewport_size, const math::vec3& pos, math::vec3 & point, bool clipX = true, bool clipY = true, bool clipZ = true);
+	bool world_to_viewport(const upoint& viewport_pos, const usize& viewport_size, const math::vec3& pos, math::vec3 & point, bool clipX = true, bool clipY = true, bool clipZ = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : estimate_zoom_factor ()
@@ -430,7 +430,7 @@ public:
 	/// point to use as a tolerance for picking.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::vec3 estimate_pick_tolerance(float pixelTolerance, const math::vec3 & referencePosition, const math::transform_t & objectTransform);
+	math::vec3 estimate_pick_tolerance(float pixelTolerance, const math::vec3 & referencePosition, const math::transform & objectTransform);
 
 	//-----------------------------------------------------------------------------
 	//  Name : look_at ()
@@ -513,27 +513,27 @@ protected:
 	// Protected Variables
 	//-------------------------------------------------------------------------
 	/// The type of projection currently selected for this camera.
-	ProjectionMode _projection_mode = ProjectionMode::Perspective;
+	projection_mode _projection_mode = projection_mode::perspective;
 	/// Vertical degrees angle (perspective only).
 	float _fov = 60.0f;
 	/// Near clip plane Distance
 	float _near_clip = 0.1f;
 	/// Far clip plane Distance
 	float _far_clip = 1000.0f;
-	/// Camera's half-size when in orthographic mode.
+	/// camera's half-size when in orthographic mode.
 	float _ortho_size = 5;
 	/// Viewport position
-	uPoint _viewport_pos = { 0, 0 };
+	upoint _viewport_pos = { 0, 0 };
 	/// Viewport size
-	uSize _viewport_size = { 0, 0 };
+	usize _viewport_size = { 0, 0 };
 	/// Cached view matrix
-	math::transform_t _view;
+	math::transform _view;
 	/// Cached projection matrix.
-	math::transform_t _projection;
+	math::transform _projection;
 	/// Cached "previous" view matrix.
-	math::transform_t _last_view;
+	math::transform _last_view;
 	/// Cached "previous" projection matrix.
-	math::transform_t _last_projection;
+	math::transform _last_projection;
 	/// Details regarding the camera frustum.
 	math::frustum _frustum;
 	/// The near clipping volume (area of space between the camera position and the near plane).

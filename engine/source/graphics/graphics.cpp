@@ -2,13 +2,13 @@
 
 namespace gfx
 {
-	VertexDecl PosTexCoord0Vertex::decl;
-	VertexDecl MeshVertex::decl;
+	VertexDecl pos_texcoord0_vertex::decl;
+	VertexDecl mesh_vertex::decl;
 
 	TextureFormat::Enum get_best_format(std::uint16_t type_flags, std::uint32_t search_flags)
 	{
 		//( "DX11", "Go back over the list and find good formats for DX11" )
-		bool is_depth = ((search_flags & FormatSearchFlags::RequireDepth) != 0);
+		bool is_depth = ((search_flags & format_search_flags::RequireDepth) != 0);
 		// Get best format for the target case.
 
 		if (!is_depth)
@@ -18,12 +18,12 @@ namespace gfx
 			// Does the user prefer compressed textures in this case?
 			// We will select compressed formats only in the
 			// four channel non-floating point cases.
-			if ((search_flags & FormatSearchFlags::PreferCompressed) &&
-				(search_flags & FormatSearchFlags::FourChannels) &&
-				!(search_flags & FormatSearchFlags::FloatingPoint))
+			if ((search_flags & format_search_flags::PreferCompressed) &&
+				(search_flags & format_search_flags::FourChannels) &&
+				!(search_flags & format_search_flags::FloatingPoint))
 			{
 				// Alpha is required?
-				if ((search_flags & FormatSearchFlags::RequireAlpha))
+				if ((search_flags & format_search_flags::RequireAlpha))
 				{
 					if (is_format_supported(type_flags, TextureFormat::BC2))
 						return TextureFormat::BC2;
@@ -41,16 +41,16 @@ namespace gfx
 			} // End if prefer compressed formats
 
 			// Standard formats, and fallback for compression unsupported case
-			bool accept_padding = ((search_flags & FormatSearchFlags::AllowPaddingChannels) != 0);
-			bool requires_alpha = ((search_flags & FormatSearchFlags::RequireAlpha) != 0);
-			if ((search_flags & FormatSearchFlags::FloatingPoint))
+			bool accept_padding = ((search_flags & format_search_flags::AllowPaddingChannels) != 0);
+			bool requires_alpha = ((search_flags & format_search_flags::RequireAlpha) != 0);
+			if ((search_flags & format_search_flags::FloatingPoint))
 			{
 				// Floating point formats ONLY!
-				bool accept_half = ((search_flags & FormatSearchFlags::HalfPrecisionFloat) != 0);
-				bool accept_full = ((search_flags & FormatSearchFlags::FullPrecisionFloat) != 0);
+				bool accept_half = ((search_flags & format_search_flags::HalfPrecisionFloat) != 0);
+				bool accept_full = ((search_flags & format_search_flags::FullPrecisionFloat) != 0);
 
 				// How many channels?
-				if ((search_flags & FormatSearchFlags::FourChannels))
+				if ((search_flags & format_search_flags::FourChannels))
 				{
 					if (accept_full && is_format_supported(type_flags, TextureFormat::RGBA32F))
 						return TextureFormat::RGBA32F;
@@ -58,7 +58,7 @@ namespace gfx
 						return TextureFormat::RGBA16F;
 
 				} // End if FourChannel
-				else if ((search_flags & FormatSearchFlags::TwoChannels))
+				else if ((search_flags & format_search_flags::TwoChannels))
 				{
 					if (!requires_alpha)
 					{
@@ -82,7 +82,7 @@ namespace gfx
 					} // End if requires_alpha
 
 				} // End if TwoChannel
-				else if ((search_flags & FormatSearchFlags::OneChannel))
+				else if ((search_flags & format_search_flags::OneChannel))
 				{
 					if (!requires_alpha)
 					{
@@ -115,7 +115,7 @@ namespace gfx
 			else
 			{
 				// How many channels?
-				if ((search_flags & FormatSearchFlags::FourChannels))
+				if ((search_flags & format_search_flags::FourChannels))
 				{
 					if (!requires_alpha)
 					{
@@ -147,7 +147,7 @@ namespace gfx
 					} // End if requires_alpha
 
 				} // End if FourChannel
-				else if ((search_flags & FormatSearchFlags::TwoChannels))
+				else if ((search_flags & format_search_flags::TwoChannels))
 				{
 					if (!requires_alpha)
 					{
@@ -185,7 +185,7 @@ namespace gfx
 					} // End if requires_alpha
 
 				} // End if TwoChannel
-				else if ((search_flags & FormatSearchFlags::OneChannel))
+				else if ((search_flags & format_search_flags::OneChannel))
 				{
 					if (!requires_alpha)
 					{
@@ -233,12 +233,12 @@ namespace gfx
 		} // End if color formats
 		else
 		{
-			bool requires_stencil = ((search_flags & FormatSearchFlags::RequireStencil) != 0);
-			if ((search_flags & FormatSearchFlags::FloatingPoint))
+			bool requires_stencil = ((search_flags & format_search_flags::RequireStencil) != 0);
+			if ((search_flags & format_search_flags::FloatingPoint))
 			{
 				// Floating point formats ONLY!
-				bool accept_half = ((search_flags & FormatSearchFlags::HalfPrecisionFloat) != 0);
-				bool accept_full = ((search_flags & FormatSearchFlags::FullPrecisionFloat) != 0);
+				bool accept_half = ((search_flags & format_search_flags::HalfPrecisionFloat) != 0);
+				bool accept_full = ((search_flags & format_search_flags::FullPrecisionFloat) != 0);
 				if (!requires_stencil)
 				{
 					if (accept_full && is_format_supported(type_flags, TextureFormat::D32F))
@@ -296,8 +296,8 @@ namespace gfx
 
 		if (initted)
 		{
-			PosTexCoord0Vertex::init();
-			MeshVertex::init();
+			pos_texcoord0_vertex::init();
+			mesh_vertex::init();
 		}
 
 		return initted;
@@ -313,11 +313,11 @@ namespace gfx
 		float texture_half = get_half_texel();
 		bool origin_bottom_left = is_origin_bottom_left();
 
-		if (3 == getAvailTransientVertexBuffer(3, PosTexCoord0Vertex::decl))
+		if (3 == getAvailTransientVertexBuffer(3, pos_texcoord0_vertex::decl))
 		{
 			TransientVertexBuffer vb;
-			allocTransientVertexBuffer(&vb, 3, PosTexCoord0Vertex::decl);
-			PosTexCoord0Vertex* vertex = (PosTexCoord0Vertex*)vb.data;
+			allocTransientVertexBuffer(&vb, 3, pos_texcoord0_vertex::decl);
+			pos_texcoord0_vertex* vertex = (pos_texcoord0_vertex*)vb.data;
 
 			const float minx = -width;
 			const float maxx = width;
@@ -373,11 +373,11 @@ namespace gfx
 		float texture_half = get_half_texel();
 		bool origin_bottom_left = is_origin_bottom_left();
 
-		if (4 == getAvailTransientVertexBuffer(4, PosTexCoord0Vertex::decl))
+		if (4 == getAvailTransientVertexBuffer(4, pos_texcoord0_vertex::decl))
 		{
 			TransientVertexBuffer vb;
-			allocTransientVertexBuffer(&vb, 4, PosTexCoord0Vertex::decl);
-			PosTexCoord0Vertex* vertex = (PosTexCoord0Vertex*)vb.data;
+			allocTransientVertexBuffer(&vb, 4, pos_texcoord0_vertex::decl);
+			pos_texcoord0_vertex* vertex = (pos_texcoord0_vertex*)vb.data;
 
 			const float minx = -width;
 			const float maxx = width;

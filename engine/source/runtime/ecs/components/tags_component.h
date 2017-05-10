@@ -7,25 +7,25 @@
  /**
   * Allow entities to be tagged with strings.
   *
-  * entity.assign<TagsComponent>("tag1", "tag2");
+  * entity.assign<tags_component>("tag1", "tag2");
   *
-  * ComponentPtr<TagsComponent> tags;
-  * for (Entity entity : entity_manager.entities_with_components(tags))
+  * ComponentPtr<tags_component> tags;
+  * for (entity entity : entity_manager.entities_with_components(tags))
   */
 
-class TagsComponent : public runtime::Component
+class tags_component : public runtime::component
 {
-	COMPONENT(TagsComponent)
-	SERIALIZABLE(TagsComponent)
-	REFLECTABLE(TagsComponent, Component)
+	COMPONENT(tags_component)
+	SERIALIZABLE(tags_component)
+	REFLECTABLE(tags_component, component)
 public:
 	/**
-	 * Construct a new TagsComponent with the given tags.
+	 * Construct a new tags_component with the given tags.
 	 *
-	 * eg. TagsComponent tags("a", "b", "c");
+	 * eg. tags_component tags("a", "b", "c");
 	 */
 	template <typename ... Args>
-	TagsComponent(const std::string &tag, const Args & ... tags)
+	tags_component(const std::string &tag, const Args & ... tags)
 	{
 		set_tags(tag, tags ...);
 	}

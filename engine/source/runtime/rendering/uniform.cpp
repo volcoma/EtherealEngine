@@ -1,11 +1,11 @@
 #include "uniform.h"
 
-Uniform::~Uniform()
+uniform::~uniform()
 {
 	dispose();
 }
 
-void Uniform::dispose()
+void uniform::dispose()
 {
 	if (is_valid())
 		gfx::destroyUniform(handle);
@@ -13,12 +13,12 @@ void Uniform::dispose()
 	handle = { bgfx::invalidHandle };
 }
 
-bool Uniform::is_valid() const
+bool uniform::is_valid() const
 {
 	return gfx::isValid(handle);
 }
 
-void Uniform::populate(const std::string& _name, gfx::UniformType::Enum _type, std::uint16_t _num /*= 1*/)
+void uniform::populate(const std::string& _name, gfx::UniformType::Enum _type, std::uint16_t _num /*= 1*/)
 {
 	dispose();
 
@@ -26,7 +26,7 @@ void Uniform::populate(const std::string& _name, gfx::UniformType::Enum _type, s
 	gfx::getUniformInfo(handle, info);
 }
 
-void Uniform::populate(gfx::UniformHandle _handle)
+void uniform::populate(gfx::UniformHandle _handle)
 {
 	dispose();
 

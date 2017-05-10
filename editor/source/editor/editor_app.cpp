@@ -12,14 +12,14 @@
 namespace editor
 {
 
-	void EditorApp::start()
+	void editor_app::start()
 	{
-		auto engine = core::get_subsystem<runtime::Engine>();
+		auto engine = core::get_subsystem<runtime::engine>();
 
 		sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 		desktop.width = 1280;
 		desktop.height = 720;
-		auto main_window = std::make_shared<MainEditorWindow>(
+		auto main_window = std::make_shared<main_editor_window>(
 			desktop,
 			"Editor",
 			sf::Style::Default);
@@ -31,10 +31,10 @@ namespace editor
 		}
 
 		core::add_subsystem<GuiSystem>();
-		core::add_subsystem<DockingSystem>();
-		core::add_subsystem<EditState>();
-		core::add_subsystem<PickingSystem>();
-		core::add_subsystem<DebugDrawSystem>();
-		core::add_subsystem<ProjectManager>();
+		core::add_subsystem<docking_system>();
+		core::add_subsystem<editor_state>();
+		core::add_subsystem<picking_system>();
+		core::add_subsystem<debugdraw_system>();
+		core::add_subsystem<project_manager>();
 	}
 }

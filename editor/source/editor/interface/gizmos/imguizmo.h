@@ -22,18 +22,18 @@ namespace imguizmo
 	// Needs view and projection matrices. 
 	// matrix parameter is the source matrix (where will be gizmo be drawn) and might be transformed by the function. Return deltaMatrix is optional
 	// translation is applied in world space
-	enum OPERATION
+	enum operation
 	{
-		TRANSLATE,
-		ROTATE,
-		SCALE
+		translate,
+		rotate,
+		scale
 	};
 
-	enum MODE
+	enum mode
 	{
-		LOCAL,
-		WORLD
+		local,
+		world
 	};
 
-	void manipulate(const float *view, const float *projection, OPERATION operation, MODE mode, float *matrix, float *deltaMatrix = 0, float *snap = 0);
+	void manipulate(const float *view, const float *projection, operation op, mode mod, float *matrix, float *deltaMatrix = 0, float *snap = 0);
 };

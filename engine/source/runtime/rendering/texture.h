@@ -4,7 +4,7 @@
 #include <memory>
 #include "core/common/basetypes.hpp"
 
-struct Texture
+struct texture
 {
 
 	//-----------------------------------------------------------------------------
@@ -15,7 +15,7 @@ struct Texture
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	Texture() = default;
+	texture() = default;
 	
 	//-----------------------------------------------------------------------------
 	//  Name : Texture ()
@@ -25,7 +25,7 @@ struct Texture
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	Texture(const gfx::Memory* _mem
+	texture(const gfx::Memory* _mem
 		, std::uint32_t _flags = BGFX_TEXTURE_NONE
 		, std::uint8_t _skip = 0
 		, gfx::TextureInfo* _info = nullptr)
@@ -41,7 +41,7 @@ struct Texture
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	Texture(std::uint16_t _width
+	texture(std::uint16_t _width
 		, std::uint16_t _height
 		, bool _hasMips
 		, std::uint16_t _numLayers
@@ -61,7 +61,7 @@ struct Texture
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	Texture(gfx::BackbufferRatio::Enum _ratio
+	texture(gfx::BackbufferRatio::Enum _ratio
 		, bool _hasMips
 		, std::uint16_t _numLayers
 		, gfx::TextureFormat::Enum _format
@@ -79,7 +79,7 @@ struct Texture
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	Texture(std::uint16_t _width
+	texture(std::uint16_t _width
 		, std::uint16_t _height
 		, std::uint16_t _depth
 		, bool _hasMips
@@ -99,7 +99,7 @@ struct Texture
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	Texture(std::uint16_t _size
+	texture(std::uint16_t _size
 		, bool _hasMips
 		, std::uint16_t _numLayers
 		, gfx::TextureFormat::Enum _format
@@ -118,7 +118,7 @@ struct Texture
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	~Texture();
+	~texture();
 
 	//-----------------------------------------------------------------------------
 	//  Name : is_valid ()
@@ -230,7 +230,7 @@ struct Texture
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	uSize get_size() const;
+	usize get_size() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : is_render_target ()

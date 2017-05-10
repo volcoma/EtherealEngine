@@ -248,7 +248,7 @@ public:
     /// \see setPosition
     ///
     ////////////////////////////////////////////////////////////
-    iPoint getPosition() const;
+    ipoint getPosition() const;
 
     ////////////////////////////////////////////////////////////
     /// \brief Change the position of the window on screen
@@ -262,7 +262,7 @@ public:
     /// \see getPosition
     ///
     ////////////////////////////////////////////////////////////
-    void setPosition(const iPoint& position);
+    void setPosition(const ipoint& position);
 
     ////////////////////////////////////////////////////////////
     /// \brief Get the size of the rendering region of the window
@@ -275,7 +275,7 @@ public:
     /// \see setSize
     ///
     ////////////////////////////////////////////////////////////
-    uSize getSize() const;
+    usize getSize() const;
 
     ////////////////////////////////////////////////////////////
     /// \brief Change the size of the rendering region of the window
@@ -285,7 +285,7 @@ public:
     /// \see getSize
     ///
     ////////////////////////////////////////////////////////////
-    void setSize(const uSize& size);
+    void setSize(const usize& size);
 
     ////////////////////////////////////////////////////////////
     /// \brief Change the title of the window
@@ -507,7 +507,7 @@ private:
     // Member data
     ////////////////////////////////////////////////////////////
     priv::WindowImpl* m_impl;           ///< Platform-specific implementation of the window
-    uSize	          m_size;           ///< Current size of the window
+    usize	          m_size;           ///< Current size of the window
 };
 
 } // namespace sf

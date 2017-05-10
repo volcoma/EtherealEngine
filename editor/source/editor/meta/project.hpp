@@ -8,12 +8,12 @@
 
 namespace editor
 {
-	SAVE(ProjectManager::Options)
+	SAVE(project_manager::options)
 	{
 		try_save(ar, cereal::make_nvp("recent_projects", obj.recent_project_paths));
 	}
 
-	LOAD(ProjectManager::Options)
+	LOAD(project_manager::options)
 	{
 		try_load(ar, cereal::make_nvp("recent_projects", obj.recent_project_paths));
 	}

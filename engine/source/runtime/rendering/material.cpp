@@ -5,16 +5,16 @@
 
 #include "../assets/asset_manager.h"
 
-Material::Material()
+material::material()
 {
-	auto am = core::get_subsystem<runtime::AssetManager>();
-	am->load<Texture>("engine_data:/textures/default_color", false)
+	auto am = core::get_subsystem<runtime::asset_manager>();
+	am->load<texture>("engine_data:/textures/default_color", false)
 		.then([this](auto asset) mutable
 	{
 		_default_color_map = asset;
 	});
 
-	am->load<Texture>("engine_data:/textures/default_normal", false)
+	am->load<texture>("engine_data:/textures/default_normal", false)
 		.then([this](auto asset) mutable
 	{
 		_default_normal_map = asset;
@@ -22,42 +22,42 @@ Material::Material()
 }
 
 
-Material::~Material()
+material::~material()
 {
 
 }
 
-void Material::set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::TextureHandle _texture, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
-{
-	get_program()->set_texture(_stage, _sampler, _texture, _flags);
-}
-
-void Material::set_texture(std::uint8_t _stage, const std::string& _sampler, Texture* _texture, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
+void material::set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::TextureHandle _texture, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
 	get_program()->set_texture(_stage, _sampler, _texture, _flags);
 }
 
-void Material::set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::FrameBufferHandle _handle, uint8_t _attachment /*= 0 */, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
+void material::set_texture(std::uint8_t _stage, const std::string& _sampler, texture* _texture, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
+{
+	get_program()->set_texture(_stage, _sampler, _texture, _flags);
+}
+
+void material::set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::FrameBufferHandle _handle, uint8_t _attachment /*= 0 */, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
 	get_program()->set_texture(_stage, _sampler, _handle, _attachment, _flags);
 }
 
-void Material::set_texture(std::uint8_t _stage, const std::string& _sampler, FrameBuffer* _handle, uint8_t _attachment /*= 0 */, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
+void material::set_texture(std::uint8_t _stage, const std::string& _sampler, frame_buffer* _handle, uint8_t _attachment /*= 0 */, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
 	get_program()->set_texture(_stage, _sampler, _handle, _attachment, _flags);
 }
 
-void Material::set_uniform(const std::string& _name, const void* _value, std::uint16_t _num /*= 1*/)
+void material::set_uniform(const std::string& _name, const void* _value, std::uint16_t _num /*= 1*/)
 {
 	get_program()->set_uniform(_name, _value, _num);
 }
 
-Program* Material::get_program() const
+program* material::get_program() const
 {
 	return skinned ? _program_skinned.get() : _program.get();
 }
 
-std::uint64_t Material::get_render_states(bool apply_cull, bool depth_write, bool depth_test) const
+std::uint64_t material::get_render_states(bool apply_cull, bool depth_write, bool depth_test) const
 {
 	// Set render states.
 	std::uint64_t states = 0
@@ -74,41 +74,41 @@ std::uint64_t Material::get_render_states(bool apply_cull, bool depth_write, boo
 	if (apply_cull)
 	{
 		auto cullType = get_cull_type();
-		if (cullType == CullType::CounterClockWise)
+		if (cullType == cull_type::counter_clockwise)
 			states |= BGFX_STATE_CULL_CCW;
-		if (cullType == CullType::ClockWise)
+		if (cullType == cull_type::clockwise)
 			states |= BGFX_STATE_CULL_CW;
 	}
 
 	return states;
 }
 
-StandardMaterial::StandardMaterial()
+standard_material::standard_material()
 {
-	auto am = core::get_subsystem<runtime::AssetManager>();
+	auto am = core::get_subsystem<runtime::asset_manager>();
 
-	am->load<Shader>("engine_data:/shaders/vs_deferred_geom", false)
+	am->load<shader>("engine_data:/shaders/vs_deferred_geom", false)
 		.then([this, am](auto vs)
 	{
-		am->load<Shader>("engine_data:/shaders/fs_deferred_geom", false)
+		am->load<shader>("engine_data:/shaders/fs_deferred_geom", false)
 			.then([this, vs](auto fs)
 		{
-			_program = std::make_unique<Program>(vs, fs);
+			_program = std::make_unique<program>(vs, fs);
 		});
 	});
 
-	am->load<Shader>("engine_data:/shaders/vs_deferred_geom_skinned", false)
+	am->load<shader>("engine_data:/shaders/vs_deferred_geom_skinned", false)
 		.then([this, am](auto vs)
 	{
-		am->load<Shader>("engine_data:/shaders/fs_deferred_geom", false)
+		am->load<shader>("engine_data:/shaders/fs_deferred_geom", false)
 			.then([this, vs](auto fs)
 		{
-			_program_skinned = std::make_unique<Program>(vs, fs);
+			_program_skinned = std::make_unique<program>(vs, fs);
 		});
 	});
 }
 
-void StandardMaterial::submit()
+void standard_material::submit()
 {
 	if (!is_valid())
 		return;

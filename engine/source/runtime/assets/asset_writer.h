@@ -3,8 +3,8 @@
 #include "asset_handle.h"
 #include "../system/fileSystem.h"
 
-class Material;
-struct AssetWriter
+class material;
+struct asset_writer
 {
 	//-----------------------------------------------------------------------------
 	//  Name : write_material_to_file ()
@@ -14,5 +14,5 @@ struct AssetWriter
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void write_material_to_file(const fs::path& absoluteKey, const AssetHandle<Material>& asset);
+	static void write_material_to_file(const fs::path& absoluteKey, const asset_handle<material>& asset);
 };

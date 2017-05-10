@@ -4,15 +4,15 @@
 #include "../../rendering/mesh.h"
 #include "../math/transform.hpp"
 
-REFLECT(Mesh::Info)
+REFLECT(mesh::info)
 {
-	rttr::registration::class_<Mesh::Info>("Info")
+	rttr::registration::class_<mesh::info>("info")
 		.property_readonly("Vertices",
-			&Mesh::Info::vertices)
+			&mesh::info::vertices)
 		.property_readonly("Primitives",
-			&Mesh::Info::primitives)
+			&mesh::info::primitives)
 		.property_readonly("Subsets",
-			&Mesh::Info::subsets)
+			&mesh::info::subsets)
 		;
 }
 
@@ -36,71 +36,71 @@ namespace bgfx
 }
 
 
-SAVE(Mesh::Triangle)
+SAVE(mesh::triangle)
 {
 	try_save(ar, cereal::make_nvp("data_group_id", obj.data_group_id));
 	try_save(ar, cereal::make_nvp("indices", obj.indices));
 	try_save(ar, cereal::make_nvp("flags", obj.flags));
 }
 
-LOAD(Mesh::Triangle)
+LOAD(mesh::triangle)
 {
 	try_load(ar, cereal::make_nvp("data_group_id", obj.data_group_id));
 	try_load(ar, cereal::make_nvp("indices", obj.indices));
 	try_load(ar, cereal::make_nvp("flags", obj.flags));
 }
 
-SAVE(SkinBindData::VertexInfluence)
+SAVE(skin_bind_data::vertex_influence)
 {
 	try_save(ar, cereal::make_nvp("vertex_index", obj.vertex_index));
 	try_save(ar, cereal::make_nvp("weight", obj.weight));
 }
 
-LOAD(SkinBindData::VertexInfluence)
+LOAD(skin_bind_data::vertex_influence)
 {
 	try_load(ar, cereal::make_nvp("vertex_index", obj.vertex_index));
 	try_load(ar, cereal::make_nvp("weight", obj.weight));
 }
 
-SAVE(SkinBindData::BoneInfluence)
+SAVE(skin_bind_data::bone_influence)
 {
 	try_save(ar, cereal::make_nvp("bone_id", obj.bone_id));
 	try_save(ar, cereal::make_nvp("bind_pose_transform", obj.bind_pose_transform));
 	try_save(ar, cereal::make_nvp("influences", obj.influences));
 }
 
-LOAD(SkinBindData::BoneInfluence)
+LOAD(skin_bind_data::bone_influence)
 {
 	try_load(ar, cereal::make_nvp("bone_id", obj.bone_id));
 	try_load(ar, cereal::make_nvp("bind_pose_transform", obj.bind_pose_transform));
 	try_load(ar, cereal::make_nvp("influences", obj.influences));
 }
 
-SAVE(SkinBindData)
+SAVE(skin_bind_data)
 {
 	try_save(ar, cereal::make_nvp("bones", obj._bones));
 }
 
-LOAD(SkinBindData)
+LOAD(skin_bind_data)
 {
 	try_load(ar, cereal::make_nvp("bones", obj._bones));
 }
 
-SAVE(Mesh::ArmatureNode)
+SAVE(mesh::armature_node)
 {
 	try_save(ar, cereal::make_nvp("name", obj.name));
 	try_save(ar, cereal::make_nvp("transform", obj.transform));
 	try_save(ar, cereal::make_nvp("children", obj.children));
 }
 
-LOAD(Mesh::ArmatureNode)
+LOAD(mesh::armature_node)
 {
 	try_load(ar, cereal::make_nvp("name", obj.name));
 	try_load(ar, cereal::make_nvp("transform", obj.transform));
 	try_load(ar, cereal::make_nvp("children", obj.children));
 }
 
-SAVE(Mesh::LoadData)
+SAVE(mesh::load_data)
 {
 	try_save(ar, cereal::make_nvp("vertex_format", obj.vertex_format));
 	try_save(ar, cereal::make_nvp("vertex_count", obj.vertex_count));
@@ -111,7 +111,7 @@ SAVE(Mesh::LoadData)
 	try_save(ar, cereal::make_nvp("root_node", obj.root_node));
 }
 
-LOAD(Mesh::LoadData)
+LOAD(mesh::load_data)
 {
 	try_load(ar, cereal::make_nvp("vertex_format", obj.vertex_format));
 	try_load(ar, cereal::make_nvp("vertex_count", obj.vertex_count));

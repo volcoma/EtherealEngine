@@ -20,16 +20,16 @@
 
 namespace editor
 {
-	void DebugDrawSystem::frame_render(std::chrono::duration<float> dt)
+	void debugdraw_system::frame_render(std::chrono::duration<float> dt)
 	{
-		auto es = core::get_subsystem<EditState>();
+		auto es = core::get_subsystem<editor_state>();
 		auto& editor_camera = es->camera;
 		auto& selected = es->selection_data.object;
 		if (!editor_camera ||
-			!editor_camera.has_component<CameraComponent>())
+			!editor_camera.has_component<camera_component>())
 			return;
 
-		const auto camera_comp = editor_camera.component<CameraComponent>();
+		const auto camera_comp = editor_camera.get_component<camera_component>();
 		const auto camera_comp_ptr = camera_comp.lock().get();
 		auto& render_view = camera_comp_ptr->get_render_view();
 		auto& camera = camera_comp_ptr->get_camera();
@@ -39,7 +39,7 @@ namespace editor
 		const auto surface = render_view.get_output_fbo(viewport_size);
 		const auto camera_posiiton = camera.get_position();
 
-		RenderPass pass("debug_draw_pass");
+		render_pass pass("debug_draw_pass");
 		pass.bind(surface.get());
 		pass.set_view_proj(view, proj);
 		ddRAII dd(pass.id);
@@ -92,23 +92,23 @@ namespace editor
 		}
 
 
-		if (!selected || !selected.is_type<runtime::Entity>())
+		if (!selected || !selected.is_type<runtime::entity>())
 			return;
 
-		auto selected_entity = selected.get_value<runtime::Entity>();
+		auto selected_entity = selected.get_value<runtime::entity>();
 
 		if (!selected_entity ||
-			!selected_entity.has_component<TransformComponent>())
+			!selected_entity.has_component<transform_component>())
 			return;
 
 
-		const auto transform_comp = selected_entity.component<TransformComponent>().lock();
+		const auto transform_comp = selected_entity.get_component<transform_component>().lock();
 		const auto transform_comp_ptr = transform_comp.get();
 		const auto& world_transform = transform_comp_ptr->get_transform();
 
-		if (selected_entity.has_component<CameraComponent>() && selected_entity != editor_camera)
+		if (selected_entity.has_component<camera_component>() && selected_entity != editor_camera)
 		{
-			const auto selected_camera_comp = selected_entity.component<CameraComponent>();
+			const auto selected_camera_comp = selected_entity.get_component<camera_component>();
 			const auto selected_camera_comp_ptr = selected_camera_comp.lock().get();
 			auto& selected_camera = selected_camera_comp_ptr->get_camera();
 			const auto view_proj = selected_camera.get_view_projection();
@@ -116,7 +116,7 @@ namespace editor
 			ddPush();
 			ddSetColor(0xffffffff);
 			
-			if (selected_camera.get_projection_mode() == ProjectionMode::Perspective)
+			if (selected_camera.get_projection_mode() == projection_mode::perspective)
 			{
 				ddSetTransform(nullptr);
 				ddDrawFrustum(&view_proj);
@@ -137,12 +137,12 @@ namespace editor
 			ddPop();
 		}
 
-		if (selected_entity.has_component<LightComponent>())
+		if (selected_entity.has_component<light_component>())
 		{
-			const auto light_comp = selected_entity.component<LightComponent>();
+			const auto light_comp = selected_entity.get_component<light_component>();
 			const auto light_comp_ptr = light_comp.lock().get();
 			const auto& light = light_comp_ptr->get_light();
-			if (light.light_type == LightType::Spot)
+			if (light.light_type == light_type::spot)
 			{
 				auto adjacent = light.spot_data.get_range();
 				{
@@ -172,7 +172,7 @@ namespace editor
 					ddPop();
 				}
 			}
-			else if (light.light_type == LightType::Point)
+			else if (light.light_type == light_type::point)
 			{
 				auto radius = light.point_data.range;
 				ddPush();
@@ -184,7 +184,7 @@ namespace editor
 				ddDrawCircle(Axis::Z, center.x, center.y, center.z, radius);
 				ddPop();
 			}
-			else if (light.light_type == LightType::Directional)
+			else if (light.light_type == light_type::directional)
 			{
 				ddPush();
 				ddSetLod(UINT8_MAX);
@@ -200,12 +200,12 @@ namespace editor
 			}
 		}
 
-		if (selected_entity.has_component<ReflectionProbeComponent>())
+		if (selected_entity.has_component<reflection_probe_component>())
 		{
-			const auto probe_comp = selected_entity.component<ReflectionProbeComponent>();
+			const auto probe_comp = selected_entity.get_component<reflection_probe_component>();
 			const auto probe_comp_ptr = probe_comp.lock().get();
 			const auto& probe = probe_comp_ptr->get_probe();
-			if (probe.probe_type == ProbeType::Box)
+			if (probe.probe_type == probe_type::box)
 			{
 				ddPush();
 				ddSetColor(0xff00ff00);
@@ -235,9 +235,9 @@ namespace editor
 			}
 		}
 
-		if (selected_entity.has_component<ModelComponent>())
+		if (selected_entity.has_component<model_component>())
 		{
-			const auto model_comp = selected_entity.component<ModelComponent>();
+			const auto model_comp = selected_entity.get_component<model_component>();
 			const auto model_comp_ptr = model_comp.lock().get();
 			const auto& model = model_comp_ptr->get_model();
 			if (!model.is_valid())
@@ -269,9 +269,9 @@ namespace editor
 						false,
 						BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA),
 						0,
-						_program.get(), [&u_params](Program& program)
+						_program.get(), [&u_params](program& p)
 					{
-						program.set_uniform("u_params", &u_params, 2);
+						p.set_uniform("u_params", &u_params, 2);
 					});
 				}
 				else
@@ -295,18 +295,18 @@ namespace editor
 	}
 
 
-	bool DebugDrawSystem::initialize()
+	bool debugdraw_system::initialize()
 	{
-		runtime::on_frame_render.connect(this, &DebugDrawSystem::frame_render);
+		runtime::on_frame_render.connect(this, &debugdraw_system::frame_render);
 
-		auto am = core::get_subsystem<runtime::AssetManager>();
-		am->load<Shader>("editor_data:/shaders/vs_wf_wireframe", false)
+		auto am = core::get_subsystem<runtime::asset_manager>();
+		am->load<shader>("editor_data:/shaders/vs_wf_wireframe", false)
 			.then([this, am](auto vs)
 		{
-			am->load<Shader>("editor_data:/shaders/fs_wf_wireframe", false)
+			am->load<shader>("editor_data:/shaders/fs_wf_wireframe", false)
 				.then([this, vs](auto fs)
 			{
-				_program = std::make_unique<Program>(vs, fs);
+				_program = std::make_unique<program>(vs, fs);
 			});
 		});
 
@@ -314,10 +314,10 @@ namespace editor
 		return true;
 	}
 
-	void DebugDrawSystem::dispose()
+	void debugdraw_system::dispose()
 	{
 		ddShutdown();
-		runtime::on_frame_render.disconnect(this, &DebugDrawSystem::frame_render);
+		runtime::on_frame_render.disconnect(this, &debugdraw_system::frame_render);
 	}
 
 }

@@ -5,10 +5,10 @@
 #include "core/serialization/cereal/types/vector.hpp"
 #include "core/logging/logging.h"
 
-inline std::map<uint32_t, runtime::Entity>& getSerializationMap()
+inline std::map<uint32_t, runtime::entity>& get_serialization_map()
 {
 	/// Keep count of serialized entities
-	static std::map<uint32_t, runtime::Entity> serializationMap;
+	static std::map<uint32_t, runtime::entity> serializationMap;
 	return serializationMap;
 }
 
@@ -16,13 +16,13 @@ inline std::map<uint32_t, runtime::Entity>& getSerializationMap()
 namespace runtime
 {
 
-SAVE(Entity)
+SAVE(entity)
 {
 
 	auto id = obj.id().index();
 	try_save(ar, cereal::make_nvp("entity_id", id));
 	
-	auto& serializationMap = getSerializationMap();
+	auto& serializationMap = get_serialization_map();
 	auto it = serializationMap.find(id);
 	if (it == serializationMap.end())
 	{
@@ -33,17 +33,17 @@ SAVE(Entity)
 	}
 }
 
-LOAD(Entity)
+LOAD(entity)
 {
 	std::uint32_t id;
 	std::string name;
-	std::vector<CHandle<Component>> components;
+	std::vector<chandle<component>> components;
 
 	
 	try_load(ar, cereal::make_nvp("entity_id", id));
 	
 
-	auto& serializationMap = getSerializationMap();
+	auto& serializationMap = get_serialization_map();
 	auto it = serializationMap.find(id);
 	if (it != serializationMap.end())
 	{
@@ -51,7 +51,7 @@ LOAD(Entity)
 	}
 	else
 	{
-		auto ecs = core::get_subsystem<EntityComponentSystem>();
+		auto ecs = core::get_subsystem<entity_component_system>();
 		obj = ecs->create();
 		serializationMap[id] = obj;
 

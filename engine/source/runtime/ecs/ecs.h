@@ -2,7 +2,7 @@
 
 #include "core/subsystem/subsystem.h"
 #include "core/subsystem/simulation.h"
-#include "core/events/event.hpp"
+#include "core/signals/signal.hpp"
 #include "core/common/assert.hpp"
 #include "core/nonstd/type_traits.hpp"
 #include "core/reflection/reflection.h"
@@ -30,32 +30,32 @@ namespace runtime
 {
 	static const std::size_t MAX_COMPONENTS = 128;
 
-	class Component;
-	class ComponentStorage
+	class component;
+	class component_storage
 	{
 	public:
-		ComponentStorage(std::size_t size = 100);
-		~ComponentStorage();
+		component_storage(std::size_t size = 100);
+		~component_storage();
 
 		inline std::size_t size() const { return data.size(); }
 		inline std::size_t capacity() const { return data.capacity(); }
 		/// Ensure at least n elements will fit in the pool.
 		void expand(std::size_t n);
 		void reserve(std::size_t n);
-		std::shared_ptr<Component> get(std::size_t n);
-		const std::shared_ptr<Component> get(std::size_t n) const;
+		std::shared_ptr<component> get(std::size_t n);
+		const std::shared_ptr<component> get(std::size_t n) const;
 
 		template<typename T>
 		std::shared_ptr<T> get(std::size_t n)
 		{
-			static_assert(std::is_base_of<Component, T>::value, "Invalid component type.");
+			static_assert(std::is_base_of<component, T>::value, "Invalid component type.");
 
 			return std::static_pointer_cast<T>(get(n));
 		}
 		template<typename T>
 		std::shared_ptr<T> get(std::size_t n) const
 		{
-			static_assert(std::is_base_of<Component, T>::value, "Invalid component type.");
+			static_assert(std::is_base_of<component, T>::value, "Invalid component type.");
 
 			return std::static_pointer_cast<T>(get(n));
 		}
@@ -70,209 +70,209 @@ namespace runtime
 			return std::static_pointer_cast<T>(data[index]);
 		}
 
-		std::weak_ptr<Component> set(unsigned int index, std::shared_ptr<Component> component);
+		std::weak_ptr<component> set(unsigned int index, std::shared_ptr<component> component);
 	private:
-		std::vector<std::shared_ptr<Component>> data;
+		std::vector<std::shared_ptr<component>> data;
 	};
 
 
-	class EntityComponentSystem;
+	class entity_component_system;
 
 	template<typename C>
-	using CHandle = std::weak_ptr<C>;
+	using chandle = std::weak_ptr<C>;
 
-	/** A convenience handle around an Entity::Id.
+	/** A convenience handle around an entity::Id.
 	*
 	* If an entity is destroyed, any copies will be invalidated. Use valid() to
 	* check for validity before using.
 	*
-	* Create entities with `EntityComponentSystem`:
+	* Create entities with `entity_component_system`:
 	*
-	*     Entity entity = entity_manager->create();
+	*     entity entity = entity_manager->create();
 	*/
-	class Entity
+	class entity
 	{
 	public:
-		struct Id
+		struct id_t
 		{
-			Id() : id_(0) {}
-			explicit Id(std::uint64_t id) : id_(id) {}
-			Id(std::uint32_t index, std::uint32_t version) : id_(std::uint64_t(index) | std::uint64_t(version) << 32UL) {}
+			id_t() : id_(0) {}
+			explicit id_t(std::uint64_t id) : id_(id) {}
+			id_t(std::uint32_t index, std::uint32_t version) : id_(std::uint64_t(index) | std::uint64_t(version) << 32UL) {}
 
 			std::uint64_t id() const { return id_; }
 
-			bool operator == (const Id &other) const { return id_ == other.id_; }
-			bool operator != (const Id &other) const { return id_ != other.id_; }
-			bool operator < (const Id &other) const { return id_ < other.id_; }
+			bool operator == (const id_t &other) const { return id_ == other.id_; }
+			bool operator != (const id_t &other) const { return id_ != other.id_; }
+			bool operator < (const id_t &other) const { return id_ < other.id_; }
 
 			std::uint32_t index() const { return id_ & 0xffffffffUL; }
 			std::uint32_t version() const { return id_ >> 32; }
 
 		private:
-			friend class EntityComponentSystem;
+			friend class entity_component_system;
 
 			std::uint64_t id_;
 		};
 
 
 		/**
-		* Id of an invalid Entity.
+		* Id of an invalid entity.
 		*/
-		static const Id INVALID;
+		static const id_t INVALID;
 
-		Entity() = default;
-		Entity(EntityComponentSystem *manager, Entity::Id id) : manager_(manager), id_(id) {}
-		Entity(const Entity &other) = default;
-		Entity &operator = (const Entity &other) = default;
+		entity() = default;
+		entity(entity_component_system *manager, entity::id_t id) : manager_(manager), id_(id) {}
+		entity(const entity &other) = default;
+		entity &operator = (const entity &other) = default;
 
 		/**
-		* Check if Entity handle is invalid.
+		* Check if entity handle is invalid.
 		*/
 		operator bool() const
 		{
 			return valid();
 		}
 
-		bool operator == (const Entity &other) const
+		bool operator == (const entity &other) const
 		{
 			return other.manager_ == manager_ && other.id_ == id_;
 		}
 
-		bool operator != (const Entity &other) const
+		bool operator != (const entity &other) const
 		{
 			return !(other == *this);
 		}
 
-		bool operator < (const Entity &other) const
+		bool operator < (const entity &other) const
 		{
 			return other.id_ < id_;
 		}
 		void set_name(std::string name);
 		const std::string& get_name() const;
 		/**
-		* Is this Entity handle valid?
+		* Is this entity handle valid?
 		*
 		* In older versions of EntityX, there were no guarantees around entity
 		* validity if a previously allocated entity slot was reassigned. That is no
-		* longer the case: if a slot is reassigned, old Entity::Id's will be
+		* longer the case: if a slot is reassigned, old entity::Id's will be
 		* invalid.
 		*/
 		bool valid() const;
 
 		/**
-		* Invalidate Entity handle, disassociating it from an EntityComponentSystem and invalidating its ID.
+		* Invalidate entity handle, disassociating it from an entity_component_system and invalidating its ID.
 		*
 		* Note that this does *not* affect the underlying entity and its
-		* components. Use destroy() to destroy the associated Entity and components.
+		* components. Use destroy() to destroy the associated entity and components.
 		*/
 		void invalidate();
 
 		std::string to_string() const;
 
-		Id id() const { return id_; }
+		id_t id() const { return id_; }
 
 		template <typename C, typename ... Args>
-		CHandle<C> assign(Args && ... args);
+		chandle<C> assign(Args && ... args);
 
-		CHandle<Component> assign(std::shared_ptr<Component> component);
+		chandle<component> assign(std::shared_ptr<component> component);
 
 		template <typename C>
-		CHandle<C> assign_from_copy(const CHandle<C> &component);
+		chandle<C> assign_from_copy(const chandle<C> &component);
 
-		CHandle<Component> assign_from_copy(std::shared_ptr<Component> component);
+		chandle<component> assign_from_copy(std::shared_ptr<component> component);
 
 		template <typename C>
 		void remove();
 
-		void remove(std::shared_ptr<Component> component);
+		void remove(std::shared_ptr<component> component);
 
 		template <typename C, typename = typename std::enable_if<!std::is_const<C>::value>::type>
-		CHandle<C> component();
+		chandle<C> get_component();
 
 		template <typename C, typename = typename std::enable_if<std::is_const<C>::value>::type>
-		const CHandle<C> component() const;
+		const chandle<C> get_component() const;
 
 		template <typename ... Components>
-		std::tuple<CHandle<Components>...> components();
+		std::tuple<chandle<Components>...> components();
 
 		template <typename ... Components>
-		std::tuple<CHandle<const Components>...> components() const;
+		std::tuple<chandle<const Components>...> components() const;
 
-		std::vector<CHandle<Component>> all_components() const;
-		std::vector<std::shared_ptr<Component>> all_components_shared() const;
+		std::vector<chandle<component>> all_components() const;
+		std::vector<std::shared_ptr<component>> all_components_shared() const;
 
 		template <typename C>
 		bool has_component() const;
 
-		bool has_component(std::shared_ptr<Component> component) const;
+		bool has_component(std::shared_ptr<component> component) const;
 
 		template <typename A, typename ... Args>
-		void unpack(CHandle<A> &a, CHandle<Args> & ... args);
+		void unpack(chandle<A> &a, chandle<Args> & ... args);
 
 		/**
-		* Destroy and invalidate this Entity.
+		* Destroy and invalidate this entity.
 		*/
 		void destroy();
 
 		std::bitset<MAX_COMPONENTS> component_mask() const;
 
 	private:
-		EntityComponentSystem *manager_ = nullptr;
-		Entity::Id id_ = INVALID;
+		entity_component_system *manager_ = nullptr;
+		entity::id_t id_ = INVALID;
 	};
 
 
 #define COMPONENT(type)															\
 private:																		\
-virtual nonstd::type_info_polymorphic::index_t runtime_id() const				\
+virtual rtti::type_index_sequential_t::index_t runtime_id() const				\
 {																				\
-	return nonstd::type_info_polymorphic::id<Component, type>();				\
+	return rtti::type_index_sequential_t::id<component, type>();				\
 }																				\
 public:																			\
-runtime::CHandle<type> handle()													\
+runtime::chandle<type> handle()													\
 {																				\
-	return get_entity().component<type>();										\
+	return get_entity().get_component<type>();										\
 }																				\
-virtual std::shared_ptr<Component> clone() const								\
+virtual std::shared_ptr<component> clone() const								\
 {																				\
-	return std::static_pointer_cast<Component>(std::make_shared<type>(*this));	\
+	return std::static_pointer_cast<component>(std::make_shared<type>(*this));	\
 }
 
-	class Component
+	class component
 	{
-		REFLECTABLE(Component)
-		SERIALIZABLE(Component)
-		friend class EntityComponentSystem;
+		REFLECTABLE(component)
+		SERIALIZABLE(component)
+		friend class entity_component_system;
 	public:
 		//-----------------------------------------------------------------------------
-		//  Name : Component ()
+		//  Name : component ()
 		/// <summary>
 		/// 
 		/// 
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		Component() { touch(); }
+		component() { touch(); }
 
 		//-----------------------------------------------------------------------------
-		//  Name : Component ()
+		//  Name : component ()
 		/// <summary>
 		/// 
 		/// 
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		Component(const Component& component) { touch(); }
+		component(const component& component) { touch(); }
 
 		//-----------------------------------------------------------------------------
-		//  Name : ~Component (virtual )
+		//  Name : ~component (virtual )
 		/// <summary>
 		/// 
 		/// 
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		virtual ~Component() = default;
+		virtual ~component() = default;
 
 		//-----------------------------------------------------------------------------
 		//  Name : clone (virtual )
@@ -282,7 +282,7 @@ virtual std::shared_ptr<Component> clone() const								\
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		virtual std::shared_ptr<Component> clone() const = 0;
+		virtual std::shared_ptr<component> clone() const = 0;
 
 		//-----------------------------------------------------------------------------
 		//  Name : touch (virtual )
@@ -292,7 +292,7 @@ virtual std::shared_ptr<Component> clone() const								\
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------	
-		virtual void touch() { _last_touched = core::get_subsystem<core::Simulation>()->get_frame() + 1; }
+		virtual void touch() { _last_touched = core::get_subsystem<core::simulation>()->get_frame() + 1; }
 
 		//-----------------------------------------------------------------------------
 		//  Name : isDirty (virtual )
@@ -302,7 +302,7 @@ virtual std::shared_ptr<Component> clone() const								\
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		virtual bool is_dirty() const { return _last_touched >= core::get_subsystem<core::Simulation>()->get_frame(); }
+		virtual bool is_dirty() const { return _last_touched >= core::get_subsystem<core::simulation>()->get_frame(); }
 
 		//-----------------------------------------------------------------------------
 		//  Name : onEntitySet (virtual )
@@ -322,7 +322,7 @@ virtual std::shared_ptr<Component> clone() const								\
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		Entity get_entity() { return _entity; }
+		entity get_entity() { return _entity; }
 
 	protected:
 		//-----------------------------------------------------------------------------
@@ -333,34 +333,34 @@ virtual std::shared_ptr<Component> clone() const								\
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		virtual nonstd::type_info_polymorphic::index_t runtime_id() const = 0;
-		/// Owning Entity
-		Entity _entity;
+		virtual rtti::type_index_sequential_t::index_t runtime_id() const = 0;
+		/// Owning entity
+		entity _entity;
 		/// Was the component touched.
 		std::uint64_t _last_touched = 0;
 	};
 
 
-	extern event<void(Entity)> on_entity_created;
-	extern event<void(Entity)> on_entity_destroyed;
-	extern event<void(Entity, CHandle<Component>)> on_component_added;
-	extern event<void(Entity, CHandle<Component>)> on_component_removed;
+	extern signal<void(entity)> on_entity_created;
+	extern signal<void(entity)> on_entity_destroyed;
+	extern signal<void(entity, chandle<component>)> on_component_added;
+	extern signal<void(entity, chandle<component>)> on_component_removed;
 	
 	/**
-	* Manages Entity::Id creation and component assignment.
+	* Manages entity::Id creation and component assignment.
 	*/
-	class EntityComponentSystem : public core::Subsystem
+	class entity_component_system : public core::subsystem
 	{
 	public:
-		typedef std::bitset<MAX_COMPONENTS> ComponentMask;
+		typedef std::bitset<MAX_COMPONENTS> component_mask_t;
 
-		explicit EntityComponentSystem();
-		virtual ~EntityComponentSystem();
+		explicit entity_component_system();
+		virtual ~entity_component_system();
 
-		/// An iterator over a view of the entities in an EntityComponentSystem.
+		/// An iterator over a view of the entities in an entity_component_system.
 		/// If All is true it will iterate over all valid entities and will ignore the entity mask.
 		template <class Delegate, bool All = false>
-		class ViewIterator : public std::iterator<std::input_iterator_tag, Entity::Id>
+		class view_iterator : public std::iterator<std::input_iterator_tag, entity::id_t>
 		{
 		public:
 			Delegate &operator ++()
@@ -371,11 +371,11 @@ virtual std::shared_ptr<Component> clone() const								\
 			}
 			bool operator == (const Delegate& rhs) const { return i_ == rhs.i_; }
 			bool operator != (const Delegate& rhs) const { return i_ != rhs.i_; }
-			Entity operator * () { return Entity(manager_, manager_->create_id(i_)); }
-			const Entity operator * () const { return Entity(manager_, manager_->create_id(i_)); }
+			entity operator * () { return entity(manager_, manager_->create_id(i_)); }
+			const entity operator * () const { return entity(manager_, manager_->create_id(i_)); }
 
 		protected:
-			ViewIterator(EntityComponentSystem *manager, std::uint32_t index)
+			view_iterator(entity_component_system *manager, std::uint32_t index)
 				: manager_(manager), i_(index), capacity_(manager_->capacity()), free_cursor_(~0UL)
 			{
 				if (All)
@@ -384,7 +384,7 @@ virtual std::shared_ptr<Component> clone() const								\
 					free_cursor_ = 0;
 				}
 			}
-			ViewIterator(EntityComponentSystem *manager, const ComponentMask mask, std::uint32_t index)
+			view_iterator(entity_component_system *manager, const component_mask_t mask, std::uint32_t index)
 				: manager_(manager), mask_(mask), i_(index), capacity_(manager_->capacity()), free_cursor_(~0UL)
 			{
 				if (All)
@@ -403,7 +403,7 @@ virtual std::shared_ptr<Component> clone() const								\
 
 				if (i_ < capacity_)
 				{
-					Entity entity = manager_->get(manager_->create_id(i_));
+					entity entity = manager_->get(manager_->create_id(i_));
 					static_cast<Delegate*>(this)->next_entity(entity);
 				}
 			}
@@ -424,77 +424,77 @@ virtual std::shared_ptr<Component> clone() const								\
 				return true;
 			}
 
-			EntityComponentSystem *manager_;
-			ComponentMask mask_;
+			entity_component_system *manager_;
+			component_mask_t mask_;
 			std::uint32_t i_;
 			size_t capacity_;
 			size_t free_cursor_;
 		};
 
 		template <bool All>
-		class BaseView
+		class base_view
 		{
 		public:
-			class Iterator : public ViewIterator<Iterator, All>
+			class iterator_type : public view_iterator<iterator_type, All>
 			{
 			public:
-				Iterator(EntityComponentSystem *manager,
-					const ComponentMask mask,
-					std::uint32_t index) : ViewIterator<Iterator, All>(manager, mask, index)
+				iterator_type(entity_component_system *manager,
+					const component_mask_t mask,
+					std::uint32_t index) : view_iterator<iterator_type, All>(manager, mask, index)
 				{
-					ViewIterator<Iterator, All>::next();
+					view_iterator<iterator_type, All>::next();
 				}
 
-				void next_entity(Entity &entity) {}
+				void next_entity(entity &entity) {}
 			};
 
-			Iterator begin() { return Iterator(manager_, mask_, 0); }
-			Iterator end() { return Iterator(manager_, mask_, std::uint32_t(manager_->capacity())); }
-			const Iterator begin() const { return Iterator(manager_, mask_, 0); }
-			const Iterator end() const { return Iterator(manager_, mask_, manager_->capacity()); }
+			iterator_type begin() { return iterator_type(manager_, mask_, 0); }
+			iterator_type end() { return iterator_type(manager_, mask_, std::uint32_t(manager_->capacity())); }
+			const iterator_type begin() const { return iterator_type(manager_, mask_, 0); }
+			const iterator_type end() const { return iterator_type(manager_, mask_, manager_->capacity()); }
 
 		private:
-			friend class EntityComponentSystem;
+			friend class entity_component_system;
 
-			explicit BaseView(EntityComponentSystem *manager) : manager_(manager) { mask_.set(); }
-			BaseView(EntityComponentSystem *manager, ComponentMask mask) :
+			explicit base_view(entity_component_system *manager) : manager_(manager) { mask_.set(); }
+			base_view(entity_component_system *manager, component_mask_t mask) :
 				manager_(manager), mask_(mask) {}
 
-			EntityComponentSystem *manager_;
-			ComponentMask mask_;
+			entity_component_system *manager_;
+			component_mask_t mask_;
 		};
 
 		template <bool All, typename ... Components>
-		class TypedView : public BaseView<All>
+		class typed_view : public base_view<All>
 		{
 		public:
 			template <typename T> struct identity { typedef T type; };
 
-			void each(typename identity<std::function<void(Entity entity, Components&...)>>::type f)
+			void each(typename identity<std::function<void(entity entity, Components&...)>>::type f)
 			{
 				for (auto it : *this)
-					f(it, *(it.template component<Components>().lock().get())...);
+					f(it, *(it.template get_component<Components>().lock().get())...);
 			}
 
 		private:
-			friend class EntityComponentSystem;
+			friend class entity_component_system;
 
-			explicit TypedView(EntityComponentSystem *manager) : BaseView<All>(manager) {}
-			TypedView(EntityComponentSystem *manager, ComponentMask mask) : BaseView<All>(manager, mask) {}
+			explicit typed_view(entity_component_system *manager) : base_view<All>(manager) {}
+			typed_view(entity_component_system *manager, component_mask_t mask) : base_view<All>(manager, mask) {}
 		};
 
-		template <typename ... Components> using View = TypedView<false, Components...>;
+		template <typename ... Components> using View = typed_view<false, Components...>;
 
 		template <typename ... Components>
-		class UnpackingView
+		class unpacking_view
 		{
 		public:
-			struct Unpacker
+			struct unpacker
 			{
-				explicit Unpacker(CHandle<Components> & ... handles) :
-					handles(std::tuple<CHandle<Components> & ...>(handles...)) {}
+				explicit unpacker(chandle<Components> & ... handles) :
+					handles(std::tuple<chandle<Components> & ...>(handles...)) {}
 
-				void unpack(Entity &entity) const
+				void unpack(entity &entity) const
 				{
 					unpack_<0, Components...>(entity);
 				}
@@ -502,58 +502,58 @@ virtual std::shared_ptr<Component> clone() const								\
 
 			private:
 				template <int N, typename C>
-				void unpack_(Entity &entity) const
+				void unpack_(entity &entity) const
 				{
-					std::get<N>(handles) = entity.component<C>();
+					std::get<N>(handles) = entity.get_component<C>();
 				}
 
 				template <int N, typename C0, typename C1, typename ... Cn>
-				void unpack_(Entity &entity) const
+				void unpack_(entity &entity) const
 				{
-					std::get<N>(handles) = entity.component<C0>();
+					std::get<N>(handles) = entity.get_component<C0>();
 					unpack_<N + 1, C1, Cn...>(entity);
 				}
 
-				std::tuple<CHandle<Components> & ...> handles;
+				std::tuple<chandle<Components> & ...> handles;
 			};
 
 
-			class Iterator : public ViewIterator<Iterator>
+			class iterator_type : public view_iterator<iterator_type>
 			{
 			public:
-				Iterator(EntityComponentSystem *manager,
-					const ComponentMask mask,
+				iterator_type(entity_component_system *manager,
+					const component_mask_t mask,
 					std::uint32_t index,
-					const Unpacker &unpacker) : ViewIterator<Iterator>(manager, mask, index), unpacker_(unpacker)
+					const unpacker &unpacker) : view_iterator<iterator_type>(manager, mask, index), unpacker_(unpacker)
 				{
-					ViewIterator<Iterator>::next();
+					view_iterator<iterator_type>::next();
 				}
 
-				void next_entity(Entity &entity)
+				void next_entity(entity &entity)
 				{
 					unpacker_.unpack(entity);
 				}
 
 			private:
-				const Unpacker &unpacker_;
+				const unpacker &unpacker_;
 			};
 
 
-			Iterator begin() { return Iterator(manager_, mask_, 0, unpacker_); }
-			Iterator end() { return Iterator(manager_, mask_, static_cast<std::uint32_t>(manager_->capacity()), unpacker_); }
-			const Iterator begin() const { return Iterator(manager_, mask_, 0, unpacker_); }
-			const Iterator end() const { return Iterator(manager_, mask_, static_cast<std::uint32_t>(manager_->capacity()), unpacker_); }
+			iterator_type begin() { return iterator_type(manager_, mask_, 0, unpacker_); }
+			iterator_type end() { return iterator_type(manager_, mask_, static_cast<std::uint32_t>(manager_->capacity()), unpacker_); }
+			const iterator_type begin() const { return iterator_type(manager_, mask_, 0, unpacker_); }
+			const iterator_type end() const { return iterator_type(manager_, mask_, static_cast<std::uint32_t>(manager_->capacity()), unpacker_); }
 
 
 		private:
-			friend class EntityComponentSystem;
+			friend class entity_component_system;
 
-			UnpackingView(EntityComponentSystem *manager, ComponentMask mask, CHandle<Components> & ... handles) :
+			unpacking_view(entity_component_system *manager, component_mask_t mask, chandle<Components> & ... handles) :
 				manager_(manager), mask_(mask), unpacker_(handles...) {}
 
-			EntityComponentSystem *manager_;
-			ComponentMask mask_;
-			Unpacker unpacker_;
+			entity_component_system *manager_;
+			component_mask_t mask_;
+			unpacker unpacker_;
 		};
 
 		/**
@@ -569,7 +569,7 @@ virtual std::shared_ptr<Component> clone() const								\
 		/**
 		* Return true if the given entity ID is still valid.
 		*/
-		bool valid(Entity::Id id) const
+		bool valid(entity::id_t id) const
 		{
 			return id.index() < entity_version_.size() && entity_version_[id.index()] == id.version();
 		}
@@ -582,11 +582,11 @@ virtual std::shared_ptr<Component> clone() const								\
 			return index < entity_version_.size();
 		}
 		/**
-		* Create a new Entity::Id.
+		* Create a new entity::Id.
 		*
 		* Emits EntityCreatedEvent.
 		*/
-		Entity create()
+		entity create()
 		{
 			std::uint32_t index, version;
 			if (free_list_.empty())
@@ -601,143 +601,143 @@ virtual std::shared_ptr<Component> clone() const								\
 				free_list_.pop_back();
 				version = entity_version_[index];
 			}
-			Entity entity(this, Entity::Id(index, version));
+			entity entity(this, entity::id_t(index, version));
 			on_entity_created(entity);
 			return entity;
 		}
 
 		/**
-		* Create a new Entity by copying another. Copy-constructs each component.
+		* Create a new entity by copying another. Copy-constructs each component.
 		*
 		* Emits EntityCreatedEvent.
 		*/
-		Entity create_from_copy(Entity original);
+		entity create_from_copy(entity original);
 
 
 		/**
-		* Destroy an existing Entity::Id and its associated Components.
+		* Destroy an existing entity::Id and its associated Components.
 		*
 		* Emits EntityDestroyedEvent.
 		*/
-		void destroy(Entity::Id id);
+		void destroy(entity::id_t id);
 
-		Entity get(Entity::Id id)
+		entity get(entity::id_t id)
 		{
 			assert_valid(id);
-			return Entity(this, id);
+			return entity(this, id);
 		}
 
 		/**
-		* Create an Entity::Id for a slot.
+		* Create an entity::Id for a slot.
 		*
-		* NOTE: Does *not* check for validity, but the Entity::Id constructor will
+		* NOTE: Does *not* check for validity, but the entity::Id constructor will
 		* fail if the ID is invalid.
 		*/
-		Entity::Id create_id(std::uint32_t index) const
+		entity::id_t create_id(std::uint32_t index) const
 		{
-			return Entity::Id(index, entity_version_[index]);
+			return entity::id_t(index, entity_version_[index]);
 		}
 
 		/**
-		* Assign a Component to an Entity::Id, passing through Component constructor arguments.
+		* Assign a component to an entity::Id, passing through component constructor arguments.
 		*
 		*     Position &position = em.assign<Position>(e, x, y);
 		*
 		* @returns Smart pointer to newly created component.
 		*/
 		template <typename C, typename ... Args>
-		CHandle<C> assign(Entity::Id id, Args && ... args)
+		chandle<C> assign(entity::id_t id, Args && ... args)
 		{
 			return std::static_pointer_cast<C>(assign(id, std::make_shared<C>(std::forward<Args>(args) ...)).lock());
 		}
 
-		CHandle<Component> assign(Entity::Id id, std::shared_ptr<Component> component);
+		chandle<component> assign(entity::id_t id, std::shared_ptr<component> comp);
 
 		/**
-		* Remove a Component from an Entity::Id
+		* Remove a component from an entity::Id
 		*
 		* Emits a ComponentRemovedEvent<C> event.
 		*/
 		template <typename C>
-		void remove(Entity::Id id)
+		void remove(entity::id_t id)
 		{
-			remove(id, nonstd::type_info_polymorphic::id<Component, C>());
+			remove(id, rtti::type_index_sequential_t::id<component, C>());
 		}
-		void remove(Entity::Id id, std::shared_ptr<Component> component);
-		void remove(Entity::Id id, const nonstd::type_info_polymorphic::index_t family);
+		void remove(entity::id_t id, std::shared_ptr<component> component);
+		void remove(entity::id_t id, const rtti::type_index_sequential_t::index_t family);
 
 		/**
-		* Check if an Entity has a component.
+		* Check if an entity has a component.
 		*/
 		template <typename C>
-		bool has_component(Entity::Id id) const
+		bool has_component(entity::id_t id) const
 		{
-			return has_component(id, nonstd::type_info_polymorphic::id<Component, C>());
+			return has_component(id, rtti::type_index_sequential_t::id<component, C>());
 		}
 
 
-		bool has_component(Entity::Id id, std::shared_ptr<Component> component) const;
+		bool has_component(entity::id_t id, std::shared_ptr<component> component) const;
 
-		bool has_component(Entity::Id id, nonstd::type_info_polymorphic::index_t family) const;
+		bool has_component(entity::id_t id, rtti::type_index_sequential_t::index_t family) const;
 		/**
-		* Retrieve a Component assigned to an Entity::Id.
+		* Retrieve a component assigned to an entity::Id.
 		*
-		* @returns Pointer to an instance of C, or nullptr if the Entity::Id does not have that Component.
+		* @returns Pointer to an instance of C, or nullptr if the entity::Id does not have that component.
 		*/
 		template <typename C, typename = typename std::enable_if<!std::is_const<C>::value>::type>
-		CHandle<C> component(Entity::Id id)
+		chandle<C> get_component(entity::id_t id)
 		{
 			assert_valid(id);
-			auto family = nonstd::type_info_polymorphic::id<Component, C>();
+			auto family = rtti::type_index_sequential_t::id<component, C>();
 			// We don't bother checking the component mask, as we return a nullptr anyway.
 			if (family >= component_pools_.size())
-				return CHandle<C>();
-			ComponentStorage *pool = component_pools_[family];
+				return chandle<C>();
+			component_storage *pool = component_pools_[family];
 			if (!pool || !entity_component_mask_[id.index()][family])
-				return CHandle<C>();
-			return CHandle<C>(pool->get<C>(id.index()));
+				return chandle<C>();
+			return chandle<C>(pool->get<C>(id.index()));
 		}
 
 		/**
-		* Retrieve a Component assigned to an Entity::Id.
+		* Retrieve a component assigned to an entity::Id.
 		*
-		* @returns Component instance, or nullptr if the Entity::Id does not have that Component.
+		* @returns component instance, or nullptr if the entity::Id does not have that component.
 		*/
 		template <typename C, typename = typename std::enable_if<std::is_const<C>::value>::type>
-		const CHandle<C> component(Entity::Id id) const
+		const chandle<C> get_component(entity::id_t id) const
 		{
 			assert_valid(id);
-			auto family = nonstd::type_info_polymorphic::id<Component, C>();
+			auto family = rtti::type_index_sequential_t::id<component, C>();
 			// We don't bother checking the component mask, as we return a nullptr anyway.
 			if (family >= component_pools_.size())
-				return CHandle<C>();
-			ComponentStorage *pool = component_pools_[family];
+				return chandle<C>();
+			component_storage *pool = component_pools_[family];
 			if (!pool || !entity_component_mask_[id.index()][family])
-				return CHandle<C>();
-			return CHandle<C>(pool->get<C>(id.index()));
+				return chandle<C>();
+			return chandle<C>(pool->get<C>(id.index()));
 		}
 
 		template <typename ... Components>
-		std::tuple<CHandle<Components>...> components(Entity::Id id)
+		std::tuple<chandle<Components>...> components(entity::id_t id)
 		{
-			return std::make_tuple(component<Components>(id)...);
+			return std::make_tuple(get_component<Components>(id)...);
 		}
 
 		template <typename ... Components>
-		std::tuple<CHandle<const Components>...> components(Entity::Id id) const
+		std::tuple<chandle<const Components>...> components(entity::id_t id) const
 		{
-			return std::make_tuple(component<const Components>(id)...);
+			return std::make_tuple(get_component<const Components>(id)...);
 		}
 
-		std::vector<CHandle<Component>> all_components(Entity::Id id) const;
-		std::vector<std::shared_ptr<Component>> all_components_shared(Entity::Id id) const;
+		std::vector<chandle<component>> all_components(entity::id_t id) const;
+		std::vector<std::shared_ptr<component>> all_components_shared(entity::id_t id) const;
 		/**
 		* Find Entities that have all of the specified Components.
 		*
 		* @code
-		* for (Entity entity : entity_manager.entities_with_components<Position, Direction>()) {
-		*   CHandle<Position> position = entity.component<Position>();
-		*   CHandle<Direction> direction = entity.component<Direction>();
+		* for (entity entity : entity_manager.entities_with_components<Position, Direction>()) {
+		*   chandle<Position> position = entity.get_component<Position>();
+		*   chandle<Direction> direction = entity.get_component<Direction>();
 		*
 		*   ...
 		* }
@@ -753,7 +753,7 @@ virtual std::shared_ptr<Component> clone() const								\
 		template <typename T> struct identity { typedef T type; };
 
 		template <typename ... Components>
-		void each(typename identity<std::function<void(Entity entity, Components&...)>>::type f)
+		void each(typename identity<std::function<void(entity entity, Components&...)>>::type f)
 		{
 			return entities_with_components<Components...>().each(f);
 		}
@@ -763,38 +763,38 @@ virtual std::shared_ptr<Component> clone() const								\
 		* to the given parameters.
 		*
 		* @code
-		* CHandle<Position> position;
-		* CHandle<Direction> direction;
-		* for (Entity entity : entity_manager.entities_with_components(position, direction)) {
+		* chandle<Position> position;
+		* chandle<Direction> direction;
+		* for (entity entity : entity_manager.entities_with_components(position, direction)) {
 		*   // Use position and component here.
 		* }
 		* @endcode
 		*/
 		template <typename ... Components>
-		UnpackingView<Components...> entities_with_components(CHandle<Components> & ... components)
+		unpacking_view<Components...> entities_with_components(chandle<Components> & ... components)
 		{
 			auto mask = component_mask<Components...>();
-			return UnpackingView<Components...>(this, mask, components...);
+			return unpacking_view<Components...>(this, mask, components...);
 		}
 
 		/**
 		* Iterate over all *valid* entities (ie. not in the free list). Not fast
 		*
 		* @code
-		* for (Entity entity : entity_manager.all_entities()) {}
+		* for (entity entity : entity_manager.all_entities()) {}
 		*
 		* @return An iterator view over all valid entities.
 		*/
-		BaseView<true> all_entities()
+		base_view<true> all_entities()
 		{
-			return BaseView<true>(this);
+			return base_view<true>(this);
 		}
 
 		template <typename C>
-		void unpack(Entity::Id id, CHandle<C> &a)
+		void unpack(entity::id_t id, chandle<C> &a)
 		{
 			assert_valid(id);
-			a = component<C>(id);
+			a = get_component<C>(id);
 		}
 
 		/**
@@ -804,67 +804,67 @@ virtual std::shared_ptr<Component> clone() const								\
 		*
 		* Useful for fast bulk iterations.
 		*
-		* CHandle<Position> p;
-		* CHandle<Direction> d;
+		* chandle<Position> p;
+		* chandle<Direction> d;
 		* unpack<Position, Direction>(e, p, d);
 		*/
 		template <typename A, typename ... Args>
-		void unpack(Entity::Id id, CHandle<A> &a, CHandle<Args> & ... args)
+		void unpack(entity::id_t id, chandle<A> &a, chandle<Args> & ... args)
 		{
 			assert_valid(id);
-			a = component<A>(id);
+			a = get_component<A>(id);
 			unpack<Args ...>(id, args ...);
 		}
 
 		/**
-		* Destroy all entities and reset the EntityComponentSystem.
+		* Destroy all entities and reset the entity_component_system.
 		*/
 		void dispose();
 
-		void set_entity_name(Entity::Id id, std::string name);
-		const std::string& get_entity_name(Entity::Id id);
+		void set_entity_name(entity::id_t id, std::string name);
+		const std::string& get_entity_name(entity::id_t id);
 	private:
-		friend class Entity;
+		friend class entity;
 
-		inline void assert_valid(Entity::Id id) const
+		inline void assert_valid(entity::id_t id) const
 		{
-			Expects(id.index() < entity_component_mask_.size() && "Entity::Id ID outside entity vector range");
-			Expects(entity_version_[id.index()] == id.version() && "Attempt to access Entity via a stale Entity::Id");
+			Expects(id.index() < entity_component_mask_.size() && "entity::Id ID outside entity vector range");
+			Expects(entity_version_[id.index()] == id.version() && "Attempt to access entity via a stale entity::Id");
 		}
 
-		ComponentMask component_mask(Entity::Id id)
+		component_mask_t component_mask(entity::id_t id)
 		{
 			assert_valid(id);
 			return entity_component_mask_.at(id.index());
 		}
 
-		ComponentMask component_mask(Entity::Id id) const
+		component_mask_t component_mask(entity::id_t id) const
 		{
 			assert_valid(id);
 			return entity_component_mask_.at(id.index());
 		}
 		template <typename C>
-		ComponentMask component_mask()
+		component_mask_t component_mask()
 		{
-			ComponentMask mask;
-			mask.set(nonstd::type_info_polymorphic::id<Component, C>());
+			component_mask_t mask;
+			mask.set(rtti::type_index_sequential_t::id<component, C>());
 			return mask;
 		}
 
 		template <typename C1, typename C2, typename ... Components>
-		ComponentMask component_mask()
+		component_mask_t component_mask()
 		{
 			return component_mask<C1>() | component_mask<C2, Components ...>();
 		}
 
 		template <typename C>
-		ComponentMask component_mask(const CHandle<C> &c)
+		component_mask_t component_mask(const chandle<C> &c)
 		{
 			return component_mask<C>();
 		}
 
 		template <typename C1, typename ... Components>
-		ComponentMask component_mask(const CHandle<C1> &c1, const CHandle<Components> &... args)
+		component_mask_t component_mask(const chandle<C1> &c1, const chandle<Components> &... args)
 		{
 			return component_mask<C1, Components ...>();
 		}
@@ -875,19 +875,19 @@ virtual std::shared_ptr<Component> clone() const								\
 			{
 				entity_component_mask_.resize(index + 1);
 				entity_version_.resize(index + 1);
-				for (ComponentStorage *pool : component_pools_)
+				for (component_storage *pool : component_pools_)
 					if (pool) pool->expand(index + 1);
 			}
 		}
 
 		template <typename C>
-		ComponentStorage *accomodate_component()
+		component_storage *accomodate_component()
 		{
-			auto family = nonstd::type_info_polymorphic::id<Component, C>();
+			auto family = rtti::type_index_sequential_t::id<component, C>();
 			return accomodate_component(family);
 		}
 
-		ComponentStorage *accomodate_component(nonstd::type_info_polymorphic::index_t family)
+		component_storage *accomodate_component(rtti::type_index_sequential_t::index_t family)
 		{
 			if (component_pools_.size() <= family)
 			{
@@ -895,7 +895,7 @@ virtual std::shared_ptr<Component> clone() const								\
 			}
 			if (!component_pools_[family])
 			{
-				ComponentStorage *pool = new ComponentStorage();
+				component_storage *pool = new component_storage();
 				pool->expand(index_counter_);
 				component_pools_[family] = pool;
 			}
@@ -905,11 +905,11 @@ virtual std::shared_ptr<Component> clone() const								\
 
 		std::uint32_t index_counter_ = 0;
 
-		// Each element in component_pools_ corresponds to a Pool for a Component.
-		// The index into the vector is the Component::family().
-		std::vector<ComponentStorage*> component_pools_;
-		// Bitmask of components associated with each entity. Index into the vector is the Entity::Id.
-		std::vector<ComponentMask> entity_component_mask_;
+		// Each element in component_pools_ corresponds to a Pool for a component.
+		// The index into the vector is the component::family().
+		std::vector<component_storage*> component_pools_;
+		// Bitmask of components associated with each entity. Index into the vector is the entity::Id.
+		std::vector<component_mask_t> entity_component_mask_;
 		// Vector of entity version numbers. Incremented each time an entity is destroyed
 		std::vector<std::uint32_t> entity_version_;
 		// List of available entity slots.
@@ -920,118 +920,118 @@ virtual std::shared_ptr<Component> clone() const								\
 
 
 	template <typename C, typename ... Args>
-	CHandle<C> Entity::assign(Args && ... args)
+	chandle<C> entity::assign(Args && ... args)
 	{
 		Expects(valid());
 		return manager_->assign<C>(id_, std::forward<Args>(args) ...);
 	}
 
-	inline CHandle<Component> Entity::assign(std::shared_ptr<Component> component)
+	inline chandle<component> entity::assign(std::shared_ptr<component> component)
 	{
 		Expects(valid());
 		return manager_->assign(id_, component);
 	}
 
 	template <typename C>
-	CHandle<C> Entity::assign_from_copy(const CHandle<C> &component)
+	chandle<C> entity::assign_from_copy(const chandle<C> &component)
 	{
 		Expects(valid());
 		return manager_->assign(id_, component.get()->clone());
 	}
 
 	template <typename C>
-	void Entity::remove()
+	void entity::remove()
 	{
 		Expects(valid() && has_component<C>());
 		manager_->remove<C>(id_);
 	}
 
-	inline void Entity::remove(std::shared_ptr<Component> component)
+	inline void entity::remove(std::shared_ptr<component> component)
 	{
 		Expects(valid() && has_component(component));
 		manager_->remove(id_, component);
 	}
 
 	template <typename C, typename>
-	CHandle<C> Entity::component()
+	chandle<C> entity::get_component()
 	{
 		Expects(valid());
-		return manager_->component<C>(id_);
+		return manager_->get_component<C>(id_);
 	}
 
 	template <typename C, typename>
-	const CHandle<C> Entity::component() const
+	const chandle<C> entity::get_component() const
 	{
 		Expects(valid());
-		return const_cast<const EntityComponentSystem*>(manager_)->component<const C>(id_);
+		return const_cast<const entity_component_system*>(manager_)->get_component<const C>(id_);
 	}
 
 	template <typename ... Components>
-	std::tuple<CHandle<Components>...> Entity::components()
+	std::tuple<chandle<Components>...> entity::components()
 	{
 		Expects(valid());
 		return manager_->components<Components...>(id_);
 	}
 
-	inline std::vector<CHandle<Component>> Entity::all_components() const
+	inline std::vector<chandle<component>> entity::all_components() const
 	{
 		Expects(valid());
 		return manager_->all_components(id_);
 	}
 
-	inline std::vector<std::shared_ptr<Component>> Entity::all_components_shared() const
+	inline std::vector<std::shared_ptr<component>> entity::all_components_shared() const
 	{
 		Expects(valid());
 		return manager_->all_components_shared(id_);
 	}
 
 	template <typename ... Components>
-	std::tuple<CHandle<const Components>...> Entity::components() const
+	std::tuple<chandle<const Components>...> entity::components() const
 	{
 		Expects(valid());
-		return const_cast<const EntityComponentSystem*>(manager_)->components<const Components...>(id_);
+		return const_cast<const entity_component_system*>(manager_)->components<const Components...>(id_);
 	}
 
 
 	template <typename C>
-	bool Entity::has_component() const
+	bool entity::has_component() const
 	{
 		Expects(valid());
 		return manager_->has_component<C>(id_);
 	}
 
-	inline bool Entity::has_component(std::shared_ptr<Component> component) const
+	inline bool entity::has_component(std::shared_ptr<component> component) const
 	{
 		Expects(valid());
 		return manager_->has_component(id_, component);
 	}
 
 	template <typename A, typename ... Args>
-	void Entity::unpack(CHandle<A> &a, CHandle<Args> & ... args)
+	void entity::unpack(chandle<A> &a, chandle<Args> & ... args)
 	{
 		Expects(valid());
 		manager_->unpack(id_, a, args ...);
 	}
 
-	inline bool Entity::valid() const
+	inline bool entity::valid() const
 	{
 		return manager_ && manager_->valid(id_);
 	}
 
-	inline std::ostream &operator << (std::ostream &out, const Entity::Id &id)
+	inline std::ostream &operator << (std::ostream &out, const entity::id_t &id)
 	{
 		out << "id_" << id.index() << "_" << id.version() << "";
 		return out;
 	}
 
 
-	inline std::ostream &operator << (std::ostream &out, const Entity &entity)
+	inline std::ostream &operator << (std::ostream &out, const entity &entity)
 	{
 		out << "entity(" << entity.id() << ")";
 		return out;
 	}
 
-	inline std::string Entity::to_string() const
+	inline std::string entity::to_string() const
 	{
 		auto name = get_name();
 		if (name == "")
@@ -1046,9 +1046,9 @@ virtual std::shared_ptr<Component> clone() const								\
 
 namespace std
 {
-	template <> struct hash<runtime::Entity>
+	template <> struct hash<runtime::entity>
 	{
-		std::size_t operator () (const runtime::Entity &entity) const
+		std::size_t operator () (const runtime::entity &entity) const
 		{
 			return static_cast<std::size_t>(entity.id().index() ^ entity.id().version());
 		}

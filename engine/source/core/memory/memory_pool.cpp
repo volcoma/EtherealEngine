@@ -4,7 +4,7 @@
 namespace core
 {
 
-	MemoryPool::MemoryPool(size_t block_size, size_t chunk_size)
+	memory_pool::memory_pool(size_t block_size, size_t chunk_size)
 	{
 		_first_free_block = invalid;
 		_available = 0;
@@ -12,12 +12,12 @@ namespace core
 		_chunk_entries_size = chunk_size;
 	}
 
-	MemoryPool::~MemoryPool()
+	memory_pool::~memory_pool()
 	{
 		free_all();
 	}
 
-	void* MemoryPool::malloc()
+	void* memory_pool::malloc()
 	{
 		if (_first_free_block == invalid)
 		{
@@ -40,7 +40,7 @@ namespace core
 		return static_cast<void*>(block);
 	}
 
-	void MemoryPool::free(void* block)
+	void memory_pool::free(void* block)
 	{
 		// find block index of the element
 		size_t index = invalid;
@@ -69,7 +69,7 @@ namespace core
 		_available++;
 	}
 
-	void MemoryPool::free_all()
+	void memory_pool::free_all()
 	{
 		// returns allocated chunk to system
 		for (auto chunk : _chunks)
@@ -80,7 +80,7 @@ namespace core
 		_first_free_block = invalid;
 	}
 
-	size_t MemoryPool::grow()
+	size_t memory_pool::grow()
 	{
 		auto chunk = static_cast<uint8_t*>(::malloc(_chunk_entries_size*_block_size));
 		memset(chunk, 0xCC, _chunk_entries_size*_block_size);

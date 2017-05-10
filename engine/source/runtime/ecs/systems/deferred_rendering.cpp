@@ -17,9 +17,9 @@
 
 namespace runtime
 {
-	Camera get_face_camera(std::uint32_t face,  const math::transform_t& transform)
+	camera get_face_camera(std::uint32_t face,  const math::transform& transform)
 	{
-		Camera camera;
+		camera camera;
 		camera.set_fov(90.0f);
 		camera.set_aspect_ratio(1.0f, true);
 		camera.set_near_clip(0.01f);
@@ -32,7 +32,7 @@ namespace runtime
 		math::vec3 Y(0, 1, 0);
 		math::vec3 Z(0, 0, 1);
 		math::vec3 Zero(0, 0, 0);
-		math::transform_t t;
+		math::transform t;
 		// Generate the correct view matrix for the frustum
 		if (!gfx::is_origin_bottom_left())
 		{
@@ -82,7 +82,7 @@ namespace runtime
 		return camera;
 	}
 
-	void update_lod_data(LodData& lod_data, std::size_t total_lods, float min_dist, float max_dist, float transition_time, float distance, float dt)
+	void update_lod_data(lod_data& lod_data, std::size_t total_lods, float min_dist, float max_dist, float transition_time, float distance, float dt)
 	{
 		if (total_lods == 1)
 			return;
@@ -106,10 +106,10 @@ namespace runtime
 		}
 	}
 
-	bool should_rebuild_reflections(VisibilitySetModels& visibility_set, const ReflectionProbe& probe)
+	bool should_rebuild_reflections(visibility_set_models_t& visibility_set, const reflection_probe& probe)
 	{
 
- 		if (probe.method == ReflectMethod::Environment)
+ 		if (probe.method == reflect_method::environment)
  			return false;
 
 		for (auto& element : visibility_set)
@@ -151,11 +151,11 @@ namespace runtime
 		return false;
 	}
 
-	VisibilitySetModels DeferredRendering::gather_visible_models(EntityComponentSystem& ecs, Camera* camera, bool dirty_only/* = false*/, bool static_only /*= true*/, bool require_reflection_caster /*= false*/)
+	visibility_set_models_t deferred_rendering::gather_visible_models(entity_component_system& ecs, camera* camera, bool dirty_only/* = false*/, bool static_only /*= true*/, bool require_reflection_caster /*= false*/)
 	{
-		VisibilitySetModels result;
-		CHandle<TransformComponent> transform_comp_handle;
-		CHandle<ModelComponent> model_comp_handle;
+		visibility_set_models_t result;
+		chandle<transform_component> transform_comp_handle;
+		chandle<model_component> model_comp_handle;
 		for (auto entity : ecs.entities_with_components(transform_comp_handle, model_comp_handle))
 		{
 			auto model_comp_ptr = model_comp_handle.lock();
@@ -188,7 +188,7 @@ namespace runtime
 				// Test the bounding box of the mesh
 				if (math::frustum::test_obb(frustum, bounds, world_transform))
 				{
-					// Only dirty Mesh components.
+					// Only dirty mesh components.
 					if (dirty_only)
 					{
 						if (transform_comp_ptr->is_dirty() || model_comp_ptr->is_dirty())
@@ -205,7 +205,7 @@ namespace runtime
 			}
 			else
 			{
-				// Only dirty Mesh components.
+				// Only dirty mesh components.
 				if (dirty_only)
 				{
 					if (transform_comp_ptr->is_dirty() || model_comp_ptr->is_dirty())
@@ -224,22 +224,22 @@ namespace runtime
 	}
 
 
-	void DeferredRendering::frame_render(std::chrono::duration<float> dt)
+	void deferred_rendering::frame_render(std::chrono::duration<float> dt)
 	{
-		auto& ecs = *core::get_subsystem<EntityComponentSystem>();
+		auto& ecs = *core::get_subsystem<entity_component_system>();
 
 		build_reflections_pass(ecs, dt);
 		build_shadows_pass(ecs, dt);
 		camera_pass(ecs, dt);		
 	}
 
-	void DeferredRendering::build_reflections_pass(EntityComponentSystem& ecs, std::chrono::duration<float> dt)
+	void deferred_rendering::build_reflections_pass(entity_component_system& ecs, std::chrono::duration<float> dt)
 	{
 		auto dirty_models = gather_visible_models(ecs, nullptr, true, true, true);
-		ecs.each<TransformComponent, ReflectionProbeComponent>([this, &ecs, dt, &dirty_models](
-			Entity ce,
-			TransformComponent& transform_comp,
-			ReflectionProbeComponent& reflection_probe_comp
+		ecs.each<transform_component, reflection_probe_component>([this, &ecs, dt, &dirty_models](
+			entity ce,
+			transform_component& transform_comp,
+			reflection_probe_component& reflection_probe_comp
 			)
 		{
 			const auto& world_tranform = transform_comp.get_transform();
@@ -264,38 +264,38 @@ namespace runtime
 				auto& render_view = reflection_probe_comp.get_render_view(i);
 				camera.set_viewport_size(cubemap_fbo->get_size());
 				auto& camera_lods = _lod_data[ce];
-				VisibilitySetModels visibility_set;
+				visibility_set_models_t visibility_set;
 
-				if (probe.method != ReflectMethod::Environment)
+				if (probe.method != reflect_method::environment)
 					visibility_set = gather_visible_models(ecs, &camera, !should_rebuild, true, true);
 
-				std::shared_ptr<FrameBuffer> output = nullptr;
+				std::shared_ptr<frame_buffer> output = nullptr;
 				output = g_buffer_pass(output, camera, render_view, visibility_set, camera_lods, dt);
 				output = lighting_pass(output, camera, render_view, ecs, dt, false);
 				output = atmospherics_pass(output, camera, render_view, ecs, dt);
 				output = tonemapping_pass(output, camera, render_view);
 
-				RenderPass pass("cubemap_fill");
+				render_pass pass("cubemap_fill");
 				gfx::blit(pass.id, gfx::getTexture(cubemap_fbo->handle), 0, 0, 0, i, gfx::getTexture(output->handle));
 			}
 
-			RenderPass pass("cubemap_generate_mips");
+			render_pass pass("cubemap_generate_mips");
 			pass.bind(cubemap_fbo.get());
 
 		});
 	}
 
-	void DeferredRendering::build_shadows_pass(EntityComponentSystem& ecs, std::chrono::duration<float> dt)
+	void deferred_rendering::build_shadows_pass(entity_component_system& ecs, std::chrono::duration<float> dt)
 	{
 
 	}
 
 
-	void DeferredRendering::camera_pass(EntityComponentSystem& ecs, std::chrono::duration<float> dt)
+	void deferred_rendering::camera_pass(entity_component_system& ecs, std::chrono::duration<float> dt)
 	{
-		ecs.each<CameraComponent>([this, &ecs, dt](
-			Entity ce,
-			CameraComponent& camera_comp
+		ecs.each<camera_component>([this, &ecs, dt](
+			entity ce,
+			camera_component& camera_comp
 			)
 		{
 			auto& camera_lods = _lod_data[ce];
@@ -307,14 +307,14 @@ namespace runtime
 	}
 
 
-	std::shared_ptr<FrameBuffer> DeferredRendering::deferred_render_full(
-		Camera& camera,
-		RenderView& render_view, 
-		EntityComponentSystem& ecs, 
-		std::unordered_map<Entity, LodData>& camera_lods, 
+	std::shared_ptr<frame_buffer> deferred_rendering::deferred_render_full(
+		camera& camera,
+		render_view& render_view, 
+		entity_component_system& ecs,
+		std::unordered_map<entity, lod_data>& camera_lods, 
 		std::chrono::duration<float> dt)
 	{
-		std::shared_ptr<FrameBuffer> output = nullptr;
+		std::shared_ptr<frame_buffer> output = nullptr;
 
 		auto visibility_set = gather_visible_models(ecs, &camera, false, false, false);
 
@@ -331,12 +331,12 @@ namespace runtime
 		return output;
 	}
 
-	std::shared_ptr<FrameBuffer> DeferredRendering::g_buffer_pass(
-		std::shared_ptr<FrameBuffer> input,
-		Camera& camera,
-		RenderView& render_view,
-		VisibilitySetModels& visibility_set,
-		std::unordered_map<Entity, LodData>& camera_lods, 
+	std::shared_ptr<frame_buffer> deferred_rendering::g_buffer_pass(
+		std::shared_ptr<frame_buffer> input,
+		camera& camera,
+		render_view& render_view,
+		visibility_set_models_t& visibility_set,
+		std::unordered_map<entity, lod_data>& camera_lods, 
 		std::chrono::duration<float> dt)
 	{
 		const auto& view = camera.get_view();
@@ -344,7 +344,7 @@ namespace runtime
 		const auto& viewport_size = camera.get_viewport_size();
 		auto g_buffer_fbo = render_view.get_g_buffer_fbo(viewport_size);
 
-		RenderPass pass("g_buffer_fill");
+		render_pass pass("g_buffer_fill");
 		pass.bind(g_buffer_fbo.get());
 		pass.clear();
 		pass.set_view_proj(view, proj);
@@ -433,11 +433,11 @@ namespace runtime
 				0,
 				current_lod_index,
 				nullptr,
-				[&camera, &clip_planes, &params](Program& program)
+				[&camera, &clip_planes, &params](program& p)
 			{
-				program.set_uniform("u_camera_wpos", &camera.get_position());
-				program.set_uniform("u_camera_clip_planes", &clip_planes);
-				program.set_uniform("u_lod_params", &params);
+				p.set_uniform("u_camera_wpos", &camera.get_position());
+				p.set_uniform("u_camera_clip_planes", &clip_planes);
+				p.set_uniform("u_lod_params", &params);
 			});
 
 			if (current_time != 0.0f)
@@ -451,9 +451,9 @@ namespace runtime
 					0,
 					target_lod_index,
 					nullptr,
-					[&camera, &clip_planes, &params_inv](Program& program)
+					[&camera, &clip_planes, &params_inv](program& p)
 				{
-					program.set_uniform("u_lod_params", &params_inv);
+					p.set_uniform("u_lod_params", &params_inv);
 				});
 			}
 
@@ -462,11 +462,11 @@ namespace runtime
 		return g_buffer_fbo;
 	}
 
-	std::shared_ptr<FrameBuffer> DeferredRendering::lighting_pass(
-		std::shared_ptr<FrameBuffer> input, 
-		Camera& camera, 
-		RenderView& render_view,
-		EntityComponentSystem& ecs,
+	std::shared_ptr<frame_buffer> deferred_rendering::lighting_pass(
+		std::shared_ptr<frame_buffer> input, 
+		camera& camera, 
+		render_view& render_view,
+		entity_component_system& ecs,
 		std::chrono::duration<float> dt,
 		bool bind_indirect_specular)
 	{
@@ -480,25 +480,25 @@ namespace runtime
 
 		static auto light_buffer_format = gfx::get_best_format(
 			BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER,
-			gfx::FormatSearchFlags::FourChannels |
-			gfx::FormatSearchFlags::RequireAlpha |
-			gfx::FormatSearchFlags::HalfPrecisionFloat);
+			gfx::format_search_flags::FourChannels |
+			gfx::format_search_flags::RequireAlpha |
+			gfx::format_search_flags::HalfPrecisionFloat);
 
 		auto light_buffer = render_view.get_texture("LBUFFER", viewport_size.width, viewport_size.height, false, 1, light_buffer_format);
 		auto l_buffer_fbo = render_view.get_fbo("LBUFFER", { light_buffer });
 		const auto buffer_size = l_buffer_fbo->get_size();
 
-		RenderPass pass("light_buffer_fill");
+		render_pass pass("light_buffer_fill");
 		pass.bind(l_buffer_fbo.get());
 		pass.clear(BGFX_CLEAR_COLOR, 0, 0.0f, 0);
 		pass.set_view_proj(view, proj);
 
 		auto refl_buffer = render_view.get_texture("RBUFFER", viewport_size.width, viewport_size.height, false, 1, light_buffer_format).get();
 
-		ecs.each<TransformComponent, LightComponent>([this, bind_indirect_specular, &camera, &pass, &buffer_size, &view, &proj, g_buffer_fbo, refl_buffer](
-			Entity e,
-			TransformComponent& transform_comp_ref,
-			LightComponent& light_comp_ref
+		ecs.each<transform_component, light_component>([this, bind_indirect_specular, &camera, &pass, &buffer_size, &view, &proj, g_buffer_fbo, refl_buffer](
+			entity e,
+			transform_component& transform_comp_ref,
+			light_component& light_comp_ref
 			)
 		{
 			const auto& light = light_comp_ref.get_light();
@@ -506,20 +506,20 @@ namespace runtime
 			const auto& light_position = world_transform.get_position();
 			const auto& light_direction = world_transform.z_unit_axis();
 
-			iRect rect(0, 0, buffer_size.width, buffer_size.height);
+			irect rect(0, 0, buffer_size.width, buffer_size.height);
 			if (light_comp_ref.compute_projected_sphere_rect(rect, light_position, light_direction, view, proj) == 0)
 				return;
 
 
-			Program* program = nullptr;
-			if (light.light_type == LightType::Directional && _directional_light_program)
+			program* program = nullptr;
+			if (light.light_type == light_type::directional && _directional_light_program)
 			{
 				// Draw light.
 				program = _directional_light_program.get();
 				program->begin_pass();
 				program->set_uniform("u_light_direction", &light_direction);
 			}
-			if (light.light_type == LightType::Point && _point_light_program)
+			if (light.light_type == light_type::point && _point_light_program)
 			{
 				float light_data[4] =
 				{
@@ -536,7 +536,7 @@ namespace runtime
 				program->set_uniform("u_light_data", light_data);
 			}
 
-			if (light.light_type == LightType::Spot && _spot_light_program)
+			if (light.light_type == light_type::spot && _spot_light_program)
 			{
 				float light_data[4] =
 				{
@@ -587,11 +587,11 @@ namespace runtime
 		return l_buffer_fbo;
 	}
 
-	std::shared_ptr<FrameBuffer> DeferredRendering::reflection_probe_pass(
-		std::shared_ptr<FrameBuffer> input,
-		Camera& camera,
-		RenderView& render_view,
-		EntityComponentSystem& ecs,
+	std::shared_ptr<frame_buffer> deferred_rendering::reflection_probe_pass(
+		std::shared_ptr<frame_buffer> input,
+		camera& camera,
+		render_view& render_view,
+		entity_component_system& ecs,
 		std::chrono::duration<float> dt)
 	{
 		const auto& view = camera.get_view();
@@ -603,48 +603,48 @@ namespace runtime
 
 		static auto refl_buffer_format = gfx::get_best_format(
 			BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER,
-			gfx::FormatSearchFlags::FourChannels |
-			gfx::FormatSearchFlags::RequireAlpha |
-			gfx::FormatSearchFlags::HalfPrecisionFloat);
+			gfx::format_search_flags::FourChannels |
+			gfx::format_search_flags::RequireAlpha |
+			gfx::format_search_flags::HalfPrecisionFloat);
 
 		auto refl_buffer = render_view.get_texture("RBUFFER", viewport_size.width, viewport_size.height, false, 1, refl_buffer_format);
 		auto r_buffer_fbo = render_view.get_fbo("RBUFFER", { refl_buffer });
 		const auto buffer_size = refl_buffer->get_size();
 
-		RenderPass pass("refl_buffer_fill");
+		render_pass pass("refl_buffer_fill");
 		pass.bind(r_buffer_fbo.get());
 		pass.clear(BGFX_CLEAR_COLOR, 0, 0.0f, 0);
 		pass.set_view_proj(view, proj);
 
 
-		ecs.each<TransformComponent, ReflectionProbeComponent>([this, &camera, &pass, &buffer_size, &view, &proj, g_buffer_fbo](
-			Entity e,
-			TransformComponent& transform_comp_ref,
-			ReflectionProbeComponent& probe_comp_ref
+		ecs.each<transform_component, reflection_probe_component>([this, &camera, &pass, &buffer_size, &view, &proj, g_buffer_fbo](
+			entity e,
+			transform_component& transform_comp_ref,
+			reflection_probe_component& probe_comp_ref
 			)
 		{
 			const auto& probe = probe_comp_ref.get_probe();
 			const auto& world_transform = transform_comp_ref.get_transform();
 			const auto& probe_position = world_transform.get_position();
 
-			iRect rect(0, 0, buffer_size.width, buffer_size.height);
+			irect rect(0, 0, buffer_size.width, buffer_size.height);
 			if (probe_comp_ref.compute_projected_sphere_rect(rect, probe_position, view, proj) == 0)
 				return;
 
 			const auto cubemap = probe_comp_ref.get_cubemap();
 
-			Program* program = nullptr;
+			program* program = nullptr;
 			float influence_radius = 0.0f;
-			if (probe.probe_type == ProbeType::Sphere && _sphere_ref_probe_program)
+			if (probe.probe_type == probe_type::sphere && _sphere_ref_probe_program)
 			{
 				program = _sphere_ref_probe_program.get();
 				program->begin_pass();
 				influence_radius = probe.sphere_data.range;
 			}
 
-			if (probe.probe_type == ProbeType::Box && _box_ref_probe_program)
+			if (probe.probe_type == probe_type::box && _box_ref_probe_program)
 			{
-				math::transform_t t;
+				math::transform t;
 				t.set_scale(probe.box_data.extents);
 				t = world_transform * t;
 				auto u_inv_world = math::inverse(t);
@@ -704,11 +704,11 @@ namespace runtime
 		return r_buffer_fbo;
 	}
 
-	std::shared_ptr<FrameBuffer> DeferredRendering::atmospherics_pass(
-		std::shared_ptr<FrameBuffer> input,
-		Camera& camera,
-		RenderView& render_view,
-		EntityComponentSystem& ecs,
+	std::shared_ptr<frame_buffer> deferred_rendering::atmospherics_pass(
+		std::shared_ptr<frame_buffer> input,
+		camera& camera,
+		render_view& render_view,
+		entity_component_system& ecs,
 		std::chrono::duration<float> dt)
 	{
 		auto far_clip_cache = camera.get_far_clip();
@@ -720,37 +720,37 @@ namespace runtime
 	
 		static auto light_buffer_format = gfx::get_best_format(
 			BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER,
-			gfx::FormatSearchFlags::FourChannels |
-			gfx::FormatSearchFlags::RequireAlpha |
-			gfx::FormatSearchFlags::HalfPrecisionFloat);
+			gfx::format_search_flags::FourChannels |
+			gfx::format_search_flags::RequireAlpha |
+			gfx::format_search_flags::HalfPrecisionFloat);
 
 		auto light_buffer = render_view.get_texture("LBUFFER", viewport_size.width, viewport_size.height, false, 1, light_buffer_format, gfx::get_default_rt_sampler_flags());
 		input = render_view.get_fbo("LBUFFER", { light_buffer, render_view.get_depth_stencil_buffer(viewport_size) });
 	
 		const auto surface = input.get();
 		const auto output_size = surface->get_size();
-		RenderPass pass("atmospherics_fill");
+		render_pass pass("atmospherics_fill");
 		pass.bind(surface);
 		pass.set_view_proj(view, proj);
 
 		if (surface && _atmospherics_program)
 		{
-			ecs.each<TransformComponent, LightComponent>([this, &output_size, &pass](
-				Entity e,
-				TransformComponent& transform_comp_ref,
-				LightComponent& light_comp_ref
+			ecs.each<transform_component, light_component>([this, &output_size, &pass](
+				entity e,
+				transform_component& transform_comp_ref,
+				light_component& light_comp_ref
 				)
 			{
 				const auto& light = light_comp_ref.get_light();
 				const auto& world_transform = transform_comp_ref.get_transform();
 				const auto& light_direction = world_transform.z_unit_axis();
 
-				if (light.light_type == LightType::Directional)
+				if (light.light_type == light_type::directional)
 				{
 					_atmospherics_program->begin_pass();
 					_atmospherics_program->set_uniform("u_light_direction", &light_direction);
 
-					iRect rect(0, 0, output_size.width, output_size.height);
+					irect rect(0, 0, output_size.width, output_size.height);
 					gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
 					auto topology = gfx::clip_quad(1.0f);
 					gfx::setState(topology
@@ -768,10 +768,10 @@ namespace runtime
 		return input;
 	}
 
-	std::shared_ptr<FrameBuffer> DeferredRendering::tonemapping_pass(
-		std::shared_ptr<FrameBuffer> input,
-		Camera& camera,
-		RenderView& render_view)
+	std::shared_ptr<frame_buffer> deferred_rendering::tonemapping_pass(
+		std::shared_ptr<frame_buffer> input,
+		camera& camera,
+		render_view& render_view)
 	{
 		if (!input)
 			return nullptr;
@@ -781,7 +781,7 @@ namespace runtime
 		const auto output_size = surface->get_size();
 		const auto& view = camera.get_view();
 		const auto& proj = camera.get_projection();
-		RenderPass pass("output_buffer_fill");
+		render_pass pass("output_buffer_fill");
 		pass.bind(surface.get());
 		pass.set_view_proj(view, proj);
 
@@ -789,7 +789,7 @@ namespace runtime
 		{
 			_gamma_correction_program->begin_pass();
 			_gamma_correction_program->set_texture(0, "s_input", gfx::getTexture(input->handle));
-			iRect rect(0, 0, output_size.width, output_size.height);
+			irect rect(0, 0, output_size.width, output_size.height);
 			gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
 			auto topology = gfx::clip_quad(1.0f);
 			gfx::setState(topology
@@ -803,7 +803,7 @@ namespace runtime
 		return surface;
 	}
 
-	void DeferredRendering::receive(Entity e)
+	void deferred_rendering::receive(entity e)
 	{
 		_lod_data.erase(e);
 		for (auto& pair : _lod_data)
@@ -811,68 +811,68 @@ namespace runtime
 			pair.second.erase(e);
 		}
 	}
-	bool DeferredRendering::initialize()
+	bool deferred_rendering::initialize()
 	{
-		on_entity_destroyed.connect(this, &DeferredRendering::receive);
-		on_frame_render.connect(this, &DeferredRendering::frame_render);
+		on_entity_destroyed.connect(this, &deferred_rendering::receive);
+		on_frame_render.connect(this, &deferred_rendering::frame_render);
 
-		auto am = core::get_subsystem<runtime::AssetManager>();
-		am->load<Shader>("engine_data:/shaders/vs_clip_quad", false)
+		auto am = core::get_subsystem<runtime::asset_manager>();
+		am->load<shader>("engine_data:/shaders/vs_clip_quad", false)
 			.then([this, am](auto vs)
 		{
-			am->load<Shader>("engine_data:/shaders/fs_deferred_point_light", false)
+			am->load<shader>("engine_data:/shaders/fs_deferred_point_light", false)
 				.then([this, vs](auto fs)
 			{
-				_point_light_program = std::make_unique<Program>(vs, fs);
+				_point_light_program = std::make_unique<program>(vs, fs);
 			});
 
-			am->load<Shader>("engine_data:/shaders/fs_deferred_spot_light", false)
+			am->load<shader>("engine_data:/shaders/fs_deferred_spot_light", false)
 				.then([this, vs](auto fs)
 			{
-				_spot_light_program = std::make_unique<Program>(vs, fs);
+				_spot_light_program = std::make_unique<program>(vs, fs);
 			});
 
-			am->load<Shader>("engine_data:/shaders/fs_deferred_directional_light", false)
+			am->load<shader>("engine_data:/shaders/fs_deferred_directional_light", false)
 				.then([this, vs](auto fs)
 			{
-				_directional_light_program = std::make_unique<Program>(vs, fs);
+				_directional_light_program = std::make_unique<program>(vs, fs);
 			});
 
-			am->load<Shader>("engine_data:/shaders/fs_gamma_correction", false)
+			am->load<shader>("engine_data:/shaders/fs_gamma_correction", false)
 				.then([this, vs](auto fs)
 			{
-				_gamma_correction_program = std::make_unique<Program>(vs, fs);
+				_gamma_correction_program = std::make_unique<program>(vs, fs);
 			});
 		});
 
-		am->load<Shader>("engine_data:/shaders/vs_clip_quad_ex", false)
+		am->load<shader>("engine_data:/shaders/vs_clip_quad_ex", false)
 			.then([this, am](auto vs)
 		{
-			am->load<Shader>("engine_data:/shaders/fs_sphere_reflection_probe", false)
+			am->load<shader>("engine_data:/shaders/fs_sphere_reflection_probe", false)
 				.then([this, vs](auto fs)
 			{
-				_sphere_ref_probe_program = std::make_unique<Program>(vs, fs);
+				_sphere_ref_probe_program = std::make_unique<program>(vs, fs);
 			});
 
-			am->load<Shader>("engine_data:/shaders/fs_box_reflection_probe", false)
+			am->load<shader>("engine_data:/shaders/fs_box_reflection_probe", false)
 				.then([this, vs](auto fs)
 			{
-				_box_ref_probe_program = std::make_unique<Program>(vs, fs);
+				_box_ref_probe_program = std::make_unique<program>(vs, fs);
 			});
-			am->load<Shader>("engine_data:/shaders/fs_atmospherics", false)
+			am->load<shader>("engine_data:/shaders/fs_atmospherics", false)
 				.then([this, vs](auto fs)
 			{
-				_atmospherics_program = std::make_unique<Program>(vs, fs);
+				_atmospherics_program = std::make_unique<program>(vs, fs);
 			});
 		});
 
 		return true;
 	}
 
-	void DeferredRendering::dispose()
+	void deferred_rendering::dispose()
 	{
-		on_entity_destroyed.disconnect(this, &DeferredRendering::receive);
-		on_frame_render.disconnect(this, &DeferredRendering::frame_render);
+		on_entity_destroyed.disconnect(this, &deferred_rendering::receive);
+		on_frame_render.disconnect(this, &deferred_rendering::frame_render);
 	}
 
 

@@ -1,22 +1,22 @@
 #include "reflection_probe_component.h"
 
-ReflectionProbeComponent::ReflectionProbeComponent()
+reflection_probe_component::reflection_probe_component()
 {
 }
 
-ReflectionProbeComponent::ReflectionProbeComponent(const ReflectionProbeComponent& lightComponent)
+reflection_probe_component::reflection_probe_component(const reflection_probe_component& lightComponent)
 {
 	_probe = lightComponent._probe;
 }
 
-ReflectionProbeComponent::~ReflectionProbeComponent()
+reflection_probe_component::~reflection_probe_component()
 {
 
 }
 
-int ReflectionProbeComponent::compute_projected_sphere_rect(iRect& rect, const math::vec3& position, const math::transform_t& view, const math::transform_t& proj)
+int reflection_probe_component::compute_projected_sphere_rect(irect& rect, const math::vec3& position, const math::transform& view, const math::transform& proj)
 {
-	if (_probe.probe_type == ProbeType::Sphere)
+	if (_probe.probe_type == probe_type::sphere)
 	{
 		return math::compute_projected_sphere_rect(
 			rect.left,
@@ -28,7 +28,7 @@ int ReflectionProbeComponent::compute_projected_sphere_rect(iRect& rect, const m
 			view,
 			proj);
 	}
-	else if (_probe.probe_type == ProbeType::Box)
+	else if (_probe.probe_type == probe_type::box)
 	{
 		float w2 = math::pow(_probe.box_data.extents.x * 2.0f, 2.0f);
 		float h2 = math::pow(_probe.box_data.extents.y * 2.0f, 2.0f);
@@ -52,14 +52,14 @@ int ReflectionProbeComponent::compute_projected_sphere_rect(iRect& rect, const m
 	}
 }
 
-std::shared_ptr<Texture> ReflectionProbeComponent::get_cubemap()
+std::shared_ptr<texture> reflection_probe_component::get_cubemap()
 {
 	static auto buffer_format = gfx::get_best_format(
 		BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER |
 		BGFX_CAPS_FORMAT_TEXTURE_CUBE |
 		BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN,
-		gfx::FormatSearchFlags::FourChannels |
-		gfx::FormatSearchFlags::RequireAlpha);
+		gfx::format_search_flags::FourChannels |
+		gfx::format_search_flags::RequireAlpha);
 
 	static auto flags = gfx::get_default_rt_sampler_flags() | BGFX_TEXTURE_BLIT_DST;
 
@@ -68,12 +68,12 @@ std::shared_ptr<Texture> ReflectionProbeComponent::get_cubemap()
 }
 
 
-std::shared_ptr<FrameBuffer> ReflectionProbeComponent::get_cubemap_fbo()
+std::shared_ptr<frame_buffer> reflection_probe_component::get_cubemap_fbo()
 {
 	return _render_view[0].get_fbo("CUBEMAP", {get_cubemap()});
 }
 
-void ReflectionProbeComponent::set_probe(const ReflectionProbe& probe)
+void reflection_probe_component::set_probe(const reflection_probe& probe)
 {
 	if (probe == _probe)
 		return;

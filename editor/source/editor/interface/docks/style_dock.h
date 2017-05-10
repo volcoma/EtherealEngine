@@ -2,9 +2,9 @@
 
 #include "imguidock.h"
 
-struct StyleDock : public ImGuiDock::Dock
+struct style_dock : public imguidock::dock
 {
-	StyleDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize);
+	style_dock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize);
 
 	void render(const ImVec2& area);
 };

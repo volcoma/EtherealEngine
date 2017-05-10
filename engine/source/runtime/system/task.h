@@ -26,20 +26,20 @@ namespace runtime
 	// Main Class Declarations
 	//-----------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------
-	//  Name : TaskSystem (Class)
+	//  Name : task_system (Class)
 	/// <summary>
 	/// A Light-weight task scheduler with automatic load balancing,
 	/// the dependencies between tasks are addressed as parent - child relationships.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	struct TaskSystem : public core::Subsystem
+	struct task_system : public core::subsystem
 	{
-		TaskSystem(unsigned worker = 0) : _core(worker) {}
+		task_system(unsigned worker = 0) : _core(worker) {}
 
 		//-----------------------------------------------------------------------------
 		//  Name : initialize ()
 		/// <summary>
-		/// Initialize task TaskSystem with specified worker count
+		/// Initialize task task_system with specified worker count
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		bool initialize() override;
@@ -60,7 +60,7 @@ namespace runtime
 		/// Creates task
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		core::Handle create(const std::string& name);
+		core::handle create(const std::string& name);
 
 		//-----------------------------------------------------------------------------
 		//  Name : create ()
@@ -69,7 +69,7 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template<typename F, typename ... Args>
-		core::Handle create(const std::string& name, F&& functor, Args&& ... args);
+		core::handle create(const std::string& name, F&& functor, Args&& ... args);
 
 		//-----------------------------------------------------------------------------
 		//  Name : create_as_child ()
@@ -78,7 +78,7 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template<typename F, typename ... Args>
-		core::Handle create_as_child(core::Handle parent, const std::string& name, F&& functor, Args&&... args);
+		core::handle create_as_child(core::handle parent, const std::string& name, F&& functor, Args&&... args);
 
 		//-----------------------------------------------------------------------------
 		//  Name : create_parallel_for ()
@@ -87,7 +87,7 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template<typename F, typename IT>
-		core::Handle create_parallel_for(const std::string& name, F&& functor, IT begin, IT end, size_t step);
+		core::handle create_parallel_for(const std::string& name, F&& functor, IT begin, IT end, size_t step);
 
 		//-----------------------------------------------------------------------------
 		//  Name : run ()
@@ -96,7 +96,7 @@ namespace runtime
 		/// If on_main_thread is set to true the task will be executed on the main thread.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void run(core::Handle, bool on_main_thread = false);
+		void run(core::handle, bool on_main_thread = false);
 
 		//-----------------------------------------------------------------------------
 		//  Name : execute_tasks_on_main ()
@@ -114,7 +114,7 @@ namespace runtime
 		/// Wait for a task to complete. This will block the current thread.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void wait(core::Handle);
+		void wait(core::handle);
 
 		//-----------------------------------------------------------------------------
 		//  Name : is_completed ()
@@ -122,7 +122,7 @@ namespace runtime
 		/// Returns true if task completed.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool is_completed(core::Handle);
+		bool is_completed(core::handle);
 
 		//-----------------------------------------------------------------------------
 		//  Name : get_main_thread ()
@@ -133,10 +133,10 @@ namespace runtime
 		std::thread::id get_main_thread() const { return _thread_main; }
 
 	protected:
-		struct Task
+		struct task_t
 		{
-			Task() {}
-			Task(Task&& rhs) : jobs(rhs.jobs.load())
+			task_t() {}
+			task_t(task_t&& rhs) : jobs(rhs.jobs.load())
 			{
 				closure = std::move(rhs.closure);
 				parent = rhs.parent;
@@ -145,7 +145,7 @@ namespace runtime
 
 			std::function<void()> closure = nullptr;
 			std::atomic<uint32_t> jobs;
-			core::Handle parent;
+			core::handle parent;
 			std::string name;
 		};
 
@@ -155,7 +155,7 @@ namespace runtime
 		/// Creates a task.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		core::Handle create_internal(const std::string&, std::function<void()>);
+		core::handle create_internal(const std::string&, std::function<void()>);
 
 
 		//-----------------------------------------------------------------------------
@@ -167,7 +167,7 @@ namespace runtime
 		/// as well.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		core::Handle create_as_child_internal(core::Handle, const std::string&, std::function<void()>);
+		core::handle create_as_child_internal(core::handle, const std::string&, std::function<void()>);
 
 	public:
 		/// several callbacks instended for thread initialization and profilers
@@ -186,7 +186,7 @@ namespace runtime
 		/// Worker threads run method.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		static void thread_run(TaskSystem&, unsigned index);
+		static void thread_run(task_system&, unsigned index);
 
 		//-----------------------------------------------------------------------------
 		//  Name : finish ()
@@ -194,7 +194,7 @@ namespace runtime
 		/// Finishes a task.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void finish(core::Handle);
+		void finish(core::handle);
 
 		//-----------------------------------------------------------------------------
 		//  Name : execute_one ()
@@ -202,7 +202,7 @@ namespace runtime
 		/// Executes a single task from a queue.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool execute_one(unsigned, bool, std::mutex&, std::deque<core::Handle>&);
+		bool execute_one(unsigned, bool, std::mutex&, std::deque<core::handle>&);
 
 		//-----------------------------------------------------------------------------
 		//  Name : execute_one ()
@@ -210,7 +210,7 @@ namespace runtime
 		/// Executes a single task from a queue.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool execute_one(core::Handle handle, unsigned, bool, std::mutex&, std::deque<core::Handle>&);
+		bool execute_one(core::handle handle, unsigned, bool, std::mutex&, std::deque<core::handle>&);
 
 		//-----------------------------------------------------------------------------
 		//  Name : get_thread_index ()
@@ -226,7 +226,7 @@ namespace runtime
 			///
 			std::mutex mutex;
 			///
-			std::deque<core::Handle> tasks;
+			std::deque<core::handle> tasks;
 		};
 
 		///
@@ -234,7 +234,7 @@ namespace runtime
 		///
 		std::mutex _tasks_mutex;
 		///
-		core::DynamicHandleObjectSet<Task, 32> _tasks;
+		core::dynamic_handle_object_set_t<task_t, 32> _tasks;
 		///
 		TasksWrapper _main_thread_tasks;
 		///
@@ -252,27 +252,27 @@ namespace runtime
 	};
 
 	// IMPLEMENTATIONS of TASKSYSTEM
-	inline core::Handle TaskSystem::create(const std::string& name)
+	inline core::handle task_system::create(const std::string& name)
 	{
 		return create_internal(name, nullptr);
 	}
 
 	template<typename F, typename ... Args>
-	core::Handle TaskSystem::create(const std::string& name, F&& functor, Args&& ... args)
+	core::handle task_system::create(const std::string& name, F&& functor, Args&& ... args)
 	{
 		auto functor_with_env = std::bind(std::forward<F>(functor), std::forward<Args>(args)...);
 		return create_internal(name, functor_with_env);
 	}
 
 	template<typename F, typename ... Args>
-	core::Handle TaskSystem::create_as_child(core::Handle parent, const std::string& name, F&& functor, Args&&... args)
+	core::handle task_system::create_as_child(core::handle parent, const std::string& name, F&& functor, Args&&... args)
 	{
 		auto functor_with_env = std::bind(std::forward<F>(functor), std::forward<Args>(args)...);
 		return create_as_child_internal(parent, name, functor_with_env);
 	}
 
 	template<typename F, typename IT>
-	core::Handle TaskSystem::create_parallel_for(const std::string& name, F&& functor, IT begin, IT end, size_t step)
+	core::handle task_system::create_parallel_for(const std::string& name, F&& functor, IT begin, IT end, size_t step)
 	{
 		auto master = create_internal(name, nullptr);
 		for (auto it = begin; it < end; it += step)

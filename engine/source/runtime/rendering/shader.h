@@ -4,17 +4,17 @@
 #include <memory>
 #include <vector>
 
-struct Shader
+struct shader
 {
 	//-----------------------------------------------------------------------------
-	//  Name : ~Shader ()
+	//  Name : ~shader ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	~Shader();
+	~shader();
 
 	//-----------------------------------------------------------------------------
 	//  Name : dispose ()
@@ -47,7 +47,7 @@ struct Shader
 	void populate(const gfx::Memory* _mem);
 
 	/// Uniforms for this shader
-	std::vector<std::shared_ptr<Uniform>> uniforms;
+	std::vector<std::shared_ptr<uniform>> uniforms;
 	/// Internal handle
 	gfx::ShaderHandle handle = { gfx::invalidHandle };
 };

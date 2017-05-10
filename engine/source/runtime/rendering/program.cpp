@@ -4,25 +4,25 @@
 #include "uniform.h"
 #include "frame_buffer.h"
 
-Program::Program(AssetHandle<Shader> computeShader)
+program::program(asset_handle<shader> computeShader)
 {
 	add_shader(computeShader);
 	populate();
 }
 
-Program::Program(AssetHandle<Shader> vertexShader, AssetHandle<Shader> fragmentShader)
+program::program(asset_handle<shader> vertexShader, asset_handle<shader> fragmentShader)
 {
 	add_shader(vertexShader);
 	add_shader(fragmentShader);
 	populate();
 }
 
-Program::~Program()
+program::~program()
 {
 	dispose();
 }
 
-void Program::dispose()
+void program::dispose()
 {
 	if (is_valid())
 		gfx::destroyProgram(handle);
@@ -30,23 +30,23 @@ void Program::dispose()
 	handle = { gfx::invalidHandle };
 }
 
-bool Program::is_valid() const
+bool program::is_valid() const
 {
 	return gfx::isValid(handle);
 }
 
-void Program::set_texture(std::uint8_t _stage, const std::string& _sampler, FrameBuffer* frameBuffer, uint8_t _attachment /*= 0 */, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
+void program::set_texture(std::uint8_t _stage, const std::string& _sampler, frame_buffer* frameBuffer, uint8_t _attachment /*= 0 */, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
 	if (!frameBuffer)
 		return;
 
 	gfx::setTexture(_stage, get_uniform(_sampler, true)->handle, gfx::getTexture(frameBuffer->handle, _attachment), _flags);
 }
-void Program::set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::FrameBufferHandle frameBuffer, uint8_t _attachment /*= 0 */, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
+void program::set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::FrameBufferHandle frameBuffer, uint8_t _attachment /*= 0 */, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
 	gfx::setTexture(_stage, get_uniform(_sampler, true)->handle, gfx::getTexture(frameBuffer, _attachment), _flags);
 }
-void Program::set_texture(std::uint8_t _stage, const std::string& _sampler, Texture* _texture, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
+void program::set_texture(std::uint8_t _stage, const std::string& _sampler, texture* _texture, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
 	if (!_texture)
 		return;
@@ -54,12 +54,12 @@ void Program::set_texture(std::uint8_t _stage, const std::string& _sampler, Text
 	gfx::setTexture(_stage, get_uniform(_sampler, true)->handle, _texture->handle, _flags);
 }
 
-void Program::set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::TextureHandle _texture, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
+void program::set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::TextureHandle _texture, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
 	gfx::setTexture(_stage, get_uniform(_sampler, true)->handle, _texture, _flags);
 }
 
-void Program::set_uniform(const std::string& _name, const void* _value, uint16_t _num)
+void program::set_uniform(const std::string& _name, const void* _value, uint16_t _num)
 {
 	auto hUniform = get_uniform(_name);
 
@@ -67,9 +67,9 @@ void Program::set_uniform(const std::string& _name, const void* _value, uint16_t
 		gfx::setUniform(hUniform->handle, _value, _num);
 }
 
-std::shared_ptr<Uniform> Program::get_uniform(const std::string& _name, bool texture)
+std::shared_ptr<uniform> program::get_uniform(const std::string& _name, bool texture)
 {
-	std::shared_ptr<Uniform> hUniform;
+	std::shared_ptr<uniform> hUniform;
 	auto it = uniforms.find(_name);
 	if (it != uniforms.end())
 	{
@@ -79,7 +79,7 @@ std::shared_ptr<Uniform> Program::get_uniform(const std::string& _name, bool tex
 	{
 		if (texture)
 		{
-			hUniform = std::make_shared<Uniform>();
+			hUniform = std::make_shared<uniform>();
 			hUniform->populate(_name, gfx::UniformType::Int1, 1);
 			uniforms[_name] = hUniform;
 		}
@@ -88,7 +88,7 @@ std::shared_ptr<Uniform> Program::get_uniform(const std::string& _name, bool tex
 	return hUniform;
 }
 
-void Program::add_shader(AssetHandle<Shader> shader)
+void program::add_shader(asset_handle<shader> shader)
 {
 	shaders.push_back(shader);
 	shaders_cached.push_back(shader->handle.idx);
@@ -98,7 +98,7 @@ void Program::add_shader(AssetHandle<Shader> shader)
 	}
 }
 
-void Program::populate()
+void program::populate()
 {
 	dispose();
 
@@ -115,7 +115,7 @@ void Program::populate()
 	}
 }
 
-bool Program::begin_pass()
+bool program::begin_pass()
 {
 	bool repopulate = false;
 	for (std::size_t i = 0; i < shaders_cached.size(); ++i)

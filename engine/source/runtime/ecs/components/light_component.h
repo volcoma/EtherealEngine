@@ -1,6 +1,6 @@
 #pragma once
 //-----------------------------------------------------------------------------
-// LightComponent Header Includes
+// light_component Header Includes
 //-----------------------------------------------------------------------------
 #include "../ecs.h"
 #include "../../rendering/light.h"
@@ -13,23 +13,23 @@
 // Main Class Declarations
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-//  Name : LightComponent (Class)
+//  Name : light_component (Class)
 /// <summary>
-/// Class that contains our core Light data, used for rendering and other things.
+/// Class that contains our core light data, used for rendering and other things.
 /// </summary>
 //-----------------------------------------------------------------------------
-class LightComponent : public runtime::Component
+class light_component : public runtime::component
 {
-	COMPONENT(LightComponent)
-	SERIALIZABLE(LightComponent)
-	REFLECTABLE(LightComponent, runtime::Component)
+	COMPONENT(light_component)
+	SERIALIZABLE(light_component)
+	REFLECTABLE(light_component, runtime::component)
 public:
 	//-------------------------------------------------------------------------
 	// Constructors & Destructors
 	//-------------------------------------------------------------------------
-	LightComponent();
-	LightComponent(const LightComponent& camera);
-	virtual ~LightComponent();
+	light_component();
+	light_component(const light_component& camera);
+	virtual ~light_component();
 
 	//-------------------------------------------------------------------------
 	// Public Methods
@@ -42,7 +42,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const Light& get_light() const { return _light; }
+	inline const light& get_light() const { return _light; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_light ()
@@ -52,7 +52,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_light(const Light& light) { _light = light; }
+	inline void set_light(const light& light) { _light = light; }
 
 
 	//-----------------------------------------------------------------------------
@@ -64,16 +64,16 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	int compute_projected_sphere_rect(
-		iRect& rect,
+		irect& rect,
 		const math::vec3& light_position,
 		const math::vec3& light_direction,
-		const math::transform_t& view,
-		const math::transform_t& proj);
+		const math::transform& view,
+		const math::transform& proj);
 
 private:
 	//-------------------------------------------------------------------------
 	// Private Member Variables.
 	//-------------------------------------------------------------------------
 	/// The light object this component represents
-	Light _light;
+	light _light;
 };

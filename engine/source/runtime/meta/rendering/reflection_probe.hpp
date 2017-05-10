@@ -5,32 +5,32 @@
 #include "core/logging/logging.h"
 #include "../../rendering/reflection_probe.h"
 
-REFLECT(ReflectionProbe)
+REFLECT(reflection_probe)
 {
-	rttr::registration::enumeration<ProbeType>("ProbeType")
+	rttr::registration::enumeration<probe_type>("probe_type")
 		(
-			rttr::value("Box", ProbeType::Box),
-			rttr::value("Sphere", ProbeType::Sphere)
+			rttr::value("Box", probe_type::box),
+			rttr::value("Sphere", probe_type::sphere)
 		);
-	rttr::registration::enumeration<ReflectMethod>("ReflectMethod")
+	rttr::registration::enumeration<reflect_method>("ReflectMethod")
 		(
-			rttr::value("Environment", ReflectMethod::Environment),
-			rttr::value("Static", ReflectMethod::Static)
+			rttr::value("Environment", reflect_method::environment),
+			rttr::value("Static Only", reflect_method::static_only)
 		);
-	rttr::registration::class_<ReflectionProbe::Box>("Box")
-		.property("Extents", &ReflectionProbe::Box::extents)
-		.property("Transition Distance", &ReflectionProbe::Box::transition_distance)
+	rttr::registration::class_<reflection_probe::box>("box")
+		.property("Extents", &reflection_probe::box::extents)
+		.property("Transition Distance", &reflection_probe::box::transition_distance)
 		;
-	rttr::registration::class_<ReflectionProbe::Sphere>("Sphere")
-		.property("Range", &ReflectionProbe::Sphere::range)
+	rttr::registration::class_<reflection_probe::sphere>("sphere")
+		.property("Range", &reflection_probe::sphere::range)
 		;
-	rttr::registration::class_<ReflectionProbe>("ReflectionProbe")
-		.property("Type", &ReflectionProbe::probe_type)
-		.property("Method", &ReflectionProbe::method)
+	rttr::registration::class_<reflection_probe>("reflection_probe")
+		.property("Type", &reflection_probe::probe_type)
+		.property("Method", &reflection_probe::method)
 		;
 }
 
-SAVE(ReflectionProbe)
+SAVE(reflection_probe)
 {
 	try_save(ar, cereal::make_nvp("probe_type", obj.probe_type));
 	try_save(ar, cereal::make_nvp("method", obj.method));
@@ -39,7 +39,7 @@ SAVE(ReflectionProbe)
 	try_save(ar, cereal::make_nvp("range", obj.sphere_data.range));
 }
 
-LOAD(ReflectionProbe)
+LOAD(reflection_probe)
 {
 	try_load(ar, cereal::make_nvp("probe_type", obj.probe_type));
 	try_load(ar, cereal::make_nvp("method", obj.method));

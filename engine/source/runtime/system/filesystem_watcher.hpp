@@ -19,13 +19,13 @@
 //-----------------------------------------------------------------------------
 inline void log_path(const fs::path& path)
 {
-	APPLOG_ERROR((std::string("Watcher can't locate a file or parse the wild card at: ") + path.string()).c_str());
+	APPLOG_ERROR((std::string("watcher_impl can't locate a file or parse the wild card at: ") + path.string()).c_str());
 }
 
 namespace fs
 {
 
-	class FSWatcher
+	class filesystem_watcher
 	{
 	public:
 		struct Entry
@@ -114,28 +114,28 @@ namespace fs
 		}
 
 		//-----------------------------------------------------------------------------
-		//  Name : ~FSWatcher ()
+		//  Name : ~filesystem_watcher ()
 		/// <summary>
 		/// 
 		/// 
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		~FSWatcher()
+		~filesystem_watcher()
 		{
 			close();
 		}
 	protected:
 
 		//-----------------------------------------------------------------------------
-		//  Name : FSWatcher ()
+		//  Name : filesystem_watcher ()
 		/// <summary>
 		/// 
 		/// 
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		FSWatcher()
+		filesystem_watcher()
 			: _watching(false)
 		{
 		}
@@ -196,10 +196,10 @@ namespace fs
 			});
 		}
 
-		static FSWatcher& get_watcher()
+		static filesystem_watcher& get_watcher()
 		{
-			// create the static FSWatcher instance
-			static FSWatcher wd;
+			// create the static filesystem_watcher instance
+			static filesystem_watcher wd;
 			return wd;
 		}
 
@@ -251,7 +251,7 @@ namespace fs
 				std::lock_guard<std::recursive_mutex> lock(wd._mutex);
 				if (wd._watchers.find(key) == wd._watchers.end())
 				{
-					wd._watchers.emplace(make_pair(key, Watcher(p, filter, initialList, listCallback)));
+					wd._watchers.emplace(make_pair(key, watcher_impl(p, filter, initialList, listCallback)));
 				}
 			}
 			
@@ -405,18 +405,18 @@ namespace fs
 			return pathFilter;
 		}
 
-		class Watcher
+		class watcher_impl
 		{
 		public:
 			//-----------------------------------------------------------------------------
-			//  Name : Watcher ()
+			//  Name : watcher_impl ()
 			/// <summary>
 			/// 
 			/// 
 			/// 
 			/// </summary>
 			//-----------------------------------------------------------------------------
-			Watcher(const fs::path &path, const std::string &filter, bool initialList, const std::function<void(const std::vector<Entry>&)> &listCallback)
+			watcher_impl(const fs::path &path, const std::string &filter, bool initialList, const std::function<void(const std::vector<Entry>&)> &listCallback)
 				: _filter(filter), _callback(listCallback)
 			{
 				_root = path;
@@ -617,8 +617,8 @@ namespace fs
 		/// Thread that polls for changes
 		std::thread _thread;
 		/// Registered file watchers
-		std::map<std::string, Watcher> _watchers;
+		std::map<std::string, watcher_impl> _watchers;
 	};
 
-	using watcher = FSWatcher;
+	using watcher = filesystem_watcher;
 }

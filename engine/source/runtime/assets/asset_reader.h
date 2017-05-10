@@ -2,14 +2,14 @@
 #include "load_request.hpp"
 #include "../system/fileSystem.h"
 
-struct Texture;
-struct Shader;
-class Mesh;
-class Material;
-struct Prefab;
-struct Scene;
+struct texture;
+struct shader;
+class mesh;
+class material;
+struct prefab;
+struct scene;
 
-struct AssetReader
+struct asset_reader
 {
 	//-----------------------------------------------------------------------------
 	//  Name : load_texture_from_file ()
@@ -19,7 +19,7 @@ struct AssetReader
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void load_texture_from_file(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Texture>& request);
+	static void load_texture_from_file(const std::string& key, const fs::path& absoluteKey, bool async, load_request<texture>& request);
 	
 	//-----------------------------------------------------------------------------
 	//  Name : load_shader_from_file ()
@@ -29,7 +29,7 @@ struct AssetReader
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void load_shader_from_file(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Shader>& request);
+	static void load_shader_from_file(const std::string& key, const fs::path& absoluteKey, bool async, load_request<shader>& request);
 	
 	//-----------------------------------------------------------------------------
 	//  Name : load_shader_from_memory ()
@@ -39,7 +39,7 @@ struct AssetReader
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void load_shader_from_memory(const std::string& key, const std::uint8_t* data, std::uint32_t size, LoadRequest<Shader>& request);
+	static void load_shader_from_memory(const std::string& key, const std::uint8_t* data, std::uint32_t size, load_request<shader>& request);
 	
 	//-----------------------------------------------------------------------------
 	//  Name : load_mesh_from_file ()
@@ -49,7 +49,7 @@ struct AssetReader
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void load_mesh_from_file(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Mesh>& request);
+	static void load_mesh_from_file(const std::string& key, const fs::path& absoluteKey, bool async, load_request<mesh>& request);
 	
 	//-----------------------------------------------------------------------------
 	//  Name : load_material_from_file ()
@@ -59,7 +59,7 @@ struct AssetReader
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void load_material_from_file(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Material>& request);
+	static void load_material_from_file(const std::string& key, const fs::path& absoluteKey, bool async, load_request<material>& request);
 
 	//-----------------------------------------------------------------------------
 	//  Name : load_prefab_from_file ()
@@ -69,7 +69,7 @@ struct AssetReader
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void load_prefab_from_file(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Prefab>& request);
+	static void load_prefab_from_file(const std::string& key, const fs::path& absoluteKey, bool async, load_request<prefab>& request);
 
 	//-----------------------------------------------------------------------------
 	//  Name : load_scene_from_file ()
@@ -79,6 +79,6 @@ struct AssetReader
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void load_scene_from_file(const std::string& key, const fs::path& absoluteKey, bool async, LoadRequest<Scene>& request);
+	static void load_scene_from_file(const std::string& key, const fs::path& absoluteKey, bool async, load_request<scene>& request);
 
 };

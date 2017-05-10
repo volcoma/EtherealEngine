@@ -5,28 +5,28 @@
 #include "input_mapping.hpp"
 
 #include "core/common/basetypes.hpp"
-#include "core/events/event.hpp"
+#include "core/signals/signal.hpp"
 
 namespace runtime
 {
-	using ActionMap = std::unordered_map<std::string, std::unordered_map<ActionType, event<void(const sf::Event&)>>>;
+	using action_map_t = std::unordered_map<std::string, std::unordered_map<action_type, signal<void(const sf::Event&)>>>;
 
-	struct ActionMapper
+	struct action_mapper
 	{
 		///
-		KeyboardMapper keyboard_mapper;
+		keyboard_mapper keyboard_map;
 		///
-		MouseButtonMapper mouse_button_mapper;
+		mouse_button_mapper mouse_button_map;
 		///
-		MouseWheelMapper mouse_wheel_mapper;
+		mouse_wheel_mapper mouse_wheel_map;
 		///
-		TouchFingerMapper touch_finger_mapper;
+		touch_finger_mapper touch_finger_map;
 		///
-		JoystickButtonMapper joystick_button_mapper;
+		joystick_button_mapper joystick_button_map;
 		///
-		EventMapper event_mapper;
+		event_mapper event_map;
 		///
-		ActionMap actions;
+		action_map_t actions;
 
 		void handle_event(const sf::Event& event)
 		{
@@ -35,17 +35,17 @@ namespace runtime
 				auto mappings = mapper.get_mapping(event);
 				for (auto& action : mappings.actions)
 				{
-					auto& mappedEvent = actions[action][mappings.type];
-					mappedEvent(event);
+					auto& mapped_event = actions[action][mappings.type];
+					mapped_event(event);
 				}
 			};
 
-			trigger_callbacks(keyboard_mapper, event);
-			trigger_callbacks(mouse_button_mapper, event);
-			trigger_callbacks(mouse_wheel_mapper, event);
-			trigger_callbacks(touch_finger_mapper, event);
-			trigger_callbacks(joystick_button_mapper, event);
-			trigger_callbacks(event_mapper, event);
+			trigger_callbacks(keyboard_map, event);
+			trigger_callbacks(mouse_button_map, event);
+			trigger_callbacks(mouse_wheel_map, event);
+			trigger_callbacks(touch_finger_map, event);
+			trigger_callbacks(joystick_button_map, event);
+			trigger_callbacks(event_map, event);
 		}
 
 	
@@ -55,23 +55,23 @@ namespace runtime
 // 	auto& mappings = input->get_mappings();
 //
 //	// You can map different type of events to the same action
-// 	mappings.event_mapper.map("some_action", sf::Event::TextEntered);
-// 	mappings.mouse_button_mapper.map("some_action", sf::Mouse::Right);
-// 	mappings.keyboard_mapper.map("some_action", sf::Keyboard::Space);
+// 	mappings.event_map.map("some_action", sf::Event::TextEntered);
+// 	mappings.mouse_button_map.map("some_action", sf::Mouse::Right);
+// 	mappings.keyboard_map.map("some_action", sf::Keyboard::Space);
 //
 // 	//you can subscribe to a callback for a specific event and action type
-// 	mappings.actions["some_action"][ActionType::Pressed].connect([](const sf::Event& e)
+// 	mappings.actions["some_action"][action_type::pressed].connect([](const sf::Event& e)
 // 	{
 // 		//do some stuff
 // 	});
-// 	mappings.actions["some_action"][ActionType::Changed].connect([](const sf::Event& e)
+// 	mappings.actions["some_action"][action_type::changed].connect([](const sf::Event& e)
 // 	{
 // 		//do some stuff
 // 	});
-	class Input : public core::Subsystem
+	class input : public core::subsystem
 	{
 	public:
-		Input();
+		input();
 
 		//-----------------------------------------------------------------------------
 		//  Name : initialize ()
@@ -101,7 +101,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		inline ActionMapper& get_mappings() { return _action_mapper; }
+		inline action_mapper& get_mappings() { return _action_mapper; }
 
 		//-----------------------------------------------------------------------------
 		//  Name : reset_state ()
@@ -171,7 +171,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		inline const iPoint& get_current_cursor_position() const { return _current_cursor_position; }
+		inline const ipoint& get_current_cursor_position() const { return _current_cursor_position; }
 
 		//-----------------------------------------------------------------------------
 		//  Name : get_cursor_last_position ()
@@ -181,7 +181,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		inline const iPoint& get_last_cursor_position() const { return _last_cursor_position; }
+		inline const ipoint& get_last_cursor_position() const { return _last_cursor_position; }
 
 		//-----------------------------------------------------------------------------
 		//  Name : get_cursor_delta_move ()
@@ -191,7 +191,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		iPoint get_cursor_delta_move() const;
+		ipoint get_cursor_delta_move() const;
 
 		//-----------------------------------------------------------------------------
 		//  Name : is_mouse_button_pressed ()
@@ -375,7 +375,7 @@ namespace runtime
 		bool joystick_event(const sf::Event& event);
 
 		///
-		ActionMapper _action_mapper;
+		action_mapper _action_mapper;
 		/// 
 		bool _mouse_move_event = false;
 		/// 
@@ -383,9 +383,9 @@ namespace runtime
 		/// 
 		float _mouse_scroll_delta = 0.0f;
 		/// 
-		iPoint _current_cursor_position;
+		ipoint _current_cursor_position;
 		/// 
-		iPoint _last_cursor_position;
+		ipoint _last_cursor_position;
 		/// 
 		std::unordered_map<unsigned int, bool> _mouse_buttons_pressed;
 		/// 

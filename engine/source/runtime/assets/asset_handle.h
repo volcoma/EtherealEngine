@@ -4,14 +4,14 @@
 #include <memory>
 
 template<typename T>
-struct AssetLink
+struct asset_link
 {
 	std::string id;
 	std::shared_ptr<T> asset;
 };
 
 template<typename T>
-struct AssetHandle
+struct asset_handle
 {
 	//-----------------------------------------------------------------------------
 	//  Name : get ()
@@ -77,7 +77,7 @@ struct AssetHandle
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	AssetHandle & operator=(const AssetHandle & handle)
+	asset_handle & operator=(const asset_handle & handle)
 	{
 		// Share the specified handle's data pointer
 		if (link != handle.link)
@@ -94,7 +94,7 @@ struct AssetHandle
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	AssetHandle & operator=(std::shared_ptr<T> data)
+	asset_handle & operator=(std::shared_ptr<T> data)
 	{
 		// Own the specified handle's data pointer
 		if (data != link->asset)
@@ -111,7 +111,7 @@ struct AssetHandle
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline bool operator==(const AssetHandle & handle) const
+	inline bool operator==(const asset_handle & handle) const
 	{
 		return (get() == handle.get());
 	}
@@ -124,7 +124,7 @@ struct AssetHandle
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline bool operator!=(const AssetHandle & handle) const
+	inline bool operator!=(const asset_handle & handle) const
 	{
 		return (get() != handle.get());
 	}
@@ -137,7 +137,7 @@ struct AssetHandle
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline bool operator<(const AssetHandle & handle) const
+	inline bool operator<(const asset_handle & handle) const
 	{
 		return (get() < handle.get());
 	}
@@ -150,7 +150,7 @@ struct AssetHandle
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline bool operator>(const AssetHandle & handle) const
+	inline bool operator>(const asset_handle & handle) const
 	{
 		return (get() > handle.get());
 	}
@@ -182,5 +182,5 @@ struct AssetHandle
 	}
 
 	// Internal link to asset
-	std::shared_ptr<AssetLink<T>> link = std::make_shared<AssetLink<T>>();
+	std::shared_ptr<asset_link<T>> link = std::make_shared<asset_link<T>>();
 };

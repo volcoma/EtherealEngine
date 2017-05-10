@@ -5,10 +5,10 @@
 #include <memory>
 #include "ImGuiDock.h"
 
-struct DockingSystem : public core::Subsystem
+struct docking_system : public core::subsystem
 {
 	bool initialize();
 	void dispose();
 private:
-	std::vector<std::unique_ptr<ImGuiDock::Dock>> _docks;
+	std::vector<std::unique_ptr<imguidock::dock>> _docks;
 };

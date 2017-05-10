@@ -2,9 +2,9 @@
 
 #include "imguidock.h"
 
-struct SceneDock : public ImGuiDock::Dock
+struct scene_dock : public imguidock::dock
 {
-	SceneDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize);
+	scene_dock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize);
 
 	void render(const ImVec2& area);
 };

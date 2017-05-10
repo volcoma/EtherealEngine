@@ -8,15 +8,15 @@ namespace ecs
 {
 	namespace utils
 	{
-		void save_entity(const fs::path& dir, const runtime::Entity& data)
+		void save_entity(const fs::path& dir, const runtime::entity& data)
 		{
 			const fs::path fullPath = dir / fs::path(data.to_string() + extensions::prefab);
 			save_data(fullPath, { data });
 		}
 
-		bool try_load_entity(const fs::path& fullPath, runtime::Entity& outData)
+		bool try_load_entity(const fs::path& fullPath, runtime::entity& outData)
 		{
-			std::vector<runtime::Entity> outDataVec;
+			std::vector<runtime::entity> outDataVec;
 			if (!load_data(fullPath, outDataVec))
 				return false;
 
@@ -27,31 +27,31 @@ namespace ecs
 		}
 
 
-		void save_data(const fs::path& fullPath, const std::vector<runtime::Entity>& data)
+		void save_data(const fs::path& fullPath, const std::vector<runtime::entity>& data)
 		{
 			std::ofstream os(fullPath, std::fstream::binary | std::fstream::trunc);
 			serialize_data(os, data);
 		}
 
-		bool load_data(const fs::path& fullPath, std::vector<runtime::Entity>& outData)
+		bool load_data(const fs::path& fullPath, std::vector<runtime::entity>& outData)
 		{
 			std::ifstream is(fullPath, std::fstream::binary);
 			return deserialize_data(is, outData);
 		}
 
-		void serialize_data(std::ostream& stream, const std::vector<runtime::Entity>& data)
+		void serialize_data(std::ostream& stream, const std::vector<runtime::entity>& data)
 		{
 			cereal::oarchive_json_t ar(stream);
 
 			try_save(ar, cereal::make_nvp("data", data));
 
-			getSerializationMap().clear();
+			get_serialization_map().clear();
 		}
 
-		bool deserialize_data(std::istream& stream, std::vector<runtime::Entity>& outData)
+		bool deserialize_data(std::istream& stream, std::vector<runtime::entity>& outData)
 		{
 			// get length of file:
-			getSerializationMap().clear();
+			get_serialization_map().clear();
 			stream.seekg(0, stream.end);
 			std::streampos length = stream.tellg();
 			stream.seekg(0, stream.beg);
@@ -63,7 +63,7 @@ namespace ecs
 
 				stream.clear();
 				stream.seekg(0);
-				getSerializationMap().clear();
+				get_serialization_map().clear();
 				return true;
 			}
 			return false;

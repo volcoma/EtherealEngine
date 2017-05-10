@@ -8,24 +8,18 @@
 #include <sstream>
 namespace cfg
 {
-    class Config
+    class config
     {
     public:
-        Config();
+        config();
 
-        ~Config();
+        ~config();
         
         bool has_value(const std::string& section, const std::string& name) const;
 
-        const std::string get(const std::string& section, const std::string& name) const;
+        const std::string& get(const std::string& section, const std::string& name) const;
 
-		std::string get_value(const std::string& section, const std::string& name, const std::string& defaultValue)
-		{
-			if (!has_value(section, name))
-				return defaultValue;
-
-			return get(section, name);
-		}
+		const std::string& get_value(const std::string& section, const std::string& name, const std::string& defaultValue);
 
 		template<typename T>
 		T get_value(const std::string& section, const std::string& name, const T& defaultValue)
@@ -33,7 +27,7 @@ namespace cfg
 			if (!has_value(section, name))
 				return defaultValue;
 
-			auto value = get(section, name);
+			const auto& value = get(section, name);
 
 			T result;
 			std::istringstream(value) >> result;

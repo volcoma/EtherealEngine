@@ -4,7 +4,7 @@
 #include <core/console/console.h>
 #include <string>
 #include <deque>
-class ConsoleLog : public logging::sinks::base_sink<std::mutex>, public Console
+class console_log : public logging::sinks::base_sink<std::mutex>, public console
 {
 public:
 	using entries_t = std::deque<std::pair<std::string, logging::level::level_enum>>;

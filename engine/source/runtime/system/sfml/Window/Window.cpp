@@ -183,14 +183,14 @@ bool Window::waitEvent(Event& event)
 
 
 ////////////////////////////////////////////////////////////
-iPoint Window::getPosition() const
+ipoint Window::getPosition() const
 {
-    return m_impl ? m_impl->getPosition() : iPoint();
+    return m_impl ? m_impl->getPosition() : ipoint();
 }
 
 
 ////////////////////////////////////////////////////////////
-void Window::setPosition(const iPoint& position)
+void Window::setPosition(const ipoint& position)
 {
     if (m_impl)
         m_impl->setPosition(position);
@@ -198,14 +198,14 @@ void Window::setPosition(const iPoint& position)
 
 
 ////////////////////////////////////////////////////////////
-uSize Window::getSize() const
+usize Window::getSize() const
 {
     return m_size;
 }
 
 
 ////////////////////////////////////////////////////////////
-void Window::setSize(const uSize& size)
+void Window::setSize(const usize& size)
 {
     if (m_impl)
     {

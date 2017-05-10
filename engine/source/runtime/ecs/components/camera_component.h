@@ -1,6 +1,6 @@
 #pragma once
 //-----------------------------------------------------------------------------
-// CameraComponent Header Includes
+// camera_component Header Includes
 //-----------------------------------------------------------------------------
 #include "../ecs.h"
 #include "core/math/math_includes.h"
@@ -16,23 +16,23 @@
 // Main Class Declarations
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-//  Name : CameraComponent (Class)
+//  Name : camera_component (Class)
 /// <summary>
-/// Class that contains our core Camera data, used for rendering and other things.
+/// Class that contains our core camera data, used for rendering and other things.
 /// </summary>
 //-----------------------------------------------------------------------------
-class CameraComponent : public runtime::Component
+class camera_component : public runtime::component
 {
-	COMPONENT(CameraComponent)
-	SERIALIZABLE(CameraComponent)
-	REFLECTABLE(CameraComponent, runtime::Component)
+	COMPONENT(camera_component)
+	SERIALIZABLE(camera_component)
+	REFLECTABLE(camera_component, runtime::component)
 public:
 	//-------------------------------------------------------------------------
 	// Constructors & Destructors
 	//-------------------------------------------------------------------------
-	CameraComponent();
-	CameraComponent(const CameraComponent& camera);
-	virtual ~CameraComponent();
+	camera_component();
+	camera_component(const camera_component& camera);
+	virtual ~camera_component();
 
 	//-------------------------------------------------------------------------
 	// Public Methods
@@ -45,7 +45,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	CameraComponent& set_fov(float fovDegrees);
+	camera_component& set_fov(float fovDegrees);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_near_clip ()
@@ -55,7 +55,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	CameraComponent& set_near_clip(float distance);
+	camera_component& set_near_clip(float distance);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_far_clip ()
@@ -65,7 +65,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	CameraComponent& set_far_clip(float distance);
+	camera_component& set_far_clip(float distance);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_projection_mode ()
@@ -75,7 +75,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	CameraComponent& set_projection_mode(ProjectionMode mode);
+	camera_component& set_projection_mode(projection_mode mode);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_fov ()
@@ -115,7 +115,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	ProjectionMode get_projection_mode() const;
+	projection_mode get_projection_mode() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_camera ()
@@ -125,7 +125,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline Camera& get_camera() { return _camera; }
+	inline camera& get_camera() { return _camera; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_camera ()
@@ -135,7 +135,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const Camera& get_camera() const { return _camera; }
+	inline const camera& get_camera() const { return _camera; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : update ()
@@ -145,7 +145,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void update(const math::transform_t& t);
+	void update(const math::transform& t);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_hdr ()
@@ -175,7 +175,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_viewport_size(const uSize& size);
+	void set_viewport_size(const usize& size);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_viewport_size ()
@@ -185,7 +185,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const uSize& get_viewport_size() const;
+	const usize& get_viewport_size() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_ortho_size ()
@@ -225,15 +225,15 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline RenderView& get_render_view() { return _render_view; }
+	inline render_view& get_render_view() { return _render_view; }
 private:
 	//-------------------------------------------------------------------------
 	// Private Member Variables.
 	//-------------------------------------------------------------------------
 	/// The camera object this component represents
-	Camera _camera;
+	camera _camera;
 	/// The render view for this component
-	RenderView _render_view;
+	render_view _render_view;
 	/// Is the camera HDR?
 	bool _hdr = true;
 };

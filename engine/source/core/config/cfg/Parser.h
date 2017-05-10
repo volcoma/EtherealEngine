@@ -7,15 +7,14 @@
 
 namespace cfg
 {
-    class Config;
-
-    class Parser
+    class config;
+    class parser
     {
     public:
     
-        Parser(Config& config);
+        parser(config& c);
 
-        ~Parser();
+        ~parser();
         
         /**
          * Parse a stream.
@@ -43,7 +42,7 @@ namespace cfg
             ERROR		 // this should never be returned
         };
         
-        Config&       config;
+        config&       conf;
         std::istream* in;
         std::string   file;
         unsigned int  line;
@@ -71,8 +70,8 @@ namespace cfg
 
         void error(const std::string& msg);
 
-        Parser(const Parser&) = delete;
-        const Parser& operator = (const Parser&) = delete;
+        parser(const parser&) = delete;
+        const parser& operator = (const parser&) = delete;
     };
 }
 

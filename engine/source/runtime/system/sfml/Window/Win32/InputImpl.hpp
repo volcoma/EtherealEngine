@@ -81,7 +81,7 @@ public:
     /// \return Current position of the mouse
     ///
     ////////////////////////////////////////////////////////////
-    static iPoint getMousePosition();
+    static ipoint getMousePosition();
 
     ////////////////////////////////////////////////////////////
     /// \brief Get the current position of the mouse in window coordinates
@@ -95,7 +95,7 @@ public:
     /// \return Current position of the mouse
     ///
     ////////////////////////////////////////////////////////////
-    static iPoint getMousePosition(const Window& relativeTo);
+    static ipoint getMousePosition(const Window& relativeTo);
 
     ////////////////////////////////////////////////////////////
     /// \brief Set the current position of the mouse in desktop coordinates
@@ -107,7 +107,7 @@ public:
     /// \param position New position of the mouse
     ///
     ////////////////////////////////////////////////////////////
-    static void setMousePosition(const iPoint& position);
+    static void setMousePosition(const ipoint& position);
 
     ////////////////////////////////////////////////////////////
     /// \brief Set the current position of the mouse in window coordinates
@@ -120,7 +120,7 @@ public:
     /// \param relativeTo Reference window
     ///
     ////////////////////////////////////////////////////////////
-    static void setMousePosition(const iPoint& position, const Window& relativeTo);
+    static void setMousePosition(const ipoint& position, const Window& relativeTo);
 
     ////////////////////////////////////////////////////////////
     /// \brief Check if a touch event is currently down
@@ -143,7 +143,7 @@ public:
     /// \return Current position of \a finger, or undefined if it's not down
     ///
     ////////////////////////////////////////////////////////////
-    static iPoint getTouchPosition(unsigned int finger);
+    static ipoint getTouchPosition(unsigned int finger);
 
     ////////////////////////////////////////////////////////////
     /// \brief Get the current position of a touch in window coordinates
@@ -157,7 +157,7 @@ public:
     /// \return Current position of \a finger, or undefined if it's not down
     ///
     ////////////////////////////////////////////////////////////
-    static iPoint getTouchPosition(unsigned int finger, const Window& relativeTo);
+    static ipoint getTouchPosition(unsigned int finger, const Window& relativeTo);
 };
 
 } // namespace priv

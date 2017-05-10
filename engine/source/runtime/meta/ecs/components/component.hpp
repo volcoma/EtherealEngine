@@ -4,20 +4,20 @@
 #include "core/logging/logging.h"
 
 
-REFLECT(runtime::Component)
+REFLECT(runtime::component)
 {
-	rttr::registration::class_<runtime::Component>("Component");
+	rttr::registration::class_<runtime::component>("component");
 
 }
 
 namespace runtime
 {
-	SAVE(Component)
+	SAVE(component)
 	{
 		try_save(ar, cereal::make_nvp("owner", obj._entity));
 	}
 
-	LOAD(Component)
+	LOAD(component)
 	{
 		try_load(ar, cereal::make_nvp("owner", obj._entity));
 	}

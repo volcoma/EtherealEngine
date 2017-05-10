@@ -39,14 +39,14 @@ bool Touch::isDown(unsigned int finger)
 
 
 ////////////////////////////////////////////////////////////
-iPoint Touch::getPosition(unsigned int finger)
+ipoint Touch::getPosition(unsigned int finger)
 {
     return priv::InputImpl::getTouchPosition(finger);
 }
 
 
 ////////////////////////////////////////////////////////////
-iPoint Touch::getPosition(unsigned int finger, const Window& relativeTo)
+ipoint Touch::getPosition(unsigned int finger, const Window& relativeTo)
 {
     return priv::InputImpl::getTouchPosition(finger, relativeTo);
 }

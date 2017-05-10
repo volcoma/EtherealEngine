@@ -7,28 +7,28 @@
 #include "../../rendering/model.h"
 #include "../assets/asset_handle.hpp"
 
-REFLECT(Model)
+REFLECT(model)
 {
-	rttr::registration::class_<Model>("Model")
+	rttr::registration::class_<model>("model")
 		.property("Levels of Detail",
-			&Model::get_lods,
-			&Model::set_lods)
+			&model::get_lods,
+			&model::set_lods)
 		.property("Materials",
-			&Model::get_materials,
-			&Model::set_materials)
+			&model::get_materials,
+			&model::set_materials)
 		.property("Transition Time",
-			&Model::get_lod_transition_time,
-			&Model::set_lod_transition_time)
+			&model::get_lod_transition_time,
+			&model::set_lod_transition_time)
 		.property("Max Distance",
-			&Model::get_lod_max_distance,
-			&Model::set_lod_max_distance)
+			&model::get_lod_max_distance,
+			&model::set_lod_max_distance)
 		.property("Min Distance",
-			&Model::get_lod_min_distance,
-			&Model::set_lod_min_distance)
+			&model::get_lod_min_distance,
+			&model::set_lod_min_distance)
 		;
 }
 
-SAVE(Model)
+SAVE(model)
 {
 	try_save(ar, cereal::make_nvp("lods", obj._mesh_lods));
 	try_save(ar, cereal::make_nvp("materials", obj._materials));
@@ -37,7 +37,7 @@ SAVE(Model)
 	try_save(ar, cereal::make_nvp("min_distance", obj._min_distance));
 }
 
-LOAD(Model)
+LOAD(model)
 {
 
 	try_load(ar, cereal::make_nvp("lods", obj._mesh_lods));

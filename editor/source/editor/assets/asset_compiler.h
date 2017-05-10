@@ -1,54 +1,54 @@
 #pragma once
 #include "runtime/system/filesystem.h"
 
-struct Shader;
-struct Texture;
-class Mesh;
+struct shader;
+struct texture;
+class mesh;
 
-struct ShaderCompiler
+struct shader_compiler
 {
 	static void compile(const fs::path& absoluteKey);
 };
 
-struct TextureCompiler
+struct texture_compiler
 {
 	static void compile(const fs::path& absoluteKey);
 };
 
-struct MeshCompiler
+struct mesh_compiler
 {
 	static void compile(const fs::path& absoluteKey);
 };
 
 template<typename T>
-struct AssetCompiler
+struct asset_compiler
 {
 	static void compile(const fs::path& absoluteKey);
 };
 
 template<>
-struct AssetCompiler<Shader>
+struct asset_compiler<shader>
 {
 	static void compile(const fs::path& absoluteKey)
 	{
-		ShaderCompiler::compile(absoluteKey);
+		shader_compiler::compile(absoluteKey);
 	}
 };
 
 template<>
-struct AssetCompiler<Texture>
+struct asset_compiler<texture>
 {
 	static void compile(const fs::path& absoluteKey)
 	{
-		TextureCompiler::compile(absoluteKey);
+		texture_compiler::compile(absoluteKey);
 	}
 };
 
 template<>
-struct AssetCompiler<Mesh>
+struct asset_compiler<mesh>
 {
 	static void compile(const fs::path& absoluteKey)
 	{
-		MeshCompiler::compile(absoluteKey);
+		mesh_compiler::compile(absoluteKey);
 	}
 };

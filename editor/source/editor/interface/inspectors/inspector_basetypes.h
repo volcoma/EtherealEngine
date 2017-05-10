@@ -3,86 +3,86 @@
 #include "inspector.h"
 #include "core/common/basetypes.hpp"
 
-struct Inspector_iRect : public Inspector
+struct inspector_irect : public inspector
 {
-	REFLECTABLE(Inspector_iRect, Inspector)
+	REFLECTABLE(inspector_irect, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_iRect, iRect)
+INSPECTOR_REFLECT(inspector_irect, irect)
 
-struct Inspector_uRect : public Inspector
+struct inspector_urect : public inspector
 {
-	REFLECTABLE(Inspector_uRect, Inspector)
+	REFLECTABLE(inspector_urect, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_uRect, uRect)
+INSPECTOR_REFLECT(inspector_urect, urect)
 
-struct Inspector_fRect : public Inspector
+struct inspector_frect : public inspector
 {
-	REFLECTABLE(Inspector_fRect, Inspector)
+	REFLECTABLE(inspector_frect, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_fRect, fRect)
+INSPECTOR_REFLECT(inspector_frect, frect)
 
-struct Inspector_iPoint : public Inspector
+struct inspector_ipoint : public inspector
 {
-	REFLECTABLE(Inspector_iPoint, Inspector)
+	REFLECTABLE(inspector_ipoint, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_iPoint, iPoint)
+INSPECTOR_REFLECT(inspector_ipoint, ipoint)
 
-struct Inspector_uPoint : public Inspector
+struct inspector_upoint : public inspector
 {
-	REFLECTABLE(Inspector_uPoint, Inspector)
+	REFLECTABLE(inspector_upoint, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_uPoint, uPoint)
+INSPECTOR_REFLECT(inspector_upoint, upoint)
 
-struct Inspector_fPoint : public Inspector
+struct inspector_fpoint : public inspector
 {
-	REFLECTABLE(Inspector_fPoint, Inspector)
+	REFLECTABLE(inspector_fpoint, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_fPoint, fPoint)
+INSPECTOR_REFLECT(inspector_fpoint, fpoint)
 
-struct Inspector_iSize : public Inspector
+struct inspector_isize : public inspector
 {
-	REFLECTABLE(Inspector_iSize, Inspector)
+	REFLECTABLE(inspector_isize, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_iSize, iSize)
+INSPECTOR_REFLECT(inspector_isize, isize)
 
-struct Inspector_uSize : public Inspector
+struct inspector_usize : public inspector
 {
-	REFLECTABLE(Inspector_uSize, Inspector)
+	REFLECTABLE(inspector_usize, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_uSize, uSize)
+INSPECTOR_REFLECT(inspector_usize, usize)
 
-struct Inspector_fSize : public Inspector
+struct inspector_fsize : public inspector
 {
-	REFLECTABLE(Inspector_fSize, Inspector)
+	REFLECTABLE(inspector_fsize, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_fSize, fSize)
+INSPECTOR_REFLECT(inspector_fsize, fsize)
 
-struct Inspector_iRange : public Inspector
+struct inspector_irange : public inspector
 {
-	REFLECTABLE(Inspector_iRange, Inspector)
+	REFLECTABLE(inspector_irange, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_iRange, iRange)
+INSPECTOR_REFLECT(inspector_irange, irange)
 
-struct Inspector_uRange : public Inspector
+struct inspector_urange : public inspector
 {
-	REFLECTABLE(Inspector_uRange, Inspector)
+	REFLECTABLE(inspector_urange, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_uRange, uRange)
+INSPECTOR_REFLECT(inspector_urange, urange)
 
-struct Inspector_fRange : public Inspector
+struct inspector_frange : public inspector
 {
-	REFLECTABLE(Inspector_fRange, Inspector)
+	REFLECTABLE(inspector_frange, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_fRange, fRange)
+INSPECTOR_REFLECT(inspector_frange, frange)

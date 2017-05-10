@@ -14,7 +14,7 @@ namespace gfx
 	using namespace bgfx;
 	using namespace bx;
 	
-	struct PosTexCoord0Vertex
+	struct pos_texcoord0_vertex
 	{
 		float x, y, z;
 		float u, v;
@@ -31,7 +31,7 @@ namespace gfx
 		static bgfx::VertexDecl decl;
 	};
 
-	struct MeshVertex
+	struct mesh_vertex
 	{
 		static void init()
 		{
@@ -78,9 +78,9 @@ namespace gfx
 		return 0 != (formatCaps & flags);
 	}
 
-	namespace FormatSearchFlags
+	namespace format_search_flags
 	{
-		enum E
+		enum e
 		{
 			OneChannel = 0x1,
 			TwoChannels = 0x2,
@@ -97,7 +97,7 @@ namespace gfx
 			FloatingPoint = 0xF000,
 		};
 
-	}; // End Namespace : FormatSearchFlags
+	}; // End Namespace : format_search_flags
 
 	TextureFormat::Enum get_best_format(std::uint16_t type, std::uint32_t search_flags);
 

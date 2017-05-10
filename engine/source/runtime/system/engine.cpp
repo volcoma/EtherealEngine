@@ -12,12 +12,13 @@
 
 namespace runtime
 {
-	event<void(std::chrono::duration<float>)> on_frame_begin;
-	event<void(std::chrono::duration<float>)> on_frame_update;
-	event<void(std::chrono::duration<float>)> on_frame_render;
-	event<void(std::chrono::duration<float>)> on_frame_end;
+	signal<void(std::chrono::duration<float>)> on_frame_begin;
+	signal<void(std::chrono::duration<float>)> on_frame_update;
+	signal<void(std::chrono::duration<float>)> on_frame_render;
+	signal<void(std::chrono::duration<float>)> on_frame_end;
 
-	bool Engine::initialize()
+
+	bool engine::initialize()
 	{
 		auto logger = logging::create(APPLOG,
 		{
@@ -31,42 +32,42 @@ namespace runtime
 		return true;
 	}
 
-	void Engine::dispose()
+	void engine::dispose()
 	{
 
 	}
 
 
-	bool Engine::start(std::shared_ptr<RenderWindow> main_window)
+	bool engine::start(std::shared_ptr<render_window> main_window)
 	{
-		core::add_subsystem<core::Simulation>();
+		core::add_subsystem<core::simulation>();
 
-		auto renderer = core::add_subsystem<Renderer>();
-		if (!renderer->init_backend(*main_window))
+		auto render = core::add_subsystem<renderer>();
+		if (!render->init_backend(*main_window))
 		{
 			APPLOG_ERROR("Could not initialize rendering backend!");
 			return false;
 		}
 		register_window(main_window);
-		core::add_subsystem<Input>();
-		core::add_subsystem<AssetManager>();
-		core::add_subsystem<EntityComponentSystem>();
-		core::add_subsystem<TaskSystem>();
-		core::add_subsystem<SceneGraph>();
-		core::add_subsystem<CameraSystem>();
-		core::add_subsystem<DeferredRendering>();
+		core::add_subsystem<input>();
+		core::add_subsystem<asset_manager>();
+		core::add_subsystem<entity_component_system>();
+		core::add_subsystem<task_system>();
+		core::add_subsystem<scene_graph>();
+		core::add_subsystem<camera_system>();
+		core::add_subsystem<deferred_rendering>();
 
 		return true;
 	}
 
 
-	void Engine::run_one_frame()
+	void engine::run_one_frame()
 	{
 		if (!_running)
 			return;
 
-		auto sim = core::get_subsystem<core::Simulation>();
-		auto input = core::get_subsystem<Input>();
+		auto sim = core::get_subsystem<core::simulation>();
+		auto inp = core::get_subsystem<input>();
 
 		sim->run_one_frame();
 		auto dt = sim->get_delta_time();
@@ -96,7 +97,7 @@ namespace runtime
 			{
 				if (has_focus)
 				{
-					input->handle_event(e);
+					inp->handle_event(e);
 				}
 			}
 
@@ -119,12 +120,12 @@ namespace runtime
 		on_frame_end(dt);
 	}
 	
-	void Engine::register_window(std::shared_ptr<RenderWindow> window)
+	void engine::register_window(std::shared_ptr<render_window> window)
 	{
-		auto on_closed = [this](RenderWindow& wnd)
+		auto on_closed = [this](render_window& wnd)
 		{
 			_windows.erase(std::remove_if(std::begin(_windows), std::end(_windows),
-				[this, &wnd](std::shared_ptr<RenderWindow>& other)
+				[this, &wnd](std::shared_ptr<render_window>& other)
 			{
 				return (&wnd == other.get());
 			}), std::end(_windows));
@@ -138,7 +139,7 @@ namespace runtime
 		_windows.push_back(window);
 	}
 
-	void Engine::destroy_windows()
+	void engine::destroy_windows()
 	{
 		_windows.clear();
 		_focused_window.reset();

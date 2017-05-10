@@ -5,9 +5,9 @@
 #include "../../../meta/rendering/light.hpp"
 
 
-REFLECT(LightComponent)
+REFLECT(light_component)
 {
-	rttr::registration::class_<LightComponent>("LightComponent")
+	rttr::registration::class_<light_component>("light_component")
 		(
 			rttr::metadata("Category", "Lighting"),
 			rttr::metadata("Id", "Light")
@@ -19,18 +19,18 @@ REFLECT(LightComponent)
 }
 
 
-SAVE(LightComponent)
+SAVE(light_component)
 {
-	try_save(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)));
+	try_save(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::component>(&obj)));
 	try_save(ar, cereal::make_nvp("light", obj._light));
 }
 
-LOAD(LightComponent)
+LOAD(light_component)
 {
-	try_load(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::Component>(&obj)));
+	try_load(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::component>(&obj)));
 	try_load(ar, cereal::make_nvp("light", obj._light));
 }
 
 
 #include "core/serialization/archives.h"
-CEREAL_REGISTER_TYPE(LightComponent);
+CEREAL_REGISTER_TYPE(light_component);

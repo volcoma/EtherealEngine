@@ -10,22 +10,20 @@
 #include "runtime/system/engine.h"
 #include "core/serialization/archives.h"
 #include "meta/project.hpp"
-class Mesh;
-struct Prefab;
-struct Scene;
-struct Texture;
-struct Shader;
-class Material;
+class mesh;
+struct prefab;
+struct scene;
+struct texture;
+struct shader;
+class material;
 
 namespace editor
 {
-
-
 	template<typename T>
 	void watch_assets(const fs::path& protocol, const std::string& wildcard, bool initialList, bool reloadAsync)
 	{
-		auto am = core::get_subsystem<runtime::AssetManager>();
-		auto ts = core::get_subsystem<runtime::TaskSystem>();
+		auto am = core::get_subsystem<runtime::asset_manager>();
+		auto ts = core::get_subsystem<runtime::task_system>();
 
 		const fs::path dir = fs::resolve_protocol(protocol);
 		fs::path watchDir = dir / wildcard;
@@ -69,8 +67,8 @@ namespace editor
 	template<typename T>
 	void watch_raw_assets(const fs::path& protocol, const std::string& wildcard, bool initialList)
 	{
-		auto am = core::get_subsystem<runtime::AssetManager>();
-		auto ts = core::get_subsystem<runtime::TaskSystem>();
+		auto am = core::get_subsystem<runtime::asset_manager>();
+		auto ts = core::get_subsystem<runtime::task_system>();
 
 		const fs::path dir = fs::resolve_protocol(protocol);
 		const fs::path watch_dir = dir / wildcard;
@@ -97,7 +95,7 @@ namespace editor
 						// created or modified or renamed
 						auto task = ts->create("", [p]()
 						{
-							AssetCompiler<T>::compile(p);
+							asset_compiler<T>::compile(p);
 						});
 						ts->run(task);
 					}
@@ -105,7 +103,7 @@ namespace editor
 			}
 		});
 	}
-	void AssetFolder::watch(bool recompile_assets)
+	void asset_directory::watch(bool recompile_assets)
 	{
 		fs::watcher::watch(absolute / fs::path("*"), true, [this, recompile_assets](const std::vector<fs::watcher::Entry>& entries)
 		{
@@ -118,7 +116,7 @@ namespace editor
 					if (entry.state == fs::watcher::Entry::New)
 					{
 						std::unique_lock<std::mutex> lock(directories_mutex);
-						directories.emplace_back(std::make_shared<AssetFolder>(this, p, p.filename().string(), root_path, recompile_assets));
+						directories.emplace_back(std::make_shared<asset_directory>(this, p, p.filename().string(), root_path, recompile_assets));
 
 					}
 					else if (entry.state == fs::watcher::Entry::Modified)
@@ -129,7 +127,7 @@ namespace editor
 					{
 						std::unique_lock<std::mutex> lock(directories_mutex);
 						auto it = std::find_if(std::begin(directories), std::end(directories),
-							[&entry](const std::shared_ptr<AssetFolder>& other) { return entry.last_path == other->absolute; }
+							[&entry](const std::shared_ptr<asset_directory>& other) { return entry.last_path == other->absolute; }
 						);
 
 						if (it != std::end(directories))
@@ -143,7 +141,7 @@ namespace editor
 					{
 						std::unique_lock<std::mutex> lock(directories_mutex);
 						directories.erase(std::remove_if(std::begin(directories), std::end(directories),
-							[&entry](const std::shared_ptr<AssetFolder>& other) { return entry.path.filename().string() == other->name; }
+							[&entry](const std::shared_ptr<asset_directory>& other) { return entry.path.filename().string() == other->name; }
 						), std::end(directories));
 					}
 				}
@@ -154,7 +152,7 @@ namespace editor
 						std::unique_lock<std::mutex> lock(files_mutex);
 						fs::path filename = p.stem();
 						fs::path ext = p.extension();
-						files.emplace_back(AssetFile(p, filename.string(), ext.string(), root_path));
+						files.emplace_back(asset_file(p, filename.string(), ext.string(), root_path));
 					}
 					else if (entry.state == fs::watcher::Entry::Modified)
 					{
@@ -164,7 +162,7 @@ namespace editor
 					{
 						std::unique_lock<std::mutex> lock(files_mutex);
 						auto it = std::find_if(std::begin(files), std::end(files),
-							[&entry](const AssetFile& other) { return entry.last_path == other.absolute; }
+							[&entry](const asset_file& other) { return entry.last_path == other.absolute; }
 						);
 
 						if (it != std::end(files))
@@ -179,7 +177,7 @@ namespace editor
 					{
 						std::unique_lock<std::mutex> lock(files_mutex);
 						files.erase(std::remove_if(std::begin(files), std::end(files),
-							[&entry](const AssetFile& other) { return entry.path == other.absolute; }
+							[&entry](const asset_file& other) { return entry.path == other.absolute; }
 						), std::end(files));
 					}
 				}
@@ -187,41 +185,41 @@ namespace editor
 		});
 		static const std::string wildcard = "*";
 
-		watch_assets<Material>(relative, wildcard + extensions::material, true, false);
+		watch_assets<material>(relative, wildcard + extensions::material, true, false);
 
-		watch_assets<Texture>(relative, wildcard + extensions::texture, !recompile_assets, true);
+		watch_assets<texture>(relative, wildcard + extensions::texture, !recompile_assets, true);
 		static const std::array<std::string, 6>  raw_texture_formats = 
 		{ 
 			"*.png", "*.jpg", "*.tga", "*.dds", "*.ktx", "*.pvr" 
 		};
 		for (const auto& format : raw_texture_formats)
 		{
-			watch_raw_assets<Texture>(relative, format, recompile_assets);
+			watch_raw_assets<texture>(relative, format, recompile_assets);
 		}
 
-		watch_assets<Shader>(relative, wildcard + extensions::shader, !recompile_assets, true);
-		watch_raw_assets<Shader>(relative, "*.sc", recompile_assets);
+		watch_assets<shader>(relative, wildcard + extensions::shader, !recompile_assets, true);
+		watch_raw_assets<shader>(relative, "*.sc", recompile_assets);
 
-		watch_assets<Mesh>(relative, wildcard + extensions::mesh, !recompile_assets, true);
+		watch_assets<mesh>(relative, wildcard + extensions::mesh, !recompile_assets, true);
 		static const std::array<std::string, 5>  raw_mesh_formats =
 		{
 			"*.obj", "*.fbx", "*.dae", "*.blend", "*.3ds"
 		};
 		for (const auto& format : raw_mesh_formats)
 		{
-			watch_raw_assets<Mesh>(relative, format, recompile_assets);
+			watch_raw_assets<mesh>(relative, format, recompile_assets);
 		}
-		watch_assets<Prefab>(relative, wildcard + extensions::prefab, true, true);
-		watch_assets<Scene>(relative, wildcard + extensions::scene, true, true);
+		watch_assets<prefab>(relative, wildcard + extensions::prefab, true, true);
+		watch_assets<scene>(relative, wildcard + extensions::scene, true, true);
 		
 	}
 
-	AssetFile::AssetFile(const fs::path& abs, const std::string& n, const std::string& ext, const fs::path& r)
+	asset_file::asset_file(const fs::path& abs, const std::string& n, const std::string& ext, const fs::path& r)
 	{
 		populate(abs, n, ext, r);
 	}
 
-	void AssetFile::populate(const fs::path& abs, const std::string& n, const std::string& ext, const fs::path& r)
+	void asset_file::populate(const fs::path& abs, const std::string& n, const std::string& ext, const fs::path& r)
 	{
 		absolute = abs;
 		name = n;
@@ -232,17 +230,17 @@ namespace editor
 		relative = string_utils::replace(a.replace_extension().generic_string(), root_path.generic_string(), "app:/data");
 	}
 
-	AssetFolder::AssetFolder(AssetFolder* p, const fs::path& abs, const std::string& n, const fs::path& r, bool recompile_assets)
+	asset_directory::asset_directory(asset_directory* p, const fs::path& abs, const std::string& n, const fs::path& r, bool recompile_assets)
 	{
 		populate(p, abs, n, r, recompile_assets);
 	}
 
-	AssetFolder::~AssetFolder()
+	asset_directory::~asset_directory()
 	{
 		unwatch();
 	}
 
-	void AssetFolder::populate(AssetFolder* p, const fs::path& abs, const std::string& n, const fs::path& r, bool recompile_assets)
+	void asset_directory::populate(asset_directory* p, const fs::path& abs, const std::string& n, const fs::path& r, bool recompile_assets)
 	{	
 		if(!absolute.empty())
 			unwatch();
@@ -256,12 +254,12 @@ namespace editor
 		watch(recompile_assets);
 	}
 
-	void AssetFolder::unwatch()
+	void asset_directory::unwatch()
 	{
 		fs::watcher::unwatch(absolute / fs::path("*"), true);
 	}
 
-	void ProjectManager::open_project(const fs::path& project_path, bool recompile_assets)
+	void project_manager::open_project(const fs::path& project_path, bool recompile_assets)
 	{
 		if (!fs::exists(project_path, std::error_code{}))
 		{
@@ -271,9 +269,9 @@ namespace editor
 
 		fs::add_path_protocol("app:", project_path);
 		
-		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
-		auto am = core::get_subsystem<runtime::AssetManager>();
-		auto es = core::get_subsystem<EditState>();
+		auto ecs = core::get_subsystem<runtime::entity_component_system>();
+		auto am = core::get_subsystem<runtime::asset_manager>();
+		auto es = core::get_subsystem<editor_state>();
 		ecs->dispose();
 		es->unselect();
 		es->scene.clear();
@@ -286,39 +284,39 @@ namespace editor
 		static const std::string wildcard = "*";
 
 		/// for debug purposes
-		watch_assets<Shader>("engine_data:/shaders", wildcard + extensions::shader, !recompile_assets, true);
-		watch_raw_assets<Shader>("engine_data:/shaders", "*.sc", recompile_assets);
-		watch_assets<Shader>("editor_data:/shaders", wildcard + extensions::shader, !recompile_assets, true);
-		watch_raw_assets<Shader>("editor_data:/shaders", "*.sc", recompile_assets);
+		watch_assets<shader>("engine_data:/shaders", wildcard + extensions::shader, !recompile_assets, true);
+		watch_raw_assets<shader>("engine_data:/shaders", "*.sc", recompile_assets);
+		watch_assets<shader>("editor_data:/shaders", wildcard + extensions::shader, !recompile_assets, true);
+		watch_raw_assets<shader>("editor_data:/shaders", "*.sc", recompile_assets);
 
-//  	watch_assets<Mesh>("engine_data:/meshes", wildcard + extensions::mesh, !recompile_assets, true);
-//  	watch_raw_assets<Mesh>("engine_data:/meshes", "*.obj", recompile_assets);
-// 		watch_raw_assets<Mesh>("engine_data:/meshes", "*.fbx", recompile_assets);
-// 		watch_raw_assets<Mesh>("engine_data:/meshes", "*.dae", recompile_assets);
-// 		watch_raw_assets<Mesh>("engine_data:/meshes", "*.blend", recompile_assets);
-// 		watch_raw_assets<Mesh>("engine_data:/meshes", "*.3ds", recompile_assets);
+//  	watch_assets<mesh>("engine_data:/meshes", wildcard + extensions::mesh, !recompile_assets, true);
+//  	watch_raw_assets<mesh>("engine_data:/meshes", "*.obj", recompile_assets);
+// 		watch_raw_assets<mesh>("engine_data:/meshes", "*.fbx", recompile_assets);
+// 		watch_raw_assets<mesh>("engine_data:/meshes", "*.dae", recompile_assets);
+// 		watch_raw_assets<mesh>("engine_data:/meshes", "*.blend", recompile_assets);
+// 		watch_raw_assets<mesh>("engine_data:/meshes", "*.3ds", recompile_assets);
 // 
-// 		watch_assets<Texture>("engine_data:/textures", wildcard + extensions::texture, true, true);
-// 		watch_raw_assets<Texture>("engine_data:/textures", "*.png", recompile_assets);
-// 		watch_raw_assets<Texture>("engine_data:/textures", "*.tga", recompile_assets);
-// 		watch_raw_assets<Texture>("engine_data:/textures", "*.dds", recompile_assets);
-// 		watch_raw_assets<Texture>("engine_data:/textures", "*.ktx", recompile_assets);
-// 		watch_raw_assets<Texture>("engine_data:/textures", "*.pvr", recompile_assets);
+// 		watch_assets<texture>("engine_data:/textures", wildcard + extensions::texture, true, true);
+// 		watch_raw_assets<texture>("engine_data:/textures", "*.png", recompile_assets);
+// 		watch_raw_assets<texture>("engine_data:/textures", "*.tga", recompile_assets);
+// 		watch_raw_assets<texture>("engine_data:/textures", "*.dds", recompile_assets);
+// 		watch_raw_assets<texture>("engine_data:/textures", "*.ktx", recompile_assets);
+// 		watch_raw_assets<texture>("engine_data:/textures", "*.pvr", recompile_assets);
 // 
-// 		watch_assets<Texture>("editor_data:/icons", wildcard + extensions::texture, true, true);
-// 		watch_raw_assets<Texture>("editor_data:/icons", "*.png", recompile_assets);
-// 		watch_raw_assets<Texture>("editor_data:/icons", "*.tga", recompile_assets);
-// 		watch_raw_assets<Texture>("editor_data:/icons", "*.dds", recompile_assets);
-// 		watch_raw_assets<Texture>("editor_data:/icons", "*.ktx", recompile_assets);
-// 		watch_raw_assets<Texture>("editor_data:/icons", "*.pvr", recompile_assets);
+// 		watch_assets<texture>("editor_data:/icons", wildcard + extensions::texture, true, true);
+// 		watch_raw_assets<texture>("editor_data:/icons", "*.png", recompile_assets);
+// 		watch_raw_assets<texture>("editor_data:/icons", "*.tga", recompile_assets);
+// 		watch_raw_assets<texture>("editor_data:/icons", "*.dds", recompile_assets);
+// 		watch_raw_assets<texture>("editor_data:/icons", "*.ktx", recompile_assets);
+// 		watch_raw_assets<texture>("editor_data:/icons", "*.pvr", recompile_assets);
 // 
 
 		auto& root = fs::resolve_protocol("app:/data");
 		root_directory.reset();
-		root_directory = std::make_shared<AssetFolder>(nullptr, root, root.filename().string(), root, recompile_assets);
+		root_directory = std::make_shared<asset_directory>(nullptr, root, root.filename().string(), root, recompile_assets);
 	}
 
-	void ProjectManager::create_project(const fs::path& project_path)
+	void project_manager::create_project(const fs::path& project_path)
 	{
 		fs::add_path_protocol("app:", project_path);
 		fs::create_directory(fs::resolve_protocol("app:/data"), std::error_code{});
@@ -327,7 +325,7 @@ namespace editor
 		open_project(project_path, false);
 	}
 
-	void ProjectManager::load_config()
+	void project_manager::load_config()
 	{
 		const fs::path project_config_file = fs::resolve_protocol("editor_data:/config/project.cfg");
 		if (!fs::exists(project_config_file, std::error_code{}))
@@ -359,7 +357,7 @@ namespace editor
 		}
 	}
 
-	void ProjectManager::save_config()
+	void project_manager::save_config()
 	{
 		auto& rp = _options.recent_project_paths;
 		auto project_path = fs::resolve_protocol("app:");
@@ -375,13 +373,13 @@ namespace editor
 		try_save(ar, cereal::make_nvp("options", _options));
 	}
 
-	bool ProjectManager::initialize()
+	bool project_manager::initialize()
 	{
 		load_config();
 		return true;
 	}
 
-	void ProjectManager::dispose()
+	void project_manager::dispose()
 	{
 		save_config();
 		fs::watcher::unwatch_all();

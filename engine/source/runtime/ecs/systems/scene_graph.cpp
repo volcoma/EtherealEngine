@@ -3,7 +3,7 @@
 #include "../../system/engine.h"
 namespace runtime
 {
-	void update_transform(CHandle<TransformComponent> hTransform, std::chrono::duration<float> dt)
+	void update_transform(chandle<transform_component> hTransform, std::chrono::duration<float> dt)
 	{
 		auto pTransform = hTransform.lock();
 		if (pTransform)
@@ -18,11 +18,11 @@ namespace runtime
 		}
 	}
 
-	void SceneGraph::frame_update(std::chrono::duration<float> dt)
+	void scene_graph::frame_update(std::chrono::duration<float> dt)
 	{
-		auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
+		auto ecs = core::get_subsystem<runtime::entity_component_system>();
 		_roots.clear();
-		ecs->each<TransformComponent>([this](runtime::Entity e, TransformComponent& transformComponent)
+		ecs->each<transform_component>([this](runtime::entity e, transform_component& transformComponent)
 		{
 			auto parent = transformComponent.get_parent();
 			if (parent.expired())
@@ -37,15 +37,15 @@ namespace runtime
 		}
 	}
 
-	bool SceneGraph::initialize()
+	bool scene_graph::initialize()
 	{
-		runtime::on_frame_update.connect(this, &SceneGraph::frame_update);
+		runtime::on_frame_update.connect(this, &scene_graph::frame_update);
 
 		return true;
 	}
 
-	void SceneGraph::dispose()
+	void scene_graph::dispose()
 	{
-		runtime::on_frame_update.disconnect(this, &SceneGraph::frame_update);
+		runtime::on_frame_update.disconnect(this, &scene_graph::frame_update);
 	}
 }

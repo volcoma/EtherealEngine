@@ -125,7 +125,7 @@ public:
     /// \return Position of the window, in pixels
     ///
     ////////////////////////////////////////////////////////////
-    virtual iPoint getPosition() const = 0;
+    virtual ipoint getPosition() const = 0;
 
     ////////////////////////////////////////////////////////////
     /// \brief Change the position of the window on screen
@@ -133,7 +133,7 @@ public:
     /// \param position New position of the window, in pixels
     ///
     ////////////////////////////////////////////////////////////
-    virtual void setPosition(const iPoint& position) = 0;
+    virtual void setPosition(const ipoint& position) = 0;
 
     ////////////////////////////////////////////////////////////
     /// \brief Get the client size of the window
@@ -141,7 +141,7 @@ public:
     /// \return Size of the window, in pixels
     ///
     ////////////////////////////////////////////////////////////
-    virtual uSize getSize() const = 0;
+    virtual usize getSize() const = 0;
 
     ////////////////////////////////////////////////////////////
     /// \brief Change the size of the rendering region of the window
@@ -149,7 +149,7 @@ public:
     /// \param size New size, in pixels
     ///
     ////////////////////////////////////////////////////////////
-    virtual void setSize(const uSize& size) = 0;
+    virtual void setSize(const usize& size) = 0;
 
     ////////////////////////////////////////////////////////////
     /// \brief Change the title of the window

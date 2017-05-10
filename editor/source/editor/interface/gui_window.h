@@ -2,36 +2,36 @@
 #include "runtime/rendering/render_window.h"
 #include "docks/imguidock.h"
 
-class GuiWindow : public RenderWindow
+class gui_window : public render_window
 {
 public:
 	//-----------------------------------------------------------------------------
-	//  Name : GuiWindow ()
+	//  Name : gui_window ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	GuiWindow();
+	gui_window();
 	//-----------------------------------------------------------------------------
-	//  Name : GuiWindow ()
+	//  Name : gui_window ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	GuiWindow(sf::VideoMode mode, const std::string& title, std::uint32_t style = sf::Style::Default);
+	gui_window(sf::VideoMode mode, const std::string& title, std::uint32_t style = sf::Style::Default);
 	//-----------------------------------------------------------------------------
-	//  Name : ~GuiWindow (virtual )
+	//  Name : ~gui_window (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual ~GuiWindow();
+	virtual ~gui_window();
 
 	//-----------------------------------------------------------------------------
 	//  Name : frame_begin (virtual )
@@ -71,6 +71,14 @@ public:
 	//-----------------------------------------------------------------------------
 	virtual void on_gui(std::chrono::duration<float> dt) {}
 
+	//-----------------------------------------------------------------------------
+	//  Name : render_dockspace (virtual )
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	virtual void render_dockspace();
 
 	//-----------------------------------------------------------------------------
@@ -100,11 +108,11 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline ImGuiDock::Dockspace& get_dockspace() { return _dockspace; }
+	inline imguidock::dockspace& get_dockspace() { return _dockspace; }
 
 private:
 	///
-	ImGuiDock::Dockspace _dockspace;
+	imguidock::dockspace _dockspace;
 	///
 	ImGuiContext* _gui_context;
 };

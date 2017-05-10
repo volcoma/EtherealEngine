@@ -4,9 +4,9 @@
 
 namespace runtime
 {
-	struct App
+	struct app
 	{
-		App();
+		app();
 
 		//-----------------------------------------------------------------------------
 		//  Name : setup (virtual )

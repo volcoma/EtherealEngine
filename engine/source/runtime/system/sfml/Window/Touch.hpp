@@ -61,7 +61,7 @@ public:
     /// \return Current position of \a finger, or undefined if it's not down
     ///
     ////////////////////////////////////////////////////////////
-    static iPoint getPosition(unsigned int finger);
+    static ipoint getPosition(unsigned int finger);
 
     ////////////////////////////////////////////////////////////
     /// \brief Get the current position of a touch in window coordinates
@@ -75,7 +75,7 @@ public:
     /// \return Current position of \a finger, or undefined if it's not down
     ///
     ////////////////////////////////////////////////////////////
-    static iPoint getPosition(unsigned int finger, const Window& relativeTo);
+    static ipoint getPosition(unsigned int finger, const Window& relativeTo);
 };
 
 } // namespace sf

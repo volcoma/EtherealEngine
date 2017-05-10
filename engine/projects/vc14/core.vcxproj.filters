@@ -79,9 +79,6 @@
     <Filter Include="Source Files\reflection\rttr\detail\variant_array_view">
       <UniqueIdentifier>{58a8f8d0-8521-4e7d-aebd-95892a831bbe}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\events">
-      <UniqueIdentifier>{d09d6d9e-ee7a-4edd-8b24-e53df25688ee}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\random">
       <UniqueIdentifier>{5f8cb413-c8e9-4ac1-beda-eae8d06e882c}</UniqueIdentifier>
     </Filter>
@@ -169,17 +166,11 @@
     <Filter Include="Source Files\nonstd">
       <UniqueIdentifier>{2cc78274-1dd0-45cb-837d-5fe8d04030f1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\signals">
+      <UniqueIdentifier>{64c0f5ed-1f02-4690-bab5-823e0ff4c37b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\core\events\delegate.hpp">
-      <Filter>Source Files\events</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\events\event.hpp">
-      <Filter>Source Files\events</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\events\signal.hpp">
-      <Filter>Source Files\events</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\core\reflection\reflection.h">
       <Filter>Source Files\reflection</Filter>
     </ClInclude>
@@ -515,9 +506,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\core\platform_config.h">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\core\math\math_includes.h">
-      <Filter>Source Files\math</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\core\math\glm_includes.h">
       <Filter>Source Files\math</Filter>
@@ -1317,9 +1305,6 @@
     <ClInclude Include="..\..\source\core\common\pathname_tag_tree.h">
       <Filter>Source Files\common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\core\events\binder.hpp">
-      <Filter>Source Files\events</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\core\nonstd\any.hpp">
       <Filter>Source Files\nonstd</Filter>
     </ClInclude>
@@ -1358,6 +1343,18 @@
     </ClInclude>
     <ClInclude Include="..\..\source\core\config\cfg\parser.h">
       <Filter>Source Files\config\cfg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\math\math_includes.h">
+      <Filter>Source Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\signals\binder.hpp">
+      <Filter>Source Files\signals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\signals\delegate.hpp">
+      <Filter>Source Files\signals</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\core\signals\signal.hpp">
+      <Filter>Source Files\signals</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

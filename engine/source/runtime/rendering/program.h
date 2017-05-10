@@ -6,12 +6,12 @@
 #include <unordered_map>
 #include <limits>
 
-struct FrameBuffer;
-struct Texture;
-struct Shader;
-struct Uniform;
+struct frame_buffer;
+struct texture;
+struct shader;
+struct uniform;
 
-struct Program
+struct program
 {
 	//-----------------------------------------------------------------------------
 	//  Name : Program ()
@@ -21,7 +21,7 @@ struct Program
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	Program() = default;
+	program() = default;
 	
 	//-----------------------------------------------------------------------------
 	//  Name : Program ()
@@ -31,7 +31,7 @@ struct Program
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	Program(AssetHandle<Shader> computeShader);
+	program(asset_handle<shader> computeShader);
 	
 	//-----------------------------------------------------------------------------
 	//  Name : Program ()
@@ -41,7 +41,7 @@ struct Program
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	Program(AssetHandle<Shader> vertexShader, AssetHandle<Shader> fragmentShader);
+	program(asset_handle<shader> vertexShader, asset_handle<shader> fragmentShader);
 	
 	//-----------------------------------------------------------------------------
 	//  Name : ~Program ()
@@ -51,7 +51,7 @@ struct Program
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	~Program();
+	~program();
 
 	//-----------------------------------------------------------------------------
 	//  Name : dispose ()
@@ -83,7 +83,7 @@ struct Program
 	//-----------------------------------------------------------------------------
 	void set_texture(std::uint8_t _stage
 		, const std::string& _sampler
-		, FrameBuffer* _handle
+		, frame_buffer* _handle
 		, uint8_t _attachment = 0
 		, std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
 	
@@ -111,7 +111,7 @@ struct Program
 	//-----------------------------------------------------------------------------
 	void set_texture(std::uint8_t _stage
 		, const std::string& _sampler
-		, Texture* _texture
+		, texture* _texture
 		, std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
 	
 	//-----------------------------------------------------------------------------
@@ -145,7 +145,7 @@ struct Program
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::shared_ptr<Uniform> get_uniform(const std::string& _name, bool texture = false);
+	std::shared_ptr<uniform> get_uniform(const std::string& _name, bool texture = false);
 
 	//-----------------------------------------------------------------------------
 	//  Name : add_shader ()
@@ -155,7 +155,7 @@ struct Program
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void add_shader(AssetHandle<Shader> shader);
+	void add_shader(asset_handle<shader> shader);
 	
 	//-----------------------------------------------------------------------------
 	//  Name : populate ()
@@ -178,11 +178,11 @@ struct Program
 	bool begin_pass();
 
 	/// Shaders that created this program.
-	std::vector<AssetHandle<Shader>> shaders;
+	std::vector<asset_handle<shader>> shaders;
 	/// Shaders that created this program.
 	std::vector<std::uint16_t> shaders_cached;
 	/// All uniforms for this program.
-	std::unordered_map<std::string, std::shared_ptr<Uniform>> uniforms;
+	std::unordered_map<std::string, std::shared_ptr<uniform>> uniforms;
 	/// Internal handle
 	gfx::ProgramHandle handle = { gfx::invalidHandle };
 };

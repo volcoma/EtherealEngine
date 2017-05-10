@@ -8,42 +8,42 @@
 #include "core/serialization/serialization.h"
 #include "graphics/graphics.h"
 
-struct Program;
-struct Texture;
-struct FrameBuffer;
+struct program;
+struct texture;
+struct frame_buffer;
 
-enum class CullType : std::uint32_t
+enum class cull_type : std::uint32_t
 {
-	None,
-	ClockWise,
-	CounterClockWise,
+	none,
+	clockwise,
+	counter_clockwise,
 };
 
-class Material
+class material
 {
 public:
-	REFLECTABLE(Material)
-	SERIALIZABLE(Material)
+	REFLECTABLE(material)
+	SERIALIZABLE(material)
 
 	//-----------------------------------------------------------------------------
-	//  Name : Material ()
+	//  Name : material ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	Material();
+	material();
 
 	//-----------------------------------------------------------------------------
-	//  Name : ~Material (virtual )
+	//  Name : ~material (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual ~Material();
+	virtual ~material();
 
 	//-----------------------------------------------------------------------------
 	//  Name : is_valid ()
@@ -65,7 +65,7 @@ public:
 	//-----------------------------------------------------------------------------
 	void set_texture(std::uint8_t _stage
 		, const std::string& _sampler
-		, FrameBuffer* _handle
+		, frame_buffer* _handle
 		, uint8_t _attachment = 0
 		, std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
 
@@ -93,7 +93,7 @@ public:
 	//-----------------------------------------------------------------------------
 	void set_texture(std::uint8_t _stage
 		, const std::string& _sampler
-		, Texture* _texture
+		, texture* _texture
 		, std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
 
 	//-----------------------------------------------------------------------------
@@ -127,7 +127,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	Program* get_program() const;
+	program* get_program() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : submit (virtual )
@@ -147,7 +147,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline CullType get_cull_type() const { return _cull_type; }
+	inline cull_type get_cull_type() const { return _cull_type; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_cull_type ()
@@ -157,7 +157,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_cull_type(CullType val) { _cull_type = val; }
+	inline void set_cull_type(cull_type val) { _cull_type = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_render_states ()
@@ -172,33 +172,33 @@ public:
 	bool skinned = false;
 protected:
 	/// Program that is responsible for rendering.
-	std::unique_ptr<Program> _program;
+	std::unique_ptr<program> _program;
 	/// Program that is responsible for rendering.
-	std::unique_ptr<Program> _program_skinned;
+	std::unique_ptr<program> _program_skinned;
 	/// Cull type for this material.
-	CullType _cull_type = CullType::CounterClockWise;
+	cull_type _cull_type = cull_type::counter_clockwise;
 	/// Default color texture
-	AssetHandle<Texture> _default_color_map;
+	asset_handle<texture> _default_color_map;
 	/// Default normal texture
-	AssetHandle<Texture> _default_normal_map;
+	asset_handle<texture> _default_normal_map;
 };
 
 
-class StandardMaterial : public Material
+class standard_material : public material
 {
 public:
-	REFLECTABLE(StandardMaterial, Material)
-	SERIALIZABLE(StandardMaterial)
+	REFLECTABLE(standard_material, material)
+	SERIALIZABLE(standard_material)
 
 	//-----------------------------------------------------------------------------
-	//  Name : StandardMaterial ()
+	//  Name : standard_material ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	StandardMaterial();
+	standard_material();
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_base_color ()
@@ -388,7 +388,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> get_color_map() { return _maps["color"]; }
+	inline asset_handle<texture> get_color_map() { return _maps["color"]; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_color_map ()
@@ -398,7 +398,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_color_map(AssetHandle<Texture> val) { _maps["color"] = val; }
+	inline void set_color_map(asset_handle<texture> val) { _maps["color"] = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_normal_map ()
@@ -408,7 +408,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> get_normal_map() { return _maps["normal"]; }
+	inline asset_handle<texture> get_normal_map() { return _maps["normal"]; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_normal_map ()
@@ -418,7 +418,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_normal_map(AssetHandle<Texture> val) { _maps["normal"] = val; }
+	inline void set_normal_map(asset_handle<texture> val) { _maps["normal"] = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_roughness_map ()
@@ -428,7 +428,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> get_roughness_map() { return _maps["roughness"]; }
+	inline asset_handle<texture> get_roughness_map() { return _maps["roughness"]; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_roughness_map ()
@@ -438,7 +438,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_roughness_map(AssetHandle<Texture> val) { _maps["roughness"] = val; }
+	inline void set_roughness_map(asset_handle<texture> val) { _maps["roughness"] = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_metalness_map ()
@@ -448,7 +448,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> get_metalness_map() { return _maps["metalness"]; }
+	inline asset_handle<texture> get_metalness_map() { return _maps["metalness"]; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_metalness_map ()
@@ -458,7 +458,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_metalness_map(AssetHandle<Texture> val) { _maps["metalness"] = val; }
+	inline void set_metalness_map(asset_handle<texture> val) { _maps["metalness"] = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_ao_map ()
@@ -468,7 +468,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline AssetHandle<Texture> get_ao_map() { return _maps["ao"]; }
+	inline asset_handle<texture> get_ao_map() { return _maps["ao"]; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_ao_map ()
@@ -478,7 +478,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_ao_map(AssetHandle<Texture> val) { _maps["ao"] = val; }
+	inline void set_ao_map(asset_handle<texture> val) { _maps["ao"] = val; }
 
 	//-----------------------------------------------------------------------------
 	//  Name : submit (virtual )
@@ -529,5 +529,5 @@ private:
 	};
 
 	/// Texture maps
-	std::unordered_map<std::string, AssetHandle<Texture>> _maps;
+	std::unordered_map<std::string, asset_handle<texture>> _maps;
 };

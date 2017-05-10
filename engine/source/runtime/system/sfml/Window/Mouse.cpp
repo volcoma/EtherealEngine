@@ -40,28 +40,28 @@ bool Mouse::isButtonPressed(Button button)
 
 
 ////////////////////////////////////////////////////////////
-iPoint Mouse::getPosition()
+ipoint Mouse::getPosition()
 {
     return priv::InputImpl::getMousePosition();
 }
 
 
 ////////////////////////////////////////////////////////////
-iPoint Mouse::getPosition(const Window& relativeTo)
+ipoint Mouse::getPosition(const Window& relativeTo)
 {
     return priv::InputImpl::getMousePosition(relativeTo);
 }
 
 
 ////////////////////////////////////////////////////////////
-void Mouse::setPosition(const iPoint& position)
+void Mouse::setPosition(const ipoint& position)
 {
     priv::InputImpl::setMousePosition(position);
 }
 
 
 ////////////////////////////////////////////////////////////
-void Mouse::setPosition(const iPoint& position, const Window& relativeTo)
+void Mouse::setPosition(const ipoint& position, const Window& relativeTo)
 {
     priv::InputImpl::setMousePosition(position, relativeTo);
 }

@@ -63,8 +63,7 @@ bool try_implicit_cast(const nonstd::any& operand, To& result)
 {
 	if (operand.type() == rtti::type_id<To>())
 	{
-		auto val = nonstd::any_cast<To>(operand);
-		result = static_cast<To>(val);
+		result = nonstd::any_cast<To>(operand);
 		return true;
 	}
 	else if (implicit_cast_impl<std::int8_t>(operand, result))
@@ -143,9 +142,9 @@ T implicit_cast(const nonstd::any& operand)
 }
 
 // Function wrapper used for storage and invoke
-struct function_wrapper
+struct base_function_wrapper
 {
-	virtual ~function_wrapper() = default;
+	virtual ~base_function_wrapper() = default;
 
 	virtual nonstd::any invoke(const std::vector<nonstd::any>& params) const = 0;
 
@@ -153,10 +152,10 @@ struct function_wrapper
 };
 
 template<typename F, typename IndexSequence>
-class function_wrapper_t;
+class function_wrapper;
 
 template<typename F, size_t... ArgCount>
-class function_wrapper_t<F, nonstd::index_sequence<ArgCount...>> : public function_wrapper
+class function_wrapper<F, nonstd::index_sequence<ArgCount...>> : public base_function_wrapper
 {
 	template<std::size_t... Arg_Idx>
 	nonstd::any invoke_variadic_impl(nonstd::index_sequence<Arg_Idx...>, const std::vector<nonstd::any>& arg_list) const
@@ -197,11 +196,11 @@ public:
 	using delegate_t = delegate<typename nonstd::function_traits<F>::function_type>;
 
 	template<typename C>
-	function_wrapper_t(C * const object_ptr, F f)
+	function_wrapper(C * const object_ptr, F f)
 		: _function(object_ptr, f)
 	{}
 
-	function_wrapper_t(F f)
+	function_wrapper(F f)
 		: _function(f)
 	{}
 
@@ -227,23 +226,23 @@ private:
 };
 
 template <typename F>
-std::unique_ptr<function_wrapper> make_wrapper(F f)
+std::unique_ptr<base_function_wrapper> make_wrapper(F f)
 {
 	using arg_index_sequence = nonstd::make_index_sequence< nonstd::function_traits<F>::arity >;
-	using wrapper = function_wrapper_t<F, arg_index_sequence>;
+	using wrapper = function_wrapper<F, arg_index_sequence>;
 	return std::unique_ptr<wrapper>(new wrapper(std::forward<F>(f)));
 }
 
 template <typename C, typename F>
-std::unique_ptr<function_wrapper> make_wrapper(C * const object_ptr, F f)
+std::unique_ptr<base_function_wrapper> make_wrapper(C * const object_ptr, F f)
 {
 	using arg_index_sequence = nonstd::make_index_sequence< nonstd::function_traits<F>::arity >;
-	using wrapper = function_wrapper_t<F, arg_index_sequence>;
+	using wrapper = function_wrapper<F, arg_index_sequence>;
 	return std::unique_ptr<wrapper>(new wrapper(object_ptr, std::forward<F>(f)));
 }
 
 template<typename id_t = std::string, typename sentinel_t = std::weak_ptr<void>>
-class signals_t
+class signals
 {
 	struct info_t
 	{
@@ -252,7 +251,7 @@ class signals_t
 		///Sentinel used for life tracking
 		nonstd::optional<sentinel_t> sentinel;
 		///The function wrapper
-		std::unique_ptr<function_wrapper> function;
+		std::unique_ptr<base_function_wrapper> function;
 	};
 
 public:
@@ -324,7 +323,7 @@ public:
 		auto& container = _list[id];
 
 		using arg_index_sequence = nonstd::make_index_sequence< nonstd::function_traits<F>::arity >;
-		auto slot = typename function_wrapper_t<F, arg_index_sequence>::delegate_t(object_ptr, f);
+		auto slot = typename function_wrapper<F, arg_index_sequence>::delegate_t(object_ptr, f);
 		container.erase(std::remove_if(std::begin(container), std::end(container),
 			[&slot](const info_t& info) { return info.function->owns(slot); }
 		), std::end(container));
@@ -379,14 +378,14 @@ private:
 };
 
 template<typename id_t = std::string, typename sentinel_t = std::weak_ptr<void>>
-class functions_t
+class functions
 {
 	struct info_t
 	{
 		///Sentinel used for life tracking
 		nonstd::optional<sentinel_t> sentinel;
 		///The function wrapper
-		std::unique_ptr<function_wrapper> function;
+		std::unique_ptr<base_function_wrapper> function;
 	};
 public:
 	template<typename F>
@@ -492,10 +491,10 @@ private:
 
 
 template<typename id_t = std::string, typename sentinel_t = std::weak_ptr<void>>
-struct binder_t
+struct binder
 {
-	signals_t<id_t, sentinel_t> signals;
-	functions_t<id_t, sentinel_t> functions;
+	signals<id_t, sentinel_t> signals;
+	functions<id_t, sentinel_t> functions;
 };
 
 #endif

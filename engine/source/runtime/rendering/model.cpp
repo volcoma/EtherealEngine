@@ -8,22 +8,22 @@
 #include "../assets/asset_manager.h"
 
 
-Model::Model()
+model::model()
 {
-	auto am = core::get_subsystem<runtime::AssetManager>();
-	am->load<Material>("embedded:/standard", false)
+	auto am = core::get_subsystem<runtime::asset_manager>();
+	am->load<material>("embedded:/standard", false)
 		.then([this](auto asset)
 	{
 		_default_material = asset;
 	});
 }
 
-bool Model::is_valid() const
+bool model::is_valid() const
 {
 	return !_mesh_lods.empty();
 }
 
-AssetHandle<Mesh> Model::get_lod(std::uint32_t lod) const
+asset_handle<mesh> model::get_lod(std::uint32_t lod) const
 {
 	if (_mesh_lods.size() > lod)
 	{
@@ -44,10 +44,10 @@ AssetHandle<Mesh> Model::get_lod(std::uint32_t lod) const
 				return lodMesh;
 		}
 	}
-	return AssetHandle<Mesh>();
+	return asset_handle<mesh>();
 }
 
-void Model::set_lod(AssetHandle<Mesh> mesh, std::uint32_t lod)
+void model::set_lod(asset_handle<mesh> mesh, std::uint32_t lod)
 {
 	if (lod >= _mesh_lods.size())
 		_mesh_lods.resize(lod + 1);
@@ -58,7 +58,7 @@ void Model::set_lod(AssetHandle<Mesh> mesh, std::uint32_t lod)
 		_materials.resize(mesh->get_subset_count(), _default_material);
 }
 
-void Model::set_material(AssetHandle<Material> material, std::uint32_t index)
+void model::set_material(asset_handle<material> material, std::uint32_t index)
 {
 	if (index >= _mesh_lods.size())
 		_mesh_lods.resize(index + 1);
@@ -66,12 +66,12 @@ void Model::set_material(AssetHandle<Material> material, std::uint32_t index)
 	_materials[index] = material;
 }
 
-const std::vector<AssetHandle<Mesh>>& Model::get_lods() const
+const std::vector<asset_handle<mesh>>& model::get_lods() const
 {
 	return _mesh_lods;
 }
 
-void Model::set_lods(const std::vector<AssetHandle<Mesh>>& lods)
+void model::set_lods(const std::vector<asset_handle<mesh>>& lods)
 {
 	_mesh_lods = lods;
 
@@ -87,26 +87,26 @@ void Model::set_lods(const std::vector<AssetHandle<Mesh>>& lods)
 }
 
 
-const std::vector<AssetHandle<Material>>& Model::get_materials() const
+const std::vector<asset_handle<material>>& model::get_materials() const
 {
 	return _materials;
 }
 
-void Model::set_materials(const std::vector<AssetHandle<Material>>& materials)
+void model::set_materials(const std::vector<asset_handle<material>>& materials)
 {
 	_materials = materials;
 }
 
 
-AssetHandle<Material> Model::get_material_for_group(const size_t& group) const
+asset_handle<material> model::get_material_for_group(const size_t& group) const
 {
 	if (_materials.size() <= group)
-		return AssetHandle<Material>();
+		return asset_handle<material>();
 
 	return _materials[group];
 }
 
-void Model::set_lod_max_distance(float distance)
+void model::set_lod_max_distance(float distance)
 {
 	if (distance < _min_distance)
 		distance = _min_distance;
@@ -114,7 +114,7 @@ void Model::set_lod_max_distance(float distance)
 	_max_distance = distance;
 }
 
-void Model::set_lod_min_distance(float distance)
+void model::set_lod_min_distance(float distance)
 {
 	if (distance > _max_distance)
 		distance = _max_distance;
@@ -122,18 +122,18 @@ void Model::set_lod_min_distance(float distance)
 	_min_distance = distance;
 }
 
-void Model::render(std::uint8_t id, const math::transform_t& mtx, bool apply_cull, bool depth_write, bool depth_test, std::uint64_t extra_states, unsigned int lod, Program* user_program, std::function<void(Program&)> setup_params) const
+void model::render(std::uint8_t id, const math::transform& mtx, bool apply_cull, bool depth_write, bool depth_test, std::uint64_t extra_states, unsigned int lod, program* user_program, std::function<void(program&)> setup_params) const
 {
 	const auto mesh = get_lod(lod);
 	if (!mesh)
 		return;
 
-	AssetHandle<Material> last_set_material;
-	auto render_subset = [this, &mesh, &last_set_material](std::uint8_t id, bool skinned, std::uint32_t group_id, const float* mtx, std::uint32_t count, bool apply_cull, bool depth_write, bool depth_test, std::uint64_t extra_states, Program* user_program, std::function<void(Program&)> setup_params)
+	asset_handle<material> last_set_material;
+	auto render_subset = [this, &mesh, &last_set_material](std::uint8_t id, bool skinned, std::uint32_t group_id, const float* mtx, std::uint32_t count, bool apply_cull, bool depth_write, bool depth_test, std::uint64_t extra_states, program* user_program, std::function<void(program&)> setup_params)
 	{
 		bool valid_program = false;
-		Program* program = user_program;
-		AssetHandle<Material> mat = get_material_for_group(group_id);
+		program* program = user_program;
+		asset_handle<material> mat = get_material_for_group(group_id);
 		if (mat)
 		{
 			mat->skinned = skinned;
@@ -179,7 +179,7 @@ void Model::render(std::uint8_t id, const math::transform_t& mtx, bool apply_cul
 	{
 		// Build an array containing all of the bones that are required
 		// by the binding data in the skinned mesh.
-		std::vector<math::transform_t> node_transforms(gfx::get_max_blend_transforms());// (boneEntities.size());
+		std::vector<math::transform> node_transforms(gfx::get_max_blend_transforms());// (boneEntities.size());
 		// Process each palette in the skin with a matching attribute.
 		const auto& palettes = mesh->get_bone_palettes();
 		for (const auto& palette : palettes)

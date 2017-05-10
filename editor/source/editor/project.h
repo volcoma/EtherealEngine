@@ -7,9 +7,9 @@
 
 namespace editor
 {
-	struct AssetFile
+	struct asset_file
 	{
-		AssetFile(const fs::path& abs, const std::string& n, const std::string& ext, const fs::path& r);
+		asset_file(const fs::path& abs, const std::string& n, const std::string& ext, const fs::path& r);
 
 		void populate(const fs::path& abs, const std::string& n, const std::string& ext, const fs::path& r);
 
@@ -25,13 +25,13 @@ namespace editor
 		std::string extension;
 	};
 
-	struct AssetFolder : std::enable_shared_from_this<AssetFolder>
+	struct asset_directory : std::enable_shared_from_this<asset_directory>
 	{
-		AssetFolder(AssetFolder* p, const fs::path& abs, const std::string& n, const fs::path& r, bool recompile_assets);
+		asset_directory(asset_directory* p, const fs::path& abs, const std::string& n, const fs::path& r, bool recompile_assets);
 
-		~AssetFolder();
+		~asset_directory();
 
-		void populate(AssetFolder* p, const fs::path& abs, const std::string& n, const fs::path& r, bool recompile_assets);
+		void populate(asset_directory* p, const fs::path& abs, const std::string& n, const fs::path& r, bool recompile_assets);
 
 		void watch(bool recompile_assets);
 
@@ -47,20 +47,20 @@ namespace editor
 		///
 		std::mutex files_mutex;
 		///
-		std::vector<AssetFile> files;
+		std::vector<asset_file> files;
 		///
-		AssetFolder* parent;
+		asset_directory* parent = nullptr;
 		///
 		std::mutex directories_mutex;
 		///
-		std::vector<std::shared_ptr<AssetFolder>> directories;
+		std::vector<std::shared_ptr<asset_directory>> directories;
 	};
 
 
-	class ProjectManager : public core::Subsystem
+	class project_manager : public core::subsystem
 	{
 	public:
-		struct Options
+		struct options
 		{
 			///
 			std::deque<std::string> recent_project_paths;
@@ -154,7 +154,7 @@ namespace editor
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		inline Options& get_options() { return _options; }
+		inline options& get_options() { return _options; }
 
 
 		//-----------------------------------------------------------------------------
@@ -165,14 +165,14 @@ namespace editor
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		inline std::weak_ptr<AssetFolder> get_root_directory() { return root_directory; }
+		inline std::weak_ptr<asset_directory> get_root_directory() { return root_directory; }
 	private:
 		/// Project options
-		Options _options;
+		options _options;
 		/// Current project name
 		std::string _project_name;
 		///
-		std::shared_ptr<AssetFolder> root_directory = nullptr;
+		std::shared_ptr<asset_directory> root_directory = nullptr;
 
 	};
 }

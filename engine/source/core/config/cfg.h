@@ -1,3 +1,3 @@
 #pragma once
 
-#include "cfg/Config.h"
+#include "cfg/config.h"

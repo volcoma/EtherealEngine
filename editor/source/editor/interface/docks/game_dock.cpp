@@ -5,16 +5,16 @@
 #include "runtime/rendering/render_pass.h"
 #include "runtime/rendering/camera.h"
 
-void GameDock::render(const ImVec2& area)
+void game_dock::render(const ImVec2& area)
 {
-	auto es = core::get_subsystem<editor::EditState>();
+	auto es = core::get_subsystem<editor::editor_state>();
 	auto& editor_camera = es->camera;
 	auto& dragged = es->drag_data.object;
 
-	auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
-	ecs->each<CameraComponent>([&editor_camera](
-		runtime::Entity e,
-		CameraComponent& camera_comp
+	auto ecs = core::get_subsystem<runtime::entity_component_system>();
+	ecs->each<camera_component>([&editor_camera](
+		runtime::entity e,
+		camera_component& camera_comp
 		)
 	{
 		if (e == editor_camera)
@@ -35,9 +35,9 @@ void GameDock::render(const ImVec2& area)
 	});
 }
 
-GameDock::GameDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize)
+game_dock::game_dock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize)
 {
 
-	initialize(dtitle, dcloseButton, dminSize, std::bind(&GameDock::render, this, std::placeholders::_1));
+	initialize(dtitle, dcloseButton, dminSize, std::bind(&game_dock::render, this, std::placeholders::_1));
 }
 

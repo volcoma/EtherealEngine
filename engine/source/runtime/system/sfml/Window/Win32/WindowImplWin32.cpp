@@ -205,7 +205,7 @@ m_cursorGrabbed   (m_fullscreen)
 
     // By default, the OS limits the size of the window the the desktop size,
     // we have to resize it after creation to apply the real size
-    setSize(uSize(mode.width, mode.height));
+    setSize(usize(mode.width, mode.height));
 
     // Switch to fullscreen if requested
     if (m_fullscreen)
@@ -272,17 +272,17 @@ void WindowImplWin32::processEvents()
 
 
 ////////////////////////////////////////////////////////////
-iPoint WindowImplWin32::getPosition() const
+ipoint WindowImplWin32::getPosition() const
 {
     RECT rect;
     GetWindowRect(m_handle, &rect);
 
-    return iPoint(rect.left, rect.top);
+    return ipoint(rect.left, rect.top);
 }
 
 
 ////////////////////////////////////////////////////////////
-void WindowImplWin32::setPosition(const iPoint& position)
+void WindowImplWin32::setPosition(const ipoint& position)
 {
     SetWindowPos(m_handle, NULL, position.x, position.y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 
@@ -292,17 +292,17 @@ void WindowImplWin32::setPosition(const iPoint& position)
 
 
 ////////////////////////////////////////////////////////////
-uSize WindowImplWin32::getSize() const
+usize WindowImplWin32::getSize() const
 {
     RECT rect;
     GetClientRect(m_handle, &rect);
 
-    return uSize(rect.right - rect.left, rect.bottom - rect.top);
+    return usize(rect.right - rect.left, rect.bottom - rect.top);
 }
 
 
 ////////////////////////////////////////////////////////////
-void WindowImplWin32::setSize(const uSize& size)
+void WindowImplWin32::setSize(const usize& size)
 {
     // SetWindowPos wants the total size of the window (including title bar and borders),
     // so we have to compute it

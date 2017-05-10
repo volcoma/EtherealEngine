@@ -2,89 +2,87 @@
 
 #include "inspector.h"
 
-struct Inspector_Bool : public Inspector
+struct inspector_bool : public inspector
 {
-	REFLECTABLE(Inspector_Bool, Inspector)
+	REFLECTABLE(inspector_bool, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };	
-INSPECTOR_REFLECT(Inspector_Bool, bool)
+INSPECTOR_REFLECT(inspector_bool, bool)
 
 
-struct Inspector_Float : public Inspector
+struct inspector_float : public inspector
 {
-	REFLECTABLE(Inspector_Float, Inspector)
+	REFLECTABLE(inspector_float, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_Float, float)
+INSPECTOR_REFLECT(inspector_float, float)
 
 
-struct Inspector_Double : public Inspector
+struct inspector_double : public inspector
 {
-	REFLECTABLE(Inspector_Double, Inspector)
+	REFLECTABLE(inspector_double, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_Double, double)
+INSPECTOR_REFLECT(inspector_double, double)
 
-struct Inspector_Int8 : public Inspector
+struct inspector_int8 : public inspector
 {
-	REFLECTABLE(Inspector_Int8, Inspector)
+	REFLECTABLE(inspector_int8, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_Int8, std::int8_t)
+INSPECTOR_REFLECT(inspector_int8, std::int8_t)
 
-struct Inspector_Int16 : public Inspector
+struct inspector_int16 : public inspector
 {
-	REFLECTABLE(Inspector_Int16, Inspector)
+	REFLECTABLE(inspector_int16, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_Int16, std::int16_t)
+INSPECTOR_REFLECT(inspector_int16, std::int16_t)
 
-struct Inspector_Int32 : public Inspector
+struct inspector_int32 : public inspector
 {
-	REFLECTABLE(Inspector_Int32, Inspector)
+	REFLECTABLE(inspector_int32, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_Int32, std::int32_t)
+INSPECTOR_REFLECT(inspector_int32, std::int32_t)
 
-struct Inspector_Int64 : public Inspector
+struct inspector_int64 : public inspector
 {
-	REFLECTABLE(Inspector_Int64, Inspector)
+	REFLECTABLE(inspector_int64, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_Int64, std::int64_t)
+INSPECTOR_REFLECT(inspector_int64, std::int64_t)
 
-struct Inspector_UInt8 : public Inspector
+struct inspector_uint8 : public inspector
 {
-	REFLECTABLE(Inspector_UInt8, Inspector)
+	REFLECTABLE(inspector_uint8, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_UInt8, std::uint8_t)
+INSPECTOR_REFLECT(inspector_uint8, std::uint8_t)
 
-struct Inspector_UInt16 : public Inspector
+struct inspector_uint16 : public inspector
 {
-	REFLECTABLE(Inspector_UInt16, Inspector)
+	REFLECTABLE(inspector_uint16, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_UInt16, std::uint16_t)
+INSPECTOR_REFLECT(inspector_uint16, std::uint16_t)
 
-struct Inspector_UInt32 : public Inspector
+struct inspector_uint32 : public inspector
 {
-	REFLECTABLE(Inspector_UInt32, Inspector)
+	REFLECTABLE(inspector_uint32, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_UInt32, std::uint32_t)
+INSPECTOR_REFLECT(inspector_uint32, std::uint32_t)
 
-struct Inspector_UInt64 : public Inspector
+struct inspector_uint64 : public inspector
 {
-	REFLECTABLE(Inspector_UInt64, Inspector)
+	REFLECTABLE(inspector_uint64, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_UInt64, std::uint64_t)
-
-
-struct Inspector_String : public Inspector
+INSPECTOR_REFLECT(inspector_uint64, std::uint64_t)
+struct inspector_string : public inspector
 {
-	REFLECTABLE(Inspector_String, Inspector)
+	REFLECTABLE(inspector_string, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_String, std::string)
+INSPECTOR_REFLECT(inspector_string, std::string)

@@ -8,9 +8,9 @@
 #include "runtime/rendering/mesh.h"
 
 
-math::transform_t process_matrix(const aiMatrix4x4& assimp_matrix)
+math::transform process_matrix(const aiMatrix4x4& assimp_matrix)
 {
-	math::transform_t matrix;
+	math::transform matrix;
 
 	for (unsigned int i = 0; i < 4; ++i)
 	{
@@ -22,7 +22,7 @@ math::transform_t process_matrix(const aiMatrix4x4& assimp_matrix)
 	return matrix;
 }
 
-void process_vertices(aiMesh* mesh, Mesh::LoadData& load_data)
+void process_vertices(aiMesh* mesh, mesh::load_data& load_data)
 {
 	// Determine the correct offset to any relevant elements in the vertex
 	bool has_position = load_data.vertex_format.has(gfx::Attrib::Position);
@@ -100,7 +100,7 @@ void process_vertices(aiMesh* mesh, Mesh::LoadData& load_data)
 	}
 }
 
-void process_faces(aiMesh* mesh, Mesh::LoadData& load_data)
+void process_faces(aiMesh* mesh, mesh::load_data& load_data)
 {
 	load_data.triangle_count += mesh->mNumFaces;
 
@@ -108,7 +108,7 @@ void process_faces(aiMesh* mesh, Mesh::LoadData& load_data)
 	{
 		aiFace face = mesh->mFaces[i];
 
-		Mesh::Triangle triangle;
+		mesh::triangle triangle;
 
 		triangle.data_group_id = mesh->mMaterialIndex;
 
@@ -122,25 +122,25 @@ void process_faces(aiMesh* mesh, Mesh::LoadData& load_data)
 	}
 }
 
-void process_bones(aiMesh* mesh, Mesh::LoadData& load_data)
+void process_bones(aiMesh* mesh, mesh::load_data& load_data)
 {
 	if (mesh->mBones)
 	{
-		SkinBindData::BoneArray bone_influences;
+		skin_bind_data::bone_influence_array_t bone_influences;
 		for (size_t i = 0; i < mesh->mNumBones; ++i)
 		{
 			aiBone* assimp_bone = mesh->mBones[i];
-			SkinBindData::BoneInfluence bone_influence;
+			skin_bind_data::bone_influence bone_influence;
 			bone_influence.bone_id = assimp_bone->mName.C_Str();
 			const aiMatrix4x4& assimp_matrix = assimp_bone->mOffsetMatrix;
-			math::transform_t matrix = process_matrix(assimp_matrix);
+			math::transform matrix = process_matrix(assimp_matrix);
 			bone_influence.bind_pose_transform = math::transpose(matrix);
 
 			for (size_t j = 0; j < assimp_bone->mNumWeights; ++j)
 			{
 				aiVertexWeight assimp_influence = assimp_bone->mWeights[j];
 
-				SkinBindData::VertexInfluence influence;
+				skin_bind_data::vertex_influence influence;
 				influence.vertex_index = assimp_influence.mVertexId;
 				influence.weight = assimp_influence.mWeight;
 
@@ -172,14 +172,14 @@ void process_bones(aiMesh* mesh, Mesh::LoadData& load_data)
 	}
 }
 
-void process_mesh(aiMesh* mesh, Mesh::LoadData& load_data)
+void process_mesh(aiMesh* mesh, mesh::load_data& load_data)
 {
 	process_faces(mesh, load_data);
 	process_vertices(mesh, load_data);
 	process_bones(mesh, load_data);
 }
 
-void process_material(aiMaterial* mat, Mesh::LoadData& load_data)
+void process_material(aiMaterial* mat, mesh::load_data& load_data)
 {
 	auto mat_index = load_data.materials.size();
 	load_data.materials.push_back({});
@@ -187,7 +187,7 @@ void process_material(aiMaterial* mat, Mesh::LoadData& load_data)
 	aiColor3D color;
 	float opacity = 0.0f;
 
-	Mesh::LoadData::Mat data;
+	mesh::load_data::load_material data;
 
 	auto is_not_black = [](aiColor3D color)
 	{
@@ -212,7 +212,7 @@ void process_material(aiMaterial* mat, Mesh::LoadData& load_data)
 		data.base_color.value.a = opacity;
 	}
 
-	auto get_texture = [](std::size_t mat_index, aiMaterial* mat, Mesh::LoadData& load_data, aiTextureType t, Mesh::LoadData::Mat::TextureType tt)
+	auto get_texture = [](std::size_t mat_index, aiMaterial* mat, mesh::load_data& load_data, aiTextureType t, mesh::load_data::load_material::texture_type tt)
 	{
 		const auto textures = mat->GetTextureCount(t);
 		if (textures > 0)
@@ -231,13 +231,13 @@ void process_material(aiMaterial* mat, Mesh::LoadData& load_data)
 		}
 	};
 
-	get_texture(mat_index, mat, load_data, aiTextureType_DIFFUSE, Mesh::LoadData::Mat::BaseColor);
-	get_texture(mat_index, mat, load_data, aiTextureType_NORMALS, Mesh::LoadData::Mat::Normal);
-	get_texture(mat_index, mat, load_data, aiTextureType_EMISSIVE, Mesh::LoadData::Mat::Emissive);
+	get_texture(mat_index, mat, load_data, aiTextureType_DIFFUSE, mesh::load_data::load_material::BaseColor);
+	get_texture(mat_index, mat, load_data, aiTextureType_NORMALS, mesh::load_data::load_material::Normal);
+	get_texture(mat_index, mat, load_data, aiTextureType_EMISSIVE, mesh::load_data::load_material::Emissive);
 }
 
 
-void process_meshes(const aiScene* scene, Mesh::LoadData& load_data)
+void process_meshes(const aiScene* scene, mesh::load_data& load_data)
 {
 	for (size_t i = 0; i < scene->mNumMeshes; ++i)
 	{
@@ -246,7 +246,7 @@ void process_meshes(const aiScene* scene, Mesh::LoadData& load_data)
 	}
 }
 
-void process_materials(const aiScene* scene, Mesh::LoadData& load_data)
+void process_materials(const aiScene* scene, mesh::load_data& load_data)
 {
 	for (size_t i = 0; i < scene->mNumMaterials; ++i)
 	{
@@ -255,18 +255,18 @@ void process_materials(const aiScene* scene, Mesh::LoadData& load_data)
 	}
 }
 
-void process_node(aiNode* node, Mesh::ArmatureNode& armature_node)
+void process_node(aiNode* node, mesh::armature_node& armature_node)
 {
 	armature_node.children.resize(node->mNumChildren);
 
 	for (size_t i = 0; i < node->mNumChildren; ++i)
 	{
 		aiNode* child_node = node->mChildren[i];
-		auto child_armature = std::make_unique<Mesh::ArmatureNode>();
+		auto child_armature = std::make_unique<mesh::armature_node>();
 		child_armature->name = child_node->mName.C_Str();
 
 		const aiMatrix4x4& assimp_matrix = child_node->mTransformation;
-		math::transform_t matrix = process_matrix(assimp_matrix);
+		math::transform matrix = process_matrix(assimp_matrix);
 		child_armature->transform = math::transpose(matrix);
 
 		armature_node.children[i] = std::move(child_armature);
@@ -274,24 +274,24 @@ void process_node(aiNode* node, Mesh::ArmatureNode& armature_node)
 	}
 }
 
-void process_nodes(const aiScene* scene, Mesh::LoadData& load_data)
+void process_nodes(const aiScene* scene, mesh::load_data& load_data)
 {
 	aiNode* root = scene->mRootNode->mChildren[0];
-	load_data.root_node = std::make_unique<Mesh::ArmatureNode>();
+	load_data.root_node = std::make_unique<mesh::armature_node>();
 	process_node(root, *load_data.root_node.get());
 
 }
 
-void process_imported_scene(const aiScene* scene, Mesh::LoadData& load_data)
+void process_imported_scene(const aiScene* scene, mesh::load_data& load_data)
 {
-	load_data.vertex_format = gfx::MeshVertex::decl;
+	load_data.vertex_format = gfx::mesh_vertex::decl;
 	process_meshes(scene, load_data);
 	process_materials(scene, load_data);
 	process_nodes(scene, load_data);
 }
 
 
-bool importer::load_mesh_data_from_file(const std::string& path, Mesh::LoadData& load_data)
+bool importer::load_mesh_data_from_file(const std::string& path, mesh::load_data& load_data)
 {
 	Assimp::Importer importer;
 

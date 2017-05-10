@@ -3,7 +3,7 @@
 
 namespace runtime
 {
-	Input::Input()
+	input::input()
 	{
 		auto p = sf::Mouse::getPosition();
 		_current_cursor_position.x = p.x;
@@ -11,7 +11,7 @@ namespace runtime
 		_last_cursor_position = _current_cursor_position;
 	}
 
-	void Input::reset_state(std::chrono::duration<float>)
+	void input::reset_state(std::chrono::duration<float>)
 	{
 		key_reset();
 
@@ -20,7 +20,7 @@ namespace runtime
 		joystick_reset();
 	}
 
-	void Input::handle_event(const sf::Event& event)
+	void input::handle_event(const sf::Event& event)
 	{
 		_action_mapper.handle_event(event);
 
@@ -32,72 +32,72 @@ namespace runtime
 
 	}
 
-	bool Input::is_key_pressed(sf::Keyboard::Key key)
+	bool input::is_key_pressed(sf::Keyboard::Key key)
 	{
 		return _keys_pressed[key];
 	}
 
-	bool Input::is_key_down(sf::Keyboard::Key key)
+	bool input::is_key_down(sf::Keyboard::Key key)
 	{
 		return _keys_down[key];
 	}
 
-	bool Input::is_key_released(sf::Keyboard::Key key)
+	bool input::is_key_released(sf::Keyboard::Key key)
 	{
 		return _keys_released[key];
 	}
 
-	bool Input::is_mouse_button_pressed(sf::Mouse::Button button)
+	bool input::is_mouse_button_pressed(sf::Mouse::Button button)
 	{
 		return _mouse_buttons_pressed[button];
 	}
 
-	bool Input::is_mouse_button_down(sf::Mouse::Button button)
+	bool input::is_mouse_button_down(sf::Mouse::Button button)
 	{
 		return _mouse_buttons_down[button];
 	}
 
-	bool Input::is_mouse_button_released(sf::Mouse::Button button)
+	bool input::is_mouse_button_released(sf::Mouse::Button button)
 	{
 		return _mouse_buttons_released[button];
 	}
 
-	bool Input::is_joystick_connected(unsigned int joystickId)
+	bool input::is_joystick_connected(unsigned int joystickId)
 	{
 		return _joysticks_connected[joystickId];
 	}
 
-	bool Input::is_joystick_active(unsigned int joystickId)
+	bool input::is_joystick_active(unsigned int joystickId)
 	{
 		return _joysticks_active[joystickId];
 	}
 
-	bool Input::is_joystick_disconnected(unsigned int joystickId)
+	bool input::is_joystick_disconnected(unsigned int joystickId)
 	{
 		return _joysticks_disconnected[joystickId];
 	}
 
-	bool Input::is_joystick_button_pressed(unsigned int joystickId, unsigned int button)
+	bool input::is_joystick_button_pressed(unsigned int joystickId, unsigned int button)
 	{
 		return _joystick_buttons_pressed[std::pair<unsigned int, unsigned int>(joystickId, button)];
 	}
 
-	bool Input::is_joystick_button_down(unsigned int joystickId, unsigned int button)
+	bool input::is_joystick_button_down(unsigned int joystickId, unsigned int button)
 	{
 		return _joystick_buttons_down[std::pair<unsigned int, unsigned int>(joystickId, button)];
 	}
 
-	bool Input::is_joystick_button_released(unsigned int joystickId, unsigned int button)
+	bool input::is_joystick_button_released(unsigned int joystickId, unsigned int button)
 	{
 		return _joystick_buttons_released[std::pair<unsigned int, unsigned int>(joystickId, button)];
 	}
 
-	float Input::get_joystick_axis_position(unsigned int joystickId, sf::Joystick::Axis axis)
+	float input::get_joystick_axis_position(unsigned int joystickId, sf::Joystick::Axis axis)
 	{
 		return _joystick_axis_positions[std::pair<unsigned int, unsigned int>(joystickId, axis)];
 	}
 
-	void Input::key_reset()
+	void input::key_reset()
 	{
 		for (auto& it : _keys_pressed)
 		{
@@ -115,7 +115,7 @@ namespace runtime
 		}
 	}
 
-	bool Input::key_event(const sf::Event& event)
+	bool input::key_event(const sf::Event& event)
 	{
 		if (event.type == sf::Event::KeyPressed)
 		{
@@ -133,7 +133,7 @@ namespace runtime
 		return false;
 	}
 
-	void Input::mouse_reset()
+	void input::mouse_reset()
 	{
 		_mouse_move_event = false;
 		_last_cursor_position = _current_cursor_position;
@@ -159,7 +159,7 @@ namespace runtime
 		}
 	}
 
-	bool Input::mouse_event(const sf::Event& event)
+	bool input::mouse_event(const sf::Event& event)
 	{
 		if (event.type == sf::Event::MouseButtonPressed)
 		{
@@ -177,7 +177,7 @@ namespace runtime
 		else if (event.type == sf::Event::MouseMoved)
 		{
 			_last_cursor_position = _current_cursor_position;
-			iPoint mouse;
+			ipoint mouse;
 			mouse.x = event.mouseMove.x;
 			mouse.y = event.mouseMove.y;
 			_current_cursor_position = mouse;
@@ -193,7 +193,7 @@ namespace runtime
 		return false;
 	}
 
-	void Input::joystick_reset()
+	void input::joystick_reset()
 	{
 		for (auto& it : _joystick_buttons_pressed)
 		{
@@ -226,7 +226,7 @@ namespace runtime
 		}
 	}
 
-	bool Input::joystick_event(const sf::Event& event)
+	bool input::joystick_event(const sf::Event& event)
 	{
 		if (event.type == sf::Event::JoystickConnected)
 		{
@@ -265,21 +265,21 @@ namespace runtime
 		return false;
 	}
 
-	iPoint Input::get_cursor_delta_move() const
+	ipoint input::get_cursor_delta_move() const
 	{
-		return iPoint{ get_current_cursor_position().x - get_last_cursor_position().x, get_current_cursor_position().y - get_last_cursor_position().y };
+		return ipoint{ get_current_cursor_position().x - get_last_cursor_position().x, get_current_cursor_position().y - get_last_cursor_position().y };
 	}
 
-	bool Input::initialize()
+	bool input::initialize()
 	{
-		on_frame_begin.connect(this, &Input::reset_state);
+		on_frame_begin.connect(this, &input::reset_state);
 
 		return true;
 	}
 
-	void Input::dispose()
+	void input::dispose()
 	{
-		on_frame_begin.disconnect(this, &Input::reset_state);
+		on_frame_begin.disconnect(this, &input::reset_state);
 	}
 
 }

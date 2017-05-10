@@ -18,7 +18,7 @@ namespace ecs
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void save_entity(const fs::path& dir, const runtime::Entity& data);
+		void save_entity(const fs::path& dir, const runtime::entity& data);
 
 		//-----------------------------------------------------------------------------
 		//  Name : try_load_entity ()
@@ -28,7 +28,7 @@ namespace ecs
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool try_load_entity(const fs::path& fullPath, runtime::Entity& outData);
+		bool try_load_entity(const fs::path& fullPath, runtime::entity& outData);
 
 		//-----------------------------------------------------------------------------
 		//  Name : save_data ()
@@ -38,7 +38,7 @@ namespace ecs
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void save_data(const fs::path& fullPath, const std::vector<runtime::Entity>& data);
+		void save_data(const fs::path& fullPath, const std::vector<runtime::entity>& data);
 
 		//-----------------------------------------------------------------------------
 		//  Name : load_data ()
@@ -48,7 +48,7 @@ namespace ecs
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool load_data(const fs::path& fullPath, std::vector<runtime::Entity>& outData);
+		bool load_data(const fs::path& fullPath, std::vector<runtime::entity>& outData);
 
 		//-----------------------------------------------------------------------------
 		//  Name : serialize_data ()
@@ -58,7 +58,7 @@ namespace ecs
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void serialize_data(std::ostream& stream, const std::vector<runtime::Entity>& data);
+		void serialize_data(std::ostream& stream, const std::vector<runtime::entity>& data);
 
 		//-----------------------------------------------------------------------------
 		//  Name : deserialize_data ()
@@ -68,6 +68,6 @@ namespace ecs
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool deserialize_data(std::istream& stream, std::vector<runtime::Entity>& outData);
+		bool deserialize_data(std::istream& stream, std::vector<runtime::entity>& outData);
 	}
 }

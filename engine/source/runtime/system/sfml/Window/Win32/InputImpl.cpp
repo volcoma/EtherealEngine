@@ -182,16 +182,16 @@ bool InputImpl::isMouseButtonPressed(Mouse::Button button)
 
 
 ////////////////////////////////////////////////////////////
-iPoint InputImpl::getMousePosition()
+ipoint InputImpl::getMousePosition()
 {
     POINT point;
     GetCursorPos(&point);
-    return iPoint(point.x, point.y);
+    return ipoint(point.x, point.y);
 }
 
 
 ////////////////////////////////////////////////////////////
-iPoint InputImpl::getMousePosition(const Window& relativeTo)
+ipoint InputImpl::getMousePosition(const Window& relativeTo)
 {
     WindowHandle handle = relativeTo.getSystemHandle();
     if (handle)
@@ -199,24 +199,24 @@ iPoint InputImpl::getMousePosition(const Window& relativeTo)
         POINT point;
         GetCursorPos(&point);
         ScreenToClient(handle, &point);
-        return iPoint(point.x, point.y);
+        return ipoint(point.x, point.y);
     }
     else
     {
-        return iPoint();
+        return ipoint();
     }
 }
 
 
 ////////////////////////////////////////////////////////////
-void InputImpl::setMousePosition(const iPoint& position)
+void InputImpl::setMousePosition(const ipoint& position)
 {
     SetCursorPos(position.x, position.y);
 }
 
 
 ////////////////////////////////////////////////////////////
-void InputImpl::setMousePosition(const iPoint& position, const Window& relativeTo)
+void InputImpl::setMousePosition(const ipoint& position, const Window& relativeTo)
 {
     WindowHandle handle = relativeTo.getSystemHandle();
     if (handle)
@@ -237,18 +237,18 @@ bool InputImpl::isTouchDown(unsigned int /*finger*/)
 
 
 ////////////////////////////////////////////////////////////
-iPoint InputImpl::getTouchPosition(unsigned int /*finger*/)
+ipoint InputImpl::getTouchPosition(unsigned int /*finger*/)
 {
     // Not applicable
-    return iPoint();
+    return ipoint();
 }
 
 
 ////////////////////////////////////////////////////////////
-iPoint InputImpl::getTouchPosition(unsigned int /*finger*/, const Window& /*relativeTo*/)
+ipoint InputImpl::getTouchPosition(unsigned int /*finger*/, const Window& /*relativeTo*/)
 {
     // Not applicable
-    return iPoint();
+    return ipoint();
 }
 
 } // namespace priv

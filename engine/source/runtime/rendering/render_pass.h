@@ -6,17 +6,17 @@
 #include <unordered_map>
 #include <string>
 
-struct RenderPass
+struct render_pass
 {
 	//-----------------------------------------------------------------------------
-	//  Name : RenderPass ()
+	//  Name : render_pass ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	RenderPass(const std::string& n);
+	render_pass(const std::string& n);
 
 	//-----------------------------------------------------------------------------
 	//  Name : bind ()
@@ -26,7 +26,7 @@ struct RenderPass
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void bind(FrameBuffer* fb) const;
+	void bind(frame_buffer* fb) const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : clear ()
@@ -59,7 +59,7 @@ struct RenderPass
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_view_proj(const math::transform_t& v, const math::transform_t& p);
+	void set_view_proj(const math::transform& v, const math::transform& p);
 	void set_view_proj_ortho_full(float depth);
 	//-----------------------------------------------------------------------------
 	//  Name : reset ()

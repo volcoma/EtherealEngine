@@ -15,11 +15,11 @@
 #include <cstdint>
 #include <algorithm>
 
-struct Half
+struct half
 {
 public:
-    Half() {};
-    Half( float f )
+    half() {};
+    half( float f )
     {
         const std::uint32_t data = (std::uint32_t&)f;
         const std::uint32_t signBit = (data >> 31);
@@ -49,15 +49,15 @@ public:
         _data = (std::uint16_t)((signBit << 15) | (exponent << 10) | (mantissa >> 13));
     }
 
-    Half( const Half & h ) :
+    half( const half & h ) :
         _data( h._data ) {}
 
     // Inline operators
-    inline bool operator == ( const Half & h ) const
+    inline bool operator == ( const half & h ) const
     {
         return _data == h._data;
     }
-    inline bool operator != ( const Half & h ) const
+    inline bool operator != ( const half & h ) const
     {
         return _data != h._data;
     }
@@ -84,50 +84,50 @@ private:
     // Private Members
 	std::uint16_t _data;
 
-}; // End Struct Half
+}; // End Struct half
 
 
 template<typename T>
-struct Range
+struct range
 {
 
-	Range(){}
-	Range(T _min, T _max) :
+	range(){}
+	range(T _min, T _max) :
 		Min(_min), Max(_max) {}
 	T Min;
 	T Max;
 
 	// Inline operators
-	inline bool operator==(const Range & b) const
+	inline bool operator==(const range & b) const
 	{
 		return (Min == b.Min && Max == b.Max);
 	}
-	inline bool operator!=(const Range & b) const
+	inline bool operator!=(const range & b) const
 	{
 		return (Min != b.Min || Max != b.Max);
 	}
 
-}; // End Struct Range<Float>
+}; // End Struct range<Float>
 
 template<typename T>
-struct Size
+struct size
 {
-	Size(){}
-	Size(T _width, T _height) :
+	size(){}
+	size(T _width, T _height) :
 		width(_width), height(_height) {}
 	T width;
 	T height;
 
 	// Inline operators
-	inline bool operator==(const Size & b) const
+	inline bool operator==(const size & b) const
 	{
 		return (width == b.width && height == b.height);
 	}
-	inline bool operator!=(const Size & b) const
+	inline bool operator!=(const size & b) const
 	{
 		return (width != b.width || height != b.height);
 	}
-	inline bool operator<(const Size & b) const
+	inline bool operator<(const size & b) const
 	{
 		if (width > b.width)
 			return false;
@@ -135,7 +135,7 @@ struct Size
 			return true;
 		return (height < b.height);
 	}
-	inline bool operator>(const Size & b) const
+	inline bool operator>(const size & b) const
 	{
 		if (width < b.width)
 			return false;
@@ -153,20 +153,20 @@ struct Size
 
 
 template<typename T>
-struct Point
+struct point
 {
-	Point(){}
-	Point(T _x, T _y) :
+	point(){}
+	point(T _x, T _y) :
 		x(_x), y(_y) {}
 	T x;
 	T y;
 
 	// Inline operators
-	inline bool operator==(const Point & b) const
+	inline bool operator==(const point & b) const
 	{
 		return (x == b.x && y == b.y);
 	}
-	inline bool operator!=(const Point & b) const
+	inline bool operator!=(const point & b) const
 	{
 		return (x != b.x || y != b.y);
 	}
@@ -175,10 +175,10 @@ struct Point
 
 
 template<typename T>
-struct Rect
+struct rect
 {
-	Rect(){}
-	Rect(T _left, T _top, T _right, T _bottom) :
+	rect(){}
+	rect(T _left, T _top, T _right, T _bottom) :
 		left(_left), top(_top), right(_right), bottom(_bottom) {}
 	T left;
 	T top;
@@ -188,25 +188,25 @@ struct Rect
 	// Inline functions
 	inline T width() const { return right - left; }
 	inline T height() const { return bottom - top; }
-	inline bool isEmpty() const { return (left == 0 && right == 0 && top == 0 && bottom == 0); }
+	inline bool empty() const { return (left == 0 && right == 0 && top == 0 && bottom == 0); }
 
 	template<typename T1 = T>
-	inline Size<T1> size() const { return Size<T1>(right - left, bottom - top); }
-	inline bool containsPoint(const Point<T> & point) const
+	inline size<T1> size() const { return size<T1>(right - left, bottom - top); }
+	inline bool contains(const point<T> & p) const
 	{
-		return (point.x >= left && point.x <= right &&
-			point.y >= top && point.y <= bottom);
+		return (p.x >= left && p.x <= right &&
+			p.y >= top && p.y <= bottom);
 	}
 
-	static Rect intersect(const Rect & a, const Rect & b)
+	static rect intersect(const rect & a, const rect & b)
 	{
-		Rect c(std::max(a.left, b.left), std::max(a.top, b.top),
+		rect c(std::max(a.left, b.left), std::max(a.top, b.top),
 			std::min(a.right, b.right), std::min(a.bottom, b.bottom));
 
 		// If no intersection occurred, just return an empty rectangle
 		if (c.left > c.right || c.top > c.bottom)
 		{
-			return Rect();
+			return rect();
 		}
 		else
 		{
@@ -216,15 +216,15 @@ struct Rect
 	}
 
 	// Inline operators
-	inline bool operator==(const Rect & b) const
+	inline bool operator==(const rect & b) const
 	{
 		return (left == b.left && top == b.top && right == b.right && bottom == b.bottom);
 	}
-	inline bool operator!=(const Rect & b) const
+	inline bool operator!=(const rect & b) const
 	{
 		return (left != b.left || top != b.top || right != b.right || bottom != b.bottom);
 	}
-	inline Rect & operator+=(const Point<T> & p)
+	inline rect & operator+=(const point<T> & p)
 	{
 		left += p.x;
 		right += p.x;
@@ -232,7 +232,7 @@ struct Rect
 		bottom += p.y;
 		return *this;
 	}
-	inline Rect & operator-=(const Point<T> & p)
+	inline rect & operator-=(const point<T> & p)
 	{
 		left -= p.x;
 		right -= p.x;
@@ -240,7 +240,7 @@ struct Rect
 		bottom -= p.y;
 		return *this;
 	}
-	inline bool operator<(const Rect & b) const
+	inline bool operator<(const rect & b) const
 	{
 		T r = left - b.left;
 		if (r) return (r < 0);
@@ -252,7 +252,7 @@ struct Rect
 		if (r) return (r<0);
 		return false;
 	}
-	inline bool operator>(const Rect & b) const
+	inline bool operator>(const rect & b) const
 	{
 		T r = left - b.left;
 		if (r) return (r>0);
@@ -267,24 +267,24 @@ struct Rect
 
 
 	// Static inline functions
-	static Rect inflate(const Rect & rc, T x, T y)
+	static rect inflate(const rect & rc, T x, T y)
 	{
-		return Rect(rc.left - x, rc.top - y, rc.right + x, rc.bottom + y);
+		return rect(rc.left - x, rc.top - y, rc.right + x, rc.bottom + y);
 	}
 }; // End Struct TRect
 
-typedef Range<std::int32_t>		iRange;
-typedef Range<std::uint32_t>	uRange;
-typedef Range<float>			fRange;
+typedef range<std::int32_t>		irange;
+typedef range<std::uint32_t>	urange;
+typedef range<float>			frange;
 
-typedef Point<std::int32_t>		iPoint;
-typedef Point<std::uint32_t>	uPoint;
-typedef Point<float>			fPoint;
+typedef point<std::int32_t>		ipoint;
+typedef point<std::uint32_t>	upoint;
+typedef point<float>			fpoint;
 
-typedef Size<std::int32_t>		iSize;
-typedef Size<std::uint32_t>		uSize;
-typedef Size<float>				fSize;
+typedef size<std::int32_t>		isize;
+typedef size<std::uint32_t>		usize;
+typedef size<float>				fsize;
 
-typedef Rect<std::int32_t>		iRect;
-typedef Rect<std::uint32_t>		uRect;
-typedef Rect<float>				fRect;
+typedef rect<std::int32_t>		irect;
+typedef rect<std::uint32_t>		urect;
+typedef rect<float>				frect;

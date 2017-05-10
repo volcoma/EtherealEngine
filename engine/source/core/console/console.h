@@ -12,15 +12,15 @@
 #include <unordered_map>
 #include "../nonstd/type_traits.hpp"
 
-class Console
+class console
 {
 public:
-	explicit Console();
-	virtual ~Console();
+	explicit console();
+	virtual ~console();
 
 	// disallow copying
-	Console(Console const&) = delete;
-	Console& operator=(const Console&) = delete;
+	console(console const&) = delete;
+	console& operator=(const console&) = delete;
 
 	/**
 	* @brief Registers a new command with the given name and callback.
@@ -36,7 +36,7 @@ public:
 	std::vector<std::string> list_of_commands(const std::string& filter = "");
 
 private:
-	struct Command
+	struct command
 	{
 		const std::string name;
 		std::string description;
@@ -46,7 +46,7 @@ private:
 		std::function<void(std::vector<std::string>&)> call;
 		std::function<std::string(void)> get_usage;
 
-		explicit Command(const std::string& name, const std::string& description, unsigned int numArguments, const std::vector<std::string>& argumentNames, const std::vector<std::string>& defaultArguments)
+		explicit command(const std::string& name, const std::string& description, unsigned int numArguments, const std::vector<std::string>& argumentNames, const std::vector<std::string>& defaultArguments)
 			: name(name)
 			, description(description)
 			, num_arguments(numArguments)
@@ -56,11 +56,11 @@ private:
 		}
 
 		// disallow copying
-		Command(Command const&) = delete;
-		Command& operator=(const Command&) = delete;
+		command(command const&) = delete;
+		command& operator=(const command&) = delete;
 	};
 
-	std::unordered_map<std::string, std::shared_ptr<Command>> commands;
+	std::unordered_map<std::string, std::shared_ptr<command>> commands;
 	std::set<std::string> names;
 	void register_help_command();
 	void help_command(const std::string& term);
@@ -111,7 +111,7 @@ struct function_traits<std::function<R(Args...)>>
 };
 
 template <typename... Args>
-void Console::register_command(const std::string& name, const std::string& description, const std::vector<std::string>& argumentNames, const std::vector<std::string>& defaultArguments, const std::function<void(Args...)>& callback)
+void console::register_command(const std::string& name, const std::string& description, const std::vector<std::string>& argumentNames, const std::vector<std::string>& defaultArguments, const std::function<void(Args...)>& callback)
 {
 	static const auto argCount = function_traits<std::function<void(Args...)>>::nargs;
 	assert(argumentNames.size() <= argCount);
@@ -119,10 +119,10 @@ void Console::register_command(const std::string& name, const std::string& descr
 	assert(commands.find(name) == commands.end());
 	assert(names.find(name) == names.end());
 
-	auto command = std::make_shared<Command>(name, description, static_cast<unsigned int>(argCount), argumentNames, defaultArguments);
-	auto commandRaw = command.get();
+	auto cmd = std::make_shared<command>(name, description, static_cast<unsigned int>(argCount), argumentNames, defaultArguments);
+	auto commandRaw = cmd.get();
 
-	command->call = [this, commandRaw, callback](std::vector<std::string>& arguments)
+	cmd->call = [this, commandRaw, callback](std::vector<std::string>& arguments)
 	{
 
 		// add the arguments checks and set the default arguments
@@ -170,20 +170,20 @@ void Console::register_command(const std::string& name, const std::string& descr
 		print(commandRaw->get_usage());
 	};
 
-	command->get_usage = [this, commandRaw]()
+	cmd->get_usage = [this, commandRaw]()
 	{
 		auto requiredArguments = sizeof...(Args)-commandRaw->default_arguments.size();
 		return "Usage: " + commandRaw->name + NameArguments<Args...>::get(commandRaw->argument_names, 0, static_cast<unsigned int>(requiredArguments));
 	};
 
-	commands[name] = command;
+	commands[name] = cmd;
 	names.insert(name);
 }
 
 /**
 * bindCallback, base case
 */
-inline std::function<void()> Console::bind_callback(
+inline std::function<void()> console::bind_callback(
 	std::function<void()> callback,
 	const std::vector<std::string>&,
 	int)
@@ -197,7 +197,7 @@ inline std::function<void()> Console::bind_callback(
 * Run the "bind" code for each argument.
 */
 template <typename T, typename... Args>
-std::function<void()> Console::bind_callback(std::function<void(T, Args...)> callback, const std::vector<std::string>& arguments, int argumentIndex)
+std::function<void()> console::bind_callback(std::function<void(T, Args...)> callback, const std::vector<std::string>& arguments, int argumentIndex)
 {
 	T value = argumentConverter<T>::convert(arguments.at(argumentIndex));
 	std::function<void(Args...)> nextCallback = [callback, value](Args... args)
@@ -212,16 +212,16 @@ std::function<void()> Console::bind_callback(std::function<void(T, Args...)> cal
 * has been run
 */
 template <typename T>
-inline T Console::argumentConverter<T>::convert(const std::string& s)
+inline T console::argumentConverter<T>::convert(const std::string& s)
 {
-	static_assert(sizeof(T) != sizeof(T), "Console commands may only take arguments of type int, float or std::string.");
+	static_assert(sizeof(T) != sizeof(T), "console commands may only take arguments of type int, float or std::string.");
 }
 
 /**
 * convert arguments from string to int
 */
 template <>
-inline int Console::argumentConverter<int>::convert(const std::string& s)
+inline int console::argumentConverter<int>::convert(const std::string& s)
 {
 	return std::stoi(s);
 }
@@ -230,7 +230,7 @@ inline int Console::argumentConverter<int>::convert(const std::string& s)
 * convert arguments from string to float
 */
 template <>
-inline float Console::argumentConverter<float>::convert(const std::string& s)
+inline float console::argumentConverter<float>::convert(const std::string& s)
 {
 	return std::stof(s);
 }
@@ -239,7 +239,7 @@ inline float Console::argumentConverter<float>::convert(const std::string& s)
 *  (dummy)convert arguments from string to string
 */
 template <>
-inline std::string Console::argumentConverter<std::string>::convert(const std::string& s)
+inline std::string console::argumentConverter<std::string>::convert(const std::string& s)
 {
 	return s;
 }
@@ -248,7 +248,7 @@ inline std::string Console::argumentConverter<std::string>::convert(const std::s
 * Return the list of the arguments of a command pretty printed. Base case.
 */
 template <>
-struct Console::NameArguments<>
+struct console::NameArguments<>
 {
 	static inline std::string get(
 		const std::vector<std::string> argumentNames,
@@ -271,7 +271,7 @@ struct Console::NameArguments<>
 * Return the list of the arguments of a command pretty printed. Recursion step.
 */
 template <typename T, typename... Args>
-struct Console::NameArguments<T, Args...>
+struct console::NameArguments<T, Args...>
 {
 	static inline std::string get(const std::vector<std::string>& argumentNames, unsigned int nextName, unsigned int requiredArguments)
 	{

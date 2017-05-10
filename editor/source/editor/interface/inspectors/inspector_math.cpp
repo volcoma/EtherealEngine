@@ -1,7 +1,7 @@
 #include "inspector_math.h"
 #include "../gizmos/imguizmo.h"
 
-bool Inspector_Vector2::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_vec2::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<math::vec2>();
 	const char* names[] = { "X", "Y" };
@@ -13,7 +13,7 @@ bool Inspector_Vector2::inspect(rttr::variant& var, bool readOnly, std::function
 	return false;
 }
 
-bool Inspector_Vector3::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_vec3::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<math::vec3>();
 	const char* names[] = { "X", "Y", "Z" };
@@ -25,7 +25,7 @@ bool Inspector_Vector3::inspect(rttr::variant& var, bool readOnly, std::function
 	return false;
 }
 
-bool Inspector_Vector4::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_vec4::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<math::vec4>();
 	const char* names[] = { "X", "Y", "Z", "W" };
@@ -37,7 +37,7 @@ bool Inspector_Vector4::inspect(rttr::variant& var, bool readOnly, std::function
 	return false;
 }
 
-bool Inspector_Color::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_color::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<math::color>();
 	if (gui::ColorEdit4("", &data.value.x))
@@ -49,7 +49,7 @@ bool Inspector_Color::inspect(rttr::variant& var, bool readOnly, std::function<r
 	return false;
 }
 
-bool Inspector_Quaternion::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_quaternion::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<math::quat>();
 	const char* names[] = { "X", "Y", "Z" };
@@ -72,9 +72,9 @@ bool Inspector_Quaternion::inspect(rttr::variant& var, bool readOnly, std::funct
 }
 
 
-bool Inspector_Transform::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_transform::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<math::transform_t>();
+	auto data = var.get_value<math::transform>();
 	const char* names[] = { "X", "Y", "Z" };
 	math::vec3 position = data.get_position();
 	math::vec3 scale = data.get_scale();

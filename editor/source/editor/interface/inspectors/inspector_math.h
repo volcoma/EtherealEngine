@@ -2,46 +2,46 @@
 #include "inspector.h"
 #include "core/math/math_includes.h"
 
-struct Inspector_Vector2 : public Inspector
+struct inspector_vec2 : public inspector
 {
-	REFLECTABLE(Inspector_Vector2, Inspector)
+	REFLECTABLE(inspector_vec2, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_Vector2, math::vec2)
+INSPECTOR_REFLECT(inspector_vec2, math::vec2)
 
-struct Inspector_Vector3 : public Inspector
+struct inspector_vec3 : public inspector
 {
-	REFLECTABLE(Inspector_Vector3, Inspector)
+	REFLECTABLE(inspector_vec3, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_Vector3, math::vec3)
+INSPECTOR_REFLECT(inspector_vec3, math::vec3)
 
-struct Inspector_Vector4 : public Inspector
+struct inspector_vec4 : public inspector
 {
-	REFLECTABLE(Inspector_Vector4, Inspector)
+	REFLECTABLE(inspector_vec4, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_Vector4, math::vec4)
+INSPECTOR_REFLECT(inspector_vec4, math::vec4)
 
-struct Inspector_Color : public Inspector
+struct inspector_color : public inspector
 {
-	REFLECTABLE(Inspector_Color, Inspector)
+	REFLECTABLE(inspector_color, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_Color, math::color)
+INSPECTOR_REFLECT(inspector_color, math::color)
 
 
-struct Inspector_Quaternion : public Inspector
+struct inspector_quaternion : public inspector
 {
-	REFLECTABLE(Inspector_Quaternion, Inspector)
+	REFLECTABLE(inspector_quaternion, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_Quaternion, math::quat)
+INSPECTOR_REFLECT(inspector_quaternion, math::quat)
 
 
-struct Inspector_Transform : public Inspector
+struct inspector_transform : public inspector
 {
-	REFLECTABLE(Inspector_Transform, Inspector)
+	REFLECTABLE(inspector_transform, inspector)
 	bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(Inspector_Transform, math::transform_t)
+INSPECTOR_REFLECT(inspector_transform, math::transform)

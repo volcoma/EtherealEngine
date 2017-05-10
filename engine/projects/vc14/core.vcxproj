@@ -35,10 +35,6 @@
     <ClInclude Include="..\..\source\core\config\cfg\parser.h" />
     <ClInclude Include="..\..\source\core\console\console.h" />
     <ClInclude Include="..\..\source\core\core.h" />
-    <ClInclude Include="..\..\source\core\events\binder.hpp" />
-    <ClInclude Include="..\..\source\core\events\delegate.hpp" />
-    <ClInclude Include="..\..\source\core\events\event.hpp" />
-    <ClInclude Include="..\..\source\core\events\signal.hpp" />
     <ClInclude Include="..\..\source\core\logging\logging.h" />
     <ClInclude Include="..\..\source\core\logging\spdlog\async_logger.h" />
     <ClInclude Include="..\..\source\core\logging\spdlog\common.h" />
@@ -413,6 +409,9 @@
     <ClInclude Include="..\..\source\core\serialization\cereal\types\valarray.hpp" />
     <ClInclude Include="..\..\source\core\serialization\cereal\types\vector.hpp" />
     <ClInclude Include="..\..\source\core\serialization\serialization.h" />
+    <ClInclude Include="..\..\source\core\signals\binder.hpp" />
+    <ClInclude Include="..\..\source\core\signals\delegate.hpp" />
+    <ClInclude Include="..\..\source\core\signals\signal.hpp" />
     <ClInclude Include="..\..\source\core\subsystem\simulation.h" />
     <ClInclude Include="..\..\source\core\subsystem\subsystem.h" />
   </ItemGroup>

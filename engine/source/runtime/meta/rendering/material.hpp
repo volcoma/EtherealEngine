@@ -10,100 +10,100 @@
 #include "../math/vector.hpp"
 #include "../assets/asset_handle.hpp"
 
-REFLECT(Material)
+REFLECT(material)
 {
-	rttr::registration::enumeration<CullType>("CullType")
+	rttr::registration::enumeration<cull_type>("CullType")
 		(
-			rttr::value("None", CullType::None),
-			rttr::value("Clock-Wise", CullType::ClockWise),
-			rttr::value("Counter Clock-Wise", CullType::CounterClockWise)
+			rttr::value("None", cull_type::none),
+			rttr::value("Clock-Wise", cull_type::clockwise),
+			rttr::value("Counter Clock-Wise", cull_type::counter_clockwise)
 			);
 
-	rttr::registration::class_<Material>("Material")
+	rttr::registration::class_<material>("material")
 		.property("Cull Type",
-			&StandardMaterial::get_cull_type,
-			&StandardMaterial::set_cull_type)
+			&standard_material::get_cull_type,
+			&standard_material::set_cull_type)
 		;
 }
 
 
-SAVE(Material)
+SAVE(material)
 {
 	try_save(ar, cereal::make_nvp("cull_type", obj._cull_type));
 }
 
-LOAD(Material)
+LOAD(material)
 {
 	try_load(ar, cereal::make_nvp("cull_type", obj._cull_type));
 }
 
-REFLECT(StandardMaterial)
+REFLECT(standard_material)
 {
-	rttr::registration::class_<StandardMaterial>("StandardMaterial")
+	rttr::registration::class_<standard_material>("standard_material")
 		.property("Base Color",
-			&StandardMaterial::get_base_color,
-			&StandardMaterial::set_base_color)
+			&standard_material::get_base_color,
+			&standard_material::set_base_color)
 		.property("Subsurface Color",
-			&StandardMaterial::get_subsurface_color,
-			&StandardMaterial::set_subsurface_color)
+			&standard_material::get_subsurface_color,
+			&standard_material::set_subsurface_color)
 		.property("Emissive Color",
-			&StandardMaterial::get_emissive_color,
-			&StandardMaterial::set_emissive_color)
+			&standard_material::get_emissive_color,
+			&standard_material::set_emissive_color)
 		.property("Roughness",
-			&StandardMaterial::get_roughness,
-			&StandardMaterial::set_roughness)
+			&standard_material::get_roughness,
+			&standard_material::set_roughness)
 		(
 			rttr::metadata("Min", 0.0f),
 			rttr::metadata("Max", 1.0f)
 		)
 		.property("Metalness",
-			&StandardMaterial::get_metalness,
-			&StandardMaterial::set_metalness)
+			&standard_material::get_metalness,
+			&standard_material::set_metalness)
 		(
 			rttr::metadata("Min", 0.0f),
 			rttr::metadata("Max", 1.0f)
 		)
 		.property("Bumpiness",
-			&StandardMaterial::get_bumpiness,
-			&StandardMaterial::set_bumpiness)
+			&standard_material::get_bumpiness,
+			&standard_material::set_bumpiness)
 		(
 			rttr::metadata("Min", 0.0f),
 			rttr::metadata("Max", 10.0f)
 		)
 		.property("Alpha Test Value",
-			&StandardMaterial::get_alpha_test_value,
-			&StandardMaterial::set_alpha_test_value)
+			&standard_material::get_alpha_test_value,
+			&standard_material::set_alpha_test_value)
 		(
 			rttr::metadata("Min", 0.0f),
 			rttr::metadata("Max", 1.0f)
 		)
 		.property("Tiling",
-			&StandardMaterial::get_tiling,
-			&StandardMaterial::set_tiling)
+			&standard_material::get_tiling,
+			&standard_material::set_tiling)
 		.property("Dither Threshold",
-			&StandardMaterial::get_dither_threshold,
-			&StandardMaterial::set_dither_threshold)
+			&standard_material::get_dither_threshold,
+			&standard_material::set_dither_threshold)
 		.property("Color Map",
-			&StandardMaterial::get_color_map,
-			&StandardMaterial::set_color_map)
+			&standard_material::get_color_map,
+			&standard_material::set_color_map)
 		.property("Normal Map",
-			&StandardMaterial::get_normal_map,
-			&StandardMaterial::set_normal_map)
+			&standard_material::get_normal_map,
+			&standard_material::set_normal_map)
 		.property("Roughness Map",
-			&StandardMaterial::get_roughness_map,
-			&StandardMaterial::set_roughness_map)
+			&standard_material::get_roughness_map,
+			&standard_material::set_roughness_map)
 		(
 			rttr::metadata("Tooltip", "black/white texture. The more white the rougher the surface.")
 		)
 		.property("Metalness Map",
-			&StandardMaterial::get_metalness_map,
-			&StandardMaterial::set_metalness_map)
+			&standard_material::get_metalness_map,
+			&standard_material::set_metalness_map)
 		(
 			rttr::metadata("Tooltip", "black/white texture. The more white the more metallic the surface.")
 		)
 		.property("AO Map",
-			&StandardMaterial::get_ao_map,
-			&StandardMaterial::set_ao_map)
+			&standard_material::get_ao_map,
+			&standard_material::set_ao_map)
 		(
 			rttr::metadata("Tooltip", "black/white texture.")
 		)
@@ -111,9 +111,9 @@ REFLECT(StandardMaterial)
 }
 
 
-SAVE(StandardMaterial)
+SAVE(standard_material)
 {
-	try_save(ar, cereal::make_nvp("base_type", cereal::base_class<Material>(&obj)));
+	try_save(ar, cereal::make_nvp("base_type", cereal::base_class<material>(&obj)));
 	try_save(ar, cereal::make_nvp("base_color", obj._base_color));
 	try_save(ar, cereal::make_nvp("subsurface_color", obj._subsurface_color));
 	try_save(ar, cereal::make_nvp("emissive_color", obj._emissive_color));
@@ -123,9 +123,9 @@ SAVE(StandardMaterial)
 	try_save(ar, cereal::make_nvp("maps", obj._maps));
 }
 
-LOAD(StandardMaterial)
+LOAD(standard_material)
 {
-	try_load(ar, cereal::make_nvp("base_type", cereal::base_class<Material>(&obj)));
+	try_load(ar, cereal::make_nvp("base_type", cereal::base_class<material>(&obj)));
 	try_load(ar, cereal::make_nvp("base_color", obj._base_color));
 	try_load(ar, cereal::make_nvp("subsurface_color", obj._subsurface_color));
 	try_load(ar, cereal::make_nvp("emissive_color", obj._emissive_color));
@@ -136,4 +136,4 @@ LOAD(StandardMaterial)
 }
 
 #include "core/serialization/archives.h"
-CEREAL_REGISTER_TYPE(StandardMaterial);
+CEREAL_REGISTER_TYPE(standard_material);

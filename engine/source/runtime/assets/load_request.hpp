@@ -3,11 +3,11 @@
 #include <string>
 
 #include "../system/task.h"
-#include "core/events/event.hpp"
+#include "core/signals/signal.hpp"
 #include "asset_handle.h"
 
 template<typename T>
-struct LoadRequest
+struct load_request
 {
 	//-----------------------------------------------------------------------------
 	//  Name : then ()
@@ -17,7 +17,7 @@ struct LoadRequest
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void then(const delegate<void(AssetHandle<T>)>& callback)
+	void then(const delegate<void(asset_handle<T>)>& callback)
 	{
 		if (is_ready())
 			callback(asset);
@@ -50,7 +50,7 @@ struct LoadRequest
 	{
 		if (load_task.is_valid())
 		{
-			auto ts = core::get_subsystem<runtime::TaskSystem>();
+			auto ts = core::get_subsystem<runtime::task_system>();
 			ts->wait(load_task);
 			// all resource loading tasks create a subtask on the main thread.
 			// this way we can be avoid circle wait.
@@ -66,7 +66,7 @@ struct LoadRequest
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_task(core::Handle task)
+	void set_task(core::handle task)
 	{
 		load_task = task;
 	}
@@ -100,9 +100,9 @@ struct LoadRequest
 	}
 
 	/// Requested asset
-	AssetHandle<T> asset;
+	asset_handle<T> asset;
 	/// Associated task with this request
-	core::Handle load_task;
+	core::handle load_task;
 	/// Subscribed callbacks
-	event<void(AssetHandle<T>)> callbacks;
+	signal<void(asset_handle<T>)> callbacks;
 };

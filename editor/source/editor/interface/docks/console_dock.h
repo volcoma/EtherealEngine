@@ -2,17 +2,17 @@
 
 #include "imguidock.h"
 
-class ConsoleLog;
-struct ConsoleDock : public ImGuiDock::Dock
+class console_log;
+struct console_dock : public imguidock::dock
 {
-	ConsoleDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize, std::shared_ptr<ConsoleLog> log)
+	console_dock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize, std::shared_ptr<console_log> log)
 	{	
 		_console_log = log;
-		initialize(dtitle, dcloseButton, dminSize, std::bind(&ConsoleDock::render, this, std::placeholders::_1));
+		initialize(dtitle, dcloseButton, dminSize, std::bind(&console_dock::render, this, std::placeholders::_1));
 	}
 
 	void render(const ImVec2& area);
 
 private:
-	std::shared_ptr<ConsoleLog> _console_log;
+	std::shared_ptr<console_log> _console_log;
 };

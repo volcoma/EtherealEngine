@@ -16,11 +16,11 @@ namespace core
 	/// Class responsible for timers.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	struct Simulation : public core::Subsystem
+	struct simulation : public core::subsystem
 	{
-		using timepoint = std::chrono::time_point<std::chrono::high_resolution_clock>;
-		using clock = std::chrono::high_resolution_clock;
-		using duration = std::chrono::high_resolution_clock::duration;
+		using timepoint_t = std::chrono::time_point<std::chrono::high_resolution_clock>;
+		using clock_t = std::chrono::high_resolution_clock;
+		using duration_t = std::chrono::high_resolution_clock::duration;
 
 		//-----------------------------------------------------------------------------
 		//  Name : initialize ()
@@ -100,7 +100,7 @@ namespace core
 		/// Returns duration since launch.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		duration get_time_since_launch() const;
+		duration_t get_time_since_launch() const;
 		
 		//-----------------------------------------------------------------------------
 		//  Name : get_fps ()
@@ -126,16 +126,16 @@ namespace core
 		///
 		unsigned int _max_inactive_fps = 0;
 		/// previous time steps for smoothing in seconds
-		std::vector<duration> _previous_timesteps;
+		std::vector<duration_t> _previous_timesteps;
 		/// next frame time step in seconds
-		duration _timestep = duration::zero();
+		duration_t _timestep = duration_t::zero();
 		/// current frame
 		std::uint64_t _frame = 0;
 		/// how many frames to average for the smoothed time step
 		unsigned int _smoothing_step = 11;
 		/// frame update timer
-		timepoint _last_frame_timepoint = clock::now();
+		timepoint_t _last_frame_timepoint = clock_t::now();
 		/// time point when we launched
-		timepoint _launch_timepoint = clock::now();
+		timepoint_t _launch_timepoint = clock_t::now();
 	};
 }

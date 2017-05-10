@@ -4,7 +4,7 @@
 #include "core/serialization/serialization.h"
 #include "core/logging/logging.h"
 
-SAVE(GUIStyle::HSVSetup)
+SAVE(gui_style::hsv_setup)
 {
 	try_save(ar, cereal::make_nvp("col_main_hue", obj.col_main_hue));
 	try_save(ar, cereal::make_nvp("col_main_sat", obj.col_main_sat));
@@ -21,7 +21,7 @@ SAVE(GUIStyle::HSVSetup)
 	try_save(ar, cereal::make_nvp("frame_rounding", obj.frame_rounding));
 }
 
-LOAD(GUIStyle::HSVSetup)
+LOAD(gui_style::hsv_setup)
 {
 	try_load(ar, cereal::make_nvp("col_main_hue", obj.col_main_hue));
 	try_load(ar, cereal::make_nvp("col_main_sat", obj.col_main_sat));

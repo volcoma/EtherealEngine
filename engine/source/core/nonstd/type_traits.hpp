@@ -6,32 +6,6 @@
 
 namespace nonstd
 {
-
-	// incremental id of type
-	struct type_info_polymorphic
-	{
-		using index_t = size_t;
-
-		template<typename Base, typename Derived>
-		static index_t id()
-		{
-			static_assert(std::is_base_of<Base, Derived>::value, "D should be derived from B.");
-			static index_t sid = counter<Base>::value++;
-			return sid;
-		}
-
-	protected:
-		template<typename Base>
-		struct counter
-		{
-			static index_t value;
-		};
-	};
-
-	template<typename B>
-	type_info_polymorphic::index_t type_info_polymorphic::counter<B>::value = 0;
-
-
 	/// Class template integer_sequence
 	template<typename _Tp, _Tp... _Idx>
 	struct integer_sequence
@@ -117,6 +91,34 @@ namespace nonstd
 
 }
 
+namespace rtti
+{
+	// incremental id of type
+	struct type_index_sequential_t
+	{
+		using index_t = size_t;
+
+		template<typename Base, typename Derived>
+		static index_t id()
+		{
+			static_assert(std::is_base_of<Base, Derived>::value, "D should be derived from B.");
+			static index_t sid = counter<Base>::value++;
+			return sid;
+		}
+
+	protected:
+		template<typename Base>
+		struct counter
+		{
+			static index_t value;
+		};
+	};
+
+	template<typename B>
+	type_index_sequential_t::index_t type_index_sequential_t::counter<B>::value = 0;
+
+}
+
 ///////////////////////////////////////////////////////
 #define __try_using_rtti__ 1
 ///////////////////////////////////////////////////////
@@ -179,6 +181,7 @@ namespace rtti
 			return reinterpret_cast<std::size_t>(_info);
 #endif
 		}
+
 	};
 
 	namespace detail

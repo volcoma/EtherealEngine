@@ -6,7 +6,7 @@ struct InspectorRegistry
 {
 	InspectorRegistry()
 	{
-		auto inspector_types = rttr::type::get<Inspector>().get_derived_classes();
+		auto inspector_types = rttr::type::get<inspector>().get_derived_classes();
 		for (auto& inspector_type : inspector_types)
 		{
 			auto inspected_type_var = inspector_type.get_metadata(INSPECTED_TYPE);
@@ -16,20 +16,18 @@ struct InspectorRegistry
 				auto inspector_var = inspector_type.create();
 				if (inspector_var)
 				{
-					auto inspector = inspector_var.get_value<std::shared_ptr<Inspector>>();
-					type_map[inspected_type] = inspector;
+					type_map[inspected_type] = inspector_var.get_value<std::shared_ptr<inspector>>();
 				}
 			}
 		}
 	}
-	std::unordered_map<rttr::type, std::shared_ptr<Inspector>> type_map;
+	std::unordered_map<rttr::type, std::shared_ptr<inspector>> type_map;
 };
 
-std::shared_ptr<Inspector> get_inspector(rttr::type type)
+std::shared_ptr<inspector> get_inspector(rttr::type type)
 {
 	static InspectorRegistry registry;
-	auto inspector = registry.type_map[type];
-	return inspector;
+	return registry.type_map[type];
 }
 
 bool inspect_var(rttr::variant& var, bool read_only, std::function<rttr::variant(const rttr::variant&)> get_metadata)
@@ -65,7 +63,7 @@ bool inspect_var(rttr::variant& var, bool read_only, std::function<rttr::variant
 			rttr::instance prop_object = prop_var;
 			bool has_inspector = !!get_inspector(prop_object.get_derived_type());
 			bool details = !has_inspector && !is_enum;
-			PropertyLayout layout(prop);
+			property_layout layout(prop);
 			bool open = true;
 			if (details)
 			{
@@ -116,7 +114,7 @@ bool inspect_array(rttr::variant& var, bool read_only)
 
 	if (array_view.is_dynamic())
 	{
-		PropertyLayout layout("Size");
+		property_layout layout("Size");
 		if (gui::InputInt("", &int_size))
 		{
 			if (int_size < 0)
@@ -131,7 +129,7 @@ bool inspect_array(rttr::variant& var, bool read_only)
 		std::string element = "Element ";
 		element += std::to_string(i);
 
-		PropertyLayout layout(element.data());
+		property_layout layout(element.data());
 
 		changed |= inspect_var(value);
 

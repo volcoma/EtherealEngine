@@ -1,16 +1,16 @@
 #include "texture.h"
 
-Texture::~Texture()
+texture::~texture()
 {
 	dispose();
 }
 
-bool Texture::is_valid() const
+bool texture::is_valid() const
 {
 	return gfx::isValid(handle);
 }
 
-void Texture::dispose()
+void texture::dispose()
 {
 	if (is_valid())
 		gfx::destroyTexture(handle);
@@ -18,7 +18,7 @@ void Texture::dispose()
 	handle = { bgfx::invalidHandle };
 }
 
-void Texture::populate(const gfx::Memory* _mem, std::uint32_t _flags /*= BGFX_TEXTURE_NONE */, std::uint8_t _skip /*= 0 */, gfx::TextureInfo* _info /*= nullptr*/)
+void texture::populate(const gfx::Memory* _mem, std::uint32_t _flags /*= BGFX_TEXTURE_NONE */, std::uint8_t _skip /*= 0 */, gfx::TextureInfo* _info /*= nullptr*/)
 {
 	dispose();
 
@@ -35,7 +35,7 @@ void Texture::populate(const gfx::Memory* _mem, std::uint32_t _flags /*= BGFX_TE
 	ratio = gfx::BackbufferRatio::Count;
 }
 
-void Texture::populate(std::uint16_t _width, std::uint16_t _height, bool _hasMips, std::uint16_t _numLayers, gfx::TextureFormat::Enum _format, std::uint32_t _flags /*= BGFX_TEXTURE_NONE */, const gfx::Memory* _mem /*= nullptr */)
+void texture::populate(std::uint16_t _width, std::uint16_t _height, bool _hasMips, std::uint16_t _numLayers, gfx::TextureFormat::Enum _format, std::uint32_t _flags /*= BGFX_TEXTURE_NONE */, const gfx::Memory* _mem /*= nullptr */)
 {
 	dispose();
 
@@ -55,7 +55,7 @@ void Texture::populate(std::uint16_t _width, std::uint16_t _height, bool _hasMip
 	ratio = gfx::BackbufferRatio::Count;
 }
 
-void Texture::populate(std::uint16_t _width, std::uint16_t _height, std::uint16_t _depth, bool _hasMips, gfx::TextureFormat::Enum _format, std::uint32_t _flags /*= BGFX_TEXTURE_NONE */, const gfx::Memory* _mem /*= nullptr */)
+void texture::populate(std::uint16_t _width, std::uint16_t _height, std::uint16_t _depth, bool _hasMips, gfx::TextureFormat::Enum _format, std::uint32_t _flags /*= BGFX_TEXTURE_NONE */, const gfx::Memory* _mem /*= nullptr */)
 {
 	dispose();
 
@@ -75,7 +75,7 @@ void Texture::populate(std::uint16_t _width, std::uint16_t _height, std::uint16_
 	ratio = gfx::BackbufferRatio::Count;
 }
 
-void Texture::populate(std::uint16_t _size, bool _hasMips, std::uint16_t _numLayers, gfx::TextureFormat::Enum _format, std::uint32_t _flags /*= BGFX_TEXTURE_NONE */, const gfx::Memory* _mem /*= nullptr */)
+void texture::populate(std::uint16_t _size, bool _hasMips, std::uint16_t _numLayers, gfx::TextureFormat::Enum _format, std::uint32_t _flags /*= BGFX_TEXTURE_NONE */, const gfx::Memory* _mem /*= nullptr */)
 {
 	dispose();
 
@@ -95,7 +95,7 @@ void Texture::populate(std::uint16_t _size, bool _hasMips, std::uint16_t _numLay
 	ratio = gfx::BackbufferRatio::Count;
 }
 
-void Texture::populate(gfx::BackbufferRatio::Enum _ratio, bool _hasMips, std::uint16_t _numLayers, gfx::TextureFormat::Enum _format, std::uint32_t _flags /*= BGFX_TEXTURE_NONE */)
+void texture::populate(gfx::BackbufferRatio::Enum _ratio, bool _hasMips, std::uint16_t _numLayers, gfx::TextureFormat::Enum _format, std::uint32_t _flags /*= BGFX_TEXTURE_NONE */)
 {
 	dispose();
 
@@ -118,11 +118,11 @@ void Texture::populate(gfx::BackbufferRatio::Enum _ratio, bool _hasMips, std::ui
 	ratio = _ratio;
 }
 
-uSize Texture::get_size() const
+usize texture::get_size() const
 {
 	if (ratio == gfx::BackbufferRatio::Count)
 	{
-		uSize size =
+		usize size =
 		{
 			static_cast<std::uint32_t>(info.width),
 			static_cast<std::uint32_t>(info.height)
@@ -135,7 +135,7 @@ uSize Texture::get_size() const
 		std::uint16_t width;
 		std::uint16_t height;
 		gfx::get_size_from_ratio(ratio, width, height);
-		uSize size =
+		usize size =
 		{
 			static_cast<std::uint32_t>(width),
 			static_cast<std::uint32_t>(height)

@@ -11,10 +11,10 @@
 #include "runtime/rendering/mesh.h"
 #include "runtime/assets/asset_handle.h"
 
-void check_context_menu(runtime::Entity entity)
+void check_context_menu(runtime::entity entity)
 {
-	auto es = core::get_subsystem<editor::EditState>();
-	auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
+	auto es = core::get_subsystem<editor::editor_state>();
+	auto ecs = core::get_subsystem<runtime::entity_component_system>();
 	auto& editor_camera = es->camera;
 	if (entity && entity != editor_camera)
 	{
@@ -23,14 +23,14 @@ void check_context_menu(runtime::Entity entity)
 			if (gui::Selectable("Create child"))
 			{
 				auto object = ecs->create();
-				object.assign<TransformComponent>().lock()
-					->set_parent(entity.component<TransformComponent>());
+				object.assign<transform_component>().lock()
+					->set_parent(entity.get_component<transform_component>());
 			}
 			if (gui::Selectable("Clone"))
 			{
 				auto object = ecs->create_from_copy(entity);
-				object.component<TransformComponent>().lock()
-					->set_parent(entity.component<TransformComponent>().lock()->get_parent(), false, true);
+				object.get_component<transform_component>().lock()
+					->set_parent(entity.get_component<transform_component>().lock()->get_parent(), false, true);
 
 				es->select(object);
 			}
@@ -49,7 +49,7 @@ void check_context_menu(runtime::Entity entity)
 			if (gui::Selectable("Create empty"))
 			{
 				auto object = ecs->create();
-				object.assign<TransformComponent>();
+				object.assign<transform_component>();
 			}
 
 			gui::EndPopup();
@@ -59,16 +59,16 @@ void check_context_menu(runtime::Entity entity)
 
 }
 
-void check_drag(runtime::Entity entity)
+void check_drag(runtime::entity entity)
 {
 	if (!gui::IsWindowHovered())
 		return;
 
-	auto es = core::get_subsystem<editor::EditState>();
+	auto es = core::get_subsystem<editor::editor_state>();
 	auto& editor_camera = es->camera;
 	auto& dragged = es->drag_data.object;
 
-	auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
+	auto ecs = core::get_subsystem<runtime::entity_component_system>();
 
 	if (entity)
 	{
@@ -84,54 +84,54 @@ void check_drag(runtime::Entity entity)
 
 			if (dragged && entity != editor_camera)
 			{
-				if (dragged.is_type<runtime::Entity>())
+				if (dragged.is_type<runtime::entity>())
 				{
-					auto dragged_entity = dragged.get_value<runtime::Entity>();
+					auto dragged_entity = dragged.get_value<runtime::entity>();
 					if (dragged_entity && dragged_entity != entity)
 					{
 						gui::SetMouseCursor(ImGuiMouseCursor_Move);
 						if (gui::IsMouseReleased(gui::drag_button))
 						{
-							dragged_entity.component<TransformComponent>().lock()
-								->set_parent(entity.component<TransformComponent>());
+							dragged_entity.get_component<transform_component>().lock()
+								->set_parent(entity.get_component<transform_component>());
 
 							es->drop();
 						}
 					}
 				}
 
-				if (dragged.is_type<AssetHandle<Prefab>>())
+				if (dragged.is_type<asset_handle<prefab>>())
 				{
 					gui::SetMouseCursor(ImGuiMouseCursor_Move);
 					if (gui::IsMouseReleased(gui::drag_button))
 					{
-						auto prefab = dragged.get_value<AssetHandle<Prefab>>();
-						auto object = prefab->instantiate();
-						object.component<TransformComponent>().lock()
-							->set_parent(entity.component<TransformComponent>());
+						auto pfab = dragged.get_value<asset_handle<prefab>>();
+						auto object = pfab->instantiate();
+						object.get_component<transform_component>().lock()
+							->set_parent(entity.get_component<transform_component>());
 
 						es->drop();
 						es->select(object);
 					}
 				}
-				if (dragged.is_type<AssetHandle<Mesh>>())
+				if (dragged.is_type<asset_handle<mesh>>())
 				{
 					gui::SetMouseCursor(ImGuiMouseCursor_Move);
 					if (gui::IsMouseReleased(gui::drag_button))
 					{
-						auto mesh = dragged.get_value<AssetHandle<Mesh>>();
-						Model model;
-						model.set_lod(mesh, 0);
+						auto hmesh = dragged.get_value<asset_handle<mesh>>();
+						model mdl;
+						mdl.set_lod(hmesh, 0);
 
 						auto object = ecs->create();
 						//Add component and configure it.
-						object.assign<TransformComponent>().lock()
-							->set_parent(entity.component<TransformComponent>());
+						object.assign<transform_component>().lock()
+							->set_parent(entity.get_component<transform_component>());
 						//Add component and configure it.
-						object.assign<ModelComponent>().lock()
+						object.assign<model_component>().lock()
 							->set_casts_shadow(true)
 							.set_casts_reflection(false)
-							.set_model(model);
+							.set_model(mdl);
 
 						es->drop();
 						es->select(object);
@@ -143,21 +143,21 @@ void check_drag(runtime::Entity entity)
 
 }
 
-void draw_entity(runtime::Entity entity)
+void draw_entity(runtime::entity entity)
 {
 	if (!entity)
 		return;
 
 	gui::PushID(entity.id().index());
 	gui::AlignFirstTextHeightToWidgets();
-	auto es = core::get_subsystem<editor::EditState>();
-	auto input = core::get_subsystem<runtime::Input>();
+	auto es = core::get_subsystem<editor::editor_state>();
+	auto input = core::get_subsystem<runtime::input>();
 	auto& selected = es->selection_data.object;
 	static bool edit_label = false;
 	bool is_selected = false;
-	if (selected && selected.is_type<runtime::Entity>())
+	if (selected && selected.is_type<runtime::entity>())
 	{
-		is_selected = selected.get_value<runtime::Entity>() == entity;
+		is_selected = selected.get_value<runtime::entity>() == entity;
 	}
 
 	std::string name = entity.to_string();
@@ -176,7 +176,7 @@ void draw_entity(runtime::Entity entity)
 		}
 	}
 
-	auto transformComponent = entity.component<TransformComponent>().lock();
+	auto transformComponent = entity.get_component<transform_component>().lock();
 	bool no_children = true;
 	if (transformComponent)
 		no_children = transformComponent->get_children().empty();
@@ -251,7 +251,7 @@ void draw_entity(runtime::Entity entity)
 	{
 		if (!no_children)
 		{
-			auto children = entity.component<TransformComponent>().lock()->get_children();
+			auto children = entity.get_component<transform_component>().lock()->get_children();
 			for (auto& child : children)
 			{
 				if (!child.expired())
@@ -265,12 +265,12 @@ void draw_entity(runtime::Entity entity)
 	gui::PopID();
 }
 
-void HierarchyDock::render(const ImVec2& area)
+void hierarchy_dock::render(const ImVec2& area)
 {
-	auto es = core::get_subsystem<editor::EditState>();
-	auto ecs = core::get_subsystem<runtime::EntityComponentSystem>();
-	auto sg = core::get_subsystem<runtime::SceneGraph>();
-	auto input = core::get_subsystem<runtime::Input>();
+	auto es = core::get_subsystem<editor::editor_state>();
+	auto ecs = core::get_subsystem<runtime::entity_component_system>();
+	auto sg = core::get_subsystem<runtime::scene_graph>();
+	auto input = core::get_subsystem<runtime::input>();
 
 	auto& roots = sg->get_roots();
 
@@ -278,15 +278,15 @@ void HierarchyDock::render(const ImVec2& area)
 	auto& selected = es->selection_data.object;
 	auto& dragged = es->drag_data.object;
 
-	check_context_menu(runtime::Entity());
+	check_context_menu(runtime::entity());
 
 	if (gui::IsWindowFocused())
 	{
 		if (input->is_key_pressed(sf::Keyboard::Delete))
 		{
-			if (selected && selected.is_type<runtime::Entity>())
+			if (selected && selected.is_type<runtime::entity>())
 			{
-				auto sel = selected.get_value<runtime::Entity>();
+				auto sel = selected.get_value<runtime::entity>();
 				if (sel && sel != editor_camera)
 				{
 					sel.destroy();
@@ -299,14 +299,14 @@ void HierarchyDock::render(const ImVec2& area)
 		{
 			if (input->is_key_down(sf::Keyboard::LControl))
 			{
-				if (selected && selected.is_type<runtime::Entity>())
+				if (selected && selected.is_type<runtime::entity>())
 				{
-					auto sel = selected.get_value<runtime::Entity>();
+					auto sel = selected.get_value<runtime::entity>();
 					if (sel && sel != editor_camera)
 					{
 						auto clone = ecs->create_from_copy(sel);
-						clone.component<TransformComponent>().lock()
-							->set_parent(sel.component<TransformComponent>().lock()->get_parent(), false, true);
+						clone.get_component<transform_component>().lock()
+							->set_parent(sel.get_component<transform_component>().lock()->get_parent(), false, true);
 						es->select(clone);
 					}
 				}
@@ -332,49 +332,49 @@ void HierarchyDock::render(const ImVec2& area)
 
 		if (dragged)
 		{
-			if (dragged.is_type<runtime::Entity>())
+			if (dragged.is_type<runtime::entity>())
 			{
 				gui::SetMouseCursor(ImGuiMouseCursor_Move);
 				if (gui::IsMouseReleased(gui::drag_button))
 				{
-					auto dragged_entity = dragged.get_value<runtime::Entity>();
+					auto dragged_entity = dragged.get_value<runtime::entity>();
 					if (dragged_entity)
 					{
-						dragged_entity.component<TransformComponent>().lock()
-							->set_parent(runtime::CHandle<TransformComponent>());
+						dragged_entity.get_component<transform_component>().lock()
+							->set_parent(runtime::chandle<transform_component>());
 					}
 
 					es->drop();
 				}
 			}
-			if (dragged.is_type<AssetHandle<Prefab>>())
+			if (dragged.is_type<asset_handle<prefab>>())
 			{
 				gui::SetMouseCursor(ImGuiMouseCursor_Move);
 				if (gui::IsMouseReleased(gui::drag_button))
 				{
-					auto prefab = dragged.get_value<AssetHandle<Prefab>>();
-					auto object = prefab->instantiate();
+					auto pfab = dragged.get_value<asset_handle<prefab>>();
+					auto object = pfab->instantiate();
 					es->drop();
 					es->select(object);
 				}
 			}
-			if (dragged.is_type<AssetHandle<Mesh>>())
+			if (dragged.is_type<asset_handle<mesh>>())
 			{
 				gui::SetMouseCursor(ImGuiMouseCursor_Move);
 				if (gui::IsMouseReleased(gui::drag_button))
 				{
-					auto mesh = dragged.get_value<AssetHandle<Mesh>>();
-					Model model;
-					model.set_lod(mesh, 0);
+					auto hmesh = dragged.get_value<asset_handle<mesh>>();
+					model mdl;
+					mdl.set_lod(hmesh, 0);
 
 					auto object = ecs->create();
 					//Add component and configure it.
-					object.assign<TransformComponent>();
+					object.assign<transform_component>();
 					//Add component and configure it.
-					object.assign<ModelComponent>().lock()
+					object.assign<model_component>().lock()
 						->set_casts_shadow(true)
 						.set_casts_reflection(false)
-						.set_model(model);
+						.set_model(mdl);
 
 					es->drop();
 					es->select(object);
@@ -384,9 +384,9 @@ void HierarchyDock::render(const ImVec2& area)
 	}
 }
 
-HierarchyDock::HierarchyDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize)
+hierarchy_dock::hierarchy_dock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize)
 {
 
-	initialize(dtitle, dcloseButton, dminSize, std::bind(&HierarchyDock::render, this, std::placeholders::_1));
+	initialize(dtitle, dcloseButton, dminSize, std::bind(&hierarchy_dock::render, this, std::placeholders::_1));
 }
 

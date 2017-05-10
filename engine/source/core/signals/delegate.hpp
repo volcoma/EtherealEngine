@@ -33,7 +33,7 @@ public:
     object_ptr_(const_cast<C *>(o))
     {}
 
-    template <class C, typename = typename ::std::enable_if< ::std::is_class<C> {}>::type>
+	template <class C, typename = typename ::std::enable_if< ::std::is_class<C>::value, C>::type>
     explicit delegate(C const & o) noexcept :
     object_ptr_(const_cast<C *>(&o))
     {}

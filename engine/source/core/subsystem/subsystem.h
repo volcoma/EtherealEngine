@@ -9,12 +9,12 @@
 
 namespace core
 {
-	struct Subsystem
+	struct subsystem
 	{
-		Subsystem() = default;
-		Subsystem(const Subsystem&) = delete;
-		Subsystem& operator = (const Subsystem&) = delete;
-		virtual ~Subsystem() {}
+		subsystem() = default;
+		subsystem(const subsystem&) = delete;
+		subsystem& operator = (const subsystem&) = delete;
+		virtual ~subsystem() {}
 
 		//-----------------------------------------------------------------------------
 		//  Name : initialize (virtual )
@@ -37,7 +37,7 @@ namespace core
 		virtual void dispose() {}
 	};
 
-	struct SubsystemContext
+	struct subsystem_context
 	{
 		//-----------------------------------------------------------------------------
 		//  Name : initialize ()
@@ -112,17 +112,17 @@ namespace core
 
 	protected:
 		/// 
-		std::vector<nonstd::type_info_polymorphic::index_t> _orders;
+		std::vector<std::size_t> _orders;
 		///
-		std::unordered_map<nonstd::type_info_polymorphic::index_t, Subsystem*> _subsystems;
+		std::unordered_map<std::size_t, subsystem*> _subsystems;
 	};
 
 	//
 	// IMPLEMENTATIONS of SUBSYSTEMS
 	template<typename S, typename ... Args>
-	S* SubsystemContext::add_subsystem(Args&& ... args)
+	S* subsystem_context::add_subsystem(Args&& ... args)
 	{
-		auto index = nonstd::type_info_polymorphic::id<Subsystem, S>();
+		auto index = rtti::type_id<S>().hash_code();
 		Expects(!has_subsystems<S>() && "duplicated subsystem");
 	
 		auto sys = new (std::nothrow) S(std::forward<Args>(args)...);
@@ -135,9 +135,9 @@ namespace core
 	}
 
 	template<typename S>
-	S* SubsystemContext::get_subsystem()
+	S* subsystem_context::get_subsystem()
 	{
-		auto index = nonstd::type_info_polymorphic::id<Subsystem, S>();
+		auto index = rtti::type_id<S>().hash_code();
 
 		auto found = _subsystems.find(index);
 		if (found != _subsystems.end())
@@ -147,9 +147,9 @@ namespace core
 	}
 
 	template<typename S>
-	void SubsystemContext::remove_subsystem()
+	void subsystem_context::remove_subsystem()
 	{
-		auto index = nonstd::type_info_polymorphic::id<Subsystem, S>();
+		auto index = rtti::type_id<S>().hash_code();
 
 		auto found = _subsystems.find(index);
 		if (found != _subsystems.end())
@@ -162,14 +162,14 @@ namespace core
 	}
 
 	template<typename S>
-	bool SubsystemContext::has_subsystems() const
+	bool subsystem_context::has_subsystems() const
 	{
-		auto index = nonstd::type_info_polymorphic::id<Subsystem, S>();
+		auto index = rtti::type_id<S>().hash_code();
 		return _subsystems.find(index) != _subsystems.end();
 	}
 
 	template<typename S1, typename S2, typename ... Args> 
-	bool SubsystemContext::has_subsystems() const
+	bool subsystem_context::has_subsystems() const
 	{
 		return has_subsystems<S1>() && has_subsystems<S2, Args...>();
 	}
@@ -190,7 +190,7 @@ namespace core
 	template<typename ... Args> 
 	bool has_subsystems();
 
-	struct SubsystemContext;
+	struct subsystem_context;
 	namespace details
 	{
 		enum class Status : uint8_t
@@ -238,7 +238,7 @@ namespace core
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		SubsystemContext& context();
+		subsystem_context& context();
 	}
 
 	template<typename S> 

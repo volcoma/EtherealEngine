@@ -6,21 +6,23 @@
 #include "runtime/assets/asset_handle.h"
 #include <chrono>
 
-struct Texture;
+struct texture;
 namespace editor
 {
-	struct EditState : core::Subsystem
+	struct editor_state : core::subsystem
 	{
-		struct DragData
+		struct drag_type
 		{
 			rttr::variant object;
 			std::string description;
 		};
-		struct SelectionData
+
+		struct selection
 		{
 			rttr::variant object;
 		};
-		struct SnapData
+
+		struct snap
 		{
 			///
 			math::vec3 translation_snap = { 1.0f, 1.0f, 1.0f };
@@ -101,8 +103,9 @@ namespace editor
 		//-----------------------------------------------------------------------------
 		void drop();
 
+		void frame_end(std::chrono::duration<float> dt);
 		/// editor camera
-		runtime::Entity camera;
+		runtime::entity camera;
 		/// current scene
 		std::string scene;
 		/// enable editor grid
@@ -110,17 +113,17 @@ namespace editor
 		/// enable wireframe selection
 		bool wireframe_selection = true;
 		/// current manipulation gizmo operation.
-		imguizmo::OPERATION operation = imguizmo::TRANSLATE;
+		imguizmo::operation operation = imguizmo::translate;
 		/// current manipulation gizmo space.
-		imguizmo::MODE mode = imguizmo::LOCAL;
+		imguizmo::mode mode = imguizmo::local;
 		/// drag data containing dragged object
-		DragData drag_data;
+		drag_type drag_data;
 		/// selection data containing selected object
-		SelectionData selection_data;
+		selection selection_data;
 		/// snap data containging various snap options
-		SnapData snap_data;
+		snap snap_data;
 		/// editor icons lookup map
-		std::unordered_map<std::string, AssetHandle<Texture>> icons;
+		std::unordered_map<std::string, asset_handle<texture>> icons;
 	};
 
 }

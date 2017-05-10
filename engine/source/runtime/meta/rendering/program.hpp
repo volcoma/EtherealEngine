@@ -6,14 +6,14 @@
 #include "../../rendering/program.h"
 #include "../assets/asset_handle.hpp"
 
-SAVE(Program)
+SAVE(program)
 {
 	try_save(ar, cereal::make_nvp("shaders", shaders));
 }
 
-LOAD(Program)
+LOAD(program)
 {
-	std::vector<AssetHandle<Shader>> shaders;
+	std::vector<asset_handle<shader>> shaders;
 
 	try_load(ar, cereal::make_nvp("shaders", shaders));
 

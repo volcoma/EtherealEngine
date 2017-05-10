@@ -9,13 +9,13 @@
 #include "../../edit_state.h"
 
 
-bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<AssetHandle<Texture>>();
-	auto es = core::get_subsystem<editor::EditState>();
-	auto am = core::get_subsystem<runtime::AssetManager>();
+	auto data = var.get_value<asset_handle<texture>>();
+	auto es = core::get_subsystem<editor::editor_state>();
+	auto am = core::get_subsystem<runtime::asset_manager>();
 	auto& selected = es->selection_data.object;
-	bool is_selected = selected && selected.is_type<AssetHandle<Texture>>();
+	bool is_selected = selected && selected.is_type<asset_handle<texture>>();
 	bool changed = false;
 	float available = math::min(64.0f, gui::GetContentRegionAvailWidth() / 1.5f);
 	if (is_selected)
@@ -47,7 +47,7 @@ bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, s
 	auto bbMinFrame = gui::GetItemRectMin();
 	auto bbMaxFrame = gui::GetItemBoxMax();
 	
-	if (selected && !selected.is_type<AssetHandle<Texture>>())
+	if (selected && !selected.is_type<asset_handle<texture>>())
 	{
 		std::string item = data ? data.id() : "none";
 		rttr::variant var_str = item;
@@ -56,11 +56,11 @@ bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, s
 			item = var_str.to_string();
 			if (item.empty())
 			{
-				data = AssetHandle<Texture>();
+				data = asset_handle<texture>();
 			}
 			else
 			{
-				am->load<Texture>(item, false)
+				am->load<texture>(item, false)
 					.then([&data](auto asset) mutable
 				{
 					data = asset;
@@ -71,7 +71,7 @@ bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, s
 		}
 
 		auto& dragged = es->drag_data.object;
-		if (dragged && dragged.is_type<AssetHandle<Texture>>())
+		if (dragged && dragged.is_type<asset_handle<texture>>())
 		{
 			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.9f));
 			gui::RenderFrameEx(bbMinFrame, bbMaxFrame, true, 0.0f, 1.0f);
@@ -88,7 +88,7 @@ bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, s
 
 				if (gui::IsMouseReleased(gui::drag_button))
 				{
-					data = dragged.get_value<AssetHandle<Texture>>();
+					data = dragged.get_value<asset_handle<texture>>();
 					var = data;
 					return true;
 
@@ -109,14 +109,14 @@ bool Inspector_AssetHandle_Texture::inspect(rttr::variant& var, bool readOnly, s
 }
 
 
-bool Inspector_AssetHandle_Material::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_asset_handle_material::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<AssetHandle<Material>>();
+	auto data = var.get_value<asset_handle<material>>();
 
-	auto es = core::get_subsystem<editor::EditState>();
-	auto am = core::get_subsystem<runtime::AssetManager>();
+	auto es = core::get_subsystem<editor::editor_state>();
+	auto am = core::get_subsystem<runtime::asset_manager>();
 	auto& selected = es->selection_data.object;
-	if (selected && !selected.is_type<AssetHandle<Material>>())
+	if (selected && !selected.is_type<asset_handle<material>>())
 	{
 		std::string item = data ? data.id() : "none";
 		rttr::variant var_str = item;
@@ -125,11 +125,11 @@ bool Inspector_AssetHandle_Material::inspect(rttr::variant& var, bool readOnly, 
 			item = var_str.to_string();
 			if (item.empty())
 			{
-				data = AssetHandle<Material>();
+				data = asset_handle<material>();
 			}
 			else
 			{
-				am->load<Material>(item, false)
+				am->load<material>(item, false)
 					.then([&data](auto asset) mutable
 				{
 					data = asset;
@@ -140,7 +140,7 @@ bool Inspector_AssetHandle_Material::inspect(rttr::variant& var, bool readOnly, 
 		}
 
 		auto& dragged = es->drag_data.object;
-		if (dragged && dragged.is_type<AssetHandle<Material>>())
+		if (dragged && dragged.is_type<asset_handle<material>>())
 		{
 			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.9f));
 			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
@@ -154,7 +154,7 @@ bool Inspector_AssetHandle_Material::inspect(rttr::variant& var, bool readOnly, 
 				gui::PopStyleColor();
 				if (gui::IsMouseReleased(gui::drag_button))
 				{
-					data = dragged.get_value<AssetHandle<Material>>();
+					data = dragged.get_value<asset_handle<material>>();
 					var = data;
 					return true;
 
@@ -179,14 +179,14 @@ bool Inspector_AssetHandle_Material::inspect(rttr::variant& var, bool readOnly, 
 	return changed;
 }
 
-bool Inspector_AssetHandle_Mesh::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_asset_handle_mesh::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<AssetHandle<Mesh>>();
+	auto data = var.get_value<asset_handle<mesh>>();
 
-	auto es = core::get_subsystem<editor::EditState>();
-	auto am = core::get_subsystem<runtime::AssetManager>();
+	auto es = core::get_subsystem<editor::editor_state>();
+	auto am = core::get_subsystem<runtime::asset_manager>();
 	auto& selected = es->selection_data.object;
-	if (selected && !selected.is_type<AssetHandle<Mesh>>())
+	if (selected && !selected.is_type<asset_handle<mesh>>())
 	{
 		std::string item = data ? data.id() : "none";
 		rttr::variant var_str = item;
@@ -195,11 +195,11 @@ bool Inspector_AssetHandle_Mesh::inspect(rttr::variant& var, bool readOnly, std:
 			item = var_str.to_string();
 			if (item.empty())
 			{
-				data = AssetHandle<Mesh>();
+				data = asset_handle<mesh>();
 			}
 			else
 			{
-				am->load<Mesh>(item, false)
+				am->load<mesh>(item, false)
 					.then([&data](auto asset) mutable
 				{
 					data = asset;
@@ -210,7 +210,7 @@ bool Inspector_AssetHandle_Mesh::inspect(rttr::variant& var, bool readOnly, std:
 		}
 		
 		auto& dragged = es->drag_data.object;
-		if (dragged && dragged.is_type<AssetHandle<Mesh>>())
+		if (dragged && dragged.is_type<asset_handle<mesh>>())
 		{
 			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.9f));
 			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
@@ -224,7 +224,7 @@ bool Inspector_AssetHandle_Mesh::inspect(rttr::variant& var, bool readOnly, std:
 				gui::PopStyleColor();
 				if (gui::IsMouseReleased(gui::drag_button))
 				{
-					data = dragged.get_value<AssetHandle<Mesh>>();
+					data = dragged.get_value<asset_handle<mesh>>();
 					var = data;
 					return true;
 
@@ -238,7 +238,7 @@ bool Inspector_AssetHandle_Mesh::inspect(rttr::variant& var, bool readOnly, std:
 
 	if (data)
 	{
-		Mesh::Info info;
+		mesh::info info;
 		info.vertices = data->get_vertex_count();
 		info.primitives = data->get_face_count();
 		info.subsets = static_cast<std::uint32_t>(data->get_subset_count());
@@ -248,14 +248,14 @@ bool Inspector_AssetHandle_Mesh::inspect(rttr::variant& var, bool readOnly, std:
 	return changed;
 }
 
-bool Inspector_AssetHandle_Prefab::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_asset_handle_prefab::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<AssetHandle<Prefab>>();
+	auto data = var.get_value<asset_handle<prefab>>();
 
-	auto es = core::get_subsystem<editor::EditState>();
-	auto am = core::get_subsystem<runtime::AssetManager>();
+	auto es = core::get_subsystem<editor::editor_state>();
+	auto am = core::get_subsystem<runtime::asset_manager>();
 	auto& selected = es->selection_data.object;
-	if (selected && !selected.is_type<AssetHandle<Prefab>>())
+	if (selected && !selected.is_type<asset_handle<prefab>>())
 	{
 		std::string item = data ? data.id() : "none";
 		rttr::variant var_str = item;
@@ -264,11 +264,11 @@ bool Inspector_AssetHandle_Prefab::inspect(rttr::variant& var, bool readOnly, st
 			item = var_str.to_string();
 			if (item.empty())
 			{
-				data = AssetHandle<Prefab>();
+				data = asset_handle<prefab>();
 			}
 			else
 			{
-				am->load<Prefab>(item, false)
+				am->load<prefab>(item, false)
 					.then([&data](auto asset) mutable
 				{
 					data = asset;
@@ -279,7 +279,7 @@ bool Inspector_AssetHandle_Prefab::inspect(rttr::variant& var, bool readOnly, st
 		}
 
 		auto& dragged = es->drag_data.object;
-		if (dragged && dragged.is_type<AssetHandle<Prefab>>())
+		if (dragged && dragged.is_type<asset_handle<prefab>>())
 		{
 			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.9f));
 			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
@@ -293,7 +293,7 @@ bool Inspector_AssetHandle_Prefab::inspect(rttr::variant& var, bool readOnly, st
 				gui::PopStyleColor();
 				if (gui::IsMouseReleased(gui::drag_button))
 				{
-					data = dragged.get_value<AssetHandle<Prefab>>();
+					data = dragged.get_value<asset_handle<prefab>>();
 					var = data;
 					return true;
 

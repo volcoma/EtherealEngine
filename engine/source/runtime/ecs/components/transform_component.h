@@ -7,51 +7,51 @@
 // Main Class Declarations
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-//  Name : TransformComponent (Class)
+//  Name : transform_component (Class)
 /// <summary>
 /// Class containing transformation data and functionality. It represents
 /// an object's state in a 3D setup. Provides functionality for manipulating that state.
 /// </summary>
 //-----------------------------------------------------------------------------
-class TransformComponent : public runtime::Component
+class transform_component : public runtime::component
 {
-	COMPONENT(TransformComponent)
-	SERIALIZABLE(TransformComponent)
-	REFLECTABLE(TransformComponent, runtime::Component)
+	COMPONENT(transform_component)
+	SERIALIZABLE(transform_component)
+	REFLECTABLE(transform_component, runtime::component)
 
 public:
 	//-------------------------------------------------------------------------
 	// Constructors & Destructors
 	//-------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------
-	//  Name : TransformComponent ()
+	//  Name : transform_component ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	TransformComponent();
+	transform_component();
 
 	//-----------------------------------------------------------------------------
-	//  Name : TransformComponent ()
+	//  Name : transform_component ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	TransformComponent(const TransformComponent& rhs);
+	transform_component(const transform_component& rhs);
 
 	//-----------------------------------------------------------------------------
-	//  Name : ~TransformComponent ()
+	//  Name : ~transform_component ()
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	~TransformComponent();
+	~transform_component();
 
 
 	//-------------------------------------------------------------------------
@@ -95,7 +95,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const math::transform_t& get_local_transform() const;
+	const math::transform& get_local_transform() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_transform ()
@@ -105,7 +105,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const math::transform_t& get_transform();
+	const math::transform& get_transform();
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_position ()
@@ -233,7 +233,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	TransformComponent& look_at(float x, float y, float z);
+	transform_component& look_at(float x, float y, float z);
 
 	//-----------------------------------------------------------------------------
 	//  Name : look_at (virtual )
@@ -243,7 +243,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	TransformComponent& look_at(const math::vec3 & point);
+	transform_component& look_at(const math::vec3 & point);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_position()
@@ -253,7 +253,7 @@ public:
 	/// for initialization purposes.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& set_position(const math::vec3 & position);
+	virtual transform_component& set_position(const math::vec3 & position);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_local_position()
@@ -263,7 +263,7 @@ public:
 	/// for initialization purposes.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& set_local_position(const math::vec3 & position);
+	virtual transform_component& set_local_position(const math::vec3 & position);
 
 	//-----------------------------------------------------------------------------
 	//  Name : move()
@@ -271,7 +271,7 @@ public:
 	/// Move the current position of the node by the specified amount.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& move(const math::vec3 & amount);
+	virtual transform_component& move(const math::vec3 & amount);
 
 	//-----------------------------------------------------------------------------
 	//  Name : move_local()
@@ -280,7 +280,7 @@ public:
 	/// its own local axes.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& move_local(const math::vec3 & amount);
+	virtual transform_component& move_local(const math::vec3 & amount);
 
 	//-----------------------------------------------------------------------------
 	//  Name : rotate (virtual )
@@ -290,7 +290,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& rotate(float x, float y, float z);
+	virtual transform_component& rotate(float x, float y, float z);
 
 	//-----------------------------------------------------------------------------
 	//  Name : rotate (virtual )
@@ -300,7 +300,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& rotate(float x, float y, float z, const math::vec3 & center);
+	virtual transform_component& rotate(float x, float y, float z, const math::vec3 & center);
 
 	//-----------------------------------------------------------------------------
 	//  Name : rotate_local (virtual )
@@ -310,7 +310,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& rotate_local(float x, float y, float z);
+	virtual transform_component& rotate_local(float x, float y, float z);
 
 	//-----------------------------------------------------------------------------
 	//  Name : rotate_axis (virtual )
@@ -320,7 +320,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& rotate_axis(float degrees, const math::vec3 & axis);
+	virtual transform_component& rotate_axis(float degrees, const math::vec3 & axis);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_scale (virtual )
@@ -330,7 +330,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& set_scale(const math::vec3 & s);
+	virtual transform_component& set_scale(const math::vec3 & s);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_local_scale (virtual )
@@ -340,7 +340,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& set_local_scale(const math::vec3 & scale);
+	virtual transform_component& set_local_scale(const math::vec3 & scale);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_rotation (virtual )
@@ -350,7 +350,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& set_rotation(const math::quat & rotation);
+	virtual transform_component& set_rotation(const math::quat & rotation);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_local_rotation (virtual )
@@ -360,7 +360,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& set_local_rotation(const math::quat & rotation);
+	virtual transform_component& set_local_rotation(const math::quat & rotation);
 
 	//-----------------------------------------------------------------------------
 	//  Name : reset_rotation (virtual )
@@ -370,7 +370,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& reset_rotation();
+	virtual transform_component& reset_rotation();
 
 	//-----------------------------------------------------------------------------
 	//  Name : reset_scale (virtual )
@@ -380,7 +380,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& reset_scale();
+	virtual transform_component& reset_scale();
 
 	//-----------------------------------------------------------------------------
 	//  Name : reset_local_rotation (virtual )
@@ -390,7 +390,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& reset_local_rotation();
+	virtual transform_component& reset_local_rotation();
 
 	//-----------------------------------------------------------------------------
 	//  Name : reset_local_scale (virtual )
@@ -400,7 +400,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& reset_local_scale();
+	virtual transform_component& reset_local_scale();
 
 	//-----------------------------------------------------------------------------
 	//  Name : reset_pivot (virtual )
@@ -410,7 +410,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& reset_pivot();
+	virtual transform_component& reset_pivot();
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_local_transform (virtual )
@@ -420,7 +420,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& set_local_transform(const math::transform_t & trans);
+	virtual transform_component& set_local_transform(const math::transform & trans);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_transform (virtual )
@@ -430,7 +430,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& set_transform(const math::transform_t & trans);
+	virtual transform_component& set_transform(const math::transform & trans);
 
 	//-----------------------------------------------------------------------------
 	//  Name : look_at (virtual )
@@ -440,7 +440,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& look_at(const math::vec3 & eye, const math::vec3 & at);
+	virtual transform_component& look_at(const math::vec3 & eye, const math::vec3 & at);
 
 	//-----------------------------------------------------------------------------
 	//  Name : look_at (virtual )
@@ -450,7 +450,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& look_at(const math::vec3 & eye, const math::vec3 & at, const math::vec3 & up);
+	virtual transform_component& look_at(const math::vec3 & eye, const math::vec3 & at, const math::vec3 & up);
 
 	//-----------------------------------------------------------------------------
 	//  Name : can_adjust_pivot (virtual )
@@ -490,7 +490,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& set_parent(runtime::CHandle<TransformComponent> parent, bool world_position_stays, bool local_position_stays);
+	virtual transform_component& set_parent(runtime::chandle<transform_component> parent, bool world_position_stays, bool local_position_stays);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_parent (virtual )
@@ -500,7 +500,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual TransformComponent& set_parent(runtime::CHandle<TransformComponent> parent);
+	virtual transform_component& set_parent(runtime::chandle<transform_component> parent);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_parent ()
@@ -510,7 +510,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const runtime::CHandle<TransformComponent>& get_parent() const;
+	const runtime::chandle<transform_component>& get_parent() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_children ()
@@ -520,7 +520,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const std::vector<runtime::CHandle<TransformComponent>>& get_children() const;
+	const std::vector<runtime::chandle<transform_component>>& get_children() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : attach_child ()
@@ -530,7 +530,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void attach_child(runtime::CHandle<TransformComponent> child);
+	void attach_child(runtime::chandle<transform_component> child);
 
 	//-----------------------------------------------------------------------------
 	//  Name : remove_child ()
@@ -540,7 +540,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void remove_child(runtime::CHandle<TransformComponent> child);
+	void remove_child(runtime::chandle<transform_component> child);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_slow_parenting ()
@@ -586,13 +586,13 @@ protected:
 	// Protected Member Variables
 	//-------------------------------------------------------------------------
 	/// Parent object.
-	runtime::CHandle<TransformComponent> _parent;
+	runtime::chandle<transform_component> _parent;
 	/// Children object.
-	std::vector<runtime::CHandle<TransformComponent>> _children;
+	std::vector<runtime::chandle<transform_component>> _children;
 	/// Local transformation relative to the parent
-	math::transform_t _local_transform;
+	math::transform _local_transform;
 	/// Cached world transformation at pivot point.
-	math::transform_t _world_transform;
+	math::transform _world_transform;
 	/// Is slow parenting enabled?
 	bool _slow_parenting = false;
 	/// Slow parenting speed.

@@ -472,7 +472,7 @@ namespace imguizmo
 
 		ImDrawList* mDrawList;
 
-		MODE mMode;
+		mode mMode;
 		matrix_t mViewMat;
 		matrix_t mProjectionMat;
 		matrix_t mModel;
@@ -632,13 +632,13 @@ namespace imguizmo
 		return trf.w;
 	}
 
-	static void ComputeContext(const float *view, const float *projection, float *matrix, MODE mode)
+	static void ComputeContext(const float *view, const float *projection, float *matrix, mode mode)
 	{
 		gContext.mMode = mode;
 		gContext.mViewMat = *(matrix_t*)view;
 		gContext.mProjectionMat = *(matrix_t*)projection;
 
-		if (mode == LOCAL)
+		if (mode == local)
 		{
 			gContext.mModel = *(matrix_t*)matrix;
 			gContext.mModel.OrthoNormalize();
@@ -673,7 +673,7 @@ namespace imguizmo
 		ComputeCameraRay(gContext.mRayOrigin, gContext.mRayVector);
 	}
 
-	static void ComputeColors(ImU32 *colors, int type, OPERATION operation)
+	static void ComputeColors(ImU32 *colors, int type, operation operation)
 	{
 
 		static const ImU32 _sc_color = 0xFFFFB3E6;
@@ -681,7 +681,7 @@ namespace imguizmo
 		{
 			switch (operation)
 			{
-			case TRANSLATE:
+			case translate:
 				colors[0] = (type == MOVE_SCREEN) ? selectionColor : _sc_color;
 				for (int i = 0; i < 3; ++i)
 				{
@@ -689,12 +689,12 @@ namespace imguizmo
 					colors[i + 4] = (type == (int)(MOVE_XY + i)) ? selectionColor : planeColor;
 				}
 				break;
-			case ROTATE:
+			case rotate:
 				colors[0] = (type == ROTATE_SCREEN) ? selectionColor : _sc_color;
 				for (int i = 0; i < 3; ++i)
 					colors[i + 1] = (type == (int)(ROTATE_X + i)) ? selectionColor : directionColor[i];
 				break;
-			case SCALE:
+			case scale:
 				colors[0] = (type == SCALE_XYZ) ? selectionColor : _sc_color;
 				for (int i = 0; i < 3; ++i)
 					colors[i + 1] = (type == (int)(SCALE_X + i)) ? selectionColor : directionColor[i];
@@ -800,7 +800,7 @@ namespace imguizmo
 
 		// colors
 		ImU32 colors[7];
-		ComputeColors(colors, type, ROTATE);
+		ComputeColors(colors, type, rotate);
 
 		vec_t cameraToModelNormalized = Normalized(gContext.mModel.v.position - gContext.mCameraEye);
 		cameraToModelNormalized.TransformVector(gContext.mModelInverse);
@@ -865,7 +865,7 @@ namespace imguizmo
 
 		// colors
 		ImU32 colors[7];
-		ComputeColors(colors, type, SCALE);
+		ComputeColors(colors, type, scale);
 
 		// draw screen circle
 		drawList->AddCircleFilled(gContext.mScreenSquareCenter, 12.f, colors[0], 32);
@@ -930,7 +930,7 @@ namespace imguizmo
 
 		// colors
 		ImU32 colors[7];
-		ComputeColors(colors, type, TRANSLATE);
+		ComputeColors(colors, type, translate);
 
 		// draw screen quad
 		drawList->AddRectFilled(gContext.mScreenSquareMin, gContext.mScreenSquareMax, colors[0], 2.f);
@@ -1112,7 +1112,7 @@ namespace imguizmo
 	static void HandleTranslation(float *matrix, float *deltaMatrix, int& type, float *snap)
 	{
 		ImGuiIO& io = ImGui::GetIO();
-		bool applyTranslationLocaly = gContext.mMode == LOCAL || type == MOVE_SCREEN;
+		bool applyTranslationLocaly = gContext.mMode == local || type == MOVE_SCREEN;
 
 		// move
 		if (gContext.mbUsing)
@@ -1275,7 +1275,7 @@ namespace imguizmo
 	static void HandleRotation(float *matrix, float *deltaMatrix, int& type, float *snap)
 	{
 		ImGuiIO& io = ImGui::GetIO();
-		bool applyRotationLocaly = gContext.mMode == LOCAL;
+		bool applyRotationLocaly = gContext.mMode == local;
 
 		if (!gContext.mbUsing)
 		{
@@ -1352,9 +1352,9 @@ namespace imguizmo
 		}
 	}
 
-	void manipulate(const float *view, const float *projection, OPERATION operation, MODE mode, float *matrix, float *deltaMatrix, float *snap)
+	void manipulate(const float *view, const float *projection, operation op, mode mod, float *matrix, float *deltaMatrix, float *snap)
 	{
-		ComputeContext(view, projection, matrix, mode);
+		ComputeContext(view, projection, matrix, mod);
 		// set delta to identity 
 		if (deltaMatrix)
 			((matrix_t*)deltaMatrix)->SetToIdentity();
@@ -1369,29 +1369,29 @@ namespace imguizmo
 		int type = NONE;
 		if (gContext.mbEnable)
 		{
-			switch (operation)
+			switch (op)
 			{
-			case ROTATE:
+			case rotate:
 				HandleRotation(matrix, deltaMatrix, type, snap);
 				break;
-			case TRANSLATE:
+			case translate:
 				HandleTranslation(matrix, deltaMatrix, type, snap);
 				break;
-			case SCALE:
+			case scale:
 				HandleScale(matrix, deltaMatrix, type, snap);
 				break;
 			}
 		}
 
-		switch (operation)
+		switch (op)
 		{
-		case ROTATE:
+		case rotate:
 			DrawRotationGizmo(type);
 			break;
-		case TRANSLATE:
+		case translate:
 			DrawTranslationGizmo(type);
 			break;
-		case SCALE:
+		case scale:
 			DrawScaleGizmo(type);
 			break;
 		}

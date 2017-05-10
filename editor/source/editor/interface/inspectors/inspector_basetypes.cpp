@@ -1,8 +1,8 @@
 #include "inspector_basetypes.h"
 
-bool Inspector_iRect::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_irect::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<iRect>();
+	auto data = var.get_value<irect>();
 	bool changed = false;
 	const char* namesLT[] = { "L", "T" };
 	const char* namesRB[] = { "R", "B" };
@@ -17,9 +17,9 @@ bool Inspector_iRect::inspect(rttr::variant& var, bool readOnly, std::function<r
 	return false;
 }
 
-bool Inspector_uRect::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_urect::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<uRect>();
+	auto data = var.get_value<urect>();
 	bool changed = false;
 	const char* namesLT[] = { "L", "T" };
 	const char* namesRB[] = { "R", "B" };
@@ -34,9 +34,9 @@ bool Inspector_uRect::inspect(rttr::variant& var, bool readOnly, std::function<r
 	return false;
 }
 
-bool Inspector_fRect::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_frect::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<fRect>();
+	auto data = var.get_value<frect>();
 	bool changed = false;
 	const char* namesLT[] = { "L", "T" };
 	const char* namesRB[] = { "R", "B" };
@@ -51,9 +51,9 @@ bool Inspector_fRect::inspect(rttr::variant& var, bool readOnly, std::function<r
 	return false;
 }
 
-bool Inspector_iPoint::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_ipoint::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<iPoint>();
+	auto data = var.get_value<ipoint>();
 	bool changed = false;
 	const char* names[] = { "X", "Y" };
 
@@ -66,9 +66,9 @@ bool Inspector_iPoint::inspect(rttr::variant& var, bool readOnly, std::function<
 	return false;
 }
 
-bool Inspector_uPoint::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_upoint::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<uPoint>();
+	auto data = var.get_value<upoint>();
 	bool changed = false;
 	const char* names[] = { "X", "Y" };
 
@@ -81,9 +81,9 @@ bool Inspector_uPoint::inspect(rttr::variant& var, bool readOnly, std::function<
 	return false;
 }
 
-bool Inspector_fPoint::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_fpoint::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<fPoint>();
+	auto data = var.get_value<fpoint>();
 	bool changed = false;
 	const char* names[] = { "X", "Y" };
 
@@ -96,9 +96,9 @@ bool Inspector_fPoint::inspect(rttr::variant& var, bool readOnly, std::function<
 	return false;
 }
 
-bool Inspector_iSize::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_isize::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<iSize>();
+	auto data = var.get_value<isize>();
 	bool changed = false;
 	const char* names[] = { "W", "H" };
 
@@ -111,9 +111,9 @@ bool Inspector_iSize::inspect(rttr::variant& var, bool readOnly, std::function<r
 	return false;
 }
 
-bool Inspector_uSize::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_usize::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<uSize>();
+	auto data = var.get_value<usize>();
 	bool changed = false;
 	const char* names[] = { "W", "H" };
 
@@ -126,9 +126,9 @@ bool Inspector_uSize::inspect(rttr::variant& var, bool readOnly, std::function<r
 	return false;
 }
 
-bool Inspector_fSize::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_fsize::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<fSize>();
+	auto data = var.get_value<fsize>();
 	bool changed = false;
 	const char* names[] = { "W", "H" };
 
@@ -141,9 +141,9 @@ bool Inspector_fSize::inspect(rttr::variant& var, bool readOnly, std::function<r
 	return false;
 }
 
-bool Inspector_iRange::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_irange::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<iRange>();
+	auto data = var.get_value<irange>();
 	bool changed = false;
 	const char* names[] = { "Min", "Max" };
 
@@ -156,9 +156,9 @@ bool Inspector_iRange::inspect(rttr::variant& var, bool readOnly, std::function<
 	return false;
 }
 
-bool Inspector_uRange::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_urange::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<uRange>();
+	auto data = var.get_value<urange>();
 	bool changed = false;
 	const char* names[] = { "Min", "Max" };
 
@@ -171,9 +171,9 @@ bool Inspector_uRange::inspect(rttr::variant& var, bool readOnly, std::function<
 	return false;
 }
 
-bool Inspector_fRange::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_frange::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<fRange>();
+	auto data = var.get_value<frange>();
 	bool changed = false;
 	const char* names[] = { "Min", "Max" };
 

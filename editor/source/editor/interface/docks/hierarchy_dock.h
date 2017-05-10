@@ -2,9 +2,9 @@
 
 #include "imguidock.h"
 
-struct HierarchyDock : public ImGuiDock::Dock
+struct hierarchy_dock : public imguidock::dock
 {
-	HierarchyDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize);
+	hierarchy_dock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize);
 
 	void render(const ImVec2& area);
 };

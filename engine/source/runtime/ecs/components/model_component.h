@@ -3,29 +3,29 @@
 #include "../ecs.h"
 #include "../../rendering/model.h"
 
-class Material;
+class material;
 //-----------------------------------------------------------------------------
 // Main Class Declarations
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-//  Name : ModelComponent (Class)
+//  Name : model_component (Class)
 /// <summary>
 /// Class that contains core data for meshes.
 /// </summary>
 //-----------------------------------------------------------------------------
-class ModelComponent : public runtime::Component
+class model_component : public runtime::component
 {
-	COMPONENT(ModelComponent)
-	SERIALIZABLE(ModelComponent)
-	REFLECTABLE(ModelComponent, Component)
+	COMPONENT(model_component)
+	SERIALIZABLE(model_component)
+	REFLECTABLE(model_component, component)
 
 public:
 	//-------------------------------------------------------------------------
 	// Constructors & Destructors
 	//-------------------------------------------------------------------------
-	ModelComponent();
-	ModelComponent(const ModelComponent& component);
-	virtual ~ModelComponent();
+	model_component();
+	model_component(const model_component& component);
+	virtual ~model_component();
 
 	//-------------------------------------------------------------------------
 	// Public Virtual Methods (Override)
@@ -41,7 +41,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	ModelComponent& set_casts_shadow(bool castShadow);
+	model_component& set_casts_shadow(bool castShadow);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_casts_reflection ()
@@ -51,7 +51,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	ModelComponent& set_casts_reflection(bool castReflection);
+	model_component& set_casts_reflection(bool castReflection);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_static ()
@@ -61,7 +61,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	ModelComponent& set_static(bool bStatic);
+	model_component& set_static(bool bStatic);
 
 	//-----------------------------------------------------------------------------
 	//  Name : casts_shadow ()
@@ -101,7 +101,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const Model& get_model() const;
+	const model& get_model() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_model ()
@@ -111,7 +111,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	ModelComponent& set_model(const Model& model);
+	model_component& set_model(const model& model);
 
 private:
 	//-------------------------------------------------------------------------
@@ -124,5 +124,5 @@ private:
 	///
 	bool _casts_reflection = true;
 	///
-	Model _model;
+	model _model;
 };

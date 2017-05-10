@@ -1,11 +1,11 @@
 #include "shader.h"
 
-Shader::~Shader()
+shader::~shader()
 {
 	dispose();
 }
 
-void Shader::dispose()
+void shader::dispose()
 {
 	uniforms.clear();
 
@@ -15,12 +15,12 @@ void Shader::dispose()
 	handle = { bgfx::invalidHandle };
 }
 
-bool Shader::is_valid() const
+bool shader::is_valid() const
 {
 	return gfx::isValid(handle);
 }
 
-void Shader::populate(const gfx::Memory* _mem)
+void shader::populate(const gfx::Memory* _mem)
 {
 	dispose();
 

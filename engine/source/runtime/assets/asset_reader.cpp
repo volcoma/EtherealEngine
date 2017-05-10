@@ -17,7 +17,7 @@
 #include "meta/rendering/mesh.hpp"
 #include <cstdint>
 
-void AssetReader::load_texture_from_file(const std::string& key, const fs::path& absolute_key, bool async, LoadRequest<Texture>& request)
+void asset_reader::load_texture_from_file(const std::string& key, const fs::path& absolute_key, bool async, load_request<texture>& request)
 {
 	auto read_memory = std::make_shared<fs::byte_array_t>();
 
@@ -44,8 +44,8 @@ void AssetReader::load_texture_from_file(const std::string& key, const fs::path&
 
 		if (nullptr != mem)
 		{
-			auto texture = std::make_shared<Texture>(mem, 0, 0, nullptr);
-			request.set_data(key, texture);
+			auto tex = std::make_shared<texture>(mem, 0, 0, nullptr);
+			request.set_data(key, tex);
 			request.invoke_callbacks();
 		}
 		
@@ -53,7 +53,7 @@ void AssetReader::load_texture_from_file(const std::string& key, const fs::path&
 
 	if (async)
 	{
-		auto ts = core::get_subsystem<runtime::TaskSystem>();
+		auto ts = core::get_subsystem<runtime::task_system>();
 
 		auto task = ts->create("", [ts, read_memory_func, create_resource_func]()
 		{
@@ -74,7 +74,7 @@ void AssetReader::load_texture_from_file(const std::string& key, const fs::path&
 
 }
 
-void AssetReader::load_shader_from_file(const std::string& key, const fs::path& absolute_key, bool async, LoadRequest<Shader>& request)
+void asset_reader::load_shader_from_file(const std::string& key, const fs::path& absolute_key, bool async, load_request<shader>& request)
 {
 	struct Wrapper
 	{
@@ -97,21 +97,21 @@ void AssetReader::load_shader_from_file(const std::string& key, const fs::path& 
 		wrapper->binaries.clear();
 		if (nullptr != mem)
 		{
-			auto shader = std::make_shared<Shader>();
-			shader->populate(mem);
-			auto uniform_count = gfx::getShaderUniforms(shader->handle);
+			auto shdr = std::make_shared<shader>();
+			shdr->populate(mem);
+			auto uniform_count = gfx::getShaderUniforms(shdr->handle);
 			std::vector<gfx::UniformHandle> uniforms(uniform_count);
-			gfx::getShaderUniforms(shader->handle, &uniforms[0], uniform_count);
-			shader->uniforms.reserve(uniform_count);
-			for (auto& uniform : uniforms)
+			gfx::getShaderUniforms(shdr->handle, &uniforms[0], uniform_count);
+			shdr->uniforms.reserve(uniform_count);
+			for (auto& uni : uniforms)
 			{
-				std::shared_ptr<Uniform> hUniform = std::make_shared<Uniform>();
-				hUniform->populate(uniform);
+				auto hUniform = std::make_shared<uniform>();
+				hUniform->populate(uni);
 
-				shader->uniforms.push_back(hUniform);
+				shdr->uniforms.push_back(hUniform);
 			}
 
-			request.set_data(key, shader);
+			request.set_data(key, shdr);
 			request.invoke_callbacks();
 		}
 		
@@ -119,7 +119,7 @@ void AssetReader::load_shader_from_file(const std::string& key, const fs::path& 
 
 	if (async)
 	{
-		auto ts = core::get_subsystem<runtime::TaskSystem>();
+		auto ts = core::get_subsystem<runtime::task_system>();
 
 		auto task = ts->create("", [ts, deserialize, create_resource_func]() mutable
 		{
@@ -139,7 +139,7 @@ void AssetReader::load_shader_from_file(const std::string& key, const fs::path& 
 	}
 }
 
-void AssetReader::load_shader_from_memory(const std::string& key, const std::uint8_t* data, std::uint32_t size, LoadRequest<Shader>& request)
+void asset_reader::load_shader_from_memory(const std::string& key, const std::uint8_t* data, std::uint32_t size, load_request<shader>& request)
 {
 	auto create_resource_func = [&key, data, size, &request]() mutable
 	{
@@ -149,21 +149,21 @@ void AssetReader::load_shader_from_memory(const std::string& key, const std::uin
 		const gfx::Memory* mem = gfx::copy(data, size);
 		if (nullptr != mem)
 		{
-			auto shader = std::make_shared<Shader>();
-			shader->populate(mem);
-			auto uniform_count = gfx::getShaderUniforms(shader->handle);
+			auto shdr = std::make_shared<shader>();
+			shdr->populate(mem);
+			auto uniform_count = gfx::getShaderUniforms(shdr->handle);
 			std::vector<gfx::UniformHandle> uniforms(uniform_count);
-			gfx::getShaderUniforms(shader->handle, &uniforms[0], uniform_count);
-			shader->uniforms.reserve(uniform_count);
-			for (auto& uniform : uniforms)
+			gfx::getShaderUniforms(shdr->handle, &uniforms[0], uniform_count);
+			shdr->uniforms.reserve(uniform_count);
+			for (auto& uni : uniforms)
 			{
-				std::shared_ptr<Uniform> hUniform = std::make_shared<Uniform>();
-				hUniform->populate(uniform);
+				auto hUniform = std::make_shared<uniform>();
+				hUniform->populate(uni);
 
-				shader->uniforms.push_back(hUniform);
+				shdr->uniforms.push_back(hUniform);
 			}
 
-			request.set_data(key, shader);
+			request.set_data(key, shdr);
 			request.invoke_callbacks();
 
 		}
@@ -173,18 +173,18 @@ void AssetReader::load_shader_from_memory(const std::string& key, const std::uin
 
 }
 
-void AssetReader::load_mesh_from_file(const std::string& key, const fs::path& absolute_key, bool async, LoadRequest<Mesh>& request)
+void asset_reader::load_mesh_from_file(const std::string& key, const fs::path& absolute_key, bool async, load_request<mesh>& request)
 {
 	struct Wrapper
 	{
-		std::shared_ptr<Mesh> mesh;
+		std::shared_ptr<mesh> mesh;
 	};
 
 	auto wrapper = std::make_shared<Wrapper>();
-	wrapper->mesh = std::make_shared<Mesh>();
+	wrapper->mesh = std::make_shared<mesh>();
 	auto deserialize = [wrapper, absolute_key]() mutable
 	{
-		Mesh::LoadData data;
+		mesh::load_data data;
 		{
 			std::ifstream stream{ absolute_key, std::ios::in | std::ios::binary };
 			cereal::iarchive_binary_t ar(stream);
@@ -205,7 +205,7 @@ void AssetReader::load_mesh_from_file(const std::string& key, const fs::path& ab
 		wrapper->mesh->build_vb();
 		wrapper->mesh->build_ib();
 
-		if (wrapper->mesh->get_status() == MeshStatus::Prepared)
+		if (wrapper->mesh->get_status() == mesh_status::prepared)
 		{
 			request.set_data(key, wrapper->mesh);
 			request.invoke_callbacks();
@@ -215,7 +215,7 @@ void AssetReader::load_mesh_from_file(const std::string& key, const fs::path& ab
 
 	if (async)
 	{
-		auto ts = core::get_subsystem<runtime::TaskSystem>();
+		auto ts = core::get_subsystem<runtime::task_system>();
 
 		auto task = ts->create("", [ts, deserialize, create_resource_func]() mutable
 		{
@@ -235,15 +235,15 @@ void AssetReader::load_mesh_from_file(const std::string& key, const fs::path& ab
 	}
 }
 
-void AssetReader::load_material_from_file(const std::string& key, const fs::path& absolute_key, bool async, LoadRequest<Material>& request)
+void asset_reader::load_material_from_file(const std::string& key, const fs::path& absolute_key, bool async, load_request<material>& request)
 {
 	struct MatWrapper
 	{
-		std::shared_ptr<Material> material;
+		std::shared_ptr<material> material;
 	};
 
 	auto wrapper = std::make_shared<MatWrapper>();
-	wrapper->material = std::make_shared<Material>();
+	wrapper->material = std::make_shared<material>();
 	auto deserialize = [wrapper, absolute_key]() mutable
 	{
 		std::ifstream stream{ absolute_key, std::ios::in | std::ios::binary };
@@ -261,7 +261,7 @@ void AssetReader::load_material_from_file(const std::string& key, const fs::path
 
 	if (async)
 	{
-		auto ts = core::get_subsystem<runtime::TaskSystem>();
+		auto ts = core::get_subsystem<runtime::task_system>();
 
 		auto task = ts->create("", [ts, deserialize, create_resource_func]() mutable
 		{
@@ -281,7 +281,7 @@ void AssetReader::load_material_from_file(const std::string& key, const fs::path
 	}
 }
 
-void AssetReader::load_prefab_from_file(const std::string& key, const fs::path& absolute_key, bool async, LoadRequest<Prefab>& request)
+void asset_reader::load_prefab_from_file(const std::string& key, const fs::path& absolute_key, bool async, load_request<prefab>& request)
 {
 
 	std::shared_ptr<std::istringstream> read_memory = std::make_shared<std::istringstream>();
@@ -297,16 +297,16 @@ void AssetReader::load_prefab_from_file(const std::string& key, const fs::path& 
 
 	auto create_resource_func = [read_memory, key, absolute_key, &request]() mutable
 	{
-		auto prefab = std::make_shared<Prefab>();
-		prefab->data = read_memory;
-		request.set_data(key, prefab);
+		auto pfab = std::make_shared<prefab>();
+		pfab->data = read_memory;
+		request.set_data(key, pfab);
 		request.invoke_callbacks();
 	};
 	
 
 	if (async)
 	{
-		auto ts = core::get_subsystem<runtime::TaskSystem>();
+		auto ts = core::get_subsystem<runtime::task_system>();
 
 		auto task = ts->create("", [ts, read_memory_func, create_resource_func]() mutable
 		{
@@ -326,7 +326,7 @@ void AssetReader::load_prefab_from_file(const std::string& key, const fs::path& 
 	}
 }
 
-void AssetReader::load_scene_from_file(const std::string& key, const fs::path& absolute_key, bool async, LoadRequest<Scene>& request)
+void asset_reader::load_scene_from_file(const std::string& key, const fs::path& absolute_key, bool async, load_request<scene>& request)
 {
 
 	std::shared_ptr<std::istringstream> read_memory = std::make_shared<std::istringstream>();
@@ -342,16 +342,16 @@ void AssetReader::load_scene_from_file(const std::string& key, const fs::path& a
 
 	auto create_resource_func = [read_memory, key, absolute_key, &request]() mutable
 	{
-		auto scene = std::make_shared<Scene>();
-		scene->data = read_memory;
-		request.set_data(key, scene);
+		auto sc = std::make_shared<scene>();
+		sc->data = read_memory;
+		request.set_data(key, sc);
 		request.invoke_callbacks();
 	};
 
 
 	if (async)
 	{
-		auto ts = core::get_subsystem<runtime::TaskSystem>();
+		auto ts = core::get_subsystem<runtime::task_system>();
 
 		auto task = ts->create("", [ts, read_memory_func, create_resource_func]() mutable
 		{

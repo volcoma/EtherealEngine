@@ -2,10 +2,9 @@
 
 #include "imguidock.h"
 
-struct InspectorDock : public ImGuiDock::Dock
+struct inspector_dock : public imguidock::dock
 {
-	InspectorDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize);
-
+	inspector_dock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize);
 
 	void render(const ImVec2& area);
 };

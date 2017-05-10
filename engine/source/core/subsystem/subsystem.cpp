@@ -4,12 +4,12 @@
 namespace core
 {
 
-	bool SubsystemContext::initialize()
+	bool subsystem_context::initialize()
 	{
 		return true;
 	}
 
-	void SubsystemContext::dispose()
+	void subsystem_context::dispose()
 	{
 		for (auto iter = _orders.rbegin(); iter != _orders.rend(); iter++)
 		{
@@ -27,12 +27,12 @@ namespace core
 
 	namespace details
 	{
-		std::unique_ptr<SubsystemContext> s_context;
+		std::unique_ptr<subsystem_context> s_context;
 		Status s_status = Status::IDLE;
 
 		bool initialize()
 		{
-			auto context = std::unique_ptr<SubsystemContext>(new (std::nothrow) SubsystemContext());
+			auto context = std::unique_ptr<subsystem_context>(new (std::nothrow) subsystem_context());
 			if (context.get() == nullptr || !context->initialize())
 				return false;
 
@@ -56,7 +56,7 @@ namespace core
 			s_status = Status::DISPOSED;
 		}
 
-		SubsystemContext& context()
+		subsystem_context& context()
 		{
 			return *s_context;
 		}

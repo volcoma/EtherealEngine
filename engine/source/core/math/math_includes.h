@@ -32,7 +32,7 @@ namespace math
 		float light_x,
 		float light_z,
 		float radius,
-		const transform_t& proj,
+		const transform& proj,
 		const vec3& axis,
 		float axis_sign,
 		std::int32_t& in_out_min_x,
@@ -100,8 +100,8 @@ namespace math
 		std::int32_t& bottom,
 		const vec3& sphere_center,
 		float radius, 
-		const transform_t& view, 
-		const transform_t& proj)
+		const transform& view, 
+		const transform& proj)
 	{
 		vec3 view_origin = (vec3&)math::inverse(view)[3];
 		// Calculate a screen rectangle for the sphere's radius.

@@ -4,15 +4,15 @@
 
 namespace editor
 {
-	struct AssetFolder;
+	struct asset_directory;
 }
 
-struct AssetsDock : public ImGuiDock::Dock
+struct assets_dock : public imguidock::dock
 {
-	AssetsDock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize);
+	assets_dock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize);
 	void render(const ImVec2& area);
 
 private:
-	std::weak_ptr<editor::AssetFolder> opened_folder;
+	std::weak_ptr<editor::asset_directory> opened_dir;
 	float scale_icons = 0.7f;
 };

@@ -80,7 +80,7 @@ bbox_extruded::bbox_extruded( )
 /// bbox_extruded Class Constructor, sets values from vector values passed
 /// </summary>
 //-----------------------------------------------------------------------------
-bbox_extruded::bbox_extruded( const bbox & AABB, const vec3 & vecOrigin, float fRange, const transform_t * pTransform /* = nullptr */ )
+bbox_extruded::bbox_extruded( const bbox & AABB, const vec3 & vecOrigin, float fRange, const transform * pTransform /* = nullptr */ )
 {
     // Generate extrude box values automatically
     extrude( AABB, vecOrigin, fRange, pTransform );
@@ -107,7 +107,7 @@ void bbox_extruded::reset()
 /// Generate the extruded box planes / edges.
 /// </summary>
 //-----------------------------------------------------------------------------
-void bbox_extruded::extrude( const bbox & AABB, const vec3 & vecOrigin, float fRange, const transform_t * pTransform /* = nullptr */ )
+void bbox_extruded::extrude( const bbox & AABB, const vec3 & vecOrigin, float fRange, const transform * pTransform /* = nullptr */ )
 {
     bbox Bounds = AABB;
 

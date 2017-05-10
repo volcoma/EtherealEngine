@@ -4,18 +4,45 @@
 #include <memory>
 #include <chrono>
 
-struct Program;
+struct program;
 
 namespace editor
 {
-	class DebugDrawSystem : public core::Subsystem
+	class debugdraw_system : public core::subsystem
 	{
 	public:
+		//-----------------------------------------------------------------------------
+		//  Name : initialize ()
+		/// <summary>
+		/// 
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		bool initialize();
+
+		//-----------------------------------------------------------------------------
+		//  Name : dispose ()
+		/// <summary>
+		/// 
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
 		void dispose();
-		virtual void frame_render(std::chrono::duration<float> dt);
+
+		//-----------------------------------------------------------------------------
+		//  Name : frame_render ()
+		/// <summary>
+		/// 
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
+		void frame_render(std::chrono::duration<float> dt);
 
 	private:
-		std::unique_ptr<Program> _program;
+		///
+		std::unique_ptr<program> _program;
 	};
 }

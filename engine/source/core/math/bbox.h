@@ -30,8 +30,8 @@ namespace math
 		//-------------------------------------------------------------------------
 		// Public Methods
 		//-------------------------------------------------------------------------
-		plane get_plane(VolumePlane::Side side) const;
-		void get_plane_points(VolumePlane::Side side, vec3 points_out[]) const;
+		plane get_plane(volume_plane::e side) const;
+		void get_plane_points(volume_plane::e side, vec3 points_out[]) const;
 		bbox& from_points(const char * point_buffer, unsigned int point_count, unsigned int point_stride, bool reset = true);
 		bbox& from_sphere(const vec3& center, float radius);
 		bool intersect(const bbox & bounds) const;
@@ -47,7 +47,7 @@ namespace math
 		vec3 closest_point(const vec3 & source_point) const;
 		void validate();
 		void reset();
-		bbox& mul(const transform_t & t);
+		bbox& mul(const transform & t);
 		void inflate(float amount);
 		void inflate(const vec3 & amount);
 		bool is_populated() const;
@@ -59,7 +59,7 @@ namespace math
 		//-------------------------------------------------------------------------
 		// Public Static Functions
 		//-------------------------------------------------------------------------
-		static bbox mul(const bbox& bounds, const transform_t & t);
+		static bbox mul(const bbox& bounds, const transform & t);
 
 		//-------------------------------------------------------------------------
 		// Public Operators
@@ -67,7 +67,7 @@ namespace math
 		bbox operator * (float scale) const;
 		bbox& operator += (const vec3 & shift);
 		bbox& operator -= (const vec3 & shift);
-		bbox& operator *= (const transform_t & t);
+		bbox& operator *= (const transform & t);
 		bbox& operator *= (float scale);
 		bool operator != (const bbox & bounds) const;
 		bool operator == (const bbox & bounds) const;

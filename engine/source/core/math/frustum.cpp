@@ -27,7 +27,7 @@ namespace math
 	/// frustum Class Constructor
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	frustum::frustum(const transform_t & View, const transform_t & Proj, bool _oglNDC)
+	frustum::frustum(const transform & View, const transform & Proj, bool _oglNDC)
 	{
 		update(View, Proj, _oglNDC);
 	}
@@ -40,28 +40,26 @@ namespace math
 	//-----------------------------------------------------------------------------
 	frustum::frustum(const bbox & AABB)
 	{
-		using namespace VolumeGeometry;
-		using namespace VolumePlane;
 
 		// Compute planes
-		planes[Left] = AABB.get_plane(Left);
-		planes[Right] = AABB.get_plane(Right);
-		planes[Top] = AABB.get_plane(Top);
-		planes[Bottom] = AABB.get_plane(Bottom);
-		planes[Near] = AABB.get_plane(Near);
-		planes[Far] = AABB.get_plane(Far);
+		planes[volume_plane::left] = AABB.get_plane(volume_plane::left);
+		planes[volume_plane::right] = AABB.get_plane(volume_plane::right);
+		planes[volume_plane::top] = AABB.get_plane(volume_plane::top);
+		planes[volume_plane::bottom] = AABB.get_plane(volume_plane::bottom);
+		planes[volume_plane::near_plane] = AABB.get_plane(volume_plane::near_plane);
+		planes[volume_plane::far_plane] = AABB.get_plane(volume_plane::far_plane);
 
 		// Compute points
 		vec3 e = AABB.get_extents();
 		vec3 p = AABB.get_center();
-		points[LeftBottomNear] = vec3(p.x - e.x, p.y - e.y, p.z + e.z);
-		points[LeftBottomFar] = vec3(p.x - e.x, p.y - e.y, p.z + e.z);
-		points[RightBottomNear] = vec3(p.x + e.x, p.y - e.y, p.z - e.z);
-		points[RightBottomFar] = vec3(p.x + e.x, p.y - e.y, p.z + e.z);
-		points[LeftTopNear] = vec3(p.x - e.x, p.y + e.y, p.z + e.z);
-		points[LeftTopFar] = vec3(p.x - e.x, p.y + e.y, p.z + e.z);
-		points[RightTopNear] = vec3(p.x + e.x, p.y + e.y, p.z - e.z);
-		points[RightTopFar] = vec3(p.x + e.x, p.y + e.y, p.z + e.z);
+		points[volume_geometry_point::left_bottom_near] = vec3(p.x - e.x, p.y - e.y, p.z + e.z);
+		points[volume_geometry_point::left_bottom_far] = vec3(p.x - e.x, p.y - e.y, p.z + e.z);
+		points[volume_geometry_point::right_bottom_near] = vec3(p.x + e.x, p.y - e.y, p.z - e.z);
+		points[volume_geometry_point::right_bottom_far] = vec3(p.x + e.x, p.y - e.y, p.z + e.z);
+		points[volume_geometry_point::left_top_near] = vec3(p.x - e.x, p.y + e.y, p.z + e.z);
+		points[volume_geometry_point::left_top_far] = vec3(p.x - e.x, p.y + e.y, p.z + e.z);
+		points[volume_geometry_point::right_top_near] = vec3(p.x + e.x, p.y + e.y, p.z - e.z);
+		points[volume_geometry_point::right_top_far] = vec3(p.x + e.x, p.y + e.y, p.z + e.z);
 		position = p;
 	}
 
@@ -71,12 +69,11 @@ namespace math
 	/// Compute the new frustum details based on the matrices specified.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void frustum::update(const transform_t & View, const transform_t & Proj, bool _oglNDC)
+	void frustum::update(const transform & View, const transform & Proj, bool _oglNDC)
 	{
-		using namespace VolumePlane;
-
+	
 		// Build a combined view & projection matrix
-		const transform_t m = Proj * View;
+		const transform m = Proj * View;
 
 		const float* _viewProj = m;
 		const float xw = _viewProj[3];
@@ -99,42 +96,42 @@ namespace math
 		const float zx = _viewProj[8];
 		const float wx = _viewProj[12];
 
-		planes[Left].data.x = xw + xx;
-		planes[Left].data.y = yw + yx;
-		planes[Left].data.z = zw + zx;
-		planes[Left].data.w = ww + wx;
+		planes[volume_plane::left].data.x = xw + xx;
+		planes[volume_plane::left].data.y = yw + yx;
+		planes[volume_plane::left].data.z = zw + zx;
+		planes[volume_plane::left].data.w = ww + wx;
 
-		planes[Right].data.x = xw - xx;
-		planes[Right].data.y = yw - yx;
-		planes[Right].data.z = zw - zx;
-		planes[Right].data.w = ww - wx;
+		planes[volume_plane::right].data.x = xw - xx;
+		planes[volume_plane::right].data.y = yw - yx;
+		planes[volume_plane::right].data.z = zw - zx;
+		planes[volume_plane::right].data.w = ww - wx;
 
-		planes[Top].data.x = xw - xy;
-		planes[Top].data.y = yw - yy;
-		planes[Top].data.z = zw - zy;
-		planes[Top].data.w = ww - wy;
+		planes[volume_plane::top].data.x = xw - xy;
+		planes[volume_plane::top].data.y = yw - yy;
+		planes[volume_plane::top].data.z = zw - zy;
+		planes[volume_plane::top].data.w = ww - wy;
 
-		planes[Bottom].data.x = xw + xy;
-		planes[Bottom].data.y = yw + yy;
-		planes[Bottom].data.z = zw + zy;
-		planes[Bottom].data.w= ww + wy;
+		planes[volume_plane::bottom].data.x = xw + xy;
+		planes[volume_plane::bottom].data.y = yw + yy;
+		planes[volume_plane::bottom].data.z = zw + zy;
+		planes[volume_plane::bottom].data.w= ww + wy;
 
-		planes[Near].data.x = xw + xz;
-		planes[Near].data.y = yw + yz;
-		planes[Near].data.z = zw + zz;
-		planes[Near].data.w = ww + wz;
+		planes[volume_plane::near_plane].data.x = xw + xz;
+		planes[volume_plane::near_plane].data.y = yw + yz;
+		planes[volume_plane::near_plane].data.z = zw + zz;
+		planes[volume_plane::near_plane].data.w = ww + wz;
 
-		planes[Far].data.x = xw - xz;
-		planes[Far].data.y = yw - yz;
-		planes[Far].data.z = zw - zz;
-		planes[Far].data.w = ww - wz;
+		planes[volume_plane::far_plane].data.x = xw - xz;
+		planes[volume_plane::far_plane].data.y = yw - yz;
+		planes[volume_plane::far_plane].data.z = zw - zz;
+		planes[volume_plane::far_plane].data.w = ww - wz;
 	
 		if (!_oglNDC)
 		{
-			planes[Near].data.x = xz;
-			planes[Near].data.y = yz;
-			planes[Near].data.z = zz;
-			planes[Near].data.w = wz;
+			planes[volume_plane::near_plane].data.x = xz;
+			planes[volume_plane::near_plane].data.y = yz;
+			planes[volume_plane::near_plane].data.z = zz;
+			planes[volume_plane::near_plane].data.w = wz;
 		}
 
 		// Copy and normalize the planes
@@ -180,9 +177,9 @@ namespace math
 		// Compute the 8 corner points
 		for (int i = 0; i < 8; ++i)
 		{
-			const plane& p0 = plane::normalize((i & 1) ? planes[VolumePlane::Near] : planes[VolumePlane::Far]);
-			const plane& p1 = plane::normalize((i & 2) ? planes[VolumePlane::Top] : planes[VolumePlane::Bottom]);
-			const plane& p2 = plane::normalize((i & 4) ? planes[VolumePlane::Left] : planes[VolumePlane::Right]);
+			const plane& p0 = plane::normalize((i & 1) ? planes[volume_plane::near_plane] : planes[volume_plane::far_plane]);
+			const plane& p1 = plane::normalize((i & 2) ? planes[volume_plane::top] : planes[volume_plane::bottom]);
+			const plane& p2 = plane::normalize((i & 4) ? planes[volume_plane::left] : planes[volume_plane::right]);
 
 			// Compute the point at which the three planes intersect
 			float cosTheta, secTheta;
@@ -213,9 +210,9 @@ namespace math
 	/// Determine whether or not the box passed is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	VolumeQuery::E frustum::classify_aabb(const bbox & AABB) const
+	volume_query frustum::classify_aabb(const bbox & AABB) const
 	{
-		VolumeQuery::E  Result = VolumeQuery::Inside;
+		volume_query  Result = volume_query::inside;
 		vec3 NearPoint, FarPoint;
 		for (size_t i = 0; i < 6; i++)
 		{
@@ -234,11 +231,11 @@ namespace math
 
 			// If near extreme point is outside, then the AABB is totally outside the frustum
 			if (plane::dotCoord(plane, NearPoint) > 0.0f)
-				return VolumeQuery::Outside;
+				return volume_query::outside;
 
 			// If far extreme point is outside, then the AABB is intersecting the frustum
 			if (plane::dotCoord(plane, FarPoint) > 0.0f)
-				Result = VolumeQuery::Intersect;
+				Result = volume_query::intersect;
 
 		} // Next plane
 		return Result;
@@ -250,9 +247,9 @@ namespace math
 	/// Determine whether or not the box passed is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	VolumeQuery::E frustum::classify_obb(frustum frustum, const bbox & AABB, const transform_t & t)
+	volume_query frustum::classify_obb(frustum frustum, const bbox & AABB, const transform & t)
 	{
-		transform_t invTransform = inverse(t);
+		transform invTransform = inverse(t);
 
 		frustum.mul(invTransform);
 
@@ -265,11 +262,11 @@ namespace math
 	/// Determine whether or not the box passed is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	VolumeQuery::E frustum::classify_aabb(const bbox & AABB, unsigned int & FrustumBits, int & LastOutside) const
+	volume_query frustum::classify_aabb(const bbox & AABB, unsigned int & FrustumBits, int & LastOutside) const
 	{
 		// If the 'last outside plane' index was specified, test it first!
 		vec3 NearPoint, FarPoint;
-		VolumeQuery::E Result = VolumeQuery::Inside;
+		volume_query Result = volume_query::inside;
 		if (LastOutside >= 0 && (((FrustumBits >> LastOutside) & 0x1) == 0x0))
 		{
 			const plane & plane = planes[LastOutside];
@@ -286,11 +283,11 @@ namespace math
 
 			// If near extreme point is outside, then the AABB is totally outside the frustum
 			if (plane::dotCoord(plane, NearPoint) > 0.0f)
-				return VolumeQuery::Outside;
+				return volume_query::outside;
 
 			// If far extreme point is outside, then the AABB is intersecting the frustum
 			if (plane::dotCoord(plane, FarPoint) > 0.0f)
-				Result = VolumeQuery::Intersect;
+				Result = volume_query::intersect;
 			else
 				FrustumBits |= (0x1 << LastOutside); // We were totally inside this frustum plane, update our bit set
 
@@ -323,13 +320,13 @@ namespace math
 			{
 				// Update the 'last outside' index and return.
 				LastOutside = (int)i;
-				return VolumeQuery::Outside;
+				return volume_query::outside;
 
 			} // End if outside frustum plane
 
 			// If far extreme point is outside, then the AABB is intersecting the frustum
 			if (plane::dotCoord(plane, FarPoint) > 0.0f)
-				Result = VolumeQuery::Intersect;
+				Result = volume_query::intersect;
 			else
 				FrustumBits |= (0x1 << i); // We were totally inside this frustum plane, update our bit set
 
@@ -346,9 +343,9 @@ namespace math
 	/// Determine whether or not the box passed is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	VolumeQuery::E frustum::classify_obb(frustum frustum, const bbox & AABB, const transform_t & t, unsigned int & FrustumBits, int & LastOutside)
+	volume_query frustum::classify_obb(frustum frustum, const bbox & AABB, const transform & t, unsigned int & FrustumBits, int & LastOutside)
 	{
-		transform_t invTransform = inverse(t);
+		transform invTransform = inverse(t);
 
 		frustum.mul(invTransform);
 
@@ -395,9 +392,9 @@ namespace math
 	/// Determine whether or not the box passed is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool frustum::test_obb(frustum frustum, const bbox & AABB, const transform_t & t)
+	bool frustum::test_obb(frustum frustum, const bbox & AABB, const transform & t)
 	{
-		transform_t invTransform = inverse(t);
+		transform invTransform = inverse(t);
 
 		frustum.mul(invTransform);
 
@@ -411,9 +408,9 @@ namespace math
 	/// Determine whether or not the box passed is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool frustum::test_extruded_obb(frustum frustum, const bbox_extruded & AABB, const transform_t & t)
+	bool frustum::test_extruded_obb(frustum frustum, const bbox_extruded & AABB, const transform & t)
 	{
-		transform_t invTransform = inverse(t);
+		transform invTransform = inverse(t);
 
 		frustum.mul(invTransform);
 
@@ -439,19 +436,20 @@ namespace math
 			return false;
 
 		// Test frustum edges against extruded box.
-		using namespace VolumeGeometry;
-		bIntersect1 = (Box.test_line(points[LeftBottomFar], points[LeftBottomNear])) ||
-			(Box.test_line(points[LeftBottomNear], points[RightBottomNear])) ||
-			(Box.test_line(points[RightBottomNear], points[RightBottomFar])) ||
-			(Box.test_line(points[RightBottomFar], points[LeftBottomFar])) ||
-			(Box.test_line(points[RightBottomFar], points[LeftTopFar])) ||
-			(Box.test_line(points[RightBottomNear], points[RightTopNear])) ||
-			(Box.test_line(points[LeftBottomFar], points[LeftTopFar])) ||
-			(Box.test_line(points[LeftBottomNear], points[LeftTopNear])) ||
-			(Box.test_line(points[LeftTopNear], points[LeftTopFar])) ||
-			(Box.test_line(points[LeftTopFar], points[RightTopNear])) ||
-			(Box.test_line(points[RightTopFar], points[RightTopNear])) ||
-			(Box.test_line(points[RightTopNear], points[LeftTopNear]));
+
+		bIntersect1 = 
+			(Box.test_line(points[volume_geometry_point::left_bottom_far],		points[volume_geometry_point::left_bottom_near])) ||
+			(Box.test_line(points[volume_geometry_point::left_bottom_near],		points[volume_geometry_point::right_bottom_near])) ||
+			(Box.test_line(points[volume_geometry_point::right_bottom_near],	points[volume_geometry_point::right_bottom_far])) ||
+			(Box.test_line(points[volume_geometry_point::right_bottom_far],		points[volume_geometry_point::left_bottom_far])) ||
+			(Box.test_line(points[volume_geometry_point::right_bottom_far],		points[volume_geometry_point::left_top_far])) ||
+			(Box.test_line(points[volume_geometry_point::right_bottom_near],	points[volume_geometry_point::right_top_near])) ||
+			(Box.test_line(points[volume_geometry_point::left_bottom_far],		points[volume_geometry_point::left_top_far])) ||
+			(Box.test_line(points[volume_geometry_point::left_bottom_near],		points[volume_geometry_point::left_top_near])) ||
+			(Box.test_line(points[volume_geometry_point::left_top_near],		points[volume_geometry_point::left_top_far])) ||
+			(Box.test_line(points[volume_geometry_point::left_top_far],			points[volume_geometry_point::right_top_near])) ||
+			(Box.test_line(points[volume_geometry_point::right_top_far],		points[volume_geometry_point::right_top_near])) ||
+			(Box.test_line(points[volume_geometry_point::right_top_near],		points[volume_geometry_point::left_top_near]));
 
 
 		// Test extruded box edges against frustum
@@ -485,9 +483,9 @@ namespace math
 	/// Determine whether or not the sphere passed is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	VolumeQuery::E frustum::classify_sphere(const vec3 & vecCenter, float fRadius) const
+	volume_query frustum::classify_sphere(const vec3 & vecCenter, float fRadius) const
 	{
-		VolumeQuery::E Result = VolumeQuery::Inside;
+		volume_query Result = volume_query::inside;
 
 		// Test frustum planes
 		for (unsigned int i = 0; i < 6; ++i)
@@ -496,11 +494,11 @@ namespace math
 
 			// Sphere entirely in front of plane
 			if (fDot >= fRadius)
-				return VolumeQuery::Outside;
+				return volume_query::outside;
 
 			// Sphere spans plane
 			if (fDot >= -fRadius)
-				Result = VolumeQuery::Intersect;
+				Result = volume_query::intersect;
 
 		} // Next plane
 
@@ -688,7 +686,7 @@ namespace math
 	/// Classify the frustum with respect to the plane
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	VolumeQuery::E frustum::classify_plane(const plane & plane) const
+	volume_query frustum::classify_plane(const plane & plane) const
 	{
 		unsigned int nInFrontCount = 0;
 		unsigned int nBehindCount = 0;
@@ -706,14 +704,14 @@ namespace math
 
 		// frustum entirely in front of plane
 		if (nInFrontCount == 8)
-			return VolumeQuery::Outside;
+			return volume_query::outside;
 
 		// frustum entire behind plane
 		if (nBehindCount == 8)
-			return VolumeQuery::Inside;
+			return volume_query::inside;
 
 		// Return intersection (spanning the plane)
-		return VolumeQuery::Intersect;
+		return volume_query::intersect;
 	}
 
 
@@ -725,22 +723,22 @@ namespace math
 	//-----------------------------------------------------------------------------
 	bool frustum::test_frustum(const frustum & f) const
 	{
-		using namespace VolumeGeometry;
 
 		// A -> B
 		bool bIntersect1;
-		bIntersect1 = test_line(f.points[LeftBottomFar], f.points[LeftBottomNear]) ||
-			test_line(f.points[LeftBottomNear], f.points[RightBottomNear]) ||
-			test_line(f.points[RightBottomNear], f.points[RightBottomFar]) ||
-			test_line(f.points[RightBottomFar], f.points[LeftBottomFar]) ||
-			test_line(f.points[RightBottomFar], f.points[RightTopFar]) ||
-			test_line(f.points[RightBottomNear], f.points[RightTopNear]) ||
-			test_line(f.points[LeftBottomFar], f.points[LeftTopFar]) ||
-			test_line(f.points[LeftBottomNear], f.points[LeftTopNear]) ||
-			test_line(f.points[LeftTopNear], f.points[LeftTopFar]) ||
-			test_line(f.points[LeftTopFar], f.points[RightTopFar]) ||
-			test_line(f.points[RightTopFar], f.points[RightTopNear]) ||
-			test_line(f.points[RightTopNear], f.points[LeftTopNear]);
+		bIntersect1 =
+			test_line(f.points[volume_geometry_point::left_bottom_far],		f.points[volume_geometry_point::left_bottom_near]) ||
+			test_line(f.points[volume_geometry_point::left_bottom_near],	f.points[volume_geometry_point::right_bottom_near]) ||
+			test_line(f.points[volume_geometry_point::right_bottom_near],	f.points[volume_geometry_point::right_bottom_far]) ||
+			test_line(f.points[volume_geometry_point::right_bottom_far],	f.points[volume_geometry_point::left_bottom_far]) ||
+			test_line(f.points[volume_geometry_point::right_bottom_far],	f.points[volume_geometry_point::right_top_far]) ||
+			test_line(f.points[volume_geometry_point::right_bottom_near],	f.points[volume_geometry_point::right_top_near]) ||
+			test_line(f.points[volume_geometry_point::left_bottom_far],		f.points[volume_geometry_point::left_top_far]) ||
+			test_line(f.points[volume_geometry_point::left_bottom_near],	f.points[volume_geometry_point::left_top_near]) ||
+			test_line(f.points[volume_geometry_point::left_top_near],		f.points[volume_geometry_point::left_top_far]) ||
+			test_line(f.points[volume_geometry_point::left_top_far],		f.points[volume_geometry_point::right_top_far]) ||
+			test_line(f.points[volume_geometry_point::right_top_far],		f.points[volume_geometry_point::right_top_near]) ||
+			test_line(f.points[volume_geometry_point::right_top_near],		f.points[volume_geometry_point::left_top_near]);
 
 		// Early out
 		if (bIntersect1)
@@ -748,18 +746,19 @@ namespace math
 
 		// B -> A
 		bool bIntersect2;
-		bIntersect2 = f.test_line(points[LeftBottomFar], points[LeftBottomNear]) ||
-			f.test_line(points[LeftBottomNear], points[RightBottomNear]) ||
-			f.test_line(points[RightBottomNear], points[RightBottomFar]) ||
-			f.test_line(points[RightBottomFar], points[LeftBottomFar]) ||
-			f.test_line(points[RightBottomFar], points[LeftTopFar]) ||
-			f.test_line(points[RightBottomNear], points[RightTopNear]) ||
-			f.test_line(points[LeftBottomFar], points[LeftTopFar]) ||
-			f.test_line(points[LeftBottomNear], points[LeftTopNear]) ||
-			f.test_line(points[LeftTopNear], points[LeftTopFar]) ||
-			f.test_line(points[LeftTopFar], points[RightTopNear]) ||
-			f.test_line(points[RightTopFar], points[RightTopNear]) ||
-			f.test_line(points[RightTopNear], points[LeftTopNear]);
+		bIntersect2 = 
+			f.test_line(points[volume_geometry_point::left_bottom_far],		points[volume_geometry_point::left_bottom_near]) ||
+			f.test_line(points[volume_geometry_point::left_bottom_near],	points[volume_geometry_point::right_bottom_near]) ||
+			f.test_line(points[volume_geometry_point::right_bottom_near],	points[volume_geometry_point::right_bottom_far]) ||
+			f.test_line(points[volume_geometry_point::right_bottom_far],	points[volume_geometry_point::left_bottom_far]) ||
+			f.test_line(points[volume_geometry_point::right_bottom_far],	points[volume_geometry_point::left_top_far]) ||
+			f.test_line(points[volume_geometry_point::right_bottom_near],	points[volume_geometry_point::right_top_near]) ||
+			f.test_line(points[volume_geometry_point::left_bottom_far],		points[volume_geometry_point::left_top_far]) ||
+			f.test_line(points[volume_geometry_point::left_bottom_near],	points[volume_geometry_point::left_top_near]) ||
+			f.test_line(points[volume_geometry_point::left_top_near],		points[volume_geometry_point::left_top_far]) ||
+			f.test_line(points[volume_geometry_point::left_top_far],		points[volume_geometry_point::right_top_near]) ||
+			f.test_line(points[volume_geometry_point::right_top_far],		points[volume_geometry_point::right_top_near]) ||
+			f.test_line(points[volume_geometry_point::right_top_near],		points[volume_geometry_point::left_top_near]);
 
 		// Return intersection result
 		return bIntersect2;
@@ -772,10 +771,10 @@ namespace math
 	/// Transforms this frustum by the specified matrix.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	frustum& frustum::mul(const transform_t & t)
+	frustum& frustum::mul(const transform & t)
 	{
 		plane NewPlane;
-		transform_t mtxIT, mtx = t;
+		transform mtxIT, mtx = t;
 		mtxIT = inverse(mtx);
 		mtxIT = transpose(mtxIT);
 
@@ -789,10 +788,10 @@ namespace math
 
 		// transform points
 		for (unsigned int i = 0; i < 8; ++i)
-			points[i] = transform_t::transform_coord(points[i], mtx);
+			points[i] = transform::transform_coord(points[i], mtx);
 
 		// transform originating position.
-		position = transform_t::transform_coord(position, mtx);
+		position = transform::transform_coord(position, mtx);
 
 		// Return reference to self.
 		return *this;
@@ -805,7 +804,7 @@ namespace math
 	/// resulting frustum as a copy.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	frustum frustum::mul(frustum f, const transform_t & t)
+	frustum frustum::mul(frustum f, const transform & t)
 	{
 		return f.mul(t);
 	}

@@ -22,14 +22,13 @@ void Tooltip(const std::string& tooltip)
 	}
 }
 
-PropertyLayout::PropertyLayout(const rttr::property& prop, bool columns /*= true*/)
-{
-	
+property_layout::property_layout(const rttr::property& prop, bool columns /*= true*/)
+{	
 	if (columns)
 		gui::Columns(2, nullptr, false);
 
 	gui::AlignFirstTextHeightToWidgets();
-	gui::TextUnformatted(prop.get_name().data());
+	gui::TextUnformatted(prop.get_name().c_str());
 
 	Tooltip(prop);
 	
@@ -38,11 +37,11 @@ PropertyLayout::PropertyLayout(const rttr::property& prop, bool columns /*= true
 	if (columns)
 		gui::SetColumnOffset(1, std::max(gui::GetColumnOffset(), gui::CalcTextSize(prop.get_name().c_str()).x));
 
-	gui::PushID(prop.get_name().data());
+	gui::PushID(prop.get_name().c_str());
 	gui::PushItemWidth(gui::GetContentRegionAvailWidth());
 }
 
-PropertyLayout::PropertyLayout(const std::string& name, bool columns /*= true*/)
+property_layout::property_layout(const std::string& name, bool columns /*= true*/)
 {
 	if (columns)
 		gui::Columns(2, nullptr, false);
@@ -59,7 +58,7 @@ PropertyLayout::PropertyLayout(const std::string& name, bool columns /*= true*/)
 	gui::PushItemWidth(gui::GetContentRegionAvailWidth());
 }
 
-PropertyLayout::PropertyLayout(const std::string& name, const std::string& tooltip, bool columns /*= true*/)
+property_layout::property_layout(const std::string& name, const std::string& tooltip, bool columns /*= true*/)
 {
 	if (columns)
 		gui::Columns(2, nullptr, false);
@@ -74,13 +73,11 @@ PropertyLayout::PropertyLayout(const std::string& name, const std::string& toolt
 	if (columns)
 		gui::SetColumnOffset(1, std::max(gui::GetColumnOffset(), gui::CalcTextSize(name.c_str()).x));
 
-	
-
 	gui::PushID(name.c_str());
 	gui::PushItemWidth(gui::GetContentRegionAvailWidth());
 }
 
-PropertyLayout::~PropertyLayout()
+property_layout::~property_layout()
 {
 	gui::PopItemWidth();
 	gui::PopID();

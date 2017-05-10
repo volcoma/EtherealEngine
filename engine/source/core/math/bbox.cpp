@@ -98,7 +98,7 @@ namespace math
 	/// Retrieves the plane for the specified side of the bounding box
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	plane bbox::get_plane(VolumePlane::Side side) const
+	plane bbox::get_plane(volume_plane::e side) const
 	{
 		plane bounds_plane;
 		memset(&bounds_plane, 0, sizeof(plane));
@@ -106,27 +106,27 @@ namespace math
 		// Select the requested side
 		switch (side)
 		{
-		case VolumePlane::Top:
+		case volume_plane::top:
 			bounds_plane.data.y = 1;
 			bounds_plane.data.w = -max.y;
 			break;
-		case VolumePlane::Right:
+		case volume_plane::right:
 			bounds_plane.data.x = 1;
 			bounds_plane.data.w = -max.x;
 			break;
-		case VolumePlane::Far:
+		case volume_plane::far_plane:
 			bounds_plane.data.z = 1;
 			bounds_plane.data.w = -max.z;
 			break;
-		case VolumePlane::Bottom:
+		case volume_plane::bottom:
 			bounds_plane.data.y = -1;
 			bounds_plane.data.w = min.y;
 			break;
-		case VolumePlane::Left:
+		case volume_plane::left:
 			bounds_plane.data.x = -1;
 			bounds_plane.data.w = min.x;
 			break;
-		case VolumePlane::Near:
+		case volume_plane::near_plane:
 			bounds_plane.data.z = -1;
 			bounds_plane.data.w = min.z;
 			break;
@@ -143,42 +143,42 @@ namespace math
 	/// the bounding box
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void bbox::get_plane_points(VolumePlane::Side side, vec3 points_out[]) const
+	void bbox::get_plane_points(volume_plane::e side, vec3 points_out[]) const
 	{
 		// Select the requested side
 		switch (side)
 		{
-		case VolumePlane::Top:
+		case volume_plane::top:
 			points_out[0].x = min.x; points_out[0].y = max.y; points_out[0].z = min.z;
 			points_out[1].x = min.x; points_out[1].y = max.y; points_out[1].z = max.z;
 			points_out[2].x = max.x; points_out[2].y = max.y; points_out[2].z = max.z;
 			points_out[3].x = max.x; points_out[3].y = max.y; points_out[3].z = min.z;
 			break;
-		case VolumePlane::Right:
+		case volume_plane::right:
 			points_out[0].x = max.x; points_out[0].y = min.y; points_out[0].z = min.z;
 			points_out[1].x = max.x; points_out[1].y = max.y; points_out[1].z = min.z;
 			points_out[2].x = max.x; points_out[2].y = max.y; points_out[2].z = max.z;
 			points_out[3].x = max.x; points_out[3].y = min.y; points_out[3].z = max.z;
 			break;
-		case VolumePlane::Far:
+		case volume_plane::far_plane:
 			points_out[0].x = max.x; points_out[0].y = min.y; points_out[0].z = max.z;
 			points_out[1].x = max.x; points_out[1].y = max.y; points_out[1].z = max.z;
 			points_out[2].x = min.x; points_out[2].y = max.y; points_out[2].z = max.z;
 			points_out[3].x = min.x; points_out[3].y = min.y; points_out[3].z = max.z;
 			break;
-		case VolumePlane::Bottom:
+		case volume_plane::bottom:
 			points_out[0].x = min.x; points_out[0].y = min.y; points_out[0].z = max.z;
 			points_out[1].x = min.x; points_out[1].y = min.y; points_out[1].z = min.z;
 			points_out[2].x = max.x; points_out[2].y = min.y; points_out[2].z = min.z;
 			points_out[3].x = max.x; points_out[3].y = min.y; points_out[3].z = max.z;
 			break;
-		case VolumePlane::Left:
+		case volume_plane::left:
 			points_out[0].x = min.x; points_out[0].y = min.y; points_out[0].z = max.z;
 			points_out[1].x = min.x; points_out[1].y = max.y; points_out[1].z = max.z;
 			points_out[2].x = min.x; points_out[2].y = max.y; points_out[2].z = min.z;
 			points_out[3].x = min.x; points_out[3].y = min.y; points_out[3].z = min.z;
 			break;
-		case VolumePlane::Near:
+		case volume_plane::near_plane:
 			points_out[0].x = min.x; points_out[0].y = min.y; points_out[0].z = min.z;
 			points_out[1].x = min.x; points_out[1].y = max.y; points_out[1].z = min.z;
 			points_out[2].x = max.x; points_out[2].y = max.y; points_out[2].z = min.z;
@@ -622,7 +622,7 @@ namespace math
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : containsPoint()
+	//  Name : contains()
 	/// <summary>
 	/// Tests to see if a point falls within this bounding box or not
 	/// including a specific tolerance around the box.
@@ -638,7 +638,7 @@ namespace math
 
 
 	//-----------------------------------------------------------------------------
-	//  Name : containsPoint()
+	//  Name : contains()
 	/// <summary>
 	/// Tests to see if a point falls within this bounding box or not.
 	/// </summary>
@@ -652,7 +652,7 @@ namespace math
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : containsPoint()
+	//  Name : contains()
 	/// <summary>
 	/// Tests to see if a point falls within this bounding box or not
 	/// including a specific tolerance around the box.
@@ -713,7 +713,7 @@ namespace math
 	/// transformation'.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bbox& bbox::mul(const transform_t& t)
+	bbox& bbox::mul(const transform& t)
 	{
 		*this = mul(*this, t);
 
@@ -728,7 +728,7 @@ namespace math
 	/// new resulting box as a copy.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bbox bbox::mul(const bbox& bounds, const transform_t & t)
+	bbox bbox::mul(const bbox& bounds, const transform & t)
 	{
 		bbox result;
 		vec3 bounds_center = bounds.get_center();
@@ -849,7 +849,7 @@ namespace math
 	/// Transforms the bounding box by the matrix passed.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bbox& bbox::operator*= (const transform_t & t)
+	bbox& bbox::operator*= (const transform & t)
 	{
 		mul(t);
 		return *this;

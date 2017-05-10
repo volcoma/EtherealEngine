@@ -7,12 +7,12 @@
 
 namespace cfg
 {
-    Parser::Parser(Config& c)
-    : config(c), in(nullptr), next_token(NO_TOKEN) {}
+    parser::parser(config& c)
+    : conf(c), in(nullptr), next_token(NO_TOKEN) {}
 
-    Parser::~Parser() {}
+    parser::~parser() {}
         
-    void Parser::parse(std::istream& i, const std::string& f, unsigned int l)
+    void parser::parse(std::istream& i, const std::string& f, unsigned int l)
     {
         in   = &i;
         file = f;
@@ -37,7 +37,7 @@ namespace cfg
         }
     }
 
-    Parser::Token Parser::get_next_token(std::string& value)
+    parser::Token parser::get_next_token(std::string& value)
     {
         Token token = next_token;
         value = next_value;
@@ -51,7 +51,7 @@ namespace cfg
         return token;
     }
             
-    Parser::Token Parser::lex_token(std::string& value)
+    parser::Token parser::lex_token(std::string& value)
     {
         value.clear();
         int c = in->get();
@@ -103,7 +103,7 @@ namespace cfg
         }
     }
 
-    Parser::Token Parser::lex_whitespace(std::string& value)
+    parser::Token parser::lex_whitespace(std::string& value)
     {
         int c = in->get();
         while (true)        
@@ -121,7 +121,7 @@ namespace cfg
         }
     }
 
-    Parser::Token Parser::lex_newline(std::string& value)
+    parser::Token parser::lex_newline(std::string& value)
     {
         int c = in->get();
         line++;
@@ -145,7 +145,7 @@ namespace cfg
         }
     }
 
-    Parser::Token Parser::lex_number(std::string& value)
+    parser::Token parser::lex_number(std::string& value)
     {
         int c = in->get();
         while (true)
@@ -166,7 +166,7 @@ namespace cfg
         }
     }
 
-    Parser::Token Parser::lex_identifier(std::string& value)
+    parser::Token parser::lex_identifier(std::string& value)
     {
         int c = in->get();
         while (true)        
@@ -196,7 +196,7 @@ namespace cfg
         }        
     }
     
-    Parser::Token Parser::lex_string(std::string& value)
+    parser::Token parser::lex_string(std::string& value)
     {
         int c = in->get();
         while (true)        
@@ -255,7 +255,7 @@ namespace cfg
         }
     }
 
-    Parser::Token Parser::lex_comment(std::string& value)
+    parser::Token parser::lex_comment(std::string& value)
     {
         int c = in->get();
         while (true)
@@ -272,7 +272,7 @@ namespace cfg
         }
     }
 
-    void Parser::parse_section() 
+    void parser::parse_section() 
     {
         parse_section_header();
 
@@ -282,7 +282,7 @@ namespace cfg
         }
     }
 
-    void Parser::parse_section_header() 
+    void parser::parse_section_header() 
     {
         std::string value;
         Token t = get_next_token(value);
@@ -313,7 +313,7 @@ namespace cfg
 
     }
 
-    void Parser::parse_value_pair() 
+    void parser::parse_value_pair() 
     {
         std::string value;
         Token t = get_next_token(value);
@@ -342,7 +342,7 @@ namespace cfg
             error("Expected identifier or string.");
         }
         
-        config.set_value(section, name, value);
+		conf.set_value(section, name, value);
 
         t = get_next_token(value);
         if (t != NEWLINE && t != FILE_END)
@@ -351,7 +351,7 @@ namespace cfg
         }
     }
 
-    void Parser::error(const std::string& msg)
+    void parser::error(const std::string& msg)
     {
         std::stringstream buff;
         if (!file.empty())
