@@ -20,10 +20,10 @@
 
 std::vector<runtime::entity> gather_scene_data()
 {
-	auto es = core::get_subsystem<editor::editing_system>();
-	auto sg = core::get_subsystem<runtime::scene_graph>();
-	const auto& roots = sg->get_roots();
-	auto editor_camera = es->camera;
+	auto& es = core::get_subsystem<editor::editing_system>();
+	auto& sg = core::get_subsystem<runtime::scene_graph>();
+	const auto& roots = sg.get_roots();
+	auto editor_camera = es.camera;
 	std::vector<runtime::entity> entities;
 	for (auto root : roots)
 	{
@@ -38,18 +38,18 @@ std::vector<runtime::entity> gather_scene_data()
 
 void default_scene()
 {
-	auto am = core::get_subsystem<runtime::asset_manager>();
-	auto ecs = core::get_subsystem<runtime::entity_component_system>();
+	auto& am = core::get_subsystem<runtime::asset_manager>();
+	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
 
 	{
-		auto object = ecs->create();
+		auto object = ecs.create();
 		object.set_name("main camera");
 		object.assign<transform_component>().lock()
 			->set_local_position({ 0.0f, 2.0f, -5.0f });
 		object.assign<camera_component>();
 	}
 	{
-		auto object = ecs->create();
+		auto object = ecs.create();
 		object.set_name("light");
 		object.assign<transform_component>().lock()
 			->set_local_position({ 1.0f, 6.0f, -3.0f })
@@ -57,7 +57,7 @@ void default_scene()
 		object.assign<light_component>();
 	}
 	{
-		auto object = ecs->create();
+		auto object = ecs.create();
 		object.set_name("global probe");
 		object.assign<transform_component>().lock()
 			->set_local_position({ 0.0f, 0.1f, 0.0f });
@@ -70,7 +70,7 @@ void default_scene()
 			->set_probe(probe);
 	}
 	{
-		auto object = ecs->create();
+		auto object = ecs.create();
 		object.set_name("local probe");
 		object.assign<transform_component>().lock()
 			->set_local_position({ 0.0f, 0.1f, 0.0f });
@@ -82,12 +82,12 @@ void default_scene()
 			->set_probe(probe);
 	}
 	{
-		auto object = ecs->create();
+		auto object = ecs.create();
 		object.set_name("platform");
 		object.assign<transform_component>();
 
 		model model;
-		am->load<mesh>("embedded:/plane", false)
+		am.load<mesh>("embedded:/plane", false)
 			.then([&model](auto asset)
 		{
 			model.set_lod(asset, 0);
@@ -100,13 +100,13 @@ void default_scene()
 			.set_model(model);
 	}
 	{
-		auto object = ecs->create();
+		auto object = ecs.create();
 		object.set_name("object");
 		object.assign<transform_component>().lock()
 			->set_local_position({ 0.0f, 0.5f, 0.0f });
 
 		model model;
-		am->load<mesh>("embedded:/sphere", false)
+		am.load<mesh>("embedded:/sphere", false)
 			.then([&model](auto asset)
 		{
 			model.set_lod(asset, 0);
@@ -122,62 +122,62 @@ void default_scene()
 
 auto create_new_scene()
 {
-	auto es = core::get_subsystem<editor::editing_system>();
-	auto ecs = core::get_subsystem<runtime::entity_component_system>();
-	es->save_editor_camera();
-	ecs->dispose();
-	es->load_editor_camera();
+	auto& es = core::get_subsystem<editor::editing_system>();
+	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
+	es.save_editor_camera();
+	ecs.dispose();
+	es.load_editor_camera();
 	default_scene();
-	es->scene.clear();
+	es.scene.clear();
 }
 
 auto open_scene()
 {
-	auto es = core::get_subsystem<editor::editing_system>();
-	auto ecs = core::get_subsystem<runtime::entity_component_system>();
+	auto& es = core::get_subsystem<editor::editing_system>();
+	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
 	std::string path;
 	if (open_file_dialog(extensions::scene.substr(1), fs::resolve_protocol("app:/data").string(), path))
 	{
-		es->save_editor_camera();
-		ecs->dispose();
-		es->load_editor_camera();
+		es.save_editor_camera();
+		ecs.dispose();
+		es.load_editor_camera();
 
 		std::vector<runtime::entity> outData;
 		if (ecs::utils::load_data(path, outData))
 		{
-			es->scene = path;
+			es.scene = path;
 		}
 	}
 }
 
 auto save_scene()
 {
-	auto es = core::get_subsystem<editor::editing_system>();
-	const auto& path = es->scene;
+	auto& es = core::get_subsystem<editor::editing_system>();
+	const auto& path = es.scene;
 	if (path != "")
 	{
 		std::vector<runtime::entity> entities = gather_scene_data();
 		ecs::utils::save_data(path, entities);
 	}
 
-	es->save_editor_camera();
+	es.save_editor_camera();
 }
 
 void save_scene_as()
 {
-	auto es = core::get_subsystem<editor::editing_system>();
+	auto& es = core::get_subsystem<editor::editing_system>();
 
 	std::string path;
 	if (save_file_dialog(extensions::scene.substr(1), fs::resolve_protocol("app:/data").string(), path))
 	{
-		es->scene = path;	
+		es.scene = path;	
 		if(!fs::path(path).has_extension())
-			es->scene += extensions::scene;
+			es.scene += extensions::scene;
 
 		save_scene();	
 	}
 
-	es->save_editor_camera();
+	es.save_editor_camera();
 }
 
 
@@ -213,31 +213,31 @@ void main_editor_window::on_gui(std::chrono::duration<float> dt)
 
 void main_editor_window::on_menubar()
 {
-	auto es = core::get_subsystem<editor::editing_system>();
-	auto pm = core::get_subsystem<editor::project_manager>();
-	auto input = core::get_subsystem<runtime::input>();
-	const auto& current_project = pm->get_current_project();
+	auto& es = core::get_subsystem<editor::editing_system>();
+	auto& pm = core::get_subsystem<editor::project_manager>();
+	auto& input = core::get_subsystem<runtime::input>();
+	const auto& current_project = pm.get_current_project();
 
-	if (input->is_key_down(sf::Keyboard::LControl))
+	if (input.is_key_down(sf::Keyboard::LControl))
 	{
-		if (input->is_key_down(sf::Keyboard::LShift))
+		if (input.is_key_down(sf::Keyboard::LShift))
 		{
-			if (input->is_key_pressed(sf::Keyboard::S))
+			if (input.is_key_pressed(sf::Keyboard::S))
 			{
 				save_scene_as();
 			}
 		}
-		else if (input->is_key_pressed(sf::Keyboard::S))
+		else if (input.is_key_pressed(sf::Keyboard::S))
 		{
 			save_scene();
 		}
 
-		if (input->is_key_pressed(sf::Keyboard::O))
+		if (input.is_key_pressed(sf::Keyboard::O))
 		{
 			open_scene();
 		}
 
-		if (input->is_key_pressed(sf::Keyboard::N))
+		if (input.is_key_pressed(sf::Keyboard::N))
 		{
 			create_new_scene();
 		}
@@ -265,13 +265,13 @@ void main_editor_window::on_menubar()
 				io.MouseDown[2] = false;
 			}
 
-			if (gui::MenuItem("Save", "Ctrl+S", false, es->scene != "" && current_project != ""))
+			if (gui::MenuItem("Save", "Ctrl+S", false, es.scene != "" && current_project != ""))
 			{
 				save_scene();
 			}
-			auto ecs = core::get_subsystem<runtime::entity_component_system>();
+			auto& ecs = core::get_subsystem<runtime::entity_component_system>();
 
-			if (gui::MenuItem("Save As..", "Ctrl+Shift+S", false, ecs->size() > 0 && current_project != ""))
+			if (gui::MenuItem("Save As..", "Ctrl+Shift+S", false, ecs.size() > 0 && current_project != ""))
 			{
 				save_scene_as();
 			}
@@ -315,45 +315,45 @@ void main_editor_window::on_menubar()
 
 void main_editor_window::on_toolbar()
 {
-	auto es = core::get_subsystem<editor::editing_system>();
-	auto& icons = es->icons;
+	auto& es = core::get_subsystem<editor::editing_system>();
+	auto& icons = es.icons;
 
 	float width = gui::GetContentRegionAvailWidth();
-	if (gui::ToolbarButton(icons["translate"].get(), "Translate", es->operation == imguizmo::operation::translate))
+	if (gui::ToolbarButton(icons["translate"].get(), "Translate", es.operation == imguizmo::operation::translate))
 	{
-		es->operation = imguizmo::operation::translate;
+		es.operation = imguizmo::operation::translate;
 	}
 	gui::SameLine(0.0f);
-	if (gui::ToolbarButton(icons["rotate"].get(), "Rotate", es->operation == imguizmo::operation::rotate))
+	if (gui::ToolbarButton(icons["rotate"].get(), "Rotate", es.operation == imguizmo::operation::rotate))
 	{
-		es->operation = imguizmo::operation::rotate;
+		es.operation = imguizmo::operation::rotate;
 	}
 	gui::SameLine(0.0f);
-	if (gui::ToolbarButton(icons["scale"].get(), "Scale", es->operation == imguizmo::operation::scale))
+	if (gui::ToolbarButton(icons["scale"].get(), "Scale", es.operation == imguizmo::operation::scale))
 	{
-		es->operation = imguizmo::operation::scale;
-		es->mode = imguizmo::mode::local;
+		es.operation = imguizmo::operation::scale;
+		es.mode = imguizmo::mode::local;
 	}
 	gui::SameLine(0.0f, 50.0f);
 
-	if (gui::ToolbarButton(icons["local"].get(), "Local Coordinate System", es->mode == imguizmo::mode::local))
+	if (gui::ToolbarButton(icons["local"].get(), "Local Coordinate System", es.mode == imguizmo::mode::local))
 	{
-		es->mode = imguizmo::mode::local;
+		es.mode = imguizmo::mode::local;
 	}
 	gui::SameLine(0.0f);
-	if (gui::ToolbarButton(icons["global"].get(), "Global Coordinate System", es->mode == imguizmo::mode::world, es->operation != imguizmo::operation::scale))
+	if (gui::ToolbarButton(icons["global"].get(), "Global Coordinate System", es.mode == imguizmo::mode::world, es.operation != imguizmo::operation::scale))
 	{
-		es->mode = imguizmo::mode::world;
+		es.mode = imguizmo::mode::world;
 	}
 	gui::SameLine(0.0f);
-	if (gui::ToolbarButton(icons["grid"].get(), "Show Grid", es->show_grid))
+	if (gui::ToolbarButton(icons["grid"].get(), "Show Grid", es.show_grid))
 	{
-		es->show_grid = !es->show_grid;
+		es.show_grid = !es.show_grid;
 	}
 	gui::SameLine(0.0f);
-	if (gui::ToolbarButton(icons["wireframe"].get(), "Wireframe Selection", es->wireframe_selection))
+	if (gui::ToolbarButton(icons["wireframe"].get(), "Wireframe Selection", es.wireframe_selection))
 	{
-		es->wireframe_selection = !es->wireframe_selection;
+		es.wireframe_selection = !es.wireframe_selection;
 	}
 
 	gui::SameLine(width / 2.0f - 36.0f);
@@ -381,8 +381,8 @@ void main_editor_window::render_dockspace()
 
 void main_editor_window::on_start_page()
 {
-	auto es = core::get_subsystem<editor::editing_system>();
-	auto pm = core::get_subsystem<editor::project_manager>();
+	auto& es = core::get_subsystem<editor::editing_system>();
+	auto& pm = core::get_subsystem<editor::project_manager>();
 
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoMove |
@@ -399,13 +399,13 @@ void main_editor_window::on_start_page()
 		if (gui::BeginChild("projects_content", ImVec2(gui::GetContentRegionAvail().x * 0.7f, gui::GetContentRegionAvail().y - gui::GetTextLineHeightWithSpacing()), false, flags))
 		{
 
-			const auto& rencent_projects = pm->get_options().recent_project_paths;
+			const auto& rencent_projects = pm.get_options().recent_project_paths;
 			for (auto& path : rencent_projects)
 			{
 				if (gui::Selectable(path.c_str()))
 				{
-					pm->open_project(path, recompile_assets);
-					es->load_editor_camera();
+					pm.open_project(path, recompile_assets);
+					es.load_editor_camera();
 					maximize();
 					_show_start_page = false;
 				}
@@ -434,8 +434,8 @@ void main_editor_window::on_start_page()
 			std::string path;
 			if (pick_folder_dialog("", path))
 			{
-				pm->create_project(path);
-				es->load_editor_camera();
+				pm.create_project(path);
+				es.load_editor_camera();
 				maximize();
 				_show_start_page = false;
 			}
@@ -446,8 +446,8 @@ void main_editor_window::on_start_page()
 			std::string path;
 			if (pick_folder_dialog("", path))
 			{
-				pm->open_project(path, recompile_assets);
-				es->load_editor_camera();
+				pm.open_project(path, recompile_assets);
+				es.load_editor_camera();
 				maximize();
 				_show_start_page = false;
 			}

@@ -22,9 +22,9 @@ namespace editor
 {
 	void debugdraw_system::frame_render(std::chrono::duration<float> dt)
 	{
-		auto es = core::get_subsystem<editing_system>();
-		auto& editor_camera = es->camera;
-		auto& selected = es->selection_data.object;
+		auto& es = core::get_subsystem<editing_system>();
+		auto& editor_camera = es.camera;
+		auto& selected = es.selection_data.object;
 		if (!editor_camera ||
 			!editor_camera.has_component<camera_component>())
 			return;
@@ -79,7 +79,7 @@ namespace editor
 
 		};
 
-		if (es->show_grid)
+		if (es.show_grid)
 		{
 			static const auto far_clip = 200;
 			static const auto height = 40.0f;
@@ -299,11 +299,11 @@ namespace editor
 	{
 		runtime::on_frame_render.connect(this, &debugdraw_system::frame_render);
 
-		auto am = core::get_subsystem<runtime::asset_manager>();
-		am->load<shader>("editor_data:/shaders/vs_wf_wireframe", false)
-			.then([this, am](auto vs)
+		auto& am = core::get_subsystem<runtime::asset_manager>();
+		am.load<shader>("editor_data:/shaders/vs_wf_wireframe", false)
+			.then([this, &am](auto vs)
 		{
-			am->load<shader>("editor_data:/shaders/fs_wf_wireframe", false)
+			am.load<shader>("editor_data:/shaders/fs_wf_wireframe", false)
 				.then([this, vs](auto fs)
 			{
 				_program = std::make_unique<program>(vs, fs);

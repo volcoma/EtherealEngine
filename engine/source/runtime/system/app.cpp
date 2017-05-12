@@ -16,7 +16,7 @@ namespace runtime
 
 	void app::start()
 	{
-		auto eng = core::get_subsystem<engine>();
+		auto& eng = core::get_subsystem<engine>();
 
 		sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 		desktop.width = 1280;
@@ -27,7 +27,7 @@ namespace runtime
 			sf::Style::Default);
 		
 
-		if(!eng->start(main_window))
+		if(!eng.start(main_window))
 		{
 			_exitcode = -1;
 			return;
@@ -36,8 +36,8 @@ namespace runtime
 
 	void app::stop()
 	{
-		auto eng = core::get_subsystem<engine>();
-		eng->destroy_windows();
+		auto& eng = core::get_subsystem<engine>();
+		eng.destroy_windows();
 	}
 
 	int app::run()
@@ -58,9 +58,9 @@ namespace runtime
 			return _exitcode;
 		}
 
-		auto eng = core::get_subsystem<engine>();
-		while (eng->is_running())
-			eng->run_one_frame();
+		auto& eng = core::get_subsystem<engine>();
+		while (eng.is_running())
+			eng.run_one_frame();
 
 		stop();
 
@@ -76,8 +76,8 @@ namespace runtime
 
 	void app::quit(int exitcode)
 	{
-		auto eng = core::add_subsystem<engine>();
-		eng->set_running(false);
+		auto& eng = core::add_subsystem<engine>();
+		eng.set_running(false);
 		_exitcode = exitcode;
 	}
 

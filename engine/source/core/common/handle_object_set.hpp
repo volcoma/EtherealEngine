@@ -286,7 +286,7 @@ namespace core
 				while (handle.get_index() >= N*_chunks.size())
 				{
 					auto chunk = new (std::nothrow) uint8_t[sizeof(aligned_storage_t)*N];
-					Ensures(chunk != nullptr);
+					ensures(chunk != nullptr);
 					_chunks.push_back(chunk);
 				}
 			}

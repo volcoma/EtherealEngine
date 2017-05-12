@@ -51,8 +51,8 @@ LOAD(entity)
 	}
 	else
 	{
-		auto ecs = core::get_subsystem<entity_component_system>();
-		obj = ecs->create();
+		auto& ecs = core::get_subsystem<entity_component_system>();
+		obj = ecs.create();
 		serializationMap[id] = obj;
 
 		try_load(ar, cereal::make_nvp("name", name));

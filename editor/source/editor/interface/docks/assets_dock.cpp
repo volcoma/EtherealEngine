@@ -19,8 +19,8 @@
 template<typename T>
 asset_handle<texture> get_asset_icon(T asset)
 {
-	auto es = core::get_subsystem<editor::editing_system>();
-	return es->icons["folder"];
+	auto& es = core::get_subsystem<editor::editing_system>();
+	return es.icons["folder"];
 }
 
 template<>
@@ -31,41 +31,41 @@ asset_handle<texture> get_asset_icon(asset_handle<texture> asset)
 template<>
 asset_handle<texture> get_asset_icon(asset_handle<prefab> asset)
 {
-	auto es = core::get_subsystem<editor::editing_system>();
-	return es->icons["prefab"];
+	auto& es = core::get_subsystem<editor::editing_system>();
+	return es.icons["prefab"];
 }
 
 template<>
 asset_handle<texture> get_asset_icon(asset_handle<scene> asset)
 {
-	auto es = core::get_subsystem<editor::editing_system>();
-	return es->icons["scene"];
+	auto& es = core::get_subsystem<editor::editing_system>();
+	return es.icons["scene"];
 }
 
 template<>
 asset_handle<texture> get_asset_icon(asset_handle<mesh> asset)
 {
-	auto es = core::get_subsystem<editor::editing_system>();
-	return es->icons["mesh"];
+	auto& es = core::get_subsystem<editor::editing_system>();
+	return es.icons["mesh"];
 }
 template<>
 asset_handle<texture> get_asset_icon(asset_handle<material> asset)
 {
-	auto es = core::get_subsystem<editor::editing_system>();
-	return es->icons["material"];
+	auto& es = core::get_subsystem<editor::editing_system>();
+	return es.icons["material"];
 }
 
 asset_handle<texture> get_loading_icon()
 {
-	auto es = core::get_subsystem<editor::editing_system>();
-	return es->icons["loading"];
+	auto& es = core::get_subsystem<editor::editing_system>();
+	return es.icons["loading"];
 }
 
 template<>
 asset_handle<texture> get_asset_icon(asset_handle<shader> asset)
 {
-	auto es = core::get_subsystem<editor::editing_system>();
-	return es->icons["shader"];
+	auto& es = core::get_subsystem<editor::editing_system>();
+	return es.icons["shader"];
 }
 
 asset_handle<texture>& get_icon()
@@ -229,9 +229,9 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 
 	auto dir = opened_dir.lock().get();
 	
-	auto es = core::get_subsystem<editor::editing_system>();
-	auto am = core::get_subsystem<runtime::asset_manager>();
-	auto input = core::get_subsystem<runtime::input>();
+	auto& es = core::get_subsystem<editor::editing_system>();
+	auto& am = core::get_subsystem<runtime::asset_manager>();
+	auto& input = core::get_subsystem<runtime::input>();
 	{
 		std::unique_lock<std::mutex> lock(dir->directories_mutex);
 
@@ -244,7 +244,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 				entry->absolute,
 				size,
 				opened_dir,
-				*am, *input, *es);
+				am, input, es);
 			if (action == 3)
 			{
 				opened_dir = entry;
@@ -258,7 +258,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 		{
 			if (file.extension == extensions::texture)
 			{
-				auto asset = am->find_or_create_asset_entry<texture>(file.relative).asset;
+				auto asset = am.find_or_create_asset_entry<texture>(file.relative).asset;
 
 				list_item<asset_handle<texture>, texture>(
 					asset,
@@ -267,12 +267,12 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 					file.absolute,
 					size,
 					opened_dir,
-					*am, *input, *es);
+					am, input, es);
 			}
 			if (file.extension == extensions::mesh)
 			{
 
-				auto asset = am->find_or_create_asset_entry<mesh>(file.relative).asset;
+				auto asset = am.find_or_create_asset_entry<mesh>(file.relative).asset;
 
 				list_item<asset_handle<mesh>, mesh>(
 					asset,
@@ -281,11 +281,11 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 					file.absolute,
 					size,
 					opened_dir,
-					*am, *input, *es);
+					am, input, es);
 			}
 			if (file.extension == extensions::material)
 			{
-				auto asset = am->find_or_create_asset_entry<material>(file.relative).asset;
+				auto asset = am.find_or_create_asset_entry<material>(file.relative).asset;
 
 				list_item<asset_handle<material>, material>(
 					asset,
@@ -294,11 +294,11 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 					file.absolute,
 					size,
 					opened_dir,
-					*am, *input, *es);
+					am, input, es);
 			}
 			if (file.extension == extensions::prefab)
 			{
-				auto asset = am->find_or_create_asset_entry<prefab>(file.relative).asset;
+				auto asset = am.find_or_create_asset_entry<prefab>(file.relative).asset;
 
 				list_item<asset_handle<prefab>, prefab>(
 					asset,
@@ -307,11 +307,11 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 					file.absolute,
 					size,
 					opened_dir,
-					*am, *input, *es);
+					am, input, es);
 			}
 			if (file.extension == extensions::scene)
 			{
-				auto asset = am->find_or_create_asset_entry<scene>(file.relative).asset;
+				auto asset = am.find_or_create_asset_entry<scene>(file.relative).asset;
 
 				int action = list_item<asset_handle<scene>, scene>(
 					asset,
@@ -320,19 +320,19 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 					file.absolute,
 					size,
 					opened_dir,
-					*am, *input, *es);
+					am, input, es);
 
 				if (action == 3)
 				{
 					if (asset)
 					{
-						auto es = core::get_subsystem<editor::editing_system>();
-						auto ecs = core::get_subsystem<runtime::entity_component_system>();
+						auto& es = core::get_subsystem<editor::editing_system>();
+						auto& ecs = core::get_subsystem<runtime::entity_component_system>();
 
-						ecs->dispose();
-						es->load_editor_camera();
+						ecs.dispose();
+						es.load_editor_camera();
 						asset->instantiate();
-						es->scene = fs::resolve_protocol(asset.id()).string() + extensions::scene;
+						es.scene = fs::resolve_protocol(asset.id()).string() + extensions::scene;
 
 					}
 
@@ -340,7 +340,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 			}
 			if (file.extension == extensions::shader)
 			{
-				auto asset = am->find_or_create_asset_entry<shader>(file.relative).asset;
+				auto asset = am.find_or_create_asset_entry<shader>(file.relative).asset;
 
 				list_item<asset_handle<shader>, shader>(
 					asset,
@@ -349,7 +349,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 					file.absolute,
 					size,
 					opened_dir,
-					*am, *input, *es);
+					am, input, es);
 			}
 		}
 	}
@@ -385,7 +385,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 					fs::path parent_dir = dir->relative;
 					asset.link->id = (parent_dir / string_utils::format("New Material (%s)", fs::path(std::tmpnam(nullptr)).filename().string().c_str())).generic_string();
 					asset.link->asset = std::make_shared<standard_material>();
-					am->save<material>(asset);
+					am.save<material>(asset);
 				}
 				
 			}
@@ -410,19 +410,19 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 
 void assets_dock::render(const ImVec2& area)
 {
-	auto project = core::get_subsystem<editor::project_manager>();
+	auto& project = core::get_subsystem<editor::project_manager>();
 
 	if (opened_dir.expired())
-		opened_dir = project->get_root_directory();
+		opened_dir = project.get_root_directory();
 
-	auto es = core::get_subsystem<editor::editing_system>();
-	auto input = core::get_subsystem<runtime::input>();
+	auto& es = core::get_subsystem<editor::editing_system>();
+	auto& input = core::get_subsystem<runtime::input>();
 
 	float width = gui::GetContentRegionAvailWidth();
 
 	if (!gui::IsAnyItemActive())
 	{
-		if (input->is_key_pressed(sf::Keyboard::BackSpace) && !opened_dir.expired())
+		if (input.is_key_pressed(sf::Keyboard::BackSpace) && !opened_dir.expired())
 		{
 			auto opened_folder_shared = opened_dir.lock();
 
@@ -437,7 +437,7 @@ void assets_dock::render(const ImVec2& area)
 		std::vector<std::string> paths;
 		if (open_multiple_files_dialog("obj,fbx,dae,blend,3ds,mtl,png,jpg,tga,dds,ktx,pvr,sc,io,sh", "", paths))
 		{
-			auto ts = core::get_subsystem<runtime::task_system>();
+			auto& ts = core::get_subsystem<runtime::task_system>();
 
 			auto opened_folder_shared = opened_dir.lock();
 
@@ -448,7 +448,7 @@ void assets_dock::render(const ImVec2& area)
 				fs::path ext = p.extension().string();
 				fs::path filename = p.filename();
 
-				auto task = ts->create("Import Asset", [opened_dir](const fs::path& path, const fs::path& p, const fs::path& filename)
+				auto task = ts.create("Import Asset", [opened_dir](const fs::path& path, const fs::path& p, const fs::path& filename)
 				{
 					std::error_code error;
 					fs::path dir = opened_dir / filename;
@@ -462,7 +462,7 @@ void assets_dock::render(const ImVec2& area)
 					}
 				}, p, p, filename);
 
-				ts->run(task);
+				ts.run(task);
 			}
 		}
 	}
@@ -511,7 +511,7 @@ void assets_dock::render(const ImVec2& area)
 	{
 		if (gui::IsWindowHovered())
 		{
-			auto& dragged = es->drag_data.object;
+			auto& dragged = es.drag_data.object;
 			if (dragged && dragged.is_type<runtime::entity>())
 			{
 				gui::SetMouseCursor(ImGuiMouseCursor_Move);
@@ -520,7 +520,7 @@ void assets_dock::render(const ImVec2& area)
 					auto entity = dragged.get_value<runtime::entity>();
 					if (entity)
 						ecs::utils::save_entity(dir->absolute, entity);
-					es->drop();
+					es.drop();
 				}
 			}
 		}

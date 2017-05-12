@@ -7,12 +7,12 @@
 
 void game_dock::render(const ImVec2& area)
 {
-	auto es = core::get_subsystem<editor::editing_system>();
-	auto& editor_camera = es->camera;
-	auto& dragged = es->drag_data.object;
+	auto& es = core::get_subsystem<editor::editing_system>();
+	auto& editor_camera = es.camera;
+	auto& dragged = es.drag_data.object;
 
-	auto ecs = core::get_subsystem<runtime::entity_component_system>();
-	ecs->each<camera_component>([&editor_camera](
+	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
+	ecs.each<camera_component>([&editor_camera](
 		runtime::entity e,
 		camera_component& camera_comp
 		)

@@ -4,9 +4,9 @@
 
 void inspector_dock::render(const ImVec2& area)
 {
-	auto es = core::get_subsystem<editor::editing_system>();
+	auto& es = core::get_subsystem<editor::editing_system>();
 
-	auto& selected = es->selection_data.object;
+	auto& selected = es.selection_data.object;
 	if (selected)
 	{
 		inspect_var(selected);

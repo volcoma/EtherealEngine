@@ -110,7 +110,7 @@ namespace runtime
 			std::unique_lock<std::mutex> L(_tasks_mutex);
 			task = _tasks.fetch(handle);
 		}
-		Expects(task != nullptr && task->jobs.load() > 0);
+		expects(task != nullptr && task->jobs.load() > 0);
 
 		if (on_main_thread)
 		{

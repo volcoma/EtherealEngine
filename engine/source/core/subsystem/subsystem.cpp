@@ -14,51 +14,45 @@ namespace core
 		for (auto iter = _orders.rbegin(); iter != _orders.rend(); iter++)
 		{
 			auto found = _subsystems.find(*iter);
-			Ensures(found != _subsystems.end());
+			ensures(found != _subsystems.end());
 
 			found->second->dispose();
-			delete found->second;
+			found->second.reset();
 			_subsystems.erase(found);
 		}
 
 		_orders.clear();
-		Ensures(_subsystems.size() == 0);
+		ensures(_subsystems.size() == 0);
 	}
 
 	namespace details
 	{
-		std::unique_ptr<subsystem_context> s_context;
-		Status s_status = Status::IDLE;
-
-		bool initialize()
+		internal_status& status()
 		{
-			auto context = std::unique_ptr<subsystem_context>(new (std::nothrow) subsystem_context());
-			if (context.get() == nullptr || !context->initialize())
-				return false;
-
-			s_context = std::move(context);
-			s_status = Status::RUNNING;
-			return true;
-		}
-
-		Status status()
-		{
+			static internal_status s_status = internal_status::idle;
 			return s_status;
 		}
 
 		void dispose()
 		{
-			if (s_context.get())
-			{
-				s_context->dispose();
-				s_context.reset();
-			}
-			s_status = Status::DISPOSED;
+			context().dispose();
+			context() = {};
+			status() = internal_status::disposed;
 		}
 
 		subsystem_context& context()
 		{
-			return *s_context;
+			static subsystem_context s_context;
+			return s_context;
+		}
+
+		bool initialize()
+		{
+			if (!context().initialize())
+				return false;
+
+			status() = internal_status::running;
+			return true;
 		}
 	}
 }

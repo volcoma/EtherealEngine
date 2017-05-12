@@ -14,7 +14,7 @@ namespace editor
 
 	void app::start()
 	{
-		auto engine = core::get_subsystem<runtime::engine>();
+		auto& engine = core::get_subsystem<runtime::engine>();
 
 		sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 		desktop.width = 1280;
@@ -24,7 +24,7 @@ namespace editor
 			"Editor",
 			sf::Style::Default);
 
-		if (!engine->start(main_window))
+		if (!engine.start(main_window))
 		{
 			_exitcode = -1;
 			return;

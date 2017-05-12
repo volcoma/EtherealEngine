@@ -7,9 +7,9 @@ namespace runtime
 {
 	void camera_system::frame_update(std::chrono::duration<float> dt)
 	{
-		auto ecs = core::get_subsystem<entity_component_system>();
+		auto &ecs = core::get_subsystem<entity_component_system>();
 
-		ecs->each<transform_component, camera_component>([this](
+		ecs.each<transform_component, camera_component>([this](
 			entity e,
 			transform_component& transformComponent,
 			camera_component& cameraComponent

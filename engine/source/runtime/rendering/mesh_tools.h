@@ -39,7 +39,7 @@ struct triangle_mesh_tools
 
 	static inline void add_triangle(std::vector<std::uint32_t>& out_indices, int a, int b, int c)
 	{
-		Expects((a >= 0) && (b >= 0) && (c >= 0));
+		expects((a >= 0) && (b >= 0) && (c >= 0));
 		out_indices.push_back(a);
 		out_indices.push_back(b);
 		out_indices.push_back(c);
@@ -117,7 +117,7 @@ struct triangle_mesh_tools
 
 	static inline void generate_normals(std::vector<math::vec3>& out_normals, const std::vector<math::vec3>& vertices, const std::vector<std::uint32_t>& indices, bool counter_clockwise, int index_from = 0, int index_count = -1, bool fix_broken_normals = true)
 	{
-		Expects(out_normals.size() == vertices.size());
+		expects(out_normals.size() == vertices.size());
 		if (index_count == -1)
 			index_count = (int)indices.size();
 
@@ -166,7 +166,7 @@ struct triangle_mesh_tools
 	// based on http://www.terathon.com/code/tangent.html
 	static void generate_tangents(std::vector<math::vec4>& out_tangents, std::vector<math::vec4>& out_bitangents, const std::vector<math::vec3>& vertices, const std::vector<math::vec3>& normals, const std::vector<math::vec2>& texturecoords, const std::vector<std::uint32_t>& indices)
 	{
-		Expects(out_tangents.size() == vertices.size());
+		expects(out_tangents.size() == vertices.size());
 
 		std::vector<math::vec3> tempTans;
 		tempTans.resize(vertices.size() * 2, math::vec3(0.0f, 0.0f, 0.0f));
@@ -174,7 +174,7 @@ struct triangle_mesh_tools
 		math::vec3 * tan1 = &tempTans[0];
 		math::vec3 * tan2 = &tempTans[vertices.size()];
 
-		Expects((indices.size() % 3) == 0);
+		expects((indices.size() % 3) == 0);
 		int triangleCount = (int)indices.size() / 3;
 
 		for (long a = 0; a < triangleCount; a++)

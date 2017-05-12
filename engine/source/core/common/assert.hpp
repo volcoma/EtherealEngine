@@ -26,23 +26,23 @@
 
 #if defined(THROW_ON_CONTRACT_VIOLATION)
 
-#define Expects(cond)  if (!(cond)) \
+#define expects(cond)  if (!(cond)) \
     throw std::runtime_error("Precondition failure at " __FILE__ ": " STRINGIFY(__LINE__))
-#define Ensures(cond)  if (!(cond)) \
+#define ensures(cond)  if (!(cond)) \
     throw std::runtime_error("Postcondition failure at " __FILE__ ": " STRINGIFY(__LINE__))
 
 
 #elif defined(TERMINATE_ON_CONTRACT_VIOLATION)
 
 
-#define Expects(cond)           if (!(cond)) std::terminate()
-#define Ensures(cond)           if (!(cond)) std::terminate()
+#define expects(cond)           if (!(cond)) std::terminate()
+#define ensures(cond)           if (!(cond)) std::terminate()
 
 
 #elif defined(UNENFORCED_ON_CONTRACT_VIOLATION)
 
-#define Expects(cond)           
-#define Ensures(cond)           
+#define expects(cond)           
+#define ensures(cond)           
 
 #endif 
 

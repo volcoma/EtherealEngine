@@ -42,8 +42,8 @@ namespace runtime
 	{
 		core::add_subsystem<core::simulation>();
 
-		auto render = core::add_subsystem<renderer>();
-		if (!render->init_backend(*main_window))
+		auto& render = core::add_subsystem<renderer>();
+		if (!render.init_backend(*main_window))
 		{
 			APPLOG_ERROR("Could not initialize rendering backend!");
 			return false;
@@ -66,11 +66,11 @@ namespace runtime
 		if (!_running)
 			return;
 
-		auto sim = core::get_subsystem<core::simulation>();
-		auto inp = core::get_subsystem<input>();
+		auto& sim = core::get_subsystem<core::simulation>();
+		auto& inp = core::get_subsystem<input>();
 
-		sim->run_one_frame();
-		auto dt = sim->get_delta_time();
+		sim.run_one_frame();
+		auto dt = sim.get_delta_time();
 
 		_focused_window = nullptr;
 		//get a copy of the windows for safe iterator invalidation
@@ -97,7 +97,7 @@ namespace runtime
 			{
 				if (has_focus)
 				{
-					inp->handle_event(e);
+					inp.handle_event(e);
 				}
 			}
 

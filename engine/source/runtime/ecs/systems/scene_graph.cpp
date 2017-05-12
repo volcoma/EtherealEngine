@@ -20,9 +20,9 @@ namespace runtime
 
 	void scene_graph::frame_update(std::chrono::duration<float> dt)
 	{
-		auto ecs = core::get_subsystem<runtime::entity_component_system>();
+		auto& ecs = core::get_subsystem<runtime::entity_component_system>();
 		_roots.clear();
-		ecs->each<transform_component>([this](runtime::entity e, transform_component& transformComponent)
+		ecs.each<transform_component>([this](runtime::entity e, transform_component& transformComponent)
 		{
 			auto parent = transformComponent.get_parent();
 			if (parent.expired())

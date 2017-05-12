@@ -6,8 +6,8 @@ runtime::chandle<transform_component> create_from_component(runtime::chandle<tra
 {
 	if (!component.expired())
 	{
-		auto ecs = core::get_subsystem<runtime::entity_component_system>();
-		auto entity = ecs->create_from_copy(component.lock()->get_entity());
+		auto& ecs = core::get_subsystem<runtime::entity_component_system>();
+		auto entity = ecs.create_from_copy(component.lock()->get_entity());
 		return entity.get_component<transform_component>();
 	}
 	APPLOG_ERROR("trying to clone a null component");

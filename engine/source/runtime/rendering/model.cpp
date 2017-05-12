@@ -10,8 +10,8 @@
 
 model::model()
 {
-	auto am = core::get_subsystem<runtime::asset_manager>();
-	am->load<material>("embedded:/standard", false)
+	auto& am = core::get_subsystem<runtime::asset_manager>();
+	am.load<material>("embedded:/standard", false)
 		.then([this](auto asset)
 	{
 		_default_material = asset;

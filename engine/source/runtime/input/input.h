@@ -51,8 +51,8 @@ namespace runtime
 	
 	};
 
-// 	auto input = core::get_subsystem<runtime::Input>();
-// 	auto& mappings = input->get_mappings();
+// 	auto& input = core::get_subsystem<runtime::Input>();
+// 	auto& mappings = input.get_mappings();
 //
 //	// You can map different type of events to the same action
 // 	mappings.event_map.map("some_action", sf::Event::TextEntered);

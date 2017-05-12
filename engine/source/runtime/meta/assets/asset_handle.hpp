@@ -46,8 +46,8 @@ namespace cereal
 		}
 		else
 		{
-			auto am = core::get_subsystem<runtime::asset_manager>();
-			am->load<T>(obj.link->id, false)
+			auto& am = core::get_subsystem<runtime::asset_manager>();
+			am.load<T>(obj.link->id, false)
 				.then([&obj](auto asset) mutable
 			{
 				obj = asset;

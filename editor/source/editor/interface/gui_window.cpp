@@ -205,11 +205,11 @@ void gui_window::frame_end()
 {
 	render_window::frame_end();
 
-	auto es = core::get_subsystem<editor::editing_system>();
+	auto& es = core::get_subsystem<editor::editing_system>();
 
-	if (gui::IsMouseDragging(gui::drag_button) && es->drag_data.object)
+	if (gui::IsMouseDragging(gui::drag_button) && es.drag_data.object)
 	{
-		gui::SetTooltip(es->drag_data.description.c_str());
+		gui::SetTooltip(es.drag_data.description.c_str());
 
 		if (gui::GetMouseCursor() == ImGuiMouseCursor_Arrow)
 			gui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);
@@ -219,13 +219,13 @@ void gui_window::frame_end()
 	{
 		if (gui::IsMouseDoubleClicked(0) && !imguizmo::is_over())
 		{
-			es->unselect();
-			es->drop();
+			es.unselect();
+			es.drop();
 		}
 	}
 	if (gui::IsMouseReleased(gui::drag_button))
 	{
-		es->drop();
+		es.drop();
 	}
 
 	imgui_frame_end();

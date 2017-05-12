@@ -50,11 +50,11 @@ struct load_request
 	{
 		if (load_task.is_valid())
 		{
-			auto ts = core::get_subsystem<runtime::task_system>();
-			ts->wait(load_task);
+			auto& ts = core::get_subsystem<runtime::task_system>();
+			ts.wait(load_task);
 			// all resource loading tasks create a subtask on the main thread.
 			// this way we can be avoid circle wait.
-			ts->execute_tasks_on_main({});
+			ts.execute_tasks_on_main({});
 		}
 	}
 

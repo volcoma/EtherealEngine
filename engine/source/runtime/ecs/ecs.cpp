@@ -28,19 +28,19 @@ namespace runtime
 
 	std::shared_ptr<component> component_storage::get(std::size_t n)
 	{
-		Expects(n < size());
+		expects(n < size());
 		return data[n];
 	}
 
 	const std::shared_ptr<component> component_storage::get(std::size_t n) const
 	{
-		Expects(n < size());
+		expects(n < size());
 		return data[n];
 	}
 
 	void component_storage::destroy(std::size_t n)
 	{
-		Expects(n < size());
+		expects(n < size());
 		auto& element = data[n];
 		element.reset();
 	}
@@ -56,13 +56,13 @@ namespace runtime
 
 	void entity::set_name(std::string name)
 	{
-		Expects(valid());
+		expects(valid());
 		manager_->set_entity_name(id_, name);
 	}
 
 	const std::string& entity::get_name() const
 	{
-		Expects(valid());
+		expects(valid());
 		return manager_->get_entity_name(id_);
 	}
 
@@ -74,13 +74,13 @@ namespace runtime
 
 	chandle<component> entity::assign_from_copy(std::shared_ptr<component> component)
 	{
-		Expects(valid());
+		expects(valid());
 		return manager_->assign(id_, component->clone());
 	}
 
 	void entity::destroy()
 	{
-		Expects(valid());
+		expects(valid());
 		manager_->destroy(id_);
 		invalidate();
 	}
@@ -244,7 +244,7 @@ namespace runtime
 
 	entity entity_component_system::create_from_copy(entity original)
 	{
-		Expects(original.valid());
+		expects(original.valid());
 		auto clone = create();
 		auto mask = original.component_mask();
 		for (size_t i = 0; i < component_pools_.size(); ++i)

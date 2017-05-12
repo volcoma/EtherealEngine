@@ -3,6 +3,7 @@
 #include "../nonstd/type_traits.hpp"
 #include "../common/assert.hpp"
 
+#include <memory>
 #include <vector>
 #include <unordered_map>
 #include <chrono>
@@ -66,7 +67,7 @@ namespace core
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template<typename S, typename ... Args> 
-		S* add_subsystem(Args&& ...);
+		S& add_subsystem(Args&& ...);
 
 		//-----------------------------------------------------------------------------
 		//  Name : get_subsystem ()
@@ -77,7 +78,7 @@ namespace core
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template<typename S> 
-		S* get_subsystem();
+		S& get_subsystem();
 
 		//-----------------------------------------------------------------------------
 		//  Name : remove_subsystem ()
@@ -114,57 +115,47 @@ namespace core
 		/// 
 		std::vector<std::size_t> _orders;
 		///
-		std::unordered_map<std::size_t, subsystem*> _subsystems;
+		std::unordered_map<std::size_t, std::unique_ptr<subsystem>> _subsystems;
 	};
 
 	//
 	// IMPLEMENTATIONS of SUBSYSTEMS
 	template<typename S, typename ... Args>
-	S* subsystem_context::add_subsystem(Args&& ... args)
+	S& subsystem_context::add_subsystem(Args&& ... args)
 	{
 		auto index = rtti::type_id<S>().hash_code();
-		Expects(!has_subsystems<S>() && "duplicated subsystem");
+		expects(!has_subsystems<S>() && "duplicated subsystem");
 	
-		auto sys = new (std::nothrow) S(std::forward<Args>(args)...);
+		//auto sys = new (std::nothrow) S(std::forward<Args>(args)...);
 		_orders.push_back(index);
-		_subsystems.insert(std::make_pair(index, sys));
-
-		Expects(sys->initialize() && "failed to initialize subsystem.");
+		_subsystems.emplace(std::make_pair(index, std::make_unique<S>(std::forward<Args>(args)...)));
+		auto& sys = static_cast<S&>(*_subsystems[index].get());
+		expects(sys.initialize() && "failed to initialize subsystem.");
 		
 		return sys;
 	}
 
 	template<typename S>
-	S* subsystem_context::get_subsystem()
+	S& subsystem_context::get_subsystem()
 	{
-		auto index = rtti::type_id<S>().hash_code();
-
-		auto found = _subsystems.find(index);
-		if (found != _subsystems.end())
-			return static_cast<S*>(found->second);
-
-		return nullptr;
+		expects(has_subsystems<S>() && "failed to find system");
+		const auto index = rtti::type_id<S>().hash_code();
+		return static_cast<S&>(*_subsystems[index].get());
 	}
 
 	template<typename S>
 	void subsystem_context::remove_subsystem()
 	{
-		auto index = rtti::type_id<S>().hash_code();
-
-		auto found = _subsystems.find(index);
-		if (found != _subsystems.end())
-		{
-			found->second->dispose();
-			delete found->second;
-			_orders.erase(index);
-			_subsystems.erase(found);
-		}
+		expects(has_subsystems<S>() && "failed to find system");
+		const auto index = rtti::type_id<S>().hash_code();
+		_subsystems.erase(index);
+		_orders.erase(index);
 	}
 
 	template<typename S>
 	bool subsystem_context::has_subsystems() const
 	{
-		auto index = rtti::type_id<S>().hash_code();
+		const auto index = rtti::type_id<S>().hash_code();
 		return _subsystems.find(index) != _subsystems.end();
 	}
 
@@ -176,11 +167,11 @@ namespace core
 
 	// retrieve the registered system instance, existence should be guaranteed
 	template<typename S>
-	S* get_subsystem();
+	S& get_subsystem();
 
 	// spawn a new subsystem with type S and construct arguments
 	template<typename S, typename ... Args> 
-	S* add_subsystem(Args&& ... args);
+	S& add_subsystem(Args&& ... args);
 
 	// release and unregistered a subsystem from our context
 	template<typename S>
@@ -193,11 +184,11 @@ namespace core
 	struct subsystem_context;
 	namespace details
 	{
-		enum class Status : uint8_t
+		enum class internal_status : uint8_t
 		{
-			IDLE,
-			RUNNING,
-			DISPOSED
+			idle,
+			running,
+			disposed
 		};
 
 		//-----------------------------------------------------------------------------
@@ -218,7 +209,7 @@ namespace core
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		Status status();
+		internal_status& status();
 
 		//-----------------------------------------------------------------------------
 		//  Name : dispose ()
@@ -242,30 +233,30 @@ namespace core
 	}
 
 	template<typename S> 
-	S* get_subsystem()
+	S& get_subsystem()
 	{
-		return details::status() != details::Status::RUNNING ?
-			nullptr : details::context().get_subsystem<S>();
+		expects(details::status() == details::internal_status::running && "details::context must be initialized");
+		return details::context().get_subsystem<S>();
 	}
 
 	template<typename S, typename ... Args> 
-	S* add_subsystem(Args&& ... args)
+	S& add_subsystem(Args&& ... args)
 	{
-		return details::status() != details::Status::RUNNING ?
-			nullptr : details::context().add_subsystem<S>(std::forward<Args>(args)...);
+		expects(details::status() == details::internal_status::running && "details::context must be initialized");
+		return details::context().add_subsystem<S>(std::forward<Args>(args)...);
 	}
 
 	template<typename S>
 	void remove_subsystem()
 	{
-		if (details::status() == details::Status::RUNNING)
+		if (details::status() == details::internal_status::running)
 			details::context().remove_subsystem<S>();
 	}
 
 	template<typename ... Args> 
 	bool has_subsystems()
 	{
-		return details::status() != details::Status::RUNNING ?
+		return details::status() != details::internal_status::running ?
 			false : details::context().has_subsystems<Args...>();
 	}
 }

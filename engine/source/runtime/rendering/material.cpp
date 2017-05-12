@@ -7,14 +7,14 @@
 
 material::material()
 {
-	auto am = core::get_subsystem<runtime::asset_manager>();
-	am->load<texture>("engine_data:/textures/default_color", false)
+	auto& am = core::get_subsystem<runtime::asset_manager>();
+	am.load<texture>("engine_data:/textures/default_color", false)
 		.then([this](auto asset) mutable
 	{
 		_default_color_map = asset;
 	});
 
-	am->load<texture>("engine_data:/textures/default_normal", false)
+	am.load<texture>("engine_data:/textures/default_normal", false)
 		.then([this](auto asset) mutable
 	{
 		_default_normal_map = asset;
@@ -85,22 +85,22 @@ std::uint64_t material::get_render_states(bool apply_cull, bool depth_write, boo
 
 standard_material::standard_material()
 {
-	auto am = core::get_subsystem<runtime::asset_manager>();
+	auto& am = core::get_subsystem<runtime::asset_manager>();
 
-	am->load<shader>("engine_data:/shaders/vs_deferred_geom", false)
-		.then([this, am](auto vs)
+	am.load<shader>("engine_data:/shaders/vs_deferred_geom", false)
+		.then([this, &am](auto vs)
 	{
-		am->load<shader>("engine_data:/shaders/fs_deferred_geom", false)
+		am.load<shader>("engine_data:/shaders/fs_deferred_geom", false)
 			.then([this, vs](auto fs)
 		{
 			_program = std::make_unique<program>(vs, fs);
 		});
 	});
 
-	am->load<shader>("engine_data:/shaders/vs_deferred_geom_skinned", false)
-		.then([this, am](auto vs)
+	am.load<shader>("engine_data:/shaders/vs_deferred_geom_skinned", false)
+		.then([this, &am](auto vs)
 	{
-		am->load<shader>("engine_data:/shaders/fs_deferred_geom", false)
+		am.load<shader>("engine_data:/shaders/fs_deferred_geom", false)
 			.then([this, vs](auto fs)
 		{
 			_program_skinned = std::make_unique<program>(vs, fs);

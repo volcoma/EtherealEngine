@@ -30,8 +30,8 @@ bool docking_system::initialize()
 	auto& console = _docks[5];
 	auto& style = _docks[6];
 
-	auto engine = core::get_subsystem<runtime::engine>();
-	const auto& windows = engine->get_windows();
+	auto& engine = core::get_subsystem<runtime::engine>();
+	const auto& windows = engine.get_windows();
 	auto& window = static_cast<gui_window&>(*windows[0]);
 	auto& dockspace = window.get_dockspace();
 	dockspace.dock_to(scene.get(), imguidock::slot::none, 200, true);

@@ -128,40 +128,40 @@ bool gui_system::initialize()
 	io.IniFilename = nullptr;
 	io.RenderDrawListsFn = renderFunc;
 
-	auto am = core::get_subsystem<runtime::asset_manager>();
+	auto& am = core::get_subsystem<runtime::asset_manager>();
 
 	switch (gfx::getRendererType())
 	{
 	case gfx::RendererType::Direct3D9:
-		am->create_asset_from_memory<shader>("embedded:/vs_ocornut_imgui", &vs_ocornut_imgui_dx9[0], sizeof(vs_ocornut_imgui_dx9));
-		am->create_asset_from_memory<shader>("embedded:/fs_ocornut_imgui", &fs_ocornut_imgui_dx9[0], sizeof(fs_ocornut_imgui_dx9));
+		am.create_asset_from_memory<shader>("embedded:/vs_ocornut_imgui", &vs_ocornut_imgui_dx9[0], sizeof(vs_ocornut_imgui_dx9));
+		am.create_asset_from_memory<shader>("embedded:/fs_ocornut_imgui", &fs_ocornut_imgui_dx9[0], sizeof(fs_ocornut_imgui_dx9));
 		break;
 
 	case gfx::RendererType::Direct3D11:
 	case gfx::RendererType::Direct3D12:
-		am->create_asset_from_memory<shader>("embedded:/vs_ocornut_imgui", &vs_ocornut_imgui_dx11[0], sizeof(vs_ocornut_imgui_dx11));
-		am->create_asset_from_memory<shader>("embedded:/fs_ocornut_imgui", &fs_ocornut_imgui_dx11[0], sizeof(fs_ocornut_imgui_dx11));
+		am.create_asset_from_memory<shader>("embedded:/vs_ocornut_imgui", &vs_ocornut_imgui_dx11[0], sizeof(vs_ocornut_imgui_dx11));
+		am.create_asset_from_memory<shader>("embedded:/fs_ocornut_imgui", &fs_ocornut_imgui_dx11[0], sizeof(fs_ocornut_imgui_dx11));
 
 		break;
 	case gfx::RendererType::Metal:
-		am->create_asset_from_memory<shader>("embedded:/vs_ocornut_imgui", &vs_ocornut_imgui_mtl[0], sizeof(vs_ocornut_imgui_mtl));
-		am->create_asset_from_memory<shader>("embedded:/fs_ocornut_imgui", &fs_ocornut_imgui_mtl[0], sizeof(fs_ocornut_imgui_mtl));
+		am.create_asset_from_memory<shader>("embedded:/vs_ocornut_imgui", &vs_ocornut_imgui_mtl[0], sizeof(vs_ocornut_imgui_mtl));
+		am.create_asset_from_memory<shader>("embedded:/fs_ocornut_imgui", &fs_ocornut_imgui_mtl[0], sizeof(fs_ocornut_imgui_mtl));
 
 		break;
 	case gfx::RendererType::OpenGL:
 	case gfx::RendererType::OpenGLES:
-		am->create_asset_from_memory<shader>("embedded:/vs_ocornut_imgui", &vs_ocornut_imgui_glsl[0], sizeof(vs_ocornut_imgui_glsl));
-		am->create_asset_from_memory<shader>("embedded:/fs_ocornut_imgui", &fs_ocornut_imgui_glsl[0], sizeof(fs_ocornut_imgui_glsl));
+		am.create_asset_from_memory<shader>("embedded:/vs_ocornut_imgui", &vs_ocornut_imgui_glsl[0], sizeof(vs_ocornut_imgui_glsl));
+		am.create_asset_from_memory<shader>("embedded:/fs_ocornut_imgui", &fs_ocornut_imgui_glsl[0], sizeof(fs_ocornut_imgui_glsl));
 
 		break;
 	default:
 
 		break;
 	}
-	am->load<shader>("embedded:/vs_ocornut_imgui", false)
-		.then([am](auto vs)
+	am.load<shader>("embedded:/vs_ocornut_imgui", false)
+		.then([&am](auto vs)
 	{
-		am->load<shader>("embedded:/fs_ocornut_imgui", false)
+		am.load<shader>("embedded:/fs_ocornut_imgui", false)
 			.then([vs](auto fs)
 		{
 			s_program = std::make_unique<program>(vs, fs);

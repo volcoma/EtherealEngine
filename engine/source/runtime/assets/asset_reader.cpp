@@ -53,18 +53,18 @@ void asset_reader::load_texture_from_file(const std::string& key, const fs::path
 
 	if (async)
 	{
-		auto ts = core::get_subsystem<runtime::task_system>();
+		auto& ts = core::get_subsystem<runtime::task_system>();
 
-		auto task = ts->create("", [ts, read_memory_func, create_resource_func]()
+		auto task = ts.create("", [&ts, read_memory_func, create_resource_func]()
 		{
 			read_memory_func();
 
-			auto callback = ts->create("Create Resource", create_resource_func);
+			auto callback = ts.create("Create Resource", create_resource_func);
 
-			ts->run(callback, true);
+			ts.run(callback, true);
 		});
 		request.set_task(task);
-		ts->run(task);
+		ts.run(task);
 	}
 	else
 	{
@@ -119,18 +119,18 @@ void asset_reader::load_shader_from_file(const std::string& key, const fs::path&
 
 	if (async)
 	{
-		auto ts = core::get_subsystem<runtime::task_system>();
+		auto& ts = core::get_subsystem<runtime::task_system>();
 
-		auto task = ts->create("", [ts, deserialize, create_resource_func]() mutable
+		auto task = ts.create("", [&ts, deserialize, create_resource_func]() mutable
 		{
 			deserialize();
 
-			auto callback = ts->create("Create Resource", create_resource_func);
+			auto callback = ts.create("Create Resource", create_resource_func);
 
-			ts->run(callback, true);
+			ts.run(callback, true);
 		});
 		request.set_task(task);
-		ts->run(task);
+		ts.run(task);
 	}
 	else
 	{
@@ -215,18 +215,18 @@ void asset_reader::load_mesh_from_file(const std::string& key, const fs::path& a
 
 	if (async)
 	{
-		auto ts = core::get_subsystem<runtime::task_system>();
+		auto& ts = core::get_subsystem<runtime::task_system>();
 
-		auto task = ts->create("", [ts, deserialize, create_resource_func]() mutable
+		auto task = ts.create("", [&ts, deserialize, create_resource_func]() mutable
 		{
 			deserialize();
 
-			auto callback = ts->create("Create Resource", create_resource_func);
+			auto callback = ts.create("Create Resource", create_resource_func);
 
-			ts->run(callback, true);
+			ts.run(callback, true);
 		});
 		request.set_task(task);
-		ts->run(task);
+		ts.run(task);
 	}
 	else
 	{
@@ -261,18 +261,18 @@ void asset_reader::load_material_from_file(const std::string& key, const fs::pat
 
 	if (async)
 	{
-		auto ts = core::get_subsystem<runtime::task_system>();
+		auto& ts = core::get_subsystem<runtime::task_system>();
 
-		auto task = ts->create("", [ts, deserialize, create_resource_func]() mutable
+		auto task = ts.create("", [&ts, deserialize, create_resource_func]() mutable
 		{
 			deserialize();
 
-			auto callback = ts->create("Create Resource", create_resource_func);
+			auto callback = ts.create("Create Resource", create_resource_func);
 
-			ts->run(callback, true);
+			ts.run(callback, true);
 		});
 		request.set_task(task);
-		ts->run(task);
+		ts.run(task);
 	}
 	else
 	{
@@ -306,18 +306,18 @@ void asset_reader::load_prefab_from_file(const std::string& key, const fs::path&
 
 	if (async)
 	{
-		auto ts = core::get_subsystem<runtime::task_system>();
+		auto& ts = core::get_subsystem<runtime::task_system>();
 
-		auto task = ts->create("", [ts, read_memory_func, create_resource_func]() mutable
+		auto task = ts.create("", [&ts, read_memory_func, create_resource_func]() mutable
 		{
 			read_memory_func();
 
-			auto callback = ts->create("Create Resource", create_resource_func);
+			auto callback = ts.create("Create Resource", create_resource_func);
 
-			ts->run(callback, true);
+			ts.run(callback, true);
 		});
 		request.set_task(task);
-		ts->run(task);
+		ts.run(task);
 	}
 	else
 	{
@@ -351,18 +351,18 @@ void asset_reader::load_scene_from_file(const std::string& key, const fs::path& 
 
 	if (async)
 	{
-		auto ts = core::get_subsystem<runtime::task_system>();
+		auto& ts = core::get_subsystem<runtime::task_system>();
 
-		auto task = ts->create("", [ts, read_memory_func, create_resource_func]() mutable
+		auto task = ts.create("", [&ts, read_memory_func, create_resource_func]() mutable
 		{
 			read_memory_func();
 
-			auto callback = ts->create("Create Resource", create_resource_func);
+			auto callback = ts.create("Create Resource", create_resource_func);
 
-			ts->run(callback, true);
+			ts.run(callback, true);
 		});
 		request.set_task(task);
-		ts->run(task);
+		ts.run(task);
 	}
 	else
 	{

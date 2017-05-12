@@ -64,10 +64,10 @@ void show_statistics(const unsigned int frameRate)
 
 void draw_selected_camera(const ImVec2& size)
 {
-	auto input = core::get_subsystem<runtime::input>();
-	auto es = core::get_subsystem<editor::editing_system>();
-	auto& selected = es->selection_data.object;
-	auto& editor_camera = es->camera;
+	auto& input = core::get_subsystem<runtime::input>();
+	auto& es = core::get_subsystem<editor::editing_system>();
+	auto& selected = es.selection_data.object;
+	auto& editor_camera = es.camera;
 
 	if (selected.is_type<runtime::entity>())
 	{
@@ -101,7 +101,7 @@ void draw_selected_camera(const ImVec2& size)
 			}
 			gui::End();
 
-			if (input->is_key_pressed(sf::Keyboard::F) && sel.has_component<transform_component>())
+			if (input.is_key_pressed(sf::Keyboard::F) && sel.has_component<transform_component>())
 			{
 				auto transform = editor_camera.get_component<transform_component>().lock();
 				auto transform_selected = sel.get_component<transform_component>().lock();
@@ -115,33 +115,33 @@ void draw_selected_camera(const ImVec2& size)
 
 void manipulation_gizmos()
 {
-	auto input = core::get_subsystem<runtime::input>();
-	auto es = core::get_subsystem<editor::editing_system>();
-	auto& selected = es->selection_data.object;
-	auto& editor_camera = es->camera;
-	auto& operation = es->operation;
-	auto& mode = es->mode;
+	auto& input = core::get_subsystem<runtime::input>();
+	auto& es = core::get_subsystem<editor::editing_system>();
+	auto& selected = es.selection_data.object;
+	auto& editor_camera = es.camera;
+	auto& operation = es.operation;
+	auto& mode = es.mode;
 
-	if (!input->is_mouse_button_down(sf::Mouse::Right) && !gui::IsAnyItemActive() && !imguizmo::is_using())
+	if (!input.is_mouse_button_down(sf::Mouse::Right) && !gui::IsAnyItemActive() && !imguizmo::is_using())
 	{
-		if (input->is_key_pressed(sf::Keyboard::W))
+		if (input.is_key_pressed(sf::Keyboard::W))
 		{
 			operation = imguizmo::operation::translate;
 		}
-		if (input->is_key_pressed(sf::Keyboard::E))
+		if (input.is_key_pressed(sf::Keyboard::E))
 		{
 			operation = imguizmo::operation::rotate;
 		}
-		if (input->is_key_pressed(sf::Keyboard::R))
+		if (input.is_key_pressed(sf::Keyboard::R))
 		{
 			operation = imguizmo::operation::scale;
 			mode = imguizmo::mode::local;
 		}
-		if (input->is_key_pressed(sf::Keyboard::T))
+		if (input.is_key_pressed(sf::Keyboard::T))
 		{
 			mode = imguizmo::mode::local;
 		}
-		if (input->is_key_pressed(sf::Keyboard::Y) && operation != imguizmo::operation::scale)
+		if (input.is_key_pressed(sf::Keyboard::Y) && operation != imguizmo::operation::scale)
 		{
 			mode = imguizmo::mode::world;
 		}
@@ -162,14 +162,14 @@ void manipulation_gizmos()
 			math::transform delta;
 			math::transform inputTransform = transform;
 			float* snap = nullptr;
-			if (input->is_key_down(sf::Keyboard::LControl))
+			if (input.is_key_down(sf::Keyboard::LControl))
 			{
 				if (operation == imguizmo::operation::translate)
-					snap = &es->snap_data.translation_snap[0];
+					snap = &es.snap_data.translation_snap[0];
 				else if (operation == imguizmo::operation::rotate)
-					snap = &es->snap_data.rotation_degree_snap;
+					snap = &es.snap_data.rotation_degree_snap;
 				else if (operation == imguizmo::operation::scale)
-					snap = &es->snap_data.scale_snap;
+					snap = &es.snap_data.scale_snap;
 			}
 
 			imguizmo::manipulate(
@@ -192,22 +192,22 @@ void handle_camera_movement()
 	if (!gui::IsWindowFocused())
 		return;
 
-	auto es = core::get_subsystem<editor::editing_system>();
-	auto input = core::get_subsystem<runtime::input>();
-	auto sim = core::get_subsystem<core::simulation>();
+	auto& es = core::get_subsystem<editor::editing_system>();
+	auto& input = core::get_subsystem<runtime::input>();
+	auto& sim = core::get_subsystem<core::simulation>();
 
-	auto& editor_camera = es->camera;
-	auto dt = sim->get_delta_time().count();
+	auto& editor_camera = es.camera;
+	auto dt = sim.get_delta_time().count();
 
 	auto transform = editor_camera.get_component<transform_component>().lock();
 	float movement_speed = 5.0f;
 	float rotation_speed = 0.2f;
 	float multiplier = 5.0f;
-	ipoint delta_move = input->get_cursor_delta_move();
+	ipoint delta_move = input.get_cursor_delta_move();
 
-	if (input->is_mouse_button_down(sf::Mouse::Middle))
+	if (input.is_mouse_button_down(sf::Mouse::Middle))
 	{
-		if (input->is_key_down(sf::Keyboard::LShift))
+		if (input.is_key_down(sf::Keyboard::LShift))
 		{
 			movement_speed *= multiplier;
 		}
@@ -222,58 +222,58 @@ void handle_camera_movement()
 		}
 	}
 
-	if (input->is_mouse_button_down(sf::Mouse::Right))
+	if (input.is_mouse_button_down(sf::Mouse::Right))
 	{
-		if (input->is_key_down(sf::Keyboard::LShift))
+		if (input.is_key_down(sf::Keyboard::LShift))
 		{
 			movement_speed *= multiplier;
 		}
 
-		if (input->is_key_down(sf::Keyboard::W))
+		if (input.is_key_down(sf::Keyboard::W))
 		{
 			transform->move_local({ 0.0f, 0.0f, movement_speed * dt });
 		}
 
-		if (input->is_key_down(sf::Keyboard::S))
+		if (input.is_key_down(sf::Keyboard::S))
 		{
 			transform->move_local({ 0.0f, 0.0f, -movement_speed * dt });
 		}
 
-		if (input->is_key_down(sf::Keyboard::A))
+		if (input.is_key_down(sf::Keyboard::A))
 		{
 			transform->move_local({ -movement_speed * dt, 0.0f, 0.0f });
 		}
 
-		if (input->is_key_down(sf::Keyboard::D))
+		if (input.is_key_down(sf::Keyboard::D))
 		{
 			transform->move_local({ movement_speed * dt, 0.0f, 0.0f });
 		}
-		if (input->is_key_down(sf::Keyboard::Up))
+		if (input.is_key_down(sf::Keyboard::Up))
 		{
 			transform->move_local({ 0.0f, 0.0f, movement_speed * dt });
 		}
 
-		if (input->is_key_down(sf::Keyboard::Down))
+		if (input.is_key_down(sf::Keyboard::Down))
 		{
 			transform->move_local({ 0.0f, 0.0f, -movement_speed * dt });
 		}
 
-		if (input->is_key_down(sf::Keyboard::Left))
+		if (input.is_key_down(sf::Keyboard::Left))
 		{
 			transform->move_local({ -movement_speed * dt, 0.0f, 0.0f });
 		}
 
-		if (input->is_key_down(sf::Keyboard::Right))
+		if (input.is_key_down(sf::Keyboard::Right))
 		{
 			transform->move_local({ movement_speed * dt, 0.0f, 0.0f });
 		}
 
-		if (input->is_key_down(sf::Keyboard::Space))
+		if (input.is_key_down(sf::Keyboard::Space))
 		{
 			transform->move_local({ 0.0f, movement_speed * dt, 0.0f });
 		}
 
-		if (input->is_key_down(sf::Keyboard::LControl))
+		if (input.is_key_down(sf::Keyboard::LControl))
 		{
 			transform->move_local({ 0.0f, -movement_speed * dt, 0.0f });
 		}
@@ -290,29 +290,29 @@ void handle_camera_movement()
 		transform->rotate_local(dy, 0.0f, 0.0f);
 
 
-		float delta_wheel = input->get_mouse_wheel_scroll_delta_move();
+		float delta_wheel = input.get_mouse_wheel_scroll_delta_move();
 		transform->move_local({ 0.0f, 0.0f, 14.0f * movement_speed * delta_wheel * dt });
 	}
 }
 
 void scene_dock::render(const ImVec2& area)
 {
-	auto es = core::get_subsystem<editor::editing_system>();
-	auto engine = core::get_subsystem<runtime::engine>();
-	auto ecs = core::get_subsystem<runtime::entity_component_system>();
-	auto input = core::get_subsystem<runtime::input>();
-	auto sim = core::get_subsystem<core::simulation>();
+	auto& es = core::get_subsystem<editor::editing_system>();
+	auto& engine = core::get_subsystem<runtime::engine>();
+	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
+	auto& input = core::get_subsystem<runtime::input>();
+	auto& sim = core::get_subsystem<core::simulation>();
 
-	auto window = engine->get_focused_window();
-	auto& editor_camera = es->camera;
-	auto& selected = es->selection_data.object;
-	auto& dragged = es->drag_data.object;
+	auto window = engine.get_focused_window();
+	auto& editor_camera = es.camera;
+	auto& selected = es.selection_data.object;
+	auto& dragged = es.drag_data.object;
 
 	bool has_edit_camera = editor_camera
 		&& editor_camera.has_component<camera_component>()
 		&& editor_camera.has_component<transform_component>();
 
-	show_statistics(sim->get_fps());
+	show_statistics(sim.get_fps());
 
 	if (!has_edit_camera)
 		return;
@@ -350,7 +350,7 @@ void scene_dock::render(const ImVec2& area)
 			ImGui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
 			ImGui::PopStyleColor();
 
-			if (input->is_key_pressed(sf::Keyboard::Delete))
+			if (input.is_key_pressed(sf::Keyboard::Delete))
 			{
 				if (selected && selected.is_type<runtime::entity>())
 				{
@@ -358,24 +358,24 @@ void scene_dock::render(const ImVec2& area)
 					if (sel && sel != editor_camera)
 					{
 						sel.destroy();
-						es->unselect();
+						es.unselect();
 					}
 				}
 			}
 
-			if (input->is_key_pressed(sf::Keyboard::D))
+			if (input.is_key_pressed(sf::Keyboard::D))
 			{
-				if (input->is_key_down(sf::Keyboard::LControl))
+				if (input.is_key_down(sf::Keyboard::LControl))
 				{
 					if (selected && selected.is_type<runtime::entity>())
 					{
 						auto sel = selected.get_value<runtime::entity>();
 						if (sel && sel != editor_camera)
 						{
-							auto clone = ecs->create_from_copy(sel);
+							auto clone = ecs.create_from_copy(sel);
 							clone.get_component<transform_component>().lock()
 								->set_parent(sel.get_component<transform_component>().lock()->get_parent(), false, true);
-							es->select(clone);
+							es.select(clone);
 						}
 					}
 				}
@@ -437,7 +437,7 @@ void scene_dock::render(const ImVec2& area)
 					}
 
 
-					es->drop();
+					es.drop();
 				}
 			}
 			if (dragged.is_type<asset_handle<prefab>>())
@@ -449,8 +449,8 @@ void scene_dock::render(const ImVec2& area)
 					auto object = pfab->instantiate();
 					object.get_component<transform_component>().lock()
 						->set_position(projected_pos);
-					es->drop();
-					es->select(object);
+					es.drop();
+					es.select(object);
 				}
 			}
 			if (dragged.is_type<asset_handle<mesh>>())
@@ -462,7 +462,7 @@ void scene_dock::render(const ImVec2& area)
 					model mdl;
 					mdl.set_lod(hmesh, 0);
 
-					auto object = ecs->create();
+					auto object = ecs.create();
 					//Add component and configure it.
 					object.assign<transform_component>().lock()
 						->set_position(projected_pos);
@@ -472,8 +472,8 @@ void scene_dock::render(const ImVec2& area)
 						.set_casts_reflection(false)
 						.set_model(mdl);
 
-					es->drop();
-					es->select(object);
+					es.drop();
+					es.select(object);
 				}
 			}
 		}

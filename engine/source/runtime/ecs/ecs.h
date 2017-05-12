@@ -292,7 +292,7 @@ virtual std::shared_ptr<component> clone() const								\
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------	
-		virtual void touch() { _last_touched = core::get_subsystem<core::simulation>()->get_frame() + 1; }
+		virtual void touch() { _last_touched = core::get_subsystem<core::simulation>().get_frame() + 1; }
 
 		//-----------------------------------------------------------------------------
 		//  Name : isDirty (virtual )
@@ -302,7 +302,7 @@ virtual std::shared_ptr<component> clone() const								\
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		virtual bool is_dirty() const { return _last_touched >= core::get_subsystem<core::simulation>()->get_frame(); }
+		virtual bool is_dirty() const { return _last_touched >= core::get_subsystem<core::simulation>().get_frame(); }
 
 		//-----------------------------------------------------------------------------
 		//  Name : onEntitySet (virtual )
@@ -828,8 +828,8 @@ virtual std::shared_ptr<component> clone() const								\
 
 		inline void assert_valid(entity::id_t id) const
 		{
-			Expects(id.index() < entity_component_mask_.size() && "entity::Id ID outside entity vector range");
-			Expects(entity_version_[id.index()] == id.version() && "Attempt to access entity via a stale entity::Id");
+			expects(id.index() < entity_component_mask_.size() && "entity::Id ID outside entity vector range");
+			expects(entity_version_[id.index()] == id.version() && "Attempt to access entity via a stale entity::Id");
 		}
 
 		component_mask_t component_mask(entity::id_t id)
@@ -922,73 +922,73 @@ virtual std::shared_ptr<component> clone() const								\
 	template <typename C, typename ... Args>
 	chandle<C> entity::assign(Args && ... args)
 	{
-		Expects(valid());
+		expects(valid());
 		return manager_->assign<C>(id_, std::forward<Args>(args) ...);
 	}
 
 	inline chandle<component> entity::assign(std::shared_ptr<component> component)
 	{
-		Expects(valid());
+		expects(valid());
 		return manager_->assign(id_, component);
 	}
 
 	template <typename C>
 	chandle<C> entity::assign_from_copy(const chandle<C> &component)
 	{
-		Expects(valid());
+		expects(valid());
 		return manager_->assign(id_, component.get()->clone());
 	}
 
 	template <typename C>
 	void entity::remove()
 	{
-		Expects(valid() && has_component<C>());
+		expects(valid() && has_component<C>());
 		manager_->remove<C>(id_);
 	}
 
 	inline void entity::remove(std::shared_ptr<component> component)
 	{
-		Expects(valid() && has_component(component));
+		expects(valid() && has_component(component));
 		manager_->remove(id_, component);
 	}
 
 	template <typename C, typename>
 	chandle<C> entity::get_component()
 	{
-		Expects(valid());
+		expects(valid());
 		return manager_->get_component<C>(id_);
 	}
 
 	template <typename C, typename>
 	const chandle<C> entity::get_component() const
 	{
-		Expects(valid());
+		expects(valid());
 		return const_cast<const entity_component_system*>(manager_)->get_component<const C>(id_);
 	}
 
 	template <typename ... Components>
 	std::tuple<chandle<Components>...> entity::components()
 	{
-		Expects(valid());
+		expects(valid());
 		return manager_->components<Components...>(id_);
 	}
 
 	inline std::vector<chandle<component>> entity::all_components() const
 	{
-		Expects(valid());
+		expects(valid());
 		return manager_->all_components(id_);
 	}
 
 	inline std::vector<std::shared_ptr<component>> entity::all_components_shared() const
 	{
-		Expects(valid());
+		expects(valid());
 		return manager_->all_components_shared(id_);
 	}
 
 	template <typename ... Components>
 	std::tuple<chandle<const Components>...> entity::components() const
 	{
-		Expects(valid());
+		expects(valid());
 		return const_cast<const entity_component_system*>(manager_)->components<const Components...>(id_);
 	}
 
@@ -996,20 +996,20 @@ virtual std::shared_ptr<component> clone() const								\
 	template <typename C>
 	bool entity::has_component() const
 	{
-		Expects(valid());
+		expects(valid());
 		return manager_->has_component<C>(id_);
 	}
 
 	inline bool entity::has_component(std::shared_ptr<component> component) const
 	{
-		Expects(valid());
+		expects(valid());
 		return manager_->has_component(id_, component);
 	}
 
 	template <typename A, typename ... Args>
 	void entity::unpack(chandle<A> &a, chandle<Args> & ... args)
 	{
-		Expects(valid());
+		expects(valid());
 		manager_->unpack(id_, a, args ...);
 	}
 

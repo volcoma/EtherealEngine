@@ -13,7 +13,7 @@ std::uint8_t generate_id()
 		gfx::frame();
 		index++;
 	}
-	Expects(index < 256);
+	expects(index < 256);
 	// find the first unset bit
 	std::uint8_t idx = index++;
 
@@ -30,7 +30,7 @@ render_pass::render_pass(const std::string& n)
 
 void render_pass::bind(frame_buffer* fb) const
 {
-	Expects(fb != nullptr);
+	expects(fb != nullptr);
 
 	const auto size = fb->get_size();
 

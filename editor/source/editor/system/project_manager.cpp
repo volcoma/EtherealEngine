@@ -24,13 +24,13 @@ namespace editor
 	template<typename T>
 	void watch_assets(const fs::path& protocol, const std::string& wildcard, bool initialList, bool reloadAsync)
 	{
-		auto am = core::get_subsystem<runtime::asset_manager>();
-		auto ts = core::get_subsystem<runtime::task_system>();
+		auto& am = core::get_subsystem<runtime::asset_manager>();
+		auto& ts = core::get_subsystem<runtime::task_system>();
 
 		const fs::path dir = fs::resolve_protocol(protocol);
 		fs::path watchDir = dir / wildcard;
 
-		fs::watcher::watch(watchDir, initialList, [am, ts, protocol, reloadAsync](const std::vector<fs::watcher::Entry>& entries)
+		fs::watcher::watch(watchDir, initialList, [&am, &ts, protocol, reloadAsync](const std::vector<fs::watcher::Entry>& entries)
 		{
 			for (auto& entry : entries)
 			{
@@ -41,11 +41,11 @@ namespace editor
 				{
 					if (entry.state == fs::watcher::Entry::Removed)
 					{
-						auto task = ts->create("Remove Asset", [entry, protocol, key, am]()
+						auto task = ts.create("Remove Asset", [entry, protocol, key, &am]()
 						{
-							am->clear_asset<T>(key);
+							am.clear_asset<T>(key);
 						});
-						ts->run(task, true);
+						ts.run(task, true);
 					}
 					else if (entry.state == fs::watcher::Entry::Renamed)
 					{
@@ -54,11 +54,11 @@ namespace editor
 					else
 					{
 						//created or modified
-						auto task = ts->create("Load Asset", [reloadAsync, key, am]()
+						auto task = ts.create("Load Asset", [reloadAsync, key, &am]()
 						{
-							am->load<T>(key, reloadAsync, true);
+							am.load<T>(key, reloadAsync, true);
 						});
-						ts->run(task, true);
+						ts.run(task, true);
 					}
 				}
 				
@@ -69,13 +69,13 @@ namespace editor
 	template<typename T>
 	void watch_raw_assets(const fs::path& protocol, const std::string& wildcard, bool initialList)
 	{
-		auto am = core::get_subsystem<runtime::asset_manager>();
-		auto ts = core::get_subsystem<runtime::task_system>();
+		auto& am = core::get_subsystem<runtime::asset_manager>();
+		auto& ts = core::get_subsystem<runtime::task_system>();
 
 		const fs::path dir = fs::resolve_protocol(protocol);
 		const fs::path watch_dir = dir / wildcard;
 
-		fs::watcher::watch(watch_dir, initialList, [am, ts, protocol](const std::vector<fs::watcher::Entry>& entries)
+		fs::watcher::watch(watch_dir, initialList, [&am, &ts, protocol](const std::vector<fs::watcher::Entry>& entries)
 		{
 			for (auto& entry : entries)
 			{
@@ -86,20 +86,20 @@ namespace editor
 				{
 					if (entry.state == fs::watcher::Entry::Removed)
 					{
-						auto task = ts->create("Remove Asset", [entry, protocol, key, am]()
+						auto task = ts.create("Remove Asset", [entry, protocol, key, &am]()
 						{
-							am->delete_asset<T>(key);
+							am.delete_asset<T>(key);
 						});
-						ts->run(task, true);
+						ts.run(task, true);
 					}
 					else
 					{
 						// created or modified or renamed
-						auto task = ts->create("", [p]()
+						auto task = ts.create("", [p]()
 						{
 							asset_compiler::compile<T>(p);
 						});
-						ts->run(task);
+						ts.run(task);
 					}
 				}
 			}
@@ -271,13 +271,13 @@ namespace editor
 
 		fs::add_path_protocol("app:", project_path);
 		
-		auto ecs = core::get_subsystem<runtime::entity_component_system>();
-		auto am = core::get_subsystem<runtime::asset_manager>();
-		auto es = core::get_subsystem<editing_system>();
-		ecs->dispose();
-		es->unselect();
-		es->scene.clear();
-		am->clear("app:/data");
+		auto& ecs = core::get_subsystem<runtime::entity_component_system>();
+		auto& am = core::get_subsystem<runtime::asset_manager>();
+		auto& es = core::get_subsystem<editing_system>();
+		ecs.dispose();
+		es.unselect();
+		es.scene.clear();
+		am.clear("app:/data");
 		set_current_project(project_path.filename().string());
 		save_config();
 

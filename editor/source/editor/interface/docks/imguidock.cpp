@@ -459,17 +459,17 @@ namespace imguidock
 					_current_dock_to->container = nullptr;
 					_current_dock_to->draging = true;
 					
-					auto guiWindow = std::make_shared<gui_window>(
+					auto window = std::make_shared<gui_window>(
 						sf::VideoMode((unsigned int)_current_dock_to->last_size.x, (unsigned int)_current_dock_to->last_size.y),
 						"",//std::string(m_currentDockTo->title),
 						sf::Style::Default
 						);
 
-					auto engine = core::get_subsystem<runtime::engine>();
-					engine->register_window(guiWindow);
-					guiWindow->get_dockspace().dock_to(_current_dock_to, slot::tab, 0, true);
-					guiWindow->setPosition(sf::Mouse::getPosition());
-					guiWindow->requestFocus();
+					auto& engine = core::get_subsystem<runtime::engine>();
+					engine.register_window(window);
+					window->get_dockspace().dock_to(_current_dock_to, slot::tab, 0, true);
+					window->setPosition(sf::Mouse::getPosition());
+					window->requestFocus();
 				}
 			}
 			else if (_current_dock_action == eDrag)
@@ -523,17 +523,17 @@ namespace imguidock
 
 	gui_window *dockspace::is_any_window_dragged()
 	{
-		auto engine = core::get_subsystem<runtime::engine>();
-		const auto& windows = engine->get_windows();
+		auto& engine = core::get_subsystem<runtime::engine>();
+		const auto& windows = engine.get_windows();
 
 		for (auto window : windows)
 		{
-			gui_window* guiWindow = static_cast<gui_window*>(window.get());
-			auto& dockspace = guiWindow->get_dockspace();
+			gui_window* gui_wnd = static_cast<gui_window*>(window.get());
+			auto& dockspace = gui_wnd->get_dockspace();
 			if (dockspace.root.splits[0] && dockspace.root.splits[0]->active_dock)
 			{
 				if (dockspace.root.splits[0]->active_dock->draging)
-					return guiWindow;
+					return gui_wnd;
 			}
 			
 		}
@@ -542,7 +542,7 @@ namespace imguidock
 		return nullptr;
 	}
 
-	static ImRect getSlotRect(ImRect parent_rect, slot dock_slot)
+	static ImRect get_slot_rect(ImRect parent_rect, slot dock_slot)
 	{
 		ImVec2 size = parent_rect.Max - parent_rect.Min;
 		ImVec2 center = parent_rect.Min + size * 0.5f;
@@ -566,7 +566,7 @@ namespace imguidock
 		auto checkSlot = [&mouse_pos](ImRect rect, slot slot) -> bool
 		{
 
-			auto slotRect = getSlotRect(rect, slot);
+			auto slotRect = get_slot_rect(rect, slot);
 
 			ImGui::GetWindowDrawList()->AddRectFilled(
 				slotRect.Min,

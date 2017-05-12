@@ -22,16 +22,16 @@ namespace editor
 {
 	void picking_system::frame_render(std::chrono::duration<float> dt)
 	{
-		auto es = core::get_subsystem<editing_system>();
-		auto input = core::get_subsystem<runtime::input>();
-		auto engine = core::get_subsystem<runtime::engine>();
-		auto renderer = core::get_subsystem<runtime::renderer>();
-		auto ecs = core::get_subsystem<runtime::entity_component_system>();
+		auto& es = core::get_subsystem<editing_system>();
+		auto& input = core::get_subsystem<runtime::input>();
+		auto& engine = core::get_subsystem<runtime::engine>();
+		auto& renderer = core::get_subsystem<runtime::renderer>();
+		auto& ecs = core::get_subsystem<runtime::entity_component_system>();
 
-		const auto render_frame = renderer->get_render_frame();
+		const auto render_frame = renderer.get_render_frame();
 
-		auto& editor_camera = es->camera;
-		if (imguizmo::is_over() && es->selection_data.object)
+		auto& editor_camera = es.camera;
+		if (imguizmo::is_over() && es.selection_data.object)
 			return;
 
 		if (!editor_camera || !editor_camera.has_component<camera_component>())
@@ -44,7 +44,7 @@ namespace editor
 		auto far_clip = camera.get_far_clip();
 		auto view_proj = camera.get_view_projection();
 		auto inv_view_proj = math::inverse(view_proj);
-		const auto& mouse_pos = input->get_current_cursor_position();
+		const auto& mouse_pos = input.get_current_cursor_position();
 		const auto& frustum = camera.get_frustum();
 		math::vec2 cursor_pos = math::vec2{ mouse_pos.x, mouse_pos.y };
 		math::vec3 pick_eye;
@@ -57,7 +57,7 @@ namespace editor
 		if (!camera.viewport_to_world(cursor_pos, frustum.planes[math::volume_plane::far_plane], pick_at, true))
 			return;
 
-		if (input->is_mouse_button_pressed(sf::Mouse::Left))
+		if (input.is_mouse_button_pressed(sf::Mouse::Left))
 		{
 			_reading = 0;
 			_start_readback = true;
@@ -74,7 +74,7 @@ namespace editor
 
 			pass.set_view_proj(pick_view, pick_proj);
 
-			ecs->each<transform_component, model_component>([this, &pass, &camera](
+			ecs.each<transform_component, model_component>([this, &pass, &camera](
 				runtime::entity e,
 				transform_component& transform_comp_ref,
 				model_component& model_comp_ref
@@ -183,12 +183,12 @@ namespace editor
 					if (pair.second == max_amount)
 					{
 						id_key = pair.first;
-						if (ecs->valid_index(id_key))
+						if (ecs.valid_index(id_key))
 						{
-							auto eid = ecs->create_id(id_key);
-							auto pickedEntity = ecs->get(eid);
+							auto eid = ecs.create_id(id_key);
+							auto pickedEntity = ecs.get(eid);
 							if (pickedEntity)
-								es->select(pickedEntity);
+								es.select(pickedEntity);
 						}
 						break;
 					}
@@ -197,7 +197,7 @@ namespace editor
 			}
 			else
 			{
-				es->unselect();
+				es.unselect();
 			}
 		}
 	}
@@ -247,11 +247,11 @@ namespace editor
 			| BGFX_TEXTURE_V_CLAMP
 			);
 
-		auto am = core::get_subsystem<runtime::asset_manager>();
-		am->load<shader>("editor_data:/shaders/vs_picking_id", false)
-			.then([this, am](auto vs)
+		auto& am = core::get_subsystem<runtime::asset_manager>();
+		am.load<shader>("editor_data:/shaders/vs_picking_id", false)
+			.then([this, &am](auto vs)
 		{
-			am->load<shader>("editor_data:/shaders/fs_picking_id", false)
+			am.load<shader>("editor_data:/shaders/fs_picking_id", false)
 				.then([this, vs](auto fs)
 			{
 				_program = std::make_unique<program>(vs, fs);
