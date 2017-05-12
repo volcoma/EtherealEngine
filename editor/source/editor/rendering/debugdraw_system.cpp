@@ -1,4 +1,5 @@
 #include "debugdraw_system.h"
+#include "../editing/editing_system.h"
 #include "runtime/ecs/components/transform_component.h"
 #include "runtime/ecs/components/camera_component.h"
 #include "runtime/ecs/components/model_component.h"
@@ -15,14 +16,13 @@
 #include "runtime/rendering/material.h"
 #include "runtime/rendering/debugdraw/debugdraw.h"
 #include "runtime/assets/asset_manager.h"
-#include "../edit_state.h"
 #include "runtime/system/engine.h"
 
 namespace editor
 {
 	void debugdraw_system::frame_render(std::chrono::duration<float> dt)
 	{
-		auto es = core::get_subsystem<editor_state>();
+		auto es = core::get_subsystem<editing_system>();
 		auto& editor_camera = es->camera;
 		auto& selected = es->selection_data.object;
 		if (!editor_camera ||

@@ -1,18 +1,18 @@
-#include "editor_app.h"
+#include "app.h"
 #include "runtime/system/engine.h"
 #include "runtime/rendering/render_window.h"
 #include "editor_window.h"
-#include "interface/gui_system.h"
-#include "interface/docks/docking.h"
-#include "edit_state.h"
-#include "project.h"
-#include "systems/picking_system.h"
-#include "systems/debugdraw_system.h"
+#include "../interface/gui_system.h"
+#include "../interface/docks/docking.h"
+#include "../editing/editing_system.h"
+#include "../system/project_manager.h"
+#include "../editing/picking_system.h"
+#include "../rendering/debugdraw_system.h"
 
 namespace editor
 {
 
-	void editor_app::start()
+	void app::start()
 	{
 		auto engine = core::get_subsystem<runtime::engine>();
 
@@ -30,9 +30,9 @@ namespace editor
 			return;
 		}
 
-		core::add_subsystem<GuiSystem>();
+		core::add_subsystem<gui_system>();
 		core::add_subsystem<docking_system>();
-		core::add_subsystem<editor_state>();
+		core::add_subsystem<editing_system>();
 		core::add_subsystem<picking_system>();
 		core::add_subsystem<debugdraw_system>();
 		core::add_subsystem<project_manager>();

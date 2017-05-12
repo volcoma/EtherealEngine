@@ -1,8 +1,8 @@
 #include "editor_window.h"
-#include "edit_state.h"
-#include "project.h"
+#include "../editing/editing_system.h"
+#include "project_manager.h"
 
-#include "filedialog/filedialog.h"
+#include "../filedialog/filedialog.h"
 #include "runtime/ecs/systems/scene_graph.h"
 #include "runtime/ecs/components/model_component.h"
 #include "runtime/ecs/components/transform_component.h"
@@ -20,7 +20,7 @@
 
 std::vector<runtime::entity> gather_scene_data()
 {
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	auto sg = core::get_subsystem<runtime::scene_graph>();
 	const auto& roots = sg->get_roots();
 	auto editor_camera = es->camera;
@@ -122,7 +122,7 @@ void default_scene()
 
 auto create_new_scene()
 {
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	auto ecs = core::get_subsystem<runtime::entity_component_system>();
 	es->save_editor_camera();
 	ecs->dispose();
@@ -133,7 +133,7 @@ auto create_new_scene()
 
 auto open_scene()
 {
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	auto ecs = core::get_subsystem<runtime::entity_component_system>();
 	std::string path;
 	if (open_file_dialog(extensions::scene.substr(1), fs::resolve_protocol("app:/data").string(), path))
@@ -152,7 +152,7 @@ auto open_scene()
 
 auto save_scene()
 {
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	const auto& path = es->scene;
 	if (path != "")
 	{
@@ -165,7 +165,7 @@ auto save_scene()
 
 void save_scene_as()
 {
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 
 	std::string path;
 	if (save_file_dialog(extensions::scene.substr(1), fs::resolve_protocol("app:/data").string(), path))
@@ -213,7 +213,7 @@ void main_editor_window::on_gui(std::chrono::duration<float> dt)
 
 void main_editor_window::on_menubar()
 {
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	auto pm = core::get_subsystem<editor::project_manager>();
 	auto input = core::get_subsystem<runtime::input>();
 	const auto& current_project = pm->get_current_project();
@@ -315,7 +315,7 @@ void main_editor_window::on_menubar()
 
 void main_editor_window::on_toolbar()
 {
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	auto& icons = es->icons;
 
 	float width = gui::GetContentRegionAvailWidth();
@@ -381,7 +381,7 @@ void main_editor_window::render_dockspace()
 
 void main_editor_window::on_start_page()
 {
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	auto pm = core::get_subsystem<editor::project_manager>();
 
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar |

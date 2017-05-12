@@ -6,13 +6,13 @@
 #include "runtime/assets/asset_manager.h"
 #include "runtime/system/filesystem.h"
 #include "core/serialization/archives.h"
-#include "../../edit_state.h"
+#include "../../editing/editing_system.h"
 
 
 bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<asset_handle<texture>>();
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	auto am = core::get_subsystem<runtime::asset_manager>();
 	auto& selected = es->selection_data.object;
 	bool is_selected = selected && selected.is_type<asset_handle<texture>>();
@@ -113,7 +113,7 @@ bool inspector_asset_handle_material::inspect(rttr::variant& var, bool readOnly,
 {
 	auto data = var.get_value<asset_handle<material>>();
 
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	auto am = core::get_subsystem<runtime::asset_manager>();
 	auto& selected = es->selection_data.object;
 	if (selected && !selected.is_type<asset_handle<material>>())
@@ -183,7 +183,7 @@ bool inspector_asset_handle_mesh::inspect(rttr::variant& var, bool readOnly, std
 {
 	auto data = var.get_value<asset_handle<mesh>>();
 
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	auto am = core::get_subsystem<runtime::asset_manager>();
 	auto& selected = es->selection_data.object;
 	if (selected && !selected.is_type<asset_handle<mesh>>())
@@ -252,7 +252,7 @@ bool inspector_asset_handle_prefab::inspect(rttr::variant& var, bool readOnly, s
 {
 	auto data = var.get_value<asset_handle<prefab>>();
 
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	auto am = core::get_subsystem<runtime::asset_manager>();
 	auto& selected = es->selection_data.object;
 	if (selected && !selected.is_type<asset_handle<prefab>>())

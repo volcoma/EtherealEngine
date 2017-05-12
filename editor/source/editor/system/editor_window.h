@@ -1,5 +1,5 @@
 #pragma once
-#include "interface/gui_window.h"
+#include "../interface/gui_window.h"
 
 class main_editor_window : public gui_window
 {

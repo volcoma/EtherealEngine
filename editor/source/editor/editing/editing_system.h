@@ -1,7 +1,7 @@
 #pragma once
 #include "core/subsystem/subsystem.h"
-#include "interface/docks/imguidock.h"
-#include "interface/gizmos/imguizmo.h"
+#include "../interface/docks/imguidock.h"
+#include "../interface/gizmos/imguizmo.h"
 #include "runtime/ecs/ecs.h"
 #include "runtime/assets/asset_handle.h"
 #include <chrono>
@@ -9,7 +9,7 @@
 struct texture;
 namespace editor
 {
-	struct editor_state : core::subsystem
+	struct editing_system : core::subsystem
 	{
 		struct drag_type
 		{
@@ -103,7 +103,6 @@ namespace editor
 		//-----------------------------------------------------------------------------
 		void drop();
 
-		void frame_end(std::chrono::duration<float> dt);
 		/// editor camera
 		runtime::entity camera;
 		/// current scene

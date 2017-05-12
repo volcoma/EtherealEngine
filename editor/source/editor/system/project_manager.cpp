@@ -1,15 +1,17 @@
-#include "project.h"
+#include "project_manager.h"
 #include "runtime/system/filesystem_watcher.hpp"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/assets/asset_extensions.h"
 #include "runtime/ecs/ecs.h"
 #include "runtime/system/task.h"
-#include "edit_state.h"
-#include "editor_window.h"
-#include "assets/asset_compiler.h"
 #include "runtime/system/engine.h"
 #include "core/serialization/archives.h"
-#include "meta/project.hpp"
+
+#include "../editing/editing_system.h"
+#include "../assets/asset_compiler.h"
+#include "../meta/project_manager.hpp"
+#include <fstream>
+
 class mesh;
 struct prefab;
 struct scene;
@@ -95,7 +97,7 @@ namespace editor
 						// created or modified or renamed
 						auto task = ts->create("", [p]()
 						{
-							asset_compiler<T>::compile(p);
+							asset_compiler::compile<T>(p);
 						});
 						ts->run(task);
 					}
@@ -271,7 +273,7 @@ namespace editor
 		
 		auto ecs = core::get_subsystem<runtime::entity_component_system>();
 		auto am = core::get_subsystem<runtime::asset_manager>();
-		auto es = core::get_subsystem<editor_state>();
+		auto es = core::get_subsystem<editing_system>();
 		ecs->dispose();
 		es->unselect();
 		es->scene.clear();

@@ -19,8 +19,8 @@
 #include "runtime/rendering/shader.h"
 #include "runtime/rendering/texture.h"
 
-
-void shader_compiler::compile(const fs::path& absolute_key)
+template<>
+void asset_compiler::compile<shader>(const fs::path& absolute_key)
 {
 	std::string str_input = absolute_key.string();
 	std::string file = absolute_key.stem().string();
@@ -143,8 +143,8 @@ void shader_compiler::compile(const fs::path& absolute_key)
 	fs::remove(entry, std::error_code{});
 }
 
-
-void texture_compiler::compile(const fs::path& absolute_key)
+template<>
+void asset_compiler::compile<texture>(const fs::path& absolute_key)
 {
 	std::string str_input = absolute_key.string();
 	std::string raw_ext = absolute_key.filename().extension().string();
@@ -182,7 +182,8 @@ void texture_compiler::compile(const fs::path& absolute_key)
 	}
 }
 
-void mesh_compiler::compile(const fs::path& absolute_key)
+template<>
+void asset_compiler::compile<mesh>(const fs::path& absolute_key)
 {
 	std::string str_input = absolute_key.string();
 	std::string file = absolute_key.stem().string();

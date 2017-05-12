@@ -1,6 +1,6 @@
 #include "gui_window.h"
 #include "runtime/rendering/render_pass.h"
-#include "../edit_state.h"
+#include "../editing/editing_system.h"
 
 void handle_sfml_event(sf::Event event)
 {
@@ -205,7 +205,7 @@ void gui_window::frame_end()
 {
 	render_window::frame_end();
 
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 
 	if (gui::IsMouseDragging(gui::drag_button) && es->drag_data.object)
 	{

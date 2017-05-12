@@ -1,6 +1,6 @@
 #include "hierarchy_dock.h"
-#include "../../edit_state.h"
-#include "../../project.h"
+#include "../../editing/editing_system.h"
+#include "../../system/project_manager.h"
 #include "runtime/ecs/prefab.h"
 #include "runtime/ecs/utils.h"
 #include "runtime/ecs/components/transform_component.h"
@@ -13,7 +13,7 @@
 
 void check_context_menu(runtime::entity entity)
 {
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	auto ecs = core::get_subsystem<runtime::entity_component_system>();
 	auto& editor_camera = es->camera;
 	if (entity && entity != editor_camera)
@@ -64,7 +64,7 @@ void check_drag(runtime::entity entity)
 	if (!gui::IsWindowHovered())
 		return;
 
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	auto& editor_camera = es->camera;
 	auto& dragged = es->drag_data.object;
 
@@ -150,7 +150,7 @@ void draw_entity(runtime::entity entity)
 
 	gui::PushID(entity.id().index());
 	gui::AlignFirstTextHeightToWidgets();
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	auto input = core::get_subsystem<runtime::input>();
 	auto& selected = es->selection_data.object;
 	static bool edit_label = false;
@@ -267,7 +267,7 @@ void draw_entity(runtime::entity entity)
 
 void hierarchy_dock::render(const ImVec2& area)
 {
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	auto ecs = core::get_subsystem<runtime::entity_component_system>();
 	auto sg = core::get_subsystem<runtime::scene_graph>();
 	auto input = core::get_subsystem<runtime::input>();

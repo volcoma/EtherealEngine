@@ -121,7 +121,7 @@ void renderFunc(ImDrawData *_drawData)
 }
 
 
-bool GuiSystem::initialize()
+bool gui_system::initialize()
 {
 	s_contexts.set_initial_context(ImGui::GetCurrentContext());
 	ImGuiIO& io = ImGui::GetIO();
@@ -228,15 +228,15 @@ bool GuiSystem::initialize()
 	io.FontAllowUserScaling = true;
 	s_gui_style.load_style();
 
-	runtime::on_frame_begin.connect(this, &GuiSystem::frame_begin);
+	runtime::on_frame_begin.connect(this, &gui_system::frame_begin);
 
 
 	return true;
 }
 
-void GuiSystem::dispose()
+void gui_system::dispose()
 {
-	runtime::on_frame_begin.disconnect(this, &GuiSystem::frame_begin);
+	runtime::on_frame_begin.disconnect(this, &gui_system::frame_begin);
 
 	s_textures.clear();
 	s_contexts.restore_initial_context();
@@ -249,14 +249,13 @@ void GuiSystem::dispose()
 	ImGui::Shutdown();
 }
 
-void GuiSystem::frame_begin(std::chrono::duration<float>)
+void gui_system::frame_begin(std::chrono::duration<float>)
 {
 	s_textures.clear();
 }
 
 namespace gui
 {
-
 	ImFont* GetFont(const std::string& id)
 	{
 		auto it = s_fonts.find(id);

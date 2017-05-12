@@ -38,12 +38,12 @@ struct gui_style
 // Main Class Declarations
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-//  Name : GuiSystem (Class)
+//  Name : gui_system (Class)
 /// <summary>
 /// Class for the management of interface elements.
 /// </summary>
 //-----------------------------------------------------------------------------
-struct GuiSystem : public core::subsystem
+struct gui_system : public core::subsystem
 {
 	bool initialize();
 	void dispose();

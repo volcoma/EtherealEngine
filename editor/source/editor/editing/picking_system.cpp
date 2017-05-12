@@ -1,4 +1,5 @@
 #include "picking_system.h"
+#include "editing_system.h"
 #include "runtime/ecs/components/transform_component.h"
 #include "runtime/ecs/components/camera_component.h"
 #include "runtime/ecs/components/model_component.h"
@@ -15,13 +16,13 @@
 #include "runtime/system/engine.h"
 #include "runtime/rendering/renderer.h"
 #include "runtime/input/input.h"
-#include "../edit_state.h"
+
 
 namespace editor
 {
 	void picking_system::frame_render(std::chrono::duration<float> dt)
 	{
-		auto es = core::get_subsystem<editor_state>();
+		auto es = core::get_subsystem<editing_system>();
 		auto input = core::get_subsystem<runtime::input>();
 		auto engine = core::get_subsystem<runtime::engine>();
 		auto renderer = core::get_subsystem<runtime::renderer>();

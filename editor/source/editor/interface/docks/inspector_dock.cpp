@@ -1,10 +1,10 @@
 #include "inspector_dock.h"
-#include "../../edit_state.h"
+#include "../../editing/editing_system.h"
 #include "../inspectors/inspectors.h"
 
 void inspector_dock::render(const ImVec2& area)
 {
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 
 	auto& selected = es->selection_data.object;
 	if (selected)

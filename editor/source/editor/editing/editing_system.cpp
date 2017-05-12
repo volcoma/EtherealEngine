@@ -1,4 +1,4 @@
-#include "edit_state.h"
+#include "editing_system.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/rendering/texture.h"
 #include "runtime/rendering/mesh.h"
@@ -12,7 +12,7 @@
 namespace editor
 {
 
-	bool editor_state::initialize()
+	bool editing_system::initialize()
 	{
 		auto am = core::get_subsystem<runtime::asset_manager>();
 
@@ -132,23 +132,23 @@ namespace editor
 	}
 
 
-	void editor_state::dispose()
+	void editing_system::dispose()
 	{
 		drag_data = {};
 		selection_data = {};
 		icons.clear();
 	}
 
-	void editor_state::save_editor_camera()
+	void editing_system::save_editor_camera()
 	{
-		auto es = core::get_subsystem<editor::editor_state>();
+		auto es = core::get_subsystem<editor::editing_system>();
 		if (es->camera)
 			ecs::utils::save_data(fs::resolve_protocol("app:/settings/editor_camera.cfg"), { es->camera });
 	}
 
-	void editor_state::load_editor_camera()
+	void editing_system::load_editor_camera()
 	{
-		auto es = core::get_subsystem<editor::editor_state>();
+		auto es = core::get_subsystem<editor::editing_system>();
 		runtime::entity object;
 		if (!ecs::utils::try_load_entity(fs::resolve_protocol("app:/settings/editor_camera.cfg"), object))
 		{
@@ -163,25 +163,25 @@ namespace editor
 		es->camera = object;
 	}
 
-	void editor_state::select(rttr::variant object)
+	void editing_system::select(rttr::variant object)
 	{
 		selection_data.object = object;
 	}
 
-	void editor_state::unselect()
+	void editing_system::unselect()
 	{
 		selection_data = {};
 		imguizmo::enable(false);
 		imguizmo::enable(true);
 	}
 
-	void editor_state::drag(rttr::variant object, const std::string& description)
+	void editing_system::drag(rttr::variant object, const std::string& description)
 	{
 		drag_data.object = object;
 		drag_data.description = description;
 	}
 
-	void editor_state::drop()
+	void editing_system::drop()
 	{
 		drag_data = {};
 	}

@@ -1,5 +1,5 @@
 #include "game_dock.h"
-#include "../../edit_state.h"
+#include "../../editing/editing_system.h"
 #include "runtime/ecs/ecs.h"
 #include "runtime/ecs/components/camera_component.h"
 #include "runtime/rendering/render_pass.h"
@@ -7,7 +7,7 @@
 
 void game_dock::render(const ImVec2& area)
 {
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	auto& editor_camera = es->camera;
 	auto& dragged = es->drag_data.object;
 

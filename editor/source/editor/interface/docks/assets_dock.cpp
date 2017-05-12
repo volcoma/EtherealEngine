@@ -11,15 +11,15 @@
 #include "runtime/ecs/scene.h"
 #include "runtime/ecs/utils.h"
 #include "runtime/input/input.h"
-#include "../../edit_state.h"
-#include "../../project.h"
+#include "../../editing/editing_system.h"
+#include "../../system/project_manager.h"
 #include "../../filedialog/filedialog.h"
 #include <cstdio>
 
 template<typename T>
 asset_handle<texture> get_asset_icon(T asset)
 {
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	return es->icons["folder"];
 }
 
@@ -31,40 +31,40 @@ asset_handle<texture> get_asset_icon(asset_handle<texture> asset)
 template<>
 asset_handle<texture> get_asset_icon(asset_handle<prefab> asset)
 {
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	return es->icons["prefab"];
 }
 
 template<>
 asset_handle<texture> get_asset_icon(asset_handle<scene> asset)
 {
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	return es->icons["scene"];
 }
 
 template<>
 asset_handle<texture> get_asset_icon(asset_handle<mesh> asset)
 {
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	return es->icons["mesh"];
 }
 template<>
 asset_handle<texture> get_asset_icon(asset_handle<material> asset)
 {
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	return es->icons["material"];
 }
 
 asset_handle<texture> get_loading_icon()
 {
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	return es->icons["loading"];
 }
 
 template<>
 asset_handle<texture> get_asset_icon(asset_handle<shader> asset)
 {
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	return es->icons["shader"];
 }
 
@@ -83,7 +83,7 @@ int list_item(Wrapper& entry,
 	std::weak_ptr<editor::asset_directory> opened_dir,
 	runtime::asset_manager& manager,
 	runtime::input& input, 
-	editor::editor_state& edit_state)
+	editor::editing_system& edit_state)
 {
 	auto& selected = edit_state.selection_data.object;
 	int action = 0;
@@ -229,7 +229,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 
 	auto dir = opened_dir.lock().get();
 	
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	auto am = core::get_subsystem<runtime::asset_manager>();
 	auto input = core::get_subsystem<runtime::input>();
 	{
@@ -326,7 +326,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 				{
 					if (asset)
 					{
-						auto es = core::get_subsystem<editor::editor_state>();
+						auto es = core::get_subsystem<editor::editing_system>();
 						auto ecs = core::get_subsystem<runtime::entity_component_system>();
 
 						ecs->dispose();
@@ -415,7 +415,7 @@ void assets_dock::render(const ImVec2& area)
 	if (opened_dir.expired())
 		opened_dir = project->get_root_directory();
 
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	auto input = core::get_subsystem<runtime::input>();
 
 	float width = gui::GetContentRegionAvailWidth();

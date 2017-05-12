@@ -1,5 +1,5 @@
 #include "runtime/runtime.h"
-#include "editor_app.h"
+#include "system/app.h"
 //Regex to count lines of code
 //^(?!(\s*\*))(?!(\s*\-\-\>))(?!(\s*\<\!\-\-))(?!(\s*\n))(?!(\s*\*\/))(?!(\s*\/\*))(?!(\s*\/\/\/))(?!(\s*\/\/))(?!(\s*\}))(?!(\s*\{))(?!(\s(using))).*$
 int main(int _argc, char* _argv[])
@@ -12,7 +12,7 @@ int main(int _argc, char* _argv[])
 	fs::add_path_protocol("engine_data:", engine_data.string());
 	fs::add_path_protocol("editor_data:", editor_data.string());
 
-	editor::editor_app app;
+	editor::app app;
 	int return_code = app.run();
 
 	return return_code;

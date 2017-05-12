@@ -4,7 +4,7 @@
 
 namespace editor
 {
-	struct editor_app : public runtime::app
+	struct app : public runtime::app
 	{
 		//-----------------------------------------------------------------------------
 		//  Name : start (virtual )

@@ -1,6 +1,6 @@
 #include "scene_dock.h"
-#include "../../edit_state.h"
-#include "../../project.h"
+#include "../../editing/editing_system.h"
+#include "../../system/project_manager.h"
 #include "core/subsystem/simulation.h"
 #include "runtime/system/engine.h"
 #include "runtime/input/input.h"
@@ -65,7 +65,7 @@ void show_statistics(const unsigned int frameRate)
 void draw_selected_camera(const ImVec2& size)
 {
 	auto input = core::get_subsystem<runtime::input>();
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	auto& selected = es->selection_data.object;
 	auto& editor_camera = es->camera;
 
@@ -116,7 +116,7 @@ void draw_selected_camera(const ImVec2& size)
 void manipulation_gizmos()
 {
 	auto input = core::get_subsystem<runtime::input>();
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	auto& selected = es->selection_data.object;
 	auto& editor_camera = es->camera;
 	auto& operation = es->operation;
@@ -192,7 +192,7 @@ void handle_camera_movement()
 	if (!gui::IsWindowFocused())
 		return;
 
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	auto input = core::get_subsystem<runtime::input>();
 	auto sim = core::get_subsystem<core::simulation>();
 
@@ -297,7 +297,7 @@ void handle_camera_movement()
 
 void scene_dock::render(const ImVec2& area)
 {
-	auto es = core::get_subsystem<editor::editor_state>();
+	auto es = core::get_subsystem<editor::editing_system>();
 	auto engine = core::get_subsystem<runtime::engine>();
 	auto ecs = core::get_subsystem<runtime::entity_component_system>();
 	auto input = core::get_subsystem<runtime::input>();

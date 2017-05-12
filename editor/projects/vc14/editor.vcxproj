@@ -280,9 +280,8 @@
     <ClInclude Include="..\..\source\editor\assets\asset_compiler.h" />
     <ClInclude Include="..\..\source\editor\assets\mesh_importer.h" />
     <ClInclude Include="..\..\source\editor\console\console_log.h" />
-    <ClInclude Include="..\..\source\editor\editor_window.h" />
-    <ClInclude Include="..\..\source\editor\editor_app.h" />
-    <ClInclude Include="..\..\source\editor\edit_state.h" />
+    <ClInclude Include="..\..\source\editor\editing\editing_system.h" />
+    <ClInclude Include="..\..\source\editor\editing\picking_system.h" />
     <ClInclude Include="..\..\source\editor\filedialog\filedialog.h" />
     <ClInclude Include="..\..\source\editor\filedialog\nfd\common.h" />
     <ClInclude Include="..\..\source\editor\filedialog\nfd\nfd.h" />
@@ -314,11 +313,12 @@
     <ClInclude Include="..\..\source\editor\interface\inspectors\inspector_entity.h" />
     <ClInclude Include="..\..\source\editor\interface\inspectors\inspector_light.h" />
     <ClInclude Include="..\..\source\editor\interface\inspectors\inspector_math.h" />
-    <ClInclude Include="..\..\source\editor\meta\project.hpp" />
+    <ClInclude Include="..\..\source\editor\meta\project_manager.hpp" />
     <ClInclude Include="..\..\source\editor\meta\interface\gui_system.hpp" />
-    <ClInclude Include="..\..\source\editor\project.h" />
-    <ClInclude Include="..\..\source\editor\systems\debugdraw_system.h" />
-    <ClInclude Include="..\..\source\editor\systems\picking_system.h" />
+    <ClInclude Include="..\..\source\editor\rendering\debugdraw_system.h" />
+    <ClInclude Include="..\..\source\editor\system\app.h" />
+    <ClInclude Include="..\..\source\editor\system\editor_window.h" />
+    <ClInclude Include="..\..\source\editor\system\project_manager.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\engine\projects\vc14\runtime.vcxproj">
@@ -335,9 +335,8 @@
     <ClCompile Include="..\..\source\editor\assets\asset_compiler.cpp" />
     <ClCompile Include="..\..\source\editor\assets\mesh_importer.cpp" />
     <ClCompile Include="..\..\source\editor\console\console_log.cpp" />
-    <ClCompile Include="..\..\source\editor\editor_window.cpp" />
-    <ClCompile Include="..\..\source\editor\editor_app.cpp" />
-    <ClCompile Include="..\..\source\editor\edit_state.cpp" />
+    <ClCompile Include="..\..\source\editor\editing\editing_system.cpp" />
+    <ClCompile Include="..\..\source\editor\editing\picking_system.cpp" />
     <ClCompile Include="..\..\source\editor\filedialog\nfd\nfd_common.cpp" />
     <ClCompile Include="..\..\source\editor\filedialog\nfd\nfd_win.cpp" />
     <ClCompile Include="..\..\source\editor\interface\docks\assets_dock.cpp" />
@@ -363,9 +362,10 @@
     <ClCompile Include="..\..\source\editor\interface\inspectors\inspector_light.cpp" />
     <ClCompile Include="..\..\source\editor\interface\inspectors\inspector_math.cpp" />
     <ClCompile Include="..\..\source\editor\main.cpp" />
-    <ClCompile Include="..\..\source\editor\project.cpp" />
-    <ClCompile Include="..\..\source\editor\systems\debugdraw_system.cpp" />
-    <ClCompile Include="..\..\source\editor\systems\picking_system.cpp" />
+    <ClCompile Include="..\..\source\editor\rendering\debugdraw_system.cpp" />
+    <ClCompile Include="..\..\source\editor\system\app.cpp" />
+    <ClCompile Include="..\..\source\editor\system\editor_window.cpp" />
+    <ClCompile Include="..\..\source\editor\system\project_manager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\source\editor\interface\imgui\imgui_user.inl" />
