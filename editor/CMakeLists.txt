@@ -11,6 +11,7 @@ target_link_libraries(editor PUBLIC SPIRV)
 target_link_libraries(editor PUBLIC SPVRemapper)
 target_link_libraries(editor PUBLIC glsl_optimizer)
 target_link_libraries(editor PUBLIC fcpp)
+#target_link_libraries(editor PUBLIC tracey)
 
 install(TARGETS editor
         RUNTIME DESTINATION bin

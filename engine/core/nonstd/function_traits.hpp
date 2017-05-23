@@ -141,6 +141,9 @@ namespace nonstd
 	template<typename T, size_t Index>
 	using param_types_decayed_t = typename param_types_decayed<T, Index>::type;
 	
+	template<typename T, size_t Index>
+	using param_types_t = typename param_types<T, Index>::type;
+	
 }
 
 
