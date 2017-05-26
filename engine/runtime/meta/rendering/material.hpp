@@ -12,17 +12,20 @@
 
 REFLECT(material)
 {
-	rttr::registration::enumeration<cull_type>("CullType")
+	rttr::registration::enumeration<cull_type>("cull_type")
 		(
-			rttr::value("None", cull_type::none),
-			rttr::value("Clock-Wise", cull_type::clockwise),
-			rttr::value("Counter Clock-Wise", cull_type::counter_clockwise)
+			rttr::value("none", cull_type::none),
+			rttr::value("clockwise", cull_type::clockwise),
+			rttr::value("counter_clockwise", cull_type::counter_clockwise)
 			);
 
 	rttr::registration::class_<material>("material")
-		.property("Cull Type",
+		.property("cull_type",
 			&standard_material::get_cull_type,
 			&standard_material::set_cull_type)
+		(
+			rttr::metadata("pretty_name", "Cull Type")
+		)
 		;
 }
 
@@ -40,71 +43,99 @@ LOAD(material)
 REFLECT(standard_material)
 {
 	rttr::registration::class_<standard_material>("standard_material")
-		.property("Base Color",
+		.property("base_color",
 			&standard_material::get_base_color,
 			&standard_material::set_base_color)
-		.property("Subsurface Color",
+		(
+			rttr::metadata("pretty_name", "Base Color")
+		)
+		.property("",
 			&standard_material::get_subsurface_color,
 			&standard_material::set_subsurface_color)
-		.property("Emissive Color",
+		(
+			rttr::metadata("pretty_name", "Subsurface Color")
+		)
+		.property("emissive_color",
 			&standard_material::get_emissive_color,
 			&standard_material::set_emissive_color)
-		.property("Roughness",
+		(
+			rttr::metadata("pretty_name", "Emissive Color")
+		)
+		.property("roughness",
 			&standard_material::get_roughness,
 			&standard_material::set_roughness)
 		(
+			rttr::metadata("pretty_name", "Roughness"),
 			rttr::metadata("Min", 0.0f),
 			rttr::metadata("Max", 1.0f)
 		)
-		.property("Metalness",
+		.property("metalness",
 			&standard_material::get_metalness,
 			&standard_material::set_metalness)
 		(
+			rttr::metadata("pretty_name", "Metalness"),
 			rttr::metadata("Min", 0.0f),
 			rttr::metadata("Max", 1.0f)
 		)
-		.property("Bumpiness",
+		.property("bumpiness",
 			&standard_material::get_bumpiness,
 			&standard_material::set_bumpiness)
 		(
+			rttr::metadata("pretty_name", "Bumpiness"),
 			rttr::metadata("Min", 0.0f),
 			rttr::metadata("Max", 10.0f)
 		)
-		.property("Alpha Test Value",
+		.property("alpha_test_value",
 			&standard_material::get_alpha_test_value,
 			&standard_material::set_alpha_test_value)
 		(
+			rttr::metadata("pretty_name", "Alpha Test Value"),
 			rttr::metadata("Min", 0.0f),
 			rttr::metadata("Max", 1.0f)
 		)
-		.property("Tiling",
+		.property("tiling",
 			&standard_material::get_tiling,
 			&standard_material::set_tiling)
-		.property("Dither Threshold",
+		(
+			rttr::metadata("pretty_name", "Tiling")
+		)
+		.property("dither_threshold",
 			&standard_material::get_dither_threshold,
 			&standard_material::set_dither_threshold)
-		.property("Color Map",
+		(
+			rttr::metadata("pretty_name", "Dither Threshold")
+		)
+		.property("color_map",
 			&standard_material::get_color_map,
 			&standard_material::set_color_map)
-		.property("Normal Map",
+		(
+			rttr::metadata("pretty_name", "Color Map")
+		)
+		.property("normal_map",
 			&standard_material::get_normal_map,
 			&standard_material::set_normal_map)
-		.property("Roughness Map",
+		(
+			rttr::metadata("pretty_name", "Normal Map")
+		)
+		.property("roughness_map",
 			&standard_material::get_roughness_map,
 			&standard_material::set_roughness_map)
 		(
+			rttr::metadata("pretty_name", "Roughness Map"),
 			rttr::metadata("Tooltip", "black/white texture. The more white the rougher the surface.")
 		)
-		.property("Metalness Map",
+		.property("metalness_map",
 			&standard_material::get_metalness_map,
 			&standard_material::set_metalness_map)
 		(
+			rttr::metadata("pretty_name", "Metalness Map"),
 			rttr::metadata("Tooltip", "black/white texture. The more white the more metallic the surface.")
 		)
-		.property("AO Map",
+		.property("ao_map",
 			&standard_material::get_ao_map,
 			&standard_material::set_ao_map)
 		(
+			rttr::metadata("pretty_name", "AO Map"),
 			rttr::metadata("Tooltip", "black/white texture.")
 		)
 		;

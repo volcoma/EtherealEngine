@@ -3,11 +3,12 @@
 #include "runtime/rendering/texture.h"
 #include "runtime/rendering/mesh.h"
 #include "runtime/rendering/material.h"
-#include "runtime/system/sfml/Window.hpp"
+#include "runtime/rendering/render_window.h"
 #include "runtime/ecs/prefab.h"
 #include "runtime/ecs/utils.h"
 #include "runtime/ecs/components/transform_component.h"
 #include "runtime/ecs/components/camera_component.h"
+#include "runtime/system/engine.h"
 
 namespace editor
 {
@@ -128,12 +129,16 @@ namespace editor
 			icons["folder"] = asset;
 		});
 
+		runtime::on_window_frame_render.connect(this, &editing_system::on_window_frame_render);
+
 		return true;
 	}
 
 
 	void editing_system::dispose()
 	{
+		runtime::on_window_frame_render.disconnect(this, &editing_system::on_window_frame_render);
+
 		drag_data = {};
 		selection_data = {};
 		icons.clear();
@@ -186,5 +191,28 @@ namespace editor
 		drag_data = {};
 	}
 
+	void editing_system::on_window_frame_render(const render_window& window)
+	{
+		if (gui::IsMouseDragging(gui::drag_button) && drag_data.object)
+		{
+			gui::SetTooltip(drag_data.description.c_str());
+
+			if (gui::GetMouseCursor() == ImGuiMouseCursor_Arrow)
+				gui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);
+		}
+
+		if (!gui::IsAnyItemActive() && !gui::IsAnyItemHovered())
+		{
+			if (gui::IsMouseDoubleClicked(0) && !imguizmo::is_over())
+			{
+				unselect();
+				drop();
+			}
+		}
+		if (gui::IsMouseReleased(gui::drag_button))
+		{
+			drop();
+		}
+	}
 
 }

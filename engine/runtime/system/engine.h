@@ -131,4 +131,9 @@ namespace runtime
 	extern event<void(std::chrono::duration<float>)> on_frame_update;
 	extern event<void(std::chrono::duration<float>)> on_frame_render;
 	extern event<void(std::chrono::duration<float>)> on_frame_end;
+
+	extern event<void(const render_window&)> on_window_frame_begin;
+	extern event<void(const render_window&)> on_window_frame_update;
+	extern event<void(const render_window&)> on_window_frame_render;
+	extern event<void(const render_window&)> on_window_frame_end;
 }

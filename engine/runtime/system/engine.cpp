@@ -17,6 +17,10 @@ namespace runtime
 	event<void(std::chrono::duration<float>)> on_frame_render;
 	event<void(std::chrono::duration<float>)> on_frame_end;
 
+	event<void(const render_window&)> on_window_frame_begin;
+	event<void(const render_window&)> on_window_frame_update;
+	event<void(const render_window&)> on_window_frame_render;
+	event<void(const render_window&)> on_window_frame_end;
 
 	bool engine::initialize()
 	{
@@ -89,6 +93,8 @@ namespace runtime
 		for (auto window : windows)
 		{
 			window->frame_begin();
+			
+			on_window_frame_begin(*window);
 
 			bool has_focus = window->hasFocus();
 
@@ -102,6 +108,7 @@ namespace runtime
 			}
 
 			window->frame_update(dt);
+			on_window_frame_update(*window);
 		}
 
 		on_frame_update(dt);
@@ -111,7 +118,10 @@ namespace runtime
 		for (auto window : windows)
 		{
 			window->frame_render(dt);
+			on_window_frame_render(*window);
+
 			window->frame_end();
+			on_window_frame_end(*window);
 
 			if (window->is_main())
 				_running = window->isOpen();

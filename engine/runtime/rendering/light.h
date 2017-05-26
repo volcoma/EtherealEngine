@@ -11,42 +11,42 @@ enum class light_type : std::uint8_t
 	point = 1,
 	directional = 2,
 
-	Count
+	count
 };
 
 enum class depth_impl : std::uint8_t
 {
-	InvZ = 0,
-	Linear = 1,
+	invz = 0,
+	linear = 1,
 
-	Count
+	count
 };
 
 enum class pack_depth : std::uint8_t
 {
-	RGBA = 0,
-	VSM = 1,
+	rgba = 0,
+	vsm = 1,
 
-	Count
+	count
 };
 
 enum class sm_impl : std::uint8_t
 {
-	Hard = 0,
-	PCF = 1,
-	VSM = 2,
-	ESM = 3,
+	hard = 0,
+	pcf = 1,
+	vsm = 2,
+	esm = 3,
 
-	Count
+	count
 };
 
 enum class sm_type : std::uint8_t
 {
-	Single = 0,
-	Omni = 1,
-	Cascade = 2,
+	single = 0,
+	omni = 1,
+	cascade = 2,
 
-	Count
+	count
 };
 
 
@@ -56,8 +56,8 @@ struct light
 	SERIALIZABLE(light)
 
 	light_type light_type = light_type::directional;
-	depth_impl depth_impl = depth_impl::InvZ;
-	sm_impl sm_impl = sm_impl::Hard;
+	depth_impl depth_impl = depth_impl::invz;
+	sm_impl sm_impl = sm_impl::hard;
 
 	struct spot
 	{

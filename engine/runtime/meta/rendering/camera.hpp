@@ -9,8 +9,8 @@ REFLECT(camera)
 {
 	rttr::registration::enumeration<projection_mode>("projection_mode")
 		(
-			rttr::value("Perspective", projection_mode::perspective),
-			rttr::value("Orthographic", projection_mode::orthographic)
+			rttr::value("perspective", projection_mode::perspective),
+			rttr::value("orthographic", projection_mode::orthographic)
 			);
 	rttr::registration::class_<camera>("camera");
 }

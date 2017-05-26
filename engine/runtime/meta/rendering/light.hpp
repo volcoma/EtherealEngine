@@ -8,95 +8,124 @@
 REFLECT(light)
 {
 	rttr::registration::class_<light::spot>("spot")
-		.property("Range",
+		.property("range",
 			&light::spot::get_range,
 			&light::spot::set_range)
 		(
+			rttr::metadata("pretty_name", "Range"),
 			rttr::metadata("Min", 0.1f)
 		)
-		.property("Inner Angle",
+		.property("inner_angle",
 			&light::spot::get_inner_angle,
 			&light::spot::set_inner_angle)
 		(
+			rttr::metadata("pretty_name", "Inner Angle"),
 			rttr::metadata("Min", 1.0f),
 			rttr::metadata("Max", 85.0f),
 			rttr::metadata("Step", 0.1f)
 		)
-		.property("Outer Angle",
+		.property("outer_angle",
 			&light::spot::get_outer_angle,
 			&light::spot::set_outer_angle)
 		(
+			rttr::metadata("pretty_name", "Outer Angle"),
 			rttr::metadata("Min", 1.0f),
 			rttr::metadata("Max", 90.0f),
 			rttr::metadata("Step", 0.1f)
 		);
 
 	rttr::registration::class_<light::point>("point")
-		.property("Range", &light::point::range)
+		.property("range", &light::point::range)
 		(
+			rttr::metadata("pretty_name", "Range"),
 			rttr::metadata("Min", 0.1f)
 		)
-		.property("Exponent Falloff", &light::point::exponent_falloff)
+		.property("exponent_falloff", &light::point::exponent_falloff)
 		(
+			rttr::metadata("pretty_name", "Exponent Falloff"),
 			rttr::metadata("Min", 0.1f),
 			rttr::metadata("Max", 10.0f)
 		)
-		.property("FovX adjust", &light::point::fov_x_adjust)
+		.property("fovx_adjust", &light::point::fov_x_adjust)
 		(
+			rttr::metadata("pretty_name", "FovX Adjust"),
 			rttr::metadata("Min", -20.0f),
 			rttr::metadata("Max", 20.0f),
 			rttr::metadata("Step", 0.0001f)
 		)
-		.property("FovY adjust", &light::point::fov_y_adjust)
+		.property("fovy_adjust", &light::point::fov_y_adjust)
 		(
+			rttr::metadata("pretty_name", "FovY Adjust"),
 			rttr::metadata("Min", -20.0f),
 			rttr::metadata("Max", 20.0f),
 			rttr::metadata("Step", 0.0001f)
 		)
-		.property("Stencil Pack", &light::point::stencil_pack);
+		.property("stencil_pack", &light::point::stencil_pack)
+		(
+			rttr::metadata("pretty_name", "Stencil Pack")
+		);
 
 	rttr::registration::class_<light::directional>("directional")
-		.property("Splits", &light::directional::num_splits)
+		.property("splits", &light::directional::num_splits)
 		(
+			rttr::metadata("pretty_name", "Splits"),
 			rttr::metadata("Min", 1),
 			rttr::metadata("Max", 4)
-			)
-		.property("Distribution", &light::directional::split_distribution)
+		)
+		.property("distribution", &light::directional::split_distribution)
 		(
+			rttr::metadata("pretty_name", "Distribution"),
 			rttr::metadata("Min", 0.0f),
 			rttr::metadata("Max", 1.0f),
 			rttr::metadata("Step", 0.001f)
-			)
-		.property("Stabilize", &light::directional::stabilize);
+		)
+		.property("stabilize", &light::directional::stabilize)
+		(
+			rttr::metadata("pretty_name", "Stabilize")
+		)
+		;
 
 	rttr::registration::enumeration<light_type>("light_type")
 		(
-			rttr::value("Spot", light_type::spot),
-			rttr::value("Point", light_type::point),
-			rttr::value("Directional", light_type::directional)
-			);
+			rttr::value("spot", light_type::spot),
+			rttr::value("point", light_type::point),
+			rttr::value("directional", light_type::directional)
+		);
 	rttr::registration::enumeration<depth_impl>("depth_impl")
 		(
-			rttr::value("InvZ", depth_impl::InvZ),
-			rttr::value("Linear", depth_impl::Linear)
-			);
+			rttr::value("invz", depth_impl::invz),
+			rttr::value("linear", depth_impl::linear)
+		);
 	rttr::registration::enumeration<sm_impl>("sm_impl")
 		(
-			rttr::value("Hard", sm_impl::Hard),
-			rttr::value("PCF", sm_impl::PCF),
-			rttr::value("VSM", sm_impl::VSM),
-			rttr::value("ESM", sm_impl::ESM)
-			);
+			rttr::value("hard", sm_impl::hard),
+			rttr::value("pcf", sm_impl::pcf),
+			rttr::value("vsm", sm_impl::vsm),
+			rttr::value("esm", sm_impl::esm)
+		);
 	rttr::registration::class_<light>("light")
-		.property("Color", &light::color)
-		.property("Intensity", &light::intensity)
+		.property("color", &light::color)
 		(
+			rttr::metadata("pretty_name", "Color")
+		)
+		.property("intensity", &light::intensity)
+		(
+			rttr::metadata("pretty_name", "Intensity"),
 			rttr::metadata("Min", 0.0f),
 			rttr::metadata("Max", 10.0f)
 		)
-		.property("Type", &light::light_type)
-		.property("Shadows", &light::sm_impl)
-		.property("Depth", &light::depth_impl)
+		.property("light_type", &light::light_type)
+		(
+			rttr::metadata("pretty_name", "Light Type")
+		)
+		.property("sm_impl", &light::sm_impl)
+		(
+			rttr::metadata("pretty_name", "Shadow Impl")
+		)
+		.property("depth_impl", &light::depth_impl)
+		(
+			rttr::metadata("pretty_name", "Depth Impl")
+		)
 		;
 }
 

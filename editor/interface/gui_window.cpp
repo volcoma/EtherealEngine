@@ -1,6 +1,5 @@
 #include "gui_window.h"
 #include "runtime/rendering/render_pass.h"
-#include "../editing/editing_system.h"
 
 void handle_sfml_event(sf::Event event)
 {
@@ -204,29 +203,6 @@ void gui_window::render_dockspace()
 void gui_window::frame_end()
 {
 	render_window::frame_end();
-
-	auto& es = core::get_subsystem<editor::editing_system>();
-
-	if (gui::IsMouseDragging(gui::drag_button) && es.drag_data.object)
-	{
-		gui::SetTooltip(es.drag_data.description.c_str());
-
-		if (gui::GetMouseCursor() == ImGuiMouseCursor_Arrow)
-			gui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);
-	}
-
-	if (!gui::IsAnyItemActive() && !gui::IsAnyItemHovered())
-	{
-		if (gui::IsMouseDoubleClicked(0) && !imguizmo::is_over())
-		{
-			es.unselect();
-			es.drop();
-		}
-	}
-	if (gui::IsMouseReleased(gui::drag_button))
-	{
-		es.drop();
-	}
 
 	imgui_frame_end();
 }

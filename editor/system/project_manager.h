@@ -94,7 +94,7 @@ namespace editor
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void open_project(const fs::path& project_path, bool recompile_assets);
+		void open_project(const fs::path& project_path, bool recompile_project_assets, bool recompile_engine_assets);
 
 		//-----------------------------------------------------------------------------
 		//  Name : create_project ()

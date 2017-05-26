@@ -6,6 +6,7 @@
 #include "runtime/assets/asset_handle.h"
 #include <chrono>
 
+class render_window;
 struct texture;
 namespace editor
 {
@@ -103,6 +104,8 @@ namespace editor
 		//-----------------------------------------------------------------------------
 		void drop();
 
+		void on_window_frame_render(const render_window& window);
+		
 		/// editor camera
 		runtime::entity camera;
 		/// current scene

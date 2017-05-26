@@ -85,21 +85,45 @@ REFLECT(gfx::TextureInfo)
 			);
 
 	rttr::registration::class_<gfx::TextureInfo>("TextureInfo")
-		.property_readonly("Format",
+		.property_readonly("format",
 			&gfx::TextureInfo::format)
-		.property_readonly("Storage Size",
+		(
+			rttr::metadata("pretty_name", "Format")
+		)
+		.property_readonly("storageSize",
 			&gfx::TextureInfo::storageSize)
-		.property_readonly("Width",
+		(
+			rttr::metadata("pretty_name", "Storage Size")
+		)
+		.property_readonly("width",
 			&gfx::TextureInfo::width)
-		.property_readonly("Height",
+		(
+			rttr::metadata("pretty_name", "Width")
+		)
+		.property_readonly("height",
 			&gfx::TextureInfo::height)
-		.property_readonly("Depth",
+		(
+			rttr::metadata("pretty_name", "Height")
+		)
+		.property_readonly("depth",
 			&gfx::TextureInfo::depth)
-		.property_readonly("Mips",
+		(
+			rttr::metadata("pretty_name", "Depth")
+		)
+		.property_readonly("numMips",
 			&gfx::TextureInfo::numMips)
-		.property_readonly("Bits Per Pixel",
+		(
+			rttr::metadata("pretty_name", "Mips")
+		)
+		.property_readonly("bitsPerPixel",
 			&gfx::TextureInfo::bitsPerPixel)
-		.property_readonly("Cubemap",
+		(
+			rttr::metadata("pretty_name", "Bits Per Pixel")
+		)
+		.property_readonly("cubeMap",
 			&gfx::TextureInfo::cubeMap)
+		(
+			rttr::metadata("pretty_name", "Cubemap")
+		)
 		;
 }

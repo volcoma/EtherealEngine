@@ -27,17 +27,22 @@ property_layout::property_layout(const rttr::property& prop, bool columns /*= tr
 	if (columns)
 		gui::Columns(2, nullptr, false);
 
+	std::string pretty_name = prop.get_name();
+	auto meta_pretty_name = prop.get_metadata("pretty_name");
+	if (meta_pretty_name)
+		pretty_name = meta_pretty_name.get_value<std::string>();
+
 	gui::AlignFirstTextHeightToWidgets();
-	gui::TextUnformatted(prop.get_name().c_str());
+	gui::TextUnformatted(pretty_name.c_str());
 
 	Tooltip(prop);
 	
 	gui::NextColumn();
 
 	if (columns)
-		gui::SetColumnOffset(1, std::max(gui::GetColumnOffset(), gui::CalcTextSize(prop.get_name().c_str()).x));
+		gui::SetColumnOffset(1, std::max(gui::GetColumnOffset(), gui::CalcTextSize(pretty_name.c_str()).x));
 
-	gui::PushID(prop.get_name().c_str());
+	gui::PushID(pretty_name.c_str());
 	gui::PushItemWidth(gui::GetContentRegionAvailWidth());
 }
 
