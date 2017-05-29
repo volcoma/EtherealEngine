@@ -138,7 +138,6 @@ bool inspect_array(rttr::variant& var, bool read_only)
 
 	}
 
-
 	return changed;
 }
 
@@ -161,8 +160,8 @@ bool inspect_enum(rttr::variant& var, rttr::enumeration& data, bool read_only)
 	else
 	{
 		int listbox_item_current = var.to_int();
-
-		if (gui::Combo("", &listbox_item_current, cstrings.data(), static_cast<int>(cstrings.size()), static_cast<int>(cstrings.size())))
+		int listbox_item_size = static_cast<int>(cstrings.size());
+		if (gui::Combo("", &listbox_item_current, cstrings.data(), listbox_item_size, listbox_item_size))
 		{
 			rttr::variant arg(listbox_item_current);
 			arg.convert(var.get_type());

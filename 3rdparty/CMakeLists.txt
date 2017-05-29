@@ -41,6 +41,8 @@ target_include_directories (bgfx PUBLIC
 ${CMAKE_CURRENT_SOURCE_DIR}
 ${CMAKE_CURRENT_SOURCE_DIR}/bgfx/include)
 
+add_subdirectory_ex(bgfx_cmake)
+
 add_subdirectory_ex(glslang)
 target_include_directories (glslang PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

@@ -42,8 +42,8 @@ REFLECT(transform_component)
 		(
 			rttr::metadata("pretty_name", "Slow Parenting Speed"),
 			rttr::metadata("Tooltip", "Controls the speed at which the slow parenting works."),
-			rttr::metadata("Min", 0.0f),
-			rttr::metadata("Max", 30.0f)
+			rttr::metadata("min", 0.0f),
+			rttr::metadata("max", 30.0f)
 		)
 		;
 

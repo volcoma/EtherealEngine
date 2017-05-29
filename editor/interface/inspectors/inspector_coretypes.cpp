@@ -38,25 +38,25 @@ bool inspector_float::inspect(rttr::variant& var, bool readOnly, std::function<r
 		float step = 0.05f;
 		std::string format = "%.3f";
 
-		auto minVar = get_metadata("Min");
-		if (minVar)
-			min = minVar.to_float();
+		auto min_var = get_metadata("min");
+		if (min_var)
+			min = min_var.to_float();
 
-		auto maxVar = get_metadata("Max");
-		if (maxVar)
-			max = maxVar.to_float();
+		auto max_var = get_metadata("max");
+		if (max_var)
+			max = max_var.to_float();
 
-		auto formatVar = get_metadata("Format");
-		if (formatVar)
-			format = formatVar.to_string();
+		auto format_var = get_metadata("format");
+		if (format_var)
+			format = format_var.to_string();
 
-		auto stepVar = get_metadata("Step");
-		if (stepVar)
-			step = stepVar.to_float();
+		auto step_var = get_metadata("step");
+		if (step_var)
+			step = step_var.to_float();
 
-		bool isRange = maxVar.is_valid();
+		bool is_range = max_var.is_valid();
 		
-		if (isRange)
+		if (is_range)
 		{
 			if (gui::SliderFloat("", &data, min, max, format.c_str()))
 			{
@@ -94,25 +94,25 @@ bool inspector_double::inspect(rttr::variant& var, bool readOnly, std::function<
 		float step = 0.05f;
 		std::string format = "%.3f";
 
-		auto minVar = get_metadata("Min");
-		if (minVar)
-			min = minVar.to_float();
+		auto min_var = get_metadata("min");
+		if (min_var)
+			min = min_var.to_float();
 
-		auto maxVar = get_metadata("Max");
-		if (maxVar)
-			max = maxVar.to_float();
+		auto max_var = get_metadata("max");
+		if (max_var)
+			max = max_var.to_float();
 
-		auto formatVar = get_metadata("Format");
-		if (formatVar)
-			format = formatVar.to_string();
+		auto format_var = get_metadata("format");
+		if (format_var)
+			format = format_var.to_string();
 
-		auto stepVar = get_metadata("Step");
-		if (stepVar)
-			step = stepVar.to_float();
+		auto step_var = get_metadata("step");
+		if (step_var)
+			step = step_var.to_float();
 
-		bool isRange = maxVar.is_valid();
+		bool is_range = max_var.is_valid();
 		
-		if (isRange)
+		if (is_range)
 		{
 			if (gui::SliderFloat("", &data, min, max, format.c_str()))
 			{
@@ -145,17 +145,17 @@ bool inspector_int8::inspect(rttr::variant& var, bool readOnly, std::function<rt
 		int min = 0;
 		int max = 0;
 
-		auto minVar = get_metadata("Min");
-		if (minVar)
-			min = minVar.to_int();
+		auto min_var = get_metadata("min");
+		if (min_var)
+			min = min_var.to_int();
 
-		auto maxVar = get_metadata("Max");
-		if (maxVar)
-			max = maxVar.to_int();
+		auto max_var = get_metadata("max");
+		if (max_var)
+			max = max_var.to_int();
 
-		bool isRange = maxVar.is_valid();
+		bool is_range = max_var.is_valid();
 		
-		if (isRange)
+		if (is_range)
 		{
 			if (gui::SliderInt("", &data, min, max))
 			{
@@ -189,17 +189,17 @@ bool inspector_int16::inspect(rttr::variant& var, bool readOnly, std::function<r
 		int min = 0;
 		int max = 0;
 
-		auto minVar = get_metadata("Min");
-		if (minVar)
-			min = minVar.to_int();
+		auto min_var = get_metadata("min");
+		if (min_var)
+			min = min_var.to_int();
 
-		auto maxVar = get_metadata("Max");
-		if (maxVar)
-			max = maxVar.to_int();
+		auto max_var = get_metadata("max");
+		if (max_var)
+			max = max_var.to_int();
 
-		bool isRange = maxVar.is_valid();
+		bool is_range = max_var.is_valid();
 		
-		if (isRange)
+		if (is_range)
 		{
 			if (gui::SliderInt("", &data, min, max))
 			{
@@ -233,17 +233,17 @@ bool inspector_int32::inspect(rttr::variant& var, bool readOnly, std::function<r
 		int min = 0;
 		int max = 0;
 
-		auto minVar = get_metadata("Min");
-		if (minVar)
-			min = minVar.to_int();
+		auto min_var = get_metadata("min");
+		if (min_var)
+			min = min_var.to_int();
 		
-		auto maxVar = get_metadata("Max");
-		if (maxVar)
-			max = maxVar.to_int();
+		auto max_var = get_metadata("max");
+		if (max_var)
+			max = max_var.to_int();
 
-		bool isRange = maxVar.is_valid();
+		bool is_range = max_var.is_valid();
 		
-		if (isRange)
+		if (is_range)
 		{
 			if (gui::SliderInt("", &data, min, max))
 			{
@@ -277,17 +277,17 @@ bool inspector_int64::inspect(rttr::variant& var, bool readOnly, std::function<r
 		int min = 0;
 		int max = 0;
 
-		auto minVar = get_metadata("Min");
-		if (minVar)
-			min = minVar.to_int();
+		auto min_var = get_metadata("min");
+		if (min_var)
+			min = min_var.to_int();
 
-		auto maxVar = get_metadata("Max");
-		if (maxVar)
-			max = maxVar.to_int();
+		auto max_var = get_metadata("max");
+		if (max_var)
+			max = max_var.to_int();
 
-		bool isRange = maxVar.is_valid();
+		bool is_range = max_var.is_valid();
 		
-		if (isRange)
+		if (is_range)
 		{
 			if (gui::SliderInt("", &data, min, max))
 			{
@@ -322,17 +322,17 @@ bool inspector_uint8::inspect(rttr::variant& var, bool readOnly, std::function<r
 		int min = 0;
 		int max = 0;
 
-		auto minVar = get_metadata("Min");
-		if (minVar)
-			min = minVar.to_int();
+		auto min_var = get_metadata("min");
+		if (min_var)
+			min = min_var.to_int();
 
-		auto maxVar = get_metadata("Max");
-		if (maxVar)
-			max = maxVar.to_int();
+		auto max_var = get_metadata("max");
+		if (max_var)
+			max = max_var.to_int();
 
-		bool isRange = maxVar.is_valid();
+		bool is_range = max_var.is_valid();
 		
-		if (isRange)
+		if (is_range)
 		{
 			if (gui::SliderInt("", &data, min, max))
 			{
@@ -366,17 +366,17 @@ bool inspector_uint16::inspect(rttr::variant& var, bool readOnly, std::function<
 		int min = 0;
 		int max = 0;
 
-		auto minVar = get_metadata("Min");
-		if (minVar)
-			min = minVar.to_int();
+		auto min_var = get_metadata("min");
+		if (min_var)
+			min = min_var.to_int();
 
-		auto maxVar = get_metadata("Max");
-		if (maxVar)
-			max = maxVar.to_int();
+		auto max_var = get_metadata("max");
+		if (max_var)
+			max = max_var.to_int();
 
-		bool isRange = maxVar.is_valid();
+		bool is_range = max_var.is_valid();
 		
-		if (isRange)
+		if (is_range)
 		{
 			if (gui::SliderInt("", &data, min, max))
 			{
@@ -410,17 +410,17 @@ bool inspector_uint32::inspect(rttr::variant& var, bool readOnly, std::function<
 		int min = 0;
 		int max = 0;
 
-		auto minVar = get_metadata("Min");
-		if (minVar)
-			min = minVar.to_int();
+		auto min_var = get_metadata("min");
+		if (min_var)
+			min = min_var.to_int();
 
-		auto maxVar = get_metadata("Max");
-		if (maxVar)
-			max = maxVar.to_int();
+		auto max_var = get_metadata("max");
+		if (max_var)
+			max = max_var.to_int();
 
-		bool isRange = maxVar.is_valid();
+		bool is_range = max_var.is_valid();
 		
-		if (isRange)
+		if (is_range)
 		{
 			if (gui::SliderInt("", &data, min, max))
 			{
@@ -454,17 +454,17 @@ bool inspector_uint64::inspect(rttr::variant& var, bool readOnly, std::function<
 		int min = 0;
 		int max = 0;
 
-		auto minVar = get_metadata("Min");
-		if (minVar)
-			min = minVar.to_int();
+		auto min_var = get_metadata("min");
+		if (min_var)
+			min = min_var.to_int();
 
-		auto maxVar = get_metadata("Max");
-		if (maxVar)
-			max = maxVar.to_int();
+		auto max_var = get_metadata("max");
+		if (max_var)
+			max = max_var.to_int();
 
-		bool isRange = maxVar.is_valid();
+		bool is_range = max_var.is_valid();
 		
-		if (isRange)
+		if (is_range)
 		{
 			if (gui::SliderInt("", &data, min, max))
 			{

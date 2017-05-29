@@ -13,52 +13,52 @@ REFLECT(light)
 			&light::spot::set_range)
 		(
 			rttr::metadata("pretty_name", "Range"),
-			rttr::metadata("Min", 0.1f)
+			rttr::metadata("min", 0.1f)
 		)
 		.property("inner_angle",
 			&light::spot::get_inner_angle,
 			&light::spot::set_inner_angle)
 		(
 			rttr::metadata("pretty_name", "Inner Angle"),
-			rttr::metadata("Min", 1.0f),
-			rttr::metadata("Max", 85.0f),
-			rttr::metadata("Step", 0.1f)
+			rttr::metadata("min", 1.0f),
+			rttr::metadata("max", 85.0f),
+			rttr::metadata("step", 0.1f)
 		)
 		.property("outer_angle",
 			&light::spot::get_outer_angle,
 			&light::spot::set_outer_angle)
 		(
 			rttr::metadata("pretty_name", "Outer Angle"),
-			rttr::metadata("Min", 1.0f),
-			rttr::metadata("Max", 90.0f),
-			rttr::metadata("Step", 0.1f)
+			rttr::metadata("min", 1.0f),
+			rttr::metadata("max", 90.0f),
+			rttr::metadata("step", 0.1f)
 		);
 
 	rttr::registration::class_<light::point>("point")
 		.property("range", &light::point::range)
 		(
 			rttr::metadata("pretty_name", "Range"),
-			rttr::metadata("Min", 0.1f)
+			rttr::metadata("min", 0.1f)
 		)
 		.property("exponent_falloff", &light::point::exponent_falloff)
 		(
 			rttr::metadata("pretty_name", "Exponent Falloff"),
-			rttr::metadata("Min", 0.1f),
-			rttr::metadata("Max", 10.0f)
+			rttr::metadata("min", 0.1f),
+			rttr::metadata("max", 10.0f)
 		)
 		.property("fovx_adjust", &light::point::fov_x_adjust)
 		(
 			rttr::metadata("pretty_name", "FovX Adjust"),
-			rttr::metadata("Min", -20.0f),
-			rttr::metadata("Max", 20.0f),
-			rttr::metadata("Step", 0.0001f)
+			rttr::metadata("min", -20.0f),
+			rttr::metadata("max", 20.0f),
+			rttr::metadata("step", 0.0001f)
 		)
 		.property("fovy_adjust", &light::point::fov_y_adjust)
 		(
 			rttr::metadata("pretty_name", "FovY Adjust"),
-			rttr::metadata("Min", -20.0f),
-			rttr::metadata("Max", 20.0f),
-			rttr::metadata("Step", 0.0001f)
+			rttr::metadata("min", -20.0f),
+			rttr::metadata("max", 20.0f),
+			rttr::metadata("step", 0.0001f)
 		)
 		.property("stencil_pack", &light::point::stencil_pack)
 		(
@@ -69,15 +69,15 @@ REFLECT(light)
 		.property("splits", &light::directional::num_splits)
 		(
 			rttr::metadata("pretty_name", "Splits"),
-			rttr::metadata("Min", 1),
-			rttr::metadata("Max", 4)
+			rttr::metadata("min", 1),
+			rttr::metadata("max", 4)
 		)
 		.property("distribution", &light::directional::split_distribution)
 		(
 			rttr::metadata("pretty_name", "Distribution"),
-			rttr::metadata("Min", 0.0f),
-			rttr::metadata("Max", 1.0f),
-			rttr::metadata("Step", 0.001f)
+			rttr::metadata("min", 0.0f),
+			rttr::metadata("max", 1.0f),
+			rttr::metadata("step", 0.001f)
 		)
 		.property("stabilize", &light::directional::stabilize)
 		(
@@ -111,8 +111,8 @@ REFLECT(light)
 		.property("intensity", &light::intensity)
 		(
 			rttr::metadata("pretty_name", "Intensity"),
-			rttr::metadata("Min", 0.0f),
-			rttr::metadata("Max", 10.0f)
+			rttr::metadata("min", 0.0f),
+			rttr::metadata("max", 10.0f)
 		)
 		.property("light_type", &light::light_type)
 		(

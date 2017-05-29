@@ -27,7 +27,7 @@ option(BUILD_SHARED_LIBS
 )
 message(STATUS "BUILD_SHARED_LIBS >>> ${BUILD_SHARED_LIBS}")
 
-add_definitions(-DPROJECT_DIRECTORY="${PROJECT_SOURCE_DIR}")
+add_definitions(-DENGINE_DIRECTORY="${PROJECT_SOURCE_DIR}")
 
 function(add_subdirectory_ex arg1)
 	message(STATUS "---------Configure ${arg1}")
@@ -40,6 +40,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /bigobj")
+	set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} /IGNORE:4221")
 endif()
 message(STATUS "CMAKE_CXX_FLAGS >>> ${CMAKE_CXX_FLAGS}")
 message(STATUS "CMAKE_CXX_FLAGS_DEBUG >>> ${CMAKE_CXX_FLAGS_DEBUG}")

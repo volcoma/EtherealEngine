@@ -66,32 +66,32 @@ REFLECT(standard_material)
 			&standard_material::set_roughness)
 		(
 			rttr::metadata("pretty_name", "Roughness"),
-			rttr::metadata("Min", 0.0f),
-			rttr::metadata("Max", 1.0f)
+			rttr::metadata("min", 0.0f),
+			rttr::metadata("max", 1.0f)
 		)
 		.property("metalness",
 			&standard_material::get_metalness,
 			&standard_material::set_metalness)
 		(
 			rttr::metadata("pretty_name", "Metalness"),
-			rttr::metadata("Min", 0.0f),
-			rttr::metadata("Max", 1.0f)
+			rttr::metadata("min", 0.0f),
+			rttr::metadata("max", 1.0f)
 		)
 		.property("bumpiness",
 			&standard_material::get_bumpiness,
 			&standard_material::set_bumpiness)
 		(
 			rttr::metadata("pretty_name", "Bumpiness"),
-			rttr::metadata("Min", 0.0f),
-			rttr::metadata("Max", 10.0f)
+			rttr::metadata("min", 0.0f),
+			rttr::metadata("max", 10.0f)
 		)
 		.property("alpha_test_value",
 			&standard_material::get_alpha_test_value,
 			&standard_material::set_alpha_test_value)
 		(
 			rttr::metadata("pretty_name", "Alpha Test Value"),
-			rttr::metadata("Min", 0.0f),
-			rttr::metadata("Max", 1.0f)
+			rttr::metadata("min", 0.0f),
+			rttr::metadata("max", 1.0f)
 		)
 		.property("tiling",
 			&standard_material::get_tiling,

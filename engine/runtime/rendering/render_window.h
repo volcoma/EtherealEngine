@@ -6,6 +6,7 @@
 #include "../system/sfml/Window.hpp"
 #include "core/signals/event.hpp"
 #include <chrono>
+
 struct frame_buffer;
 class render_window : public sf::Window
 {

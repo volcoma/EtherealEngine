@@ -390,14 +390,14 @@ void main_editor_window::on_start_page()
 		ImGuiWindowFlags_HorizontalScrollbar |
 		ImGuiWindowFlags_NoSavedSettings;
 
-	static bool recompile_project_assets = true;
+	static bool recompile_project_assets = false;
 	static bool recompile_engine_assets = false;
 	gui::AlignFirstTextHeightToWidgets();
 	gui::Text("Recent Projects");
 	gui::Separator();
 	gui::BeginGroup();
 	{
-		if (gui::BeginChild("projects_content", ImVec2(gui::GetContentRegionAvail().x * 0.7f, gui::GetContentRegionAvail().y - gui::GetTextLineHeightWithSpacing() * 2.0f), false, flags))
+		if (gui::BeginChild("projects_content", ImVec2(gui::GetContentRegionAvail().x * 0.7f, gui::GetContentRegionAvail().y - gui::GetItemsLineHeightWithSpacing() * 2.0f), false, flags))
 		{
 
 			const auto& rencent_projects = pm.get_options().recent_project_paths;
