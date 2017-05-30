@@ -28,7 +28,7 @@ option(BUILD_SHARED_LIBS
 message(STATUS "BUILD_SHARED_LIBS >>> ${BUILD_SHARED_LIBS}")
 
 add_definitions(-DENGINE_DIRECTORY="${PROJECT_SOURCE_DIR}")
-
+add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
 function(add_subdirectory_ex arg1)
 	message(STATUS "---------Configure ${arg1}")
 	add_subdirectory(${arg1})

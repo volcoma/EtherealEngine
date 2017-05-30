@@ -2,8 +2,8 @@
 #include "core/common/string.h"
 #include "core/logging/logging.h"
 #include "runtime/system/filesystem.h"
-#include "../shaderc/shaderc.h"
-#include "../texturec/texturec.h"
+#include "shaderc/shaderc.h"
+#include "texturec/texturec.h"
 #include <fstream>
 #include <array>
 #include "graphics/graphics.h"
@@ -168,13 +168,16 @@ void asset_compiler::compile<texture>(const fs::path& absolute_key)
 	}
 
 
-	static const int arg_count = 5;
+	static const int arg_count = 7;
 	const char* args_array[arg_count];
 	args_array[0] = "-f";
 	args_array[1] = str_input.c_str();
 	args_array[2] = "-o";
 	args_array[3] = str_output.c_str();
-	args_array[4] = "-m";
+	args_array[4] = "--as";
+	args_array[5] = "ktx";
+	args_array[6] = "-m";
+	
 
 	if (compile_texture(arg_count, args_array) != 0)
 	{
