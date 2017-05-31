@@ -47,7 +47,7 @@ void inspector_entity::component::instance::setup(const std::vector<runtime::cha
 			auto meta_category = info.get_metadata("Category");
 			auto meta_id = info.get_metadata("Id");
 
-			std::string name = info.get_name();
+			std::string name = info.get_name().to_string();
 
 			if (meta_id)
 			{
@@ -154,7 +154,7 @@ inspector_entity::component::type::type() :
 		auto meta_category = info.get_metadata("Category");
 		auto meta_id = info.get_metadata("Id");
 		
-		std::string name = info.get_name();
+		std::string name = info.get_name().to_string();
 
 		if (meta_id)
 		{
@@ -181,13 +181,15 @@ void inspector_entity::component::type::inspect(ImGuiTextFilter& filter, runtime
 {
 	gui::Separator();
 	
-	if (gui::ButtonEx("<", ImVec2(0, 0), _itor.steps() > 1 ? 0 : ImGuiButtonFlags_Disabled))
+	if (_itor.steps() > 1)
 	{
-		_itor.step_out();
+		if (gui::Button("BACK"))
+		{
+			_itor.step_out();
+		}
+		gui::Separator();
 	}
-	gui::Separator();
-
-
+	
 	if (_itor.step_stack_pop())
 	{
 		_itor.step_in();

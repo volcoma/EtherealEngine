@@ -45,6 +45,7 @@ x86/
 bld/
 [Bb]uild/
 [Bb]in/
+[Ll]ib/
 [Oo]bj/
 [Ll]og/
 .vs/

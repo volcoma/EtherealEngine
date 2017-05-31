@@ -1,9 +1,9 @@
 #pragma once
 #include "core/reflection/reflection.h"
 #include "core/serialization/serialization.h"
-#include "core/serialization/cereal/types/unordered_map.hpp"
-#include "core/serialization/cereal/types/string.hpp"
-#include "core/serialization/cereal/types/utility.hpp"
+#include "core/serialization/types/unordered_map.hpp"
+#include "core/serialization/types/string.hpp"
+#include "core/serialization/types/utility.hpp"
 #include "core/logging/logging.h"
 #include "../../rendering/material.h"
 #include "../../rendering/program.h"

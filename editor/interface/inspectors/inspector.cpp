@@ -27,7 +27,7 @@ property_layout::property_layout(const rttr::property& prop, bool columns /*= tr
 	if (columns)
 		gui::Columns(2, nullptr, false);
 
-	std::string pretty_name = prop.get_name();
+	std::string pretty_name = prop.get_name().to_string();
 	auto meta_pretty_name = prop.get_metadata("pretty_name");
 	if (meta_pretty_name)
 		pretty_name = meta_pretty_name.get_value<std::string>();

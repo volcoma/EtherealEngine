@@ -2,8 +2,8 @@
 
 #include "../system/project_manager.h"
 #include "core/serialization/serialization.h"
-#include "core/serialization/cereal/types/deque.hpp"
-#include "core/serialization/cereal/types/string.hpp"
+#include "core/serialization/types/deque.hpp"
+#include "core/serialization/types/string.hpp"
 #include "core/logging/logging.h"
 
 namespace editor

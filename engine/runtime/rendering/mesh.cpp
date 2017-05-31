@@ -2759,8 +2759,6 @@ bool mesh::end_prepare(bool hardware_copy /* = true */, bool weld /* = true */, 
 
 	} // End if previously preparing
 
-	  // Clear out old data that is no longer necessary in order to preserve memory
-	gfx::setVertexBuffer(0, gfx::VertexBufferHandle{ gfx::invalidHandle });
 	// Scan the preparation data for degenerate triangles.
 	std::uint16_t position_offset = _vertex_format.getOffset(gfx::Attrib::Position);
 	std::uint16_t vertex_stride = _vertex_format.getStride();

@@ -1,7 +1,7 @@
 #pragma once
 #include "core/math/math_includes.h"
 #include "core/common/basetypes.hpp"
-#include "core/reflection/rttr/rttr_enable.h"
+#include "core/reflection/registration.h"
 #include "core/serialization/serialization.h"
 
 enum class projection_mode : std::uint32_t

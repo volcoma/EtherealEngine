@@ -2,7 +2,7 @@
 
 #include "graphics/graphics.h"
 #include "core/math/math_includes.h"
-#include "core/reflection/reflection.h"
+#include "core/reflection/registration.h"
 #include "core/serialization/serialization.h"
 #include <vector>
 #include <map>

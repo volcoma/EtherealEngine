@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/serialization/serialization.h"
-#include "core/serialization/cereal/types/string.hpp"
+#include "core/serialization/types/string.hpp"
 #include "core/common/string.h"
 #include "core/logging/logging.h"
 #include "../../assets/asset_handle.h"

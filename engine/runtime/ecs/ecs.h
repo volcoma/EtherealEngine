@@ -5,7 +5,7 @@
 #include "core/signals/event.hpp"
 #include "core/common/assert.hpp"
 #include "core/nonstd/type_traits.hpp"
-#include "core/reflection/reflection.h"
+#include "core/reflection/registration.h"
 #include "core/serialization/serialization.h"
 
 #include <bitset>

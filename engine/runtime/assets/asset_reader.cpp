@@ -11,8 +11,8 @@
 #include "../system/task.h"
 #include "core/serialization/serialization.h"
 #include "core/serialization/archives.h"
-#include "core/serialization/cereal/types/unordered_map.hpp"
-#include "core/serialization/cereal/types/vector.hpp"
+#include "core/serialization/types/unordered_map.hpp"
+#include "core/serialization/types/vector.hpp"
 #include "../meta/rendering/material.hpp"
 #include "../meta/rendering/mesh.hpp"
 #include <cstdint>

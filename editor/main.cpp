@@ -1,7 +1,6 @@
 #include "runtime/runtime.h"
 #include "system/app.h"
-//Regex to count lines of code
-//^(?!(\s*\*))(?!(\s*\-\-\>))(?!(\s*\<\!\-\-))(?!(\s*\n))(?!(\s*\*\/))(?!(\s*\/\*))(?!(\s*\/\/\/))(?!(\s*\/\/))(?!(\s*\}))(?!(\s*\{))(?!(\s(using))).*$
+
 int main(int _argc, char* _argv[])
 {
 	//fs::path exe_path = fs::canonical(fs::executable_path(_argv[0]).remove_filename());

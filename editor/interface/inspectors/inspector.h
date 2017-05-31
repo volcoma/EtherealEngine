@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/reflection/registration.h"
 #include "core/reflection/reflection.h"
 #include "../gui_system.h"
 

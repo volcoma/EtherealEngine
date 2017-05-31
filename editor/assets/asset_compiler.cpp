@@ -11,8 +11,8 @@
 #include "runtime/assets/asset_extensions.h"
 #include "core/serialization/serialization.h"
 #include "core/serialization/archives.h"
-#include "core/serialization/cereal/types/unordered_map.hpp"
-#include "core/serialization/cereal/types/vector.hpp"
+#include "core/serialization/types/unordered_map.hpp"
+#include "core/serialization/types/vector.hpp"
 
 #include "mesh_importer.h"
 #include "runtime/meta/rendering/mesh.hpp"

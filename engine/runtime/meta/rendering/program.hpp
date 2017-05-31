@@ -1,6 +1,6 @@
 #pragma once
 #include "core/serialization/serialization.h"
-#include "core/serialization/cereal/types/vector.hpp"
+#include "core/serialization/types/vector.hpp"
 #include "core/reflection/reflection.h"
 #include "core/logging/logging.h"
 #include "../../rendering/program.h"

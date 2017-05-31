@@ -4,7 +4,7 @@
 #include "core/math/math_includes.h"
 #include <unordered_map>
 
-#include "core/reflection/rttr/rttr_enable.h"
+#include "core/reflection/registration.h"
 #include "core/serialization/serialization.h"
 #include "graphics/graphics.h"
 
