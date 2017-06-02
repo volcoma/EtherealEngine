@@ -46,6 +46,7 @@ message(STATUS "CMAKE_CXX_FLAGS >>> ${CMAKE_CXX_FLAGS}")
 message(STATUS "CMAKE_CXX_FLAGS_DEBUG >>> ${CMAKE_CXX_FLAGS_DEBUG}")
 message(STATUS "CMAKE_CXX_FLAGS_RELEASE >>> ${CMAKE_CXX_FLAGS_RELEASE}")
 
+
 add_subdirectory_ex(engine)
 add_subdirectory_ex(editor)
 add_subdirectory_ex(3rdparty)

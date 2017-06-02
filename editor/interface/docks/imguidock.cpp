@@ -1,6 +1,7 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imguidock.h"
 #include "../gui_window.h"
+#include "runtime/input/input.h"
 #include "runtime/system/engine.h"
 
 namespace imguidock
@@ -251,14 +252,14 @@ namespace imguidock
 		if (split && split->active_dock)
 		{
 			auto& active_dock = split->active_dock;
-			bool mouseleft = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+			bool mouseleft = mml::mouse::is_button_pressed(mml::mouse::left);
 			if (active_dock->draging && mouseleft)
 			{
-				auto pos = sf::Mouse::getPosition();
-				pos.x -= 20;
-				pos.y -= 40;
-				window->setPosition(pos);
-				window->setAlpha(0.3f);
+				auto pos = mml::mouse::get_position();
+				pos[0] -= 20;
+				pos[1] -= 40;
+				window->set_position(pos);
+				window->set_alpha(0.3f);
 			}
 			else
 			{
@@ -273,11 +274,11 @@ namespace imguidock
 							active_dock->redock_slot, 0, true);
 						active_dock->redock_to = nullptr;
 
-						window->close();
+						window->request_close();
 					}
 					else
 					{
-						window->setAlpha(1.0f);
+						window->set_alpha(1.0f);
 					}
 				}
 				active_dock->draging = false;
@@ -319,10 +320,10 @@ namespace imguidock
 			gui_window* dragged_window = is_any_window_dragged();
 			if (dragged_window != nullptr && dragged_window->get_dockspace().root.splits[0]->active_dock != container->active_dock)
 			{
-				auto mouse_pos = sf::Mouse::getPosition(*owner);
-				ImVec2 cursor_pos = { float(mouse_pos.x), float(mouse_pos.y) };
-				if ((mouse_pos.x > screen_cursor_pos.x && mouse_pos.x < (screen_cursor_pos.x + size.x)) &&
-					(mouse_pos.y > screen_cursor_pos.y && mouse_pos.y < (screen_cursor_pos.y + size.y)))
+				auto mouse_pos = mml::mouse::get_position(*owner);
+				ImVec2 cursor_pos = { float(mouse_pos[0]), float(mouse_pos[1]) };
+				if ((mouse_pos[0] > screen_cursor_pos.x && mouse_pos[0] < (screen_cursor_pos.x + size.x)) &&
+					(mouse_pos[1] > screen_cursor_pos.y && mouse_pos[1] < (screen_cursor_pos.y + size.y)))
 				{
 					ImGui::BeginChild("##dockSlotPreview");
 					ImGui::PushClipRect(ImVec2(), ImGui::GetIO().DisplaySize, false);
@@ -460,16 +461,16 @@ namespace imguidock
 					_current_dock_to->draging = true;
 					
 					auto window = std::make_shared<gui_window>(
-						sf::VideoMode((unsigned int)_current_dock_to->last_size.x, (unsigned int)_current_dock_to->last_size.y),
+						mml::video_mode((unsigned int)_current_dock_to->last_size.x, (unsigned int)_current_dock_to->last_size.y),
 						"",//std::string(m_currentDockTo->title),
-						sf::Style::Default
+						mml::style::Default
 						);
 
 					auto& engine = core::get_subsystem<runtime::engine>();
 					engine.register_window(window);
 					window->get_dockspace().dock_to(_current_dock_to, slot::tab, 0, true);
-					window->setPosition(sf::Mouse::getPosition());
-					window->requestFocus();
+					window->set_position(mml::mouse::get_position());
+					window->request_focus();
 				}
 			}
 			else if (_current_dock_action == eDrag)

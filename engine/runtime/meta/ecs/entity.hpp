@@ -62,8 +62,12 @@ LOAD(entity)
 		for (auto component : components)
 		{
 			auto component_shared = component.lock();
-			obj.assign(component_shared);
-			component_shared->touch();
+			if (component_shared)
+			{
+				obj.assign(component_shared);
+				component_shared->touch();
+			}
+			
 		}
 	}
 

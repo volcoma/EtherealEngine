@@ -879,7 +879,7 @@ namespace math
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : setPosition ()
+	//  Name : set_position ()
 	/// <summary>
 	/// Set the position of the origin of this transform with respect its parent.
 	/// </summary>
@@ -891,7 +891,7 @@ namespace math
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : setPosition ()
+	//  Name : set_position ()
 	/// <summary>
 	/// Set the position of the origin of this transform with respect its parent.
 	/// </summary>

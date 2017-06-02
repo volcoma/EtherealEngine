@@ -3,12 +3,13 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include "../system/sfml/Window.hpp"
+#include "mml/window/window.hpp"
 #include "core/signals/event.hpp"
+#include "core/common/basetypes.hpp"
 #include <chrono>
 
 struct frame_buffer;
-class render_window : public sf::Window
+class render_window : public mml::window
 {
 public:
 	//-----------------------------------------------------------------------------
@@ -29,7 +30,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	render_window(sf::VideoMode mode, const std::string& title, std::uint32_t style = sf::Style::Default);
+	render_window(mml::video_mode mode, const std::string& title, std::uint32_t style = mml::style::Default);
 
 	//-----------------------------------------------------------------------------
 	//  Name : ~render_window (virtual )
@@ -138,22 +139,15 @@ public:
 protected:
 
 	//-----------------------------------------------------------------------------
-	//  Name : onResize (virtual )
+	//  Name : on_resize (virtual )
 	/// <summary>
 	/// This function is called so that derived classes can
 	/// perform custom actions when the size of the window changes.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void onResize();
+	virtual void on_resize();
 
-	//-----------------------------------------------------------------------------
-	//  Name : onClose (virtual )
-	/// <summary>
-	/// This function is called so that derived classes can
-	/// perform custom actions when the window is closed
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	virtual void onClose();
+	virtual bool filter_event(const mml::platform_event& event);
 
 	/// Render surface for this window.
 	std::shared_ptr<frame_buffer> _surface;

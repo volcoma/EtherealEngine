@@ -57,7 +57,7 @@ namespace editor
 		if (!camera.viewport_to_world(cursor_pos, frustum.planes[math::volume_plane::far_plane], pick_at, true))
 			return;
 
-		if (input.is_mouse_button_pressed(sf::Mouse::Left))
+		if (input.is_mouse_button_pressed(mml::mouse::left))
 		{
 			_reading = 0;
 			_start_readback = true;

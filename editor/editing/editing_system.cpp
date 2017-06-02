@@ -155,7 +155,10 @@ namespace editor
 	{
 		auto& es = core::get_subsystem<editor::editing_system>();
 		runtime::entity object;
-		if (!ecs::utils::try_load_entity(fs::resolve_protocol("app:/settings/editor_camera.cfg"), object))
+		ecs::utils::try_load_entity(fs::resolve_protocol("app:/settings/editor_camera.cfg"), object);
+	
+		if (!object.has_component<transform_component>() ||
+			object.has_component<camera_component>())
 		{
 			auto& ecs = core::get_subsystem<runtime::entity_component_system>();
 			object = ecs.create();

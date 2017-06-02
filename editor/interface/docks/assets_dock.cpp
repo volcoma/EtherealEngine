@@ -104,12 +104,12 @@ int list_item(Wrapper& entry,
 	bool edit_label = false;
 	if (already_selected && !gui::IsAnyItemActive())
 	{
-		if (input.is_key_pressed(sf::Keyboard::F2))
+		if (input.is_key_pressed(mml::keyboard::F2))
 		{
 			edit_label = true;
 		}
 
-		if (input.is_key_pressed(sf::Keyboard::Delete))
+		if (input.is_key_pressed(mml::keyboard::Delete))
 		{
 			if (is_directory)
 			{
@@ -422,7 +422,7 @@ void assets_dock::render(const ImVec2& area)
 
 	if (!gui::IsAnyItemActive())
 	{
-		if (input.is_key_pressed(sf::Keyboard::BackSpace) && !opened_dir.expired())
+		if (input.is_key_pressed(mml::keyboard::BackSpace) && !opened_dir.expired())
 		{
 			auto opened_folder_shared = opened_dir.lock();
 

@@ -76,7 +76,7 @@ namespace runtime
 		gfx::PlatformData pd
 		{
 			nullptr,
-			main_window.getSystemHandle(),
+			main_window.get_system_handle(),
 			nullptr,
 			nullptr,
 			nullptr

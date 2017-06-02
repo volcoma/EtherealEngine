@@ -62,7 +62,7 @@ transform_component& transform_component::move(const math::vec3 & amount)
 	vNewPos += get_y_axis() * amount.y;
 	vNewPos += get_z_axis() * amount.z;
 
-	// Pass through to setPosition so that any derived classes need not
+	// Pass through to set_position so that any derived classes need not
 	// override the 'move' method in order to catch this position change.
 	set_position(vNewPos);
 	return *this;
@@ -75,7 +75,7 @@ transform_component& transform_component::move_local(const math::vec3 & amount)
 	vNewPos += get_local_y_axis() * amount.y;
 	vNewPos += get_local_z_axis() * amount.z;
 
-	// Pass through to setPosition so that any derived classes need not
+	// Pass through to set_position so that any derived classes need not
 	// override the 'move' method in order to catch this position change.
 	set_local_position(vNewPos);
 	return *this;

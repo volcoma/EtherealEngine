@@ -101,7 +101,7 @@ void draw_selected_camera(const ImVec2& size)
 			}
 			gui::End();
 
-			if (input.is_key_pressed(sf::Keyboard::F) && sel.has_component<transform_component>())
+			if (input.is_key_pressed(mml::keyboard::F) && sel.has_component<transform_component>())
 			{
 				auto transform = editor_camera.get_component<transform_component>().lock();
 				auto transform_selected = sel.get_component<transform_component>().lock();
@@ -122,26 +122,26 @@ void manipulation_gizmos()
 	auto& operation = es.operation;
 	auto& mode = es.mode;
 
-	if (!input.is_mouse_button_down(sf::Mouse::Right) && !gui::IsAnyItemActive() && !imguizmo::is_using())
+	if (!input.is_mouse_button_down(mml::mouse::right) && !gui::IsAnyItemActive() && !imguizmo::is_using())
 	{
-		if (input.is_key_pressed(sf::Keyboard::W))
+		if (input.is_key_pressed(mml::keyboard::W))
 		{
 			operation = imguizmo::operation::translate;
 		}
-		if (input.is_key_pressed(sf::Keyboard::E))
+		if (input.is_key_pressed(mml::keyboard::E))
 		{
 			operation = imguizmo::operation::rotate;
 		}
-		if (input.is_key_pressed(sf::Keyboard::R))
+		if (input.is_key_pressed(mml::keyboard::R))
 		{
 			operation = imguizmo::operation::scale;
 			mode = imguizmo::mode::local;
 		}
-		if (input.is_key_pressed(sf::Keyboard::T))
+		if (input.is_key_pressed(mml::keyboard::T))
 		{
 			mode = imguizmo::mode::local;
 		}
-		if (input.is_key_pressed(sf::Keyboard::Y) && operation != imguizmo::operation::scale)
+		if (input.is_key_pressed(mml::keyboard::Y) && operation != imguizmo::operation::scale)
 		{
 			mode = imguizmo::mode::world;
 		}
@@ -162,7 +162,7 @@ void manipulation_gizmos()
 			math::transform delta;
 			math::transform inputTransform = transform;
 			float* snap = nullptr;
-			if (input.is_key_down(sf::Keyboard::LControl))
+			if (input.is_key_down(mml::keyboard::LControl))
 			{
 				if (operation == imguizmo::operation::translate)
 					snap = &es.snap_data.translation_snap[0];
@@ -203,11 +203,11 @@ void handle_camera_movement()
 	float movement_speed = 5.0f;
 	float rotation_speed = 0.2f;
 	float multiplier = 5.0f;
-	ipoint delta_move = input.get_cursor_delta_move();
+	auto delta_move = input.get_cursor_delta_move();
 
-	if (input.is_mouse_button_down(sf::Mouse::Middle))
+	if (input.is_mouse_button_down(mml::mouse::middle))
 	{
-		if (input.is_key_down(sf::Keyboard::LShift))
+		if (input.is_key_down(mml::keyboard::LShift))
 		{
 			movement_speed *= multiplier;
 		}
@@ -222,58 +222,58 @@ void handle_camera_movement()
 		}
 	}
 
-	if (input.is_mouse_button_down(sf::Mouse::Right))
+	if (input.is_mouse_button_down(mml::mouse::right))
 	{
-		if (input.is_key_down(sf::Keyboard::LShift))
+		if (input.is_key_down(mml::keyboard::LShift))
 		{
 			movement_speed *= multiplier;
 		}
 
-		if (input.is_key_down(sf::Keyboard::W))
+		if (input.is_key_down(mml::keyboard::W))
 		{
 			transform->move_local({ 0.0f, 0.0f, movement_speed * dt });
 		}
 
-		if (input.is_key_down(sf::Keyboard::S))
+		if (input.is_key_down(mml::keyboard::S))
 		{
 			transform->move_local({ 0.0f, 0.0f, -movement_speed * dt });
 		}
 
-		if (input.is_key_down(sf::Keyboard::A))
+		if (input.is_key_down(mml::keyboard::A))
 		{
 			transform->move_local({ -movement_speed * dt, 0.0f, 0.0f });
 		}
 
-		if (input.is_key_down(sf::Keyboard::D))
+		if (input.is_key_down(mml::keyboard::D))
 		{
 			transform->move_local({ movement_speed * dt, 0.0f, 0.0f });
 		}
-		if (input.is_key_down(sf::Keyboard::Up))
+		if (input.is_key_down(mml::keyboard::Up))
 		{
 			transform->move_local({ 0.0f, 0.0f, movement_speed * dt });
 		}
 
-		if (input.is_key_down(sf::Keyboard::Down))
+		if (input.is_key_down(mml::keyboard::Down))
 		{
 			transform->move_local({ 0.0f, 0.0f, -movement_speed * dt });
 		}
 
-		if (input.is_key_down(sf::Keyboard::Left))
+		if (input.is_key_down(mml::keyboard::Left))
 		{
 			transform->move_local({ -movement_speed * dt, 0.0f, 0.0f });
 		}
 
-		if (input.is_key_down(sf::Keyboard::Right))
+		if (input.is_key_down(mml::keyboard::Right))
 		{
 			transform->move_local({ movement_speed * dt, 0.0f, 0.0f });
 		}
 
-		if (input.is_key_down(sf::Keyboard::Space))
+		if (input.is_key_down(mml::keyboard::Space))
 		{
 			transform->move_local({ 0.0f, movement_speed * dt, 0.0f });
 		}
 
-		if (input.is_key_down(sf::Keyboard::LControl))
+		if (input.is_key_down(mml::keyboard::LControl))
 		{
 			transform->move_local({ 0.0f, -movement_speed * dt, 0.0f });
 		}
@@ -338,7 +338,7 @@ void scene_dock::render(const ImVec2& area)
 		{
 			gui::SetWindowFocus();
 			if (window)
-				window->setMouseCursorVisible(false);
+				window->set_mouse_cursor_visible(false);
 		}
 
 		manipulation_gizmos();
@@ -350,7 +350,7 @@ void scene_dock::render(const ImVec2& area)
 			ImGui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
 			ImGui::PopStyleColor();
 
-			if (input.is_key_pressed(sf::Keyboard::Delete))
+			if (input.is_key_pressed(mml::keyboard::Delete))
 			{
 				if (selected && selected.is_type<runtime::entity>())
 				{
@@ -363,9 +363,9 @@ void scene_dock::render(const ImVec2& area)
 				}
 			}
 
-			if (input.is_key_pressed(sf::Keyboard::D))
+			if (input.is_key_pressed(mml::keyboard::D))
 			{
-				if (input.is_key_down(sf::Keyboard::LControl))
+				if (input.is_key_down(mml::keyboard::LControl))
 				{
 					if (selected && selected.is_type<runtime::entity>())
 					{
@@ -386,7 +386,7 @@ void scene_dock::render(const ImVec2& area)
 		if (gui::IsMouseReleased(1) || gui::IsMouseReleased(2))
 		{
 			if (window)
-				window->setMouseCursorVisible(true);
+				window->set_mouse_cursor_visible(true);
 		}
 
 		if (show_gbuffer)
@@ -401,7 +401,7 @@ void scene_dock::render(const ImVec2& area)
 				{
 					gui::SetWindowFocus();
 					if (window)
-						window->setMouseCursorVisible(false);
+						window->set_mouse_cursor_visible(false);
 				}
 			}
 		}

@@ -1,17 +1,17 @@
 #include "gui_window.h"
 #include "runtime/rendering/render_pass.h"
 
-void handle_sfml_event(sf::Event event)
+void handle_sfml_event(mml::platform_event event)
 {
 	auto& io = gui::GetIO();
-	if (event.type == sf::Event::LostFocus)
+	if (event.type == mml::platform_event::lost_focus)
 	{
 		io.MouseDown[0] = false;
 		io.MouseDown[1] = false;
 		io.MouseDown[2] = false;
 	}
 
-	if (event.type == sf::Event::KeyPressed)
+	if (event.type == mml::platform_event::key_pressed)
 	{
 		io.KeysDown[event.key.code] = true;
 		io.KeyAlt = event.key.alt;
@@ -20,7 +20,7 @@ void handle_sfml_event(sf::Event event)
 		io.KeySuper = event.key.system;
 	}
 
-	if (event.type == sf::Event::KeyReleased)
+	if (event.type == mml::platform_event::key_released)
 	{
 		io.KeysDown[event.key.code] = false;
 		io.KeyAlt = event.key.alt;
@@ -29,49 +29,59 @@ void handle_sfml_event(sf::Event event)
 		io.KeySuper = event.key.system;
 	}
 
-	if (event.type == sf::Event::MouseWheelScrolled)
+	if (event.type == mml::platform_event::mouse_wheel_scrolled)
 	{
 		io.MouseWheel += event.mouseWheelScroll.delta;
 	}
 
-	if (event.type == sf::Event::MouseButtonPressed)
+	if (event.type == mml::platform_event::mouse_button_pressed)
 	{
 		io.MouseDown[event.mouseButton.button] = true;
 	}
 
-	if (event.type == sf::Event::MouseButtonReleased)
+	if (event.type == mml::platform_event::mouse_button_released)
 	{
 		io.MouseDown[event.mouseButton.button] = false;
 	}
 
-	if (event.type == sf::Event::MouseMoved)
+	if (event.type == mml::platform_event::mouse_moved)
 	{
 		io.MousePos.x = float(event.mouseMove.x);
 		io.MousePos.y = float(event.mouseMove.y);
 	}
 
-	if (event.type == sf::Event::TextEntered)
+	if (event.type == mml::platform_event::text_entered)
 	{
 		if (event.text.unicode > 0 && event.text.unicode < 0x10000)
 			io.AddInputCharacter(event.text.unicode);
 	}
 }
 
-sf::Window::Cursor map_cursor(ImGuiMouseCursor cursor)
+const mml::cursor* map_cursor(ImGuiMouseCursor cursor)
 {
-	static std::map<ImGuiMouseCursor_, sf::Window::Cursor> cursor_map = {
-		{ ImGuiMouseCursor_Arrow, sf::Window::Arrow },
-		{ ImGuiMouseCursor_Move, sf::Window::Hand },
-		{ ImGuiMouseCursor_NotAllowed, sf::Window::NotAllowed },
-		{ ImGuiMouseCursor_Help, sf::Window::Help },
-		{ ImGuiMouseCursor_TextInput, sf::Window::Text },
-		{ ImGuiMouseCursor_ResizeNS, sf::Window::SizeVertical },
-		{ ImGuiMouseCursor_ResizeEW, sf::Window::SizeHorizontal },
-		{ ImGuiMouseCursor_ResizeNESW, sf::Window::SizeBottomLeftTopRight },
-		{ ImGuiMouseCursor_ResizeNWSE, sf::Window::SizeTopLeftBottomRight }
+	static std::map<ImGuiMouseCursor_, mml::cursor::type> cursor_map = {
+		{ ImGuiMouseCursor_Arrow, mml::cursor::arrow },
+		{ ImGuiMouseCursor_Move, mml::cursor::hand },
+		{ ImGuiMouseCursor_NotAllowed, mml::cursor::not_allowed },
+		{ ImGuiMouseCursor_Help, mml::cursor::help },
+		{ ImGuiMouseCursor_TextInput, mml::cursor::text },
+		{ ImGuiMouseCursor_ResizeNS, mml::cursor::size_vertical },
+		{ ImGuiMouseCursor_ResizeEW, mml::cursor::size_horizontal },
+		{ ImGuiMouseCursor_ResizeNESW, mml::cursor::size_bottom_left_top_right },
+		{ ImGuiMouseCursor_ResizeNWSE, mml::cursor::size_top_left_bottom_right }
 	};
+	auto id = cursor_map[static_cast<ImGuiMouseCursor_>(cursor)];
+	static std::map<mml::cursor::type, std::unique_ptr<mml::cursor>> cursors;
+	if (cursors.find(id) == cursors.end())
+	{
+		auto cursor = std::make_unique<mml::cursor>();
+		if (cursor->load_from_system(id))
+		{
+			cursors.emplace(id, std::move(cursor));
+		}
+	}
 
-	return cursor_map[static_cast<ImGuiMouseCursor_>(cursor)];
+	return cursors[id].get();
 }
 
 void imgui_frame_update(render_window& window, std::chrono::duration<float> dt, const usize& view_size)
@@ -82,17 +92,22 @@ void imgui_frame_update(render_window& window, std::chrono::duration<float> dt, 
 	// Setup time step
 	io.DeltaTime = dt.count();
 
-	auto window_pos = window.getPosition();
-	auto window_size = window.getSize();
+	auto window_pos = window.get_position();
+	auto window_size = window.get_size();
 	irect rect;
-	rect.left = window_pos.x;
-	rect.top = window_pos.y;
-	rect.right = window_size.width;
-	rect.bottom = window_size.height;
-	auto mouse_pos = sf::Mouse::getPosition(window);
+	rect.left = window_pos[0];
+	rect.top = window_pos[1];
+	rect.right = window_size[0];
+	rect.bottom = window_size[1];
+	auto mouse_pos = mml::mouse::get_position(window);
 
-	if (window.hasFocus() && rect.contains(mouse_pos))
-		window.setMouseCursor(map_cursor(gui::GetMouseCursor()));
+	if (window.has_focus() && rect.contains({ mouse_pos[0], mouse_pos[1] }))
+	{
+		auto cursor = map_cursor(gui::GetMouseCursor());
+		if(cursor)
+			window.set_mouse_cursor(*cursor);
+	}
+		
 
 	// Start the frame	
 	gui::NewFrame();
@@ -151,7 +166,7 @@ gui_window::gui_window()
 	_gui_context = imgui_create_context();
 }
 
-gui_window::gui_window(sf::VideoMode mode, const std::string& title, std::uint32_t style /*= sf::Style::Default*/)
+gui_window::gui_window(mml::video_mode mode, const std::string& title, std::uint32_t style /*= mml::style::Default*/)
 : render_window(mode, title, style)
 , _dockspace(this)
 {
@@ -163,11 +178,11 @@ gui_window::~gui_window()
 	imgui_destroy_context(_gui_context);
 }
 
-bool gui_window::filterEvent(const sf::Event& event)
+bool gui_window::filter_event(const mml::platform_event& event)
 {
 	handle_sfml_event(event);
 
-	return render_window::filterEvent(event);;
+	return render_window::filter_event(event);;
 }
 
 void gui_window::frame_begin()

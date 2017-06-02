@@ -5,9 +5,9 @@ namespace runtime
 {
 	input::input()
 	{
-		auto p = sf::Mouse::getPosition();
-		_current_cursor_position.x = p.x;
-		_current_cursor_position.y = p.y;
+		auto p = mml::mouse::get_position();
+		_current_cursor_position.x = p[0];
+		_current_cursor_position.y = p[1];
 		_last_cursor_position = _current_cursor_position;
 	}
 
@@ -20,7 +20,7 @@ namespace runtime
 		joystick_reset();
 	}
 
-	void input::handle_event(const sf::Event& event)
+	void input::handle_event(const mml::platform_event& event)
 	{
 		_action_mapper.handle_event(event);
 
@@ -32,69 +32,69 @@ namespace runtime
 
 	}
 
-	bool input::is_key_pressed(sf::Keyboard::Key key)
+	bool input::is_key_pressed(mml::keyboard::key key)
 	{
 		return _keys_pressed[key];
 	}
 
-	bool input::is_key_down(sf::Keyboard::Key key)
+	bool input::is_key_down(mml::keyboard::key key)
 	{
 		return _keys_down[key];
 	}
 
-	bool input::is_key_released(sf::Keyboard::Key key)
+	bool input::is_key_released(mml::keyboard::key key)
 	{
 		return _keys_released[key];
 	}
 
-	bool input::is_mouse_button_pressed(sf::Mouse::Button button)
+	bool input::is_mouse_button_pressed(mml::mouse::button button)
 	{
 		return _mouse_buttons_pressed[button];
 	}
 
-	bool input::is_mouse_button_down(sf::Mouse::Button button)
+	bool input::is_mouse_button_down(mml::mouse::button button)
 	{
 		return _mouse_buttons_down[button];
 	}
 
-	bool input::is_mouse_button_released(sf::Mouse::Button button)
+	bool input::is_mouse_button_released(mml::mouse::button button)
 	{
 		return _mouse_buttons_released[button];
 	}
 
-	bool input::is_joystick_connected(unsigned int joystickId)
+	bool input::is_joystick_connected(unsigned int joystick_id)
 	{
-		return _joysticks_connected[joystickId];
+		return _joysticks_connected[joystick_id];
 	}
 
-	bool input::is_joystick_active(unsigned int joystickId)
+	bool input::is_joystick_active(unsigned int joystick_id)
 	{
-		return _joysticks_active[joystickId];
+		return _joysticks_active[joystick_id];
 	}
 
-	bool input::is_joystick_disconnected(unsigned int joystickId)
+	bool input::is_joystick_disconnected(unsigned int joystick_id)
 	{
-		return _joysticks_disconnected[joystickId];
+		return _joysticks_disconnected[joystick_id];
 	}
 
-	bool input::is_joystick_button_pressed(unsigned int joystickId, unsigned int button)
+	bool input::is_joystick_button_pressed(unsigned int joystick_id, unsigned int button)
 	{
-		return _joystick_buttons_pressed[std::pair<unsigned int, unsigned int>(joystickId, button)];
+		return _joystick_buttons_pressed[std::pair<unsigned int, unsigned int>(joystick_id, button)];
 	}
 
-	bool input::is_joystick_button_down(unsigned int joystickId, unsigned int button)
+	bool input::is_joystick_button_down(unsigned int joystick_id, unsigned int button)
 	{
-		return _joystick_buttons_down[std::pair<unsigned int, unsigned int>(joystickId, button)];
+		return _joystick_buttons_down[std::pair<unsigned int, unsigned int>(joystick_id, button)];
 	}
 
-	bool input::is_joystick_button_released(unsigned int joystickId, unsigned int button)
+	bool input::is_joystick_button_released(unsigned int joystick_id, unsigned int button)
 	{
-		return _joystick_buttons_released[std::pair<unsigned int, unsigned int>(joystickId, button)];
+		return _joystick_buttons_released[std::pair<unsigned int, unsigned int>(joystick_id, button)];
 	}
 
-	float input::get_joystick_axis_position(unsigned int joystickId, sf::Joystick::Axis axis)
+	float input::get_joystick_axis_position(unsigned int joystick_id, mml::joystick::axis axis)
 	{
-		return _joystick_axis_positions[std::pair<unsigned int, unsigned int>(joystickId, axis)];
+		return _joystick_axis_positions[std::pair<unsigned int, unsigned int>(joystick_id, axis)];
 	}
 
 	void input::key_reset()
@@ -115,15 +115,15 @@ namespace runtime
 		}
 	}
 
-	bool input::key_event(const sf::Event& event)
+	bool input::key_event(const mml::platform_event& event)
 	{
-		if (event.type == sf::Event::KeyPressed)
+		if (event.type == mml::platform_event::key_pressed)
 		{
 			_keys_pressed[event.key.code] = !_keys_down[event.key.code];
 			_keys_released[event.key.code] = false;
 			return true;
 		}
-		else if (event.type == sf::Event::KeyReleased)
+		else if (event.type == mml::platform_event::key_released)
 		{
 			_keys_pressed[event.key.code] = false;
 			_keys_down[event.key.code] = false;
@@ -159,22 +159,22 @@ namespace runtime
 		}
 	}
 
-	bool input::mouse_event(const sf::Event& event)
+	bool input::mouse_event(const mml::platform_event& event)
 	{
-		if (event.type == sf::Event::MouseButtonPressed)
+		if (event.type == mml::platform_event::mouse_button_pressed)
 		{
 			_mouse_buttons_pressed[event.mouseButton.button] = !_mouse_buttons_down[event.mouseButton.button];
 			_mouse_buttons_released[event.mouseButton.button] = false;
 			return true;
 		}
-		else if (event.type == sf::Event::MouseButtonReleased)
+		else if (event.type == mml::platform_event::mouse_button_released)
 		{
 			_mouse_buttons_pressed[event.mouseButton.button] = false;
 			_mouse_buttons_down[event.mouseButton.button] = false;
 			_mouse_buttons_released[event.mouseButton.button] = true;
 			return true;
 		}
-		else if (event.type == sf::Event::MouseMoved)
+		else if (event.type == mml::platform_event::mouse_moved)
 		{
 			_last_cursor_position = _current_cursor_position;
 			ipoint mouse;
@@ -184,7 +184,7 @@ namespace runtime
 			_mouse_move_event = true;
 			return true;
 		}
-		else if (event.type == sf::Event::MouseWheelMoved)
+		else if (event.type == mml::platform_event::mouse_wheel_moved)
 		{
 			mouse_wheel_scrolled = true;
 			_mouse_scroll_delta = static_cast<float>(event.mouseWheel.delta);
@@ -226,39 +226,39 @@ namespace runtime
 		}
 	}
 
-	bool input::joystick_event(const sf::Event& event)
+	bool input::joystick_event(const mml::platform_event& event)
 	{
-		if (event.type == sf::Event::JoystickConnected)
+		if (event.type == mml::platform_event::joystick_connected)
 		{
-			_joysticks_connected[event.joystickConnect.joystickId] = !_joysticks_active[event.joystickConnect.joystickId];
-			_joysticks_disconnected[event.joystickConnect.joystickId] = false;
+			_joysticks_connected[event.joystickConnect.joystick_id] = !_joysticks_active[event.joystickConnect.joystick_id];
+			_joysticks_disconnected[event.joystickConnect.joystick_id] = false;
 			return true;
 		}
-		else if (event.type == sf::Event::JoystickDisconnected)
+		else if (event.type == mml::platform_event::joystick_disconnected)
 		{
-			_joysticks_connected[event.joystickConnect.joystickId] = false;
-			_joysticks_active[event.joystickConnect.joystickId] = false;
-			_joysticks_disconnected[event.joystickConnect.joystickId] = true;
+			_joysticks_connected[event.joystickConnect.joystick_id] = false;
+			_joysticks_active[event.joystickConnect.joystick_id] = false;
+			_joysticks_disconnected[event.joystickConnect.joystick_id] = true;
 			return true;
 		}
-		else if (event.type == sf::Event::JoystickButtonPressed)
+		else if (event.type == mml::platform_event::joystick_button_pressed)
 		{
-			std::pair<unsigned int, unsigned int> k(event.joystickButton.joystickId, event.joystickButton.button);
+			std::pair<unsigned int, unsigned int> k(event.joystickButton.joystick_id, event.joystickButton.button);
 			_joystick_buttons_pressed[k] = !_joystick_buttons_down[k];
 			_joystick_buttons_released[k] = false;
 			return true;
 		}
-		else if (event.type == sf::Event::JoystickButtonReleased)
+		else if (event.type == mml::platform_event::joystick_button_released)
 		{
-			std::pair<unsigned int, unsigned int> k(event.joystickButton.joystickId, event.joystickButton.button);
+			std::pair<unsigned int, unsigned int> k(event.joystickButton.joystick_id, event.joystickButton.button);
 			_joystick_buttons_pressed[k] = false;
 			_joystick_buttons_down[k] = false;
 			_joystick_buttons_released[k] = true;
 			return true;
 		}
-		else if (event.type == sf::Event::JoystickMoved)
+		else if (event.type == mml::platform_event::joystick_moved)
 		{
-			std::pair<unsigned int, unsigned int> k(event.joystickMove.joystickId, event.joystickMove.axis);
+			std::pair<unsigned int, unsigned int> k(event.joystickMove.joystick_id, event.joystickMove.axis);
 			_joystick_axis_positions[k] = event.joystickMove.position;
 			return true;
 		}

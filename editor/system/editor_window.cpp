@@ -185,7 +185,7 @@ main_editor_window::main_editor_window()
 {
 }
 
-main_editor_window::main_editor_window(sf::VideoMode mode, const std::string& title, std::uint32_t style /*= sf::Style::Default*/)
+main_editor_window::main_editor_window(mml::video_mode mode, const std::string& title, std::uint32_t style /*= mml::style::Default*/)
 	:gui_window(mode, title, style)
 {
 }
@@ -218,26 +218,26 @@ void main_editor_window::on_menubar()
 	auto& input = core::get_subsystem<runtime::input>();
 	const auto& current_project = pm.get_current_project();
 
-	if (input.is_key_down(sf::Keyboard::LControl))
+	if (input.is_key_down(mml::keyboard::LControl))
 	{
-		if (input.is_key_down(sf::Keyboard::LShift))
+		if (input.is_key_down(mml::keyboard::LShift))
 		{
-			if (input.is_key_pressed(sf::Keyboard::S))
+			if (input.is_key_pressed(mml::keyboard::S))
 			{
 				save_scene_as();
 			}
 		}
-		else if (input.is_key_pressed(sf::Keyboard::S))
+		else if (input.is_key_pressed(mml::keyboard::S))
 		{
 			save_scene();
 		}
 
-		if (input.is_key_pressed(sf::Keyboard::O))
+		if (input.is_key_pressed(mml::keyboard::O))
 		{
 			open_scene();
 		}
 
-		if (input.is_key_pressed(sf::Keyboard::N))
+		if (input.is_key_pressed(mml::keyboard::N))
 		{
 			create_new_scene();
 		}

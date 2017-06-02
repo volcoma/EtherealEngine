@@ -19,3 +19,6 @@ target_include_directories (tracey PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory_ex(rttr)
 
 add_subdirectory_ex(cereal)
+
+add_subdirectory_ex(mml)
+target_include_directories (mml-window PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/mml/include)

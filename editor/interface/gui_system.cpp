@@ -14,6 +14,7 @@
 #include "runtime/rendering/render_window.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/system/engine.h"
+#include "runtime/input/input.h"
 #include <unordered_map>
 
 // -------------------------------------------------------------------
@@ -176,23 +177,23 @@ bool gui_system::initialize()
 		.end();
 
 	// init keyboard mapping
-	io.KeyMap[ImGuiKey_Tab] = sf::Keyboard::Tab;
-	io.KeyMap[ImGuiKey_LeftArrow] = sf::Keyboard::Left;
-	io.KeyMap[ImGuiKey_RightArrow] = sf::Keyboard::Right;
-	io.KeyMap[ImGuiKey_UpArrow] = sf::Keyboard::Up;
-	io.KeyMap[ImGuiKey_DownArrow] = sf::Keyboard::Down;
-	io.KeyMap[ImGuiKey_Home] = sf::Keyboard::Home;
-	io.KeyMap[ImGuiKey_End] = sf::Keyboard::End;
-	io.KeyMap[ImGuiKey_Delete] = sf::Keyboard::Delete;
-	io.KeyMap[ImGuiKey_Backspace] = sf::Keyboard::BackSpace;
-	io.KeyMap[ImGuiKey_Enter] = sf::Keyboard::Return;
-	io.KeyMap[ImGuiKey_Escape] = sf::Keyboard::Escape;
-	io.KeyMap[ImGuiKey_A] = sf::Keyboard::A;
-	io.KeyMap[ImGuiKey_C] = sf::Keyboard::C;
-	io.KeyMap[ImGuiKey_V] = sf::Keyboard::V;
-	io.KeyMap[ImGuiKey_X] = sf::Keyboard::X;
-	io.KeyMap[ImGuiKey_Y] = sf::Keyboard::Y;
-	io.KeyMap[ImGuiKey_Z] = sf::Keyboard::Z;
+	io.KeyMap[ImGuiKey_Tab] = mml::keyboard::Tab;
+	io.KeyMap[ImGuiKey_LeftArrow] = mml::keyboard::Left;
+	io.KeyMap[ImGuiKey_RightArrow] = mml::keyboard::Right;
+	io.KeyMap[ImGuiKey_UpArrow] = mml::keyboard::Up;
+	io.KeyMap[ImGuiKey_DownArrow] = mml::keyboard::Down;
+	io.KeyMap[ImGuiKey_Home] = mml::keyboard::Home;
+	io.KeyMap[ImGuiKey_End] = mml::keyboard::End;
+	io.KeyMap[ImGuiKey_Delete] = mml::keyboard::Delete;
+	io.KeyMap[ImGuiKey_Backspace] = mml::keyboard::BackSpace;
+	io.KeyMap[ImGuiKey_Enter] = mml::keyboard::Return;
+	io.KeyMap[ImGuiKey_Escape] = mml::keyboard::Escape;
+	io.KeyMap[ImGuiKey_A] = mml::keyboard::A;
+	io.KeyMap[ImGuiKey_C] = mml::keyboard::C;
+	io.KeyMap[ImGuiKey_V] = mml::keyboard::V;
+	io.KeyMap[ImGuiKey_X] = mml::keyboard::X;
+	io.KeyMap[ImGuiKey_Y] = mml::keyboard::Y;
+	io.KeyMap[ImGuiKey_Z] = mml::keyboard::Z;
 
 	std::uint8_t* data = nullptr;
 	std::int32_t width = 0;

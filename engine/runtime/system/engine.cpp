@@ -81,7 +81,7 @@ namespace runtime
 		auto windows = get_windows();
 		for (auto window : windows)
 		{
-			if (window->hasFocus())
+			if (window->has_focus())
 			{
 				_focused_window = window;
 				break;
@@ -96,10 +96,10 @@ namespace runtime
 			
 			on_window_frame_begin(*window);
 
-			bool has_focus = window->hasFocus();
+			bool has_focus = window->has_focus();
 
-			sf::Event e;
-			while (window->pollEvent(e))
+			mml::platform_event e;
+			while (window->poll_event(e))
 			{
 				if (has_focus)
 				{
@@ -124,7 +124,7 @@ namespace runtime
 			on_window_frame_end(*window);
 
 			if (window->is_main())
-				_running = window->isOpen();
+				_running = window->is_open();
 		}
 
 		on_frame_end(dt);

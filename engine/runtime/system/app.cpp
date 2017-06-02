@@ -18,13 +18,13 @@ namespace runtime
 	{
 		auto& eng = core::get_subsystem<engine>();
 
-		sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+		mml::video_mode desktop = mml::video_mode::get_desktop_mode();
 		desktop.width = 1280;
 		desktop.height = 720;
 		auto main_window = std::make_shared<render_window>(
 			desktop,
 			"App",
-			sf::Style::Default);
+			mml::style::Default);
 		
 
 		if(!eng.start(main_window))

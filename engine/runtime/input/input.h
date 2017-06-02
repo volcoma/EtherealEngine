@@ -9,7 +9,7 @@
 
 namespace runtime
 {
-	using action_map_t = std::unordered_map<std::string, std::unordered_map<action_type, event<void(const sf::Event&)>>>;
+	using action_map_t = std::unordered_map<std::string, std::unordered_map<action_type, event<void(const mml::platform_event&)>>>;
 
 	struct action_mapper
 	{
@@ -28,9 +28,9 @@ namespace runtime
 		///
 		action_map_t actions;
 
-		void handle_event(const sf::Event& event)
+		void handle_event(const mml::platform_event& event)
 		{
-			auto trigger_callbacks = [this](auto mapper, const sf::Event& event)
+			auto trigger_callbacks = [this](auto mapper, const mml::platform_event& event)
 			{
 				auto mappings = mapper.get_mapping(event);
 				for (auto& action : mappings.actions)
@@ -55,16 +55,16 @@ namespace runtime
 // 	auto& mappings = input.get_mappings();
 //
 //	// You can map different type of events to the same action
-// 	mappings.event_map.map("some_action", sf::Event::TextEntered);
-// 	mappings.mouse_button_map.map("some_action", sf::Mouse::Right);
-// 	mappings.keyboard_map.map("some_action", sf::Keyboard::Space);
+// 	mappings.event_map.map("some_action", mml::platform_event::text_entered);
+// 	mappings.mouse_button_map.map("some_action", mml::mouse::Right);
+// 	mappings.keyboard_map.map("some_action", mml::keyboard::Space);
 //
 // 	//you can subscribe to a callback for a specific event and action type
-// 	mappings.actions["some_action"][action_type::pressed].connect([](const sf::Event& e)
+// 	mappings.actions["some_action"][action_type::pressed].connect([](const mml::platform_event& e)
 // 	{
 // 		//do some stuff
 // 	});
-// 	mappings.actions["some_action"][action_type::changed].connect([](const sf::Event& e)
+// 	mappings.actions["some_action"][action_type::changed].connect([](const mml::platform_event& e)
 // 	{
 // 		//do some stuff
 // 	});
@@ -121,7 +121,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void handle_event(const sf::Event& event);
+		void handle_event(const mml::platform_event& event);
 
 		//-----------------------------------------------------------------------------
 		//  Name : is_key_pressed ()
@@ -131,7 +131,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool is_key_pressed(sf::Keyboard::Key key);
+		bool is_key_pressed(mml::keyboard::key key);
 
 		//-----------------------------------------------------------------------------
 		//  Name : is_key_down ()
@@ -141,7 +141,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool is_key_down(sf::Keyboard::Key key);
+		bool is_key_down(mml::keyboard::key key);
 
 		//-----------------------------------------------------------------------------
 		//  Name : is_key_released ()
@@ -151,7 +151,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool is_key_released(sf::Keyboard::Key key);
+		bool is_key_released(mml::keyboard::key key);
 
 		//-----------------------------------------------------------------------------
 		//  Name : mouseMoved ()
@@ -201,7 +201,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool is_mouse_button_pressed(sf::Mouse::Button button);
+		bool is_mouse_button_pressed(mml::mouse::button button);
 
 		//-----------------------------------------------------------------------------
 		//  Name : is_mouse_button_down ()
@@ -211,7 +211,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool is_mouse_button_down(sf::Mouse::Button button);
+		bool is_mouse_button_down(mml::mouse::button button);
 
 		//-----------------------------------------------------------------------------
 		//  Name : is_mouse_button_released ()
@@ -221,7 +221,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool is_mouse_button_released(sf::Mouse::Button button);
+		bool is_mouse_button_released(mml::mouse::button button);
 
 		//-----------------------------------------------------------------------------
 		//  Name : is_mouse_wheel_scrolled ()
@@ -251,7 +251,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool is_joystick_connected(unsigned int joystickId);
+		bool is_joystick_connected(unsigned int joystick_id);
 
 		//-----------------------------------------------------------------------------
 		//  Name : is_joystick_active ()
@@ -261,7 +261,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool is_joystick_active(unsigned int joystickId);
+		bool is_joystick_active(unsigned int joystick_id);
 
 		//-----------------------------------------------------------------------------
 		//  Name : is_joystick_disconnected ()
@@ -271,7 +271,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool is_joystick_disconnected(unsigned int joystickId);
+		bool is_joystick_disconnected(unsigned int joystick_id);
 
 		//-----------------------------------------------------------------------------
 		//  Name : is_joystick_button_pressed ()
@@ -281,7 +281,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool is_joystick_button_pressed(unsigned int joystickId, unsigned int button);
+		bool is_joystick_button_pressed(unsigned int joystick_id, unsigned int button);
 
 		//-----------------------------------------------------------------------------
 		//  Name : is_joystick_button_down ()
@@ -291,7 +291,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool is_joystick_button_down(unsigned int joystickId, unsigned int button);
+		bool is_joystick_button_down(unsigned int joystick_id, unsigned int button);
 
 		//-----------------------------------------------------------------------------
 		//  Name : is_joystick_button_released ()
@@ -301,7 +301,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool is_joystick_button_released(unsigned int joystickId, unsigned int button);
+		bool is_joystick_button_released(unsigned int joystick_id, unsigned int button);
 
 		//-----------------------------------------------------------------------------
 		//  Name : get_joystick_axis_position ()
@@ -311,7 +311,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		float get_joystick_axis_position(unsigned int joystickId, sf::Joystick::Axis axis);
+		float get_joystick_axis_position(unsigned int joystick_id, mml::joystick::axis axis);
 
 	private:
 		//-----------------------------------------------------------------------------
@@ -332,7 +332,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool key_event(const sf::Event& event);
+		bool key_event(const mml::platform_event& event);
 
 		//-----------------------------------------------------------------------------
 		//  Name : mouse_reset ()
@@ -352,7 +352,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool mouse_event(const sf::Event& event);
+		bool mouse_event(const mml::platform_event& event);
 
 		//-----------------------------------------------------------------------------
 		//  Name : joystick_reset ()
@@ -372,7 +372,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool joystick_event(const sf::Event& event);
+		bool joystick_event(const mml::platform_event& event);
 
 		///
 		action_mapper _action_mapper;

@@ -6,7 +6,4 @@ add_library (runtime ${libsrc})
 
 target_link_libraries(runtime PUBLIC core)
 target_link_libraries(runtime PUBLIC graphics)
-#target_link_libraries(runtime PUBLIC sfml-window)
-if(WIN32)
-	target_link_libraries(runtime PUBLIC winmm)
-endif()
+target_link_libraries(runtime PUBLIC mml-window)

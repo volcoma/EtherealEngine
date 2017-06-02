@@ -1,7 +1,6 @@
 #pragma once
 
 #include "assert.h"
-#include "basetypes.hpp"
 #include "handle.hpp"
 #include "handle_object_set.hpp"
 #include "handle_set.hpp"

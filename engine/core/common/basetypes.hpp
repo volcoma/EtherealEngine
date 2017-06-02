@@ -144,7 +144,7 @@ struct size
 		return (height > b.height);
 	}
 
-	inline bool isValid() const
+	inline bool is_valid() const
 	{
 		return width != 0 && height != 0;
 	}

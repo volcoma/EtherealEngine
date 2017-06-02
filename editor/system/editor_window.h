@@ -22,7 +22,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	main_editor_window(sf::VideoMode mode, const std::string& title, std::uint32_t style = sf::Style::Default);
+	main_editor_window(mml::video_mode mode, const std::string& title, std::uint32_t style = mml::style::Default);
 	
 	//-----------------------------------------------------------------------------
 	//  Name : ~ProjectManagerWindow (virtual )

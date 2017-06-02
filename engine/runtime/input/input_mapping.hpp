@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../system/sfml/Window/Event.hpp"
-#include "../system/sfml/Window/Mouse.hpp"
-#include "../system/sfml/Window/Keyboard.hpp"
-#include "../system/sfml/Window/Touch.hpp"
-#include "../system/sfml/Window/Joystick.hpp"
-#include "../system/sfml/Window/Sensor.hpp"
+#include "mml/window/event.hpp"
+#include "mml/window/mouse.hpp"
+#include "mml/window/keyboard.hpp"
+#include "mml/window/touch.hpp"
+#include "mml/window/joystick.hpp"
+#include "mml/window/sensor.hpp"
 #include <unordered_map>
 #include <vector>
 #include <string>
@@ -63,7 +63,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual input_mapping get_mapping(const sf::Event& e) = 0;
+	virtual input_mapping get_mapping(const mml::platform_event& e) = 0;
 
 protected:
 	/// mappings
@@ -71,17 +71,17 @@ protected:
 };
 
 
-struct keyboard_mapper : public input_mapper<sf::Keyboard::Key>
+struct keyboard_mapper : public input_mapper<mml::keyboard::key>
 {
-	virtual input_mapping get_mapping(const sf::Event& e)
+	virtual input_mapping get_mapping(const mml::platform_event& e)
 	{
 		input_mapping binds;
-		if (e.type == sf::Event::EventType::KeyPressed)
+		if (e.type == mml::platform_event::event_type::key_pressed)
 		{
 			binds.actions = _bindings[e.key.code];
 			binds.type = action_type::pressed;
 		}
-		if (e.type == sf::Event::EventType::KeyReleased)
+		if (e.type == mml::platform_event::event_type::key_released)
 		{
 			binds.actions = _bindings[e.key.code];
 			binds.type = action_type::released;
@@ -91,17 +91,17 @@ struct keyboard_mapper : public input_mapper<sf::Keyboard::Key>
 
 };
 
-struct mouse_button_mapper : public input_mapper<sf::Mouse::Button>
+struct mouse_button_mapper : public input_mapper<mml::mouse::button>
 {
-	virtual input_mapping get_mapping(const sf::Event& e)
+	virtual input_mapping get_mapping(const mml::platform_event& e)
 	{
 		input_mapping binds;
-		if (e.type == sf::Event::EventType::MouseButtonPressed)
+		if (e.type == mml::platform_event::event_type::mouse_button_pressed)
 		{
 			binds.actions = _bindings[e.mouseButton.button];
 			binds.type = action_type::pressed;
 		}
-		if (e.type == sf::Event::EventType::MouseButtonReleased)
+		if (e.type == mml::platform_event::event_type::mouse_button_released)
 		{
 			binds.actions = _bindings[e.mouseButton.button];
 			binds.type = action_type::released;
@@ -110,12 +110,12 @@ struct mouse_button_mapper : public input_mapper<sf::Mouse::Button>
 	}
 };
 
-struct mouse_wheel_mapper : public input_mapper<sf::Mouse::Wheel>
+struct mouse_wheel_mapper : public input_mapper<mml::mouse::wheel>
 {
-	virtual input_mapping get_mapping(const sf::Event& e)
+	virtual input_mapping get_mapping(const mml::platform_event& e)
 	{
 		input_mapping binds;
-		if (e.type == sf::Event::EventType::MouseWheelScrolled)
+		if (e.type == mml::platform_event::event_type::mouse_wheel_scrolled)
 		{
 			binds.actions = _bindings[e.mouseWheelScroll.wheel];
 			binds.type = action_type::changed;
@@ -126,20 +126,20 @@ struct mouse_wheel_mapper : public input_mapper<sf::Mouse::Wheel>
 
 struct touch_finger_mapper : public input_mapper<unsigned int>
 {
-	virtual input_mapping get_mapping(const sf::Event& e)
+	virtual input_mapping get_mapping(const mml::platform_event& e)
 	{
 		input_mapping binds;
-		if (e.type == sf::Event::EventType::TouchBegan)
+		if (e.type == mml::platform_event::event_type::touch_began)
 		{
 			binds.actions = _bindings[e.touch.finger];
 			binds.type = action_type::pressed;
 		}
-		if (e.type == sf::Event::EventType::TouchMoved)
+		if (e.type == mml::platform_event::event_type::touch_moved)
 		{
 			binds.actions = _bindings[e.touch.finger];
 			binds.type = action_type::changed;
 		}
-		if (e.type == sf::Event::EventType::TouchEnded)
+		if (e.type == mml::platform_event::event_type::touch_ended)
 		{
 			binds.actions = _bindings[e.touch.finger];
 			binds.type = action_type::released;
@@ -150,26 +150,26 @@ struct touch_finger_mapper : public input_mapper<unsigned int>
 
 struct joystick_button_mapper : public input_mapper<std::pair<unsigned int, unsigned int>>
 {
-	virtual input_mapping get_mapping(const sf::Event& e)
+	virtual input_mapping get_mapping(const mml::platform_event& e)
 	{
 		input_mapping binds;
-		if (e.type == sf::Event::EventType::JoystickButtonPressed)
+		if (e.type == mml::platform_event::event_type::joystick_button_pressed)
 		{
-			binds.actions = _bindings[{e.joystickButton.joystickId, e.joystickButton.button}];
+			binds.actions = _bindings[{e.joystickButton.joystick_id, e.joystickButton.button}];
 			binds.type = action_type::pressed;
 		}
-		if (e.type == sf::Event::EventType::JoystickButtonReleased)
+		if (e.type == mml::platform_event::event_type::joystick_button_released)
 		{
-			binds.actions = _bindings[{e.joystickButton.joystickId, e.joystickButton.button}];
+			binds.actions = _bindings[{e.joystickButton.joystick_id, e.joystickButton.button}];
 			binds.type = action_type::released;
 		}
 		return binds;
 	}
 };
 
-struct event_mapper : public input_mapper<sf::Event::EventType>
+struct event_mapper : public input_mapper<mml::platform_event::event_type>
 {
-	virtual input_mapping get_mapping(const sf::Event& e)
+	virtual input_mapping get_mapping(const mml::platform_event& e)
 	{
 		input_mapping binds;
 		binds.actions = _bindings[e.type];

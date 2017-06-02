@@ -231,7 +231,7 @@ std::unique_ptr<base_function_wrapper> make_wrapper(C * const object_ptr, F&& f)
 }
 
 template<typename id_t = std::string, typename sentinel_t = std::weak_ptr<void>>
-class signals
+class signals_t
 {
 	struct info_t
 	{
@@ -389,7 +389,7 @@ private:
 
 
 template<typename id_t = std::string, typename sentinel_t = std::weak_ptr<void>>
-class functions
+class functions_t
 {
 	struct info_t
 	{
@@ -508,8 +508,8 @@ private:
 template<typename id_t = std::string, typename sentinel_t = std::weak_ptr<void>>
 struct binder
 {
-	signals<id_t, sentinel_t> signals;
-	functions<id_t, sentinel_t> functions;
+	signals_t<id_t, sentinel_t> signals;
+	functions_t<id_t, sentinel_t> functions;
 };
 
 #endif

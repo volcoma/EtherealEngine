@@ -16,13 +16,13 @@ namespace editor
 	{
 		auto& engine = core::get_subsystem<runtime::engine>();
 
-		sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+		mml::video_mode desktop = mml::video_mode::get_desktop_mode();
 		desktop.width = 1280;
 		desktop.height = 720;
 		auto main_window = std::make_shared<main_editor_window>(
 			desktop,
 			"Editor",
-			sf::Style::Default);
+			mml::style::Default);
 
 		if (!engine.start(main_window))
 		{

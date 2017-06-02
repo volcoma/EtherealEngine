@@ -22,7 +22,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	gui_window(sf::VideoMode mode, const std::string& title, std::uint32_t style = sf::Style::Default);
+	gui_window(mml::video_mode mode, const std::string& title, std::uint32_t style = mml::style::Default);
 	//-----------------------------------------------------------------------------
 	//  Name : ~gui_window (virtual )
 	/// <summary>
@@ -91,14 +91,14 @@ public:
 	//-----------------------------------------------------------------------------
 	virtual void frame_end();
 	//-----------------------------------------------------------------------------
-	//  Name : filterEvent (virtual )
+	//  Name : filter_event (virtual )
 	/// <summary>
 	/// 
 	/// 
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual bool filterEvent(const sf::Event& event);
+	virtual bool filter_event(const mml::platform_event& event);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_dockspace ()
