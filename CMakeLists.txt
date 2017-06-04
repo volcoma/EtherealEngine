@@ -35,9 +35,6 @@ function(add_subdirectory_ex arg1)
 	message(STATUS "---------Done ${arg1}")
 endfunction(add_subdirectory_ex)
 
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin) 
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib) 
-
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /bigobj")
     set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} /IGNORE:4221")
@@ -49,6 +46,9 @@ message(STATUS "PROJECT_BINARY_DIR >>> ${PROJECT_BINARY_DIR}")
 message(STATUS "CMAKE_CXX_FLAGS >>> ${CMAKE_CXX_FLAGS}")
 message(STATUS "CMAKE_CXX_FLAGS_DEBUG >>> ${CMAKE_CXX_FLAGS_DEBUG}")
 message(STATUS "CMAKE_CXX_FLAGS_RELEASE >>> ${CMAKE_CXX_FLAGS_RELEASE}")
+
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin) 
+set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib) 
 
 add_subdirectory_ex(engine)
 add_subdirectory_ex(editor)
