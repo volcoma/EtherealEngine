@@ -45,10 +45,10 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj -Wa,--hash-size=2048" )
 endif()
 
+message(STATUS "PROJECT_BINARY_DIR >>> ${PROJECT_BINARY_DIR}")
 message(STATUS "CMAKE_CXX_FLAGS >>> ${CMAKE_CXX_FLAGS}")
 message(STATUS "CMAKE_CXX_FLAGS_DEBUG >>> ${CMAKE_CXX_FLAGS_DEBUG}")
 message(STATUS "CMAKE_CXX_FLAGS_RELEASE >>> ${CMAKE_CXX_FLAGS_RELEASE}")
-
 
 add_subdirectory_ex(engine)
 add_subdirectory_ex(editor)

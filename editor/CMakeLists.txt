@@ -11,6 +11,6 @@ target_link_libraries(editor PUBLIC shaderc)
 target_link_libraries(editor PUBLIC texturec)
 
 install(TARGETS editor
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib/static)
+        RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/bin
+        LIBRARY DESTINATION ${PROJECT_SOURCE_DIR}/lib
+        ARCHIVE DESTINATION ${PROJECT_SOURCE_DIR}/lib/static)
