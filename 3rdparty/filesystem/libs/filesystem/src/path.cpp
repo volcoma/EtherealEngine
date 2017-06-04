@@ -132,15 +132,18 @@ namespace filesystem
     if (this == &p)  // self-append
     {
       path rhs(p);
+	  rhs.make_preferred();
       if (!detail::is_directory_separator(rhs.m_pathname[0]))
         m_append_separator_if_needed();
       m_pathname += rhs.m_pathname;
     }
     else
     {
-      if (!detail::is_directory_separator(*p.m_pathname.begin()))
+	  path rhs(p);
+	  rhs.make_preferred();
+      if (!detail::is_directory_separator(*rhs.m_pathname.begin()))
         m_append_separator_if_needed();
-      m_pathname += p.m_pathname;
+      m_pathname += rhs.m_pathname;
     }
     return *this;
   }
@@ -153,16 +156,20 @@ namespace filesystem
       && ptr < m_pathname.data() + m_pathname.size())  // overlapping source
     {
       path rhs(ptr);
+	  rhs.make_preferred();
       if (!detail::is_directory_separator(rhs.m_pathname[0]))
         m_append_separator_if_needed();
       m_pathname += rhs.m_pathname;
     }
     else
     {
-      if (!detail::is_directory_separator(*ptr))
+	  path rhs(ptr);
+	  rhs.make_preferred();
+      if (!detail::is_directory_separator(rhs.m_pathname[0]))
         m_append_separator_if_needed();
-      m_pathname += ptr;
+      m_pathname += rhs.m_pathname;
     }
+
     return *this;
   }
 

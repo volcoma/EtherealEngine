@@ -358,9 +358,9 @@ namespace fs
 				{
 					visitor(pathFilter.first);
 				}
-				else
+				else if(fs::exists(pathFilter.first, err))
 				{
-					for (fs::directory_iterator it(pathFilter.first); it != end; ++it)
+					for (fs::directory_iterator it(pathFilter.first, err); it != end; ++it)
 					{
 						std::string current = it->path().string();
 						size_t beforePos = current.find(before);

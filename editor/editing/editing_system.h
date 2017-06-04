@@ -89,6 +89,21 @@ namespace editor
 		void unselect();
 
 		//-----------------------------------------------------------------------------
+		//  Name : try_unselect ()
+		/// <summary>
+		/// Clears the selection data if it maches the type.
+		/// </summary>
+		//-----------------------------------------------------------------------------
+		template<typename T>
+		void try_unselect()
+		{
+			if (selection_data.object.is_type<T>())
+			{
+				unselect();
+			}
+		}
+
+		//-----------------------------------------------------------------------------
 		//  Name : drag ()
 		/// <summary>
 		/// Starts dragging an object. Can be anything.

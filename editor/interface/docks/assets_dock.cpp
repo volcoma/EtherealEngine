@@ -251,6 +251,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 			if (action == 3)
 			{
 				opened_dir = entry;
+				es.try_unselect<std::shared_ptr<editor::asset_directory>>();
 			}
 		}
 	}

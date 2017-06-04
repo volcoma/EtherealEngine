@@ -20,8 +20,8 @@ namespace fs
 
 	protocols_t& get_path_protocols()
 	{
-		static protocols_t mProtocols;
-		return mProtocols;
+		static protocols_t protocols;
+		return protocols;
 	}
 
 	byte_array_t read_stream(std::istream & stream)
@@ -49,7 +49,7 @@ namespace fs
 	path resolve_protocol(const path& _path)
 	{
 		const auto root = _path.root_name().string();
-		const auto relativePath = _path.relative_path();
+		const auto relative_path = _path.relative_path();
 		// Matching path protocol in our list?
 		auto& protocols = get_path_protocols();
 
@@ -58,8 +58,8 @@ namespace fs
 		if (it == std::end(protocols))
 			return path{};
 
-		const auto resolvedPath = it->second;
-		auto result = resolvedPath / relativePath;
+		const auto resolved = it->second;
+		auto result = resolved / relative_path;
 		return result;
 	}
 
