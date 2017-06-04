@@ -11,21 +11,21 @@ bool inspector_light_component::inspect(rttr::variant& var, bool readOnly, std::
 	if (changed)
 		light_val = light_var.get_value<light>();
 
-	if (light_val.light_type == light_type::spot)
+    if (light_val.type == light_type::spot)
 	{
 		rttr::variant v = light_val.spot_data;
 		changed |= inspect_var(v);
 		if (changed)
 			light_val.spot_data = v.get_value<light::spot>();
 	}
-	else if (light_val.light_type == light_type::point)
+    else if (light_val.type == light_type::point)
 	{
 		rttr::variant v = light_val.point_data;
 		changed |= inspect_var(v);
 		if (changed)
 			light_val.point_data = v.get_value<light::point>();
 	}
-	else if (light_val.light_type == light_type::directional)
+    else if (light_val.type == light_type::directional)
 	{
 		rttr::variant v = light_val.directional_data;
 		changed |= inspect_var(v);
@@ -53,14 +53,14 @@ bool inspector_reflection_probe_component::inspect(rttr::variant& var, bool read
 	if (changed)
 		probe = probe_var.get_value<reflection_probe>();
 
-	if (probe.probe_type == probe_type::box)
+    if (probe.type == probe_type::box)
 	{
 		rttr::variant v = probe.box_data;
 		changed |= inspect_var(v);
 		if (changed)
 			probe.box_data = v.get_value<reflection_probe::box>();
 	}
-	else if (probe.probe_type == probe_type::sphere)
+    else if (probe.type == probe_type::sphere)
 	{
 		rttr::variant v = probe.sphere_data;
 		changed |= inspect_var(v);

@@ -34,9 +34,9 @@ REFLECT(reflection_probe)
 		)
 		;
 	rttr::registration::class_<reflection_probe>("reflection_probe")
-		.property("probe_type", &reflection_probe::probe_type)
+        .property("type", &reflection_probe::type)
 		(
-			rttr::metadata("pretty_name", "Probe Type")
+            rttr::metadata("pretty_name", "Type")
 		)
 		.property("method", &reflection_probe::method)
 		(
@@ -47,7 +47,7 @@ REFLECT(reflection_probe)
 
 SAVE(reflection_probe)
 {
-	try_save(ar, cereal::make_nvp("probe_type", obj.probe_type));
+    try_save(ar, cereal::make_nvp("type", obj.type));
 	try_save(ar, cereal::make_nvp("method", obj.method));
 	try_save(ar, cereal::make_nvp("extents", obj.box_data.extents));
 	try_save(ar, cereal::make_nvp("transition_distance", obj.box_data.transition_distance));
@@ -56,7 +56,7 @@ SAVE(reflection_probe)
 
 LOAD(reflection_probe)
 {
-	try_load(ar, cereal::make_nvp("probe_type", obj.probe_type));
+    try_load(ar, cereal::make_nvp("type", obj.type));
 	try_load(ar, cereal::make_nvp("method", obj.method));
 	try_load(ar, cereal::make_nvp("extents", obj.box_data.extents));
 	try_load(ar, cereal::make_nvp("transition_distance", obj.box_data.transition_distance));

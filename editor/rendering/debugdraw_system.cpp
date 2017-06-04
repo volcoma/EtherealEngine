@@ -142,7 +142,7 @@ namespace editor
 			const auto light_comp = selected_entity.get_component<light_component>();
 			const auto light_comp_ptr = light_comp.lock().get();
 			const auto& light = light_comp_ptr->get_light();
-			if (light.light_type == light_type::spot)
+            if (light.type == light_type::spot)
 			{
 				auto adjacent = light.spot_data.get_range();
 				{
@@ -172,7 +172,7 @@ namespace editor
 					ddPop();
 				}
 			}
-			else if (light.light_type == light_type::point)
+            else if (light.type == light_type::point)
 			{
 				auto radius = light.point_data.range;
 				ddPush();
@@ -184,7 +184,7 @@ namespace editor
 				ddDrawCircle(Axis::Z, center.x, center.y, center.z, radius);
 				ddPop();
 			}
-			else if (light.light_type == light_type::directional)
+            else if (light.type == light_type::directional)
 			{
 				ddPush();
 				ddSetLod(UINT8_MAX);
@@ -205,7 +205,7 @@ namespace editor
 			const auto probe_comp = selected_entity.get_component<reflection_probe_component>();
 			const auto probe_comp_ptr = probe_comp.lock().get();
 			const auto& probe = probe_comp_ptr->get_probe();
-			if (probe.probe_type == probe_type::box)
+            if (probe.type == probe_type::box)
 			{
 				ddPush();
 				ddSetColor(0xff00ff00);

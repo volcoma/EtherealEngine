@@ -16,7 +16,7 @@ reflection_probe_component::~reflection_probe_component()
 
 int reflection_probe_component::compute_projected_sphere_rect(irect& rect, const math::vec3& position, const math::transform& view, const math::transform& proj)
 {
-	if (_probe.probe_type == probe_type::sphere)
+    if (_probe.type == probe_type::sphere)
 	{
 		return math::compute_projected_sphere_rect(
 			rect.left,
@@ -28,7 +28,7 @@ int reflection_probe_component::compute_projected_sphere_rect(irect& rect, const
 			view,
 			proj);
 	}
-	else if (_probe.probe_type == probe_type::box)
+    else if (_probe.type == probe_type::box)
 	{
 		float w2 = math::pow(_probe.box_data.extents.x * 2.0f, 2.0f);
 		float h2 = math::pow(_probe.box_data.extents.y * 2.0f, 2.0f);

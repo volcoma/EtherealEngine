@@ -10,7 +10,7 @@
 
 #include "runtime/assets/asset_extensions.h"
 #include "core/serialization/serialization.h"
-#include "core/serialization/archives.h"
+#include "core/serialization/binary_archive.h"
 #include "core/serialization/types/unordered_map.hpp"
 #include "core/serialization/types/vector.hpp"
 
@@ -39,8 +39,7 @@ void asset_compiler::compile<shader>(const fs::path& absolute_key)
 	bool fs = string_utils::begins_with(file, "fs_");
 	bool cs = string_utils::begins_with(file, "cs_");
 
-	std::unordered_map<gfx::RendererType::Enum, fs::byte_array_t> binaries;
-	binaries.reserve(4);
+    std::map<gfx::RendererType::Enum, fs::byte_array_t> binaries;
 	std::string str_output = output.string();
 	for (auto& platform : supported)
 	{
@@ -135,12 +134,13 @@ void asset_compiler::compile<shader>(const fs::path& absolute_key)
 
 	fs::path entry = dir / fs::path(file + ".buildtemp");
 	{		
-		std::ofstream soutput(entry, std::ios::out | std::ios::binary);
+        std::ofstream soutput(entry.string(), std::ios::out | std::ios::binary);
 		cereal::oarchive_binary_t ar(soutput);
 		try_save(ar, cereal::make_nvp("shader", binaries));
 	}
-	fs::copy(entry, output, fs::copy_options::overwrite_existing, std::error_code{});
-	fs::remove(entry, std::error_code{});
+    fs::error_code err;
+    fs::copy(entry, output, err);
+    fs::remove(entry, err);
 }
 
 template<>
@@ -153,17 +153,12 @@ void asset_compiler::compile<texture>(const fs::path& absolute_key)
 	output /= fs::path(file + extensions::texture);
 
 	std::string str_output = output.string();
-
+    fs::error_code err;
 	if (raw_ext == ".dds" || raw_ext == ".pvr" || raw_ext == ".ktx")
 	{
-		if (!fs::copy_file(str_input, str_output, fs::copy_options::overwrite_existing, std::error_code{}))
-		{
-			APPLOG_ERROR("Failed compilation of {0}", str_input);
-		}
-		else
-		{
-			fs::last_write_time(str_output, fs::file_time_type::clock::now(), std::error_code{});
-		}
+        fs::copy_file(str_input, str_output, err);
+        auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        fs::last_write_time(str_output, now, err);
 		return;
 	}
 
@@ -202,11 +197,12 @@ void asset_compiler::compile<mesh>(const fs::path& absolute_key)
 
 	fs::path entry = dir / fs::path(file + ".buildtemp");
 	{
-		std::ofstream soutput(entry, std::ios::out | std::ios::binary);
+        std::ofstream soutput(entry.string(), std::ios::out | std::ios::binary);
 		cereal::oarchive_binary_t ar(soutput);
 		try_save(ar, cereal::make_nvp("mesh", data));
 	}
-	fs::copy(entry, output, fs::copy_options::overwrite_existing, std::error_code{});
-	fs::remove(entry, std::error_code{});
+    fs::error_code err;
+    fs::copy(entry, output, err);
+    fs::remove(entry, err);
 
 }

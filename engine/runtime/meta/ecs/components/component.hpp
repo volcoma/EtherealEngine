@@ -1,8 +1,7 @@
 #pragma once
 #include "../../../ecs/ecs.h"
 #include "core/reflection/reflection.h"
-#include "core/logging/logging.h"
-
+#include "../entity.hpp"
 
 REFLECT(runtime::component)
 {

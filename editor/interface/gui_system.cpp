@@ -392,20 +392,21 @@ void gui_style::set_style_colors(const hsv_setup& _setup)
 }
 
 //////////////////////////////////////////////////////////////////////////
-#include "core/serialization/archives.h"
+#include "core/serialization/associative_archive.h"
 #include "../meta/interface/gui_system.hpp"
 
 void gui_style::load_style()
 {
 	const fs::path absoluteKey = fs::resolve_protocol("editor_data:/config/style.cfg");
-	if (!fs::exists(absoluteKey, std::error_code{}))
+    fs::error_code err;
+    if (!fs::exists(absoluteKey, err))
 	{
 		save_style();
 	}
 	else
 	{
-		std::ifstream output(absoluteKey);
-		cereal::iarchive_json_t ar(output);
+		std::ifstream output(absoluteKey.string());
+        cereal::iarchive_associative_t ar(output);
 
 		try_load(ar, cereal::make_nvp("style", setup));
 	}
@@ -414,8 +415,8 @@ void gui_style::load_style()
 void gui_style::save_style()
 {
 	const fs::path absoluteKey = fs::resolve_protocol("editor_data:/config/style.cfg");
-	std::ofstream output(absoluteKey);
-	cereal::oarchive_json_t ar(output);
+	std::ofstream output(absoluteKey.string());
+    cereal::oarchive_associative_t ar(output);
 
 	try_save(ar, cereal::make_nvp("style", setup));
 }

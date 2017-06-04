@@ -4,10 +4,9 @@
 #include "core/serialization/types/unordered_map.hpp"
 #include "core/serialization/types/string.hpp"
 #include "core/serialization/types/utility.hpp"
-#include "core/logging/logging.h"
 #include "../../rendering/material.h"
 #include "../../rendering/program.h"
-#include "../math/vector.hpp"
+#include "core/meta/math/vector.hpp"
 #include "../assets/asset_handle.hpp"
 
 REFLECT(material)
@@ -166,5 +165,5 @@ LOAD(standard_material)
 	try_load(ar, cereal::make_nvp("maps", obj._maps));
 }
 
-#include "core/serialization/archives.h"
-CEREAL_REGISTER_TYPE(standard_material);
+#include "core/serialization/associative_archive.h"
+CEREAL_REGISTER_TYPE(standard_material)

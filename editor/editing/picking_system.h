@@ -10,10 +10,9 @@ struct texture;
 
 namespace editor
 {
+#define TEX_ID_DIM 1
 	class picking_system : public core::subsystem
 	{
-		// Size of the ID buffer
-		static const unsigned int _id_dimensions = 1;
 	public:
 		//-----------------------------------------------------------------------------
 		//  Name : initialize ()
@@ -52,7 +51,7 @@ namespace editor
 		/// picking program
 		std::unique_ptr<program> _program;
 		/// Read blit into this
-		std::uint8_t _blit_data[_id_dimensions*_id_dimensions * 4]; 
+        std::uint8_t _blit_data[TEX_ID_DIM*TEX_ID_DIM * 4];
 		/// Indicates if is reading and when it will be ready
 		std::uint32_t _reading = 0;
 		///

@@ -2,11 +2,13 @@
 
 #include <unordered_map>
 #include <istream>
-#include <filesystem>
-
+#include "boost/filesystem.hpp"
+#include <chrono>
 namespace fs
 {
-	using namespace std::experimental::filesystem;
+	using file_time_type = std::time_t;
+	using error_code = boost::system::error_code;
+    using namespace boost::filesystem;
 	using protocols_t = std::unordered_map<std::string, std::string>;
 	using byte_array_t = std::vector<char>;
 

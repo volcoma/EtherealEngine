@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <map>
 #include "core/subsystem/subsystem.h"
 #include "input_mapping.hpp"
 
@@ -9,7 +10,7 @@
 
 namespace runtime
 {
-	using action_map_t = std::unordered_map<std::string, std::unordered_map<action_type, event<void(const mml::platform_event&)>>>;
+    using action_map_t = std::unordered_map<std::string, std::map<action_type, event<void(const mml::platform_event&)>>>;
 
 	struct action_mapper
 	{

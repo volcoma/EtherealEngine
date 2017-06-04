@@ -2,7 +2,6 @@
 
 #include "core/serialization/serialization.h"
 #include "core/reflection/reflection.h"
-#include "core/logging/logging.h"
 #include "../../rendering/light.h"
 
 REFLECT(light)
@@ -91,17 +90,17 @@ REFLECT(light)
 			rttr::value("point", light_type::point),
 			rttr::value("directional", light_type::directional)
 		);
-	rttr::registration::enumeration<depth_impl>("depth_impl")
+    rttr::registration::enumeration<depth_type>("depth_type")
 		(
-			rttr::value("invz", depth_impl::invz),
-			rttr::value("linear", depth_impl::linear)
+            rttr::value("invz", depth_type::invz),
+            rttr::value("linear", depth_type::linear)
 		);
-	rttr::registration::enumeration<sm_impl>("sm_impl")
+    rttr::registration::enumeration<shadow_type>("shadow_type")
 		(
-			rttr::value("hard", sm_impl::hard),
-			rttr::value("pcf", sm_impl::pcf),
-			rttr::value("vsm", sm_impl::vsm),
-			rttr::value("esm", sm_impl::esm)
+            rttr::value("hard", shadow_type::hard),
+            rttr::value("pcf", shadow_type::pcf),
+            rttr::value("vsm", shadow_type::vsm),
+            rttr::value("esm", shadow_type::esm)
 		);
 	rttr::registration::class_<light>("light")
 		.property("color", &light::color)
@@ -114,26 +113,26 @@ REFLECT(light)
 			rttr::metadata("min", 0.0f),
 			rttr::metadata("max", 10.0f)
 		)
-		.property("light_type", &light::light_type)
+        .property("type", &light::type)
 		(
-			rttr::metadata("pretty_name", "Light Type")
+            rttr::metadata("pretty_name", "Type")
 		)
-		.property("sm_impl", &light::sm_impl)
+        .property("shadow", &light::shadow)
 		(
-			rttr::metadata("pretty_name", "Shadow Impl")
+            rttr::metadata("pretty_name", "Shadow")
 		)
-		.property("depth_impl", &light::depth_impl)
+        .property("depth", &light::depth)
 		(
-			rttr::metadata("pretty_name", "Depth Impl")
+            rttr::metadata("pretty_name", "Depth")
 		)
 		;
 }
 
 SAVE(light)
 {
-	try_save(ar, cereal::make_nvp("light_type", obj.light_type));
-	try_save(ar, cereal::make_nvp("depth_impl", obj.depth_impl));
-	try_save(ar, cereal::make_nvp("sm_impl", obj.sm_impl));
+    try_save(ar, cereal::make_nvp("type", obj.type));
+    try_save(ar, cereal::make_nvp("depth", obj.depth));
+    try_save(ar, cereal::make_nvp("shadow", obj.shadow));
 	try_save(ar, cereal::make_nvp("spot_range", obj.spot_data.range));
 	try_save(ar, cereal::make_nvp("spot_inner_angle", obj.spot_data.inner_angle));
 	try_save(ar, cereal::make_nvp("spot_outer_angle", obj.spot_data.outer_angle));
@@ -151,9 +150,9 @@ SAVE(light)
 
 LOAD(light)
 {
-	try_load(ar, cereal::make_nvp("light_type", obj.light_type));
-	try_load(ar, cereal::make_nvp("depth_impl", obj.depth_impl));
-	try_load(ar, cereal::make_nvp("sm_impl", obj.sm_impl));
+    try_load(ar, cereal::make_nvp("type", obj.type));
+    try_load(ar, cereal::make_nvp("depth", obj.depth));
+    try_load(ar, cereal::make_nvp("shadow", obj.shadow));
 	try_load(ar, cereal::make_nvp("spot_range", obj.spot_data.range));
 	try_load(ar, cereal::make_nvp("spot_inner_angle", obj.spot_data.inner_angle));
 	try_load(ar, cereal::make_nvp("spot_outer_angle", obj.spot_data.outer_angle));

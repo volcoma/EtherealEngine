@@ -64,7 +64,7 @@ void default_scene()
 
 		reflection_probe probe;
 		probe.method = reflect_method::environment;
-		probe.probe_type = probe_type::sphere;
+        probe.type = probe_type::sphere;
 		probe.sphere_data.range = 1000.0f;
 		object.assign<reflection_probe_component>().lock()
 			->set_probe(probe);
@@ -77,7 +77,7 @@ void default_scene()
 
 		reflection_probe probe;
 		probe.method = reflect_method::static_only;
-		probe.probe_type = probe_type::box;
+        probe.type = probe_type::box;
 		object.assign<reflection_probe_component>().lock()
 			->set_probe(probe);
 	}

@@ -14,7 +14,7 @@ enum class light_type : std::uint8_t
 	count
 };
 
-enum class depth_impl : std::uint8_t
+enum class depth_type : std::uint8_t
 {
 	invz = 0,
 	linear = 1,
@@ -30,7 +30,7 @@ enum class pack_depth : std::uint8_t
 	count
 };
 
-enum class sm_impl : std::uint8_t
+enum class shadow_type : std::uint8_t
 {
 	hard = 0,
 	pcf = 1,
@@ -55,9 +55,9 @@ struct light
 	REFLECTABLE(light)
 	SERIALIZABLE(light)
 
-	light_type light_type = light_type::directional;
-	depth_impl depth_impl = depth_impl::invz;
-	sm_impl sm_impl = sm_impl::hard;
+    light_type type = light_type::directional;
+    depth_type depth = depth_type::invz;
+    shadow_type shadow = shadow_type::hard;
 
 	struct spot
 	{

@@ -113,7 +113,8 @@ int list_item(Wrapper& entry,
 		{
 			if (is_directory)
 			{
-				fs::remove_all(absolute, std::error_code{});
+                fs::error_code err;
+                fs::remove_all(absolute, err);
 			}
 			else
 			{
@@ -124,11 +125,12 @@ int list_item(Wrapper& entry,
 					auto opened_folder_shared = opened_dir.lock();
 					auto& files = opened_folder_shared->files;
 
+                    fs::error_code err;
 					for (auto& file : files)
 					{
 						if (file.relative == relative)
 						{
-							fs::remove(file.absolute, std::error_code{});
+                            fs::remove(file.absolute, err);
 						}
 					}
 				}
@@ -194,7 +196,8 @@ int list_item(Wrapper& entry,
 				fs::path new_absolute_path = absolute;
 				new_absolute_path.remove_filename();
 				new_absolute_path /= new_name;
-				fs::rename(absolute, new_absolute_path, std::error_code{});
+                fs::error_code err;
+                fs::rename(absolute, new_absolute_path, err);
 			}
 			else
 			{
@@ -365,7 +368,8 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 				if (dir)
 				{
 					int i = 0;
-					while (!fs::create_directory(dir->absolute / string_utils::format("New Folder (%d)", i), std::error_code{}))
+                    fs::error_code err;
+                    while (!fs::create_directory(dir->absolute / string_utils::format("New Folder (%d)", i), err))
 					{
 						++i;
 					}
@@ -450,15 +454,15 @@ void assets_dock::render(const ImVec2& area)
 
 				auto task = ts.create("Import Asset", [opened_dir](const fs::path& path, const fs::path& p, const fs::path& filename)
 				{
-					std::error_code error;
+                    fs::error_code err;
 					fs::path dir = opened_dir / filename;
-					if (!fs::copy_file(path, dir, fs::copy_options::overwrite_existing, error))
+                    fs::copy_file(path, dir, err);
+					//{
+					//	APPLOG_ERROR("Failed to import file {0} with message {1}", p.string(), error.message());
+					//}
+					//else
 					{
-						APPLOG_ERROR("Failed to import file {0} with message {1}", p.string(), error.message());
-					}
-					else
-					{
-						fs::last_write_time(dir, fs::file_time_type::clock::now(), std::error_code{});
+                        fs::last_write_time(dir, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()), err);
 					}
 				}, p, p, filename);
 

@@ -4,7 +4,7 @@
 #include <mml/window/window.hpp>
 #include <mml/window/window_impl.hpp>
 #include <mml/system/err.hpp>
-
+#include <cstring>
 
 namespace
 {

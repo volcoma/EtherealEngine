@@ -1,11 +1,11 @@
 #include "string.h"
 
-int string_utils::compare(const std::string& s1, const std::string & s2, bool ignoreCase, const char * language /*= "english"*/)
+int string_utils::compare(const std::string& s1, const std::string & s2, bool ignoreCase)
 {
 	if (!ignoreCase)
 		return s1.compare(s2);
 	else
-		return StrICmp(language)(s1, s2);
+        return StrICmp()(s1, s2);
 }
 
 std::string string_utils::trim(const std::string& str)

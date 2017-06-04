@@ -243,7 +243,8 @@ namespace runtime
 			auto absolute_new_key = get_absolute_key(new_key, storage);
 			
 			// rename compiled assets
-			fs::rename(absolute_key, absolute_new_key, std::error_code{});
+            fs::error_code err;
+            fs::rename(absolute_key, absolute_new_key, err);
 
 			auto& request = storage->container[key];
 			storage->container[new_key] = request;
@@ -286,7 +287,8 @@ namespace runtime
 			auto storage = get_storage<T>();
 			fs::path absolute_key = get_absolute_key(key, storage);
 
-			fs::remove(absolute_key, std::error_code{});
+            fs::error_code err;
+            fs::remove(absolute_key, err);
 
 			auto& request = storage->container[key];
 			request.asset.link->asset.reset();
@@ -366,6 +368,7 @@ namespace runtime
 		)
 		{
 
+            fs::error_code err;
 			auto it = container.find(key);
 			if (it != std::end(container))
 			{
@@ -382,7 +385,7 @@ namespace runtime
 
 				return request;
 			}
-			else if (!fs::exists(absoluteKey, std::error_code{}))
+            else if (!fs::exists(absoluteKey, err))
 			{
 				static load_request<T> emptyRequest;
 				return emptyRequest;

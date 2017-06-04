@@ -48,7 +48,8 @@ bool inspect_var(rttr::variant& var, bool read_only, std::function<rttr::variant
 	{
 		if (type.is_enumeration())
 		{
-			changed |= inspect_enum(var, type.get_enumeration(), read_only);
+            auto enumeration = type.get_enumeration();
+            changed |= inspect_enum(var, enumeration, read_only);
 		}
 	}
 	else
@@ -83,7 +84,8 @@ bool inspect_var(rttr::variant& var, bool read_only, std::function<rttr::variant
 				}
 				else if (is_enum)
 				{
-					changed |= inspect_enum(prop_var, prop.get_enumeration(), is_readonly);
+                    auto enumeration = prop.get_enumeration();
+                    changed |= inspect_enum(prop_var, enumeration, is_readonly);
 				}
 				else
 				{

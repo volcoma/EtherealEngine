@@ -43,7 +43,7 @@ namespace fs
 			State state = Unmodified;
 			fs::file_time_type last_mod_time;
 			uintmax_t size = 0;
-			fs::file_type type = fs::file_type::none;
+			fs::file_type type;// = fs::file_type::none;
 		};
 
 		//-----------------------------------------------------------------------------
@@ -88,13 +88,13 @@ namespace fs
 		/// Sets the last modification time of a file or directory. by default sets the time to the current time 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		static void touch(const fs::path &path, fs::file_time_type time = fs::file_time_type::clock::now())
+		static void touch(const fs::path &path, fs::file_time_type time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()))
 		{
-
+            fs::error_code err;
 			// if the file or directory exists change its last write time
-			if (fs::exists(path, std::error_code{}))
+            if (fs::exists(path, err))
 			{
-				fs::last_write_time(path, time, std::error_code{});
+                fs::last_write_time(path, time, err);
 				return;
 			}
 			// if not, visit each path if there's a wild card
@@ -102,7 +102,8 @@ namespace fs
 			{
 				visit_wild_card_path(path, true, [time](const fs::path &p)
 				{
-					fs::last_write_time(p, time, std::error_code{});
+                    fs::error_code err;
+                    fs::last_write_time(p, time, err);
 					return false;
 				});
 			}
@@ -241,7 +242,8 @@ namespace fs
 				}
 				else
 				{
-					if (!fs::exists(path, std::error_code{}))
+                    fs::error_code err;
+                    if (!fs::exists(path, err))
 					{
 						log_path(path);
 						return;
@@ -278,7 +280,7 @@ namespace fs
 				{
 					for (auto it = wd._watchers.begin(); it != wd._watchers.end(); )
 					{
-						auto& watcher_key = fs::path(it->first).parent_path();
+                        auto watcher_key = fs::path(it->first).parent_path();
 						if (watcher_key == dir)
 						{
 							it->second.watch();
@@ -322,8 +324,8 @@ namespace fs
 				p = path.parent_path();
 			}
 
-			// throw an exception if the file doesn't exist
-			if (filter.empty() && !fs::exists(p, std::error_code{}))
+            fs::error_code err;
+            if (filter.empty() && !fs::exists(p, err))
 			{
 				log_path(path);
 			}
@@ -351,7 +353,8 @@ namespace fs
 				std::string before = full.substr(0, wildcardPos);
 				std::string after = full.substr(wildcardPos + 1);
 				fs::directory_iterator end;
-				if (visitEmpty && fs::is_empty(pathFilter.first, std::error_code{}))
+                fs::error_code err;
+                if (visitEmpty && fs::is_empty(pathFilter.first, err))
 				{
 					visitor(pathFilter.first);
 				}
@@ -551,9 +554,10 @@ namespace fs
 			void poll_entry(const fs::path &path, Entry& entry)
 			{
 				// get the last modification time
-				auto time = fs::last_write_time(path, std::error_code{});
-				auto size = fs::file_size(path, std::error_code{});
-				fs::file_status status = fs::status(path, std::error_code{});
+                fs::error_code err;
+                auto time = fs::last_write_time(path, err);
+                auto size = fs::file_size(path, err);
+                fs::file_status status = fs::status(path, err);
 				// add a new modification time to the map
 				std::string key = path.string();
 				if (_entries.find(key) == _entries.end())
@@ -570,7 +574,7 @@ namespace fs
 				}
 				// or compare with an older one
 				auto &fi = _entries[key];
-				if (!fs::exists(fi.path, std::error_code{}))
+                if (!fs::exists(fi.path, err))
 				{
 					auto fi_copy = fi;
 					fi_copy.state = Entry::State::Removed;

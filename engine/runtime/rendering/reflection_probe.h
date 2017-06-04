@@ -34,7 +34,7 @@ struct reflection_probe
 	};
 
 	/// The probe type
-	probe_type probe_type = probe_type::box;
+    probe_type type = probe_type::box;
 	/// Reflection Method
 	reflect_method method = reflect_method::environment;
 	/// Data describing box projection
@@ -45,7 +45,7 @@ struct reflection_probe
 
 inline bool operator==(const reflection_probe& pr1, const reflection_probe& pr2)
 {
-	return pr1.probe_type == pr2.probe_type &&
+    return pr1.type == pr2.type &&
 		pr1.method == pr2.method &&
 		pr1.box_data.extents == pr2.box_data.extents &&
 		pr1.box_data.transition_distance == pr2.box_data.transition_distance &&

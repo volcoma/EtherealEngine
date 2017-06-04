@@ -76,9 +76,10 @@ namespace fs
 		{
 			return "";
 		}
+        fs::error_code err;
 		path full_path(
 			system_complete(
-				path(std::string(argv0)), std::error_code{}));
+                path(std::string(argv0)), err));
 		return full_path;
 	}
 }
@@ -114,9 +115,10 @@ namespace fs
 		{
 			return executable_path_fallback(argv0);
 		}
+        fs::error_code err;
 		path full_path(
 			system_complete(
-				path(std::string(buf)).normalize(), std::error_code{}));
+                path(std::string(buf)).normalize(), err));
 		return full_path;
 	}
 	void show_in_graphical_env(const path& _path)
@@ -138,9 +140,10 @@ namespace fs
 			return executable_path_fallback(argv0);
 		}
 		std::string path(buf, size);
+        fs::error_code err;
 		path full_path(
 			system_complete(
-				path(path).normalize(), std::error_code{}));
+                path(path).normalize(), err));
 		return full_path;
 	}
 	void show_in_graphical_env(const path& _path)

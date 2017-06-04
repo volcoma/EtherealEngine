@@ -3,6 +3,7 @@
 #pragma once
 
 #include <memory>
+#include <cstring>
 template <typename T> class delegate;
 template<class R, class ...A>
 class delegate<R(A...)>
@@ -221,7 +222,7 @@ public:
     {
         // comparison between functor and non-functor is left as undefined at the moment.
         if (store_size_ && rhs.store_size_) // both functors
-            return (memcmp(store_.get(), rhs.store_.get(), store_size_) == 0) && (stub_ptr_ == rhs.stub_ptr_);
+            return (std::memcmp(store_.get(), rhs.store_.get(), store_size_) == 0) && (stub_ptr_ == rhs.stub_ptr_);
         return (object_ptr_ == rhs.object_ptr_) && (stub_ptr_ == rhs.stub_ptr_);
     }
 

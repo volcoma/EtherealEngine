@@ -35,6 +35,16 @@ namespace spdlog
 		using platform_sink_st = android_sink_st;
 	}
 }
+#else
+#include "spdlog/sinks/syslog_sink.h"
+namespace spdlog
+{
+    namespace sinks
+    {
+        using platform_sink_mt = stdout_sink_mt;
+        using platform_sink_st = stdout_sink_st;
+    }
+}
 #endif
 #include "spdlog/sinks/file_sinks.h"
 

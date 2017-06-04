@@ -1,6 +1,6 @@
 #include "utils.h"
 #include "core/serialization/serialization.h"
-#include "core/serialization/archives.h"
+#include "core/serialization/associative_archive.h"
 #include "../Meta/Ecs/Entity.hpp"
 #include "../assets/asset_extensions.h"
 
@@ -29,19 +29,19 @@ namespace ecs
 
 		void save_data(const fs::path& fullPath, const std::vector<runtime::entity>& data)
 		{
-			std::ofstream os(fullPath, std::fstream::binary | std::fstream::trunc);
+			std::ofstream os(fullPath.string(), std::fstream::binary | std::fstream::trunc);
 			serialize_data(os, data);
 		}
 
 		bool load_data(const fs::path& fullPath, std::vector<runtime::entity>& outData)
 		{
-			std::ifstream is(fullPath, std::fstream::binary);
+			std::ifstream is(fullPath.string(), std::fstream::binary);
 			return deserialize_data(is, outData);
 		}
 
 		void serialize_data(std::ostream& stream, const std::vector<runtime::entity>& data)
 		{
-			cereal::oarchive_json_t ar(stream);
+            cereal::oarchive_associative_t ar(stream);
 
 			try_save(ar, cereal::make_nvp("data", data));
 
@@ -57,7 +57,7 @@ namespace ecs
 			stream.seekg(0, stream.beg);
 			if (length > 0)
 			{
-				cereal::iarchive_json_t ar(stream);
+                cereal::iarchive_associative_t ar(stream);
 
 				try_load(ar, cereal::make_nvp("data", outData));
 

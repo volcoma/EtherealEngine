@@ -1,9 +1,9 @@
 #pragma once
 #include "../../../ecs/components/reflection_probe_component.h"
 #include "core/reflection/reflection.h"
-#include "core/logging/logging.h"
-#include "../../../meta/rendering/reflection_probe.hpp"
-
+#include "../../rendering/reflection_probe.hpp"
+#include "core/meta/math/vector.hpp"
+#include "component.hpp"
 
 REFLECT(reflection_probe_component)
 {
@@ -32,6 +32,5 @@ LOAD(reflection_probe_component)
 	try_load(ar, cereal::make_nvp("probe", obj._probe));
 }
 
-
-#include "core/serialization/archives.h"
-CEREAL_REGISTER_TYPE(reflection_probe_component);
+#include "core/serialization/associative_archive.h"
+CEREAL_REGISTER_TYPE(reflection_probe_component)

@@ -9738,6 +9738,7 @@ static void SetClipboardTextFn_DefaultImpl(const char* text)
 
 static void ImeSetInputScreenPosFn_DefaultImpl(int x, int y)
 {
+    #ifdef _MSC_VER
     // Notify OS Input Method Editor of text input position
     if (HWND hwnd = (HWND)GImGui->IO.ImeWindowHandle)
         if (HIMC himc = ImmGetContext(hwnd))
@@ -9748,6 +9749,7 @@ static void ImeSetInputScreenPosFn_DefaultImpl(int x, int y)
             cf.dwStyle = CFS_FORCE_POSITION;
             ImmSetCompositionWindow(himc, &cf);
         }
+    #endif
 }
 
 #else

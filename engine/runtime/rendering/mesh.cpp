@@ -5,7 +5,7 @@
 #include "core/logging/logging.h"
 #include <algorithm>
 #include "mesh_tools.h"
-
+#include <cmath>
 
 #define RMC_DEFINE_DATA                     \
     std::vector<math::vec3> vertices;		\
@@ -38,6 +38,8 @@ namespace MeshOptimizer
 
 mesh::mesh()
 {
+    _hardware_vb = std::make_shared<vertex_buffer>();
+    _hardware_ib = std::make_shared<index_buffer>();
 	// Initialize variable to sensible defaults
 	_bbox.reset();
 	_prepare_status = mesh_status::not_prepared;
@@ -862,7 +864,7 @@ bool mesh::add_primitives(const triangle_array_t & aTriangles)
 				{
 					float fnorm[4];
 					gfx::vertexUnpack(fnorm, gfx::Attrib::Normal, _vertex_format, dst_ptr);
-					if (_isnan(fnorm[0]) || _isnan(fnorm[1]) || _isnan(fnorm[2]))
+                    if (std::isnan(fnorm[0]) || std::isnan(fnorm[1]) || std::isnan(fnorm[2]))
 						gfx::vertexPack(fnorm, true, gfx::Attrib::Normal, _vertex_format, dst_ptr);
 
 				} // End if have normal

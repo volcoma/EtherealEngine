@@ -22,3 +22,6 @@ add_subdirectory_ex(cereal)
 
 add_subdirectory_ex(mml)
 target_include_directories (mml-window PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/mml/include)
+
+add_subdirectory_ex(filesystem)
+target_include_directories (filesystem PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

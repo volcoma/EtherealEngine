@@ -6,7 +6,7 @@
 #include "mml/window/touch.hpp"
 #include "mml/window/joystick.hpp"
 #include "mml/window/sensor.hpp"
-#include <unordered_map>
+#include <map>
 #include <vector>
 #include <string>
 #include "core/common/utils.h"
@@ -67,7 +67,7 @@ public:
 
 protected:
 	/// mappings
-	std::unordered_map<T, std::vector<std::string>> _bindings;
+    std::map<T, std::vector<std::string>> _bindings;
 };
 
 

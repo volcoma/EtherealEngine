@@ -34,7 +34,7 @@ void LOAD_FUNCTION_NAME(Archive & ar, cls & obj)
 
 #include "../logging/logging.h"
 template<typename Archive, typename T>
-bool try_save(Archive& ar, T const& t)
+bool try_save(Archive& ar, cereal::NameValuePair<T>&& t)
 {
 	try
 	{
@@ -49,7 +49,7 @@ bool try_save(Archive& ar, T const& t)
 }
 
 template<typename Archive, typename T>
-bool try_load(Archive& ar, T& t)
+bool try_load(Archive& ar, cereal::NameValuePair<T>&& t)
 {
 	try
 	{
@@ -65,7 +65,7 @@ bool try_load(Archive& ar, T& t)
 
 
 template<typename Archive, typename T>
-bool try_serialize(Archive& ar, T& t)
+bool try_serialize(Archive& ar, cereal::NameValuePair<T>&& t)
 {
 	try
 	{

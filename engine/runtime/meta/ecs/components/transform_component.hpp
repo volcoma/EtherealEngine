@@ -3,7 +3,9 @@
 #include "core/reflection/reflection.h"
 #include "core/serialization/serialization.h"
 #include "core/serialization/types/vector.hpp"
-#include "core/logging/logging.h"
+#include "core/meta/math/vector.hpp"
+#include "core/meta/math/transform.hpp"
+#include "component.hpp"
 
 REFLECT(transform_component)
 {
@@ -73,5 +75,5 @@ LOAD(transform_component)
 	}
 }
 
-#include "core/serialization/archives.h"
-CEREAL_REGISTER_TYPE(transform_component);
+#include "core/serialization/associative_archive.h"
+CEREAL_REGISTER_TYPE(transform_component)

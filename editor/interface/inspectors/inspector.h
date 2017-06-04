@@ -45,7 +45,7 @@ REFLECT(inspector_type)														\
 		rttr::policy::ctor::as_std_shared_ptr								\
 	)																		\
 	;																		\
-}
+}                                                                           \
 
 #define DECLARE_INSPECTOR(inspector_type, inspected_type)					\
 struct inspector_type : public inspector									\
@@ -55,4 +55,5 @@ struct inspector_type : public inspector									\
 		bool readOnly,														\
 		std::function<rttr::variant(const rttr::variant&)> get_metadata);	\
 };																			\
-INSPECTOR_REFLECT(inspector_type, inspected_type)
+INSPECTOR_REFLECT(inspector_type, inspected_type)                           \
+

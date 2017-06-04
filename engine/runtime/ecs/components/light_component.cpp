@@ -16,7 +16,7 @@ light_component::~light_component()
 
 int light_component::compute_projected_sphere_rect(irect& rect, const math::vec3& light_position, const math::vec3& light_direction, const math::transform& view, const math::transform& proj)
 {
-	if (_light.light_type == light_type::point)
+    if (_light.type == light_type::point)
 	{
 		return math::compute_projected_sphere_rect(
 			rect.left,
@@ -28,7 +28,7 @@ int light_component::compute_projected_sphere_rect(irect& rect, const math::vec3
 			view,
 			proj);
 	}
-	else if (_light.light_type == light_type::spot)
+    else if (_light.type == light_type::spot)
 	{
 		float range = _light.spot_data.get_range();
 		float clamped_inner_cone_angle = math::radians(math::clamp(_light.spot_data.get_inner_angle(), 0.0f, 89.0f));

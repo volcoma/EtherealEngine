@@ -3,7 +3,6 @@
 #include "core/serialization/serialization.h"
 #include "core/serialization/types/string.hpp"
 #include "core/common/string.h"
-#include "core/logging/logging.h"
 #include "../../assets/asset_handle.h"
 #include "../../assets/asset_manager.h"
 #include "../../rendering/mesh.h"

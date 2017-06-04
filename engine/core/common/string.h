@@ -16,10 +16,11 @@ namespace string_utils
 	class StrICmp
 	{
 	public:
+        StrICmp() = default;
 		//---------------------------------------------------------------------
 		// Constructors & Destructors
 		//---------------------------------------------------------------------
-		StrICmp(const char * lpszLang = "english") : mLocale(lpszLang) {}
+        StrICmp(const char * lpszLang) : mLocale(lpszLang) {}
 
 		//---------------------------------------------------------------------
 		// Public Classes
@@ -78,7 +79,7 @@ namespace string_utils
 	/// Compare the two std::strings with optional case ignore.
 	/// </summary>
 	//-------------------------------------------------------------------------
-	int compare(const std::string& s1, const std::string & s2, bool ignoreCase, const char * language = "english");
+    int compare(const std::string& s1, const std::string & s2, bool ignoreCase);
 	//-------------------------------------------------------------------------
 	//  Name : trim()
 	/// <summary>

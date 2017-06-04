@@ -3,7 +3,8 @@
 #include "core/reflection/reflection.h"
 #include "core/serialization/serialization.h"
 #include "core/serialization/types/vector.hpp"
-#include "core/logging/logging.h"
+#include "../../rendering/model.hpp"
+#include "component.hpp"
 
 REFLECT(model_component)
 {
@@ -63,6 +64,5 @@ LOAD(model_component)
 	try_load(ar, cereal::make_nvp("model", obj._model));
 }
 
-
-#include "core/serialization/archives.h"
-CEREAL_REGISTER_TYPE(model_component);
+#include "core/serialization/associative_archive.h"
+CEREAL_REGISTER_TYPE(model_component)

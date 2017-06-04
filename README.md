@@ -19,19 +19,20 @@ Supported mesh formats: obj, fbx, dae, 3ds, blend
 Any suggestions and help will be appreciated.
 
 ## BUILD
-VS2015 solution is included in the repo. Just build it.
+The engine uses the CMake build system.
 
 
 ## PLATFORMS
 It is written in a cross-platform manner.
 
-Platform | Supported
+Compiler | Supported
 -------- | ---------
-Windows  | yes
-Linux | needs some work 
+MSVC     | yes
+MinGW    | yes
+GCC      | probably
 
 ## CODEBASE
-c++14/c++17 Using the latest and greates features of the language.
+c++14 Using the latest and greatest features of the language.
 
 ## CODE STYLE
 ```c++

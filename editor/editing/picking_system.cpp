@@ -141,7 +141,7 @@ namespace editor
 			_reading = 0;
 			std::map<std::uint32_t, std::uint32_t> ids;  // This contains all the IDs found in the buffer
 			std::uint32_t max_amount = 0;
-			for (std::uint8_t* x = _blit_data; x < _blit_data + _id_dimensions * _id_dimensions * 4;)
+            for (std::uint8_t* x = _blit_data; x < _blit_data + TEX_ID_DIM * TEX_ID_DIM * 4;)
 			{
 				std::uint8_t rr = *x++;
 				std::uint8_t gg = *x++;
@@ -206,7 +206,7 @@ namespace editor
 	{
 		runtime::on_frame_render.connect(this, &picking_system::frame_render);
 		// Set up ID buffer, which has a color target and depth buffer
-		auto picking_rt = std::make_shared<texture>(_id_dimensions, _id_dimensions, false, 1, gfx::TextureFormat::RGBA8, 0
+        auto picking_rt = std::make_shared<texture>(TEX_ID_DIM, TEX_ID_DIM, false, 1, gfx::TextureFormat::RGBA8, 0
 			| BGFX_TEXTURE_RT
 			| BGFX_TEXTURE_MIN_POINT
 			| BGFX_TEXTURE_MAG_POINT
@@ -215,7 +215,7 @@ namespace editor
 			| BGFX_TEXTURE_V_CLAMP
 			);
 
-		auto picking_rt_depth = std::make_shared<texture>(_id_dimensions, _id_dimensions, false, 1, gfx::TextureFormat::D24S8, 0
+        auto picking_rt_depth = std::make_shared<texture>(TEX_ID_DIM, TEX_ID_DIM, false, 1, gfx::TextureFormat::D24S8, 0
 			| BGFX_TEXTURE_RT
 			| BGFX_TEXTURE_MIN_POINT
 			| BGFX_TEXTURE_MAG_POINT
@@ -237,7 +237,7 @@ namespace editor
 		// Impossible to read directly from a render target, you *must* blit to a CPU texture
 		// first. Algorithm Overview: Render on GPU -> Blit to CPU texture -> Read from CPU
 		// texture.
-		_blit_tex = std::make_shared<texture>(_id_dimensions, _id_dimensions, false, 1, gfx::TextureFormat::RGBA8, 0
+        _blit_tex = std::make_shared<texture>(TEX_ID_DIM, TEX_ID_DIM, false, 1, gfx::TextureFormat::RGBA8, 0
 			| BGFX_TEXTURE_BLIT_DST
 			| BGFX_TEXTURE_READ_BACK
 			| BGFX_TEXTURE_MIN_POINT

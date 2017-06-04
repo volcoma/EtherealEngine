@@ -1,9 +1,9 @@
 #pragma once
 
+#include "core/reflection/reflection.h"
 #include "core/serialization/serialization.h"
-#include "core/logging/logging.h"
 #include "../../rendering/camera.h"
-#include "../core/basetypes.hpp"
+#include "core/meta/common/basetypes.hpp"
 
 REFLECT(camera)
 {

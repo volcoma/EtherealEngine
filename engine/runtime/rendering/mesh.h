@@ -1105,9 +1105,9 @@ protected:
 	/// Material and data group information for each triangle.
 	subset_key_array_t _triangle_data;
 	/// After constructing the mesh, this will contain the actual hardware vertex buffer resource
-	std::shared_ptr<vertex_buffer> _hardware_vb = std::make_shared<vertex_buffer>();
+    std::shared_ptr<vertex_buffer> _hardware_vb;
 	/// After constructing the mesh, this will contain the actual hardware index buffer resource
-	std::shared_ptr<index_buffer> _hardware_ib = std::make_shared<index_buffer>();
+    std::shared_ptr<index_buffer> _hardware_ib;
 
 	// mesh data look up tables
 	/// The actual list of subsets maintained by this mesh.

@@ -5,11 +5,11 @@
 #include "runtime/ecs/ecs.h"
 #include "runtime/system/task.h"
 #include "runtime/system/engine.h"
-#include "core/serialization/archives.h"
+#include "core/serialization/associative_archive.h"
 
 #include "../editing/editing_system.h"
 #include "../assets/asset_compiler.h"
-#include "../meta/project_manager.hpp"
+#include "../meta/system/project_manager.hpp"
 #include <fstream>
 
 class mesh;
@@ -37,7 +37,7 @@ namespace editor
 				auto p = entry.path;
 				auto key = (protocol / p.filename().replace_extension()).generic_string();
 
-				if (entry.type == fs::file_type::regular)
+				if (entry.type == fs::file_type::regular_file)
 				{
 					if (entry.state == fs::watcher::Entry::Removed)
 					{
@@ -82,7 +82,7 @@ namespace editor
 				const auto& p = entry.path;
 				auto key = (protocol / p.stem()).generic_string();
 
-				if (entry.type == fs::file_type::regular)
+				if (entry.type == fs::file_type::regular_file)
 				{
 					if (entry.state == fs::watcher::Entry::Removed)
 					{
@@ -113,7 +113,7 @@ namespace editor
 			{
 				const auto& p = entry.path;
 
-				if (entry.type == fs::file_type::directory)
+				if (entry.type == fs::file_type::directory_file)
 				{
 					if (entry.state == fs::watcher::Entry::New)
 					{
@@ -147,7 +147,7 @@ namespace editor
 						), std::end(directories));
 					}
 				}
-				else if (entry.type == fs::file_type::regular)
+				else if (entry.type == fs::file_type::regular_file)
 				{
 					if (entry.state == fs::watcher::Entry::New)
 					{
@@ -265,7 +265,8 @@ namespace editor
 
 	void project_manager::open_project(const fs::path& project_path, bool recompile_project_assets, bool recompile_engine_assets)
 	{
-		if (!fs::exists(project_path, std::error_code{}))
+        fs::error_code err;
+        if (!fs::exists(project_path, err))
 		{
 			APPLOG_ERROR("Project directory doesn't exist {0}", project_path.string());
 			return;
@@ -315,31 +316,33 @@ namespace editor
 // 		watch_raw_assets<texture>("editor_data:/icons", "*.pvr", recompile_engine_assets);
 // 
 
-		auto& root = fs::resolve_protocol("app:/data");
+        auto root = fs::resolve_protocol("app:/data");
 		root_directory.reset();
 		root_directory = std::make_shared<asset_directory>(nullptr, root, root.filename().string(), root, recompile_project_assets);
 	}
 
 	void project_manager::create_project(const fs::path& project_path)
 	{
+        fs::error_code err;
 		fs::add_path_protocol("app:", project_path);
-		fs::create_directory(fs::resolve_protocol("app:/data"), std::error_code{});
-		fs::create_directory(fs::resolve_protocol("app:/settings"), std::error_code{});
+        fs::create_directory(fs::resolve_protocol("app:/data"), err);
+        fs::create_directory(fs::resolve_protocol("app:/settings"), err);
 
 		open_project(project_path, false, false);
 	}
 
 	void project_manager::load_config()
 	{
+        fs::error_code err;
 		const fs::path project_config_file = fs::resolve_protocol("editor_data:/config/project.cfg");
-		if (!fs::exists(project_config_file, std::error_code{}))
+        if (!fs::exists(project_config_file, err))
 		{
 			save_config();
 		}
 		else
 		{
-			std::ifstream output(project_config_file);
-			cereal::iarchive_json_t ar(output);
+			std::ifstream output(project_config_file.string());
+            cereal::iarchive_associative_t ar(output);
 
 			try_load(ar, cereal::make_nvp("options", _options));
 
@@ -349,7 +352,7 @@ namespace editor
 			{
 				auto& item = *iter;
 
-				if (!fs::exists(item, std::error_code{}))
+                if (!fs::exists(item, err))
 				{
 					iter = items.erase(iter);
 				}
@@ -369,10 +372,11 @@ namespace editor
 		{
 			rp.push_back(project_path.generic_string());
 		}
-		fs::create_directory(fs::resolve_protocol("editor_data:/config"), std::error_code{});
+        fs::error_code err;
+        fs::create_directory(fs::resolve_protocol("editor_data:/config"), err);
 		const std::string project_config_file = fs::resolve_protocol("editor_data:/config/project.cfg").string();
 		std::ofstream output(project_config_file);
-		cereal::oarchive_json_t ar(output);
+        cereal::oarchive_associative_t ar(output);
 
 		try_save(ar, cereal::make_nvp("options", _options));
 	}

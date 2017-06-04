@@ -193,12 +193,12 @@ namespace runtime
 					{
 						if (transform_comp_ptr->is_dirty() || model_comp_ptr->is_dirty())
 						{
-							result.push_back({ entity, transform_comp_handle, model_comp_handle });
+                            result.push_back(std::make_tuple(entity, transform_comp_handle, model_comp_handle));
 						}
 					} // End if dirty_only
 					else
 					{
-						result.push_back({ entity, transform_comp_handle, model_comp_handle });
+                        result.push_back(std::make_tuple(entity, transform_comp_handle, model_comp_handle));
 					}
 
 				} // Enf if visble
@@ -210,12 +210,12 @@ namespace runtime
 				{
 					if (transform_comp_ptr->is_dirty() || model_comp_ptr->is_dirty())
 					{
-						result.push_back({ entity, transform_comp_handle, model_comp_handle });
+                        result.push_back(std::make_tuple(entity, transform_comp_handle, model_comp_handle));
 					}
 				} // End if dirty_only
 				else
 				{
-					result.push_back({ entity, transform_comp_handle, model_comp_handle });
+                    result.push_back(std::make_tuple(entity, transform_comp_handle, model_comp_handle));
 				}
 			}
 
@@ -435,7 +435,8 @@ namespace runtime
 				nullptr,
 				[&camera, &clip_planes, &params](program& p)
 			{
-				p.set_uniform("u_camera_wpos", &camera.get_position());
+                auto camera_pos = camera.get_position();
+                p.set_uniform("u_camera_wpos", &camera_pos);
 				p.set_uniform("u_camera_clip_planes", &clip_planes);
 				p.set_uniform("u_lod_params", &params);
 			});
@@ -512,14 +513,14 @@ namespace runtime
 
 
 			program* program = nullptr;
-			if (light.light_type == light_type::directional && _directional_light_program)
+            if (light.type == light_type::directional && _directional_light_program)
 			{
 				// Draw light.
 				program = _directional_light_program.get();
 				program->begin_pass();
 				program->set_uniform("u_light_direction", &light_direction);
 			}
-			if (light.light_type == light_type::point && _point_light_program)
+            if (light.type == light_type::point && _point_light_program)
 			{
 				float light_data[4] =
 				{
@@ -536,7 +537,7 @@ namespace runtime
 				program->set_uniform("u_light_data", light_data);
 			}
 
-			if (light.light_type == light_type::spot && _spot_light_program)
+            if (light.type == light_type::spot && _spot_light_program)
 			{
 				float light_data[4] =
 				{
@@ -563,8 +564,9 @@ namespace runtime
 					light.color.value.b,
 					light.intensity
 				};
+                auto camera_pos = camera.get_position();
 				program->set_uniform("u_light_color_intensity", light_color_intensity);
-				program->set_uniform("u_camera_position", &camera.get_position());
+                program->set_uniform("u_camera_position", &camera_pos);
 				program->set_texture(0, "s_tex0", gfx::getTexture(g_buffer_fbo->handle, 0));
 				program->set_texture(1, "s_tex1", gfx::getTexture(g_buffer_fbo->handle, 1));
 				program->set_texture(2, "s_tex2", gfx::getTexture(g_buffer_fbo->handle, 2));
@@ -635,14 +637,14 @@ namespace runtime
 
 			program* program = nullptr;
 			float influence_radius = 0.0f;
-			if (probe.probe_type == probe_type::sphere && _sphere_ref_probe_program)
+            if (probe.type == probe_type::sphere && _sphere_ref_probe_program)
 			{
 				program = _sphere_ref_probe_program.get();
 				program->begin_pass();
 				influence_radius = probe.sphere_data.range;
 			}
 
-			if (probe.probe_type == probe_type::box && _box_ref_probe_program)
+            if (probe.type == probe_type::box && _box_ref_probe_program)
 			{
 				math::transform t;
 				t.set_scale(probe.box_data.extents);
@@ -745,7 +747,7 @@ namespace runtime
 				const auto& world_transform = transform_comp_ref.get_transform();
 				const auto& light_direction = world_transform.z_unit_axis();
 
-				if (light.light_type == light_type::directional)
+                if (light.type == light_type::directional)
 				{
 					_atmospherics_program->begin_pass();
 					_atmospherics_program->set_uniform("u_light_direction", &light_direction);

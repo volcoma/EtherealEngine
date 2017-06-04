@@ -1,9 +1,8 @@
 #pragma once
 #include "../../../ecs/components/camera_component.h"
 #include "core/reflection/reflection.h"
-#include "core/logging/logging.h"
-#include "../../../meta/rendering/camera.hpp"
-
+#include "../../rendering/camera.hpp"
+#include "component.hpp"
 
 REFLECT(camera_component)
 {
@@ -85,6 +84,5 @@ LOAD(camera_component)
 	try_load(ar, cereal::make_nvp("hdr", obj._hdr));
 }
 
-
-#include "core/serialization/archives.h"
-CEREAL_REGISTER_TYPE(camera_component);
+#include "core/serialization/associative_archive.h"
+CEREAL_REGISTER_TYPE(camera_component)

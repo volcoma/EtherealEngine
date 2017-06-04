@@ -3,7 +3,6 @@
 #include "core/reflection/reflection.h"
 #include "core/serialization/serialization.h"
 #include "core/serialization/types/vector.hpp"
-#include "core/logging/logging.h"
 
 inline std::map<uint32_t, runtime::entity>& get_serialization_map()
 {

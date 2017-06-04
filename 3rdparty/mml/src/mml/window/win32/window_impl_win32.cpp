@@ -413,7 +413,7 @@ void window_impl_win32::set_alpha(float alpha)
 	else
 	{
 		make_transparent(hwnd);
-		SetLayeredWindowAttributes(get_system_handle(), 0, unsigned char(alpha * 255), LWA_ALPHA);
+        SetLayeredWindowAttributes(get_system_handle(), 0, (unsigned char)(alpha * 255), LWA_ALPHA);
 	}
 }
 

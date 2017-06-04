@@ -2,7 +2,7 @@
 #include "core/serialization/serialization.h"
 #include "core/reflection/reflection.h"
 #include "../../rendering/mesh.h"
-#include "../math/transform.hpp"
+#include "core/meta/math/transform.hpp"
 
 REFLECT(mesh::info)
 {
