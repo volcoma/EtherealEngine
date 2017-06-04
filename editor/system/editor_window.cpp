@@ -377,6 +377,26 @@ void main_editor_window::render_dockspace()
 {
 	if (!_show_start_page)
 		gui_window::render_dockspace();
+
+	if (_console_log)
+	{
+		auto items = _console_log->get_items();
+		if (!items.empty())
+		{
+			auto& last_item = items.back();
+			const auto& colorization = _console_log->get_level_colorization(last_item.second);
+			ImVec4 col = { colorization[0], colorization[1], colorization[2], colorization[3] };
+
+			float offset = ImGui::GetStyle().ItemSpacing.y;
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + offset);
+			gui::PushStyleColor(ImGuiCol_Text, col);
+			if (gui::Selectable(last_item.first.c_str(), false, 0, ImVec2(0, gui::GetItemsLineHeightWithSpacing() - offset)))
+			{
+				_dockspace.activate_dock(_console_dock_name);
+			}
+			gui::PopStyleColor();
+		}
+	}
 }
 
 void main_editor_window::on_start_page()
@@ -465,4 +485,11 @@ void main_editor_window::on_start_page()
 
 	}
 	gui::EndGroup();
+}
+
+
+void main_editor_window::set_log(const std::string& name, std::shared_ptr<console_log> log)
+{
+	_console_dock_name = name;
+	_console_log = log;
 }

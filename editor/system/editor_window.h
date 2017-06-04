@@ -1,6 +1,6 @@
 #pragma once
 #include "../interface/gui_window.h"
-
+#include "../console/console_log.h"
 class main_editor_window : public gui_window
 {
 public:
@@ -94,7 +94,20 @@ public:
 	//-----------------------------------------------------------------------------
 	void show_start_page(bool show) { _show_start_page = show; }
 
+	//-----------------------------------------------------------------------------
+	//  Name : set_log ()
+	/// <summary>
+	/// 
+	/// 
+	/// 
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	void set_log(const std::string& name, std::shared_ptr<console_log> log);
 private:
 	///
 	bool _show_start_page = true;
+	///
+	std::shared_ptr<console_log> _console_log;
+	///
+	std::string _console_dock_name;
 };

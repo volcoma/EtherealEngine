@@ -1,6 +1,6 @@
 #include "docking.h"
 #include "runtime/system/engine.h"
-#include "../gui_window.h"
+#include "../../system/editor_window.h"
 #include "core/logging/logging.h"
 #include "scene_dock.h"
 #include "game_dock.h"
@@ -32,7 +32,7 @@ bool docking_system::initialize()
 
 	auto& engine = core::get_subsystem<runtime::engine>();
 	const auto& windows = engine.get_windows();
-	auto& window = static_cast<gui_window&>(*windows[0]);
+	auto& window = static_cast<main_editor_window&>(*windows[0]);
 	auto& dockspace = window.get_dockspace();
 	dockspace.dock_to(scene.get(), imguidock::slot::none, 200, true);
 	dockspace.dock_with(game.get(), scene.get(), imguidock::slot::tab, 300, false);
@@ -44,7 +44,7 @@ bool docking_system::initialize()
 
 	auto logger = logging::get(APPLOG);
 	logger->add_sink(log);
-
+	window.set_log("Console", log);
 	std::function<void()> log_version = []()
 	{
 		APPLOG_INFO("Version 1.0");

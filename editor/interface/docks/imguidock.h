@@ -80,7 +80,8 @@ namespace imguidock
 
 		void update_and_draw(ImVec2 size);
 		void clear();
-		bool has_dock(const std::string& name);
+		void activate_dock(const std::string& name);
+
 		node root;
 		std::vector<node*> nodes;
 	protected:

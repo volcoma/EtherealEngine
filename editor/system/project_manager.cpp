@@ -216,8 +216,6 @@ namespace editor
 		
 	}
 
-
-
 	asset_file::asset_file(const fs::path& abs, const std::string& n, const std::string& ext, const fs::path& r)
 	{
 		populate(abs, n, ext, r);

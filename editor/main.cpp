@@ -1,6 +1,5 @@
 #include "system/app.h"
 #include "runtime/runtime.h"
-
 int main(int _argc, char* _argv[])
 {
 	//fs::path exe_path = fs::canonical(fs::executable_path(_argv[0]).remove_filename());

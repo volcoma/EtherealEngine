@@ -4,6 +4,8 @@
 #include <core/console/console.h>
 #include <string>
 #include <deque>
+#include <array>
+
 class console_log : public logging::sinks::base_sink<std::mutex>, public console
 {
 public:
@@ -59,6 +61,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline int get_pending_entries() const { return _pending; }
 
+	const std::array<float, 4>& get_level_colorization(logging::level::level_enum level);
 	//-----------------------------------------------------------------------------
 	//  Name : set_pending_entries ()
 	/// <summary>

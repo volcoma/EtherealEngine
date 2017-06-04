@@ -30,31 +30,17 @@ void console_dock::render(const ImVec2& area)
 	}
 	gui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1)); // Tighten spacing
 
-	auto itemsCopy = _console_log->get_items();
+	auto items = _console_log->get_items();
 
-	static std::map<logging::level::level_enum, ImVec4> colorMappings
+	for (auto& pair_msg : items)
 	{
-		{ logging::level::trace,{ 1.0f, 1.0f, 1.0f, 1.0f } },
-		{ logging::level::debug,{ 1.0f, 1.0f, 1.0f, 1.0f } },
-		{ logging::level::info,{ 1.0f, 1.0f, 1.0f, 1.0f } },
-		{ logging::level::notice,{ 1.0f, 5.0f, 0.0f, 1.0f } },
-		{ logging::level::warn,{ 1.0f, 0.494f, 0.0f, 1.0f } },
-		{ logging::level::err,{ 1.0f, 0.0f, 0.0f, 1.0f } },
-		{ logging::level::critical,{ 1.0f, 1.0f, 1.0f, 1.0f } },
-		{ logging::level::alert,{ 1.0f, 1.0f, 1.0f, 1.0f } },
-		{ logging::level::emerg,{ 1.0f, 1.0f, 1.0f, 1.0f } },
-		{ logging::level::off,{ 1.0f, 1.0f, 1.0f, 1.0f } },
-
-	};
-
-	for (auto& pairMsg : itemsCopy)
-	{
-		const char* itemCstr = pairMsg.first.c_str();
-		if (!filter.PassFilter(itemCstr))
+		const char* item_cstr = pair_msg.first.c_str();
+		if (!filter.PassFilter(item_cstr))
 			continue;
-		ImVec4 col = colorMappings[pairMsg.second];
+		const auto& colorization = _console_log->get_level_colorization(pair_msg.second);
+		ImVec4 col = { colorization[0], colorization[1], colorization[2], colorization[3] };
 		gui::PushStyleColor(ImGuiCol_Text, col);
-		gui::TextWrapped(itemCstr);
+		gui::TextWrapped(item_cstr);
 		gui::PopStyleColor();
 	}
 	if (_console_log->get_pending_entries() > 0)

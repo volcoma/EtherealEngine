@@ -2,6 +2,7 @@
 #include "runtime/rendering/render_window.h"
 #include "docks/imguidock.h"
 
+
 class gui_window : public render_window
 {
 public:
@@ -81,6 +82,8 @@ public:
 	//-----------------------------------------------------------------------------
 	virtual void render_dockspace();
 
+
+
 	//-----------------------------------------------------------------------------
 	//  Name : frame_end (virtual )
 	/// <summary>
@@ -110,9 +113,10 @@ public:
 	//-----------------------------------------------------------------------------
 	inline imguidock::dockspace& get_dockspace() { return _dockspace; }
 
-private:
+protected:
 	///
 	imguidock::dockspace _dockspace;
 	///
 	ImGuiContext* _gui_context;
+
 };

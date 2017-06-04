@@ -450,7 +450,6 @@ namespace imguidock
 		uint32_t idgen = 0;
 		ImVec2 backup_pos = ImGui::GetCursorPos();
 		render_container(idgen, &root, dockspaceSize, backup_pos);
-		ImGui::SetCursorPos(backup_pos);
 		if (_current_dock_to)
 		{
 			if (_current_dock_action == eUndock)
@@ -507,19 +506,28 @@ namespace imguidock
 		root = {};
 	}
 
-	bool dockspace::has_dock(const std::string& name)
+	void activete_dock_impl(node* node, const std::string& title)
 	{
-		for (auto n : nodes)
+		for (auto d : node->docks)
 		{
-			if (n->active_dock)
+			if (d->title == "Console")
 			{
-				if (n->active_dock->title == name)
-				{
-					return true;
-				}
+				node->active_dock = d;
+				return;
 			}
 		}
-		return false;
+
+		if (node->splits[0])
+			activete_dock_impl(node->splits[0], title);
+
+		if (node->splits[1])
+			activete_dock_impl(node->splits[1], title);
+	}
+
+
+	void dockspace::activate_dock(const std::string& name)
+	{
+		activete_dock_impl(&root, name);
 	}
 
 	gui_window *dockspace::is_any_window_dragged()
