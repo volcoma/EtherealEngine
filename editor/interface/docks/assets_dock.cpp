@@ -74,6 +74,116 @@ asset_handle<texture>& get_icon()
 	return tex;
 }
 
+template<typename T>
+void list_entry(
+	T& entry,
+	const std::string& name,
+	bool is_selected,
+	bool is_dragging,
+	const float size,
+	std::function<void()> on_click, 
+	std::function<void()> on_double_click,
+	std::function<void(const std::string&)> on_rename,
+	std::function<void()> on_delete,
+	std::function<void()> on_drag)
+{
+	bool edit_label = false;
+	if (is_selected && !gui::IsAnyItemActive())
+	{
+		
+		if (gui::IsKeyPressed(mml::keyboard::F2))
+		{
+			edit_label = true;
+		}
+
+		if (gui::IsKeyPressed(mml::keyboard::Delete))
+		{
+			if (on_delete)
+				on_delete();
+		}
+	}
+
+	auto get_icon = [](auto entry)
+	{
+		if (!entry)
+			return get_loading_icon();
+		
+		return get_asset_icon(entry);
+	};
+
+	auto icon = get_icon(entry);
+	bool loading = !entry;
+
+	gui::PushID(name.c_str());
+
+	if (gui::GetContentRegionAvailWidth() < size)
+		gui::NewLine();
+
+	static std::string inputBuff(64, 0);
+	std::memset(&inputBuff[0], 0, 64);
+	std::memcpy(&inputBuff[0], name.c_str(), name.size() < 64 ? name.size() : 64);
+
+	ImVec2 item_size = { size, size };
+	ImVec2 texture_size = item_size;
+	if (icon)
+		texture_size = { float(icon->info.width), float(icon->info.height) };
+	ImVec2 uv0 = { 0.0f, 0.0f };
+	ImVec2 uv1 = { 1.0f, 1.0f };
+
+	bool* edit = edit_label ? &edit_label : nullptr;
+	int action = gui::ImageButtonWithAspectAndLabel(
+		icon.link->asset,
+		texture_size, item_size, uv0, uv1,
+		is_selected,
+		edit,
+		loading ? "Loading" : name.c_str(),
+		&inputBuff[0],
+		inputBuff.size(),
+		ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll);
+
+	if (loading)
+	{
+		gui::PopID();
+		gui::SameLine();
+		return;
+	}
+
+	if (action == 1)
+	{
+		if (on_click)
+			on_click();
+	}
+	else if (action  == 2)
+	{
+		std::string new_name = std::string(inputBuff.c_str());
+		if (new_name != name && new_name != "")
+		{
+			if (on_rename)
+				on_rename(new_name);
+		}
+	}
+	else if (action == 3)
+	{
+		if (on_double_click)
+			on_double_click();
+	}
+	if (gui::IsItemHoveredRect())
+	{
+		if (gui::IsMouseClicked(gui::drag_button) && !is_dragging)
+		{
+			if (on_drag)
+				on_drag();
+		}
+
+	}
+
+
+	gui::PopID();
+	gui::SameLine();
+
+}
+
+
 template<typename Wrapper, typename T>
 int list_item(Wrapper& entry,
 	const std::string& name,
@@ -240,19 +350,45 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 
 		for (auto& entry : dir->directories)
 		{
-			int action = list_item<std::shared_ptr<editor::asset_directory>, editor::asset_directory>(
-				entry,
-				entry->name,
-				entry->relative,
-				entry->absolute,
-				size,
-				opened_dir,
-				am, input, es);
-			if (action == 3)
+			using entry_t = std::shared_ptr<editor::asset_directory>;
+			const auto& name = entry->name;
+			const auto& relative = entry->relative;
+			const auto& absolute = entry->absolute;
+			auto& selected = es.selection_data.object;
+			bool is_selected = selected.is_type<entry_t>() ? (selected.get_value<entry_t>() == entry) : false;
+			bool is_dragging = !!es.drag_data.object;
+			list_entry(
+			entry,
+			name,
+			is_selected,
+			is_dragging,
+			size,
+			[&]() // on_click
+			{
+				es.select(entry);
+			},
+			[&]() // on_double_click
 			{
 				opened_dir = entry;
 				es.try_unselect<std::shared_ptr<editor::asset_directory>>();
+			}, 
+			[&](const std::string& new_name) // on_rename
+			{
+				fs::path new_absolute_path = absolute;
+				new_absolute_path.remove_filename();
+				new_absolute_path /= new_name;
+				fs::error_code err;
+				fs::rename(absolute, new_absolute_path, err);
+			}, 
+			[&]() // on_delete
+			{
+				fs::error_code err;
+				fs::remove_all(absolute, err);
+			}, 
+			[]() // on_drag
+			{
 			}
+			);
 		}
 	}
 	{
@@ -262,99 +398,351 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 		{
 			if (file.extension == extensions::texture)
 			{
-				auto asset = am.find_or_create_asset_entry<texture>(file.relative).asset;
+                using asset_t = texture;
+                using entry_t = asset_handle<asset_t>;
+                auto entry = am.find_or_create_asset_entry<asset_t>(file.relative).asset;
+				const auto& name = file.name;
+				const auto& relative = file.relative;
+				const auto& absolute = file.absolute;
+				auto& selected = es.selection_data.object;
+				bool is_selected = selected.is_type<entry_t>() ? (selected.get_value<entry_t>() == entry) : false;
+				bool is_dragging = !!es.drag_data.object;
+				list_entry(
+				entry,
+				name,
+				is_selected,
+				is_dragging,
+				size,
+				[&]() // on_click
+				{
+					es.select(entry);
+				},
+				[&]() // on_double_click
+				{
+					
+				}, 
+				[&](const std::string& new_name) // on_rename
+				{
+					const auto asset_dir = fs::path(relative).remove_filename();
+					std::string new_relative = (asset_dir / new_name).generic_string();
+                    am.rename_asset<asset_t>(relative, new_relative);
+				}, 
+				[&]() // on_delete
+				{
+                    am.delete_asset<asset_t>(relative);
 
-				list_item<asset_handle<texture>, texture>(
-					asset,
-					file.name,
-					file.relative,
-					file.absolute,
-					size,
-					opened_dir,
-					am, input, es);
+					if (!opened_dir.expired())
+					{
+						auto opened_folder_shared = opened_dir.lock();
+						auto& files = opened_folder_shared->files;
+
+						fs::error_code err;
+						for (auto& f : files)
+						{
+							if (f.relative == relative)
+							{
+								fs::remove(f.absolute, err);
+							}
+						}
+					}
+				}, 
+				[&]() // on_drag
+				{
+					es.drag(entry, relative);
+				}
+				);
 			}
 			if (file.extension == extensions::mesh)
 			{
+                using asset_t = mesh;
+                using entry_t = asset_handle<asset_t>;
+                auto entry = am.find_or_create_asset_entry<asset_t>(file.relative).asset;
+                const auto& name = file.name;
+                const auto& relative = file.relative;
+                const auto& absolute = file.absolute;
+                auto& selected = es.selection_data.object;
+                bool is_selected = selected.is_type<entry_t>() ? (selected.get_value<entry_t>() == entry) : false;
+                bool is_dragging = !!es.drag_data.object;
+                list_entry(
+                entry,
+                name,
+                is_selected,
+                is_dragging,
+                size,
+                [&]() // on_click
+                {
+                    es.select(entry);
+                },
+                [&]() // on_double_click
+                {
 
-				auto asset = am.find_or_create_asset_entry<mesh>(file.relative).asset;
+                },
+                [&](const std::string& new_name) // on_rename
+                {
+                    const auto asset_dir = fs::path(relative).remove_filename();
+                    std::string new_relative = (asset_dir / new_name).generic_string();
+                    am.rename_asset<asset_t>(relative, new_relative);
+                },
+                [&]() // on_delete
+                {
+                    am.delete_asset<asset_t>(relative);
 
-				list_item<asset_handle<mesh>, mesh>(
-					asset,
-					file.name,
-					file.relative,
-					file.absolute,
-					size,
-					opened_dir,
-					am, input, es);
+                    if (!opened_dir.expired())
+                    {
+                        auto opened_folder_shared = opened_dir.lock();
+                        auto& files = opened_folder_shared->files;
+
+                        fs::error_code err;
+                        for (auto& f : files)
+                        {
+                            if (f.relative == relative)
+                            {
+                                fs::remove(f.absolute, err);
+                            }
+                        }
+                    }
+                },
+                [&]() // on_drag
+                {
+                    es.drag(entry, relative);
+                }
+                );
 			}
 			if (file.extension == extensions::material)
 			{
-				auto asset = am.find_or_create_asset_entry<material>(file.relative).asset;
+                using asset_t = material;
+                using entry_t = asset_handle<asset_t>;
+                auto entry = am.find_or_create_asset_entry<asset_t>(file.relative).asset;
+                const auto& name = file.name;
+                const auto& relative = file.relative;
+                const auto& absolute = file.absolute;
+                auto& selected = es.selection_data.object;
+                bool is_selected = selected.is_type<entry_t>() ? (selected.get_value<entry_t>() == entry) : false;
+                bool is_dragging = !!es.drag_data.object;
+                list_entry(
+                entry,
+                name,
+                is_selected,
+                is_dragging,
+                size,
+                [&]() // on_click
+                {
+                    es.select(entry);
+                },
+                [&]() // on_double_click
+                {
 
-				list_item<asset_handle<material>, material>(
-					asset,
-					file.name,
-					file.relative,
-					file.absolute,
-					size,
-					opened_dir,
-					am, input, es);
+                },
+                [&](const std::string& new_name) // on_rename
+                {
+                    const auto asset_dir = fs::path(relative).remove_filename();
+                    std::string new_relative = (asset_dir / new_name).generic_string();
+                    am.rename_asset<asset_t>(relative, new_relative);
+                },
+                [&]() // on_delete
+                {
+                    am.delete_asset<asset_t>(relative);
+
+                    if (!opened_dir.expired())
+                    {
+                        auto opened_folder_shared = opened_dir.lock();
+                        auto& files = opened_folder_shared->files;
+
+                        fs::error_code err;
+                        for (auto& f : files)
+                        {
+                            if (f.relative == relative)
+                            {
+                                fs::remove(f.absolute, err);
+                            }
+                        }
+                    }
+                },
+                [&]() // on_drag
+                {
+                    es.drag(entry, relative);
+                }
+                );
 			}
+            if (file.extension == extensions::shader)
+            {
+                using asset_t = shader;
+                using entry_t = asset_handle<asset_t>;
+                auto entry = am.find_or_create_asset_entry<asset_t>(file.relative).asset;
+                const auto& name = file.name;
+                const auto& relative = file.relative;
+                const auto& absolute = file.absolute;
+                auto& selected = es.selection_data.object;
+                bool is_selected = selected.is_type<entry_t>() ? (selected.get_value<entry_t>() == entry) : false;
+                bool is_dragging = !!es.drag_data.object;
+                list_entry(
+                entry,
+                name,
+                is_selected,
+                is_dragging,
+                size,
+                [&]() // on_click
+                {
+                    es.select(entry);
+                },
+                [&]() // on_double_click
+                {
+
+                },
+                [&](const std::string& new_name) // on_rename
+                {
+                    const auto asset_dir = fs::path(relative).remove_filename();
+                    std::string new_relative = (asset_dir / new_name).generic_string();
+                    am.rename_asset<asset_t>(relative, new_relative);
+                },
+                [&]() // on_delete
+                {
+                    am.delete_asset<asset_t>(relative);
+
+                    if (!opened_dir.expired())
+                    {
+                        auto opened_folder_shared = opened_dir.lock();
+                        auto& files = opened_folder_shared->files;
+
+                        fs::error_code err;
+                        for (auto& f : files)
+                        {
+                            if (f.relative == relative)
+                            {
+                                fs::remove(f.absolute, err);
+                            }
+                        }
+                    }
+                },
+                [&]() // on_drag
+                {
+                    es.drag(entry, relative);
+                }
+                );
+            }
 			if (file.extension == extensions::prefab)
 			{
-				auto asset = am.find_or_create_asset_entry<prefab>(file.relative).asset;
+                using asset_t = prefab;
+                using entry_t = asset_handle<asset_t>;
+                auto entry = am.find_or_create_asset_entry<asset_t>(file.relative).asset;
+                const auto& name = file.name;
+                const auto& relative = file.relative;
+                const auto& absolute = file.absolute;
+                auto& selected = es.selection_data.object;
+                bool is_selected = selected.is_type<entry_t>() ? (selected.get_value<entry_t>() == entry) : false;
+                bool is_dragging = !!es.drag_data.object;
+                list_entry(
+                entry,
+                name,
+                is_selected,
+                is_dragging,
+                size,
+                [&]() // on_click
+                {
+                    es.select(entry);
+                },
+                [&]() // on_double_click
+                {
 
-				list_item<asset_handle<prefab>, prefab>(
-					asset,
-					file.name,
-					file.relative,
-					file.absolute,
-					size,
-					opened_dir,
-					am, input, es);
+                },
+                [&](const std::string& new_name) // on_rename
+                {
+                    const auto asset_dir = fs::path(relative).remove_filename();
+                    std::string new_relative = (asset_dir / new_name).generic_string();
+                    am.rename_asset<asset_t>(relative, new_relative);
+                },
+                [&]() // on_delete
+                {
+                    am.delete_asset<asset_t>(relative);
+
+                    if (!opened_dir.expired())
+                    {
+                        auto opened_folder_shared = opened_dir.lock();
+                        auto& files = opened_folder_shared->files;
+
+                        fs::error_code err;
+                        for (auto& f : files)
+                        {
+                            if (f.relative == relative)
+                            {
+                                fs::remove(f.absolute, err);
+                            }
+                        }
+                    }
+                },
+                [&]() // on_drag
+                {
+                    es.drag(entry, relative);
+                }
+                );
 			}
 			if (file.extension == extensions::scene)
 			{
-				auto asset = am.find_or_create_asset_entry<scene>(file.relative).asset;
+                using asset_t = scene;
+                using entry_t = asset_handle<asset_t>;
+                auto entry = am.find_or_create_asset_entry<asset_t>(file.relative).asset;
+                const auto& name = file.name;
+                const auto& relative = file.relative;
+                const auto& absolute = file.absolute;
+                auto& selected = es.selection_data.object;
+                bool is_selected = selected.is_type<entry_t>() ? (selected.get_value<entry_t>() == entry) : false;
+                bool is_dragging = !!es.drag_data.object;
+                list_entry(
+                entry,
+                name,
+                is_selected,
+                is_dragging,
+                size,
+                [&]() // on_click
+                {
+                    es.select(entry);
+                },
+                [&]() // on_double_click
+                {
+                    if(!entry)
+                        return;
 
-				int action = list_item<asset_handle<scene>, scene>(
-					asset,
-					file.name,
-					file.relative,
-					file.absolute,
-					size,
-					opened_dir,
-					am, input, es);
+                    auto& ecs = core::get_subsystem<runtime::entity_component_system>();
+                    ecs.dispose();
+                    es.load_editor_camera();
+                    entry->instantiate();
+                    es.scene = fs::resolve_protocol(entry.id()).string() + extensions::scene;
 
-				if (action == 3)
-				{
-					if (asset)
-					{
-						auto& es = core::get_subsystem<editor::editing_system>();
-						auto& ecs = core::get_subsystem<runtime::entity_component_system>();
 
-						ecs.dispose();
-						es.load_editor_camera();
-						asset->instantiate();
-						es.scene = fs::resolve_protocol(asset.id()).string() + extensions::scene;
+                },
+                [&](const std::string& new_name) // on_rename
+                {
+                    const auto asset_dir = fs::path(relative).remove_filename();
+                    std::string new_relative = (asset_dir / new_name).generic_string();
+                    am.rename_asset<asset_t>(relative, new_relative);
+                },
+                [&]() // on_delete
+                {
+                    am.delete_asset<asset_t>(relative);
 
-					}
+                    if (!opened_dir.expired())
+                    {
+                        auto opened_folder_shared = opened_dir.lock();
+                        auto& files = opened_folder_shared->files;
 
-				}
+                        fs::error_code err;
+                        for (auto& f : files)
+                        {
+                            if (f.relative == relative)
+                            {
+                                fs::remove(f.absolute, err);
+                            }
+                        }
+                    }
+                },
+                [&]() // on_drag
+                {
+                    es.drag(entry, relative);
+                }
+                );
+
 			}
-			if (file.extension == extensions::shader)
-			{
-				auto asset = am.find_or_create_asset_entry<shader>(file.relative).asset;
 
-				list_item<asset_handle<shader>, shader>(
-					asset,
-					file.name,
-					file.relative,
-					file.absolute,
-					size,
-					opened_dir,
-					am, input, es);
-			}
 		}
 	}
 
@@ -422,8 +810,6 @@ void assets_dock::render(const ImVec2& area)
 
 	auto& es = core::get_subsystem<editor::editing_system>();
 	auto& input = core::get_subsystem<runtime::input>();
-
-	float width = gui::GetContentRegionAvailWidth();
 
 	if (!gui::IsAnyItemActive())
 	{

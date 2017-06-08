@@ -237,7 +237,7 @@ namespace gfx
 			if ((search_flags & format_search_flags::FloatingPoint))
 			{
 				// Floating point formats ONLY!
-				bool accept_half = ((search_flags & format_search_flags::HalfPrecisionFloat) != 0);
+                //bool accept_half = ((search_flags & format_search_flags::HalfPrecisionFloat) != 0);
 				bool accept_full = ((search_flags & format_search_flags::FullPrecisionFloat) != 0);
 				if (!requires_stencil)
 				{
@@ -384,8 +384,8 @@ namespace gfx
 			const float miny = -height;
 			const float maxy = height;
 
-			const float texel_half_w = texture_half;
-			const float texel_half_h = texture_half;
+            //const float texel_half_w = texture_half;
+            //const float texel_half_h = texture_half;
 			const float minu = 0.0f;
 			const float maxu = 1.0f;
 

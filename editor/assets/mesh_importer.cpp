@@ -30,7 +30,6 @@ void process_vertices(aiMesh* mesh, mesh::load_data& load_data)
 	bool has_bitangent = load_data.vertex_format.has(gfx::Attrib::Bitangent);
 	bool has_tangent = load_data.vertex_format.has(gfx::Attrib::Tangent);
 	bool has_texcoord0 = load_data.vertex_format.has(gfx::Attrib::TexCoord0);
-	bool has_texcoord1 = load_data.vertex_format.has(gfx::Attrib::TexCoord1);
 	auto nVertexStride = load_data.vertex_format.getStride();
 
 	std::uint32_t nCurrentVertex = load_data.vertex_count;

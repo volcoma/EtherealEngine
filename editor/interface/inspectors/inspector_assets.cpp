@@ -21,7 +21,6 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool readOnly, 
 	if (is_selected)
 		available = gui::GetContentRegionAvailWidth();
 
-	float max_size = available;
 	ImVec2 size = { available, available };
 	if (data)
 	{

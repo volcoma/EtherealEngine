@@ -88,7 +88,6 @@ math::bbox camera::get_local_bounding_box()
 {
 	if (_projection_mode == projection_mode::perspective)
 	{
-		float fNearSize = math::tan(math::radians<float>(_fov*0.5f)) * _near_clip;
 		float fFarSize = math::tan(math::radians<float>(_fov*0.5f)) * _far_clip;
 		return math::bbox(-fFarSize* _aspect_ratio, -fFarSize, _near_clip, fFarSize* _aspect_ratio, fFarSize, _far_clip);
 	}

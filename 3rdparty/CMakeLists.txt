@@ -25,3 +25,6 @@ target_include_directories (mml-window PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/mml/in
 
 add_subdirectory_ex(filesystem)
 target_include_directories (filesystem PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+add_subdirectory_ex(glm)
+target_include_directories (glm_static PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/glm)

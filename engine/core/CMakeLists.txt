@@ -12,3 +12,4 @@ add_library (core ${libsrc})
 
 target_link_libraries(core PUBLIC rttr_core_lib)
 target_link_libraries(core PUBLIC cereal)
+target_link_libraries(core PUBLIC glm_static)

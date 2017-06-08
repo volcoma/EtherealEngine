@@ -255,17 +255,17 @@ namespace ImGui
 			{	
 				SetCursorScreenPos(pos);
 				PushItemWidth(size.x);
-				
+
 				if (InputText("",
-					&buf[0],
-					buf_size,
-					flags))
+				    &buf[0],
+				    buf_size,
+				    flags))
 				{
 					edit = false;
 					return_value = 2;
 				}
-				
-				PopItemWidth();		
+
+				PopItemWidth();
 				inputActive = IsItemActive();
 				if (!inputActive && (IsMouseClicked(0) || IsMouseDragging()))
 				{
