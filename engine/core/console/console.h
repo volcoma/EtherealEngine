@@ -10,7 +10,6 @@
 #include <vector>
 #include <set>
 #include <unordered_map>
-#include "../nonstd/type_traits.hpp"
 
 class console
 {
@@ -89,31 +88,10 @@ private:
 
 };
 
-/***********************************
-* Template function implementaions
-***********************************
-*/
-template<typename T>
-struct function_traits;     //renamed it!
-
-template<typename R, typename ...Args>
-struct function_traits<std::function<R(Args...)>>
-{
-	static const size_t nargs = sizeof...(Args);
-
-	typedef R result_type;
-
-	template <size_t i>
-	struct arg
-	{
-		typedef typename std::tuple_element<i, std::tuple<Args...>>::type type;
-	};
-};
-
 template <typename... Args>
 void console::register_command(const std::string& name, const std::string& description, const std::vector<std::string>& argumentNames, const std::vector<std::string>& defaultArguments, const std::function<void(Args...)>& callback)
 {
-	static const auto argCount = function_traits<std::function<void(Args...)>>::nargs;
+	const auto argCount = sizeof...(Args);
 	assert(argumentNames.size() <= argCount);
 	assert(defaultArguments.size() <= argCount);
 	assert(commands.find(name) == commands.end());

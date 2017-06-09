@@ -277,7 +277,7 @@ namespace ImGui
 		EndGroup();
 
 		
-		static ImGuiID id;
+		static ImGuiID id = 0;
 
 		if (IsItemHovered() && !IsMouseDragging(0))
 		{

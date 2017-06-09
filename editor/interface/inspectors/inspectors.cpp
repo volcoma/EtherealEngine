@@ -2,9 +2,9 @@
 #include <unordered_map>
 #include <vector>
 
-struct InspectorRegistry
+struct inspector_registry
 {
-	InspectorRegistry()
+    inspector_registry()
 	{
 		auto inspector_types = rttr::type::get<inspector>().get_derived_classes();
 		for (auto& inspector_type : inspector_types)
@@ -26,7 +26,7 @@ struct InspectorRegistry
 
 std::shared_ptr<inspector> get_inspector(rttr::type type)
 {
-	static InspectorRegistry registry;
+    static inspector_registry registry;
 	return registry.type_map[type];
 }
 
@@ -60,6 +60,7 @@ bool inspect_var(rttr::variant& var, bool read_only, std::function<rttr::variant
 			auto prop_name = prop.get_name();
 			bool is_readonly = prop.is_readonly();
 			bool is_array = prop.is_array();
+            bool is_associative_container = prop.get_type().is_associative_container();
 			bool is_enum = prop.is_enumeration();
 			rttr::instance prop_object = prop_var;
 			bool has_inspector = !!get_inspector(prop_object.get_derived_type());
@@ -82,6 +83,10 @@ bool inspect_var(rttr::variant& var, bool read_only, std::function<rttr::variant
 				{
 					changed |= inspect_array(prop_var, is_readonly);
 				}
+				else if (is_associative_container)
+                {
+                    changed |= inspect_associative_container(prop_var, is_readonly);
+                }
 				else if (is_enum)
 				{
                     auto enumeration = prop.get_enumeration();
@@ -141,6 +146,15 @@ bool inspect_array(rttr::variant& var, bool read_only)
 	}
 
 	return changed;
+}
+
+bool inspect_associative_container(rttr::variant& var, bool read_only)
+{
+    auto associative_view = var.create_associative_view();
+    auto size = associative_view.get_size();
+    bool changed = false;
+
+    return changed;
 }
 
 
