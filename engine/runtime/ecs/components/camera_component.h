@@ -21,9 +21,8 @@
 /// Class that contains our core camera data, used for rendering and other things.
 /// </summary>
 //-----------------------------------------------------------------------------
-class camera_component : public runtime::component
+class camera_component : public runtime::component_impl<camera_component>
 {
-	COMPONENT(camera_component)
 	SERIALIZABLE(camera_component)
 	REFLECTABLE(camera_component, runtime::component)
 public:

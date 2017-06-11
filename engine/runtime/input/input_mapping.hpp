@@ -9,7 +9,7 @@
 #include <map>
 #include <vector>
 #include <string>
-#include "core/common/utils.h"
+#include "core/common/hash.hpp"
 namespace std
 {
 	template<typename S, typename T> struct hash<pair<S, T>>

@@ -3,7 +3,7 @@
 #include <string>
 #include <deque>
 #include <stack>
-#include "../nonstd/recursive_wrapper.hpp"
+#include "nonstd/recursive_wrapper.hpp"
 
 class path_name_tag_tree
 {

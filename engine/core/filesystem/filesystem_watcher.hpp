@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <map>
@@ -9,7 +8,6 @@
 #include <mutex>
 
 #include "filesystem.h"
-#include "core/logging/logging.h"
 
 //-----------------------------------------------------------------------------
 //  Name : log_path ()
@@ -19,7 +17,6 @@
 //-----------------------------------------------------------------------------
 inline void log_path(const fs::path& path)
 {
-	APPLOG_ERROR((std::string("watcher_impl can't locate a file or parse the wild card at: ") + path.string()).c_str());
 }
 
 namespace fs

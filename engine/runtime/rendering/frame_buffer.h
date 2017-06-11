@@ -1,7 +1,7 @@
 #pragma once
 
 #include "texture.h"
-#include "graphics/graphics.h"
+#include "core/graphics/graphics.h"
 
 struct fbo_attachment
 {
@@ -343,7 +343,7 @@ struct frame_buffer
 
 #include <functional>
 #include <chrono>
-#include "core/common/utils.h"
+#include "core/common/hash.hpp"
 
 struct texture_key
 {

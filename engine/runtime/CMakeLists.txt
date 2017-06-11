@@ -7,5 +7,3 @@ add_library (runtime ${libsrc})
 target_link_libraries(runtime PUBLIC core)
 target_link_libraries(runtime PUBLIC graphics)
 target_link_libraries(runtime PUBLIC mml-window)
-
-target_link_libraries(runtime PUBLIC filesystem)

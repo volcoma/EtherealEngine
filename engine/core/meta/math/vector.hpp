@@ -40,4 +40,3 @@ namespace cereal
 		try_serialize(ar, cereal::make_nvp("a", obj.value.a));
 	}
 }
-

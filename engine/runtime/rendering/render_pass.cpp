@@ -1,6 +1,6 @@
 #include "render_pass.h"
 #include "core/common/assert.hpp"
-#include "graphics/graphics.h"
+#include "core/graphics/graphics.h"
 #include <bitset>
 
 static std::uint8_t index = 0;

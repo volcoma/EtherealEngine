@@ -1,8 +1,8 @@
 #pragma once
 
-#include "graphics/graphics.h"
-#include <memory>
+#include "core/graphics/graphics.h"
 #include "core/common/basetypes.hpp"
+#include <memory>
 
 struct texture
 {

@@ -3,7 +3,7 @@
 #include "ecs.h"
 #include <vector>
 #include <fstream>
-#include "../system/filesystem.h"
+#include "core/filesystem/filesystem.h"
 
 
 namespace ecs

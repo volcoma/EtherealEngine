@@ -18,86 +18,83 @@
 struct half
 {
 public:
-    half() {};
-    half( float f )
-    {
-        const std::uint32_t data = (std::uint32_t&)f;
-        const std::uint32_t signBit = (data >> 31);
+	half() = default;
+	half(float f)
+	{
+		const std::uint32_t data = (std::uint32_t&)f;
+		const std::uint32_t signBit = (data >> 31);
 		std::uint32_t exponent = ((data >> 23) & 0xFF);
 		std::uint32_t mantissa = (data & 0x7FFFFF);
 
-        // Handle cases
-        if ( exponent == 255 ) // NaN or inf
-            exponent = 31;
-        else if ( exponent < 102 ) // (127-15)-10
-            exponent = mantissa = 0;
-        else if ( exponent >= 143 ) // 127+(31-15)
-        {
-            exponent = 31;
-            mantissa = 0;
-        }
-        else if( exponent <= 112 ) // 127-15
-        {
-            mantissa |= (1<<23);
-            mantissa = mantissa >> (1 + (112 - exponent));
-            exponent = 0;
-        }
-        else
-            exponent -= 112;
+		// Handle cases
+		if (exponent == 255) // NaN or inf
+			exponent = 31;
+		else if (exponent < 102) // (127-15)-10
+			exponent = mantissa = 0;
+		else if (exponent >= 143) // 127+(31-15)
+		{
+			exponent = 31;
+			mantissa = 0;
+		}
+		else if (exponent <= 112) // 127-15
+		{
+			mantissa |= (1 << 23);
+			mantissa = mantissa >> (1 + (112 - exponent));
+			exponent = 0;
+		}
+		else
+			exponent -= 112;
 
-        // Store
-        _data = (std::uint16_t)((signBit << 15) | (exponent << 10) | (mantissa >> 13));
-    }
+		// Store
+		_data = (std::uint16_t)((signBit << 15) | (exponent << 10) | (mantissa >> 13));
+	}
 
-    half( const half & h ) :
-        _data( h._data ) {}
+	half(const half & h) :
+		_data(h._data) {}
 
-    // Inline operators
-    inline bool operator == ( const half & h ) const
-    {
-        return _data == h._data;
-    }
-    inline bool operator != ( const half & h ) const
-    {
-        return _data != h._data;
-    }
-    inline operator float() const
-    {
-        const std::uint32_t signBit = (_data >> 15);
+	inline bool operator == (const half & h) const
+	{
+		return _data == h._data;
+	}
+	inline bool operator != (const half & h) const
+	{
+		return _data != h._data;
+	}
+	inline operator float() const
+	{
+		const std::uint32_t signBit = (_data >> 15);
 		std::uint32_t exponent = ((_data >> 10) & 0x1F);
 		std::uint32_t mantissa = (_data & 0x03FF);
-        
-        // Handle cases
-        if(exponent == 31)
-            exponent = 255;
-        else if(exponent == 0) 
-            exponent = 0;
-        else
-            exponent += 112;
-        
-        // Convert
-        const std::uint32_t data = (signBit << 31) | (exponent << 23) | (mantissa << 13);
-        return (float&)data;
-    }
+
+		// Handle cases
+		if (exponent == 31)
+			exponent = 255;
+		else if (exponent == 0)
+			exponent = 0;
+		else
+			exponent += 112;
+
+		// Convert
+		const std::uint32_t data = (signBit << 31) | (exponent << 23) | (mantissa << 13);
+		return (float&)data;
+	}
 
 private:
-    // Private Members
+	///
 	std::uint16_t _data;
 
-}; // End Struct half
+};
 
 
 template<typename T>
 struct range
 {
-
-	range(){}
+	range() = default;
 	range(T _min, T _max) :
 		Min(_min), Max(_max) {}
 	T Min;
 	T Max;
 
-	// Inline operators
 	inline bool operator==(const range & b) const
 	{
 		return (Min == b.Min && Max == b.Max);
@@ -112,7 +109,7 @@ struct range
 template<typename T>
 struct size
 {
-	size(){}
+	size() = default;
 	size(T _width, T _height) :
 		width(_width), height(_height) {}
 	T width;
@@ -129,11 +126,10 @@ struct size
 	}
 	inline bool operator<(const size & b) const
 	{
-		if (width > b.width)
-			return false;
-		if (width < b.width)
-			return true;
-		return (height < b.height);
+		if (width != b.width)
+			return (width < b.width);
+		else
+			return (height < b.height);
 	}
 	inline bool operator>(const size & b) const
 	{
@@ -155,7 +151,7 @@ struct size
 template<typename T>
 struct point
 {
-	point(){}
+	point() {}
 	point(T _x, T _y) :
 		x(_x), y(_y) {}
 	T x;
@@ -171,13 +167,13 @@ struct point
 		return (x != b.x || y != b.y);
 	}
 
-}; // End Struct TPoint
+}; // End Struct point
 
 
 template<typename T>
 struct rect
 {
-	rect(){}
+	rect() {}
 	rect(T _left, T _top, T _right, T _bottom) :
 		left(_left), top(_top), right(_right), bottom(_bottom) {}
 	T left;
@@ -185,13 +181,16 @@ struct rect
 	T right;
 	T bottom;
 
-	// Inline functions
 	inline T width() const { return right - left; }
 	inline T height() const { return bottom - top; }
 	inline bool empty() const { return (left == 0 && right == 0 && top == 0 && bottom == 0); }
 
 	template<typename T1 = T>
-	inline size<T1> size() const { return size<T1>(right - left, bottom - top); }
+	inline size<T1> size() const 
+	{
+		return size<T1>(right - left, bottom - top); 
+	}
+
 	inline bool contains(const point<T> & p) const
 	{
 		return (p.x >= left && p.x <= right &&
@@ -212,10 +211,8 @@ struct rect
 		{
 			return c;
 		}
-			
 	}
 
-	// Inline operators
 	inline bool operator==(const rect & b) const
 	{
 		return (left == b.left && top == b.top && right == b.right && bottom == b.bottom);
@@ -243,48 +240,54 @@ struct rect
 	inline bool operator<(const rect & b) const
 	{
 		T r = left - b.left;
-		if (r) return (r < 0);
+		if (r) 
+			return (r < 0);
 		r = top - b.top;
-		if (r) return (r < 0);
+		if (r)
+			return (r < 0);
 		r = right - b.right;
-		if (r) return (r<0);
+		if (r)
+			return (r < 0);
 		r = bottom - b.bottom;
-		if (r) return (r<0);
+		if (r) 
+			return (r < 0);
 		return false;
 	}
 	inline bool operator>(const rect & b) const
 	{
 		T r = left - b.left;
-		if (r) return (r>0);
+		if (r)
+			return (r > 0);
 		r = top - b.top;
-		if (r) return (r > 0);
+		if (r) 
+			return (r > 0);
 		r = right - b.right;
-		if (r) return (r > 0);
+		if (r) 
+			return (r > 0);
 		r = bottom - b.bottom;
-		if (r) return (r > 0);
+		if (r) 
+			return (r > 0);
 		return false;
 	}
 
-
-	// Static inline functions
 	static rect inflate(const rect & rc, T x, T y)
 	{
 		return rect(rc.left - x, rc.top - y, rc.right + x, rc.bottom + y);
 	}
-}; // End Struct TRect
+};
 
-typedef range<std::int32_t>		irange;
-typedef range<std::uint32_t>	urange;
-typedef range<float>			frange;
+using irange = range<std::int32_t>;
+using urange = range<std::uint32_t>;
+using frange = range<float>;
 
-typedef point<std::int32_t>		ipoint;
-typedef point<std::uint32_t>	upoint;
-typedef point<float>			fpoint;
+using ipoint = point<std::int32_t>;
+using upoint = point<std::uint32_t>;
+using fpoint = point<float>;
 
-typedef size<std::int32_t>		isize;
-typedef size<std::uint32_t>		usize;
-typedef size<float>				fsize;
+using isize = size<std::int32_t>;
+using usize = size<std::uint32_t>;
+using fsize = size<float>;
 
-typedef rect<std::int32_t>		irect;
-typedef rect<std::uint32_t>		urect;
-typedef rect<float>				frect;
+using irect = rect<std::int32_t>;
+using urect = rect<std::uint32_t>;
+using frect = rect<float>;

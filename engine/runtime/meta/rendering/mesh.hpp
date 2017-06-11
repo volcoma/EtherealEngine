@@ -133,4 +133,3 @@ LOAD(mesh::load_data)
 	try_load(ar, cereal::make_nvp("skin_data", obj.skin_data));
 	try_load(ar, cereal::make_nvp("root_node", obj.root_node));
 }
-

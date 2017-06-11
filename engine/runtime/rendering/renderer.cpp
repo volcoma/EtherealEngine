@@ -1,5 +1,5 @@
 #include "renderer.h"
-#include "graphics/graphics.h"
+#include "core/graphics/graphics.h"
 #include "core/logging/logging.h"
 #include "core/common/string.h"
 #include <cstdarg>

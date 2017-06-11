@@ -13,9 +13,8 @@
 /// an object's state in a 3D setup. Provides functionality for manipulating that state.
 /// </summary>
 //-----------------------------------------------------------------------------
-class transform_component : public runtime::component
+class transform_component : public runtime::component_impl<transform_component>
 {
-	COMPONENT(transform_component)
 	SERIALIZABLE(transform_component)
 	REFLECTABLE(transform_component, runtime::component)
 

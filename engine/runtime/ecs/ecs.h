@@ -4,7 +4,7 @@
 #include "core/subsystem/simulation.h"
 #include "core/signals/event.hpp"
 #include "core/common/assert.hpp"
-#include "core/nonstd/type_traits.hpp"
+#include "core/common/nonstd/type_traits.hpp"
 #include "core/reflection/registration.h"
 #include "core/serialization/serialization.h"
 
@@ -221,24 +221,7 @@ namespace runtime
 		entity::id_t id_ = INVALID;
 	};
 
-
-#define COMPONENT(type)															\
-private:																		\
-virtual rtti::type_index_sequential_t::index_t runtime_id() const				\
-{																				\
-	return rtti::type_index_sequential_t::id<component, type>();				\
-}																				\
-public:																			\
-runtime::chandle<type> handle()													\
-{																				\
-	return get_entity().get_component<type>();										\
-}																				\
-virtual std::shared_ptr<component> clone() const								\
-{																				\
-	return std::static_pointer_cast<component>(std::make_shared<type>(*this));	\
-}
-
-	class component
+	class component : public std::enable_shared_from_this<component>
 	{
 		REFLECTABLE(component)
 		SERIALIZABLE(component)
@@ -295,7 +278,7 @@ virtual std::shared_ptr<component> clone() const								\
 		virtual void touch() { _last_touched = core::get_subsystem<core::simulation>().get_frame() + 1; }
 
 		//-----------------------------------------------------------------------------
-		//  Name : isDirty (virtual )
+		//  Name : is_dirty (virtual )
 		/// <summary>
 		/// 
 		/// 
@@ -305,7 +288,7 @@ virtual std::shared_ptr<component> clone() const								\
 		virtual bool is_dirty() const { return _last_touched >= core::get_subsystem<core::simulation>().get_frame(); }
 
 		//-----------------------------------------------------------------------------
-		//  Name : onEntitySet (virtual )
+		//  Name : on_entity_set (virtual )
 		/// <summary>
 		/// 
 		/// 
@@ -315,7 +298,7 @@ virtual std::shared_ptr<component> clone() const								\
 		virtual void on_entity_set() {}
 
 		//-----------------------------------------------------------------------------
-		//  Name : getEntity ()
+		//  Name : get_entity ()
 		/// <summary>
 		/// 
 		/// 
@@ -339,6 +322,25 @@ virtual std::shared_ptr<component> clone() const								\
 		/// Was the component touched.
 		std::uint64_t _last_touched = 0;
 	};
+
+    template<typename T>
+    class component_impl : public component
+    {
+    private:
+        virtual rtti::type_index_sequential_t::index_t runtime_id() const
+        {
+            return rtti::type_index_sequential_t::id<component, T>();
+        }
+    public:
+        chandle<T> handle()
+        {
+            return std::static_pointer_cast<T>(shared_from_this());
+        }
+        virtual std::shared_ptr<component> clone() const
+        {
+            return std::static_pointer_cast<component>(std::make_shared<T>(static_cast<const T&>(*this)));
+        }
+    };
 
 
 	extern event<void(entity)> on_entity_created;

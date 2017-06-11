@@ -87,4 +87,3 @@ namespace cereal
 		try_serialize(ar, cereal::make_nvp("col_3", obj[3]));
 	}
 }
-

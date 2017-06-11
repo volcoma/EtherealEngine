@@ -28,7 +28,11 @@ option(BUILD_SHARED_LIBS
 message(STATUS "BUILD_SHARED_LIBS >>> ${BUILD_SHARED_LIBS}")
 
 add_definitions(-DENGINE_DIRECTORY="${PROJECT_SOURCE_DIR}")
-add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
+
+if(MSVC)
+	add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
+endif()
+
 function(add_subdirectory_ex arg1)
 	message(STATUS "---------Configure ${arg1}")
 	add_subdirectory(${arg1})
@@ -38,6 +42,8 @@ endfunction(add_subdirectory_ex)
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /bigobj")
     set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} /IGNORE:4221")
+elseif(MINGW)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3" )
 else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj -Wa,--hash-size=2048" )
 endif()

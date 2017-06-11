@@ -1,5 +1,5 @@
 #include "camera_component.h"
-#include "graphics/graphics.h"
+#include "core/graphics/graphics.h"
 
 camera_component::camera_component()
 {

@@ -19,9 +19,8 @@
 /// Class that contains our core light data, used for rendering and other things.
 /// </summary>
 //-----------------------------------------------------------------------------
-class reflection_probe_component : public runtime::component
+class reflection_probe_component : public runtime::component_impl<reflection_probe_component>
 {
-	COMPONENT(reflection_probe_component)
 	SERIALIZABLE(reflection_probe_component)
 	REFLECTABLE(reflection_probe_component, runtime::component)
 public:

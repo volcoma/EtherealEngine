@@ -1,6 +1,7 @@
 #include "task.h"
-#include "engine.h"
 #include "core/common/assert.hpp"
+#include "engine.h"
+#include <algorithm>
 
 namespace runtime
 {

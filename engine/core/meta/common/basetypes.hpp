@@ -29,4 +29,3 @@ namespace cereal
 		try_serialize(ar, cereal::make_nvp("y", obj.y));
 	}
 }
-

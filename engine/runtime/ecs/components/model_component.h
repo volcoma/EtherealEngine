@@ -13,9 +13,8 @@ class material;
 /// Class that contains core data for meshes.
 /// </summary>
 //-----------------------------------------------------------------------------
-class model_component : public runtime::component
+class model_component : public runtime::component_impl<model_component>
 {
-	COMPONENT(model_component)
 	SERIALIZABLE(model_component)
 	REFLECTABLE(model_component, component)
 

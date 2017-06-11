@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "asset_handle.h"
-#include "../system/fileSystem.h"
+#include "core/filesystem/filesystem.h"
 
 class material;
 struct asset_writer

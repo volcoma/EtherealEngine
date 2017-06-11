@@ -1,12 +1,11 @@
 #include "project_manager.h"
-#include "runtime/system/filesystem_watcher.hpp"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/assets/asset_extensions.h"
 #include "runtime/ecs/ecs.h"
 #include "runtime/system/task.h"
 #include "runtime/system/engine.h"
+#include "core/filesystem/filesystem_watcher.hpp"
 #include "core/serialization/associative_archive.h"
-
 #include "../editing/editing_system.h"
 #include "../assets/asset_compiler.h"
 #include "../meta/system/project_manager.hpp"

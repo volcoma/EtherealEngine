@@ -2,7 +2,7 @@
 #include "asset_reader.h"
 #include "asset_writer.h"
 #include "asset_extensions.h"
-#include "graphics/graphics.h"
+#include "core/graphics/graphics.h"
 
 #include "../rendering/mesh.h"
 #include "../rendering/material.h"

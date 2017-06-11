@@ -18,9 +18,8 @@
 /// Class that contains our core light data, used for rendering and other things.
 /// </summary>
 //-----------------------------------------------------------------------------
-class light_component : public runtime::component
+class light_component : public runtime::component_impl<light_component>
 {
-	COMPONENT(light_component)
 	SERIALIZABLE(light_component)
 	REFLECTABLE(light_component, runtime::component)
 public:

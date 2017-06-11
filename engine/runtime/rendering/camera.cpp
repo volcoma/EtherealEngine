@@ -1,6 +1,6 @@
 #include "camera.h"
 #include <limits>
-#include "graphics/graphics.h"
+#include "core/graphics/graphics.h"
 
 float camera::get_zoom_factor() const
 {

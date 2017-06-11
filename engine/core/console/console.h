@@ -10,6 +10,7 @@
 #include <vector>
 #include <set>
 #include <unordered_map>
+#include "../common/nonstd/type_traits.hpp"
 
 class console
 {
@@ -100,7 +101,7 @@ void console::register_command(const std::string& name, const std::string& descr
 	auto cmd = std::make_shared<command>(name, description, static_cast<unsigned int>(argCount), argumentNames, defaultArguments);
 	auto commandRaw = cmd.get();
 
-	cmd->call = [this, commandRaw, callback](std::vector<std::string>& arguments)
+	cmd->call = [this, commandRaw, callback, argCount](std::vector<std::string>& arguments)
 	{
 
 		// add the arguments checks and set the default arguments

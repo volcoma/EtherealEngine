@@ -1,6 +1,6 @@
 #include "filesystem.h"
-#include "core/common/string.h"
-#include "core/platform_config.h"
+#include "../common/string.h"
+#include "../common/platform_config.h"
 
 namespace fs
 {

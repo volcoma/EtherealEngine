@@ -5,15 +5,15 @@
 #include "runtime/rendering/shader.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/assets/asset_extensions.h"
-#include "runtime/system/filesystem.h"
-#include "runtime/system/filesystem_watcher.hpp"
 #include "runtime/ecs/prefab.h"
 #include "runtime/ecs/scene.h"
 #include "runtime/ecs/utils.h"
 #include "runtime/input/input.h"
+#include "core/filesystem/filesystem.h"
+#include "core/filesystem/filesystem_watcher.hpp"
 #include "../../editing/editing_system.h"
 #include "../../system/project_manager.h"
-#include "../../filedialog/filedialog.h"
+#include "filedialog/filedialog.h"
 #include <cstdio>
 
 template<typename T>

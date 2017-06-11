@@ -1,7 +1,7 @@
 #pragma once
 
 #include "handle_set.hpp"
-#include "assert.hpp"
+#include "../common/assert.hpp"
 #include <thread>
 
 namespace core

@@ -1,5 +1,5 @@
 #include "handle_set.hpp"
-#include "assert.hpp"
+#include "../common/assert.hpp"
 
 namespace core
 {

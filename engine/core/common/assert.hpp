@@ -11,7 +11,7 @@
 // when pre/post conditions on the types are violated:
 //
 // 1. TERMINATE_ON_CONTRACT_VIOLATION: std::terminate will be called (default)
-// 2. THROW_ON_CONTRACT_VIOLATION: a gsl::fail_fast exception will be thrown
+// 2. THROW_ON_CONTRACT_VIOLATION: a std::runtime_error exception will be thrown
 // 3. UNENFORCED_ON_CONTRACT_VIOLATION: nothing happens  
 //
 #define THROW_ON_CONTRACT_VIOLATION

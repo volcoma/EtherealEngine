@@ -3,7 +3,7 @@
 #include "spdlog/spdlog.h"
 #include "spdlog/details/null_mutex.h"
 
-#include "../platform_config.h"
+#include "../common/platform_config.h"
 
 #if $on($windows) && $on($msvc)
 #include "spdlog/sinks/msvc_sink.h"

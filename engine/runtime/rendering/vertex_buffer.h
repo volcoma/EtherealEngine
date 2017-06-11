@@ -1,6 +1,6 @@
 #pragma once
 
-#include "graphics/graphics.h"
+#include "core/graphics/graphics.h"
 
 struct vertex_buffer
 {

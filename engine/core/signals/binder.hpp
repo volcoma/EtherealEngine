@@ -11,10 +11,10 @@
 #include <algorithm>
 #include <type_traits>
 
-#include "../nonstd/type_traits.hpp"
-#include "../nonstd/any.hpp"
-#include "../nonstd/optional.hpp"
-#include "../nonstd/function_traits.hpp"
+#include "../common/nonstd/type_traits.hpp"
+#include "../common/nonstd/any.hpp"
+#include "../common/nonstd/optional.hpp"
+#include "../common/nonstd/function_traits.hpp"
 #include "delegate.hpp"
 
 //Used for type deduction ease

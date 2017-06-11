@@ -1,8 +1,7 @@
 #pragma once
 
 #include "core/subsystem/subsystem.h"
-#include "core/common/spin.hpp"
-#include "core/common/handle_object_set.hpp"
+#include "core/handle/handle_object_set.hpp"
 
 #include <vector>
 #include <deque>
@@ -10,6 +9,7 @@
 #include <mutex>
 #include <thread>
 #include <condition_variable>
+#include <atomic>
 
 namespace runtime
 {

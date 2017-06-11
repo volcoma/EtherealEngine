@@ -14,14 +14,14 @@ namespace rttr
 	}
 }
 
-#define RTTR_REGISTRATION_FRIEND_NON_INTRUSIVE(cls) template<typename T> friend void ::rttr_auto_register_reflection_function_t();   \
+#define RTTR_REGISTRATION_FRIEND_NON_INTRUSIVE() template<typename T> friend void ::rttr_auto_register_reflection_function_t();   \
                                  template<typename Ctor_Type, typename Policy, typename Accessor, typename Arg_Indexer> \
                                  friend struct rttr::detail::constructor_invoker;
 
 
 #define EXPAND(x) x
 #define REFLECTABLE_IMPL(cls, ...)\
-RTTR_REGISTRATION_FRIEND_NON_INTRUSIVE(cls)\
+RTTR_REGISTRATION_FRIEND_NON_INTRUSIVE()\
 RTTR_ENABLE(__VA_ARGS__)\
 public:
 

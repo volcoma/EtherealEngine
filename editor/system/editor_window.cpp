@@ -1,7 +1,6 @@
 #include "editor_window.h"
 #include "../editing/editing_system.h"
 #include "project_manager.h"
-
 #include "filedialog/filedialog.h"
 #include "runtime/ecs/systems/scene_graph.h"
 #include "runtime/ecs/components/model_component.h"
@@ -10,12 +9,12 @@
 #include "runtime/ecs/components/light_component.h"
 #include "runtime/ecs/components/reflection_probe_component.h"
 #include "runtime/ecs/utils.h"
-#include "runtime/system/filesystem.h"
 #include "runtime/system/engine.h"
 #include "runtime/rendering/render_pass.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/assets/asset_extensions.h"
 #include "runtime/input/input.h"
+#include "core/filesystem/filesystem.h"
 #include "core/logging/logging.h"
 
 std::vector<runtime::entity> gather_scene_data()

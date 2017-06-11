@@ -35,13 +35,13 @@ set(BOOST_SOURCES
   ${CMAKE_CURRENT_LIST_DIR}/libs/filesystem/src/windows_file_codecvt.cpp
   )
 
-add_library(filesystem STATIC ${BOOST_SOURCES})
+add_library(boost_filesystem STATIC ${BOOST_SOURCES})
 
-target_include_directories(filesystem
+target_include_directories(boost_filesystem
   PUBLIC
     ${CMAKE_CURRENT_LIST_DIR})
 
-target_compile_features(filesystem
+target_compile_features(boost_filesystem
   PUBLIC
     cxx_auto_type
     cxx_decltype
@@ -50,11 +50,11 @@ target_compile_features(filesystem
     cxx_nullptr
     cxx_override)
 
-target_compile_definitions(filesystem
+target_compile_definitions(boost_filesystem
   PUBLIC
     -DBOOST_ALL_NO_LIB)
 
 if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
   add_executable(test-linkage link-test/main.cpp)
-  target_link_libraries(test-linkage filesystem)
+  target_link_libraries(test-linkage boost_filesystem)
 endif()

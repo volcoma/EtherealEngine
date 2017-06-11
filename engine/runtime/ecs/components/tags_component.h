@@ -13,9 +13,8 @@
   * for (entity entity : entity_manager.entities_with_components(tags))
   */
 
-class tags_component : public runtime::component
+class tags_component : public runtime::component_impl<tags_component>
 {
-	COMPONENT(tags_component)
 	SERIALIZABLE(tags_component)
 	REFLECTABLE(tags_component, component)
 public:

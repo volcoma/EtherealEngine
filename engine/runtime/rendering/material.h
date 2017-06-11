@@ -2,11 +2,11 @@
 
 #include "../assets/asset_handle.h"
 #include "core/math/math_includes.h"
-#include <unordered_map>
-
 #include "core/reflection/registration.h"
 #include "core/serialization/serialization.h"
-#include "graphics/graphics.h"
+#include "core/graphics/graphics.h"
+
+#include <unordered_map>
 
 struct program;
 struct texture;

@@ -36,9 +36,15 @@ namespace bgfx
 					} \
 				BX_MACRO_BLOCK_END
 
-#define BX_TRACE _BX_TRACE
-#define BX_WARN  _BX_WARN
-#define BX_CHECK _BX_CHECK
+#ifndef BX_TRACE
+#	define BX_TRACE _BX_TRACE
+#endif
+#ifndef BX_WARN
+#	define BX_WARN  _BX_WARN
+#endif
+#ifndef BX_CHECK
+#	define BX_CHECK _BX_CHECK
+#endif
 
 #ifndef SHADERC_CONFIG_HLSL
 #	define SHADERC_CONFIG_HLSL BX_PLATFORM_WINDOWS

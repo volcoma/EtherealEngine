@@ -1,23 +1,21 @@
 #include "asset_compiler.h"
 #include "core/common/string.h"
 #include "core/logging/logging.h"
-#include "runtime/system/filesystem.h"
-#include "shaderc/shaderc.h"
-#include "texturec/texturec.h"
-#include <fstream>
-#include <array>
-#include "graphics/graphics.h"
-
-#include "runtime/assets/asset_extensions.h"
+#include "core/filesystem/filesystem.h"
 #include "core/serialization/serialization.h"
 #include "core/serialization/binary_archive.h"
 #include "core/serialization/types/unordered_map.hpp"
 #include "core/serialization/types/vector.hpp"
-
-#include "mesh_importer.h"
+#include "runtime/assets/asset_extensions.h"
 #include "runtime/meta/rendering/mesh.hpp"
 #include "runtime/rendering/shader.h"
 #include "runtime/rendering/texture.h"
+#include "mesh_importer.h"
+#include "shaderc/shaderc.h"
+#include "texturec/texturec.h"
+#include "core/graphics/graphics.h"
+#include <fstream>
+#include <array>
 
 template<>
 void asset_compiler::compile<shader>(const fs::path& absolute_key)
