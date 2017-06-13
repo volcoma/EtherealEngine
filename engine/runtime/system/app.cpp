@@ -24,7 +24,7 @@ namespace runtime
 		auto main_window = std::make_shared<render_window>(
 			desktop,
 			"App",
-			mml::style::Default);
+			mml::style::standard);
 		
 
 		if(!eng.start(main_window))

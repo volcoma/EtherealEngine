@@ -22,7 +22,7 @@ namespace editor
 		auto main_window = std::make_shared<main_editor_window>(
 			desktop,
 			"Editor",
-			mml::style::Default);
+			mml::style::standard);
 
 		if (!engine.start(main_window))
 		{

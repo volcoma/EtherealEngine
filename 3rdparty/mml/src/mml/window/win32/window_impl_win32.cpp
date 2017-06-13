@@ -148,7 +148,7 @@ _last_size        ({mode.width, mode.height}),
 _resizing        (false),
 _surrogate       (0),
 _mouse_inside     (false),
-_fullscreen      (style & style::Fullscreen),
+_fullscreen      (style & style::fullscreen),
 _cursor_grabbed   (_fullscreen)
 {
     // Set that this process is DPI aware and can handle DPI scaling
@@ -168,15 +168,15 @@ _cursor_grabbed   (_fullscreen)
 
     // Choose the window style according to the style parameter
     DWORD win32Style = WS_VISIBLE;
-    if (style == style::None)
+    if (style == style::none)
     {
         win32Style |= WS_POPUP;
     }
     else
     {
-        if (style & style::Titlebar) win32Style |= WS_CAPTION | WS_MINIMIZEBOX;
-        if (style & style::Resize)   win32Style |= WS_THICKFRAME | WS_MAXIMIZEBOX;
-        if (style & style::Close)    win32Style |= WS_SYSMENU;
+        if (style & style::titlebar) win32Style |= WS_CAPTION | WS_MINIMIZEBOX;
+        if (style & style::resize)   win32Style |= WS_THICKFRAME | WS_MAXIMIZEBOX;
+        if (style & style::close)    win32Style |= WS_SYSMENU;
     }
 
     // In windowed mode, adjust width and height so that window will have the requested client area

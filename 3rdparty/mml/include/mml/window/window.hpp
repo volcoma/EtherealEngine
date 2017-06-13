@@ -47,7 +47,7 @@ public:
     /// depth defined in \a mode. An optional style can be passed to
     /// customize the look and behavior of the window (borders,
     /// title bar, resizable, closable, ...). If \a style contains
-    /// style::Fullscreen, then \a mode must be a valid video mode.
+    /// style::fullscreen, then \a mode must be a valid video mode.
     ///
     /// The fourth parameter is an optional structure specifying
     /// advanced OpenGL context settings such as antialiasing,
@@ -58,7 +58,7 @@ public:
     /// \param style    %window style, a bitwise OR combination of mml::style enumerators
     ///
     ////////////////////////////////////////////////////////////
-    window(video_mode mode, const std::string& title, std::uint32_t style = style::Default);
+    window(video_mode mode, const std::string& title, std::uint32_t style = style::standard);
 
     ////////////////////////////////////////////////////////////
     /// \brief Construct the window from an existing control
@@ -87,7 +87,7 @@ public:
     /// \brief Create (or recreate) the window
     ///
     /// If the window was already created, it closes it first.
-    /// If \a style contains style::Fullscreen, then \a mode
+    /// If \a style contains style::fullscreen, then \a mode
     /// must be a valid video mode.
     ///
     /// The fourth parameter is an optional structure specifying
@@ -100,7 +100,7 @@ public:
     /// \param settings Additional settings for the underlying OpenGL context
     ///
     ////////////////////////////////////////////////////////////
-    void create(video_mode mode, const std::string& title, std::uint32_t style = style::Default);
+    void create(video_mode mode, const std::string& title, std::uint32_t style = style::standard);
 
     ////////////////////////////////////////////////////////////
     /// \brief Create (or recreate) the window from an existing control

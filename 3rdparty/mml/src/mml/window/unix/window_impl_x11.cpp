@@ -408,7 +408,7 @@ _last_cursor     (None),
 _key_repeat      (true),
 _previous_size   (-1, -1),
 _use_size_hints   (false),
-_fullscreen     ((style & style::Fullscreen) != 0),
+_fullscreen     ((style & style::fullscreen) != 0),
 _cursor_grabbed  (_fullscreen),
 _window_mapped   (false),
 _icon_pixmap     (0),
@@ -505,17 +505,17 @@ _last_input_time  (0)
             hints.decorations = 0;
             hints.functions   = 0;
 
-            if (style & style::Titlebar)
+            if (style & style::titlebar)
             {
                 hints.decorations |= MWM_DECOR_BORDER | MWM_DECOR_TITLE | MWM_DECOR_MINIMIZE | MWM_DECOR_MENU;
                 hints.functions   |= MWM_FUNC_MOVE | MWM_FUNC_MINIMIZE;
             }
-            if (style & style::Resize)
+            if (style & style::resize)
             {
                 hints.decorations |= MWM_DECOR_MAXIMIZE | MWM_DECOR_RESIZEH;
                 hints.functions   |= MWM_FUNC_MAXIMIZE | MWM_FUNC_RESIZE;
             }
-            if (style & style::Close)
+            if (style & style::close)
             {
                 hints.decorations |= 0;
                 hints.functions   |= MWM_FUNC_CLOSE;
@@ -533,7 +533,7 @@ _last_input_time  (0)
     }
 
     // This is a hack to force some windows managers to disable resizing
-    if (!(style & style::Resize))
+    if (!(style & style::resize))
     {
         _use_size_hints = true;
         XSizeHints* sizeHints = XAllocSizeHints();

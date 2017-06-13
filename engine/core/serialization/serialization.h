@@ -3,6 +3,8 @@
 #include "cereal/access.hpp"
 #include "cereal/types/polymorphic.hpp"
 #include "cereal/types/vector.hpp"
+#include <functional>
+#include <string>
 
 #define SERIALIZE_FUNCTION_NAME CEREAL_SERIALIZE_FUNCTION_NAME
 #define SAVE_FUNCTION_NAME CEREAL_SAVE_FUNCTION_NAME
@@ -11,6 +13,9 @@
 namespace serialization
 {
 	using namespace cereal;
+
+	void set_warning_logger(std::function<void(const std::string& log_msg)> logger);
+	void log_warning(const std::string& log_msg);
 }
 
 #define SERIALIZABLE(T) \
@@ -32,7 +37,6 @@ void SAVE_FUNCTION_NAME(Archive & ar, cls const & obj)
 template<typename Archive> inline \
 void LOAD_FUNCTION_NAME(Archive & ar, cls & obj)
 
-#include "../logging/logging.h"
 template<typename Archive, typename T>
 inline bool try_save(Archive& ar, cereal::NameValuePair<T>&& t)
 {
@@ -42,7 +46,7 @@ inline bool try_save(Archive& ar, cereal::NameValuePair<T>&& t)
 	}
 	catch (cereal::Exception e)
 	{
-		APPLOG_WARNING(e.what());
+		serialization::log_warning(e.what());
 		return false;
 	}
 	return true;
@@ -57,7 +61,7 @@ inline bool try_load(Archive& ar, cereal::NameValuePair<T>&& t)
 	}
 	catch (cereal::Exception e)
 	{
-		APPLOG_WARNING(e.what());
+		serialization::log_warning(e.what());
 		return false;
 	}
 	return true;
@@ -73,7 +77,7 @@ inline bool try_serialize(Archive& ar, cereal::NameValuePair<T>&& t)
 	}
 	catch (cereal::Exception e)
 	{
-		APPLOG_WARNING(e.what());
+		serialization::log_warning(e.what());
 		return false;
 	}
 	return true;

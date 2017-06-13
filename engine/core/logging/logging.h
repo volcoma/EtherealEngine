@@ -47,17 +47,22 @@ namespace spdlog
 }
 #endif
 #include "spdlog/sinks/file_sinks.h"
+#include "spdlog/sinks/dist_sink.h"
 
 
 namespace logging
 {
 	using namespace spdlog;
-
+	inline std::shared_ptr<sinks::dist_sink_mt> get_mutable_logging_container()
+	{
+		static auto sink = std::make_shared<sinks::dist_sink_mt>();
+		return sink;
+	}
 #define APPLOG "Log"
-#define APPLOG_INFO(...) spdlog::get("Log")->info().write(__VA_ARGS__)
-#define APPLOG_TRACE(...) spdlog::get("Log")->trace().write(__VA_ARGS__)
-#define APPLOG_ERROR(...) spdlog::get("Log")->error().write(__VA_ARGS__)
-#define APPLOG_WARNING(...) spdlog::get("Log")->warn().write(__VA_ARGS__)
-#define APPLOG_NOTICE(...) spdlog::get("Log")->notice().write(__VA_ARGS__)
+#define APPLOG_INFO(...) spdlog::get("Log")->info(__VA_ARGS__)
+#define APPLOG_TRACE(...) spdlog::get("Log")->trace(__VA_ARGS__)
+#define APPLOG_ERROR(...) spdlog::get("Log")->error(__VA_ARGS__)
+#define APPLOG_WARNING(...) spdlog::get("Log")->warn(__VA_ARGS__)
+#define APPLOG_NOTICE(...) spdlog::get("Log")->notice(__VA_ARGS__)
 
 }

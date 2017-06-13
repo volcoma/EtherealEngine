@@ -69,7 +69,7 @@ void console_dock::render(const ImVec2& area)
 		std::string errorMsg = _console_log->process_input(command);
 		if (errorMsg != "")
 		{
-			APPLOG_NOTICE(errorMsg.c_str());
+			APPLOG_WARNING(errorMsg.c_str());
 		}
 		// Demonstrate keeping auto focus on the input box
 		if (gui::IsItemHovered() || (gui::IsRootWindowOrAnyChildFocused() && !gui::IsAnyItemActive() && !gui::IsMouseClicked(0)))

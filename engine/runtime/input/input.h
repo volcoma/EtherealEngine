@@ -52,7 +52,7 @@ namespace runtime
 	
 	};
 
-// 	auto& input = core::get_subsystem<runtime::Input>();
+// 	auto& input = core::get_subsystem<runtime::input>();
 // 	auto& mappings = input.get_mappings();
 //
 //	// You can map different type of events to the same action

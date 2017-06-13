@@ -386,10 +386,10 @@ void main_editor_window::render_dockspace()
 			const auto& colorization = _console_log->get_level_colorization(last_item.second);
 			ImVec4 col = { colorization[0], colorization[1], colorization[2], colorization[3] };
 
-			float offset = ImGui::GetStyle().ItemSpacing.y;
-			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + offset);
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY());
 			gui::PushStyleColor(ImGuiCol_Text, col);
-			if (gui::Selectable(last_item.first.c_str(), false, 0, ImVec2(0, gui::GetItemsLineHeightWithSpacing() - offset)))
+			ImGui::AlignFirstTextHeightToWidgets();
+			if (gui::Selectable(last_item.first.c_str(), false, 0, ImVec2(0, gui::GetTextLineHeight())))
 			{
 				_dockspace.activate_dock(_console_dock_name);
 			}

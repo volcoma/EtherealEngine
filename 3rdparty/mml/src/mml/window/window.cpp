@@ -54,14 +54,14 @@ void window::create(video_mode mode, const std::string& title, std::uint32_t sty
     // Destroy the previous window implementation
     dispose();
 
-    // Fullscreen style requires some tests
-    if (style & style::Fullscreen)
+    // fullscreen style requires some tests
+    if (style & style::fullscreen)
     {
         // Make sure there's not already a fullscreen window (only one is allowed)
         if (fullscreenWindow)
         {
             err() << "Creating two fullscreen windows is not allowed, switching to windowed mode" << std::endl;
-            style &= ~style::Fullscreen;
+            style &= ~style::fullscreen;
         }
         else
         {
@@ -79,13 +79,13 @@ void window::create(video_mode mode, const std::string& title, std::uint32_t sty
 
     // Check validity of style according to the underlying platform
     #if defined(MML_SYSTEM_IOS) || defined(MML_SYSTEM_ANDROID)
-        if (style & style::Fullscreen)
-            style &= ~style::Titlebar;
+        if (style & style::fullscreen)
+            style &= ~style::titlebar;
         else
-            style |= style::Titlebar;
+            style |= style::titlebar;
     #else
-        if ((style & style::Close) || (style & style::Resize))
-            style |= style::Titlebar;
+        if ((style & style::close) || (style & style::resize))
+            style |= style::titlebar;
     #endif
 
     // Recreate the window implementation

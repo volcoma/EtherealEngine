@@ -1,6 +1,6 @@
 #include "mesh_importer.h"
+#include "core/logging/logging.h"
 #include "core/graphics/graphics.h"
-
 #include "core/math/math_includes.h"
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"

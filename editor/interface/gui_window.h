@@ -23,7 +23,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	gui_window(mml::video_mode mode, const std::string& title, std::uint32_t style = mml::style::Default);
+	gui_window(mml::video_mode mode, const std::string& title, std::uint32_t style = mml::style::standard);
 	//-----------------------------------------------------------------------------
 	//  Name : ~gui_window (virtual )
 	/// <summary>

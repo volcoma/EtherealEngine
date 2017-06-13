@@ -1,5 +1,6 @@
 #include "engine.h"
 #include "core/subsystem/simulation.h"
+#include "core/serialization/serialization.h"
 #include "../rendering/renderer.h"
 #include "../input/input.h"
 #include "../ecs/ecs.h"
@@ -24,12 +25,17 @@ namespace runtime
 
 	bool engine::initialize()
 	{
-		auto logger = logging::create(APPLOG,
-		{
-			std::make_shared<logging::sinks::platform_sink_mt>(),
-			std::make_shared<logging::sinks::daily_file_sink_mt>("Log", "log", 23, 59),
-		});
+		auto logging_container = logging::get_mutable_logging_container();
+		logging_container->add_sink(std::make_shared<logging::sinks::platform_sink_mt>());
+		logging_container->add_sink(std::make_shared<logging::sinks::daily_file_sink_mt>("Log", 23, 59));
+
+		auto logger = logging::create(APPLOG, logging_container);
 		
+		serialization::set_warning_logger([](const std::string& msg)
+		{
+			APPLOG_WARNING(msg);
+		});
+
 		// fire engine
 		_running = true;
 
@@ -79,14 +85,15 @@ namespace runtime
 		_focused_window = nullptr;
 		//get a copy of the windows for safe iterator invalidation
 		auto windows = get_windows();
-		for (auto window : windows)
-		{
-			if (window->has_focus())
-			{
-				_focused_window = window;
-				break;
-			}
-		}
+        auto it = std::find_if(std::begin(windows), std::end(windows),[](const auto& window)
+        {
+            return window->has_focus();
+        });
+
+        if(it != std::end(windows))
+        {
+            _focused_window = *it;
+        }
 
 		on_frame_begin(dt);
 

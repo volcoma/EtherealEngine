@@ -462,7 +462,7 @@ namespace imguidock
 					auto window = std::make_shared<gui_window>(
 						mml::video_mode((unsigned int)_current_dock_to->last_size.x, (unsigned int)_current_dock_to->last_size.y),
 						"",//std::string(m_currentDockTo->title),
-						mml::style::Default
+						mml::style::standard
 						);
 
 					auto& engine = core::get_subsystem<runtime::engine>();

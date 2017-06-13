@@ -42,8 +42,8 @@ bool docking_system::initialize()
 	dockspace.dock_with(assets.get(), console.get(), imguidock::slot::tab, 250, true);
 	dockspace.dock_with(style.get(), assets.get(), imguidock::slot::right, 300, true);
 
-	auto logger = logging::get(APPLOG);
-	logger->add_sink(log);
+	auto logging_container = logging::get_mutable_logging_container();
+	logging_container->add_sink(log);
 	window.set_log("Console", log);
 	std::function<void()> log_version = []()
 	{
