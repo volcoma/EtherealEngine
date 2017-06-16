@@ -3,7 +3,6 @@
 #include "runtime/meta/meta.h"
 int main(int _argc, char* _argv[])
 {
-	//fs::path exe_path = fs::canonical(fs::executable_path(_argv[0]).remove_filename());
 	fs::path engine_path = fs::system_complete(ENGINE_DIRECTORY);
 	fs::path engine_data = engine_path / "engine_data";
 	fs::path editor_data = engine_path / "editor_data";
