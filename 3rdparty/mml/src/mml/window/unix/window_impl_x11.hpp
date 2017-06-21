@@ -114,6 +114,11 @@ public:
     ////////////////////////////////////////////////////////////
     virtual void set_visible(bool visible);
 
+    virtual void maximize();
+    virtual void minimize();O
+    virtual void restore();
+    virtual void set_alpha(float alpha);
+
     ////////////////////////////////////////////////////////////
     /// \brief Show or hide the mouse cursor
     ///

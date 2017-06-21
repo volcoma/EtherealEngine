@@ -248,10 +248,10 @@ namespace editor
 			);
 
 		auto& am = core::get_subsystem<runtime::asset_manager>();
-		am.load<shader>("editor_data:/shaders/vs_picking_id", false)
+		am.load<shader>("editor_data:/shaders/vs_picking_id.sc", false)
 			.then([this, &am](auto vs)
 		{
-			am.load<shader>("editor_data:/shaders/fs_picking_id", false)
+			am.load<shader>("editor_data:/shaders/fs_picking_id.sc", false)
 				.then([this, vs](auto fs)
 			{
 				_program = std::make_unique<program>(vs, fs);

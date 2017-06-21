@@ -7,13 +7,14 @@
 #include "core/common/string.h"
 #include "core/signals/event.hpp"
 #include "core/filesystem/filesystem.h"
-#include "load_request.hpp"
+#include "asset_request.hpp"
+#include "asset_extensions.h"
 
 namespace runtime
 {
 	/// aliases
 	template<typename T>
-	using request_container_t = std::unordered_map<std::string, load_request<T>>;
+	using request_container_t = std::unordered_map<std::string, request<T>>;
 
 	struct base_storage
 	{
@@ -98,24 +99,24 @@ namespace runtime
 		}
 
 		/// key, data, size, outRequest
-		delegate<void(const std::string&, const std::uint8_t*, std::uint32_t, load_request<T>&)> load_from_memory = [](const fs::path&, const std::uint8_t*, std::uint32_t, load_request<T>&) {};
+		delegate<void(const std::string&, const std::uint8_t*, std::uint32_t, request<T>&)> load_from_memory = [](const fs::path&, const std::uint8_t*, std::uint32_t, request<T>&) {};
 
 		/// key, absolutKey, async, outReqeust
-		delegate<void(const std::string&, const fs::path&, bool, load_request<T>&)> load_from_file = [](const fs::path&, const fs::path&, bool, load_request<T>&) {};
+		delegate<void(const std::string&, const fs::path&, bool, request<T>&)> load_from_file = [](const fs::path&, const fs::path&, bool, request<T>&) {};
 
 		/// absolutKey, asset
 		delegate<void(const fs::path&, const asset_handle<T>&)> save_to_file = [](const fs::path&, const asset_handle<T>&) {};
 
-		/// Storage container
-		std::unordered_map<std::string, load_request<T>> container;
+        /// Storage containerО
+		std::unordered_map<std::string, request<T>> container;
 		/// Extension
-		std::string ext;
+        //std::string ext;
 	};
 
 	template<typename T>
 	inline fs::path get_absolute_key(const std::string& to_lower_key, T storage)
 	{
-		fs::path absolute_key = fs::absolute(fs::resolve_protocol(to_lower_key).string() + storage->ext);
+		fs::path absolute_key = fs::absolute(fs::resolve_protocol(to_lower_key).string());
 		return absolute_key;
 	};
 
@@ -215,7 +216,7 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template<typename T>
-		load_request<T>& create_asset_from_memory(
+		request<T>& create_asset_from_memory(
 			const std::string& key,
 			const std::uint8_t* data,
 			const std::uint32_t& size)
@@ -246,10 +247,16 @@ namespace runtime
             fs::error_code err;
             fs::rename(absolute_key, absolute_new_key, err);
 
-			auto& request = storage->container[key];
-			storage->container[new_key] = request;
-			storage->container[new_key].asset.link->id = new_key;
-			storage->container.erase(key);
+			auto it = storage->container.find(key);
+			if (it != storage->container.end())
+			{
+				auto& request = it->second;
+				storage->container[new_key] = request;
+				storage->container[new_key].asset.link->id = new_key;
+				storage->container.erase(it);
+			}
+
+			
 		}
 
 		//-----------------------------------------------------------------------------
@@ -266,10 +273,15 @@ namespace runtime
 		{
 			auto storage = get_storage<T>();
 		
-			auto& request = storage->container[key];
-			request.asset.link->asset.reset();
-			request.asset.link->id.clear();
-			storage->container.erase(key);
+			auto it = storage->container.find(key);
+			if (it != storage->container.end())
+			{
+				auto& request = it->second;
+				request.asset.link->asset.reset();
+				request.asset.link->id.clear();
+				storage->container.erase(it);
+			}
+			
 		}
 
 		//-----------------------------------------------------------------------------
@@ -304,7 +316,7 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template<typename T>
-		load_request<T>& load(
+		request<T>& load(
 			const std::string& key,
 			bool async,
 			bool force = false)
@@ -340,7 +352,7 @@ namespace runtime
 		}
 
 		template<typename T>
-		load_request<T>& find_or_create_asset_entry(
+		request<T>& find_or_create_asset_entry(
 			const std::string& key
 		)
 		{
@@ -358,7 +370,7 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template<typename T, typename F>
-		load_request<T>& load_asset_from_file_impl(
+		request<T>& load_asset_from_file_impl(
 			const std::string& key,
 			const fs::path& absoluteKey,
 			bool async,
@@ -387,7 +399,7 @@ namespace runtime
 			}
             else if (!fs::exists(absoluteKey, err))
 			{
-				static load_request<T> emptyRequest;
+				static request<T> emptyRequest;
 				return emptyRequest;
 			}
 			else
@@ -409,7 +421,7 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template<typename T, typename F>
-		load_request<T>& create_asset_from_memory_impl(
+		request<T>& create_asset_from_memory_impl(
 			const std::string& key,
 			const std::uint8_t* data,
 			const std::uint32_t& size,
@@ -445,7 +457,7 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template<typename T>
-		load_request<T>& find_or_create_asset_impl(
+		request<T>& find_or_create_asset_impl(
 			const std::string& key,
 			request_container_t<T>& container
 		)

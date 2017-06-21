@@ -10,7 +10,7 @@ namespace runtime
 	{
 		if (_core == 0)
 			_core = std::thread::hardware_concurrency() - 1;
-
+		
 		_core = std::max(_core, (uint32_t)1);
 		_stop = false;
 		for (uint32_t i = 0; i < _core; ++i)

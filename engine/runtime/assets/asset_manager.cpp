@@ -13,18 +13,15 @@ namespace runtime
 	{
 		{
 			auto storage = add<shader>();
-			storage->ext = extensions::shader;
 			storage->load_from_file = asset_reader::load_shader_from_file;
 			storage->load_from_memory = asset_reader::load_shader_from_memory;
 		}
 		{
 			auto storage = add<texture>();
-			storage->ext = extensions::texture;
 			storage->load_from_file = asset_reader::load_texture_from_file;
 		}
 		{
 			auto storage = add<mesh>();
-			storage->ext = extensions::mesh;
 			storage->load_from_file = asset_reader::load_mesh_from_file;
 			{
 				auto id = "embedded:/sphere";
@@ -123,7 +120,6 @@ namespace runtime
 		}
 		{
 			auto storage = add<material>();
-			storage->ext = extensions::material;
 			storage->load_from_file = asset_reader::load_material_from_file;
 			storage->save_to_file = asset_writer::write_material_to_file;
 			{
@@ -135,12 +131,10 @@ namespace runtime
 		}
 		{
 			auto storage = add<prefab>();
-			storage->ext = extensions::prefab;
 			storage->load_from_file = asset_reader::load_prefab_from_file;
 		}
 		{
 			auto storage = add<scene>();
-			storage->ext = extensions::scene;
 			storage->load_from_file = asset_reader::load_scene_from_file;
 		}
 

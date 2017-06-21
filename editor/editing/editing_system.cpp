@@ -17,113 +17,113 @@ namespace editor
 	{
 		auto& am = core::get_subsystem<runtime::asset_manager>();
 
-		am.load<texture>("editor_data:/icons/translate", false)
+		am.load<texture>("editor_data:/icons/translate.png", false)
 			.then([this](auto asset) mutable
 		{
 			icons["translate"] = asset;
 		});
 
-		am.load<texture>("editor_data:/icons/rotate", false)
+		am.load<texture>("editor_data:/icons/rotate.png", false)
 			.then([this](auto asset) mutable
 		{
 			icons["rotate"] = asset;
 		});
 
-		am.load<texture>("editor_data:/icons/scale", false)
+		am.load<texture>("editor_data:/icons/scale.png", false)
 			.then([this](auto asset) mutable
 		{
 			icons["scale"] = asset;
 		});
 
-		am.load<texture>("editor_data:/icons/local", false)
+		am.load<texture>("editor_data:/icons/local.png", false)
 			.then([this](auto asset) mutable
 		{
 			icons["local"] = asset;
 		});
 
-		am.load<texture>("editor_data:/icons/global", false)
+		am.load<texture>("editor_data:/icons/global.png", false)
 			.then([this](auto asset) mutable
 		{
 			icons["global"] = asset;
 		});
 
-		am.load<texture>("editor_data:/icons/play", false)
+		am.load<texture>("editor_data:/icons/play.png", false)
 			.then([this](auto asset) mutable
 		{
 			icons["play"] = asset;
 		});
 
-		am.load<texture>("editor_data:/icons/pause", false)
+		am.load<texture>("editor_data:/icons/pause.png", false)
 			.then([this](auto asset) mutable
 		{
 			icons["pause"] = asset;
 		});
 
-		am.load<texture>("editor_data:/icons/stop", false)
+		am.load<texture>("editor_data:/icons/stop.png", false)
 			.then([this](auto asset) mutable
 		{
 			icons["stop"] = asset;
 		});
 
-		am.load<texture>("editor_data:/icons/next", false)
+		am.load<texture>("editor_data:/icons/next.png", false)
 			.then([this](auto asset) mutable
 		{
 			icons["next"] = asset;
 		});
 
-		am.load<texture>("editor_data:/icons/material", false)
+		am.load<texture>("editor_data:/icons/material.png", false)
 			.then([this](auto asset) mutable
 		{
 			icons["material"] = asset;
 		});
 
-		am.load<texture>("editor_data:/icons/mesh", false)
+		am.load<texture>("editor_data:/icons/mesh.png", false)
 			.then([this](auto asset) mutable
 		{
 			icons["mesh"] = asset;
 		});
 
-		am.load<texture>("editor_data:/icons/export", false)
+		am.load<texture>("editor_data:/icons/export.png", false)
 			.then([this](auto asset) mutable
 		{
 			icons["import"] = asset;
 		});
 
-		am.load<texture>("editor_data:/icons/grid", false)
+		am.load<texture>("editor_data:/icons/grid.png", false)
 			.then([this](auto asset) mutable
 		{
 			icons["grid"] = asset;
 		});
 
-		am.load<texture>("editor_data:/icons/wireframe", false)
+		am.load<texture>("editor_data:/icons/wireframe.png", false)
 			.then([this](auto asset) mutable
 		{
 			icons["wireframe"] = asset;
 		});
 
-		am.load<texture>("editor_data:/icons/prefab", false)
+		am.load<texture>("editor_data:/icons/prefab.png", false)
 			.then([this](auto asset) mutable
 		{
 			icons["prefab"] = asset;
 		});
 
-		am.load<texture>("editor_data:/icons/scene", false)
+		am.load<texture>("editor_data:/icons/scene.png", false)
 			.then([this](auto asset) mutable
 		{
 			icons["scene"] = asset;
 		});
 
-		am.load<texture>("editor_data:/icons/shader", false)
+		am.load<texture>("editor_data:/icons/shader.png", false)
 			.then([this](auto asset) mutable
 		{
 			icons["shader"] = asset;
 		});
-		am.load<texture>("editor_data:/icons/loading", false)
+		am.load<texture>("editor_data:/icons/loading.png", false)
 			.then([this](auto asset) mutable
 		{
 			icons["loading"] = asset;
 		});
-		am.load<texture>("editor_data:/icons/folder", false)
+		am.load<texture>("editor_data:/icons/folder.png", false)
 			.then([this](auto asset) mutable
 		{
 			icons["folder"] = asset;

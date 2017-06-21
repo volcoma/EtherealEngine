@@ -323,7 +323,6 @@ bool importer::load_mesh_data_from_file(const std::string& path, mesh::load_data
 		APPLOG_ERROR(importer.GetErrorString());
 		return false;
 	}
-	APPLOG_INFO("Imported {0}", path);
 	process_imported_scene(scene, load_data);
 
 	return true;

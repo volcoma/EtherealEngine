@@ -25,22 +25,24 @@ namespace fs
 	class filesystem_watcher
 	{
 	public:
-		struct Entry
+		enum entry_status
 		{
-			enum State
-			{
-				New,
-				Modified,
-				Removed,
-				Renamed,
-				Unmodified,
-			};
+			created,
+			modified,
+			removed,
+			renamed,
+			unmodified,
+		};
+
+		struct entry
+		{
+			
 			fs::path path;
 			fs::path last_path;
-			State state = Unmodified;
+			entry_status status = unmodified;
 			fs::file_time_type last_mod_time;
 			uintmax_t size = 0;
-			fs::file_type type;// = fs::file_type::none;
+			fs::file_type type;
 		};
 
 		//-----------------------------------------------------------------------------
@@ -52,7 +54,7 @@ namespace fs
 		/// or a directory.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		static void watch(const fs::path &path, bool initialList, const std::function<void(const std::vector<Entry>&)> &callback)
+		static void watch(const fs::path &path, bool initialList, const std::function<void(const std::vector<entry>&, bool)> &callback)
 		{
 			watch_impl(path, initialList, callback);
 		}
@@ -209,7 +211,7 @@ namespace fs
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		static void watch_impl(const fs::path &path, bool initialList = true, const std::function<void(const std::vector<Entry>&)> &listCallback = std::function<void(const std::vector<Entry>&)>())
+		static void watch_impl(const fs::path &path, bool initialList = true, const std::function<void(const std::vector<entry>&, bool)> &listCallback = {})
 		{
 			auto& wd = get_watcher();
 			// and start its thread
@@ -377,7 +379,7 @@ namespace fs
 			return pathFilter;
 		}
 
-		static std::pair<fs::path, std::string> visit_wild_card_path_cache(const std::map <std::string, Entry>& entries, const fs::path &path, bool visitEmpty, const std::function<bool(const fs::path&)> &visitor)
+		static std::pair<fs::path, std::string> visit_wild_card_path_cache(const std::map <std::string, entry>& entries, const fs::path &path, bool visitEmpty, const std::function<bool(const fs::path&)> &visitor)
 		{
 			std::pair<fs::path, std::string> pathFilter = get_path_filter_pair(path);
 			if (!pathFilter.second.empty())
@@ -416,27 +418,27 @@ namespace fs
 			/// 
 			/// </summary>
 			//-----------------------------------------------------------------------------
-			watcher_impl(const fs::path &path, const std::string &filter, bool initialList, const std::function<void(const std::vector<Entry>&)> &listCallback)
+			watcher_impl(const fs::path &path, const std::string &filter, bool initialList, const std::function<void(const std::vector<entry>&, bool)> &listCallback)
 				: _filter(filter), _callback(listCallback)
 			{
 				_root = path;
-				std::vector<Entry> entries;
+				std::vector<entry> entries;
 				// make sure we store all initial write time
 				if (!_filter.empty())
 				{
 					visit_wild_card_path(path / filter, false, [this, &entries](const fs::path &p)
 					{
-						Entry entry;
-						poll_entry(p, entry);
-						entries.push_back(entry);
+						entry e;
+						poll_entry(p, e);
+						entries.push_back(e);
 						return false;
 					});
 				}
 				else
 				{
-					Entry entry;
-					poll_entry(_root, entry);
-					entries.push_back(entry);
+					entry e;
+					poll_entry(_root, e);
+					entries.push_back(e);
 				}
 
 				_entries_cached = _entries;
@@ -447,7 +449,7 @@ namespace fs
 					// so we have to manually call it here if we want that behavior
 					if (entries.size() > 0 && _callback)
 					{
-						_callback(entries);
+						_callback(entries, true);
 					}
 				}
 
@@ -464,28 +466,28 @@ namespace fs
 			void watch()
 			{
 				
-				std::vector<Entry> entries;
+				std::vector<entry> entries;
 				// otherwise we check the whole parent directory
 				if (!_filter.empty())
 				{
 					visit_wild_card_path(_root / _filter, false, [this, &entries](const fs::path &p)
 					{
-						Entry entry;
-						poll_entry(p, entry);
-						if (entry.state != Entry::State::Unmodified && _callback)
+						entry e;
+						poll_entry(p, e);
+						if (e.status != entry_status::unmodified && _callback)
 						{
-							entries.push_back(entry);
+							entries.push_back(e);
 						}
 						return false;
 					});
 
 					visit_wild_card_path_cache(_entries_cached, _root / _filter, false, [this, &entries](const fs::path &p)
 					{
-						Entry entry;
-						poll_entry(p, entry);
-						if (entry.state == Entry::State::Removed && _callback)
+						entry e;
+						poll_entry(p, e);
+						if (e.status == entry_status::removed && _callback)
 						{
-							entries.push_back(entry);
+							entries.push_back(e);
 						}
 						return false;
 					});
@@ -493,36 +495,36 @@ namespace fs
 				}
 				else
 				{
-					Entry entry;
-					poll_entry(_root, entry);
+					entry e;
+					poll_entry(_root, e);
 
-					if (entry.state != Entry::State::Unmodified && _callback)
+					if (e.status != entry_status::unmodified && _callback)
 					{
-						entries.push_back(entry);
+						entries.push_back(e);
 					}
 				}
 
 				auto __entries = entries;
-				for (auto& entry : __entries)
+				for (auto& e : __entries)
 				{
-					if (entry.state == Entry::New)
+					if (e.status == entry_status::created)
 					{
 						for (auto& other : __entries)
 						{
-							if (other.state == Entry::Removed)
+							if (other.status == entry_status::removed)
 							{
-								if (entry.last_mod_time == other.last_mod_time && entry.size == other.size)
+								if (e.last_mod_time == other.last_mod_time && e.size == other.size)
 								{
 									entries.erase(std::remove_if(std::begin(entries), std::end(entries),
-										[&other](const Entry& rhs) { return other.path == rhs.path; }
+										[&other](const entry& rhs) { return other.path == rhs.path; }
 									), std::end(entries));
 
 									auto it = std::find_if(std::begin(entries), std::end(entries), 
-										[&entry](const Entry& rhs) { return entry.path == rhs.path; }
+										[&e](const entry& rhs) { return e.path == rhs.path; }
 									);
 									if (it != std::end(entries))
 									{
-										it->state = Entry::Renamed;
+										it->status = entry_status::renamed;
 										it->last_path = other.path;
 									}
 								}
@@ -536,7 +538,7 @@ namespace fs
 
 				if (entries.size() > 0 && _callback)
 				{
-					_callback(entries);
+					_callback(entries, false);
 				}
 			}
 
@@ -548,7 +550,7 @@ namespace fs
 			/// 
 			/// </summary>
 			//-----------------------------------------------------------------------------
-			void poll_entry(const fs::path &path, Entry& entry)
+			void poll_entry(const fs::path &path, entry& entry)
 			{
 				// get the last modification time
                 fs::error_code err;
@@ -563,7 +565,7 @@ namespace fs
 					fi.path = path;
 					fi.last_path = path;
 					fi.last_mod_time = time;
-					fi.state = Entry::State::New;
+					fi.status = entry_status::created;
 					fi.size = size;
 					fi.type = status.type();
 					entry = fi;
@@ -574,7 +576,7 @@ namespace fs
                 if (!fs::exists(fi.path, err))
 				{
 					auto fi_copy = fi;
-					fi_copy.state = Entry::State::Removed;
+					fi_copy.status = entry_status::removed;
 					_entries.erase(key);
 					entry = fi_copy;
 					return;
@@ -585,14 +587,14 @@ namespace fs
 				{
 					fi.size = size;
 					fi.last_mod_time = time;
-					fi.state = Entry::State::Modified;
+					fi.status = entry_status::modified;
 					fi.type = status.type();
 					entry = fi;
 					return;
 				}
 				else
 				{
-					fi.state = Entry::State::Unmodified;
+					fi.status = entry_status::unmodified;
 					fi.type = status.type();
 					entry = fi;
 					return;
@@ -605,11 +607,11 @@ namespace fs
 			/// Filter applied
 			std::string _filter;
 			/// Callback for list of modifications
-			std::function<void(const std::vector<Entry>&)> _callback;
+			std::function<void(const std::vector<entry>&, bool)> _callback;
 			/// Cache watched files
-			std::map <std::string, Entry> _entries;
+			std::map <std::string, entry> _entries;
 			/// Cache watched files
-			std::map <std::string, Entry> _entries_cached;
+			std::map <std::string, entry> _entries_cached;
 		};
 		/// Mutex for the file watchers
 		std::recursive_mutex _mutex;

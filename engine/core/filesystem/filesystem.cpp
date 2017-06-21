@@ -5,10 +5,10 @@
 namespace fs
 {
 
-	bool add_path_protocol(const path& protocol, const path& dir)
+    bool add_path_protocol(const std::string& protocol, const path& dir)
 	{
 		// Protocol matching is case insensitive, convert to lower case
-		auto protocol_lower = string_utils::to_lower(protocol.string());
+        auto protocol_lower = string_utils::to_lower(protocol);
 
 		auto& protocols = get_path_protocols();
 		// Add to the list
@@ -47,8 +47,13 @@ namespace fs
 	}
 
 	path resolve_protocol(const path& _path)
-	{
-		const auto root = _path.root_name().string();
+	{        
+        const auto string_path = _path.string();
+        auto pos = string_path.find(':', 0) + 1;
+        if(pos == std::string::npos)
+            return path{};
+
+        const auto root = string_path.substr(0, pos);
 		const auto relative_path = _path.relative_path();
 		// Matching path protocol in our list?
 		auto& protocols = get_path_protocols();

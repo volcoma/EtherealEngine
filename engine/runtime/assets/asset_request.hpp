@@ -6,8 +6,11 @@
 #include "core/signals/event.hpp"
 #include "asset_handle.h"
 
+namespace runtime
+{
+
 template<typename T>
-struct load_request
+struct request
 {
 	//-----------------------------------------------------------------------------
 	//  Name : then ()
@@ -106,3 +109,6 @@ struct load_request
 	/// Subscribed callbacks
 	event<void(asset_handle<T>)> callbacks;
 };
+
+
+}

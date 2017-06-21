@@ -234,7 +234,7 @@ namespace runtime
 		///
 		std::mutex _tasks_mutex;
 		///
-		core::dynamic_handle_object_set_t<task_t, 32> _tasks;
+        core::dynamic_handle_object_set<task_t, 32> _tasks;
 		///
 		TasksWrapper _main_thread_tasks;
 		///

@@ -7,7 +7,7 @@
 #include <cctype>
 #include <regex>
 
-#include "Parser.h"
+#include "parser.h"
 
 namespace cfg
 {

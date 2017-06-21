@@ -27,13 +27,13 @@ namespace editor
 
 	struct asset_directory : std::enable_shared_from_this<asset_directory>
 	{
-		asset_directory(asset_directory* p, const fs::path& abs, const std::string& n, const fs::path& r, bool recompile_assets);
+		asset_directory(asset_directory* p, const fs::path& abs, const std::string& n, const fs::path& r);
 
 		~asset_directory();
 
-		void populate(asset_directory* p, const fs::path& abs, const std::string& n, const fs::path& r, bool recompile_assets);
+		void populate(asset_directory* p, const fs::path& abs, const std::string& n, const fs::path& r);
 
-		void watch(bool recompile_assets);
+		void watch();
 
 		void unwatch();
 		///
@@ -94,7 +94,7 @@ namespace editor
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void open_project(const fs::path& project_path, bool recompile_project_assets, bool recompile_engine_assets);
+		void open_project(const fs::path& project_path);
 
 		//-----------------------------------------------------------------------------
 		//  Name : create_project ()

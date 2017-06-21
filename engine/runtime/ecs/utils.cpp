@@ -1,7 +1,7 @@
 #include "utils.h"
 #include "core/serialization/serialization.h"
 #include "core/serialization/associative_archive.h"
-#include "../Meta/Ecs/Entity.hpp"
+#include "../meta/ecs/entity.hpp"
 #include "../assets/asset_extensions.h"
 
 namespace ecs

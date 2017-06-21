@@ -239,6 +239,7 @@ namespace ImGui
 			if (!(selected && edit))
 			{
 				PushTextWrapPos(pos.x + size.x * 0.9f);
+				AlignFirstTextHeightToWidgets();
 				Text(label);
 				PopTextWrapPos();
 			}

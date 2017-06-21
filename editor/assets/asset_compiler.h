@@ -4,5 +4,5 @@
 struct asset_compiler
 {
 	template<typename T>
-	static void compile(const fs::path& absoluteKey);
+	static void compile(const fs::path& absolute_key);
 };

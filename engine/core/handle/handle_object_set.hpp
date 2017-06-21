@@ -41,7 +41,7 @@ namespace core
 		*
 		* @return     Returns nullptr_t if no object assigned to this handle.
 		*/
-		T* fetch(handle handle);
+        T* fetch(handle _handle);
 
 		/**
 		* @brief      Determines if the handle and its interanl object is alive
@@ -50,14 +50,14 @@ namespace core
 		*
 		* @return     True if alive, False otherwise.
 		*/
-		bool is_alive(handle handle) const;
+        bool is_alive(handle _handle) const;
 
 		/**
 		* @brief      Recycle the handle, and its internal object.
 		*
 		* @param[in]  handle  The unique handle of object.
 		*/
-		bool free(handle handle);
+        bool free(handle _handle);
 
 		/**
 		* @brief      Reset this object pool to initial state, and destroy all the objects.
@@ -90,7 +90,7 @@ namespace core
 		const_iterator_t end() const;
 
 	protected:
-		T* fetch_without_check(handle handle);
+        T* fetch_without_check(handle _handle);
 
 		array_t _buffer;
 		handle_set<N> _handles;
@@ -102,13 +102,13 @@ namespace core
 	* @tparam     T     The type of object.
 	*/
 	template<typename T, size_t N> 
-	struct dynamic_handle_object_set_t
+    struct dynamic_handle_object_set
 	{
 		using index_t = handle::index_t;
 		using aligned_storage_t = typename std::aligned_storage<sizeof(T), alignof(T)>::type;
 		using mutex_t = std::mutex;
 
-		virtual ~dynamic_handle_object_set_t();
+        virtual ~dynamic_handle_object_set();
 
 		/**
 		* @brief      Create a constructed object, and a associated unique handle.
@@ -128,7 +128,7 @@ namespace core
 		*
 		* @return     Returns nullptr_t if no object assigned to this handle.
 		*/
-		T* fetch(handle handle);
+        T* fetch(handle _handle);
 
 		/**
 		* @brief      Determines if the handle and its interanl object is alive
@@ -137,14 +137,14 @@ namespace core
 		*
 		* @return     True if alive, False otherwise.
 		*/
-		bool is_alive(handle handle) const;
+        bool is_alive(handle _handle) const;
 
 		/**
 		* @brief      Recycle the handle, and its internal object.
 		*
 		* @param[in]  handle  The unique handle of object.
 		*/
-		bool free(handle handle);
+        bool free(handle _handle);
 
 		/**
 		* @brief      Reset this object pool to initial state, and destroy all the objects,
@@ -177,7 +177,7 @@ namespace core
 		const_iterator_t end() const;
 
 	protected:
-		T* fetch_without_check(handle handle);
+        T* fetch_without_check(handle _handle);
 
 		std::mutex _malloc_mutex;
 		std::vector<uint8_t*> _chunks;
@@ -206,29 +206,29 @@ namespace core
 	}
 
 	template<typename T, size_t N>
-	inline T* handle_object_set<T, N>::fetch(handle handle)
+    inline T* handle_object_set<T, N>::fetch(handle _handle)
 	{
-		return is_alive(handle) ? fetch_without_check(handle) : nullptr;
+        return is_alive(_handle) ? fetch_without_check(_handle) : nullptr;
 	}
 
 	template<typename T, size_t N>
-	inline T* handle_object_set<T, N>::fetch_without_check(handle handle)
+    inline T* handle_object_set<T, N>::fetch_without_check(handle _handle)
 	{
-		return (T*)_buffer.data() + sizeof(aligned_storage_t)*handle.get_index();
+        return reinterpret_cast<T*>(_buffer.data()) + sizeof(aligned_storage_t)*_handle.get_index();
 	}
 
 	template<typename T, size_t N>
-	inline bool handle_object_set<T, N>::is_alive(handle handle) const
+    inline bool handle_object_set<T, N>::is_alive(handle _handle) const
 	{
-		return _handles.is_alive(handle);
+        return _handles.is_alive(_handle);
 	}
 
 	template<typename T, size_t N>
-	inline bool handle_object_set<T, N>::free(handle handle)
+    inline bool handle_object_set<T, N>::free(handle _handle)
 	{
-		if (_handles.free(handle))
+        if (_handles.free(_handle))
 		{
-			auto object = fetch_without_check(handle);
+            auto object = fetch_without_check(_handle);
 			object->~T();
 			return true;
 		}
@@ -268,7 +268,7 @@ namespace core
 	}
 
 	template<typename T, size_t N>
-	dynamic_handle_object_set_t<T, N>::~dynamic_handle_object_set_t()
+    dynamic_handle_object_set<T, N>::~dynamic_handle_object_set()
 	{
 		clear();
 		for (auto chunk : _chunks)
@@ -277,7 +277,7 @@ namespace core
 	}
 
 	template<typename T, size_t N>
-	template<typename ... Args> handle dynamic_handle_object_set_t<T, N>::create(Args&&... args)
+    template<typename ... Args> handle dynamic_handle_object_set<T, N>::create(Args&&... args)
 	{
 		if (auto handle = _handles.create())
 		{
@@ -302,31 +302,31 @@ namespace core
 	}
 
 	template<typename T, size_t N>
-	inline T* dynamic_handle_object_set_t<T, N>::fetch(handle handle)
+    inline T* dynamic_handle_object_set<T, N>::fetch(handle _handle)
 	{
-		return is_alive(handle) ? fetch_without_check(handle) : nullptr;
+        return is_alive(_handle) ? fetch_without_check(_handle) : nullptr;
 	}
 
 	template<typename T, size_t N>
-	inline T* dynamic_handle_object_set_t<T, N>::fetch_without_check(handle handle)
+    inline T* dynamic_handle_object_set<T, N>::fetch_without_check(handle _handle)
 	{
-		auto index = handle.get_index() / N;
-		auto offset = (handle.get_index() % N) * sizeof(aligned_storage_t);
-		return (T*)(_chunks[index] + offset);
+        auto index = _handle.get_index() / N;
+        auto offset = (_handle.get_index() % N) * sizeof(aligned_storage_t);
+        return reinterpret_cast<T*>(_chunks[index] + offset);
 	}
 
 	template<typename T, size_t N>
-	inline bool dynamic_handle_object_set_t<T, N>::is_alive(handle handle) const
+    inline bool dynamic_handle_object_set<T, N>::is_alive(handle _handle) const
 	{
-		return _handles.is_alive(handle);
+        return _handles.is_alive(_handle);
 	}
 
 	template<typename T, size_t N>
-	inline bool dynamic_handle_object_set_t<T, N>::free(handle handle)
+    inline bool dynamic_handle_object_set<T, N>::free(handle _handle)
 	{
-		if (_handles.free(handle))
+        if (_handles.free(_handle))
 		{
-			auto object = fetch_without_check(handle);
+            auto object = fetch_without_check(_handle);
 			object->~T();
 			return true;
 		}
@@ -334,7 +334,7 @@ namespace core
 	}
 
 	template<typename T, size_t N>
-	inline void dynamic_handle_object_set_t<T, N>::clear()
+    inline void dynamic_handle_object_set<T, N>::clear()
 	{
 		for (auto handle : _handles)
 		{
@@ -347,19 +347,19 @@ namespace core
 	}
 
 	template<typename T, size_t N>
-    inline typename std::size_t dynamic_handle_object_set_t<T, N>::size() const
+    inline typename std::size_t dynamic_handle_object_set<T, N>::size() const
 	{
 		return _handles.size();
 	}
 
 	template<typename T, size_t N>
-	inline typename dynamic_handle_object_set_t<T, N>::const_iterator_t dynamic_handle_object_set_t<T, N>::begin() const
+    inline typename dynamic_handle_object_set<T, N>::const_iterator_t dynamic_handle_object_set<T, N>::begin() const
 	{
 		return _handles.begin();
 	}
 
 	template<typename T, size_t N>
-	inline typename dynamic_handle_object_set_t<T, N>::const_iterator_t dynamic_handle_object_set_t<T, N>::end() const
+    inline typename dynamic_handle_object_set<T, N>::const_iterator_t dynamic_handle_object_set<T, N>::end() const
 	{
 		return _handles.end();
 	}

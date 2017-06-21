@@ -347,7 +347,6 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 	auto& input = core::get_subsystem<runtime::input>();
 	{
 		std::unique_lock<std::mutex> lock(dir->directories_mutex);
-
 		for (auto& entry : dir->directories)
 		{
 			using entry_t = std::shared_ptr<editor::asset_directory>;
@@ -371,7 +370,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 			{
 				opened_dir = entry;
 				es.try_unselect<std::shared_ptr<editor::asset_directory>>();
-			}, 
+			},
 			[&](const std::string& new_name) // on_rename
 			{
 				fs::path new_absolute_path = absolute;
@@ -379,12 +378,12 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 				new_absolute_path /= new_name;
 				fs::error_code err;
 				fs::rename(absolute, new_absolute_path, err);
-			}, 
+			},
 			[&]() // on_delete
 			{
 				fs::error_code err;
 				fs::remove_all(absolute, err);
-			}, 
+			},
 			[]() // on_drag
 			{
 			}
@@ -396,117 +395,95 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 
 		for (auto& file : dir->files)
 		{
-			if (file.extension == extensions::texture)
-			{
-                using asset_t = texture;
-                using entry_t = asset_handle<asset_t>;
-                auto entry = am.find_or_create_asset_entry<asset_t>(file.relative).asset;
-				const auto& name = file.name;
-				const auto& relative = file.relative;
-				const auto& absolute = file.absolute;
-				auto& selected = es.selection_data.object;
-				bool is_selected = selected.is_type<entry_t>() ? (selected.get_value<entry_t>() == entry) : false;
-				bool is_dragging = !!es.drag_data.object;
-				list_entry(
-				entry,
-				name,
-				is_selected,
-				is_dragging,
-				size,
-				[&]() // on_click
-				{
-					es.select(entry);
-				},
-				[&]() // on_double_click
-				{
-					
-				}, 
-				[&](const std::string& new_name) // on_rename
-				{
-					const auto asset_dir = fs::path(relative).remove_filename();
-					std::string new_relative = (asset_dir / new_name).generic_string();
-                    am.rename_asset<asset_t>(relative, new_relative);
-				}, 
-				[&]() // on_delete
-				{
-                    am.delete_asset<asset_t>(relative);
-
-					if (!opened_dir.expired())
-					{
-						auto opened_folder_shared = opened_dir.lock();
-						auto& files = opened_folder_shared->files;
-
-						fs::error_code err;
-						for (auto& f : files)
-						{
-							if (f.relative == relative)
-							{
-								fs::remove(f.absolute, err);
-							}
-						}
-					}
-				}, 
-				[&]() // on_drag
-				{
-					es.drag(entry, relative);
-				}
-				);
-			}
-			if (file.extension == extensions::mesh)
-			{
-                using asset_t = mesh;
-                using entry_t = asset_handle<asset_t>;
-                auto entry = am.find_or_create_asset_entry<asset_t>(file.relative).asset;
-                const auto& name = file.name;
-                const auto& relative = file.relative;
-                const auto& absolute = file.absolute;
-                auto& selected = es.selection_data.object;
-                bool is_selected = selected.is_type<entry_t>() ? (selected.get_value<entry_t>() == entry) : false;
-                bool is_dragging = !!es.drag_data.object;
-                list_entry(
-                entry,
-                name,
-                is_selected,
-                is_dragging,
-                size,
-                [&]() // on_click
+            for(const auto& ext : extensions::texture)
+            {
+                if (file.extension == ext)
                 {
-                    es.select(entry);
-                },
-                [&]() // on_double_click
-                {
-
-                },
-                [&](const std::string& new_name) // on_rename
-                {
-                    const auto asset_dir = fs::path(relative).remove_filename();
-                    std::string new_relative = (asset_dir / new_name).generic_string();
-                    am.rename_asset<asset_t>(relative, new_relative);
-                },
-                [&]() // on_delete
-                {
-                    am.delete_asset<asset_t>(relative);
-
-                    if (!opened_dir.expired())
+                    using asset_t = texture;
+                    using entry_t = asset_handle<asset_t>;
+                    auto entry = am.find_or_create_asset_entry<asset_t>(file.relative).asset;
+                    const auto& name = file.name;
+                    const auto& relative = file.relative;
+                    const auto& absolute = file.absolute;
+                    auto& selected = es.selection_data.object;
+                    bool is_selected = selected.is_type<entry_t>() ? (selected.get_value<entry_t>() == entry) : false;
+                    bool is_dragging = !!es.drag_data.object;
+                    list_entry(
+                    entry,
+                    name,
+                    is_selected,
+                    is_dragging,
+                    size,
+                    [&]() // on_click
                     {
-                        auto opened_folder_shared = opened_dir.lock();
-                        auto& files = opened_folder_shared->files;
+                        es.select(entry);
+                    },
+                    [&]() // on_double_click
+                    {
 
-                        fs::error_code err;
-                        for (auto& f : files)
-                        {
-                            if (f.relative == relative)
-                            {
-                                fs::remove(f.absolute, err);
-                            }
-                        }
+                    },
+                    [&](const std::string& new_name) // on_rename
+                    {
+                        const auto asset_dir = fs::path(relative).remove_filename();
+						const auto new_relative = (asset_dir / new_name).generic_string() + file.extension;
+                        am.rename_asset<asset_t>(relative, new_relative);
+                    },
+                    [&]() // on_delete
+                    {
+                        am.delete_asset<asset_t>(relative);
+
+                    },
+                    [&]() // on_drag
+                    {
+                        es.drag(entry, relative);
                     }
-                },
-                [&]() // on_drag
-                {
-                    es.drag(entry, relative);
+                    );
                 }
-                );
+            }
+			for (const auto& ext : extensions::mesh)
+			{
+				if (file.extension == ext)
+				{
+
+					using asset_t = mesh;
+					using entry_t = asset_handle<asset_t>;
+					auto entry = am.find_or_create_asset_entry<asset_t>(file.relative).asset;
+					const auto& name = file.name;
+					const auto& relative = file.relative;
+					const auto& absolute = file.absolute;
+					auto& selected = es.selection_data.object;
+					bool is_selected = selected.is_type<entry_t>() ? (selected.get_value<entry_t>() == entry) : false;
+					bool is_dragging = !!es.drag_data.object;
+					list_entry(
+					entry,
+					name,
+					is_selected,
+					is_dragging,
+					size,
+					[&]() // on_click
+					{
+						es.select(entry);
+					},
+					[&]() // on_double_click
+					{
+
+					},
+					[&](const std::string& new_name) // on_rename
+					{
+						const auto asset_dir = fs::path(relative).remove_filename();
+						const auto new_relative = (asset_dir / new_name).generic_string() + file.extension;
+						am.rename_asset<asset_t>(relative, new_relative);
+					},
+					[&]() // on_delete
+					{
+						am.delete_asset<asset_t>(relative);
+					},
+					[&]() // on_drag
+					{
+						es.drag(entry, relative);
+					}
+					);
+				}
 			}
 			if (file.extension == extensions::material)
 			{
@@ -536,27 +513,12 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
                 [&](const std::string& new_name) // on_rename
                 {
                     const auto asset_dir = fs::path(relative).remove_filename();
-                    std::string new_relative = (asset_dir / new_name).generic_string();
+					const auto new_relative = (asset_dir / new_name).generic_string() + file.extension;
                     am.rename_asset<asset_t>(relative, new_relative);
                 },
                 [&]() // on_delete
                 {
                     am.delete_asset<asset_t>(relative);
-
-                    if (!opened_dir.expired())
-                    {
-                        auto opened_folder_shared = opened_dir.lock();
-                        auto& files = opened_folder_shared->files;
-
-                        fs::error_code err;
-                        for (auto& f : files)
-                        {
-                            if (f.relative == relative)
-                            {
-                                fs::remove(f.absolute, err);
-                            }
-                        }
-                    }
                 },
                 [&]() // on_drag
                 {
@@ -592,27 +554,12 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
                 [&](const std::string& new_name) // on_rename
                 {
                     const auto asset_dir = fs::path(relative).remove_filename();
-                    std::string new_relative = (asset_dir / new_name).generic_string();
+					const auto new_relative = (asset_dir / new_name).generic_string() + file.extension;
                     am.rename_asset<asset_t>(relative, new_relative);
                 },
                 [&]() // on_delete
                 {
                     am.delete_asset<asset_t>(relative);
-
-                    if (!opened_dir.expired())
-                    {
-                        auto opened_folder_shared = opened_dir.lock();
-                        auto& files = opened_folder_shared->files;
-
-                        fs::error_code err;
-                        for (auto& f : files)
-                        {
-                            if (f.relative == relative)
-                            {
-                                fs::remove(f.absolute, err);
-                            }
-                        }
-                    }
                 },
                 [&]() // on_drag
                 {
@@ -648,27 +595,12 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
                 [&](const std::string& new_name) // on_rename
                 {
                     const auto asset_dir = fs::path(relative).remove_filename();
-                    std::string new_relative = (asset_dir / new_name).generic_string();
+					const auto new_relative = (asset_dir / new_name).generic_string() + file.extension;
                     am.rename_asset<asset_t>(relative, new_relative);
                 },
                 [&]() // on_delete
                 {
                     am.delete_asset<asset_t>(relative);
-
-                    if (!opened_dir.expired())
-                    {
-                        auto opened_folder_shared = opened_dir.lock();
-                        auto& files = opened_folder_shared->files;
-
-                        fs::error_code err;
-                        for (auto& f : files)
-                        {
-                            if (f.relative == relative)
-                            {
-                                fs::remove(f.absolute, err);
-                            }
-                        }
-                    }
                 },
                 [&]() // on_drag
                 {
@@ -706,43 +638,26 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
                     ecs.dispose();
                     es.load_editor_camera();
                     entry->instantiate();
-                    es.scene = fs::resolve_protocol(entry.id()).string() + extensions::scene;
+                    es.scene = fs::resolve_protocol(entry.id()).string() + file.extension;
 
 
                 },
                 [&](const std::string& new_name) // on_rename
                 {
                     const auto asset_dir = fs::path(relative).remove_filename();
-                    std::string new_relative = (asset_dir / new_name).generic_string();
+					const auto new_relative = (asset_dir / new_name).generic_string() + file.extension;
                     am.rename_asset<asset_t>(relative, new_relative);
                 },
                 [&]() // on_delete
                 {
                     am.delete_asset<asset_t>(relative);
-
-                    if (!opened_dir.expired())
-                    {
-                        auto opened_folder_shared = opened_dir.lock();
-                        auto& files = opened_folder_shared->files;
-
-                        fs::error_code err;
-                        for (auto& f : files)
-                        {
-                            if (f.relative == relative)
-                            {
-                                fs::remove(f.absolute, err);
-                            }
-                        }
-                    }
                 },
                 [&]() // on_drag
                 {
                     es.drag(entry, relative);
                 }
                 );
-
 			}
-
 		}
 	}
 
@@ -776,7 +691,8 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 				{
 					asset_handle<material> asset;
 					fs::path parent_dir = dir->relative;
-					asset.link->id = (parent_dir / string_utils::format("New Material (%s)", fs::path(std::tmpnam(nullptr)).filename().string().c_str())).generic_string();
+					std::string name = string_utils::format("New Material (%s)", fs::path(std::tmpnam(nullptr)).filename().string().c_str());
+					asset.link->id = (parent_dir / (name + extensions::material)).generic_string();
 					asset.link->asset = std::make_shared<standard_material>();
 					am.save<material>(asset);
 				}

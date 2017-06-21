@@ -17,13 +17,34 @@
 #include <fstream>
 #include <array>
 
+
+class material;
+struct prefab;
+struct scene;
+
+template<>
+void asset_compiler::compile<prefab>(const fs::path& absolute_key)
+{
+}
+
+template<>
+void asset_compiler::compile<scene>(const fs::path& absolute_key)
+{
+}
+
+template<>
+void asset_compiler::compile<material>(const fs::path& absolute_key)
+{
+}
+
 template<>
 void asset_compiler::compile<shader>(const fs::path& absolute_key)
 {
+	fs::path output = absolute_key;
+	output.concat(extensions::compiled);
 	std::string str_input = absolute_key.string();
 	std::string file = absolute_key.stem().string();
 	fs::path dir = absolute_key.parent_path();
-	fs::path output = dir / fs::path(file + extensions::shader);
 
 	std::array<gfx::RendererType::Enum, 4> supported =
 	{
@@ -118,6 +139,10 @@ void asset_compiler::compile<shader>(const fs::path& absolute_key)
 			APPLOG_ERROR("Failed compilation of {0} for {1} with error \n{2}", str_input, gfx::getRendererName(platform), err);
 			continue;
 		}
+		else
+		{
+			APPLOG_INFO("Successful compilation of {0} for {1}", str_input, gfx::getRendererName(platform));
+		}
 
 		if (sz > 0)
 		{
@@ -144,11 +169,11 @@ void asset_compiler::compile<shader>(const fs::path& absolute_key)
 template<>
 void asset_compiler::compile<texture>(const fs::path& absolute_key)
 {
+	fs::path output = absolute_key;
+	output.concat(extensions::compiled);
 	std::string str_input = absolute_key.string();
 	std::string raw_ext = absolute_key.filename().extension().string();
 	std::string file = absolute_key.stem().string();
-	fs::path output = absolute_key.parent_path();
-	output /= fs::path(file + extensions::texture);
 
 	std::string str_output = output.string();
     fs::error_code err;
@@ -157,6 +182,7 @@ void asset_compiler::compile<texture>(const fs::path& absolute_key)
         fs::copy_file(str_input, str_output, err);
         auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         fs::last_write_time(str_output, now, err);
+		APPLOG_INFO("Successful compilation of {0}", str_input);
 		return;
 	}
 
@@ -176,15 +202,20 @@ void asset_compiler::compile<texture>(const fs::path& absolute_key)
 	{
 		APPLOG_ERROR("Failed compilation of {0}", str_input);
 	}
+	else
+	{
+		APPLOG_INFO("Successful compilation of {0}", str_input);
+	}
 }
 
 template<>
 void asset_compiler::compile<mesh>(const fs::path& absolute_key)
 {
+	fs::path output = absolute_key;
+	output.concat(extensions::compiled);
 	std::string str_input = absolute_key.string();
 	std::string file = absolute_key.stem().string();
 	fs::path dir = absolute_key.parent_path();
-	fs::path output = dir / fs::path(file + extensions::mesh);
 
 	mesh::load_data data;
 	if (!importer::load_mesh_data_from_file(str_input, data))
@@ -202,5 +233,7 @@ void asset_compiler::compile<mesh>(const fs::path& absolute_key)
     fs::error_code err;
     fs::copy(entry, output, err);
     fs::remove(entry, err);
+
+	APPLOG_INFO("Successful compilation of {0}", str_input);
 
 }

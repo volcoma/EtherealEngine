@@ -6,7 +6,7 @@
 struct fbo_attachment
 {
     /// Texture handle.
-    std::shared_ptr<texture> texture;
+    std::shared_ptr<::texture> texture;
     /// Mip level.
     uint16_t mip = 0;
     /// Cubemap side or depth layer/slice.

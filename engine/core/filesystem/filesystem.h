@@ -21,7 +21,7 @@ namespace fs
 	/// relevant mapped path.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool add_path_protocol(const path& protocol, const path& directory);
+    bool add_path_protocol(const std::string& protocol, const path& directory);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_path_protocols ()

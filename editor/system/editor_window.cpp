@@ -409,14 +409,12 @@ void main_editor_window::on_start_page()
 		ImGuiWindowFlags_HorizontalScrollbar |
 		ImGuiWindowFlags_NoSavedSettings;
 
-	static bool recompile_project_assets = false;
-	static bool recompile_engine_assets = false;
 	gui::AlignFirstTextHeightToWidgets();
 	gui::Text("Recent Projects");
 	gui::Separator();
 	gui::BeginGroup();
 	{
-		if (gui::BeginChild("projects_content", ImVec2(gui::GetContentRegionAvail().x * 0.7f, gui::GetContentRegionAvail().y - gui::GetItemsLineHeightWithSpacing() * 2.0f), false, flags))
+		if (gui::BeginChild("projects_content", ImVec2(gui::GetContentRegionAvail().x * 0.7f, gui::GetContentRegionAvail().y), false, flags))
 		{
 
 			const auto& rencent_projects = pm.get_options().recent_project_paths;
@@ -424,7 +422,7 @@ void main_editor_window::on_start_page()
 			{
 				if (gui::Selectable(path.c_str()))
 				{
-					pm.open_project(path, recompile_project_assets, recompile_engine_assets);
+					pm.open_project(path);
 					es.load_editor_camera();
 					maximize();
 					_show_start_page = false;
@@ -432,24 +430,7 @@ void main_editor_window::on_start_page()
 			}
 		}
 		gui::EndChild();
-		gui::Checkbox("Recompile Project Assets", &recompile_project_assets);
-		if (gui::IsItemHoveredRect())
-		{
-			gui::SetTooltip(
-				"Force to recompile all project assets when a project is opened.\n"
-				"This will create compiled versions of the raw ones \n"
-				"which will be loaded into the app."
-			);
-		}
-		gui::Checkbox("Recompile Engine Assets", &recompile_engine_assets);
-		if (gui::IsItemHoveredRect())
-		{
-			gui::SetTooltip(
-				"Force to recompile all engine assets when a project is opened.\n"
-				"This will create compiled versions of the raw ones \n"
-				"which will be loaded into the app."
-			);
-		}
+		
 	}
 	gui::EndGroup();
 
@@ -474,7 +455,7 @@ void main_editor_window::on_start_page()
 			std::string path;
 			if (pick_folder_dialog("", path))
 			{
-				pm.open_project(path, recompile_project_assets, recompile_engine_assets);
+				pm.open_project(path);
 				es.load_editor_camera();
 				maximize();
 				_show_start_page = false;

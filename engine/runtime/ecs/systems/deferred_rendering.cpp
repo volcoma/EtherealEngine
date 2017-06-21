@@ -819,49 +819,49 @@ namespace runtime
 		on_frame_render.connect(this, &deferred_rendering::frame_render);
 
 		auto& am = core::get_subsystem<runtime::asset_manager>();
-		am.load<shader>("engine_data:/shaders/vs_clip_quad", false)
+		am.load<shader>("engine_data:/shaders/vs_clip_quad.sc", false)
 			.then([this, &am](auto vs)
 		{
-			am.load<shader>("engine_data:/shaders/fs_deferred_point_light", false)
+			am.load<shader>("engine_data:/shaders/fs_deferred_point_light.sc", false)
 				.then([this, vs](auto fs)
 			{
 				_point_light_program = std::make_unique<program>(vs, fs);
 			});
 
-			am.load<shader>("engine_data:/shaders/fs_deferred_spot_light", false)
+			am.load<shader>("engine_data:/shaders/fs_deferred_spot_light.sc", false)
 				.then([this, vs](auto fs)
 			{
 				_spot_light_program = std::make_unique<program>(vs, fs);
 			});
 
-			am.load<shader>("engine_data:/shaders/fs_deferred_directional_light", false)
+			am.load<shader>("engine_data:/shaders/fs_deferred_directional_light.sc", false)
 				.then([this, vs](auto fs)
 			{
 				_directional_light_program = std::make_unique<program>(vs, fs);
 			});
 
-			am.load<shader>("engine_data:/shaders/fs_gamma_correction", false)
+			am.load<shader>("engine_data:/shaders/fs_gamma_correction.sc", false)
 				.then([this, vs](auto fs)
 			{
 				_gamma_correction_program = std::make_unique<program>(vs, fs);
 			});
 		});
 
-		am.load<shader>("engine_data:/shaders/vs_clip_quad_ex", false)
+		am.load<shader>("engine_data:/shaders/vs_clip_quad_ex.sc", false)
 			.then([this, &am](auto vs)
 		{
-			am.load<shader>("engine_data:/shaders/fs_sphere_reflection_probe", false)
+			am.load<shader>("engine_data:/shaders/fs_sphere_reflection_probe.sc", false)
 				.then([this, vs](auto fs)
 			{
 				_sphere_ref_probe_program = std::make_unique<program>(vs, fs);
 			});
 
-			am.load<shader>("engine_data:/shaders/fs_box_reflection_probe", false)
+			am.load<shader>("engine_data:/shaders/fs_box_reflection_probe.sc", false)
 				.then([this, vs](auto fs)
 			{
 				_box_ref_probe_program = std::make_unique<program>(vs, fs);
 			});
-			am.load<shader>("engine_data:/shaders/fs_atmospherics", false)
+			am.load<shader>("engine_data:/shaders/fs_atmospherics.sc", false)
 				.then([this, vs](auto fs)
 			{
 				_atmospherics_program = std::make_unique<program>(vs, fs);
