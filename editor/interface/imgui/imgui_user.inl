@@ -1,6 +1,6 @@
 #include "imgui_user.h"
 #include "imgui_internal.h"
-
+#include <vector>
 namespace ImGui
 {
 	void RenderFrameEx(ImVec2 p_min, ImVec2 p_max, bool border, float rounding, float thickness)
@@ -371,5 +371,112 @@ namespace ImGui
 		RenderTextClipped(value_bb.Min, value_bb.Max, value_text_begin, value_text_end, NULL, ImGuiAlign_Center | ImGuiAlign_VCenter);
 		if (label_size.x > 0.0f)
 			RenderText(ImVec2(value_bb.Max.x + style.ItemInnerSpacing.x, value_bb.Min.y + style.FramePadding.y), label);
+	}
+
+
+	struct UserStacks
+	{
+		std::vector<ImVec2> max_label_sizes;
+		std::vector<bool> label_on_the_left;
+	};
+
+	UserStacks& GetUserStacks()
+	{
+		static UserStacks stacks;
+		return stacks;
+	}
+
+	void PushUserMaxLabelSize(const ImVec2& size)
+	{
+		auto& stacks = GetUserStacks();
+		stacks.max_label_sizes.push_back(size);
+	}
+	void PopUserMaxLabelSize()
+	{
+		auto& stacks = GetUserStacks();
+		stacks.max_label_sizes.pop_back();
+	}
+
+	void PushUserLabelIsLeft(bool left)
+	{
+		auto& stacks = GetUserStacks();
+		stacks.label_on_the_left.push_back(left);
+	}
+	void PopUserLabelIsLeft()
+	{
+		auto& stacks = GetUserStacks();
+		stacks.label_on_the_left.pop_back();
+	}
+
+	bool ComboBoxUser(const char* label, int* current_item, const char** items, int items_count, int height_in_items)
+	{
+		auto& stacks = GetUserStacks();
+		bool label_on_the_left = false;
+		
+		if(!stacks.label_on_the_left.empty())
+			label_on_the_left = stacks.label_on_the_left.front();
+
+		if (label_on_the_left)
+		{
+			ImVec2 label_size = CalcTextSize(label);
+			ImVec2 padding = { 0.0f, 0.0f };
+
+			bool label_on_the_left = false;
+
+			if (!stacks.max_label_sizes.empty())
+			{
+				ImVec2 max_label_size = stacks.max_label_sizes.front();
+
+				padding = max_label_size - label_size;
+			}
+			
+			PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
+			Dummy(padding);
+			SameLine();
+			PopStyleVar();
+			TextUnformatted(label);
+			SameLine();
+			return Combo(("##" + std::string(label)).c_str(), current_item, items, items_count, height_in_items);
+		}
+		else
+		{
+			return Combo(label, current_item, items, items_count, height_in_items);
+		}
+	}
+
+	bool InputTextUser(const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags, ImGuiTextEditCallback callback, void* user_data)
+	{
+		auto& stacks = GetUserStacks();
+		bool label_on_the_left = false;
+
+		if (!stacks.label_on_the_left.empty())
+			label_on_the_left = stacks.label_on_the_left.front();
+
+		if (label_on_the_left)
+		{
+			ImVec2 label_size = CalcTextSize(label);
+			ImVec2 padding = { 0.0f, 0.0f };
+
+			bool label_on_the_left = false;
+
+			if (!stacks.max_label_sizes.empty())
+			{
+				ImVec2 max_label_size = stacks.max_label_sizes.front();
+
+				padding = max_label_size - label_size;
+			}
+
+			PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
+			Dummy(padding);
+			SameLine();
+			PopStyleVar();
+			TextUnformatted(label);
+			SameLine();
+			return InputText(("##" + std::string(label)).c_str(), buf, buf_size, flags, callback, user_data);
+		}
+		else
+		{
+			return InputText(label, buf, buf_size, flags, callback, user_data);
+		}
 	}
 }
