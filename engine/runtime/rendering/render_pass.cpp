@@ -3,21 +3,21 @@
 #include "core/graphics/graphics.h"
 #include <bitset>
 
-static std::uint8_t index = 0;
-static std::uint8_t last_index = 0;
+static std::uint8_t s_index = 0;
+static std::uint8_t s_last_index = 0;
 
 std::uint8_t generate_id()
 {
-	if (index == 255)
+    if (s_index == 255)
 	{
 		gfx::frame();
-		index++;
+        s_index++;
 	}
-	expects(index < 256);
+    expects(s_index < 256);
 	// find the first unset bit
-	std::uint8_t idx = index++;
+    std::uint8_t idx = s_index++;
 
-	last_index = idx;
+    s_last_index = idx;
 	return idx;
 }
 
@@ -89,15 +89,15 @@ void render_pass::set_view_proj_ortho_full(float depth)
 
 void render_pass::reset()
 {
-	for (std::uint8_t i = 0; i < index; ++i)
+    for (std::uint8_t i = 0; i < s_index; ++i)
 	{
 		gfx::resetView(i);
 	}
-	index = 0;
-	last_index = 0;
+    s_index = 0;
+    s_last_index = 0;
 }
 
 std::uint8_t render_pass::get_pass()
 {
-	return last_index;
+    return s_last_index;
 }

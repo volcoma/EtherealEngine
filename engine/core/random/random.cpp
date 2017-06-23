@@ -1,6 +1,6 @@
 #include "random.h"
 
-namespace random
+namespace rnd
 {
 
 engine::engine(result_type value) : impl(value)

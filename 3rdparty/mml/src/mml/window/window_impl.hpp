@@ -96,7 +96,7 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     virtual window_handle get_system_handle() const = 0;
-
+    virtual void* get_system_handle_specific() const = 0;
     ////////////////////////////////////////////////////////////
     /// \brief Get the position of the window
     ///

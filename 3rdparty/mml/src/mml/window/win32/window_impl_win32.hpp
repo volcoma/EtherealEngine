@@ -53,7 +53,7 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     virtual window_handle get_system_handle() const;
-
+	virtual void* get_system_handle_specific() const { return nullptr; }
     ////////////////////////////////////////////////////////////
     /// \brief Get the position of the window
     ///

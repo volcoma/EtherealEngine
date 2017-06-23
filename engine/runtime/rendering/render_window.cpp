@@ -58,7 +58,7 @@ void render_window::prepare_surface()
 	}
 	else
 	{
-		_surface->populate(get_system_handle(), size[0], size[1]);
+        _surface->populate((void*)(uintptr_t)get_system_handle(), size[0], size[1]);
 	}
 
 }

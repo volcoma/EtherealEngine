@@ -398,31 +398,6 @@ _last_input_time  (0)
 	}
 }
 
-XVisualInfo selectBestVisual(::Display* XDisplay, unsigned int bitsPerPixel)
-{
-	XVisualInfo vTemplate;
-
-	// Get X11 visuals compatible with this EGL config
-	XVisualInfo *availableVisuals, bestVisual;
-	int visualCount = 0;
-
-	availableVisuals = XGetVisualInfo(XDisplay, VisualIDMask, &vTemplate, &visualCount);
-
-	if (visualCount == 0)
-	{
-		// Can't happen...
-		err() << "No X11 visual found. Bug in your EGL implementation ?" << std::endl;
-
-		return XVisualInfo();
-	}
-
-	// Pick up the best one
-	bestVisual = availableVisuals[0];
-	XFree(availableVisuals);
-
-	return bestVisual;
-}
-
 
 ////////////////////////////////////////////////////////////
 window_impl_x11::window_impl_x11(video_mode mode, const std::string& title, unsigned long style) :
@@ -458,12 +433,13 @@ _last_input_time  (0)
 	int width  = mode.width;
 	int height = mode.height;
 
-	// Choose the visual according to the context settings
-	XVisualInfo visualInfo = selectBestVisual(_display, mode.bits_per_pixel);
+    // Choose the visual according to the context setting
+    Visual* visual = DefaultVisual(_display, _screen);
 
+    int32_t depth  = DefaultDepth(_display, _screen);
 	// Define the window attributes
 	XSetWindowAttributes attributes;
-	attributes.colormap = XCreateColormap(_display, DefaultRootWindow(_display), visualInfo.visual, AllocNone);
+    attributes.colormap = XCreateColormap(_display, DefaultRootWindow(_display), visual, AllocNone);
 	attributes.event_mask = eventMask;
 	attributes.override_redirect = (_fullscreen && !ewmhSupported()) ? True : False;
 
@@ -472,9 +448,9 @@ _last_input_time  (0)
 	                         left, top,
 	                         width, height,
 	                         0,
-	                         visualInfo.depth,
+                             depth,
 	                         InputOutput,
-	                         visualInfo.visual,
+                             visual,
 	                         CWEventMask | CWOverrideRedirect | CWColormap,
 	                         &attributes);
 
@@ -901,9 +877,9 @@ void window_impl_x11::maximize()
 ////////////////////////////////////////////////////////////
 void window_impl_x11::minimize()
 {
-	XIconifyWindow(_display, _window, _screen);
+    //XIconifyWindow(_display, _window, _screen);
 
-	XFlush(_display);
+    //XFlush(_display);
 }
 
 ////////////////////////////////////////////////////////////
@@ -915,19 +891,19 @@ void window_impl_x11::restore()
 ////////////////////////////////////////////////////////////
 void window_impl_x11::set_alpha(float alpha)
 {
-	Display* display = XOpenDisplay(NULL);
-	unsigned long opacity = (0xffffffff / 0xff) * static_cast<unsigned char>(alpha * 255);
-	Atom property = XInternAtom(display, "_NET_WM_WINDOW_OPACITY", false);
-	if (property != None)
-	{
-		XChangeProperty(display, _window, property, XA_CARDINAL, 32, PropModeReplace, (unsigned char*)&opacity, 1);
-		XFlush(display);
-		XCloseDisplay(display);
-	}
-	else
-	{
-		XCloseDisplay(display);
-	}
+//	Display* display = XOpenDisplay(NULL);
+//	unsigned long opacity = (0xffffffff / 0xff) * static_cast<unsigned char>(alpha * 255);
+//	Atom property = XInternAtom(display, "_NET_WM_WINDOW_OPACITY", false);
+//	if (property != None)
+//	{
+//		XChangeProperty(display, _window, property, XA_CARDINAL, 32, PropModeReplace, (unsigned char*)&opacity, 1);
+//		XFlush(display);
+//		XCloseDisplay(display);
+//	}
+//	else
+//	{
+//		XCloseDisplay(display);
+//	}
 
 }
 
@@ -1048,7 +1024,7 @@ bool window_impl_x11::has_focus() const
 {
 	::Window focusedWindow = 0;
 	int revertToReturn = 0;
-	XGetInputFocus(_display, &focusedWindow, &revertToReturn);
+    XGetInputFocus(_display, &focusedWindow, &revertToReturn);
 
 	return (_window == focusedWindow);
 }

@@ -3,7 +3,7 @@
 #include "core/subsystem/subsystem.h"
 #include <vector>
 #include <memory>
-#include "ImGuiDock.h"
+#include "imguidock.h"
 
 struct docking_system : public core::subsystem
 {

@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.7)
-
 add_subdirectory_ex(filedialog)
 target_include_directories (filedialog PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

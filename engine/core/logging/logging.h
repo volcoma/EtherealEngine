@@ -16,17 +16,17 @@ namespace spdlog
 	}
 }
 #elif $on($linux) || $on($apple)
-#include "spdlog/sinks/syslog_sink.h"
+#include "spdlog/sinks/stdout_sinks.h"
 namespace spdlog
 {
 	namespace sinks
 	{
-		using platform_sink_mt = syslog_sink;
-		using platform_sink_st = syslog_sink;
+    using platform_sink_mt = stdout_sink_mt;
+    using platform_sink_st = stdout_sink_st;
 	}
 }
 #elif $on($android)
-#include "spdlog/sinks/syslog_sink.h"
+#include "spdlog/sinks/android_sink.h"
 namespace spdlog
 {
 	namespace sinks
@@ -36,7 +36,7 @@ namespace spdlog
 	}
 }
 #else
-#include "spdlog/sinks/syslog_sink.h"
+#include "spdlog/sinks/stdout_sinks.h"
 namespace spdlog
 {
     namespace sinks

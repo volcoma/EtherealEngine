@@ -144,11 +144,11 @@ namespace fs
 		{
 			return executable_path_fallback(argv0);
 		}
-		std::string path(buf, size);
+        std::string p(buf, size);
         fs::error_code err;
 		path full_path(
 			system_complete(
-                path(path).normalize(), err));
+                path(p).normalize(), err));
 		return full_path;
 	}
 	void show_in_graphical_env(const path& _path)

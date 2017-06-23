@@ -2,7 +2,7 @@
 
 #include <random>
 
-namespace random
+namespace rnd
 {
 
 class engine

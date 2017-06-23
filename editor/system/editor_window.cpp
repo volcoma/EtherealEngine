@@ -408,7 +408,7 @@ void main_editor_window::on_start_page()
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_HorizontalScrollbar |
 		ImGuiWindowFlags_NoSavedSettings;
-
+	
 	gui::AlignFirstTextHeightToWidgets();
 	gui::Text("Recent Projects");
 	gui::Separator();
@@ -428,6 +428,7 @@ void main_editor_window::on_start_page()
 					_show_start_page = false;
 				}
 			}
+
 		}
 		gui::EndChild();
 		

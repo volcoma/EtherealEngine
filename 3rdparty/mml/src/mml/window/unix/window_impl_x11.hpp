@@ -55,7 +55,7 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     virtual window_handle get_system_handle() const;
-
+    virtual void* get_system_handle_specific() const { return _display; }
     ////////////////////////////////////////////////////////////
     /// \brief Get the position of the window
     ///
@@ -115,7 +115,7 @@ public:
     virtual void set_visible(bool visible);
 
     virtual void maximize();
-    virtual void minimize();O
+    virtual void minimize();
     virtual void restore();
     virtual void set_alpha(float alpha);
 

@@ -315,8 +315,10 @@ window_handle window::get_system_handle() const
 {
     return _impl ? _impl->get_system_handle() : 0;
 }
-
-
+void* window::get_system_handle_specific() const
+{
+    return _impl ? _impl->get_system_handle_specific() : 0;
+}
 ////////////////////////////////////////////////////////////
 void window::on_create()
 {
