@@ -12,12 +12,16 @@
 
 namespace bx
 {
-	extern const float pi;
-	extern const float invPi;
-	extern const float piHalf;
-	extern const float sqrt2;
-	extern const float invLogNat2;
-	extern const float huge;
+	extern const float kPi;
+	extern const float kPi2;
+	extern const float kInvPi;
+	extern const float kPiHalf;
+	extern const float kSqrt2;
+	extern const float kInvLogNat2;
+	extern const float kHuge;
+
+	///
+	typedef float (*LerpFn)(float _a, float _b, float _t);
 
 	///
 	struct Handness
@@ -185,6 +189,12 @@ namespace bx
 	float fgain(float _time, float _gain);
 
 	///
+	float angleDiff(float _a, float _b);
+
+	/// Shortest distance linear interpolation between two angles.
+	float angleLerp(float _a, float _b, float _t);
+
+	///
 	void vec3Move(float* _result, const float* _a);
 
 	///
@@ -322,85 +332,85 @@ namespace bx
 	void mtxLookAt(float* _result, const float* _eye, const float* _at, const float* _up = NULL);
 
 	///
-	void mtxProj(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false);
+	void mtxProj(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc);
 
 	///
-	void mtxProj(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false);
+	void mtxProj(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc);
 
 	///
-	void mtxProj(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false);
+	void mtxProj(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc);
 
 	///
-	void mtxProjLh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false);
+	void mtxProjLh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc);
 
 	///
-	void mtxProjLh(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false);
+	void mtxProjLh(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc);
 
 	///
-	void mtxProjLh(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false);
+	void mtxProjLh(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc);
 
 	///
-	void mtxProjRh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false);
+	void mtxProjRh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc);
 
 	///
-	void mtxProjRh(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false);
+	void mtxProjRh(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc);
 
 	///
-	void mtxProjRh(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false);
+	void mtxProjRh(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc);
 
 	///
-	void mtxProjInf(float* _result, const float _fov[4], float _near, bool _oglNdc = false);
+	void mtxProjInf(float* _result, const float _fov[4], float _near, bool _oglNdc);
 
 	///
-	void mtxProjInf(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc = false);
+	void mtxProjInf(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc);
 
 	///
-	void mtxProjInf(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc = false);
+	void mtxProjInf(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc);
 
 	///
-	void mtxProjInfLh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc = false);
+	void mtxProjInfLh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc);
 
 	///
-	void mtxProjInfLh(float* _result, const float _fov[4], float _near, bool _oglNdc = false);
+	void mtxProjInfLh(float* _result, const float _fov[4], float _near, bool _oglNdc);
 
 	///
-	void mtxProjInfLh(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc = false);
+	void mtxProjInfLh(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc);
 
 	///
-	void mtxProjInfRh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc = false);
+	void mtxProjInfRh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc);
 
 	///
-	void mtxProjInfRh(float* _result, const float _fov[4], float _near, bool _oglNdc = false);
+	void mtxProjInfRh(float* _result, const float _fov[4], float _near, bool _oglNdc);
 
 	///
-	void mtxProjInfRh(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc = false);
+	void mtxProjInfRh(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc);
 
 	///
-	void mtxProjRevInfLh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc = false);
+	void mtxProjRevInfLh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc);
 
 	///
-	void mtxProjRevInfLh(float* _result, const float _fov[4], float _near, bool _oglNdc = false);
+	void mtxProjRevInfLh(float* _result, const float _fov[4], float _near, bool _oglNdc);
 
 	///
-	void mtxProjRevInfLh(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc = false);
+	void mtxProjRevInfLh(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc);
 
 	///
-	void mtxProjRevInfRh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc = false);
+	void mtxProjRevInfRh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc);
 
 	///
-	void mtxProjRevInfRh(float* _result, const float _fov[4], float _near, bool _oglNdc = false);
+	void mtxProjRevInfRh(float* _result, const float _fov[4], float _near, bool _oglNdc);
 
 	///
-	void mtxProjRevInfRh(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc = false);
+	void mtxProjRevInfRh(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc);
 
 	///
-	void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false);
+	void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset, bool _oglNdc);
 
 	///
-	void mtxOrthoLh(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false);
+	void mtxOrthoLh(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset, bool _oglNdc);
 
 	///
-	void mtxOrthoRh(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false);
+	void mtxOrthoRh(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset, bool _oglNdc);
 
 	///
 	void mtxRotateX(float* _result, float _ax);

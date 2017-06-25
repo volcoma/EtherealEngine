@@ -4,7 +4,6 @@
 --
 
 local bxDir = path.getabsolute("..")
-local naclToolchain = ""
 
 local function crtNone()
 
@@ -69,11 +68,8 @@ function toolchain(_buildDir, _libDir)
 			{ "tvos-simulator",  "tvOS - Simulator"           },
 			{ "mingw-gcc",       "MinGW"                      },
 			{ "mingw-clang",     "MinGW (clang compiler)"     },
-			{ "nacl",            "Native Client"              },
-			{ "nacl-arm",        "Native Client - ARM"        },
 			{ "netbsd",          "NetBSD"                     },
 			{ "osx",             "OSX"                        },
-			{ "pnacl",           "Native Client - PNaCl"      },
 			{ "orbis",           "Orbis"                      },
 			{ "qnx-arm",         "QNX/Blackberry - ARM"       },
 			{ "riscv",           "RISC-V"                     },
@@ -325,6 +321,10 @@ function toolchain(_buildDir, _libDir)
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-steamlink"))
 
 		elseif "mingw-gcc" == _OPTIONS["gcc"] then
+			if not os.getenv("MINGW") then
+				print("Set MINGW enviroment variable.")
+			end
+
 			local mingwToolchain = "x86_64-w64-mingw32"
 			if compiler32bit then
 				if os.is("linux") then
@@ -347,42 +347,6 @@ function toolchain(_buildDir, _libDir)
 --			premake.gcc.llvm = true
 			location (path.join(_buildDir, "projects", _ACTION .. "-mingw-clang"))
 
-		elseif "nacl" == _OPTIONS["gcc"] then
-
-			if not os.getenv("NACL_SDK_ROOT") then
-				print("Set NACL_SDK_ROOT enviroment variable.")
-			end
-
-			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_x86_glibc/bin/x86_64-nacl-"
-			if os.is("macosx") then
-				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/mac_x86_glibc/bin/x86_64-nacl-"
-			elseif os.is("linux") then
-				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/linux_x86_glibc/bin/x86_64-nacl-"
-			end
-
-			premake.gcc.cc  = naclToolchain .. "gcc"
-			premake.gcc.cxx = naclToolchain .. "g++"
-			premake.gcc.ar  = naclToolchain .. "ar"
-			location (path.join(_buildDir, "projects", _ACTION .. "-nacl"))
-
-		elseif "nacl-arm" == _OPTIONS["gcc"] then
-
-			if not os.getenv("NACL_SDK_ROOT") then
-				print("Set NACL_SDK_ROOT enviroment variable.")
-			end
-
-			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_arm_glibc/bin/arm-nacl-"
-			if os.is("macosx") then
-				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/mac_arm_glibc/bin/arm-nacl-"
-			elseif os.is("linux") then
-				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/linux_arm_glibc/bin/arm-nacl-"
-			end
-
-			premake.gcc.cc  = naclToolchain .. "gcc"
-			premake.gcc.cxx = naclToolchain .. "g++"
-			premake.gcc.ar  = naclToolchain .. "ar"
-			location (path.join(_buildDir, "projects", _ACTION .. "-nacl-arm"))
-
 		elseif "netbsd" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-netbsd"))
 
@@ -399,24 +363,6 @@ function toolchain(_buildDir, _libDir)
 				premake.gcc.ar  = "$(OSXCROSS)/target/bin/" .. osxToolchain .. "ar"
 			end
 			location (path.join(_buildDir, "projects", _ACTION .. "-osx"))
-
-		elseif "pnacl" == _OPTIONS["gcc"] then
-
-			if not os.getenv("NACL_SDK_ROOT") then
-				print("Set NACL_SDK_ROOT enviroment variable.")
-			end
-
-			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_pnacl/bin/pnacl-"
-			if os.is("macosx") then
-				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/mac_pnacl/bin/pnacl-"
-			elseif os.is("linux") then
-				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/linux_pnacl/bin/pnacl-"
-			end
-
-			premake.gcc.cc  = naclToolchain .. "clang"
-			premake.gcc.cxx = naclToolchain .. "clang++"
-			premake.gcc.ar  = naclToolchain .. "ar"
-			location (path.join(_buildDir, "projects", _ACTION .. "-pnacl"))
 
 		elseif "orbis" == _OPTIONS["gcc"] then
 
@@ -1028,6 +974,9 @@ function toolchain(_buildDir, _libDir)
 			"-Wunused-value",
 			"-Wundef",
 		}
+		buildoptions_cpp {
+			"-std=c++11",
+		}
 
 	configuration { "freebsd" }
 		targetdir (path.join(_buildDir, "freebsd/bin"))
@@ -1036,83 +985,6 @@ function toolchain(_buildDir, _libDir)
 		includedirs {
 			path.join(bxDir, "include/compat/freebsd"),
 		}
-
-	configuration { "nacl or nacl-arm or pnacl" }
-		buildoptions {
-			"-U__STRICT_ANSI__", -- strcasecmp, setenv, unsetenv,...
-			"-fno-stack-protector",
-			"-fdiagnostics-show-option",
-			"-fdata-sections",
-			"-ffunction-sections",
-			"-Wunused-value",
-			"-Wundef",
-		}
-		buildoptions_cpp {
-			"-std=c++11",
-		}
-		includedirs {
-			"$(NACL_SDK_ROOT)/include",
-			path.join(bxDir, "include/compat/nacl"),
-		}
-
-	configuration { "nacl" }
-		buildoptions {
-			"-pthread",
-			"-mfpmath=sse", -- force SSE to get 32-bit and 64-bit builds deterministic.
-			"-msse2",
-		}
-		linkoptions {
-			"-Wl,--gc-sections",
-		}
-
-	configuration { "x32", "nacl" }
-		targetdir (path.join(_buildDir, "nacl-x86/bin"))
-		objdir (path.join(_buildDir, "nacl-x86/obj"))
-		libdirs { path.join(_libDir, "lib/nacl-x86") }
-		linkoptions { "-melf32_nacl" }
-
-	configuration { "x32", "nacl", "Debug" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/glibc_x86_32/Debug" }
-
-	configuration { "x32", "nacl", "Release" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/glibc_x86_32/Release" }
-
-	configuration { "x64", "nacl" }
-		targetdir (path.join(_buildDir, "nacl-x64/bin"))
-		objdir (path.join(_buildDir, "nacl-x64/obj"))
-		libdirs { path.join(_libDir, "lib/nacl-x64") }
-		linkoptions { "-melf64_nacl" }
-
-	configuration { "x64", "nacl", "Debug" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/glibc_x86_64/Debug" }
-
-	configuration { "x64", "nacl", "Release" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/glibc_x86_64/Release" }
-
-	configuration { "nacl-arm" }
-		buildoptions {
-			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
-		}
-		targetdir (path.join(_buildDir, "nacl-arm/bin"))
-		objdir (path.join(_buildDir, "nacl-arm/obj"))
-		libdirs { path.join(_libDir, "lib/nacl-arm") }
-
-	configuration { "nacl-arm", "Debug" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/glibc_arm/Debug" }
-
-	configuration { "nacl-arm", "Release" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/glibc_arm/Release" }
-
-	configuration { "pnacl" }
-		targetdir (path.join(_buildDir, "pnacl/bin"))
-		objdir (path.join(_buildDir, "pnacl/obj"))
-		libdirs { path.join(_libDir, "lib/pnacl") }
-
-	configuration { "pnacl", "Debug" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/pnacl/Debug" }
-
-	configuration { "pnacl", "Release" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/pnacl/Release" }
 
 	configuration { "xbox360" }
 		targetdir (path.join(_buildDir, "xbox360/bin"))
@@ -1304,12 +1176,8 @@ function toolchain(_buildDir, _libDir)
 			"$(SCE_ORBIS_SDK_DIR)/target/include",
 			"$(SCE_ORBIS_SDK_DIR)/target/include_common",
 		}
-		buildoptions {
-		}
 		buildoptions_cpp {
 			"-std=c++11",
-		}
-		linkoptions {
 		}
 
 	configuration { "qnx-arm" }
@@ -1418,18 +1286,6 @@ function strip()
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
 			"$(SILENT) $(MINGW)/bin/strip -s \"$(TARGET)\""
-		}
-
-	configuration { "pnacl" }
-		postbuildcommands {
-			"$(SILENT) echo Running pnacl-finalize.",
-			"$(SILENT) " .. naclToolchain .. "finalize \"$(TARGET)\""
-		}
-
-	configuration { "*nacl*", "Release" }
-		postbuildcommands {
-			"$(SILENT) echo Stripping symbols.",
-			"$(SILENT) " .. naclToolchain .. "strip -s \"$(TARGET)\""
 		}
 
 	configuration { "asmjs" }

@@ -12,6 +12,15 @@
 
 namespace bx
 {
+	struct Units
+	{
+		enum Enum
+		{
+			Kilo,
+			Kibi,
+		};
+	};
+
 	/// Non-zero-terminated string view.
 	class StringView
 	{
@@ -212,8 +221,8 @@ namespace bx
 	/// Extract base file name from file path.
 	const char* baseName(const char* _filePath);
 
-	/// Convert size in bytes to human readable string.
-	void prettify(char* _out, int32_t _count, uint64_t _size);
+	/// Convert size in bytes to human readable string kibi units.
+	int32_t prettify(char* _out, int32_t _count, uint64_t _size, Units::Enum _units = Units::Kibi);
 
 	///
 	int32_t toString(char* _out, int32_t _max, double _value);
@@ -229,6 +238,12 @@ namespace bx
 
 	///
 	int32_t toString(char* _out, int32_t _max, uint64_t _value, uint32_t _base = 10);
+
+	///
+	bool fromString(float* _out, const char* _str);
+
+	///
+	bool fromString(double* _out, const char* _str);
 
 } // namespace bx
 

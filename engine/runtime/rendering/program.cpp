@@ -27,7 +27,7 @@ void program::dispose()
 	if (is_valid())
 		gfx::destroyProgram(handle);
 	
-	handle = { gfx::invalidHandle };
+	handle = { gfx::kInvalidHandle };
 }
 
 bool program::is_valid() const

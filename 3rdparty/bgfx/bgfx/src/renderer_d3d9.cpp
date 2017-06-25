@@ -284,6 +284,8 @@ namespace bgfx { namespace d3d9
 		{ 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BINORMAL,     0 },
 		{ 0, 0, D3DDECLTYPE_UBYTE4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR,        0 },
 		{ 0, 0, D3DDECLTYPE_UBYTE4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR,        1 },
+		{ 0, 0, D3DDECLTYPE_UBYTE4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR,        2 },
+		{ 0, 0, D3DDECLTYPE_UBYTE4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR,        3 },
 		{ 0, 0, D3DDECLTYPE_UBYTE4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BLENDINDICES, 0 },
 		{ 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BLENDWEIGHT,  0 },
 		{ 0, 0, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD,     0 },
@@ -412,7 +414,7 @@ namespace bgfx { namespace d3d9
 
 			ErrorState::Enum errorState = ErrorState::Default;
 
-			m_fbh.idx = invalidHandle;
+			m_fbh.idx = kInvalidHandle;
 			bx::memSet(m_uniforms, 0, sizeof(m_uniforms) );
 			bx::memSet(&m_resolution, 0, sizeof(m_resolution) );
 
@@ -429,7 +431,7 @@ namespace bgfx { namespace d3d9
 			m_params.EnableAutoDepthStencil = TRUE;
 			m_params.AutoDepthStencilFormat = D3DFMT_D24S8;
 			m_params.Flags = D3DPRESENTFLAG_DISCARD_DEPTHSTENCIL;
-#if BX_PLATFORM_WINDOWS
+
 			m_params.FullScreen_RefreshRateInHz = 0;
 			m_params.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 			m_params.SwapEffect = D3DSWAPEFFECT_DISCARD;
@@ -812,37 +814,6 @@ namespace bgfx { namespace d3d9
 			}
 
 			m_fmtDepth = D3DFMT_D24S8;
-
-#elif BX_PLATFORM_XBOX360
-			m_params.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
-			m_params.DisableAutoBackBuffer = FALSE;
-			m_params.DisableAutoFrontBuffer = FALSE;
-			m_params.FrontBufferFormat = D3DFMT_X8R8G8B8;
-			m_params.FrontBufferColorSpace = D3DCOLORSPACE_RGB;
-
-			m_d3d9 = Direct3DCreate9(D3D_SDK_VERSION);
-			BX_TRACE("Creating D3D9 %p", m_d3d9);
-
-			XVIDEO_MODE videoMode;
-			XGetVideoMode(&videoMode);
-			if (!videoMode.fIsWideScreen)
-			{
-				m_params.Flags |= D3DPRESENTFLAG_NO_LETTERBOX;
-			}
-
-			BX_TRACE("Creating device");
-			DX_CHECK(m_d3d9->CreateDevice(m_adapter
-					, m_deviceType
-					, NULL
-					, D3DCREATE_HARDWARE_VERTEXPROCESSING|D3DCREATE_BUFFER_2_FRAMES
-					, &m_params
-					, &m_device
-					) );
-
-			BX_TRACE("Device %p", m_device);
-
-			m_fmtDepth = D3DFMT_D24FS8;
-#endif // BX_PLATFORM_WINDOWS
 
 			{
 				IDirect3DSwapChain9* swapChain;
@@ -1364,7 +1335,7 @@ namespace bgfx { namespace d3d9
 			DX_CHECK(device->SetIndices(ib.m_ptr) );
 
 			float proj[16];
-			bx::mtxOrtho(proj, 0.0f, (float)width, (float)height, 0.0f, 0.0f, 1000.0f);
+			bx::mtxOrtho(proj, 0.0f, (float)width, (float)height, 0.0f, 0.0f, 1000.0f, 0.0f, false);
 
 			PredefinedUniform& predefined = program.m_predefined[0];
 			uint8_t flags = predefined.m_type;
@@ -2512,7 +2483,7 @@ namespace bgfx { namespace d3d9
 			}
 		}
 
-		uint16_t shaderSize;
+		uint32_t shaderSize;
 		bx::read(&reader, shaderSize);
 
 		const DWORD* code = (const DWORD*)reader.getDataPtr();
@@ -3629,7 +3600,7 @@ namespace bgfx { namespace d3d9
 			Query& query = m_query[(m_control.m_read + ii) % size];
 			if (query.m_handle.idx == _handle.idx)
 			{
-				query.m_handle.idx = bgfx::invalidHandle;
+				query.m_handle.idx = bgfx::kInvalidHandle;
 			}
 		}
 	}
@@ -3730,7 +3701,7 @@ namespace bgfx { namespace d3d9
 		ViewState viewState(_render, false);
 
 		DX_CHECK(device->SetRenderState(D3DRS_FILLMODE, _render->m_debug&BGFX_DEBUG_WIREFRAME ? D3DFILL_WIREFRAME : D3DFILL_SOLID) );
-		uint16_t programIdx = invalidHandle;
+		uint16_t programIdx = kInvalidHandle;
 		SortKey key;
 		uint16_t view = UINT16_MAX;
 		FrameBufferHandle fbh = { BGFX_CONFIG_MAX_FRAME_BUFFERS };
@@ -3814,7 +3785,7 @@ namespace bgfx { namespace d3d9
 					BGFX_PROFILER_BEGIN_DYNAMIC(s_viewName[key.m_view]);
 
 					view = key.m_view;
-					programIdx = invalidHandle;
+					programIdx = kInvalidHandle;
 
 					if (_render->m_fb[view].idx != fbh.idx)
 					{
@@ -4085,7 +4056,7 @@ namespace bgfx { namespace d3d9
 				{
 					programIdx = key.m_program;
 
-					if (invalidHandle == programIdx)
+					if (kInvalidHandle == programIdx)
 					{
 						device->SetVertexShader(NULL);
 						device->SetPixelShader(NULL);
@@ -4101,7 +4072,7 @@ namespace bgfx { namespace d3d9
 						constantsChanged = true;
 				}
 
-				if (invalidHandle != programIdx)
+				if (kInvalidHandle != programIdx)
 				{
 					ProgramD3D9& program = m_program[programIdx];
 
@@ -4133,7 +4104,7 @@ namespace bgfx { namespace d3d9
 						||  current.m_un.m_draw.m_textureFlags != bind.m_un.m_draw.m_textureFlags
 						||  programChanged)
 						{
-							if (invalidHandle != bind.m_idx)
+							if (kInvalidHandle != bind.m_idx)
 							{
 								m_textures[bind.m_idx].commit(stage, bind.m_un.m_draw.m_textureFlags, _render->m_colorPalette);
 							}
@@ -4230,7 +4201,7 @@ namespace bgfx { namespace d3d9
 					currentState.m_indexBuffer = draw.m_indexBuffer;
 
 					uint16_t handle = draw.m_indexBuffer.idx;
-					if (invalidHandle != handle)
+					if (kInvalidHandle != handle)
 					{
 						const IndexBufferD3D9& ib = m_indexBuffers[handle];
 						DX_CHECK(device->SetIndices(ib.m_ptr) );

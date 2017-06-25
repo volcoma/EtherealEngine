@@ -12,7 +12,7 @@ void shader::dispose()
 	if (is_valid())
 		gfx::destroyShader(handle);
 
-	handle = { bgfx::invalidHandle };
+	handle = { bgfx::kInvalidHandle };
 }
 
 bool shader::is_valid() const

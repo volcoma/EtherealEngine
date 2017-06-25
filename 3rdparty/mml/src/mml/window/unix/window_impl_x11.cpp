@@ -877,9 +877,9 @@ void window_impl_x11::maximize()
 ////////////////////////////////////////////////////////////
 void window_impl_x11::minimize()
 {
-    //XIconifyWindow(_display, _window, _screen);
+	XIconifyWindow(_display, _window, _screen);
 
-    //XFlush(_display);
+    XFlush(_display);
 }
 
 ////////////////////////////////////////////////////////////
@@ -891,20 +891,13 @@ void window_impl_x11::restore()
 ////////////////////////////////////////////////////////////
 void window_impl_x11::set_alpha(float alpha)
 {
-//	Display* display = XOpenDisplay(NULL);
-//	unsigned long opacity = (0xffffffff / 0xff) * static_cast<unsigned char>(alpha * 255);
-//	Atom property = XInternAtom(display, "_NET_WM_WINDOW_OPACITY", false);
-//	if (property != None)
-//	{
-//		XChangeProperty(display, _window, property, XA_CARDINAL, 32, PropModeReplace, (unsigned char*)&opacity, 1);
-//		XFlush(display);
-//		XCloseDisplay(display);
-//	}
-//	else
-//	{
-//		XCloseDisplay(display);
-//	}
-
+	unsigned long opacity = (0xffffffff / 0xff) * static_cast<unsigned char>(alpha * 255);
+	Atom property = XInternAtom(_display, "_NET_WM_WINDOW_OPACITY", false);
+	if (property != None)
+	{
+		XChangeProperty(_display, _window, property, XA_CARDINAL, 32, PropModeReplace, (unsigned char*)&opacity, 1);
+		XFlush(_display);
+	}
 }
 
 

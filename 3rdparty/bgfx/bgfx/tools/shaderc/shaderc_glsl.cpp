@@ -4,11 +4,11 @@
  */
 
 #include "shaderc.h"
-#include <glsl-optimizer/src/glsl/glsl_optimizer.h>
+#include "glsl_optimizer.h"
 
 namespace bgfx { namespace glsl
 {
-	static bool compile(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, std::string& err)
+	static bool compile(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer)
 	{
 		char ch = char(tolower(_cmdLine.findOption('\0', "type")[0]) );
 		const glslopt_shader_type type = ch == 'f'
@@ -35,40 +35,39 @@ namespace bgfx { namespace glsl
 			break;
 		}
 
-		//glslopt_ctx* ctx = glslopt_initialize(target);
-		//
-		//glslopt_shader* shader = glslopt_optimize(ctx, type, _code.c_str(), 0);
-		//
-		//if (!glslopt_get_status(shader) )
-		//{
-		//	const char* log = glslopt_get_log(shader);
-		//	int32_t source  = 0;
-		//	int32_t line    = 0;
-		//	int32_t column  = 0;
-		//	int32_t start   = 0;
-		//	int32_t end     = INT32_MAX;
-		//
-		//	bool found = false
-		//		|| 3 == sscanf(log, "%u:%u(%u):", &source, &line, &column)
-		//		|| 2 == sscanf(log, "(%u,%u):", &line, &column)
-		//		;
-		//
-		//	if (found
-		//	&&  0 != line)
-		//	{
-		//		start = bx::uint32_imax(1, line-10);
-		//		end   = start + 20;
-		//	}
-		//
-		//	printCode(err, _code.c_str(), line, start, end, column);
-		//	bx::stringPrintf(err, "Error: %s\n", log);
-		//	fprintf(stderr, "Error: %s\n", log);
-		//	glslopt_cleanup(ctx);
-		//	return false;
-		//}
-		//
-		//const char* optimizedShader = glslopt_get_output(shader);
-		const char* optimizedShader = _code.c_str();
+		glslopt_ctx* ctx = glslopt_initialize(target);
+
+		glslopt_shader* shader = glslopt_optimize(ctx, type, _code.c_str(), 0);
+
+		if (!glslopt_get_status(shader) )
+		{
+			const char* log = glslopt_get_log(shader);
+			int32_t source  = 0;
+			int32_t line    = 0;
+			int32_t column  = 0;
+			int32_t start   = 0;
+			int32_t end     = INT32_MAX;
+
+			bool found = false
+				|| 3 == sscanf(log, "%u:%u(%u):", &source, &line, &column)
+				|| 2 == sscanf(log, "(%u,%u):", &line, &column)
+				;
+
+			if (found
+			&&  0 != line)
+			{
+				start = bx::uint32_imax(1, line-10);
+				end   = start + 20;
+			}
+
+			printCode(_code.c_str(), line, start, end, column);
+			fprintf(stderr, "Error: %s\n", log);
+			glslopt_cleanup(ctx);
+			return false;
+		}
+
+		const char* optimizedShader = glslopt_get_output(shader);
+
 		// Trim all directives.
 		while ('#' == *optimizedShader)
 		{
@@ -293,16 +292,16 @@ namespace bgfx { namespace glsl
 			writeFile(disasmfp.c_str(), optimizedShader, shaderSize);
 		}
 
-		//glslopt_cleanup(ctx);
+		glslopt_cleanup(ctx);
 
 		return true;
 	}
 
 } // namespace glsl
 
-	bool compileGLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, std::string& err)
+	bool compileGLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer)
 	{
-		return glsl::compile(_cmdLine, _version, _code, _writer, err);
+		return glsl::compile(_cmdLine, _version, _code, _writer);
 	}
 
 } // namespace bgfx

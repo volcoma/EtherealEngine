@@ -38,25 +38,32 @@ namespace editor
 				const bool is_compiled = extensions::is_compiled_format(ext);
 				if (is_compiled)
 				{
-					const bool remove_compiled_extension = (ext == extensions::compiled);
-
-					auto path = (protocol / p.filename());
+					auto filename = p.filename();
 
 					//remove the compiled extension if we have one
-					if (remove_compiled_extension)
-						path.replace_extension();
+					if (ext == extensions::compiled)
+					{
+						if (is_initial_list)
+							continue;
 
+						for (auto temp = filename; temp.has_extension(); temp = filename.stem() )
+						{
+							filename = temp;
+						}
+						
+					}
+					auto path = (protocol / filename);
 					auto key = path.generic_string();
 
 					if (entry.type == fs::file_type::regular_file)
 					{
 						if (entry.status == fs::watcher::entry_status::removed)
 						{
-							auto task = ts.create("clear_asset", [entry, protocol, key, &am]()
-							{
-								am.clear_asset<T>(key);
-							});
-							ts.run(task, true);
+							//auto task = ts.create("clear_asset", [entry, protocol, key, &am]()
+							//{
+							//	am.clear_asset<T>(key);
+							//});
+							//ts.run(task, true);
 						}
 						else if (entry.status == fs::watcher::entry_status::renamed)
 						{
@@ -75,9 +82,6 @@ namespace editor
 				}
 				else
 				{
-					//if (is_initial_list)
-					//	continue;
-
 					auto key = (protocol / p.filename()).generic_string();
 					if (entry.type == fs::file_type::regular_file)
 					{
@@ -280,8 +284,8 @@ namespace editor
 		fs::watcher::unwatch_all();
 		
 		/// for debug purposes
-		//watch_assets<shader>("engine_data:/shaders", "*.sc", true, true);
-		//watch_assets<shader>("editor_data:/shaders", "*.sc", true, true);
+		watch_assets<shader>("engine_data:/shaders", "*.sc", true, true);
+		watch_assets<shader>("editor_data:/shaders", "*.sc", true, true);
 		//watch_assets<texture>("engine_data:/textures", "*.png", true, true);
 		//watch_assets<texture>("engine_data:/textures", "*.tga", true, true);
 		//watch_assets<texture>("engine_data:/textures", "*.dds", true, true);
@@ -349,7 +353,7 @@ namespace editor
 	void project_manager::save_config()
 	{
 		auto& rp = _options.recent_project_paths;
-		auto project_path = fs::resolve_protocol("app:");
+		auto project_path = fs::resolve_protocol("app:/");
 		if (std::find(std::begin(rp), std::end(rp), project_path.generic_string()) == std::end(rp))
 		{
 			rp.push_back(project_path.generic_string());

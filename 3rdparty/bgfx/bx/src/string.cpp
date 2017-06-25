@@ -27,7 +27,7 @@ namespace bx
 
 	inline bool isInRange(char _ch, char _from, char _to)
 	{
-		return unsigned(_ch - _from) < unsigned(_to-_from);
+		return unsigned(_ch - _from) <= unsigned(_to-_from);
 	}
 
 	bool isUpper(char _ch)
@@ -906,19 +906,36 @@ namespace bx
 		return _filePath;
 	}
 
-	void prettify(char* _out, int32_t _count, uint64_t _size)
+	static const char s_units[] = { 'B', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y' };
+
+	template<uint32_t Kilo, char KiloCh0, char KiloCh1>
+	static int32_t prettify(char* _out, int32_t _count, uint64_t _size)
 	{
 		uint8_t idx = 0;
 		double size = double(_size);
 		while (_size != (_size&0x7ff)
-		&&     idx < 9)
+		&&     idx < BX_COUNTOF(s_units) )
 		{
-			_size >>= 10;
-			size *= 1.0/1024.0;
+			_size /= Kilo;
+			size  *= 1.0/double(Kilo);
 			++idx;
 		}
 
-		snprintf(_out, _count, "%0.2f %c%c", size, "BkMGTPEZY"[idx], idx > 0 ? 'B' : '\0');
+		return snprintf(_out, _count, "%0.2f %c%c%c", size
+			, s_units[idx]
+			, idx > 0 ? KiloCh0 : '\0'
+			, KiloCh1
+			);
+	}
+
+	int32_t prettify(char* _out, int32_t _count, uint64_t _size, Units::Enum _units)
+	{
+		if (Units::Kilo == _units)
+		{
+			return prettify<1000, 'B', '\0'>(_out, _count, _size);
+		}
+
+		return prettify<1024, 'i', 'B'>(_out, _count, _size);
 	}
 
 } // namespace bx

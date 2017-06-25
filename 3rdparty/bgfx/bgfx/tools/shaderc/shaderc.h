@@ -36,21 +36,15 @@ namespace bgfx
 					} \
 				BX_MACRO_BLOCK_END
 
-#ifndef BX_TRACE
-#	define BX_TRACE _BX_TRACE
-#endif
-#ifndef BX_WARN
-#	define BX_WARN  _BX_WARN
-#endif
-#ifndef BX_CHECK
-#	define BX_CHECK _BX_CHECK
-#endif
+#define BX_TRACE _BX_TRACE
+#define BX_WARN  _BX_WARN
+#define BX_CHECK _BX_CHECK
 
 #ifndef SHADERC_CONFIG_HLSL
 #	define SHADERC_CONFIG_HLSL BX_PLATFORM_WINDOWS
 #endif // SHADERC_CONFIG_HLSL
 
-#include <malloc.h>
+#include <alloca.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -74,38 +68,38 @@ namespace bgfx
 {
 	extern bool g_verbose;
 
-	class LineReader
+	class LineReader : public bx::ReaderI
 	{
 	public:
 		LineReader(const char* _str)
 			: m_str(_str)
 			, m_pos(0)
-			, m_size((uint32_t)bx::strLen(_str))
+			, m_size(bx::strLen(_str) )
 		{
 		}
 
-		std::string getLine()
+		virtual int32_t read(void* _data, int32_t _size, bx::Error* _err) BX_OVERRIDE
 		{
-			const char* str = &m_str[m_pos];
-			skipLine();
+			if (m_str[m_pos] == '\0'
+			||  m_pos == m_size)
+			{
+				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "LineReader: EOF.");
+				return 0;
+			}
 
-			const char* eol = &m_str[m_pos];
-
-			std::string tmp;
-			tmp.assign(str, eol - str);
-			return tmp;
-		}
-
-		bool isEof() const
-		{
-			return m_str[m_pos] == '\0';
-		}
-
-		void skipLine()
-		{
-			const char* str = &m_str[m_pos];
+			uint32_t pos = m_pos;
+			const char* str = &m_str[pos];
 			const char* nl = bx::strnl(str);
-			m_pos += (uint32_t)(nl - str);
+			pos += (uint32_t)(nl - str);
+
+			const char* eol = &m_str[pos];
+
+			uint32_t size = bx::uint32_min(uint32_t(eol - str), _size);
+
+			bx::memCopy(_data, str, size);
+			m_pos += size;
+
+			return size;
 		}
 
 		const char* m_str;
@@ -130,18 +124,18 @@ namespace bgfx
 
 	typedef std::vector<Uniform> UniformArray;
 
-	void printCode(std::string& err, const char* _code, int32_t _line = 0, int32_t _start = 0, int32_t _end = INT32_MAX, int32_t _column = -1);
+	void printCode(const char* _code, int32_t _line = 0, int32_t _start = 0, int32_t _end = INT32_MAX, int32_t _column = -1);
 	void strReplace(char* _str, const char* _find, const char* _replace);
 	int32_t writef(bx::WriterI* _writer, const char* _format, ...);
 	void writeFile(const char* _filePath, const void* _data, int32_t _size);
 
-	bool compileGLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, std::string& err);
-	bool compileHLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, std::string& err);
-	bool compilePSSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, std::string& err);
-	bool compileSPIRVShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, std::string& err);
+	bool compileGLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer);
+	bool compileHLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer);
+	bool compilePSSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer);
+	bool compileSPIRVShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer);
 
 } // namespace bgfx
 
-int compile_shader(int _argc, const char* _argv[], bx::MemoryBlock& memBlock, int64_t& sz, std::string& err);
+int compile_shader(int _argc, const char* _argv[]);
 
 #endif // SHADERC_H_HEADER_GUARD

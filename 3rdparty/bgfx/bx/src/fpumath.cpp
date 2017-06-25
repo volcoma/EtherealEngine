@@ -8,15 +8,16 @@
 
 namespace bx
 {
-	const float pi         = 3.1415926535897932384626433832795f;
-	const float invPi      = 1.0f/pi;
-	const float piHalf     = 1.5707963267948966192313216916398f;
-	const float sqrt2      = 1.4142135623730950488016887242097f;
-	const float invLogNat2 = 1.4426950408889634073599246810019f;
+	const float kPi         = 3.1415926535897932384626433832795f;
+	const float kPi2        = 6.2831853071795864769252867665590f;
+	const float kInvPi      = 1.0f/kPi;
+	const float kPiHalf     = 1.5707963267948966192313216916398f;
+	const float kSqrt2      = 1.4142135623730950488016887242097f;
+	const float kInvLogNat2 = 1.4426950408889634073599246810019f;
 #if BX_COMPILER_MSVC
-	const float huge   = float(HUGE_VAL);
+	const float kHuge = float(HUGE_VAL);
 #else
-	const float huge   = HUGE_VALF;
+	const float kHuge = HUGE_VALF;
 #endif // BX_COMPILER_MSVC
 
 	float fabsolute(float _a)

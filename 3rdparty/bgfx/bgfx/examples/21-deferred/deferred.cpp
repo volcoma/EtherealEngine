@@ -273,11 +273,11 @@ class ExampleDeferred : public entry::AppI
 		// Load normal texture.
 		m_textureNormal = loadTexture("textures/fieldstone-n.dds");
 
-		m_gbufferTex[0].idx = bgfx::invalidHandle;
-		m_gbufferTex[1].idx = bgfx::invalidHandle;
-		m_gbufferTex[2].idx = bgfx::invalidHandle;
-		m_gbuffer.idx = bgfx::invalidHandle;
-		m_lightBuffer.idx = bgfx::invalidHandle;
+		m_gbufferTex[0].idx = bgfx::kInvalidHandle;
+		m_gbufferTex[1].idx = bgfx::kInvalidHandle;
+		m_gbufferTex[2].idx = bgfx::kInvalidHandle;
+		m_gbuffer.idx = bgfx::kInvalidHandle;
+		m_lightBuffer.idx = bgfx::kInvalidHandle;
 
 		// Imgui.
 		imguiCreate();
@@ -430,29 +430,21 @@ class ExampleDeferred : public entry::AppI
 						, uint16_t(m_height)
 						);
 
-				imguiBeginScrollArea("Settings", m_width - m_width / 5 - 10, 10, m_width / 5, m_height / 3, &m_scrollArea);
-				imguiSeparatorLine();
+				ImGui::SetNextWindowPos(ImVec2(m_width - m_width / 5.0f - 10.0f, 10.0f) );
+				ImGui::Begin("Deferred Rendering Settings"
+					, NULL
+					, ImVec2(m_width / 5.0f, m_height / 3.0f)
+					, ImGuiWindowFlags_AlwaysAutoResize
+					);
 
-				imguiSlider("Num lights", m_numLights, 1, 2048);
+				ImGui::SliderInt("Num lights", &m_numLights, 1, 2048);
+				ImGui::Checkbox("Show G-Buffer.", &m_showGBuffer);
+				ImGui::Checkbox("Show light scissor.", &m_showScissorRects);
+				ImGui::Checkbox("Animate mesh.", &m_animateMesh);
+				ImGui::SliderFloat("Anim.speed", &m_lightAnimationSpeed, 0.0f, 0.4f);
 
-				if (imguiCheck("Show G-Buffer.", m_showGBuffer) )
-				{
-					m_showGBuffer = !m_showGBuffer;
-				}
+				ImGui::End();
 
-				if (imguiCheck("Show light scissor.", m_showScissorRects) )
-				{
-					m_showScissorRects = !m_showScissorRects;
-				}
-
-				if (imguiCheck("Animate mesh.", m_animateMesh) )
-				{
-					m_animateMesh = !m_animateMesh;
-				}
-
-				imguiSlider("Lights animation speed", m_lightAnimationSpeed, 0.0f, 0.4f, 0.01f);
-
-				imguiEndScrollArea();
 				imguiEndFrame();
 
 				// Update camera.
@@ -482,16 +474,18 @@ class ExampleDeferred : public entry::AppI
 					bx::mtxMul(vp, view, proj);
 					bx::mtxInverse(invMvp, vp);
 
-					bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
+					const bgfx::Caps* caps = bgfx::getCaps();
+
+					bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f, caps->homogeneousDepth);
 					bgfx::setViewTransform(RENDER_PASS_LIGHT_ID,   NULL, proj);
 					bgfx::setViewTransform(RENDER_PASS_COMBINE_ID, NULL, proj);
 
 					const float aspectRatio = float(m_height)/float(m_width);
 					const float size = 10.0f;
-					bx::mtxOrtho(proj, -size, size, size*aspectRatio, -size*aspectRatio, 0.0f, 1000.0f);
+					bx::mtxOrtho(proj, -size, size, size*aspectRatio, -size*aspectRatio, 0.0f, 1000.0f, 0.0f, caps->homogeneousDepth);
 					bgfx::setViewTransform(RENDER_PASS_DEBUG_GBUFFER_ID, NULL, proj);
 
-					bx::mtxOrtho(proj, 0.0f, (float)m_width, 0.0f, (float)m_height, 0.0f, 1000.0f);
+					bx::mtxOrtho(proj, 0.0f, (float)m_width, 0.0f, (float)m_height, 0.0f, 1000.0f, 0.0f, caps->homogeneousDepth);
 					bgfx::setViewTransform(RENDER_PASS_DEBUG_LIGHTS_ID, NULL, proj);
 				}
 
@@ -546,10 +540,10 @@ class ExampleDeferred : public entry::AppI
 				{
 					Sphere lightPosRadius;
 
-					float lightTime = time * m_lightAnimationSpeed * (bx::fsin(light/float(m_numLights) * bx::piHalf ) * 0.5f + 0.5f);
-					lightPosRadius.m_center[0] = bx::fsin( ( (lightTime + light*0.47f) + bx::piHalf*1.37f ) )*offset;
-					lightPosRadius.m_center[1] = bx::fcos( ( (lightTime + light*0.69f) + bx::piHalf*1.49f ) )*offset;
-					lightPosRadius.m_center[2] = bx::fsin( ( (lightTime + light*0.37f) + bx::piHalf*1.57f ) )*2.0f;
+					float lightTime = time * m_lightAnimationSpeed * (bx::fsin(light/float(m_numLights) * bx::kPiHalf ) * 0.5f + 0.5f);
+					lightPosRadius.m_center[0] = bx::fsin( ( (lightTime + light*0.47f) + bx::kPiHalf*1.37f ) )*offset;
+					lightPosRadius.m_center[1] = bx::fcos( ( (lightTime + light*0.69f) + bx::kPiHalf*1.49f ) )*offset;
+					lightPosRadius.m_center[2] = bx::fsin( ( (lightTime + light*0.37f) + bx::kPiHalf*1.57f ) )*2.0f;
 					lightPosRadius.m_radius = 2.0f;
 
 					Aabb aabb;

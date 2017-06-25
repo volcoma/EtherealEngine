@@ -737,7 +737,8 @@ namespace runtime
 
 		if (surface && _atmospherics_program)
 		{
-			ecs.each<transform_component, light_component>([this, &output_size, &pass](
+			int sun_count = 0;
+			ecs.each<transform_component, light_component>([this, &output_size, &pass, &sun_count](
 				entity e,
 				transform_component& transform_comp_ref,
 				light_component& light_comp_ref
@@ -749,6 +750,9 @@ namespace runtime
 
                 if (light.type == light_type::directional)
 				{
+					if (sun_count++ > 0)
+						return;
+
 					_atmospherics_program->begin_pass();
 					_atmospherics_program->set_uniform("u_light_direction", &light_direction);
 

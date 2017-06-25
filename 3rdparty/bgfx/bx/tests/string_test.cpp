@@ -182,12 +182,59 @@ TEST_CASE("toString double", "")
 	REQUIRE(testToString(0.0000000001,            "1e-10") );
 }
 
+static bool testFromString(double _value, const char* _input)
+{
+	char tmp[1024];
+	bx::toString(tmp, BX_COUNTOF(tmp), _value);
+
+	double lhs;
+	bx::fromString(&lhs, tmp);
+
+	double rhs;
+	bx::fromString(&rhs, _input);
+
+	if (lhs == rhs)
+	{
+		return true;
+	}
+
+	printf("result '%f', input '%s'\n", _value, _input);
+	return false;
+}
+
+TEST_CASE("fromString double", "")
+{
+	REQUIRE(testFromString(0.0,                     "0.0") );
+	REQUIRE(testFromString(-0.0,                    "-0.0") );
+	REQUIRE(testFromString(1.0,                     "1.0") );
+	REQUIRE(testFromString(-1.0,                    "-1.0") );
+	REQUIRE(testFromString(1.2345,                  "1.2345") );
+	REQUIRE(testFromString(1.2345678,               "1.2345678") );
+	REQUIRE(testFromString(0.123456789012,          "0.123456789012") );
+	REQUIRE(testFromString(1234567.8,               "1234567.8") );
+	REQUIRE(testFromString(-79.39773355813419,      "-79.39773355813419") );
+	REQUIRE(testFromString(0.000001,                "0.000001") );
+	REQUIRE(testFromString(0.0000001,               "1e-7") );
+	REQUIRE(testFromString(1e30,                    "1e30") );
+	REQUIRE(testFromString(1.234567890123456e30,    "1.234567890123456e30") );
+	REQUIRE(testFromString(-5e-324,                 "-5e-324") );
+	REQUIRE(testFromString(2.225073858507201e-308,  "2.225073858507201e-308") );
+	REQUIRE(testFromString(2.2250738585072014e-308, "2.2250738585072014e-308") );
+	REQUIRE(testFromString(1.7976931348623157e308,  "1.7976931348623157e308") );
+	REQUIRE(testFromString(0.00000123123123,        "0.00000123123123") );
+	REQUIRE(testFromString(0.000000123123123,       "1.23123123e-7") );
+	REQUIRE(testFromString(123123.123,              "123123.123") );
+	REQUIRE(testFromString(1231231.23,              "1231231.23") );
+	REQUIRE(testFromString(0.000000000123123,       "1.23123e-10") );
+	REQUIRE(testFromString(0.0000000001,            "1e-10") );
+}
+
 TEST_CASE("StringView", "")
 {
 	bx::StringView sv("test");
 	REQUIRE(4 == sv.getLength() );
 
-	bx::CrtAllocator crt;
+	bx::DefaultAllocator crt;
 	g_allocator = &crt;
 
 	typedef bx::StringT<&g_allocator> String;

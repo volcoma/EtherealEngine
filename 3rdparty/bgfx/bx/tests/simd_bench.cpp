@@ -98,7 +98,7 @@ void simd_bench_pass(bx::simd128_t* _dst, bx::simd128_t* _src, uint32_t _numVert
 
 void simd_bench()
 {
-	bx::CrtAllocator allocator;
+	bx::DefaultAllocator allocator;
 	bx::RngMwc rng;
 
 	const uint32_t numVertices = 1024*1024;

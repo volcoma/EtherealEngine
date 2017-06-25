@@ -249,5 +249,5 @@ struct texture
 	/// Back buffer ratio if any.
 	gfx::BackbufferRatio::Enum ratio = gfx::BackbufferRatio::Count;
 	/// Internal handle
-	gfx::TextureHandle handle = { gfx::invalidHandle };
+	gfx::TextureHandle handle = { gfx::kInvalidHandle };
 };

@@ -935,9 +935,7 @@ typedef uint64_t GLuint64;
 #	define GL_LINE_SMOOTH 0x0B20
 #endif // GL_LINE_SMOOTH
 
-#if BX_PLATFORM_NACL
-#	include "glcontext_ppapi.h"
-#elif BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS
 #	include <windows.h>
 #elif BX_PLATFORM_LINUX || BX_PLATFORM_BSD
 #	include "glcontext_glx.h"
@@ -1515,6 +1513,45 @@ namespace bgfx { namespace gl
 
 		Query m_query[BGFX_CONFIG_MAX_OCCLUSION_QUERIES];
 		bx::RingBufferControl m_control;
+	};
+
+	class LineReader : public bx::ReaderI
+	{
+	public:
+		LineReader(const void* _str)
+			: m_str( (const char*)_str)
+			, m_pos(0)
+			, m_size(bx::strLen( (const char*)_str) )
+		{
+		}
+
+		virtual int32_t read(void* _data, int32_t _size, bx::Error* _err) BX_OVERRIDE
+		{
+			if (m_str[m_pos] == '\0'
+			||  m_pos == m_size)
+			{
+				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "LineReader: EOF.");
+				return 0;
+			}
+
+			uint32_t pos = m_pos;
+			const char* str = &m_str[pos];
+			const char* nl = bx::strnl(str);
+			pos += (uint32_t)(nl - str);
+
+			const char* eol = &m_str[pos];
+
+			uint32_t size = bx::uint32_min(uint32_t(eol - str), _size);
+
+			bx::memCopy(_data, str, size);
+			m_pos += size;
+
+			return size;
+		}
+
+		const char* m_str;
+		uint32_t m_pos;
+		uint32_t m_size;
 	};
 
 } /* namespace gl */ } // namespace bgfx

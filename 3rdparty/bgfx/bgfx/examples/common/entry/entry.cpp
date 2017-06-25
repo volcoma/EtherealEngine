@@ -56,10 +56,9 @@ namespace entry
 
 	static String s_currentDir;
 
-#if BX_CONFIG_CRT_FILE_READER_WRITER
-	class FileReader : public bx::CrtFileReader
+	class FileReader : public bx::FileReader
 	{
-		typedef bx::CrtFileReader super;
+		typedef bx::FileReader super;
 
 	public:
 		virtual bool open(const char* _filePath, bx::Error* _err) BX_OVERRIDE
@@ -70,9 +69,9 @@ namespace entry
 		}
 	};
 
-	class FileWriter : public bx::CrtFileWriter
+	class FileWriter : public bx::FileWriter
 	{
-		typedef bx::CrtFileWriter super;
+		typedef bx::FileWriter super;
 
 	public:
 		virtual bool open(const char* _filePath, bool _append, bx::Error* _err) BX_OVERRIDE
@@ -82,7 +81,6 @@ namespace entry
 			return super::open(filePath.getPtr(), _append, _err);
 		}
 	};
-#endif // BX_CONFIG_CRT_FILE_READER_WRITER
 
 	void setCurrentDir(const char* _dir)
 	{
@@ -95,7 +93,7 @@ namespace entry
 BX_PRAGMA_DIAGNOSTIC_PUSH();
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4459); // warning C4459: declaration of 's_allocator' hides global declaration
 BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wshadow");
-		static bx::CrtAllocator s_allocator;
+		static bx::DefaultAllocator s_allocator;
 		return &s_allocator;
 BX_PRAGMA_DIAGNOSTIC_POP();
 	}
@@ -443,10 +441,8 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			}
 		}
 
-#if BX_CONFIG_CRT_FILE_READER_WRITER
 		s_fileReader = BX_NEW(g_allocator, FileReader);
 		s_fileWriter = BX_NEW(g_allocator, FileWriter);
-#endif // BX_CONFIG_CRT_FILE_READER_WRITER
 
 		cmdInit();
 		cmdAdd("mouselock", cmdMouseLock);
@@ -468,13 +464,11 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 		cmdShutdown();
 
-#if BX_CONFIG_CRT_FILE_READER_WRITER
 		BX_DELETE(g_allocator, s_fileReader);
 		s_fileReader = NULL;
 
 		BX_DELETE(g_allocator, s_fileWriter);
 		s_fileWriter = NULL;
-#endif // BX_CONFIG_CRT_FILE_READER_WRITER
 
 		if (BX_ENABLED(ENTRY_CONFIG_PROFILER)
 		&&  NULL != s_rmt)

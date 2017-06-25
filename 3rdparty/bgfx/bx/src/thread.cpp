@@ -7,7 +7,6 @@
 
 #if    BX_PLATFORM_ANDROID \
 	|| BX_PLATFORM_LINUX   \
-	|| BX_PLATFORM_NACL    \
 	|| BX_PLATFORM_IOS     \
 	|| BX_PLATFORM_OSX     \
 	|| BX_PLATFORM_PS4     \
@@ -21,7 +20,6 @@
 #	endif // BX_PLATFORM_
 #elif  BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_WINRT   \
-	|| BX_PLATFORM_XBOX360 \
 	|| BX_PLATFORM_XBOXONE
 #	include <windows.h>
 #	include <limits.h>
@@ -41,7 +39,6 @@ namespace bx
 	{
 #if    BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_WINRT   \
-	|| BX_PLATFORM_XBOX360 \
 	|| BX_PLATFORM_XBOXONE
 		static DWORD WINAPI threadFunc(LPVOID _arg);
 		HANDLE m_handle;
@@ -52,7 +49,9 @@ namespace bx
 #endif // BX_PLATFORM_
 	};
 
-#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
+#if    BX_PLATFORM_WINDOWS \
+	|| BX_PLATFORM_XBOXONE \
+	|| BX_PLATFORM_WINRT
 	DWORD WINAPI ThreadInternal::threadFunc(LPVOID _arg)
 	{
 		Thread* thread = (Thread*)_arg;
@@ -77,7 +76,7 @@ namespace bx
 		: m_fn(NULL)
 		, m_userData(NULL)
 		, m_stackSize(0)
-		, m_exitCode(0 /*EXIT_SUCCESS*/)
+		, m_exitCode(kExitSuccess)
 		, m_running(false)
 	{
 		BX_STATIC_ASSERT(sizeof(ThreadInternal) <= sizeof(m_internal) );
@@ -85,7 +84,6 @@ namespace bx
 		ThreadInternal* ti = (ThreadInternal*)m_internal;
 #if    BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_WINRT   \
-	|| BX_PLATFORM_XBOX360 \
 	|| BX_PLATFORM_XBOXONE
 		ti->m_handle   = INVALID_HANDLE_VALUE;
 		ti->m_threadId = UINT32_MAX;
@@ -112,7 +110,8 @@ namespace bx
 		m_running = true;
 
 		ThreadInternal* ti = (ThreadInternal*)m_internal;
-#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE
+#if    BX_PLATFORM_WINDOWS \
+	|| BX_PLATFORM_XBOXONE
 		ti->m_handle = ::CreateThread(NULL
 				, m_stackSize
 				, (LPTHREAD_START_ROUTINE)ti->threadFunc
@@ -163,7 +162,7 @@ namespace bx
 	{
 		BX_CHECK(m_running, "Not running!");
 		ThreadInternal* ti = (ThreadInternal*)m_internal;
-#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
+#if BX_PLATFORM_WINDOWS
 		WaitForSingleObject(ti->m_handle, INFINITE);
 		GetExitCodeThread(ti->m_handle, (DWORD*)&m_exitCode);
 		CloseHandle(ti->m_handle);

@@ -9,39 +9,12 @@ BX_PRAGMA_DIAGNOSTIC_PUSH()
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4100) // error C4100: 'inclusionDepth' : unreferenced formal parameter
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4265) // error C4265: 'spv::spirvbin_t': class has virtual functions, but destructor is not virtual
 BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wshadow") // warning: declaration of 'userData' shadows a member of 'glslang::TShader::Includer::IncludeResult'
-#include <glslang/glslang/Public/ShaderLang.h>
-#include <glslang/glslang/Include/ResourceLimits.h>
-#include <glslang/SPIRV/SPVRemapper.h>
-//#include <spirv-tools/libspirv.hpp>
-//#include <spirv-tools/optimizer.hpp>
+#include <ShaderLang.h>
+#include <ResourceLimits.h>
+#include <SPIRV/SPVRemapper.h>
+#include <SPIRV/GlslangToSpv.h>
 BX_PRAGMA_DIAGNOSTIC_POP()
 
-namespace bgfx_alloc
-{
-	static bx::CrtAllocator s_allocator;
-	bx::AllocatorI* g_allocator = &s_allocator;
-
-	struct TinyStlAllocator
-	{
-		static void* static_allocate(size_t _bytes);
-		static void static_deallocate(void* _ptr, size_t /*_bytes*/);
-	};
-
-	void* TinyStlAllocator::static_allocate(size_t _bytes)
-	{
-		return BX_ALLOC(g_allocator, _bytes);
-	}
-
-	void TinyStlAllocator::static_deallocate(void* _ptr, size_t /*_bytes*/)
-	{
-		if (NULL != _ptr)
-		{
-			BX_FREE(g_allocator, _ptr);
-		}
-	}
-} // namespace bgfx
-
-#define TINYSTL_ALLOCATOR bgfx_alloc::TinyStlAllocator
 #include <tinystl/allocator.h>
 #include <tinystl/string.h>
 #include <tinystl/unordered_map.h>
@@ -49,12 +22,6 @@ namespace bgfx_alloc
 namespace stl = tinystl;
 
 #include "../../src/shader_spirv.h"
-
-namespace glslang
-{
-	void GlslangToSpv(const glslang::TIntermediate& _intermediate, std::vector<uint32_t>& _spirv);
-
-} // namespace glslang
 
 namespace bgfx { namespace spirv
 {
@@ -529,7 +496,7 @@ namespace bgfx { namespace spirv
 		virtual int32_t write(const void* _data, int32_t _size, bx::Error*) BX_OVERRIDE
 		{
 			char* out = (char*)alloca(_size + 1);
-			memcpy(out, _data, _size);
+			bx::memCopy(out, _data, _size);
 			out[_size] = '\0';
 			printf("%s", out);
 			return _size;
@@ -552,7 +519,7 @@ namespace bgfx { namespace spirv
 //		fprintf(stderr, "%s\n", _message);
 //	}
 
-	static bool compile(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, std::string& str_err)
+	static bool compile(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer)
 	{
 		BX_UNUSED(_cmdLine, _version, _code, _writer);
 
@@ -628,8 +595,7 @@ namespace bgfx { namespace spirv
 					end   = start + 20;
 				}
 
-				printCode(str_err, _code.c_str(), line, start, end, column);
-				bx::stringPrintf(str_err, "%s\n", log);
+				printCode(_code.c_str(), line, start, end, column);
 
 				fprintf(stderr, "%s\n", log);
 			}
@@ -648,7 +614,6 @@ namespace bgfx { namespace spirv
 				if (NULL != log)
 				{
 					fprintf(stderr, "%s\n", log);
-					bx::stringPrintf(str_err, "%s\n", log);
 				}
 			}
 			else
@@ -757,7 +722,7 @@ namespace bgfx { namespace spirv
 
 				if (optimized)
 				{
-					uint16_t shaderSize = (uint16_t)spirv.size()*sizeof(uint32_t);
+					uint32_t shaderSize = (uint32_t)spirv.size()*sizeof(uint32_t);
 					bx::write(_writer, shaderSize);
 					bx::write(_writer, spirv.data(), shaderSize);
 					uint8_t nul = 0;
@@ -776,9 +741,9 @@ namespace bgfx { namespace spirv
 
 } // namespace spirv
 
-	bool compileSPIRVShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, std::string& err)
+	bool compileSPIRVShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer)
 	{
-		return spirv::compile(_cmdLine, _version, _code, _writer, err);
+		return spirv::compile(_cmdLine, _version, _code, _writer);
 	}
 
 } // namespace bgfx

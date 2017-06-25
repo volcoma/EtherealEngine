@@ -1,6 +1,7 @@
 #include "system/app.h"
 #include "core/filesystem/filesystem.h"
 #include "runtime/meta/meta.h"
+
 int main(int _argc, char* _argv[])
 {
 	fs::path engine_path = fs::system_complete(ENGINE_DIRECTORY);

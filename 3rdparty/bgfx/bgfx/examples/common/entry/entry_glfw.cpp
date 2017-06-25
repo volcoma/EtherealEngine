@@ -327,6 +327,7 @@ namespace entry
 			s_translateKey[GLFW_KEY_END]          = Key::End;
 			s_translateKey[GLFW_KEY_PRINT_SCREEN] = Key::Print;
 			s_translateKey[GLFW_KEY_KP_ADD]       = Key::Plus;
+			s_translateKey[GLFW_KEY_EQUAL]        = Key::Plus;
 			s_translateKey[GLFW_KEY_KP_SUBTRACT]  = Key::Minus;
 			s_translateKey[GLFW_KEY_MINUS]        = Key::Minus;
 			s_translateKey[GLFW_KEY_COMMA]        = Key::Comma;
@@ -402,7 +403,7 @@ namespace entry
 			if (!glfwInit() )
 			{
 				DBG("glfwInit failed!");
-				return EXIT_FAILURE;
+				return bx::kExitFailure;
 			}
 
 			glfwSetJoystickCallback(joystickCb);
@@ -421,7 +422,7 @@ namespace entry
 			{
 				DBG("glfwCreateWindow failed!");
 				glfwTerminate();
-				return EXIT_FAILURE;
+				return bx::kExitFailure;
 			}
 
 			glfwSetKeyCallback(m_windows[0], keyCb);

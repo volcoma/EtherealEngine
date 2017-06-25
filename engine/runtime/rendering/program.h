@@ -184,5 +184,5 @@ struct program
 	/// All uniforms for this program.
 	std::unordered_map<std::string, std::shared_ptr<uniform>> uniforms;
 	/// Internal handle
-	gfx::ProgramHandle handle = { gfx::invalidHandle };
+	gfx::ProgramHandle handle = { gfx::kInvalidHandle };
 };

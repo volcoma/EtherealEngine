@@ -56,7 +56,7 @@ void main()
 {
 	const vec3 u_kr = vec3(0.18867780436772762f, 0.4978442963618773f, 0.6616065586417131f);
 	const vec3 u_ground_color = vec3(0.63f, 0.6f, 0.57f);	
-	const float u_rayleigh_brightness = 3.3f;
+	const float u_rayleigh_brightness = 9.0f;
 	const float u_mie_brightness = 0.1f;
 	const float u_spot_brightness = 10.0f;
 	const float u_scatter_strength = 0.028;

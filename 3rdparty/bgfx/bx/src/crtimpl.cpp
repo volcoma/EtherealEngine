@@ -4,24 +4,37 @@
  */
 
 #include <bx/crtimpl.h>
-#include <stdio.h>
 
-#if BX_CONFIG_ALLOCATOR_CRT
-#	include <malloc.h>
-#endif // BX_CONFIG_ALLOCATOR_CRT
+#include <stdio.h>
+#include <malloc.h>
+
+#ifndef BX_CONFIG_CRT_FILE_READER_WRITER
+#	define BX_CONFIG_CRT_FILE_READER_WRITER !(0 \
+			|| BX_CRT_NONE                      \
+			)
+#endif // BX_CONFIG_CRT_FILE_READER_WRITER
+
+#ifndef BX_CONFIG_CRT_PROCESS
+#	define BX_CONFIG_CRT_PROCESS !(0  \
+			|| BX_CRT_NONE            \
+			|| BX_PLATFORM_EMSCRIPTEN \
+			|| BX_PLATFORM_PS4        \
+			|| BX_PLATFORM_WINRT      \
+			|| BX_PLATFORM_XBOXONE    \
+			)
+#endif // BX_CONFIG_CRT_PROCESS
 
 namespace bx
 {
-#if BX_CONFIG_ALLOCATOR_CRT
-	CrtAllocator::CrtAllocator()
+	DefaultAllocator::DefaultAllocator()
 	{
 	}
 
-	CrtAllocator::~CrtAllocator()
+	DefaultAllocator::~DefaultAllocator()
 	{
 	}
 
-	void* CrtAllocator::realloc(void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line)
+	void* DefaultAllocator::realloc(void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line)
 	{
 		if (0 == _size)
 		{
@@ -70,7 +83,6 @@ namespace bx
 		return bx::alignedRealloc(this, _ptr, _size, _align, _file, _line);
 #	endif // BX_
 	}
-#endif // BX_CONFIG_ALLOCATOR_CRT
 
 #if BX_CONFIG_CRT_FILE_READER_WRITER
 
@@ -90,137 +102,322 @@ namespace bx
 #		define ftello64 ftell
 #	endif // BX_
 
-	CrtFileReader::CrtFileReader()
-		: m_file(NULL)
+	class FileReaderImpl : public bx::FileReaderI
 	{
-	}
-
-	CrtFileReader::~CrtFileReader()
-	{
-	}
-
-	bool CrtFileReader::open(const char* _filePath, Error* _err)
-	{
-		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
-
-		if (NULL != m_file)
+	public:
+		FileReaderImpl(FILE* _file)
+			: m_file(_file)
+			, m_open(false)
 		{
-			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_ALREADY_OPEN, "CrtFileReader: File is already open.");
-			return false;
 		}
 
-		m_file = fopen(_filePath, "rb");
-		if (NULL == m_file)
+		virtual ~FileReaderImpl()
 		{
-			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "CrtFileReader: Failed to open file.");
-			return false;
+			close();
 		}
 
-		return true;
-	}
-
-	void CrtFileReader::close()
-	{
-		BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
-		FILE* file = (FILE*)m_file;
-		fclose(file);
-		m_file = NULL;
-	}
-
-	int64_t CrtFileReader::seek(int64_t _offset, Whence::Enum _whence)
-	{
-		BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
-		FILE* file = (FILE*)m_file;
-		fseeko64(file, _offset, _whence);
-		return ftello64(file);
-	}
-
-	int32_t CrtFileReader::read(void* _data, int32_t _size, Error* _err)
-	{
-		BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
-		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
-
-		FILE* file = (FILE*)m_file;
-		int32_t size = (int32_t)fread(_data, 1, _size, file);
-		if (size != _size)
+		virtual bool open(const char* _filePath, Error* _err) BX_OVERRIDE
 		{
-			if (0 != feof(file) )
+			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+
+			if (NULL != m_file)
 			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "CrtFileReader: EOF.");
-			}
-			else if (0 != ferror(file) )
-			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_READ, "CrtFileReader: read error.");
+				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_ALREADY_OPEN, "FileReader: File is already open.");
+				return false;
 			}
 
-			return size >= 0 ? size : 0;
+			m_file = fopen(_filePath, "rb");
+			if (NULL == m_file)
+			{
+				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "FileReader: Failed to open file.");
+				return false;
+			}
+
+			m_open = true;
+			return true;
 		}
 
-		return size;
-	}
-
-	CrtFileWriter::CrtFileWriter()
-		: m_file(NULL)
-	{
-	}
-
-	CrtFileWriter::~CrtFileWriter()
-	{
-	}
-
-	bool CrtFileWriter::open(const char* _filePath, bool _append, Error* _err)
-	{
-		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
-
-		if (NULL != m_file)
+		virtual void close() BX_OVERRIDE
 		{
-			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_ALREADY_OPEN, "CrtFileReader: File is already open.");
+			if (m_open
+			&&  NULL != m_file)
+			{
+				fclose(m_file);
+				m_file = NULL;
+			}
+		}
+
+		virtual int64_t seek(int64_t _offset, Whence::Enum _whence) BX_OVERRIDE
+		{
+			BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
+			fseeko64(m_file, _offset, _whence);
+			return ftello64(m_file);
+		}
+
+		virtual int32_t read(void* _data, int32_t _size, Error* _err) BX_OVERRIDE
+		{
+			BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
+			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+
+			int32_t size = (int32_t)fread(_data, 1, _size, m_file);
+			if (size != _size)
+			{
+				if (0 != feof(m_file) )
+				{
+					BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "FileReader: EOF.");
+				}
+				else if (0 != ferror(m_file) )
+				{
+					BX_ERROR_SET(_err, BX_ERROR_READERWRITER_READ, "FileReader: read error.");
+				}
+
+				return size >= 0 ? size : 0;
+			}
+
+			return size;
+		}
+
+	private:
+		FILE* m_file;
+		bool  m_open;
+	};
+
+	class FileWriterImpl : public bx::FileWriterI
+	{
+	public:
+		FileWriterImpl(FILE* _file)
+			: m_file(_file)
+			, m_open(false)
+		{
+		}
+
+		virtual ~FileWriterImpl()
+		{
+			close();
+		}
+
+		virtual bool open(const char* _filePath, bool _append, Error* _err) BX_OVERRIDE
+		{
+			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+
+			if (NULL != m_file)
+			{
+				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_ALREADY_OPEN, "FileReader: File is already open.");
+				return false;
+			}
+
+			m_file = fopen(_filePath, _append ? "ab" : "wb");
+
+			if (NULL == m_file)
+			{
+				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "FileWriter: Failed to open file.");
+				return false;
+			}
+
+			m_open = true;
+			return true;
+		}
+
+		virtual void close() BX_OVERRIDE
+		{
+			if (m_open
+			&&  NULL != m_file)
+			{
+				fclose(m_file);
+				m_file = NULL;
+			}
+		}
+
+		virtual int64_t seek(int64_t _offset, Whence::Enum _whence) BX_OVERRIDE
+		{
+			BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
+			fseeko64(m_file, _offset, _whence);
+			return ftello64(m_file);
+		}
+
+		virtual int32_t write(const void* _data, int32_t _size, Error* _err) BX_OVERRIDE
+		{
+			BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
+			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+
+			int32_t size = (int32_t)fwrite(_data, 1, _size, m_file);
+			if (size != _size)
+			{
+				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "FileWriter: write failed.");
+				return size >= 0 ? size : 0;
+			}
+
+			return size;
+		}
+
+	private:
+		FILE* m_file;
+		bool  m_open;
+	};
+
+#else
+
+	class FileReaderImpl : public bx::FileReaderI
+	{
+	public:
+		FileReaderImpl(void*)
+		{
+		}
+
+		virtual ~FileReaderImpl()
+		{
+			close();
+		}
+
+		virtual bool open(const char* _filePath, Error* _err) BX_OVERRIDE
+		{
+			BX_UNUSED(_filePath, _err);
 			return false;
 		}
 
-		m_file = fopen(_filePath, _append ? "ab" : "wb");
-
-		if (NULL == m_file)
+		virtual void close() BX_OVERRIDE
 		{
-			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "CrtFileWriter: Failed to open file.");
+		}
+
+		virtual int64_t seek(int64_t _offset, Whence::Enum _whence) BX_OVERRIDE
+		{
+			BX_UNUSED(_offset, _whence);
+			return 0;
+		}
+
+		virtual int32_t read(void* _data, int32_t _size, Error* _err) BX_OVERRIDE
+		{
+			BX_UNUSED(_data, _size, _err);
+			return 0;
+		}
+	};
+
+	class FileWriterImpl : public bx::FileWriterI
+	{
+	public:
+		FileWriterImpl(void*)
+		{
+		}
+
+		virtual ~FileWriterImpl()
+		{
+			close();
+		}
+
+		virtual bool open(const char* _filePath, bool _append, Error* _err) BX_OVERRIDE
+		{
+			BX_UNUSED(_filePath, _append);
 			return false;
 		}
 
-		return true;
-	}
-
-	void CrtFileWriter::close()
-	{
-		BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
-		FILE* file = (FILE*)m_file;
-		fclose(file);
-		m_file = NULL;
-	}
-
-	int64_t CrtFileWriter::seek(int64_t _offset, Whence::Enum _whence)
-	{
-		BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
-		FILE* file = (FILE*)m_file;
-		fseeko64(file, _offset, _whence);
-		return ftello64(file);
-	}
-
-	int32_t CrtFileWriter::write(const void* _data, int32_t _size, Error* _err)
-	{
-		BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
-		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
-
-		FILE* file = (FILE*)m_file;
-		int32_t size = (int32_t)fwrite(_data, 1, _size, file);
-		if (size != _size)
+		virtual void close() BX_OVERRIDE
 		{
-			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "CrtFileWriter: write failed.");
-			return size >= 0 ? size : 0;
 		}
 
-		return size;
-	}
+		virtual int64_t seek(int64_t _offset, Whence::Enum _whence) BX_OVERRIDE
+		{
+			BX_UNUSED(_offset, _whence);
+			return 0;
+		}
+
+		virtual int32_t write(const void* _data, int32_t _size, Error* _err) BX_OVERRIDE
+		{
+			BX_UNUSED(_data, _size, _err);
+			return 0;
+		}
+	};
+
 #endif // BX_CONFIG_CRT_FILE_READER_WRITER
+
+	FileReader::FileReader()
+	{
+		BX_STATIC_ASSERT(sizeof(FileReaderImpl) <= sizeof(m_internal) );
+		new(m_internal) FileReaderImpl(NULL);
+	}
+
+	FileReader::~FileReader()
+	{
+		FileReaderImpl* impl = reinterpret_cast<FileReaderImpl*>(m_internal);
+		impl->~FileReaderImpl();
+	}
+
+	bool FileReader::open(const char* _filePath, Error* _err)
+	{
+		FileReaderImpl* impl = reinterpret_cast<FileReaderImpl*>(m_internal);
+		return impl->open(_filePath, _err);
+	}
+
+	void FileReader::close()
+	{
+		FileReaderImpl* impl = reinterpret_cast<FileReaderImpl*>(m_internal);
+		impl->close();
+	}
+
+	int64_t FileReader::seek(int64_t _offset, Whence::Enum _whence)
+	{
+		FileReaderImpl* impl = reinterpret_cast<FileReaderImpl*>(m_internal);
+		return impl->seek(_offset, _whence);
+	}
+
+	int32_t FileReader::read(void* _data, int32_t _size, Error* _err)
+	{
+		FileReaderImpl* impl = reinterpret_cast<FileReaderImpl*>(m_internal);
+		return impl->read(_data, _size, _err);
+	}
+
+	FileWriter::FileWriter()
+	{
+		BX_STATIC_ASSERT(sizeof(FileWriterImpl) <= sizeof(m_internal) );
+		new(m_internal) FileWriterImpl(NULL);
+	}
+
+	FileWriter::~FileWriter()
+	{
+		FileWriterImpl* impl = reinterpret_cast<FileWriterImpl*>(m_internal);
+		impl->~FileWriterImpl();
+	}
+
+	bool FileWriter::open(const char* _filePath, bool _append, Error* _err)
+	{
+		FileWriterImpl* impl = reinterpret_cast<FileWriterImpl*>(m_internal);
+		return impl->open(_filePath, _append, _err);
+	}
+
+	void FileWriter::close()
+	{
+		FileWriterImpl* impl = reinterpret_cast<FileWriterImpl*>(m_internal);
+		impl->close();
+	}
+
+	int64_t FileWriter::seek(int64_t _offset, Whence::Enum _whence)
+	{
+		FileWriterImpl* impl = reinterpret_cast<FileWriterImpl*>(m_internal);
+		return impl->seek(_offset, _whence);
+	}
+
+	int32_t FileWriter::write(const void* _data, int32_t _size, Error* _err)
+	{
+		FileWriterImpl* impl = reinterpret_cast<FileWriterImpl*>(m_internal);
+		return impl->write(_data, _size, _err);
+	}
+
+	ReaderI* getStdIn()
+	{
+		static FileReaderImpl s_stdIn(stdout);
+		return &s_stdIn;
+	}
+
+	WriterI* getStdOut()
+	{
+		static FileWriterImpl s_stdOut(stdout);
+		return &s_stdOut;
+	}
+
+	WriterI* getStdErr()
+	{
+		static FileWriterImpl s_stdOut(stderr);
+		return &s_stdOut;
+	}
 
 #if BX_CONFIG_CRT_PROCESS
 

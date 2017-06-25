@@ -566,41 +566,6 @@ bool DeduceVersionProfile(TInfoSink& infoSink, EShLanguage stage, bool versionNo
         }
     }
 
-    // A meta check on the condition of the compiler itself...
-    switch (version) {
-
-    // ES versions
-    case 100:
-    case 300:
-        // versions are complete
-        break;
-
-    // Desktop versions
-    case 110:
-    case 120:
-    case 130:
-    case 140:
-    case 150:
-    case 330:
-        // versions are complete
-        break;
-
-    case 310:
-    case 400:
-    case 410:
-    case 420:
-    case 430:
-    case 440:
-    case 450:
-        infoSink.info << "Warning, version " << version << " is not yet complete; most version-specific features are present, but some are missing.\n";
-        break;
-
-    default:
-        infoSink.info << "Warning, version " << version << " is unknown.\n";
-        break;
-
-    }
-
     return correct;
 }
 
@@ -623,7 +588,7 @@ bool ProcessDeferred(
     const char* customPreamble,
     const EShOptimizationLevel optLevel,
     const TBuiltInResource* resources,
-    int defaultVersion,         // use 100 for ES environment, 110 for desktop; this is the GLSL version, not SPIR-V or Vulkan
+    int defaultVersion,  // use 100 for ES environment, 110 for desktop; this is the GLSL version, not SPIR-V or Vulkan
     EProfile defaultProfile,
     // set version/profile to defaultVersion/defaultProfile regardless of the #version
     // directive in the source code
@@ -663,7 +628,7 @@ bool ProcessDeferred(
     const char** names = new const char*[numTotal];
     for (int s = 0; s < numStrings; ++s) {
         strings[s + numPre] = shaderStrings[s];
-        if (inputLengths == 0 || inputLengths[s] < 0)
+        if (inputLengths == nullptr || inputLengths[s] < 0)
             lengths[s + numPre] = strlen(shaderStrings[s]);
         else
             lengths[s + numPre] = inputLengths[s];
@@ -678,12 +643,14 @@ bool ProcessDeferred(
 
     // First, without using the preprocessor or parser, find the #version, so we know what
     // symbol tables, processing rules, etc. to set up.  This does not need the extra strings
-    // outlined above, just the user shader.
-    glslang::TInputScanner userInput(numStrings, &strings[numPre], &lengths[numPre]);  // no preamble
+    // outlined above, just the user shader, after the system and user preambles.
+    glslang::TInputScanner userInput(numStrings, &strings[numPre], &lengths[numPre]);
     int version = 0;
     EProfile profile = ENoProfile;
     bool versionNotFirstToken = false;
-    bool versionNotFirst = (messages & EShMsgReadHlsl) ? true : userInput.scanVersion(version, profile, versionNotFirstToken);
+    bool versionNotFirst = (messages & EShMsgReadHlsl) ?
+                                true :
+                                userInput.scanVersion(version, profile, versionNotFirstToken);
     bool versionNotFound = version == 0;
     if (forceDefaultVersionAndProfile && (messages & EShMsgReadHlsl) == 0) {
         if (! (messages & EShMsgSuppressWarnings) && ! versionNotFound &&
@@ -710,7 +677,8 @@ bool ProcessDeferred(
         spvVersion.vulkan = 100;     // TODO: eventually have this come from the outside
     else if (spvVersion.spv != 0)
         spvVersion.openGl = 100;     // TODO: eventually have this come from the outside
-    bool goodVersion = DeduceVersionProfile(compiler->infoSink, compiler->getLanguage(), versionNotFirst, defaultVersion, source, version, profile, spvVersion);
+    bool goodVersion = DeduceVersionProfile(compiler->infoSink, compiler->getLanguage(),
+                                            versionNotFirst, defaultVersion, source, version, profile, spvVersion);
     bool versionWillBeError = (versionNotFound || (profile == EEsProfile && version >= 300 && versionNotFirst));
     bool warnVersionNotFirst = false;
     if (! versionWillBeError && versionNotFirstToken) {
@@ -728,6 +696,11 @@ bool ProcessDeferred(
         intermediate.setOriginUpperLeft();
     if ((messages & EShMsgHlslOffsets) || (messages & EShMsgReadHlsl))
         intermediate.setHlslOffsets();
+    if (messages & EShMsgDebugInfo) {
+        intermediate.setSourceFile(names[numPre]);
+        for (int s = 0; s < numStrings; ++s)
+            intermediate.addSourceText(strings[numPre + s]);
+    }
     SetupBuiltinSymbolTable(version, profile, spvVersion, source);
 
     TSymbolTable* cachedTable = SharedSymbolTables[MapVersionToIndex(version)]
@@ -756,7 +729,7 @@ bool ProcessDeferred(
                                                          compiler->getLanguage(), compiler->infoSink,
                                                          spvVersion, forwardCompatible, messages, false, sourceEntryPointName);
 
-    TPpContext ppContext(*parseContext, names[numPre]? names[numPre]: "", includer);
+    TPpContext ppContext(*parseContext, names[numPre] ? names[numPre] : "", includer);
 
     // only GLSL (bison triggered, really) needs an externally set scan context
     glslang::TScanContext scanContext(*parseContext);
@@ -1578,6 +1551,7 @@ void TShader::setHlslIoMapping(bool hlslIoMap)          { intermediate->setHlslI
 void TShader::setFlattenUniformArrays(bool flatten)     { intermediate->setFlattenUniformArrays(flatten); }
 void TShader::setNoStorageFormat(bool useUnknownFormat) { intermediate->setNoStorageFormat(useUnknownFormat); }
 void TShader::setResourceSetBinding(const std::vector<std::string>& base)   { intermediate->setResourceSetBinding(base); }
+void TShader::setTextureSamplerTransformMode(EShTextureSamplerTransformMode mode) { intermediate->setTextureSamplerTransformMode(mode); }
 
 //
 // Turn the shader strings into a parse tree in the TIntermediate.
@@ -1599,11 +1573,6 @@ bool TShader::parse(const TBuiltInResource* builtInResources, int defaultVersion
                            preamble, EShOptNone, builtInResources, defaultVersion,
                            defaultProfile, forceDefaultVersionAndProfile,
                            forwardCompatible, messages, *intermediate, includer, sourceEntryPointName);
-}
-
-bool TShader::parse(const TBuiltInResource* builtInResources, int defaultVersion, bool forwardCompatible, EShMessages messages)
-{
-    return parse(builtInResources, defaultVersion, ENoProfile, false, forwardCompatible, messages);
 }
 
 // Fill in a string with the result of preprocessing ShaderStrings

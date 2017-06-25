@@ -49,5 +49,5 @@ struct shader
 	/// Uniforms for this shader
 	std::vector<std::shared_ptr<uniform>> uniforms;
 	/// Internal handle
-	gfx::ShaderHandle handle = { gfx::invalidHandle };
+	gfx::ShaderHandle handle = { gfx::kInvalidHandle };
 };

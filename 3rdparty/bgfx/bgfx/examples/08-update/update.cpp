@@ -210,13 +210,13 @@ public:
 		// Create programs.
 		m_program    = loadProgram("vs_update", "fs_update");
 		m_programCmp = loadProgram("vs_update", "fs_update_cmp");
-		m_program3d.idx = bgfx::invalidHandle;
+		m_program3d.idx = bgfx::kInvalidHandle;
 		if (m_texture3DSupported)
 		{
 			m_program3d = loadProgram("vs_update", "fs_update_3d");
 		}
 
-		m_programCompute.idx = bgfx::invalidHandle;
+		m_programCompute.idx = bgfx::kInvalidHandle;
 		if (m_computeSupported)
 		{
 			m_programCompute = bgfx::createProgram( loadShader( "cs_update" ), true );
@@ -231,7 +231,7 @@ public:
 
 		for(uint32_t ii = 0; ii<BX_COUNTOF( m_textureCube ); ++ii)
 		{
-			m_textureCube[ii].idx = bgfx::invalidHandle;
+			m_textureCube[ii].idx = bgfx::kInvalidHandle;
 		}
 
 		m_textureCube[0] = bgfx::createTextureCube(
@@ -492,7 +492,8 @@ public:
 			// Set view and projection matrix for view 1.
 			const float aspectRatio = float(m_height)/float(m_width);
 			const float size = 11.0f;
-			bx::mtxOrtho(proj, -size, size, size*aspectRatio, -size*aspectRatio, 0.0f, 1000.0f);
+			const bgfx::Caps* caps = bgfx::getCaps();
+			bx::mtxOrtho(proj, -size, size, size*aspectRatio, -size*aspectRatio, 0.0f, 1000.0f, 0.0f, caps->homogeneousDepth);
 			bgfx::setViewTransform(1, NULL, proj);
 
 			float mtx[16];

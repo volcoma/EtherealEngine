@@ -998,13 +998,15 @@ namespace runtime
 	template <typename C>
 	bool entity::has_component() const
 	{
-		expects(valid());
+		if (!valid())
+			return false;
 		return manager_->has_component<C>(id_);
 	}
 
 	inline bool entity::has_component(std::shared_ptr<component> component) const
 	{
-		expects(valid());
+		if (!valid())
+			return false;
 		return manager_->has_component(id_, component);
 	}
 

@@ -117,19 +117,17 @@ namespace bgfx
 		{
 			BX_UNUSED(_filePath, _width, _height, _pitch, _data, _size, _yflip);
 
-#if BX_CONFIG_CRT_FILE_READER_WRITER
 			const int32_t len = bx::strLen(_filePath)+5;
 			char* filePath = (char*)alloca(len);
 			bx::strCopy(filePath, len, _filePath);
 			bx::strCat(filePath, len, ".tga");
 
-			bx::CrtFileWriter writer;
+			bx::FileWriter writer;
 			if (bx::open(&writer, filePath) )
 			{
 				bimg::imageWriteTga(&writer, _width, _height, _pitch, _data, false, _yflip);
 				bx::close(&writer);
 			}
-#endif // BX_CONFIG_CRT_FILE_READER_WRITER
 		}
 
 		virtual void captureBegin(uint32_t /*_width*/, uint32_t /*_height*/, uint32_t /*_pitch*/, TextureFormat::Enum /*_format*/, bool /*_yflip*/) BX_OVERRIDE
@@ -781,7 +779,7 @@ namespace bgfx
 				if (isValid(m_program[ii]) )
 				{
 					destroyProgram(m_program[ii]);
-					m_program[ii].idx = invalidHandle;
+					m_program[ii].idx = kInvalidHandle;
 				}
 			}
 
@@ -870,17 +868,24 @@ namespace bgfx
 
 		m_uniformEnd = m_uniformBuffer->getPos();
 
-		m_key.m_program = invalidHandle == _program.idx
+		m_key.m_program = kInvalidHandle == _program.idx
 			? 0
 			: _program.idx
 			;
 
-		m_key.m_depth  = (uint32_t)_depth;
-		m_key.m_view   = _id;
-		m_key.m_seq    = s_ctx->m_seq[_id] & s_ctx->m_seqMask[_id];
+		m_key.m_view = _id;
+
+		bool key1 = false;
+		switch (s_ctx->m_viewMode[_id])
+		{
+		case ViewMode::Sequential:      m_key.m_seq   = s_ctx->m_seq[_id];              break;
+		case ViewMode::DepthAscending:  m_key.m_depth = (uint32_t)_depth;  key1 = true; break;
+		case ViewMode::DepthDescending: m_key.m_depth = (uint32_t)-_depth; key1 = true; break;
+		default:                                                                        break;
+		}
 		s_ctx->m_seq[_id]++;
 
-		uint64_t key = m_key.encodeDraw();
+		uint64_t key = m_key.encodeDraw(key1);
 		m_sortKeys[m_num]   = key;
 		m_sortValues[m_num] = m_numRenderItems;
 		++m_num;
@@ -1156,13 +1161,26 @@ namespace bgfx
 
 		BX_TRACE("");
 		BX_TRACE("Sort key masks:");
-		BX_TRACE("\t  View     %016" PRIx64, SORT_KEY_VIEW_MASK);
-		BX_TRACE("\t  Draw bit %016" PRIx64, SORT_KEY_DRAW_BIT);
-		BX_TRACE("\t  Seq      %016" PRIx64, SORT_KEY_SEQ_MASK);
-		BX_TRACE("\tD Trans    %016" PRIx64, SORT_KEY_DRAW_TRANS_MASK);
-		BX_TRACE("\tD Program  %016" PRIx64, SORT_KEY_DRAW_PROGRAM_MASK);
-		BX_TRACE("\tC Program  %016" PRIx64, SORT_KEY_COMPUTE_PROGRAM_MASK);
-		BX_TRACE("\tD Depth    %016" PRIx64, SORT_KEY_DRAW_DEPTH_MASK);
+		BX_TRACE("\t   View     %016" PRIx64, SORT_KEY_VIEW_MASK);
+		BX_TRACE("\t   Draw bit %016" PRIx64, SORT_KEY_DRAW_BIT);
+
+		BX_TRACE("");
+		BX_TRACE("\tD  Type     %016" PRIx64, SORT_KEY_DRAW_TYPE_BIT);
+
+		BX_TRACE("");
+		BX_TRACE("\tD0 Seq      %016" PRIx64, SORT_KEY_DRAW_0_SEQ_MASK);
+		BX_TRACE("\tD0 Trans    %016" PRIx64, SORT_KEY_DRAW_0_TRANS_MASK);
+		BX_TRACE("\tD0 Program  %016" PRIx64, SORT_KEY_DRAW_0_PROGRAM_MASK);
+		BX_TRACE("\tD0 Depth    %016" PRIx64, SORT_KEY_DRAW_0_DEPTH_MASK);
+
+		BX_TRACE("");
+		BX_TRACE("\tD1 Depth    %016" PRIx64, SORT_KEY_DRAW_1_DEPTH_MASK);
+		BX_TRACE("\tD1 Trans    %016" PRIx64, SORT_KEY_DRAW_1_TRANS_MASK);
+		BX_TRACE("\tD1 Program  %016" PRIx64, SORT_KEY_DRAW_1_PROGRAM_MASK);
+
+		BX_TRACE("");
+		BX_TRACE("\t C Seq      %016" PRIx64, SORT_KEY_COMPUTE_SEQ_MASK);
+		BX_TRACE("\t C Program  %016" PRIx64, SORT_KEY_COMPUTE_PROGRAM_MASK);
 
 		BX_TRACE("");
 		BX_TRACE("Supported capabilities (renderer %s, vendor 0x%04x, device 0x%04x):"
@@ -1958,7 +1976,6 @@ namespace bgfx
 					 ||  BX_PLATFORM_ANDROID
 					 ||  BX_PLATFORM_EMSCRIPTEN
 					 ||  BX_PLATFORM_IOS
-					 ||  BX_PLATFORM_NACL
 					 ||  BX_PLATFORM_RPI
 					 ) )
 				{
@@ -2597,7 +2614,7 @@ namespace bgfx
 		}
 		else
 		{
-			bx::CrtAllocator allocator;
+			bx::DefaultAllocator allocator;
 			g_allocator =
 				s_allocatorStub = BX_NEW(&allocator, AllocatorStub);
 		}
@@ -2613,7 +2630,7 @@ namespace bgfx
 		}
 
 		if (true
-		&&  !BX_ENABLED(BX_PLATFORM_EMSCRIPTEN || BX_PLATFORM_NACL || BX_PLATFORM_PS4)
+		&&  !BX_ENABLED(BX_PLATFORM_EMSCRIPTEN || BX_PLATFORM_PS4)
 		&&  RendererType::Noop != _type
 		&&  NULL == g_platformData.ndt
 		&&  NULL == g_platformData.nwh
@@ -2677,7 +2694,7 @@ error:
 
 			if (NULL != s_allocatorStub)
 			{
-				bx::CrtAllocator allocator;
+				bx::DefaultAllocator allocator;
 				BX_DELETE(&allocator, s_allocatorStub);
 				s_allocatorStub = NULL;
 			}
@@ -2717,7 +2734,7 @@ error:
 
 		if (NULL != s_allocatorStub)
 		{
-			bx::CrtAllocator allocator;
+			bx::DefaultAllocator allocator;
 			BX_DELETE(&allocator, s_allocatorStub);
 			s_allocatorStub = NULL;
 		}
@@ -3134,7 +3151,7 @@ error:
 		}
 
 		if (0 != (_flags & BGFX_TEXTURE_MSAA_SAMPLE)
-		&&  0 == (g_caps.supported & BGFX_CAPS_FORMAT_TEXTURE_MSAA) )
+		&&  0 == (g_caps.formats[_format] & BGFX_CAPS_FORMAT_TEXTURE_MSAA) )
 		{
 			_err->setError(BGFX_ERROR_TEXTURE_VALIDATION
 				, "MSAA sampling for this texture format is not supported."
@@ -3604,11 +3621,11 @@ error:
 		s_ctx->setViewClear(_id, _flags, _depth, _stencil, _0, _1, _2, _3, _4, _5, _6, _7);
 	}
 
-	void setViewSeq(uint8_t _id, bool _enabled)
+	void setViewMode(uint8_t _id, ViewMode::Enum _mode)
 	{
 		BGFX_CHECK_MAIN_THREAD();
 		BX_CHECK(checkView(_id), "Invalid view id: %d", _id);
-		s_ctx->setViewSeq(_id, _enabled);
+		s_ctx->setViewMode(_id, _mode);
 	}
 
 	void setViewFrameBuffer(uint8_t _id, FrameBufferHandle _handle)
@@ -4691,9 +4708,9 @@ BGFX_C_API void bgfx_set_view_clear_mrt(uint8_t _id, uint16_t _flags, float _dep
 	bgfx::setViewClear(_id, _flags, _depth, _stencil, _0, _1, _2, _3, _4, _5, _6, _7);
 }
 
-BGFX_C_API void bgfx_set_view_seq(uint8_t _id, bool _enabled)
+BGFX_C_API void bgfx_set_view_mode(uint8_t _id, bgfx_view_mode_t _mode)
 {
-	bgfx::setViewSeq(_id, _enabled);
+	bgfx::setViewMode(_id, bgfx::ViewMode::Enum(_mode) );
 }
 
 BGFX_C_API void bgfx_set_view_frame_buffer(uint8_t _id, bgfx_frame_buffer_handle_t _handle)
@@ -5048,7 +5065,7 @@ BGFX_C_API bgfx_interface_vtbl_t* bgfx_get_interface(uint32_t _version)
 	BGFX_IMPORT_FUNC(set_view_scissor) \
 	BGFX_IMPORT_FUNC(set_view_clear) \
 	BGFX_IMPORT_FUNC(set_view_clear_mrt) \
-	BGFX_IMPORT_FUNC(set_view_seq) \
+	BGFX_IMPORT_FUNC(set_view_mode) \
 	BGFX_IMPORT_FUNC(set_view_frame_buffer) \
 	BGFX_IMPORT_FUNC(set_view_transform) \
 	BGFX_IMPORT_FUNC(set_view_transform_stereo) \

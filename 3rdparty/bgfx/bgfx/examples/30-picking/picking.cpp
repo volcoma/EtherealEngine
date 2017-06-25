@@ -357,26 +357,30 @@ class ExamplePicking : public entry::AppI
 			}
 
 			// Draw UI
-			imguiBeginFrame(m_mouseState.m_mx
-				, m_mouseState.m_my
+			imguiBeginFrame(
+				   m_mouseState.m_mx
+				,  m_mouseState.m_my
 				, (m_mouseState.m_buttons[entry::MouseButton::Left] ? IMGUI_MBUT_LEFT : 0)
 				| (m_mouseState.m_buttons[entry::MouseButton::Right] ? IMGUI_MBUT_RIGHT : 0)
 				| (m_mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
-				, m_mouseState.m_mz
+				,  m_mouseState.m_mz
 				, uint16_t(m_width)
 				, uint16_t(m_height)
 				);
 
-			imguiBeginArea("Picking Render Target:", 10, 100, 300, 400);
-			imguiImage(m_pickingRT, 1.0f, 1.0f, 1.0f);
-			imguiSlider("FOV", m_fov, 1.0f, 60.0f, 1.0f);
+			ImGui::SetNextWindowPos(ImVec2(m_width - m_width / 5.0f - 10.0f, 10.0f) );
+			ImGui::Begin("Picking Render Target"
+				, NULL
+				, ImVec2(m_width / 5.0f, m_height / 2.0f)
+				, ImGuiWindowFlags_AlwaysAutoResize
+				);
 
-			if (imguiCheck("Spin Camera", m_cameraSpin))
-			{
-				m_cameraSpin = !m_cameraSpin;
-			}
+			ImGui::Image(m_pickingRT, ImVec2(m_width / 5.0f - 16.0f, m_width / 5.0f - 16.0f) );
+			ImGui::SliderFloat("Field of view", &m_fov, 1.0f, 60.0f);
+			ImGui::Checkbox("Spin Camera", &m_cameraSpin);
 
-			imguiEndArea();
+			ImGui::End();
+
 			imguiEndFrame();
 
 			// Advance to next frame. Rendering thread will be kicked to

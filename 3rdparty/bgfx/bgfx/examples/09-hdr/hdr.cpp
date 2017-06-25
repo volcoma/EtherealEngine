@@ -204,7 +204,7 @@ class ExampleHDR : public entry::AppI
 		}
 		else
 		{
-			m_rb.idx = bgfx::invalidHandle;
+			m_rb.idx = bgfx::kInvalidHandle;
 		}
 
 		// Imgui.
@@ -301,25 +301,30 @@ class ExampleHDR : public entry::AppI
 					, uint16_t(m_height)
 					);
 
-			imguiBeginScrollArea("Settings", m_width - m_width / 5 - 10, 10, m_width / 5, m_height / 2, &m_scrollArea);
-			imguiSeparatorLine();
+			ImGui::SetNextWindowPos(ImVec2(m_width - m_width / 5.0f - 10.0f, 10.0f) );
+			ImGui::Begin("HDR Settings"
+				, NULL
+				, ImVec2(m_width / 5.0f, m_height / 2.0f)
+				, ImGuiWindowFlags_AlwaysAutoResize
+				);
 
-			imguiSlider("Speed", m_speed, 0.0f, 1.0f, 0.01f);
-			imguiSeparator();
+			ImGui::SliderFloat("Speed", &m_speed, 0.0f, 1.0f);
+			ImGui::Separator();
 
-			imguiSlider("Middle gray", m_middleGray, 0.1f, 1.0f, 0.01f);
-			imguiSlider("White point", m_white,      0.1f, 2.0f, 0.01f);
-			imguiSlider("Threshold",   m_threshold,  0.1f, 2.0f, 0.01f);
+			ImGui::SliderFloat("Middle gray", &m_middleGray, 0.1f, 1.0f);
+			ImGui::SliderFloat("White point", &m_white,      0.1f, 2.0f);
+			ImGui::SliderFloat("Threshold",   &m_threshold,  0.1f, 2.0f);
 
 			if (bgfx::isValid(m_rb) )
 			{
 				union { uint32_t color; uint8_t bgra[4]; } cast = { m_lumBgra8 };
 				float exponent = cast.bgra[3]/255.0f * 255.0f - 128.0f;
 				float lumAvg   = cast.bgra[2]/255.0f * bx::fexp2(exponent);
-				imguiSlider("Lum Avg", lumAvg, 0.0f, 1.0f, 0.01f, false);
+				ImGui::SliderFloat("Lum Avg", &lumAvg, 0.0f, 1.0f);
 			}
 
-			imguiEndScrollArea();
+			ImGui::End();
+
 			imguiEndFrame();
 
 			// This dummy draw call is here to make sure that view 0 is cleared
@@ -399,8 +404,9 @@ class ExampleHDR : public entry::AppI
 			bgfx::FrameBufferHandle invalid = BGFX_INVALID_HANDLE;
 			bgfx::setViewFrameBuffer(hdrHBlurTonemap, invalid);
 
+			const bgfx::Caps* caps = bgfx::getCaps();
 			float proj[16];
-			bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
+			bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f, caps->homogeneousDepth);
 
 			uint8_t order[] =
 			{
@@ -437,7 +443,7 @@ class ExampleHDR : public entry::AppI
 
 			float view[16];
 			bx::mtxLookAt(view, temp, at);
-			bx::mtxProj(proj, 60.0f, float(m_width)/float(m_height), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
+			bx::mtxProj(proj, 60.0f, float(m_width)/float(m_height), 0.1f, 100.0f, caps->homogeneousDepth);
 
 			// Set view and projection matrix for view hdrMesh.
 			bgfx::setViewTransform(hdrMesh, view, proj);

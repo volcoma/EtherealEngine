@@ -15,7 +15,7 @@ void texture::dispose()
 	if (is_valid())
 		gfx::destroyTexture(handle);
 
-	handle = { bgfx::invalidHandle };
+	handle = { bgfx::kInvalidHandle };
 }
 
 void texture::populate(const gfx::Memory* _mem, std::uint32_t _flags /*= BGFX_TEXTURE_NONE */, std::uint8_t _skip /*= 0 */, gfx::TextureInfo* _info /*= nullptr*/)

@@ -206,12 +206,11 @@ class ExampleOIT : public entry::AppI
 		m_wbPass         = loadProgram("vs_oit",      "fs_oit_wb"               );
 		m_wbBlit         = loadProgram("vs_oit_blit", "fs_oit_wb_blit"          );
 
-		m_fbtextures[0].idx = bgfx::invalidHandle;
-		m_fbtextures[1].idx = bgfx::invalidHandle;
-		m_fbh.idx = bgfx::invalidHandle;
+		m_fbtextures[0].idx = bgfx::kInvalidHandle;
+		m_fbtextures[1].idx = bgfx::kInvalidHandle;
+		m_fbh.idx = bgfx::kInvalidHandle;
 
 		m_mode = 1;
-		m_scrollArea = 0;
 		m_frontToBack = true;
 		m_fadeInOut   = false;
 
@@ -279,30 +278,28 @@ class ExampleOIT : public entry::AppI
 				, uint16_t(m_height)
 				);
 
-			imguiBeginScrollArea("Settings", m_width - m_width / 4 - 10, 10, m_width / 4, m_height / 3, &m_scrollArea);
-			imguiSeparatorLine();
-
-			imguiLabel("Blend mode:");
-
-			m_mode = imguiChoose(m_mode
-				, "None"
-				, "Separate"
-				, "MRT Independent"
+			ImGui::SetNextWindowPos(ImVec2((float)m_width - (float)m_width / 4.0f - 10.0f, 10.0f) );
+			ImGui::SetNextWindowSize(ImVec2((float)m_width / 4.0f, (float)m_height / 3.0f) );
+			ImGui::Begin("Settings"
+				, NULL
+				, ImVec2((float)m_width / 4.0f, (float)m_height / 3.0f)
+				, ImGuiWindowFlags_AlwaysAutoResize
 				);
 
-			imguiSeparatorLine();
+			ImGui::Separator();
 
-			if (imguiCheck("Front to back", m_frontToBack) )
-			{
-				m_frontToBack ^= true;
-			}
+			ImGui::Text("Blend mode:");
 
-			if (imguiCheck("Fade in/out", m_fadeInOut) )
-			{
-				m_fadeInOut ^= true;
-			}
+			ImGui::RadioButton("None", &m_mode, 0);
+			ImGui::RadioButton("Separate", &m_mode, 1);
+			ImGui::RadioButton("MRT Independent", &m_mode, 2);
 
-			imguiEndScrollArea();
+			ImGui::Separator();
+
+			ImGui::Checkbox("Front to back", &m_frontToBack);
+			ImGui::Checkbox("Fade in/out", &m_fadeInOut);
+
+			ImGui::End();
 			imguiEndFrame();
 
 			// Set view 0 default viewport.
@@ -366,7 +363,9 @@ class ExampleOIT : public entry::AppI
 
 			// Set view and projection matrix for view 1.
 			bx::mtxIdentity(view);
-			bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
+
+			const bgfx::Caps* caps = bgfx::getCaps();
+			bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f, caps->homogeneousDepth);
 			bgfx::setViewTransform(1, view, proj);
 
 			for (uint32_t depth = 0; depth < 3; ++depth)
@@ -411,48 +410,48 @@ class ExampleOIT : public entry::AppI
 							;
 
 						const uint64_t stateNoDepth = 0
-						| BGFX_STATE_CULL_CW
-						| BGFX_STATE_RGB_WRITE
-						| BGFX_STATE_ALPHA_WRITE
-						| BGFX_STATE_DEPTH_TEST_ALWAYS
-						| BGFX_STATE_MSAA
-						;
+							| BGFX_STATE_CULL_CW
+							| BGFX_STATE_RGB_WRITE
+							| BGFX_STATE_ALPHA_WRITE
+							| BGFX_STATE_DEPTH_TEST_ALWAYS
+							| BGFX_STATE_MSAA
+							;
 
 						bgfx::ProgramHandle program = BGFX_INVALID_HANDLE;
 						switch (m_mode)
 						{
-							case 0:
-								// Set vertex and fragment shaders.
-								program = m_blend;
+						case 0:
+							// Set vertex and fragment shaders.
+							program = m_blend;
 
-								// Set render states.
-								bgfx::setState(state
-									| BGFX_STATE_BLEND_ALPHA
-									);
-								break;
+							// Set render states.
+							bgfx::setState(state
+								| BGFX_STATE_BLEND_ALPHA
+								);
+							break;
 
-							case 1:
-								// Set vertex and fragment shaders.
-								program = m_wbSeparatePass;
+						case 1:
+							// Set vertex and fragment shaders.
+							program = m_wbSeparatePass;
 
-								// Set render states.
-								bgfx::setState(stateNoDepth
-									| BGFX_STATE_BLEND_FUNC_SEPARATE(BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ZERO, BGFX_STATE_BLEND_INV_SRC_ALPHA)
-									);
-								break;
+							// Set render states.
+							bgfx::setState(stateNoDepth
+								| BGFX_STATE_BLEND_FUNC_SEPARATE(BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ZERO, BGFX_STATE_BLEND_INV_SRC_ALPHA)
+								);
+							break;
 
-							default:
-								// Set vertex and fragment shaders.
-								program = m_wbPass;
+						default:
+							// Set vertex and fragment shaders.
+							program = m_wbPass;
 
-								// Set render states.
-								bgfx::setState(stateNoDepth
-									| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ONE)
-									| BGFX_STATE_BLEND_INDEPENDENT
-									, 0
-									| BGFX_STATE_BLEND_FUNC_RT_1(BGFX_STATE_BLEND_ZERO, BGFX_STATE_BLEND_SRC_COLOR)
-									);
-								break;
+							// Set render states.
+							bgfx::setState(stateNoDepth
+								| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ONE)
+								| BGFX_STATE_BLEND_INDEPENDENT
+								, 0
+								| BGFX_STATE_BLEND_FUNC_RT_1(BGFX_STATE_BLEND_ZERO, BGFX_STATE_BLEND_SRC_COLOR)
+								);
+							break;
 						}
 
 						// Submit primitive for rendering to view 0.
@@ -490,8 +489,7 @@ class ExampleOIT : public entry::AppI
 	uint32_t m_debug;
 	uint32_t m_reset;
 
-	uint32_t m_mode;
-	int32_t  m_scrollArea;
+	int32_t m_mode;
 	bool m_frontToBack;
 	bool m_fadeInOut;
 

@@ -37,7 +37,6 @@ Supported platforms:
  * iOS (iPhone, iPad, AppleTV)
  * Linux
  * MIPS Creator CI20
- * Native Client (PPAPI 37+, ARM, x86, x64, PNaCl)
  * OSX (10.9+)
  * RaspberryPi
  * SteamLink
@@ -95,10 +94,10 @@ https://github.com/dariomanesku/cmftStudio cmftStudio - cubemap filtering tool.
 
 ## Crown
 
-https://github.com/taylor001/crown Crown is a general purpose data-driven game
+https://github.com/dbartolini/crown Crown is a general purpose data-driven game
 engine, written from scratch with a minimalistic and data-oriented design
 philosophy in mind.  
-![Crown screenshot](https://raw.githubusercontent.com/taylor001/crown/master/docs/shots/level-editor.png)
+![Crown screenshot](https://raw.githubusercontent.com/dbartolini/crown/master/docs/shots/level-editor.png)
 
 ## Offroad Legends 2
 
@@ -147,7 +146,13 @@ C++ and using bgfx to support multiple rendering APIs.
 ## DLS
 
 http://makingartstudios.itch.io/dls - DLS the digital logic simulator game.  
-![dls-screenshot](https://img.itch.io/aW1hZ2UvMzk3MTgvMTc5MjQ4LnBuZw==/original/kA%2FQPb.png)
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=6o1-sQRNqcA
+" target="_blank"><img src="http://img.youtube.com/vi/6o1-sQRNqcA/0.jpg" 
+alt="DLS - Creating a 4-bit Register "
+width="640" height="480" border="0" /></a>
+
+http://dls.makingartstudios.com/sandbox/ - DLS: The Sandbox  
+![dls-sandbox-screenshot](https://pbs.twimg.com/media/DBaFwOKWAAEq0mp.jpg:large)
 
 ## MAME
 

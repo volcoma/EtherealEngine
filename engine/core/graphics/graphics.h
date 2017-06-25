@@ -1,13 +1,10 @@
 #pragma once
 
+#include <string>
 #include <cstdint>
 #include "bgfx/bgfx.h"
 #include "bgfx/platform.h"
 #include "bgfx/embedded_shader.h"
-#include "bx/spscqueue.h"
-#include "bx/handlealloc.h"
-#include "bx/readerwriter.h"
-#include "bx/error.h"
 
 namespace gfx
 {
@@ -128,4 +125,5 @@ namespace gfx
 	std::uint64_t clip_quad(float depth = 0.0f, float width = 1.0f, float height = 1.0f);
 
 	void get_size_from_ratio(BackbufferRatio::Enum _ratio, uint16_t& _width, uint16_t& _height);
+	const std::string& get_renderer_filename_extension();
 }

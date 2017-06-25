@@ -172,6 +172,8 @@ namespace bgfx { namespace hlsl
 		{ bgfx::Attrib::Bitangent, "BITANGENT",    0 },
 		{ bgfx::Attrib::Color0,    "COLOR",        0 },
 		{ bgfx::Attrib::Color1,    "COLOR",        1 },
+		{ bgfx::Attrib::Color2,    "COLOR",        2 },
+		{ bgfx::Attrib::Color3,    "COLOR",        3 },
 		{ bgfx::Attrib::Indices,   "BLENDINDICES", 0 },
 		{ bgfx::Attrib::Weight,    "BLENDWEIGHT",  0 },
 		{ bgfx::Attrib::TexCoord0, "TEXCOORD",     0 },
@@ -190,7 +192,7 @@ namespace bgfx { namespace hlsl
 		for (uint32_t ii = 0; ii < bgfx::Attrib::Count; ++ii)
 		{
 			const RemapInputSemantic& ris = s_remapInputSemantic[ii];
-			if (0 == strcmp(ris.m_name, _name)
+			if (0 == bx::strCmp(ris.m_name, _name)
 			&&  ris.m_index == _index)
 			{
 				return ris;
@@ -543,23 +545,17 @@ namespace bgfx { namespace hlsl
 		return true;
 	}
 
-	static bool compile(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, bool _firstPass, std::string& err)
+	static bool compile(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, bool _firstPass)
 	{
 		const char* profile = _cmdLine.findOption('p', "profile");
 		if (NULL == profile)
 		{
 			fprintf(stderr, "Error: Shader profile must be specified.\n");
-			bx::stringPrintf(err, "Error: Shader profile must be specified.\n");
 			return false;
 		}
 
 		s_compiler = load();
-		if (!s_compiler)
-		{
-			bx::stringPrintf(err, "Could not load d3dcompiler dll.\n");
-			fprintf(stderr, "Could not load d3dcompiler dll.\n");
-			return false;
-		}
+
 		bool result = false;
 		bool debug = _cmdLine.hasArg('\0', "debug");
 
@@ -630,7 +626,7 @@ namespace bgfx { namespace hlsl
 			int32_t end    = INT32_MAX;
 
 			bool found = false
-				|| 2 == sscanf(log, "(%u,%u):", &line, &column)
+				|| 2 == sscanf(log, "(%u,%u):",  &line, &column)
 				|| 2 == sscanf(log, " :%u:%u: ", &line, &column)
 				;
 
@@ -641,8 +637,7 @@ namespace bgfx { namespace hlsl
 				end   = start + 20;
 			}
 
-			printCode(err, _code.c_str(), line, start, end, column);
-			bx::stringPrintf(err, "Error: D3DCompile failed 0x%08x %s\n", (uint32_t)hr, log);
+			printCode(_code.c_str(), line, start, end, column);
 			fprintf(stderr, "Error: D3DCompile failed 0x%08x %s\n", (uint32_t)hr, log);
 			errorMsg->Release();
 			return false;
@@ -658,7 +653,6 @@ namespace bgfx { namespace hlsl
 			if (!getReflectionDataD3D9(code, uniforms) )
 			{
 				fprintf(stderr, "Error: Unable to get D3D9 reflection data.\n");
-				bx::stringPrintf(err, "Error: Unable to get D3D9 reflection data.\n");
 				goto error;
 			}
 		}
@@ -668,7 +662,6 @@ namespace bgfx { namespace hlsl
 			if (!getReflectionDataD3D11(code, profile[0] == 'v', uniforms, numAttrs, attrs, size, unusedUniforms) )
 			{
 				fprintf(stderr, "Error: Unable to get D3D11 reflection data.\n");
-				bx::stringPrintf(err, "Error: Unable to get D3D11 reflection data.\n");
 				goto error;
 			}
 
@@ -679,36 +672,43 @@ namespace bgfx { namespace hlsl
 
 				// first time through, we just find unused uniforms and get rid of them
 				std::string output;
+				bx::Error err;
 				LineReader reader(_code.c_str() );
-				while (!reader.isEof() )
+				while (err.isOk() )
 				{
-					std::string line = reader.getLine();
-					for (UniformNameList::iterator it = unusedUniforms.begin(), itEnd = unusedUniforms.end(); it != itEnd; ++it)
+					char str[4096];
+					int32_t len = bx::read(&reader, str, BX_COUNTOF(str), &err);
+					if (err.isOk() )
 					{
-						size_t index = line.find("uniform ");
-						if (index == std::string::npos)
+						std::string strLine(str, len);
+
+						for (UniformNameList::iterator it = unusedUniforms.begin(), itEnd = unusedUniforms.end(); it != itEnd; ++it)
 						{
-							continue;
+							size_t index = strLine.find("uniform ");
+							if (index == std::string::npos)
+							{
+								continue;
+							}
+
+							// matching lines like:  uniform u_name;
+							// we want to replace "uniform" with "static" so that it's no longer
+							// included in the uniform blob that the application must upload
+							// we can't just remove them, because unused functions might still reference
+							// them and cause a compile error when they're gone
+							if (!!bx::findIdentifierMatch(strLine.c_str(), it->c_str() ) )
+							{
+								strLine = strLine.replace(index, strLength, "static");
+								unusedUniforms.erase(it);
+								break;
+							}
 						}
 
-						// matching lines like:  uniform u_name;
-						// we want to replace "uniform" with "static" so that it's no longer
-						// included in the uniform blob that the application must upload
-						// we can't just remove them, because unused functions might still reference
-						// them and cause a compile error when they're gone
-						if (!!bx::findIdentifierMatch(line.c_str(), it->c_str() ) )
-						{
-							line = line.replace(index, strLength, "static");
-							unusedUniforms.erase(it);
-							break;
-						}
+						output += strLine;
 					}
-
-					output += line;
 				}
 
 				// recompile with the unused uniforms converted to statics
-				return compile(_cmdLine, _version, output.c_str(), _writer, false, err);
+				return compile(_cmdLine, _version, output.c_str(), _writer, false);
 			}
 		}
 
@@ -756,7 +756,7 @@ namespace bgfx { namespace hlsl
 		}
 
 		{
-			uint16_t shaderSize = (uint16_t)code->GetBufferSize();
+			uint32_t shaderSize = static_cast<uint32_t>(code->GetBufferSize());
 			bx::write(_writer, shaderSize);
 			bx::write(_writer, code->GetBufferPointer(), shaderSize);
 			uint8_t nul = 0;
@@ -806,9 +806,9 @@ namespace bgfx { namespace hlsl
 
 } // namespace hlsl
 
-	bool compileHLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, std::string& err)
+	bool compileHLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer)
 	{
-		return hlsl::compile(_cmdLine, _version, _code, _writer, true, err);
+		return hlsl::compile(_cmdLine, _version, _code, _writer, true);
 	}
 
 } // namespace bgfx
@@ -817,11 +817,10 @@ namespace bgfx { namespace hlsl
 
 namespace bgfx
 {
-	bool compileHLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer, std::string& err)
+	bool compileHLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer)
 	{
 		BX_UNUSED(_cmdLine, _version, _code, _writer);
 		fprintf(stderr, "HLSL compiler is not supported on this platform.\n");
-		bx::stringPrintf(err, "HLSL compiler is not supported on this platform.\n");
 		return false;
 	}
 

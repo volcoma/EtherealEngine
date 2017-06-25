@@ -1,5 +1,6 @@
 #include "graphics.h"
-
+#include <algorithm>
+#include <map>
 namespace gfx
 {
 	VertexDecl pos_texcoord0_vertex::decl;
@@ -449,9 +450,26 @@ namespace gfx
 			break;
 		}
 
-		_width = bx::uint16_max(1, _width);
-		_height = bx::uint16_max(1, _height);
+		_width = std::max<uint16_t>(1, _width);
+		_height = std::max<uint16_t>(1, _height);
 		
+	}
+
+	const std::string& get_renderer_filename_extension()
+	{
+		static std::map<gfx::RendererType::Enum, std::string> types =
+		{
+			{ RendererType::Direct3D9, ".dx9" },
+			{ RendererType::Direct3D11, ".dx11" },
+			{ RendererType::Direct3D12, ".dx12" },
+			{ RendererType::Gnm, ".gnm" },
+			{ RendererType::Metal, ".metal" },
+			{ RendererType::OpenGL, ".gl" },
+			{ RendererType::OpenGLES, ".gles" },
+			{ RendererType::Noop, ".noop" }
+		};
+
+		return types[getRendererType()];
 	}
 
 }

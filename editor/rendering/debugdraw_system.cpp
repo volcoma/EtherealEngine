@@ -132,6 +132,7 @@ namespace editor
 				aabb.m_max[2] = bounds.max.z;
 				ddSetTransform(&world_transform);
 				ddDraw(aabb);
+				ddSetTransform(nullptr);
 			}
 			
 			ddPop();
@@ -219,6 +220,7 @@ namespace editor
 				aabb.m_max[1] = probe.box_data.extents.y;
 				aabb.m_max[2] = probe.box_data.extents.z;
 				ddDraw(aabb);
+				ddSetTransform(nullptr);
 				ddPop();
 			}
 			else
@@ -288,6 +290,7 @@ namespace editor
 					aabb.m_max[1] = bounds.max.y;
 					aabb.m_max[2] = bounds.max.z;
 					ddDraw(aabb);
+					ddSetTransform(nullptr);
 					ddPop();
 				}
 			}

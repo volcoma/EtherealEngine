@@ -562,7 +562,7 @@ void help(const char* _str, const bx::Error& _err)
 
 	help(str.c_str(), false);
 }
-
+#include "texturec.h"
 int compile_texture(int _argc, const char* _argv[])
 {
 	bx::CommandLine cmdLine(_argc, _argv);
@@ -575,27 +575,27 @@ int compile_texture(int _argc, const char* _argv[])
 			, BIMG_TEXTUREC_VERSION_MINOR
 			, BIMG_API_VERSION
 			);
-		return EXIT_SUCCESS;
+		return bx::kExitSuccess;
 	}
 
 	if (cmdLine.hasArg('h', "help") )
 	{
 		help();
-		return EXIT_FAILURE;
+		return bx::kExitFailure;
 	}
 
 	const char* inputFileName = cmdLine.findOption('f');
 	if (NULL == inputFileName)
 	{
 		help("Input file must be specified.");
-		return EXIT_FAILURE;
+		return bx::kExitFailure;
 	}
 
 	const char* outputFileName = cmdLine.findOption('o');
 	if (NULL == outputFileName)
 	{
 		help("Output file must be specified.");
-		return EXIT_FAILURE;
+		return bx::kExitFailure;
 	}
 
 	const char* saveAs = cmdLine.findOption("as");
@@ -604,7 +604,7 @@ int compile_texture(int _argc, const char* _argv[])
 	if (NULL == saveAs)
 	{
 		help("Output file format must be specified.");
-		return EXIT_FAILURE;
+		return bx::kExitFailure;
 	}
 
 	Options options;
@@ -644,7 +644,7 @@ int compile_texture(int _argc, const char* _argv[])
 		if (!bimg::isValid(options.format) )
 		{
 			help("Invalid format specified.");
-			return EXIT_FAILURE;
+			return bx::kExitFailure;
 		}
 	}
 
@@ -658,26 +658,26 @@ int compile_texture(int _argc, const char* _argv[])
 		case 'd': options.quality = bimg::Quality::Default; break;
 		default:
 			help("Invalid quality specified.");
-			return EXIT_FAILURE;
+			return bx::kExitFailure;
 		}
 	}
 
 	bx::Error err;
-	bx::CrtFileReader reader;
+	bx::FileReader reader;
 	if (!bx::open(&reader, inputFileName, &err) )
 	{
 		help("Failed to open input file.", err);
-		return EXIT_FAILURE;
+		return bx::kExitFailure;
 	}
 
 	uint32_t inputSize = (uint32_t)bx::getSize(&reader);
 	if (0 == inputSize)
 	{
 		help("Failed to read input file.", err);
-		return EXIT_FAILURE;
+		return bx::kExitFailure;
 	}
 
-	bx::CrtAllocator allocator;
+	bx::DefaultAllocator allocator;
 	uint8_t* inputData = (uint8_t*)BX_ALLOC(&allocator, inputSize);
 
 	bx::read(&reader, inputData, inputSize, &err);
@@ -686,7 +686,7 @@ int compile_texture(int _argc, const char* _argv[])
 	if (!err.isOk() )
 	{
 		help("Failed to read input file.", err);
-		return EXIT_FAILURE;
+		return bx::kExitFailure;
 	}
 
 	bimg::ImageContainer* output = convert(&allocator, inputData, inputSize, options, &err);
@@ -695,7 +695,7 @@ int compile_texture(int _argc, const char* _argv[])
 
 	if (NULL != output)
 	{
-		bx::CrtFileWriter writer;
+		bx::FileWriter writer;
 		if (bx::open(&writer, outputFileName, false, &err) )
 		{
 			if (NULL != bx::strFindI(saveAs, "ktx") )
@@ -712,13 +712,13 @@ int compile_texture(int _argc, const char* _argv[])
 			if (!err.isOk() )
 			{
 				help(NULL, err);
-				return EXIT_FAILURE;
+				return bx::kExitFailure;
 			}
 		}
 		else
 		{
 			help("Failed to open output file.", err);
-			return EXIT_FAILURE;
+			return bx::kExitFailure;
 		}
 
 		bimg::imageFree(output);
@@ -726,8 +726,8 @@ int compile_texture(int _argc, const char* _argv[])
 	else
 	{
 		help(NULL, err);
-		return EXIT_FAILURE;
+		return bx::kExitFailure;
 	}
 
-	return EXIT_SUCCESS;
+	return bx::kExitSuccess;
 }

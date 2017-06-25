@@ -12,45 +12,43 @@ struct GfxCallback : public gfx::CallbackI
 	{
 	}
 
-	virtual void traceVargs(const char* _filePath, std::uint16_t _line, const char* _format, std::va_list _argList) BX_OVERRIDE
+	virtual void traceVargs(const char* _filePath, std::uint16_t _line, const char* _format, std::va_list _argList)
 	{
 		APPLOG_TRACE(string_utils::format(_format, _argList).c_str());
 	}
 
-	virtual void fatal(gfx::Fatal::Enum _code, const char* _str) BX_OVERRIDE
+	virtual void fatal(gfx::Fatal::Enum _code, const char* _str)
 	{
 		APPLOG_ERROR(_str);
 	}
 
-	virtual uint32_t cacheReadSize(uint64_t /*_id*/) BX_OVERRIDE
+	virtual uint32_t cacheReadSize(uint64_t /*_id*/)
 	{
 		return 0;
 	}
 
-	virtual bool cacheRead(uint64_t /*_id*/, void* /*_data*/, uint32_t /*_size*/) BX_OVERRIDE
+	virtual bool cacheRead(uint64_t /*_id*/, void* /*_data*/, uint32_t /*_size*/)
 	{
 		return false;
 	}
 
-	virtual void cacheWrite(uint64_t /*_id*/, const void* /*_data*/, uint32_t /*_size*/) BX_OVERRIDE
+	virtual void cacheWrite(uint64_t /*_id*/, const void* /*_data*/, uint32_t /*_size*/)
 	{
 	}
 
-	virtual void screenShot(const char* _filePath, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _data, uint32_t _size, bool _yflip) BX_OVERRIDE
-	{
-		BX_UNUSED(_filePath, _width, _height, _pitch, _data, _size, _yflip);
-	}
-
-	virtual void captureBegin(uint32_t /*_width*/, uint32_t /*_height*/, uint32_t /*_pitch*/, gfx::TextureFormat::Enum /*_format*/, bool /*_yflip*/) BX_OVERRIDE
-	{
-		BX_TRACE("Warning: using capture without callback (a.k.a. pointless).");
-	}
-
-	virtual void captureEnd() BX_OVERRIDE
+	virtual void screenShot(const char* _filePath, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _data, uint32_t _size, bool _yflip)
 	{
 	}
 
-	virtual void captureFrame(const void* /*_data*/, uint32_t /*_size*/) BX_OVERRIDE
+	virtual void captureBegin(uint32_t /*_width*/, uint32_t /*_height*/, uint32_t /*_pitch*/, gfx::TextureFormat::Enum /*_format*/, bool /*_yflip*/)
+	{
+	}
+
+	virtual void captureEnd()
+	{
+	}
+
+	virtual void captureFrame(const void* /*_data*/, uint32_t /*_size*/)
 	{
 	}
 
@@ -75,7 +73,7 @@ namespace runtime
 	{
 		gfx::PlatformData pd
 		{
-            main_window.get_system_handle_specific(),
+			(void*)(uintptr_t)main_window.get_system_handle_specific(),
             (void*)(uintptr_t)main_window.get_system_handle(),
 			nullptr,
 			nullptr,

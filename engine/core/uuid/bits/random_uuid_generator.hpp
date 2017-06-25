@@ -36,6 +36,7 @@ namespace uuids
 				std::numeric_limits<result_type>::min(),
 				std::numeric_limits<result_type>::max()) {}
 
+
 		uuid operator ()()
 		{
 			std::uint8_t bytes[uuid::size()];

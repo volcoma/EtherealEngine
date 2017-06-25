@@ -10,7 +10,7 @@ void index_buffer::dispose()
 	if (is_valid())
 		gfx::destroyIndexBuffer(handle);
 
-	handle = { bgfx::invalidHandle };
+	handle = { bgfx::kInvalidHandle };
 }
 
 bool index_buffer::is_valid() const

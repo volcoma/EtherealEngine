@@ -81,27 +81,32 @@ namespace runtime
 
 	void asset_reader::load_shader_from_file(const std::string& key, const fs::path& absolute_key, bool async, request<shader>& request)
 	{
-		struct Wrapper
+		auto read_memory = std::make_shared<fs::byte_array_t>();
+		const auto& renderer_extension = gfx::get_renderer_filename_extension();
+		auto compiled_absolute_key = absolute_key.string() + renderer_extension + extensions::compiled;
+
+		auto read_memory_func = [read_memory, compiled_absolute_key]()
 		{
-			std::map<gfx::RendererType::Enum, fs::byte_array_t> binaries;
+			if (!read_memory)
+				return;
+
+			auto stream = std::ifstream{ compiled_absolute_key, std::ios::in | std::ios::binary };
+			*read_memory = fs::read_stream(stream);
 		};
 
-		auto compiled_absolute_key = absolute_key.string() + extensions::compiled;
-
-		auto wrapper = std::make_shared<Wrapper>();
-		auto deserialize = [wrapper, compiled_absolute_key]() mutable
+		auto create_resource_func = [read_memory, key, &request]() mutable
 		{
-			std::ifstream stream{ compiled_absolute_key, std::ios::in | std::ios::binary };
-			cereal::iarchive_binary_t ar(stream);
+			// if someone destroyed our memory
+			if (!read_memory)
+				return;
+			// if nothing was read
+			if (read_memory->empty())
+				return;
 
-			try_load(ar, cereal::make_nvp("shader", wrapper->binaries));
-		};
+			const gfx::Memory* mem = gfx::copy(read_memory->data(), static_cast<std::uint32_t>(read_memory->size()));
+			read_memory->clear();
+			read_memory.reset();
 
-		auto create_resource_func = [wrapper, key, &request]() mutable
-		{
-			auto& read_memory = wrapper->binaries[gfx::getRendererType()];
-			const gfx::Memory* mem = gfx::copy(&read_memory[0], static_cast<std::uint32_t>(read_memory.size()));
-			wrapper->binaries.clear();
 			if (nullptr != mem)
 			{
 				auto shdr = std::make_shared<shader>();
@@ -131,9 +136,9 @@ namespace runtime
 		{
 			auto& ts = core::get_subsystem<runtime::task_system>();
 
-			auto task = ts.create("", [&ts, deserialize, create_resource_func]() mutable
+			auto task = ts.create("", [&ts, read_memory_func, create_resource_func]() mutable
 			{
-				deserialize();
+				read_memory_func();
 
 				auto callback = ts.create("Create Resource", create_resource_func);
 
@@ -144,7 +149,7 @@ namespace runtime
 		}
 		else
 		{
-			deserialize();
+			read_memory_func();
 			create_resource_func();
 		}
 	}

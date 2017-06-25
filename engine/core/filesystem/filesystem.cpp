@@ -28,7 +28,7 @@ namespace fs
 	{
 		// Open the stream
 		byte_array_t read_memory;
-		if (stream) {
+		if (stream.good()) {
 			// get length of file:
 			stream.seekg(0, stream.end);
 			size_t length = static_cast<std::size_t>(stream.tellg());
@@ -54,7 +54,7 @@ namespace fs
             return path{};
 
         const auto root = string_path.substr(0, pos);
-		const auto relative_path = _path.relative_path();
+		const auto relative_path = string_path.substr(pos + 1);
 		// Matching path protocol in our list?
 		auto& protocols = get_path_protocols();
 

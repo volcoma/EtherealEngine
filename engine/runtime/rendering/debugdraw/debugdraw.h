@@ -7,9 +7,6 @@
 #define DEBUGDRAW_H_HEADER_GUARD
 
 #include <bx/allocator.h>
-#include <bx/bx.h>
-#include <bimg/bimg.h>
-#include <bgfx/bgfx.h>
 #include "bounds.h"
 
 struct Axis
@@ -154,7 +151,8 @@ struct ddRAII
 	{
 		ddBegin(_viewId);
 	}
-	~ddRAII()
+
+	ddRAII()
 	{
 		ddEnd();
 	}

@@ -72,13 +72,13 @@ static const uint16_t s_cubeIndices[36] =
 	6, 3, 7,
 };
 
-#if BX_PLATFORM_EMSCRIPTEN || BX_PLATFORM_NACL
+#if BX_PLATFORM_EMSCRIPTEN
 static const int64_t highwm = 1000000/35;
 static const int64_t lowwm  = 1000000/27;
 #else
 static const int64_t highwm = 1000000/65;
 static const int64_t lowwm  = 1000000/57;
-#endif // BX_PLATFORM_EMSCRIPTEN || BX_PLATFORM_NACL
+#endif // BX_PLATFORM_EMSCRIPTEN
 
 class ExampleDrawStress : public entry::AppI
 {
@@ -114,11 +114,11 @@ class ExampleDrawStress : public entry::AppI
 
 		// Set view 0 clear state.
 		bgfx::setViewClear(0
-				, BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
-				, 0x303030ff
-				, 1.0f
-				, 0
-				);
+			, BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
+			, 0x303030ff
+			, 1.0f
+			, 0
+			);
 
 		// Create vertex stream declaration.
 		PosColorVertex::init();
@@ -127,16 +127,16 @@ class ExampleDrawStress : public entry::AppI
 
 		// Create program from shaders.
 		m_program = bgfx::createProgram(
-				  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_drawstress")
-				, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_drawstress")
-				, true /* destroy shaders when program is destroyed */
-				);
+			  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_drawstress")
+			, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_drawstress")
+			, true /* destroy shaders when program is destroyed */
+			);
 
 		// Create static vertex buffer.
 		m_vbh = bgfx::createVertexBuffer(
-					  bgfx::makeRef(s_cubeVertices, sizeof(s_cubeVertices) )
-					, PosColorVertex::ms_decl
-					);
+			  bgfx::makeRef(s_cubeVertices, sizeof(s_cubeVertices) )
+			, PosColorVertex::ms_decl
+			);
 
 		// Create static index buffer.
 		m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(s_cubeIndices, sizeof(s_cubeIndices) ) );
@@ -200,50 +200,53 @@ class ExampleDrawStress : public entry::AppI
 			float time = (float)( (now-m_timeOffset)/freq);
 
 			imguiBeginFrame(m_mouseState.m_mx
-					,  m_mouseState.m_my
-					, (m_mouseState.m_buttons[entry::MouseButton::Left  ] ? IMGUI_MBUT_LEFT   : 0)
-					| (m_mouseState.m_buttons[entry::MouseButton::Right ] ? IMGUI_MBUT_RIGHT  : 0)
-					| (m_mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
-					,  m_mouseState.m_mz
-					, uint16_t(m_width)
-					, uint16_t(m_height)
-					);
+				,  m_mouseState.m_my
+				, (m_mouseState.m_buttons[entry::MouseButton::Left  ] ? IMGUI_MBUT_LEFT   : 0)
+				| (m_mouseState.m_buttons[entry::MouseButton::Right ] ? IMGUI_MBUT_RIGHT  : 0)
+				| (m_mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
+				,  m_mouseState.m_mz
+				, uint16_t(m_width)
+				, uint16_t(m_height)
+				);
 
-			imguiBeginScrollArea("Settings", m_width - m_width / 4 - 10, 10, m_width / 4, m_height / 2, &m_scrollArea);
-			imguiSeparatorLine();
+			ImGui::SetNextWindowPos(ImVec2((float)m_width - (float)m_width / 4.0f - 10.0f, 10.0f) );
+			ImGui::SetNextWindowSize(ImVec2((float)m_width / 4.0f, (float)m_height / 2.0f) );
+			ImGui::Begin("Settings"
+				, NULL
+				, ImVec2((float)m_width / 4.0f, (float)m_height / 2.0f)
+				, ImGuiWindowFlags_AlwaysAutoResize
+				);
 
-			m_transform = imguiChoose(m_transform
-					, "Rotate"
-					, "No fragments"
-					);
-			imguiSeparatorLine();
+			ImGui::RadioButton("Rotate",&m_transform,0);
+			ImGui::RadioButton("No fragments",&m_transform,1);
+			ImGui::Separator();
 
-			if (imguiCheck("Auto adjust", m_autoAdjust) )
-			{
-				m_autoAdjust ^= true;
-			}
+			ImGui::Checkbox("Auto adjust", &m_autoAdjust);
 
-			imguiSlider("Dim", m_dim, 5, m_maxDim);
-			imguiLabel("Draw calls: %d", m_dim*m_dim*m_dim);
-			imguiLabel("Avg Delta Time (1 second) [ms]: %0.4f", m_deltaTimeAvgNs/1000.0f);
+			ImGui::SliderInt("Dim", &m_dim, 5, m_maxDim);
+			ImGui::Text("Draw calls: %d", m_dim*m_dim*m_dim);
+			ImGui::Text("Avg Delta Time (1 second) [ms]: %0.4f", m_deltaTimeAvgNs/1000.0f);
 
-			imguiSeparatorLine();
+			ImGui::Separator();
 			const bgfx::Stats* stats = bgfx::getStats();
-			imguiLabel("GPU %0.6f [ms]", double(stats->gpuTimeEnd - stats->gpuTimeBegin)*1000.0/stats->gpuTimerFreq);
-			imguiLabel("CPU %0.6f [ms]", double(stats->cpuTimeEnd - stats->cpuTimeBegin)*1000.0/stats->cpuTimerFreq);
-			imguiLabel("Waiting for render thread %0.6f [ms]", double(stats->waitRender) * toMs);
-			imguiLabel("Waiting for submit thread %0.6f [ms]", double(stats->waitSubmit) * toMs);
+			ImGui::Text("GPU %0.6f [ms]", double(stats->gpuTimeEnd - stats->gpuTimeBegin)*1000.0/stats->gpuTimerFreq);
+			ImGui::Text("CPU %0.6f [ms]", double(stats->cpuTimeEnd - stats->cpuTimeBegin)*1000.0/stats->cpuTimerFreq);
+			ImGui::Text("Waiting for render thread %0.6f [ms]", double(stats->waitRender) * toMs);
+			ImGui::Text("Waiting for submit thread %0.6f [ms]", double(stats->waitSubmit) * toMs);
 
-			imguiEndScrollArea();
+			ImGui::End();
+
 			imguiEndFrame();
 
 			float at[3] = { 0.0f, 0.0f, 0.0f };
 			float eye[3] = { 0.0f, 0.0f, -35.0f };
 
 			float view[16];
-			float proj[16];
 			bx::mtxLookAt(view, eye, at);
-			bx::mtxProj(proj, 60.0f, float(m_width)/float(m_height), 0.1f, 100.0f);
+
+			const bgfx::Caps* caps = bgfx::getCaps();
+			float proj[16];
+			bx::mtxProj(proj, 60.0f, float(m_width)/float(m_height), 0.1f, 100.0f, caps->homogeneousDepth);
 
 			// Set view and projection matrix for view 0.
 			bgfx::setViewTransform(0, view, proj);
@@ -324,7 +327,7 @@ class ExampleDrawStress : public entry::AppI
 	int32_t  m_scrollArea;
 	int32_t  m_dim;
 	int32_t  m_maxDim;
-	uint32_t m_transform;
+	int32_t  m_transform;
 
 	int64_t  m_timeOffset;
 

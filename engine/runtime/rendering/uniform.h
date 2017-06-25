@@ -58,5 +58,5 @@ struct uniform
 	/// Uniform info
 	gfx::UniformInfo info;
 	/// Internal handle
-	gfx::UniformHandle handle = { gfx::invalidHandle };
+	gfx::UniformHandle handle = { gfx::kInvalidHandle };
 };
