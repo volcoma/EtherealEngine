@@ -25,11 +25,10 @@ The engine uses the CMake build system.
 ## PLATFORMS
 It is written in a cross-platform manner.
 
-Compiler          | Supported
------------------ | ---------
-MSVC(windows)     | yes
-MinGW(windows)    | yes
-GCC(linux)        | yes
+OS          | Supported Compilers with C++14
+------------| ---------------------
+Windows     | MSVC, MinGW
+Linux       | GCC
 
 ## CODEBASE
 c++14 Using the latest and greatest features of the language.
