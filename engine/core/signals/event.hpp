@@ -135,7 +135,6 @@ public:
 	/// \param args The arguments to emit to the slots connected to the signal
 	/// \note
 	/// This is equvialent to emit.
-//	template <class ...Args>
 	void operator()(Args... args) const
 	{
 		emit(std::forward<Args>(args)...);

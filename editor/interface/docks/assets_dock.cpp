@@ -14,7 +14,6 @@
 #include "../../editing/editing_system.h"
 #include "../../system/project_manager.h"
 #include "filedialog/filedialog.h"
-#include <cstdio>
 
 template<typename T>
 asset_handle<texture> get_asset_icon(T asset)
@@ -691,7 +690,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 				{
 					asset_handle<material> asset;
 					fs::path parent_dir = dir->relative;
-					std::string name = string_utils::format("New Material (%s)", fs::path(std::tmpnam(nullptr)).filename().string().c_str());
+					std::string name = string_utils::format("New Material (%s)", string_utils::random_string(16).c_str());
 					asset.link->id = (parent_dir / (name + extensions::material)).generic_string();
 					asset.link->asset = std::make_shared<standard_material>();
 					am.save<material>(asset);
@@ -778,7 +777,9 @@ void assets_dock::render(const ImVec2& area)
 	gui::SliderFloat("", &scale_icons, 0.5f, 1.0f);
 	if (gui::IsItemHovered())
 	{
-		gui::SetTooltip("Scale Icons");
+		gui::BeginTooltip();
+		gui::TextUnformatted("Scale Icons");
+		gui::EndTooltip();
 	}
 	gui::PopItemWidth();
 	gui::SameLine();
@@ -796,7 +797,8 @@ void assets_dock::render(const ImVec2& area)
 	{
 		if (rit != hierarchy.rbegin())
 		{
-			gui::Text(">");
+			gui::AlignFirstTextHeightToWidgets();
+			gui::TextUnformatted(">");
 			gui::SameLine();
 		}
 

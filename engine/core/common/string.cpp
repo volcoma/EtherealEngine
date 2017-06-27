@@ -282,6 +282,27 @@ std::string string_utils::word_wrap(const std::string & value, std::string::size
 	return wrapString;
 }
 
+std::string string_utils::random_string(std::string::size_type length)
+{
+	auto randchar = []() -> char
+	{
+		const char charset[] =
+			"0123456789"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+			"abcdefghijklmnopqrstuvwxyz";
+		static std::default_random_engine engine{ std::random_device{}() };
+
+		const size_t max_index = (sizeof(charset) - 1);
+		static std::uniform_int_distribution<std::string::size_type> dist(0, max_index);
+
+		return charset[dist(engine)];
+	};
+
+	std::string str(length, 0);
+	std::generate_n(str.begin(), length, randchar);
+	return str;
+}
+
 std::string string_utils::command_line_args(int _argc, char* _argv[])
 {
 	std::string cmdLine = "";

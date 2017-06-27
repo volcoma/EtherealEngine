@@ -613,6 +613,7 @@ window_impl_x11::~window_impl_x11()
 	// Destroy the window
 	if (_window && !_is_external)
 	{
+		XUnmapWindow(_display, _window);
 		XDestroyWindow(_display, _window);
 		XFlush(_display);
 	}
@@ -870,8 +871,39 @@ void window_impl_x11::set_visible(bool visible)
 
 ////////////////////////////////////////////////////////////
 void window_impl_x11::maximize()
-{
+{    
 
+    Atom _NET_WM_STATE = get_atom("_NET_WM_STATE", false);
+
+    Atom _NET_WM_STATE_MAXIMIZED_VERT = get_atom("_NET_WM_STATE_MAXIMIZED_VERT", false);
+
+    Atom _NET_WM_STATE_MAXIMIZED_HORZ = get_atom("_NET_WM_STATE_MAXIMIZED_HORZ", false);
+
+    if (_window_mapped)
+    {
+
+        XEvent e;
+        std::memset(&e, 0, sizeof(e));
+
+        e.xany.type = ClientMessage;
+        e.xclient.message_type = _NET_WM_STATE;
+        e.xclient.format = 32;
+        e.xclient.window = _window;
+        e.xclient.data.l[0] = _NET_WM_STATE_ADD;
+        e.xclient.data.l[1] = _NET_WM_STATE_MAXIMIZED_VERT;
+        e.xclient.data.l[2] = _NET_WM_STATE_MAXIMIZED_HORZ;
+        e.xclient.data.l[3] = 0l;
+
+        XSendEvent(_display, RootWindow(_display, _screen), 0,
+                       SubstructureNotifyMask | SubstructureRedirectMask, &e);
+
+    }
+    else
+    {
+        //X11_SetNetWMState(_this, data->xwindow, window->flags);
+    }
+
+    XFlush(_display);
 }
 
 ////////////////////////////////////////////////////////////
@@ -881,26 +913,103 @@ void window_impl_x11::minimize()
 
     XFlush(_display);
 }
+static Bool is_map_notify(Display *dpy, XEvent *ev, XPointer win)
+{
+    return ev->type == MapNotify && ev->xmap.window == *((Window*)win);
 
+}
 ////////////////////////////////////////////////////////////
 void window_impl_x11::restore()
 {
+    {
+        Atom _NET_WM_STATE = get_atom("_NET_WM_STATE", false);
 
+        Atom _NET_WM_STATE_MAXIMIZED_VERT = get_atom("_NET_WM_STATE_MAXIMIZED_VERT", false);
+
+        Atom _NET_WM_STATE_MAXIMIZED_HORZ = get_atom("_NET_WM_STATE_MAXIMIZED_HORZ", false);
+
+        if (_window_mapped)
+        {
+
+            XEvent e;
+            std::memset(&e, 0, sizeof(e));
+
+            e.xany.type = ClientMessage;
+            e.xclient.message_type = _NET_WM_STATE;
+            e.xclient.format = 32;
+            e.xclient.window = _window;
+            e.xclient.data.l[0] = _NET_WM_STATE_REMOVE;
+            e.xclient.data.l[1] = _NET_WM_STATE_MAXIMIZED_VERT;
+            e.xclient.data.l[2] = _NET_WM_STATE_MAXIMIZED_HORZ;
+            e.xclient.data.l[3] = 0l;
+
+            XSendEvent(_display, RootWindow(_display, _screen), 0,
+                           SubstructureNotifyMask | SubstructureRedirectMask, &e);
+
+        }
+        else
+        {
+            //X11_SetNetWMState(_this, data->xwindow, window->flags);
+        }
+
+        XFlush(_display);
+    }
+
+
+
+    {
+        XEvent event;
+        if (!_window_mapped)
+        {
+            XMapRaised(_display,_window);
+            /* Blocking wait for "MapNotify" event.
+            * We use X11_XIfEvent because pXWindowEvent takes a mask rather than a type,
+            * and XCheckTypedWindowEvent doesn't block */
+
+            XIfEvent(_display, &event, &is_map_notify, (XPointer)&_window);
+
+            XFlush(_display);
+
+        }
+    }
+
+    {
+        Atom _NET_ACTIVE_WINDOW = get_atom("_NET_ACTIVE_WINDOW", false);
+
+        if (_window_mapped)
+        {
+            XEvent e;
+            std::memset(&e, 0, sizeof(e));
+
+            e.xany.type = ClientMessage;
+            e.xclient.message_type = _NET_ACTIVE_WINDOW;
+            e.xclient.format = 32;
+            e.xclient.window = _window;
+            e.xclient.data.l[0] = 1;  /* source indication. 1 = application */
+            e.xclient.data.l[1] = _last_input_time;
+            e.xclient.data.l[2] = 0;
+
+            XSendEvent(_display, RootWindow(_display, _screen), 0,
+                       SubstructureNotifyMask | SubstructureRedirectMask, &e);
+
+
+            XFlush(_display);
+        }
+
+    }
 }
 
 ////////////////////////////////////////////////////////////
 void window_impl_x11::set_alpha(float alpha)
 {
 	unsigned long opacity = (0xffffffff / 0xff) * static_cast<unsigned char>(alpha * 255);
-	Atom property = XInternAtom(_display, "_NET_WM_WINDOW_OPACITY", false);
+	Atom property = get_atom("_NET_WM_WINDOW_OPACITY", false);
 	if (property != None)
 	{
 		XChangeProperty(_display, _window, property, XA_CARDINAL, 32, PropModeReplace, (unsigned char*)&opacity, 1);
 		XFlush(_display);
 	}
 }
-
-
 
 ////////////////////////////////////////////////////////////
 void window_impl_x11::set_mouse_cursor_visible(bool visible)
@@ -1669,15 +1778,15 @@ bool window_impl_x11::process_event(XEvent& windowEvent)
 			{
 				platform_event event;
 				event.type          = platform_event::mouse_button_pressed;
-				event.mouseButton.x = windowEvent.xbutton.x;
-				event.mouseButton.y = windowEvent.xbutton.y;
+				event.mouse_button.x = windowEvent.xbutton.x;
+				event.mouse_button.y = windowEvent.xbutton.y;
 				switch(button)
 				{
-				    case Button1: event.mouseButton.button = mouse::left;     break;
-				    case Button2: event.mouseButton.button = mouse::middle;   break;
-				    case Button3: event.mouseButton.button = mouse::right;    break;
-				    case 8:       event.mouseButton.button = mouse::x_button1; break;
-				    case 9:       event.mouseButton.button = mouse::x_button2; break;
+				    case Button1: event.mouse_button.button = mouse::left;     break;
+				    case Button2: event.mouse_button.button = mouse::middle;   break;
+				    case Button3: event.mouse_button.button = mouse::right;    break;
+				    case 8:       event.mouse_button.button = mouse::x_button1; break;
+				    case 9:       event.mouse_button.button = mouse::x_button2; break;
 				}
 				push_event(event);
 			}
@@ -1699,15 +1808,15 @@ bool window_impl_x11::process_event(XEvent& windowEvent)
 			{
 				platform_event event;
 				event.type          = platform_event::mouse_button_released;
-				event.mouseButton.x = windowEvent.xbutton.x;
-				event.mouseButton.y = windowEvent.xbutton.y;
+				event.mouse_button.x = windowEvent.xbutton.x;
+				event.mouse_button.y = windowEvent.xbutton.y;
 				switch(button)
 				{
-				    case Button1: event.mouseButton.button = mouse::left;     break;
-				    case Button2: event.mouseButton.button = mouse::middle;   break;
-				    case Button3: event.mouseButton.button = mouse::right;    break;
-				    case 8:       event.mouseButton.button = mouse::x_button1; break;
-				    case 9:       event.mouseButton.button = mouse::x_button2; break;
+				    case Button1: event.mouse_button.button = mouse::left;     break;
+				    case Button2: event.mouse_button.button = mouse::middle;   break;
+				    case Button3: event.mouse_button.button = mouse::right;    break;
+				    case 8:       event.mouse_button.button = mouse::x_button1; break;
+				    case 9:       event.mouse_button.button = mouse::x_button2; break;
 				}
 				push_event(event);
 			}
@@ -1715,27 +1824,21 @@ bool window_impl_x11::process_event(XEvent& windowEvent)
 			{
 				platform_event event;
 
-				event.type             = platform_event::mouse_wheel_moved;
-				event.mouseWheel.delta = (button == Button4) ? 1 : -1;
-				event.mouseWheel.x     = windowEvent.xbutton.x;
-				event.mouseWheel.y     = windowEvent.xbutton.y;
-				push_event(event);
-
 				event.type                   = platform_event::mouse_wheel_scrolled;
-				event.mouseWheelScroll.wheel = mouse::vertical_wheel;
-				event.mouseWheelScroll.delta = (button == Button4) ? 1 : -1;
-				event.mouseWheelScroll.x     = windowEvent.xbutton.x;
-				event.mouseWheelScroll.y     = windowEvent.xbutton.y;
+				event.mouse_wheel_scroll.wheel = mouse::vertical_wheel;
+				event.mouse_wheel_scroll.delta = (button == Button4) ? 1 : -1;
+				event.mouse_wheel_scroll.x     = windowEvent.xbutton.x;
+				event.mouse_wheel_scroll.y     = windowEvent.xbutton.y;
 				push_event(event);
 			}
 			else if ((button == 6) || (button == 7))
 			{
 				platform_event event;
 				event.type                   = platform_event::mouse_wheel_scrolled;
-				event.mouseWheelScroll.wheel = mouse::horizontal_wheel;
-				event.mouseWheelScroll.delta = (button == 6) ? 1 : -1;
-				event.mouseWheelScroll.x     = windowEvent.xbutton.x;
-				event.mouseWheelScroll.y     = windowEvent.xbutton.y;
+				event.mouse_wheel_scroll.wheel = mouse::horizontal_wheel;
+				event.mouse_wheel_scroll.delta = (button == 6) ? 1 : -1;
+				event.mouse_wheel_scroll.x     = windowEvent.xbutton.x;
+				event.mouse_wheel_scroll.y     = windowEvent.xbutton.y;
 				push_event(event);
 			}
 			break;
@@ -1746,8 +1849,8 @@ bool window_impl_x11::process_event(XEvent& windowEvent)
 	    {
 		    platform_event event;
 			event.type        = platform_event::mouse_moved;
-			event.mouseMove.x = windowEvent.xmotion.x;
-			event.mouseMove.y = windowEvent.xmotion.y;
+			event.mouse_move.x = windowEvent.xmotion.x;
+			event.mouse_move.y = windowEvent.xmotion.y;
 			push_event(event);
 			break;
 	    }

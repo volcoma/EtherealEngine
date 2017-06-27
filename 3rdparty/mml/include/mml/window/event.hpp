@@ -160,55 +160,118 @@ public:
     /// \brief Enumeration of the different types of events
     ///
     ////////////////////////////////////////////////////////////
-    enum event_type
-    {
-        closed,                 ///< The window requested to be closed (no data)
-        resized,                ///< The window was resized (data in event.size)
-        lost_focus,              ///< The window lost the focus (no data)
-        gained_focus,            ///< The window gained the focus (no data)
-        text_entered,            ///< A character was entered (data in event.text)
-        key_pressed,             ///< A key was pressed (data in event.key)
-        key_released,            ///< A key was released (data in event.key)
-        mouse_wheel_moved,        ///< The mouse wheel was scrolled (data in event.mouseWheel) (deprecated)
-        mouse_wheel_scrolled,     ///< The mouse wheel was scrolled (data in event.mouseWheelScroll)
-        mouse_button_pressed,     ///< A mouse button was pressed (data in event.mouseButton)
-        mouse_button_released,    ///< A mouse button was released (data in event.mouseButton)
-        mouse_moved,             ///< The mouse cursor moved (data in event.mouseMove)
-        mouse_entered,           ///< The mouse cursor entered the area of the window (no data)
-        mouse_left,              ///< The mouse cursor left the area of the window (no data)
-        joystick_button_pressed,  ///< A joystick button was pressed (data in event.joystickButton)
-        joystick_button_released, ///< A joystick button was released (data in event.joystickButton)
-        joystick_moved,          ///< The joystick moved along an axis (data in event.joystickMove)
-        joystick_connected,      ///< A joystick was connected (data in event.joystickConnect)
-        joystick_disconnected,   ///< A joystick was disconnected (data in event.joystickConnect)
-        touch_began,             ///< A touch event began (data in event.touch)
-        touch_moved,             ///< A touch moved (data in event.touch)
-        touch_ended,             ///< A touch event ended (data in event.touch)
-        sensor_changed,          ///< A sensor value changed (data in event.sensor)
+	enum event_type
+	{
+		///< The window requested to be closed (no data)
+		closed,
 
-        count                   ///< Keep last -- the total number of event types
-    };
+		///< The window was resized (data in event.size)
+		resized,
+
+		///< The window lost the focus (no data)
+		lost_focus,
+
+		///< The window gained the focus (no data)
+		gained_focus,
+
+		///< A character was entered (data in event.text)
+		text_entered,
+
+		///< A key was pressed (data in event.key)
+		key_pressed,
+
+		///< A key was released (data in event.key)
+		key_released,
+
+		///< The mouse wheel was scrolled (data in event.mouse_wheel_scroll)
+		mouse_wheel_scrolled,
+
+		///< A mouse button was pressed (data in event.mouse_button)
+		mouse_button_pressed,
+
+		///< A mouse button was released (data in event.mouse_button)
+		mouse_button_released,
+
+		///< The mouse cursor moved (data in event.mouse_move)
+		mouse_moved,
+
+		///< The mouse cursor entered the area of the window (no data)
+		mouse_entered,
+
+		///< The mouse cursor left the area of the window (no data)
+		mouse_left,
+
+		///< A joystick button was pressed (data in event.joystick_button)
+		joystick_button_pressed,
+
+		///< A joystick button was released (data in event.joystick_button)
+		joystick_button_released,
+
+		///< The joystick moved along an axis (data in event.joystick_move)
+		joystick_moved,
+
+		///< A joystick was connected (data in event.joystick_connect)
+		joystick_connected,
+
+		///< A joystick was disconnected (data in event.joystick_connect)
+		joystick_disconnected,
+
+		///< A touch event began (data in event.touch)
+		touch_began,
+
+		///< A touch moved (data in event.touch)
+		touch_moved,
+
+		///< A touch event ended (data in event.touch)
+		touch_ended,
+
+		///< A sensor value changed (data in event.sensor)
+		sensor_changed,
+
+		///< Keep last -- the total number of event types
+		count
+	};
 
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
     event_type type; ///< Type of the event
 
-    union
-    {
-        size_event					size;              ///< Size event parameters (platform_event::resized)
-        key_event					key;               ///< key event parameters (platform_event::key_pressed, platform_event::key_released)
-        text_event					text;              ///< Text event parameters (platform_event::text_entered)
-        mouse_move_event			mouseMove;         ///< mouse move event parameters (platform_event::mouse_moved)
-        mouse_button_event			mouseButton;       ///< mouse button event parameters (platform_event::mouse_button_pressed, platform_event::mouse_button_released)
-        mouse_wheel_event			mouseWheel;        ///< mouse wheel event parameters (platform_event::mouse_wheel_moved) (deprecated)
-        mouse_wheel_scroll_event	mouseWheelScroll;  ///< mouse wheel event parameters (platform_event::mouse_wheel_scrolled)
-        joystick_move_event			joystickMove;      ///< joystick move event parameters (platform_event::joystick_moved)
-        joystick_button_event		joystickButton;    ///< joystick button event parameters (platform_event::joystick_button_pressed, platform_event::joystick_button_released)
-        joystick_connect_event		joystickConnect;   ///< joystick (dis)connect event parameters (platform_event::joystick_connected, platform_event::joystick_disconnected)
-        touch_event					touch;             ///< touch events parameters (platform_event::touch_began, platform_event::touch_moved, platform_event::touch_ended)
-        sensor_event				sensor;            ///< sensor event parameters (platform_event::sensor_changed)
-    };
+	union
+	{
+		///< Size event parameters (platform_event::resized)
+		size_event					size;
+
+		///< key event parameters (platform_event::key_pressed, platform_event::key_released)
+		key_event					key;
+
+		///< Text event parameters (platform_event::text_entered)
+		text_event					text;
+
+		///< mouse move event parameters (platform_event::mouse_moved)
+		mouse_move_event			mouse_move;
+
+		///< mouse button event parameters (platform_event::mouse_button_pressed, platform_event::mouse_button_released)
+		mouse_button_event			mouse_button;
+
+		///< mouse wheel event parameters (platform_event::mouse_wheel_scrolled)
+		mouse_wheel_scroll_event	mouse_wheel_scroll;
+
+		///< joystick move event parameters (platform_event::joystick_moved)
+		joystick_move_event			joystick_move;
+
+		///< joystick button event parameters (platform_event::joystick_button_pressed, platform_event::joystick_button_released)
+		joystick_button_event		joystick_button;
+
+		///< joystick (dis)connect event parameters (platform_event::joystick_connected, platform_event::joystick_disconnected)
+		joystick_connect_event		joystick_connect;
+
+		///< touch events parameters (platform_event::touch_began, platform_event::touch_moved, platform_event::touch_ended)
+		touch_event					touch;
+
+		///< sensor event parameters (platform_event::sensor_changed)
+		sensor_event				sensor;
+	};
 };
 
 } // namespace mml

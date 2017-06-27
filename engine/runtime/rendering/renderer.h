@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/subsystem/subsystem.h"
-#include "../rendering/render_window.h"
+#include "mml/window/window.hpp"
 #include <memory>
 #include <vector>
 
@@ -36,7 +36,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool init_backend(render_window& main_window);
+		bool init_backend(mml::window& main_window);
 
 		//-----------------------------------------------------------------------------
 		//  Name : frame_end ()

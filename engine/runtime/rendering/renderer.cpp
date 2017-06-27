@@ -14,7 +14,7 @@ struct GfxCallback : public gfx::CallbackI
 
 	virtual void traceVargs(const char* _filePath, std::uint16_t _line, const char* _format, std::va_list _argList)
 	{
-		APPLOG_TRACE(string_utils::format(_format, _argList).c_str());
+		//APPLOG_TRACE(string_utils::format(_format, _argList).c_str());
 	}
 
 	virtual void fatal(gfx::Fatal::Enum _code, const char* _str)
@@ -69,7 +69,7 @@ namespace runtime
 		gfx::shutdown();
 	}
 
-	bool renderer::init_backend(render_window& main_window)
+	bool renderer::init_backend(mml::window& main_window)
 	{
 		gfx::PlatformData pd
 		{
@@ -91,9 +91,6 @@ namespace runtime
 			APPLOG_ERROR("Does not support dx9. Minimum supported is dx11.");
 			return false;
 		}
-
-		main_window.set_main(true);
-
 		return true;
 	}
 

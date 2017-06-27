@@ -459,17 +459,16 @@ namespace imguidock
 					_current_dock_to->container = nullptr;
 					_current_dock_to->draging = true;
 					
-					auto window = std::make_shared<gui_window>(
+					auto& engine = core::get_subsystem<runtime::engine>();
+					auto window = std::make_unique<gui_window>(
 						mml::video_mode((unsigned int)_current_dock_to->last_size.x, (unsigned int)_current_dock_to->last_size.y),
-						"",//std::string(m_currentDockTo->title),
+						"Editor Dock",
 						mml::style::standard
 						);
-
-					auto& engine = core::get_subsystem<runtime::engine>();
-					engine.register_window(window);
 					window->get_dockspace().dock_to(_current_dock_to, slot::tab, 0, true);
 					window->set_position(mml::mouse::get_position());
 					window->request_focus();
+					engine.register_window(std::move(window));
 				}
 			}
 			else if (_current_dock_action == eDrag)
@@ -535,7 +534,7 @@ namespace imguidock
 		auto& engine = core::get_subsystem<runtime::engine>();
 		const auto& windows = engine.get_windows();
 
-		for (auto window : windows)
+		for (const auto& window : windows)
 		{
 			gui_window* gui_wnd = static_cast<gui_window*>(window.get());
 			auto& dockspace = gui_wnd->get_dockspace();

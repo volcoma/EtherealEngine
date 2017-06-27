@@ -27,6 +27,13 @@ namespace priv
 ////////////////////////////////////////////////////////////
 Display* open_display()
 {
+    static bool first = true;
+    if(first)
+    {
+        XInitThreads();
+        first = false;
+    }
+
 	std::lock_guard<std::mutex> lock(mutex);
 
     if (referenceCount == 0)

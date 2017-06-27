@@ -198,7 +198,9 @@ namespace editor
 	{
 		if (gui::IsMouseDragging(gui::drag_button) && drag_data.object)
 		{
-			gui::SetTooltip(drag_data.description.c_str());
+			gui::BeginTooltip();
+			gui::TextUnformatted(drag_data.description.c_str());
+			gui::EndTooltip();
 
 			if (gui::GetMouseCursor() == ImGuiMouseCursor_Arrow)
 				gui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);

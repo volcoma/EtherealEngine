@@ -48,13 +48,14 @@ namespace fs
 
 	path resolve_protocol(const path& _path)
 	{        
-        const auto string_path = _path.string();
+        const auto string_path = _path.generic_string();
         auto pos = string_path.find(':', 0) + 1;
         if(pos == std::string::npos)
             return path{};
 
         const auto root = string_path.substr(0, pos);
-		const auto relative_path = string_path.substr(pos + 1);
+
+		fs::path relative_path = string_path.substr(pos + 1);
 		// Matching path protocol in our list?
 		auto& protocols = get_path_protocols();
 
@@ -64,7 +65,7 @@ namespace fs
 			return path{};
 
 		const auto resolved = it->second;
-		auto result = resolved / relative_path;
+		auto result = resolved / relative_path.make_preferred();
 		return result;
 	}
 

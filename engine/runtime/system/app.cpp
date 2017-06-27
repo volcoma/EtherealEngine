@@ -21,13 +21,13 @@ namespace runtime
 		mml::video_mode desktop = mml::video_mode::get_desktop_mode();
 		desktop.width = 1280;
 		desktop.height = 720;
-		auto main_window = std::make_shared<render_window>(
+		auto main_window = std::make_unique<render_window>(
 			desktop,
 			"App",
 			mml::style::standard);
 		
 
-		if(!eng.start(main_window))
+		if(!eng.start(std::move(main_window)))
 		{
 			_exitcode = -1;
 			return;

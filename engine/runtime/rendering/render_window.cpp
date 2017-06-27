@@ -7,19 +7,6 @@
 void render_window::on_resize()
 {
 	prepare_surface();
-	auto size = get_size();
-	on_resized(*this, { size[0], size[1] });
-}
-
-bool render_window::filter_event(const mml::platform_event& event)
-{
-	if (event.type == mml::platform_event::closed)
-	{
-		on_closed(*this);
-		dispose();
-	}
-
-	return mml::window::filter_event(event);
 }
 
 render_window::render_window()
@@ -37,6 +24,11 @@ render_window::~render_window()
 	// force internal handle destruction
 	_surface->dispose();
 	_surface.reset();
+
+	//this is a must to flush the destruction
+	//of the frame buffer
+	gfx::frame();
+	gfx::frame();
 }
 
 void render_window::frame_end()

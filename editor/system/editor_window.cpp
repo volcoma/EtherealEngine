@@ -410,7 +410,7 @@ void main_editor_window::on_start_page()
 		ImGuiWindowFlags_NoSavedSettings;
 	
 	gui::AlignFirstTextHeightToWidgets();
-	gui::Text("Recent Projects");
+	gui::TextUnformatted("Recent Projects");
 	gui::Separator();
 	gui::BeginGroup();
 	{

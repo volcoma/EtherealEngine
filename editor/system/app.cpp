@@ -19,12 +19,12 @@ namespace editor
 		mml::video_mode desktop = mml::video_mode::get_desktop_mode();
 		desktop.width = 1280;
 		desktop.height = 720;
-		auto main_window = std::make_shared<main_editor_window>(
+		auto main_window = std::make_unique<main_editor_window>(
 			desktop,
 			"Editor",
 			mml::style::standard);
 
-		if (!engine.start(main_window))
+		if (!engine.start(std::move(main_window)))
 		{
 			_exitcode = -1;
 			return;

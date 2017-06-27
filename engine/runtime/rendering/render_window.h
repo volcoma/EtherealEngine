@@ -42,11 +42,6 @@ public:
 	//-----------------------------------------------------------------------------
 	virtual ~render_window();
 
-	/// event triggered when window is resized.
-	event<void(render_window&, const usize&)> on_resized;
-	/// event triggered when window is closed.
-	event<void(render_window&)> on_closed;
-
 	//-----------------------------------------------------------------------------
 	//  Name : get_surface ()
 	/// <summary>
@@ -146,8 +141,6 @@ protected:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	virtual void on_resize();
-
-	virtual bool filter_event(const mml::platform_event& event);
 
 	/// Render surface for this window.
 	std::shared_ptr<frame_buffer> _surface;

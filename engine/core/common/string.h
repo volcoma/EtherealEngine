@@ -4,7 +4,7 @@
 // std::string Header Includes
 //-----------------------------------------------------------------------------
 #include <string>   // std::string / std::wstd::string
-
+#include <random>
 #include <cctype>   // toupper / tolower
 #include <stdarg.h>
 #include <algorithm>
@@ -188,6 +188,15 @@ namespace string_utils
 	/// </summary>
 	//-------------------------------------------------------------------------
 	std::string word_wrap(const std::string & value, std::string::size_type maximumLength, const std::string & linePadding = "");
+
+	//-------------------------------------------------------------------------
+	//  Name : random_string ()
+	/// <summary>
+	/// Wraps the std::string up to the maximum length and optionally inserts an
+	/// aribitrary padding std::string at the beginning of each new line
+	/// </summary>
+	//-------------------------------------------------------------------------
+	std::string random_string(std::string::size_type length);
 
 	//-----------------------------------------------------------------------------
 	//  Name : command_line_args ()

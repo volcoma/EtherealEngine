@@ -64,7 +64,6 @@ endif()
 
 if( UNIX AND NOT APPLE )
 	target_link_libraries( bgfx PUBLIC GL )
-	target_compile_definitions( bgfx PRIVATE "BGFX_CONFIG_MULTITHREADED=0" )
 endif()
 
 # Excluded files from compilation

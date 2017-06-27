@@ -59,7 +59,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool start(std::shared_ptr<render_window> main_window);
+		bool start(std::unique_ptr<render_window> main_window);
 
 		//-----------------------------------------------------------------------------
 		//  Name : run_one_frame ()
@@ -95,8 +95,18 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void register_window(std::shared_ptr<render_window> window);
+		void register_window(std::unique_ptr<render_window> window);
 
+		//-----------------------------------------------------------------------------
+		//  Name : register_main_window ()
+		/// <summary>
+		/// 
+		/// 
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
+		void register_main_window(std::unique_ptr<render_window> window);
+		
 		//-----------------------------------------------------------------------------
 		//  Name : get_windows ()
 		/// <summary>
@@ -105,7 +115,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		inline const std::vector<std::shared_ptr<render_window>>& get_windows() const { return _windows; }
+		inline const std::vector<std::unique_ptr<render_window>>& get_windows() const { return _windows; }
 
 		//-----------------------------------------------------------------------------
 		//  Name : get_focused_window ()
@@ -115,15 +125,16 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		render_window* get_focused_window() { return _focused_window.get(); }
+		render_window* get_focused_window() const;
 
 	protected:
+		void process_pending_events();
+		void process_pending_windows();
 		/// exiting flag
 		bool _running = false;
 		/// engine windows
-		std::vector<std::shared_ptr<render_window>> _windows;
-		/// currently processed window
-		std::shared_ptr<render_window> _focused_window;
+		std::vector<std::unique_ptr<render_window>> _windows;
+		std::vector<std::unique_ptr<render_window>> _windows_pending_addition;
 	};
 
 	/// engine events

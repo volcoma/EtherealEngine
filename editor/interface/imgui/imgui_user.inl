@@ -240,7 +240,7 @@ namespace ImGui
 			{
 				PushTextWrapPos(pos.x + size.x * 0.9f);
 				AlignFirstTextHeightToWidgets();
-				Text(label);
+				TextUnformatted(label);
 				PopTextWrapPos();
 			}
 			
@@ -249,7 +249,11 @@ namespace ImGui
 			if (!edit)
 			{
 				if (IsItemHovered())
-					SetTooltip(label);
+				{
+					BeginTooltip();
+					TextUnformatted(label);
+					EndTooltip();
+				}
 			}
 
 			if(selected && edit)

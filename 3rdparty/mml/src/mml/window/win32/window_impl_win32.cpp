@@ -793,17 +793,11 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
 
             platform_event event;
 
-            event.type             = platform_event::mouse_wheel_moved;
-            event.mouseWheel.delta = delta / 120;
-            event.mouseWheel.x     = position.x;
-            event.mouseWheel.y     = position.y;
-            push_event(event);
-
             event.type                   = platform_event::mouse_wheel_scrolled;
-            event.mouseWheelScroll.wheel = mouse::vertical_wheel;
-            event.mouseWheelScroll.delta = static_cast<float>(delta) / 120.f;
-            event.mouseWheelScroll.x     = position.x;
-            event.mouseWheelScroll.y     = position.y;
+            event.mouse_wheel_scroll.wheel = mouse::vertical_wheel;
+            event.mouse_wheel_scroll.delta = static_cast<float>(delta) / 120.f;
+            event.mouse_wheel_scroll.x     = position.x;
+            event.mouse_wheel_scroll.y     = position.y;
             push_event(event);
             break;
         }
@@ -821,10 +815,10 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
 
             platform_event event;
             event.type                   = platform_event::mouse_wheel_scrolled;
-            event.mouseWheelScroll.wheel = mouse::horizontal_wheel;
-            event.mouseWheelScroll.delta = -static_cast<float>(delta) / 120.f;
-            event.mouseWheelScroll.x     = position.x;
-            event.mouseWheelScroll.y     = position.y;
+            event.mouse_wheel_scroll.wheel = mouse::horizontal_wheel;
+            event.mouse_wheel_scroll.delta = -static_cast<float>(delta) / 120.f;
+            event.mouse_wheel_scroll.x     = position.x;
+            event.mouse_wheel_scroll.y     = position.y;
             push_event(event);
             break;
         }
@@ -834,9 +828,9 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
         {
             platform_event event;
             event.type               = platform_event::mouse_button_pressed;
-            event.mouseButton.button = mouse::left;
-            event.mouseButton.x      = static_cast<std::int16_t>(LOWORD(lParam));
-            event.mouseButton.y      = static_cast<std::int16_t>(HIWORD(lParam));
+            event.mouse_button.button = mouse::left;
+            event.mouse_button.x      = static_cast<std::int16_t>(LOWORD(lParam));
+            event.mouse_button.y      = static_cast<std::int16_t>(HIWORD(lParam));
             push_event(event);
             break;
         }
@@ -846,9 +840,9 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
         {
             platform_event event;
             event.type               = platform_event::mouse_button_released;
-            event.mouseButton.button = mouse::left;
-            event.mouseButton.x      = static_cast<std::int16_t>(LOWORD(lParam));
-            event.mouseButton.y      = static_cast<std::int16_t>(HIWORD(lParam));
+            event.mouse_button.button = mouse::left;
+            event.mouse_button.x      = static_cast<std::int16_t>(LOWORD(lParam));
+            event.mouse_button.y      = static_cast<std::int16_t>(HIWORD(lParam));
             push_event(event);
             break;
         }
@@ -858,9 +852,9 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
         {
             platform_event event;
             event.type               = platform_event::mouse_button_pressed;
-            event.mouseButton.button = mouse::right;
-            event.mouseButton.x      = static_cast<std::int16_t>(LOWORD(lParam));
-            event.mouseButton.y      = static_cast<std::int16_t>(HIWORD(lParam));
+            event.mouse_button.button = mouse::right;
+            event.mouse_button.x      = static_cast<std::int16_t>(LOWORD(lParam));
+            event.mouse_button.y      = static_cast<std::int16_t>(HIWORD(lParam));
             push_event(event);
             break;
         }
@@ -870,9 +864,9 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
         {
             platform_event event;
             event.type               = platform_event::mouse_button_released;
-            event.mouseButton.button = mouse::right;
-            event.mouseButton.x      = static_cast<std::int16_t>(LOWORD(lParam));
-            event.mouseButton.y      = static_cast<std::int16_t>(HIWORD(lParam));
+            event.mouse_button.button = mouse::right;
+            event.mouse_button.x      = static_cast<std::int16_t>(LOWORD(lParam));
+            event.mouse_button.y      = static_cast<std::int16_t>(HIWORD(lParam));
             push_event(event);
             break;
         }
@@ -882,9 +876,9 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
         {
             platform_event event;
             event.type               = platform_event::mouse_button_pressed;
-            event.mouseButton.button = mouse::middle;
-            event.mouseButton.x      = static_cast<std::int16_t>(LOWORD(lParam));
-            event.mouseButton.y      = static_cast<std::int16_t>(HIWORD(lParam));
+            event.mouse_button.button = mouse::middle;
+            event.mouse_button.x      = static_cast<std::int16_t>(LOWORD(lParam));
+            event.mouse_button.y      = static_cast<std::int16_t>(HIWORD(lParam));
             push_event(event);
             break;
         }
@@ -894,9 +888,9 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
         {
             platform_event event;
             event.type               = platform_event::mouse_button_released;
-            event.mouseButton.button = mouse::middle;
-            event.mouseButton.x      = static_cast<std::int16_t>(LOWORD(lParam));
-            event.mouseButton.y      = static_cast<std::int16_t>(HIWORD(lParam));
+            event.mouse_button.button = mouse::middle;
+            event.mouse_button.x      = static_cast<std::int16_t>(LOWORD(lParam));
+            event.mouse_button.y      = static_cast<std::int16_t>(HIWORD(lParam));
             push_event(event);
             break;
         }
@@ -906,9 +900,9 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
         {
             platform_event event;
             event.type               = platform_event::mouse_button_pressed;
-            event.mouseButton.button = HIWORD(wParam) == XBUTTON1 ? mouse::x_button1 : mouse::x_button2;
-            event.mouseButton.x      = static_cast<std::int16_t>(LOWORD(lParam));
-            event.mouseButton.y      = static_cast<std::int16_t>(HIWORD(lParam));
+            event.mouse_button.button = HIWORD(wParam) == XBUTTON1 ? mouse::x_button1 : mouse::x_button2;
+            event.mouse_button.x      = static_cast<std::int16_t>(LOWORD(lParam));
+            event.mouse_button.y      = static_cast<std::int16_t>(HIWORD(lParam));
             push_event(event);
             break;
         }
@@ -918,9 +912,9 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
         {
             platform_event event;
             event.type               = platform_event::mouse_button_released;
-            event.mouseButton.button = HIWORD(wParam) == XBUTTON1 ? mouse::x_button1 : mouse::x_button2;
-            event.mouseButton.x      = static_cast<std::int16_t>(LOWORD(lParam));
-            event.mouseButton.y      = static_cast<std::int16_t>(HIWORD(lParam));
+            event.mouse_button.button = HIWORD(wParam) == XBUTTON1 ? mouse::x_button1 : mouse::x_button2;
+            event.mouse_button.x      = static_cast<std::int16_t>(LOWORD(lParam));
+            event.mouse_button.y      = static_cast<std::int16_t>(HIWORD(lParam));
             push_event(event);
             break;
         }
@@ -1002,8 +996,8 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
             // Generate a MouseMove event
             platform_event event;
             event.type        = platform_event::mouse_moved;
-            event.mouseMove.x = x;
-            event.mouseMove.y = y;
+            event.mouse_move.x = x;
+            event.mouse_move.y = y;
             push_event(event);
             break;
         }

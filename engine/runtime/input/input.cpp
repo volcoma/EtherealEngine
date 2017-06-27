@@ -163,31 +163,31 @@ namespace runtime
 	{
 		if (event.type == mml::platform_event::mouse_button_pressed)
 		{
-			_mouse_buttons_pressed[event.mouseButton.button] = !_mouse_buttons_down[event.mouseButton.button];
-			_mouse_buttons_released[event.mouseButton.button] = false;
+			_mouse_buttons_pressed[event.mouse_button.button] = !_mouse_buttons_down[event.mouse_button.button];
+			_mouse_buttons_released[event.mouse_button.button] = false;
 			return true;
 		}
 		else if (event.type == mml::platform_event::mouse_button_released)
 		{
-			_mouse_buttons_pressed[event.mouseButton.button] = false;
-			_mouse_buttons_down[event.mouseButton.button] = false;
-			_mouse_buttons_released[event.mouseButton.button] = true;
+			_mouse_buttons_pressed[event.mouse_button.button] = false;
+			_mouse_buttons_down[event.mouse_button.button] = false;
+			_mouse_buttons_released[event.mouse_button.button] = true;
 			return true;
 		}
 		else if (event.type == mml::platform_event::mouse_moved)
 		{
 			_last_cursor_position = _current_cursor_position;
 			ipoint mouse;
-			mouse.x = event.mouseMove.x;
-			mouse.y = event.mouseMove.y;
+			mouse.x = event.mouse_move.x;
+			mouse.y = event.mouse_move.y;
 			_current_cursor_position = mouse;
 			_mouse_move_event = true;
 			return true;
 		}
-		else if (event.type == mml::platform_event::mouse_wheel_moved)
+		else if (event.type == mml::platform_event::mouse_wheel_scrolled)
 		{
 			mouse_wheel_scrolled = true;
-			_mouse_scroll_delta = static_cast<float>(event.mouseWheel.delta);
+			_mouse_scroll_delta = static_cast<float>(event.mouse_wheel_scroll.delta);
 			return true;
 		}
 		return false;
@@ -230,27 +230,27 @@ namespace runtime
 	{
 		if (event.type == mml::platform_event::joystick_connected)
 		{
-			_joysticks_connected[event.joystickConnect.joystick_id] = !_joysticks_active[event.joystickConnect.joystick_id];
-			_joysticks_disconnected[event.joystickConnect.joystick_id] = false;
+			_joysticks_connected[event.joystick_connect.joystick_id] = !_joysticks_active[event.joystick_connect.joystick_id];
+			_joysticks_disconnected[event.joystick_connect.joystick_id] = false;
 			return true;
 		}
 		else if (event.type == mml::platform_event::joystick_disconnected)
 		{
-			_joysticks_connected[event.joystickConnect.joystick_id] = false;
-			_joysticks_active[event.joystickConnect.joystick_id] = false;
-			_joysticks_disconnected[event.joystickConnect.joystick_id] = true;
+			_joysticks_connected[event.joystick_connect.joystick_id] = false;
+			_joysticks_active[event.joystick_connect.joystick_id] = false;
+			_joysticks_disconnected[event.joystick_connect.joystick_id] = true;
 			return true;
 		}
 		else if (event.type == mml::platform_event::joystick_button_pressed)
 		{
-			std::pair<unsigned int, unsigned int> k(event.joystickButton.joystick_id, event.joystickButton.button);
+			std::pair<unsigned int, unsigned int> k(event.joystick_button.joystick_id, event.joystick_button.button);
 			_joystick_buttons_pressed[k] = !_joystick_buttons_down[k];
 			_joystick_buttons_released[k] = false;
 			return true;
 		}
 		else if (event.type == mml::platform_event::joystick_button_released)
 		{
-			std::pair<unsigned int, unsigned int> k(event.joystickButton.joystick_id, event.joystickButton.button);
+			std::pair<unsigned int, unsigned int> k(event.joystick_button.joystick_id, event.joystick_button.button);
 			_joystick_buttons_pressed[k] = false;
 			_joystick_buttons_down[k] = false;
 			_joystick_buttons_released[k] = true;
@@ -258,8 +258,8 @@ namespace runtime
 		}
 		else if (event.type == mml::platform_event::joystick_moved)
 		{
-			std::pair<unsigned int, unsigned int> k(event.joystickMove.joystick_id, event.joystickMove.axis);
-			_joystick_axis_positions[k] = event.joystickMove.position;
+			std::pair<unsigned int, unsigned int> k(event.joystick_move.joystick_id, event.joystick_move.axis);
+			_joystick_axis_positions[k] = event.joystick_move.position;
 			return true;
 		}
 		return false;
@@ -272,14 +272,14 @@ namespace runtime
 
 	bool input::initialize()
 	{
-		on_frame_begin.connect(this, &input::reset_state);
+		on_frame_end.connect(this, &input::reset_state);
 
 		return true;
 	}
 
 	void input::dispose()
 	{
-		on_frame_begin.disconnect(this, &input::reset_state);
+		on_frame_end.disconnect(this, &input::reset_state);
 	}
 
 }

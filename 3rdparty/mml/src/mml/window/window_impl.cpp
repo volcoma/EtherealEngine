@@ -136,7 +136,7 @@ void window_impl::process_joystick_events()
         {
             platform_event event;
             event.type = connected ? platform_event::joystick_connected : platform_event::joystick_disconnected;
-            event.joystickButton.joystick_id = i;
+            event.joystick_button.joystick_id = i;
             push_event(event);
         }
 
@@ -154,9 +154,9 @@ void window_impl::process_joystick_events()
                     {
                         platform_event event;
                         event.type = platform_event::joystick_moved;
-                        event.joystickMove.joystick_id = i;
-                        event.joystickMove.axis = axis;
-                        event.joystickMove.position = currPos;
+                        event.joystick_move.joystick_id = i;
+                        event.joystick_move.axis = axis;
+                        event.joystick_move.position = currPos;
                         push_event(event);
                     }
                 }
@@ -172,8 +172,8 @@ void window_impl::process_joystick_events()
                 {
                     platform_event event;
                     event.type = currPressed ? platform_event::joystick_button_pressed : platform_event::joystick_button_released;
-                    event.joystickButton.joystick_id = i;
-                    event.joystickButton.button = j;
+                    event.joystick_button.joystick_id = i;
+                    event.joystick_button.button = j;
                     push_event(event);
                 }
             }

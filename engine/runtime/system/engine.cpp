@@ -48,7 +48,7 @@ namespace runtime
 	}
 
 
-	bool engine::start(std::shared_ptr<render_window> main_window)
+	bool engine::start(std::unique_ptr<render_window> main_window)
 	{
 		core::add_subsystem<core::simulation>();
 
@@ -58,7 +58,8 @@ namespace runtime
 			APPLOG_ERROR("Could not initialize rendering backend!");
 			return false;
 		}
-		register_window(main_window);
+		register_main_window(std::move(main_window));
+	
 		core::add_subsystem<input>();
 		core::add_subsystem<asset_manager>();
 		core::add_subsystem<entity_component_system>();
@@ -70,6 +71,23 @@ namespace runtime
 		return true;
 	}
 
+	render_window* engine::get_focused_window() const
+	{
+		render_window* focused_window = nullptr;
+		//get a copy of the windows for safe iterator invalidation
+		const auto& windows = get_windows();
+		auto it = std::find_if(std::begin(windows), std::end(windows), [](const auto& window)
+		{
+			return window->has_focus();
+		});
+
+		if (it != std::end(windows))
+		{
+			focused_window = it->get();
+		}
+
+		return focused_window;
+	}
 
 	void engine::run_one_frame()
 	{
@@ -77,89 +95,105 @@ namespace runtime
 			return;
 
 		auto& sim = core::get_subsystem<core::simulation>();
-		auto& inp = core::get_subsystem<input>();
-
+		
 		sim.run_one_frame();
-		auto dt = sim.get_delta_time();
 
-		_focused_window = nullptr;
-		//get a copy of the windows for safe iterator invalidation
-		auto windows = get_windows();
-        auto it = std::find_if(std::begin(windows), std::end(windows),[](const auto& window)
-        {
-            return window->has_focus();
-        });
+		process_pending_windows();
 
-        if(it != std::end(windows))
-        {
-            _focused_window = *it;
-        }
-
-		on_frame_begin(dt);
-
-		for (auto window : windows)
+		process_pending_events();
+		
+		if (!_windows.empty())
 		{
-			window->frame_begin();
-			
-			on_window_frame_begin(*window);
+			auto dt = sim.get_delta_time();
+			on_frame_begin(dt);
+
+			for (auto& window : _windows)
+			{
+				window->frame_begin();
+				on_window_frame_begin(*window);
+
+				window->frame_update(dt);
+				on_window_frame_update(*window);
+			}
+
+			on_frame_update(dt);
+
+			on_frame_render(dt);
+
+			for (auto& window : _windows)
+			{
+				window->frame_render(dt);
+				on_window_frame_render(*window);
+
+				window->frame_end();
+				on_window_frame_end(*window);
+			}
+
+			on_frame_end(dt);
+		}
+	}
+	
+	void engine::register_window(std::unique_ptr<render_window> window)
+	{
+		window->prepare_surface();
+		_windows_pending_addition.emplace_back(std::move(window));
+	}
+
+	void engine::register_main_window(std::unique_ptr<render_window> window)
+	{
+		window->set_main(true);
+		window->prepare_surface();
+		_windows.emplace_back(std::move(window));
+	}
+
+	void engine::process_pending_events()
+	{
+		auto& inp = core::get_subsystem<input>();
+		auto window_iterator = std::begin(_windows);
+		while (window_iterator != std::end(_windows))
+		{
+			auto& window = *window_iterator;
 
 			bool has_focus = window->has_focus();
-
+			bool has_closed = false;
 			mml::platform_event e;
 			while (window->poll_event(e))
 			{
-				if (has_focus)
+				if (e.type == mml::platform_event::closed)
+				{
+					has_closed = true;
+					_running = !window->is_main();
+					break;
+				}
+				else if (has_focus)
 				{
 					inp.handle_event(e);
 				}
 			}
 
-			window->frame_update(dt);
-			on_window_frame_update(*window);
-		}
-
-		on_frame_update(dt);
-
-		on_frame_render(dt);
-
-		for (auto window : windows)
-		{
-			window->frame_render(dt);
-			on_window_frame_render(*window);
-
-			window->frame_end();
-			on_window_frame_end(*window);
-
-			if (window->is_main())
-				_running = window->is_open();
-		}
-
-		on_frame_end(dt);
-	}
-	
-	void engine::register_window(std::shared_ptr<render_window> window)
-	{
-		auto on_closed = [this](render_window& wnd)
-		{
-			_windows.erase(std::remove_if(std::begin(_windows), std::end(_windows),
-				[this, &wnd](std::shared_ptr<render_window>& other)
+			if (has_closed)
 			{
-				return (&wnd == other.get());
-			}), std::end(_windows));
+				window_iterator = _windows.erase(window_iterator);
+			}
+			else
+			{
+				++window_iterator;
+			}
+		}
+	}
 
-			if (&wnd == _focused_window.get())
-				_focused_window.reset();
-		};
-
-		window->on_closed.connect(on_closed);
-		window->prepare_surface();
-		_windows.push_back(window);
+	void engine::process_pending_windows()
+	{
+		for (auto& window : _windows_pending_addition)
+		{
+			_windows.emplace_back(std::move(window));
+		}
+		_windows_pending_addition.clear();
 	}
 
 	void engine::destroy_windows()
 	{
 		_windows.clear();
-		_focused_window.reset();
 	}
 
 }

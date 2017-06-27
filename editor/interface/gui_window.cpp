@@ -31,23 +31,23 @@ void handle_sfml_event(mml::platform_event event)
 
 	if (event.type == mml::platform_event::mouse_wheel_scrolled)
 	{
-		io.MouseWheel += event.mouseWheelScroll.delta;
+		io.MouseWheel += event.mouse_wheel_scroll.delta;
 	}
 
 	if (event.type == mml::platform_event::mouse_button_pressed)
 	{
-		io.MouseDown[event.mouseButton.button] = true;
+		io.MouseDown[event.mouse_button.button] = true;
 	}
 
 	if (event.type == mml::platform_event::mouse_button_released)
 	{
-		io.MouseDown[event.mouseButton.button] = false;
+		io.MouseDown[event.mouse_button.button] = false;
 	}
 
 	if (event.type == mml::platform_event::mouse_moved)
 	{
-		io.MousePos.x = float(event.mouseMove.x);
-		io.MousePos.y = float(event.mouseMove.y);
+		io.MousePos.x = float(event.mouse_move.x);
+		io.MousePos.y = float(event.mouse_move.y);
 	}
 
 	if (event.type == mml::platform_event::text_entered)

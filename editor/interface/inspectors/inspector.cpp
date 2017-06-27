@@ -8,7 +8,9 @@ void Tooltip(const rttr::property& prop)
 		auto tooltip = prop.get_metadata("Tooltip");
 		if (tooltip)
 		{
-			gui::SetTooltip(tooltip.to_string().c_str());
+			gui::BeginTooltip();
+			gui::TextUnformatted(tooltip.to_string().c_str());
+			gui::EndTooltip();
 		}
 	}
 }
@@ -18,7 +20,9 @@ void Tooltip(const std::string& tooltip)
 	if (gui::IsItemHovered())
 	{
 		gui::SetMouseCursor(ImGuiMouseCursor_Help);
-		gui::SetTooltip(tooltip.c_str());	
+		gui::BeginTooltip();
+		gui::TextUnformatted(tooltip.c_str());
+		gui::EndTooltip();
 	}
 }
 
