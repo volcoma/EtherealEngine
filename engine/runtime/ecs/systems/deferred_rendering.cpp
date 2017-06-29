@@ -84,12 +84,10 @@ namespace runtime
 
 	void update_lod_data(lod_data& lod_data, std::size_t total_lods, float min_dist, float max_dist, float transition_time, float distance, float dt)
 	{
-		if (total_lods == 1)
+        if (total_lods <= 1)
 			return;
 
 		total_lods -= 1;
-		if (total_lods < 0)
-			total_lods = 0;
 
 		const float factor = 1.0f - math::clamp((max_dist - distance) / (max_dist - min_dist), 0.0f, 1.0f);
 		const int lod = (int)math::lerp(0.0f, static_cast<float>(total_lods), factor);

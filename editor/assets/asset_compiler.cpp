@@ -118,7 +118,7 @@ void asset_compiler::compile<shader>(const fs::path& absolute_key)
 	{
 		static std::mutex mtx;
 		std::lock_guard<std::mutex> lock(mtx);
-		result = compile_shader(arg_count, args_array);
+        result = compile_shader(arg_count, args_array);
 	}
 	else
 	{

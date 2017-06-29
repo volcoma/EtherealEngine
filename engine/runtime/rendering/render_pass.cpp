@@ -11,9 +11,9 @@ std::uint8_t generate_id()
     if (s_index == 255)
 	{
 		gfx::frame();
-        s_index++;
+        s_index = 0;
 	}
-    expects(s_index < 256);
+    expects(s_index <= 255);
 	// find the first unset bit
     std::uint8_t idx = s_index++;
 

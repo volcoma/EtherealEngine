@@ -40,7 +40,7 @@ void console_dock::render(const ImVec2& area)
 		const auto& colorization = _console_log->get_level_colorization(pair_msg.second);
 		ImVec4 col = { colorization[0], colorization[1], colorization[2], colorization[3] };
 		gui::PushStyleColor(ImGuiCol_Text, col);
-		gui::TextWrapped(item_cstr);
+        gui::TextWrapped("%s", item_cstr);
 		gui::PopStyleColor();
 	}
 	if (_console_log->get_pending_entries() > 0)

@@ -31,3 +31,7 @@ target_link_libraries(core PUBLIC serialization)
 target_link_libraries(core PUBLIC signals)
 target_link_libraries(core PUBLIC singleton)
 target_link_libraries(core PUBLIC subsystem)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_link_libraries(core PUBLIC "-stdlib=libstdc++ -lstdc++")
+endif()

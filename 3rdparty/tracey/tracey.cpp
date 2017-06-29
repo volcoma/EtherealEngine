@@ -2862,7 +2862,7 @@ namespace {
             INIT();
             int socket = static_cast<int>(SOCKET(PF_INET, SOCK_STREAM, IPPROTO_IP));
             if( socket < 0 ) {
-                return "cannot init socket", false;
+                return /*"cannot init socket",*/false;
             }
 
             struct sockaddr_in l;
@@ -2885,7 +2885,7 @@ namespace {
 
         daemons[ port ][ mask ] = fn;
 
-        return "ok", true;
+        return /*"ok",*/ true;
     }
 }
 
