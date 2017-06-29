@@ -1,5 +1,5 @@
 ## INFO
-Cross-platform C++ Game Engine
+Cross-platform C++ Game Engine in c++14
 
 WYSIWYG Editor
 
@@ -22,12 +22,14 @@ Any suggestions and help will be appreciated.
 
 
 ## PLATFORMS
-It is written in a cross-platform manner.
+It is written in a cross-platform manner using c++14.
 
-OS          | Supported Compilers with C++14
-------------| ---------------------
-Windows     | MSVC(2015 +), MinGW
-Linux       | GCC(5.4 +), clang(3.8 +)
+Compilers      | Windows | Linux
+---------------| --------|--------
+MSVC(2015 +)   | yes     |
+MinGW          | yes     |
+GCC(5.4 +)     |         | yes
+clang(3.8 +)   |         | yes
 
 ## CODEBASE
 c++14 Using the latest and greatest features of the language.
