@@ -946,6 +946,11 @@ namespace heal {
             char buf[128];
             if( sprintf(buf, "%" SCNu32, t ) > 0 ) this->assign(buf);
         }
+#elif $on($gnuc)
+        sfstring( const long unsigned int &t ) : std::string() {
+            char buf[128];
+            if( sprintf(buf, "%lu", t ) > 0 ) this->assign(buf);
+        }
 #endif
 
         sfstring( char *t ) : std::string( t ? t : "" )

@@ -30,15 +30,15 @@ void process_vertices(aiMesh* mesh, mesh::load_data& load_data)
 	bool has_bitangent = load_data.vertex_format.has(gfx::Attrib::Bitangent);
 	bool has_tangent = load_data.vertex_format.has(gfx::Attrib::Tangent);
 	bool has_texcoord0 = load_data.vertex_format.has(gfx::Attrib::TexCoord0);
-	auto nVertexStride = load_data.vertex_format.getStride();
+	auto vertex_stride = load_data.vertex_format.getStride();
 
-	std::uint32_t nCurrentVertex = load_data.vertex_count;
+	std::uint32_t current_vertex = load_data.vertex_count;
 	load_data.vertex_count += mesh->mNumVertices;
-	load_data.vertex_data.resize(load_data.vertex_count * nVertexStride);
+	load_data.vertex_data.resize(load_data.vertex_count * vertex_stride);
 
-	std::uint8_t* current_vertex_ptr = &load_data.vertex_data[0] + nCurrentVertex * nVertexStride;
+	std::uint8_t* current_vertex_ptr = &load_data.vertex_data[0] + current_vertex * vertex_stride;
 
-	for (size_t i = 0; i < mesh->mNumVertices; ++i, current_vertex_ptr += nVertexStride)
+	for (size_t i = 0; i < mesh->mNumVertices; ++i, current_vertex_ptr += vertex_stride)
 	{
 		//position
 		if (mesh->mVertices && has_position)
