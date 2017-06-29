@@ -9,7 +9,6 @@ WIP - not production ready in any way
 ## FEATURES
 Check out the Projects tab for more information of upcomming features.
 
-
 ## ASSETS
 Supported texture formats: png, tga, dds, ktx, pvr
 
@@ -19,7 +18,7 @@ Supported mesh formats: obj, fbx, dae, 3ds, blend
 Any suggestions and help will be appreciated.
 
 ## BUILD
-The engine uses the CMake build system.
+*The engine uses the CMake build system.
 
 
 ## PLATFORMS
@@ -27,8 +26,8 @@ It is written in a cross-platform manner.
 
 OS          | Supported Compilers with C++14
 ------------| ---------------------
-Windows     | MSVC, MinGW
-Linux       | GCC
+Windows     | MSVC(2015 +), MinGW
+Linux       | GCC(5.4 +), clang(3.8 +)
 
 ## CODEBASE
 c++14 Using the latest and greatest features of the language.
