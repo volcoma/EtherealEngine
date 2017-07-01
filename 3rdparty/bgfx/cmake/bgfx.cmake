@@ -63,7 +63,10 @@ if( APPLE )
 endif()
 
 if( UNIX AND NOT APPLE )
-	target_link_libraries( bgfx PUBLIC GL )
+	find_package(OpenGL REQUIRED)
+	find_library( OPENGL_LIBRARY GL )
+	mark_as_advanced( OPENGL_LIBRARY )
+	target_link_libraries( bgfx PUBLIC ${OPENGL_LIBRARY} )
 endif()
 
 # Excluded files from compilation

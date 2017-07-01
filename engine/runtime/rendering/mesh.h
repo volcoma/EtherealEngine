@@ -384,7 +384,7 @@ public:
 	struct triangle
 	{
 		std::uint32_t data_group_id = 0;
-		std::uint32_t indices[3];
+        std::uint32_t indices[3] = {0, 0, 0};
 		std::uint8_t flags = 0;
 	};
 

@@ -121,7 +121,7 @@ namespace runtime
 			}
 			unsigned index = get_thread_index();
 			if (index == 0)
-				execute_one(index, true, _main_thread_tasks.mutex, _main_thread_tasks.tasks);
+				execute_one(index, false, _main_thread_tasks.mutex, _main_thread_tasks.tasks);
 		}
 		else
 		{
@@ -137,9 +137,31 @@ namespace runtime
 	void task_system::execute_tasks_on_main(std::chrono::duration<float>)
 	{
 		unsigned index = get_thread_index();
-		while (!_main_thread_tasks.tasks.empty())
+
+		std::deque<core::handle> tasks;
 		{
-			execute_one(index, true, _main_thread_tasks.mutex, _main_thread_tasks.tasks);
+			std::lock_guard<std::mutex> lock(_main_thread_tasks.mutex);
+			tasks = std::move(_main_thread_tasks.tasks);
+		}
+
+		while (!tasks.empty())
+		{
+			core::handle handle = tasks.front();
+			tasks.pop_front();
+
+			if (auto task = _tasks.fetch(handle))
+			{
+				if (on_task_start)
+					on_task_start(index, task->name);
+
+				if (task->closure)
+					task->closure();
+
+				finish(handle);
+
+				if (on_task_stop)
+					on_task_stop(index, task->name);
+			}
 		}
 	}
 

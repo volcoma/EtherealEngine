@@ -11,8 +11,8 @@ target_include_directories (bgfx PUBLIC
 ${CMAKE_CURRENT_SOURCE_DIR}/bgfx/bgfx/src}
 ${CMAKE_CURRENT_SOURCE_DIR}/bgfx/bgfx/include)
 
-add_subdirectory_ex(tracey)
-target_include_directories (tracey PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+#add_subdirectory_ex(tracey)
+#target_include_directories (tracey PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_subdirectory_ex(rttr)
 

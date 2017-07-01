@@ -92,6 +92,7 @@ namespace core
 	protected:
         T* fetch_without_check(handle _handle);
 
+		std::mutex _buffer_mutex;
 		array_t _buffer;
 		handle_set<N> _handles;
 	};
@@ -214,6 +215,7 @@ namespace core
 	template<typename T, size_t N>
     inline T* handle_object_set<T, N>::fetch_without_check(handle _handle)
 	{
+		std::unique_lock<std::mutex> lock(_buffer_mutex);
         return reinterpret_cast<T*>(_buffer.data()) + sizeof(aligned_storage_t)*_handle.get_index();
 	}
 
@@ -271,6 +273,8 @@ namespace core
     dynamic_handle_object_set<T, N>::~dynamic_handle_object_set()
 	{
 		clear();
+
+		std::unique_lock<std::mutex> lock(_malloc_mutex);
 		for (auto chunk : _chunks)
 			delete[] chunk;
 		_chunks.clear();
@@ -312,6 +316,7 @@ namespace core
 	{
         auto index = _handle.get_index() / N;
         auto offset = (_handle.get_index() % N) * sizeof(aligned_storage_t);
+		std::unique_lock<std::mutex> lock(_malloc_mutex);
         return reinterpret_cast<T*>(_chunks[index] + offset);
 	}
 

@@ -9,7 +9,7 @@
 
 #define RMC_DEFINE_DATA                     \
     std::vector<math::vec3> vertices;		\
-	std::vector<math::vec3> normals;		\
+    std::vector<math::vec4> normals;		\
 	std::vector<math::vec4> tangents;		\
 	std::vector<math::vec4> bitangents;		\
 	std::vector<math::vec2> texcoords0;		\
@@ -2133,19 +2133,19 @@ bool mesh::create_dodecahedron(const gfx::VertexDecl& format, bool hardware_copy
 	{
 		// Store vertex components
 		if (has_position)
-			gfx::vertexPack(&vertices[i][0], false, gfx::Attrib::Position, format, current_vertex_ptr, std::uint32_t(i));
+            gfx::vertexPack(&vertices[i][0], false, gfx::Attrib::Position, format, current_vertex_ptr, std::uint32_t(i));
 		if (has_normals)
-			gfx::vertexPack(&normals[i][0], true, gfx::Attrib::Normal, format, current_vertex_ptr, std::uint32_t(i));
+            gfx::vertexPack(&normals[i][0], true, gfx::Attrib::Normal, format, current_vertex_ptr, std::uint32_t(i));
 		if (has_texcoord0)
-			gfx::vertexPack(&texcoords0[i][0], true, gfx::Attrib::TexCoord0, format, current_vertex_ptr, std::uint32_t(i));
+            gfx::vertexPack(&texcoords0[i][0], true, gfx::Attrib::TexCoord0, format, current_vertex_ptr, std::uint32_t(i));
 		if (has_texcoord1)
-			gfx::vertexPack(&texcoords1[i][0], true, gfx::Attrib::TexCoord1, format, current_vertex_ptr, std::uint32_t(i));
+            gfx::vertexPack(&texcoords1[i][0], true, gfx::Attrib::TexCoord1, format, current_vertex_ptr, std::uint32_t(i));
 		if (has_tangents)
-			gfx::vertexPack(&tangents[i][0], true, gfx::Attrib::Tangent, format, current_vertex_ptr, std::uint32_t(i));
+            gfx::vertexPack(&tangents[i][0], true, gfx::Attrib::Tangent, format, current_vertex_ptr, std::uint32_t(i));
 		if (has_bitangents)
-			gfx::vertexPack(&bitangents[i][0], true, gfx::Attrib::Bitangent, format, current_vertex_ptr, std::uint32_t(i));
+            gfx::vertexPack(&bitangents[i][0], true, gfx::Attrib::Bitangent, format, current_vertex_ptr, std::uint32_t(i));
 
-		_bbox.add_point(vertices[i]);
+        _bbox.add_point(vertices[i]);
 	}
 
 	for (std::size_t i = 0; i < indices.size(); i += 3)
@@ -2203,19 +2203,19 @@ bool mesh::create_icosphere(const gfx::VertexDecl& format, int tesselation_level
 	{
 		// Store vertex components
 		if (has_position)
-			gfx::vertexPack(&vertices[i][0], false, gfx::Attrib::Position, format, current_vertex_ptr, std::uint32_t(i));
+            gfx::vertexPack(&vertices[i].x, false, gfx::Attrib::Position, format, current_vertex_ptr, std::uint32_t(i));
 		if (has_normals)
-			gfx::vertexPack(&normals[i][0], true, gfx::Attrib::Normal, format, current_vertex_ptr, std::uint32_t(i));
+            gfx::vertexPack(&normals[i].x, true, gfx::Attrib::Normal, format, current_vertex_ptr, std::uint32_t(i));
 		if (has_texcoord0)
-			gfx::vertexPack(&texcoords0[i][0], true, gfx::Attrib::TexCoord0, format, current_vertex_ptr, std::uint32_t(i));
+            gfx::vertexPack(&texcoords0[i].x, true, gfx::Attrib::TexCoord0, format, current_vertex_ptr, std::uint32_t(i));
 		if (has_texcoord1)
-			gfx::vertexPack(&texcoords1[i][0], true, gfx::Attrib::TexCoord1, format, current_vertex_ptr, std::uint32_t(i));		
+            gfx::vertexPack(&texcoords1[i].x, true, gfx::Attrib::TexCoord1, format, current_vertex_ptr, std::uint32_t(i));
 		if (has_tangents)
-			gfx::vertexPack(&tangents[i][0], true, gfx::Attrib::Tangent, format, current_vertex_ptr, std::uint32_t(i));
+            gfx::vertexPack(&tangents[i].x, true, gfx::Attrib::Tangent, format, current_vertex_ptr, std::uint32_t(i));
 		if (has_bitangents)
-			gfx::vertexPack(&bitangents[i][0], true, gfx::Attrib::Bitangent, format, current_vertex_ptr, std::uint32_t(i));
+            gfx::vertexPack(&bitangents[i].x, true, gfx::Attrib::Bitangent, format, current_vertex_ptr, std::uint32_t(i));
 
-		_bbox.add_point(vertices[i]);
+        _bbox.add_point(vertices[i]);
 	}
 
 	for (std::size_t i = 0; i < indices.size(); i += 3)

@@ -6,19 +6,32 @@
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 #include "runtime/rendering/mesh.h"
-
+#include <algorithm>
 
 math::transform process_matrix(const aiMatrix4x4& assimp_matrix)
 {
 	math::transform matrix;
 
-	for (unsigned int i = 0; i < 4; ++i)
-	{
-		for (unsigned int j = 0; j < 4; ++j)
-		{
-			matrix[i][j] = assimp_matrix[i][j];
-		}
-	}
+    matrix[1][0] = assimp_matrix.a1;
+    matrix[2][0] = assimp_matrix.a2;
+    matrix[3][0] = assimp_matrix.a3;
+    matrix[4][0] = assimp_matrix.a4;
+
+    matrix[1][1] = assimp_matrix.b1;
+    matrix[2][1] = assimp_matrix.b2;
+    matrix[3][1] = assimp_matrix.b3;
+    matrix[4][1] = assimp_matrix.b4;
+
+    matrix[1][2] = assimp_matrix.c1;
+    matrix[2][2] = assimp_matrix.c2;
+    matrix[3][2] = assimp_matrix.c3;
+    matrix[4][2] = assimp_matrix.c4;
+
+    matrix[1][3] = assimp_matrix.d1;
+    matrix[2][3] = assimp_matrix.d2;
+    matrix[3][3] = assimp_matrix.d3;
+    matrix[4][3] = assimp_matrix.d4;
+
 	return matrix;
 }
 
@@ -111,7 +124,9 @@ void process_faces(aiMesh* mesh, mesh::load_data& load_data)
 
 		triangle.data_group_id = mesh->mMaterialIndex;
 
-		for (size_t j = 0; j < 3; ++j)
+        auto num_indices = std::min<size_t>(face.mNumIndices, 3);
+
+        for (size_t j = 0; j < num_indices; ++j)
 		{
 			triangle.indices[j] = face.mIndices[j] + load_data.vertex_count;
 		}
@@ -132,8 +147,7 @@ void process_bones(aiMesh* mesh, mesh::load_data& load_data)
 			skin_bind_data::bone_influence bone_influence;
 			bone_influence.bone_id = assimp_bone->mName.C_Str();
 			const aiMatrix4x4& assimp_matrix = assimp_bone->mOffsetMatrix;
-			math::transform matrix = process_matrix(assimp_matrix);
-			bone_influence.bind_pose_transform = math::transpose(matrix);
+            bone_influence.bind_pose_transform = process_matrix(assimp_matrix);
 
 			for (size_t j = 0; j < assimp_bone->mNumWeights; ++j)
 			{
@@ -265,8 +279,7 @@ void process_node(aiNode* node, mesh::armature_node& armature_node)
 		child_armature->name = child_node->mName.C_Str();
 
 		const aiMatrix4x4& assimp_matrix = child_node->mTransformation;
-		math::transform matrix = process_matrix(assimp_matrix);
-		child_armature->transform = math::transpose(matrix);
+        child_armature->transform = process_matrix(assimp_matrix);
 
 		armature_node.children[i] = std::move(child_armature);
 		process_node(child_node, *armature_node.children[i].get());
