@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-#set(ECM_ENABLE_SANITIZERS "thread")
+#set(ECM_ENABLE_SANITIZERS "custom")
 
 if(UNIX AND NOT APPLE)
     set(LINUX TRUE)
@@ -20,6 +20,7 @@ elseif(WIN32)
     message(STATUS "OS >>> Windows")
     # stuff that should happen not on Linux
 endif()
+
 
 message(STATUS "COMPILER >>> ${CMAKE_CXX_COMPILER_ID}")
 

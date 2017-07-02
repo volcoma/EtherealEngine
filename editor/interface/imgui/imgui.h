@@ -891,8 +891,12 @@ public:
     {
         if (new_capacity <= Capacity) return;
         T* new_data = (value_type*)ImGui::MemAlloc((size_t)new_capacity * sizeof(value_type));
-        memcpy(new_data, Data, (size_t)Size * sizeof(value_type));
-        ImGui::MemFree(Data);
+        if(Data != NULL)
+        {
+            memcpy(new_data, Data, (size_t)Size * sizeof(value_type));
+            ImGui::MemFree(Data);
+        }
+
         Data = new_data;
         Capacity = new_capacity;
     }

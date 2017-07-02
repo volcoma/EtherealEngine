@@ -66,8 +66,8 @@ namespace imguizmo
 		vec_t operator * (const vec_t& v) const;
 
 		const vec_t& operator + () const { return (*this); }
-		float Length() const { return sqrtf(x*x + y*y + z*z); };
-		float LengthSq() const { return (x*x + y*y + z*z); };
+        float Length() const { return sqrtf(x*x + y*y + z*z); }
+        float LengthSq() const { return (x*x + y*y + z*z); }
 		vec_t Normalize() { (*this) *= (1.f / Length()); return (*this); }
 		vec_t Normalize(const vec_t& v) { this->Set(v.x, v.y, v.z, v.w); this->Normalize(); return (*this); }
 
@@ -663,7 +663,7 @@ namespace imguizmo
 		gContext.mCameraRight = viewInverse.v.right;
 		gContext.mCameraUp = viewInverse.v.up;
 
-		gContext.mScreenFactor = 0.15f * GetUniform(gContext.mModel.v.position, gContext.mViewProjection);
+        gContext.mScreenFactor = 0.15f * GetUniform(gContext.mModel.v.position, gContext.mViewProjection) + 0.001f;
 
 		ImVec2 centerSSpace = worldToPos(makeVect(0.f, 0.f), gContext.mMVP);
 		gContext.mScreenSquareCenter = centerSSpace;

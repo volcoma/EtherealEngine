@@ -36,9 +36,9 @@ namespace bgfx
 
 	struct BX_NO_VTABLE VRImplI
 	{
-		virtual ~VRImplI() = 0;
+        virtual ~VRImplI() = 0;
 
-		virtual bool init() = 0;
+        virtual bool init() = 0;
 		virtual void shutdown() = 0;
 		virtual void connect(VRDesc* _desc) = 0;
 		virtual void disconnect() = 0;
@@ -48,16 +48,16 @@ namespace bgfx
 		virtual void updateInput(HMD& _hmd) = 0;
 		virtual void recenter() = 0;
 
-		virtual bool createSwapChain(const VRDesc& _desc, int _msaaSamples, int _mirrorWidth, int _mirrorHeight);
+        virtual bool createSwapChain(const VRDesc& _desc, int _msaaSamples, int _mirrorWidth, int _mirrorHeight) = 0;
 		virtual void destroySwapChain() = 0;
 		virtual void destroyMirror() = 0;
 		virtual void makeRenderTargetActive(const VRDesc& _desc) = 0;
 		virtual bool submitSwapChain(const VRDesc& _desc) = 0;
 	};
 
-	inline VRImplI::~VRImplI()
-	{
-	}
+    inline VRImplI::~VRImplI()
+    {
+    }
 
 	class VR
 	{

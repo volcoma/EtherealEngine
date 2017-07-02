@@ -68,21 +68,21 @@ namespace cereal
     {
       private:
         //! Forces instantiation at pre-execution time
-        static void instantiate( T const & ) {}
+		static void instantiate( T const * ) {}
 
         static T & create()
         {
-          static T t;
-          instantiate(instance);
-          return t;
+			static T t;
+			instantiate(&instance);
+			return t;
         }
 
         StaticObject( StaticObject const & /*other*/ ) {}
 
       public:
         static T & getInstance()
-        {
-          return create();
+		{
+			return create();
         }
 
         //! A class that acts like std::lock_guard
@@ -117,10 +117,10 @@ namespace cereal
         }
 
       private:
-        static T & instance;
-    };
+		static T& instance;
+	};
 
-    template <class T> T & StaticObject<T>::instance = StaticObject<T>::create();
+	template <class T> T& StaticObject<T>::instance = StaticObject<T>::create();
   } // namespace detail
 } // namespace cereal
 

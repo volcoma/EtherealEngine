@@ -115,14 +115,14 @@ struct triangle_mesh_tools
 		add_triangle(out_indices, i0, i3, i4);
 	}
 
-    static inline void generate_normals(std::vector<math::vec4>& out_normals, const std::vector<math::vec3>& vertices, const std::vector<std::uint32_t>& indices, bool counter_clockwise, int index_from = 0, int index_count = -1, bool fix_broken_normals = true)
+	static inline void generate_normals(std::vector<math::vec4>& out_normals, const std::vector<math::vec3>& vertices, const std::vector<std::uint32_t>& indices, bool counter_clockwise, int index_from = 0, int index_count = -1, bool fix_broken_normals = true)
 	{
 		expects(out_normals.size() == vertices.size());
 		if (index_count == -1)
 			index_count = (int)indices.size();
 
 		for (int i = 0; i < (int)vertices.size(); i++)
-            out_normals[i] = math::vec4(0.0f, 0.0f, 0.0, 0.0f);
+			out_normals[i] = math::vec4(0.0f, 0.0f, 0.0, 0.0f);
 
 		for (int i = index_from; i < index_count; i += 3)
 		{
@@ -147,9 +147,9 @@ struct triangle_mesh_tools
 			}
 
 			// don't normalize, leave it weighted by area
-            out_normals[indices[i + 0]] += math::vec4(norm.x, norm.y, norm.z, 0.0f);
-            out_normals[indices[i + 1]] += math::vec4(norm.x, norm.y, norm.z, 0.0f);
-            out_normals[indices[i + 2]] += math::vec4(norm.x, norm.y, norm.z, 0.0f);
+			out_normals[indices[i + 0]] += math::vec4(norm.x, norm.y, norm.z, 0.0f);
+			out_normals[indices[i + 1]] += math::vec4(norm.x, norm.y, norm.z, 0.0f);
+			out_normals[indices[i + 2]] += math::vec4(norm.x, norm.y, norm.z, 0.0f);
 		}
 
 		for (int i = 0; i < (int)vertices.size(); i++)
@@ -157,14 +157,14 @@ struct triangle_mesh_tools
 			float length = math::length(out_normals[i]);
 
 			if (length < math::epsilon<float>())
-                out_normals[i] = math::vec4(0.0f, 0.0f, (fix_broken_normals) ? (1.0f) : (0.0f), 0.0f);
+				out_normals[i] = math::vec4(0.0f, 0.0f, (fix_broken_normals) ? (1.0f) : (0.0f), 0.0f);
 			else
 				out_normals[i] *= 1.0f / length;
 		}
 	}
 
 	// based on http://www.terathon.com/code/tangent.html
-    static void generate_tangents(std::vector<math::vec4>& out_tangents, std::vector<math::vec4>& out_bitangents, const std::vector<math::vec3>& vertices, const std::vector<math::vec4>& normals, const std::vector<math::vec2>& texturecoords, const std::vector<std::uint32_t>& indices)
+	static void generate_tangents(std::vector<math::vec4>& out_tangents, std::vector<math::vec4>& out_bitangents, const std::vector<math::vec3>& vertices, const std::vector<math::vec4>& normals, const std::vector<math::vec2>& texturecoords, const std::vector<std::uint32_t>& indices)
 	{
 		expects(out_tangents.size() == vertices.size());
 
@@ -203,7 +203,7 @@ struct triangle_mesh_tools
 			float t1 = w2.y - w1.y;
 			float t2 = w3.y - w1.y;
 
-			float r = 1.0F / (s1 * t2 - s2 * t1);
+			float r = 1.0f / (s1 * t2 - s2 * t1 + math::epsilon<float>());
 			math::vec3 sdir((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r);
 			math::vec3 tdir((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, (s1 * z2 - s2 * z1) * r);
 
@@ -234,14 +234,14 @@ struct triangle_mesh_tools
 	}
 
 	// dummy tangents, for better, http://www.terathon.com/code/tangent.html or http://developer.nvidia.com/object/NVMeshMender.html 
-    static void fill_dummy_ttt(const std::vector<math::vec3> & vertices, const std::vector<math::vec4> & normals, std::vector<math::vec4> & tangents, std::vector<math::vec2> & texcoords0, std::vector<math::vec2> & texcoords1)
+	static void fill_dummy_ttt(const std::vector<math::vec3> & vertices, const std::vector<math::vec4> & normals, std::vector<math::vec4> & tangents, std::vector<math::vec2> & texcoords0, std::vector<math::vec2> & texcoords1)
 	{
 		for (size_t i = 0; i < vertices.size(); i++)
 		{
 			math::vec3 bitangent = math::normalize(vertices[i] + math::vec3(0.0f, 0.0f, -5.0f));
-            if (math::dot(bitangent, math::vec3(normals[i])) > 0.9f)
+			if (math::dot(bitangent, math::vec3(normals[i])) > 0.9f)
 				bitangent = math::normalize(vertices[i] + math::vec3(-5.0f, 0.0f, 0.0f));
-            tangents[i] = math::vec4(math::normalize(math::cross(bitangent, math::vec3(normals[i]))), 1.0);
+			tangents[i] = math::vec4(math::normalize(math::cross(bitangent, math::vec3(normals[i]))), 1.0);
 			texcoords0[i] = math::vec2(vertices[i].x / 2.0f + 0.5f, vertices[i].y / 2.0f + 0.5f);
 			texcoords1[i] = texcoords0[i];
 		}
