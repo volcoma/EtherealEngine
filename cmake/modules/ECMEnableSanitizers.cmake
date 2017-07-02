@@ -109,6 +109,10 @@ macro (check_compiler_version gcc_required_version clang_required_version)
             AND
             CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${clang_required_version}
         )
+		#OR
+		#(
+		#	CMAKE_CXX_COMPILER_ID MATCHES "MSVC"
+		#)
     )
         # error !
         message(FATAL_ERROR "You ask to enable the sanitizer ${CUR_SANITIZER},
@@ -148,19 +152,21 @@ macro (enable_sanitizer_flags sanitize_option)
     endif ()
 endmacro ()
 
-# for each element of the ECM_ENABLE_SANITIZERS list
-foreach ( CUR_SANITIZER ${ECM_ENABLE_SANITIZERS} )
-	message(STATUS "---------CONSIDERING SANITIZER = ${CUR_SANITIZER}")
-    # lowercase filter
-    string(TOLOWER ${CUR_SANITIZER} CUR_SANITIZER)
-    # check option and enable appropriate flags
-    enable_sanitizer_flags ( ${CUR_SANITIZER} )
-    set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${XSAN_COMPILE_FLAGS}" )
-    if (CMAKE_CXX_COMPILER_ID STREQUAL GNU)
-        link_libraries(${XSAN_LINKER_FLAGS})
-    endif()
-    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-        string(REPLACE "-Wl,--no-undefined" "" CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
-        string(REPLACE "-Wl,--no-undefined" "" CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS}")
-    endif ()
-endforeach ()
+macro(enable_sanitizers ECM_ENABLE_SANITIZERS)
+	# for each element of the ECM_ENABLE_SANITIZERS list
+	foreach ( CUR_SANITIZER ${ECM_ENABLE_SANITIZERS} )
+		message(STATUS "---------CONSIDERING SANITIZER = ${CUR_SANITIZER}")
+		# lowercase filter
+		string(TOLOWER ${CUR_SANITIZER} CUR_SANITIZER)
+		# check option and enable appropriate flags
+		enable_sanitizer_flags ( ${CUR_SANITIZER} )
+		set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${XSAN_COMPILE_FLAGS}" )
+		if (CMAKE_CXX_COMPILER_ID STREQUAL GNU)
+			link_libraries(${XSAN_LINKER_FLAGS})
+		endif()
+		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+			string(REPLACE "-Wl,--no-undefined" "" CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
+			string(REPLACE "-Wl,--no-undefined" "" CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS}")
+		endif ()
+	endforeach ()
+endmacro()
