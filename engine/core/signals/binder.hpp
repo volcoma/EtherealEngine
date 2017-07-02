@@ -15,6 +15,7 @@
 #include "../common/nonstd/any.hpp"
 #include "../common/nonstd/optional.hpp"
 #include "../common/nonstd/function_traits.hpp"
+#include "../common/nonstd/sequence.hpp"
 #include "delegate.hpp"
 
 //Used for type deduction ease

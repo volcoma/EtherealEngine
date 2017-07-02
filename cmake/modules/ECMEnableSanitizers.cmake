@@ -109,10 +109,10 @@ macro (check_compiler_version gcc_required_version clang_required_version)
             AND
             CMAKE_CXX_COMPILER_VERSION VERSION_LESS ${clang_required_version}
         )
-		#OR
-		#(
-		#	CMAKE_CXX_COMPILER_ID MATCHES "MSVC"
-		#)
+		OR
+		(
+			CMAKE_CXX_COMPILER_ID MATCHES "MSVC"
+		)
     )
         # error !
         message(FATAL_ERROR "You ask to enable the sanitizer ${CUR_SANITIZER},
