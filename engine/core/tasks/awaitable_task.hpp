@@ -329,8 +329,7 @@ namespace tasks
                 F && f, Args && ... args
             )
                 : _f    (std::allocator_arg_t (), alloc, std::forward <F> (f))
-                , _args (std::allocator_arg_t (), alloc,
-                         std::forward <Args> (args)...)
+                , _args (std::forward <Args> (args)...)
             {}
 
             std::future <R> get_future ()
@@ -384,7 +383,7 @@ namespace tasks
             template <std::size_t ... I>
             inline bool do_ready_ (nonstd::index_sequence <I...>) const noexcept
             {
-				bool all_true = nonstd::check_all_true(call_ready(std::get<I>(_args))...);
+                bool all_true = nonstd::check_all_true(call_ready(std::get<I>(_args))...);
 				return all_true;
 			}
 
@@ -485,11 +484,17 @@ namespace tasks
                 return true;
             }
 
-            std::pair <bool, awaitable_task> pop ()
+            std::pair <bool, awaitable_task> pop (bool wait = true)
             {
                 std::unique_lock <std::mutex> lock (mutex_);
-                while (tasks_.empty () && !done_)
-                    cv_.wait (lock);
+
+                if(wait)
+                {
+                    while (tasks_.empty () && !done_)
+                    {
+                        cv_.wait (lock);
+                    }
+                }
 
                 if (tasks_.empty ())
                     return std::make_pair (false, awaitable_task {});
@@ -511,7 +516,7 @@ namespace tasks
 
                 for (auto lag = iter++; lag != old_last; lag = iter++) 
 				{
-                    if (iter->ready ()) 
+                    if (iter->ready ())
 					{
                         if (last_ == iter)
                             last_ = lag;
@@ -530,14 +535,21 @@ namespace tasks
                  * front of the task list, release the lock, and wait for the
                  * task to be ready.
                  */
-                auto t = std::move (tasks_.front ());
-                tasks_.pop_front ();
-                lock.unlock ();
+                if(wait)
+                {
+                    auto t = std::move (tasks_.front ());
+                    tasks_.pop_front ();
+                    lock.unlock ();
 
-                while (!t.ready ())
-                    std::this_thread::yield ();
+                    while (!t.ready ())
+                        std::this_thread::yield ();
 
-                return std::make_pair (true, std::move (t));
+                    return std::make_pair (true, std::move (t));
+                }
+                else
+                {
+                    return std::make_pair (false, awaitable_task {});
+                }
             }
 
             void push (awaitable_task t)
@@ -603,7 +615,7 @@ namespace tasks
 
     public:
         awaitable_task_system ()
-			: awaitable_task_system(std::thread::hardware_concurrency() - 1)
+			: awaitable_task_system(std::thread::hardware_concurrency())
         {}
 
         awaitable_task_system (std::size_t nthreads,
@@ -656,10 +668,10 @@ namespace tasks
 
 
 		//-----------------------------------------------------------------------------
-		//  Name : push_ready ()
+        //  Name : push_ready ()
 		/// <summary>
 		/// Pushes a immediately invokable task to be executed.
-		/// Ready tasks are assumed to be immediately invokable; that is,
+        /// Ready tasks are assumed to be immediately invokable; that is,
 		/// invoking the underlying pakcaged_task with the provided arguments
 		/// will not block.This is contrasted with async tasks where some or
 		/// all of the provided arguments may be futures waiting on results of
@@ -677,11 +689,11 @@ namespace tasks
         {
 			if (nthreads_ == 0)
 			{
-				return push_ready_on_main(std::forward <F>(f), std::forward <Args>(args)...);
+                return push_ready_on_main(std::forward <F>(f), std::forward <Args>(args)...);
 			}
 			else
 			{
-				auto t = make_ready_task(
+                auto t = make_ready_task(
 					std::allocator_arg_t{}, alloc_,
 					std::forward <F>(f), std::forward <Args>(args)...
 				);
@@ -706,7 +718,7 @@ namespace tasks
 		/// Pushes an awaitable task to be executed.
 		/// Awaitable tasks are assumed to take arguments where some or all are
 		/// backed by futures waiting on results of other tasks.This is
-		/// contrasted with ready tasks that are assumed to be immediately invokable.
+        /// contrasted with ready tasks that are assumed to be immediately invokable.
 		/// </summary>
 		//-----------------------------------------------------------------------------
         template <class F, class ... Args>
@@ -750,7 +762,7 @@ namespace tasks
 		/// Pushes an awaitable task to be executed.
 		/// Awaitable tasks are assumed to take arguments where some or all are
 		/// backed by futures waiting on results of other tasks.This is
-		/// contrasted with ready tasks that are assumed to be immediately invokable.
+        /// contrasted with ready tasks that are assumed to be immediately invokable.
 		/// </summary>
 		//-----------------------------------------------------------------------------
         void push_awaitable (awaitable_task && t)
@@ -776,10 +788,10 @@ namespace tasks
 
 
 		//-----------------------------------------------------------------------------
-		//  Name : push_ready_on_main ()
+        //  Name : push_ready_on_main ()
 		/// <summary>
 		/// Pushes a immediately invokable task to be executed.
-		/// Ready tasks are assumed to be immediately invokable; that is,
+        /// Ready tasks are assumed to be immediately invokable; that is,
 		/// invoking the underlying pakcaged_task with the provided arguments
 		/// will not block.This is contrasted with async tasks where some or
 		/// all of the provided arguments may be futures waiting on results of
@@ -787,15 +799,15 @@ namespace tasks
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template <class F, class ... Args>
-		auto push_ready_on_main(F && f, Args && ... args)
+        auto push_ready_on_main(F && f, Args && ... args)
 			-> typename std::remove_reference <
-			decltype (make_ready_task(
+            decltype (make_ready_task(
 				std::allocator_arg_t{}, alloc_,
 				std::forward <F>(f), std::forward <Args>(args)...
 			).second)
 			>::type
 		{
-			auto t = make_ready_task(
+            auto t = make_ready_task(
 				std::allocator_arg_t{}, alloc_,
 				std::forward <F>(f), std::forward <Args>(args)...
 			);
@@ -817,7 +829,7 @@ namespace tasks
 		/// Pushes an awaitable task to be executed.
 		/// Awaitable tasks are assumed to take arguments where some or all are
 		/// backed by futures waiting on results of other tasks.This is
-		/// contrasted with ready tasks that are assumed to be immediately invokable.
+        /// contrasted with ready tasks that are assumed to be immediately invokable.
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template <class F, class ... Args>
@@ -837,7 +849,7 @@ namespace tasks
 			const auto queue_index = get_main_thread_queue_idx();
 			for (std::size_t k = 0; k < 10; ++k)
 			{
-				if (queues_[queue_index].try_push(std::move(t.first)))
+                if (queues_[queue_index].try_push(t.first))
 					return std::move(t.second);
 			}
 
@@ -851,7 +863,7 @@ namespace tasks
 		/// Pushes an awaitable task to be executed.
 		/// Awaitable tasks are assumed to take arguments where some or all are
 		/// backed by futures waiting on results of other tasks.This is
-		/// contrasted with ready tasks that are assumed to be immediately invokable.
+        /// contrasted with ready tasks that are assumed to be immediately invokable.
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		void push_awaitable_on_main(awaitable_task && t)
@@ -884,14 +896,15 @@ namespace tasks
 					break;
 			}
 
-			if (!p.first)
-			{
-				p = queues_[queue_index].pop();
-				if (!p.first)
-					return;
-			}
+            if (!p.first)
+            {
+                p = queues_[queue_index].pop(false);
+                if (!p.first)
+                    return;
+            }
 
-			p.second();
+            if(p.first)
+                p.second();
 			
 		}
     };
