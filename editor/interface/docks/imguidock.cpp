@@ -260,6 +260,7 @@ namespace imguidock
 				pos[1] -= 40;
 				window->set_position(pos);
 				window->set_alpha(0.3f);
+				active_dock->redock_to = nullptr;
 			}
 			else
 			{
@@ -280,8 +281,9 @@ namespace imguidock
 					{
 						window->set_alpha(1.0f);
 					}
+					active_dock->draging = false;
 				}
-				active_dock->draging = false;
+				
 			}
 		}
 	}
@@ -340,10 +342,7 @@ namespace imguidock
 							dragged_window_dock->redock_slot = dock_slot;
 							dragged_window_dock->redock_from_window = owner;
 						}
-						else
-						{
-							dragged_window_dock->redock_to = nullptr;
-						}
+		
 					}
 					
 				}
@@ -456,7 +455,7 @@ namespace imguidock
 	{
 		uint32_t idgen = 0;
 		ImVec2 backup_pos = ImGui::GetCursorPos();
-		update_drag(owner);
+		
 		render_container(idgen, &root, dockspaceSize, backup_pos);
 		if (_current_dock_to)
 		{
@@ -470,7 +469,7 @@ namespace imguidock
 					auto& engine = core::get_subsystem<runtime::engine>();
 					auto window = std::make_unique<gui_window>(
 						mml::video_mode((unsigned int)_current_dock_to->last_size.x, (unsigned int)_current_dock_to->last_size.y),
-						"Editor Dock",
+						"Editor Window",
 						mml::style::standard
 						);
 					window->get_dockspace().dock_to(_current_dock_to, slot::tab, 0, true);
@@ -498,7 +497,7 @@ namespace imguidock
 			_current_dock_to = nullptr;
 			_current_dock_action = eNull;
 		}
-
+		update_drag(owner);
 		
 	}
 
