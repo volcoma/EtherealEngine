@@ -244,7 +244,7 @@ namespace imguidock
 		return false;
 	}
 
-	void updateDrag(gui_window* window)
+	void update_drag(gui_window* window)
 	{
 		auto& dockspace = window->get_dockspace();
 		auto& split = dockspace.root.splits[0];
@@ -330,15 +330,22 @@ namespace imguidock
 					slot dock_slot = render_dock_slot_preview(cursor_pos, screen_cursor_pos, size);
 					ImGui::PopClipRect();
 					ImGui::EndChild();
-					if (dock_slot != slot::none)
+					auto dragged_window_dock = dragged_window->get_dockspace().root.splits[0]->active_dock;
+					if (dragged_window_dock)
 					{
-						dock *dragged_window_dock = dragged_window->get_dockspace().root.splits[0]->active_dock;
-						dragged_window_dock->redock_from = this;
-						dragged_window_dock->redock_to = container->active_dock;
-						dragged_window_dock->redock_slot = dock_slot;
-						dragged_window_dock->redock_from_window = owner;
+						if (dock_slot != slot::none)
+						{
+							dragged_window_dock->redock_from = this;
+							dragged_window_dock->redock_to = container->active_dock;
+							dragged_window_dock->redock_slot = dock_slot;
+							dragged_window_dock->redock_from_window = owner;
+						}
+						else
+						{
+							dragged_window_dock->redock_to = nullptr;
+						}
 					}
-					else dragged_window->get_dockspace().root.splits[0]->active_dock->redock_to = nullptr;
+					
 				}
 
 			}
@@ -449,6 +456,7 @@ namespace imguidock
 	{
 		uint32_t idgen = 0;
 		ImVec2 backup_pos = ImGui::GetCursorPos();
+		update_drag(owner);
 		render_container(idgen, &root, dockspaceSize, backup_pos);
 		if (_current_dock_to)
 		{
@@ -491,7 +499,7 @@ namespace imguidock
 			_current_dock_action = eNull;
 		}
 
-		updateDrag(owner);
+		
 	}
 
 	void dockspace::clear()
@@ -707,19 +715,19 @@ namespace imguidock
 
 
 			ImGui::SameLine();
-// 			if (dock->closeButton == true)
-// 			{
-// 				ImVec2 backupCursorPos = ImGui::GetCursorScreenPos();
-// 				ImGui::SetCursorPosX(backupCursorPos.x - 26);
-// 				ImGui::SetCursorPosY(backupCursorPos.y + 10);
-// 				ImGui::SetItemAllowOverlap();
-// 				if(ImGui::CloseButton(5, ImVec2(backupCursorPos.x - 18, backupCursorPos.y + 10), 7))
-// 				{
-// 					m_currentDockToAction = eClose;
-// 					m_currentDockTo = dock;
-// 				}
-// 				ImGui::SetCursorPos(backupCursorPos);
-// 			}
+ 			//if (dock->close_button == true)
+ 			//{
+ 			//	ImVec2 backupCursorPos = ImGui::GetCursorScreenPos();
+ 			//	ImGui::SetCursorPosX(backupCursorPos.x - 26);
+ 			//	ImGui::SetCursorPosY(backupCursorPos.y + 10);
+ 			//	ImGui::SetItemAllowOverlap();
+ 			//	if(ImGui::CloseButton(5, ImVec2(backupCursorPos.x - 18, backupCursorPos.y + 10), 7))
+ 			//	{
+			//		_current_dock_action = eClose;
+ 			//		_current_dock_to = dock;
+ 			//	}
+ 			//	ImGui::SetCursorPos(backupCursorPos);
+ 			//}
 
 			ImGui::PopStyleColor(3);
 		}

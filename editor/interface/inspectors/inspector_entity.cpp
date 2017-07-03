@@ -273,8 +273,9 @@ bool inspector_entity::inspect(rttr::variant& var, bool readOnly, std::function<
 	if (gui::Button("+Component"))
 	{
 		gui::OpenPopup("ComponentMenu");
-		
+		gui::SetNextWindowPos(gui::GetCursorScreenPos());
 	}
+
 
 	if (gui::BeginPopup("ComponentMenu"))
 	{

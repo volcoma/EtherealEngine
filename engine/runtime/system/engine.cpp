@@ -102,9 +102,10 @@ namespace runtime
 
 		process_pending_events();
 		
+		auto dt = sim.get_delta_time();
+
 		if (!_windows.empty())
-		{
-			auto dt = sim.get_delta_time();
+		{		
 			on_frame_begin(dt);
 
 			for (auto& window : _windows)

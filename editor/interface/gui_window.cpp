@@ -180,6 +180,8 @@ gui_window::~gui_window()
 
 bool gui_window::filter_event(const mml::platform_event& event)
 {
+	imgui_set_context(_gui_context);
+
 	handle_sfml_event(event);
 
 	return render_window::filter_event(event);;
