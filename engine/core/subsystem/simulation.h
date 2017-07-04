@@ -16,7 +16,7 @@ namespace core
 	/// Class responsible for timers.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	struct simulation : public core::subsystem
+	struct simulation : public subsystem
 	{
 		using timepoint_t = std::chrono::time_point<std::chrono::high_resolution_clock>;
 		using clock_t = std::chrono::high_resolution_clock;

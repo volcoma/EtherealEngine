@@ -1,5 +1,6 @@
 #include "engine.h"
 #include "core/subsystem/simulation.h"
+#include "core/subsystem/tasks.hpp"
 #include "core/serialization/serialization.h"
 #include "../rendering/renderer.h"
 #include "../input/input.h"
@@ -51,6 +52,7 @@ namespace runtime
 	bool engine::start(std::unique_ptr<render_window> main_window)
 	{
 		core::add_subsystem<core::simulation>();
+		core::add_subsystem<core::task_system>();
 
 		auto& render = core::add_subsystem<renderer>();
 		if (!render.init_backend(*main_window))
@@ -74,7 +76,7 @@ namespace runtime
 	render_window* engine::get_focused_window() const
 	{
 		render_window* focused_window = nullptr;
-		//get a copy of the windows for safe iterator invalidation
+
 		const auto& windows = get_windows();
 		auto it = std::find_if(std::begin(windows), std::end(windows), [](const auto& window)
 		{
@@ -95,8 +97,10 @@ namespace runtime
 			return;
 
 		auto& sim = core::get_subsystem<core::simulation>();
-		
+		auto& tasks = core::get_subsystem<core::task_system>();
+
 		sim.run_one_frame();
+		tasks.run_on_main();
 
 		process_pending_windows();
 
