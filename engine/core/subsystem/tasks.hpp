@@ -23,6 +23,160 @@
 
 namespace core
 {
+	class task_system;
+
+	namespace detail
+	{
+		template<void(*ctor)()>
+		struct static_initializer
+		{
+			struct constructor { constructor() { ctor(); } };
+			static constructor initializer;
+		};
+
+		template<void(*ctor)()>
+		typename static_initializer<ctor>::constructor static_initializer<ctor>::initializer;
+
+		inline std::thread::id get_main_thread_id()
+		{
+			static auto id = std::this_thread::get_id();
+			return id;
+		}
+		inline void init_main_thread_id()
+		{
+			static_initializer<init_main_thread_id>::initializer;
+			get_main_thread_id();
+		}
+		inline bool is_main_thread()
+		{
+			return get_main_thread_id() == std::this_thread::get_id();
+		}
+	}
+
+	template<typename T>
+	class task_future
+	{
+	public:
+		std::shared_future<T> future;
+		std::uint64_t id = 0;		
+	
+		auto get() const -> decltype (future.get())
+		{
+			return future.get();
+		}
+
+		void wait() const
+		{
+			if (detail::is_main_thread() && _system)
+			{
+				_system->processing_wait_id(id);
+			}
+			else if(future.valid())
+			{
+				future.wait();
+			}
+		}
+
+		template<class _Rep,
+			class _Per>
+			std::future_status wait_for(
+				const std::chrono::duration<_Rep, _Per>& rel_time) const
+		{	// wait for duration
+			future.wait_for(rel_time);
+		}
+
+		template<class _Clock,
+			class _Dur>
+			std::future_status wait_until(
+				const std::chrono::time_point<_Clock, _Dur>& abs_time) const
+		{	// wait until time point
+			future.wait_until(abs_time);
+		}
+
+	private:
+		friend class task_system;
+		task_system* _system = nullptr;
+	};
+
+	template <class>
+	struct is_future : std::false_type {};
+
+	template <class T>
+	struct is_future <std::future<T>> : std::true_type {};
+
+	template <class T>
+	struct is_future <std::shared_future<T>> : std::true_type {};
+	template <class T>
+	struct is_future <std::shared_future<T>&> : std::true_type {};
+	template <class T>
+	struct is_future <const std::shared_future<T>&> : std::true_type {};
+
+	template <class T>
+	struct is_future <task_future <T>> : std::true_type {};
+	template <class T>
+	struct is_future <task_future <T>&> : std::true_type {};
+	template <class T>
+	struct is_future <const task_future <T>&> : std::true_type {};
+
+
+	template <class T>
+	struct decay_future
+	{
+		using type = T;
+	};
+
+	template <class T>
+	struct decay_future <std::future <T>>
+	{
+		using type = T;
+	};
+
+	template <class T>
+	struct decay_future <std::shared_future <T>>
+	{
+		using type = T;
+	};
+
+	template <class T>
+	struct decay_future <std::shared_future<T>&>
+	{
+		using type = T;
+	};
+
+	template <class T>
+	struct decay_future <const std::shared_future<T>&>
+	{
+		using type = T;
+	};
+
+	template <class T>
+	struct decay_future <task_future <T>>
+	{
+		using type = T;
+	};
+
+	template <class T>
+	struct decay_future <task_future<T>&>
+	{
+		using type = T;
+	};
+
+	template <class T>
+	struct decay_future <const task_future<T>&>
+	{
+		using type = T;
+	};
+
+	namespace
+	{
+		inline std::uint64_t get_next_id()
+		{
+			static std::atomic<std::uint64_t> counter{ 0 };
+			return counter++;
+		}
+	}
+	
+	
 	/*
 	 * awaitable_task; a type-erased, allocator-aware std::packaged_task that
 	 * also contains its own arguments. The underlying packaged_task and the
@@ -51,8 +205,8 @@ namespace core
 	{
 		template <class T>
 		using decay_if_future = typename std::conditional <
-			nonstd::is_future <typename std::decay <T>::type>::value,
-			typename nonstd::decay_future <T>::type, T
+			is_future <typename std::decay <T>::type>::value,
+			typename decay_future <T>::type, T
 		>::type;
 
 		struct ready_task_tag {};
@@ -78,17 +232,22 @@ namespace core
 			return static_cast <bool> (_t);
 		}
 
+		std::uint64_t get_id() const
+		{
+			return _t->id;
+		}
+
 		friend class task_system;
 
 		template <class F, class ... Args>
 		friend std::pair <
 			awaitable_task,
-			std::future <typename std::result_of <F(Args...)>::type>
+			task_future <typename std::result_of <F(Args...)>::type>
 		> make_ready_task(F && f, Args && ... args)
 		{
 			using pair_type = std::pair <
 				awaitable_task,
-				std::future <typename std::result_of <F(Args...)>::type>
+				task_future <typename std::result_of <F(Args...)>::type>
 			>;
 			using model_type = ready_task_model <
 				typename std::result_of <F(Args...)>::type(Args...)
@@ -105,13 +264,13 @@ namespace core
 		template <class Allocator, class F, class ... Args>
 		friend std::pair <
 			awaitable_task,
-			std::future <typename std::result_of <F(Args...)>::type>
+			task_future <typename std::result_of <F(Args...)>::type>
 		> make_ready_task(std::allocator_arg_t, Allocator const & alloc,
 			F && f, Args && ... args)
 		{
 			using pair_type = std::pair <
 				awaitable_task,
-				std::future <typename std::result_of <F(Args...)>::type>
+				task_future <typename std::result_of <F(Args...)>::type>
 			>;
 			using model_type = ready_task_model <
 				typename std::result_of <F(Args...)>::type(Args...)
@@ -128,14 +287,14 @@ namespace core
 		template <class F, class ... Args>
 		friend std::pair <
 			awaitable_task,
-			std::future <typename std::result_of <
+			task_future <typename std::result_of <
 			F(decay_if_future <Args>...)
 			>::type>
 		> make_awaitable_task(F && f, Args && ... args)
 		{
 			using pair_type = std::pair <
 				awaitable_task,
-				std::future <typename std::result_of <
+				task_future <typename std::result_of <
 				F(decay_if_future <Args>...)
 				>::type>
 			>;
@@ -157,7 +316,7 @@ namespace core
 		template <class Allocator, class F, class ... Args>
 		friend std::pair <
 			awaitable_task,
-			std::future <typename std::result_of <
+			task_future <typename std::result_of <
 			F(decay_if_future <Args>...)
 			>::type>
 		> make_awaitable_task(std::allocator_arg_t, Allocator const & alloc,
@@ -165,7 +324,7 @@ namespace core
 		{
 			using pair_type = std::pair <
 				awaitable_task,
-				std::future <typename std::result_of <
+				task_future <typename std::result_of <
 				F(decay_if_future <Args>...)
 				>::type>
 			>;
@@ -256,6 +415,8 @@ namespace core
 			virtual ~task_concept() noexcept {}
 			virtual void invoke_() = 0;
 			virtual bool ready_() const noexcept = 0;
+
+			std::uint64_t id = get_next_id();
 		};
 
 		template <class> struct ready_task_model;
@@ -286,9 +447,12 @@ namespace core
 					std::forward <Args>(args)...)
 			{}
 
-			std::future <R> get_future()
+			task_future<R> get_future()
 			{
-				return _f.get_future();
+				task_future<R> result;
+				result.future = _f.get_future().share();
+				result.id = id;
+				return result;
 			}
 
 			void invoke_() override
@@ -302,8 +466,9 @@ namespace core
 			}
 
 		private:
+			
 			std::packaged_task <R(Args...)> _f;
-			std::tuple <nonstd::special_decay_t<Args>...> _args;
+			std::tuple <nonstd::special_decay_t<Args>...> _args;		
 		};
 
 		template <class ...> struct awaitable_task_model;
@@ -332,9 +497,12 @@ namespace core
 				, _args(std::forward <Args>(args)...)
 			{}
 
-			std::future <R> get_future()
+			task_future<R> get_future()
 			{
-				return _f.get_future();
+				task_future<R> result;
+				result.future = _f.get_future().share();
+				result.id = id;
+				return result;
 			}
 
 			void invoke_() override
@@ -358,7 +526,21 @@ namespace core
 			}
 
 			template <class T>
-			static inline auto call_get(std::future <T> && t) noexcept
+			static inline auto call_get(task_future<T> && t) noexcept
+				-> decltype (t.future.get())
+			{
+				return t.future.get();
+			}
+
+			template <class T>
+			static inline auto call_get(std::future<T> && t) noexcept
+				-> decltype (t.get())
+			{
+				return t.get();
+			}
+
+			template <class T>
+			static inline auto call_get(std::shared_future<T> && t) noexcept
 				-> decltype (t.get())
 			{
 				return t.get();
@@ -374,7 +556,21 @@ namespace core
 			static inline bool call_ready(T &) noexcept { return true; }
 
 			template <class T>
-			static inline bool call_ready(std::future <T> & t) noexcept
+			static inline bool call_ready(task_future<T> & t) noexcept
+			{
+				using namespace std::chrono_literals;
+				return t.wait_for(0s) == std::future_status::ready;
+			}
+
+			template <class T>
+			static inline bool call_ready(std::future<T> & t) noexcept
+			{
+				using namespace std::chrono_literals;
+				return t.wait_for(0s) == std::future_status::ready;
+			}
+
+			template <class T>
+			static inline bool call_ready(std::shared_future<T> & t) noexcept
 			{
 				using namespace std::chrono_literals;
 				return t.wait_for(0s) == std::future_status::ready;
@@ -387,7 +583,7 @@ namespace core
 			}
 
 			std::packaged_task <R(CallArgs...)> _f;
-			std::tuple <nonstd::special_decay_t<FutArgs>...> _args;
+			std::tuple <nonstd::special_decay_t<FutArgs>...> _args;			
 		};
 
 		std::unique_ptr <task_concept> _t;
@@ -438,6 +634,12 @@ namespace core
 				, last_(std::move(other).last_)
 				, done_(other.done_.load())
 			{}
+
+			bool is_empty()
+			{
+				std::unique_lock <std::mutex> lock(mutex_);
+				return tasks_.empty();
+			}
 
 			void set_done()
 			{
@@ -582,7 +784,6 @@ namespace core
 			{
 				std::pair <bool, awaitable_task> p = { false, awaitable_task() };
 
-
 				for (std::size_t k = 0; k < 10 * nthreads_; ++k)
 				{
 					const auto queue_index = get_thread_queue_idx(idx, k);
@@ -598,7 +799,8 @@ namespace core
 						return;
 				}
 
-				p.second();
+				if(p.first)
+					p.second();
 			}
 		}
 
@@ -709,7 +911,7 @@ namespace core
 					std::allocator_arg_t{}, alloc_,
 					std::forward <F>(f), std::forward <Args>(args)...
 				);
-
+				t.second._system = this;
 				auto const idx = current_index_++;
 				for (std::size_t k = 0; k < 10 * nthreads_; ++k)
 				{
@@ -752,7 +954,7 @@ namespace core
 					std::allocator_arg_t{}, alloc_,
 					std::forward <F>(f), std::forward <Args>(args)...
 				);
-
+				t.second._system = this;
 				auto const idx = current_index_++;
 				for (std::size_t k = 0; k < 10 * nthreads_; ++k)
 				{
@@ -767,37 +969,6 @@ namespace core
 			}
 
 		}
-
-		//-----------------------------------------------------------------------------
-		//  Name : push_awaitable ()
-		/// <summary>
-		/// Pushes an awaitable task to be executed.
-		/// Awaitable tasks are assumed to take arguments where some or all are
-		/// backed by futures waiting on results of other tasks.This is
-		/// contrasted with ready tasks that are assumed to be immediately invokable.
-		/// </summary>
-		//-----------------------------------------------------------------------------
-		void push_awaitable(awaitable_task && t)
-		{
-			if (nthreads_ == 0)
-			{
-				push_awaitable_on_main(std::forward<awaitable_task>(t));
-			}
-			else
-			{
-				auto const idx = current_index_++;
-				for (std::size_t k = 0; k < 10 * nthreads_; ++k)
-				{
-					const auto queue_index = get_thread_queue_idx(idx, k);
-					if (queues_[queue_index].try_push(t))
-						return;
-				}
-
-				const auto queue_index = get_thread_queue_idx(idx);
-				queues_[queue_index].push(std::move(t));
-			}
-		}
-
 
 		//-----------------------------------------------------------------------------
 		//  Name : push_ready_on_main ()
@@ -823,6 +994,8 @@ namespace core
 				std::allocator_arg_t{}, alloc_,
 				std::forward <F>(f), std::forward <Args>(args)...
 			);
+			t.second._system = this;
+
 			const auto queue_index = get_main_thread_queue_idx();
 			for (std::size_t k = 0; k < 10 * nthreads_; ++k)
 			{
@@ -857,6 +1030,7 @@ namespace core
 				std::allocator_arg_t{}, alloc_,
 				std::forward <F>(f), std::forward <Args>(args)...
 			);
+			t.second._system = this;
 
 			const auto queue_index = get_main_thread_queue_idx();
 			for (std::size_t k = 0; k < 10; ++k)
@@ -867,27 +1041,6 @@ namespace core
 
 			queues_[queue_index].push(std::move(t.first));
 			return std::move(t.second);
-		}
-
-		//-----------------------------------------------------------------------------
-		//  Name : push_awaitable_on_main ()
-		/// <summary>
-		/// Pushes an awaitable task to be executed.
-		/// Awaitable tasks are assumed to take arguments where some or all are
-		/// backed by futures waiting on results of other tasks.This is
-		/// contrasted with ready tasks that are assumed to be immediately invokable.
-		/// </summary>
-		//-----------------------------------------------------------------------------
-		void push_awaitable_on_main(awaitable_task && t)
-		{
-			const auto queue_index = get_main_thread_queue_idx();
-			for (std::size_t k = 0; k < 10; ++k)
-			{
-				if (queues_[queue_index].try_push(t))
-					return;
-			}
-
-			queues_[queue_index].push(std::move(t));
 		}
 
 		//-----------------------------------------------------------------------------
@@ -919,6 +1072,45 @@ namespace core
 				p.second();
 
 		}
+
+		void processing_wait_id(const std::uint64_t& id)
+		{
+			std::pair <bool, awaitable_task> p = { false, awaitable_task() };
+
+			const auto queue_index = get_main_thread_queue_idx();
+
+			auto& queue = queues_[queue_index];
+
+			while (!queue.is_empty())
+			{
+				for (std::size_t k = 0; k < 10; ++k)
+				{
+					p = queue.try_pop();
+					if (p.first)
+						break;
+				}
+
+				if (!p.first)
+				{
+					p = queue.pop(false);
+					if (!p.first)
+						continue;
+				}
+
+				if (p.first)
+					p.second();
+
+				if (p.second.get_id() == id)
+					break;
+			}
+		}
+
+		template<typename T>
+		void processing_wait(const task_future<T>& task)
+		{
+			processing_wait_id(task.id);
+		}
+		
 	};
 }   // namespace tasks
 

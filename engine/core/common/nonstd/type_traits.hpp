@@ -26,24 +26,6 @@ namespace nonstd
 		using type = T;
 	};
 
-	template <class>
-	struct is_future : std::false_type {};
-
-	template <class T>
-	struct is_future <std::future <T>> : std::true_type {};
-
-	template <class T>
-	struct decay_future
-	{
-		using type = T;
-	};
-
-	template <class T>
-	struct decay_future <std::future <T>>
-	{
-		using type = T;
-	};
-
 	static bool check_all_true() { return true; }
 
 	template<typename... BoolArgs>
