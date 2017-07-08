@@ -30,7 +30,7 @@ namespace runtime
 		logging_container->add_sink(std::make_shared<logging::sinks::daily_file_sink_mt>("Log", 23, 59));
 
 		auto logger = logging::create(APPLOG, logging_container);
-		
+
 		serialization::set_warning_logger([](const std::string& msg)
 		{
 			APPLOG_WARNING(msg);
@@ -44,7 +44,8 @@ namespace runtime
 
 	void engine::dispose()
 	{
-
+		_windows.clear();
+		_windows_pending_addition.clear();
 	}
 
 
@@ -60,7 +61,7 @@ namespace runtime
 			return false;
 		}
 		register_main_window(std::move(main_window));
-	
+
 		core::add_subsystem<input>();
 		core::add_subsystem<asset_manager>();
 		core::add_subsystem<entity_component_system>();
@@ -103,11 +104,14 @@ namespace runtime
 		process_pending_windows();
 
 		process_pending_events();
-		
+
+		if (!_running)
+			return;
+
 		auto dt = sim.get_delta_time();
 
 		if (!_windows.empty())
-		{		
+		{
 			on_frame_begin(dt);
 
 			for (auto& window : _windows)
@@ -135,7 +139,7 @@ namespace runtime
 			on_frame_end(dt);
 		}
 	}
-	
+
 	void engine::register_window(std::unique_ptr<render_window> window)
 	{
 		window->prepare_surface();
@@ -174,9 +178,17 @@ namespace runtime
 				}
 			}
 
-			if (has_closed)
+			if (!_running || has_closed)
 			{
-				window_iterator = _windows.erase(window_iterator);
+				if (window->is_main())
+				{
+					window->destroy_surface();
+					++window_iterator;
+				}
+				else
+				{
+					window_iterator = _windows.erase(window_iterator);
+				}
 			}
 			else
 			{
@@ -191,12 +203,6 @@ namespace runtime
 		{
 			_windows.emplace_back(std::move(window));
 		}
-		_windows_pending_addition.clear();
-	}
-
-	void engine::destroy_windows()
-	{
-		_windows.clear();
 		_windows_pending_addition.clear();
 	}
 

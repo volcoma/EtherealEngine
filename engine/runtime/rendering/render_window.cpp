@@ -21,14 +21,22 @@ render_window::render_window(mml::video_mode mode, const std::string& title, std
 
 render_window::~render_window()
 {
-	// force internal handle destruction
-	_surface->dispose();
-	_surface.reset();
+	destroy_surface();
+}
 
-	//this is a must to flush the destruction
-	//of the frame buffer
-	gfx::frame();
-	gfx::frame();
+void render_window::destroy_surface()
+{
+	// force internal handle destruction
+	if (_surface)
+	{
+		_surface->dispose();
+		_surface.reset();
+
+		//this is a must to flush the destruction
+		//of the frame buffer
+		gfx::frame();
+		gfx::frame();
+	}
 }
 
 void render_window::frame_end()

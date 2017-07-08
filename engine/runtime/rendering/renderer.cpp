@@ -66,6 +66,7 @@ namespace runtime
 	void renderer::dispose()
 	{
 		on_frame_end.disconnect(this, &renderer::frame_end);
+
 		gfx::shutdown();
 	}
 

@@ -36,8 +36,7 @@ namespace runtime
 
 	void app::stop()
 	{
-		auto& eng = core::get_subsystem<engine>();
-		eng.destroy_windows();
+
 	}
 
 	int app::run()
