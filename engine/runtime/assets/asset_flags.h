@@ -17,7 +17,7 @@ enum class load_mode
 
 enum class load_flags
 {
-	default,
+    standard,
 	reload,
 	do_not_unload
 };

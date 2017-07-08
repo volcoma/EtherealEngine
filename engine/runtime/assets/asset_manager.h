@@ -183,7 +183,7 @@ namespace runtime
 		core::task_future<asset_handle<T>> load(
 			const std::string& key,
 			load_mode mode = load_mode::sync,
-			load_flags flags = load_flags::default)
+            load_flags flags = load_flags::standard)
 		{
 			auto& storage = get_storage<T>();
 			//if embedded resource
@@ -212,7 +212,7 @@ namespace runtime
 			const std::uint8_t* data,
 			const std::uint32_t& size,
 			load_mode mode = load_mode::sync,
-			load_flags flags = load_flags::default)
+            load_flags flags = load_flags::standard)
 		{
 			auto& storage = get_storage<T>();
 			return create_asset_from_memory_impl<T>(

@@ -445,8 +445,7 @@ namespace core
 				F && f, Args && ... args
 			)
 				: _f(std::allocator_arg_t(), alloc, std::forward <F>(f))
-				, _args(std::allocator_arg_t(), alloc,
-					std::forward <Args>(args)...)
+                , _args(std::forward<Args>(args)...)
 			{}
 
 			task_future<R> get_future()

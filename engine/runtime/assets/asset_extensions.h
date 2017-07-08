@@ -8,17 +8,23 @@ struct scene;
 struct prefab;
 class material;
 
-struct extensions 
+namespace extensions 
 {
-	static const std::array<std::string, 6> texture;
-	static const std::array<std::string, 5> mesh;
-	static const std::string shader;
-	static const std::string material;
-	static const std::string prefab;
-	static const std::string scene;
-	static const std::string compiled;
+	const std::array<std::string, 6> texture =
+	{
+		".png", ".jpg", ".tga", ".dds", ".ktx", ".pvr"
+	};
+	const std::array<std::string, 5> mesh =
+	{
+		".obj", ".fbx", ".dae", ".blend", ".3ds"
+	};
+	const std::string shader = ".sc";
+	const std::string material = ".mat";
+	const std::string prefab = ".pfb";
+	const std::string scene = ".sgr";
+	const std::string compiled = ".asset";
 
-	static bool is_compiled_format(const std::string& extension)
+	inline bool is_compiled_format(const std::string& extension)
 	{
 		const bool is_compiled =
 		(
@@ -30,7 +36,7 @@ struct extensions
 		return is_compiled;
 	}
 
-	static bool is_has_compiled_format(const std::string& extension)
+	inline bool is_has_compiled_format(const std::string& extension)
 	{
 		const bool is_compiled =
 			(
@@ -43,32 +49,32 @@ struct extensions
 	}
 
 	template<typename T>
-	static std::string get_compiled_format()
+	inline std::string get_compiled_format()
 	{
 		return extensions::compiled;
 	}
 
 	template<>
-	static std::string get_compiled_format<::shader>()
+	inline std::string get_compiled_format<::shader>()
 	{
 		const auto& renderer_extension = gfx::get_renderer_filename_extension();
 		return renderer_extension + extensions::compiled;
 	}
 
 	template<>
-	static std::string get_compiled_format<::scene>()
+	inline std::string get_compiled_format<::scene>()
 	{
 		return "";
 	}
 
 	template<>
-	static std::string get_compiled_format<::prefab>()
+	inline std::string get_compiled_format<::prefab>()
 	{
 		return "";
 	}
 
 	template<>
-	static std::string get_compiled_format<::material>()
+	inline std::string get_compiled_format<::material>()
 	{
 		return "";
 	}
