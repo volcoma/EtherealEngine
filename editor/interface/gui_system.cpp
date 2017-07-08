@@ -129,6 +129,7 @@ bool gui_system::initialize()
 	io.IniFilename = nullptr;
 	io.RenderDrawListsFn = renderFunc;
 
+	auto& ts = core::get_subsystem<core::task_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
 
 	switch (gfx::getRendererType())
@@ -159,16 +160,16 @@ bool gui_system::initialize()
 
 		break;
 	}
-	am.load<shader>("embedded:/vs_ocornut_imgui", false)
-		.then([&am](auto vs)
-	{
-		am.load<shader>("embedded:/fs_ocornut_imgui", false)
-			.then([vs](auto fs)
-		{
-			s_program = std::make_unique<program>(vs, fs);
-		});
-	});
+	
+	auto vs_ocornut_imgui = am.load<shader>("embedded:/vs_ocornut_imgui");
+	auto fs_ocornut_imgui = am.load<shader>("embedded:/fs_ocornut_imgui");
 
+	ts.push_awaitable_on_main([](asset_handle<shader> vs, asset_handle<shader> fs)
+	{
+		s_program = std::make_unique<program>(vs, fs);
+
+	}, vs_ocornut_imgui, fs_ocornut_imgui);
+	
 	s_decl
 		.begin()
 		.add(gfx::Attrib::Position, 2, gfx::AttribType::Float)

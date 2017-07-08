@@ -12,25 +12,25 @@ math::transform process_matrix(const aiMatrix4x4& assimp_matrix)
 {
 	math::transform matrix;
 
-    matrix[1][0] = assimp_matrix.a1;
-    matrix[2][0] = assimp_matrix.a2;
-    matrix[3][0] = assimp_matrix.a3;
-    matrix[4][0] = assimp_matrix.a4;
+    matrix[0][0] = assimp_matrix.a1;
+    matrix[1][0] = assimp_matrix.a2;
+    matrix[2][0] = assimp_matrix.a3;
+    matrix[3][0] = assimp_matrix.a4;
 
-    matrix[1][1] = assimp_matrix.b1;
-    matrix[2][1] = assimp_matrix.b2;
-    matrix[3][1] = assimp_matrix.b3;
-    matrix[4][1] = assimp_matrix.b4;
+    matrix[0][1] = assimp_matrix.b1;
+	matrix[1][1] = assimp_matrix.b2;
+	matrix[2][1] = assimp_matrix.b3;
+	matrix[3][1] = assimp_matrix.b4;
 
-    matrix[1][2] = assimp_matrix.c1;
-    matrix[2][2] = assimp_matrix.c2;
-    matrix[3][2] = assimp_matrix.c3;
-    matrix[4][2] = assimp_matrix.c4;
+    matrix[0][2] = assimp_matrix.c1;
+	matrix[1][2] = assimp_matrix.c2;
+	matrix[2][2] = assimp_matrix.c3;
+	matrix[3][2] = assimp_matrix.c4;
 
-    matrix[1][3] = assimp_matrix.d1;
-    matrix[2][3] = assimp_matrix.d2;
-    matrix[3][3] = assimp_matrix.d3;
-    matrix[4][3] = assimp_matrix.d4;
+    matrix[0][3] = assimp_matrix.d1;
+	matrix[1][3] = assimp_matrix.d2;
+	matrix[2][3] = assimp_matrix.d3;
+	matrix[3][3] = assimp_matrix.d4;
 
 	return matrix;
 }

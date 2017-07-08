@@ -820,55 +820,60 @@ namespace runtime
 		on_entity_destroyed.connect(this, &deferred_rendering::receive);
 		on_frame_render.connect(this, &deferred_rendering::frame_render);
 
+		auto& ts = core::get_subsystem<core::task_system>();
 		auto& am = core::get_subsystem<runtime::asset_manager>();
-		am.load<shader>("engine_data:/shaders/vs_clip_quad.sc", false)
-			.then([this, &am](auto vs)
+		auto vs_clip_quad = am.load<shader>("engine_data:/shaders/vs_clip_quad.sc");
+		auto fs_deferred_point_light = am.load<shader>("engine_data:/shaders/fs_deferred_point_light.sc");
+		auto fs_deferred_spot_light = am.load<shader>("engine_data:/shaders/fs_deferred_spot_light.sc");
+		auto fs_deferred_directional_light = am.load<shader>("engine_data:/shaders/fs_deferred_directional_light.sc");
+		auto fs_gamma_correction = am.load<shader>("engine_data:/shaders/fs_gamma_correction.sc");
+		auto vs_clip_quad_ex = am.load<shader>("engine_data:/shaders/vs_clip_quad_ex.sc");
+		auto fs_sphere_reflection_probe = am.load<shader>("engine_data:/shaders/fs_sphere_reflection_probe.sc");
+		auto fs_box_reflection_probe = am.load<shader>("engine_data:/shaders/fs_box_reflection_probe.sc");
+		auto fs_atmospherics = am.load<shader>("engine_data:/shaders/fs_atmospherics.sc");
+
+
+		ts.push_awaitable_on_main([this](asset_handle<shader> vs, asset_handle<shader> fs)
 		{
-			am.load<shader>("engine_data:/shaders/fs_deferred_point_light.sc", false)
-				.then([this, vs](auto fs)
-			{
-				_point_light_program = std::make_unique<program>(vs, fs);
-			});
+			_point_light_program = std::make_unique<program>(vs, fs);
 
-			am.load<shader>("engine_data:/shaders/fs_deferred_spot_light.sc", false)
-				.then([this, vs](auto fs)
-			{
-				_spot_light_program = std::make_unique<program>(vs, fs);
-			});
+		}, vs_clip_quad, fs_deferred_point_light);
 
-			am.load<shader>("engine_data:/shaders/fs_deferred_directional_light.sc", false)
-				.then([this, vs](auto fs)
-			{
-				_directional_light_program = std::make_unique<program>(vs, fs);
-			});
-
-			am.load<shader>("engine_data:/shaders/fs_gamma_correction.sc", false)
-				.then([this, vs](auto fs)
-			{
-				_gamma_correction_program = std::make_unique<program>(vs, fs);
-			});
-		});
-
-		am.load<shader>("engine_data:/shaders/vs_clip_quad_ex.sc", false)
-			.then([this, &am](auto vs)
+		ts.push_awaitable_on_main([this](asset_handle<shader> vs, asset_handle<shader> fs)
 		{
-			am.load<shader>("engine_data:/shaders/fs_sphere_reflection_probe.sc", false)
-				.then([this, vs](auto fs)
-			{
-				_sphere_ref_probe_program = std::make_unique<program>(vs, fs);
-			});
+			_spot_light_program = std::make_unique<program>(vs, fs);
 
-			am.load<shader>("engine_data:/shaders/fs_box_reflection_probe.sc", false)
-				.then([this, vs](auto fs)
-			{
-				_box_ref_probe_program = std::make_unique<program>(vs, fs);
-			});
-			am.load<shader>("engine_data:/shaders/fs_atmospherics.sc", false)
-				.then([this, vs](auto fs)
-			{
-				_atmospherics_program = std::make_unique<program>(vs, fs);
-			});
-		});
+		}, vs_clip_quad, fs_deferred_spot_light);
+
+		ts.push_awaitable_on_main([this](asset_handle<shader> vs, asset_handle<shader> fs)
+		{
+			_directional_light_program = std::make_unique<program>(vs, fs);
+
+		}, vs_clip_quad, fs_deferred_directional_light);
+
+		ts.push_awaitable_on_main([this](asset_handle<shader> vs, asset_handle<shader> fs)
+		{
+			_gamma_correction_program = std::make_unique<program>(vs, fs);
+
+		}, vs_clip_quad, fs_gamma_correction);
+
+		ts.push_awaitable_on_main([this](asset_handle<shader> vs, asset_handle<shader> fs)
+		{
+			_sphere_ref_probe_program = std::make_unique<program>(vs, fs);
+
+		}, vs_clip_quad_ex, fs_sphere_reflection_probe);
+
+		ts.push_awaitable_on_main([this](asset_handle<shader> vs, asset_handle<shader> fs)
+		{
+			_box_ref_probe_program = std::make_unique<program>(vs, fs);
+
+		}, vs_clip_quad_ex, fs_box_reflection_probe);
+
+		ts.push_awaitable_on_main([this](asset_handle<shader> vs, asset_handle<shader> fs)
+		{
+			_atmospherics_program = std::make_unique<program>(vs, fs);
+
+		}, vs_clip_quad_ex, fs_atmospherics);
 
 		return true;
 	}

@@ -10,7 +10,6 @@
 #include "../ecs/systems/deferred_rendering.h"
 #include "../rendering/render_window.h"
 #include "../assets/asset_manager.h"
-#include "task.h"
 
 namespace runtime
 {
@@ -65,7 +64,6 @@ namespace runtime
 		core::add_subsystem<input>();
 		core::add_subsystem<asset_manager>();
 		core::add_subsystem<entity_component_system>();
-		core::add_subsystem<task_system>();
 		core::add_subsystem<scene_graph>();
 		core::add_subsystem<camera_system>();
 		core::add_subsystem<deferred_rendering>();
@@ -199,6 +197,7 @@ namespace runtime
 	void engine::destroy_windows()
 	{
 		_windows.clear();
+		_windows_pending_addition.clear();
 	}
 
 }

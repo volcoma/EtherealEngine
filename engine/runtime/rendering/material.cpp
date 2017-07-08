@@ -7,18 +7,14 @@
 
 material::material()
 {
+	auto& ts = core::get_subsystem<core::task_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
-	am.load<texture>("engine_data:/textures/default_color.dds", false)
-		.then([this](auto asset) mutable
-	{
-		_default_color_map = asset;
-	});
+	auto default_color = am.load<texture>("engine_data:/textures/default_color.dds");
+	_default_color_map = default_color.get();
 
-	am.load<texture>("engine_data:/textures/default_normal.dds", false)
-		.then([this](auto asset) mutable
-	{
-		_default_normal_map = asset;
-	});
+	auto default_normal = am.load<texture>("engine_data:/textures/default_normal.dds");
+	_default_normal_map = default_normal.get();
+
 }
 
 
@@ -85,27 +81,23 @@ std::uint64_t material::get_render_states(bool apply_cull, bool depth_write, boo
 
 standard_material::standard_material()
 {
+	auto& ts = core::get_subsystem<core::task_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
+	auto vs_deferred_geom = am.load<shader>("engine_data:/shaders/vs_deferred_geom.sc");
+	auto vs_deferred_geom_skinned = am.load<shader>("engine_data:/shaders/vs_deferred_geom_skinned.sc");
+	auto fs_deferred_geom = am.load<shader>("engine_data:/shaders/fs_deferred_geom.sc");
 
-	am.load<shader>("engine_data:/shaders/vs_deferred_geom.sc", false)
-		.then([this, &am](auto vs)
+	ts.push_awaitable_on_main([this](asset_handle<shader> vs, asset_handle<shader> fs)
 	{
-		am.load<shader>("engine_data:/shaders/fs_deferred_geom.sc", false)
-			.then([this, vs](auto fs)
-		{
-			_program = std::make_unique<program>(vs, fs);
-		});
-	});
+		_program = std::make_unique<program>(vs, fs);
 
-	am.load<shader>("engine_data:/shaders/vs_deferred_geom_skinned.sc", false)
-		.then([this, &am](auto vs)
+	}, vs_deferred_geom, fs_deferred_geom);
+
+	ts.push_awaitable_on_main([this](asset_handle<shader> vs, asset_handle<shader> fs)
 	{
-		am.load<shader>("engine_data:/shaders/fs_deferred_geom.sc", false)
-			.then([this, vs](auto fs)
-		{
-			_program_skinned = std::make_unique<program>(vs, fs);
-		});
-	});
+		_program_skinned = std::make_unique<program>(vs, fs);
+
+	}, vs_deferred_geom_skinned, fs_deferred_geom);
 }
 
 void standard_material::submit()

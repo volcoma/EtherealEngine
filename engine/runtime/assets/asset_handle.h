@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 
+
 template<typename T>
 struct asset_link
 {

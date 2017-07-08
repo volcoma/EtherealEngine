@@ -8,8 +8,9 @@ const std::array<std::string, 5> extensions::mesh =
 {
     ".obj", ".fbx", ".dae", ".blend", ".3ds"
 };
-std::string extensions::shader = ".sc";
-std::string extensions::material = ".mat";
-std::string extensions::prefab = ".pfb";
-std::string extensions::scene = ".sgr";
-std::string extensions::compiled = ".asset";
+const std::string extensions::shader = ".sc";
+const std::string extensions::material = ".mat";
+const std::string extensions::prefab = ".pfb";
+const std::string extensions::scene = ".sgr";
+const std::string extensions::compiled = ".asset";
+

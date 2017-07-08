@@ -85,12 +85,10 @@ void default_scene()
 		object.set_name("platform");
 		object.assign<transform_component>();
 
+		
+		auto asset_future = am.load<mesh>("embedded:/plane");
 		model model;
-		am.load<mesh>("embedded:/plane", false)
-			.then([&model](auto asset)
-		{
-			model.set_lod(asset, 0);
-		});
+		model.set_lod(asset_future.get(), 0);
 
 		//Add component and configure it.
 		object.assign<model_component>().lock()
@@ -104,12 +102,9 @@ void default_scene()
 		object.assign<transform_component>().lock()
 			->set_local_position({ 0.0f, 0.5f, 0.0f });
 
+		auto asset_future = am.load<mesh>("embedded:/sphere");
 		model model;
-		am.load<mesh>("embedded:/sphere", false)
-			.then([&model](auto asset)
-		{
-			model.set_lod(asset, 0);
-		});
+		model.set_lod(asset_future.get(), 0);
 
 		//Add component and configure it.
 		object.assign<model_component>().lock()
@@ -256,7 +251,8 @@ void main_editor_window::on_menubar()
 			}
 			if (gui::MenuItem("Show Start Page", "Ctrl+P"))
 			{
-				_show_start_page = true;						
+				_show_start_page = true;
+				pm.close_project();
 				restore();
 				auto& io = gui::GetIO();
 				io.MouseDown[0] = false;

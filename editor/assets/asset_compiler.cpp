@@ -178,6 +178,8 @@ void asset_compiler::compile<texture>(const fs::path& absolute_key)
 	else
 	{
 		APPLOG_INFO("Successful compilation of {0}", str_input);
+		auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+		fs::last_write_time(output, now, err);
 	}
 }
 

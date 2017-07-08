@@ -1,87 +1,32 @@
 #pragma once
-#include "asset_request.hpp"
+#include "asset_flags.h"
 #include "core/filesystem/filesystem.h"
-
-struct texture;
-struct shader;
-class mesh;
-class material;
-struct prefab;
-struct scene;
 
 namespace runtime
 {
 	struct asset_reader
 	{
-		//-----------------------------------------------------------------------------
-		//  Name : load_texture_from_file ()
-		/// <summary>
-		/// 
-		/// 
-		/// 
-		/// </summary>
-		//-----------------------------------------------------------------------------
-		static void load_texture_from_file(const std::string& key, const fs::path& absoluteKey, bool async, request<texture>& request);
+		template<typename T>
+		static core::task_future<asset_handle<T>> load_from_file(const std::string& key, const load_mode& mode, asset_handle<T> original);
 
-		//-----------------------------------------------------------------------------
-		//  Name : load_shader_from_file ()
-		/// <summary>
-		/// 
-		/// 
-		/// 
-		/// </summary>
-		//-----------------------------------------------------------------------------
-		static void load_shader_from_file(const std::string& key, const fs::path& absoluteKey, bool async, request<shader>& request);
+		template<typename T>
+		static core::task_future<asset_handle<T>> load_from_memory(const std::string& key, const std::uint8_t* data, std::uint32_t size);
 
-		//-----------------------------------------------------------------------------
-		//  Name : load_shader_from_memory ()
-		/// <summary>
-		/// 
-		/// 
-		/// 
-		/// </summary>
-		//-----------------------------------------------------------------------------
-		static void load_shader_from_memory(const std::string& key, const std::uint8_t* data, std::uint32_t size, request<shader>& request);
+		template<typename T>
+		inline static core::task_future<asset_handle<T>> load_from_instance(const std::string& key, std::shared_ptr<T> instance)
+		{
+			auto& ts = core::get_subsystem<core::task_system>();
+			auto create_handle = ts.push_ready_on_main([](const std::string& key, std::shared_ptr<T> instance)
+			{
+				asset_handle<T> handle;
+				handle.link->id = key;
+				handle.link->asset = instance;
 
-		//-----------------------------------------------------------------------------
-		//  Name : load_mesh_from_file ()
-		/// <summary>
-		/// 
-		/// 
-		/// 
-		/// </summary>
-		//-----------------------------------------------------------------------------
-		static void load_mesh_from_file(const std::string& key, const fs::path& absoluteKey, bool async, request<mesh>& request);
+				return handle;
+			}, key, instance);
 
-		//-----------------------------------------------------------------------------
-		//  Name : load_material_from_file ()
-		/// <summary>
-		/// 
-		/// 
-		/// 
-		/// </summary>
-		//-----------------------------------------------------------------------------
-		static void load_material_from_file(const std::string& key, const fs::path& absoluteKey, bool async, request<material>& request);
-
-		//-----------------------------------------------------------------------------
-		//  Name : load_prefab_from_file ()
-		/// <summary>
-		/// 
-		/// 
-		/// 
-		/// </summary>
-		//-----------------------------------------------------------------------------
-		static void load_prefab_from_file(const std::string& key, const fs::path& absoluteKey, bool async, request<prefab>& request);
-
-		//-----------------------------------------------------------------------------
-		//  Name : load_scene_from_file ()
-		/// <summary>
-		/// 
-		/// 
-		/// 
-		/// </summary>
-		//-----------------------------------------------------------------------------
-		static void load_scene_from_file(const std::string& key, const fs::path& absoluteKey, bool async, request<scene>& request);
+			return create_handle;
+		}
 
 	};
 }

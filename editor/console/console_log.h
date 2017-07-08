@@ -77,5 +77,5 @@ private:
 	///
 	int _pending = 0;
 	///
-	static const std::size_t _max_size = 50;
+	static const std::size_t _max_size = 150;
 };

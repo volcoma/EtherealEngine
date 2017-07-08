@@ -2,8 +2,8 @@
 #include "runtime/assets/asset_manager.h"
 #include "runtime/assets/asset_extensions.h"
 #include "runtime/ecs/ecs.h"
-#include "runtime/system/task.h"
 #include "runtime/system/engine.h"
+#include "core/subsystem/tasks.hpp"
 #include "core/filesystem/filesystem_watcher.hpp"
 #include "core/serialization/associative_archive.h"
 #include "../editing/editing_system.h"
@@ -21,15 +21,15 @@ class material;
 namespace editor
 {
 	template<typename T>
-	void watch_assets(const fs::path& protocol, const std::string& wildcard, bool initialList, bool reloadAsync)
+	void watch_assets(const fs::path& protocol, const std::string& wildcard, bool reloadAsync)
 	{
 		auto& am = core::get_subsystem<runtime::asset_manager>();
-		auto& ts = core::get_subsystem<runtime::task_system>();
+		auto& ts = core::get_subsystem<core::task_system>();
 
 		const fs::path dir = fs::resolve_protocol(protocol);
 		fs::path watch_dir = dir / wildcard;
 
-		fs::watcher::watch(watch_dir, initialList, [&am, &ts, protocol, reloadAsync](const std::vector<fs::watcher::entry>& entries, bool is_initial_list)
+		fs::watcher::watch(watch_dir, true, [&am, &ts, protocol, reloadAsync](const std::vector<fs::watcher::entry>& entries, bool is_initial_list)
 		{
 			for (auto& entry : entries)
 			{
@@ -59,11 +59,10 @@ namespace editor
 					{
 						if (entry.status == fs::watcher::entry_status::removed)
 						{
-							//auto task = ts.create("clear_asset", [entry, protocol, key, &am]()
-							//{
-							//	am.clear_asset<T>(key);
-							//});
-							//ts.run(task, true);
+							auto task = ts.push_ready_on_main([reloadAsync, key, &am]()
+							{
+								am.clear_asset<T>(key);
+							});
 						}
 						else if (entry.status == fs::watcher::entry_status::renamed)
 						{
@@ -72,11 +71,11 @@ namespace editor
 						else
 						{
 							//created or modified
-							auto task = ts.create("load_asset", [reloadAsync, key, &am]()
+							auto task = ts.push_ready_on_main([reloadAsync, key, &am]()
 							{
-								am.load<T>(key, reloadAsync, true);
+								using namespace runtime;
+								am.load<T>(key, reloadAsync ? load_mode::async : load_mode::sync, load_flags::reload);
 							});
-							ts.run(task, true);
 						}
 					}
 				}
@@ -87,27 +86,29 @@ namespace editor
 					{
 						if (entry.status == fs::watcher::entry_status::removed)
 						{
-							auto task = ts.create("remove_asset", [p, ext, protocol, key, &am]()
+							auto task = ts.push_ready_on_main([p, ext, protocol, key, &am]()
 							{
 								am.delete_asset<T>(key);
 
 								//always add the extensions since we want the compiled asset version to be removed too.
 								auto path_to_remove = p;
-								path_to_remove.concat(extensions::compiled);
+								path_to_remove.concat(extensions::get_compiled_format<T>());
 								fs::error_code err;
 								fs::remove(path_to_remove, err);
 
 							});
-							ts.run(task, true);
+						}
+						else if (entry.status == fs::watcher::entry_status::renamed)
+						{
+
 						}
 						else
 						{
 							// created or modified or renamed
-							auto task = ts.create("compile_asset", [p]()
+							auto task = ts.push_ready([](const fs::path& p)
 							{
 								asset_compiler::compile<T>(p);
-							});
-							ts.run(task);
+							}, p);
 						}
 					}
 				}
@@ -197,21 +198,21 @@ namespace editor
 		});
 		static const std::string wildcard = "*";
 
-		watch_assets<material>(relative, wildcard + extensions::material, true, false);
+		watch_assets<material>(relative, wildcard + extensions::material, false);
 		
 		for (const auto& format : extensions::texture)
 		{
-			watch_assets<texture>(relative, wildcard + format, true, true);
+			watch_assets<texture>(relative, wildcard + format, true);
 		}
 		
-		watch_assets<shader>(relative, wildcard + extensions::shader, true, true);
+		watch_assets<shader>(relative, wildcard + extensions::shader, true);
 
 		for (const auto& format : extensions::mesh)
 		{
-			watch_assets<mesh>(relative, wildcard + format, true, true);
+			watch_assets<mesh>(relative, wildcard + format, true);
 		}
-		watch_assets<prefab>(relative, wildcard + extensions::prefab, true, true);
-		watch_assets<scene>(relative, wildcard + extensions::scene, true, true);
+		watch_assets<prefab>(relative, wildcard + extensions::prefab, true);
+		watch_assets<scene>(relative, wildcard + extensions::scene, true);
 		
 	}
 
@@ -260,8 +261,24 @@ namespace editor
 		fs::watcher::unwatch(absolute / fs::path("*"), true);
 	}
 
+	void project_manager::close_project()
+	{
+		auto& ecs = core::get_subsystem<runtime::entity_component_system>();
+		auto& am = core::get_subsystem<runtime::asset_manager>();
+		auto& es = core::get_subsystem<editing_system>();
+		ecs.dispose();
+		es.unselect();
+		es.scene.clear();
+		am.clear("app:/data");
+		fs::watcher::unwatch_all();
+		root_directory.reset();
+
+	}
+
 	void project_manager::open_project(const fs::path& project_path)
 	{
+		close_project();
+
         fs::error_code err;
         if (!fs::exists(project_path, err))
 		{
@@ -271,36 +288,28 @@ namespace editor
 
 		fs::add_path_protocol("app:", project_path);
 		
-		auto& ecs = core::get_subsystem<runtime::entity_component_system>();
-		auto& am = core::get_subsystem<runtime::asset_manager>();
-		auto& es = core::get_subsystem<editing_system>();
-		ecs.dispose();
-		es.unselect();
-		es.scene.clear();
-		am.clear("app:/data");
 		set_current_project(project_path.filename().string());
-		save_config();
 
-		fs::watcher::unwatch_all();
+		save_config();
 		
 		/// for debug purposes
-		watch_assets<shader>("engine_data:/shaders", "*.sc", true, true);
-		watch_assets<shader>("editor_data:/shaders", "*.sc", true, true);
-		//watch_assets<texture>("engine_data:/textures", "*.png", true, true);
-		//watch_assets<texture>("engine_data:/textures", "*.tga", true, true);
-		//watch_assets<texture>("engine_data:/textures", "*.dds", true, true);
-		//watch_assets<texture>("engine_data:/textures", "*.ktx", true, true);
-		//watch_assets<texture>("engine_data:/textures", "*.pvr", true, true);
-		//watch_assets<texture>("editor_data:/icons", "*.png", true, true);
-		//watch_assets<texture>("editor_data:/icons", "*.tga", true, true);
-		//watch_assets<texture>("editor_data:/icons", "*.dds", true, true);
-		//watch_assets<texture>("editor_data:/icons", "*.ktx", true, true);
-		//watch_assets<texture>("editor_data:/icons", "*.pvr", true, true);
-		//watch_assets<mesh>("engine_data:/meshes", "*.obj", true, true);
-		//watch_assets<mesh>("engine_data:/meshes", "*.fbx", true, true);
-		//watch_assets<mesh>("engine_data:/meshes", "*.dae", true, true);
-		//watch_assets<mesh>("engine_data:/meshes", "*.blend", true, true);
-		//watch_assets<mesh>("engine_data:/meshes", "*.3ds", true, true);
+		watch_assets<shader>("engine_data:/shaders", "*.sc", true);
+		watch_assets<shader>("editor_data:/shaders", "*.sc", true);
+		//watch_assets<texture>("engine_data:/textures", "*.png", true);
+		//watch_assets<texture>("engine_data:/textures", "*.tga", true);
+		//watch_assets<texture>("engine_data:/textures", "*.dds", true);
+		//watch_assets<texture>("engine_data:/textures", "*.ktx", true);
+		//watch_assets<texture>("engine_data:/textures", "*.pvr", true);
+		//watch_assets<texture>("editor_data:/icons", "*.png", true);
+		//watch_assets<texture>("editor_data:/icons", "*.tga", true);
+		//watch_assets<texture>("editor_data:/icons", "*.dds", true);
+		//watch_assets<texture>("editor_data:/icons", "*.ktx", true);
+		//watch_assets<texture>("editor_data:/icons", "*.pvr", true);
+		//watch_assets<mesh>("engine_data:/meshes", "*.obj", true);
+		//watch_assets<mesh>("engine_data:/meshes", "*.fbx", true);
+		//watch_assets<mesh>("engine_data:/meshes", "*.dae", true);
+		//watch_assets<mesh>("engine_data:/meshes", "*.blend", true);
+		//watch_assets<mesh>("engine_data:/meshes", "*.3ds", true);
 
         auto root = fs::resolve_protocol("app:/data");
 		root_directory.reset();

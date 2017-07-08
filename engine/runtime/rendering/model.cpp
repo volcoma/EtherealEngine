@@ -10,12 +10,10 @@
 
 model::model()
 {
+	auto& ts = core::get_subsystem<core::task_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
-	am.load<material>("embedded:/standard", false)
-		.then([this](auto asset)
-	{
-		_default_material = asset;
-	});
+	auto standard = am.load<material>("embedded:/standard");
+	_default_material = standard.get();
 }
 
 bool model::is_valid() const

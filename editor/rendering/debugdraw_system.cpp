@@ -302,16 +302,17 @@ namespace editor
 	{
 		runtime::on_frame_render.connect(this, &debugdraw_system::frame_render);
 
+		auto& ts = core::get_subsystem<core::task_system>();
 		auto& am = core::get_subsystem<runtime::asset_manager>();
-		am.load<shader>("editor_data:/shaders/vs_wf_wireframe.sc", false)
-			.then([this, &am](auto vs)
+
+		auto vs_wf_wireframe = am.load<shader>("editor_data:/shaders/vs_wf_wireframe.sc");
+		auto fs_wf_wireframe = am.load<shader>("editor_data:/shaders/fs_wf_wireframe.sc");
+
+		ts.push_awaitable_on_main([this](asset_handle<shader> vs, asset_handle<shader> fs)
 		{
-			am.load<shader>("editor_data:/shaders/fs_wf_wireframe.sc", false)
-				.then([this, vs](auto fs)
-			{
-				_program = std::make_unique<program>(vs, fs);
-			});
-		});
+			_program = std::make_unique<program>(vs, fs);
+
+		}, vs_wf_wireframe, fs_wf_wireframe);
 
 		ddInit();
 		return true;

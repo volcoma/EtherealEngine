@@ -247,16 +247,18 @@ namespace editor
 			| BGFX_TEXTURE_V_CLAMP
 			);
 
+		auto& ts = core::get_subsystem<core::task_system>();
 		auto& am = core::get_subsystem<runtime::asset_manager>();
-		am.load<shader>("editor_data:/shaders/vs_picking_id.sc", false)
-			.then([this, &am](auto vs)
+
+		auto vs_picking_id = am.load<shader>("editor_data:/shaders/vs_picking_id.sc");
+		auto fs_picking_id = am.load<shader>("editor_data:/shaders/fs_picking_id.sc");
+
+		ts.push_awaitable_on_main([this](asset_handle<shader> vs, asset_handle<shader> fs)
 		{
-			am.load<shader>("editor_data:/shaders/fs_picking_id.sc", false)
-				.then([this, vs](auto fs)
-			{
-				_program = std::make_unique<program>(vs, fs);
-			});
-		});
+			_program = std::make_unique<program>(vs, fs);
+
+		}, vs_picking_id, fs_picking_id);
+
 		return true;
 	}
 

@@ -5,16 +5,17 @@
 
 #include "core/common/nonstd/type_traits.hpp"
 #include "core/common/string.h"
-#include "core/signals/event.hpp"
+
+#include "core/subsystem/tasks.hpp"
 #include "core/filesystem/filesystem.h"
-#include "asset_request.hpp"
+#include "asset_flags.h"
 #include "asset_extensions.h"
 
 namespace runtime
 {
 	/// aliases
 	template<typename T>
-	using request_container_t = std::unordered_map<std::string, request<T>>;
+	using request_container_t = std::unordered_map<std::string, core::task_future<asset_handle<T>>>;
 
 	struct base_storage
 	{
@@ -86,92 +87,46 @@ namespace runtime
 		//-----------------------------------------------------------------------------
 		void clear(const std::string& protocol)
 		{
-			auto containerCopy = container;
-			for (auto& pair : containerCopy)
+			auto container_copy = container;
+			for (const auto& pair : container_copy)
 			{
 				const auto& id = pair.first;
+				const auto& task = pair.second;
+
 				if (string_utils::begins_with(id, protocol, true))
 				{
-					pair.second.wait_until_ready();
+					task.wait();
 					container.erase(id);
 				}
 			}
 		}
 
-		/// key, data, size, outRequest
-		delegate<void(const std::string&, const std::uint8_t*, std::uint32_t, request<T>&)> load_from_memory = [](const fs::path&, const std::uint8_t*, std::uint32_t, request<T>&) {};
+		/// key, data, size
+		delegate<core::task_future<asset_handle<T>>(const std::string&, const std::uint8_t*, std::uint32_t)> load_from_memory;
 
-		/// key, absolutKey, async, outReqeust
-		delegate<void(const std::string&, const fs::path&, bool, request<T>&)> load_from_file = [](const fs::path&, const fs::path&, bool, request<T>&) {};
+		/// key, mode
+		delegate<core::task_future<asset_handle<T>>(const std::string&, const load_mode&, asset_handle<T>)> load_from_file;
 
-		/// absolutKey, asset
-		delegate<void(const fs::path&, const asset_handle<T>&)> save_to_file = [](const fs::path&, const asset_handle<T>&) {};
+		/// key, mode
+		delegate<core::task_future<asset_handle<T>>(const std::string&, std::shared_ptr<T>)> load_from_instance;
 
-        /// Storage containerО
-		std::unordered_map<std::string, request<T>> container;
-		/// Extension
-        //std::string ext;
+		/// key, asset
+		delegate<void(const std::string&, const asset_handle<T>&)> save_to_file;
+
+		/// key, new_key
+		delegate<void(const std::string&, const std::string&)> rename_asset_file;
+
+		/// key
+		delegate<void(const std::string&)> delete_asset_file;
+
+		/// Storage container
+		request_container_t<T> container;
 	};
-
-	template<typename T>
-	inline fs::path get_absolute_key(const std::string& to_lower_key, T storage)
-	{
-		fs::path absolute_key = fs::absolute(fs::resolve_protocol(to_lower_key).string());
-		return absolute_key;
-	};
-
 
 	class asset_manager : public core::subsystem
 	{
 	public:
 		bool initialize();
-		//-----------------------------------------------------------------------------
-		//  Name : add ()
-		/// <summary>
-		/// 
-		/// 
-		/// 
-		/// </summary>
-		//-----------------------------------------------------------------------------
-		template <typename S>
-		void add(std::shared_ptr<asset_storage<S>> system)
-		{
-			storages.insert(std::make_pair(rtti::type_id<asset_storage<S>>().hash_code(), system));
-		}
-
-		//-----------------------------------------------------------------------------
-		//  Name : add ()
-		/// <summary>
-		/// 
-		/// 
-		/// 
-		/// </summary>
-		//-----------------------------------------------------------------------------
-		template <typename S, typename ... Args>
-		std::shared_ptr<asset_storage<S>> add(Args && ... args)
-		{
-			auto s = std::make_shared<asset_storage<S>>(std::forward<Args>(args) ...);
-			add(s);
-			return s;
-		}
-
-		//-----------------------------------------------------------------------------
-		//  Name : get_storage ()
-		/// <summary>
-		/// 
-		/// 
-		/// 
-		/// </summary>
-		//-----------------------------------------------------------------------------
-		template <typename S>
-		std::shared_ptr<asset_storage<S>> get_storage()
-		{
-			auto it = storages.find(rtti::type_id<asset_storage<S>>().hash_code());
-			//assert(it != storages.end());
-			return it == storages.end()
-				? std::shared_ptr<asset_storage<S>>()
-				: std::shared_ptr<asset_storage<S>>(std::static_pointer_cast<asset_storage<S>>(it->second));
-		}
 
 		//-----------------------------------------------------------------------------
 		//  Name : clear ()
@@ -183,7 +138,7 @@ namespace runtime
 		//-----------------------------------------------------------------------------
 		void clear()
 		{
-			for (auto& pair : storages)
+			for (auto& pair : _storages)
 			{
 				auto& storage = pair.second;
 				storage->clear();
@@ -200,10 +155,46 @@ namespace runtime
 		//-----------------------------------------------------------------------------
 		void clear(const std::string& protocol)
 		{
-			for (auto& pair : storages)
+			for (auto& pair : _storages)
 			{
 				auto& storage = pair.second;
 				storage->clear(protocol);
+			}
+		}
+		//-----------------------------------------------------------------------------
+		//  Name : add_storage ()
+		/// <summary>
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
+		template <typename S, typename ... Args>
+		asset_storage<S>& add_storage(Args&& ... args)
+		{
+			auto operation = _storages.emplace
+			(
+				rtti::type_id<asset_storage<S>>().hash_code(),
+				std::make_unique<asset_storage<S>>(std::forward<Args>(args) ...)
+			);
+
+			return static_cast<asset_storage<S>&>(*operation.first->second);
+		}
+
+		template<typename T>
+		core::task_future<asset_handle<T>> load(
+			const std::string& key,
+			load_mode mode = load_mode::sync,
+			load_flags flags = load_flags::default)
+		{
+			auto& storage = get_storage<T>();
+			//if embedded resource
+			if (key.find("embedded") != std::string::npos)
+			{
+				return find_asset_impl<T>(key, storage.container);
+			}
+			else
+			{
+				return load_asset_from_file_impl<T>(key, mode, flags, storage.container, storage.load_from_file);
+
 			}
 		}
 
@@ -216,74 +207,72 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template<typename T>
-		request<T>& create_asset_from_memory(
+		core::task_future<asset_handle<T>> create_asset_from_memory(
 			const std::string& key,
 			const std::uint8_t* data,
-			const std::uint32_t& size)
+			const std::uint32_t& size,
+			load_mode mode = load_mode::sync,
+			load_flags flags = load_flags::default)
 		{
-			auto storage = get_storage<T>();
-			return create_asset_from_memory_impl<T>(key, data, size, storage->container, storage->load_from_memory);
+			auto& storage = get_storage<T>();
+			return create_asset_from_memory_impl<T>(
+				key,
+				data,
+				size,
+				mode,
+				flags,
+				storage.container,
+				storage.load_from_memory);
 		}
 
-		//-----------------------------------------------------------------------------
-		//  Name : rename_asset ()
-		/// <summary>
-		/// 
-		/// 
-		/// 
-		/// </summary>
-		//-----------------------------------------------------------------------------
 		template<typename T>
-		void rename_asset(
-			const std::string& key,
-			const std::string& new_key)
+		core::task_future<asset_handle<T>> find_asset_entry(const std::string& key)
 		{
-			auto storage = get_storage<T>();
-
-			auto absolute_key = get_absolute_key(key, storage);
-			auto absolute_new_key = get_absolute_key(new_key, storage);
-			
-			// rename compiled assets
-            fs::error_code err;
-            fs::rename(absolute_key, absolute_new_key, err);
-
-			auto it = storage->container.find(key);
-			if (it != storage->container.end())
-			{
-				auto& request = it->second;
-				storage->container[new_key] = request;
-				storage->container[new_key].asset.link->id = new_key;
-				storage->container.erase(it);
-			}
-
-			
+			auto& storage = get_storage<T>();
+			return find_asset_impl<T>(key, storage.container);
 		}
-
-		//-----------------------------------------------------------------------------
-		//  Name : clear_asset ()
-		/// <summary>
-		/// 
-		/// 
-		/// 
-		/// </summary>
-		//-----------------------------------------------------------------------------
-		template<typename T>
-		void clear_asset(
-			const std::string& key)
-		{
-			auto storage = get_storage<T>();
 		
-			auto it = storage->container.find(key);
-			if (it != storage->container.end())
-			{
-				auto& request = it->second;
-				request.asset.link->asset.reset();
-				request.asset.link->id.clear();
-				storage->container.erase(it);
-			}
-			
+		template<typename T>
+		core::task_future<asset_handle<T>> load_asset_from_instance(const std::string& key, std::shared_ptr<T> entry)
+		{
+			auto& storage = get_storage<T>();
+			return load_asset_from_instance_impl(key, entry, storage.container, storage.load_from_instance);
 		}
 
+		template<typename T>
+		void rename_asset(const std::string& key, const std::string& new_key)
+		{
+			auto& storage = get_storage<T>();
+			storage.rename_asset_file(key, new_key);
+		
+			auto it = storage.container.find(key);
+			if (it != storage.container.end())
+			{
+				auto& future = it->second;
+				auto asset = future.get();
+				asset.link->id = new_key;
+				storage.container[new_key] = future;
+				storage.container.erase(it);
+			}
+		}
+		
+		template<typename T>
+		void clear_asset(const std::string& key)
+		{
+			auto& storage = get_storage<T>();
+
+			auto it = storage.container.find(key);
+			if (it != storage.container.end())
+			{
+				auto& future = it->second;
+
+				auto asset = future.get();
+				asset.link->asset.reset();
+				asset.link->id.clear();
+
+				storage.container.erase(it);
+			}
+		}
 		//-----------------------------------------------------------------------------
 		//  Name : delete_asset ()
 		/// <summary>
@@ -293,48 +282,14 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template<typename T>
-		void delete_asset(
-			const std::string& key)
+		void delete_asset(const std::string& key)
 		{
-			auto storage = get_storage<T>();
-			fs::path absolute_key = get_absolute_key(key, storage);
-
-            fs::error_code err;
-            fs::remove(absolute_key, err);
-
-			auto& request = storage->container[key];
-			request.asset.link->asset.reset();
-			request.asset.link->id.clear();
-			storage->container.erase(key);
+			auto& storage = get_storage<T>();
+			storage.delete_asset_file(key);
+		
+			clear_asset<T>(key);
 		}
-		//-----------------------------------------------------------------------------
-		//  Name : load ()
-		/// <summary>
-		/// 
-		/// 
-		/// 
-		/// </summary>
-		//-----------------------------------------------------------------------------
-		template<typename T>
-		request<T>& load(
-			const std::string& key,
-			bool async,
-			bool force = false)
-		{
-			auto storage = get_storage<T>();
-			//if embedded resource
-			if (key.find("embedded") != std::string::npos)
-			{
-				return find_or_create_asset_impl<T>(key, storage->container);
-			}
-			else
-			{
-				const fs::path absoluteKey = get_absolute_key(key, storage);
-				return load_asset_from_file_impl<T>(key, absoluteKey, async, force, storage->container, storage->load_from_file);
-
-			}
-		}
-
+				
 		//-----------------------------------------------------------------------------
 		//  Name : save ()
 		/// <summary>
@@ -346,20 +301,9 @@ namespace runtime
 		template<typename T>
 		void save(const asset_handle<T>& asset)
 		{
-			auto storage = get_storage<T>();
-			const fs::path absoluteKey = get_absolute_key(asset.id(), storage);
-			storage->save_to_file(absoluteKey, asset);
+			auto& storage = get_storage<T>();
+			storage.save_to_file(asset.id(), asset);
 		}
-
-		template<typename T>
-		request<T>& find_or_create_asset_entry(
-			const std::string& key
-		)
-		{
-			auto storage = get_storage<T>();
-			return find_or_create_asset_impl<T>(key, storage->container);
-		}
-
 	private:
 		//-----------------------------------------------------------------------------
 		//  Name : load_asset_from_file_impl ()
@@ -370,45 +314,41 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template<typename T, typename F>
-		request<T>& load_asset_from_file_impl(
+		core::task_future<asset_handle<T>>& load_asset_from_file_impl(
 			const std::string& key,
-			const fs::path& absoluteKey,
-			bool async,
-			bool force,
+			load_mode mode,
+			load_flags flags,
 			request_container_t<T>& container,
-			F&& loadFunc
+			F&& load_func
 		)
 		{
-
-            fs::error_code err;
+			fs::error_code err;
 			auto it = container.find(key);
 			if (it != std::end(container))
 			{
-				auto& request = it->second;
+				auto& future = it->second;
 
-				if (force)
+				if (flags == load_flags::reload && future.is_ready())
 				{
-					loadFunc(key, absoluteKey, async, request);
-				}
-				else if (!async && !request.is_ready())
-				{
-					request.wait_until_ready();
+					asset_handle<T> original = future.get();
+					future = load_func(key, mode, original);
 				}
 
-				return request;
-			}
-            else if (!fs::exists(absoluteKey, err))
-			{
-				static request<T> emptyRequest;
-				return emptyRequest;
+				if (mode == load_mode::sync)
+				{
+					future.wait();
+				}
+
+				return future;
 			}
 			else
 			{
-				auto& request = find_or_create_asset_impl(key, container);
+				auto& future = container[key];
 				//Dispatch the loading
-				loadFunc(key, absoluteKey, async, request);
+				asset_handle<T> original;
+				future = load_func(key, mode, original);
 
-				return request;
+				return future;
 			}
 		}
 
@@ -421,12 +361,14 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		template<typename T, typename F>
-		request<T>& create_asset_from_memory_impl(
+		core::task_future<asset_handle<T>>& create_asset_from_memory_impl(
 			const std::string& key,
 			const std::uint8_t* data,
 			const std::uint32_t& size,
+			load_mode mode,
+			load_flags flags,
 			request_container_t<T>& container,
-			F&& loadFunc
+			F&& load_func
 		)
 		{
 
@@ -434,40 +376,67 @@ namespace runtime
 			if (it != std::end(container))
 			{
 				// If there is already a loading request.
-				auto& request = it->second;
-				return request;
+				auto& future = it->second;
+				return future;
 			}
 			else
 			{
-				auto& request = find_or_create_asset_impl(key, container);
+				auto& future = container[key];
 				//Dispatch the loading
-				loadFunc(key, data, size, request);
+				future = load_func(key, data, size);
 
-				return request;
+				return future;
 			}
 
 		}
 
-		//-----------------------------------------------------------------------------
-		//  Name : find_or_create_asset_impl ()
-		/// <summary>
-		/// 
-		/// 
-		/// 
-		/// </summary>
-		//-----------------------------------------------------------------------------
+
+		template<typename T, typename F>
+		core::task_future<asset_handle<T>>& load_asset_from_instance_impl(
+			const std::string& key,	
+			std::shared_ptr<T> entry,
+			request_container_t<T>& container,
+			F&& load_func)
+		{
+
+			auto& future = container[key];
+			//Dispatch the loading
+			future = load_func(key, entry);
+
+			return future;
+		}
+
 		template<typename T>
-		request<T>& find_or_create_asset_impl(
+		core::task_future<asset_handle<T>> find_asset_impl(
 			const std::string& key,
 			request_container_t<T>& container
 		)
 		{
-			auto& request = container[key];
-			return request;
+			auto it = container.find(key);
+			if (it != container.end())
+			{
+				return it->second;
+			}
+			else
+			{
+				return core::task_future<asset_handle<T>>();
+			}
 		}
 
+		//-----------------------------------------------------------------------------
+		//  Name : get_storage ()
+		/// <summary>
+		/// 
+		/// </summary>
+		//-----------------------------------------------------------------------------
+		template <typename S>
+		asset_storage<S>& get_storage()
+		{
+			auto it = _storages.find(rtti::type_id<asset_storage<S>>().hash_code());
+			assert(it != _storages.end());
+			return (static_cast<asset_storage<S>&>(*it->second.get()));
+		}
 		/// Different storages
-		std::unordered_map<std::size_t, std::shared_ptr<base_storage>> storages;
+		std::unordered_map<std::size_t, std::unique_ptr<base_storage>> _storages;
 	};
-
 }

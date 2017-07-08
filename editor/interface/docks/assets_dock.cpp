@@ -9,6 +9,7 @@
 #include "runtime/ecs/scene.h"
 #include "runtime/ecs/utils.h"
 #include "runtime/input/input.h"
+#include "core/subsystem/tasks.hpp"
 #include "core/filesystem/filesystem.h"
 #include "core/filesystem/filesystem_watcher.hpp"
 #include "../../editing/editing_system.h"
@@ -135,7 +136,7 @@ void list_entry(
 		texture_size, item_size, uv0, uv1,
 		is_selected,
 		edit,
-		loading ? "Loading" : name.c_str(),
+		name.c_str(),
 		&inputBuff[0],
 		inputBuff.size(),
 		ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll);
@@ -176,163 +177,10 @@ void list_entry(
 
 	}
 
-
 	gui::PopID();
 	gui::SameLine();
 
 }
-
-
-template<typename Wrapper, typename T>
-int list_item(Wrapper& entry,
-	const std::string& name,
-	const std::string& relative,
-	const fs::path& absolute,
-	const float size,
-	std::weak_ptr<editor::asset_directory> opened_dir,
-	runtime::asset_manager& manager,
-	runtime::input& input, 
-	editor::editing_system& edit_state)
-{
-	auto& selected = edit_state.selection_data.object;
-	int action = 0;
-	bool already_selected = false;
-	if (selected.is_type<Wrapper>())
-	{
-		if (selected.get_value<Wrapper>() == entry)
-		{
-			already_selected = true;
-		}
-	}
-
-	bool is_directory = false;
-
-	if (rttr::type::get<T>() == rttr::type::get<editor::asset_directory>())
-		is_directory = true;
-
-	bool edit_label = false;
-	if (already_selected && !gui::IsAnyItemActive())
-	{
-		if (input.is_key_pressed(mml::keyboard::F2))
-		{
-			edit_label = true;
-		}
-
-		if (input.is_key_pressed(mml::keyboard::Delete))
-		{
-			if (is_directory)
-			{
-                fs::error_code err;
-                fs::remove_all(absolute, err);
-			}
-			else
-			{
-				manager.delete_asset<T>(relative);
-
-				if (!opened_dir.expired())
-				{
-					auto opened_folder_shared = opened_dir.lock();
-					auto& files = opened_folder_shared->files;
-
-                    fs::error_code err;
-					for (auto& file : files)
-					{
-						if (file.relative == relative)
-						{
-                            fs::remove(file.absolute, err);
-						}
-					}
-				}
-			}
-			edit_state.unselect();
-		}
-	}
-
-	bool loading = !entry;
-
-	asset_handle<texture>& icon = get_icon();
-
-	if (loading)
-		icon = get_loading_icon();
-	else
-		icon = get_asset_icon(entry);
-
-	gui::PushID(relative.c_str());
-
-	if (gui::GetContentRegionAvailWidth() < size)
-		gui::NewLine();
-
-	static std::string inputBuff(64, 0);
-	std::memset(&inputBuff[0], 0, 64);
-	std::memcpy(&inputBuff[0], name.c_str(), name.size() < 64 ? name.size() : 64);
-
-	ImVec2 item_size = { size, size };
-	ImVec2 texture_size = item_size;
-	if (icon)
-		texture_size = { float(icon->info.width), float(icon->info.height) };
-	ImVec2 uv0 = { 0.0f, 0.0f };
-	ImVec2 uv1 = { 1.0f, 1.0f };
-
-	bool* edit = edit_label ? &edit_label : nullptr;
-	action = gui::ImageButtonWithAspectAndLabel(
-		icon.link->asset,
-		texture_size, item_size, uv0, uv1,
-		already_selected,
-		edit,
-		loading ? "Loading" : name.c_str(),
-		&inputBuff[0],
-		inputBuff.size(),
-		ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll);
-
-	if (loading)
-	{
-		gui::PopID();
-		gui::SameLine();
-		return action;
-	}
-
-	if (action == 1)
-	{
-		edit_state.select(entry);
-	}
-	else if (action == 2)
-	{
-		std::string new_name = std::string(inputBuff.c_str());
-		if (new_name != name && new_name != "")
-		{
-			if (is_directory)
-			{
-				fs::path new_absolute_path = absolute;
-				new_absolute_path.remove_filename();
-				new_absolute_path /= new_name;
-                fs::error_code err;
-                fs::rename(absolute, new_absolute_path, err);
-			}
-			else
-			{
-				const auto asset_dir = fs::path(relative).remove_filename();
-				std::string new_relative = (asset_dir / new_name).generic_string();
-				manager.rename_asset<T>(relative, new_relative);
-			}
-		}
-	}
-
-	if (gui::IsItemHoveredRect())
-	{
-		if (gui::IsMouseClicked(gui::drag_button) && !edit_state.drag_data.object)
-		{
-			edit_state.drag(entry, relative);
-		}
-
-	}
-
-
-	gui::PopID();
-	gui::SameLine();
-
-	return action;
-};
-
 
 void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float size)
 {
@@ -400,7 +248,12 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
                 {
                     using asset_t = texture;
                     using entry_t = asset_handle<asset_t>;
-                    auto entry = am.find_or_create_asset_entry<asset_t>(file.relative).asset;
+					auto entry = entry_t{};
+					auto entry_future = am.find_asset_entry<asset_t>(file.relative);
+					if (entry_future.is_ready())
+					{
+						entry = entry_future.get();
+					}
                     const auto& name = file.name;
                     const auto& relative = file.relative;
                     const auto& absolute = file.absolute;
@@ -446,7 +299,12 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 
 					using asset_t = mesh;
 					using entry_t = asset_handle<asset_t>;
-					auto entry = am.find_or_create_asset_entry<asset_t>(file.relative).asset;
+					auto entry = entry_t{};
+					auto entry_future = am.find_asset_entry<asset_t>(file.relative);
+					if (entry_future.is_ready())
+					{
+						entry = entry_future.get();
+					}
 					const auto& name = file.name;
 					const auto& relative = file.relative;
 					const auto& absolute = file.absolute;
@@ -488,8 +346,13 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 			{
                 using asset_t = material;
                 using entry_t = asset_handle<asset_t>;
-                auto entry = am.find_or_create_asset_entry<asset_t>(file.relative).asset;
-                const auto& name = file.name;
+				auto entry = entry_t{};
+				auto entry_future = am.find_asset_entry<asset_t>(file.relative);
+				if (entry_future.is_ready())
+				{
+					entry = entry_future.get();
+				}
+				const auto& name = file.name;
                 const auto& relative = file.relative;
                 const auto& absolute = file.absolute;
                 auto& selected = es.selection_data.object;
@@ -529,8 +392,13 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
             {
                 using asset_t = shader;
                 using entry_t = asset_handle<asset_t>;
-                auto entry = am.find_or_create_asset_entry<asset_t>(file.relative).asset;
-                const auto& name = file.name;
+				auto entry = entry_t{};
+				auto entry_future = am.find_asset_entry<asset_t>(file.relative);
+				if (entry_future.is_ready())
+				{
+					entry = entry_future.get();
+				}
+				const auto& name = file.name;
                 const auto& relative = file.relative;
                 const auto& absolute = file.absolute;
                 auto& selected = es.selection_data.object;
@@ -570,8 +438,13 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 			{
                 using asset_t = prefab;
                 using entry_t = asset_handle<asset_t>;
-                auto entry = am.find_or_create_asset_entry<asset_t>(file.relative).asset;
-                const auto& name = file.name;
+				auto entry = entry_t{};
+				auto entry_future = am.find_asset_entry<asset_t>(file.relative);
+				if (entry_future.is_ready())
+				{
+					entry = entry_future.get();
+				}
+				const auto& name = file.name;
                 const auto& relative = file.relative;
                 const auto& absolute = file.absolute;
                 auto& selected = es.selection_data.object;
@@ -611,8 +484,13 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 			{
                 using asset_t = scene;
                 using entry_t = asset_handle<asset_t>;
-                auto entry = am.find_or_create_asset_entry<asset_t>(file.relative).asset;
-                const auto& name = file.name;
+				auto entry = entry_t{};
+				auto entry_future = am.find_asset_entry<asset_t>(file.relative);
+				if (entry_future.is_ready())
+				{
+					entry = entry_future.get();
+				}
+				const auto& name = file.name;
                 const auto& relative = file.relative;
                 const auto& absolute = file.absolute;
                 auto& selected = es.selection_data.object;
@@ -743,7 +621,7 @@ void assets_dock::render(const ImVec2& area)
 		std::vector<std::string> paths;
 		if (open_multiple_files_dialog("obj,fbx,dae,blend,3ds,mtl,png,jpg,tga,dds,ktx,pvr,sc,io,sh", "", paths))
 		{
-			auto& ts = core::get_subsystem<runtime::task_system>();
+			auto& ts = core::get_subsystem<core::task_system>();
 
 			auto opened_folder_shared = opened_dir.lock();
 
@@ -754,21 +632,15 @@ void assets_dock::render(const ImVec2& area)
 				fs::path ext = p.extension().string();
 				fs::path filename = p.filename();
 
-				auto task = ts.create("Import Asset", [opened_dir](const fs::path& path, const fs::path& p, const fs::path& filename)
+				auto task = ts.push_ready([opened_dir](const fs::path& path, const fs::path& filename)
 				{
                     fs::error_code err;
 					fs::path dir = opened_dir / filename;
                     fs::copy_file(path, dir, err);
-					//{
-					//	APPLOG_ERROR("Failed to import file {0} with message {1}", p.string(), error.message());
-					//}
-					//else
-					{
-                        fs::last_write_time(dir, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()), err);
-					}
-				}, p, p, filename);
+                    fs::last_write_time(dir, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()), err);
+				
+				}, p, filename);
 
-				ts.run(task);
 			}
 		}
 	}

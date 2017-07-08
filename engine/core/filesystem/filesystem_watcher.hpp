@@ -583,7 +583,7 @@ namespace fs
 				}
 
 
-				if (fi.last_mod_time < time || fi.size != size)
+				if (fi.last_mod_time != time || fi.size != size || fi.type != status.type())
 				{
 					fi.size = size;
 					fi.last_mod_time = time;

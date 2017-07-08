@@ -62,27 +62,29 @@ namespace core
 	
 		auto get() const -> decltype (future.get())
 		{
+			wait();
+
 			return future.get();
 		}
 
-		void wait() const
+		auto valid() const -> decltype (future.valid())
 		{
-			if (detail::is_main_thread() && _system)
-			{
-				_system->processing_wait_id(id);
-			}
-			else if(future.valid())
-			{
-				future.wait();
-			}
+			return future.valid();
 		}
+		bool is_ready() const
+		{
+			using namespace std::chrono_literals;
+			return valid() && wait_for(0s) == std::future_status::ready;
+		}
+
+		void wait() const;
 
 		template<class _Rep,
 			class _Per>
 			std::future_status wait_for(
 				const std::chrono::duration<_Rep, _Per>& rel_time) const
 		{	// wait for duration
-			future.wait_for(rel_time);
+			return future.wait_for(rel_time);
 		}
 
 		template<class _Clock,
@@ -90,7 +92,7 @@ namespace core
 			std::future_status wait_until(
 				const std::chrono::time_point<_Clock, _Dur>& abs_time) const
 		{	// wait until time point
-			future.wait_until(abs_time);
+			return future.wait_until(abs_time);
 		}
 
 	private:
@@ -549,28 +551,29 @@ namespace core
 			template <std::size_t ... I>
 			inline void do_invoke_(nonstd::index_sequence <I...>)
 			{
-				_f(call_get(std::get <I>(std::move(_args)))...);
+				//_f(call_get(std::get <I>(std::move(_args)))...);
+				nonstd::invoke(_f, call_get(std::get <I>(std::move(_args)))...);
 			}
 
 			template <class T>
-			static inline bool call_ready(T &) noexcept { return true; }
+			static inline bool call_ready(const T &) noexcept { return true; }
 
 			template <class T>
-			static inline bool call_ready(task_future<T> & t) noexcept
+			static inline bool call_ready(const task_future<T> & t) noexcept
 			{
 				using namespace std::chrono_literals;
 				return t.wait_for(0s) == std::future_status::ready;
 			}
 
 			template <class T>
-			static inline bool call_ready(std::future<T> & t) noexcept
+			static inline bool call_ready(const std::future<T> & t) noexcept
 			{
 				using namespace std::chrono_literals;
 				return t.wait_for(0s) == std::future_status::ready;
 			}
 
 			template <class T>
-			static inline bool call_ready(std::shared_future<T> & t) noexcept
+			static inline bool call_ready(const std::shared_future<T> & t) noexcept
 			{
 				using namespace std::chrono_literals;
 				return t.wait_for(0s) == std::future_status::ready;
@@ -996,15 +999,24 @@ namespace core
 			);
 			t.second._system = this;
 
-			const auto queue_index = get_main_thread_queue_idx();
-			for (std::size_t k = 0; k < 10 * nthreads_; ++k)
+			if (detail::is_main_thread() && t.first.ready())
 			{
-				if (queues_[queue_index].try_push(t.first))
-					return std::move(t.second);
-			}
+				t.first();
 
-			queues_[queue_index].push(std::move(t.first));
-			return std::move(t.second);
+				return std::move(t.second);
+			}
+			else
+			{
+				const auto queue_index = get_main_thread_queue_idx();
+				for (std::size_t k = 0; k < 10 * nthreads_; ++k)
+				{
+					if (queues_[queue_index].try_push(t.first))
+						return std::move(t.second);
+				}
+
+				queues_[queue_index].push(std::move(t.first));
+				return std::move(t.second);
+			}		
 		}
 
 
@@ -1032,15 +1044,25 @@ namespace core
 			);
 			t.second._system = this;
 
-			const auto queue_index = get_main_thread_queue_idx();
-			for (std::size_t k = 0; k < 10; ++k)
+			if (detail::is_main_thread() && t.first.ready())
 			{
-				if (queues_[queue_index].try_push(t.first))
-					return std::move(t.second);
+				t.first();
+			
+				return std::move(t.second);
 			}
+			else
+			{
 
-			queues_[queue_index].push(std::move(t.first));
-			return std::move(t.second);
+				const auto queue_index = get_main_thread_queue_idx();
+				for (std::size_t k = 0; k < 10; ++k)
+				{
+					if (queues_[queue_index].try_push(t.first))
+						return std::move(t.second);
+				}
+
+				queues_[queue_index].push(std::move(t.first));
+				return std::move(t.second);
+			}
 		}
 
 		//-----------------------------------------------------------------------------
@@ -1073,7 +1095,7 @@ namespace core
 
 		}
 
-		void processing_wait_id(const std::uint64_t& id)
+		void processing_wait_id_on_main(const std::uint64_t& id)
 		{
 			std::pair <bool, awaitable_task> p = { false, awaitable_task() };
 
@@ -1106,12 +1128,28 @@ namespace core
 		}
 
 		template<typename T>
-		void processing_wait(const task_future<T>& task)
+		void processing_wait_on_main(const task_future<T>& task)
 		{
-			processing_wait_id(task.id);
+			processing_wait_id_on_main(task.id);
 		}
 		
 	};
-}   // namespace tasks
+
+	template<typename T>
+	void task_future<T>::wait() const
+	{
+		if (!is_ready())
+		{
+			if (detail::is_main_thread() && _system)
+			{
+				_system->processing_wait_id_on_main(id);
+			}
+			else if (future.valid())
+			{
+				future.wait();
+			}
+		}
+	}
+}   // namespace core
 
 #endif  // #ifndef AWAITABLE_TASK_HPP

@@ -17,117 +17,25 @@ namespace editor
 	{
 		auto& am = core::get_subsystem<runtime::asset_manager>();
 
-		am.load<texture>("editor_data:/icons/translate.png", false)
-			.then([this](auto asset) mutable
-		{
-			icons["translate"] = asset;
-		});
-
-		am.load<texture>("editor_data:/icons/rotate.png", false)
-			.then([this](auto asset) mutable
-		{
-			icons["rotate"] = asset;
-		});
-
-		am.load<texture>("editor_data:/icons/scale.png", false)
-			.then([this](auto asset) mutable
-		{
-			icons["scale"] = asset;
-		});
-
-		am.load<texture>("editor_data:/icons/local.png", false)
-			.then([this](auto asset) mutable
-		{
-			icons["local"] = asset;
-		});
-
-		am.load<texture>("editor_data:/icons/global.png", false)
-			.then([this](auto asset) mutable
-		{
-			icons["global"] = asset;
-		});
-
-		am.load<texture>("editor_data:/icons/play.png", false)
-			.then([this](auto asset) mutable
-		{
-			icons["play"] = asset;
-		});
-
-		am.load<texture>("editor_data:/icons/pause.png", false)
-			.then([this](auto asset) mutable
-		{
-			icons["pause"] = asset;
-		});
-
-		am.load<texture>("editor_data:/icons/stop.png", false)
-			.then([this](auto asset) mutable
-		{
-			icons["stop"] = asset;
-		});
-
-		am.load<texture>("editor_data:/icons/next.png", false)
-			.then([this](auto asset) mutable
-		{
-			icons["next"] = asset;
-		});
-
-		am.load<texture>("editor_data:/icons/material.png", false)
-			.then([this](auto asset) mutable
-		{
-			icons["material"] = asset;
-		});
-
-		am.load<texture>("editor_data:/icons/mesh.png", false)
-			.then([this](auto asset) mutable
-		{
-			icons["mesh"] = asset;
-		});
-
-		am.load<texture>("editor_data:/icons/export.png", false)
-			.then([this](auto asset) mutable
-		{
-			icons["import"] = asset;
-		});
-
-		am.load<texture>("editor_data:/icons/grid.png", false)
-			.then([this](auto asset) mutable
-		{
-			icons["grid"] = asset;
-		});
-
-		am.load<texture>("editor_data:/icons/wireframe.png", false)
-			.then([this](auto asset) mutable
-		{
-			icons["wireframe"] = asset;
-		});
-
-		am.load<texture>("editor_data:/icons/prefab.png", false)
-			.then([this](auto asset) mutable
-		{
-			icons["prefab"] = asset;
-		});
-
-		am.load<texture>("editor_data:/icons/scene.png", false)
-			.then([this](auto asset) mutable
-		{
-			icons["scene"] = asset;
-		});
-
-		am.load<texture>("editor_data:/icons/shader.png", false)
-			.then([this](auto asset) mutable
-		{
-			icons["shader"] = asset;
-		});
-		am.load<texture>("editor_data:/icons/loading.png", false)
-			.then([this](auto asset) mutable
-		{
-			icons["loading"] = asset;
-		});
-		am.load<texture>("editor_data:/icons/folder.png", false)
-			.then([this](auto asset) mutable
-		{
-			icons["folder"] = asset;
-		});
+		icons["translate"] = am.load<texture>("editor_data:/icons/translate.png").get();
+		icons["rotate"] = am.load<texture>("editor_data:/icons/rotate.png").get();
+		icons["scale"] = am.load<texture>("editor_data:/icons/scale.png").get();
+		icons["local"] = am.load<texture>("editor_data:/icons/local.png").get();
+		icons["global"] = am.load<texture>("editor_data:/icons/global.png").get();
+		icons["play"] = am.load<texture>("editor_data:/icons/play.png").get();
+		icons["pause"] = am.load<texture>("editor_data:/icons/pause.png").get();
+		icons["stop"] = am.load<texture>("editor_data:/icons/stop.png").get();
+		icons["next"] = am.load<texture>("editor_data:/icons/next.png").get();
+		icons["material"] = am.load<texture>("editor_data:/icons/material.png").get();
+		icons["mesh"] = am.load<texture>("editor_data:/icons/mesh.png").get();
+		icons["export"] = am.load<texture>("editor_data:/icons/export.png").get();
+		icons["grid"] = am.load<texture>("editor_data:/icons/grid.png").get();
+		icons["wireframe"] = am.load<texture>("editor_data:/icons/wireframe.png").get();
+		icons["prefab"] = am.load<texture>("editor_data:/icons/prefab.png").get();
+		icons["scene"] = am.load<texture>("editor_data:/icons/scene.png").get();
+		icons["shader"] = am.load<texture>("editor_data:/icons/shader.png").get();
+		icons["loading"] = am.load<texture>("editor_data:/icons/loading.png").get();
+		icons["folder"] = am.load<texture>("editor_data:/icons/folder.png").get();
 
 		runtime::on_window_frame_render.connect(this, &editing_system::on_window_frame_render);
 
