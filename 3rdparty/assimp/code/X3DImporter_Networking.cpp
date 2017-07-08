@@ -2,7 +2,8 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2016, assimp team
+Copyright (c) 2006-2017, assimp team
+
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms,
@@ -48,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "X3DImporter_Macro.hpp"
 
 // Header files, Assimp.
-#include "DefaultIOSystem.h"
+#include <assimp/DefaultIOSystem.h>
 
 namespace Assimp
 {
@@ -88,12 +89,13 @@ void X3DImporter::ParseNode_Networking_Inline()
 
 		if(load && (url.size() > 0))
 		{
-			DefaultIOSystem io_handler;
 			std::string full_path;
 
-			full_path = mFileDir + "/" + url.front();
+			full_path = mpIOHandler->CurrentDirectory() + "/" + url.front();
 			// Attribute "url" can contain list of strings. But we need only one - first.
-			ParseFile(full_path, &io_handler);
+			mpIOHandler->PushDirectory(DefaultIOSystem::absolutePath(full_path));
+			ParseFile(full_path, mpIOHandler);
+			mpIOHandler->PopDirectory();
 		}
 
 		// check for X3DMetadataObject childs.

@@ -2,7 +2,8 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2016, assimp team
+Copyright (c) 2006-2017, assimp team
+
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms,
@@ -49,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "StringUtils.h"
 
 // Header files, Assimp.
-#include "DefaultIOSystem.h"
+#include <assimp/DefaultIOSystem.h>
 #include "fast_atof.h"
 
 // Header files, stdlib.
@@ -73,24 +74,31 @@ const aiImporterDesc X3DImporter::Description = {
 	"x3d"
 };
 
-void X3DImporter::Clear()
-{
+const std::string X3DImporter::whitespace(" ,\t\n\r");
+
+X3DImporter::X3DImporter()
+: NodeElement_Cur( nullptr )
+, mReader( nullptr ) {
+    // empty
+}
+
+X3DImporter::~X3DImporter() {
+    delete mReader;
+    // Clear() is accounting if data already is deleted. So, just check again if all data is deleted.
+    Clear();
+}
+
+void X3DImporter::Clear() {
 	NodeElement_Cur = nullptr;
 	// Delete all elements
-	if(NodeElement_List.size())
-	{
-		for(std::list<CX3DImporter_NodeElement*>::iterator it = NodeElement_List.begin(); it != NodeElement_List.end(); it++) delete *it;
-
+	if(NodeElement_List.size()) {
+        for ( std::list<CX3DImporter_NodeElement*>::iterator it = NodeElement_List.begin(); it != NodeElement_List.end(); it++ ) {
+            delete *it;
+        }
 		NodeElement_List.clear();
 	}
 }
 
-X3DImporter::~X3DImporter()
-{
-    delete mReader;
-	// Clear() is accounting if data already is deleted. So, just check again if all data is deleted.
-	Clear();
-}
 
 /*********************************************************************************************************************************************/
 /************************************************************ Functions: find set ************************************************************/
@@ -235,7 +243,7 @@ void X3DImporter::XML_CheckNode_MustBeEmpty()
 
 void X3DImporter::XML_CheckNode_SkipUnsupported(const std::string& pParentNodeName)
 {
-    const size_t Uns_Skip_Len = 189;
+    static const size_t Uns_Skip_Len = 192;
     const char* Uns_Skip[ Uns_Skip_Len ] = {
 	    // CAD geometry component
 	    "CADAssembly", "CADFace", "CADLayer", "CADPart", "IndexedQuadSet", "QuadSet",
@@ -262,7 +270,7 @@ void X3DImporter::XML_CheckNode_SkipUnsupported(const std::string& pParentNodeNa
 	    "PositionInterpolator", "PositionInterpolator2D", "ScalarInterpolator", "SplinePositionInterpolator", "SplinePositionInterpolator2D",
 	    "SplineScalarInterpolator", "SquadOrientationInterpolator",
 	    // Key device sensor component
-	    "KeySensor", "StringSensor"
+	    "KeySensor", "StringSensor",
 	    // Layering component
 	    "Layer", "LayerSet", "Viewport",
 	    // Layout component
@@ -270,7 +278,7 @@ void X3DImporter::XML_CheckNode_SkipUnsupported(const std::string& pParentNodeNa
 	    // Navigation component
 	    "Billboard", "Collision", "LOD", "NavigationInfo", "OrthoViewpoint", "Viewpoint", "ViewpointGroup",
 	    // Networking component
-	    "Anchor", "LoadSensor",
+	    "EXPORT", "IMPORT", "Anchor", "LoadSensor",
 	    // NURBS component
 	    "Contour2D", "ContourPolyline2D", "CoordinateDouble", "NurbsCurve", "NurbsCurve2D", "NurbsOrientationInterpolator", "NurbsPatchSurface",
 	    "NurbsPositionInterpolator", "NurbsSet", "NurbsSurfaceInterpolator", "NurbsSweptSurface", "NurbsSwungSurface", "NurbsTextureCoordinate",
@@ -431,43 +439,30 @@ void X3DImporter::XML_ReadNode_GetAttrVal_AsVec3f(const int pAttrIdx, aiVector3D
 
 void X3DImporter::XML_ReadNode_GetAttrVal_AsListB(const int pAttrIdx, std::list<bool>& pValue)
 {
-	// make copy of attribute value - string with list of bool values. Also all bool values is strings.
-	size_t tok_str_len = strlen(mReader->getAttributeValue(pAttrIdx));
-    if ( 0 == tok_str_len ) {
-        Throw_IncorrectAttrValue( mReader->getAttributeName( pAttrIdx ) );
-    }
+	const char *tok_cur = mReader->getAttributeValue(pAttrIdx);
+	const char *tok_end = tok_cur + strlen(tok_cur);
 
-	tok_str_len++;// take in account terminating '\0'.
-	char *tok_str = new char[tok_str_len];
-
-	strcpy(tok_str, mReader->getAttributeValue(pAttrIdx));
-	// change all spacebars to symbol '\0'. That is needed for parsing.
-	for(size_t i = 0; i < tok_str_len; i++)
+	for(;;)
 	{
-		if(tok_str[i] == ' ') tok_str[i] = 0;
-	}
+		while((tok_cur < tok_end) && (whitespace.find_first_of(*tok_cur) != std::string::npos)) tok_cur++;// skip spaces between values.
+		if (tok_cur >= tok_end)
+			break;
 
-	// at now check what current token is
-	for(char *tok_cur = tok_str, *tok_end = (tok_str + tok_str_len); tok_cur < tok_end;)
-	{
 		if(strncmp(tok_cur, "true", 4) == 0)
 		{
 			pValue.push_back(true);
-			tok_cur += 5;// five, not four. Because '\0' must be skipped too.
+			tok_cur += 4;
 		}
 		else if(strncmp(tok_cur, "false", 5) == 0)
 		{
-			pValue.push_back(true);
-			tok_cur += 6;// six, not five. Because '\0' must be skipped too.
+			pValue.push_back(false);
+			tok_cur += 5;
 		}
 		else
 		{
 			Throw_IncorrectAttrValue(mReader->getAttributeName(pAttrIdx));
 		}
-	}// for(char* tok_cur = tok_str, tok_end = (tok_str + tok_str_len); tok_cur < tok_end;)
-
-	// delete temporary string
-	delete [] tok_str;
+	}// for(;;)
 }
 
 void X3DImporter::XML_ReadNode_GetAttrVal_AsArrB(const int pAttrIdx, std::vector<bool>& pValue)
@@ -494,10 +489,10 @@ void X3DImporter::XML_ReadNode_GetAttrVal_AsListI32(const int pAttrIdx, std::lis
 
 		int32_t tval32;
 
+		while((tstr < tstr_end) && (whitespace.find_first_of(*tstr) != std::string::npos)) tstr++;// skip spaces between values.
+
 		tval32 = strtol10(tstr, &ostr);
 		if(ostr == tstr) break;
-
-		while((ostr < tstr_end) && (*ostr == ' ')) ostr++;// skip spaces between values.
 
 		tstr = ostr;
 		pValue.push_back(tval32);
@@ -523,7 +518,6 @@ void X3DImporter::XML_ReadNode_GetAttrVal_AsListF(const int pAttrIdx, std::list<
 
 	// at first check string values like '.xxx'.
 	ParseHelper_FixTruncatedFloatString(mReader->getAttributeValue(pAttrIdx), str_fixed);
-	if(!str_fixed.size()) Throw_ConvertFail_Str2ArrF(mReader->getAttributeValue(pAttrIdx));
 
 	// and convert all values and place it in list.
 	const char* pstr = str_fixed.c_str();
@@ -533,7 +527,7 @@ void X3DImporter::XML_ReadNode_GetAttrVal_AsListF(const int pAttrIdx, std::list<
 	{
 		float tvalf;
 
-		while((*pstr == ' ') && (pstr < pstr_end)) pstr++;// skip spaces between values.
+		while((pstr < pstr_end) && (whitespace.find_first_of(*pstr) != std::string::npos)) pstr++;// skip spaces between values.
 
 		if(pstr < pstr_end)// additional check, because attribute value can be ended with spaces.
 		{
@@ -562,7 +556,6 @@ void X3DImporter::XML_ReadNode_GetAttrVal_AsListD(const int pAttrIdx, std::list<
 
 	// at first check string values like '.xxx'.
 	ParseHelper_FixTruncatedFloatString(mReader->getAttributeValue(pAttrIdx), str_fixed);
-	if(!str_fixed.size()) Throw_ConvertFail_Str2ArrF(mReader->getAttributeValue(pAttrIdx));
 
 	// and convert all values and place it in list.
 	const char* pstr = str_fixed.c_str();
@@ -572,7 +565,7 @@ void X3DImporter::XML_ReadNode_GetAttrVal_AsListD(const int pAttrIdx, std::list<
 	{
 		double tvald;
 
-		while((*pstr == ' ') && (pstr < pstr_end)) pstr++;// skip spaces between values.
+		while((pstr < pstr_end) && (whitespace.find_first_of(*pstr) != std::string::npos)) pstr++;// skip spaces between values.
 
 		if(pstr < pstr_end)// additional check, because attribute value can be ended with spaces.
 		{
@@ -1147,35 +1140,36 @@ void X3DImporter::MeshGeometry_AddNormal(aiMesh& pMesh, const std::list<int32_t>
 
 	if(pNormalPerVertex)
 	{
-		const std::list<int32_t>* srcidx;
-
 		if(pNormalIdx.size() > 0)
 		{
 			// check indices array count.
 			if(pNormalIdx.size() != pCoordIdx.size()) throw DeadlyImportError("Normals and Coords inidces count must be equal.");
 
-			srcidx = &pNormalIdx;
+			tind.reserve(pNormalIdx.size());
+			for(std::list<int32_t>::const_iterator it = pNormalIdx.begin(); it != pNormalIdx.end(); it++)
+			{
+				if(*it != (-1)) tind.push_back(*it);
+			}
+
+			// copy normals to mesh
+			pMesh.mNormals = new aiVector3D[pMesh.mNumVertices];
+			for(size_t i = 0; (i < pMesh.mNumVertices) && (i < tind.size()); i++)
+			{
+				if(tind[i] >= norm_arr_copy.size())
+					throw DeadlyImportError("MeshGeometry_AddNormal. Normal index(" + to_string(tind[i]) +
+											") is out of range. Normals count: " + to_string(norm_arr_copy.size()) + ".");
+
+				pMesh.mNormals[i] = norm_arr_copy[tind[i]];
+			}
 		}
 		else
 		{
-			srcidx = &pCoordIdx;
-		}
+			if(pNormals.size() != pMesh.mNumVertices) throw DeadlyImportError("MeshGeometry_AddNormal. Normals and vertices count must be equal.");
 
-		tind.reserve(srcidx->size());
-		for(std::list<int32_t>::const_iterator it = srcidx->begin(); it != srcidx->end(); it++)
-		{
-			if(*it != (-1)) tind.push_back(*it);
-		}
-
-		// copy normals to mesh
-		pMesh.mNormals = new aiVector3D[pMesh.mNumVertices];
-		for(size_t i = 0; (i < pMesh.mNumVertices) && (i < tind.size()); i++)
-		{
-			if(tind[i] >= norm_arr_copy.size())
-				throw DeadlyImportError("MeshGeometry_AddNormal. Normal index(" + to_string(tind[i]) +
-										") is out of range. Normals count: " + to_string(norm_arr_copy.size()) + ".");
-
-			pMesh.mNormals[i] = norm_arr_copy[tind[i]];
+			// copy normals to mesh
+			pMesh.mNormals = new aiVector3D[pMesh.mNumVertices];
+			std::list<aiVector3D>::const_iterator norm_it = pNormals.begin();
+			for(size_t i = 0; i < pMesh.mNumVertices; i++) pMesh.mNormals[i] = *norm_it++;
 		}
 	}// if(pNormalPerVertex)
 	else
@@ -1673,8 +1667,10 @@ const aiImporterDesc* X3DImporter::GetInfo () const
 
 void X3DImporter::InternReadFile(const std::string& pFile, aiScene* pScene, IOSystem* pIOHandler)
 {
+	mpIOHandler = pIOHandler;
+
 	Clear();// delete old graph.
-	mFileDir = DefaultIOSystem::absolutePath(pFile);
+	pIOHandler->PushDirectory(DefaultIOSystem::absolutePath(pFile));
 	ParseFile(pFile, pIOHandler);
 	//
 	// Assimp use static arrays of objects for fast speed of rendering. That's good, but need some additional operations/

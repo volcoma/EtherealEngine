@@ -2,7 +2,8 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2016, assimp team
+Copyright (c) 2006-2017, assimp team
+
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms,
@@ -55,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <memory>
 #include <functional>
-
+#include <map>
 
 namespace Assimp {
 namespace FBX {
@@ -564,7 +565,7 @@ std::vector<const Connection*> Document::GetConnectionsSequenced(uint64_t id,
         temp.push_back((*it).second);
     }
 
-    std::sort(temp.begin(), temp.end(), std::mem_fun(&Connection::Compare));
+    std::sort(temp.begin(), temp.end(), std::mem_fn(&Connection::Compare));
 
     return temp; // NRVO should handle this
 }
@@ -616,7 +617,7 @@ std::vector<const Connection*> Document::GetConnectionsSequenced(uint64_t id, bo
         temp.push_back((*it).second);
     }
 
-    std::sort(temp.begin(), temp.end(), std::mem_fun(&Connection::Compare));
+    std::sort(temp.begin(), temp.end(), std::mem_fn(&Connection::Compare));
     return temp; // NRVO should handle this
 }
 

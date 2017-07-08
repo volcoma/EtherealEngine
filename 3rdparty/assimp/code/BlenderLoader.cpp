@@ -3,7 +3,8 @@
 Open Asset Import Library (assimp)
 ----------------------------------------------------------------------
 
-Copyright (c) 2006-2016, assimp team
+Copyright (c) 2006-2017, assimp team
+
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms,
@@ -54,12 +55,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "BlenderBMesh.h"
 #include "StringUtils.h"
 #include <assimp/scene.h>
-#include "StringComparison.h"
+#include <assimp/importerdesc.h>
 
+#include "StringComparison.h"
 #include "StreamReader.h"
 #include "MemoryIOWrapper.h"
+
 #include <cctype>
-#include <cstdint>
 
 
 // zlib is needed for compressed blend files
@@ -96,8 +98,9 @@ static const aiImporterDesc blenderDesc = {
 // ------------------------------------------------------------------------------------------------
 // Constructor to be privately used by Importer
 BlenderImporter::BlenderImporter()
-: modifier_cache(new BlenderModifierShowcase())
-{}
+: modifier_cache(new BlenderModifierShowcase()) {
+    // empty
+}
 
 // ------------------------------------------------------------------------------------------------
 // Destructor, private as well
@@ -107,6 +110,7 @@ BlenderImporter::~BlenderImporter()
 }
 
 static const char* Tokens[] = { "BLENDER" };
+static const char* TokensForSearch[] = { "blender" };
 
 // ------------------------------------------------------------------------------------------------
 // Returns whether the class can handle the format of the given file.
@@ -119,7 +123,7 @@ bool BlenderImporter::CanRead( const std::string& pFile, IOSystem* pIOHandler, b
 
     else if ((!extension.length() || checkSig) && pIOHandler)   {
         // note: this won't catch compressed files
-        return SearchFileHeaderForToken(pIOHandler,pFile, Tokens,1);
+        return SearchFileHeaderForToken(pIOHandler,pFile, TokensForSearch,1);
     }
     return false;
 }
@@ -145,8 +149,7 @@ void BlenderImporter::SetupProperties(const Importer* /*pImp*/)
     // nothing to be done for the moment
 }
 
-struct free_it
-{
+struct free_it {
     free_it(void* free) : free(free) {}
     ~free_it() {
         ::free(this->free);
@@ -164,6 +167,7 @@ void BlenderImporter::InternReadFile( const std::string& pFile,
     Bytef* dest = NULL;
     free_it free_it_really(dest);
 #endif
+
 
     FileDatabase file;
     std::shared_ptr<IOStream> stream(pIOHandler->Open(pFile,"rb"));
