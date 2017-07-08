@@ -44,7 +44,8 @@ namespace core
 		}
 		inline void init_main_thread_id()
 		{
-			static_initializer<init_main_thread_id>::initializer;
+			static auto init = static_initializer<init_main_thread_id>::initializer;
+			(void)init;
 			get_main_thread_id();
 		}
 		inline bool is_main_thread()
