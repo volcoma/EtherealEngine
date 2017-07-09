@@ -53,7 +53,11 @@ void default_scene()
 		object.assign<transform_component>().lock()
 			->set_local_position({ 1.0f, 6.0f, -3.0f })
 			.rotate_local(50.0f, -30.0f, 0.0f);
-		object.assign<light_component>();
+
+		light light_data;
+		light_data.color = math::color(255, 244, 214, 255);
+		object.assign<light_component>().lock()
+			->set_light(light_data);
 	}
 	{
 		auto object = ecs.create();
@@ -373,7 +377,7 @@ void main_editor_window::render_dockspace()
 	if (!_show_start_page)
 		gui_window::render_dockspace();
 
-	if (_console_log)
+	if (!_show_start_page)
 	{
 		auto items = _console_log->get_items();
 		if (!items.empty())

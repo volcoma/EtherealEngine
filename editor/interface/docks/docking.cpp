@@ -36,11 +36,11 @@ bool docking_system::initialize()
 	auto& dockspace = window.get_dockspace();
 	dockspace.dock_to(scene.get(), imguidock::slot::none, 200, true);
 	dockspace.dock_with(game.get(), scene.get(), imguidock::slot::tab, 300, false);
-	dockspace.dock_with(inspector.get(), scene.get(), imguidock::slot::right, 300, true);
+	dockspace.dock_with(inspector.get(), scene.get(), imguidock::slot::right, 400, true);
 	dockspace.dock_with(hierarchy.get(), scene.get(), imguidock::slot::left, 300, true);
-	dockspace.dock_to(console.get(), imguidock::slot::bottom, 250, true);
+	dockspace.dock_to(console.get(), imguidock::slot::bottom, 300, true);
 	dockspace.dock_with(assets.get(), console.get(), imguidock::slot::tab, 250, true);
-	dockspace.dock_with(style.get(), assets.get(), imguidock::slot::right, 300, true);
+	dockspace.dock_with(style.get(), assets.get(), imguidock::slot::right, 400, true);
 
 	auto logging_container = logging::get_mutable_logging_container();
 	logging_container->add_sink(log);

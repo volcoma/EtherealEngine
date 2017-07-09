@@ -10,6 +10,7 @@ SAMPLER2D(s_tex2, 2);
 SAMPLER2D(s_tex3, 3);
 SAMPLER2D(s_tex4, 4);
 SAMPLER2D(s_tex5, 5); // reflection data
+SAMPLER2D(s_tex6, 6); // ibl_brdf_lut
 
 uniform vec4 u_light_position;
 uniform vec4 u_light_direction;
@@ -31,7 +32,7 @@ vec4 pbr_light(vec2 texcoord0)
 	vec3 albedo_color = data.base_color - data.base_color * data.metalness;
 #if DIRECTIONAL_LIGHT
 	vec3 vector_to_light = -u_light_direction.xyz;
-	vec3 indirect_diffuse = albedo_color * 0.05f;
+	vec3 indirect_diffuse = albedo_color * 0.1f;
 #else
 	vec3 vector_to_light = u_light_position.xyz - world_position;
 	vec3 indirect_diffuse = vec3(0.0f, 0.0f, 0.0f);
@@ -62,7 +63,7 @@ vec4 pbr_light(vec2 texcoord0)
 	float subsurface_attenuation	= (intensity * distance_attenuation * light_radius_mask * spot_falloff) * subsurface_shadow;
 	
 	vec3 energy = AreaLightSpecular(0.0f, 0.0f, normalize(vector_to_light), lobe_roughness, vector_to_light, L, V, N);
-	SurfaceShading surface_lighting = StandardShading(albedo_color, indirect_diffuse, specular_color, indirect_specular, lobe_roughness, energy, data.metalness, data.ambient_occlusion, L, V, N);
+	SurfaceShading surface_lighting = StandardShading(albedo_color, indirect_diffuse, specular_color, indirect_specular, s_tex6, lobe_roughness, energy, data.metalness, data.ambient_occlusion, L, V, N);
 	vec3 direct_surface_lighting = surface_lighting.direct;
 	vec3 indirect_surface_lighting = surface_lighting.indirect;
 	//vec3 subsurface_lighting = SubsurfaceShadingTwoSided(data.subsurface_color, L, V, N);

@@ -211,6 +211,8 @@ namespace runtime
 		std::unique_ptr<program> _gamma_correction_program;
 		/// Program that is responsible for rendering.
 		std::unique_ptr<program> _atmospherics_program;
+
+		asset_handle<texture> _ibl_brdf_lut;
 	};
 
 }

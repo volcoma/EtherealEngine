@@ -87,7 +87,7 @@ namespace editor
 			const auto iterations = math::power_of_n_round_down(far_clip, divison);
 			for (std::uint32_t i = 0; i < iterations; ++i)
 			{
-				draw_grid(0xff606060, math::abs(camera_posiiton.y), height, far_clip, divison, i, iterations);
+				draw_grid(0xff808080, math::abs(camera_posiiton.y), height, far_clip, divison, i, iterations);
 			}
 		}
 

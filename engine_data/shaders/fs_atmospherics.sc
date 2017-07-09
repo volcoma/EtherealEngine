@@ -54,17 +54,19 @@ vec3 absorb(vec3 kr, float dist, vec3 color, float factor)
 
 void main()
 {
-	const vec3 u_kr = vec3(0.18867780436772762f, 0.4978442963618773f, 0.6616065586417131f);
+
+	const vec3 u_kr = vec3(0.12867780436772762f, 0.2478442963618773f, 0.6216065586417131f);
 	const vec3 u_ground_color = vec3(0.63f, 0.6f, 0.57f);	
 	const float u_rayleigh_brightness = 9.0f;
 	const float u_mie_brightness = 0.1f;
 	const float u_spot_brightness = 10.0f;
-	const float u_scatter_strength = 0.028;
+	const float u_spot_distance = 100.0f;
+	const float u_scatter_strength = 0.078;
 	const float u_rayleigh_strength = 0.139f;
 	const float u_mie_strength = 0.264f;
 	const float u_rayleigh_collection_power = 0.81f;
 	const float u_mie_collection_power = 0.39f;
-	const float u_mie_distribution = 0.63f;
+	const float u_mie_distribution = 0.53f;
 	const float u_surface_height = 0.99f; // < 1
 	const float u_intensity = 1.8f;
 	const int u_step_count = 2;
@@ -75,7 +77,7 @@ void main()
 	float alpha = clamp(dot(eye_dir, -u_light_direction.xyz), 0, 1);
 	float rayleigh_factor = phase(alpha, -0.01) * u_rayleigh_brightness;
 	float mie_factor = phase(alpha, u_mie_distribution) * u_mie_brightness;
-	float spot = smoothstep(0.0f, 15.0f, phase(alpha, 0.9995f)) * u_spot_brightness;
+	float spot = smoothstep(0.0f, u_spot_distance, phase(alpha, 0.9995f)) * u_spot_brightness;
 	
 	float eye_depth = atmospheric_depth(eye_pos, eye_dir);
 	float step_length = eye_depth / float(u_step_count);
@@ -101,7 +103,7 @@ void main()
 
 	vec3 color = vec3(spot * mie_collected + mie_factor * mie_collected + rayleigh_factor * rayleigh_collected);
 	float light_angle = dot(-normalize(-u_light_direction.xyz), eye_pos);
-	vec3 ground_color = u_ground_color * (saturate(-light_angle)) * 0.1f;
+	vec3 ground_color = (u_ground_color + vec3(1.0f, 1.0f, 1.0f)) * (saturate(-light_angle)) * 0.1f;
 	color = mix(color, ground_color, saturate(-eye_dir.y/0.06f + 0.4f));
 	gl_FragColor.rgb = color;
 	gl_FragColor.a = dot( color, vec3( 0.2125, 0.7154, 0.0721 ) );

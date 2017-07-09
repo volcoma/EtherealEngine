@@ -475,6 +475,8 @@ vec3 F_Fresnel( vec3 SpecularColor, float VoH )
 	return 0.5f * Square( (g - VoH) / (g + VoH) ) * ( 1.0f + Square( ((g+VoH)*VoH - 1.0f) / ((g-VoH)*VoH + 1.0f) ) );
 }
 
+// ----------------------------------------------------------------------------
+
 vec3 Fresnel( vec3 SpecularColor, float VoH )
 {
 #if   PHYSICAL_SPEC_F == 0
@@ -489,10 +491,10 @@ vec3 Fresnel( vec3 SpecularColor, float VoH )
 }
 
 
-vec3 F_Roughness(vec3 SpecularColor, float Roughness, vec3 VoH)
+vec3 F_Roughness(vec3 SpecularColor, float Roughness, float VoH)
 {
 	// Sclick using roughness to attenuate fresnel.
-	return (SpecularColor + (max(vec3(1.0f-Roughness, 1.0f-Roughness, 1.0f-Roughness), SpecularColor) - SpecularColor) * pow((1.0f - VoH), vec3(5.0f, 5.0f, 5.0f)));
+	return (SpecularColor + (max(vec3(1.0f-Roughness, 1.0f-Roughness, 1.0f-Roughness), SpecularColor) - SpecularColor) * pow((1.0f - VoH), 5.0f));
 }
 
 vec3 EnvironmentLightingDFG_GGX_Fresnel_SmithSchlickGGX( vec3 SpecularColor, float Roughness, float NoV )
@@ -529,25 +531,30 @@ struct SurfaceShading
 	vec3 indirect;
 };
 	
-SurfaceShading StandardShading( vec3 DiffuseColor, vec3 IndirectDiffuse, vec3 SpecularColor, vec3 IndirectSpecular, vec3 LobeRoughness, vec3 LobeEnergy, float metalness, float occlusion, vec3 L, vec3 V, vec3 N )
+SurfaceShading StandardShading( vec3 DiffuseColor, vec3 IndirectDiffuse, vec3 SpecularColor, vec3 IndirectSpecular, sampler2D BRDFIntegrationMap, vec3 LobeRoughness, vec3 LobeEnergy, float metalness, float occlusion, vec3 L, vec3 V, vec3 N )
 {
 	vec3 H = normalize(V + L);
 	float NoL = saturate( dot(N, L) );
 	float NoV = saturate( abs( dot(N, V) ) + 1e-5 );
 	float NoH = saturate( dot(N, H) );
 	float VoH = saturate( dot(V, H) );
-	
+	float roughness = LobeRoughness[1];
 	// Generalized microfacet specular
-	float D = Distribution( LobeRoughness[1], NoH ) * LobeEnergy[1];
-	float Vis = Visibility( LobeRoughness[1], NoV, NoL, VoH, NoH );
+	float D = Distribution( roughness, NoH ) * LobeEnergy[1];
+	float Vis = Visibility( roughness, NoV, NoL, VoH, NoH );
 	vec3 F = Fresnel( SpecularColor, VoH );
-	vec3 Diffuse_Color = Diffuse( DiffuseColor, LobeRoughness[1], NoV, NoL, VoH );
 	
-	float OneMinusReflectivity = 0.04f - metalness * 0.04f;
-	float GrazingTerm = saturate((1.0f - LobeRoughness[1]) + (1-OneMinusReflectivity));
+	vec3 Diffuse_Color = Diffuse( DiffuseColor, roughness, NoV, NoL, VoH );
+
 	float specular_occlusion = saturate( Square( NoV + occlusion ) - 1.0f + occlusion );
+	vec3 envFresnel = F_Roughness(SpecularColor, roughness, NoV);
+	vec2 envBRDF  = texture2D(BRDFIntegrationMap, vec2(NoV, roughness)).rg;
+	//set to 0 otherwise we get artefacts
+	envBRDF.y = 0.0f;
+	vec3 indirectSpec = IndirectSpecular * (envFresnel * envBRDF.x + envBRDF.y) * specular_occlusion;
+	
 	SurfaceShading shading;
-	shading.indirect = DiffuseColor * IndirectDiffuse + IndirectSpecular * EnvironmentLightingDFG_GGX_Fresnel_SmithSchlickGGX(SpecularColor, LobeRoughness[1], NoV) * specular_occlusion;
+	shading.indirect = DiffuseColor * IndirectDiffuse + indirectSpec;
 	shading.direct = Diffuse_Color * LobeEnergy[2] + (D * Vis) * F;
 	return shading;
 }

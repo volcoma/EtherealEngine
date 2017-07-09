@@ -571,6 +571,7 @@ namespace runtime
 				program->set_texture(3, "s_tex3", gfx::getTexture(g_buffer_fbo->handle, 3));
 				program->set_texture(4, "s_tex4", gfx::getTexture(g_buffer_fbo->handle, 4));
 				program->set_texture(5, "s_tex5", refl_buffer->handle);
+				program->set_texture(6, "s_tex6", _ibl_brdf_lut->handle);
 
 				gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
 				auto topology = gfx::clip_quad(1.0f);
@@ -735,38 +736,42 @@ namespace runtime
 
 		if (surface && _atmospherics_program)
 		{
-			int sun_count = 0;
-			ecs.each<transform_component, light_component>([this, &output_size, &pass, &sun_count](
+			bool found_sun = false;
+			auto light_direction = math::normalize(math::vec3(0.2f, -0.8f, 1.0f));
+			ecs.each<transform_component, light_component>([this, &light_direction, &found_sun](
 				entity e,
 				transform_component& transform_comp_ref,
 				light_component& light_comp_ref
 				)
 			{
+				if (found_sun)
+					return;
+
 				const auto& light = light_comp_ref.get_light();
-				const auto& world_transform = transform_comp_ref.get_transform();
-				const auto& light_direction = world_transform.z_unit_axis();
 
                 if (light.type == light_type::directional)
 				{
-					if (sun_count++ > 0)
-						return;
-
-					_atmospherics_program->begin_pass();
-					_atmospherics_program->set_uniform("u_light_direction", &light_direction);
-
-					irect rect(0, 0, output_size.width, output_size.height);
-					gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
-					auto topology = gfx::clip_quad(1.0f);
-					gfx::setState(topology
-						| BGFX_STATE_RGB_WRITE
-						| BGFX_STATE_ALPHA_WRITE
-						| BGFX_STATE_DEPTH_TEST_LEQUAL
-						| BGFX_STATE_BLEND_ADD
-					);
-					gfx::submit(pass.id, _atmospherics_program->handle);
-					gfx::setState(BGFX_STATE_DEFAULT);
+					found_sun = true;				
+					const auto& world_transform = transform_comp_ref.get_transform();
+					light_direction = world_transform.z_unit_axis();
+					
 				}
 			});
+			
+			_atmospherics_program->begin_pass();
+			_atmospherics_program->set_uniform("u_light_direction", &light_direction);
+
+			irect rect(0, 0, output_size.width, output_size.height);
+			gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
+			auto topology = gfx::clip_quad(1.0f);
+			gfx::setState(topology
+				| BGFX_STATE_RGB_WRITE
+				| BGFX_STATE_ALPHA_WRITE
+				| BGFX_STATE_DEPTH_TEST_LEQUAL
+				| BGFX_STATE_BLEND_ADD
+			);
+			gfx::submit(pass.id, _atmospherics_program->handle);
+			gfx::setState(BGFX_STATE_DEFAULT);
 		}
 
 		return input;
@@ -831,7 +836,7 @@ namespace runtime
 		auto fs_sphere_reflection_probe = am.load<shader>("engine_data:/shaders/fs_sphere_reflection_probe.sc");
 		auto fs_box_reflection_probe = am.load<shader>("engine_data:/shaders/fs_box_reflection_probe.sc");
 		auto fs_atmospherics = am.load<shader>("engine_data:/shaders/fs_atmospherics.sc");
-
+		_ibl_brdf_lut = am.load<texture>("engine_data:/textures/ibl_brdf_lut.png").get();
 
 		ts.push_awaitable_on_main([this](asset_handle<shader> vs, asset_handle<shader> fs)
 		{
