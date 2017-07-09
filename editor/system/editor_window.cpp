@@ -375,10 +375,9 @@ void main_editor_window::on_toolbar()
 void main_editor_window::render_dockspace()
 {
 	if (!_show_start_page)
-		gui_window::render_dockspace();
-
-	if (!_show_start_page)
 	{
+		_dockspace.update_and_draw(ImVec2(gui::GetContentRegionAvail().x, gui::GetContentRegionAvail().y - gui::GetItemsLineHeightWithSpacing()));
+
 		auto items = _console_log->get_items();
 		if (!items.empty())
 		{

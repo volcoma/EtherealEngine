@@ -214,7 +214,7 @@ void gui_window::frame_render(std::chrono::duration<float> dt)
 
 void gui_window::render_dockspace()
 {
-	_dockspace.update_and_draw(ImVec2(gui::GetContentRegionAvail().x, gui::GetContentRegionAvail().y - gui::GetItemsLineHeightWithSpacing()));	
+	_dockspace.update_and_draw(ImVec2(gui::GetContentRegionAvail()));	
 }
 
 void gui_window::frame_end()
