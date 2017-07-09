@@ -157,8 +157,11 @@ bool inspector_asset_handle_material::inspect(rttr::variant& var, bool readOnly,
 		return false;
 	}
 
-
-	
+	if (gui::Button("Apply to Asset"))
+	{
+		am.save(data);
+	}
+	gui::Separator();
 	bool changed = false;
 	{
 		rttr::variant vari = data.get();

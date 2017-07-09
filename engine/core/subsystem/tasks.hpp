@@ -9,7 +9,6 @@
 #include <cstdint>
 #include <deque>
 #include <exception>
-#include <forward_list>
 #include <future>
 #include <memory>
 #include <mutex>
@@ -598,11 +597,6 @@ namespace core
 		using Allocator = std::allocator <awaitable_task>;
 		class task_queue
 		{
-			//using iterator_type =
-			//	typename std::forward_list <awaitable_task>::iterator;
-
-			//std::forward_list <awaitable_task> tasks_;
-			//iterator_type last_;
 			std::deque<awaitable_task> tasks_;
 			std::condition_variable cv_;
 			std::mutex mutex_;
@@ -1068,19 +1062,9 @@ namespace core
 
 			while (!queue.is_empty())
 			{
-				for (std::size_t k = 0; k < 10; ++k)
-				{
-					p = queue.try_pop();
-					if (p.first)
-						break;
-				}
-
+				p = queue.pop(false);
 				if (!p.first)
-				{
-					p = queue.pop(false);
-					if (!p.first)
-						continue;
-				}
+					continue;
 
 				if (p.first)
 					p.second();
