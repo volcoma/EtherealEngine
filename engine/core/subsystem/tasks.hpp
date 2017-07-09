@@ -598,31 +598,24 @@ namespace core
 		using Allocator = std::allocator <awaitable_task>;
 		class task_queue
 		{
-			using iterator_type =
-				typename std::forward_list <awaitable_task>::iterator;
+			//using iterator_type =
+			//	typename std::forward_list <awaitable_task>::iterator;
 
-			std::forward_list <awaitable_task> tasks_;
-			iterator_type last_;
+			//std::forward_list <awaitable_task> tasks_;
+			//iterator_type last_;
+			std::deque<awaitable_task> tasks_;
 			std::condition_variable cv_;
 			std::mutex mutex_;
 			std::atomic_bool done_{ false };
 
 			/* rotates the first element of the list onto the end */
-			void rotate_with_(std::forward_list <awaitable_task> & side_buf)
+			void rotate_()
 			{
 				/* zero or one element list -- trivial to rotate */
-				if (tasks_.empty() || last_ == tasks_.begin())
+				if (tasks_.empty())
 					return;
 
-				side_buf.splice_after(side_buf.begin(), tasks_);
-				tasks_.splice_after(
-					tasks_.begin(), side_buf,
-					side_buf.begin(), side_buf.end()
-				);
-
-				auto new_last = side_buf.begin();
-				tasks_.splice_after(last_, side_buf);
-				last_ = new_last;
+				std::rotate(tasks_.begin(), tasks_.begin() + 1, tasks_.end());
 			}
 
 		public:
@@ -634,7 +627,6 @@ namespace core
 
 			task_queue(task_queue && other) noexcept
 				: tasks_(std::move(other).tasks_)
-				, last_(std::move(other).last_)
 				, done_(other.done_.load())
 			{}
 
@@ -658,12 +650,15 @@ namespace core
 				{
 					return std::make_pair(false, awaitable_task{});
 				}
-				else
+				else if(tasks_.front().ready())
 				{
 					auto t = std::move(tasks_.front());
 					tasks_.pop_front();
 					return std::make_pair(true, std::move(t));
 				}
+
+				rotate_();
+				return std::make_pair(false, awaitable_task{});
 			}
 
 			bool try_push(awaitable_task & t)
@@ -673,15 +668,7 @@ namespace core
 					if (!lock)
 						return false;
 
-					if (tasks_.empty())
-					{
-						tasks_.emplace_front(std::move(t));
-						last_ = tasks_.begin();
-					}
-					else
-					{
-						last_ = tasks_.emplace_after(last_, std::move(t));
-					}
+					tasks_.emplace_back(std::move(t));
 				}
 
 				cv_.notify_one();
@@ -703,37 +690,21 @@ namespace core
 				if (tasks_.empty())
 					return std::make_pair(false, awaitable_task{});
 
-				auto iter = tasks_.begin();
-				auto const old_last = last_;
-				std::forward_list <awaitable_task> side_buf;
-
-				if (iter->ready())
+				auto sz = tasks_.size();
+				for (decltype(sz) i = 0; i < sz; ++i)
 				{
-					auto t = std::move(*iter);
-					tasks_.pop_front();
-					return std::make_pair(true, std::move(t));
-				}
-				else
-				{
-					rotate_with_(side_buf);
-				}
-
-				for (auto lag = iter++; lag != old_last; lag = iter++)
-				{
-					if (iter->ready())
+					if (tasks_.front().ready())
 					{
-						if (last_ == iter)
-							last_ = lag;
-						auto t = std::move(*iter);
-						tasks_.erase_after(lag);
+						auto t = std::move(tasks_.front());
+						tasks_.pop_front();
 						return std::make_pair(true, std::move(t));
 					}
 					else
 					{
-						rotate_with_(side_buf);
+						rotate_();
 					}
 				}
-
+				
 				/*
 				 * If we get to this point the best we can do is pop from the
 				 * front of the task list, release the lock, and wait for the
@@ -760,15 +731,7 @@ namespace core
 			{
 				{
 					std::unique_lock <std::mutex> lock(mutex_);
-					if (tasks_.empty())
-					{
-						tasks_.emplace_front(std::move(t));
-						last_ = tasks_.begin();
-					}
-					else
-					{
-						last_ = tasks_.emplace_after(last_, std::move(t));
-					}
+					tasks_.emplace_back(std::move(t));
 				}
 				cv_.notify_one();
 			}

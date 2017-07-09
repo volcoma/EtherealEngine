@@ -378,35 +378,7 @@ namespace fs
 			}
 			return pathFilter;
 		}
-
-		static std::pair<fs::path, std::string> visit_wild_card_path_cache(const std::map <std::string, entry>& entries, const fs::path &path, bool visitEmpty, const std::function<bool(const fs::path&)> &visitor)
-		{
-			std::pair<fs::path, std::string> pathFilter = get_path_filter_pair(path);
-			if (!pathFilter.second.empty())
-			{
-				std::string full = (pathFilter.first / pathFilter.second).string();
-				size_t wildcardPos = full.find("*");
-				std::string before = full.substr(0, wildcardPos);
-				std::string after = full.substr(wildcardPos + 1);
-
-				for (auto& it : entries)
-				{
-					std::string current = it.second.path.string();
-					size_t beforePos = current.find(before);
-					size_t afterPos = current.find(after);
-					if ((beforePos != std::string::npos || before.empty())
-						&& (afterPos != std::string::npos || after.empty()))
-					{
-						if (visitor(it.second.path))
-						{
-							break;
-						}
-					}
-				}
-			}
-			return pathFilter;
-		}
-
+		
 		class watcher_impl
 		{
 		public:
@@ -428,20 +400,14 @@ namespace fs
 				{
 					visit_wild_card_path(path / filter, false, [this, &entries](const fs::path &p)
 					{
-						entry e;
-						poll_entry(p, e);
-						entries.push_back(e);
+						poll_entry(p, entries);
 						return false;
 					});
 				}
 				else
 				{
-					entry e;
-					poll_entry(_root, e);
-					entries.push_back(e);
+					poll_entry(_root, entries);
 				}
-
-				_entries_cached = _entries;
 
 				if (initialList)
 				{
@@ -472,75 +438,95 @@ namespace fs
 				{
 					visit_wild_card_path(_root / _filter, false, [this, &entries](const fs::path &p)
 					{
-						entry e;
-						poll_entry(p, e);
-						if (e.status != entry_status::unmodified && _callback)
-						{
-							entries.push_back(e);
-						}
-						return false;
-					});
-
-					visit_wild_card_path_cache(_entries_cached, _root / _filter, false, [this, &entries](const fs::path &p)
-					{
-						entry e;
-						poll_entry(p, e);
-						if (e.status == entry_status::removed && _callback)
-						{
-							entries.push_back(e);
-						}
+						poll_entry(p, entries);
 						return false;
 					});
 
 				}
 				else
 				{
-					entry e;
-					poll_entry(_root, e);
-
-					if (e.status != entry_status::unmodified && _callback)
-					{
-						entries.push_back(e);
-					}
+					poll_entry(_root, entries);
 				}
 
-				auto __entries = entries;
-				for (auto& e : __entries)
-				{
-					if (e.status == entry_status::created)
-					{
-						for (auto& other : __entries)
-						{
-							if (other.status == entry_status::removed)
-							{
-								if (e.last_mod_time == other.last_mod_time && e.size == other.size)
-								{
-									entries.erase(std::remove_if(std::begin(entries), std::end(entries),
-										[&other](const entry& rhs) { return other.path == rhs.path; }
-									), std::end(entries));
-
-									auto it = std::find_if(std::begin(entries), std::end(entries), 
-										[&e](const entry& rhs) { return e.path == rhs.path; }
-									);
-									if (it != std::end(entries))
-									{
-										it->status = entry_status::renamed;
-										it->last_path = other.path;
-									}
-								}
-
-							}
-						}
-					}
-				}
-
-				_entries_cached = _entries;
-
+				process_modifications(entries);
+						
 				if (entries.size() > 0 && _callback)
 				{
 					_callback(entries, false);
 				}
 			}
+
+			void process_modifications(std::vector<entry>& entries)
+			{
+				auto it = std::begin(_entries);
+				while (it != std::end(_entries))
+				{
+					auto &fi = it->second;
+					fs::error_code err;
+					if (!fs::exists(fi.path, err))
+					{		
+						bool was_removed = true;
+						for (auto& e : entries)
+						{
+							if (e.status == entry_status::created)
+							{
+								if (e.last_mod_time == fi.last_mod_time && e.size == fi.size)
+								{
+									e.status = entry_status::renamed;
+									e.last_path = fi.path;
+									was_removed = false;
+									break;
+								}
+							}						
+						}
+		
+						if (was_removed)
+						{
+							fi.status = entry_status::removed;
+							entries.push_back(fi);
+						}			
+
+						it = _entries.erase(it);
+					}
+					else
+					{
+						it++;
+					}
+				}
+			}
+
+			//void check_for_renamed(std::vector<entry>& entries)
+			//{
+			//	auto __entries = entries;
+			//	for (auto& e : __entries)
+			//	{
+			//		if (e.status == entry_status::created)
+			//		{
+			//			for (auto& other : __entries)
+			//			{
+			//				if (other.status == entry_status::removed)
+			//				{
+			//					if (e.last_mod_time == other.last_mod_time && e.size == other.size)
+			//					{
+			//						entries.erase(std::remove_if(std::begin(entries), std::end(entries),
+			//							[&other](const entry& rhs) { return other.path == rhs.path; }
+			//						), std::end(entries));
+			//	
+			//						auto it = std::find_if(std::begin(entries), std::end(entries),
+			//							[&e](const entry& rhs) { return e.path == rhs.path; }
+			//						);
+			//						if (it != std::end(entries))
+			//						{
+			//							it->status = entry_status::renamed;
+			//							it->last_path = other.path;
+			//						}
+			//					}
+			//	
+			//				}
+			//			}
+			//		}
+			//	}
+			//}
 
 			//-----------------------------------------------------------------------------
 			//  Name : poll_entry ()
@@ -550,7 +536,7 @@ namespace fs
 			/// 
 			/// </summary>
 			//-----------------------------------------------------------------------------
-			void poll_entry(const fs::path &path, entry& entry)
+			void poll_entry(const fs::path &path, std::vector<entry>& modifications)
 			{
 				// get the last modification time
                 fs::error_code err;
@@ -559,8 +545,28 @@ namespace fs
                 fs::file_status status = fs::status(path, err);
 				// add a new modification time to the map
 				std::string key = path.string();
-				if (_entries.find(key) == _entries.end())
+				auto it = _entries.find(key);
+				if (it != _entries.end())
 				{
+					auto &fi = it->second;
+					
+					if (fi.last_mod_time != time || fi.size != size || fi.type != status.type())
+					{
+						fi.size = size;
+						fi.last_mod_time = time;
+						fi.status = entry_status::modified;
+						fi.type = status.type();
+						modifications.push_back(fi);
+					}
+					else
+					{
+						fi.status = entry_status::unmodified;
+						fi.type = status.type();
+					}
+				}
+				else
+				{
+					// or compare with an older one
 					auto &fi = _entries[key];
 					fi.path = path;
 					fi.last_path = path;
@@ -568,37 +574,9 @@ namespace fs
 					fi.status = entry_status::created;
 					fi.size = size;
 					fi.type = status.type();
-					entry = fi;
-					return;
-				}
-				// or compare with an older one
-				auto &fi = _entries[key];
-                if (!fs::exists(fi.path, err))
-				{
-					auto fi_copy = fi;
-					fi_copy.status = entry_status::removed;
-					_entries.erase(key);
-					entry = fi_copy;
-					return;
-				}
 
-
-				if (fi.last_mod_time != time || fi.size != size || fi.type != status.type())
-				{
-					fi.size = size;
-					fi.last_mod_time = time;
-					fi.status = entry_status::modified;
-					fi.type = status.type();
-					entry = fi;
-					return;
-				}
-				else
-				{
-					fi.status = entry_status::unmodified;
-					fi.type = status.type();
-					entry = fi;
-					return;
-				}
+					modifications.push_back(fi);
+				}			
 			};
 
 		protected:
@@ -610,8 +588,6 @@ namespace fs
 			std::function<void(const std::vector<entry>&, bool)> _callback;
 			/// Cache watched files
 			std::map <std::string, entry> _entries;
-			/// Cache watched files
-			std::map <std::string, entry> _entries_cached;
 		};
 		/// Mutex for the file watchers
 		std::recursive_mutex _mutex;
