@@ -417,7 +417,7 @@ void main_editor_window::on_start_page()
 		{
 
 			const auto& rencent_projects = pm.get_options().recent_project_paths;
-			for (auto& path : rencent_projects)
+			for (const auto& path : rencent_projects)
 			{
 				if (gui::Selectable(path.c_str()))
 				{

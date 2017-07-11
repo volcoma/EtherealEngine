@@ -46,7 +46,12 @@ namespace cereal
 		else
 		{
 			auto& am = core::get_subsystem<runtime::asset_manager>();
-			obj = am.load<T>(obj.link->id).get();
+			auto& ts = core::get_subsystem<core::task_system>();
+			auto asset_future = am.load<T>(obj.link->id, runtime::load_mode::async);
+			ts.push_awaitable_on_main([obj](asset_handle<T> handle) mutable
+			{
+				obj.link->asset = handle.link->asset;
+			}, asset_future);
 		}
 	}
 }

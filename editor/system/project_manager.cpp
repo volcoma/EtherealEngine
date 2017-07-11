@@ -198,21 +198,22 @@ namespace editor
 		});
 		static const std::string wildcard = "*";
 
-		watch_assets<material>(relative, wildcard + extensions::material, false);
-		
+	
 		for (const auto& format : extensions::texture)
 		{
 			watch_assets<texture>(relative, wildcard + format, true);
 		}
 		
 		watch_assets<shader>(relative, wildcard + extensions::shader, true);
-
+		
 		for (const auto& format : extensions::mesh)
 		{
 			watch_assets<mesh>(relative, wildcard + format, true);
 		}
-		watch_assets<prefab>(relative, wildcard + extensions::prefab, true);
-		watch_assets<scene>(relative, wildcard + extensions::scene, true);
+
+		watch_assets<material>(relative, wildcard + extensions::material, false);
+		watch_assets<prefab>(relative, wildcard + extensions::prefab, false);
+		watch_assets<scene>(relative, wildcard + extensions::scene, false);
 		
 	}
 
@@ -363,10 +364,11 @@ namespace editor
 	{
 		auto& rp = _options.recent_project_paths;
 		auto project_path = fs::resolve_protocol("app:/");
-		if (std::find(std::begin(rp), std::end(rp), project_path.generic_string()) == std::end(rp))
+		if (project_path != "" && std::find(std::begin(rp), std::end(rp), project_path.generic_string()) == std::end(rp))
 		{
 			rp.push_back(project_path.generic_string());
-		}
+		}	
+		
         fs::error_code err;
         fs::create_directory(fs::resolve_protocol("editor_data:/config"), err);
 		const std::string project_config_file = fs::resolve_protocol("editor_data:/config/project.cfg").string();

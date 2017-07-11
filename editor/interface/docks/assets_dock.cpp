@@ -515,7 +515,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
                     ecs.dispose();
                     es.load_editor_camera();
                     entry->instantiate();
-                    es.scene = fs::resolve_protocol(entry.id()).string() + file.extension;
+                    es.scene = fs::resolve_protocol(entry.id()).string();
 
 
                 },

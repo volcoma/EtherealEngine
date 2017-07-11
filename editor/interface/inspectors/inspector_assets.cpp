@@ -48,7 +48,7 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool readOnly, 
 	
 	if (selected && !selected.is_type<asset_handle<texture>>())
 	{
-		std::string item = data ? data.id() : "none";
+		std::string item = !data.id().empty() ? data.id() : "none";
 		rttr::variant var_str = item;
 		if (inspect_var(var_str))
 		{
@@ -114,7 +114,7 @@ bool inspector_asset_handle_material::inspect(rttr::variant& var, bool readOnly,
 	auto& selected = es.selection_data.object;
 	if (selected && !selected.is_type<asset_handle<material>>())
 	{
-		std::string item = data ? data.id() : "none";
+		std::string item = !data.id().empty() ? data.id() : "none";
 		rttr::variant var_str = item;
 		if (inspect_var(var_str))
 		{
@@ -157,7 +157,7 @@ bool inspector_asset_handle_material::inspect(rttr::variant& var, bool readOnly,
 		return false;
 	}
 
-	if (gui::Button("Apply to Asset"))
+	if (gui::Button("Apply to Asset##top"))
 	{
 		am.save(data);
 	}
@@ -168,7 +168,7 @@ bool inspector_asset_handle_material::inspect(rttr::variant& var, bool readOnly,
 		changed |= inspect_var(vari);
 	}
 	gui::Separator();
-	if (gui::Button("Apply to Asset"))
+	if (gui::Button("Apply to Asset##bottom"))
 	{
 		am.save(data);
 	}
@@ -184,7 +184,7 @@ bool inspector_asset_handle_mesh::inspect(rttr::variant& var, bool readOnly, std
 	auto& selected = es.selection_data.object;
 	if (selected && !selected.is_type<asset_handle<mesh>>())
 	{
-		std::string item = data ? data.id() : "none";
+		std::string item = !data.id().empty() ? data.id() : "none";
 		rttr::variant var_str = item;
 		if (inspect_var(var_str))
 		{
@@ -250,7 +250,7 @@ bool inspector_asset_handle_prefab::inspect(rttr::variant& var, bool readOnly, s
 	auto& selected = es.selection_data.object;
 	if (selected && !selected.is_type<asset_handle<prefab>>())
 	{
-		std::string item = data ? data.id() : "none";
+		std::string item = !data.id().empty() ? data.id() : "none";
 		rttr::variant var_str = item;
 		if (inspect_var(var_str))
 		{

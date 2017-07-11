@@ -159,17 +159,19 @@ void asset_compiler::compile<texture>(const fs::path& absolute_key)
 		return;
 	}
 
-
-	static const int arg_count = 7;
-	const char* args_array[arg_count];
-	args_array[0] = "-f";
-	args_array[1] = str_input.c_str();
-	args_array[2] = "-o";
-	args_array[3] = str_output.c_str();
-	args_array[4] = "--as";
-	args_array[5] = "ktx";
-	args_array[6] = "-m";
-	
+	const char* args_array[] =
+	{
+		"-f",
+		str_input.c_str(),
+		"-o",
+		str_output.c_str(),
+		"--as",
+		"ktx",
+		"-m"
+		"-t",
+		"BGRA8",
+	};
+	const int arg_count = static_cast<int>(math::countof(args_array));
 
 	if (compile_texture(arg_count, args_array) != 0)
 	{

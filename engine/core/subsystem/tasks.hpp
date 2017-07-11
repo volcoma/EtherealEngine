@@ -550,7 +550,6 @@ namespace core
 			template <std::size_t ... I>
 			inline void do_invoke_(nonstd::index_sequence <I...>)
 			{
-				//_f(call_get(std::get <I>(std::move(_args)))...);
 				nonstd::invoke(_f, call_get(std::get <I>(std::move(_args)))...);
 			}
 
@@ -1033,23 +1032,13 @@ namespace core
 			std::pair <bool, awaitable_task> p = { false, awaitable_task() };
 
 			const auto queue_index = get_main_thread_queue_idx();
-			for (std::size_t k = 0; k < 10; ++k)
-			{
-				p = queues_[queue_index].try_pop();
-				if (p.first)
-					break;
-			}
 
+			p = queues_[queue_index].pop(false);
 			if (!p.first)
-			{
-				p = queues_[queue_index].pop(false);
-				if (!p.first)
-					return;
-			}
+				return;
 
 			if (p.first)
 				p.second();
-
 		}
 
 		void processing_wait_id_on_main(const std::uint64_t& id)
@@ -1067,10 +1056,12 @@ namespace core
 					continue;
 
 				if (p.first)
+				{
 					p.second();
-
-				if (p.second.get_id() == id)
-					break;
+				
+					if (p.second.get_id() == id)
+						break;
+				}
 			}
 		}
 
