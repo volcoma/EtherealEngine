@@ -170,10 +170,17 @@ namespace runtime
 			mesh::load_data data;
 			{
 				std::ifstream stream{ compiled_absolute_key, std::ios::in | std::ios::binary };
+				
+				if (stream.bad())
+				{
+					return false;
+				}
+
 				cereal::iarchive_binary_t ar(stream);
 
 				try_load(ar, cereal::make_nvp("mesh", data));
 			}
+
 			wrapper->mesh->prepare_mesh(data.vertex_format);
 			wrapper->mesh->set_vertex_source(&data.vertex_data[0], data.vertex_count, data.vertex_format);
 			wrapper->mesh->add_primitives(data.triangle_data);
@@ -187,15 +194,18 @@ namespace runtime
 		auto create_resource_func = [result = original, wrapper, key](bool read_result) mutable
 		{
 			// Build the mesh
-			wrapper->mesh->build_vb();
-			wrapper->mesh->build_ib();
-
-			if (wrapper->mesh->get_status() == mesh_status::prepared)
+			if (read_result)
 			{
-				result.link->id = key;
-				result.link->asset = wrapper->mesh;
+				wrapper->mesh->build_vb();
+				wrapper->mesh->build_ib();
+
+				if (wrapper->mesh->get_status() == mesh_status::prepared)
+				{
+					result.link->id = key;
+					result.link->asset = wrapper->mesh;
+				}
+				wrapper.reset();
 			}
-			wrapper.reset();
 
 			return result;
 		};
@@ -232,6 +242,11 @@ namespace runtime
 		auto read_memory_func = [wrapper, compiled_absolute_key]() mutable
 		{
 			std::ifstream stream{ compiled_absolute_key, std::ios::in | std::ios::binary };
+			
+			if (stream.bad())
+			{
+				return false;
+			}
 			cereal::iarchive_associative_t ar(stream);
 
 			try_load(ar, cereal::make_nvp("material", wrapper->material));
@@ -286,12 +301,16 @@ namespace runtime
 
 		auto create_resource_func = [result = original, read_memory, key](bool read_result) mutable
 		{
-			auto pfab = std::make_shared<prefab>();
-			pfab->data = read_memory;
+			if (read_result)
+			{
+				auto pfab = std::make_shared<prefab>();
+				pfab->data = read_memory;
 
-			result.link->id = key;
-			result.link->asset = pfab;
+				result.link->id = key;
+				result.link->asset = pfab;
 
+			}
+			
 			return result;
 		};
 
@@ -334,11 +353,14 @@ namespace runtime
 
 		auto create_resource_func = [result = original, read_memory, key](bool read_result) mutable
 		{
-			auto sc = std::make_shared<scene>();
-			sc->data = read_memory;
+			if (read_result)
+			{
+				auto sc = std::make_shared<scene>();
+				sc->data = read_memory;
 
-			result.link->id = key;
-			result.link->asset = sc;
+				result.link->id = key;
+				result.link->asset = sc;
+			}
 
 			return result;
 		};
