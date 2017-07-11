@@ -21,7 +21,7 @@ class material;
 namespace editor
 {
 	template<typename T>
-	void watch_assets(const fs::path& protocol, const std::string& wildcard, bool reloadAsync)
+	void watch_assets(const fs::path& protocol, const std::string& wildcard, bool reload_async)
 	{
 		auto& am = core::get_subsystem<runtime::asset_manager>();
 		auto& ts = core::get_subsystem<core::task_system>();
@@ -29,7 +29,7 @@ namespace editor
 		const fs::path dir = fs::resolve_protocol(protocol);
 		fs::path watch_dir = dir / wildcard;
 
-		fs::watcher::watch(watch_dir, true, [&am, &ts, protocol, reloadAsync](const std::vector<fs::watcher::entry>& entries, bool is_initial_list)
+		fs::watcher::watch(watch_dir, true, [&am, &ts, protocol, reload_async](const std::vector<fs::watcher::entry>& entries, bool is_initial_list)
 		{
 			for (auto& entry : entries)
 			{
@@ -43,9 +43,6 @@ namespace editor
 					//remove the compiled extension if we have one
 					if (ext == extensions::compiled)
 					{
-						if (is_initial_list)
-							continue;
-
 						for (auto temp = filename; temp.has_extension(); temp = filename.stem() )
 						{
 							filename = temp;
@@ -59,7 +56,7 @@ namespace editor
 					{
 						if (entry.status == fs::watcher::entry_status::removed)
 						{
-							auto task = ts.push_ready_on_main([reloadAsync, key, &am]()
+							auto task = ts.push_ready_on_main([reload_async, key, &am]()
 							{
 								am.clear_asset<T>(key);
 							});
@@ -70,11 +67,14 @@ namespace editor
 						}
 						else
 						{
+							using namespace runtime;
+							load_mode mode = reload_async ? load_mode::async : load_mode::sync;
+							load_flags flags = is_initial_list ? load_flags::standard : load_flags::reload;
+
 							//created or modified
-							auto task = ts.push_ready_on_main([reloadAsync, key, &am]()
+							auto task = ts.push_ready_on_main([mode, flags, key, &am]()
 							{
-								using namespace runtime;
-								am.load<T>(key, reloadAsync ? load_mode::async : load_mode::sync, load_flags::reload);
+								am.load<T>(key, mode, flags);
 							});
 						}
 					}
@@ -105,10 +105,25 @@ namespace editor
 						else
 						{
 							// created or modified or renamed
-							auto task = ts.push_ready([](const fs::path& p)
+
+							bool compile = true;
+
+							if (is_initial_list)
 							{
-								asset_compiler::compile<T>(p);
-							}, p);
+								fs::path compiled_file = p.string() + extensions::get_compiled_format<T>();
+								fs::error_code err;
+								compile = !fs::exists(compiled_file, err);
+							}
+
+							if (compile)
+							{
+								
+								auto task = ts.push_ready([](const fs::path& p)
+								{
+									asset_compiler::compile<T>(p);
+								}, p);
+							}
+							
 						}
 					}
 				}
