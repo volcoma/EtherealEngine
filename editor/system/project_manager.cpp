@@ -56,7 +56,7 @@ namespace editor
 					{
 						if (entry.status == fs::watcher::entry_status::removed)
 						{
-							auto task = ts.push_ready_on_main([reload_async, key, &am]()
+							auto task = ts.push_ready([reload_async, key, &am]()
 							{
 								am.clear_asset<T>(key);
 							});
@@ -72,7 +72,7 @@ namespace editor
 							load_flags flags = is_initial_list ? load_flags::standard : load_flags::reload;
 
 							//created or modified
-							auto task = ts.push_ready_on_main([mode, flags, key, &am]()
+							auto task = ts.push_ready([mode, flags, key, &am]()
 							{
 								am.load<T>(key, mode, flags);
 							});
@@ -86,7 +86,7 @@ namespace editor
 					{
 						if (entry.status == fs::watcher::entry_status::removed)
 						{
-							auto task = ts.push_ready_on_main([p, ext, protocol, key, &am]()
+							auto task = ts.push_ready([p, ext, protocol, key, &am]()
 							{
 								am.delete_asset<T>(key);
 
@@ -226,9 +226,9 @@ namespace editor
 			watch_assets<mesh>(relative, wildcard + format, true);
 		}
 
-		watch_assets<material>(relative, wildcard + extensions::material, false);
-		watch_assets<prefab>(relative, wildcard + extensions::prefab, false);
-		watch_assets<scene>(relative, wildcard + extensions::scene, false);
+		watch_assets<material>(relative, wildcard + extensions::material, true);
+		watch_assets<prefab>(relative, wildcard + extensions::prefab, true);
+		watch_assets<scene>(relative, wildcard + extensions::scene, true);
 		
 	}
 

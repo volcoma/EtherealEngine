@@ -65,18 +65,9 @@ namespace runtime
 
 		auto& ts = core::get_subsystem<core::task_system>();
 
-		if (mode == load_mode::async)
-		{
-			auto ready_memory_task = ts.push_ready(read_memory_func);
-			auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
-			return create_resource_task;
-		}
-		else
-		{
-			auto ready_memory_task = ts.push_ready_on_main(read_memory_func);
-			auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
-			return create_resource_task;
-		}
+		auto ready_memory_task = ts.push_ready(read_memory_func);
+		auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
+		return create_resource_task;
 
 	}
 
@@ -138,18 +129,9 @@ namespace runtime
 
 		auto& ts = core::get_subsystem<core::task_system>();
 
-		if (mode == load_mode::async)
-		{
-			auto ready_memory_task = ts.push_ready(read_memory_func);
-			auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
-			return create_resource_task;
-		}
-		else
-		{
-			auto ready_memory_task = ts.push_ready_on_main(read_memory_func);
-			auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
-			return create_resource_task;
-		}
+		auto ready_memory_task = ts.push_ready(read_memory_func);
+		auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
+		return create_resource_task;
 	}
 
 	template<>
@@ -212,18 +194,9 @@ namespace runtime
 
 		auto& ts = core::get_subsystem<core::task_system>();
 
-		if (mode == load_mode::async)
-		{
-			auto ready_memory_task = ts.push_ready(read_memory_func);
-			auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
-			return create_resource_task;
-		}
-		else
-		{
-			auto ready_memory_task = ts.push_ready_on_main(read_memory_func);
-			auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
-			return create_resource_task;
-		}
+		auto ready_memory_task = ts.push_ready(read_memory_func);
+		auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
+		return create_resource_task;
 	}
 
 	template<>
@@ -265,18 +238,10 @@ namespace runtime
 
 		auto& ts = core::get_subsystem<core::task_system>();
 
-		if (mode == load_mode::async)
-		{
-			auto ready_memory_task = ts.push_ready(read_memory_func);
-			auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
-			return create_resource_task;
-		}
-		else
-		{
-			auto ready_memory_task = ts.push_ready_on_main(read_memory_func);
-			auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
-			return create_resource_task;
-		}
+		auto ready_memory_task = ts.push_ready(read_memory_func);
+		auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
+		return create_resource_task;
+
 	}
 
 	template<>
@@ -317,18 +282,9 @@ namespace runtime
 
 		auto& ts = core::get_subsystem<core::task_system>();
 
-		if (mode == load_mode::async)
-		{
-			auto ready_memory_task = ts.push_ready(read_memory_func);
-			auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
-			return create_resource_task;
-		}
-		else
-		{
-			auto ready_memory_task = ts.push_ready_on_main(read_memory_func);
-			auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
-			return create_resource_task;
-		}
+		auto ready_memory_task = ts.push_ready(read_memory_func);
+		auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
+		return create_resource_task;
 	}
 
 	template<>
@@ -368,18 +324,9 @@ namespace runtime
 
 		auto& ts = core::get_subsystem<core::task_system>();
 
-		if (mode == load_mode::async)
-		{
-			auto ready_memory_task = ts.push_ready(read_memory_func);
-			auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
-			return create_resource_task;
-		}
-		else
-		{
-			auto ready_memory_task = ts.push_ready_on_main(read_memory_func);
-			auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
-			return create_resource_task;
-		}
+		auto ready_memory_task = ts.push_ready(read_memory_func);
+		auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
+		return create_resource_task;
 	}
 
 	template<>

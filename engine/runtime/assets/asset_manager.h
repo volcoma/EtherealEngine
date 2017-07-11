@@ -74,6 +74,7 @@ namespace runtime
 		//-----------------------------------------------------------------------------
 		void clear()
 		{
+			std::lock_guard<std::mutex> lock(container_mutex);
 			container.clear();
 		}
 
@@ -87,6 +88,7 @@ namespace runtime
 		//-----------------------------------------------------------------------------
 		void clear(const std::string& protocol)
 		{
+			std::lock_guard<std::mutex> lock(container_mutex);
 			auto container_copy = container;
 			for (const auto& pair : container_copy)
 			{
@@ -121,6 +123,9 @@ namespace runtime
 
 		/// Storage container
 		request_container_t<T> container;
+
+		/// Mutex
+		std::mutex container_mutex;
 	};
 
 	class asset_manager : public core::subsystem
@@ -189,11 +194,11 @@ namespace runtime
 			//if embedded resource
 			if (key.find("embedded") != std::string::npos)
 			{
-				return find_asset_impl<T>(key, storage.container);
+				return find_asset_impl<T>(key, storage.container_mutex, storage.container);
 			}
 			else
 			{
-				return load_asset_from_file_impl<T>(key, mode, flags, storage.container, storage.load_from_file);
+				return load_asset_from_file_impl<T>(key, mode, flags, storage.container_mutex, storage.container, storage.load_from_file);
 
 			}
 		}
@@ -221,6 +226,7 @@ namespace runtime
 				size,
 				mode,
 				flags,
+				storage.container_mutex,
 				storage.container,
 				storage.load_from_memory);
 		}
@@ -229,14 +235,14 @@ namespace runtime
 		core::task_future<asset_handle<T>> find_asset_entry(const std::string& key)
 		{
 			auto& storage = get_storage<T>();
-			return find_asset_impl<T>(key, storage.container);
+			return find_asset_impl<T>(key, storage.container_mutex, storage.container);
 		}
 		
 		template<typename T>
 		core::task_future<asset_handle<T>> load_asset_from_instance(const std::string& key, std::shared_ptr<T> entry)
 		{
 			auto& storage = get_storage<T>();
-			return load_asset_from_instance_impl(key, entry, storage.container, storage.load_from_instance);
+			return load_asset_from_instance_impl(key, entry, storage.container_mutex, storage.container, storage.load_from_instance);
 		}
 
 		template<typename T>
@@ -245,6 +251,7 @@ namespace runtime
 			auto& storage = get_storage<T>();
 			storage.rename_asset_file(key, new_key);
 		
+			std::lock_guard<std::mutex> lock(storage.container_mutex);
 			auto it = storage.container.find(key);
 			if (it != storage.container.end())
 			{
@@ -261,6 +268,7 @@ namespace runtime
 		{
 			auto& storage = get_storage<T>();
 
+			std::lock_guard<std::mutex> lock(storage.container_mutex);
 			auto it = storage.container.find(key);
 			if (it != storage.container.end())
 			{
@@ -318,16 +326,19 @@ namespace runtime
 			const std::string& key,
 			load_mode mode,
 			load_flags flags,
+			std::mutex& container_mutex,
 			request_container_t<T>& container,
 			F&& load_func
 		)
 		{
+			//std::lock_guard<std::mutex> lock(container_mutex);
+			container_mutex.lock();
 			fs::error_code err;
 			auto it = container.find(key);
 			if (it != std::end(container))
 			{
 				auto& future = it->second;
-
+				container_mutex.unlock();
 				if (flags == load_flags::reload && future.is_ready())
 				{
 					asset_handle<T> original = future.get();
@@ -344,6 +355,7 @@ namespace runtime
 			else
 			{
 				auto& future = container[key];
+				container_mutex.unlock();
 				//Dispatch the loading
 				asset_handle<T> original;
 				future = load_func(key, mode, original);
@@ -367,21 +379,24 @@ namespace runtime
 			const std::uint32_t& size,
 			load_mode mode,
 			load_flags flags,
+			std::mutex& container_mutex,
 			request_container_t<T>& container,
 			F&& load_func
 		)
 		{
-
+			container_mutex.lock();
 			auto it = container.find(key);
 			if (it != std::end(container))
 			{
 				// If there is already a loading request.
 				auto& future = it->second;
+				container_mutex.unlock();
 				return future;
 			}
 			else
 			{
 				auto& future = container[key];
+				container_mutex.unlock();
 				//Dispatch the loading
 				future = load_func(key, data, size);
 
@@ -395,11 +410,13 @@ namespace runtime
 		core::task_future<asset_handle<T>>& load_asset_from_instance_impl(
 			const std::string& key,	
 			std::shared_ptr<T> entry,
+			std::mutex& container_mutex,
 			request_container_t<T>& container,
 			F&& load_func)
 		{
-
+			container_mutex.lock();;
 			auto& future = container[key];
+			container_mutex.unlock();
 			//Dispatch the loading
 			future = load_func(key, entry);
 
@@ -409,9 +426,11 @@ namespace runtime
 		template<typename T>
 		core::task_future<asset_handle<T>> find_asset_impl(
 			const std::string& key,
+			std::mutex& container_mutex,
 			request_container_t<T>& container
 		)
 		{
+			std::lock_guard<std::mutex> lock(container_mutex);
 			auto it = container.find(key);
 			if (it != container.end())
 			{

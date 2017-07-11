@@ -735,7 +735,7 @@ namespace core
 		typename Allocator::template rebind <awaitable_task::task_concept>::other
 			alloc_;
 		std::size_t nthreads_;
-		std::size_t current_index_{ 1 };
+		std::atomic<std::size_t> current_index_{ 1 };
 
 		void run(std::size_t idx)
 		{
