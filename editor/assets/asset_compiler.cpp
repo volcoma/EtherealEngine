@@ -186,7 +186,7 @@ void asset_compiler::compile<texture>(const fs::path& absolute_key)
 template<>
 void asset_compiler::compile<mesh>(const fs::path& absolute_key)
 {
-	fs::path output = absolute_key.string() + extensions::get_compiled_format<shader>();
+	fs::path output = absolute_key.string() + extensions::get_compiled_format<mesh>();
 	std::string str_input = absolute_key.string();
 	std::string file = absolute_key.stem().string();
 	fs::path dir = absolute_key.parent_path();
