@@ -21,7 +21,7 @@ class material;
 namespace editor
 {
 	template<typename T>
-	void watch_assets(const fs::path& protocol, const std::string& wildcard, bool reload_async)
+	void watch_assets(const fs::path& protocol, const std::string& wildcard, bool reload_async, bool force_initial_recompile)
 	{
 		auto& am = core::get_subsystem<runtime::asset_manager>();
 		auto& ts = core::get_subsystem<core::task_system>();
@@ -29,7 +29,7 @@ namespace editor
 		const fs::path dir = fs::resolve_protocol(protocol);
 		fs::path watch_dir = dir / wildcard;
 
-		fs::watcher::watch(watch_dir, true, [&am, &ts, protocol, reload_async](const std::vector<fs::watcher::entry>& entries, bool is_initial_list)
+		fs::watcher::watch(watch_dir, true, [&am, &ts, protocol, reload_async, force_initial_recompile](const std::vector<fs::watcher::entry>& entries, bool is_initial_list)
 		{
 			for (auto& entry : entries)
 			{
@@ -108,7 +108,7 @@ namespace editor
 
 							bool compile = true;
 
-							if (is_initial_list)
+							if (is_initial_list && !force_initial_recompile)
 							{
 								fs::path compiled_file = p.string() + extensions::get_compiled_format<T>();
 								fs::error_code err;
@@ -116,8 +116,7 @@ namespace editor
 							}
 
 							if (compile)
-							{
-								
+							{		
 								auto task = ts.push_ready([](const fs::path& p)
 								{
 									asset_compiler::compile<T>(p);
@@ -216,19 +215,19 @@ namespace editor
 	
 		for (const auto& format : extensions::texture)
 		{
-			watch_assets<texture>(relative, wildcard + format, true);
+			watch_assets<texture>(relative, wildcard + format, true, false);
 		}
 		
-		watch_assets<shader>(relative, wildcard + extensions::shader, true);
+		watch_assets<shader>(relative, wildcard + extensions::shader, true, false);
 		
 		for (const auto& format : extensions::mesh)
 		{
-			watch_assets<mesh>(relative, wildcard + format, true);
+			watch_assets<mesh>(relative, wildcard + format, true, false);
 		}
 
-		watch_assets<material>(relative, wildcard + extensions::material, true);
-		watch_assets<prefab>(relative, wildcard + extensions::prefab, true);
-		watch_assets<scene>(relative, wildcard + extensions::scene, true);
+		watch_assets<material>(relative, wildcard + extensions::material, true, false);
+		watch_assets<prefab>(relative, wildcard + extensions::prefab, true, false);
+		watch_assets<scene>(relative, wildcard + extensions::scene, true, false);
 		
 	}
 
@@ -309,8 +308,8 @@ namespace editor
 		save_config();
 		
 		/// for debug purposes
-		watch_assets<shader>("engine_data:/shaders", "*.sc", true);
-		watch_assets<shader>("editor_data:/shaders", "*.sc", true);
+		watch_assets<shader>("engine_data:/shaders", "*.sc", true, true);
+		watch_assets<shader>("editor_data:/shaders", "*.sc", true, true);
 		//watch_assets<texture>("engine_data:/textures", "*.png", true);
 		//watch_assets<texture>("engine_data:/textures", "*.tga", true);
 		//watch_assets<texture>("engine_data:/textures", "*.dds", true);

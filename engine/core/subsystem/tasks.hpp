@@ -58,7 +58,6 @@ namespace core
 	{
 	public:
 		std::shared_future<T> future;
-		std::uint64_t id = 0;		
 	
 		auto get() const -> decltype (future.get())
 		{
@@ -452,7 +451,6 @@ namespace core
 			{
 				task_future<R> result;
 				result.future = _f.get_future().share();
-				result.id = id;
 				return result;
 			}
 
@@ -467,7 +465,6 @@ namespace core
 			}
 
 		private:
-			
 			std::packaged_task <R(Args...)> _f;
 			std::tuple <nonstd::special_decay_t<Args>...> _args;		
 		};
@@ -502,7 +499,6 @@ namespace core
 			{
 				task_future<R> result;
 				result.future = _f.get_future().share();
-				result.id = id;
 				return result;
 			}
 
@@ -763,12 +759,12 @@ namespace core
 			}
 		}
 
-		size_t get_thread_queue_idx(size_t idx, size_t seed = 0)
+		std::size_t get_thread_queue_idx(std::size_t idx, std::size_t seed = 0)
 		{
 			return ((idx + seed) % nthreads_) + 1;
 		}
 
-		size_t get_main_thread_queue_idx()
+		std::size_t get_main_thread_queue_idx()
 		{
 			return 0;
 		}
@@ -1041,34 +1037,55 @@ namespace core
 				p.second();
 		}
 
-		void processing_wait_id_on_main(const std::uint64_t& id)
+		static constexpr std::size_t invalid_index = 77777;
+
+		template<typename T>
+		bool processing_wait(const task_future<T>& task)
 		{
 			std::pair <bool, awaitable_task> p = { false, awaitable_task() };
 
-			const auto queue_index = get_main_thread_queue_idx();
+			const auto this_thread_id = std::this_thread::get_id();
+
+			std::size_t queue_index = invalid_index;
+
+			if (detail::is_main_thread())
+			{
+				queue_index = get_main_thread_queue_idx();
+			}
+			else
+			{
+				for (std::size_t i = 0; i < threads_.size(); ++i)
+				{
+					auto& thread = threads_[i];
+					if (thread.get_id() == this_thread_id)
+					{
+						//thread indices are with one less than
+						//the queues
+						queue_index = i + 1;
+						break;
+					}
+				}
+			}
+			
+			if (queue_index == invalid_index)
+				return false;
 
 			auto& queue = queues_[queue_index];
 
 			while (!queue.is_empty())
 			{
-				p = queue.pop(false);
+				p = queue.pop(!detail::is_main_thread());
 				if (!p.first)
 					continue;
 
 				if (p.first)
-				{
 					p.second();
-				
-					if (p.second.get_id() == id)
-						break;
-				}
-			}
-		}
 
-		template<typename T>
-		void processing_wait_on_main(const task_future<T>& task)
-		{
-			processing_wait_id_on_main(task.id);
+				if (task.is_ready())
+					break;
+			}
+
+			return true;
 		}
 		
 	};
@@ -1078,9 +1095,15 @@ namespace core
 	{
 		if (!is_ready())
 		{
-			if (detail::is_main_thread() && _system)
+			if (_system)
 			{
-				_system->processing_wait_id_on_main(id);
+				if (!_system->processing_wait(*this))
+				{
+					if (future.valid())
+					{
+						future.wait();
+					}
+				}
 			}
 			else if (future.valid())
 			{

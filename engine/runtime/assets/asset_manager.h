@@ -74,7 +74,7 @@ namespace runtime
 		//-----------------------------------------------------------------------------
 		void clear()
 		{
-			std::lock_guard<std::mutex> lock(container_mutex);
+			std::lock_guard<std::recursive_mutex> lock(container_mutex);
 			container.clear();
 		}
 
@@ -88,7 +88,7 @@ namespace runtime
 		//-----------------------------------------------------------------------------
 		void clear(const std::string& protocol)
 		{
-			std::lock_guard<std::mutex> lock(container_mutex);
+			std::lock_guard<std::recursive_mutex> lock(container_mutex);
 			auto container_copy = container;
 			for (const auto& pair : container_copy)
 			{
@@ -125,7 +125,7 @@ namespace runtime
 		request_container_t<T> container;
 
 		/// Mutex
-		std::mutex container_mutex;
+		std::recursive_mutex container_mutex;
 	};
 
 	class asset_manager : public core::subsystem
@@ -251,7 +251,7 @@ namespace runtime
 			auto& storage = get_storage<T>();
 			storage.rename_asset_file(key, new_key);
 		
-			std::lock_guard<std::mutex> lock(storage.container_mutex);
+			std::lock_guard<std::recursive_mutex> lock(storage.container_mutex);
 			auto it = storage.container.find(key);
 			if (it != storage.container.end())
 			{
@@ -268,7 +268,7 @@ namespace runtime
 		{
 			auto& storage = get_storage<T>();
 
-			std::lock_guard<std::mutex> lock(storage.container_mutex);
+			std::lock_guard<std::recursive_mutex> lock(storage.container_mutex);
 			auto it = storage.container.find(key);
 			if (it != storage.container.end())
 			{
@@ -326,12 +326,12 @@ namespace runtime
 			const std::string& key,
 			load_mode mode,
 			load_flags flags,
-			std::mutex& container_mutex,
+			std::recursive_mutex& container_mutex,
 			request_container_t<T>& container,
 			F&& load_func
 		)
 		{
-			std::lock_guard<std::mutex> lock(container_mutex);
+			std::lock_guard<std::recursive_mutex> lock(container_mutex);
 			auto it = container.find(key);
 			if (it != std::end(container))
 			{
@@ -375,12 +375,12 @@ namespace runtime
 			const std::uint32_t& size,
 			load_mode mode,
 			load_flags flags,
-			std::mutex& container_mutex,
+			std::recursive_mutex& container_mutex,
 			request_container_t<T>& container,
 			F&& load_func
 		)
 		{
-			std::lock_guard<std::mutex> lock(container_mutex);
+			std::lock_guard<std::recursive_mutex> lock(container_mutex);
 			auto it = container.find(key);
 			if (it != std::end(container))
 			{
@@ -404,11 +404,11 @@ namespace runtime
 		core::task_future<asset_handle<T>>& load_asset_from_instance_impl(
 			const std::string& key,	
 			std::shared_ptr<T> entry,
-			std::mutex& container_mutex,
+			std::recursive_mutex& container_mutex,
 			request_container_t<T>& container,
 			F&& load_func)
 		{
-			std::lock_guard<std::mutex> lock(container_mutex);
+			std::lock_guard<std::recursive_mutex> lock(container_mutex);
 			auto& future = container[key];
 			//Dispatch the loading
 			future = load_func(key, entry);
@@ -419,11 +419,11 @@ namespace runtime
 		template<typename T>
 		core::task_future<asset_handle<T>> find_asset_impl(
 			const std::string& key,
-			std::mutex& container_mutex,
+			std::recursive_mutex& container_mutex,
 			request_container_t<T>& container
 		)
 		{
-			std::lock_guard<std::mutex> lock(container_mutex);
+			std::lock_guard<std::recursive_mutex> lock(container_mutex);
 			auto it = container.find(key);
 			if (it != container.end())
 			{
