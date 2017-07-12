@@ -332,7 +332,6 @@ namespace runtime
 		)
 		{
 			std::lock_guard<std::mutex> lock(container_mutex);
-			fs::error_code err;
 			auto it = container.find(key);
 			if (it != std::end(container))
 			{

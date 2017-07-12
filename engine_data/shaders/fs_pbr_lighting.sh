@@ -60,7 +60,7 @@ vec4 pbr_light(vec2 texcoord0)
 	float surface_shadow = 1.0f;
 	float subsurface_shadow = 1.0f;
 	float surface_attenuation = (intensity * distance_attenuation * light_radius_mask * spot_falloff) * surface_shadow;
-	float subsurface_attenuation	= (intensity * distance_attenuation * light_radius_mask * spot_falloff) * subsurface_shadow;
+	float subsurface_attenuation = (distance_attenuation * light_radius_mask * spot_falloff) * subsurface_shadow;
 	
 	vec3 energy = AreaLightSpecular(0.0f, 0.0f, normalize(vector_to_light), lobe_roughness, vector_to_light, L, V, N);
 	SurfaceShading surface_lighting = StandardShading(albedo_color, indirect_diffuse, specular_color, indirect_specular, s_tex6, lobe_roughness, energy, data.metalness, data.ambient_occlusion, L, V, N);

@@ -477,6 +477,13 @@ vec3 F_Fresnel( vec3 SpecularColor, float VoH )
 
 // ----------------------------------------------------------------------------
 
+vec3 F_Roughness(vec3 SpecularColor, float Roughness, float VoH)
+{
+	// Sclick using roughness to attenuate fresnel.
+	return (SpecularColor + (max(vec3(1.0f-Roughness, 1.0f-Roughness, 1.0f-Roughness), SpecularColor) - SpecularColor) * pow((1.0f - VoH), 5.0f));
+}
+
+
 vec3 Fresnel( vec3 SpecularColor, float VoH )
 {
 #if   PHYSICAL_SPEC_F == 0
@@ -488,41 +495,6 @@ vec3 Fresnel( vec3 SpecularColor, float VoH )
 #elif PHYSICAL_SPEC_F == 3
 	return F_Fresnel( SpecularColor, VoH );
 #endif
-}
-
-
-vec3 F_Roughness(vec3 SpecularColor, float Roughness, float VoH)
-{
-	// Sclick using roughness to attenuate fresnel.
-	return (SpecularColor + (max(vec3(1.0f-Roughness, 1.0f-Roughness, 1.0f-Roughness), SpecularColor) - SpecularColor) * pow((1.0f - VoH), 5.0f));
-}
-
-vec3 EnvironmentLightingDFG_GGX_Fresnel_SmithSchlickGGX( vec3 SpecularColor, float Roughness, float NoV )
-{
-	float alphaR = Roughness*Roughness;
-    float x = 1.0f - alphaR;
-    float y = NoV;
-
-    float b1 = -0.1688f;
-    float b2 = 1.895f;
-    float b3 = 0.9903f;
-    float b4 = -4.853f;
-    float b5 = 8.404f;
-    float b6 = -5.069f;
-    float bias = saturate( min( b1 * x + b2 * x * x, b3 + b4 * y + b5 * y * y + b6 * y * y * y ) );
-
-    float d0 = 0.6045f;
-    float d1 = 1.699f;
-    float d2 = -0.5228f;
-    float d3 = -3.603f;
-    float d4 = 1.404f;
-    float d5 = 0.1939f;
-    float d6 = 2.661f;
-    float delta = saturate( d0 + d1 * x + d2 * y + d3 * x * x + d4 * x * y + d5 * y * y + d6 * x * x * x );
-    float scale = delta - bias;
-
-    bias *= saturate( 50.0f * SpecularColor.y );
-    return SpecularColor * scale + bias;
 }
 
 struct SurfaceShading
@@ -544,18 +516,18 @@ SurfaceShading StandardShading( vec3 DiffuseColor, vec3 IndirectDiffuse, vec3 Sp
 	float Vis = Visibility( roughness, NoV, NoL, VoH, NoH );
 	vec3 F = Fresnel( SpecularColor, VoH );
 	
-	vec3 Diffuse_Color = Diffuse( DiffuseColor, roughness, NoV, NoL, VoH );
+	vec3 diffuse_color = Diffuse( DiffuseColor, roughness, NoV, NoL, VoH );
 
 	float specular_occlusion = saturate( Square( NoV + occlusion ) - 1.0f + occlusion );
-	vec3 envFresnel = F_Roughness(SpecularColor, roughness, NoV);
-	vec2 envBRDF  = texture2D(BRDFIntegrationMap, vec2(NoV, roughness)).rg;
+	vec3 env_fresnel = F_Roughness(SpecularColor, roughness, NoV);
+	vec2 env_brdf  = texture2D(BRDFIntegrationMap, vec2(NoV, roughness)).xy;
 	//set to 0 otherwise we get artefacts
-	envBRDF.y = 0.0f;
-	vec3 indirectSpec = IndirectSpecular * (envFresnel * envBRDF.x + envBRDF.y) * specular_occlusion;
+	env_brdf.y = 0.0f;
+	vec3 indirect_spec = IndirectSpecular * (env_fresnel * env_brdf.x + env_brdf.y) * specular_occlusion;
 	
 	SurfaceShading shading;
-	shading.indirect = DiffuseColor * IndirectDiffuse + indirectSpec;
-	shading.direct = Diffuse_Color * LobeEnergy[2] + (D * Vis) * F;
+	shading.indirect = DiffuseColor * IndirectDiffuse + indirect_spec;
+	shading.direct = diffuse_color * LobeEnergy[2] + (D * Vis) * F;
 	return shading;
 }
 

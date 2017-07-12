@@ -111,7 +111,7 @@ REFLECT(light)
 		(
 			rttr::metadata("pretty_name", "Intensity"),
 			rttr::metadata("min", 0.0f),
-			rttr::metadata("max", 10.0f)
+			rttr::metadata("max", 20.0f)
 		)
         .property("type", &light::type)
 		(
