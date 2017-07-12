@@ -331,14 +331,12 @@ namespace runtime
 			F&& load_func
 		)
 		{
-			//std::lock_guard<std::mutex> lock(container_mutex);
-			container_mutex.lock();
+			std::lock_guard<std::mutex> lock(container_mutex);
 			fs::error_code err;
 			auto it = container.find(key);
 			if (it != std::end(container))
 			{
 				auto& future = it->second;
-				container_mutex.unlock();
 				if (flags == load_flags::reload && future.is_ready())
 				{
 					asset_handle<T> original = future.get();
@@ -355,7 +353,6 @@ namespace runtime
 			else
 			{
 				auto& future = container[key];
-				container_mutex.unlock();
 				//Dispatch the loading
 				asset_handle<T> original;
 				future = load_func(key, mode, original);
@@ -384,19 +381,17 @@ namespace runtime
 			F&& load_func
 		)
 		{
-			container_mutex.lock();
+			std::lock_guard<std::mutex> lock(container_mutex);
 			auto it = container.find(key);
 			if (it != std::end(container))
 			{
 				// If there is already a loading request.
 				auto& future = it->second;
-				container_mutex.unlock();
 				return future;
 			}
 			else
 			{
 				auto& future = container[key];
-				container_mutex.unlock();
 				//Dispatch the loading
 				future = load_func(key, data, size);
 
@@ -414,9 +409,8 @@ namespace runtime
 			request_container_t<T>& container,
 			F&& load_func)
 		{
-			container_mutex.lock();;
+			std::lock_guard<std::mutex> lock(container_mutex);
 			auto& future = container[key];
-			container_mutex.unlock();
 			//Dispatch the loading
 			future = load_func(key, entry);
 
