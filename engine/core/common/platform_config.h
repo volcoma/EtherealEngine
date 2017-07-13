@@ -103,6 +103,12 @@
 #   define $gelse     $yes
 #endif
 
+#if defined(__MINGW32__)
+#   define $mingw     $yes
+#else
+#   define $mingw     $no
+#endif
+
 #ifdef _MSC_VER
 #   define $msvc      $yes
 #   define $melse     $no

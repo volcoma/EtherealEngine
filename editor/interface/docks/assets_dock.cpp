@@ -581,7 +581,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 
 		gui::Separator();
 
-		if (gui::Selectable("Open In Explorer"))
+        if (gui::Selectable("Open In Environment"))
 		{
 			auto opened_folder_shared = opened_dir.lock();
 			auto dir = opened_folder_shared.get();

@@ -154,7 +154,11 @@ namespace fs
 	}
 	void show_in_graphical_env(const path& _path)
 	{
-
+        static std::string cmd = "xdg-open";
+        static std::string space = " ";
+        const std::string cmd_args = _path.string();
+        const std::string whole_command = cmd + space + cmd_args;
+        system(whole_command.c_str());
 	}
 }
 #else

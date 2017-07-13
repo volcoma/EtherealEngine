@@ -19,11 +19,11 @@ namespace runtime
 {
 	camera get_face_camera(std::uint32_t face,  const math::transform& transform)
 	{
-		camera camera;
-		camera.set_fov(90.0f);
-		camera.set_aspect_ratio(1.0f, true);
-		camera.set_near_clip(0.01f);
-		camera.set_far_clip(256.0f);
+        camera cam;
+        cam.set_fov(90.0f);
+        cam.set_aspect_ratio(1.0f, true);
+        cam.set_near_clip(0.01f);
+        cam.set_far_clip(256.0f);
 
 
 		// Configurable axis vectors used to construct view matrices. In the 
@@ -75,14 +75,14 @@ namespace runtime
 		
 		t = transform * t;
 		// First update so the camera can cache the previous matrices
-		camera.record_current_matrices();
+        cam.record_current_matrices();
 		// Set new transform
-		camera.look_at(t.get_position(), t.get_position() + t.z_unit_axis(), t.y_unit_axis());
+        cam.look_at(t.get_position(), t.get_position() + t.z_unit_axis(), t.y_unit_axis());
 
-		return camera;
+        return cam;
 	}
 
-	void update_lod_data(lod_data& lod_data, std::size_t total_lods, float min_dist, float max_dist, float transition_time, float distance, float dt)
+    void update_lod_data(lod_data& data, std::size_t total_lods, float min_dist, float max_dist, float transition_time, float distance, float dt)
 	{
         if (total_lods <= 1)
 			return;
@@ -91,16 +91,16 @@ namespace runtime
 
 		const float factor = 1.0f - math::clamp((max_dist - distance) / (max_dist - min_dist), 0.0f, 1.0f);
 		const int lod = (int)math::lerp(0.0f, static_cast<float>(total_lods), factor);
-		if (lod_data.target_lod_index != lod && lod_data.target_lod_index == lod_data.current_lod_index)
-			lod_data.target_lod_index = lod;
+        if (data.target_lod_index != lod && data.target_lod_index == data.current_lod_index)
+            data.target_lod_index = lod;
 
-		if (lod_data.current_lod_index != lod_data.target_lod_index)
-			lod_data.current_time += dt;
+        if (data.current_lod_index != data.target_lod_index)
+            data.current_time += dt;
 
-		if (lod_data.current_time >= transition_time)
+        if (data.current_time >= transition_time)
 		{
-			lod_data.current_lod_index = lod_data.target_lod_index;
-			lod_data.current_time = 0.0f;
+            data.current_lod_index = data.target_lod_index;
+            data.current_time = 0.0f;
 		}
 	}
 

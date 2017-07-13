@@ -12,12 +12,11 @@ struct GfxCallback : public gfx::CallbackI
 	{
 	}
 
-	virtual void traceVargs(const char* _filePath, std::uint16_t _line, const char* _format, std::va_list _argList)
+    virtual void traceVargs(const char* /*_filePath*/, std::uint16_t /*_line*/, const char* /*_format*/, std::va_list /*_argList*/)
 	{
-		//APPLOG_TRACE(string_utils::format(_format, _argList).c_str());
 	}
 
-	virtual void fatal(gfx::Fatal::Enum _code, const char* _str)
+    virtual void fatal(gfx::Fatal::Enum /*_code*/, const char* _str)
 	{
 		APPLOG_ERROR(_str);
 	}
@@ -36,7 +35,7 @@ struct GfxCallback : public gfx::CallbackI
 	{
 	}
 
-	virtual void screenShot(const char* _filePath, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _data, uint32_t _size, bool _yflip)
+    virtual void screenShot(const char* /*_filePath*/, uint32_t /*_width*/, uint32_t /*_height*/, uint32_t /*_pitch*/, const void* /*_data*/, uint32_t /*_size*/, bool /*_yflip*/)
 	{
 	}
 
@@ -72,19 +71,23 @@ namespace runtime
 
 	bool renderer::init_backend(mml::window& main_window)
 	{
+        static GfxCallback callback;
+
 		gfx::PlatformData pd
 		{
-			(void*)(uintptr_t)main_window.get_system_handle_specific(),
-            (void*)(uintptr_t)main_window.get_system_handle(),
+            reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(main_window.get_system_handle_specific())),
+            reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(main_window.get_system_handle())),
 			nullptr,
 			nullptr,
-			nullptr
+            nullptr,
+            nullptr,
 		};
 
 		gfx::setPlatformData(pd);
 
-		static GfxCallback callback;
-		if (!gfx::init(gfx::RendererType::Count, 0, 0, &callback))
+        // auto detect
+        const auto preferred_renderer_type = gfx::RendererType::Count;
+        if (!gfx::init(preferred_renderer_type, 0, 0, &callback))
 			return false;
 
 		if (gfx::getRendererType() == gfx::RendererType::Direct3D9)
@@ -98,6 +101,7 @@ namespace runtime
 	void renderer::frame_end(std::chrono::duration<float>)
 	{
 		_render_frame = gfx::frame();
+
 		render_pass::reset();
 	}
 

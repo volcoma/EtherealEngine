@@ -58,7 +58,9 @@ void render_window::prepare_surface()
 	}
 	else
 	{
-        _surface->populate((void*)(uintptr_t)get_system_handle(), size[0], size[1]);
+        _surface->populate(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(get_system_handle())),
+        static_cast<std::uint16_t>(size[0]),
+        static_cast<std::uint16_t>(size[1]));
 	}
 
 }
