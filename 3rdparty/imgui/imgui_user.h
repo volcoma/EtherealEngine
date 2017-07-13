@@ -16,11 +16,4 @@ namespace ImGui
 	IMGUI_API void LabelTextEx(const char* label, const char* fmt, ...);
 	IMGUI_API void LabelTextExV(const char* label, const char* fmt, va_list args);
 
-	IMGUI_API void PushUserMaxLabelSize(const ImVec2& size);
-	IMGUI_API void PopUserMaxLabelSize();
-	IMGUI_API void PushUserLabelIsLeft(bool left);
-	IMGUI_API void PopUserLabelIsLeft();
-	IMGUI_API bool ComboBoxUser(const char* label, int* current_item, const char** items, int items_count, int height_in_items = -1);
-	IMGUI_API bool InputTextUser(const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags = 0, ImGuiTextEditCallback callback = nullptr, void* user_data = nullptr);
-
 }

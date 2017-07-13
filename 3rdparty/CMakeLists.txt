@@ -28,3 +28,6 @@ add_subdirectory_ex(glm)
 target_include_directories (glm_static PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/glm)
 
 add_subdirectory_ex(spdlog)
+
+add_subdirectory_ex(imgui)
+target_include_directories (imgui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

@@ -1,5 +1,6 @@
 #pragma once
 #include "core/subsystem/subsystem.h"
+#include "core/math/math_includes.h"
 #include "../interface/docks/imguidock.h"
 #include "../interface/gizmos/imguizmo.h"
 #include "runtime/ecs/ecs.h"

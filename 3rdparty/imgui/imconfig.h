@@ -41,33 +41,6 @@
         operator MyVec4() const { return MyVec4(x,y,z,w); }
 */
 
-#include "core/math/math_includes.h"
-#define IM_VEC2_CLASS_EXTRA                                             \
-    template <typename T>                                               \
-    ImVec2(const math::tvec2<T>& v) {                                   \
-        x = static_cast<float>(v.x);                                    \
-        y = static_cast<float>(v.y);                                    \
-    }                                                                   \
-                                                                        \
-    template <typename T>                                               \
-    operator math::tvec2<T>() const {                                   \
-        return math::tvec2<T>(x, y);                                    \
-    }
-
-#define IM_VEC4_CLASS_EXTRA                                             \
-    template <typename T>                                               \
-    ImVec4(const math::tvec4<T>& v) {                                   \
-        x = static_cast<float>(v.x);                                    \
-        y = static_cast<float>(v.y);                                    \
-		z = static_cast<float>(v.z);                                    \
-        w = static_cast<float>(v.w);                                    \
-    }                                                                   \
-                                                                        \
-    template <typename T>                                               \
-    operator math::tvec4<T>() const {                                   \
-        return math::tvec4<T>(x, y, z, w);                              \
-    }
-
 //---- Tip: You can add extra functions within the ImGui:: namespace, here or in your own headers files.
 //---- e.g. create variants of the ImGui::Value() helper for your low-level math types, or your own widgets/helpers.
 /*
