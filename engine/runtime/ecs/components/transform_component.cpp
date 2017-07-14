@@ -44,8 +44,7 @@ transform_component::~transform_component()
 {
 	if (!_parent.expired())
 	{
-		if (get_entity())
-			_parent.lock()->remove_child(handle());
+		_parent.lock()->cleanup_dead_children();
 	}
 	for (auto& child : _children)
 	{
@@ -552,8 +551,19 @@ void transform_component::attach_child(runtime::chandle<transform_component> chi
 void transform_component::remove_child(runtime::chandle<transform_component> child)
 {
 	_children.erase(std::remove_if(std::begin(_children), std::end(_children),
-		[&child](runtime::chandle<transform_component> other) { return child.lock() == other.lock(); }
-	), std::end(_children));
+    [&child](runtime::chandle<transform_component> other)
+    {
+        return child.lock() == other.lock();
+    }), std::end(_children));
+}
+
+void transform_component::cleanup_dead_children()
+{
+    _children.erase(std::remove_if(std::begin(_children), std::end(_children),
+    [](runtime::chandle<transform_component> other)
+    {
+        return other.expired();
+    }), std::end(_children));
 }
 
 transform_component& transform_component::set_transform(const math::transform & tr)
