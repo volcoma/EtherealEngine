@@ -104,7 +104,7 @@ namespace bx
 	inline HandleAlloc* createHandleAlloc(AllocatorI* _allocator, uint16_t _maxHandles)
 	{
 		uint8_t* ptr = (uint8_t*)BX_ALLOC(_allocator, sizeof(HandleAlloc) + 2*_maxHandles*sizeof(uint16_t) );
-		return ::new (ptr) HandleAlloc(_maxHandles);
+		return BX_PLACEMENT_NEW(ptr, HandleAlloc)(_maxHandles);
 	}
 
 	inline void destroyHandleAlloc(AllocatorI* _allocator, HandleAlloc* _handleAlloc)

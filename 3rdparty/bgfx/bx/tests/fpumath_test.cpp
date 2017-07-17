@@ -4,7 +4,7 @@
  */
 
 #include "test.h"
-#include <bx/fpumath.h>
+#include <bx/math.h>
 
 #if !BX_COMPILER_MSVC || BX_COMPILER_MSVC >= 1800
 #include <cmath>

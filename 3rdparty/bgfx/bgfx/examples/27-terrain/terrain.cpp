@@ -10,7 +10,10 @@
 #include "bounds.h"
 #include <bx/allocator.h>
 #include <bx/debug.h>
-#include <bx/fpumath.h>
+#include <bx/math.h>
+
+namespace
+{
 
 static const uint16_t s_terrainSize = 256;
 
@@ -58,13 +61,19 @@ struct BrushData
 
 class ExampleTerrain : public entry::AppI
 {
-	void init(int _argc, char** _argv) BX_OVERRIDE
+public:
+	ExampleTerrain(const char* _name, const char* _description)
+		: entry::AppI(_name, _description)
+	{
+	}
+
+	void init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height) override
 	{
 		Args args(_argc, _argv);
 
-		m_width  = 1280;
-		m_height = 720;
-		m_debug  = BGFX_DEBUG_TEXT;
+		m_width  = _width;
+		m_height = _height;
+		m_debug  = BGFX_DEBUG_NONE;
 		m_reset  = BGFX_RESET_VSYNC;
 
 		bgfx::init(args.m_type, args.m_pciId);
@@ -126,7 +135,7 @@ class ExampleTerrain : public entry::AppI
 		cameraSetVerticalAngle(-bx::kPi/4.0f);
 	}
 
-	virtual int shutdown() BX_OVERRIDE
+	virtual int shutdown() override
 	{
 		// Cleanup.
 		cameraDestroy();
@@ -310,7 +319,7 @@ class ExampleTerrain : public entry::AppI
 				float brushAttn = m_brush.m_size - bx::fsqrt(a2 + b2);
 
 				// Raise/Lower and scale by brush power.
-				height += (bx::fclamp(brushAttn * m_brush.m_power, 0.0, m_brush.m_power) * m_brush.m_raise)
+				height += 0.0f < bx::fclamp(brushAttn*m_brush.m_power, 0.0f, m_brush.m_power) && m_brush.m_raise
 					?  1.0f
 					: -1.0f
 					;
@@ -372,7 +381,7 @@ class ExampleTerrain : public entry::AppI
 		}
 	}
 
-	bool update() BX_OVERRIDE
+	bool update() override
 	{
 		if (!entry::processEvents(m_width, m_height, m_debug, m_reset, &m_mouseState) )
 		{
@@ -381,14 +390,7 @@ class ExampleTerrain : public entry::AppI
 			const int64_t frameTime = now - last;
 			last = now;
 			const double freq = double(bx::getHPFrequency() );
-			const double toMs = 1000.0/freq;
 			const float deltaTime = float(frameTime/freq);
-
-			// Use m_debug font to print information about this example.
-			bgfx::dbgTextClear();
-			bgfx::dbgTextPrintf(0, 1, 0x4f, "bgfx/examples/27-terrain");
-			bgfx::dbgTextPrintf(0, 2, 0x6f, "Description: Terrain painting example.");
-			bgfx::dbgTextPrintf(0, 3, 0x0f, "Frame: % 7.3f[ms]", double(frameTime)*toMs);
 
 			imguiBeginFrame(m_mouseState.m_mx
 				,  m_mouseState.m_my
@@ -400,11 +402,15 @@ class ExampleTerrain : public entry::AppI
 				, uint16_t(m_height)
 				);
 
-			ImGui::SetNextWindowPos(ImVec2((float)m_width - (float)m_width / 5.0f - 10.0f, 10.0f) );
-			ImGui::SetNextWindowSize(ImVec2((float)m_width / 5.0f, (float)m_height / 3.0f) );
+			showExampleDialog(this);
+
+			ImGui::SetNextWindowPos(
+				  ImVec2(m_width - m_width / 5.0f - 10.0f, 10.0f)
+				, ImGuiSetCond_FirstUseEver
+				);
 			ImGui::Begin("Settings"
 				, NULL
-				, ImVec2((float)m_width / 5.0f, (float)m_height / 3.0f)
+				, ImVec2(m_width / 5.0f, m_height / 3.0f)
 				, ImGuiWindowFlags_AlwaysAutoResize
 				);
 
@@ -512,4 +518,6 @@ class ExampleTerrain : public entry::AppI
 	int64_t m_timeOffset;
 };
 
-ENTRY_IMPLEMENT_MAIN(ExampleTerrain);
+} // namespace
+
+ENTRY_IMPLEMENT_MAIN(ExampleTerrain, "27-terrain", "Terrain painting example.");

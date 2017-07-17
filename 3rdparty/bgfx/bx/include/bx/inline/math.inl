@@ -380,6 +380,30 @@ namespace bx
 		bx::vec3Cross(_b, _n, _t);
 	}
 
+	inline void vec3FromLatLong(float* _vec, float _u, float _v)
+	{
+		const float phi   = _u * bx::kPi2;
+		const float theta = _v * bx::kPi;
+
+		const float st = bx::fsin(theta);
+		const float sp = bx::fsin(phi);
+		const float ct = bx::fcos(theta);
+		const float cp = bx::fcos(phi);
+
+		_vec[0] = -st*sp;
+		_vec[1] = ct;
+		_vec[2] = -st*cp;
+	}
+
+	inline void vec3ToLatLong(float* _u, float* _v, const float* _vec)
+	{
+		const float phi   = bx::fatan2(_vec[0], _vec[2]);
+		const float theta = bx::facos(_vec[1]);
+
+		*_u = (bx::kPi + phi)*bx::kInvPi*0.5f;
+		*_v = theta*bx::kInvPi;
+	}
+
 	inline void quatIdentity(float* _result)
 	{
 		_result[0] = 0.0f;

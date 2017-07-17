@@ -18,11 +18,19 @@ namespace stl = tinystl;
 #include <bx/allocator.h>
 #include <bx/hash.h>
 #include <bx/simd_t.h>
-#include <bx/fpumath.h>
-#include <bx/crtimpl.h>
+#include <bx/math.h>
+#include <bx/file.h>
 #include "entry/entry.h"
 #include "camera.h"
 #include "imgui/imgui.h"
+
+namespace bgfx
+{
+	int32_t read(bx::ReaderI* _reader, bgfx::VertexDecl& _decl, bx::Error* _err = NULL);
+}
+
+namespace
+{
 
 #define SV_USE_SIMD 1
 #define MAX_INSTANCE_COUNT 25
@@ -516,7 +524,7 @@ static RenderState s_renderStates[RenderState::Count]  =
 
 struct ViewState
 {
-	ViewState(uint32_t _width = 1280, uint32_t _height = 720)
+	ViewState(uint32_t _width = 0, uint32_t _height = 0)
 		: m_width(_width)
 		, m_height(_height)
 	{
@@ -955,11 +963,6 @@ struct Group
 };
 
 typedef std::vector<Group> GroupArray;
-
-namespace bgfx
-{
-	int32_t read(bx::ReaderI* _reader, bgfx::VertexDecl& _decl, bx::Error* _err = NULL);
-}
 
 struct Mesh
 {
@@ -1866,14 +1869,20 @@ enum Scene
 
 class ExampleShadowVolumes : public entry::AppI
 {
-	void init(int _argc, char** _argv) BX_OVERRIDE
+public:
+	ExampleShadowVolumes(const char* _name, const char* _description)
+		: entry::AppI(_name, _description)
+	{
+	}
+
+	void init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height) override
 	{
 		Args args(_argc, _argv);
 
-		m_viewState = ViewState(1280, 720);
+		m_viewState   = ViewState(_width, _height);
 		m_clearValues = { 0x00000000, 1.0f, 0 };
 
-		m_debug = BGFX_DEBUG_TEXT;
+		m_debug = BGFX_DEBUG_NONE;
 		m_reset = BGFX_RESET_VSYNC;
 
 		bgfx::init(args.m_type, args.m_pciId);
@@ -2032,7 +2041,7 @@ class ExampleShadowVolumes : public entry::AppI
 		cameraGetViewMtx(m_viewState.m_view);
 	}
 
-	virtual int shutdown() BX_OVERRIDE
+	virtual int shutdown() override
 	{
 		// Cleanup
 		m_bunnyLowPolyModel.unload();
@@ -2080,7 +2089,7 @@ class ExampleShadowVolumes : public entry::AppI
 		return 0;
 	}
 
-	bool update() BX_OVERRIDE
+	bool update() override
 	{
 		if (!entry::processEvents(m_viewState.m_width, m_viewState.m_height, m_debug, m_reset, &m_mouseState) )
 		{
@@ -2152,6 +2161,8 @@ class ExampleShadowVolumes : public entry::AppI
 				, uint16_t(m_viewState.m_width)
 				, uint16_t(m_viewState.m_height)
 				);
+
+			showExampleDialog(this);
 
 			ImGui::SetNextWindowPos(ImVec2(m_viewState.m_width - 256.0f, 10.0f) );
 			ImGui::Begin("Settings"
@@ -2315,12 +2326,6 @@ class ExampleShadowVolumes : public entry::AppI
 					lightPosRadius[ii][3] = 20.0f;
 				}
 			}
-
-			//use debug font to print information about this example.
-			bgfx::dbgTextClear();
-			bgfx::dbgTextPrintf(0, 1, 0x4f, "bgfx/examples/14-shadowvolumes");
-			bgfx::dbgTextPrintf(0, 2, 0x6f, "Description: Shadow volumes.");
-			bgfx::dbgTextPrintf(0, 3, 0x0f, "Frame: % 7.3f[ms]", double(frameTime)*toMs);
 
 			if (m_showHelp)
 			{
@@ -2930,4 +2935,6 @@ class ExampleShadowVolumes : public entry::AppI
 	entry::MouseState m_mouseState;
 };
 
-ENTRY_IMPLEMENT_MAIN(ExampleShadowVolumes);
+} // namespace
+
+ENTRY_IMPLEMENT_MAIN(ExampleShadowVolumes, "14-shadowvolumes", "Shadow volumes.");

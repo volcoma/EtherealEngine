@@ -8,10 +8,9 @@
 #include "debugdraw.h"
 #include "packrect.h"
 
-#include <bx/fpumath.h>
+#include <bx/math.h>
 #include <bx/sort.h>
 #include <bx/uint32_t.h>
-#include <bx/crtimpl.h>
 #include <bx/handlealloc.h>
 
 /// Returns true if both internal transient index and vertex buffer have

@@ -11,7 +11,7 @@
 include( CMakeParseArguments )
 
 
-add_library( texturec ${BIMG_DIR}/tools/texturec/texturec.cpp ${BIMG_DIR}/tools/texturec/texturec.h )
+add_executable( texturec ${BIMG_DIR}/tools/texturec/texturec.cpp )
 target_compile_definitions( texturec PRIVATE "-D_CRT_SECURE_NO_WARNINGS" )
 set_target_properties( texturec PROPERTIES FOLDER "bgfx/tools" )
 target_link_libraries( texturec PUBLIC bx bimg)

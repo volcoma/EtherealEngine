@@ -12,11 +12,19 @@
 
 #include <bgfx/bgfx.h>
 #include <bx/timer.h>
-#include <bx/fpumath.h>
-#include <bx/crtimpl.h>
+#include <bx/math.h>
+#include <bx/file.h>
 #include "entry/entry.h"
 #include "camera.h"
 #include "imgui/imgui.h"
+
+namespace bgfx
+{
+	int32_t read(bx::ReaderI* _reader, bgfx::VertexDecl& _decl, bx::Error* _err = NULL);
+}
+
+namespace
+{
 
 #define RENDERVIEW_SHADOWMAP_0_ID 1
 #define RENDERVIEW_SHADOWMAP_1_ID 2
@@ -802,11 +810,6 @@ struct Group
 	PrimitiveArray m_prims;
 };
 
-namespace bgfx
-{
-	int32_t read(bx::ReaderI* _reader, bgfx::VertexDecl& _decl, bx::Error* _err = NULL);
-}
-
 struct Mesh
 {
 	void load(const void* _vertices, uint32_t _numVertices, const bgfx::VertexDecl _decl, const uint16_t* _indices, uint32_t _numIndices)
@@ -1059,12 +1062,12 @@ void screenSpaceQuad(float _textureWidth, float _textureHeight, bool _originBott
 }
 
 void worldSpaceFrustumCorners(float* _corners24f
-		, float _near
-		, float _far
-		, float _projWidth
-		, float _projHeight
-		, const float* __restrict _invViewMtx
-		)
+	, float _near
+	, float _far
+	, float _projWidth
+	, float _projHeight
+	, const float* __restrict _invViewMtx
+	)
 {
 	// Define frustum corners in view space.
 	const float nw = _near * _projWidth;
@@ -1278,18 +1281,24 @@ struct SceneSettings
 	bool m_stabilize;
 };
 
-
-
 class ExampleShadowmaps : public entry::AppI
 {
-	void init(int _argc, char** _argv) BX_OVERRIDE
+public:
+	ExampleShadowmaps(const char* _name, const char* _description)
+		: entry::AppI(_name, _description)
+	{
+	}
+
+	void init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height) override
 	{
 		Args args(_argc, _argv);
 
-		m_debug = BGFX_DEBUG_TEXT;
+		m_debug = BGFX_DEBUG_NONE;
 		m_reset = BGFX_RESET_VSYNC;
 
-		m_viewState = ViewState(1280, 720);
+		m_width  = _width;
+		m_height = _height;
+		m_viewState = ViewState(uint16_t(m_width), uint16_t(m_height));
 		m_clearValues = ClearValues(0x00000000, 1.0f, 0);
 
 		bgfx::init(args.m_type, args.m_pciId);
@@ -1332,10 +1341,10 @@ class ExampleShadowmaps : public entry::AppI
 		// Vertex declarations.
 		bgfx::VertexDecl PosNormalTexcoordDecl;
 		PosNormalTexcoordDecl.begin()
-		.add(bgfx::Attrib::Position,  3, bgfx::AttribType::Float)
-		.add(bgfx::Attrib::Normal,    4, bgfx::AttribType::Uint8, true, true)
-		.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
-		.end();
+			.add(bgfx::Attrib::Position,  3, bgfx::AttribType::Float)
+			.add(bgfx::Attrib::Normal,    4, bgfx::AttribType::Uint8, true, true)
+			.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+			.end();
 
 		m_posDecl.begin();
 		m_posDecl.add(bgfx::Attrib::Position,  3, bgfx::AttribType::Float);
@@ -1896,7 +1905,7 @@ class ExampleShadowmaps : public entry::AppI
 		m_timeAccumulatorScene = 0.0f;
 	}
 
-	virtual int shutdown() BX_OVERRIDE
+	virtual int shutdown() override
 	{
 		m_bunnyMesh.unload();
 		m_treeMesh.unload();
@@ -1934,7 +1943,7 @@ class ExampleShadowmaps : public entry::AppI
 		return 0;
 	}
 
-	bool update() BX_OVERRIDE
+	bool update() override
 	{
 		if (!entry::processEvents(m_width, m_height, m_debug, m_reset, &m_mouseState) )
 		{
@@ -1971,21 +1980,30 @@ class ExampleShadowmaps : public entry::AppI
 							, m_viewState.m_height
 							);
 
-			ImGui::SetNextWindowPos(ImVec2(float(m_viewState.m_width) - 300.0f - 10.0f, 10.0f) );
+			showExampleDialog(this);
+
+			ImGui::SetNextWindowPos(
+				  ImVec2(m_viewState.m_width - m_viewState.m_width / 5.0f - 10.0f, 10.0f)
+				, ImGuiSetCond_FirstUseEver
+				);
 			ImGui::Begin("Settings"
-						 , NULL
-						 , ImVec2(300.0f, 660.0f)
-						 , ImGuiWindowFlags_AlwaysAutoResize
-						 );
+				, NULL
+				, ImVec2(m_viewState.m_width / 5.0f, m_viewState.m_height - 20.0f)
+				, ImGuiWindowFlags_AlwaysAutoResize
+				);
 
 #define IMGUI_FLOAT_SLIDER(_name, _val) \
-ImGui::SliderFloat(_name \
-, &_val \
-, *( ((float*)&_val)+1) \
-, *( ((float*)&_val)+2) \
-)
-#define IMGUI_RADIO_BUTTON(_name, _var, _val) \
-if ( ImGui::RadioButton(_name, _var == _val )) _var = _val;
+	ImGui::SliderFloat(_name            \
+			, &_val                     \
+			, *( ((float*)&_val)+1)     \
+			, *( ((float*)&_val)+2)     \
+			)
+
+#define IMGUI_RADIO_BUTTON(_name, _var, _val)     \
+	if (ImGui::RadioButton(_name, _var == _val) ) \
+	{                                             \
+		_var = _val;                              \
+	}
 
 			ImGui::Checkbox("Update lights", &m_settings.m_updateLights);
 			ImGui::Checkbox("Update scene", &m_settings.m_updateScene);
@@ -2066,12 +2084,15 @@ if ( ImGui::RadioButton(_name, _var == _val )) _var = _val;
 			ImGui::End();
 #undef IMGUI_RADIO_BUTTON
 
-			ImGui::SetNextWindowPos(ImVec2(10,70) );
+			ImGui::SetNextWindowPos(
+				  ImVec2(10.0f, 260.0f)
+				, ImGuiSetCond_FirstUseEver
+				);
 			ImGui::Begin("Light"
-						 , NULL
-						 , ImVec2(330, 334)
-						 , ImGuiWindowFlags_AlwaysAutoResize
-						 );
+				, NULL
+				, ImVec2(m_viewState.m_width / 5.0f, 350.0f)
+				, ImGuiWindowFlags_AlwaysAutoResize
+				);
 			ImGui::PushItemWidth(185.0f);
 
 			bool bLtChanged = false;
@@ -2160,14 +2181,7 @@ if ( ImGui::RadioButton(_name, _var == _val )) _var = _val;
 			const int64_t frameTime = now - last;
 			last = now;
 			const double freq = double(bx::getHPFrequency() );
-			const double toMs = 1000.0/freq;
 			const float deltaTime = float(frameTime/freq);
-
-			// Use debug font to print information about this example.
-			bgfx::dbgTextClear();
-			bgfx::dbgTextPrintf(0, 1, 0x4f, "bgfx/examples/16-shadowmaps");
-			bgfx::dbgTextPrintf(0, 2, 0x6f, "Description: Shadow maps example.");
-			bgfx::dbgTextPrintf(0, 3, 0x0f, "Frame: % 7.3f[ms]", double(frameTime)*toMs);
 
 			// Update camera.
 			cameraUpdate(deltaTime, m_mouseState);
@@ -3234,4 +3248,6 @@ if ( ImGui::RadioButton(_name, _var == _val )) _var = _val;
 	float m_timeAccumulatorScene;
 };
 
-ENTRY_IMPLEMENT_MAIN(ExampleShadowmaps);
+} // namespace
+
+ENTRY_IMPLEMENT_MAIN(ExampleShadowmaps, "16-shadowmaps", "Shadow maps example.");

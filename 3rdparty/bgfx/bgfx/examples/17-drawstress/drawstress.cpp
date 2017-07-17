@@ -15,6 +15,9 @@
 #include "vs_drawstress.bin.h"
 #include "fs_drawstress.bin.h"
 
+namespace
+{
+
 static const bgfx::EmbeddedShader s_embeddedShaders[] =
 {
 	BGFX_EMBEDDED_SHADER(vs_drawstress),
@@ -82,13 +85,19 @@ static const int64_t lowwm  = 1000000/57;
 
 class ExampleDrawStress : public entry::AppI
 {
-	void init(int _argc, char** _argv) BX_OVERRIDE
+public:
+	ExampleDrawStress(const char* _name, const char* _description)
+		: entry::AppI(_name, _description)
+	{
+	}
+
+	void init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height) override
 	{
 		Args args(_argc, _argv);
 
-		m_width  = 1280;
-		m_height = 720;
-		m_debug  = BGFX_DEBUG_TEXT;
+		m_width  = _width;
+		m_height = _height;
+		m_debug  = BGFX_DEBUG_NONE;
 		m_reset  = BGFX_RESET_NONE;
 
 		m_autoAdjust = true;
@@ -145,7 +154,7 @@ class ExampleDrawStress : public entry::AppI
 		imguiCreate();
 	}
 
-	int shutdown() BX_OVERRIDE
+	int shutdown() override
 	{
 		// Cleanup.
 		imguiDestroy();
@@ -159,7 +168,7 @@ class ExampleDrawStress : public entry::AppI
 		return 0;
 	}
 
-	bool update() BX_OVERRIDE
+	bool update() override
 	{
 		if (!entry::processEvents(m_width, m_height, m_debug, m_reset, &m_mouseState) )
 		{
@@ -209,6 +218,8 @@ class ExampleDrawStress : public entry::AppI
 				, uint16_t(m_height)
 				);
 
+			showExampleDialog(this);
+
 			ImGui::SetNextWindowPos(ImVec2((float)m_width - (float)m_width / 4.0f - 10.0f, 10.0f) );
 			ImGui::SetNextWindowSize(ImVec2((float)m_width / 4.0f, (float)m_height / 2.0f) );
 			ImGui::Begin("Settings"
@@ -257,12 +268,6 @@ class ExampleDrawStress : public entry::AppI
 			// This dummy draw call is here to make sure that view 0 is cleared
 			// if no other draw calls are submitted to view 0.
 			bgfx::touch(0);
-
-			// Use debug font to print information about this example.
-			bgfx::dbgTextClear();
-			bgfx::dbgTextPrintf(0, 1, 0x4f, "bgfx/examples/17-drawstress");
-			bgfx::dbgTextPrintf(0, 2, 0x6f, "Description: Draw stress, maximizing number of draw calls.");
-			bgfx::dbgTextPrintf(0, 3, 0x0f, "Frame: %7.3f[ms]", double(frameTime)*toMs);
 
 			float mtxS[16];
 			const float scale = 0 == m_transform ? 0.25f : 0.0f;
@@ -340,4 +345,6 @@ class ExampleDrawStress : public entry::AppI
 	bgfx::IndexBufferHandle  m_ibh;
 };
 
-ENTRY_IMPLEMENT_MAIN(ExampleDrawStress);
+} // namespace
+
+ENTRY_IMPLEMENT_MAIN(ExampleDrawStress, "17-drawstress", "Draw stress, maximizing number of draw calls.");

@@ -7,7 +7,7 @@
 #define BX_SIMD_T_H_HEADER_GUARD
 
 #include "bx.h"
-#include "fpumath.h"
+#include "math.h"
 
 #define BX_SIMD_FORCE_INLINE BX_FORCE_INLINE
 #define BX_SIMD_INLINE inline

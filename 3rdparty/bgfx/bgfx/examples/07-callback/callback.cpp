@@ -5,14 +5,18 @@
 
 #include "common.h"
 #include "bgfx_utils.h"
+#include "imgui/imgui.h"
 
 #include <bx/allocator.h>
+#include <bx/file.h>
 #include <bx/string.h>
-#include <bx/crtimpl.h>
 
 #include "aviwriter.h"
 
 #include <inttypes.h>
+
+namespace
+{
 
 struct PosColorVertex
 {
@@ -123,7 +127,7 @@ struct BgfxCallback : public bgfx::CallbackI
 	{
 	}
 
-	virtual void fatal(bgfx::Fatal::Enum _code, const char* _str) BX_OVERRIDE
+	virtual void fatal(bgfx::Fatal::Enum _code, const char* _str) override
 	{
 		// Something unexpected happened, inform user and bail out.
 		bx::debugPrintf("Fatal error: 0x%08x: %s", _code, _str);
@@ -132,13 +136,13 @@ struct BgfxCallback : public bgfx::CallbackI
 		abort();
 	}
 
-	virtual void traceVargs(const char* _filePath, uint16_t _line, const char* _format, va_list _argList) BX_OVERRIDE
+	virtual void traceVargs(const char* _filePath, uint16_t _line, const char* _format, va_list _argList) override
 	{
 		bx::debugPrintf("%s (%d): ", _filePath, _line);
 		bx::debugPrintfVargs(_format, _argList);
 	}
 
-	virtual uint32_t cacheReadSize(uint64_t _id) BX_OVERRIDE
+	virtual uint32_t cacheReadSize(uint64_t _id) override
 	{
 		char filePath[256];
 		bx::snprintf(filePath, sizeof(filePath), "temp/%016" PRIx64, _id);
@@ -158,7 +162,7 @@ struct BgfxCallback : public bgfx::CallbackI
 		return 0;
 	}
 
-	virtual bool cacheRead(uint64_t _id, void* _data, uint32_t _size) BX_OVERRIDE
+	virtual bool cacheRead(uint64_t _id, void* _data, uint32_t _size) override
 	{
 		char filePath[256];
 		bx::snprintf(filePath, sizeof(filePath), "temp/%016" PRIx64, _id);
@@ -180,7 +184,7 @@ struct BgfxCallback : public bgfx::CallbackI
 		return false;
 	}
 
-	virtual void cacheWrite(uint64_t _id, const void* _data, uint32_t _size) BX_OVERRIDE
+	virtual void cacheWrite(uint64_t _id, const void* _data, uint32_t _size) override
 	{
 		char filePath[256];
 		bx::snprintf(filePath, sizeof(filePath), "temp/%016" PRIx64, _id);
@@ -196,7 +200,7 @@ struct BgfxCallback : public bgfx::CallbackI
 		}
 	}
 
-	virtual void screenShot(const char* _filePath, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _data, uint32_t /*_size*/, bool _yflip) BX_OVERRIDE
+	virtual void screenShot(const char* _filePath, uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _data, uint32_t /*_size*/, bool _yflip) override
 	{
 		char temp[1024];
 
@@ -205,7 +209,7 @@ struct BgfxCallback : public bgfx::CallbackI
 		saveTga(temp, _width, _height, _pitch, _data, false, _yflip);
 	}
 
-	virtual void captureBegin(uint32_t _width, uint32_t _height, uint32_t /*_pitch*/, bgfx::TextureFormat::Enum /*_format*/, bool _yflip) BX_OVERRIDE
+	virtual void captureBegin(uint32_t _width, uint32_t _height, uint32_t /*_pitch*/, bgfx::TextureFormat::Enum /*_format*/, bool _yflip) override
 	{
 		m_writer = BX_NEW(entry::getAllocator(), AviWriter)(entry::getFileWriter() );
 		if (!m_writer->open("temp/capture.avi", _width, _height, 60, _yflip) )
@@ -215,7 +219,7 @@ struct BgfxCallback : public bgfx::CallbackI
 		}
 	}
 
-	virtual void captureEnd() BX_OVERRIDE
+	virtual void captureEnd() override
 	{
 		if (NULL != m_writer)
 		{
@@ -225,7 +229,7 @@ struct BgfxCallback : public bgfx::CallbackI
 		}
 	}
 
-	virtual void captureFrame(const void* _data, uint32_t /*_size*/) BX_OVERRIDE
+	virtual void captureFrame(const void* _data, uint32_t /*_size*/) override
 	{
 		if (NULL != m_writer)
 		{
@@ -235,6 +239,8 @@ struct BgfxCallback : public bgfx::CallbackI
 
 	AviWriter* m_writer;
 };
+
+const size_t kNaturalAlignment = 8;
 
 class BgfxAllocator : public bx::AllocatorI
 {
@@ -249,13 +255,13 @@ public:
 	{
 	}
 
-	virtual void* realloc(void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line) BX_OVERRIDE
+	virtual void* realloc(void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line) override
 	{
 		if (0 == _size)
 		{
 			if (NULL != _ptr)
 			{
-				if (BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT >= _align)
+				if (kNaturalAlignment >= _align)
 				{
 					bx::debugPrintf("%s(%d): FREE %p\n", _file, _line, _ptr);
 					::free(_ptr);
@@ -271,7 +277,7 @@ public:
 		}
 		else if (NULL == _ptr)
 		{
-			if (BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT >= _align)
+			if (kNaturalAlignment >= _align)
 			{
 				void* ptr = ::malloc(_size);
 				bx::debugPrintf("%s(%d): ALLOC %p of %d byte(s)\n", _file, _line, ptr, _size);
@@ -283,7 +289,7 @@ public:
 			return bx::alignedAlloc(this, _size, _align, _file, _line);
 		}
 
-		if (BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT >= _align)
+		if (kNaturalAlignment >= _align)
 		{
 			void* ptr = ::realloc(_ptr, _size);
 			bx::debugPrintf("%s(%d): REALLOC %p (old %p) of %d byte(s)\n", _file, _line, ptr, _ptr, _size);
@@ -312,48 +318,56 @@ private:
 
 class ExampleCallback : public entry::AppI
 {
-	void init(int _argc, char** _argv) BX_OVERRIDE
+public:
+	ExampleCallback(const char* _name, const char* _description)
+		: entry::AppI(_name, _description)
+	{
+	}
+
+	void init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height) override
 	{
 		Args args(_argc, _argv);
 
-		m_width = 1280;
-		m_height = 720;
+		m_width  = _width;
+		m_height = _height;
+		m_debug  = BGFX_DEBUG_NONE;
+		m_reset  = 0
+			| BGFX_RESET_VSYNC
+			| BGFX_RESET_CAPTURE
+			| BGFX_RESET_MSAA_X16
+			;
 
-		// Enumerate supported backend renderers.
-		m_numRenderers = bgfx::getSupportedRenderers(BX_COUNTOF(m_renderers), m_renderers);
-
-		bgfx::init(bgfx::RendererType::Count == args.m_type
-				   ? m_renderers[bx::getHPCounter() % m_numRenderers] /* randomize renderer */
-				   : args.m_type
-				   , args.m_pciId
-				   , 0
-				   , &m_callback  // custom callback handler
-				   , &m_allocator // custom allocator
-				   );
-		bgfx::reset(m_width, m_height, BGFX_RESET_CAPTURE|BGFX_RESET_MSAA_X16);
+		bgfx::init(
+			  args.m_type
+			, args.m_pciId
+			, 0
+			, &m_callback  // custom callback handler
+			, &m_allocator // custom allocator
+			);
+		bgfx::reset(m_width, m_height, m_reset);
 
 		// Enable debug text.
-		bgfx::setDebug(BGFX_DEBUG_TEXT);
+		bgfx::setDebug(m_debug);
 
 		// Set view 0 default viewport.
 		bgfx::setViewRect(0, 0, 0, 1280, 720);
 
 		// Set view 0 clear state.
 		bgfx::setViewClear(0
-						   , BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
-						   , 0x303030ff
-						   , 1.0f
-						   , 0
-						   );
+			, BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
+			, 0x303030ff
+			, 1.0f
+			, 0
+			);
 
 		// Create vertex stream declaration.
 		PosColorVertex::init();
 
 		// Create static vertex buffer.
 		m_vbh = bgfx::createVertexBuffer(
-										 bgfx::makeRef(s_cubeVertices, sizeof(s_cubeVertices) )
-										 , PosColorVertex::ms_decl
-										 );
+			  bgfx::makeRef(s_cubeVertices, sizeof(s_cubeVertices) )
+			, PosColorVertex::ms_decl
+			);
 
 		// Create static index buffer.
 		m_ibh = bgfx::createIndexBuffer(bgfx::makeRef(s_cubeIndices, sizeof(s_cubeIndices) ) );
@@ -361,12 +375,16 @@ class ExampleCallback : public entry::AppI
 		// Create program from shaders.
 		m_program = loadProgram("vs_callback", "fs_callback");
 
-		m_time = 0.0f;
+		m_time  = 0.0f;
 		m_frame = 0;
+
+		imguiCreate();
 	}
 
-	virtual int shutdown() BX_OVERRIDE
+	virtual int shutdown() override
 	{
+		imguiDestroy();
+
 		// Cleanup.
 		bgfx::destroyIndexBuffer(m_ibh);
 		bgfx::destroyVertexBuffer(m_vbh);
@@ -380,44 +398,43 @@ class ExampleCallback : public entry::AppI
 		return 0;
 	}
 
-	bool update() BX_OVERRIDE
+	bool update() override
 	{
-
+		bool exit = false;
 
 		// 5 second 60Hz video
-		if ( m_frame < 300)
+		if (m_frame < 300)
 		{
 			++m_frame;
-			const bgfx::RendererType::Enum rendererType = bgfx::getRendererType();
+		}
+		else
+		{
+			m_reset &= ~BGFX_RESET_CAPTURE;
 
+			exit = entry::processEvents(m_width, m_height, m_debug, m_reset, &m_mouseState);
+
+			imguiBeginFrame(m_mouseState.m_mx
+				,  m_mouseState.m_my
+				, (m_mouseState.m_buttons[entry::MouseButton::Left  ] ? IMGUI_MBUT_LEFT   : 0)
+				| (m_mouseState.m_buttons[entry::MouseButton::Right ] ? IMGUI_MBUT_RIGHT  : 0)
+				| (m_mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
+				,  m_mouseState.m_mz
+				, uint16_t(m_width)
+				, uint16_t(m_height)
+				);
+
+			showExampleDialog(this);
+
+			imguiEndFrame();
+		}
+
+		if (!exit)
+		{
 			// This dummy draw call is here to make sure that view 0 is cleared
 			// if no other draw calls are submitted to view 0.
 			bgfx::touch(0);
 
-			int64_t now = bx::getHPCounter();
-			static int64_t last = now;
-			const int64_t frameTime = now - last;
-			last = now;
-			const double freq = double(bx::getHPFrequency() );
-			const double toMs = 1000.0/freq;
-
-			// Use debug font to print information about this example.
-			bgfx::dbgTextClear();
-			bgfx::dbgTextPrintf( 0, 1, 0x4f, "bgfx/examples/07-callback");
-			bgfx::dbgTextPrintf( 0, 2, 0x6f, "Description: Implementing application specific callbacks for taking screen shots,");
-			bgfx::dbgTextPrintf(13, 3, 0x6f, "caching OpenGL binary shaders, and video capture.");
-			bgfx::dbgTextPrintf( 0, 4, 0x0f, "Frame: % 7.3f[ms]", double(frameTime)*toMs);
-
-			bgfx::dbgTextPrintf( 2, 6, 0x0e, "Supported renderers:");
-			for (uint8_t ii = 0; ii < m_numRenderers; ++ii)
-			{
-				bgfx::dbgTextPrintf( 2, 7+ii, 0x0c, "[%c] %s"
-									, m_renderers[ii] == rendererType ? '\xfe' : ' '
-									, bgfx::getRendererName(m_renderers[ii])
-									);
-			}
-
-			float at[3] = { 0.0f, 0.0f, 0.0f };
+			float at[3]  = { 0.0f, 0.0f,   0.0f };
 			float eye[3] = { 0.0f, 0.0f, -35.0f };
 
 			float view[16];
@@ -473,14 +490,15 @@ class ExampleCallback : public entry::AppI
 		return false;
 	}
 
-	BgfxCallback m_callback;
+	BgfxCallback  m_callback;
 	BgfxAllocator m_allocator;
+
+	entry::MouseState m_mouseState;
 
 	uint32_t m_width;
 	uint32_t m_height;
-
-	bgfx::RendererType::Enum m_renderers[bgfx::RendererType::Count];
-	uint8_t m_numRenderers;
+	uint32_t m_debug;
+	uint32_t m_reset;
 
 	bgfx::VertexBufferHandle m_vbh;
 	bgfx::IndexBufferHandle m_ibh;
@@ -489,5 +507,6 @@ class ExampleCallback : public entry::AppI
 	uint32_t m_frame;
 };
 
-ENTRY_IMPLEMENT_MAIN(ExampleCallback);
+} // namespace
 
+ENTRY_IMPLEMENT_MAIN(ExampleCallback, "07-callback", "Implementing application specific callbacks for taking screen shots, caching OpenGL binary shaders, and video capture.");

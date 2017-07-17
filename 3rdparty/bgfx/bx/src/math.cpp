@@ -3,7 +3,7 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#include <bx/fpumath.h>
+#include <bx/math.h>
 #include <math.h>
 
 namespace bx

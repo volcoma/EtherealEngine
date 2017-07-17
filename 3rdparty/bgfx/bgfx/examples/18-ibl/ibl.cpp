@@ -14,6 +14,9 @@
 #include <bx/readerwriter.h>
 #include <bx/string.h>
 
+namespace
+{
+
 static float s_texelHalf = 0.0f;
 
 struct Uniforms
@@ -480,13 +483,19 @@ struct Settings
 
 class ExampleIbl : public entry::AppI
 {
-	void init(int _argc, char** _argv) BX_OVERRIDE
+public:
+	ExampleIbl(const char* _name, const char* _description)
+		: entry::AppI(_name, _description)
+	{
+	}
+
+	void init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height) override
 	{
 		Args args(_argc, _argv);
 
-		m_width = 1280;
-		m_height = 720;
-		m_debug = BGFX_DEBUG_TEXT;
+		m_width  = _width;
+		m_height = _height;
+		m_debug = BGFX_DEBUG_NONE;
 		m_reset  = 0
 			| BGFX_RESET_VSYNC
 			| BGFX_RESET_MSAA_X16
@@ -533,7 +542,7 @@ class ExampleIbl : public entry::AppI
 		m_meshOrb = meshLoad("meshes/orb.bin");
 	}
 
-	virtual int shutdown() BX_OVERRIDE
+	virtual int shutdown() override
 	{
 		meshUnload(m_meshBunny);
 		meshUnload(m_meshOrb);
@@ -565,7 +574,7 @@ class ExampleIbl : public entry::AppI
 		return 0;
 	}
 
-	bool update() BX_OVERRIDE
+	bool update() override
 	{
 		if (!entry::processEvents(m_width, m_height, m_debug, m_reset, &m_mouseState) )
 		{
@@ -579,10 +588,15 @@ class ExampleIbl : public entry::AppI
 				, uint16_t(m_height)
 				);
 
-			ImGui::SetNextWindowPos(ImVec2(m_width - 320.0f - 10.0f, 10.0f) );
+			showExampleDialog(this);
+
+			ImGui::SetNextWindowPos(
+				  ImVec2(m_width - m_width / 5.0f - 10.0f, 10.0f)
+				, ImGuiSetCond_FirstUseEver
+				);
 			ImGui::Begin("Settings"
 				, NULL
-				, ImVec2(320.0f, 700.0f)
+				, ImVec2(m_width / 5.0f, m_height - 20.0f)
 				, ImGuiWindowFlags_AlwaysAutoResize
 				);
 			ImGui::PushItemWidth(180.0f);
@@ -691,10 +705,13 @@ class ExampleIbl : public entry::AppI
 			ImGui::PopItemWidth();
 			ImGui::End();
 
-			ImGui::SetNextWindowPos(ImVec2(10.0f, 70.0f) );
+			ImGui::SetNextWindowPos(
+				  ImVec2(10.0f, 260.0f)
+				, ImGuiSetCond_FirstUseEver
+				);
 			ImGui::Begin("Mesh"
 				, NULL
-				, ImVec2(280.0f, 636.0f)
+				, ImVec2(m_width / 5.0f, 450.0f)
 				, ImGuiWindowFlags_AlwaysAutoResize
 				);
 
@@ -759,14 +776,7 @@ class ExampleIbl : public entry::AppI
 			const int64_t frameTime = now - last;
 			last = now;
 			const double freq = double(bx::getHPFrequency() );
-			const double toMs = 1000.0/freq;
 			const float deltaTimeSec = float(double(frameTime)/freq);
-
-			// Use debug font to print information about this example.
-			bgfx::dbgTextClear();
-			bgfx::dbgTextPrintf(0, 1, 0x4f, "bgfx/examples/18-ibl");
-			bgfx::dbgTextPrintf(0, 2, 0x6f, "Description: Image-based lighting.");
-			bgfx::dbgTextPrintf(0, 3, 0x0f, "Frame: % 7.3f[ms]", double(frameTime)*toMs);
 
 			// Camera.
 			const bool mouseOverGui = ImGui::MouseOverArea();
@@ -918,4 +928,6 @@ class ExampleIbl : public entry::AppI
 	Settings m_settings;
 };
 
-ENTRY_IMPLEMENT_MAIN(ExampleIbl);
+} // namespace
+
+ENTRY_IMPLEMENT_MAIN(ExampleIbl, "18-ibl", "Image-based lighting.");

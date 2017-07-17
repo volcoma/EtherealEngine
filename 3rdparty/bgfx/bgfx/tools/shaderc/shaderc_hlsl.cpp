@@ -731,7 +731,7 @@ namespace bgfx { namespace hlsl
 
 				BX_TRACE("%s, %s, %d, %d, %d"
 					, un.name.c_str()
-					, getUniformTypeName_(un.type)
+					, getUniformTypeName(un.type)
 					, un.num
 					, un.regIndex
 					, un.regCount
@@ -756,7 +756,7 @@ namespace bgfx { namespace hlsl
 		}
 
 		{
-			uint32_t shaderSize = static_cast<uint32_t>(code->GetBufferSize());
+			uint32_t shaderSize = uint32_t(code->GetBufferSize() );
 			bx::write(_writer, shaderSize);
 			bx::write(_writer, code->GetBufferPointer(), shaderSize);
 			uint8_t nul = 0;

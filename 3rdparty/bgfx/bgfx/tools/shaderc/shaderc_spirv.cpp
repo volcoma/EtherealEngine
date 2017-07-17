@@ -15,6 +15,32 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wshadow") // warning: declaration of 'u
 #include <SPIRV/GlslangToSpv.h>
 BX_PRAGMA_DIAGNOSTIC_POP()
 
+namespace bgfx
+{
+	static bx::DefaultAllocator s_allocator;
+	bx::AllocatorI* g_allocator = &s_allocator;
+
+	struct TinyStlAllocator
+	{
+		static void* static_allocate(size_t _bytes);
+		static void static_deallocate(void* _ptr, size_t /*_bytes*/);
+	};
+
+	void* TinyStlAllocator::static_allocate(size_t _bytes)
+	{
+		return BX_ALLOC(g_allocator, _bytes);
+	}
+
+	void TinyStlAllocator::static_deallocate(void* _ptr, size_t /*_bytes*/)
+	{
+		if (NULL != _ptr)
+		{
+			BX_FREE(g_allocator, _ptr);
+		}
+	}
+} // namespace bgfx
+
+#define TINYSTL_ALLOCATOR bgfx::TinyStlAllocator
 #include <tinystl/allocator.h>
 #include <tinystl/string.h>
 #include <tinystl/unordered_map.h>
@@ -493,7 +519,7 @@ namespace bgfx { namespace spirv
 
 	struct DebugOutputWriter : public bx::WriterI
 	{
-		virtual int32_t write(const void* _data, int32_t _size, bx::Error*) BX_OVERRIDE
+		virtual int32_t write(const void* _data, int32_t _size, bx::Error*) override
 		{
 			char* out = (char*)alloca(_size + 1);
 			bx::memCopy(out, _data, _size);
@@ -660,7 +686,7 @@ namespace bgfx { namespace spirv
 
 						BX_TRACE("%s, %s, %d, %d, %d"
 							, un.name.c_str()
-							, getUniformTypeName_(un.type)
+							, getUniformTypeName(un.type)
 							, un.num
 							, un.regIndex
 							, un.regCount

@@ -149,7 +149,7 @@ namespace bx
 
 	class DebugWriter : public WriterI
 	{
-		virtual int32_t write(const void* _data, int32_t _size, Error* _err) BX_OVERRIDE
+		virtual int32_t write(const void* _data, int32_t _size, Error* _err) override
 		{
 			BX_UNUSED(_err);
 

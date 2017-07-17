@@ -9,6 +9,9 @@
 #include "camera.h"
 #include <bgfx/bgfx.h>
 
+namespace
+{
+
 static const char* s_shapeNames[] =
 {
 	"Point",
@@ -109,13 +112,19 @@ const uint32_t kMaxParticleCount      = 32 * 1024;
 
 class ExampleNbody : public entry::AppI
 {
-	void init(int _argc, char** _argv) BX_OVERRIDE
+public:
+	ExampleNbody(const char* _name, const char* _description)
+		: entry::AppI(_name, _description)
+	{
+	}
+
+	void init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height) override
 	{
 		Args args(_argc, _argv);
 
-		m_width  = 1280;
-		m_height = 720;
-		m_debug  = BGFX_DEBUG_TEXT;
+		m_width  = _width;
+		m_height = _height;
+		m_debug  = BGFX_DEBUG_NONE;
 		m_reset  = BGFX_RESET_VSYNC;
 
 		bgfx::init(args.m_type, args.m_pciId);
@@ -136,11 +145,10 @@ class ExampleNbody : public entry::AppI
 		const bool computeSupported  = !!(caps->supported & BGFX_CAPS_COMPUTE);
 		const bool indirectSupported = !!(caps->supported & BGFX_CAPS_DRAW_INDIRECT);
 
+		imguiCreate();
+
 		if (computeSupported)
 		{
-			// Imgui.
-			imguiCreate();
-
 			bgfx::VertexDecl quadVertexDecl;
 			quadVertexDecl.begin()
 				.add(bgfx::Attrib::Position, 2, bgfx::AttribType::Float)
@@ -205,7 +213,7 @@ class ExampleNbody : public entry::AppI
 		}
 	}
 
-	virtual int shutdown() BX_OVERRIDE
+	virtual int shutdown() override
 	{
 		// Cleanup.
 		cameraDestroy();
@@ -234,10 +242,23 @@ class ExampleNbody : public entry::AppI
 		return 0;
 	}
 
-	bool update() BX_OVERRIDE
+	bool update() override
 	{
 		if (!entry::processEvents(m_width, m_height, m_debug, m_reset, &m_mouseState) )
 		{
+			imguiBeginFrame(
+				   m_mouseState.m_mx
+				,  m_mouseState.m_my
+				, (m_mouseState.m_buttons[entry::MouseButton::Left  ] ? IMGUI_MBUT_LEFT   : 0)
+				| (m_mouseState.m_buttons[entry::MouseButton::Right ] ? IMGUI_MBUT_RIGHT  : 0)
+				| (m_mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
+				,  m_mouseState.m_mz
+				, uint16_t(m_width)
+				, uint16_t(m_height)
+				);
+
+			showExampleDialog(this);
+
 			const bgfx::Caps* caps = bgfx::getCaps();
 			const bool computeSupported  = !!(caps->supported & BGFX_CAPS_COMPUTE);
 			const bool indirectSupported = !!(caps->supported & BGFX_CAPS_DRAW_INDIRECT);
@@ -255,24 +276,11 @@ class ExampleNbody : public entry::AppI
 
 			if (computeSupported)
 			{
-				// Use debug font to print information about this example.
-				bgfx::dbgTextClear();
-				bgfx::dbgTextPrintf(0, 1, 0x4f, "bgfx/examples/24-nbody");
-				bgfx::dbgTextPrintf(0, 2, 0x6f, "Description: N-body simulation with compute shaders using buffers.");
-
-				imguiBeginFrame(
-					   m_mouseState.m_mx
-					,  m_mouseState.m_my
-					, (m_mouseState.m_buttons[entry::MouseButton::Left  ] ? IMGUI_MBUT_LEFT   : 0)
-					| (m_mouseState.m_buttons[entry::MouseButton::Right ] ? IMGUI_MBUT_RIGHT  : 0)
-					| (m_mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
-					,  m_mouseState.m_mz
-					, uint16_t(m_width)
-					, uint16_t(m_height)
+				ImGui::SetNextWindowPos(
+					  ImVec2(m_width - m_width / 5.0f - 10.0f, 10.0f)
+					, ImGuiSetCond_FirstUseEver
 					);
-
-				ImGui::SetNextWindowPos(ImVec2(m_width - m_width / 5.0f - 10.0f, 10.0f) );
-				ImGui::Begin("N-body Settings"
+				ImGui::Begin("Settings"
 					, NULL
 					, ImVec2(m_width / 5.0f, m_height / 1.5f)
 					, ImGuiWindowFlags_AlwaysAutoResize
@@ -316,8 +324,6 @@ class ExampleNbody : public entry::AppI
 				}
 
 				ImGui::End();
-
-				imguiEndFrame();
 
 				if (reset)
 				{
@@ -428,15 +434,13 @@ class ExampleNbody : public entry::AppI
 			{
 				bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height) );
 
-				bgfx::dbgTextClear();
-				bgfx::dbgTextPrintf(0, 1, 0x4f, "bgfx/examples/24-nbody");
-				bgfx::dbgTextPrintf(0, 2, 0x6f, "Description: N-body simulation with compute shaders using buffers.");
-
 				bool blink = uint32_t(time*3.0f)&1;
-				bgfx::dbgTextPrintf(0, 5, blink ? 0x1f : 0x01, " Compute is not supported by GPU. ");
+				bgfx::dbgTextPrintf(0, 0, blink ? 0x1f : 0x01, " Compute is not supported by GPU. ");
 
 				bgfx::touch(0);
 			}
+
+			imguiEndFrame();
 
 			// Advance to next frame. Rendering thread will be kicked to
 			// process submitted rendering primitives.
@@ -447,6 +451,8 @@ class ExampleNbody : public entry::AppI
 
 		return false;
 	}
+
+	entry::MouseState m_mouseState;
 
 	uint32_t m_width;
 	uint32_t m_height;
@@ -469,9 +475,9 @@ class ExampleNbody : public entry::AppI
 	bgfx::DynamicVertexBufferHandle m_prevPositionBuffer1;
 	bgfx::UniformHandle u_params;
 
-	entry::MouseState m_mouseState;
-
 	int64_t m_timeOffset;
 };
 
-ENTRY_IMPLEMENT_MAIN(ExampleNbody);
+} // namespace
+
+ENTRY_IMPLEMENT_MAIN(ExampleNbody, "24-nbody", "N-body simulation with compute shaders using buffers.");

@@ -1,5 +1,6 @@
 #include "asset_compiler.h"
 #include "core/common/string.h"
+#include "core/uuid/uuid.hpp"
 #include "core/logging/logging.h"
 #include "core/filesystem/filesystem.h"
 #include "core/serialization/serialization.h"
@@ -11,11 +12,65 @@
 #include "runtime/rendering/shader.h"
 #include "runtime/rendering/texture.h"
 #include "mesh_importer.h"
-#include "shaderc/shaderc.h"
-#include "texturec/texturec.h"
 #include "core/graphics/graphics.h"
+#include "bx/error.h"
+#include "bx/process.h"
+#include "bx/string.h"
 #include <fstream>
 #include <array>
+
+namespace
+{
+	std::string escape_str(const std::string& str)
+	{
+		return '"' + str + '"';
+	}
+
+	bool run_compile_process(const std::string& process, const std::vector<std::string>& args_array, std::string& err)
+	{
+
+		std::string args;
+		size_t i = 0;
+		for (const auto& arg : args_array)
+		{
+			args += arg;
+
+			if (i++ != args_array.size() - 1)
+				args += " ";
+		}
+
+		bx::Error error;
+		bx::ProcessReader processReader;
+
+		auto executable_dir = fs::resolve_protocol("binary:/");
+		auto process_full = executable_dir / process;
+
+		processReader.open(process_full.string().c_str(), args.c_str(), &error);
+
+		if (!error.isOk())
+		{
+			err = std::string(error.getMessage().getPtr());
+			return false;
+		}
+		else
+		{
+			char buffer[2048];
+			processReader.read(buffer, sizeof(buffer), &error);
+
+			processReader.close();
+			int32_t result = processReader.getExitCode();
+
+
+			if (0 != result)
+			{
+				err = std::string(error.getMessage().getPtr());
+				return false;
+			}
+
+			return true;
+		}
+	}
+}
 
 
 class material;
@@ -23,17 +78,17 @@ struct prefab;
 struct scene;
 
 template<>
-void asset_compiler::compile<prefab>(const fs::path& absolute_key)
+void asset_compiler::compile<prefab>(const fs::path&)
 {
 }
 
 template<>
-void asset_compiler::compile<scene>(const fs::path& absolute_key)
+void asset_compiler::compile<scene>(const fs::path&)
 {
 }
 
 template<>
-void asset_compiler::compile<material>(const fs::path& absolute_key)
+void asset_compiler::compile<material>(const fs::path&)
 {
 }
 
@@ -44,21 +99,24 @@ void asset_compiler::compile<shader>(const fs::path& absolute_key)
 	std::string str_input = absolute_key.string();
 	std::string file = absolute_key.stem().string();
 	fs::path dir = absolute_key.parent_path();
-	fs::path temp = dir / fs::path(file + ".buildtemp");
 
-	bool vs = string_utils::begins_with(file, "vs_");
-	bool fs = string_utils::begins_with(file, "fs_");
-	bool cs = string_utils::begins_with(file, "cs_");
-	
+	fs::error_code err;
+	fs::path temp = fs::temp_directory_path(err);
+	temp.append(uuids::random_uuid().to_string() + ".buildtemp");
+
 	std::string str_output = temp.string();
 	fs::path include = fs::resolve_protocol("engine_data:/shaders");
 	std::string str_include = include.string();
 	fs::path varying = dir / (file + ".io");
 	std::string str_varying = varying.string();
+
 	std::string str_platform;
 	std::string str_profile;
 	std::string str_type;
 
+	bool vs = string_utils::begins_with(file, "vs_");
+	bool fs = string_utils::begins_with(file, "fs_");
+	bool cs = string_utils::begins_with(file, "cs_");
 
 	auto renderer = gfx::getRendererType();
 	if (renderer == gfx::RendererType::Direct3D11 ||
@@ -97,17 +155,16 @@ void asset_compiler::compile<shader>(const fs::path& absolute_key)
 	else
 		str_type = "unknown";
 
-
-	const char* args_array[] =
+	const std::vector<std::string> args_array =
 	{
 		"-f",
-		str_input.c_str(),
+		escape_str(str_input).c_str(),
 		"-o",
-		str_output.c_str(),
+		escape_str(str_output).c_str(),
 		"-i",
 		str_include.c_str(),
 		"--varyingdef",
-		str_varying.c_str(),
+		escape_str(str_varying).c_str(),
 		"--platform",
 		str_platform.c_str(),
 		"-p",
@@ -115,32 +172,25 @@ void asset_compiler::compile<shader>(const fs::path& absolute_key)
 		"--type",
 		str_type.c_str(),
 		"-O",
-		"3"
+		"3",
 	};
-	const int arg_count = static_cast<int>(math::countof(args_array));
 
-	fs::error_code err;
-	int result = -1;
-	if (renderer == gfx::RendererType::OpenGL)
-	{
-		static std::mutex mtx;
-		std::lock_guard<std::mutex> lock(mtx);
-        result = compile_shader(arg_count, args_array);
-	}
-	else
-	{
-		result = compile_shader(arg_count, args_array);
-	}
 	
-	if (result != 0)
+	std::string error;
+
 	{
-		APPLOG_ERROR("Failed compilation of {0}", str_input);
+		std::ofstream output_file(str_output);
+	}
+
+    if (!run_compile_process("shaderc", args_array, error))
+	{
+		APPLOG_ERROR("Failed compilation of {0} with error: {1}", str_input, error);
 	}
 	else
 	{
 		APPLOG_INFO("Successful compilation of {0}", str_input);
 		fs::copy_file(temp, output, fs::copy_option::overwrite_if_exists, err);
-		auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+		auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());		
 		fs::last_write_time(output, now, err);
 	}
 	fs::remove(temp, err);
@@ -151,36 +201,44 @@ void asset_compiler::compile<texture>(const fs::path& absolute_key)
 {
 	fs::path output = absolute_key.string() + extensions::get_compiled_format<texture>();
 	std::string str_input = absolute_key.string();
-	std::string raw_ext = absolute_key.filename().extension().string();
-	std::string file = absolute_key.stem().string();
 
-	std::string str_output = output.string();
-    fs::error_code err;
+	fs::error_code err;
+	fs::path temp = fs::temp_directory_path(err);
+	temp.append(uuids::random_uuid().to_string() + ".buildtemp");
 
-	const char* args_array[] =
+	std::string str_output = temp.string();
+  
+	const std::vector<std::string> args_array =
 	{
 		"-f",
-		str_input.c_str(),
+		escape_str(str_input).c_str(),
 		"-o",
-		str_output.c_str(),
+		escape_str(str_output).c_str(),
 		"--as",
 		"ktx",
 		"-m",
 		"-t",
 		"BGRA8",
 	};
-	const int arg_count = static_cast<int>(math::countof(args_array));
 
-	if (compile_texture(arg_count, args_array) != 0)
+    std::string error;
+
 	{
-		APPLOG_ERROR("Failed compilation of {0}", str_input);
+		std::ofstream output_file(str_output);
+	}
+
+    if (!run_compile_process("texturec", args_array, error))
+	{
+		APPLOG_ERROR("Failed compilation of {0} with error: {1}", str_input, error);
 	}
 	else
 	{
 		APPLOG_INFO("Successful compilation of {0}", str_input);
+		fs::copy_file(temp, output, fs::copy_option::overwrite_if_exists, err);
 		auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 		fs::last_write_time(output, now, err);
 	}
+	fs::remove(temp, err);
 }
 
 template<>

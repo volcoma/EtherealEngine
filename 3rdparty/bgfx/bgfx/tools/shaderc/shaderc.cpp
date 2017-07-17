@@ -5,11 +5,12 @@
 
 #include "shaderc.h"
 #include <bx/commandline.h>
+#include <bx/filepath.h>
 
 #define MAX_TAGS 256
 extern "C"
 {
-#include <fcpp/fpp.h>
+#include <fpp.h>
 } // extern "C"
 
 #define BGFX_CHUNK_MAGIC_CSH BX_MAKEFOURCC('C', 'S', 'H', 0x3)
@@ -139,7 +140,7 @@ namespace bgfx
 		NULL
 	};
 
-	const char* s_uniformTypeName_[] =
+	const char* s_uniformTypeName[] =
 	{
 		"int",  "int",
 		NULL,   NULL,
@@ -147,7 +148,7 @@ namespace bgfx
 		"mat3", "float3x3",
 		"mat4", "float4x4",
 	};
-	BX_STATIC_ASSERT(BX_COUNTOF(s_uniformTypeName_) == UniformType::Count*2);
+	BX_STATIC_ASSERT(BX_COUNTOF(s_uniformTypeName) == UniformType::Count*2);
 
 	const char* interpolationDx11(const char* _glsl)
 	{
@@ -163,23 +164,23 @@ namespace bgfx
 		return _glsl; // centroid, noperspective
 	}
 
-	const char* getUniformTypeName_(UniformType::Enum _enum)
+	const char* getUniformTypeName(UniformType::Enum _enum)
 	{
 		uint32_t idx = _enum & ~(BGFX_UNIFORM_FRAGMENTBIT|BGFX_UNIFORM_SAMPLERBIT);
 		if (idx < UniformType::Count)
 		{
-			return s_uniformTypeName_[idx];
+			return s_uniformTypeName[idx];
 		}
 
 		return "Unknown uniform type?!";
 	}
 
-	UniformType::Enum nameToUniformTypeEnum_(const char* _name)
+	UniformType::Enum nameToUniformTypeEnum(const char* _name)
 	{
 		for (uint32_t ii = 0; ii < UniformType::Count*2; ++ii)
 		{
-			if (NULL != s_uniformTypeName_[ii]
-			&&  0 == bx::strCmp(_name, s_uniformTypeName_[ii]) )
+			if (NULL != s_uniformTypeName[ii]
+			&&  0 == bx::strCmp(_name, s_uniformTypeName[ii]) )
 			{
 				return UniformType::Enum(ii/2);
 			}
@@ -223,13 +224,13 @@ namespace bgfx
 		{
 		}
 
-		virtual void close() BX_OVERRIDE
+		virtual void close() override
 		{
 			generate();
 			return bx::FileWriter::close();
 		}
 
-		virtual int32_t write(const void* _data, int32_t _size, bx::Error*) BX_OVERRIDE
+		virtual int32_t write(const void* _data, int32_t _size, bx::Error*) override
 		{
 			const char* data = (const char*)_data;
 			m_buffer.insert(m_buffer.end(), data, data+_size);
@@ -704,6 +705,15 @@ namespace bgfx
 		strReplace(_data, find, "bgfx_VoidFrag");
 	}
 
+	const char* baseName(const char* _filePath)
+	{
+		bx::FilePath fp(_filePath);
+		char tmp[bx::kMaxFilePath];
+		bx::strCopy(tmp, BX_COUNTOF(tmp), fp.getFileName() );
+		const char* base = bx::strFind(_filePath, tmp);
+		return base;
+	}
+
 	// c - compute
 	// d - domain
 	// f - fragment
@@ -888,7 +898,7 @@ namespace bgfx
 			bin2c = cmdLine.findOption("bin2c");
 			if (NULL == bin2c)
 			{
-				bin2c = bx::baseName(outFilePath);
+				bin2c = baseName(outFilePath);
 				uint32_t len = (uint32_t)bx::strLen(bin2c);
 				char* temp = (char*)alloca(len+1);
 				for (char *out = temp; *bin2c != '\0';)
@@ -927,7 +937,7 @@ namespace bgfx
 
 		std::string dir;
 		{
-			const char* base = bx::baseName(filePath);
+			const char* base = baseName(filePath);
 
 			if (base != filePath)
 			{
@@ -2200,7 +2210,7 @@ namespace bgfx
 
 } // namespace bgfx
 
-int compile_shader(int _argc, const char* _argv[])
+int main(int _argc, const char* _argv[])
 {
 	return bgfx::compileShader(_argc, _argv);
 }

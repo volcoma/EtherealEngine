@@ -3,9 +3,9 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#include <bx/simd_t.h>
+#include <bx/allocator.h>
 #include <bx/rng.h>
-#include <bx/crtimpl.h>
+#include <bx/simd_t.h>
 #include <bx/timer.h>
 
 #include <stdio.h>

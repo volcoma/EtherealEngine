@@ -8,10 +8,18 @@
 
 #include "common.h"
 #include "bgfx_utils.h"
+#include <bx/file.h>
 
-#include <bx/crtimpl.h>
 #include "camera.h"
 #include "imgui/imgui.h"
+
+namespace bgfx
+{
+	int32_t read(bx::ReaderI* _reader, bgfx::VertexDecl& _decl, bx::Error* _err = NULL);
+}
+
+namespace
+{
 
 #define RENDER_VIEWID_RANGE1_PASS_0  1
 #define RENDER_VIEWID_RANGE1_PASS_1  2
@@ -505,7 +513,7 @@ static RenderState s_renderStates[RenderState::Count] =
 
 struct ViewState
 {
-	ViewState(uint32_t _width = 1280, uint32_t _height = 720)
+	ViewState(uint32_t _width = 0, uint32_t _height = 0)
 		: m_width(_width)
 		, m_height(_height)
 	{
@@ -612,11 +620,6 @@ struct Group
 	Obb m_obb;
 	PrimitiveArray m_prims;
 };
-
-namespace bgfx
-{
-	int32_t read(bx::ReaderI* _reader, bgfx::VertexDecl& _decl, bx::Error* _err = NULL);
-}
 
 struct Mesh
 {
@@ -787,14 +790,19 @@ struct Mesh
 class ExampleStencil : public entry::AppI
 {
 public:
-	virtual void init(int _argc, char** _argv) BX_OVERRIDE
+	ExampleStencil(const char* _name, const char* _description)
+		: entry::AppI(_name, _description)
+	{
+	}
+
+	virtual void init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height) override
 	{
 		Args args(_argc, _argv);
 
-		m_viewState = ViewState(1280, 720);
+		m_viewState   = ViewState(_width, _height);
 		m_clearValues = ClearValues(0x30303000, 1.0f, 0);
 
-		m_debug = BGFX_DEBUG_TEXT;
+		m_debug = BGFX_DEBUG_NONE;
 		m_reset = BGFX_RESET_VSYNC;
 
 		bgfx::init(args.m_type, args.m_pciId);
@@ -868,7 +876,7 @@ public:
 		m_updateScene     = true;
 	}
 
-	virtual int shutdown() BX_OVERRIDE
+	virtual int shutdown() override
 	{
 		// Cleanup.
 		m_bunnyMesh.unload();
@@ -900,7 +908,7 @@ public:
 		return 0;
 	}
 
-	virtual bool update() BX_OVERRIDE
+	virtual bool update() override
 	{
 		if (!entry::processEvents(m_viewState.m_width, m_viewState.m_height, m_debug, m_reset, &m_mouseState) )
 		{
@@ -914,8 +922,13 @@ public:
 				, uint16_t(m_viewState.m_height)
 				);
 
-			ImGui::SetNextWindowPos(ImVec2(m_viewState.m_width - m_viewState.m_width / 5.0f - 10.0f, 10.0f) );
-			ImGui::Begin("Stencil Settings"
+			showExampleDialog(this);
+
+			ImGui::SetNextWindowPos(
+				  ImVec2(m_viewState.m_width - m_viewState.m_width / 5.0f - 10.0f, 10.0f)
+				, ImGuiSetCond_FirstUseEver
+				);
+			ImGui::Begin("Settings"
 				, NULL
 				, ImVec2(m_viewState.m_width / 5.0f, m_viewState.m_height / 2.0f)
 				, ImGuiWindowFlags_AlwaysAutoResize
@@ -968,16 +981,9 @@ public:
 			const int64_t frameTime = now - last;
 			last = now;
 			const double freq = double(bx::getHPFrequency() );
-			const double toMs = 1000.0/freq;
 			const float time = (float)( (now - m_timeOffset)/double(bx::getHPFrequency() ) );
 			const float deltaTime = float(frameTime/freq);
 			s_uniforms.m_time = time;
-
-			// Use debug font to print information about this example.
-			bgfx::dbgTextClear();
-			bgfx::dbgTextPrintf(0, 1, 0x4f, "bgfx/examples/13-stencil");
-			bgfx::dbgTextPrintf(0, 2, 0x6f, "Description: Stencil reflections and shadows.");
-			bgfx::dbgTextPrintf(0, 3, 0x0f, "Frame: % 7.3f[ms]", double(frameTime)*toMs);
 
 			// Update camera.
 			cameraUpdate(deltaTime, m_mouseState);
@@ -1395,4 +1401,6 @@ public:
 
 };
 
-ENTRY_IMPLEMENT_MAIN(ExampleStencil);
+} // namespace
+
+ENTRY_IMPLEMENT_MAIN(ExampleStencil, "13-stencil", "Stencil reflections and shadows.");

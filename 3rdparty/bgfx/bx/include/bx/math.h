@@ -257,6 +257,12 @@ namespace bx
 	void vec3TangentFrame(const float* _n, float* _t, float* _b, float _angle);
 
 	///
+	void vec3FromLatLong(float* _vec, float _u, float _v);
+
+	///
+	void vec3ToLatLong(float* _u, float* _v, const float* _vec);
+
+	///
 	void quatIdentity(float* _result);
 
 	///
@@ -482,6 +488,6 @@ namespace bx
 
 } // namespace bx
 
-#include "inline/fpumath.inl"
+#include "inline/math.inl"
 
 #endif // BX_FPU_MATH_H_HEADER_GUARD

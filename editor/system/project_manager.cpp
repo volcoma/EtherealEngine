@@ -56,7 +56,7 @@ namespace editor
 					{
 						if (entry.status == fs::watcher::entry_status::removed)
 						{
-							auto task = ts.push_ready([reload_async, key, &am]()
+							auto task = ts.push_ready_on_main([reload_async, key, &am]()
 							{
 								am.clear_asset<T>(key);
 							});
@@ -86,7 +86,7 @@ namespace editor
 					{
 						if (entry.status == fs::watcher::entry_status::removed)
 						{
-							auto task = ts.push_ready([p, ext, protocol, key, &am]()
+							auto task = ts.push_ready_on_main([p, ext, protocol, key, &am]()
 							{
 								am.delete_asset<T>(key);
 

@@ -50,7 +50,8 @@ namespace glslang {
 TParseContext::TParseContext(TSymbolTable& symbolTable, TIntermediate& interm, bool parsingBuiltins,
                              int version, EProfile profile, const SpvVersion& spvVersion, EShLanguage language,
                              TInfoSink& infoSink, bool forwardCompatible, EShMessages messages) :
-            TParseContextBase(symbolTable, interm, parsingBuiltins, version, profile, spvVersion, language, infoSink, forwardCompatible, messages),
+            TParseContextBase(symbolTable, interm, parsingBuiltins, version, profile, spvVersion, language,
+                              infoSink, forwardCompatible, messages),
             inMain(false),
             blockName(nullptr),
             limits(resources.limits),
@@ -1385,7 +1386,6 @@ void TParseContext::builtInOpCheck(const TSourceLoc& loc, const TFunction& fnCan
         unaryArg = callNode.getAsUnaryNode()->getOperand();
         arg0 = unaryArg;
     }
-    const TIntermSequence& aggArgs = *argp;  // only valid when unaryArg is nullptr
 
     switch (callNode.getOp()) {
     case EOpTextureGather:
@@ -1416,7 +1416,7 @@ void TParseContext::builtInOpCheck(const TSourceLoc& loc, const TFunction& fnCan
                 profileRequires(loc, ~EEsProfile, 400, E_GL_ARB_texture_gather, feature);
             else
                 profileRequires(loc, ~EEsProfile, 400, E_GL_ARB_gpu_shader5, feature);
-            if (! aggArgs[fnCandidate[0].type->getSampler().shadow ? 3 : 2]->getAsConstantUnion())
+            if (! (*argp)[fnCandidate[0].type->getSampler().shadow ? 3 : 2]->getAsConstantUnion())
                 profileRequires(loc, EEsProfile, 0, Num_AEP_gpu_shader5, AEP_gpu_shader5, "non-constant offset argument");
             if (! fnCandidate[0].type->getSampler().shadow)
                 compArg = 3;
@@ -1426,7 +1426,7 @@ void TParseContext::builtInOpCheck(const TSourceLoc& loc, const TFunction& fnCan
             if (! fnCandidate[0].type->getSampler().shadow)
                 compArg = 3;
             // check for constant offsets
-            if (! aggArgs[fnCandidate[0].type->getSampler().shadow ? 3 : 2]->getAsConstantUnion())
+            if (! (*argp)[fnCandidate[0].type->getSampler().shadow ? 3 : 2]->getAsConstantUnion())
                 error(loc, "must be a compile-time constant:", feature, "offsets argument");
             break;
         default:
@@ -1434,8 +1434,8 @@ void TParseContext::builtInOpCheck(const TSourceLoc& loc, const TFunction& fnCan
         }
 
         if (compArg > 0 && compArg < fnCandidate.getParamCount()) {
-            if (aggArgs[compArg]->getAsConstantUnion()) {
-                int value = aggArgs[compArg]->getAsConstantUnion()->getConstArray()[0].getIConst();
+            if ((*argp)[compArg]->getAsConstantUnion()) {
+                int value = (*argp)[compArg]->getAsConstantUnion()->getConstArray()[0].getIConst();
                 if (value < 0 || value > 3)
                     error(loc, "must be 0, 1, 2, or 3:", feature, "component argument");
             } else
@@ -1517,12 +1517,12 @@ void TParseContext::builtInOpCheck(const TSourceLoc& loc, const TFunction& fnCan
         }
 
         if (arg > 0) {
-            if (! aggArgs[arg]->getAsConstantUnion())
+            if (! (*argp)[arg]->getAsConstantUnion())
                 error(loc, "argument must be compile-time constant", "texel offset", "");
             else {
-                const TType& type = aggArgs[arg]->getAsTyped()->getType();
+                const TType& type = (*argp)[arg]->getAsTyped()->getType();
                 for (int c = 0; c < type.getVectorSize(); ++c) {
-                    int offset = aggArgs[arg]->getAsConstantUnion()->getConstArray()[c].getIConst();
+                    int offset = (*argp)[arg]->getAsConstantUnion()->getConstArray()[c].getIConst();
                     if (offset > resources.maxProgramTexelOffset || offset < resources.minProgramTexelOffset)
                         error(loc, "value is out of range:", "texel offset", "[gl_MinProgramTexelOffset, gl_MaxProgramTexelOffset]");
                 }
@@ -4014,6 +4014,14 @@ void TParseContext::setLayoutQualifier(const TSourceLoc& loc, TPublicType& publi
             publicType.shaderQualifiers.earlyFragmentTests = true;
             return;
         }
+        if (id == "post_depth_coverage") {
+            requireExtensions(loc, Num_post_depth_coverageEXTs, post_depth_coverageEXTs, "post depth coverage");
+            if (extensionTurnedOn(E_GL_ARB_post_depth_coverage)) {
+                publicType.shaderQualifiers.earlyFragmentTests = true;
+            }
+            publicType.shaderQualifiers.postDepthCoverage = true;
+            return;
+        }
         for (TLayoutDepth depth = (TLayoutDepth)(EldNone + 1); depth < EldCount; depth = (TLayoutDepth)(depth+1)) {
             if (id == TQualifier::getLayoutDepthString(depth)) {
                 requireProfile(loc, ECoreProfile | ECompatibilityProfile, "depth layout qualifier");
@@ -4203,6 +4211,11 @@ void TParseContext::setLayoutQualifier(const TSourceLoc& loc, TPublicType& publi
             if (! intermediate.addUsedConstantId(value))
                 error(loc, "specialization-constant id already used", id.c_str(), "");
         }
+        return;
+    }
+    if (id == "num_views") {
+        requireExtensions(loc, Num_OVR_multiview_EXTs, OVR_multiview_EXTs, "num_views");
+        publicType.shaderQualifiers.numViews = value;
         return;
     }
 
@@ -4777,8 +4790,24 @@ void TParseContext::checkNoShaderLayouts(const TSourceLoc& loc, const TShaderQua
 
     if (shaderQualifiers.geometry != ElgNone)
         error(loc, message, TQualifier::getGeometryString(shaderQualifiers.geometry), "");
+    if (shaderQualifiers.spacing != EvsNone)
+        error(loc, message, TQualifier::getVertexSpacingString(shaderQualifiers.spacing), "");
+    if (shaderQualifiers.order != EvoNone)
+        error(loc, message, TQualifier::getVertexOrderString(shaderQualifiers.order), "");
+    if (shaderQualifiers.pointMode)
+        error(loc, message, "point_mode", "");
     if (shaderQualifiers.invocations != TQualifier::layoutNotSet)
         error(loc, message, "invocations", "");
+    if (shaderQualifiers.earlyFragmentTests)
+        error(loc, message, "early_fragment_tests", "");
+    if (shaderQualifiers.postDepthCoverage)
+        error(loc, message, "post_depth_coverage", "");
+    for (int i = 0; i < 3; ++i) {
+        if (shaderQualifiers.localSize[i] > 1)
+            error(loc, message, "local_size", "");
+        if (shaderQualifiers.localSizeSpecId[i] != TQualifier::layoutNotSet)
+            error(loc, message, "local_size id", "");
+    }
     if (shaderQualifiers.vertices != TQualifier::layoutNotSet) {
         if (language == EShLangGeometry)
             error(loc, message, "max_vertices", "");
@@ -4787,15 +4816,10 @@ void TParseContext::checkNoShaderLayouts(const TSourceLoc& loc, const TShaderQua
         else
             assert(0);
     }
-    for (int i = 0; i < 3; ++i) {
-        if (shaderQualifiers.localSize[i] > 1)
-            error(loc, message, "local_size", "");
-        if (shaderQualifiers.localSizeSpecId[i] != TQualifier::layoutNotSet)
-            error(loc, message, "local_size id", "");
-    }
     if (shaderQualifiers.blendEquation)
         error(loc, message, "blend equation", "");
-    // TBD: correctness: are any of these missing?  pixelCenterInteger, originUpperLeft, spacing, order, pointmode, earlyfragment, depth
+    if (shaderQualifiers.numViews != TQualifier::layoutNotSet)
+        error(loc, message, "num_views", "");
 }
 
 // Correct and/or advance an object's offset layout qualifier.
@@ -6273,6 +6297,12 @@ void TParseContext::updateStandaloneQualifierDefaults(const TSourceLoc& loc, con
             intermediate.setEarlyFragmentTests();
         else
             error(loc, "can only apply to 'in'", "early_fragment_tests", "");
+    }
+    if (publicType.shaderQualifiers.postDepthCoverage) {
+        if (publicType.qualifier.storage == EvqVaryingIn)
+            intermediate.setPostDepthCoverage();
+        else
+            error(loc, "can only apply to 'in'", "post_coverage_coverage", "");
     }
     if (publicType.shaderQualifiers.blendEquation) {
         if (publicType.qualifier.storage != EvqVaryingOut)

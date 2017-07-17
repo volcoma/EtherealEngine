@@ -1037,6 +1037,9 @@ function toolchain(_buildDir, _libDir)
 		buildoptions_cpp {
 			"-std=c++11",
 		}
+		buildoptions_objcpp {
+			"-std=c++11",
+		}
 		buildoptions {
 			"-Wfatal-errors",
 			"-msse2",
@@ -1050,6 +1053,9 @@ function toolchain(_buildDir, _libDir)
 			"-lc++",
 		}
 		buildoptions_cpp {
+			"-std=c++11",
+		}
+		buildoptions_objcpp {
 			"-std=c++11",
 		}
 		buildoptions {

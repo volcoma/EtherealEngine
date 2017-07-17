@@ -296,7 +296,8 @@ bool HlslGrammar::acceptSamplerDeclarationDX9(TType& /*type*/)
 
 // declaration
 //      : sampler_declaration_dx9 post_decls SEMICOLON
-//      | fully_specified_type declarator_list SEMICOLON(optional for cbuffer/tbuffer)
+//      | fully_specified_type                           // for cbuffer/tbuffer
+//      | fully_specified_type declarator_list SEMICOLON // for non cbuffer/tbuffer
 //      | fully_specified_type identifier function_parameters post_decls compound_statement  // function definition
 //      | fully_specified_type identifier sampler_state post_decls compound_statement        // sampler definition
 //      | typedef declaration
@@ -370,11 +371,19 @@ bool HlslGrammar::acceptDeclaration(TIntermNode*& nodeList)
     // if (acceptSamplerDeclarationDX9(declaredType))
     //     return true;
 
+    bool forbidDeclarators = (peekTokenClass(EHTokCBuffer) || peekTokenClass(EHTokTBuffer));
     // fully_specified_type
     if (! acceptFullySpecifiedType(declaredType, nodeList))
         return false;
 
-    // identifier
+    // cbuffer and tbuffer end with the closing '}'.
+    // No semicolon is included.
+    if (forbidDeclarators)
+        return true;
+
+    // declarator_list
+    //    : declarator
+    //         : identifier
     HlslToken idToken;
     TIntermAggregate* initializers = nullptr;
     while (acceptIdentifier(idToken)) {
@@ -483,11 +492,10 @@ bool HlslGrammar::acceptDeclaration(TIntermNode*& nodeList)
             }
         }
 
-        if (acceptTokenClass(EHTokComma)) {
+        // COMMA
+        if (acceptTokenClass(EHTokComma))
             declarator_list = true;
-            continue;
-        }
-    };
+    }
 
     // The top-level initializer node is a sequence.
     if (initializers != nullptr)
@@ -499,18 +507,15 @@ bool HlslGrammar::acceptDeclaration(TIntermNode*& nodeList)
     else
         nodeList = initializers;
 
-    // SEMICOLON(optional for cbuffer/tbuffer)
+    // SEMICOLON
     if (! acceptTokenClass(EHTokSemicolon)) {
+        // This may have been a false detection of what appeared to be a declaration, but
+        // was actually an assignment such as "float = 4", where "float" is an identifier.
+        // We put the token back to let further parsing happen for cases where that may
+        // happen.  This errors on the side of caution, and mostly triggers the error.
         if (peek() == EHTokAssign || peek() == EHTokLeftBracket || peek() == EHTokDot || peek() == EHTokComma) {
-            // This may have been a false detection of what appeared to be a declaration, but
-            // was actually an assignment such as "float = 4", where "float" is an identifier.
-            // We put the token back to let further parsing happen for cases where that may
-            // happen.  This errors on the side of caution, and mostly triggers the error.
             recedeToken();
             return false;
-        } else if (declaredType.getBasicType() == EbtBlock) {
-            // cbuffer, et. al. (but not struct) don't have an ending semicolon
-            return true;
         } else {
             expected(";");
             return false;
@@ -675,10 +680,10 @@ bool HlslGrammar::acceptQualifier(TQualifier& qualifier)
             qualifier.noContraction = true;
             break;
         case EHTokIn:
-            qualifier.storage = EvqIn;
+            qualifier.storage = (qualifier.storage == EvqOut) ? EvqInOut : EvqIn;
             break;
         case EHTokOut:
-            qualifier.storage = EvqOut;
+            qualifier.storage = (qualifier.storage == EvqIn) ? EvqInOut : EvqOut;
             break;
         case EHTokInOut:
             qualifier.storage = EvqInOut;
@@ -1901,18 +1906,19 @@ bool HlslGrammar::acceptStruct(TType& type, TIntermNode*& nodeList)
     TStorageQualifier storageQualifier = EvqTemporary;
     bool readonly = false;
 
-    // CBUFFER
     if (acceptTokenClass(EHTokCBuffer)) {
+        // CBUFFER
         storageQualifier = EvqUniform;
-    // TBUFFER
     } else if (acceptTokenClass(EHTokTBuffer)) {
+        // TBUFFER
         storageQualifier = EvqBuffer;
         readonly = true;
-    }
-    // CLASS
-    // STRUCT
-    else if (! acceptTokenClass(EHTokClass) && ! acceptTokenClass(EHTokStruct))
+    } else if (! acceptTokenClass(EHTokClass) && ! acceptTokenClass(EHTokStruct)) {
+        // Neither CLASS nor STRUCT
         return false;
+    }
+
+    // Now known to be one of CBUFFER, TBUFFER, CLASS, or STRUCT
 
     // IDENTIFIER
     TString structName = "";
@@ -2547,7 +2553,18 @@ bool HlslGrammar::acceptInitializer(TIntermTyped*& node)
             expected("assignment expression in initializer list");
             return false;
         }
+
+        const bool firstNode = (node == nullptr);
+
         node = intermediate.growAggregate(node, expr, loc);
+
+        // If every sub-node in the list has qualifier EvqConst, the returned node becomes
+        // EvqConst.  Otherwise, it becomes EvqTemporary. That doesn't happen with e.g.
+        // EvqIn or EvqPosition, since the collection isn't EvqPosition if all the members are.
+        if (firstNode && expr->getQualifier().storage == EvqConst)
+            node->getQualifier().storage = EvqConst;
+        else if (expr->getQualifier().storage != EvqConst)
+            node->getQualifier().storage = EvqTemporary;
 
         // COMMA
         if (acceptTokenClass(EHTokComma)) {
@@ -2863,23 +2880,6 @@ bool HlslGrammar::acceptPostfixExpression(TIntermTyped*& node)
         // nothing found, can't post operate
         return false;
     }
-
-    // This is to guarantee we do this no matter how we get out of the stack frame.
-    // This way there's no bug if an early return forgets to do it.
-    struct tFinalize {
-        tFinalize(HlslParseContext& p) : parseContext(p) { }
-        ~tFinalize() { parseContext.finalizeFlattening(); }
-        HlslParseContext& parseContext;
-    private:
-        const tFinalize& operator=(const tFinalize&) { return *this; }
-        tFinalize(const tFinalize& f) : parseContext(f.parseContext) { }
-    } finalize(parseContext);
-
-    // Initialize the flattening accumulation data, so we can track data across multiple bracket or
-    // dot operators.  This can also be nested, e.g, for [], so we have to track each nesting
-    // level: hence the init and finalize.  Even though in practice these must be
-    // constants, they are parsed no matter what.
-    parseContext.initFlattening();
 
     // Something was found, chain as many postfix operations as exist.
     do {
@@ -3212,10 +3212,10 @@ bool HlslGrammar::acceptStatement(TIntermNode*& statement)
         return acceptScopedCompoundStatement(statement);
 
     case EHTokIf:
-        return acceptSelectionStatement(statement);
+        return acceptSelectionStatement(statement, attributes);
 
     case EHTokSwitch:
-        return acceptSwitchStatement(statement);
+        return acceptSwitchStatement(statement, attributes);
 
     case EHTokFor:
     case EHTokDo:
@@ -3328,9 +3328,11 @@ void HlslGrammar::acceptAttributes(TAttributeMap& attributes)
 //      : IF LEFT_PAREN expression RIGHT_PAREN statement
 //      : IF LEFT_PAREN expression RIGHT_PAREN statement ELSE statement
 //
-bool HlslGrammar::acceptSelectionStatement(TIntermNode*& statement)
+bool HlslGrammar::acceptSelectionStatement(TIntermNode*& statement, const TAttributeMap& attributes)
 {
     TSourceLoc loc = token.loc;
+
+    const TSelectionControl control = parseContext.handleSelectionControl(attributes);
 
     // IF
     if (! acceptTokenClass(EHTokIf))
@@ -3369,7 +3371,7 @@ bool HlslGrammar::acceptSelectionStatement(TIntermNode*& statement)
     }
 
     // Put the pieces together
-    statement = intermediate.addSelection(condition, thenElse, loc);
+    statement = intermediate.addSelection(condition, thenElse, loc, control);
     parseContext.popScope();
     --parseContext.controlFlowNestingLevel;
 
@@ -3379,10 +3381,13 @@ bool HlslGrammar::acceptSelectionStatement(TIntermNode*& statement)
 // switch_statement
 //      : SWITCH LEFT_PAREN expression RIGHT_PAREN compound_statement
 //
-bool HlslGrammar::acceptSwitchStatement(TIntermNode*& statement)
+bool HlslGrammar::acceptSwitchStatement(TIntermNode*& statement, const TAttributeMap& attributes)
 {
     // SWITCH
     TSourceLoc loc = token.loc;
+
+    const TSelectionControl control = parseContext.handleSelectionControl(attributes);
+
     if (! acceptTokenClass(EHTokSwitch))
         return false;
 
@@ -3402,7 +3407,7 @@ bool HlslGrammar::acceptSwitchStatement(TIntermNode*& statement)
     --parseContext.controlFlowNestingLevel;
 
     if (statementOkay)
-        statement = parseContext.addSwitch(loc, switchExpression, statement ? statement->getAsAggregate() : nullptr);
+        statement = parseContext.addSwitch(loc, switchExpression, statement ? statement->getAsAggregate() : nullptr, control);
 
     parseContext.popSwitchSequence();
     parseContext.popScope();

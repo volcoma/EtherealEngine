@@ -70,7 +70,11 @@ if( UNIX AND NOT APPLE )
 endif()
 
 # Excluded files from compilation
-set_source_files_properties( ${BGFX_DIR}/src/amalgamated.mm PROPERTIES HEADER_FILE_ONLY ON )
+if(NOT APPLE)
+	set_source_files_properties( ${BGFX_DIR}/src/amalgamated.mm PROPERTIES HEADER_FILE_ONLY ON )
+else()
+	set_source_files_properties( ${BGFX_DIR}/src/amalgamated.cpp PROPERTIES HEADER_FILE_ONLY ON )
+endif()
 
 # Exclude mm files if not on OS X
 if( NOT APPLE )

@@ -201,7 +201,7 @@ namespace uuids
 
 		constexpr const_iterator end() const noexcept
 		{
-			return detail::static_addressof(_data[static_size]);
+			return detail::static_addressof(_data[static_size-1]);
 		}
 
 		constexpr const_iterator cbegin() const noexcept
@@ -211,7 +211,7 @@ namespace uuids
 
 		constexpr const_iterator cend() const noexcept 
 		{
-			return detail::static_addressof(_data[static_size]);
+			return detail::static_addressof(_data[static_size-1]);
 		}
 
 		const_reverse_iterator rbegin() const noexcept

@@ -4,7 +4,7 @@
  */
 
 #include <bx/cpu.h>
-#include <bx/fpumath.h>
+#include <bx/math.h>
 #include <bx/string.h>
 #include <bx/uint32_t.h>
 

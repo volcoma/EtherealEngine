@@ -968,8 +968,10 @@ struct TShaderQualifiers {
     int localSize[3];         // compute shader
     int localSizeSpecId[3];   // compute shader specialization id for gl_WorkGroupSize
     bool earlyFragmentTests;  // fragment input
+    bool postDepthCoverage;   // fragment input
     TLayoutDepth layoutDepth;
     bool blendEquation;       // true if any blend equation was specified
+    int numViews;             // multiview extenstions
 
 #ifdef NV_EXTENSIONS
     bool layoutOverrideCoverage;    // true if layout override_coverage set
@@ -992,8 +994,10 @@ struct TShaderQualifiers {
         localSizeSpecId[1] = TQualifier::layoutNotSet;
         localSizeSpecId[2] = TQualifier::layoutNotSet;
         earlyFragmentTests = false;
+        postDepthCoverage = false;
         layoutDepth = EldNone;
         blendEquation = false;
+        numViews = TQualifier::layoutNotSet;
 #ifdef NV_EXTENSIONS
         layoutOverrideCoverage = false;
 #endif
@@ -1029,10 +1033,14 @@ struct TShaderQualifiers {
         }
         if (src.earlyFragmentTests)
             earlyFragmentTests = true;
+        if (src.postDepthCoverage)
+            postDepthCoverage = true;
         if (src.layoutDepth)
             layoutDepth = src.layoutDepth;
         if (src.blendEquation)
             blendEquation = src.blendEquation;
+        if (src.numViews != TQualifier::layoutNotSet)
+            numViews = src.numViews;
 #ifdef NV_EXTENSIONS
         if (src.layoutOverrideCoverage)
             layoutOverrideCoverage = src.layoutOverrideCoverage;
@@ -1338,7 +1346,24 @@ public:
 #else
     virtual bool isFloatingDomain() const { return basicType == EbtFloat || basicType == EbtDouble; }
 #endif
-
+    virtual bool isIntegerDomain() const
+    {
+        switch (basicType) {
+        case EbtInt:
+        case EbtUint:
+        case EbtInt64:
+        case EbtUint64:
+#ifdef AMD_EXTENSIONS
+        case EbtInt16:
+        case EbtUint16:
+#endif
+        case EbtAtomicUint:
+            return true;
+        default:
+            break;
+        }
+        return false;
+    }
     virtual bool isOpaque() const { return basicType == EbtSampler || basicType == EbtAtomicUint; }
 
     // "Image" is a superset of "Subpass"
@@ -1451,9 +1476,9 @@ public:
             case EbtUint16:
 #endif
             case EbtBool:
-            return true;
+                return true;
             default:
-            return false;
+                return false;
             }
         };
 

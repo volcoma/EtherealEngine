@@ -61,7 +61,7 @@ namespace bgfx
 #include <bx/uint32_t.h>
 #include <bx/string.h>
 #include <bx/hash.h>
-#include <bx/crtimpl.h>
+#include <bx/file.h>
 #include "../../src/vertexdecl.h"
 
 namespace bgfx
@@ -78,7 +78,7 @@ namespace bgfx
 		{
 		}
 
-		virtual int32_t read(void* _data, int32_t _size, bx::Error* _err) BX_OVERRIDE
+		virtual int32_t read(void* _data, int32_t _size, bx::Error* _err) override
 		{
 			if (m_str[m_pos] == '\0'
 			||  m_pos == m_size)
@@ -110,8 +110,8 @@ namespace bgfx
 #define BGFX_UNIFORM_FRAGMENTBIT UINT8_C(0x10)
 #define BGFX_UNIFORM_SAMPLERBIT  UINT8_C(0x20)
 
-	const char* getUniformTypeName_(UniformType::Enum _enum);
-	UniformType::Enum nameToUniformTypeEnum_(const char* _name);
+	const char* getUniformTypeName(UniformType::Enum _enum);
+	UniformType::Enum nameToUniformTypeEnum(const char* _name);
 
 	struct Uniform
 	{
@@ -135,7 +135,5 @@ namespace bgfx
 	bool compileSPIRVShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer);
 
 } // namespace bgfx
-
-int compile_shader(int _argc, const char* _argv[]);
 
 #endif // SHADERC_H_HEADER_GUARD

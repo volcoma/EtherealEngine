@@ -45,6 +45,11 @@ echo Comparing single thread to multithread for all tests in current directory..
 $EXE -i -C *.vert *.geom *.frag *.tes* *.comp > singleThread.out
 $EXE -i -C *.vert *.geom *.frag *.tes* *.comp -t > multiThread.out
 diff singleThread.out multiThread.out || HASERROR=1
+if [ $HASERROR -eq 0 ]
+then
+    rm singleThread.out
+    rm multiThread.out
+fi
 
 #
 # entry point renaming tests
@@ -98,6 +103,8 @@ diff -b $BASEDIR/hlsl.multiDescriptorSet.frag.out $TARGETDIR/hlsl.multiDescripto
 echo Testing SPV no location
 $EXE -V -C spv.noLocation.vert > $TARGETDIR/spv.noLocation.vert.out
 diff -b $BASEDIR/spv.noLocation.vert.out $TARGETDIR/spv.noLocation.vert.out || HASERROR=1
+$EXE -H --aml spv.noBuiltInLoc.vert > $TARGETDIR/spv.noBuiltInLoc.vert.out
+diff -b $BASEDIR/spv.noBuiltInLoc.vert.out $TARGETDIR/spv.noBuiltInLoc.vert.out || HASERROR=1
 
 #
 # Testing debug information
@@ -128,6 +135,16 @@ $EXE -D -e main -V -i -DUNDEFED -UIN_SHADER -DFOO=200 -UUNDEFED hlsl.-D-U.frag >
 diff -b $BASEDIR/hlsl.-D-U.frag.out $TARGETDIR/hlsl.-D-U.frag.out || HASERROR=1
 
 #
+# Test --client and --target-env
+#
+$EXE --client vulkan100      spv.targetVulkan.vert || HASERROR=1
+$EXE --client opengl100      spv.targetOpenGL.vert || HASERROR=1
+$EXE --target-env vulkan1.0  spv.targetVulkan.vert || HASERROR=1
+$EXE --target-env opengl     spv.targetOpenGL.vert || HASERROR=1
+$EXE -V100                   spv.targetVulkan.vert || HASERROR=1
+$EXE -G100                   spv.targetOpenGL.vert || HASERROR=1
+
+#
 # Final checking
 #
 if [ $HASERROR -eq 0 ]
@@ -136,5 +153,7 @@ then
 else
     echo Tests Failed.
 fi
+
+rm -f comp.spv frag.spv geom.spv tesc.spv tese.spv vert.spv
 
 exit $HASERROR

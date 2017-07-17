@@ -7,9 +7,9 @@
 #include <bgfx/bgfx.h>
 #include <bx/commandline.h>
 #include <bx/os.h>
-#include <bx/string.h>
+#include <bx/filepath.h>
 #include <bx/uint32_t.h>
-#include <bx/fpumath.h>
+#include <bx/math.h>
 #include <bx/easing.h>
 #include <entry/entry.h>
 #include <entry/input.h>
@@ -19,7 +19,8 @@
 
 #include <dirent.h>
 
-#include <bx/crtimpl.h>
+#include <bx/file.h>
+#include <bx/process.h>
 
 #include <tinystl/allocator.h>
 #include <tinystl/vector.h>
@@ -36,6 +37,7 @@ namespace stl = tinystl;
 #include "fs_texture.bin.h"
 #include "fs_texture_array.bin.h"
 #include "fs_texture_cube.bin.h"
+#include "fs_texture_cube2.bin.h"
 #include "fs_texture_sdf.bin.h"
 #include "fs_texture_3d.bin.h"
 
@@ -52,6 +54,7 @@ static const bgfx::EmbeddedShader s_embeddedShaders[] =
 	BGFX_EMBEDDED_SHADER(fs_texture_array),
 	BGFX_EMBEDDED_SHADER(vs_texture_cube),
 	BGFX_EMBEDDED_SHADER(fs_texture_cube),
+	BGFX_EMBEDDED_SHADER(fs_texture_cube2),
 	BGFX_EMBEDDED_SHADER(fs_texture_sdf),
 	BGFX_EMBEDDED_SHADER(fs_texture_3d),
 
@@ -80,6 +83,19 @@ struct Binding
 	{
 		App,
 		View,
+		Help,
+
+		Count
+	};
+};
+
+struct Geometry
+{
+	enum Enum
+	{
+		Quad,
+		Cross,
+		Hexagon,
 
 		Count
 	};
@@ -87,15 +103,23 @@ struct Binding
 
 static const InputBinding s_bindingApp[] =
 {
-	{ entry::Key::Esc,  entry::Modifier::None,  1, NULL, "exit"                },
 	{ entry::Key::KeyQ, entry::Modifier::None,  1, NULL, "exit"                },
 	{ entry::Key::KeyF, entry::Modifier::None,  1, NULL, "graphics fullscreen" },
 
 	INPUT_BINDING_END
 };
 
+const char* s_resetCmd =
+	"view zoom 1.0\n"
+	"view rotate 0\n"
+	"view cubemap\n"
+	"view pan\n"
+	;
+
 static const InputBinding s_bindingView[] =
 {
+	{ entry::Key::Esc,       entry::Modifier::None,       1, NULL, "exit"                    },
+
 	{ entry::Key::Comma,     entry::Modifier::None,       1, NULL, "view mip prev"           },
 	{ entry::Key::Period,    entry::Modifier::None,       1, NULL, "view mip next"           },
 	{ entry::Key::Comma,     entry::Modifier::LeftShift,  1, NULL, "view mip"                },
@@ -106,19 +130,21 @@ static const InputBinding s_bindingView[] =
 	{ entry::Key::Key1,      entry::Modifier::None,       1, NULL, "view zoom 1.0\n"
 	                                                               "view fit\n"              },
 
-	{ entry::Key::Key0,      entry::Modifier::None,       1, NULL, "view zoom 1.0\n"
-	                                                               "view rotate 0\n"
-	                                                               "view pan\n"              },
+	{ entry::Key::Key0,      entry::Modifier::None,       1, NULL, s_resetCmd                },
 	{ entry::Key::Plus,      entry::Modifier::None,       1, NULL, "view zoom +0.1"          },
 	{ entry::Key::Minus,     entry::Modifier::None,       1, NULL, "view zoom -0.1"          },
 
 	{ entry::Key::KeyZ,      entry::Modifier::None,       1, NULL, "view rotate -90"         },
 	{ entry::Key::KeyZ,      entry::Modifier::LeftShift,  1, NULL, "view rotate +90"         },
 
-	{ entry::Key::Up,        entry::Modifier::None,       1, NULL, "view file-up"            },
-	{ entry::Key::Down,      entry::Modifier::None,       1, NULL, "view file-down"          },
-	{ entry::Key::PageUp,    entry::Modifier::None,       1, NULL, "view file-pgup"          },
-	{ entry::Key::PageDown,  entry::Modifier::None,       1, NULL, "view file-pgdown"        },
+	{ entry::Key::Up,        entry::Modifier::None,       1, NULL, "view pan\n"
+	                                                               "view file-up"            },
+	{ entry::Key::Down,      entry::Modifier::None,       1, NULL, "view pan\n"
+	                                                               "view file-down"          },
+	{ entry::Key::PageUp,    entry::Modifier::None,       1, NULL, "view pan\n"
+	                                                               "view file-pgup"          },
+	{ entry::Key::PageDown,  entry::Modifier::None,       1, NULL, "view pan\n"
+	                                                               "view file-pgdown"        },
 
 	{ entry::Key::Left,      entry::Modifier::None,       1, NULL, "view layer prev"         },
 	{ entry::Key::Right,     entry::Modifier::None,       1, NULL, "view layer next"         },
@@ -132,6 +158,16 @@ static const InputBinding s_bindingView[] =
 
 	{ entry::Key::KeyS,      entry::Modifier::None,       1, NULL, "view sdf"                },
 
+	{ entry::Key::Space,     entry::Modifier::None,       1, NULL, "view geo\n"
+	                                                               "view pan\n"              },
+
+	INPUT_BINDING_END
+};
+
+static const InputBinding s_bindingHelp[] =
+{
+	{ entry::Key::Esc,  entry::Modifier::None,  1, NULL, "view help" },
+	{ entry::Key::KeyH, entry::Modifier::None,  1, NULL, "view help" },
 	INPUT_BINDING_END
 };
 
@@ -139,6 +175,7 @@ static const char* s_bindingName[] =
 {
 	"App",
 	"View",
+	"Help",
 };
 BX_STATIC_ASSERT(Binding::Count == BX_COUNTOF(s_bindingName) );
 
@@ -146,19 +183,23 @@ static const InputBinding* s_binding[] =
 {
 	s_bindingApp,
 	s_bindingView,
+	s_bindingHelp,
 };
 BX_STATIC_ASSERT(Binding::Count == BX_COUNTOF(s_binding) );
 
 struct View
 {
 	View()
-		: m_fileIndex(0)
+		: m_cubeMapGeo(Geometry::Quad)
+		, m_fileIndex(0)
 		, m_scaleFn(0)
 		, m_mip(0)
 		, m_layer(0)
 		, m_abgr(UINT32_MAX)
 		, m_posx(0.0f)
 		, m_posy(0.0f)
+		, m_angx(0.0f)
+		, m_angy(0.0f)
 		, m_zoom(1.0f)
 		, m_angle(0.0f)
 		, m_filter(true)
@@ -269,6 +310,43 @@ struct View
 				{
 					m_posx = 0.0f;
 					m_posy = 0.0f;
+				}
+			}
+			else if (0 == bx::strCmp(_argv[1], "cubemap") )
+			{
+				if (_argc >= 3)
+				{
+					if (_argc >= 4)
+					{
+						float yy;
+						bx::fromString(&yy, _argv[3]);
+						if (_argv[3][0] == '+'
+						||  _argv[3][0] == '-')
+						{
+							m_angy += bx::toRad(yy);
+						}
+						else
+						{
+							m_angy = bx::toRad(yy);
+						}
+					}
+
+					float xx;
+					bx::fromString(&xx, _argv[2]);
+					if (_argv[2][0] == '+'
+					||  _argv[2][0] == '-')
+					{
+						m_angx += bx::toRad(xx);
+					}
+					else
+					{
+						m_angx = bx::toRad(xx);
+					}
+				}
+				else
+				{
+					m_angx = 0.0f;
+					m_angy = 0.0f;
 				}
 			}
 			else if (0 == bx::strCmp(_argv[1], "zoom") )
@@ -382,6 +460,28 @@ struct View
 			{
 				m_sdf ^= true;
 			}
+			else if (0 == bx::strCmp(_argv[1], "geo") )
+			{
+				if (_argc >= 3)
+				{
+					if (bx::toLower(_argv[2][0]) == 'c')
+					{
+						m_cubeMapGeo = Geometry::Cross;
+					}
+					else if (bx::toLower(_argv[2][0]) == 'h')
+					{
+						m_cubeMapGeo = Geometry::Hexagon;
+					}
+					else
+					{
+						m_cubeMapGeo = Geometry::Quad;
+					}
+				}
+				else
+				{
+					m_cubeMapGeo = Geometry::Enum( (m_cubeMapGeo + 1) % Geometry::Count);
+				}
+			}
 			else if (0 == bx::strCmp(_argv[1], "help") )
 			{
 				m_help ^= true;
@@ -391,7 +491,7 @@ struct View
 		return 0;
 	}
 
-	void updateFileList(const char* _path, const char* _fileName = "")
+	void updateFileList(const char* _path, const bx::StringView& _fileName)
 	{
 		std::string path = _path;
 
@@ -425,7 +525,7 @@ struct View
 
 						if (supported)
 						{
-							if (0 == bx::strCmp(_fileName, item->d_name) )
+							if (0 == bx::strCmp(item->d_name, _fileName) )
 							{
 								m_fileIndex = uint32_t(m_fileList.size() );
 							}
@@ -448,6 +548,7 @@ struct View
 	FileList m_fileList;
 
 	bgfx::TextureInfo m_info;
+	Geometry::Enum m_cubeMapGeo;
 	uint32_t m_fileIndex;
 	uint32_t m_scaleFn;
 	uint32_t m_mip;
@@ -455,6 +556,8 @@ struct View
 	uint32_t m_abgr;
 	float    m_posx;
 	float    m_posy;
+	float    m_angx;
+	float    m_angy;
 	float    m_zoom;
 	float    m_angle;
 	bool     m_filter;
@@ -470,12 +573,13 @@ int cmdView(CmdContext* /*_context*/, void* _userData, int _argc, char const* co
 	return view->cmd(_argc, _argv);
 }
 
-struct PosUvColorVertex
+struct PosUvwColorVertex
 {
 	float m_x;
 	float m_y;
 	float m_u;
 	float m_v;
+	float m_w;
 	uint32_t m_abgr;
 
 	static void init()
@@ -483,80 +587,169 @@ struct PosUvColorVertex
 		ms_decl
 			.begin()
 			.add(bgfx::Attrib::Position,  2, bgfx::AttribType::Float)
-			.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+			.add(bgfx::Attrib::TexCoord0, 3, bgfx::AttribType::Float)
 			.add(bgfx::Attrib::Color0,    4, bgfx::AttribType::Uint8, true)
 			.end();
+	}
+
+	void set(float _x, float _y, float _u, float _v, float _w, uint32_t _abgr)
+	{
+		m_x = _x;
+		m_y = _y;
+		m_u = _u;
+		m_v = _v;
+		m_w = _w;
+		m_abgr = _abgr;
 	}
 
 	static bgfx::VertexDecl ms_decl;
 };
 
-bgfx::VertexDecl PosUvColorVertex::ms_decl;
+bgfx::VertexDecl PosUvwColorVertex::ms_decl;
 
-bool screenQuad(int32_t _x, int32_t _y, int32_t _width, uint32_t _height, uint32_t _abgr, float _maxu = 1.0f, float _maxv = 1.0f)
+static uint32_t addQuad(uint16_t* _indices, uint16_t _idx0, uint16_t _idx1, uint16_t _idx2, uint16_t _idx3)
 {
-	if (6 == bgfx::getAvailTransientVertexBuffer(6, PosUvColorVertex::ms_decl) )
+	_indices[0] = _idx0;
+	_indices[1] = _idx3;
+	_indices[2] = _idx1;
+
+	_indices[3] = _idx1;
+	_indices[4] = _idx3;
+	_indices[5] = _idx2;
+
+	return 6;
+}
+
+void setGeometry(
+	  Geometry::Enum _type
+	, int32_t _x
+	, int32_t _y
+	, int32_t _width
+	, uint32_t _height
+	, uint32_t _abgr
+	, float _maxu = 1.0f
+	, float _maxv = 1.0f
+	)
+{
+	if (Geometry::Quad == _type)
 	{
-		bgfx::TransientVertexBuffer vb;
-		bgfx::allocTransientVertexBuffer(&vb, 6, PosUvColorVertex::ms_decl);
-		PosUvColorVertex* vertex = (PosUvColorVertex*)vb.data;
+		if (6 == bgfx::getAvailTransientVertexBuffer(6, PosUvwColorVertex::ms_decl) )
+		{
+			bgfx::TransientVertexBuffer vb;
+			bgfx::allocTransientVertexBuffer(&vb, 6, PosUvwColorVertex::ms_decl);
+			PosUvwColorVertex* vertex = (PosUvwColorVertex*)vb.data;
 
-		const float widthf  = float(_width);
-		const float heightf = float(_height);
+			const float widthf  = float(_width);
+			const float heightf = float(_height);
 
-		const float minx = float(_x);
-		const float miny = float(_y);
-		const float maxx = minx+widthf;
-		const float maxy = miny+heightf;
+			const float minx = float(_x);
+			const float miny = float(_y);
+			const float maxx = minx+widthf;
+			const float maxy = miny+heightf;
 
-		const float minu = 0.0f;
-		const float maxu = _maxu;
-		const float minv = 0.0f;
-		const float maxv = _maxv;
+			const float minu = 0.0f;
+			const float maxu = _maxu;
+			const float minv = 0.0f;
+			const float maxv = _maxv;
 
-		vertex[0].m_x = minx;
-		vertex[0].m_y = miny;
-		vertex[0].m_u = minu;
-		vertex[0].m_v = minv;
+			vertex->set(minx, miny, minu, minv, 0.0f, _abgr); ++vertex;
+			vertex->set(maxx, miny, maxu, minv, 0.0f, _abgr); ++vertex;
+			vertex->set(maxx, maxy, maxu, maxv, 0.0f, _abgr); ++vertex;
 
-		vertex[1].m_x = maxx;
-		vertex[1].m_y = miny;
-		vertex[1].m_u = maxu;
-		vertex[1].m_v = minv;
+			vertex->set(maxx, maxy, maxu, maxv, 0.0f, _abgr); ++vertex;
+			vertex->set(minx, maxy, minu, maxv, 0.0f, _abgr); ++vertex;
+			vertex->set(minx, miny, minu, minv, 0.0f, _abgr); ++vertex;
 
-		vertex[2].m_x = maxx;
-		vertex[2].m_y = maxy;
-		vertex[2].m_u = maxu;
-		vertex[2].m_v = maxv;
-
-		vertex[3].m_x = maxx;
-		vertex[3].m_y = maxy;
-		vertex[3].m_u = maxu;
-		vertex[3].m_v = maxv;
-
-		vertex[4].m_x = minx;
-		vertex[4].m_y = maxy;
-		vertex[4].m_u = minu;
-		vertex[4].m_v = maxv;
-
-		vertex[5].m_x = minx;
-		vertex[5].m_y = miny;
-		vertex[5].m_u = minu;
-		vertex[5].m_v = minv;
-
-		vertex[0].m_abgr = _abgr;
-		vertex[1].m_abgr = _abgr;
-		vertex[2].m_abgr = _abgr;
-		vertex[3].m_abgr = _abgr;
-		vertex[4].m_abgr = _abgr;
-		vertex[5].m_abgr = _abgr;
-
-		bgfx::setVertexBuffer(0, &vb);
-
-		return true;
+			bgfx::setVertexBuffer(0, &vb);
+		}
 	}
+	else
+	{
+		const uint32_t numVertices = 14;
+		const uint32_t numIndices  = 36;
+		if (checkAvailTransientBuffers(numVertices, PosUvwColorVertex::ms_decl, numIndices) )
+		{
+			bgfx::TransientVertexBuffer tvb;
+			bgfx::allocTransientVertexBuffer(&tvb, numVertices, PosUvwColorVertex::ms_decl);
 
-	return false;
+			bgfx::TransientIndexBuffer tib;
+			bgfx::allocTransientIndexBuffer(&tib, numIndices);
+
+			PosUvwColorVertex* vertex = (PosUvwColorVertex*)tvb.data;
+			uint16_t* indices = (uint16_t*)tib.data;
+
+			if (Geometry::Cross == _type)
+			{
+				const float sx = _width /1.5f;
+				const float sy = _height/1.5f;
+				const float px = float(_x)-sx/4.0f;
+				const float py = float(_y);
+
+				vertex->set(0.0f*sx+px, 0.5f*sy+py, -1.0f,  1.0f, -1.0f, _abgr); ++vertex;
+				vertex->set(0.0f*sx+px, 1.0f*sy+py, -1.0f, -1.0f, -1.0f, _abgr); ++vertex;
+
+				vertex->set(0.5f*sx+px, 0.0f*sy+py, -1.0f,  1.0f, -1.0f, _abgr); ++vertex;
+				vertex->set(0.5f*sx+px, 0.5f*sy+py, -1.0f,  1.0f,  1.0f, _abgr); ++vertex;
+				vertex->set(0.5f*sx+px, 1.0f*sy+py, -1.0f, -1.0f,  1.0f, _abgr); ++vertex;
+				vertex->set(0.5f*sx+px, 1.5f*sy+py, -1.0f, -1.0f, -1.0f, _abgr); ++vertex;
+
+				vertex->set(1.0f*sx+px, 0.0f*sy+py,  1.0f,  1.0f, -1.0f, _abgr); ++vertex;
+				vertex->set(1.0f*sx+px, 0.5f*sy+py,  1.0f,  1.0f,  1.0f, _abgr); ++vertex;
+				vertex->set(1.0f*sx+px, 1.0f*sy+py,  1.0f, -1.0f,  1.0f, _abgr); ++vertex;
+				vertex->set(1.0f*sx+px, 1.5f*sy+py,  1.0f, -1.0f, -1.0f, _abgr); ++vertex;
+
+				vertex->set(1.5f*sx+px, 0.5f*sy+py,  1.0f,  1.0f, -1.0f, _abgr); ++vertex;
+				vertex->set(1.5f*sx+px, 1.0f*sy+py,  1.0f, -1.0f, -1.0f, _abgr); ++vertex;
+
+				vertex->set(2.0f*sx+px, 0.5f*sy+py, -1.0f,  1.0f, -1.0f, _abgr); ++vertex;
+				vertex->set(2.0f*sx+px, 1.0f*sy+py, -1.0f, -1.0f, -1.0f, _abgr); ++vertex;
+
+				indices += addQuad(indices,  0,  3,  4,  1);
+				indices += addQuad(indices,  2,  6,  7,  3);
+				indices += addQuad(indices,  3,  7,  8,  4);
+				indices += addQuad(indices,  4,  8,  9,  5);
+				indices += addQuad(indices,  7, 10, 11,  8);
+				indices += addQuad(indices, 10, 12, 13, 11);
+			}
+			else
+			{
+				const float sx = float(_width);
+				const float sy = float(_height);
+				const float px = float(_x) - sx/2.0f;
+				const float py = float(_y);
+
+				vertex->set(0.0f*sx+px, 0.25f*sy+py, -1.0f,  1.0f, -1.0f, _abgr); ++vertex;
+				vertex->set(0.0f*sx+px, 0.75f*sy+py, -1.0f, -1.0f, -1.0f, _abgr); ++vertex;
+
+				vertex->set(0.5f*sx+px, 0.00f*sy+py, -1.0f,  1.0f,  1.0f, _abgr); ++vertex;
+				vertex->set(0.5f*sx+px, 0.50f*sy+py, -1.0f, -1.0f,  1.0f, _abgr); ++vertex;
+				vertex->set(0.5f*sx+px, 1.00f*sy+py,  1.0f, -1.0f, -1.0f, _abgr); ++vertex;
+
+				vertex->set(1.0f*sx+px, 0.25f*sy+py,  1.0f,  1.0f,  1.0f, _abgr); ++vertex;
+				vertex->set(1.0f*sx+px, 0.75f*sy+py,  1.0f, -1.0f,  1.0f, _abgr); ++vertex;
+
+				vertex->set(1.0f*sx+px, 0.25f*sy+py,  1.0f,  1.0f,  1.0f, _abgr); ++vertex;
+				vertex->set(1.0f*sx+px, 0.75f*sy+py,  1.0f, -1.0f,  1.0f, _abgr); ++vertex;
+
+				vertex->set(1.5f*sx+px, 0.00f*sy+py, -1.0f,  1.0f,  1.0f, _abgr); ++vertex;
+				vertex->set(1.5f*sx+px, 0.50f*sy+py,  1.0f,  1.0f, -1.0f, _abgr); ++vertex;
+				vertex->set(1.5f*sx+px, 1.00f*sy+py,  1.0f, -1.0f, -1.0f, _abgr); ++vertex;
+
+				vertex->set(2.0f*sx+px, 0.25f*sy+py, -1.0f,  1.0f, -1.0f, _abgr); ++vertex;
+				vertex->set(2.0f*sx+px, 0.75f*sy+py, -1.0f, -1.0f, -1.0f, _abgr); ++vertex;
+
+				indices += addQuad(indices,  0,  2,  3,  1);
+				indices += addQuad(indices,  1,  3,  6,  4);
+				indices += addQuad(indices,  2,  5,  6,  3);
+				indices += addQuad(indices,  7,  9, 12, 10);
+				indices += addQuad(indices,  7, 10, 11,  8);
+				indices += addQuad(indices, 10, 12, 13, 11);
+			}
+
+			bgfx::setVertexBuffer(0, &tvb);
+			bgfx::setIndexBuffer(&tib);
+		}
+	}
 }
 
 template<bx::LerpFn lerpT, bx::EaseFn easeT>
@@ -649,13 +842,12 @@ void associate()
 		bx::stringPrintf(str, "[HKEY_CURRENT_USER\\Software\\Classes\\.%s]\r\n@=\"texturev\"\r\n\r\n", ext);
 	}
 
-	char temp[MAX_PATH];
-	GetTempPathA(MAX_PATH, temp);
-	bx::strCat(temp, MAX_PATH, "\\texturev.reg");
+	bx::FilePath filePath(bx::TempDir::Tag);
+	filePath.join("texture.reg");
 
 	bx::FileWriter writer;
 	bx::Error err;
-	if (bx::open(&writer, temp, false, &err) )
+	if (bx::open(&writer, filePath, false, &err) )
 	{
 		bx::write(&writer, str.c_str(), uint32_t(str.length()), &err);
 		bx::close(&writer);
@@ -663,10 +855,10 @@ void associate()
 		if (err.isOk() )
 		{
 			std::string cmd;
-			bx::stringPrintf(cmd, "regedit.exe /s %s", temp);
+			bx::stringPrintf(cmd, "/s %s", filePath.get() );
 
 			bx::ProcessReader reader;
-			if (bx::open(&reader, cmd.c_str(), &err) )
+			if (bx::open(&reader, "regedit.exe", cmd.c_str(), &err) )
 			{
 				bx::close(&reader);
 			}
@@ -694,7 +886,7 @@ void associate()
 		if (err.isOk() )
 		{
 			bx::ProcessReader reader;
-			if (bx::open(&reader, "/bin/bash /tmp/texturev.sh", &err) )
+			if (bx::open(&reader, "/bin/bash", "/tmp/texturev.sh", &err) )
 			{
 				bx::close(&reader);
 			}
@@ -791,47 +983,56 @@ int _main_(int _argc, char** _argv)
 
 	imguiCreate();
 
-	PosUvColorVertex::init();
+	PosUvwColorVertex::init();
 
 	const bgfx::Caps* caps = bgfx::getCaps();
 	bgfx::RendererType::Enum type = caps->rendererType;
+
+	bgfx::UniformHandle s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Int1);
+	bgfx::UniformHandle u_mtx      = bgfx::createUniform("u_mtx",      bgfx::UniformType::Mat4);
+	bgfx::UniformHandle u_params   = bgfx::createUniform("u_params",   bgfx::UniformType::Vec4);
 
 	bgfx::ShaderHandle vsTexture      = bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_texture");
 	bgfx::ShaderHandle fsTexture      = bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_texture");
 	bgfx::ShaderHandle fsTextureArray = bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_texture_array");
 
 	bgfx::ProgramHandle textureProgram = bgfx::createProgram(
-			  vsTexture
-			, fsTexture
-			, true
-			);
+		  vsTexture
+		, fsTexture
+		, true
+		);
+
 	bgfx::ProgramHandle textureArrayProgram = bgfx::createProgram(
-			  vsTexture
-			, bgfx::isValid(fsTextureArray)
-			? fsTextureArray
-			: fsTexture
-			, true
-			);
+		  vsTexture
+		, bgfx::isValid(fsTextureArray)
+		? fsTextureArray
+		: fsTexture
+		, true
+		);
 
 	bgfx::ProgramHandle textureCubeProgram = bgfx::createProgram(
-			  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_texture_cube")
-			, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_texture_cube")
-			, true
-			);
+		  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_texture_cube")
+		, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_texture_cube")
+		, true
+		);
+
+	bgfx::ProgramHandle textureCube2Program = bgfx::createProgram(
+		  vsTexture
+		, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_texture_cube2")
+		, true
+		);
 
 	bgfx::ProgramHandle textureSdfProgram = bgfx::createProgram(
-			  vsTexture
-			, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_texture_sdf")
-			, true);
+		  vsTexture
+		, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_texture_sdf")
+		, true
+		);
 
 	bgfx::ProgramHandle texture3DProgram = bgfx::createProgram(
-			  vsTexture
-			, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_texture_3d")
-			, true);
-
-	bgfx::UniformHandle s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Int1);
-	bgfx::UniformHandle u_mtx      = bgfx::createUniform("u_mtx",      bgfx::UniformType::Mat4);
-	bgfx::UniformHandle u_params   = bgfx::createUniform("u_params",   bgfx::UniformType::Vec4);
+		  vsTexture
+		, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_texture_3d")
+		, true
+		);
 
 	const uint32_t checkerBoardSize = 64;
 	bgfx::TextureHandle checkerBoard;
@@ -854,10 +1055,12 @@ int _main_(int _argc, char** _argv)
 	Interpolator mip(0.0f);
 	Interpolator layer(0.0f);
 	Interpolator zoom(1.0f);
-	InterpolatorAngle angle(0.0f);
 	Interpolator scale(1.0f);
 	Interpolator posx(0.0f);
 	Interpolator posy(0.0f);
+	InterpolatorAngle angle(0.0f);
+	InterpolatorAngle angx(0.0f);
+	InterpolatorAngle angy(0.0f);
 
 	const char* filePath = _argc < 2 ? "" : _argv[1];
 	bool directory = false;
@@ -869,13 +1072,13 @@ int _main_(int _argc, char** _argv)
 	std::string path = filePath;
 	if (!directory)
 	{
-		const char* fileName = directory ? filePath : bx::baseName(filePath);
-		path.assign(filePath, fileName);
-		view.updateFileList(path.c_str(), fileName);
+		bx::FilePath fp(filePath);
+		path.assign(fp.getPath().getPtr(), fp.getPath().getTerm() );
+		view.updateFileList(path.c_str(), fp.getFileName() );
 	}
 	else
 	{
-		view.updateFileList(path.c_str() );
+		view.updateFileList(path.c_str(), "");
 	}
 
 	int exitcode = bx::kExitSuccess;
@@ -913,7 +1116,6 @@ int _main_(int _argc, char** _argv)
 				);
 
 			static bool help = false;
-
 			static bool mouseDelta = false;
 			if (!mouseDelta)
 			{
@@ -929,27 +1131,136 @@ int _main_(int _argc, char** _argv)
 				cmdExec(exec);
 			}
 
-			if (mouseState.m_buttons[entry::MouseButton::Left] != mouseStatePrev.m_buttons[entry::MouseButton::Left])
+			const float xDelta = float(mouseStatePrev.m_mx - mouseState.m_mx);
+			const float yDelta = float(mouseStatePrev.m_my - mouseState.m_my);
+
+			if (!ImGui::MouseOverArea()
+			&&  !help
+			&&  mouseState.m_buttons[entry::MouseButton::Left] != mouseStatePrev.m_buttons[entry::MouseButton::Left])
 			{
 				dragging = !!mouseState.m_buttons[entry::MouseButton::Left];
 			}
 
 			if (dragging)
 			{
-				float xDelta = float(mouseStatePrev.m_mx - mouseState.m_mx);
-				float yDelta = float(mouseStatePrev.m_my - mouseState.m_my);
-
-				char exec[64];
-				bx::snprintf(exec, BX_COUNTOF(exec), "view pan %+f %+f", xDelta, yDelta);
-				cmdExec(exec);
+				if (view.m_info.cubeMap
+				&&  Geometry::Quad == view.m_cubeMapGeo)
+				{
+					char exec[64];
+					bx::snprintf(exec, BX_COUNTOF(exec), "view cubemap %+f %+f", -yDelta, -xDelta);
+					cmdExec(exec);
+				}
+				else
+				{
+					char exec[64];
+					bx::snprintf(exec, BX_COUNTOF(exec), "view pan %+f %+f", xDelta, yDelta);
+					cmdExec(exec);
+				}
 			}
 
 			mouseStatePrev = mouseState;
 
-			if (help == false
-			&&  help != view.m_help)
+			if (ImGui::BeginPopupContextVoid("Menu") )
 			{
-				ImGui::OpenPopup("Help");
+//				if (ImGui::MenuItem("Open") )
+				{
+				}
+
+//				if (ImGui::MenuItem("Save As") )
+				{
+				}
+
+				if (ImGui::MenuItem("Reset") )
+				{
+					cmdExec(s_resetCmd);
+				}
+
+				ImGui::Separator();
+				if (ImGui::BeginMenu("Options"))
+				{
+					bool filter = view.m_filter;
+					if (ImGui::MenuItem("Filter", NULL, &filter) )
+					{
+						cmdExec("view filter");
+					}
+
+					if (ImGui::BeginMenu("Cubemap", view.m_info.cubeMap) )
+					{
+						if (ImGui::MenuItem("Quad", NULL, Geometry::Quad == view.m_cubeMapGeo) )
+						{
+							cmdExec("view geo quad");
+						}
+
+						if (ImGui::MenuItem("Cross", NULL, Geometry::Cross == view.m_cubeMapGeo) )
+						{
+							cmdExec("view geo cross");
+						}
+
+						if (ImGui::MenuItem("Hexagon", NULL, Geometry::Hexagon == view.m_cubeMapGeo) )
+						{
+							cmdExec("view geo hexagon");
+						}
+
+						ImGui::EndMenu();
+					}
+
+					bool rr = 0 != (view.m_abgr & 0x000000ff);
+					if (ImGui::MenuItem("R", NULL, &rr) )
+					{
+						cmdExec("view rgb r");
+					}
+
+					bool gg = 0 != (view.m_abgr & 0x0000ff00);
+					if (ImGui::MenuItem("G", NULL, &gg) )
+					{
+						cmdExec("view rgb g");
+					}
+
+					bool bb = 0 != (view.m_abgr & 0x00ff0000);
+					if (ImGui::MenuItem("B", NULL, &bb) )
+					{
+						cmdExec("view rgb b");
+					}
+
+					bool alpha = view.m_alpha;
+					if (ImGui::MenuItem("Checkerboard", NULL, &alpha) )
+					{
+						cmdExec("view rgb a");
+					}
+
+					ImGui::EndMenu();
+				}
+
+				ImGui::Separator();
+				if (ImGui::MenuItem("Help") )
+				{
+					cmdExec("view help");
+				}
+
+				ImGui::Separator();
+				if (ImGui::MenuItem("Exit") )
+				{
+					cmdExec("exit");
+				}
+
+				ImGui::EndPopup();
+			}
+
+			if (help != view.m_help)
+			{
+				if (!help)
+				{
+					ImGui::OpenPopup("Help");
+					inputRemoveBindings(s_bindingName[Binding::View]);
+					inputAddBindings(s_bindingName[Binding::Help], s_binding[Binding::Help]);
+				}
+				else
+				{
+					inputRemoveBindings(s_bindingName[Binding::Help]);
+					inputAddBindings(s_bindingName[Binding::View], s_binding[Binding::View]);
+				}
+
+				help = view.m_help;
 			}
 
 			if (ImGui::BeginPopupModal("Help", NULL, ImGuiWindowFlags_AlwaysAutoResize) )
@@ -982,9 +1293,10 @@ int _main_(int _argc, char** _argv)
 				keyBindingHelp("1",         "Fit to window.");
 				ImGui::NextLine();
 
-				keyBindingHelp("<",   "Reset MIP level.");
-				keyBindingHelp(",/,", "MIP level up/down.");
-				keyBindingHelp("/",   "Toggle linear/point texture sampling.");
+				keyBindingHelp("<",       "Reset MIP level.");
+				keyBindingHelp(",/,",     "MIP level up/down.");
+				keyBindingHelp("/",       "Toggle linear/point texture sampling.");
+				keyBindingHelp("[space]", "Change cubemap mode.");
 				ImGui::NextLine();
 
 				keyBindingHelp("left",  "Previous layer in texture array.");
@@ -1016,8 +1328,6 @@ int _main_(int _argc, char** _argv)
 				ImGui::EndPopup();
 			}
 
-			help = view.m_help;
-
 			imguiEndFrame();
 
 			if (!bgfx::isValid(texture)
@@ -1033,13 +1343,13 @@ int _main_(int _argc, char** _argv)
 				filePath = view.m_fileList[view.m_fileIndex].c_str();
 
 				texture = loadTexture(filePath
-						, 0
-						| BGFX_TEXTURE_U_CLAMP
-						| BGFX_TEXTURE_V_CLAMP
-						| BGFX_TEXTURE_W_CLAMP
-						, 0
-						, &view.m_info
-						);
+					, 0
+					| BGFX_TEXTURE_U_CLAMP
+					| BGFX_TEXTURE_V_CLAMP
+					| BGFX_TEXTURE_W_CLAMP
+					, 0
+					, &view.m_info
+					);
 
 				std::string title;
 				if (isValid(texture) )
@@ -1092,12 +1402,22 @@ int _main_(int _argc, char** _argv)
 
 			float ortho[16];
 
-			bx::mtxOrtho(ortho, 0.0f, float(width), float(height), 0.0f, 0.0f, 1000.0f, 0.0f, caps->homogeneousDepth);
+			bx::mtxOrtho(
+				  ortho
+				, 0.0f
+				, float(width)
+				, float(height)
+				, 0.0f
+				, 0.0f
+				, 1000.0f
+				, 0.0f
+				, caps->homogeneousDepth
+				);
 			bgfx::setViewTransform(BACKGROUND_VIEW_ID, NULL, ortho);
 			bgfx::setViewRect(BACKGROUND_VIEW_ID, 0, 0, uint16_t(width), uint16_t(height) );
 
-			screenQuad(
-				  0
+			setGeometry(Geometry::Quad
+				, 0
 				, 0
 				, width
 				, height
@@ -1114,12 +1434,22 @@ int _main_(int _argc, char** _argv)
 				| BGFX_STATE_ALPHA_WRITE
 				);
 			bgfx::submit(BACKGROUND_VIEW_ID
-					, textureProgram
-					);
+				, textureProgram
+				);
 
 			float px = posx.getValue();
 			float py = posy.getValue();
-			bx::mtxOrtho(ortho, px-width/2, px+width/2, py+height/2, py-height/2, 0.0f, 1000.0f, 0.0f, caps->homogeneousDepth);
+			bx::mtxOrtho(
+				  ortho
+				, px-width/2.0f
+				, px+width/2.0f
+				, py+height/2.0f
+				, py-height/2.0f
+				, 0.0f
+				, 1000.0f
+				, 0.0f
+				, caps->homogeneousDepth
+				);
 			bgfx::setViewTransform(IMAGE_VIEW_ID, NULL, ortho);
 			bgfx::setViewRect(IMAGE_VIEW_ID, 0, 0, uint16_t(width), uint16_t(height) );
 
@@ -1127,10 +1457,8 @@ int _main_(int _argc, char** _argv)
 
 			if (view.m_fit)
 			{
-				scale.set(
-					bx::fmin( float(width)  / float(view.m_info.width)
-					,           float(height) / float(view.m_info.height)
-					)
+				scale.set(bx::fmin(float(width)  / float(view.m_info.width)
+					,              float(height) / float(view.m_info.height) )
 					, 0.1f
 					);
 			}
@@ -1141,13 +1469,15 @@ int _main_(int _argc, char** _argv)
 
 			zoom.set(view.m_zoom, transitionTime);
 			angle.set(view.m_angle, transitionTime);
+			angx.set(view.m_angx, transitionTime);
+			angy.set(view.m_angy, transitionTime);
 
 			float ss = scale.getValue()
 				* zoom.getValue()
 				;
 
-			screenQuad(
-				  -int(view.m_info.width  * ss)/2
+			setGeometry(view.m_info.cubeMap ? view.m_cubeMapGeo : Geometry::Quad
+				, -int(view.m_info.width  * ss)/2
 				, -int(view.m_info.height * ss)/2
 				,  int(view.m_info.width  * ss)
 				,  int(view.m_info.height * ss)
@@ -1159,7 +1489,8 @@ int _main_(int _argc, char** _argv)
 			bgfx::setTransform(rotz);
 
 			float mtx[16];
-			bx::mtxRotateXY(mtx, 0.0f, time);
+			bx::mtxRotateXY(mtx, angx.getValue(), angy.getValue() );
+
 			bgfx::setUniform(u_mtx, mtx);
 
 			mip.set(float(view.m_mip), 0.5f);
@@ -1202,7 +1533,10 @@ int _main_(int _argc, char** _argv)
 			}
 			else if (view.m_info.cubeMap)
 			{
-				program = textureCubeProgram;
+				program = Geometry::Quad == view.m_cubeMapGeo
+					? textureCubeProgram
+					: textureCube2Program
+					;
 			}
 			else if (1 < view.m_info.numLayers)
 			{
@@ -1223,6 +1557,7 @@ int _main_(int _argc, char** _argv)
 	{
 		bgfx::destroyTexture(texture);
 	}
+
 	bgfx::destroyTexture(checkerBoard);
 	bgfx::destroyUniform(s_texColor);
 	bgfx::destroyUniform(u_mtx);
@@ -1230,7 +1565,9 @@ int _main_(int _argc, char** _argv)
 	bgfx::destroyProgram(textureProgram);
 	bgfx::destroyProgram(textureArrayProgram);
 	bgfx::destroyProgram(textureCubeProgram);
+	bgfx::destroyProgram(textureCube2Program);
 	bgfx::destroyProgram(textureSdfProgram);
+	bgfx::destroyProgram(texture3DProgram);
 
 	imguiDestroy();
 

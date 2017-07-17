@@ -471,12 +471,13 @@ namespace bimg
 		      uint8_t* dst = (      uint8_t*)_dst;
 		const uint8_t* src = (const uint8_t*)_src;
 
-		for (uint32_t yy = 0; yy < _height; ++yy, src += _srcPitch)
+		for (uint32_t yy = 0; yy < _height; ++yy, src += _srcPitch, dst += _width*16)
 		{
-			for (uint32_t xx = 0; xx < _width; ++xx, dst += 16)
+			for (uint32_t xx = 0; xx < _width; ++xx)
 			{
-				      float* fd = (      float*)dst;
-				const float* fs = (const float*)src;
+				const uint32_t offset = xx * 16;
+				      float* fd = (      float*)(dst + offset);
+				const float* fs = (const float*)(src + offset);
 
 				fd[0] = bx::fpow(fs[0], 1.0f/2.2f);
 				fd[1] = bx::fpow(fs[1], 1.0f/2.2f);
@@ -491,12 +492,13 @@ namespace bimg
 		      uint8_t* dst = (      uint8_t*)_dst;
 		const uint8_t* src = (const uint8_t*)_src;
 
-		for (uint32_t yy = 0; yy < _height; ++yy, src += _srcPitch)
+		for (uint32_t yy = 0; yy < _height; ++yy, src += _srcPitch, dst += _width*16)
 		{
-			for (uint32_t xx = 0; xx < _width; ++xx, dst += 16)
+			for (uint32_t xx = 0; xx < _width; ++xx)
 			{
-				      float* fd = (      float*)dst;
-				const float* fs = (const float*)src;
+				const uint32_t offset = xx * 16;
+				      float* fd = (      float*)(dst + offset);
+				const float* fs = (const float*)(src + offset);
 
 				fd[0] = bx::fpow(fs[0], 2.2f);
 				fd[1] = bx::fpow(fs[1], 2.2f);
@@ -2209,6 +2211,7 @@ namespace bimg
 #define KTX_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG          0x8C03
 #define KTX_COMPRESSED_RGBA_PVRTC_2BPPV2_IMG          0x9137
 #define KTX_COMPRESSED_RGBA_PVRTC_4BPPV2_IMG          0x9138
+#define KTX_COMPRESSED_RGB_S3TC_DXT1_EXT              0x83F0
 #define KTX_COMPRESSED_RGBA_S3TC_DXT1_EXT             0x83F1
 #define KTX_COMPRESSED_RGBA_S3TC_DXT3_EXT             0x83F2
 #define KTX_COMPRESSED_RGBA_S3TC_DXT5_EXT             0x83F3
@@ -2395,9 +2398,11 @@ namespace bimg
 
 	static const KtxFormatInfo2 s_translateKtxFormat2[] =
 	{
-		{ KTX_A8,  TextureFormat::A8   },
-		{ KTX_RED, TextureFormat::R8   },
-		{ KTX_RGB, TextureFormat::RGB8 },
+		{ KTX_A8,                           TextureFormat::A8    },
+		{ KTX_RED,                          TextureFormat::R8    },
+		{ KTX_RGB,                          TextureFormat::RGB8  },
+		{ KTX_RGBA,                         TextureFormat::RGBA8 },
+		{ KTX_COMPRESSED_RGB_S3TC_DXT1_EXT, TextureFormat::BC1   },
 	};
 
 	bool imageParseKtx(ImageContainer& _imageContainer, bx::ReaderSeekerI* _reader, bx::Error* _err)
@@ -2497,7 +2502,13 @@ namespace bimg
 		_imageContainer.m_ktxLE     = fromLittleEndian;
 		_imageContainer.m_srgb      = false;
 
-		return TextureFormat::Unknown != format;
+		if (TextureFormat::Unknown == format)
+		{
+			BX_ERROR_SET(_err, BIMG_ERROR, "Unrecognized image format.");
+			return false;
+		}
+
+		return true;
 	}
 
 	ImageContainer* imageParseKtx(bx::AllocatorI* _allocator, const void* _src, uint32_t _size, bx::Error* _err)
@@ -3070,10 +3081,6 @@ namespace bimg
 			bx::memCopy(_dst, _src, _dstPitch*_height);
 			break;
 
-		case TextureFormat::RGBA8:
-			imageRgba8ToRgba32f(_dst, _width, _height, _width*4, _src);
-			break;
-
 		default:
 			if (isCompressed(_format) )
 			{
@@ -3129,15 +3136,18 @@ namespace bimg
 
 			for (uint8_t lod = 0, num = _imageContainer.m_numMips; lod < num; ++lod)
 			{
-				uint32_t imageSize = bx::toHostEndian(*(const uint32_t*)&data[offset], _imageContainer.m_ktxLE) / _imageContainer.m_numLayers;
-				offset += sizeof(uint32_t);
-
 				width  = bx::uint32_max(blockWidth  * minBlockX, ( (width  + blockWidth  - 1) / blockWidth )*blockWidth);
 				height = bx::uint32_max(blockHeight * minBlockY, ( (height + blockHeight - 1) / blockHeight)*blockHeight);
 				depth  = bx::uint32_max(1, depth);
 
-				uint32_t size = width*height*depth*bpp/8;
+				const uint32_t mipSize = width*height*depth*bpp/8;
+
+				const uint32_t size = mipSize*numSides;
+				uint32_t imageSize = bx::toHostEndian(*(const uint32_t*)&data[offset], _imageContainer.m_ktxLE);
 				BX_CHECK(size == imageSize, "KTX: Image size mismatch %d (expected %d).", size, imageSize);
+				BX_UNUSED(size, imageSize);
+
+				offset += sizeof(uint32_t);
 
 				for (uint16_t side = 0; side < numSides; ++side)
 				{
@@ -3147,7 +3157,7 @@ namespace bimg
 						_mip.m_width     = width;
 						_mip.m_height    = height;
 						_mip.m_blockSize = blockSize;
-						_mip.m_size      = size;
+						_mip.m_size      = mipSize;
 						_mip.m_data      = &data[offset];
 						_mip.m_bpp       = bpp;
 						_mip.m_format    = format;
@@ -3155,7 +3165,7 @@ namespace bimg
 						return true;
 					}
 
-					offset += imageSize;
+					offset += mipSize;
 
 					BX_CHECK(offset <= _size, "Reading past size of data buffer! (offset %d, size %d)", offset, _size);
 					BX_UNUSED(_size);
@@ -3412,7 +3422,7 @@ namespace bimg
 		return total;
 	}
 
-	static int32_t imageWriteKtxHeader(bx::WriterI* _writer, TextureFormat::Enum _format, bool _cubeMap, uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _numMips, bx::Error* _err)
+	static int32_t imageWriteKtxHeader(bx::WriterI* _writer, TextureFormat::Enum _format, bool _cubeMap, uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _numMips, uint32_t _numLayers, bx::Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
 
@@ -3429,7 +3439,7 @@ namespace bimg
 		total += bx::write(_writer, _width, _err);
 		total += bx::write(_writer, _height, _err);
 		total += bx::write(_writer, _depth, _err);
-		total += bx::write(_writer, uint32_t(0), _err); // numberOfArrayElements
+		total += bx::write(_writer, _numLayers, _err); // numberOfArrayElements
 		total += bx::write(_writer, _cubeMap ? uint32_t(6) : uint32_t(0), _err);
 		total += bx::write(_writer, uint32_t(_numMips), _err);
 		total += bx::write(_writer, uint32_t(0), _err); // Meta-data size.
@@ -3438,12 +3448,12 @@ namespace bimg
 		return total;
 	}
 
-	int32_t imageWriteKtx(bx::WriterI* _writer, TextureFormat::Enum _format, bool _cubeMap, uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _numMips, const void* _src, bx::Error* _err)
+	int32_t imageWriteKtx(bx::WriterI* _writer, TextureFormat::Enum _format, bool _cubeMap, uint32_t _width, uint32_t _height, uint32_t _depth, uint8_t _numMips, uint32_t _numLayers, const void* _src, bx::Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
 
 		int32_t total = 0;
-		total += imageWriteKtxHeader(_writer, _format, _cubeMap, _width, _height, _depth, _numMips, _err);
+		total += imageWriteKtxHeader(_writer, _format, _cubeMap, _width, _height, _depth, _numMips, _numLayers, _err);
 
 		if (!_err->isOk() )
 		{
@@ -3458,23 +3468,31 @@ namespace bimg
 		const uint32_t minBlockY   = blockInfo.minBlockY;
 
 		const uint8_t* src = (const uint8_t*)_src;
+
+		const uint32_t numLayers = bx::uint32_max(_numLayers, 1);
+		const uint32_t numSides = _cubeMap ? 6 : 1;
+
 		uint32_t width  = _width;
 		uint32_t height = _height;
 		uint32_t depth  = _depth;
 
-		for (uint8_t lod = 0, num = _numMips; lod < num && _err->isOk(); ++lod)
+		for (uint8_t lod = 0; lod < _numMips && _err->isOk(); ++lod)
 		{
 			width  = bx::uint32_max(blockWidth  * minBlockX, ( (width  + blockWidth  - 1) / blockWidth )*blockWidth);
 			height = bx::uint32_max(blockHeight * minBlockY, ( (height + blockHeight - 1) / blockHeight)*blockHeight);
 			depth  = bx::uint32_max(1, depth);
 
-			uint32_t size = width*height*depth*bpp/8;
+			const uint32_t mipSize = width*height*depth*bpp/8;
+			const uint32_t size = mipSize*numLayers*numSides;
 			total += bx::write(_writer, size, _err);
 
-			for (uint8_t side = 0, numSides = _cubeMap ? 6 : 1; side < numSides && _err->isOk(); ++side)
+			for (uint32_t layer = 0; layer < numLayers && _err->isOk(); ++layer)
 			{
-				total += bx::write(_writer, src, size, _err);
-				src += size;
+				for (uint8_t side = 0; side < numSides && _err->isOk(); ++side)
+				{
+					total += bx::write(_writer, src, size, _err);
+					src += size;
+				}
 			}
 
 			width  >>= 1;
@@ -3497,6 +3515,7 @@ namespace bimg
 			, _imageContainer.m_height
 			, _imageContainer.m_depth
 			, _imageContainer.m_numMips
+			, _imageContainer.m_numLayers
 			, _err
 			);
 
@@ -3505,17 +3524,26 @@ namespace bimg
 			return total;
 		}
 
-		for (uint8_t lod = 0, num = _imageContainer.m_numMips; lod < num && _err->isOk(); ++lod)
+		const uint32_t numMips   = _imageContainer.m_numMips;
+		const uint32_t numLayers = bx::uint32_max(_imageContainer.m_numLayers, 1);
+		const uint32_t numSides  = _imageContainer.m_cubeMap ? 6 : 1;
+
+		for (uint8_t lod = 0; lod < numMips && _err->isOk(); ++lod)
 		{
 			ImageMip mip;
 			imageGetRawData(_imageContainer, 0, lod, _data, _size, mip);
-			total += bx::write(_writer, mip.m_size, _err);
 
-			for (uint8_t side = 0, numSides = _imageContainer.m_cubeMap ? 6 : 1; side < numSides && _err->isOk(); ++side)
+			const uint32_t size = mip.m_size*numSides*numLayers;
+			total += bx::write(_writer, size, _err);
+
+			for (uint32_t layer = 0; layer < numLayers && _err->isOk(); ++layer)
 			{
-				if (imageGetRawData(_imageContainer, side, lod, _data, _size, mip) )
+				for (uint8_t side = 0; side < numSides && _err->isOk(); ++side)
 				{
-					total += bx::write(_writer, mip.m_data, mip.m_size, _err);
+					if (imageGetRawData(_imageContainer, uint16_t(layer*numSides + side), lod, _data, _size, mip) )
+					{
+						total += bx::write(_writer, mip.m_data, mip.m_size, _err);
+					}
 				}
 			}
 		}

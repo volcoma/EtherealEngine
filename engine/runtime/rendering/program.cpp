@@ -90,12 +90,12 @@ std::shared_ptr<uniform> program::get_uniform(const std::string& _name, bool tex
 
 void program::add_shader(asset_handle<shader> shader)
 {
-	shaders.push_back(shader);
-	shaders_cached.push_back(shader->handle.idx);
 	for (auto& uniform : shader->uniforms)
 	{
 		uniforms[uniform->info.name] = uniform;
 	}
+    shaders_cached.push_back(shader->handle.idx);
+    shaders.push_back(shader);
 }
 
 void program::populate()

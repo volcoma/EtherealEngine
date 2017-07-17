@@ -5,8 +5,8 @@
 
 #include "test.h"
 #include <bx/string.h>
-#include <bx/crtimpl.h>
 #include <bx/handlealloc.h>
+#include <bx/sort.h>
 
 bx::AllocatorI* g_allocator;
 
@@ -86,6 +86,68 @@ TEST_CASE("strCmpI", "")
 
 	REQUIRE(0 <  bx::strCmpI(abvgx, abvgd) );
 	REQUIRE(0 <  bx::strCmpI(abvgd, empty) );
+}
+
+TEST_CASE("strCmpV", "")
+{
+	REQUIRE(0 == bx::strCmpV("test", "test") );
+	REQUIRE(0 == bx::strCmpV("test", "testestes", 4) );
+	REQUIRE(0 == bx::strCmpV("testestes", "test", 4) );
+	REQUIRE(0 != bx::strCmpV("preprocess", "platform") );
+
+	const char* abvgd = "abvgd";
+	const char* abvgx = "abvgx";
+	const char* empty = "";
+	REQUIRE(0 == bx::strCmpV(abvgd, abvgd) );
+	REQUIRE(0 == bx::strCmpV(abvgd, abvgx, 4) );
+
+	REQUIRE(0 >  bx::strCmpV(abvgd, abvgx) );
+	REQUIRE(0 >  bx::strCmpV(empty, abvgd) );
+
+	REQUIRE(0 <  bx::strCmpV(abvgx, abvgd) );
+	REQUIRE(0 <  bx::strCmpV(abvgd, empty) );
+}
+
+static int32_t strCmpV(const void* _lhs, const void* _rhs)
+{
+	const char* lhs = *(const char**)_lhs;
+	const char* rhs = *(const char**)_rhs;
+	int32_t result = bx::strCmpV(lhs, rhs);
+	return result;
+}
+
+TEST_CASE("strCmpV sort", "")
+{
+	const char* test[] =
+	{
+		"test_1.txt",
+		"test_10.txt",
+		"test_100.txt",
+		"test_15.txt",
+		"test_11.txt",
+		"test_23.txt",
+		"test_3.txt",
+	};
+
+	const char* expected[] =
+	{
+		"test_1.txt",
+		"test_3.txt",
+		"test_10.txt",
+		"test_11.txt",
+		"test_15.txt",
+		"test_23.txt",
+		"test_100.txt",
+	};
+
+	BX_STATIC_ASSERT(BX_COUNTOF(test) == BX_COUNTOF(expected) );
+
+	bx::quickSort(test, BX_COUNTOF(test), sizeof(const char*), strCmpV);
+
+	for (uint32_t ii = 0; ii < BX_COUNTOF(test); ++ii)
+	{
+		REQUIRE(0 == bx::strCmp(test[ii], expected[ii]) );
+	}
 }
 
 TEST_CASE("strRFind", "")

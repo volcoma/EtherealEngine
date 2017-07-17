@@ -7,6 +7,9 @@
 #include "bgfx_utils.h"
 #include "imgui/imgui.h"
 
+namespace
+{
+
 struct PosColorVertex
 {
 	float m_x;
@@ -148,13 +151,19 @@ void screenSpaceQuad(float _textureWidth, float _textureHeight, bool _originBott
 
 class ExampleOIT : public entry::AppI
 {
-	void init(int _argc, char** _argv) BX_OVERRIDE
+public:
+	ExampleOIT(const char* _name, const char* _description)
+		: entry::AppI(_name, _description)
+	{
+	}
+
+	void init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height) override
 	{
 		Args args(_argc, _argv);
 
-		m_width  = 1280;
-		m_height = 720;
-		m_debug  = BGFX_DEBUG_TEXT;
+		m_width  = _width;
+		m_height = _height;
+		m_debug  = BGFX_DEBUG_NONE;
 		m_reset  = BGFX_RESET_VSYNC;
 
 		bgfx::init(args.m_type, args.m_pciId);
@@ -221,7 +230,7 @@ class ExampleOIT : public entry::AppI
 		m_timeOffset = bx::getHPCounter();
 	}
 
-	int shutdown() BX_OVERRIDE
+	int shutdown() override
 	{
 		// Cleanup.
 		imguiDestroy();
@@ -244,7 +253,7 @@ class ExampleOIT : public entry::AppI
 		return 0;
 	}
 
-	bool update() BX_OVERRIDE
+	bool update() override
 	{
 		if (!entry::processEvents(m_width, m_height, m_debug, m_reset, &m_mouseState) )
 		{
@@ -278,11 +287,15 @@ class ExampleOIT : public entry::AppI
 				, uint16_t(m_height)
 				);
 
-			ImGui::SetNextWindowPos(ImVec2((float)m_width - (float)m_width / 4.0f - 10.0f, 10.0f) );
-			ImGui::SetNextWindowSize(ImVec2((float)m_width / 4.0f, (float)m_height / 3.0f) );
+			showExampleDialog(this);
+
+			ImGui::SetNextWindowPos(
+				  ImVec2(m_width - m_width / 5.0f - 10.0f, 10.0f)
+				, ImGuiSetCond_FirstUseEver
+				);
 			ImGui::Begin("Settings"
 				, NULL
-				, ImVec2((float)m_width / 4.0f, (float)m_height / 3.0f)
+				, ImVec2(m_width / 5.0f, m_height / 3.0f)
 				, ImGuiWindowFlags_AlwaysAutoResize
 				);
 
@@ -307,23 +320,13 @@ class ExampleOIT : public entry::AppI
 			bgfx::setViewRect(1, 0, 0, uint16_t(m_width), uint16_t(m_height) );
 
 			int64_t now = bx::getHPCounter();
-			static int64_t last = now;
-			const int64_t frameTime = now - last;
-			last = now;
 			const double freq = double(bx::getHPFrequency() );
-			const double toMs = 1000.0/freq;
-
 			float time = (float)( (now-m_timeOffset)/freq);
 
-			// Use debug font to print information about this example.
-			bgfx::dbgTextClear();
 			// Reference:
 			// Weighted, Blended Order-Independent Transparency
 			// http://jcgt.org/published/0002/02/09/
 			// http://casual-effects.blogspot.com/2014/03/weighted-blended-order-independent.html
-			bgfx::dbgTextPrintf(0, 1, 0x4f, "bgfx/examples/19-oit");
-			bgfx::dbgTextPrintf(0, 2, 0x6f, "Description: Weighted, Blended Order Independent Transparency.");
-			bgfx::dbgTextPrintf(0, 3, 0x0f, "Frame: % 7.3f[ms]", double(frameTime)*toMs);
 
 			float at[3] = { 0.0f, 0.0f, 0.0f };
 			float eye[3] = { 0.0f, 0.0f, -7.0f };
@@ -518,4 +521,6 @@ class ExampleOIT : public entry::AppI
 	bgfx::FrameBufferHandle m_fbh;
 };
 
-ENTRY_IMPLEMENT_MAIN(ExampleOIT);
+} // namespace
+
+ENTRY_IMPLEMENT_MAIN(ExampleOIT, "19-oit", "Weighted, Blended Order Independent Transparency.");
