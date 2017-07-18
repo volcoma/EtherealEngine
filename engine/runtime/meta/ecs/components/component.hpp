@@ -1,23 +1,13 @@
 #pragma once
 #include "../../../ecs/ecs.h"
 #include "core/reflection/reflection.h"
-#include "../entity.hpp"
+#include "core/serialization/serialization.h"
 
-REFLECT(runtime::component)
-{
-	rttr::registration::class_<runtime::component>("component");
-
-}
+REFLECT_EXTERN(runtime::component);
 
 namespace runtime
 {
-	SAVE(component)
-	{
-		try_save(ar, cereal::make_nvp("owner", obj._entity));
-	}
+	SAVE_EXTERN(component);
 
-	LOAD(component)
-	{
-		try_load(ar, cereal::make_nvp("owner", obj._entity));
-	}
+	LOAD_EXTERN(component);
 }

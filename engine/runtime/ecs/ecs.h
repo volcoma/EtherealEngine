@@ -93,6 +93,8 @@ namespace runtime
 	class entity
 	{
 	public:
+		REFLECTABLE(entity)
+		SERIALIZABLE(entity)
 		struct id_t
 		{
 			id_t() : id_(0) {}

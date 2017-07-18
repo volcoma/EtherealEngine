@@ -24,13 +24,11 @@ macro(detect_platform)
 
 	if(MSVC)
 		add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
+		add_definitions(-D_SCL_SECURE_NO_WARNINGS=1)
 	endif()
 
 	if(MSVC)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /bigobj")
-		set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} /IGNORE:4221")
-	elseif(MINGW)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3" )
 	endif()
 endmacro()
 

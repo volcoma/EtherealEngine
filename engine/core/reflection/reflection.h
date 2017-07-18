@@ -35,8 +35,15 @@ namespace
 	};
 }
 
-#define REFLECT(cls)                                           \
-static const rttr__auto__register__t<cls> ANONYMOUS_VARIABLE(auto_register__); \
+#define REFLECT_INLINE(cls)														\
+static const rttr__auto__register__t<cls> ANONYMOUS_VARIABLE(auto_register__);	\
 template<> inline void rttr_auto_register_reflection_function_t<cls>()
+
+#define REFLECT_EXTERN(cls)														\
+//template<> void rttr_auto_register_reflection_function_t<cls>();
+
+#define REFLECT(cls)															\
+static const rttr__auto__register__t<cls> ANONYMOUS_VARIABLE(auto_register__);	\
+template<> void rttr_auto_register_reflection_function_t<cls>()
 
 #endif // RTTR_REFLECTION_H_

@@ -1,6 +1,7 @@
 #include "system/app.h"
-#include "core/filesystem/filesystem.h"
+#include "meta/meta.h"
 #include "runtime/meta/meta.h"
+#include "core/filesystem/filesystem.h"
 
 int main(int _argc, char* _argv[])
 {

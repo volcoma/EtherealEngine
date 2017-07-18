@@ -45,13 +45,13 @@ namespace ecs
 
 			try_save(ar, cereal::make_nvp("data", data));
 
-			get_serialization_map().clear();
+			runtime::get_serialization_map().clear();
 		}
 
 		bool deserialize_data(std::istream& stream, std::vector<runtime::entity>& outData)
 		{
 			// get length of file:
-			get_serialization_map().clear();
+			runtime::get_serialization_map().clear();
 			stream.seekg(0, stream.end);
 			std::streampos length = stream.tellg();
 			stream.seekg(0, stream.beg);
@@ -63,7 +63,7 @@ namespace ecs
 
 				stream.clear();
 				stream.seekg(0);
-				get_serialization_map().clear();
+				runtime::get_serialization_map().clear();
 				return true;
 			}
 			return false;

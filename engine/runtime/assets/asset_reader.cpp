@@ -7,6 +7,7 @@
 #include "../rendering/vertex_buffer.h"
 #include "../rendering/index_buffer.h"
 #include "../ecs/prefab.h"
+#include "../ecs/scene.h"
 #include "core/subsystem/tasks.hpp"
 #include "core/filesystem/filesystem.h"
 #include "core/serialization/serialization.h"
@@ -16,6 +17,7 @@
 #include "core/serialization/types/vector.hpp"
 #include "../meta/rendering/material.hpp"
 #include "../meta/rendering/mesh.hpp"
+#include "asset_extensions.h"
 #include <cstdint>
 
 namespace runtime

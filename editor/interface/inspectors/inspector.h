@@ -26,7 +26,7 @@ struct property_layout
 };
 
 
-REFLECT(inspector)
+REFLECT_INLINE(inspector)
 {
 	rttr::registration::class_<inspector>("inspector");
 }
@@ -34,7 +34,7 @@ REFLECT(inspector)
 #define INSPECTED_TYPE "inspected_type"
 
 #define INSPECTOR_REFLECT(inspector_type, inspected_type)					\
-REFLECT(inspector_type)														\
+REFLECT_INLINE(inspector_type)														\
 {																			\
 	rttr::registration::class_<inspector_type>(#inspector_type)				\
 	(																		\
