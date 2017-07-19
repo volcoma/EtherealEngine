@@ -6,6 +6,16 @@ WYSIWYG Editor
 ## STATUS
 WIP - not production ready in any way
 
+## PLATFORMS
+It is written in a cross-platform manner using c++14.
+
+Compilers      | Windows | Linux
+---------------| --------|--------
+MSVC(2015 +)   | yes     |
+MinGW          | yes     |
+GCC(5.4 +)     |         | yes
+clang(3.8 +)   |         | yes
+
 ## FEATURES
 Check out the Projects tab for more information of upcomming features.
 
@@ -19,17 +29,6 @@ Any suggestions and help will be appreciated.
 
 ## BUILD
 *The engine uses the CMake build system.
-
-
-## PLATFORMS
-It is written in a cross-platform manner using c++14.
-
-Compilers      | Windows | Linux
----------------| --------|--------
-MSVC(2015 +)   | yes     |
-MinGW          | yes     |
-GCC(5.4 +)     |         | yes
-clang(3.8 +)   |         | yes
 
 ## CODEBASE
 c++14 Using the latest and greatest features of the language.
