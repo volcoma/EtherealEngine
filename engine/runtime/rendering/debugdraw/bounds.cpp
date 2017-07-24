@@ -493,7 +493,7 @@ bool intersect(const Ray& _ray, const Aabb& _aabb, Intersection* _intersection)
 		return false;
 	}
 
-	if(NULL != _intersection)
+	if(nullptr != _intersection)
 	{
 		_intersection->m_normal[0] = float((min[0] == tmin) - (max[0] == tmin));
 		_intersection->m_normal[1] = float((min[1] == tmin) - (max[1] == tmin));
@@ -513,7 +513,7 @@ bool intersect(const Ray& _ray, const Disk& _disk, Intersection* _intersection)
 	plane.m_dist = -bx::vec3Dot(_disk.m_center, _disk.m_normal);
 
 	Intersection tmpIntersection;
-	_intersection = NULL != _intersection ? _intersection : &tmpIntersection;
+	_intersection = nullptr != _intersection ? _intersection : &tmpIntersection;
 
 	if(intersect(_ray, plane, _intersection))
 	{
@@ -564,7 +564,7 @@ bool intersect(const Ray& _ray, const Cylinder& _cylinder, bool _capsule, Inters
 
 	if(height > 0.0f && height < axisLen)
 	{
-		if(NULL != _intersection)
+		if(nullptr != _intersection)
 		{
 			const float t1 = height / axisLen;
 			float pointOnAxis[3];
@@ -624,7 +624,7 @@ bool intersect(const Ray& _ray, const Cylinder& _cylinder, bool _capsule, Inters
 	plane.m_dist = -bx::vec3Dot(pos, plane.m_normal);
 
 	Intersection tmpIntersection;
-	_intersection = NULL != _intersection ? _intersection : &tmpIntersection;
+	_intersection = nullptr != _intersection ? _intersection : &tmpIntersection;
 
 	if(intersect(_ray, plane, _intersection))
 	{
@@ -650,7 +650,7 @@ bool intersect(const Ray& _ray, const Plane& _plane, Intersection* _intersection
 		return false;
 	}
 
-	if(NULL != _intersection)
+	if(nullptr != _intersection)
 	{
 		bx::vec3Move(_intersection->m_normal, _plane.m_normal);
 
@@ -693,7 +693,7 @@ bool intersect(const Ray& _ray, const Sphere& _sphere, Intersection* _intersecti
 		return false;
 	}
 
-	if(NULL != _intersection)
+	if(nullptr != _intersection)
 	{
 		_intersection->m_dist = tt;
 
@@ -743,7 +743,7 @@ bool intersect(const Ray& _ray, const Tris& _triangle, Intersection* _intersecti
 		return false;
 	}
 
-	if(NULL != _intersection)
+	if(nullptr != _intersection)
 	{
 		bx::vec3Norm(_intersection->m_normal, normal);
 

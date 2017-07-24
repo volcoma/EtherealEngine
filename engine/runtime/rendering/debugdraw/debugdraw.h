@@ -7,6 +7,7 @@
 #define DEBUGDRAW_H_HEADER_GUARD
 
 #include "bounds.h"
+#include <bgfx/bgfx.h>
 #include <bx/allocator.h>
 
 struct Axis

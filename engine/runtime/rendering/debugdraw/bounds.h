@@ -6,6 +6,8 @@
 #ifndef BOUNDS_H_HEADER_GUARD
 #define BOUNDS_H_HEADER_GUARD
 
+#include <cstdint>
+
 struct Aabb
 {
 	float m_min[3];
@@ -116,21 +118,22 @@ void intersectPlanes(float _result[3], const Plane& _pa, const Plane& _pb, const
 Ray makeRay(float _x, float _y, const float* _invVp);
 
 /// Intersect ray / aabb.
-bool intersect(const Ray& _ray, const Aabb& _aabb, Intersection* _intersection = NULL);
+bool intersect(const Ray& _ray, const Aabb& _aabb, Intersection* _intersection = nullptr);
 
 /// Intersect ray / cylinder.
-bool intersect(const Ray& _ray, const Cylinder& _cylinder, bool _capsule, Intersection* _intersection = NULL);
+bool intersect(const Ray& _ray, const Cylinder& _cylinder, bool _capsule,
+			   Intersection* _intersection = nullptr);
 
 /// Intersect ray / disk.
-bool intersect(const Ray& _ray, const Disk& _disk, Intersection* _intersection = NULL);
+bool intersect(const Ray& _ray, const Disk& _disk, Intersection* _intersection = nullptr);
 
 /// Intersect ray / plane.
-bool intersect(const Ray& _ray, const Plane& _plane, Intersection* _intersection = NULL);
+bool intersect(const Ray& _ray, const Plane& _plane, Intersection* _intersection = nullptr);
 
 /// Intersect ray / sphere.
-bool intersect(const Ray& _ray, const Sphere& _sphere, Intersection* _intersection = NULL);
+bool intersect(const Ray& _ray, const Sphere& _sphere, Intersection* _intersection = nullptr);
 
 /// Intersect ray / triangle.
-bool intersect(const Ray& _ray, const Tris& _triangle, Intersection* _intersection = NULL);
+bool intersect(const Ray& _ray, const Tris& _triangle, Intersection* _intersection = nullptr);
 
 #endif // BOUNDS_H_HEADER_GUARD
