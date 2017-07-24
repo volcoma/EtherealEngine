@@ -3,7 +3,12 @@
 #include "core/reflection/reflection.h"
 #include "core/serialization/serialization.h"
 
-REFLECT_EXTERN(reflection_probe_component);
+REFLECT(reflection_probe_component)
+{
+	rttr::registration::class_<reflection_probe_component>("reflection_probe_component")(
+		rttr::metadata("Category", "Lighting"), rttr::metadata("Id", "Reflection Probe"))
+		.constructor<>()(rttr::policy::ctor::as_std_shared_ptr);
+}
 
 SAVE_EXTERN(reflection_probe_component);
 LOAD_EXTERN(reflection_probe_component);

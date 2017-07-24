@@ -4,13 +4,6 @@
 #include "component.hpp"
 #include "core/meta/math/vector.hpp"
 
-REFLECT(light_component)
-{
-	rttr::registration::class_<light_component>("light_component")(rttr::metadata("Category", "Lighting"),
-																   rttr::metadata("Id", "Light"))
-		.constructor<>()(rttr::policy::ctor::as_std_shared_ptr);
-}
-
 SAVE(light_component)
 {
 	try_save(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::component>(&obj)));

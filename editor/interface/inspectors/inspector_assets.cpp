@@ -102,7 +102,8 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool readOnly,
 
 	if(data)
 	{
-		rttr::variant vari = data.get()->info;
+		gfx::TextureInfo info = data.get()->info;
+		rttr::variant vari = info;
 		changed |= inspect_var(vari);
 	}
 	return changed;
