@@ -1,8 +1,8 @@
 #pragma once
 
-#include "core/reflection/registration.h"
-#include "core/reflection/reflection.h"
 #include "../gui_system.h"
+#include "core/reflection/reflection.h"
+#include "core/reflection/registration.h"
 
 struct inspector
 {
@@ -10,9 +10,9 @@ struct inspector
 
 	virtual ~inspector() = default;
 
-	virtual bool inspect(rttr::variant& var, bool readOnly, std::function<rttr::variant(const rttr::variant&)> get_metadata) = 0;
+	virtual bool inspect(rttr::variant& var, bool readOnly,
+						 std::function<rttr::variant(const rttr::variant&)> get_metadata) = 0;
 };
-
 
 struct property_layout
 {
@@ -25,7 +25,6 @@ struct property_layout
 	~property_layout();
 };
 
-
 REFLECT_INLINE(inspector)
 {
 	rttr::registration::class_<inspector>("inspector");
@@ -33,27 +32,19 @@ REFLECT_INLINE(inspector)
 
 #define INSPECTED_TYPE "inspected_type"
 
-#define INSPECTOR_REFLECT(inspector_type, inspected_type)					\
-REFLECT_INLINE(inspector_type)														\
-{																			\
-	rttr::registration::class_<inspector_type>(#inspector_type)				\
-	(																		\
-		rttr::metadata(INSPECTED_TYPE, rttr::type::get<inspected_type>())	\
-	)																		\
-	.constructor<>()														\
-	(																		\
-		rttr::policy::ctor::as_std_shared_ptr								\
-	)																		\
-	;																		\
-}                                                                           \
+#define INSPECTOR_REFLECT(inspector_type, inspected_type)                                                    \
+	REFLECT_INLINE(inspector_type)                                                                           \
+	{                                                                                                        \
+		rttr::registration::class_<inspector_type>(#inspector_type)(                                         \
+			rttr::metadata(INSPECTED_TYPE, rttr::type::get<inspected_type>()))                               \
+			.constructor<>()(rttr::policy::ctor::as_std_shared_ptr);                                         \
+	}
 
-#define DECLARE_INSPECTOR(inspector_type, inspected_type)					\
-struct inspector_type : public inspector									\
-{																			\
-	REFLECTABLE(inspector_type, inspector)									\
-	bool inspect(rttr::variant& var,										\
-		bool readOnly,														\
-		std::function<rttr::variant(const rttr::variant&)> get_metadata);	\
-};																			\
-INSPECTOR_REFLECT(inspector_type, inspected_type)                           \
-
+#define DECLARE_INSPECTOR(inspector_type, inspected_type)                                                    \
+	struct inspector_type : public inspector                                                                 \
+	{                                                                                                        \
+		REFLECTABLE(inspector_type, inspector)                                                               \
+		bool inspect(rttr::variant& var, bool readOnly,                                                      \
+					 std::function<rttr::variant(const rttr::variant&)> get_metadata);                       \
+	};                                                                                                       \
+	INSPECTOR_REFLECT(inspector_type, inspected_type)

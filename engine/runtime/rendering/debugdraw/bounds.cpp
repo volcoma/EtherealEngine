@@ -3,15 +3,15 @@
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
-#include <bx/rng.h>
-#include <bx/math.h>
 #include "bounds.h"
+#include <bx/math.h>
+#include <bx/rng.h>
 
 void aabbToObb(Obb& _obb, const Aabb& _aabb)
 {
-	bx::memSet(_obb.m_mtx, 0, sizeof(_obb.m_mtx) );
-	_obb.m_mtx[ 0] = (_aabb.m_max[0] - _aabb.m_min[0]) * 0.5f;
-	_obb.m_mtx[ 5] = (_aabb.m_max[1] - _aabb.m_min[1]) * 0.5f;
+	bx::memSet(_obb.m_mtx, 0, sizeof(_obb.m_mtx));
+	_obb.m_mtx[0] = (_aabb.m_max[0] - _aabb.m_min[0]) * 0.5f;
+	_obb.m_mtx[5] = (_aabb.m_max[1] - _aabb.m_min[1]) * 0.5f;
 	_obb.m_mtx[10] = (_aabb.m_max[2] - _aabb.m_min[2]) * 0.5f;
 	_obb.m_mtx[12] = (_aabb.m_min[0] + _aabb.m_max[0]) * 0.5f;
 	_obb.m_mtx[13] = (_aabb.m_min[1] + _aabb.m_max[1]) * 0.5f;
@@ -32,16 +32,16 @@ void toAabb(Aabb& _aabb, const Disk& _disk)
 	float nsq[3];
 	bx::vec3Mul(nsq, _disk.m_normal, _disk.m_normal);
 
-	float one[3] = { 1.0f, 1.0f, 1.0f };
+	float one[3] = {1.0f, 1.0f, 1.0f};
 	float tmp[3];
 	bx::vec3Sub(tmp, one, nsq);
 
-	const float inv = 1.0f / (tmp[0]*tmp[1]*tmp[2]);
+	const float inv = 1.0f / (tmp[0] * tmp[1] * tmp[2]);
 
 	float extent[3];
-	extent[0] = _disk.m_radius * tmp[0] * bx::fsqrt( (nsq[0] + nsq[1] * nsq[2]) * inv);
-	extent[1] = _disk.m_radius * tmp[1] * bx::fsqrt( (nsq[1] + nsq[2] * nsq[0]) * inv);
-	extent[2] = _disk.m_radius * tmp[2] * bx::fsqrt( (nsq[2] + nsq[0] * nsq[1]) * inv);
+	extent[0] = _disk.m_radius * tmp[0] * bx::fsqrt((nsq[0] + nsq[1] * nsq[2]) * inv);
+	extent[1] = _disk.m_radius * tmp[1] * bx::fsqrt((nsq[1] + nsq[2] * nsq[0]) * inv);
+	extent[2] = _disk.m_radius * tmp[2] * bx::fsqrt((nsq[2] + nsq[0] * nsq[1]) * inv);
 
 	bx::vec3Sub(_aabb.m_min, _disk.m_center, extent);
 	bx::vec3Add(_aabb.m_max, _disk.m_center, extent);
@@ -57,18 +57,18 @@ void toAabb(Aabb& _aabb, const Cylinder& _cylinder)
 	bx::vec3Mul(asq, axis, axis);
 
 	float nsq[3];
-	bx::vec3Mul(nsq, asq, 1.0f/bx::vec3Dot(axis, axis) );
+	bx::vec3Mul(nsq, asq, 1.0f / bx::vec3Dot(axis, axis));
 
-	float one[3] = { 1.0f, 1.0f, 1.0f };
+	float one[3] = {1.0f, 1.0f, 1.0f};
 	float tmp[3];
 	bx::vec3Sub(tmp, one, nsq);
 
-	const float inv = 1.0f / (tmp[0]*tmp[1]*tmp[2]);
+	const float inv = 1.0f / (tmp[0] * tmp[1] * tmp[2]);
 
 	float extent[3];
-	extent[0] = _cylinder.m_radius * tmp[0] * bx::fsqrt( (nsq[0] + nsq[1] * nsq[2]) * inv);
-	extent[1] = _cylinder.m_radius * tmp[1] * bx::fsqrt( (nsq[1] + nsq[2] * nsq[0]) * inv);
-	extent[2] = _cylinder.m_radius * tmp[2] * bx::fsqrt( (nsq[2] + nsq[0] * nsq[1]) * inv);
+	extent[0] = _cylinder.m_radius * tmp[0] * bx::fsqrt((nsq[0] + nsq[1] * nsq[2]) * inv);
+	extent[1] = _cylinder.m_radius * tmp[1] * bx::fsqrt((nsq[1] + nsq[2] * nsq[0]) * inv);
+	extent[2] = _cylinder.m_radius * tmp[2] * bx::fsqrt((nsq[2] + nsq[0] * nsq[1]) * inv);
 
 	float minP[3];
 	bx::vec3Sub(minP, _cylinder.m_pos, extent);
@@ -91,7 +91,7 @@ void aabbTransformToObb(Obb& _obb, const Aabb& _aabb, const float* _mtx)
 	aabbToObb(_obb, _aabb);
 	float result[16];
 	bx::mtxMul(result, _obb.m_mtx, _mtx);
-	bx::memCopy(_obb.m_mtx, result, sizeof(result) );
+	bx::memCopy(_obb.m_mtx, result, sizeof(result));
 }
 
 void toAabb(Aabb& _aabb, const void* _vertices, uint32_t _numVertices, uint32_t _stride)
@@ -104,7 +104,7 @@ void toAabb(Aabb& _aabb, const void* _vertices, uint32_t _numVertices, uint32_t 
 	min[2] = max[2] = position[2];
 	vertex += _stride;
 
-	for (uint32_t ii = 1; ii < _numVertices; ++ii)
+	for(uint32_t ii = 1; ii < _numVertices; ++ii)
 	{
 		position = (float*)vertex;
 		vertex += _stride;
@@ -140,7 +140,7 @@ void toAabb(Aabb& _aabb, const float* _mtx, const void* _vertices, uint32_t _num
 	min[2] = max[2] = position[2];
 	vertex += _stride;
 
-	for (uint32_t ii = 1; ii < _numVertices; ++ii)
+	for(uint32_t ii = 1; ii < _numVertices; ++ii)
 	{
 		bx::vec3MulMtx(position, (float*)vertex, _mtx);
 		vertex += _stride;
@@ -169,7 +169,7 @@ float calcAreaAabb(const Aabb& _aabb)
 	float ww = _aabb.m_max[0] - _aabb.m_min[0];
 	float hh = _aabb.m_max[1] - _aabb.m_min[1];
 	float dd = _aabb.m_max[2] - _aabb.m_min[2];
-	return 2.0f * (ww*hh + ww*dd + hh*dd);
+	return 2.0f * (ww * hh + ww * dd + hh * dd);
 }
 
 void aabbExpand(Aabb& _aabb, float _factor)
@@ -197,14 +197,7 @@ uint32_t aabbOverlapTest(const Aabb& _aabb0, const Aabb& _aabb1)
 	const uint32_t ltMinZ = _aabb0.m_max[2] < _aabb1.m_min[2];
 	const uint32_t gtMaxZ = _aabb0.m_min[2] > _aabb1.m_max[2];
 
-	return 0
-		| (ltMinX<<0)
-		| (gtMaxX<<1)
-		| (ltMinY<<2)
-		| (gtMaxY<<3)
-		| (ltMinZ<<4)
-		| (gtMaxZ<<5)
-		;
+	return 0 | (ltMinX << 0) | (gtMaxX << 1) | (ltMinY << 2) | (gtMaxY << 3) | (ltMinZ << 4) | (gtMaxZ << 5);
 }
 
 void calcObb(Obb& _obb, const void* _vertices, uint32_t _numVertices, uint32_t _stride, uint32_t _steps)
@@ -216,19 +209,19 @@ void calcObb(Obb& _obb, const void* _vertices, uint32_t _numVertices, uint32_t _
 	Obb best;
 	aabbToObb(best, aabb);
 
-	float angleStep = float(bx::kPiHalf/_steps);
+	float angleStep = float(bx::kPiHalf / _steps);
 	float ax = 0.0f;
 	float mtx[16];
 
-	for (uint32_t ii = 0; ii < _steps; ++ii)
+	for(uint32_t ii = 0; ii < _steps; ++ii)
 	{
 		float ay = 0.0f;
 
-		for (uint32_t jj = 0; jj < _steps; ++jj)
+		for(uint32_t jj = 0; jj < _steps; ++jj)
 		{
 			float az = 0.0f;
 
-			for (uint32_t kk = 0; kk < _steps; ++kk)
+			for(uint32_t kk = 0; kk < _steps; ++kk)
 			{
 				bx::mtxRotateXYZ(mtx, ax, ay, az);
 
@@ -237,7 +230,7 @@ void calcObb(Obb& _obb, const void* _vertices, uint32_t _numVertices, uint32_t _
 				toAabb(aabb, mtxT, _vertices, _numVertices, _stride);
 
 				float area = calcAreaAabb(aabb);
-				if (area < minArea)
+				if(area < minArea)
 				{
 					minArea = area;
 					aabbTransformToObb(best, aabb, mtx);
@@ -252,7 +245,7 @@ void calcObb(Obb& _obb, const void* _vertices, uint32_t _numVertices, uint32_t _
 		ax += angleStep;
 	}
 
-	bx::memCopy(&_obb, &best, sizeof(Obb) );
+	bx::memCopy(&_obb, &best, sizeof(Obb));
 }
 
 void calcMaxBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _numVertices, uint32_t _stride)
@@ -268,7 +261,7 @@ void calcMaxBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _num
 	float maxDistSq = 0.0f;
 	uint8_t* vertex = (uint8_t*)_vertices;
 
-	for (uint32_t ii = 0; ii < _numVertices; ++ii)
+	for(uint32_t ii = 0; ii < _numVertices; ++ii)
 	{
 		float* position = (float*)vertex;
 		vertex += _stride;
@@ -277,7 +270,7 @@ void calcMaxBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _num
 		float yy = position[1] - center[1];
 		float zz = position[2] - center[2];
 
-		float distSq = xx*xx + yy*yy + zz*zz;
+		float distSq = xx * xx + yy * yy + zz * zz;
 		maxDistSq = bx::fmax(distSq, maxDistSq);
 	}
 
@@ -285,7 +278,8 @@ void calcMaxBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _num
 	_sphere.m_radius = bx::fsqrt(maxDistSq);
 }
 
-void calcMinBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _numVertices, uint32_t _stride, float _step)
+void calcMinBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _numVertices, uint32_t _stride,
+						   float _step)
 {
 	bx::RngMwc rng;
 
@@ -295,7 +289,7 @@ void calcMinBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _num
 	float* position = (float*)&vertex[0];
 	bx::vec3Move(center, position);
 
-	position = (float*)&vertex[1*_stride];
+	position = (float*)&vertex[1 * _stride];
 	center[0] += position[0];
 	center[1] += position[1];
 	center[2] += position[2];
@@ -307,7 +301,7 @@ void calcMinBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _num
 	float xx = position[0] - center[0];
 	float yy = position[1] - center[1];
 	float zz = position[2] - center[2];
-	float maxDistSq = xx*xx + yy*yy + zz*zz;
+	float maxDistSq = xx * xx + yy * yy + zz * zz;
 
 	float radiusStep = _step * 0.37f;
 
@@ -315,16 +309,17 @@ void calcMinBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _num
 	do
 	{
 		done = true;
-		for (uint32_t ii = 0, index = rng.gen()%_numVertices; ii < _numVertices; ++ii, index = (index + 1)%_numVertices)
+		for(uint32_t ii = 0, index = rng.gen() % _numVertices; ii < _numVertices;
+			++ii, index = (index + 1) % _numVertices)
 		{
-			position = (float*)&vertex[index*_stride];
+			position = (float*)&vertex[index * _stride];
 
 			xx = position[0] - center[0];
 			yy = position[1] - center[1];
 			zz = position[2] - center[2];
-			float distSq = xx*xx + yy*yy + zz*zz;
+			float distSq = xx * xx + yy * yy + zz * zz;
 
-			if (distSq > maxDistSq)
+			if(distSq > maxDistSq)
 			{
 				done = false;
 
@@ -337,7 +332,7 @@ void calcMinBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _num
 			}
 		}
 
-	} while (!done);
+	} while(!done);
 
 	bx::vec3Move(_sphere.m_center, center);
 	_sphere.m_radius = bx::fsqrt(maxDistSq);
@@ -350,65 +345,65 @@ void calcPlaneUv(const Plane& _plane, float* _udir, float* _vdir)
 
 void buildFrustumPlanes(Plane* _result, const float* _viewProj)
 {
-	const float xw = _viewProj[ 3];
-	const float yw = _viewProj[ 7];
+	const float xw = _viewProj[3];
+	const float yw = _viewProj[7];
 	const float zw = _viewProj[11];
 	const float ww = _viewProj[15];
 
-	const float xz = _viewProj[ 2];
-	const float yz = _viewProj[ 6];
+	const float xz = _viewProj[2];
+	const float yz = _viewProj[6];
 	const float zz = _viewProj[10];
 	const float wz = _viewProj[14];
 
-	Plane& near   = _result[0];
-	Plane& far    = _result[1];
-	Plane& left   = _result[2];
-	Plane& right  = _result[3];
-	Plane& top    = _result[4];
+	Plane& near = _result[0];
+	Plane& far = _result[1];
+	Plane& left = _result[2];
+	Plane& right = _result[3];
+	Plane& top = _result[4];
 	Plane& bottom = _result[5];
 
 	near.m_normal[0] = xw - xz;
 	near.m_normal[1] = yw - yz;
 	near.m_normal[2] = zw - zz;
-	near.m_dist      = ww - wz;
+	near.m_dist = ww - wz;
 
 	far.m_normal[0] = xw + xz;
 	far.m_normal[1] = yw + yz;
 	far.m_normal[2] = zw + zz;
-	far.m_dist      = ww + wz;
+	far.m_dist = ww + wz;
 
-	const float xx = _viewProj[ 0];
-	const float yx = _viewProj[ 4];
-	const float zx = _viewProj[ 8];
+	const float xx = _viewProj[0];
+	const float yx = _viewProj[4];
+	const float zx = _viewProj[8];
 	const float wx = _viewProj[12];
 
 	left.m_normal[0] = xw - xx;
 	left.m_normal[1] = yw - yx;
 	left.m_normal[2] = zw - zx;
-	left.m_dist      = ww - wx;
+	left.m_dist = ww - wx;
 
 	right.m_normal[0] = xw + xx;
 	right.m_normal[1] = yw + yx;
 	right.m_normal[2] = zw + zx;
-	right.m_dist      = ww + wx;
+	right.m_dist = ww + wx;
 
-	const float xy = _viewProj[ 1];
-	const float yy = _viewProj[ 5];
-	const float zy = _viewProj[ 9];
+	const float xy = _viewProj[1];
+	const float yy = _viewProj[5];
+	const float zy = _viewProj[9];
 	const float wy = _viewProj[13];
 
 	top.m_normal[0] = xw + xy;
 	top.m_normal[1] = yw + yy;
 	top.m_normal[2] = zw + zy;
-	top.m_dist      = ww + wy;
+	top.m_dist = ww + wy;
 
 	bottom.m_normal[0] = xw - xy;
 	bottom.m_normal[1] = yw - yy;
 	bottom.m_normal[2] = zw - zy;
-	bottom.m_dist      = ww - wy;
+	bottom.m_dist = ww - wy;
 
 	Plane* plane = _result;
-	for (uint32_t ii = 0; ii < 6; ++ii)
+	for(uint32_t ii = 0; ii < 6; ++ii)
 	{
 		float invLen = 1.0f / bx::vec3Norm(plane->m_normal, plane->m_normal);
 		plane->m_dist *= invLen;
@@ -441,18 +436,18 @@ void intersectPlanes(float _result[3], const Plane& _pa, const Plane& _pb, const
 	bx::vec3Add(tmp0, tmp, tmp2);
 
 	float denom = bx::vec3Dot(_pa.m_normal, bxc);
-	bx::vec3Mul(_result, tmp0, -1.0f/denom);
+	bx::vec3Mul(_result, tmp0, -1.0f / denom);
 }
 
 Ray makeRay(float _x, float _y, const float* _invVp)
 {
 	Ray ray;
 
-	const float near[3] = { _x, _y, 0.0f };
+	const float near[3] = {_x, _y, 0.0f};
 	bx::vec3MulMtxH(ray.m_pos, near, _invVp);
 
 	float tmp[3];
-	const float far[3]  = { _x, _y, 1.0f };
+	const float far[3] = {_x, _y, 1.0f};
 	bx::vec3MulMtxH(tmp, far, _invVp);
 
 	float dir[3];
@@ -493,17 +488,16 @@ bool intersect(const Ray& _ray, const Aabb& _aabb, Intersection* _intersection)
 	const float tmin = bx::fmax3(min[0], min[1], min[2]);
 	const float tmax = bx::fmin3(max[0], max[1], max[2]);
 
-	if (tmax < 0.0f
-	||  tmin > tmax)
+	if(tmax < 0.0f || tmin > tmax)
 	{
 		return false;
 	}
 
-	if (NULL != _intersection)
+	if(NULL != _intersection)
 	{
-		_intersection->m_normal[0] = float( (min[0] == tmin) - (max[0] == tmin) );
-		_intersection->m_normal[1] = float( (min[1] == tmin) - (max[1] == tmin) );
-		_intersection->m_normal[2] = float( (min[2] == tmin) - (max[2] == tmin) );
+		_intersection->m_normal[0] = float((min[0] == tmin) - (max[0] == tmin));
+		_intersection->m_normal[1] = float((min[1] == tmin) - (max[1] == tmin));
+		_intersection->m_normal[2] = float((min[2] == tmin) - (max[2] == tmin));
 
 		_intersection->m_dist = tmin;
 		getPointAt(_intersection->m_pos, _ray, tmin);
@@ -521,7 +515,7 @@ bool intersect(const Ray& _ray, const Disk& _disk, Intersection* _intersection)
 	Intersection tmpIntersection;
 	_intersection = NULL != _intersection ? _intersection : &tmpIntersection;
 
-	if (intersect(_ray, plane, _intersection) )
+	if(intersect(_ray, plane, _intersection))
 	{
 		float tmp[3];
 		bx::vec3Sub(tmp, _disk.m_center, _intersection->m_pos);
@@ -542,10 +536,10 @@ bool intersect(const Ray& _ray, const Cylinder& _cylinder, bool _capsule, Inters
 	float normal[3];
 	bx::vec3Cross(normal, _ray.m_dir, axis);
 
-	const float len  = bx::vec3Norm(normal, normal);
-	const float dist = bx::fabsolute(bx::vec3Dot(rc, normal) );
+	const float len = bx::vec3Norm(normal, normal);
+	const float dist = bx::fabsolute(bx::vec3Dot(rc, normal));
 
-	if (dist > _cylinder.m_radius)
+	if(dist > _cylinder.m_radius)
 	{
 		return false;
 	}
@@ -557,21 +551,20 @@ bool intersect(const Ray& _ray, const Cylinder& _cylinder, bool _capsule, Inters
 	bx::vec3Cross(vo, normal, axis);
 	bx::vec3Norm(vo, vo);
 
-	const float rsq   = bx::fsq(_cylinder.m_radius);
+	const float rsq = bx::fsq(_cylinder.m_radius);
 	const float ddoto = bx::vec3Dot(_ray.m_dir, vo);
-	const float ss    = t0 - bx::fabsolute(bx::fsqrt(rsq - bx::fsq(dist) ) / ddoto);
+	const float ss = t0 - bx::fabsolute(bx::fsqrt(rsq - bx::fsq(dist)) / ddoto);
 
 	float point[3];
 	getPointAt(point, _ray, ss);
 
 	const float axisLen = bx::vec3Norm(axis, axis);
-	const float pdota   = bx::vec3Dot(_cylinder.m_pos, axis);
-	const float height  = bx::vec3Dot(point, axis) - pdota;
+	const float pdota = bx::vec3Dot(_cylinder.m_pos, axis);
+	const float height = bx::vec3Dot(point, axis) - pdota;
 
-	if (height > 0.0f
-	&&  height < axisLen)
+	if(height > 0.0f && height < axisLen)
 	{
-		if (NULL != _intersection)
+		if(NULL != _intersection)
 		{
 			const float t1 = height / axisLen;
 			float pointOnAxis[3];
@@ -589,11 +582,11 @@ bool intersect(const Ray& _ray, const Cylinder& _cylinder, bool _capsule, Inters
 		return true;
 	}
 
-	if (_capsule)
+	if(_capsule)
 	{
 		const float rdota = bx::vec3Dot(_ray.m_pos, axis);
-		const float pp    = rdota - pdota;
-		const float t1    = pp / axisLen;
+		const float pp = rdota - pdota;
+		const float t1 = pp / axisLen;
 
 		float pointOnAxis[3];
 		bx::vec3Lerp(pointOnAxis, _cylinder.m_pos, _cylinder.m_end, t1);
@@ -601,8 +594,7 @@ bool intersect(const Ray& _ray, const Cylinder& _cylinder, bool _capsule, Inters
 		float axisToRay[3];
 		bx::vec3Sub(axisToRay, _ray.m_pos, pointOnAxis);
 
-		if (_cylinder.m_radius < bx::vec3Length(axisToRay)
-		&&  0.0f > ss)
+		if(_cylinder.m_radius < bx::vec3Length(axisToRay) && 0.0f > ss)
 		{
 			return false;
 		}
@@ -610,10 +602,7 @@ bool intersect(const Ray& _ray, const Cylinder& _cylinder, bool _capsule, Inters
 		Sphere sphere;
 		sphere.m_radius = _cylinder.m_radius;
 
-		bx::vec3Move(sphere.m_center, 0.0f >= height
-			? _cylinder.m_pos
-			: _cylinder.m_end
-			);
+		bx::vec3Move(sphere.m_center, 0.0f >= height ? _cylinder.m_pos : _cylinder.m_end);
 
 		return intersect(_ray, sphere, _intersection);
 	}
@@ -621,7 +610,7 @@ bool intersect(const Ray& _ray, const Cylinder& _cylinder, bool _capsule, Inters
 	Plane plane;
 	float pos[3];
 
-	if (0.0f >= height)
+	if(0.0f >= height)
 	{
 		bx::vec3Neg(plane.m_normal, axis);
 		bx::vec3Move(pos, _cylinder.m_pos);
@@ -637,7 +626,7 @@ bool intersect(const Ray& _ray, const Cylinder& _cylinder, bool _capsule, Inters
 	Intersection tmpIntersection;
 	_intersection = NULL != _intersection ? _intersection : &tmpIntersection;
 
-	if (intersect(_ray, plane, _intersection) )
+	if(intersect(_ray, plane, _intersection))
 	{
 		float tmp[3];
 		bx::vec3Sub(tmp, pos, _intersection->m_pos);
@@ -650,22 +639,22 @@ bool intersect(const Ray& _ray, const Cylinder& _cylinder, bool _capsule, Inters
 bool intersect(const Ray& _ray, const Plane& _plane, Intersection* _intersection)
 {
 	float equation = bx::vec3Dot(_ray.m_pos, _plane.m_normal) + _plane.m_dist;
-	if (0.0f > equation)
+	if(0.0f > equation)
 	{
 		return false;
 	}
 
 	float ndotd = bx::vec3Dot(_ray.m_dir, _plane.m_normal);
-	if (0.0f < ndotd)
+	if(0.0f < ndotd)
 	{
 		return false;
 	}
 
-	if (NULL != _intersection)
+	if(NULL != _intersection)
 	{
 		bx::vec3Move(_intersection->m_normal, _plane.m_normal);
 
-		float tt = -equation/ndotd;
+		float tt = -equation / ndotd;
 		_intersection->m_dist = tt;
 
 		getPointAt(_intersection->m_pos, _ray, tt);
@@ -680,7 +669,7 @@ bool intersect(const Ray& _ray, const Sphere& _sphere, Intersection* _intersecti
 	bx::vec3Sub(rs, _ray.m_pos, _sphere.m_center);
 
 	const float bb = bx::vec3Dot(rs, _ray.m_dir);
-	if (0.0f < bb)
+	if(0.0f < bb)
 	{
 		return false;
 	}
@@ -688,23 +677,23 @@ bool intersect(const Ray& _ray, const Sphere& _sphere, Intersection* _intersecti
 	const float aa = bx::vec3Dot(_ray.m_dir, _ray.m_dir);
 	const float cc = bx::vec3Dot(rs, rs) - bx::fsq(_sphere.m_radius);
 
-	const float discriminant = bb*bb - aa*cc;
+	const float discriminant = bb * bb - aa * cc;
 
-	if (0.0f >= discriminant)
+	if(0.0f >= discriminant)
 	{
 		return false;
 	}
 
 	const float sqrtDiscriminant = bx::fsqrt(discriminant);
 	const float invA = 1.0f / aa;
-	const float tt = -(bb + sqrtDiscriminant)*invA;
+	const float tt = -(bb + sqrtDiscriminant) * invA;
 
-	if (0.0f >= tt)
+	if(0.0f >= tt)
 	{
 		return false;
 	}
 
-	if (NULL != _intersection)
+	if(NULL != _intersection)
 	{
 		_intersection->m_dist = tt;
 
@@ -739,22 +728,22 @@ bool intersect(const Ray& _ray, const Tris& _triangle, Intersection* _intersecti
 
 	const float det = bx::vec3Dot(normal, _ray.m_dir);
 
-	if (det > 0.0f)
+	if(det > 0.0f)
 	{
 		return false;
 	}
 
-	const float invDet = 1.0f/det;
+	const float invDet = 1.0f / det;
 	const float bz = bx::vec3Dot(dxo, edge02) * invDet;
 	const float by = bx::vec3Dot(dxo, edge10) * invDet;
 	const float bx = 1.0f - by - bz;
 
-	if (bx < 0.0f || by < 0.0f || bz < 0.0f)
+	if(bx < 0.0f || by < 0.0f || bz < 0.0f)
 	{
 		return false;
 	}
 
-	if (NULL != _intersection)
+	if(NULL != _intersection)
 	{
 		bx::vec3Norm(_intersection->m_normal, normal);
 

@@ -1,19 +1,13 @@
 #include "reflection_probe_component.hpp"
 #include "../../rendering/reflection_probe.hpp"
-#include "core/meta/math/vector.hpp"
 #include "component.hpp"
+#include "core/meta/math/vector.hpp"
 
 REFLECT(reflection_probe_component)
 {
-	rttr::registration::class_<reflection_probe_component>("reflection_probe_component")
-	(
-		rttr::metadata("Category", "Lighting"),
-		rttr::metadata("Id", "Reflection Probe")
-	)
-	.constructor<>()
-	(		
-		rttr::policy::ctor::as_std_shared_ptr
-	);
+	rttr::registration::class_<reflection_probe_component>("reflection_probe_component")(
+		rttr::metadata("Category", "Lighting"), rttr::metadata("Id", "Reflection Probe"))
+		.constructor<>()(rttr::policy::ctor::as_std_shared_ptr);
 }
 
 SAVE(reflection_probe_component)

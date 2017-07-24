@@ -1,15 +1,15 @@
 #include "docking.h"
-#include "runtime/system/engine.h"
+#include "../../console/console_log.h"
 #include "../../system/editor_window.h"
+#include "assets_dock.h"
+#include "console_dock.h"
 #include "core/logging/logging.h"
-#include "scene_dock.h"
 #include "game_dock.h"
 #include "hierarchy_dock.h"
 #include "inspector_dock.h"
-#include "assets_dock.h"
-#include "console_dock.h"
+#include "runtime/system/engine.h"
+#include "scene_dock.h"
 #include "style_dock.h"
-#include "../../console/console_log.h"
 
 bool docking_system::initialize()
 {
@@ -45,17 +45,8 @@ bool docking_system::initialize()
 	auto logging_container = logging::get_mutable_logging_container();
 	logging_container->add_sink(log);
 	window.set_log("Console", log);
-	std::function<void()> log_version = []()
-	{
-		APPLOG_INFO("Version 1.0");
-	};
-	log->register_command(
-		"version",
-		"Returns the current version of the Editor.",
-		{},
-		{},
-		log_version
-	);
+	std::function<void()> log_version = []() { APPLOG_INFO("Version 1.0"); };
+	log->register_command("version", "Returns the current version of the Editor.", {}, {}, log_version);
 
 	return true;
 }

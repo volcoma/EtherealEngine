@@ -5,17 +5,14 @@ namespace rnd
 
 engine::engine(result_type value) : impl(value)
 {
-
 }
 
 engine::engine(const engine& rhs) : impl(rhs.impl)
 {
-
 }
 
 engine::engine()
 {
-
 }
 
 void engine::seed(result_type value /*= type::default_seed*/)
@@ -42,5 +39,4 @@ bool operator!=(const engine& lhs, const engine& rhs)
 {
 	return lhs.impl != rhs.impl;
 }
-
 }

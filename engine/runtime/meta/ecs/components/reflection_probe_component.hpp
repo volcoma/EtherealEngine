@@ -3,7 +3,6 @@
 #include "core/reflection/reflection.h"
 #include "core/serialization/serialization.h"
 
-
 REFLECT_EXTERN(reflection_probe_component);
 
 SAVE_EXTERN(reflection_probe_component);

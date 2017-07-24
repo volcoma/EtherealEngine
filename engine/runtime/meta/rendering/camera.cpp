@@ -3,11 +3,9 @@
 #include "core/serialization/associative_archive.h"
 REFLECT(camera)
 {
-	rttr::registration::enumeration<projection_mode>("projection_mode")
-		(
-			rttr::value("perspective", projection_mode::perspective),
-			rttr::value("orthographic", projection_mode::orthographic)
-			);
+	rttr::registration::enumeration<projection_mode>("projection_mode")(
+		rttr::value("perspective", projection_mode::perspective),
+		rttr::value("orthographic", projection_mode::orthographic));
 	rttr::registration::class_<camera>("camera");
 }
 

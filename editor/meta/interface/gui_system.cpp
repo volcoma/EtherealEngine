@@ -19,7 +19,6 @@ SAVE(gui_style::hsv_setup)
 }
 SAVE_INSTANTIATE(gui_style::hsv_setup, cereal::oarchive_associative_t);
 
-
 LOAD(gui_style::hsv_setup)
 {
 	try_load(ar, cereal::make_nvp("col_main_hue", obj.col_main_hue));

@@ -7,10 +7,10 @@ vertex_buffer::~vertex_buffer()
 
 void vertex_buffer::dispose()
 {
-	if (is_valid())
+	if(is_valid())
 		gfx::destroyVertexBuffer(handle);
 
-	handle = { bgfx::kInvalidHandle };
+	handle = {bgfx::kInvalidHandle};
 }
 
 bool vertex_buffer::is_valid() const
@@ -18,7 +18,8 @@ bool vertex_buffer::is_valid() const
 	return gfx::isValid(handle);
 }
 
-void vertex_buffer::populate(const gfx::Memory* _mem, const gfx::VertexDecl& _decl, std::uint16_t _flags /*= BGFX_BUFFER_NONE*/)
+void vertex_buffer::populate(const gfx::Memory* _mem, const gfx::VertexDecl& _decl,
+							 std::uint16_t _flags /*= BGFX_BUFFER_NONE*/)
 {
 	dispose();
 

@@ -13,7 +13,7 @@ add_subdirectory(reflection)
 add_subdirectory(serialization)
 add_subdirectory(signals)
 add_subdirectory(singleton)
-add_subdirectory(subsystem)
+add_subdirectory(system)
 
 add_library (core ${libsrc})
 
@@ -30,7 +30,7 @@ target_link_libraries(core PUBLIC reflection)
 target_link_libraries(core PUBLIC serialization)
 target_link_libraries(core PUBLIC signals)
 target_link_libraries(core PUBLIC singleton)
-target_link_libraries(core PUBLIC subsystem)
+target_link_libraries(core PUBLIC system)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_link_libraries(core PUBLIC "-stdlib=libstdc++ -lstdc++")

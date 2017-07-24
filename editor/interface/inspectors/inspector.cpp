@@ -2,11 +2,11 @@
 
 void Tooltip(const rttr::property& prop)
 {
-	if (gui::IsItemHovered())
+	if(gui::IsItemHovered())
 	{
 		gui::SetMouseCursor(ImGuiMouseCursor_Help);
 		auto tooltip = prop.get_metadata("Tooltip");
-		if (tooltip)
+		if(tooltip)
 		{
 			gui::BeginTooltip();
 			gui::TextUnformatted(tooltip.to_string().c_str());
@@ -17,7 +17,7 @@ void Tooltip(const rttr::property& prop)
 
 void Tooltip(const std::string& tooltip)
 {
-	if (gui::IsItemHovered())
+	if(gui::IsItemHovered())
 	{
 		gui::SetMouseCursor(ImGuiMouseCursor_Help);
 		gui::BeginTooltip();
@@ -27,23 +27,23 @@ void Tooltip(const std::string& tooltip)
 }
 
 property_layout::property_layout(const rttr::property& prop, bool columns /*= true*/)
-{	
-	if (columns)
+{
+	if(columns)
 		gui::Columns(2, nullptr, false);
 
 	std::string pretty_name = prop.get_name().to_string();
 	auto meta_pretty_name = prop.get_metadata("pretty_name");
-	if (meta_pretty_name)
+	if(meta_pretty_name)
 		pretty_name = meta_pretty_name.get_value<std::string>();
 
 	gui::AlignFirstTextHeightToWidgets();
 	gui::TextUnformatted(pretty_name.c_str());
 
 	Tooltip(prop);
-	
+
 	gui::NextColumn();
 
-	if (columns)
+	if(columns)
 		gui::SetColumnOffset(1, std::max(gui::GetColumnOffset(), gui::CalcTextSize(pretty_name.c_str()).x));
 
 	gui::PushID(pretty_name.c_str());
@@ -52,15 +52,15 @@ property_layout::property_layout(const rttr::property& prop, bool columns /*= tr
 
 property_layout::property_layout(const std::string& name, bool columns /*= true*/)
 {
-	if (columns)
+	if(columns)
 		gui::Columns(2, nullptr, false);
 
 	gui::AlignFirstTextHeightToWidgets();
 	gui::TextUnformatted(name.c_str());
-	
+
 	gui::NextColumn();
 
-	if (columns)
+	if(columns)
 		gui::SetColumnOffset(1, std::max(gui::GetColumnOffset(), gui::CalcTextSize(name.c_str()).x));
 
 	gui::PushID(name.c_str());
@@ -69,7 +69,7 @@ property_layout::property_layout(const std::string& name, bool columns /*= true*
 
 property_layout::property_layout(const std::string& name, const std::string& tooltip, bool columns /*= true*/)
 {
-	if (columns)
+	if(columns)
 		gui::Columns(2, nullptr, false);
 
 	gui::AlignFirstTextHeightToWidgets();
@@ -79,7 +79,7 @@ property_layout::property_layout(const std::string& name, const std::string& too
 
 	gui::NextColumn();
 
-	if (columns)
+	if(columns)
 		gui::SetColumnOffset(1, std::max(gui::GetColumnOffset(), gui::CalcTextSize(name.c_str()).x));
 
 	gui::PushID(name.c_str());

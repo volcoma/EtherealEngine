@@ -1,18 +1,15 @@
 #include "pathname_tag_tree.h"
 #include <deque>
 
-path_name_tag_tree::node::node() :
-	_nodes(),
-	_tag(-1)
-{ }
-path_name_tag_tree::node::node(const node& krs) :
-	_nodes(krs._nodes),
-	_tag(krs._tag)
-{ }
+path_name_tag_tree::node::node() : _nodes(), _tag(-1)
+{
+}
+path_name_tag_tree::node::node(const node& krs) : _nodes(krs._nodes), _tag(krs._tag)
+{
+}
 
-path_name_tag_tree::path_name_tag_tree(const char sep_char, const size_t invalid_tag) :
-	_invalid_tag(invalid_tag),
-	_sep_char(sep_char)
+path_name_tag_tree::path_name_tag_tree(const char sep_char, const size_t invalid_tag)
+	: _invalid_tag(invalid_tag), _sep_char(sep_char)
 {
 	_root_node._tag = _invalid_tag;
 }
@@ -47,14 +44,14 @@ bool path_name_tag_tree::set(std::string pathname, size_t tag)
 	size_t i = pathname.find_first_of(_sep_char, 0);
 
 	node* n = &_root_node;
-	
+
 	std::deque<node*> back_trace;
 
-	if (i == std::string::npos)
+	if(i == std::string::npos)
 	{
 		const char* name = pathname.c_str();
 
-		if (n->_nodes.empty())
+		if(n->_nodes.empty())
 		{
 			n->_tag = 0;
 		}
@@ -63,11 +60,11 @@ bool path_name_tag_tree::set(std::string pathname, size_t tag)
 	}
 	else
 	{
-		for (std::string::iterator it = pathname.begin(); it != pathname.end();)
+		for(std::string::iterator it = pathname.begin(); it != pathname.end();)
 		{
 			const char* name = get_name(pathname, it, i);
 
-			if (n->_nodes.empty())
+			if(n->_nodes.empty())
 			{
 				n->_tag = 0;
 			}
@@ -78,24 +75,22 @@ bool path_name_tag_tree::set(std::string pathname, size_t tag)
 		}
 	}
 
-	
-
 	bool invalid_tag = tag == _invalid_tag;
 
-	if (i != std::string::npos)
+	if(i != std::string::npos)
 	{
 		tag = _invalid_tag;
 	}
 
-	if (n->_tag != tag)
+	if(n->_tag != tag)
 	{
 		n->_tag = tag;
 
-		if (invalid_tag)
+		if(invalid_tag)
 		{
-			for (auto it : back_trace)
+			for(auto it : back_trace)
 			{
-				if (it->_tag > 0)
+				if(it->_tag > 0)
 				{
 					--it->_tag;
 				}
@@ -103,7 +98,7 @@ bool path_name_tag_tree::set(std::string pathname, size_t tag)
 		}
 		else
 		{
-			for (auto it : back_trace)
+			for(auto it : back_trace)
 			{
 				++it->_tag;
 			}
@@ -136,7 +131,7 @@ const char* path_name_tag_tree::get_name(std::string& pathname, std::string::ite
 {
 	size_t o = it - pathname.begin();
 
-	if (o > 0)
+	if(o > 0)
 	{
 		i = pathname.find_first_of(_sep_char, o);
 	}
@@ -145,7 +140,7 @@ const char* path_name_tag_tree::get_name(std::string& pathname, std::string::ite
 		pathname[i] = 0;
 	}
 
-	if (i != std::string::npos)
+	if(i != std::string::npos)
 	{
 		it = pathname.begin() + i + 1;
 
@@ -187,24 +182,24 @@ path_name_tag_tree::node* path_name_tag_tree::get_node(std::string& pathname, bo
 
 	size_t i = pathname.find_first_of(_sep_char, 0);
 
-	if (i != std::string::npos)
+	if(i != std::string::npos)
 	{
 		n = &_root_node;
 
-		for (std::string::iterator it = pathname.begin(); it != pathname.end();)
+		for(std::string::iterator it = pathname.begin(); it != pathname.end();)
 		{
 			const char* name = get_name(pathname, it, i);
 
 			auto it_node = n->_nodes.find(name);
 
-			if (it_node == n->_nodes.end())
+			if(it_node == n->_nodes.end())
 			{
 				return nullptr;
 			}
 
 			n = it_node->second.get_pointer();
 
-			if (i == std::string::npos)
+			if(i == std::string::npos)
 			{
 				endpoint = true;
 
@@ -216,14 +211,16 @@ path_name_tag_tree::node* path_name_tag_tree::get_node(std::string& pathname, bo
 	return n;
 }
 
-path_name_tag_tree::iterator::iterator() { }
+path_name_tag_tree::iterator::iterator()
+{
+}
 path_name_tag_tree::iterator::iterator(void* p)
 {
 	setup(p);
 }
-path_name_tag_tree::iterator::iterator(const iterator& krc) :
-	_steps(krc._steps)
-{ }
+path_name_tag_tree::iterator::iterator(const iterator& krc) : _steps(krc._steps)
+{
+}
 
 void path_name_tag_tree::iterator::setup(void* p)
 {
@@ -232,7 +229,7 @@ void path_name_tag_tree::iterator::setup(void* p)
 
 bool path_name_tag_tree::iterator::step_stack_push()
 {
-	if (_steps.empty())
+	if(_steps.empty())
 	{
 		return false;
 	}
@@ -244,12 +241,12 @@ bool path_name_tag_tree::iterator::step_stack_push()
 
 bool path_name_tag_tree::iterator::step_stack_pop(bool replace)
 {
-	if (_stack.empty())
+	if(_stack.empty())
 	{
 		return false;
 	}
 
-	if (replace)
+	if(replace)
 	{
 		_steps.back() = _stack.top();
 	}
@@ -259,7 +256,7 @@ bool path_name_tag_tree::iterator::step_stack_pop(bool replace)
 	}
 
 	_stack.pop();
-	
+
 	return true;
 }
 
@@ -278,7 +275,7 @@ bool path_name_tag_tree::iterator::step_in()
 
 bool path_name_tag_tree::iterator::step_out()
 {
-	if (_steps.empty())
+	if(_steps.empty())
 	{
 		return false;
 	}
@@ -287,9 +284,9 @@ bool path_name_tag_tree::iterator::step_out()
 
 	return _steps.size() > 0;
 }
-bool path_name_tag_tree::iterator::step_reset() 
+bool path_name_tag_tree::iterator::step_reset()
 {
-	if (_steps.empty())
+	if(_steps.empty())
 	{
 		return false;
 	}
@@ -313,7 +310,7 @@ size_t path_name_tag_tree::iterator::steps()
 }
 bool path_name_tag_tree::iterator::do_step(node* n)
 {
-	if (n->_nodes.empty())
+	if(n->_nodes.empty())
 	{
 		return false;
 	}
@@ -322,7 +319,6 @@ bool path_name_tag_tree::iterator::do_step(node* n)
 
 	return true;
 }
-
 
 const bool path_name_tag_tree::iterator::is_leaf()
 {

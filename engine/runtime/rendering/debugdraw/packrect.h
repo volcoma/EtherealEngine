@@ -36,41 +36,41 @@ public:
 
 	void reset(uint16_t _width, uint16_t _height)
 	{
-		m_bw = _width/64;
-		m_bh = _height/numBlocks;
-		bx::memSet(m_mem, 0xff, sizeof(m_mem) );
+		m_bw = _width / 64;
+		m_bh = _height / numBlocks;
+		bx::memSet(m_mem, 0xff, sizeof(m_mem));
 	}
 
 	bool find(uint16_t _width, uint16_t _height, Pack2D& _pack)
 	{
-		uint16_t width  = bx::uint16_min(64, (_width  + m_bw - 1) / m_bw);
+		uint16_t width = bx::uint16_min(64, (_width + m_bw - 1) / m_bw);
 		uint16_t height = bx::uint16_min(numBlocks, (_height + m_bh - 1) / m_bh);
-		uint16_t numx = 64-width;
-		uint16_t numy = numBlocks-height;
+		uint16_t numx = 64 - width;
+		uint16_t numy = numBlocks - height;
 
-		const uint64_t scan = width == 64 ? UINT64_MAX : (UINT64_C(1)<<width)-1;
+		const uint64_t scan = width == 64 ? UINT64_MAX : (UINT64_C(1) << width) - 1;
 
-		for (uint16_t starty = 0; starty <= numy; ++starty)
+		for(uint16_t starty = 0; starty <= numy; ++starty)
 		{
 			uint64_t mem = m_mem[starty];
 			uint16_t ntz = (uint16_t)bx::uint64_cnttz(mem);
-			uint64_t mask = scan<<ntz;
+			uint64_t mask = scan << ntz;
 
-			for (uint16_t xx = ntz; xx <= numx; ++xx, mask <<= 1)
+			for(uint16_t xx = ntz; xx <= numx; ++xx, mask <<= 1)
 			{
 				uint16_t yy = starty;
-				if ( (mem&mask) == mask)
+				if((mem & mask) == mask)
 				{
 					uint16_t endy = starty + height;
-					while (yy < endy && (m_mem[yy]&mask) == mask)
+					while(yy < endy && (m_mem[yy] & mask) == mask)
 					{
 						++yy;
 					}
 
-					if (yy == endy)
+					if(yy == endy)
 					{
 						uint64_t cmask = ~mask;
-						for (yy = starty; yy < endy; ++yy)
+						for(yy = starty; yy < endy; ++yy)
 						{
 							m_mem[yy] &= cmask;
 						}
@@ -91,14 +91,14 @@ public:
 	void clear(const Pack2D& _pack)
 	{
 		uint16_t startx = bx::uint16_min(63, _pack.m_x / m_bw);
-		uint16_t starty = bx::uint16_min(numBlocks-1, _pack.m_y / m_bh);
-		uint16_t endx   = bx::uint16_min(64, (_pack.m_width + m_bw - 1) / m_bw + startx);
-		uint16_t endy   = bx::uint16_min(numBlocks, (_pack.m_height + m_bh - 1) / m_bh + starty);
-		uint16_t width  = endx - startx;
+		uint16_t starty = bx::uint16_min(numBlocks - 1, _pack.m_y / m_bh);
+		uint16_t endx = bx::uint16_min(64, (_pack.m_width + m_bw - 1) / m_bw + startx);
+		uint16_t endy = bx::uint16_min(numBlocks, (_pack.m_height + m_bh - 1) / m_bh + starty);
+		uint16_t width = endx - startx;
 
-		const uint64_t mask = (width == 64 ? UINT64_MAX : (UINT64_C(1)<<width)-1 )<<startx;
+		const uint64_t mask = (width == 64 ? UINT64_MAX : (UINT64_C(1) << width) - 1) << startx;
 
-		for (uint16_t yy = starty; yy < endy; ++yy)
+		for(uint16_t yy = starty; yy < endy; ++yy)
 		{
 			m_mem[yy] |= mask;
 		}
@@ -127,7 +127,7 @@ public:
 
 	void reset(uint16_t _side)
 	{
-		for (uint8_t ii = 0; ii < 6; ++ii)
+		for(uint8_t ii = 0; ii < 6; ++ii)
 		{
 			m_mru[ii] = ii;
 			m_ra[ii].reset(_side, _side);
@@ -137,12 +137,12 @@ public:
 	bool find(uint16_t _width, uint16_t _height, PackCube& _pack)
 	{
 		bool found = false;
-		for (uint32_t ii = 0; ii < 6; ++ii)
+		for(uint32_t ii = 0; ii < 6; ++ii)
 		{
 			uint8_t side = m_mru[ii];
 			found = m_ra[side].find(_width, _height, _pack.m_rect);
 
-			if (found)
+			if(found)
 			{
 				_pack.m_side = side;
 				m_mru[ii] = m_mru[0];
@@ -159,7 +159,9 @@ public:
 		uint8_t side = _pack.m_side;
 
 		uint32_t ii = 0;
-		for (; ii < 6 && m_mru[ii] != side; ++ii) {};
+		for(; ii < 6 && m_mru[ii] != side; ++ii)
+		{
+		};
 
 		m_mru[ii] = m_mru[0];
 		m_mru[0] = side;

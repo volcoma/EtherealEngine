@@ -7,9 +7,9 @@ struct vertex_buffer
 	//-----------------------------------------------------------------------------
 	//  Name : ~vertex_buffer ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	~vertex_buffer();
@@ -17,9 +17,9 @@ struct vertex_buffer
 	//-----------------------------------------------------------------------------
 	//  Name : dispose ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void dispose();
@@ -27,9 +27,9 @@ struct vertex_buffer
 	//-----------------------------------------------------------------------------
 	//  Name : is_valid ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	bool is_valid() const;
@@ -37,15 +37,14 @@ struct vertex_buffer
 	//-----------------------------------------------------------------------------
 	//  Name : populate ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void populate(const gfx::Memory* _mem
-		, const gfx::VertexDecl& _decl
-		, std::uint16_t _flags = BGFX_BUFFER_NONE);
+	void populate(const gfx::Memory* _mem, const gfx::VertexDecl& _decl,
+				  std::uint16_t _flags = BGFX_BUFFER_NONE);
 
 	/// Internal handle
-	gfx::VertexBufferHandle handle = { gfx::kInvalidHandle };
+	gfx::VertexBufferHandle handle = {gfx::kInvalidHandle};
 };

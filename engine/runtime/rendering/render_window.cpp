@@ -14,7 +14,9 @@ render_window::render_window()
 	_surface = std::make_shared<frame_buffer>();
 }
 
-render_window::render_window(mml::video_mode mode, const std::string& title, std::uint32_t style /*= mml::style::default*/) : mml::window(mode, title, style)
+render_window::render_window(mml::video_mode mode, const std::string& title,
+							 std::uint32_t style /*= mml::style::default*/)
+	: mml::window(mode, title, style)
 {
 	_surface = std::make_shared<frame_buffer>();
 }
@@ -27,13 +29,13 @@ render_window::~render_window()
 void render_window::destroy_surface()
 {
 	// force internal handle destruction
-	if (_surface)
+	if(_surface)
 	{
 		_surface->dispose();
 		_surface.reset();
 
-		//this is a must to flush the destruction
-		//of the frame buffer
+		// this is a must to flush the destruction
+		// of the frame buffer
 		gfx::frame();
 		gfx::frame();
 	}
@@ -48,19 +50,17 @@ void render_window::frame_end()
 
 void render_window::prepare_surface()
 {
-	if (!gfx::is_initted())
+	if(!gfx::is_initted())
 		return;
 
 	auto size = get_size();
-	if (_is_main)
-	{		
+	if(_is_main)
+	{
 		gfx::reset(size[0], size[1], 0);
 	}
 	else
 	{
-        _surface->populate(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(get_system_handle())),
-        static_cast<std::uint16_t>(size[0]),
-        static_cast<std::uint16_t>(size[1]));
+		_surface->populate(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(get_system_handle())),
+						   static_cast<std::uint16_t>(size[0]), static_cast<std::uint16_t>(size[1]));
 	}
-
 }

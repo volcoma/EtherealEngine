@@ -7,10 +7,10 @@ uniform::~uniform()
 
 void uniform::dispose()
 {
-	if (is_valid())
+	if(is_valid())
 		gfx::destroyUniform(handle);
 
-	handle = { bgfx::kInvalidHandle };
+	handle = {bgfx::kInvalidHandle};
 }
 
 bool uniform::is_valid() const

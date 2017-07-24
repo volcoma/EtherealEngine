@@ -7,7 +7,6 @@ REFLECT_EXTERN(runtime::component);
 
 namespace runtime
 {
-	SAVE_EXTERN(component);
-
-	LOAD_EXTERN(component);
+SAVE_EXTERN(component);
+LOAD_EXTERN(component);
 }

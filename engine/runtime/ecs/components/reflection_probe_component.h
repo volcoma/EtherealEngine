@@ -2,9 +2,9 @@
 //-----------------------------------------------------------------------------
 // reflection_probe_component Header Includes
 //-----------------------------------------------------------------------------
-#include "../ecs.h"
 #include "../../rendering/reflection_probe.h"
 #include "../../rendering/render_pass.h"
+#include "../ecs.h"
 #include "core/common/basetypes.hpp"
 //-----------------------------------------------------------------------------
 // Forward Declarations
@@ -16,7 +16,8 @@
 //-----------------------------------------------------------------------------
 //  Name : reflection_probe_component (Class)
 /// <summary>
-/// Class that contains our core light data, used for rendering and other things.
+/// Class that contains our core light data, used for rendering and other
+/// things.
 /// </summary>
 //-----------------------------------------------------------------------------
 class reflection_probe_component : public runtime::component_impl<reflection_probe_component>
@@ -37,19 +38,22 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : get_probe ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const reflection_probe& get_probe() const { return _probe; }
+	inline const reflection_probe& get_probe() const
+	{
+		return _probe;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_probe ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void set_probe(const reflection_probe& probe);
@@ -57,33 +61,33 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : compute_projected_sphere_rect ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	int compute_projected_sphere_rect(
-		irect& rect,
-		const math::vec3& position,
-		const math::transform& view,
-		const math::transform& proj);
+	int compute_projected_sphere_rect(irect& rect, const math::vec3& position, const math::transform& view,
+									  const math::transform& proj);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_render_view ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline render_view& get_render_view(size_t idx) { return _render_view[idx]; }
+	inline render_view& get_render_view(size_t idx)
+	{
+		return _render_view[idx];
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_cubemap ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	std::shared_ptr<texture> get_cubemap();
@@ -91,12 +95,13 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : get_cubemap_fbo ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	std::shared_ptr<frame_buffer> get_cubemap_fbo();
+
 private:
 	//-------------------------------------------------------------------------
 	// Private Member Variables.

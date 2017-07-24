@@ -1,6 +1,6 @@
 #pragma once
-#include "core/math/math_includes.h"
 #include "core/common/basetypes.hpp"
+#include "core/math/math_includes.h"
 #include "core/reflection/registration.h"
 #include "core/serialization/serialization.h"
 
@@ -78,7 +78,10 @@ public:
 	/// Retrieve the current projection mode for this camera.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline projection_mode get_projection_mode() const { return _projection_mode; }
+	inline projection_mode get_projection_mode() const
+	{
+		return _projection_mode;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_fov()
@@ -86,7 +89,10 @@ public:
 	/// Retrieve the current field of view angle in degrees.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline float get_fov() const { return _fov; }
+	inline float get_fov() const
+	{
+		return _fov;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_near_clip()
@@ -94,7 +100,10 @@ public:
 	/// Retrieve the distance from the camera to the near clip plane.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline float get_near_clip() const { return _near_clip; }
+	inline float get_near_clip() const
+	{
+		return _near_clip;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_far_clip()
@@ -102,7 +111,10 @@ public:
 	/// Retrieve the distance from the camera to the far clip plane.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline float get_far_clip() const { return _far_clip; }
+	inline float get_far_clip() const
+	{
+		return _far_clip;
+	}
 
 	//-----------------------------------------------------------------------------
 	// Name : get_ortho_size( )
@@ -110,14 +122,17 @@ public:
 	/// Get the orthographic size.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline float get_ortho_size() const { return _ortho_size; }
+	inline float get_ortho_size() const
+	{
+		return _ortho_size;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_zoom_factor ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	float get_zoom_factor() const;
@@ -125,9 +140,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : get_ppu ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	float get_ppu() const;
@@ -135,9 +150,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : set_viewport_size ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void set_viewport_size(const usize& viewportSize);
@@ -145,32 +160,41 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : set_viewport_pos ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_viewport_pos(const upoint& viewportPos) { _viewport_pos = viewportPos; }
+	inline void set_viewport_pos(const upoint& viewportPos)
+	{
+		_viewport_pos = viewportPos;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_viewport_size ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const usize& get_viewport_size() const { return _viewport_size; }
+	const usize& get_viewport_size() const
+	{
+		return _viewport_size;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_viewport_pos ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const upoint& get_viewport_pos() const { return _viewport_pos; }
+	inline const upoint& get_viewport_pos() const
+	{
+		return _viewport_pos;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_aspect_ratio ()
@@ -187,7 +211,10 @@ public:
 	/// Retrieve the aspect ratio used to generate the horizontal FOV angle.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline float get_aspect_ratio() const { return _aspect_ratio; }
+	inline float get_aspect_ratio() const
+	{
+		return _aspect_ratio;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : is_aspect_locked()
@@ -205,7 +232,10 @@ public:
 	/// This is useful as a debugging tool.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline bool is_frustum_locked() const { return _frustum_locked; }
+	inline bool is_frustum_locked() const
+	{
+		return _frustum_locked;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : lock_frustum ()
@@ -213,7 +243,10 @@ public:
 	/// Prevent the frustum from updating.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void lock_frustum(bool locked) { _frustum_locked = locked; }
+	inline void lock_frustum(bool locked)
+	{
+		_frustum_locked = locked;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_frustum()
@@ -226,8 +259,8 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : get_clipping_volume()
 	/// <summary>
-	/// Retrieve the frustum / volume that represents the space between the camera 
-	/// position and its near plane. This frustum represents the 'volume' that can 
+	/// Retrieve the frustum / volume that represents the space between the camera
+	/// position and its near plane. This frustum represents the 'volume' that can
 	/// end up clipping geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
@@ -247,7 +280,10 @@ public:
 	/// Return the current view matrix.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::transform& get_view() const { return _view; }
+	inline const math::transform& get_view() const
+	{
+		return _view;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_view ()
@@ -255,7 +291,10 @@ public:
 	/// Return the current view matrix.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline math::transform& get_view() { return _view; }
+	inline math::transform& get_view()
+	{
+		return _view;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_view_projection ()
@@ -263,7 +302,10 @@ public:
 	/// Return the current view-projection matrix.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline math::transform get_view_projection() { return get_projection() * get_view(); }
+	inline math::transform get_view_projection()
+	{
+		return get_projection() * get_view();
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_last_view ()
@@ -272,7 +314,10 @@ public:
 	/// to recordCurrentMatrices().
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::transform& get_last_view() const { return _last_view; }
+	inline const math::transform& get_last_view() const
+	{
+		return _last_view;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_last_projection ()
@@ -281,7 +326,10 @@ public:
 	/// recent call to recordCurrentMatrices().
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::transform& get_last_projection() const { return _last_projection; }
+	inline const math::transform& get_last_projection() const
+	{
+		return _last_projection;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : record_current_matrices ()
@@ -298,17 +346,21 @@ public:
 	/// Sets the current jitter value for temporal anti-aliasing
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_aa_data(const usize& viewportSize, std::uint32_t currentSubpixelIndex, std::uint32_t temporalAASamples);
+	void set_aa_data(const usize& viewportSize, std::uint32_t currentSubpixelIndex,
+					 std::uint32_t temporalAASamples);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_aa_data ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::vec4& get_aa_data() const { return _aa_data; }
+	inline const math::vec4& get_aa_data() const
+	{
+		return _aa_data;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : bounds_in_frustum ()
@@ -316,7 +368,7 @@ public:
 	/// Determine whether or not the AABB specified falls within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::volume_query bounds_in_frustum(const math::bbox & bounds);
+	math::volume_query bounds_in_frustum(const math::bbox& bounds);
 
 	//-----------------------------------------------------------------------------
 	//  Name : bounds_in_frustum ()
@@ -324,7 +376,7 @@ public:
 	/// Determine whether or not the OOBB specified is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::volume_query bounds_in_frustum(const math::bbox & bounds, const math::transform & t);
+	math::volume_query bounds_in_frustum(const math::bbox& bounds, const math::transform& t);
 
 	//-----------------------------------------------------------------------------
 	//  Name : viewport_to_ray()
@@ -333,37 +385,44 @@ public:
 	/// vector, suitable for use during picking.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool viewport_to_ray(const math::vec2 & point, math::vec3 & rayOriginOut, math::vec3 & rayDirectionOut);
+	bool viewport_to_ray(const math::vec2& point, math::vec3& rayOriginOut, math::vec3& rayDirectionOut);
 
 	//-----------------------------------------------------------------------------
 	//  Name : viewport_to_world ()
 	/// <summary>
-	/// Given a view screen position (in screen space) this function will cast that 
+	/// Given a view screen position (in screen space) this function will cast
+	/// that
 	/// ray and return the world space position on the specified plane. The value
 	/// is returned via the world parameter passed.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool viewport_to_world(const math::vec2 & point, const math::plane & plane, math::vec3 & positionOut, bool clip);
+	bool viewport_to_world(const math::vec2& point, const math::plane& plane, math::vec3& positionOut,
+						   bool clip);
 
 	//-----------------------------------------------------------------------------
 	//  Name : viewport_to_major_axis ()
 	/// <summary>
-	/// Given a view screen position (in screen space) this function will cast that 
+	/// Given a view screen position (in screen space) this function will cast
+	/// that
 	/// ray and return the world space intersection point on one of the major axis
 	/// planes selected based on the camera look vector.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool viewport_to_major_axis(const math::vec2 & point, const math::vec3 & axisOrigin, math::vec3 & positionOut, math::vec3 & majorAxisOut);
+	bool viewport_to_major_axis(const math::vec2& point, const math::vec3& axisOrigin,
+								math::vec3& positionOut, math::vec3& majorAxisOut);
 
 	//-----------------------------------------------------------------------------
 	//  Name : viewportToMajorAxis ()
 	/// <summary>
-	/// Given a view screen position (in screen space) this function will cast that 
+	/// Given a view screen position (in screen space) this function will cast
+	/// that
 	/// ray and return the world space intersection point on one of the major axis
 	/// planes selected based on the specified normal.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool viewport_to_major_axis(const math::vec2 & point, const math::vec3 & axisOrigin, const math::vec3 & alignNormal, math::vec3 & positionOut, math::vec3 & majorAxisOut);
+	bool viewport_to_major_axis(const math::vec2& point, const math::vec3& axisOrigin,
+								const math::vec3& alignNormal, math::vec3& positionOut,
+								math::vec3& majorAxisOut);
 
 	//-----------------------------------------------------------------------------
 	//  Name : viewport_to_camera ()
@@ -372,36 +431,27 @@ public:
 	/// the point into a camera space position at the near plane.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool viewport_to_camera(const math::vec3 & point, math::vec3 & positionOut);
+	bool viewport_to_camera(const math::vec3& point, math::vec3& positionOut);
 
 	//-----------------------------------------------------------------------------
 	//  Name : world_to_viewport()
 	/// <summary>
-	/// Transform a point from world space, into screen space. Returns false 
+	/// Transform a point from world space, into screen space. Returns false
 	/// if the point was clipped off the screen.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool world_to_viewport(const upoint& viewport_pos, const usize& viewport_size, const math::vec3& pos, math::vec3 & point, bool clipX = true, bool clipY = true, bool clipZ = true);
+	bool world_to_viewport(const upoint& viewport_pos, const usize& viewport_size, const math::vec3& pos,
+						   math::vec3& point, bool clipX = true, bool clipY = true, bool clipZ = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : estimate_zoom_factor ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float estimate_zoom_factor(const math::plane & plane);
-
-	//-----------------------------------------------------------------------------
-	//  Name : estimate_zoom_factor ()
-	/// <summary>
-	/// Given the current viewport type and projection mode, estimate the "zoom"
-	/// factor that can be used for scaling various operations relative to their
-	/// "scale" as it appears in the viewport.
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	float estimate_zoom_factor(const math::vec3 & position);
+	float estimate_zoom_factor(const math::plane& plane);
 
 	//-----------------------------------------------------------------------------
 	//  Name : estimate_zoom_factor ()
@@ -411,53 +461,65 @@ public:
 	/// "scale" as it appears in the viewport.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float estimate_zoom_factor(const math::plane & plane, float maximumValue);
+	float estimate_zoom_factor(const math::vec3& position);
+
+	//-----------------------------------------------------------------------------
+	//  Name : estimate_zoom_factor ()
+	/// <summary>
+	/// Given the current viewport type and projection mode, estimate the "zoom"
+	/// factor that can be used for scaling various operations relative to their
+	/// "scale" as it appears in the viewport.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	float estimate_zoom_factor(const math::plane& plane, float maximumValue);
 
 	//-----------------------------------------------------------------------------
 	// Name : estimate_zoom_factor ()
 	/// <summary>
 	/// Given the current viewport type and projection mode, estimate the "zoom"
 	/// factor that can be used for scaling various operations relative to the
-	/// "scale" of an object as it appears in the viewport at the specified position.
+	/// "scale" of an object as it appears in the viewport at the specified
+	/// position.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float estimate_zoom_factor(const math::vec3 & position, float maximumValue);
+	float estimate_zoom_factor(const math::vec3& position, float maximumValue);
 
 	//-----------------------------------------------------------------------------
 	// Name : estimate_pick_tolerance ()
 	/// <summary>
-	/// Estimate the distance (along each axis) from the specified object space 
+	/// Estimate the distance (along each axis) from the specified object space
 	/// point to use as a tolerance for picking.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::vec3 estimate_pick_tolerance(float pixelTolerance, const math::vec3 & referencePosition, const math::transform & objectTransform);
+	math::vec3 estimate_pick_tolerance(float pixelTolerance, const math::vec3& referencePosition,
+									   const math::transform& objectTransform);
 
 	//-----------------------------------------------------------------------------
 	//  Name : look_at ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void look_at(const math::vec3 & vEye, const math::vec3 & vAt);
+	void look_at(const math::vec3& vEye, const math::vec3& vAt);
 
 	//-----------------------------------------------------------------------------
 	//  Name : look_at ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void look_at(const math::vec3 & vEye, const math::vec3 & vAt, const math::vec3 & vUp);
+	void look_at(const math::vec3& vEye, const math::vec3& vAt, const math::vec3& vUp);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_position ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	math::vec3 get_position() const;
@@ -465,9 +527,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : x_unit_axis ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	math::vec3 x_unit_axis() const;
@@ -475,9 +537,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : y_unit_axis ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	math::vec3 y_unit_axis() const;
@@ -485,9 +547,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : z_unit_axis ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	math::vec3 z_unit_axis() const;
@@ -523,9 +585,9 @@ protected:
 	/// camera's half-size when in orthographic mode.
 	float _ortho_size = 5;
 	/// Viewport position
-	upoint _viewport_pos = { 0, 0 };
+	upoint _viewport_pos = {0, 0};
 	/// Viewport size
-	usize _viewport_size = { 0, 0 };
+	usize _viewport_size = {0, 0};
 	/// Cached view matrix
 	math::transform _view;
 	/// Cached projection matrix.
@@ -536,12 +598,14 @@ protected:
 	math::transform _last_projection;
 	/// Details regarding the camera frustum.
 	math::frustum _frustum;
-	/// The near clipping volume (area of space between the camera position and the near plane).
+	/// The near clipping volume (area of space between the camera position and
+	/// the near plane).
 	math::frustum _clipping_volume;
-	/// The aspect ratio used to generate the correct horizontal degrees (perspective only)
+	/// The aspect ratio used to generate the correct horizontal degrees
+	/// (perspective only)
 	float _aspect_ratio = 1.0f;
 	/// Anti-aliasing data.
-	math::vec4 _aa_data = { 0.0f, 0.0f, 0.0f, 0.0f };
+	math::vec4 _aa_data = {0.0f, 0.0f, 0.0f, 0.0f};
 	/// View matrix dirty ?
 	bool _view_dirty = true;
 	/// Projection matrix dirty ?

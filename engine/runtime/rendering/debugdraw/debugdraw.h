@@ -6,8 +6,8 @@
 #ifndef DEBUGDRAW_H_HEADER_GUARD
 #define DEBUGDRAW_H_HEADER_GUARD
 
-#include <bx/allocator.h>
 #include "bounds.h"
+#include <bx/allocator.h>
 
 struct Axis
 {
@@ -21,9 +21,15 @@ struct Axis
 	};
 };
 
-struct SpriteHandle { uint16_t idx; };
+struct SpriteHandle
+{
+	uint16_t idx;
+};
 
-inline bool isValid(SpriteHandle _handle) { return _handle.idx != UINT16_MAX; }
+inline bool isValid(SpriteHandle _handle)
+{
+	return _handle.idx != UINT16_MAX;
+}
 
 ///
 void ddInit(bool _depthTestLess = true, bx::AllocatorI* _allocator = NULL);
@@ -134,7 +140,8 @@ void ddDrawCylinder(const void* _from, const void* _to, float _radius, bool _cap
 void ddDrawCapsule(const void* _from, const void* _to, float _radius);
 
 ///
-void ddDrawAxis(float _x, float _y, float _z, float _len = 1.0f, Axis::Enum _highlight = Axis::Count, float _thickness = 0.0f);
+void ddDrawAxis(float _x, float _y, float _z, float _len = 1.0f, Axis::Enum _highlight = Axis::Count,
+				float _thickness = 0.0f);
 
 ///
 void ddDrawGrid(const void* _normal, const void* _center, uint32_t _size = 20, float _step = 1.0f);

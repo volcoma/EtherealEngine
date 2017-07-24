@@ -1,7 +1,7 @@
 #include "material.h"
 #include "program.h"
-#include "uniform.h"
 #include "texture.h"
+#include "uniform.h"
 
 #include "../assets/asset_manager.h"
 
@@ -13,31 +13,34 @@ material::material()
 
 	auto default_normal = am.load<texture>("engine_data:/textures/default_normal.dds");
 	_default_normal_map = default_normal.get();
-
 }
-
 
 material::~material()
 {
-
 }
 
-void material::set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::TextureHandle _texture, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
+void material::set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::TextureHandle _texture,
+						   std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
 	get_program()->set_texture(_stage, _sampler, _texture, _flags);
 }
 
-void material::set_texture(std::uint8_t _stage, const std::string& _sampler, texture* _texture, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
+void material::set_texture(std::uint8_t _stage, const std::string& _sampler, texture* _texture,
+						   std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
 	get_program()->set_texture(_stage, _sampler, _texture, _flags);
 }
 
-void material::set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::FrameBufferHandle _handle, uint8_t _attachment /*= 0 */, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
+void material::set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::FrameBufferHandle _handle,
+						   uint8_t _attachment /*= 0 */,
+						   std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
 	get_program()->set_texture(_stage, _sampler, _handle, _attachment, _flags);
 }
 
-void material::set_texture(std::uint8_t _stage, const std::string& _sampler, frame_buffer* _handle, uint8_t _attachment /*= 0 */, std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
+void material::set_texture(std::uint8_t _stage, const std::string& _sampler, frame_buffer* _handle,
+						   uint8_t _attachment /*= 0 */,
+						   std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
 	get_program()->set_texture(_stage, _sampler, _handle, _attachment, _flags);
 }
@@ -55,23 +58,20 @@ program* material::get_program() const
 std::uint64_t material::get_render_states(bool apply_cull, bool depth_write, bool depth_test) const
 {
 	// Set render states.
-	std::uint64_t states = 0
-		| BGFX_STATE_RGB_WRITE
-		| BGFX_STATE_ALPHA_WRITE
-		| BGFX_STATE_MSAA;
+	std::uint64_t states = 0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_MSAA;
 
-	if (depth_write)
+	if(depth_write)
 		states |= BGFX_STATE_DEPTH_WRITE;
 
-	if (depth_test)
+	if(depth_test)
 		states |= BGFX_STATE_DEPTH_TEST_LESS;
 
-	if (apply_cull)
+	if(apply_cull)
 	{
 		auto cullType = get_cull_type();
-		if (cullType == cull_type::counter_clockwise)
+		if(cullType == cull_type::counter_clockwise)
 			states |= BGFX_STATE_CULL_CCW;
-		if (cullType == cull_type::clockwise)
+		if(cullType == cull_type::clockwise)
 			states |= BGFX_STATE_CULL_CW;
 	}
 
@@ -86,22 +86,24 @@ standard_material::standard_material()
 	auto vs_deferred_geom_skinned = am.load<shader>("engine_data:/shaders/vs_deferred_geom_skinned.sc");
 	auto fs_deferred_geom = am.load<shader>("engine_data:/shaders/fs_deferred_geom.sc");
 
-	ts.push_awaitable_on_main([this](asset_handle<shader> vs, asset_handle<shader> fs)
-	{
-		_program = std::make_unique<program>(vs, fs);
+	ts.push_awaitable_on_main(
+		[this](asset_handle<shader> vs, asset_handle<shader> fs) {
+			_program = std::make_unique<program>(vs, fs);
 
-	}, vs_deferred_geom, fs_deferred_geom);
+		},
+		vs_deferred_geom, fs_deferred_geom);
 
-	ts.push_awaitable_on_main([this](asset_handle<shader> vs, asset_handle<shader> fs)
-	{
-		_program_skinned = std::make_unique<program>(vs, fs);
+	ts.push_awaitable_on_main(
+		[this](asset_handle<shader> vs, asset_handle<shader> fs) {
+			_program_skinned = std::make_unique<program>(vs, fs);
 
-	}, vs_deferred_geom_skinned, fs_deferred_geom);
+		},
+		vs_deferred_geom_skinned, fs_deferred_geom);
 }
 
 void standard_material::submit()
 {
-	if (!is_valid())
+	if(!is_valid())
 		return;
 
 	get_program()->set_uniform("u_base_color", &_base_color);

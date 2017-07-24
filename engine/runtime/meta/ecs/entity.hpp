@@ -10,5 +10,4 @@ std::map<std::uint32_t, runtime::entity>& get_serialization_map();
 
 SAVE_EXTERN(entity);
 LOAD_EXTERN(entity);
-
 }

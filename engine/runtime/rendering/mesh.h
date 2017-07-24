@@ -4,20 +4,20 @@
 #include "core/math/math_includes.h"
 #include "core/reflection/registration.h"
 #include "core/serialization/serialization.h"
-#include <vector>
 #include <map>
 #include <memory>
+#include <vector>
 
 struct vertex_buffer;
 struct index_buffer;
 
 namespace triangle_flags
 {
-	enum e
-	{
-		none = 0,
-		degenerate = 0x1,
-	};
+enum e
+{
+	none = 0,
+	degenerate = 0x1,
+};
 }
 
 enum class mesh_status
@@ -59,17 +59,25 @@ public:
 		float weight = 0.0f;
 
 		// Constructors
-		vertex_influence() {}
-		vertex_influence(std::uint32_t _index, float _weight) :
-			vertex_index(_index), weight(_weight) {}
+		vertex_influence()
+		{
+		}
+		vertex_influence(std::uint32_t _index, float _weight) : vertex_index(_index), weight(_weight)
+		{
+		}
 	};
 	using vertex_influence_array_t = std::vector<vertex_influence>;
-	// Describes the vertices that are connected to the referenced bone, and how much influence it has on them.
+	// Describes the vertices that are connected to the referenced bone, and how
+	// much influence it has on
+	// them.
 	struct bone_influence
 	{
-		/// Unique identifier of the bone from which transformation information should be taken.
+		/// Unique identifier of the bone from which transformation information
+		/// should be taken.
 		std::string bone_id;
-		/// The "bind pose" or "offset" transform that describes how the bone was positioned in relation to the original vertex data.
+		/// The "bind pose" or "offset" transform that describes how the bone was
+		/// positioned in relation to
+		/// the original vertex data.
 		math::transform bind_pose_transform;
 		/// List of vertices influenced by the referenced bone.
 		vertex_influence_array_t influences;
@@ -110,11 +118,12 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : build_vertex_table()
 	/// <summary>
-	/// Construct a list of bone influences and weights for each vertex based 
+	/// Construct a list of bone influences and weights for each vertex based
 	/// on the binding data provided.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void build_vertex_table(std::uint32_t vertex_count, const std::vector<std::uint32_t>& vertex_remap, vertex_data_array_t& table);
+	void build_vertex_table(std::uint32_t vertex_count, const std::vector<std::uint32_t>& vertex_remap,
+							vertex_data_array_t& table);
 
 	//-----------------------------------------------------------------------------
 	//  Name : remap_vertices()
@@ -175,6 +184,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void clear();
+
 private:
 	//-------------------------------------------------------------------------
 	// Private Variables
@@ -187,7 +197,7 @@ private:
 //-----------------------------------------------------------------------------
 //  Name : bone_palette (Class)
 /// <summary>
-/// Outlines a collection of bones that influence a given set of faces / 
+/// Outlines a collection of bones that influence a given set of faces /
 /// vertices in the mesh.
 /// </summary>
 //-----------------------------------------------------------------------------
@@ -202,7 +212,7 @@ public:
 	// Constructors & Destructors
 	//-------------------------------------------------------------------------
 	bone_palette(std::uint32_t paletteSize);
-	bone_palette(const bone_palette & init);
+	bone_palette(const bone_palette& init);
 	~bone_palette();
 
 	//-------------------------------------------------------------------------
@@ -215,25 +225,21 @@ public:
 	/// drawing the skinned mesh.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::vector<math::transform> get_skinning_matrices(
-        const math::transform& root_transform,
-		const std::vector<math::transform>& node_transforms,
-		const skin_bind_data& bind_data,
-		bool compute_inverse_transpose) const;
+	std::vector<math::transform> get_skinning_matrices(const math::transform& root_transform,
+													   const std::vector<math::transform>& node_transforms,
+													   const skin_bind_data& bind_data,
+													   bool compute_inverse_transpose) const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : compute_palette_fit()
 	/// <summary>
-	/// Determine the relevant "fit" information that can be used to 
-	/// discover if and how the specified combination of bones will fit into 
+	/// Determine the relevant "fit" information that can be used to
+	/// discover if and how the specified combination of bones will fit into
 	/// this palette.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void compute_palette_fit(
-		bone_index_map_t& input, 
-		std::int32_t& current_space, 
-		std::int32_t& common_base, 
-		std::int32_t& additional_bones);
+	void compute_palette_fit(bone_index_map_t& input, std::int32_t& current_space, std::int32_t& common_base,
+							 std::int32_t& additional_bones);
 
 	//-----------------------------------------------------------------------------
 	//  Name : assign_bones()
@@ -254,7 +260,7 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : translate_bone_to_palette ()
 	/// <summary>
-	/// Translate the specified bone index into its associated position in 
+	/// Translate the specified bone index into its associated position in
 	/// the palette. If it does not exist, a value of -1 will be returned.
 	/// </summary>
 	//-----------------------------------------------------------------------------
@@ -263,8 +269,8 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : get_maximum_blend_index ()
 	/// <summary>
-	/// Retrieve the maximum vertex blend index for this palette (i.e. if 
-	/// every vertex was only influenced by one bone, this variable would 
+	/// Retrieve the maximum vertex blend index for this palette (i.e. if
+	/// every vertex was only influenced by one bone, this variable would
 	/// contain a value of 0).
 	/// </summary>
 	//-----------------------------------------------------------------------------
@@ -307,7 +313,7 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : set_maximum_blend_index ()
 	/// <summary>
-	/// Set the maximum vertex blend index for this palette (i.e. if every 
+	/// Set the maximum vertex blend index for this palette (i.e. if every
 	/// vertex was only influenced by one bone, this variable would contain a
 	/// value of 0).
 	/// </summary>
@@ -317,7 +323,7 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : set_data_group ()
 	/// <summary>
-	/// Set the identifier of the data group assigned to the subset of the mesh 
+	/// Set the identifier of the data group assigned to the subset of the mesh
 	/// reserved for this bone palette.
 	/// </summary>
 	//-----------------------------------------------------------------------------
@@ -335,21 +341,25 @@ protected:
 	//-------------------------------------------------------------------------
 	// Protected Variables
 	//-------------------------------------------------------------------------
-	/// Sorted list of bones in this palette. References the elements in the standard list.
+	/// Sorted list of bones in this palette. References the elements in the
+	/// standard list.
 	bone_index_map_t _bones_lut;
-	/// Main palette of indices that reference the bones outlined in the main skin binding data.
+	/// Main palette of indices that reference the bones outlined in the main skin
+	/// binding data.
 	std::vector<std::uint32_t> _bones;
 	/// List of faces assigned to this palette.
 	std::vector<std::uint32_t> _faces;
-	/// The data group identifier used to separate the mesh data into subsets relevant to this bone palette.
+	/// The data group identifier used to separate the mesh data into subsets
+	/// relevant to this bone palette.
 	std::uint32_t _data_group_id;
 	/// The maximum size of this palette.
 	std::uint32_t _maximum_size;
-	/// The maximum vertex blend index for this palette (i.e. if every vertex was only influenced by one bone, this variable would contain a value of 0).
+	/// The maximum vertex blend index for this palette (i.e. if every vertex was
+	/// only influenced by one bone,
+	/// this variable would contain a value of 0).
 	std::int32_t _maximum_blend_index;
 
 }; // End Class bone_palette
-
 
 class mesh
 {
@@ -361,16 +371,17 @@ public:
 	// by material, but can be any arbitrary collection of triangles.
 	struct subset
 	{
-		/// The unique user assigned "data group" that can be used to separate subsets.
+		/// The unique user assigned "data group" that can be used to separate
+		/// subsets.
 		std::uint32_t data_group_id = 0;
 		/// The beginning vertex for this batch.
 		std::int32_t vertex_start = -1;
 		/// Number of vertices included in this batch.
-        std::uint32_t vertex_count = 0;
+		std::uint32_t vertex_count = 0;
 		/// The initial face, from the index buffer, to render in this batch
 		std::int32_t face_start = -1;
 		/// Number of faces to render in this batch.
-        std::uint32_t face_count = 0;
+		std::uint32_t face_count = 0;
 	};
 
 	struct info
@@ -384,7 +395,7 @@ public:
 	struct triangle
 	{
 		std::uint32_t data_group_id = 0;
-        std::uint32_t indices[3] = {0, 0, 0};
+		std::uint32_t indices[3] = {0, 0, 0};
 		std::uint8_t flags = 0;
 	};
 
@@ -395,10 +406,9 @@ public:
 	struct armature_node
 	{
 		std::string name;
-        math::transform local_transform;
-        math::transform world_transform;
+		math::transform local_transform;
+		math::transform world_transform;
 		std::vector<std::unique_ptr<armature_node>> children;
-
 	};
 
 	// mesh Construction Structures
@@ -417,13 +427,13 @@ public:
 				Count
 			};
 
-			math::color base_color = { 0.0f, 0.0f, 0.0f, 0.0f };
-			math::color emissive_color = { 0.0f, 0.0f, 0.0f, 0.0f };
+			math::color base_color = {0.0f, 0.0f, 0.0f, 0.0f};
+			math::color emissive_color = {0.0f, 0.0f, 0.0f, 0.0f};
 			std::vector<std::string> textures = std::vector<std::string>(texture_type::Count);
 		};
 
 		/// The format of the vertex data currently being used to prepare the mesh.
-		gfx::VertexDecl	vertex_format;
+		gfx::VertexDecl vertex_format;
 		/// Final vertex buffer currently being prepared.
 		std::vector<std::uint8_t> vertex_data;
 		/// Total number of vertices currently stored here.
@@ -499,14 +509,9 @@ public:
 	/// Prepare the mesh immediately with the specified data.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool prepare_mesh(
-		const gfx::VertexDecl& vertex_format,
-		void * vertices,
-		std::uint32_t vertex_count,
-		const triangle_array_t& faces,
-		bool hardware_copy = true,
-		bool weld = true,
-		bool optimize = true);
+	bool prepare_mesh(const gfx::VertexDecl& vertex_format, void* vertices, std::uint32_t vertex_count,
+					  const triangle_array_t& faces, bool hardware_copy = true, bool weld = true,
+					  bool optimize = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_vertex_source ()
@@ -522,7 +527,8 @@ public:
 	/// <summary>
 	/// Called by an external source (such as the geometry loader) in order
 	/// to populate the internal buffers ready for building the mesh.
-	/// Note : This may be called multiple times until the mesh is ready to be built
+	/// Note : This may be called multiple times until the mesh is ready to be
+	/// built
 	/// via the 'endPrepare' method.
 	/// </summary>
 	//-----------------------------------------------------------------------------
@@ -531,7 +537,7 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : bind_skin ()
 	/// <summary>
-	/// Given the specified skin binding data, convert the internal mesh data 
+	/// Given the specified skin binding data, convert the internal mesh data
 	/// into the format required for skinning.
 	/// </summary>
 	//-----------------------------------------------------------------------------
@@ -551,17 +557,10 @@ public:
 	/// Create cube geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool create_cube(
-		const gfx::VertexDecl& format,
-		float width,
-		float height,
-		float depth,
-		std::uint32_t width_segments,
-		std::uint32_t height_segments,
-		std::uint32_t depth_segments,
-		bool inverted,
-		mesh_create_origin origin,
-		bool hardware_copy = true);
+	bool create_cube(const gfx::VertexDecl& format, float width, float height, float depth,
+					 std::uint32_t width_segments, std::uint32_t height_segments,
+					 std::uint32_t depth_segments, bool inverted, mesh_create_origin origin,
+					 bool hardware_copy = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : create_cube ()
@@ -569,34 +568,20 @@ public:
 	/// Create cube geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool create_cube(
-		const gfx::VertexDecl& format,
-		float width,
-		float height,
-		float depth,
-		std::uint32_t width_segments,
-		std::uint32_t height_segments,
-		std::uint32_t depth_segments,
-		float tex_u_scale,
-		float tex_v_scale,
-		bool inverted,
-		mesh_create_origin origin,
-		bool hardware_copy = true);
+	bool create_cube(const gfx::VertexDecl& format, float width, float height, float depth,
+					 std::uint32_t width_segments, std::uint32_t height_segments,
+					 std::uint32_t depth_segments, float tex_u_scale, float tex_v_scale, bool inverted,
+					 mesh_create_origin origin, bool hardware_copy = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : create_sphere ()
 	/// <summary>
 	/// Create sphere geometry.
 	/// </summary>
-	//-----------------------------------------------------------------------------	
-	bool create_sphere(
-		const gfx::VertexDecl& format,
-		float radius,
-		std::uint32_t stacks,
-		std::uint32_t slices,
-		bool inverted,
-		mesh_create_origin origin,
-		bool hardware_copy = true);
+	//-----------------------------------------------------------------------------
+	bool create_sphere(const gfx::VertexDecl& format, float radius, std::uint32_t stacks,
+					   std::uint32_t slices, bool inverted, mesh_create_origin origin,
+					   bool hardware_copy = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : create_cylinder ()
@@ -604,15 +589,9 @@ public:
 	/// Create cylinder geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool create_cylinder(
-		const gfx::VertexDecl& format,
-		float radius,
-		float height,
-		std::uint32_t stacks,
-		std::uint32_t slices,
-		bool inverted,
-		mesh_create_origin origin,
-		bool hardware_copy = true);
+	bool create_cylinder(const gfx::VertexDecl& format, float radius, float height, std::uint32_t stacks,
+						 std::uint32_t slices, bool inverted, mesh_create_origin origin,
+						 bool hardware_copy = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : create_capsule ()
@@ -620,15 +599,9 @@ public:
 	/// Create capsule geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool create_capsule(
-		const gfx::VertexDecl& format,
-		float radius,
-		float height,
-		std::uint32_t stacks,
-		std::uint32_t slices,
-		bool inverted,
-		mesh_create_origin origin,
-		bool hardware_copy = true);
+	bool create_capsule(const gfx::VertexDecl& format, float radius, float height, std::uint32_t stacks,
+						std::uint32_t slices, bool inverted, mesh_create_origin origin,
+						bool hardware_copy = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : create_cone ()
@@ -636,16 +609,9 @@ public:
 	/// Create cone geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool create_cone(
-		const gfx::VertexDecl& format,
-		float radius,
-		float radiusTip,
-		float height,
-		std::uint32_t stacks,
-		std::uint32_t slices,
-		bool inverted,
-		mesh_create_origin origin,
-		bool hardware_copy = true);
+	bool create_cone(const gfx::VertexDecl& format, float radius, float radiusTip, float height,
+					 std::uint32_t stacks, std::uint32_t slices, bool inverted, mesh_create_origin origin,
+					 bool hardware_copy = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : create_torus ()
@@ -653,15 +619,9 @@ public:
 	/// Create torus geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool create_torus(
-		const gfx::VertexDecl& format,
-		float outer_radius,
-		float inner_radius,
-		std::uint32_t bands,
-		std::uint32_t sides,
-		bool inverted,
-		mesh_create_origin origin,
-		bool hardware_copy = true);
+	bool create_torus(const gfx::VertexDecl& format, float outer_radius, float inner_radius,
+					  std::uint32_t bands, std::uint32_t sides, bool inverted, mesh_create_origin origin,
+					  bool hardware_copy = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : create_teapot ()
@@ -717,14 +677,15 @@ public:
 	/// render data for the mesh.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool end_prepare(bool hardware_copy = true, bool weld = true, bool optimize = true, bool build_buffers = true);
+	bool end_prepare(bool hardware_copy = true, bool weld = true, bool optimize = true,
+					 bool build_buffers = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : build_vb ()
 	/// <summary>
 	/// Builds internal vertex buffer
-	/// 
-	/// 
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void build_vb(bool hardware_copy = true);
@@ -733,8 +694,8 @@ public:
 	//  Name : build_ib ()
 	/// <summary>
 	/// Builds internal index buffer
-	/// 
-	/// 
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void build_ib(bool hardware_copy = true);
@@ -746,7 +707,7 @@ public:
 	/// Generates edge-triangle adjacency information for the mesh data either
 	/// prior to, or after building the hardware buffers. Input array will be
 	/// automatically sized, and will contain 3 values per triangle contained
-	/// in the mesh representing the indices to adjacent faces for each edge in 
+	/// in the mesh representing the indices to adjacent faces for each edge in
 	/// the triangle (or 0xFFFFFFFF if there is no adjacent face).
 	/// </summary>
 	//-----------------------------------------------------------------------------
@@ -807,7 +768,7 @@ public:
 	/// retrieve the original data that was used to bind it.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const skin_bind_data&	get_skin_bind_data() const;
+	const skin_bind_data& get_skin_bind_data() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_bone_palettes ()
@@ -818,8 +779,7 @@ public:
 	//-----------------------------------------------------------------------------
 	const bone_palette_array_t& get_bone_palettes() const;
 
-
-    const armature_node* get_armature() const;
+	const armature_node* get_armature() const;
 	//-----------------------------------------------------------------------------
 	//  Name : get_subset ()
 	/// <summary>
@@ -838,7 +798,10 @@ public:
 	/// Gets the local bounding box for this mesh.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const math::bbox& get_bounds() const { return _bbox; }
+	inline const math::bbox& get_bounds() const
+	{
+		return _bbox;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_status ()
@@ -846,7 +809,10 @@ public:
 	/// Gets the peparation status for this mesh.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline mesh_status get_status() const { return _prepare_status; }
+	inline mesh_status get_status() const
+	{
+		return _prepare_status;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_subset_count ()
@@ -854,7 +820,10 @@ public:
 	/// Gets the number of subsets for this mesh
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline std::size_t get_subset_count() const { return _mesh_subsets.size(); }
+	inline std::size_t get_subset_count() const
+	{
+		return _mesh_subsets.size();
+	}
 
 protected:
 	//-------------------------------------------------------------------------
@@ -878,12 +847,15 @@ protected:
 		/// Do we own the source data?
 		bool owns_source = false;
 		/// The format of the vertex data currently being used to prepare the mesh.
-		gfx::VertexDecl	source_format;
-		/// Records the location in the vertex buffer that each vertex has been placed during data insertion.
+		gfx::VertexDecl source_format;
+		/// Records the location in the vertex buffer that each vertex has been
+		/// placed during data insertion.
 		std::vector<std::uint32_t> vertex_records;
 		/// Final vertex buffer currently being prepared.
 		byte_array_t vertex_data;
-		/// Provides additional descriptive information about the vertices in the above buffer (i.e. source provided a normal, etc.)
+		/// Provides additional descriptive information about the vertices in the
+		/// above buffer (i.e. source
+		/// provided a normal, etc.)
 		byte_array_t vertex_flags;
 		/// This is used to store the current face / triangle data.
 		triangle_array_t triangle_data;
@@ -891,13 +863,17 @@ protected:
 		std::uint32_t triangle_count = 0;
 		/// Total number of vertices currently stored here.
 		std::uint32_t vertex_count = 0;
-		/// Vertex normals should be computed (at least for any vertices where none were supplied).
+		/// Vertex normals should be computed (at least for any vertices where none
+		/// were supplied).
 		bool compute_normals = false;
-		/// Vertex binormals should be computed (at least for any vertices where none were supplied).
+		/// Vertex binormals should be computed (at least for any vertices where
+		/// none were supplied).
 		bool compute_binormals = false;
-		/// Vertex binormals should be computed (at least for any vertices where none were supplied).
+		/// Vertex binormals should be computed (at least for any vertices where
+		/// none were supplied).
 		bool compute_tangents = false;
-		/// Vertex barycentric should be computed (at least for any vertices where none were supplied).
+		/// Vertex barycentric should be computed (at least for any vertices where
+		/// none were supplied).
 		bool compute_barycentric = false;
 
 	}; // End Struct preparation_data
@@ -909,7 +885,8 @@ protected:
 		std::int32_t cache_position = -1;
 		/// The score associated with this vertex
 		float vertex_score = 0.0f;
-		/// Total number of triangles that reference this vertex that have not yet been added
+		/// Total number of triangles that reference this vertex that have not yet
+		/// been added
 		std::uint32_t unused_triangle_references = 0;
 		/// List of all of the triangles referencing this vertex
 		std::vector<std::uint32_t> triangle_references;
@@ -940,17 +917,20 @@ protected:
 		std::uint32_t data_group_id = 0;
 
 		// Constructors
-		mesh_subset_key() :
-			data_group_id(0) {}
-		mesh_subset_key(std::uint32_t _dataGroupId) :
-			data_group_id(_dataGroupId) {}
+		mesh_subset_key() : data_group_id(0)
+		{
+		}
+		mesh_subset_key(std::uint32_t _dataGroupId) : data_group_id(_dataGroupId)
+		{
+		}
 
 	}; // End Struct mesh_subset_key
 
 	using subset_key_map_t = std::map<mesh_subset_key, subset*>;
 	using subset_key_array_t = std::vector<mesh_subset_key>;
 
-	// Simple structure to allow us to leverage the hierarchical properties of a map
+	// Simple structure to allow us to leverage the hierarchical properties of a
+	// map
 	// to accelerate the weld operation.
 	struct weld_key
 	{
@@ -958,35 +938,37 @@ protected:
 		std::uint8_t* vertex;
 		// Format of the above vertex for easy access.
 		gfx::VertexDecl format;
-		// The tolerance we're using to weld (transport only, these should be the same for every key).
+		// The tolerance we're using to weld (transport only, these should be the
+		// same for every key).
 		float tolerance;
 	};
 
 	struct face_influences
 	{
-		bone_palette::bone_index_map_t bones;          // List of unique bones that influence a given number of faces.
+		bone_palette::bone_index_map_t bones; // List of unique bones that influence a given number of faces.
 	};
 
-	// Simple structure to allow us to leverage the hierarchical properties of a map
+	// Simple structure to allow us to leverage the hierarchical properties of a
+	// map
 	// to accelerate the bone index combination process.
 	struct bone_combination_key
 	{
 		face_influences* influences = nullptr;
 
 		// Constructor
-		bone_combination_key(face_influences * _influences) :
-			influences(_influences) {}
-
+		bone_combination_key(face_influences* _influences) : influences(_influences)
+		{
+		}
 	};
 	using bone_combination_map_t = std::map<bone_combination_key, std::vector<std::uint32_t>*>;
 
 	//-------------------------------------------------------------------------
 	// Friend List
 	//-------------------------------------------------------------------------
-	friend bool operator < (const adjacent_edge_key& key1, const adjacent_edge_key& key2);
-	friend bool operator < (const mesh_subset_key& key1, const mesh_subset_key& key2);
-	friend bool operator < (const weld_key& key1, const weld_key& key2);
-	friend bool operator < (const bone_combination_key& key1, const bone_combination_key& key2);
+	friend bool operator<(const adjacent_edge_key& key1, const adjacent_edge_key& key2);
+	friend bool operator<(const mesh_subset_key& key1, const mesh_subset_key& key2);
+	friend bool operator<(const weld_key& key1, const weld_key& key2);
+	friend bool operator<(const bone_combination_key& key1, const bone_combination_key& key2);
 	//-------------------------------------------------------------------------
 	// Protected Methods
 	//-------------------------------------------------------------------------
@@ -1007,22 +989,23 @@ protected:
 	/// provided when adding vertex data.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool generate_vertex_normals(std::uint32_t* adjacency_ptr, std::vector<std::uint32_t>* remap_array_ptr = nullptr);
+	bool generate_vertex_normals(std::uint32_t* adjacency_ptr,
+								 std::vector<std::uint32_t>* remap_array_ptr = nullptr);
 
 	//-----------------------------------------------------------------------------
 	//  Name : generate_vertex_barycentrics ()
 	/// <summary>
-	/// 
-	/// 
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	bool generate_vertex_barycentrics(std::uint32_t* adjacency);
 
 	//-----------------------------------------------------------------------------
-	//  Name : generate_vertex_tangents () 
+	//  Name : generate_vertex_tangents ()
 	/// <summary>
-	/// Builds the tangent space vectors for this polygon. 
-	/// Credit to Terathon Software - http://www.terathon.com/code/tangent.html 
+	/// Builds the tangent space vectors for this polygon.
+	/// Credit to Terathon Software - http://www.terathon.com/code/tangent.html
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	bool generate_vertex_tangents();
@@ -1050,7 +1033,8 @@ protected:
 	/// of primitives the required number of times based on their material.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void render_mesh_data(std::uint32_t face_start, std::uint32_t face_count, std::uint32_t vertex_start, std::uint32_t vertex_count);
+	void render_mesh_data(std::uint32_t face_start, std::uint32_t face_count, std::uint32_t vertex_start,
+						  std::uint32_t vertex_count);
 
 	//-------------------------------------------------------------------------
 	// Protected Static Functions
@@ -1063,15 +1047,13 @@ protected:
 	/// and implementation.
 	/// Note : Thanks to Tom Forsyth for the fantastic implementation on which
 	/// this is based.
-	/// URL  : http://home.comcast.net/~tom_forsyth/papers/fast_vert_cache_opt.html
+	/// URL  :
+	/// http://home.comcast.net/~tom_forsyth/papers/fast_vert_cache_opt.html
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void build_optimized_index_buffer(
-		const subset* subset,
-		std::uint32_t* source_buffer_ptr, 
-		std::uint32_t* destination_buffer_ptr,
-		std::uint32_t minimum_vertex, 
-		std::uint32_t maximum_vertex);
+	static void build_optimized_index_buffer(const subset* subset, std::uint32_t* source_buffer_ptr,
+											 std::uint32_t* destination_buffer_ptr,
+											 std::uint32_t minimum_vertex, std::uint32_t maximum_vertex);
 
 	//-----------------------------------------------------------------------------
 	//  Name : find_vertex_optimizer_score () (Private, Static)
@@ -1080,7 +1062,8 @@ protected:
 	/// identify important vertices when ordering triangle data.
 	/// Note : Thanks to Tom Forsyth for the fantastic implementation on which
 	/// this is based.
-	/// URL  : http://home.comcast.net/~tom_forsyth/papers/fast_vert_cache_opt.html
+	/// URL  :
+	/// http://home.comcast.net/~tom_forsyth/papers/fast_vert_cache_opt.html
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	static float find_vertex_optimizer_score(const optimizer_vertex_info* vertex_info_ptr);
@@ -1095,11 +1078,15 @@ protected:
 	bool _force_normal_generation;
 	/// Should we force the re-generation of vertex barycentric coords?
 	bool _force_barycentric_generation;
-	/// Allows derived classes to disable / enable the automatic re-sort operation that happens during several operations such as setFaceMaterial(), etc.
+	/// Allows derived classes to disable / enable the automatic re-sort operation
+	/// that happens during several
+	/// operations such as setFaceMaterial(), etc.
 	bool _disable_final_sort;
 
 	// mesh data
-	/// The vertex data as it exists during data insertion (prior to the actual build) and also used as the system memory copy.
+	/// The vertex data as it exists during data insertion (prior to the actual
+	/// build) and also used as the
+	/// system memory copy.
 	std::uint8_t* _system_vb = nullptr;
 	/// Vertex format used for the mesh internal vertex data.
 	gfx::VertexDecl _vertex_format;
@@ -1107,17 +1094,21 @@ protected:
 	std::uint32_t* _system_ib = nullptr;
 	/// Material and data group information for each triangle.
 	subset_key_array_t _triangle_data;
-	/// After constructing the mesh, this will contain the actual hardware vertex buffer resource
-    std::shared_ptr<vertex_buffer> _hardware_vb;
-	/// After constructing the mesh, this will contain the actual hardware index buffer resource
-    std::shared_ptr<index_buffer> _hardware_ib;
+	/// After constructing the mesh, this will contain the actual hardware vertex
+	/// buffer resource
+	std::shared_ptr<vertex_buffer> _hardware_vb;
+	/// After constructing the mesh, this will contain the actual hardware index
+	/// buffer resource
+	std::shared_ptr<index_buffer> _hardware_ib;
 
 	// mesh data look up tables
 	/// The actual list of subsets maintained by this mesh.
 	subset_array_t _mesh_subsets;
-	/// A map containing lookup information which maps data groups to subsets batched by material.
+	/// A map containing lookup information which maps data groups to subsets
+	/// batched by material.
 	data_group_subset_map_t _data_groups;
-	/// Quick binary tree lookup of existing subsets based on material AND data group id.
+	/// Quick binary tree lookup of existing subsets based on material AND data
+	/// group id.
 	subset_key_map_t _subset_lookup;
 
 	// mesh properties
@@ -1139,7 +1130,8 @@ protected:
 	preparation_data _preparation_data;
 
 	// Skin binding information
-	/// Data that describes how the mesh should be bound as a skin with supplied bone matrices.
+	/// Data that describes how the mesh should be bound as a skin with supplied
+	/// bone matrices.
 	skin_bind_data _skin_bind_data;
 	/// List of each of the unique combinations of bones to use during rendering.
 	bone_palette_array_t _bone_palettes;
@@ -1156,7 +1148,7 @@ protected:
 /// Perform less than comparison on the adjacent_edge_key structure.
 /// </summary>
 //-----------------------------------------------------------------------------
-inline bool operator < (const mesh::adjacent_edge_key& key1, const mesh::adjacent_edge_key& key2);
+inline bool operator<(const mesh::adjacent_edge_key& key1, const mesh::adjacent_edge_key& key2);
 
 //-----------------------------------------------------------------------------
 //  Name : operator < () (mesh_subset_key&, mesh_subset_key&)
@@ -1164,7 +1156,7 @@ inline bool operator < (const mesh::adjacent_edge_key& key1, const mesh::adjacen
 /// Perform less than comparison on the mesh_subset_key structure.
 /// </summary>
 //-----------------------------------------------------------------------------
-inline bool operator < (const mesh::mesh_subset_key& key1, const mesh::mesh_subset_key& key2);
+inline bool operator<(const mesh::mesh_subset_key& key1, const mesh::mesh_subset_key& key2);
 
 //-----------------------------------------------------------------------------
 //  Name : operator < () (weld_key&, weld_key&)
@@ -1172,7 +1164,7 @@ inline bool operator < (const mesh::mesh_subset_key& key1, const mesh::mesh_subs
 /// Perform less than comparison on the weld_key structure.
 /// </summary>
 //-----------------------------------------------------------------------------
-inline bool operator < (const mesh::weld_key& key1, const mesh::weld_key& key2);
+inline bool operator<(const mesh::weld_key& key1, const mesh::weld_key& key2);
 
 //-----------------------------------------------------------------------------
 //  Name : operator < () (bone_combination_key&, bone_combination_key&)
@@ -1180,4 +1172,4 @@ inline bool operator < (const mesh::weld_key& key1, const mesh::weld_key& key2);
 /// Perform less than comparison on the bone_combination_key structure.
 /// </summary>
 //-----------------------------------------------------------------------------
-inline bool operator < (const mesh::bone_combination_key& key1, const mesh::bone_combination_key& key2);
+inline bool operator<(const mesh::bone_combination_key& key1, const mesh::bone_combination_key& key2);

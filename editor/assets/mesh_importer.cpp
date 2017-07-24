@@ -1,10 +1,10 @@
 #include "mesh_importer.h"
-#include "core/logging/logging.h"
-#include "core/graphics/graphics.h"
-#include "core/math/math_includes.h"
 #include "assimp/Importer.hpp"
-#include "assimp/scene.h"
 #include "assimp/postprocess.h"
+#include "assimp/scene.h"
+#include "core/graphics/graphics.h"
+#include "core/logging/logging.h"
+#include "core/math/math_includes.h"
 #include "runtime/rendering/mesh.h"
 #include <algorithm>
 
@@ -12,22 +12,22 @@ math::transform process_matrix(const aiMatrix4x4& assimp_matrix)
 {
 	math::transform matrix;
 
-    matrix[0][0] = assimp_matrix.a1;
-    matrix[1][0] = assimp_matrix.a2;
-    matrix[2][0] = assimp_matrix.a3;
-    matrix[3][0] = assimp_matrix.a4;
+	matrix[0][0] = assimp_matrix.a1;
+	matrix[1][0] = assimp_matrix.a2;
+	matrix[2][0] = assimp_matrix.a3;
+	matrix[3][0] = assimp_matrix.a4;
 
-    matrix[0][1] = assimp_matrix.b1;
+	matrix[0][1] = assimp_matrix.b1;
 	matrix[1][1] = assimp_matrix.b2;
 	matrix[2][1] = assimp_matrix.b3;
 	matrix[3][1] = assimp_matrix.b4;
 
-    matrix[0][2] = assimp_matrix.c1;
+	matrix[0][2] = assimp_matrix.c1;
 	matrix[1][2] = assimp_matrix.c2;
 	matrix[2][2] = assimp_matrix.c3;
 	matrix[3][2] = assimp_matrix.c4;
 
-    matrix[0][3] = assimp_matrix.d1;
+	matrix[0][3] = assimp_matrix.d1;
 	matrix[1][3] = assimp_matrix.d2;
 	matrix[2][3] = assimp_matrix.d3;
 	matrix[3][3] = assimp_matrix.d4;
@@ -51,64 +51,65 @@ void process_vertices(aiMesh* mesh, mesh::load_data& load_data)
 
 	std::uint8_t* current_vertex_ptr = &load_data.vertex_data[0] + current_vertex * vertex_stride;
 
-	for (size_t i = 0; i < mesh->mNumVertices; ++i, current_vertex_ptr += vertex_stride)
+	for(size_t i = 0; i < mesh->mNumVertices; ++i, current_vertex_ptr += vertex_stride)
 	{
-		//position
-		if (mesh->mVertices && has_position)
+		// position
+		if(mesh->mVertices && has_position)
 		{
 			float position[4];
 			std::memcpy(position, &mesh->mVertices[i], sizeof(math::vec3));
 
-			if (has_position)
-				gfx::vertexPack(position, false, gfx::Attrib::Position, load_data.vertex_format, current_vertex_ptr);
+			if(has_position)
+				gfx::vertexPack(position, false, gfx::Attrib::Position, load_data.vertex_format,
+								current_vertex_ptr);
 		}
 
-		//tex coords
-		if (mesh->mTextureCoords[0] && has_texcoord0)
+		// tex coords
+		if(mesh->mTextureCoords[0] && has_texcoord0)
 		{
 			float textureCoords[4];
 			std::memcpy(textureCoords, &mesh->mTextureCoords[0][i], sizeof(math::vec2));
 
-			if (has_texcoord0)
-				gfx::vertexPack(textureCoords, true, gfx::Attrib::TexCoord0, load_data.vertex_format, current_vertex_ptr);
-	
+			if(has_texcoord0)
+				gfx::vertexPack(textureCoords, true, gfx::Attrib::TexCoord0, load_data.vertex_format,
+								current_vertex_ptr);
 		}
 
 		////normals
 		math::vec4 normal;
-		if (mesh->mNormals && has_normal)
+		if(mesh->mNormals && has_normal)
 		{
 			std::memcpy(math::value_ptr(normal), &mesh->mNormals[i], sizeof(math::vec3));
 
-			if (has_normal)
-				gfx::vertexPack(math::value_ptr(normal), true, gfx::Attrib::Normal, load_data.vertex_format, current_vertex_ptr);
-
+			if(has_normal)
+				gfx::vertexPack(math::value_ptr(normal), true, gfx::Attrib::Normal, load_data.vertex_format,
+								current_vertex_ptr);
 		}
 
 		math::vec4 tangent;
-		//tangents
-		if (mesh->mTangents && has_tangent)
+		// tangents
+		if(mesh->mTangents && has_tangent)
 		{
 			std::memcpy(math::value_ptr(tangent), &mesh->mTangents[i], sizeof(math::vec3));
 			tangent.w = 1.0f;
-			if (has_tangent)
-				gfx::vertexPack(math::value_ptr(tangent), true, gfx::Attrib::Tangent, load_data.vertex_format, current_vertex_ptr);
-
+			if(has_tangent)
+				gfx::vertexPack(math::value_ptr(tangent), true, gfx::Attrib::Tangent, load_data.vertex_format,
+								current_vertex_ptr);
 		}
 
-		//binormals
+		// binormals
 		math::vec4 bitangent;
-		if (mesh->mBitangents && has_bitangent)
+		if(mesh->mBitangents && has_bitangent)
 		{
 			std::memcpy(math::value_ptr(bitangent), &mesh->mBitangents[i], sizeof(math::vec3));
-			float handedness = math::dot(math::vec3(bitangent), math::normalize(math::cross(math::vec3(normal), math::vec3(tangent))));
+			float handedness = math::dot(
+				math::vec3(bitangent), math::normalize(math::cross(math::vec3(normal), math::vec3(tangent))));
 			tangent.w = handedness;
 
-			if (has_bitangent)
-				gfx::vertexPack(math::value_ptr(bitangent), true, gfx::Attrib::Bitangent, load_data.vertex_format, current_vertex_ptr);
-
+			if(has_bitangent)
+				gfx::vertexPack(math::value_ptr(bitangent), true, gfx::Attrib::Bitangent,
+								load_data.vertex_format, current_vertex_ptr);
 		}
-
 	}
 }
 
@@ -116,7 +117,7 @@ void process_faces(aiMesh* mesh, mesh::load_data& load_data)
 {
 	load_data.triangle_count += mesh->mNumFaces;
 
-	for (size_t i = 0; i < mesh->mNumFaces; ++i)
+	for(size_t i = 0; i < mesh->mNumFaces; ++i)
 	{
 		aiFace face = mesh->mFaces[i];
 
@@ -124,32 +125,31 @@ void process_faces(aiMesh* mesh, mesh::load_data& load_data)
 
 		triangle.data_group_id = mesh->mMaterialIndex;
 
-        auto num_indices = std::min<size_t>(face.mNumIndices, 3);
+		auto num_indices = std::min<size_t>(face.mNumIndices, 3);
 
-        for (size_t j = 0; j < num_indices; ++j)
+		for(size_t j = 0; j < num_indices; ++j)
 		{
 			triangle.indices[j] = face.mIndices[j] + load_data.vertex_count;
 		}
 
 		load_data.triangle_data.push_back(triangle);
-
 	}
 }
 
 void process_bones(aiMesh* mesh, mesh::load_data& load_data)
 {
-	if (mesh->mBones)
+	if(mesh->mBones)
 	{
 		skin_bind_data::bone_influence_array_t bone_influences;
-		for (size_t i = 0; i < mesh->mNumBones; ++i)
+		for(size_t i = 0; i < mesh->mNumBones; ++i)
 		{
 			aiBone* assimp_bone = mesh->mBones[i];
 			skin_bind_data::bone_influence bone_influence;
 			bone_influence.bone_id = assimp_bone->mName.C_Str();
 			const aiMatrix4x4& assimp_matrix = assimp_bone->mOffsetMatrix;
-            bone_influence.bind_pose_transform = process_matrix(assimp_matrix);
+			bone_influence.bind_pose_transform = process_matrix(assimp_matrix);
 
-			for (size_t j = 0; j < assimp_bone->mNumWeights; ++j)
+			for(size_t j = 0; j < assimp_bone->mNumWeights; ++j)
 			{
 				aiVertexWeight assimp_influence = assimp_bone->mWeights[j];
 
@@ -163,22 +163,20 @@ void process_bones(aiMesh* mesh, mesh::load_data& load_data)
 			bone_influences.push_back(std::move(bone_influence));
 		}
 
-
-		for (size_t i = 0; i < bone_influences.size(); ++i)
+		for(size_t i = 0; i < bone_influences.size(); ++i)
 		{
 			const auto& bone_influence_to_insert = bone_influences[i];
 			bool exist = false;
 			const auto& bones = load_data.skin_data.get_bones();
-            for (auto& bone: bones)
-            {
-                if (bone.bone_id == bone_influence_to_insert.bone_id)
-                {
-                    exist = true;
-                    break;
-                }
-
-            }
-			if (!exist)
+			for(auto& bone : bones)
+			{
+				if(bone.bone_id == bone_influence_to_insert.bone_id)
+				{
+					exist = true;
+					break;
+				}
+			}
+			if(!exist)
 				load_data.skin_data.add_bone(bone_influence_to_insert);
 		}
 		bone_influences.clear();
@@ -202,33 +200,27 @@ void process_material(aiMaterial* mat, mesh::load_data& load_data)
 
 	mesh::load_data::load_material data;
 
-	auto is_not_black = [](aiColor3D color)
-	{
-        return color.r != 0.0f || color.g != 0.0f || color.b != 0.0f;
-	};
+	auto is_not_black = [](aiColor3D color) { return color.r != 0.0f || color.g != 0.0f || color.b != 0.0f; };
 
-	auto process_color = [](const aiColor3D& c)
-	{
-		return math::color(c.r, c.g, c.b, 1.0f);
-	};
+	auto process_color = [](const aiColor3D& c) { return math::color(c.r, c.g, c.b, 1.0f); };
 
-	if (mat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS) // always keep black color for diffuse
+	if(mat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS) // always keep black color for diffuse
 	{
 		data.base_color = process_color(color);
 	}
-	if (mat->Get(AI_MATKEY_COLOR_EMISSIVE, color) == AI_SUCCESS && is_not_black(color))
+	if(mat->Get(AI_MATKEY_COLOR_EMISSIVE, color) == AI_SUCCESS && is_not_black(color))
 	{
 		data.emissive_color = process_color(color);
 	}
-	if (mat->Get(AI_MATKEY_OPACITY, opacity) == AI_SUCCESS)
+	if(mat->Get(AI_MATKEY_OPACITY, opacity) == AI_SUCCESS)
 	{
 		data.base_color.value.a = opacity;
 	}
 
-    auto get_texture = [](std::size_t mat_index, aiMaterial* mat, mesh::load_data& load_data, aiTextureType t, mesh::load_data::load_material::texture_type)
-	{
+	auto get_texture = [](std::size_t mat_index, aiMaterial* mat, mesh::load_data& load_data, aiTextureType t,
+						  mesh::load_data::load_material::texture_type) {
 		const auto textures = mat->GetTextureCount(t);
-		if (textures > 0)
+		if(textures > 0)
 		{
 			aiString path;
 			aiTextureMapping mapping;
@@ -236,7 +228,7 @@ void process_material(aiMaterial* mat, mesh::load_data& load_data)
 			float blend = 0.0f;
 			aiTextureOp textureOp;
 			aiTextureMapMode mapMode;
-			if (AI_SUCCESS == mat->GetTexture(t, 0, &path, &mapping, &index, &blend, &textureOp, &mapMode))
+			if(AI_SUCCESS == mat->GetTexture(t, 0, &path, &mapping, &index, &blend, &textureOp, &mapMode))
 			{
 				std::string relative_path = path.C_Str();
 				load_data.materials[mat_index].textures[t] = relative_path;
@@ -249,10 +241,9 @@ void process_material(aiMaterial* mat, mesh::load_data& load_data)
 	get_texture(mat_index, mat, load_data, aiTextureType_EMISSIVE, mesh::load_data::load_material::Emissive);
 }
 
-
 void process_meshes(const aiScene* scene, mesh::load_data& load_data)
 {
-	for (size_t i = 0; i < scene->mNumMeshes; ++i)
+	for(size_t i = 0; i < scene->mNumMeshes; ++i)
 	{
 		aiMesh* mesh = scene->mMeshes[i];
 		process_mesh(mesh, load_data);
@@ -261,30 +252,31 @@ void process_meshes(const aiScene* scene, mesh::load_data& load_data)
 
 void process_materials(const aiScene* scene, mesh::load_data& load_data)
 {
-	for (size_t i = 0; i < scene->mNumMaterials; ++i)
+	for(size_t i = 0; i < scene->mNumMaterials; ++i)
 	{
 		aiMaterial* mat = scene->mMaterials[i];
 		process_material(mat, load_data);
 	}
 }
 
-void process_node(const aiNode* node, mesh::armature_node* armature_node, const math::transform& parent_transform)
+void process_node(const aiNode* node, mesh::armature_node* armature_node,
+				  const math::transform& parent_transform)
 {
-    armature_node->children.resize(node->mNumChildren);
-    armature_node->name = node->mName.C_Str();
-    armature_node->local_transform = process_matrix(node->mTransformation);
-    armature_node->world_transform = parent_transform * armature_node->local_transform;
-	for (size_t i = 0; i < node->mNumChildren; ++i)
+	armature_node->children.resize(node->mNumChildren);
+	armature_node->name = node->mName.C_Str();
+	armature_node->local_transform = process_matrix(node->mTransformation);
+	armature_node->world_transform = parent_transform * armature_node->local_transform;
+	for(size_t i = 0; i < node->mNumChildren; ++i)
 	{
-        armature_node->children[i] = std::make_unique<mesh::armature_node>();
-        process_node(node->mChildren[i], armature_node->children[i].get(), armature_node->world_transform);
+		armature_node->children[i] = std::make_unique<mesh::armature_node>();
+		process_node(node->mChildren[i], armature_node->children[i].get(), armature_node->world_transform);
 	}
 }
 
 void process_nodes(const aiScene* scene, mesh::load_data& load_data)
 {
 	load_data.root_node = std::make_unique<mesh::armature_node>();
-    process_node(scene->mRootNode, load_data.root_node.get(), math::transform::identity);
+	process_node(scene->mRootNode, load_data.root_node.get(), math::transform::identity);
 }
 
 void process_imported_scene(const aiScene* scene, mesh::load_data& load_data)
@@ -295,7 +287,6 @@ void process_imported_scene(const aiScene* scene, mesh::load_data& load_data)
 	process_nodes(scene, load_data);
 }
 
-
 bool importer::load_mesh_data_from_file(const std::string& path, mesh::load_data& load_data)
 {
 	Assimp::Importer importer;
@@ -304,27 +295,15 @@ bool importer::load_mesh_data_from_file(const std::string& path, mesh::load_data
 	importer.SetPropertyBool("GLOB_MEASURE_TIME", true);
 
 	const aiScene* scene = importer.ReadFile(
-		path
-		, aiProcess_ConvertToLeftHanded
-		| aiProcess_CalcTangentSpace
-		| aiProcess_GenSmoothNormals
-		| aiProcess_JoinIdenticalVertices
-		| aiProcess_ImproveCacheLocality
-		| aiProcess_LimitBoneWeights
-		| aiProcess_RemoveRedundantMaterials
-		| aiProcess_SplitLargeMeshes
-		| aiProcess_Triangulate
-		| aiProcess_GenUVCoords
-		| aiProcess_SortByPType
-		| aiProcess_FindDegenerates
-		| aiProcess_FindInvalidData
-		| aiProcess_FindInstances
-		| aiProcess_ValidateDataStructure 
-		| aiProcess_OptimizeMeshes
-	);
+		path,
+		aiProcess_ConvertToLeftHanded | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals |
+			aiProcess_JoinIdenticalVertices | aiProcess_ImproveCacheLocality | aiProcess_LimitBoneWeights |
+			aiProcess_RemoveRedundantMaterials | aiProcess_SplitLargeMeshes | aiProcess_Triangulate |
+			aiProcess_GenUVCoords | aiProcess_SortByPType | aiProcess_FindDegenerates |
+			aiProcess_FindInvalidData | aiProcess_FindInstances | aiProcess_ValidateDataStructure |
+			aiProcess_OptimizeMeshes);
 
-
-	if (!scene)
+	if(!scene)
 	{
 		APPLOG_ERROR(importer.GetErrorString());
 		return false;

@@ -1,9 +1,9 @@
 #pragma once
-#include <map>
-#include <string>
-#include <deque>
-#include <stack>
 #include "nonstd/recursive_wrapper.hpp"
+#include <deque>
+#include <map>
+#include <stack>
+#include <string>
 
 class path_name_tag_tree
 {
@@ -16,8 +16,10 @@ class path_name_tag_tree
 		node();
 		node(const node& krs);
 	};
+
 public:
 	class iterator;
+
 public:
 	path_name_tag_tree(const char sep_char, const size_t invalid_tag);
 
@@ -31,12 +33,13 @@ public:
 
 	iterator create_iterator(std::string pathname = "");
 	void setup_iterator(iterator& it, std::string pathname = "");
-private:
 
+private:
 	const char* get_name(std::string& pathname, std::string::iterator& it, size_t& i);
 	node* get_node_ptr(std::string& pathname);
 	node& get_node_ref(std::string& pathname);
 	node* get_node(std::string& pathname, bool& endpoint);
+
 private:
 	const size_t _invalid_tag;
 	const char _sep_char;
@@ -54,7 +57,7 @@ public:
 	iterator(const iterator& krc);
 
 	void setup(void* p);
-	
+
 	bool step_stack_push();
 	bool step_stack_pop(bool replace = true);
 
@@ -68,8 +71,10 @@ public:
 	const bool is_leaf();
 	const std::string& name();
 	const size_t& tag();
+
 private:
 	bool do_step(node* n);
+
 private:
 	std::deque<step_t> _steps;
 	std::stack<step_t> _stack;

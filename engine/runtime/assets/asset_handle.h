@@ -1,25 +1,24 @@
 #pragma once
 
-#include <string>
 #include <memory>
+#include <string>
 
-
-template<typename T>
+template <typename T>
 struct asset_link
 {
 	std::string id;
 	std::shared_ptr<T> asset;
 };
 
-template<typename T>
+template <typename T>
 struct asset_handle
 {
 	//-----------------------------------------------------------------------------
 	//  Name : get ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	inline T* get() const
@@ -30,15 +29,15 @@ struct asset_handle
 	//-----------------------------------------------------------------------------
 	//  Name : reset ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	inline void reset(std::shared_ptr<T> data = nullptr)
 	{
 		link->asset = data;
-		if (!data)
+		if(!data)
 		{
 			link->id.clear();
 		}
@@ -47,9 +46,9 @@ struct asset_handle
 	//-----------------------------------------------------------------------------
 	//  Name : use_count ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	inline long use_count() const
@@ -60,9 +59,9 @@ struct asset_handle
 	//-----------------------------------------------------------------------------
 	//  Name : id ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	const std::string& id() const
@@ -73,15 +72,15 @@ struct asset_handle
 	//-----------------------------------------------------------------------------
 	//  Name : operator= ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	asset_handle & operator=(const asset_handle & handle)
+	asset_handle& operator=(const asset_handle& handle)
 	{
 		// Share the specified handle's data pointer
-		if (link != handle.link)
+		if(link != handle.link)
 			link = handle.link;
 
 		return *this;
@@ -90,15 +89,15 @@ struct asset_handle
 	//-----------------------------------------------------------------------------
 	//  Name : operator= ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	asset_handle & operator=(std::shared_ptr<T> data)
+	asset_handle& operator=(std::shared_ptr<T> data)
 	{
 		// Own the specified handle's data pointer
-		if (data != link->asset)
+		if(data != link->asset)
 			link->asset = data;
 
 		return *this;
@@ -107,12 +106,12 @@ struct asset_handle
 	//-----------------------------------------------------------------------------
 	//  Name : operator== ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline bool operator==(const asset_handle & handle) const
+	inline bool operator==(const asset_handle& handle) const
 	{
 		return (get() == handle.get());
 	}
@@ -120,12 +119,12 @@ struct asset_handle
 	//-----------------------------------------------------------------------------
 	//  Name : operator!= ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline bool operator!=(const asset_handle & handle) const
+	inline bool operator!=(const asset_handle& handle) const
 	{
 		return (get() != handle.get());
 	}
@@ -133,12 +132,12 @@ struct asset_handle
 	//-----------------------------------------------------------------------------
 	//  Name : operator< ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline bool operator<(const asset_handle & handle) const
+	inline bool operator<(const asset_handle& handle) const
 	{
 		return (get() < handle.get());
 	}
@@ -146,12 +145,12 @@ struct asset_handle
 	//-----------------------------------------------------------------------------
 	//  Name : operator> ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline bool operator>(const asset_handle & handle) const
+	inline bool operator>(const asset_handle& handle) const
 	{
 		return (get() > handle.get());
 	}
@@ -159,26 +158,26 @@ struct asset_handle
 	//-----------------------------------------------------------------------------
 	//  Name : operator bool ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	explicit operator bool() const
-	{	// test for non-null pointer
+	{ // test for non-null pointer
 		return (get() != nullptr);
 	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : operator-> ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	T *operator->() const
-	{	// return pointer to resource
+	T* operator->() const
+	{ // return pointer to resource
 		return get();
 	}
 

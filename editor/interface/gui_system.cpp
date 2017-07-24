@@ -1,20 +1,20 @@
 #include "gui_system.h"
+#include "embedded/consolas.ttf.h"
+#include "embedded/fs_ocornut_imgui.bin.h"
 #include "embedded/roboto_regular.ttf.h"
 #include "embedded/robotomono_regular.ttf.h"
-#include "embedded/consolas.ttf.h"
 #include "embedded/vs_ocornut_imgui.bin.h"
-#include "embedded/fs_ocornut_imgui.bin.h"
 
-#include "runtime/rendering/vertex_buffer.h"
+#include "runtime/assets/asset_manager.h"
+#include "runtime/input/input.h"
 #include "runtime/rendering/index_buffer.h"
 #include "runtime/rendering/program.h"
-#include "runtime/rendering/texture.h"
 #include "runtime/rendering/render_pass.h"
-#include "runtime/rendering/uniform.h"
 #include "runtime/rendering/render_window.h"
-#include "runtime/assets/asset_manager.h"
+#include "runtime/rendering/texture.h"
+#include "runtime/rendering/uniform.h"
+#include "runtime/rendering/vertex_buffer.h"
 #include "runtime/system/engine.h"
-#include "runtime/input/input.h"
 #include <unordered_map>
 
 // -------------------------------------------------------------------
@@ -32,35 +32,34 @@ public:
 		if(_initial_context)
 			gui::SetCurrentContext(_initial_context);
 	}
+
 private:
 	ImGuiContext* _initial_context = nullptr;
 };
 
-
 static gui_style s_gui_style;
 static UIContexts s_contexts;
 
-static gfx::VertexDecl				s_decl;
-static std::unique_ptr<program>		s_program;
-static asset_handle<texture>			s_font_texture;
+static gfx::VertexDecl s_decl;
+static std::unique_ptr<program> s_program;
+static asset_handle<texture> s_font_texture;
 static std::vector<std::shared_ptr<texture>> s_textures;
 static std::unordered_map<std::string, ImFont*> s_fonts;
 
-
-void renderFunc(ImDrawData *_drawData)
+void renderFunc(ImDrawData* _drawData)
 {
 	// Render command lists
-	for (int32_t ii = 0, num = _drawData->CmdListsCount; ii < num; ++ii)
+	for(int32_t ii = 0, num = _drawData->CmdListsCount; ii < num; ++ii)
 	{
 		gfx::TransientVertexBuffer tvb;
 		gfx::TransientIndexBuffer tib;
 
 		const ImDrawList* drawList = _drawData->CmdLists[ii];
-        std::uint32_t numVertices = static_cast<std::uint32_t>(drawList->VtxBuffer.size());
-        std::uint32_t numIndices = static_cast<std::uint32_t>(drawList->IdxBuffer.size());
+		std::uint32_t numVertices = static_cast<std::uint32_t>(drawList->VtxBuffer.size());
+		std::uint32_t numIndices = static_cast<std::uint32_t>(drawList->IdxBuffer.size());
 
-        if (!(gfx::getAvailTransientVertexBuffer(numVertices, s_decl) == numVertices)
-            || !(gfx::getAvailTransientIndexBuffer(numIndices) == numIndices))
+		if(!(gfx::getAvailTransientVertexBuffer(numVertices, s_decl) == numVertices) ||
+		   !(gfx::getAvailTransientIndexBuffer(numIndices) == numIndices))
 		{
 			// not enough space in transient buffer just quit drawing the rest...
 			break;
@@ -69,44 +68,40 @@ void renderFunc(ImDrawData *_drawData)
 		gfx::allocTransientVertexBuffer(&tvb, numVertices, s_decl);
 		gfx::allocTransientIndexBuffer(&tib, numIndices);
 
-        ImDrawVert* verts = reinterpret_cast<ImDrawVert*>(tvb.data);
+		ImDrawVert* verts = reinterpret_cast<ImDrawVert*>(tvb.data);
 		std::memcpy(verts, drawList->VtxBuffer.begin(), numVertices * sizeof(ImDrawVert));
 
-        ImDrawIdx* indices = reinterpret_cast<ImDrawIdx*>(tib.data);
+		ImDrawIdx* indices = reinterpret_cast<ImDrawIdx*>(tib.data);
 		std::memcpy(indices, drawList->IdxBuffer.begin(), numIndices * sizeof(ImDrawIdx));
 
 		std::uint32_t offset = 0;
-		for (const ImDrawCmd* cmd = drawList->CmdBuffer.begin(), *cmdEnd = drawList->CmdBuffer.end(); cmd != cmdEnd; ++cmd)
+		for(const ImDrawCmd *cmd = drawList->CmdBuffer.begin(), *cmdEnd = drawList->CmdBuffer.end();
+			cmd != cmdEnd; ++cmd)
 		{
-			if (cmd->UserCallback)
+			if(cmd->UserCallback)
 			{
 				cmd->UserCallback(drawList, cmd);
 			}
-			else if (0 != cmd->ElemCount)
+			else if(0 != cmd->ElemCount)
 			{
-				std::uint64_t state = 0
-					| BGFX_STATE_RGB_WRITE
-					| BGFX_STATE_ALPHA_WRITE
-					| BGFX_STATE_MSAA
-					| BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA)
-					;
+				std::uint64_t state =
+					0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_MSAA |
+					BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA);
 
 				texture* tex = s_font_texture.get();
 				program* prog = s_program.get();
-				if (!prog)
+				if(!prog)
 					return;
 
-				if (nullptr != cmd->TextureId)
+				if(nullptr != cmd->TextureId)
 				{
-                    tex = reinterpret_cast<texture*>(cmd->TextureId);
+					tex = reinterpret_cast<texture*>(cmd->TextureId);
 				}
 
 				const std::uint16_t xx = std::uint16_t(std::max(cmd->ClipRect.x, 0.0f));
 				const std::uint16_t yy = std::uint16_t(std::max(cmd->ClipRect.y, 0.0f));
-				gfx::setScissor(xx, yy
-					, std::uint16_t(std::min(cmd->ClipRect.z, 65535.0f) - xx)
-					, std::uint16_t(std::min(cmd->ClipRect.w, 65535.0f) - yy)
-				);
+				gfx::setScissor(xx, yy, std::uint16_t(std::min(cmd->ClipRect.z, 65535.0f) - xx),
+								std::uint16_t(std::min(cmd->ClipRect.w, 65535.0f) - yy));
 
 				prog->set_texture(0, "s_tex", tex);
 
@@ -121,7 +116,6 @@ void renderFunc(ImDrawData *_drawData)
 	}
 }
 
-
 bool gui_system::initialize()
 {
 	s_contexts.set_initial_context(ImGui::GetCurrentContext());
@@ -132,46 +126,54 @@ bool gui_system::initialize()
 	auto& ts = core::get_subsystem<core::task_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
 
-	switch (gfx::getRendererType())
+	switch(gfx::getRendererType())
 	{
-	case gfx::RendererType::Direct3D9:
-		am.create_asset_from_memory<shader>("embedded:/vs_ocornut_imgui", &vs_ocornut_imgui_dx9[0], sizeof(vs_ocornut_imgui_dx9));
-		am.create_asset_from_memory<shader>("embedded:/fs_ocornut_imgui", &fs_ocornut_imgui_dx9[0], sizeof(fs_ocornut_imgui_dx9));
-		break;
+		case gfx::RendererType::Direct3D9:
+			am.create_asset_from_memory<shader>("embedded:/vs_ocornut_imgui", &vs_ocornut_imgui_dx9[0],
+												sizeof(vs_ocornut_imgui_dx9));
+			am.create_asset_from_memory<shader>("embedded:/fs_ocornut_imgui", &fs_ocornut_imgui_dx9[0],
+												sizeof(fs_ocornut_imgui_dx9));
+			break;
 
-	case gfx::RendererType::Direct3D11:
-	case gfx::RendererType::Direct3D12:
-		am.create_asset_from_memory<shader>("embedded:/vs_ocornut_imgui", &vs_ocornut_imgui_dx11[0], sizeof(vs_ocornut_imgui_dx11));
-		am.create_asset_from_memory<shader>("embedded:/fs_ocornut_imgui", &fs_ocornut_imgui_dx11[0], sizeof(fs_ocornut_imgui_dx11));
+		case gfx::RendererType::Direct3D11:
+		case gfx::RendererType::Direct3D12:
+			am.create_asset_from_memory<shader>("embedded:/vs_ocornut_imgui", &vs_ocornut_imgui_dx11[0],
+												sizeof(vs_ocornut_imgui_dx11));
+			am.create_asset_from_memory<shader>("embedded:/fs_ocornut_imgui", &fs_ocornut_imgui_dx11[0],
+												sizeof(fs_ocornut_imgui_dx11));
 
-		break;
-	case gfx::RendererType::Metal:
-		am.create_asset_from_memory<shader>("embedded:/vs_ocornut_imgui", &vs_ocornut_imgui_mtl[0], sizeof(vs_ocornut_imgui_mtl));
-		am.create_asset_from_memory<shader>("embedded:/fs_ocornut_imgui", &fs_ocornut_imgui_mtl[0], sizeof(fs_ocornut_imgui_mtl));
+			break;
+		case gfx::RendererType::Metal:
+			am.create_asset_from_memory<shader>("embedded:/vs_ocornut_imgui", &vs_ocornut_imgui_mtl[0],
+												sizeof(vs_ocornut_imgui_mtl));
+			am.create_asset_from_memory<shader>("embedded:/fs_ocornut_imgui", &fs_ocornut_imgui_mtl[0],
+												sizeof(fs_ocornut_imgui_mtl));
 
-		break;
-	case gfx::RendererType::OpenGL:
-	case gfx::RendererType::OpenGLES:
-		am.create_asset_from_memory<shader>("embedded:/vs_ocornut_imgui", &vs_ocornut_imgui_glsl[0], sizeof(vs_ocornut_imgui_glsl));
-		am.create_asset_from_memory<shader>("embedded:/fs_ocornut_imgui", &fs_ocornut_imgui_glsl[0], sizeof(fs_ocornut_imgui_glsl));
+			break;
+		case gfx::RendererType::OpenGL:
+		case gfx::RendererType::OpenGLES:
+			am.create_asset_from_memory<shader>("embedded:/vs_ocornut_imgui", &vs_ocornut_imgui_glsl[0],
+												sizeof(vs_ocornut_imgui_glsl));
+			am.create_asset_from_memory<shader>("embedded:/fs_ocornut_imgui", &fs_ocornut_imgui_glsl[0],
+												sizeof(fs_ocornut_imgui_glsl));
 
-		break;
-	default:
+			break;
+		default:
 
-		break;
+			break;
 	}
-	
+
 	auto vs_ocornut_imgui = am.load<shader>("embedded:/vs_ocornut_imgui");
 	auto fs_ocornut_imgui = am.load<shader>("embedded:/fs_ocornut_imgui");
 
-	ts.push_awaitable_on_main([](asset_handle<shader> vs, asset_handle<shader> fs)
-	{
-		s_program = std::make_unique<program>(vs, fs);
+	ts.push_awaitable_on_main(
+		[](asset_handle<shader> vs, asset_handle<shader> fs) {
+			s_program = std::make_unique<program>(vs, fs);
 
-	}, vs_ocornut_imgui, fs_ocornut_imgui);
-	
-	s_decl
-		.begin()
+		},
+		vs_ocornut_imgui, fs_ocornut_imgui);
+
+	s_decl.begin()
 		.add(gfx::Attrib::Position, 2, gfx::AttribType::Float)
 		.add(gfx::Attrib::TexCoord0, 2, gfx::AttribType::Float)
 		.add(gfx::Attrib::Color0, 4, gfx::AttribType::Uint8, true)
@@ -197,8 +199,8 @@ bool gui_system::initialize()
 	io.KeyMap[ImGuiKey_Z] = mml::keyboard::Z;
 
 	std::uint8_t* data = nullptr;
-    int width = 0;
-    int height = 0;
+	int width = 0;
+	int height = 0;
 
 	ImFontConfig config;
 	config.FontDataOwnedByAtlas = false;
@@ -206,24 +208,22 @@ bool gui_system::initialize()
 	config.MergeGlyphCenterV = true;
 
 	s_fonts["default"] = io.Fonts->AddFontDefault(&config);
-	s_fonts["roboto_regular"] = io.Fonts->AddFontFromMemoryTTF((void*)s_robotoRegularTtf, sizeof(s_robotoRegularTtf), 17, &config);
-	s_fonts["roboto_regular_mono"] = io.Fonts->AddFontFromMemoryTTF((void*)s_robotoMonoRegularTtf, sizeof(s_robotoMonoRegularTtf), 14.0f, &config);
-	s_fonts["roboto_big"] = io.Fonts->AddFontFromMemoryTTF((void*)s_robotoRegularTtf, sizeof(s_robotoRegularTtf), 35, &config);
-	s_fonts["consolas"] = io.Fonts->AddFontFromMemoryTTF((void*)s_consolas_embedded, sizeof(s_consolas_embedded), 20, &config);
-	s_fonts["consolas_big"] = io.Fonts->AddFontFromMemoryTTF((void*)s_consolas_embedded, sizeof(s_consolas_embedded), 35, &config);
+	s_fonts["roboto_regular"] =
+		io.Fonts->AddFontFromMemoryTTF((void*)s_robotoRegularTtf, sizeof(s_robotoRegularTtf), 17, &config);
+	s_fonts["roboto_regular_mono"] = io.Fonts->AddFontFromMemoryTTF(
+		(void*)s_robotoMonoRegularTtf, sizeof(s_robotoMonoRegularTtf), 14.0f, &config);
+	s_fonts["roboto_big"] =
+		io.Fonts->AddFontFromMemoryTTF((void*)s_robotoRegularTtf, sizeof(s_robotoRegularTtf), 35, &config);
+	s_fonts["consolas"] =
+		io.Fonts->AddFontFromMemoryTTF((void*)s_consolas_embedded, sizeof(s_consolas_embedded), 20, &config);
+	s_fonts["consolas_big"] =
+		io.Fonts->AddFontFromMemoryTTF((void*)s_consolas_embedded, sizeof(s_consolas_embedded), 35, &config);
 
-	
 	io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
 
 	s_font_texture = std::make_shared<texture>(
-		static_cast<std::uint16_t>(width)
-		, static_cast<std::uint16_t>(height)
-		, false
-		, 1
-		, gfx::TextureFormat::BGRA8
-		, 0
-        , gfx::copy(data, static_cast<std::uint32_t>(width*height * 4))
-		);
+		static_cast<std::uint16_t>(width), static_cast<std::uint16_t>(height), false, 1,
+		gfx::TextureFormat::BGRA8, 0, gfx::copy(data, static_cast<std::uint32_t>(width * height * 4)));
 
 	// Store our identifier
 	io.Fonts->SetTexID(s_font_texture.get());
@@ -231,7 +231,6 @@ bool gui_system::initialize()
 	s_gui_style.load_style();
 
 	runtime::on_frame_begin.connect(this, &gui_system::frame_begin);
-
 
 	return true;
 }
@@ -258,76 +257,87 @@ void gui_system::frame_begin(std::chrono::duration<float>)
 
 namespace gui
 {
-	ImFont* GetFont(const std::string& id)
-	{
-		auto it = s_fonts.find(id);
-		if (it != s_fonts.end())
-			return it->second;
+ImFont* GetFont(const std::string& id)
+{
+	auto it = s_fonts.find(id);
+	if(it != s_fonts.end())
+		return it->second;
 
-		return nullptr;
-	}
+	return nullptr;
+}
 
-	void Image(std::shared_ptr<texture> texture, const ImVec2& _size, const ImVec2& _uv0 /*= ImVec2(0.0f, 0.0f) */, const ImVec2& _uv1 /*= ImVec2(1.0f, 1.0f) */, const ImVec4& _tintCol /*= ImVec4(1.0f, 1.0f, 1.0f, 1.0f) */, const ImVec4& _borderCol /*= ImVec4(0.0f, 0.0f, 0.0f, 0.0f) */)
+void Image(std::shared_ptr<texture> texture, const ImVec2& _size,
+		   const ImVec2& _uv0 /*= ImVec2(0.0f, 0.0f) */, const ImVec2& _uv1 /*= ImVec2(1.0f, 1.0f) */,
+		   const ImVec4& _tintCol /*= ImVec4(1.0f, 1.0f, 1.0f, 1.0f) */,
+		   const ImVec4& _borderCol /*= ImVec4(0.0f, 0.0f, 0.0f, 0.0f) */)
 {
 	s_textures.push_back(texture);
 
 	ImVec2 uv0 = _uv0;
 	ImVec2 uv1 = _uv1;
 
-	if (texture && texture->is_render_target())
+	if(texture && texture->is_render_target())
 	{
-		if (gfx::is_origin_bottom_left())
+		if(gfx::is_origin_bottom_left())
 		{
-			uv0 = { 0.0f, 1.0f };
-			uv1 = { 1.0f, 0.0f };
+			uv0 = {0.0f, 1.0f};
+			uv1 = {1.0f, 0.0f};
 		}
 	}
 
 	ImGui::Image(texture.get(), _size, uv0, uv1, _tintCol, _borderCol);
 }
 
-bool ImageButton(std::shared_ptr<texture> texture, const ImVec2& _size, const ImVec2& _uv0 /*= ImVec2(0.0f, 0.0f) */, const ImVec2& _uv1 /*= ImVec2(1.0f, 1.0f) */, int _framePadding /*= -1 */, const ImVec4& _bgCol /*= ImVec4(0.0f, 0.0f, 0.0f, 0.0f) */, const ImVec4& _tintCol /*= ImVec4(1.0f, 1.0f, 1.0f, 1.0f) */)
+bool ImageButton(std::shared_ptr<texture> texture, const ImVec2& _size,
+				 const ImVec2& _uv0 /*= ImVec2(0.0f, 0.0f) */, const ImVec2& _uv1 /*= ImVec2(1.0f, 1.0f) */,
+				 int _framePadding /*= -1 */, const ImVec4& _bgCol /*= ImVec4(0.0f, 0.0f, 0.0f, 0.0f) */,
+				 const ImVec4& _tintCol /*= ImVec4(1.0f, 1.0f, 1.0f, 1.0f) */)
 {
 	s_textures.push_back(texture);
 
 	ImVec2 uv0 = _uv0;
 	ImVec2 uv1 = _uv1;
 
-	if (texture && texture->is_render_target())
+	if(texture && texture->is_render_target())
 	{
-		if (gfx::is_origin_bottom_left())
+		if(gfx::is_origin_bottom_left())
 		{
-			uv0 = { 0.0f, 1.0f };
-			uv1 = { 1.0f, 0.0f };
+			uv0 = {0.0f, 1.0f};
+			uv1 = {1.0f, 0.0f};
 		}
 	}
-	
+
 	return ImGui::ImageButton(texture.get(), _size, uv0, uv1, _framePadding, _bgCol, _tintCol);
 }
 
-bool ImageButtonEx(std::shared_ptr<texture> texture, const ImVec2& size, const char* tooltip, bool selected, bool enabled)
+bool ImageButtonEx(std::shared_ptr<texture> texture, const ImVec2& size, const char* tooltip, bool selected,
+				   bool enabled)
 {
 	s_textures.push_back(texture);
 	return ImGui::ImageButtonEx(texture.get(), size, tooltip, selected, enabled);
 }
 
-void ImageWithAspect(std::shared_ptr<texture> texture, const ImVec2& texture_size, const ImVec2& size, const ImVec2& uv0, const ImVec2& uv1, const ImVec4& tint_col, const ImVec4& border_col)
+void ImageWithAspect(std::shared_ptr<texture> texture, const ImVec2& texture_size, const ImVec2& size,
+					 const ImVec2& uv0, const ImVec2& uv1, const ImVec4& tint_col, const ImVec4& border_col)
 {
 	s_textures.push_back(texture);
 	return ImGui::ImageWithAspect(texture.get(), texture_size, size, uv0, uv1, tint_col, border_col);
 }
 
-int ImageButtonWithAspectAndLabel(std::shared_ptr<texture> texture, const ImVec2& texture_size, const ImVec2& size, const ImVec2& uv0, const ImVec2& uv1, bool selected, bool* edit_label, const char* label, char* buf, size_t buf_size, ImGuiInputTextFlags flags /*= 0*/)
+int ImageButtonWithAspectAndLabel(std::shared_ptr<texture> texture, const ImVec2& texture_size,
+								  const ImVec2& size, const ImVec2& uv0, const ImVec2& uv1, bool selected,
+								  bool* edit_label, const char* label, char* buf, size_t buf_size,
+								  ImGuiInputTextFlags flags /*= 0*/)
 {
 	s_textures.push_back(texture);
-	return ImGui::ImageButtonWithAspectAndLabel(texture.get(), texture_size, size, uv0, uv1, selected, edit_label, label, buf, buf_size, flags);
+	return ImGui::ImageButtonWithAspectAndLabel(texture.get(), texture_size, size, uv0, uv1, selected,
+												edit_label, label, buf, buf_size, flags);
 }
 
 gui_style& get_gui_style()
 {
 	return s_gui_style;
 }
-
 }
 
 void gui_style::reset_style()
@@ -393,21 +403,21 @@ void gui_style::set_style_colors(const hsv_setup& _setup)
 }
 
 //////////////////////////////////////////////////////////////////////////
-#include "core/serialization/associative_archive.h"
 #include "../meta/interface/gui_system.hpp"
+#include "core/serialization/associative_archive.h"
 
 void gui_style::load_style()
 {
 	const fs::path absoluteKey = fs::resolve_protocol("editor_data:/config/style.cfg");
-    fs::error_code err;
-    if (!fs::exists(absoluteKey, err))
+	fs::error_code err;
+	if(!fs::exists(absoluteKey, err))
 	{
 		save_style();
 	}
 	else
 	{
 		std::ifstream output(absoluteKey.string());
-        cereal::iarchive_associative_t ar(output);
+		cereal::iarchive_associative_t ar(output);
 
 		try_load(ar, cereal::make_nvp("style", setup));
 	}
@@ -417,7 +427,7 @@ void gui_style::save_style()
 {
 	const fs::path absoluteKey = fs::resolve_protocol("editor_data:/config/style.cfg");
 	std::ofstream output(absoluteKey.string());
-    cereal::oarchive_associative_t ar(output);
+	cereal::oarchive_associative_t ar(output);
 
 	try_save(ar, cereal::make_nvp("style", setup));
 }

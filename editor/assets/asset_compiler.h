@@ -3,6 +3,6 @@
 
 namespace asset_compiler
 {
-	template<typename T>
-    extern void compile(const fs::path& absolute_key);
+template <typename T>
+extern void compile(const fs::path& absolute_key);
 };

@@ -2,14 +2,11 @@
 
 model_component::model_component()
 {
-
 }
 
 model_component::model_component(const model_component& component)
-	: _model(component._model)
-	, _static(component._static)
-	, _casts_shadow(component._casts_shadow)
-	, _casts_reflection(component._casts_reflection)
+	: _model(component._model), _static(component._static), _casts_shadow(component._casts_shadow),
+	  _casts_reflection(component._casts_reflection)
 {
 }
 
@@ -19,7 +16,7 @@ model_component::~model_component()
 
 model_component& model_component::set_casts_shadow(bool castShadow)
 {
-	if (_casts_shadow == castShadow)
+	if(_casts_shadow == castShadow)
 		return *this;
 
 	touch();
@@ -31,7 +28,7 @@ model_component& model_component::set_casts_shadow(bool castShadow)
 
 model_component& model_component::set_static(bool bStatic)
 {
-	if (_static == bStatic)
+	if(_static == bStatic)
 		return *this;
 
 	touch();
@@ -42,7 +39,7 @@ model_component& model_component::set_static(bool bStatic)
 
 model_component& model_component::set_casts_reflection(bool castReflection)
 {
-	if (_casts_reflection == castReflection)
+	if(_casts_reflection == castReflection)
 		return *this;
 
 	touch();
@@ -79,4 +76,3 @@ bool model_component::casts_reflection() const
 {
 	return _casts_reflection;
 }
-

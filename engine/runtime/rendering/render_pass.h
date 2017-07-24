@@ -1,19 +1,19 @@
 #pragma once
-#include "frame_buffer.h"
 #include "core/common/basetypes.hpp"
 #include "core/math/math_includes.h"
-#include <vector>
-#include <unordered_map>
+#include "frame_buffer.h"
 #include <string>
+#include <unordered_map>
+#include <vector>
 
 struct render_pass
 {
 	//-----------------------------------------------------------------------------
 	//  Name : render_pass ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	render_pass(const std::string& n);
@@ -21,9 +21,9 @@ struct render_pass
 	//-----------------------------------------------------------------------------
 	//  Name : bind ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void bind(frame_buffer* fb) const;
@@ -31,22 +31,20 @@ struct render_pass
 	//-----------------------------------------------------------------------------
 	//  Name : clear ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void clear(std::uint16_t _flags
-		, std::uint32_t _rgba = 0x000000ff
-		, float _depth = 1.0f
-		, std::uint8_t _stencil = 0) const;
+	void clear(std::uint16_t _flags, std::uint32_t _rgba = 0x000000ff, float _depth = 1.0f,
+			   std::uint8_t _stencil = 0) const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : clear ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void clear() const;
@@ -54,9 +52,9 @@ struct render_pass
 	//-----------------------------------------------------------------------------
 	//  Name : set_view_proj ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void set_view_proj(const math::transform& v, const math::transform& p);
@@ -64,9 +62,9 @@ struct render_pass
 	//-----------------------------------------------------------------------------
 	//  Name : reset ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	static void reset();
@@ -74,9 +72,9 @@ struct render_pass
 	//-----------------------------------------------------------------------------
 	//  Name : get_pass ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	static std::uint8_t get_pass();

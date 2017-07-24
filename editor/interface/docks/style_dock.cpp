@@ -9,7 +9,6 @@ style_dock::style_dock(const std::string& dtitle, bool dcloseButton, ImVec2 dmin
 	style.set_style_colors(setup);
 }
 
-
 void style_dock::render(const ImVec2&)
 {
 	auto& style = gui::get_gui_style();
@@ -34,34 +33,34 @@ void style_dock::render(const ImVec2&)
 	auto& frameRounding = setup.frame_rounding;
 
 	gui::ColorConvertHSVtoRGB(col_main_hue, col_main_sat, col_main_val, rgb.x, rgb.y, rgb.z);
-	if (gui::ColorEdit3("Main", &rgb.x, ImGuiColorEditFlags_HSV))
+	if(gui::ColorEdit3("Main", &rgb.x, ImGuiColorEditFlags_HSV))
 		gui::ColorConvertRGBtoHSV(rgb.x, rgb.y, rgb.z, col_main_hue, col_main_sat, col_main_val);
 
 	gui::ColorConvertHSVtoRGB(col_area_hue, col_area_sat, col_area_val, rgb.x, rgb.y, rgb.z);
-	if (gui::ColorEdit3("Area", &rgb.x, ImGuiColorEditFlags_HSV))
+	if(gui::ColorEdit3("Area", &rgb.x, ImGuiColorEditFlags_HSV))
 		gui::ColorConvertRGBtoHSV(rgb.x, rgb.y, rgb.z, col_area_hue, col_area_sat, col_area_val);
 
 	gui::ColorConvertHSVtoRGB(col_back_hue, col_back_sat, col_back_val, rgb.x, rgb.y, rgb.z);
-	if (gui::ColorEdit3("Back", &rgb.x, ImGuiColorEditFlags_HSV))
+	if(gui::ColorEdit3("Back", &rgb.x, ImGuiColorEditFlags_HSV))
 		gui::ColorConvertRGBtoHSV(rgb.x, rgb.y, rgb.z, col_back_hue, col_back_sat, col_back_val);
 
 	gui::ColorConvertHSVtoRGB(col_text_hue, col_text_sat, col_text_val, rgb.x, rgb.y, rgb.z);
-	if (gui::ColorEdit3("Text", &rgb.x, ImGuiColorEditFlags_HSV))
+	if(gui::ColorEdit3("Text", &rgb.x, ImGuiColorEditFlags_HSV))
 		gui::ColorConvertRGBtoHSV(rgb.x, rgb.y, rgb.z, col_text_hue, col_text_sat, col_text_val);
 
 	gui::SliderFloat("Rounding", &frameRounding, 0.0f, 10.0f);
 
-	if (gui::Button("Save"))
+	if(gui::Button("Save"))
 	{
 		style.save_style();
 	}
 	gui::SameLine();
-	if (gui::Button("Reload"))
+	if(gui::Button("Reload"))
 	{
 		style.load_style();
 	}
 	gui::SameLine();
-	if (gui::Button("Default"))
+	if(gui::Button("Default"))
 	{
 		style.reset_style();
 	}
@@ -69,6 +68,4 @@ void style_dock::render(const ImVec2&)
 	{
 		style.set_style_colors(setup);
 	}
-
-
 }

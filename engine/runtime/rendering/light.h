@@ -1,9 +1,9 @@
 #pragma once
-#include <cstdint>
-#include "program.h"
+#include "core/math/math_includes.h"
 #include "core/reflection/registration.h"
 #include "core/serialization/serialization.h"
-#include "core/math/math_includes.h"
+#include "program.h"
+#include <cstdint>
 
 enum class light_type : std::uint8_t
 {
@@ -49,32 +49,40 @@ enum class sm_type : std::uint8_t
 	count
 };
 
-
 struct light
 {
 	REFLECTABLE(light)
 	SERIALIZABLE(light)
 
-    light_type type = light_type::directional;
-    depth_type depth = depth_type::invz;
-    shadow_type shadow = shadow_type::hard;
+	light_type type = light_type::directional;
+	depth_type depth = depth_type::invz;
+	shadow_type shadow = shadow_type::hard;
 
 	struct spot
 	{
 		void set_range(float r);
-		float get_range() const { return range; }
+		float get_range() const
+		{
+			return range;
+		}
 
 		void set_outer_angle(float angle);
-		float get_outer_angle() const { return outer_angle; }
+		float get_outer_angle() const
+		{
+			return outer_angle;
+		}
 
 		void set_inner_angle(float angle);
-		float get_inner_angle() const { return inner_angle; }
+		float get_inner_angle() const
+		{
+			return inner_angle;
+		}
 
 		float range = 10.0f;
 		float outer_angle = 60.0f;
 		float inner_angle = 30.0f;
 	};
-	
+
 	struct point
 	{
 		float range = 10.0f;
@@ -94,6 +102,6 @@ struct light
 	spot spot_data;
 	point point_data;
 	directional directional_data;
-	math::color color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	math::color color = {1.0f, 1.0f, 1.0f, 1.0f};
 	float intensity = 1.0f;
 };

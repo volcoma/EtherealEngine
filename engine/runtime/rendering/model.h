@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../assets/asset_handle.h"
+#include "core/math/math_includes.h"
 #include "core/reflection/registration.h"
 #include "core/serialization/serialization.h"
-#include "core/math/math_includes.h"
 #include <vector>
 
 struct Group;
@@ -20,9 +20,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : model ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	model();
@@ -30,9 +30,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : ~model (virtual )
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	virtual ~model() = default;
@@ -40,9 +40,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : is_valid ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	bool is_valid() const;
@@ -50,9 +50,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : get_lod ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	asset_handle<mesh> get_lod(std::uint32_t lod) const;
@@ -60,9 +60,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : set_lod ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void set_lod(asset_handle<mesh> mesh, std::uint32_t lod);
@@ -70,9 +70,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : set_material ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void set_material(asset_handle<material> material, std::uint32_t index);
@@ -80,9 +80,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : get_lods ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	const std::vector<asset_handle<mesh>>& get_lods() const;
@@ -90,9 +90,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : set_lods ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void set_lods(const std::vector<asset_handle<mesh>>& lods);
@@ -100,9 +100,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : get_materials ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	const std::vector<asset_handle<material>>& get_materials() const;
@@ -110,9 +110,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : set_materials ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void set_materials(const std::vector<asset_handle<material>>& materials);
@@ -120,9 +120,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : get_material_for_group ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	asset_handle<material> get_material_for_group(const size_t& group) const;
@@ -130,49 +130,61 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : get_lod_transition_time ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline float get_lod_transition_time() const { return _transition_time; }
+	inline float get_lod_transition_time() const
+	{
+		return _transition_time;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_lod_max_distance ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline float get_lod_max_distance() const { return _max_distance; }
+	inline float get_lod_max_distance() const
+	{
+		return _max_distance;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_lod_min_distance ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline float get_lod_min_distance() const { return _min_distance; }
+	inline float get_lod_min_distance() const
+	{
+		return _min_distance;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_lod_transition_time ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_lod_transition_time(float time) { _transition_time = time; }
+	inline void set_lod_transition_time(float time)
+	{
+		_transition_time = time;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_lod_max_distance ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void set_lod_max_distance(float distance);
@@ -180,9 +192,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : set_lod_min_distance ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void set_lod_min_distance(float distance);
@@ -191,10 +203,13 @@ public:
 	//  Name : render ()
 	/// <summary>
 	/// Draws a mesh with a given program. If program is nullptr then the
-	/// materials are used instead. Extra states can be added to the material ones.
+	/// materials are used instead. Extra states can be added to the material
+	/// ones.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void render(std::uint8_t id, const math::transform& mtx, bool apply_cull, bool depth_write, bool depth_test, std::uint64_t extra_states, unsigned int lod, program* user_program, std::function<void(program&)> setup_params) const;
+	void render(std::uint8_t id, const math::transform& mtx, bool apply_cull, bool depth_write,
+				bool depth_test, std::uint64_t extra_states, unsigned int lod, program* user_program,
+				std::function<void(program&)> setup_params) const;
 
 private:
 	/// Collection of all materials for this model.

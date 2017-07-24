@@ -9,10 +9,10 @@ void shader::dispose()
 {
 	uniforms.clear();
 
-	if (is_valid())
+	if(is_valid())
 		gfx::destroyShader(handle);
 
-	handle = { bgfx::kInvalidHandle };
+	handle = {bgfx::kInvalidHandle};
 }
 
 bool shader::is_valid() const

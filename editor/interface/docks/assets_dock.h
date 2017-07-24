@@ -4,7 +4,7 @@
 
 namespace editor
 {
-	struct asset_directory;
+struct asset_directory;
 }
 
 struct assets_dock : public imguidock::dock

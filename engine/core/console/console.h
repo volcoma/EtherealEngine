@@ -3,14 +3,14 @@
 
 #include <cassert>
 
-#include <memory>
-#include <functional>
-#include <string>
-#include <sstream>
-#include <vector>
-#include <set>
-#include <unordered_map>
 #include "../common/nonstd/type_traits.hpp"
+#include <functional>
+#include <memory>
+#include <set>
+#include <sstream>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 class console
 {
@@ -29,7 +29,10 @@ public:
 	* requires and may only consist of int, float and std::string arguments.
 	*/
 	template <typename... Args>
-	void register_command(const std::string& name, const std::string& description, const std::vector<std::string>& argumentNames, const std::vector<std::string>& defaultArguments, const std::function<void(Args...)>& callback);
+	void register_command(const std::string& name, const std::string& description,
+						  const std::vector<std::string>& argumentNames,
+						  const std::vector<std::string>& defaultArguments,
+						  const std::function<void(Args...)>& callback);
 	void register_alias(const std::string& alias, const std::string& command);
 
 	std::string process_input(const std::string& line);
@@ -46,12 +49,11 @@ private:
 		std::function<void(std::vector<std::string>&)> call;
 		std::function<std::string(void)> get_usage;
 
-		explicit command(const std::string& name, const std::string& description, unsigned int numArguments, const std::vector<std::string>& argumentNames, const std::vector<std::string>& defaultArguments)
-			: name(name)
-			, description(description)
-			, num_arguments(numArguments)
-			, argument_names(argumentNames)
-			, default_arguments(defaultArguments)
+		explicit command(const std::string& name, const std::string& description, unsigned int numArguments,
+						 const std::vector<std::string>& argumentNames,
+						 const std::vector<std::string>& defaultArguments)
+			: name(name), description(description), num_arguments(numArguments),
+			  argument_names(argumentNames), default_arguments(defaultArguments)
 		{
 		}
 
@@ -71,73 +73,84 @@ private:
 		static inline T convert(const std::string& s);
 	};
 
-	static inline std::function<void()> bind_callback(std::function<void()> callback, const std::vector<std::string>& arguments, int argumentIndex);
+	static inline std::function<void()> bind_callback(std::function<void()> callback,
+													  const std::vector<std::string>& arguments,
+													  int argumentIndex);
 	template <typename T, typename... Args>
-	static std::function<void()> bind_callback(std::function<void(T, Args...)> callback, const std::vector<std::string>& arguments, int argumentIndex);
+	static std::function<void()> bind_callback(std::function<void(T, Args...)> callback,
+											   const std::vector<std::string>& arguments, int argumentIndex);
 
 	template <typename... Args>
 	struct NameArguments
 	{
-		static inline std::string get(const std::vector<std::string>& argumentNames, unsigned int nextName, unsigned int requiredArguments);
+		static inline std::string get(const std::vector<std::string>& argumentNames, unsigned int nextName,
+									  unsigned int requiredArguments);
 	};
 
 	std::stringstream printBuffer;
-	void print(std::string output) { printBuffer << output << "\n"; }
+	void print(std::string output)
+	{
+		printBuffer << output << "\n";
+	}
 
 private:
 	static std::vector<std::string> tokenize_line(const std::string& line);
-
 };
 
 template <typename... Args>
-void console::register_command(const std::string& name, const std::string& description, const std::vector<std::string>& argumentNames, const std::vector<std::string>& defaultArguments, const std::function<void(Args...)>& callback)
+void console::register_command(const std::string& name, const std::string& description,
+							   const std::vector<std::string>& argumentNames,
+							   const std::vector<std::string>& defaultArguments,
+							   const std::function<void(Args...)>& callback)
 {
-    const std::size_t argCount = sizeof...(Args);
+	const std::size_t argCount = sizeof...(Args);
 	assert(argumentNames.size() <= argCount);
 	assert(defaultArguments.size() <= argCount);
 	assert(commands.find(name) == commands.end());
 	assert(names.find(name) == names.end());
 
-	auto cmd = std::make_shared<command>(name, description, static_cast<unsigned int>(argCount), argumentNames, defaultArguments);
+	auto cmd = std::make_shared<command>(name, description, static_cast<unsigned int>(argCount),
+										 argumentNames, defaultArguments);
 	auto commandRaw = cmd.get();
 
-	cmd->call = [this, commandRaw, callback, argCount](std::vector<std::string>& arguments)
-	{
+	cmd->call = [this, commandRaw, callback, argCount](std::vector<std::string>& arguments) {
 
 		// add the arguments checks and set the default arguments
 		auto requiredArguments = argCount - commandRaw->default_arguments.size();
 
 		// make sure the number of arguments matches
-		if (arguments.size() < requiredArguments)
+		if(arguments.size() < requiredArguments)
 		{
 			print("Too few arguments.");
 		}
-		else if (arguments.size() > argCount)
+		else if(arguments.size() > argCount)
 		{
 			print("Too many arguments.");
 		}
 		else
 		{
 			// append default arguments as necessary
-            const auto offset = int(arguments.size() - requiredArguments);
-            arguments.insert(arguments.end(), commandRaw->default_arguments.begin() + offset, commandRaw->default_arguments.end());
+			const auto offset = int(arguments.size() - requiredArguments);
+			arguments.insert(arguments.end(), commandRaw->default_arguments.begin() + offset,
+							 commandRaw->default_arguments.end());
 			assert(arguments.size() == argCount);
 
 			bool failed = false;
 			std::function<void()> boundCallback;
-			// bind the command callback recursively while allowing type conversion errors to raise exceptions
-// 			try 
-// 			{
+			// bind the command callback recursively while allowing type conversion
+			// errors to raise exceptions
+			// 			try
+			// 			{
 			boundCallback = bind_callback(callback, arguments, 0);
 			/*			}*/
-			// 			catch (const std::exception&) 
+			// 			catch (const std::exception&)
 			//			{
 			// 				// TODO: remove this?
 			// 				std::cout << "crashed" << std::endl;
 			// 				failed = true;
 			// 			}
 
-			if (!failed)
+			if(!failed)
 			{
 				// actually execute the command
 				boundCallback();
@@ -150,10 +163,11 @@ void console::register_command(const std::string& name, const std::string& descr
 		print(commandRaw->get_usage());
 	};
 
-	cmd->get_usage = [this, commandRaw]()
-	{
-		auto requiredArguments = sizeof...(Args)-commandRaw->default_arguments.size();
-		return "Usage: " + commandRaw->name + NameArguments<Args...>::get(commandRaw->argument_names, 0, static_cast<unsigned int>(requiredArguments));
+	cmd->get_usage = [this, commandRaw]() {
+		auto requiredArguments = sizeof...(Args) - commandRaw->default_arguments.size();
+		return "Usage: " + commandRaw->name +
+			   NameArguments<Args...>::get(commandRaw->argument_names, 0,
+										   static_cast<unsigned int>(requiredArguments));
 	};
 
 	commands[name] = cmd;
@@ -163,10 +177,8 @@ void console::register_command(const std::string& name, const std::string& descr
 /**
 * bindCallback, base case
 */
-inline std::function<void()> console::bind_callback(
-	std::function<void()> callback,
-	const std::vector<std::string>&,
-	int)
+inline std::function<void()> console::bind_callback(std::function<void()> callback,
+													const std::vector<std::string>&, int)
 {
 	return callback;
 }
@@ -177,13 +189,11 @@ inline std::function<void()> console::bind_callback(
 * Run the "bind" code for each argument.
 */
 template <typename T, typename... Args>
-std::function<void()> console::bind_callback(std::function<void(T, Args...)> callback, const std::vector<std::string>& arguments, int argumentIndex)
+std::function<void()> console::bind_callback(std::function<void(T, Args...)> callback,
+											 const std::vector<std::string>& arguments, int argumentIndex)
 {
 	T value = argumentConverter<T>::convert(arguments.at(argumentIndex));
-	std::function<void(Args...)> nextCallback = [callback, value](Args... args)
-	{
-		callback(value, args...);
-	};
+	std::function<void(Args...)> nextCallback = [callback, value](Args... args) { callback(value, args...); };
 	return bind_callback(nextCallback, arguments, argumentIndex + 1);
 }
 
@@ -194,7 +204,9 @@ std::function<void()> console::bind_callback(std::function<void(T, Args...)> cal
 template <typename T>
 inline T console::argumentConverter<T>::convert(const std::string&)
 {
-	static_assert(sizeof(T) != sizeof(T), "console commands may only take arguments of type int, float or std::string.");
+	static_assert(sizeof(T) != sizeof(T), "console commands may only take "
+										  "arguments of type int, float or "
+										  "std::string.");
 }
 
 /**
@@ -230,13 +242,11 @@ inline std::string console::argumentConverter<std::string>::convert(const std::s
 template <>
 struct console::NameArguments<>
 {
-	static inline std::string get(
-		const std::vector<std::string> argumentNames,
-		unsigned int nextName,
-		unsigned int requiredArguments)
+	static inline std::string get(const std::vector<std::string> argumentNames, unsigned int nextName,
+								  unsigned int requiredArguments)
 	{
 		(void)argumentNames; // silence the unused compile warnings
-		if (nextName > requiredArguments)
+		if(nextName > requiredArguments)
 		{
 			return "]";
 		}
@@ -253,18 +263,19 @@ struct console::NameArguments<>
 template <typename T, typename... Args>
 struct console::NameArguments<T, Args...>
 {
-	static inline std::string get(const std::vector<std::string>& argumentNames, unsigned int nextName, unsigned int requiredArguments)
+	static inline std::string get(const std::vector<std::string>& argumentNames, unsigned int nextName,
+								  unsigned int requiredArguments)
 	{
 		std::string nameT;
-		if (rtti::type_id<T>() == rtti::type_id<int>())
+		if(rtti::type_id<T>() == rtti::type_id<int>())
 		{
 			nameT = "<int";
 		}
-		else if (rtti::type_id<T>() == rtti::type_id<float>())
+		else if(rtti::type_id<T>() == rtti::type_id<float>())
 		{
 			nameT = "<float";
 		}
-		else if (rtti::type_id<T>() == rtti::type_id<std::string>())
+		else if(rtti::type_id<T>() == rtti::type_id<std::string>())
 		{
 			nameT = "<string";
 		}
@@ -272,13 +283,13 @@ struct console::NameArguments<T, Args...>
 		{
 			nameT = "<???";
 		}
-		if (argumentNames.size() > nextName && !argumentNames[nextName].empty())
+		if(argumentNames.size() > nextName && !argumentNames[nextName].empty())
 		{
 			nameT += " " + argumentNames[nextName];
 		}
 		nameT += ">";
 
-		if (nextName == requiredArguments)
+		if(nextName == requiredArguments)
 		{
 			nameT = "[" + nameT;
 		}
@@ -286,6 +297,5 @@ struct console::NameArguments<T, Args...>
 		return " " + nameT + NameArguments<Args...>::get(argumentNames, nextName + 1, requiredArguments);
 	}
 };
-
 
 #endif

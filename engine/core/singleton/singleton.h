@@ -11,12 +11,12 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : get_instance ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static T & get_instance()
+	static T& get_instance()
 	{
 		return create();
 	}
@@ -28,17 +28,19 @@ private:
 	/// Forces instantiation at pre-execution time
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void instantiate(T const &) {}
+	static void instantiate(T const&)
+	{
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : create ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static T & create()
+	static T& create()
 	{
 		static T t;
 		instantiate(t);
@@ -48,25 +50,34 @@ private:
 	//-----------------------------------------------------------------------------
 	//  Name : singleton ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	singleton(singleton const & /*other*/) {}
+	singleton(singleton const& /*other*/)
+	{
+	}
 
 	/// Internal instance
 	static T& instance;
 };
 
-template <class T> T & singleton<T>::instance = singleton<T>::create();
+template <class T>
+T& singleton<T>::instance = singleton<T>::create();
 
-template<void(*ctor)()>
+template <void (*ctor)()>
 struct static_initializer
 {
-	struct constructor { constructor() { ctor(); } };
+	struct constructor
+	{
+		constructor()
+		{
+			ctor();
+		}
+	};
 	static constructor initializer;
 };
 
-template<void(*ctor)()>
+template <void (*ctor)()>
 typename static_initializer<ctor>::constructor static_initializer<ctor>::initializer;

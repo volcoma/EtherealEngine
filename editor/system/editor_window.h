@@ -1,35 +1,36 @@
 #pragma once
-#include "../interface/gui_window.h"
 #include "../console/console_log.h"
+#include "../interface/gui_window.h"
 class main_editor_window : public gui_window
 {
 public:
 	//-----------------------------------------------------------------------------
 	//  Name : main_editor_window ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	main_editor_window();
-	
+
 	//-----------------------------------------------------------------------------
 	//  Name : main_editor_window ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	main_editor_window(mml::video_mode mode, const std::string& title, std::uint32_t style = mml::style::standard);
-	
+	main_editor_window(mml::video_mode mode, const std::string& title,
+					   std::uint32_t style = mml::style::standard);
+
 	//-----------------------------------------------------------------------------
 	//  Name : ~ProjectManagerWindow (virtual )
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	virtual ~main_editor_window();
@@ -37,9 +38,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : on_gui (virtual )
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	virtual void on_gui(std::chrono::duration<float> dt);
@@ -47,9 +48,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : on_menubar (virtual )
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	virtual void on_menubar();
@@ -57,9 +58,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : on_toolbar (virtual )
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	virtual void on_toolbar();
@@ -67,9 +68,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : render_dockspace (virtual )
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	virtual void render_dockspace();
@@ -77,9 +78,9 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : on_start_page (virtual )
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	virtual void on_start_page();
@@ -87,22 +88,26 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : show_start_page ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void show_start_page(bool show) { _show_start_page = show; }
+	void show_start_page(bool show)
+	{
+		_show_start_page = show;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_log ()
 	/// <summary>
-	/// 
-	/// 
-	/// 
+	///
+	///
+	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void set_log(const std::string& name, std::shared_ptr<console_log> log);
+
 private:
 	///
 	bool _show_start_page = true;

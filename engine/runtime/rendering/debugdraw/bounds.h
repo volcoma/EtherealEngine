@@ -101,15 +101,18 @@ void calcObb(Obb& _obb, const void* _vertices, uint32_t _numVertices, uint32_t _
 void calcMaxBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _numVertices, uint32_t _stride);
 
 /// Calculate minimum bounding sphere.
-void calcMinBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _numVertices, uint32_t _stride, float _step = 0.01f);
+void calcMinBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _numVertices, uint32_t _stride,
+						   float _step = 0.01f);
 
-/// Returns 6 (near, far, left, right, top, bottom) planes representing frustum planes.
+/// Returns 6 (near, far, left, right, top, bottom) planes representing frustum
+/// planes.
 void buildFrustumPlanes(Plane* _planes, const float* _viewProj);
 
 /// Returns point from 3 intersecting planes.
 void intersectPlanes(float _result[3], const Plane& _pa, const Plane& _pb, const Plane& _pc);
 
-/// Make screen space ray from x, y coordinate and inverse view-projection matrix.
+/// Make screen space ray from x, y coordinate and inverse view-projection
+/// matrix.
 Ray makeRay(float _x, float _y, const float* _invVp);
 
 /// Intersect ray / aabb.

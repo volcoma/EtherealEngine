@@ -1,14 +1,14 @@
 #pragma once
 #include "../../rendering/mesh.h"
-#include "core/serialization/serialization.h"
 #include "core/reflection/reflection.h"
+#include "core/serialization/serialization.h"
 
 REFLECT_EXTERN(mesh::info);
 
 namespace bgfx
 {
-	SAVE_EXTERN(VertexDecl);
-	LOAD_EXTERN(VertexDecl);
+SAVE_EXTERN(VertexDecl);
+LOAD_EXTERN(VertexDecl);
 }
 
 SAVE_EXTERN(mesh::triangle);

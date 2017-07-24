@@ -1,56 +1,57 @@
 #ifndef CFG_CONFIG_H
 #define CFG_CONFIG_H
 
-#include <string>
-#include <map>
 #include <iostream>
+#include <map>
 #include <sstream>
+#include <string>
 namespace cfg
 {
-    class config
-    {
-    public:
-        config();
+class config
+{
+public:
+	config();
 
-        ~config();
-        
-        bool has_value(const std::string& section, const std::string& name) const;
+	~config();
 
-        const std::string& get(const std::string& section, const std::string& name) const;
+	bool has_value(const std::string& section, const std::string& name) const;
 
-		const std::string& get_value(const std::string& section, const std::string& name, const std::string& defaultValue);
+	const std::string& get(const std::string& section, const std::string& name) const;
 
-		template<typename T>
-		T get_value(const std::string& section, const std::string& name, const T& defaultValue)
-		{
-			if (!has_value(section, name))
-				return defaultValue;
+	const std::string& get_value(const std::string& section, const std::string& name,
+								 const std::string& defaultValue);
 
-			const auto& value = get(section, name);
+	template <typename T>
+	T get_value(const std::string& section, const std::string& name, const T& defaultValue)
+	{
+		if(!has_value(section, name))
+			return defaultValue;
 
-			T result;
-			std::istringstream(value) >> result;
-			return result;
-		}
+		const auto& value = get(section, name);
 
-        void set(const std::string& section, const std::string& name, const std::string& value);
+		T result;
+		std::istringstream(value) >> result;
+		return result;
+	}
 
-		template<typename T>
-		void set_value(const std::string& section, const std::string& name, const T& value)
-		{
-			std::ostringstream stream;
-			stream << value;
-			set(section, name, stream.str());
-		}
+	void set(const std::string& section, const std::string& name, const std::string& value);
 
-        void save(const std::string& file);
+	template <typename T>
+	void set_value(const std::string& section, const std::string& name, const T& value)
+	{
+		std::ostringstream stream;
+		stream << value;
+		set(section, name, stream.str());
+	}
 
-        void load(const std::string& file);
+	void save(const std::string& file);
 
-    private:
-        typedef std::map<std::string, std::string> Section;
-        std::map<std::string, Section> values;
-    };
+	void load(const std::string& file);
+
+private:
+	typedef std::map<std::string, std::string> Section;
+	std::map<std::string, Section> values;
+};
 }
 
 #endif
