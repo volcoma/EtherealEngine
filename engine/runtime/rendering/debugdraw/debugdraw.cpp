@@ -1489,7 +1489,7 @@ struct DebugDraw
 		bx::vec3Mul(vdir, vdir, _step);
 
 		const uint32_t num = (_size / 2) * 2 + 1;
-		const float halfExtent = (_size / 2);
+		const float halfExtent = static_cast<const float>(_size / 2);
 
 		float umin[3];
 		bx::vec3Mul(umin, udir, -halfExtent);

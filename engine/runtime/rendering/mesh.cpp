@@ -469,7 +469,7 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 		for(std::uint32_t j = 0; j < max_bones; ++j)
 		{
 			// Store vertex indices and weights
-			blend_indices[static_cast<math::vec4::length_type>(j)] = static_cast<std::uint32_t>(
+			blend_indices[static_cast<math::vec4::length_type>(j)] = static_cast<float>(
 				palette.translate_bone_to_palette(static_cast<std::uint32_t>(data.influences[j])));
 			blend_weights[static_cast<math::vec4::length_type>(j)] = data.weights[j];
 
