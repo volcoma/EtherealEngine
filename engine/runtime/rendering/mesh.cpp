@@ -6,6 +6,7 @@
 #include <algorithm>
 #include "mesh_tools.h"
 #include <cmath>
+#include <cstring>
 
 #define RMC_DEFINE_DATA                     \
     std::vector<math::vec3> vertices;		\
@@ -171,9 +172,12 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 		{
 			std::uint32_t vertex = tri_data[i].indices[j];
 
+            const auto& data = vertex_table[vertex];
 			// Add each influencing bone if unique.
-			for (size_t k = 0; k < vertex_table[vertex].influences.size(); ++k)
-				used_bones.bones[vertex_table[vertex].influences[k]] = 1; // Just set to any value, we're only using a key/value dictionary for acceleration
+            for(const auto& influence : data.influences)
+            {
+                used_bones.bones[static_cast<std::size_t>(influence)] = 1;// Just set to any value, we're only using a key/value dictionary for acceleration
+            }
 
 		} // Next Vertex
 
@@ -223,14 +227,14 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 		for (it_combination = bone_combinations.begin(); it_combination != bone_combinations.end(); ++it_combination)
 		{
 			face_influences* influences_ptr = it_combination->first.influences;
-			std::vector<std::uint32_t>* face_list_ptr = it_combination->second;
-
+            //std::vector<std::uint32_t>* face_list_ptr = it_combination->second;
+            int bones_size = static_cast<int>(influences_ptr->bones.size());
 			// Record the combination with the largest set of bones in case we can't
 			// find a suitable palette to insert any influence into at this point.
-			if ((int)influences_ptr->bones.size() > max_bones)
+            if (bones_size > max_bones)
 			{
 				it_largest_combination = it_combination;
-				max_bones = (int)influences_ptr->bones.size();
+                max_bones = bones_size;
 
 			} // End if largest
 
@@ -253,7 +257,7 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 					{
 						max_common = common_bones;
 						it_best_combination = it_combination;
-						palette_id = (std::int32_t)i;
+                        palette_id = static_cast<int>(i);
 
 					} // End if better choice
 
@@ -277,7 +281,7 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 			std::vector<std::uint32_t>* face_list_ptr = it_best_combination->second;
 
 			// At least one good combination was found that can be added to an existing palette.
-			_bone_palettes[palette_id].assign_bones(influences_ptr->bones, *face_list_ptr);
+            _bone_palettes[static_cast<std::size_t>(palette_id)].assign_bones(influences_ptr->bones, *face_list_ptr);
 
 			// We should now remove the selected combination.
 			bone_combinations.erase(it_best_combination);
@@ -293,7 +297,7 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 			// No combination of face influences was able to fit into an existing palette.
 			// We must generate a new one and store the largest combination discovered.
 			bone_palette new_palette(palette_size);
-			new_palette.set_data_group((std::uint32_t)_bone_palettes.size());
+            new_palette.set_data_group(static_cast<std::uint32_t>(_bone_palettes.size()));
 			new_palette.assign_bones(influences_ptr->bones, *face_list_ptr);
 			_bone_palettes.push_back(new_palette);
 
@@ -324,19 +328,20 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 			{
 				auto& data = vertex_table[tri_data[face_index].indices[k]];
 
+                const auto blend_idx = static_cast<int>(data.influences.size() - 1);
 				// Record the largest blend index necessary for processing this palette.
-				if (((int)data.influences.size() - 1) > palette.get_maximum_blend_index())
-					palette.set_maximum_blend_index(std::min<int>(3, ((int)data.influences.size() - 1)));
+                if (blend_idx > palette.get_maximum_blend_index())
+                    palette.set_maximum_blend_index(std::min<int>(3, blend_idx));
 
 				// If this vertex has already been assigned to an alternative
 				// palette, then it must be duplicated.
-				if (data.palette != -1 && data.palette != (std::int32_t)i)
+                if (data.palette != -1 && data.palette != static_cast<std::int32_t>(i))
 				{
-					std::uint32_t new_index = (std::uint32_t)vertex_table.size();
+                    std::uint32_t new_index = static_cast<std::uint32_t>(vertex_table.size());
 
 					// Split vertex
 					skin_bind_data::vertex_data new_vertex(data);
-					new_vertex.palette = (std::int32_t)i;
+                    new_vertex.palette = static_cast<std::int32_t>(i);
 					vertex_table.push_back(new_vertex);
 
 					// Update triangle indices
@@ -346,7 +351,7 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 				else
 				{
 					// Assign to palette
-					data.palette = (std::int32_t)i;
+                    data.palette = static_cast<std::int32_t>(i);
 
 				} // End if not assigned
 
@@ -370,9 +375,9 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 	{
 		new_format.m_hash = 0;
 		if (!has_weights)
-			new_format.add(bgfx::Attrib::Weight, 4, bgfx::AttribType::Float);
+            new_format.add(gfx::Attrib::Weight, 4, gfx::AttribType::Float);
 		if (!has_indices)
-			new_format.add(bgfx::Attrib::Indices, 4, bgfx::AttribType::Uint8, false, true);
+            new_format.add(gfx::Attrib::Indices, 4, gfx::AttribType::Float, false, true);
 
 		new_format.end();
 		// Add to format database.
@@ -388,7 +393,7 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 	// that the buffer also needs to grow if / when vertices were split.
 	// First convert original data into the new format and also ensure
 	// that it is large enough to contain our entire final data set.
-	std::uint32_t original_vertex_count = (std::uint32_t)_preparation_data.vertex_count;
+    std::uint32_t original_vertex_count = static_cast<std::uint32_t>(_preparation_data.vertex_count);
 	if (_vertex_format.m_hash != original_format.m_hash)
 	{
 		// Format has changed, run conversion.
@@ -418,7 +423,7 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 		if (data.palette < 0)
 			continue;
 
-		const auto& palette = _bone_palettes[data.palette];
+        const auto& palette = _bone_palettes[static_cast<std::size_t>(data.palette)];
 
 		// If this is a new vertex, duplicate data from original vertex (it will have 
 		// already been converted to its final format by this point).
@@ -438,32 +443,26 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 		  // Assign bone indices (the index to the relevant entry in the palette,
 		  // not the main bone list index) and weights.
 		math::vec4 blend_weights(0.0f, 0.0f, 0.0f, 0.0f);
-		std::uint32_t blend_indices = 0, max_bones = std::min<std::uint32_t>(4, std::uint32_t(data.influences.size()));
+        math::vec4 blend_indices(0.0f, 0.0f, 0.0f, 0.0f);
+
+        //std::uint32_t blend_indices = 0;
+        std::uint32_t max_bones = std::min<std::uint32_t>(4, std::uint32_t(data.influences.size()));
 		for (std::uint32_t j = 0; j < max_bones; ++j)
 		{
 			// Store vertex indices and weights
-			blend_indices |= (std::uint32_t)((palette.translate_bone_to_palette(data.influences[j]) & 0xFF) << (8 * j));
-			blend_weights[j] = data.weights[j];
+            blend_indices[static_cast<math::vec4::length_type>(j)] = static_cast<std::uint32_t>(palette.translate_bone_to_palette(static_cast<std::uint32_t>(data.influences[j])));
+            blend_weights[static_cast<math::vec4::length_type>(j)] = data.weights[j];
 
 		} // Next Influence
-		for (size_t j = max_bones; j < 4; ++j)
-		{
 
-			blend_indices |= (std::uint32_t)(0xFF << (8 * j));
-		}
-
-		//vec4 a_weight : BLENDWEIGHT;
-		//ivec4 a_indices : BLENDINDICES;
-		// Push to vertex.
 		gfx::vertexPack(math::value_ptr(blend_weights), false, gfx::Attrib::Weight, _vertex_format, src_vertices_ptr, std::uint32_t(i));
 
-		math::vec4 ind = math::color::u32_to_float4(blend_indices);
-		gfx::vertexPack(math::value_ptr(ind), false, gfx::Attrib::Indices, _vertex_format, src_vertices_ptr, std::uint32_t(i));
+        gfx::vertexPack(math::value_ptr(blend_indices), false, gfx::Attrib::Indices, _vertex_format, src_vertices_ptr, std::uint32_t(i));
 
 	} // Next Vertex
 
 	  // Update vertex count to match final size.
-	_preparation_data.vertex_count = (std::uint32_t)vertex_table.size();
+    _preparation_data.vertex_count = static_cast<std::uint32_t>(vertex_table.size());
 
 	vertex_table.clear();
 
@@ -532,7 +531,7 @@ bool mesh::prepare_mesh(const gfx::VertexDecl& format)
 		{
 			// Iterate through each face in the subset
 			std::uint32_t* current_index_ptr = &_system_ib[(subset->face_start * 3)];
-			for (std::int32_t i = 0; i < subset->face_count; ++i, current_index_ptr += 3)
+            for (std::uint32_t i = 0; i < subset->face_count; ++i, current_index_ptr += 3)
 			{
 				// Generate winding data
 				triangle& tri = _preparation_data.triangle_data[_preparation_data.triangle_count++];
@@ -578,7 +577,7 @@ bool mesh::prepare_mesh(const gfx::VertexDecl& format)
 			// First, retrieve the offsets to the weight and bone palette index data
 			// stored in each vertex in the mesh.
 
-			std::uint16_t vertex_stride = _vertex_format.getStride();
+            //::uint16_t vertex_stride = _vertex_format.getStride();
 			std::uint8_t* vertex_data_ptr = &_preparation_data.vertex_data[0];
 
 			// Search through each bone palette to get influence data.
@@ -591,9 +590,9 @@ bool mesh::prepare_mesh(const gfx::VertexDecl& format)
 				// Process faces in this subset to retrieve referenced vertex data.
 				std::int32_t max_blend_index = palette.get_maximum_blend_index();
 				std::vector<std::uint32_t> bones_references = palette.get_bones();
-				for (std::int32_t nFace = subset_ptr->face_start; nFace < (subset_ptr->face_start + subset_ptr->face_count); ++nFace)
+                for (std::int32_t face = subset_ptr->face_start; face < (subset_ptr->face_start + static_cast<std::int32_t>(subset_ptr->face_count)); ++face)
 				{
-					triangle& tri = _preparation_data.triangle_data[nFace];
+                    triangle& tri = _preparation_data.triangle_data[static_cast<std::size_t>(face)];
 					for (size_t i = 0; i < 3; ++i)
 					{
 						float weights[4];
@@ -603,7 +602,7 @@ bool mesh::prepare_mesh(const gfx::VertexDecl& format)
 
 						float* weights_ptr = weights;
 						std::uint32_t ind = math::color::float4_to_u32(math::vec4{ indices[0], indices[1], indices[2], indices[3] });
-						std::uint8_t* indices_ptr = (std::uint8_t*)&ind;
+                        std::uint8_t* indices_ptr = reinterpret_cast<std::uint8_t*>(&ind);
 
 						// Add influence data back to the referenced bones.
 						for (std::int32_t j = 0; j <= max_blend_index; ++j)
@@ -666,7 +665,7 @@ bool mesh::prepare_mesh(const gfx::VertexDecl& format, void* vertices_ptr, std::
 	_vertex_format = format;
 
 	// Populate preparation structures.
-	_preparation_data.triangle_count = (std::uint32_t)faces.size();
+    _preparation_data.triangle_count = static_cast<std::uint32_t>(faces.size());
 	_preparation_data.triangle_data = faces;
 	_preparation_data.vertex_count = vertex_count;
 
@@ -678,12 +677,12 @@ bool mesh::prepare_mesh(const gfx::VertexDecl& format, void* vertices_ptr, std::
 
 	// Generate the bounding box data for the new geometry.
 	std::int32_t position_offset = format.getOffset(gfx::Attrib::Position);
-	std::int32_t stride = (std::int32_t)format.getStride();
+    std::int32_t stride = static_cast<std::int32_t>(format.getStride());
 	if (format.has(gfx::Attrib::Position))
 	{
-		std::uint8_t* src_ptr = ((std::uint8_t*)vertices_ptr) + position_offset;
+        std::uint8_t* src_ptr = reinterpret_cast<std::uint8_t*>(vertices_ptr) + position_offset;
 		for (std::uint32_t i = 0; i < vertex_count; ++i, src_ptr += stride)
-			_bbox.add_point(*((math::vec3*)src_ptr));
+            _bbox.add_point(*(reinterpret_cast<math::vec3*>(src_ptr)));
 
 	} // End if has position
 
@@ -724,14 +723,14 @@ bool mesh::set_vertex_source(void* source_ptr, std::uint32_t vertex_count, const
 	_preparation_data.source_format = source_format;
 	if (source_format.m_hash == _vertex_format.m_hash)
 	{
-		_preparation_data.vertex_source = (std::uint8_t*)source_ptr;
+        _preparation_data.vertex_source = reinterpret_cast<std::uint8_t*>(source_ptr);
 
 	} // End if matching
 	else
 	{
 		_preparation_data.vertex_source = new std::uint8_t[vertex_count * _vertex_format.getStride()];
 		_preparation_data.owns_source = true;
-		gfx::vertexConvert(_vertex_format, _preparation_data.vertex_source, source_format, (std::uint8_t*)source_ptr, vertex_count);
+        gfx::vertexConvert(_vertex_format, _preparation_data.vertex_source, source_format, reinterpret_cast<std::uint8_t*>(source_ptr), vertex_count);
 	} // End if !matching
 
 	  // Allocate the vertex records for the new vertex buffer
@@ -758,7 +757,7 @@ bool mesh::set_vertex_source(void* source_ptr, std::uint32_t vertex_count, const
 }
 
 
-bool mesh::add_primitives(const triangle_array_t & aTriangles)
+bool mesh::add_primitives(const triangle_array_t & triangles)
 {
 	std::uint32_t orig_index, index;
 
@@ -794,11 +793,8 @@ bool mesh::add_primitives(const triangle_array_t & aTriangles)
 
 	// Loop through the specified faces and process them.
 	std::uint8_t* src_vertices_ptr = _preparation_data.vertex_source;
-	std::uint32_t face_count = (std::uint32_t)aTriangles.size();
-	for (std::uint32_t i = 0; i < face_count; ++i)
+    for (const auto& src_tri : triangles)
 	{
-		const triangle& src_tri = aTriangles[i];
-
 		// Retrieve vertex positions (if there are any) so that we can perform degenerate testing.
 		if (has_position)
 		{
@@ -932,7 +928,7 @@ bool mesh::create_cylinder(const gfx::VertexDecl& format, float radius, float he
 		for (std::uint32_t slice = 0; slice <= slices; ++slice)
 		{
 			// Precompute any reusable values
-			float a = (math::two_pi<float>() / (float)slices) * (float)slice;
+            float a = (math::two_pi<float>() / static_cast<float>(slices)) * static_cast<float>(slice);
 
 			// Compuse vertex normal at this location around the cylinder.
 			normal_vec.x = math::sin(a);
@@ -942,12 +938,12 @@ bool mesh::create_cylinder(const gfx::VertexDecl& format, float radius, float he
 			// Position is simply a scaled version of the normal
 			// with the correctly computed height.
 			current_pos.x = normal_vec.x * radius;
-			current_pos.y = (float)stack * (height / (float)stacks);
+            current_pos.y = static_cast<float>(stack) * (height / static_cast<float>(stacks));
 			current_pos.z = normal_vec.z * radius;
 
 			// Compute the texture coordinate.
-			current_tex.x = (1.0f / (float)slices) * (float)slice;
-			current_tex.y = (1.0f / (float)stacks) * (float)stack;
+            current_tex.x = (1.0f / static_cast<float>(slices)) * static_cast<float>(slice);
+            current_tex.y = (1.0f / static_cast<float>(stacks)) * static_cast<float>(stack);
 
 			// Position in center or at base/tip?
 			if (origin == mesh_create_origin::center)
@@ -987,7 +983,7 @@ bool mesh::create_cylinder(const gfx::VertexDecl& format, float radius, float he
 	for (std::uint32_t slice = 0; slice < slices; ++slice)
 	{
 		// Precompute any reusable values
-		float a = (math::two_pi<float>() / (float)slices) * (float)slice;
+        float a = (math::two_pi<float>() / static_cast<float>(slices)) * static_cast<float>(slice);
 
 		// Compute the vertex components.
 		current_pos = math::vec3(math::sin(a), 0, math::cos(a));
@@ -1032,7 +1028,7 @@ bool mesh::create_cylinder(const gfx::VertexDecl& format, float radius, float he
 	for (std::uint32_t slice = 0; slice < slices; ++slice)
 	{
 		// Precompute any reusable values
-		float a = (math::two_pi<float>() / (float)slices) * (float)slice;
+        float a = (math::two_pi<float>() / static_cast<float>(slices)) * static_cast<float>(slice);
 
 		// Compute the vertex components.
 		current_pos = math::vec3(math::sin(a), height, math::cos(a));
@@ -1237,8 +1233,8 @@ bool mesh::create_capsule(const gfx::VertexDecl& format, float radius, float hei
 		for (std::uint32_t slice = 0; slice <= slices; ++slice)
 		{
 			// Precompute any reusable values
-			float  a = (math::pi<float>() / (float)sphere_stacks) * (float)stack;
-			float  b = (math::two_pi<float>() / (float)slices) * (float)slice;
+            float  a = (math::pi<float>() / static_cast<float>(sphere_stacks)) * static_cast<float>(stack);
+            float  b = (math::two_pi<float>() / static_cast<float>(slices)) * static_cast<float>(slice);
 			float xz = math::sin(a);
 
 			// Compute the normal & position of the vertex
@@ -1251,7 +1247,7 @@ bool mesh::create_capsule(const gfx::VertexDecl& format, float radius, float hei
 			current_pos.y += fCylinderHeight * 0.5f;
 
 			// Compute the texture coordinate.
-			current_tex.x = (1.0f / (float)slices) * (float)slice;
+            current_tex.x = (1.0f / static_cast<float>(slices)) * static_cast<float>(slice);
 			current_tex.y = (current_pos.y + (height * 0.5f)) / height;
 
 			// Invert normal if required
@@ -1298,7 +1294,7 @@ bool mesh::create_capsule(const gfx::VertexDecl& format, float radius, float hei
 		for (std::uint32_t slice = 0; slice <= slices; ++slice)
 		{
 			// Precompute any reusable values
-			float a = (math::two_pi<float>() / (float)slices) * (float)slice;
+            float a = (math::two_pi<float>() / static_cast<float>(slices)) * static_cast<float>(slice);
 
 			// Compuse vertex normal at this location around the cylinder.
 			normal_vec.x = math::sin(a);
@@ -1308,12 +1304,12 @@ bool mesh::create_capsule(const gfx::VertexDecl& format, float radius, float hei
 			// Position is simply a scaled version of the normal
 			// with the correctly computed height.
 			current_pos.x = normal_vec.x * radius;
-			current_pos.y = (fCylinderHeight - ((float)stack * (fCylinderHeight / (float)stacks)));
+            current_pos.y = (fCylinderHeight - (static_cast<float>(stack) * (fCylinderHeight / static_cast<float>(stacks))));
 			current_pos.y -= (fCylinderHeight * 0.5f);
 			current_pos.z = normal_vec.z * radius;
 
 			// Compute the texture coordinate.
-			current_tex.x = (1.0f / (float)slices) * (float)slice;
+            current_tex.x = (1.0f / static_cast<float>(slices)) * static_cast<float>(slice);
 			current_tex.y = (current_pos.y + (height * 0.5f)) / height;
 
 			// Position in center or at base/tip?
@@ -1358,11 +1354,11 @@ bool mesh::create_capsule(const gfx::VertexDecl& format, float radius, float hei
 		for (std::uint32_t slice = 0; slice <= slices; ++slice)
 		{
 			// Precompute any reusable values
-			float  a = (math::pi<float>() / (float)sphere_stacks) * (float)stack;
-			float  b = (math::two_pi<float>() / (float)slices) * (float)slice;
+            float  a = (math::pi<float>() / static_cast<float>(sphere_stacks)) * static_cast<float>(stack);
+            float  b = (math::two_pi<float>() / static_cast<float>(slices)) * static_cast<float>(slice);
 			float xz = math::sin(a);
 
-			// Compute the normal & position of the vertex
+            // Compute the normal & position of the vertex
 			normal_vec.x = xz * math::sin(b);
 			normal_vec.y = math::cos((bNegateY) ? math::pi<float>() - a : a);
 			normal_vec.z = xz * math::cos(b);
@@ -1372,7 +1368,7 @@ bool mesh::create_capsule(const gfx::VertexDecl& format, float radius, float hei
 			current_pos.y -= fCylinderHeight * 0.5f;
 
 			// Compute the texture coordinate.
-			current_tex.x = (1.0f / (float)slices) * (float)slice;
+            current_tex.x = (1.0f / static_cast<float>(slices)) * static_cast<float>(slice);
 			current_tex.y = (current_pos.y + (height * 0.5f)) / height;
 
 			// Invert normal if required
@@ -1601,8 +1597,8 @@ bool mesh::create_sphere(const gfx::VertexDecl& format, float radius, std::uint3
 		for (std::uint32_t slice = 0; slice <= slices; ++slice)
 		{
 			// Precompute any reusable values
-			float  a = (math::pi<float>() / (float)stacks) * (float)stack;
-			float  b = (math::two_pi<float>() / (float)slices) * (float)slice;
+            float  a = (math::pi<float>() / static_cast<float>(stacks)) * static_cast<float>(stack);
+            float  b = (math::two_pi<float>() / static_cast<float>(slices)) * static_cast<float>(slice);
 			float xz = math::sin(a);
 
 			// Compute the normal & position of the vertex
@@ -1623,7 +1619,7 @@ bool mesh::create_sphere(const gfx::VertexDecl& format, float radius, std::uint3
 			if (has_normal)
 				gfx::vertexPack(&vec_normal[0], true, gfx::Attrib::Normal, format, current_vertex_ptr);
 			if (has_texcoord)
-				gfx::vertexPack(&math::vec2((1 / (float)slices) * (float)slice, (1 / (float)stacks) * (float)stack)[0], true, gfx::Attrib::TexCoord0, format, current_vertex_ptr);
+                gfx::vertexPack(&math::vec2((1 / static_cast<float>(slices)) * static_cast<float>(slice), (1 / static_cast<float>(stacks)) * static_cast<float>(stack))[0], true, gfx::Attrib::TexCoord0, format, current_vertex_ptr);
 
 			// Set flags for this vertex (we want to generate tangents 
 			// and binormals if we need them).
@@ -1709,7 +1705,7 @@ bool mesh::create_torus(const gfx::VertexDecl& format, float outer_radius, float
 	for (std::uint32_t nBand = 0; nBand <= bands; ++nBand)
 	{
 		// Precompute any re-usable values
-		float a = (math::two_pi<float>() / (float)bands) * nBand;
+        float a = (math::two_pi<float>() / static_cast<float>(bands)) * nBand;
 		float sinBand = math::sin(a);
 		float cosBand = math::cos(a);
 
@@ -1727,7 +1723,7 @@ bool mesh::create_torus(const gfx::VertexDecl& format, float outer_radius, float
 		for (std::uint32_t nSide = 0; nSide <= sides; ++nSide)
 		{
 			// Precompute any re-usable values
-			float b = (math::two_pi<float>() / (float)sides) * nSide;
+            float b = (math::two_pi<float>() / static_cast<float>(sides)) * nSide;
 			float c = math::sin(b) * fBandRadius;
 
 			// Compute the vertex components
@@ -1735,7 +1731,7 @@ bool mesh::create_torus(const gfx::VertexDecl& format, float outer_radius, float
 			position.y = vCenter.y + (math::cos(b) * fBandRadius);
 			position.z = vCenter.z + (c * cosBand);
 			normal_vec = math::normalize(position - vCenter);
-			texcoord = math::vec2((1 / (float)bands) * (float)nBand, (1 / (float)sides) * (float)nSide);
+            texcoord = math::vec2((1.0f / static_cast<float>(bands)) * static_cast<float>(nBand), (1.0f / static_cast<float>(sides)) * static_cast<float>(nSide));
 
 			// Inverting?
 			if (inverted)
@@ -2278,12 +2274,12 @@ bool mesh::create_cone(const gfx::VertexDecl& format, float radius, float radius
 		for (std::uint32_t slice = 0; slice <= slices; ++slice)
 		{
 			// Precompute any reusable values
-			float a = (math::two_pi<float>() / (float)slices) * (float)slice;
-			float b = radius + ((radius_tip - radius) * ((float)stack / (float)stacks));
+            float a = (math::two_pi<float>() / static_cast<float>(slices)) * static_cast<float>(slice);
+            float b = radius + ((radius_tip - radius) * (static_cast<float>(stack) / static_cast<float>(stacks)));
 
 			// Compute the vertex components
 			vec_position.x = math::sin(a);
-			vec_position.y = (float)stack * (height / (float)stacks);
+            vec_position.y = static_cast<float>(stack) * (height / static_cast<float>(stacks));
 			vec_position.z = math::cos(a);
 			vec_normal = math::vec3(vec_position.x, 0.0f, vec_position.z);
 			vec_position.x *= b;
@@ -2305,7 +2301,7 @@ bool mesh::create_cone(const gfx::VertexDecl& format, float radius, float radius
 			if (has_normal)
 				gfx::vertexPack(&vec_normal[0], true, gfx::Attrib::Normal, format, current_vertex_ptr);
 			if (has_texcoord)
-				gfx::vertexPack(&math::vec2((1 / (float)slices) * (float)slice, (1 / (float)stacks) * (float)stack)[0], true, gfx::Attrib::TexCoord0, format, current_vertex_ptr);
+                gfx::vertexPack(&math::vec2((1 / static_cast<float>(slices)) * static_cast<float>(slice), (1 / static_cast<float>(stacks)) * static_cast<float>(stack))[0], true, gfx::Attrib::TexCoord0, format, current_vertex_ptr);
 
 			// Set flags for this vertex (we want to generate tangents 
 			// and binormals if we need them).
@@ -2326,7 +2322,7 @@ bool mesh::create_cone(const gfx::VertexDecl& format, float radius, float radius
 	for (std::uint32_t slice = 0; slice < slices; ++slice)
 	{
 		// Precompute any reusable values
-		float a = (math::two_pi<float>() / (float)slices) * (float)slice;
+        float a = (math::two_pi<float>() / static_cast<float>(slices)) * static_cast<float>(slice);
 
 		// Compute the vertex components
 		vec_position = math::vec3(math::sin(a), 0, math::cos(a));
@@ -2372,7 +2368,7 @@ bool mesh::create_cone(const gfx::VertexDecl& format, float radius, float radius
 		for (std::uint32_t slice = 0; slice < slices; ++slice)
 		{
 			// Precompute any reusable values
-			float a = (math::two_pi<float>() / (float)slices) * (float)slice;
+            float a = (math::two_pi<float>() / static_cast<float>(slices)) * static_cast<float>(slice);
 
 			// Compute the vertex components
 			vec_position = math::vec3(math::sin(a), height, math::cos(a));
@@ -2525,7 +2521,9 @@ bool mesh::create_cube(const gfx::VertexDecl& format, float width, float height,
 
 bool mesh::create_cube(const gfx::VertexDecl& format, float width, float height, float depth, std::uint32_t width_segments, std::uint32_t height_segments, std::uint32_t depth_segments, float tex_u_scale, float tex_v_scale, bool inverted, mesh_create_origin origin, bool hardware_copy /* = true */)
 {
-	std::uint32_t x_count, y_count, counter;
+    std::uint32_t x_count = 0;
+    std::uint32_t y_count = 0;
+    std::uint32_t counter = 0;
 	math::vec3 current_pos, delta_pos_x, delta_pos_y, normal_vec;
 	math::vec2 current_tex, delta_tex;
 
@@ -2566,8 +2564,8 @@ bool mesh::create_cube(const gfx::VertexDecl& format, float width, float height,
 		case 0: // +X
 			x_count = depth_segments + 1;
 			y_count = height_segments + 1;
-			delta_pos_x = math::vec3(0, 0, depth / (float)depth_segments);
-			delta_pos_y = math::vec3(0, -height / (float)height_segments, 0);
+            delta_pos_x = math::vec3(0, 0, depth / static_cast<float>(depth_segments));
+            delta_pos_y = math::vec3(0, -height / static_cast<float>(height_segments), 0);
 			current_pos = math::vec3(half_width, height, -half_depth);
 			normal_vec = math::vec3(1, 0, 0);
 			break;
@@ -2575,8 +2573,8 @@ bool mesh::create_cube(const gfx::VertexDecl& format, float width, float height,
 		case 1: // +Y
 			x_count = width_segments + 1;
 			y_count = depth_segments + 1;
-			delta_pos_x = math::vec3(width / (float)width_segments, 0, 0);
-			delta_pos_y = math::vec3(0, 0, -depth / (float)depth_segments);
+            delta_pos_x = math::vec3(width / static_cast<float>(width_segments), 0, 0);
+            delta_pos_y = math::vec3(0, 0, -depth / static_cast<float>(depth_segments));
 			current_pos = math::vec3(-half_width, height, half_depth);
 			normal_vec = (height > 0.0f) ? math::vec3(0, 1, 0) : math::vec3(0, -1, 0);
 			break;
@@ -2584,8 +2582,8 @@ bool mesh::create_cube(const gfx::VertexDecl& format, float width, float height,
 		case 2: // +Z
 			x_count = width_segments + 1;
 			y_count = height_segments + 1;
-			delta_pos_x = math::vec3(-width / (float)width_segments, 0, 0);
-			delta_pos_y = math::vec3(0, -height / (float)height_segments, 0);
+            delta_pos_x = math::vec3(-width / static_cast<float>(width_segments), 0, 0);
+            delta_pos_y = math::vec3(0, -height / static_cast<float>(height_segments), 0);
 			current_pos = math::vec3(half_width, height, half_depth);
 			normal_vec = math::vec3(0, 0, 1);
 			break;
@@ -2593,8 +2591,8 @@ bool mesh::create_cube(const gfx::VertexDecl& format, float width, float height,
 		case 3: // -X
 			x_count = depth_segments + 1;
 			y_count = height_segments + 1;
-			delta_pos_x = math::vec3(0, 0, -depth / (float)depth_segments);
-			delta_pos_y = math::vec3(0, -height / (float)height_segments, 0);
+            delta_pos_x = math::vec3(0, 0, -depth / static_cast<float>(depth_segments));
+            delta_pos_y = math::vec3(0, -height / static_cast<float>(height_segments), 0);
 			current_pos = math::vec3(-half_width, height, half_depth);
 			normal_vec = math::vec3(-1, 0, 0);
 			break;
@@ -2602,8 +2600,8 @@ bool mesh::create_cube(const gfx::VertexDecl& format, float width, float height,
 		case 4: // -Y
 			x_count = width_segments + 1;
 			y_count = depth_segments + 1;
-			delta_pos_x = math::vec3(width / (float)width_segments, 0, 0);
-			delta_pos_y = math::vec3(0, 0, depth / (float)depth_segments);
+            delta_pos_x = math::vec3(width / static_cast<float>(width_segments), 0, 0);
+            delta_pos_y = math::vec3(0, 0, depth / static_cast<float>(depth_segments));
 			current_pos = math::vec3(-half_width, 0, -half_depth);
 			normal_vec = (height > 0.0f) ? math::vec3(0, -1, 0) : math::vec3(0, 1, 0);
 			break;
@@ -2611,8 +2609,8 @@ bool mesh::create_cube(const gfx::VertexDecl& format, float width, float height,
 		case 5: // -Z
 			x_count = width_segments + 1;
 			y_count = height_segments + 1;
-			delta_pos_x = math::vec3(width / (float)width_segments, 0, 0);
-			delta_pos_y = math::vec3(0, -height / (float)height_segments, 0);
+            delta_pos_x = math::vec3(width / static_cast<float>(width_segments), 0, 0);
+            delta_pos_y = math::vec3(0, -height / static_cast<float>(height_segments), 0);
 			current_pos = math::vec3(-half_width, height, -half_depth);
 			normal_vec = math::vec3(0, 0, -1);
 			break;
@@ -2625,7 +2623,7 @@ bool mesh::create_cube(const gfx::VertexDecl& format, float width, float height,
 
 		// Add faces
 		current_tex = math::vec2(0, 0);
-		delta_tex = math::vec2(1.0f / (float)(x_count - 1), 1.0f / (float)(y_count - 1));
+        delta_tex = math::vec2(1.0f / static_cast<float>(x_count - 1), 1.0f / static_cast<float>(y_count - 1));
 		for (std::uint32_t y = 0; y < y_count; ++y)
 		{
 			for (std::uint32_t x = 0; x < x_count; ++x)
@@ -2661,7 +2659,7 @@ bool mesh::create_cube(const gfx::VertexDecl& format, float width, float height,
 
 			  // Move to next row
 			current_pos += delta_pos_y;
-			current_pos -= delta_pos_x * (float)x_count;
+            current_pos -= delta_pos_x * static_cast<float>(x_count);
 			current_tex.x = 0.0f;
 			current_tex.y += delta_tex.y;
 
@@ -2763,7 +2761,7 @@ bool mesh::end_prepare(bool hardware_copy /* = true */, bool weld /* = true */, 
 
 	// Scan the preparation data for degenerate triangles.
 	std::uint16_t position_offset = _vertex_format.getOffset(gfx::Attrib::Position);
-	std::uint16_t vertex_stride = _vertex_format.getStride();
+    //std::uint16_t vertex_stride = _vertex_format.getStride();
 	std::uint8_t * src_vertices_ptr = &_preparation_data.vertex_data[0] + position_offset;
 	for (std::uint32_t i = 0; i < _preparation_data.triangle_count; ++i)
 	{
@@ -2793,7 +2791,7 @@ bool mesh::end_prepare(bool hardware_copy /* = true */, bool weld /* = true */, 
 		return false;
 
 	// Allocate the system memory vertex buffer ready for population.
-	_vertex_count = (std::uint32_t)_preparation_data.vertex_count;
+    _vertex_count = _preparation_data.vertex_count;
 	_system_vb = new std::uint8_t[_vertex_count * _vertex_format.getStride()];
 
 	// Copy vertex data into the new buffer and dispose of the temporary data.
@@ -2888,7 +2886,6 @@ bool mesh::sort_mesh_data(bool optimize, bool hardware_copy, bool build_buffer)
 	std::map<mesh_subset_key, std::uint32_t> subset_sizes;
 	std::map<mesh_subset_key, std::uint32_t>::iterator it_subset_size;
 	data_group_subset_map_t::iterator it_data_group;
-	std::uint32_t i, j;
 
 	// Clear out any old data EXCEPT the old subset index
 	// We'll need this in order to understand how to update
@@ -2898,7 +2895,7 @@ bool mesh::sort_mesh_data(bool optimize, bool hardware_copy, bool build_buffer)
 
 	// Our first job is to collate all the various subsets and also
 	// to determine how many triangles should exist in each.
-	for (i = 0; i < _face_count; ++i)
+    for (std::uint32_t i = 0; i < _face_count; ++i)
 	{
 		const mesh_subset_key& subset_key = _triangle_data[i];
 
@@ -2922,7 +2919,7 @@ bool mesh::sort_mesh_data(bool optimize, bool hardware_copy, bool build_buffer)
 	  // We should now have a complete list of subsets and the number of triangles
 	  // which should exist in each. Populate mesh subset table and update start / count 
 	  // values so that we can correctly generate the new sorted index buffer.
-	std::uint32_t counter = 0;
+    std::int32_t counter = 0;
 	subset_array_t new_subsets;
 	for (it_subset_size = subset_sizes.begin(); it_subset_size != subset_sizes.end(); ++it_subset_size)
 	{
@@ -2965,9 +2962,9 @@ bool mesh::sort_mesh_data(bool optimize, bool hardware_copy, bool build_buffer)
 	std::uint32_t* face_remap_ptr = new std::uint32_t[_face_count];
 
 	// Start building new indices
-	std::int32_t  index;
-	std::uint32_t index_start = 0;
-	for (i = 0; i < _face_count; ++i)
+    std::uint32_t index = 0;
+    std::uint32_t index_start = 0;
+    for (std::uint32_t i = 0; i < _face_count; ++i)
 	{
 		// Find a matching subset for this triangle
 		subset* sub = _subset_lookup[_triangle_data[i]];
@@ -2975,34 +2972,34 @@ bool mesh::sort_mesh_data(bool optimize, bool hardware_copy, bool build_buffer)
 		// Copy index data over to new buffer, taking care to record the correct
 		// vertex values as required. We'll temporarily use VertexStart and VertexCount
 		// as a MathUtility::minValue/max record that we'll come round and correct later.
-		index_start = (sub->face_start + sub->face_count) * 3;
+        index_start = (static_cast<std::uint32_t>(sub->face_start) + sub->face_count) * 3;
 
 		// Index[0]
-		index = (std::int32_t)(*src_indices_ptr++);
-		if (index < sub->vertex_start)
-			sub->vertex_start = index;
+        index = static_cast<std::uint32_t>(*src_indices_ptr++);
+        if (static_cast<std::int32_t>(index) < sub->vertex_start)
+            sub->vertex_start = static_cast<std::int32_t>(index);
 		if (index > sub->vertex_count)
 			sub->vertex_count = index;
-		dst_indices_ptr[index_start++] = index;
+        dst_indices_ptr[index_start++] = index;
 
 		// Index[1]
-		index = (std::int32_t)(*src_indices_ptr++);
-		if (index < sub->vertex_start)
-			sub->vertex_start = index;
+        index = static_cast<std::uint32_t>(*src_indices_ptr++);
+        if (static_cast<std::int32_t>(index) < sub->vertex_start)
+            sub->vertex_start = static_cast<std::int32_t>(index);
 		if (index > sub->vertex_count)
 			sub->vertex_count = index;
-		dst_indices_ptr[index_start++] = index;
+        dst_indices_ptr[index_start++] = index;
 
 		// Index[2]
-		index = (std::int32_t)(*src_indices_ptr++);
-		if (index < sub->vertex_start)
-			sub->vertex_start = index;
+        index = static_cast<std::uint32_t>(*src_indices_ptr++);
+        if (static_cast<std::int32_t>(index) < sub->vertex_start)
+            sub->vertex_start = static_cast<std::int32_t>(index);
 		if (index > sub->vertex_count)
 			sub->vertex_count = index;
-		dst_indices_ptr[index_start++] = index;
+        dst_indices_ptr[index_start++] = index;
 
 		// Store face re-map information so that we can remap data as required
-		face_remap_ptr[i] = sub->face_start + sub->face_count;
+        face_remap_ptr[i] = static_cast<std::uint32_t>(sub->face_start) + sub->face_count;
 
 		// We have now recorded a triangle in this subset
 		sub->face_count++;
@@ -3031,17 +3028,21 @@ bool mesh::sort_mesh_data(bool optimize, bool hardware_copy, bool build_buffer)
 	// if requested. Otherwise, just copy them over directly.
 	src_indices_ptr = dst_indices_ptr;
 	dst_indices_ptr = _system_ib;
-
-	for (counter = 0, i = 0; i < (size_t)new_subsets.size(); ++i)
+    counter = 0;
+    for (auto subset : new_subsets)
 	{
-		subset* subset = new_subsets[i];
-
 		// Note: Remember that at this stage, the subset's 'vertex_count' member still describes
 		// a 'max' vertex (not a count)... We're correcting this later.
 		if (optimize == true)
-			build_optimized_index_buffer(subset, src_indices_ptr + (subset->face_start * 3), dst_indices_ptr, subset->vertex_start, subset->vertex_count);
+            build_optimized_index_buffer(subset,
+                                         src_indices_ptr + (subset->face_start * 3),
+                                         dst_indices_ptr,
+                                         static_cast<std::uint32_t>(subset->vertex_start),
+                                         static_cast<std::uint32_t>(subset->vertex_count));
 		else
-			memcpy(dst_indices_ptr, src_indices_ptr + (subset->face_start * 3), subset->face_count * 3 * sizeof(std::uint32_t));
+            memcpy(dst_indices_ptr,
+                   src_indices_ptr + (subset->face_start * 3),
+                   static_cast<std::size_t>(subset->face_count) * 3 * sizeof(std::uint32_t));
 
 		// This subset's starting face now refers to its location 
 		// in the final destination buffer rather than the temporary one.
@@ -3059,14 +3060,14 @@ bool mesh::sort_mesh_data(bool optimize, bool hardware_copy, bool build_buffer)
 	// Rebuild the additional triangle data based on the newly sorted
 	// subset data, and also convert the previously recorded maximum
 	// vertex value (stored in "vertex_count") into its final form
-	for (i = 0; i < (std::uint32_t)new_subsets.size(); ++i)
-	{
+    for (auto subset : new_subsets)
+    {
 		// Convert vertex "Max" to "Count"
-		subset * subset = new_subsets[i];
-		subset->vertex_count = (subset->vertex_count - subset->vertex_start) + 1;
+        subset->vertex_count = (subset->vertex_count - static_cast<std::uint32_t>(subset->vertex_start)) + 1;
 
 		// Update additional triangle data array.
-		for (j = subset->face_start; j < ((std::uint32_t)subset->face_start + (std::uint32_t)subset->face_count); ++j)
+        std::uint32_t fstart = static_cast<std::uint32_t>(subset->face_start);
+        for (std::uint32_t j = fstart; j < (fstart + subset->face_count); ++j)
 		{
 			_triangle_data[j].data_group_id = subset->data_group_id;
 
@@ -3085,8 +3086,8 @@ bool mesh::sort_mesh_data(bool optimize, bool hardware_copy, bool build_buffer)
 	// Index data and subsets have been updated and potentially need to be serialized.
 
 	// Destroy old subset data.
-	for (i = 0; i < _mesh_subsets.size(); ++i)
-		checked_delete(_mesh_subsets[i]);
+    for (auto subset: _mesh_subsets)
+        checked_delete(subset);
 	_mesh_subsets.clear();
 
 	// Use the new subset data.
@@ -3134,7 +3135,7 @@ float mesh::find_vertex_optimizer_score(const optimizer_vertex_info* vertex_info
 
 	  // Bonus points for having a low number of tris still to
 	  // use the vert, so we get rid of lone verts quickly.
-	float valence_boost = math::pow((float)vertex_info_ptr->unused_triangle_references, -MeshOptimizer::ValenceBoostPower);
+    float valence_boost = math::pow(static_cast<float>(vertex_info_ptr->unused_triangle_references), -MeshOptimizer::ValenceBoostPower);
 	score += MeshOptimizer::ValenceBoostScale * valence_boost;
 
 	// Return the final score
@@ -3145,7 +3146,6 @@ void mesh::build_optimized_index_buffer(const subset* subset, std::uint32_t* src
 {
 	optimizer_vertex_info* vertex_info_ptr = nullptr, *vert_ptr;
 	optimizer_triangle_info* triangle_info_ptr = nullptr, *tri_ptr;
-	std::uint32_t i, j, k, vertex_count;
 	float best_score = 0.0f, score;
 	std::int32_t best_triangle = -1;
 	std::uint32_t vertex_cache_size = 0;
@@ -3153,15 +3153,15 @@ void mesh::build_optimized_index_buffer(const subset* subset, std::uint32_t* src
 
 	// Declare vertex cache storage (plus one to allow them to drop "off the end")
 	std::uint32_t vertex_cache_ptr[MeshOptimizer::MaxVertexCacheSize + 1];
-
+    std::memset(vertex_cache_ptr, 0, sizeof(vertex_cache_ptr));
 	// First allocate enough room for the optimization information for each vertex and triangle
-	vertex_count = (max_vertex - min_vertex) + 1;
+    std::uint32_t vertex_count = (max_vertex - min_vertex) + 1;
 	vertex_info_ptr = new optimizer_vertex_info[vertex_count];
 	triangle_info_ptr = new optimizer_triangle_info[subset->face_count];
 
 	// The first pass is to initialize the vertex information with information about the
 	// faces which reference them.
-	for (i = 0; i < (unsigned)subset->face_count; ++i)
+    for (std::uint32_t i = 0; i < subset->face_count; ++i)
 	{
 		index = src_buffer_ptr[i * 3] - min_vertex;
 		vertex_info_ptr[index].unused_triangle_references++;
@@ -3176,11 +3176,11 @@ void mesh::build_optimized_index_buffer(const subset* subset, std::uint32_t* src
 	} // Next triangle
 
 	  // Initialize vertex scores
-	for (i = 0; i < vertex_count; ++i)
+    for (std::uint32_t i = 0; i < vertex_count; ++i)
 		vertex_info_ptr[i].vertex_score = find_vertex_optimizer_score(&vertex_info_ptr[i]);
 
 	// Compute the score for each triangle, and record the triangle with the best score
-	for (i = 0; i < (unsigned)subset->face_count; ++i)
+    for (std::uint32_t i = 0; i < subset->face_count; ++i)
 	{
 		// The triangle score is the sum of the scores of each of
 		// its three vertices.
@@ -3196,14 +3196,14 @@ void mesh::build_optimized_index_buffer(const subset* subset, std::uint32_t* src
 		if (score > best_score)
 		{
 			best_score = score;
-			best_triangle = (signed)i;
+            best_triangle = static_cast<std::int32_t>(i);
 
 		} // End if better than previous score
 
 	} // Next triangle
 
 	  // Now we can start adding triangles, beginning with the previous highest scoring triangle.
-	for (i = 0; i < (unsigned)subset->face_count; ++i)
+    for (std::uint32_t i = 0; i < subset->face_count; ++i)
 	{
 		// If we don't know the best triangle, for whatever reason, find it
 		if (best_triangle < 0)
@@ -3212,7 +3212,7 @@ void mesh::build_optimized_index_buffer(const subset* subset, std::uint32_t* src
 			best_score = 0.0f;
 
 			// Iterate through the entire list of un-added faces
-			for (j = 0; j < (unsigned)subset->face_count; ++j)
+            for (std::uint32_t j = 0; j < subset->face_count; ++j)
 			{
 				if (triangle_info_ptr[j].added == false)
 				{
@@ -3222,7 +3222,7 @@ void mesh::build_optimized_index_buffer(const subset* subset, std::uint32_t* src
 					if (score > best_score)
 					{
 						best_score = score;
-						best_triangle = (signed)j;
+                        best_triangle = static_cast<std::int32_t>(j);
 
 					} // End if better than previous score
 
@@ -3233,7 +3233,7 @@ void mesh::build_optimized_index_buffer(const subset* subset, std::uint32_t* src
 		} // End if best triangle is not known
 
 		  // Use the best scoring triangle from last pass and reset score keeping
-		triangle_index = (unsigned)best_triangle;
+        triangle_index = static_cast<std::uint32_t>(best_triangle);
 		tri_ptr = &triangle_info_ptr[triangle_index];
 		best_triangle = -1;
 		best_score = 0.0f;
@@ -3241,7 +3241,7 @@ void mesh::build_optimized_index_buffer(const subset* subset, std::uint32_t* src
 		// This triangle can be added to the 'draw' list, and each
 		// of the vertices it references should be updated.
 		tri_ptr->added = true;
-		for (j = 0; j < 3; ++j)
+        for (std::uint32_t j = 0; j < 3; ++j)
 		{
 			// Extract the vertex index and store in the index buffer
 			index = src_buffer_ptr[(triangle_index * 3) + j];
@@ -3305,7 +3305,7 @@ void mesh::build_optimized_index_buffer(const subset* subset, std::uint32_t* src
 				else
 				{
 					// Shuffle EVERYONE up who came before us.
-					memmove(&vertex_cache_ptr[1], &vertex_cache_ptr[0], vert_ptr->cache_position * sizeof(std::uint32_t));
+                    memmove(&vertex_cache_ptr[1], &vertex_cache_ptr[0], static_cast<std::size_t>(vert_ptr->cache_position) * sizeof(std::uint32_t));
 
 					// Insert this vertex at the head
 					vertex_cache_ptr[0] = index;
@@ -3315,13 +3315,13 @@ void mesh::build_optimized_index_buffer(const subset* subset, std::uint32_t* src
 			} // End if already in cache
 
 			  // Update the cache position records for all vertices in the cache
-			for (k = 0; k < vertex_cache_size; ++k)
-				vertex_info_ptr[vertex_cache_ptr[k]].cache_position = k;
+            for (std::uint32_t k = 0; k < vertex_cache_size; ++k)
+                vertex_info_ptr[vertex_cache_ptr[k]].cache_position = static_cast<std::int32_t>(k);
 
 		} // Next Index
 
 		  // Recalculate the of all vertices contained in the cache
-		for (j = 0; j < vertex_cache_size; ++j)
+        for (std::uint32_t j = 0; j < vertex_cache_size; ++j)
 		{
 			vert_ptr = &vertex_info_ptr[vertex_cache_ptr[j]];
 			vert_ptr->vertex_score = find_vertex_optimizer_score(vert_ptr);
@@ -3330,12 +3330,12 @@ void mesh::build_optimized_index_buffer(const subset* subset, std::uint32_t* src
 
 		  // Update the score of the triangles which reference this vertex
 		  // and record the highest scoring.
-		for (j = 0; j < vertex_cache_size; ++j)
+        for (std::uint32_t j = 0; j < vertex_cache_size; ++j)
 		{
 			vert_ptr = &vertex_info_ptr[vertex_cache_ptr[j]];
 
 			// For each triangle referenced
-			for (k = 0; k < vert_ptr->unused_triangle_references; ++k)
+            for (std::uint32_t k = 0; k < vert_ptr->unused_triangle_references; ++k)
 			{
 				triangle_index = vert_ptr->triangle_references[k];
 				tri_ptr = &triangle_info_ptr[triangle_index];
@@ -3348,7 +3348,7 @@ void mesh::build_optimized_index_buffer(const subset* subset, std::uint32_t* src
 				if (score > best_score)
 				{
 					best_score = score;
-					best_triangle = (signed)triangle_index;
+                    best_triangle = static_cast<std::int32_t>(triangle_index);
 
 				} // End if better than previous score
 
@@ -3366,9 +3366,6 @@ void mesh::build_optimized_index_buffer(const subset* subset, std::uint32_t* src
 
 void mesh::draw()
 {
-	// Should we get involved in the rendering process?
-	std::int32_t face_start = 0, face_count = 0, vertex_start = 0, vertex_count = 0;
-
 	for (size_t i = 0; i < _mesh_subsets.size(); ++i)
 	{
 		draw_subset(std::uint32_t(i));
@@ -3384,20 +3381,20 @@ void mesh::draw_subset(std::uint32_t data_group_id)
 		return;
 
 	// Process and draw all subsets of the mesh that use the specified material.
-	std::int32_t subset_vert_start = 0, subset_vert_end = 0;
-	std::int32_t face_start = 0, face_count = 0, vertex_start = 0, vertex_end = 0, vertex_count = 0;
+    std::uint32_t subset_vert_start = 0;
+    std::uint32_t subset_vert_end = 0;
 
 	subset* subset = it->second;
-	face_start = subset->face_start;
-	face_count = subset->face_count;
-	vertex_start = subset->vertex_start;
-	vertex_end = vertex_start + subset->vertex_count - 1;
-
+    std::uint32_t face_start = static_cast<std::uint32_t>(subset->face_start);
+    std::uint32_t face_count = subset->face_count;
+    std::uint32_t vertex_start = static_cast<std::uint32_t>(subset->vertex_start);
+    std::uint32_t vertex_end = vertex_start + subset->vertex_count - 1;
+    std::uint32_t vertex_count = 0;
 	// Vertex start/end is a little more complex, but can be computed
 	// using a containment style test. First precompute some values to
 	// make the tests a little simpler.
-	subset_vert_start = subset->vertex_start;
-	subset_vert_end = subset_vert_start + subset->vertex_count - 1;
+    subset_vert_start = static_cast<std::uint32_t>(subset->vertex_start);
+    subset_vert_end = subset_vert_start + subset->vertex_count - 1;
 
 	// Perform the containment tests
 	if (subset_vert_start < vertex_start) vertex_start = subset_vert_start;
@@ -3410,18 +3407,19 @@ void mesh::draw_subset(std::uint32_t data_group_id)
 
 	// Render any batched data.
 	if (face_count > 0)
-		render_mesh_data((std::uint32_t)face_start, (std::uint32_t)face_count, (std::uint32_t)vertex_start, (std::uint32_t)vertex_count);
+        render_mesh_data(face_start, face_count, vertex_start, vertex_count);
 }
 
 void mesh::draw(std::uint32_t num_faces)
 {
 	// Draw collected data
-	render_mesh_data(0, (std::uint32_t)num_faces, 0, (std::uint32_t)_vertex_count);
+    render_mesh_data(0, num_faces, 0, _vertex_count);
 }
 
 
 void mesh::render_mesh_data(std::uint32_t face_start, std::uint32_t face_count, std::uint32_t vertex_start, std::uint32_t vertex_count)
 {
+    (void)vertex_start;
 	std::uint32_t index_start = face_start * 3;
 	std::uint32_t index_count = face_count * 3;
 	// Hardware or software rendering?
@@ -3558,9 +3556,9 @@ bool mesh::generate_vertex_normals(std::uint32_t* adjacency_ptr, std::vector<std
 	{
 		// Retrieve positions of each referenced vertex.
 		const triangle& tri = _preparation_data.triangle_data[i];
-		const math::vec3 * v1 = (math::vec3*)(src_vertices_ptr + (tri.indices[0] * vertex_stride) + position_offset);
-		const math::vec3 * v2 = (math::vec3*)(src_vertices_ptr + (tri.indices[1] * vertex_stride) + position_offset);
-		const math::vec3 * v3 = (math::vec3*)(src_vertices_ptr + (tri.indices[2] * vertex_stride) + position_offset);
+        const math::vec3 * v1 = reinterpret_cast<const math::vec3*>(src_vertices_ptr + (tri.indices[0] * vertex_stride) + position_offset);
+        const math::vec3 * v2 = reinterpret_cast<const math::vec3*>(src_vertices_ptr + (tri.indices[1] * vertex_stride) + position_offset);
+        const math::vec3 * v3 = reinterpret_cast<const math::vec3*>(src_vertices_ptr + (tri.indices[2] * vertex_stride) + position_offset);
 
 		// Compute the two edge vectors required for generating our normal
 		// We normalize here to prevent problems when the triangles are very small.
@@ -3766,7 +3764,7 @@ bool mesh::generate_vertex_normals(std::uint32_t* adjacency_ptr, std::vector<std
 
 bool mesh::generate_vertex_barycentrics(std::uint32_t* adjacency)
 {
-
+    (void)adjacency;
 	return true;
 }
 
@@ -3971,9 +3969,9 @@ bool mesh::generate_adjacency(std::vector<std::uint32_t>& adjacency)
 				continue;
 
 			// Retrieve positions of each referenced vertex.
-			const math::vec3 * v1 = (math::vec3*)(src_vertices_ptr + (tri.indices[0] * vertex_stride));
-			const math::vec3 * v2 = (math::vec3*)(src_vertices_ptr + (tri.indices[1] * vertex_stride));
-			const math::vec3 * v3 = (math::vec3*)(src_vertices_ptr + (tri.indices[2] * vertex_stride));
+            const math::vec3 * v1 = reinterpret_cast<const math::vec3*>(src_vertices_ptr + (tri.indices[0] * vertex_stride));
+            const math::vec3 * v2 = reinterpret_cast<const math::vec3*>(src_vertices_ptr + (tri.indices[1] * vertex_stride));
+            const math::vec3 * v3 = reinterpret_cast<const math::vec3*>(src_vertices_ptr + (tri.indices[2] * vertex_stride));
 
 			// edge 1
 			edge.vertex1 = v1;
@@ -4006,9 +4004,9 @@ bool mesh::generate_adjacency(std::vector<std::uint32_t>& adjacency)
 				continue;
 
 			// Retrieve positions of each referenced vertex.
-			const math::vec3 * v1 = (math::vec3*)(src_vertices_ptr + (tri.indices[0] * vertex_stride));
-			const math::vec3 * v2 = (math::vec3*)(src_vertices_ptr + (tri.indices[1] * vertex_stride));
-			const math::vec3 * v3 = (math::vec3*)(src_vertices_ptr + (tri.indices[2] * vertex_stride));
+            const math::vec3 * v1 = reinterpret_cast<const math::vec3*>(src_vertices_ptr + (tri.indices[0] * vertex_stride));
+            const math::vec3 * v2 = reinterpret_cast<const math::vec3*>(src_vertices_ptr + (tri.indices[1] * vertex_stride));
+            const math::vec3 * v3 = reinterpret_cast<const math::vec3*>(src_vertices_ptr + (tri.indices[2] * vertex_stride));
 
 			// Note: Notice below that the order of the edge vertices
 			//       is swapped. This is because we want to find the 
@@ -4063,9 +4061,9 @@ bool mesh::generate_adjacency(std::vector<std::uint32_t>& adjacency)
 			adjacent_edge_key edge;
 
 			// Retrieve positions of each referenced vertex.
-			const math::vec3 * v1 = (math::vec3*)(src_vertices_ptr + (src_indices_ptr[0] * vertex_stride));
-			const math::vec3 * v2 = (math::vec3*)(src_vertices_ptr + (src_indices_ptr[1] * vertex_stride));
-			const math::vec3 * v3 = (math::vec3*)(src_vertices_ptr + (src_indices_ptr[2] * vertex_stride));
+            const math::vec3 * v1 = reinterpret_cast<const math::vec3*>(src_vertices_ptr + (src_indices_ptr[0] * vertex_stride));
+            const math::vec3 * v2 = reinterpret_cast<const math::vec3*>(src_vertices_ptr + (src_indices_ptr[1] * vertex_stride));
+            const math::vec3 * v3 = reinterpret_cast<const math::vec3*>(src_vertices_ptr + (src_indices_ptr[2] * vertex_stride));
 
 			// edge 1
 			edge.vertex1 = v1;
@@ -4094,9 +4092,9 @@ bool mesh::generate_adjacency(std::vector<std::uint32_t>& adjacency)
 			adjacent_edge_key edge;
 
 			// Retrieve positions of each referenced vertex.
-			const math::vec3 * v1 = (math::vec3*)(src_vertices_ptr + (src_indices_ptr[0] * vertex_stride));
-			const math::vec3 * v2 = (math::vec3*)(src_vertices_ptr + (src_indices_ptr[1] * vertex_stride));
-			const math::vec3 * v3 = (math::vec3*)(src_vertices_ptr + (src_indices_ptr[2] * vertex_stride));
+            const math::vec3 * v1 = reinterpret_cast<const math::vec3*>(src_vertices_ptr + (src_indices_ptr[0] * vertex_stride));
+            const math::vec3 * v2 = reinterpret_cast<const math::vec3*>(src_vertices_ptr + (src_indices_ptr[1] * vertex_stride));
+            const math::vec3 * v3 = reinterpret_cast<const math::vec3*>(src_vertices_ptr + (src_indices_ptr[2] * vertex_stride));
 
 			// Note: Notice below that the order of the edge vertices
 			//       is swapped. This is because we want to find the 
@@ -4234,7 +4232,7 @@ std::uint32_t mesh::get_face_count() const
 	if (_prepare_status == mesh_status::prepared)
 		return _face_count;
 	else if (_prepare_status == mesh_status::preparing)
-		return (std::uint32_t)_preparation_data.triangle_data.size();
+        return static_cast<std::uint32_t>(_preparation_data.triangle_data.size());
 	else
 		return 0;
 }
@@ -4285,7 +4283,12 @@ const skin_bind_data& mesh::get_skin_bind_data() const
 
 const mesh::bone_palette_array_t& mesh::get_bone_palettes() const
 {
-	return _bone_palettes;
+    return _bone_palettes;
+}
+
+const mesh::armature_node *mesh::get_armature() const
+{
+    return _root.get();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -4303,7 +4306,7 @@ void skin_bind_data::remove_empty_bones()
 	{
 		if (_bones[i].influences.empty())
 		{
-			_bones.erase(_bones.begin() + i);
+            _bones.erase(_bones.begin() + static_cast<int>(i));
 
 		} // End if empty
 		else
@@ -4383,15 +4386,15 @@ void skin_bind_data::build_vertex_table(std::uint32_t vertex_count, const std::v
 				if (vertex == 0xFFFFFFFF) continue;
 				auto& data = table[vertex];
 				// Push influence data.
-				data.influences.push_back((std::int32_t)i);
+                data.influences.push_back(static_cast<std::int32_t>(i));
 				data.weights.push_back(influences[j].weight);
 			} // End if remap
 			else
 			{
 				auto& data = table[influences[j].vertex_index];
 				// Push influence data.
-				data.influences.push_back((std::int32_t)i);
-				data.weights.push_back(influences[j].weight);
+                data.influences.push_back(static_cast<std::int32_t>(i));
+                data.weights.push_back(influences[j].weight);
 			}
 
 		} // Next Influence
@@ -4454,14 +4457,14 @@ bone_palette::bone_palette(std::uint32_t palette_size)
 /// Class copy constructor.
 /// </summary>
 //-----------------------------------------------------------------------------
-bone_palette::bone_palette(const bone_palette & Init)
+bone_palette::bone_palette(const bone_palette & rhs)
 {
-	_bones_lut = Init._bones_lut;
-	_bones = Init._bones;
-	_faces = Init._faces;
-	_data_group_id = Init._data_group_id;
-	_maximum_size = Init._maximum_size;
-	_maximum_blend_index = Init._maximum_blend_index;
+    _bones_lut = rhs._bones_lut;
+    _bones = rhs._bones;
+    _faces = rhs._faces;
+    _data_group_id = rhs._data_group_id;
+    _maximum_size = rhs._maximum_size;
+    _maximum_blend_index = rhs._maximum_blend_index;
 }
 
 //-----------------------------------------------------------------------------
@@ -4485,45 +4488,23 @@ std::vector<math::transform> bone_palette::get_skinning_matrices(const math::tra
 	const std::uint32_t max_blend_transforms = gfx::get_max_blend_transforms();
 	std::vector<math::transform> transforms;
 	transforms.resize(max_blend_transforms);
+
 	// Compute transformation matrix for each bone in the palette
-	if (compute_inverse_transpose)
-	{
-		std::vector<math::transform> inverse_transpospose_transforms;
-		inverse_transpospose_transforms.resize(max_blend_transforms);
+    for (size_t i = 0; i < _bones.size(); ++i)
+    {
+        auto bone = _bones[i];
+        const auto& bone_transform = node_transforms[bone];
+        const auto& bone_data = bind_list[bone];
+        auto& transform = transforms[bone];
+        transform = root_transform * bone_transform * bone_data.bind_pose_transform;
+        if (compute_inverse_transpose)
+        {
+            transform = math::transpose(math::inverse(transform));
+        }
 
-		for (size_t i = 0; i < _bones.size(); ++i)
-		{
-			auto& bone_transform = node_transforms[_bones[i]];
-			const auto& bone_data = bind_list[_bones[i]];
+    } // Next Bone
 
-			transforms[i] = root_transform * bone_transform * bone_data.bind_pose_transform;
-
-			// Compute inverse transpose
-			inverse_transpospose_transforms[i] = transforms[i];
-			inverse_transpospose_transforms[i] = math::inverse(inverse_transpospose_transforms[i]);
-			inverse_transpospose_transforms[i] = math::transpose(inverse_transpospose_transforms[i]);
-
-		} // Next Bone
-
-		return inverse_transpospose_transforms;
-
-	} // End if compute_inverse_transpose
-	else
-	{
-
-		for (size_t i = 0; i < _bones.size(); ++i)
-		{
-			auto& bone_transform = node_transforms[_bones[i]];
-			const auto& bone_data = bind_list[_bones[i]];
-
-			transforms[i] = root_transform * bone_transform * bone_data.bind_pose_transform;
-
-		} // Next Bone
-
-		return transforms;
-
-	} // End if !compute_inverse_transpose
-
+    return transforms;
 }
 
 
@@ -4537,7 +4518,7 @@ void bone_palette::assign_bones(bone_index_map_t& bones, std::vector<std::uint32
 		it_bone2 = _bones_lut.find(it_bone->first);
 		if (it_bone2 == _bones_lut.end())
 		{
-			_bones_lut[it_bone->first] = (std::uint32_t)_bones.size();
+            _bones_lut[it_bone->first] = static_cast<std::uint32_t>(_bones.size());
 			_bones.push_back(it_bone->first);
 
 		} // End if not already added
@@ -4563,7 +4544,7 @@ void bone_palette::assign_bones(const std::vector<std::uint32_t>& bones)
 		it_bone = _bones_lut.find(bones[i]);
 		if (it_bone == _bones_lut.end())
 		{
-			_bones_lut[bones[i]] = (std::uint32_t)_bones.size();
+            _bones_lut[bones[i]] = static_cast<std::uint32_t>(_bones.size());
 			_bones.push_back(bones[i]);
 
 		} // End if not already added
@@ -4575,14 +4556,14 @@ void bone_palette::assign_bones(const std::vector<std::uint32_t>& bones)
 void bone_palette::compute_palette_fit(bone_index_map_t& input, std::int32_t& current_space, std::int32_t& common_bones, std::int32_t& additional_bones)
 {
 	// Reset values
-	current_space = _maximum_size - (std::int32_t)_bones.size();
+    current_space =  static_cast<std::int32_t>(_maximum_size - static_cast<std::uint32_t>(_bones.size()));
 	common_bones = 0;
 	additional_bones = 0;
 
 	// Early out if possible
 	if (_bones.size() == 0)
 	{
-		additional_bones = (int)input.size();
+        additional_bones = static_cast<std::int32_t>(input.size());
 		return;
 
 	} // End if no bones stored
@@ -4621,9 +4602,9 @@ std::uint32_t bone_palette::get_data_group() const
 }
 
 
-void bone_palette::set_data_group(std::uint32_t nGroup)
+void bone_palette::set_data_group(std::uint32_t group)
 {
-	_data_group_id = nGroup;
+    _data_group_id = group;
 }
 
 
@@ -4689,12 +4670,7 @@ bool operator < (const mesh::adjacent_edge_key& key1, const mesh::adjacent_edge_
 
 bool operator < (const mesh::mesh_subset_key& key1, const mesh::mesh_subset_key& key2)
 {
-	std::int32_t difference = (std::int32_t)key1.data_group_id - (std::int32_t)key2.data_group_id;
-	
-	if (difference != 0) return (difference < 0);
-
-	// Exactly equal
-	return false;
+    return key1.data_group_id < key2.data_group_id;
 }
 
 bool operator < (const mesh::weld_key& key1, const mesh::weld_key& key2)
@@ -4703,7 +4679,7 @@ bool operator < (const mesh::weld_key& key1, const mesh::weld_key& key2)
 	gfx::vertexUnpack(pos1, gfx::Attrib::Position, key1.format, key1.vertex);
 	math::vec3 v1(pos1[0], pos1[1], pos1[2]);
 
-	float pos2[4];
+    float pos2[4] = {0};
 	gfx::vertexUnpack(pos1, gfx::Attrib::Position, key2.format, key2.vertex);
 	math::vec3 v2(pos2[0], pos2[1], pos2[2]);
 	float tolerance = key1.tolerance * key2.tolerance;
@@ -4716,17 +4692,17 @@ bool operator < (const mesh::bone_combination_key& key1, const mesh::bone_combin
 	const mesh::face_influences* p1 = key1.influences;
 	const mesh::face_influences* p2 = key2.influences;
 
-	// The bone count must match.
-	int difference = (int)p1->bones.size() - (int)p2->bones.size();
-	if (difference != 0) return (difference < 0);
+    // The bone count must match.
+    if(p1->bones.size() != p2->bones.size())
+        return p1->bones.size() < p2->bones.size();
 
 	// Compare the bone indices in each list
 	auto it_bone1 = p1->bones.begin();
 	auto it_bone2 = p2->bones.begin();
 	for (; it_bone1 != p1->bones.end() && it_bone2 != p2->bones.end(); ++it_bone1, ++it_bone2)
 	{
-		difference = (int)it_bone1->first - (int)it_bone2->first;
-		if (difference != 0) return (difference < 0);
+        if(it_bone1->first != it_bone2->first)
+            return it_bone1->first < it_bone2->first;
 
 	} // Next Bone
 

@@ -2,18 +2,17 @@
 #include "core/common/assert.hpp"
 #include "core/graphics/graphics.h"
 #include <bitset>
-
+#include <limits>
 static std::uint8_t s_index = 0;
 static std::uint8_t s_last_index = 0;
 
 std::uint8_t generate_id()
 {
-    if (s_index == 255)
+    if (s_index == std::numeric_limits<decltype(s_index)>::max())
 	{
 		gfx::frame();
         s_index = 0;
 	}
-    expects(s_index <= 255);
 	// find the first unset bit
     std::uint8_t idx = s_index++;
 

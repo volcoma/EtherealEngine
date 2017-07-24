@@ -1,7 +1,7 @@
 #include "console_dock.h"
 #include "../../console/console_log.h"
 
-void console_dock::render(const ImVec2& area)
+void console_dock::render(const ImVec2&)
 {
 	if (!_console_log)
 		return;

@@ -102,7 +102,7 @@ namespace editor
 		drag_data = {};
 	}
 
-	void editing_system::on_window_frame_render(const render_window& window)
+    void editing_system::on_window_frame_render(const render_window&)
 	{
 		if (gui::IsMouseDragging(gui::drag_button) && drag_data.object)
 		{

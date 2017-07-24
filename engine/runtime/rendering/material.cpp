@@ -7,7 +7,6 @@
 
 material::material()
 {
-	auto& ts = core::get_subsystem<core::task_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
 	auto default_color = am.load<texture>("engine_data:/textures/default_color.dds");
 	_default_color_map = default_color.get();

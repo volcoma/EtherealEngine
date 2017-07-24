@@ -517,10 +517,10 @@ transform_component& transform_component::set_parent(runtime::chandle<transform_
 
 	_parent = parent;
 
-	if (!parent.expired())
+    if (!_parent.expired())
 	{
 		// We're now attached / detached as required.	
-		parent_ptr->attach_child(handle());
+        _parent.lock()->attach_child(handle());
 	}
 
 	if (world_position_stays)

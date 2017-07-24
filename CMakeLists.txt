@@ -20,8 +20,9 @@ list(APPEND SANITIZERS "custom")
 detect_platform()
 print_info()
 set_output_paths()
-set_project_custom_defines()
 
-add_subdirectory_ex(engine)
-add_subdirectory_ex(editor)
 add_subdirectory_ex(3rdparty)
+add_subdirectory_ex(engine)
+
+set_project_custom_defines()
+add_subdirectory_ex(editor)

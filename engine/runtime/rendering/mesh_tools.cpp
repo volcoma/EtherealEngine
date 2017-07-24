@@ -1,4 +1,5 @@
 #include "mesh_tools.h"
+#include "core/math/math_includes.h"
 
 void convert_to_y_up(std::vector<math::vec3>& out_vertices)
 {
@@ -302,7 +303,7 @@ void triangle_mesh_tools::create_dodecahedron(std::vector<math::vec3>& out_verti
 // ------------------------------------------------------------------------------------------------
 static void tessellate_sphere(std::vector<math::vec3>& out_vertices, std::vector<std::uint32_t>& out_indices, const std::vector<math::vec3>& in_vertices, const std::vector<std::uint32_t>& in_indices, bool share_vertices)
 {
-	int base_out_vertex = (int)out_vertices.size();
+    int base_out_vertex = static_cast<int>(out_vertices.size());
 
 	for (size_t i = 0; i < in_indices.size(); i += 3)
 	{
@@ -426,8 +427,8 @@ void triangle_mesh_tools::create_cylinder(
 
 	for (int i = 0; i < tessellation; i++)
 	{
-		s = ::cos(angle);
-		t = ::sin(angle);
+        s = math::cos(angle);
+        t = math::sin(angle);
 		angle += angle_delta;
 
 		vTs.push_back(math::vec3(s * radius_top, t * radius_top, half_height));

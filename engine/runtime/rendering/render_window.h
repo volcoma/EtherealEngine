@@ -100,7 +100,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void frame_update(std::chrono::duration<float> dt) {}
+    virtual void frame_update(std::chrono::duration<float>) {}
 
 	//-----------------------------------------------------------------------------
 	//  Name : frame_render (virtual )
@@ -110,7 +110,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void frame_render(std::chrono::duration<float> dt) {}
+    virtual void frame_render(std::chrono::duration<float>) {}
 
 	//-----------------------------------------------------------------------------
 	//  Name : frame_end (virtual )

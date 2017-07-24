@@ -1,6 +1,5 @@
-
-#ifndef _CFG_PARSER_H_
-#define _CFG_PARSER_H_
+#ifndef CFG_PARSER_H
+#define CFG_PARSER_H
 
 #include <string>
 #include <iostream>

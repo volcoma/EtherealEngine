@@ -1,16 +1,16 @@
 $input a_position, a_normal, a_tangent, a_bitangent, a_texcoord0, a_weight, a_indices
 $output v_wpos, v_pos, v_wnormal, v_wtangent, v_wbitangent, v_texcoord0
 
+#define BGFX_CONFIG_MAX_BONES 128
 #include "common.sh"
 
 void main()
 {
-	
 	//u_model should already be in the right space
-	mat4 model = a_weight.x * u_model[int(a_indices.x)] + 
-	a_weight.y * u_model[int(a_indices.y)] +
-	a_weight.z * u_model[int(a_indices.z)] +
-	a_weight.w * u_model[int(a_indices.w)];
+	mat4 model = 	a_weight.x * u_model[int(a_indices.x)] + 
+					a_weight.y * u_model[int(a_indices.y)] +
+					a_weight.z * u_model[int(a_indices.z)] +
+					a_weight.w * u_model[int(a_indices.w)];
   			
 	vec3 wpos = mul(model, vec4(a_position, 1.0) ).xyz;
 	gl_Position = mul(u_viewProj, vec4(wpos, 1.0) );

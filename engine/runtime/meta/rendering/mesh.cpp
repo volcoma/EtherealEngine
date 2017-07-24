@@ -118,7 +118,8 @@ LOAD_INSTANTIATE(skin_bind_data, cereal::iarchive_binary_t);
 SAVE(mesh::armature_node)
 {
 	try_save(ar, cereal::make_nvp("name", obj.name));
-	try_save(ar, cereal::make_nvp("transform", obj.transform));
+    try_save(ar, cereal::make_nvp("local_transform", obj.local_transform));
+    try_save(ar, cereal::make_nvp("world_transform", obj.world_transform));
 	try_save(ar, cereal::make_nvp("children", obj.children));
 }
 SAVE_INSTANTIATE(mesh::armature_node, cereal::oarchive_binary_t);
@@ -127,7 +128,8 @@ SAVE_INSTANTIATE(mesh::armature_node, cereal::oarchive_binary_t);
 LOAD(mesh::armature_node)
 {
 	try_load(ar, cereal::make_nvp("name", obj.name));
-	try_load(ar, cereal::make_nvp("transform", obj.transform));
+    try_load(ar, cereal::make_nvp("local_transform", obj.local_transform));
+    try_load(ar, cereal::make_nvp("world_transform", obj.world_transform));
 	try_load(ar, cereal::make_nvp("children", obj.children));
 }
 LOAD_INSTANTIATE(mesh::armature_node, cereal::iarchive_binary_t);

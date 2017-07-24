@@ -56,8 +56,8 @@ void renderFunc(ImDrawData *_drawData)
 		gfx::TransientIndexBuffer tib;
 
 		const ImDrawList* drawList = _drawData->CmdLists[ii];
-		std::uint32_t numVertices = (std::uint32_t)drawList->VtxBuffer.size();
-		std::uint32_t numIndices = (std::uint32_t)drawList->IdxBuffer.size();
+        std::uint32_t numVertices = static_cast<std::uint32_t>(drawList->VtxBuffer.size());
+        std::uint32_t numIndices = static_cast<std::uint32_t>(drawList->IdxBuffer.size());
 
         if (!(gfx::getAvailTransientVertexBuffer(numVertices, s_decl) == numVertices)
             || !(gfx::getAvailTransientIndexBuffer(numIndices) == numIndices))
@@ -69,10 +69,10 @@ void renderFunc(ImDrawData *_drawData)
 		gfx::allocTransientVertexBuffer(&tvb, numVertices, s_decl);
 		gfx::allocTransientIndexBuffer(&tib, numIndices);
 
-		ImDrawVert* verts = (ImDrawVert*)tvb.data;
+        ImDrawVert* verts = reinterpret_cast<ImDrawVert*>(tvb.data);
 		std::memcpy(verts, drawList->VtxBuffer.begin(), numVertices * sizeof(ImDrawVert));
 
-		ImDrawIdx* indices = (ImDrawIdx*)tib.data;
+        ImDrawIdx* indices = reinterpret_cast<ImDrawIdx*>(tib.data);
 		std::memcpy(indices, drawList->IdxBuffer.begin(), numIndices * sizeof(ImDrawIdx));
 
 		std::uint32_t offset = 0;
@@ -98,7 +98,7 @@ void renderFunc(ImDrawData *_drawData)
 
 				if (nullptr != cmd->TextureId)
 				{
-					tex = (texture*)cmd->TextureId;
+                    tex = reinterpret_cast<texture*>(cmd->TextureId);
 				}
 
 				const std::uint16_t xx = std::uint16_t(std::max(cmd->ClipRect.x, 0.0f));
@@ -197,8 +197,8 @@ bool gui_system::initialize()
 	io.KeyMap[ImGuiKey_Z] = mml::keyboard::Z;
 
 	std::uint8_t* data = nullptr;
-	std::int32_t width = 0;
-	std::int32_t height = 0;
+    int width = 0;
+    int height = 0;
 
 	ImFontConfig config;
 	config.FontDataOwnedByAtlas = false;
@@ -222,7 +222,7 @@ bool gui_system::initialize()
 		, 1
 		, gfx::TextureFormat::BGRA8
 		, 0
-		, gfx::copy(data, width*height * 4)
+        , gfx::copy(data, static_cast<std::uint32_t>(width*height * 4))
 		);
 
 	// Store our identifier

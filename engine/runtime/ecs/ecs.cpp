@@ -111,12 +111,11 @@ namespace runtime
 
 	void entity_component_system::dispose()
 	{
-		for (entity entity : all_entities()) entity.destroy();
-		for (component_storage *pool : component_pools_)
-		{
-			if (pool)
-				delete pool;
-		}
+        for (entity entity : all_entities())
+        {
+            entity.destroy();
+        }
+
 		component_pools_.clear();
 		entity_component_mask_.clear();
 		entity_version_.clear();
@@ -135,7 +134,7 @@ namespace runtime
 		const std::uint32_t index = id.index();
 
 		// Find the pool for this component family.
-		component_storage *pool = component_pools_[family];
+        auto& pool = component_pools_[family];
 		chandle<component> handle(pool->get(id.index()));
 		on_component_removed(get(id), handle);
 		// Remove component bit.
@@ -156,7 +155,7 @@ namespace runtime
 		// We don't bother checking the component mask, as we return a nullptr anyway.
 		if (family >= component_pools_.size())
 			return false;
-		component_storage *pool = component_pools_[family];
+        auto& pool = component_pools_[family];
 		if (!pool || !entity_component_mask_[id.index()][family])
 			return false;
 		return true;
@@ -170,7 +169,7 @@ namespace runtime
 		{
 			if (mask.test(i))
 			{
-				auto pool = component_pools_[i];
+                auto& pool = component_pools_[i];
 				if (pool)
 					components.push_back(chandle<component>(pool->get(id.index())));
 			}
@@ -186,7 +185,7 @@ namespace runtime
 		{
 			if (mask.test(i))
 			{
-				auto pool = component_pools_[i];
+                auto& pool = component_pools_[i];
 				if (pool)
 					components.push_back(pool->get(id.index()));
 			}
@@ -201,9 +200,9 @@ namespace runtime
 		//assert(!entity_component_mask_[id.index()].test(family));
 
 		// Placement new into the component pool.
-		component_storage *pool = accomodate_component(family);
+        auto& pool = accomodate_component(family);
 
-		auto ptr = pool->set(id.index(), comp);
+        auto ptr = pool.set(id.index(), comp);
 		// Set the bit for this component.
 		entity_component_mask_[id.index()].set(family);
 
@@ -225,7 +224,7 @@ namespace runtime
 		{
 			if (mask.test(i))
 			{
-				auto pool = component_pools_[i];
+                auto& pool = component_pools_[i];
 				if (pool)
 				{
 					auto handle = pool->get(index);
@@ -258,8 +257,10 @@ namespace runtime
 		}
 		clone.set_name(original.get_name());
 		return clone;
-	}
+    }
 
-	// 	EntityCreatedEvent::~EntityCreatedEvent() {}
+    component::~component() {}
+
+    // 	EntityCreatedEvent::~EntityCreatedEvent() {}
 	// 	EntityDestroyedEvent::~EntityDestroyedEvent() }
 }

@@ -1,6 +1,5 @@
-
-#ifndef _CFG_CONFIG_H_
-#define _CFG_CONFIG_H_
+#ifndef CFG_CONFIG_H
+#define CFG_CONFIG_H
 
 #include <string>
 #include <map>

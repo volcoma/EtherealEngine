@@ -70,7 +70,7 @@ public:
 	/// 
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void on_gui(std::chrono::duration<float> dt) {}
+    virtual void on_gui(std::chrono::duration<float>) {}
 
 	//-----------------------------------------------------------------------------
 	//  Name : render_dockspace (virtual )

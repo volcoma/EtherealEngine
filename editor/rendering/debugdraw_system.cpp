@@ -20,7 +20,7 @@
 
 namespace editor
 {
-	void debugdraw_system::frame_render(std::chrono::duration<float> dt)
+    void debugdraw_system::frame_render(std::chrono::duration<float>)
 	{
 		auto& es = core::get_subsystem<editing_system>();
 		auto& editor_camera = es.camera;
@@ -44,50 +44,61 @@ namespace editor
 		pass.set_view_proj(view, proj);
 		ddRAII dd(pass.id);
 
-		auto draw_grid = [](std::uint32_t grid_color, float height, float height_intervals, std::uint32_t grid_size, std::uint32_t size_intervals, std::uint32_t iteration, std::uint32_t max_iterations)
-		{
-	
-			bool should_render = true;
-			if (iteration + 1 != max_iterations)
-			{
-				const auto iterationHeight = height_intervals * float(iteration + 1);
-				const float factor = math::clamp(height, 0.0f, iterationHeight) / iterationHeight;
-				std::uint32_t r = (grid_color) & 0xff;
-				std::uint32_t g = (grid_color >> 8) & 0xff;
-				std::uint32_t b = (grid_color >> 16) & 0xff;
-				std::uint32_t a = (grid_color >> 24) & 0xff;
-				a = static_cast<std::uint32_t>(math::lerp(255.0f, 0.0f, factor));
-				if (a < 10)
-					should_render = false;
+        if (es.show_grid)
+        {
+            auto draw_grid = [](
+                    std::uint32_t grid_color,
+                    float height,
+                    float height_intervals,
+                    std::uint32_t size_intervals,
+                    std::uint32_t iteration,
+                    std::uint32_t max_iterations)
+            {
 
-				grid_color = r + (g << 8) + (b << 16) + (a << 24);
-			}
+                bool should_render = true;
+                if (iteration + 1 != max_iterations)
+                {
+                    const auto iterationHeight = height_intervals * float(iteration + 1);
+                    const float factor = math::clamp(height, 0.0f, iterationHeight) / iterationHeight;
+                    std::uint32_t r = (grid_color) & 0xff;
+                    std::uint32_t g = (grid_color >> 8) & 0xff;
+                    std::uint32_t b = (grid_color >> 16) & 0xff;
+                    std::uint32_t a = (grid_color >> 24) & 0xff;
+                    a = static_cast<std::uint32_t>(math::lerp(255.0f, 0.0f, factor));
+                    if (a < 10)
+                        should_render = false;
+
+                    grid_color = r + (g << 8) + (b << 16) + (a << 24);
+                }
 
 
-			if (should_render)
-			{
-				auto step = (size_intervals * iteration);
-				step = step ? step : 1;
-				ddPush();
-				ddSetState(true, false, true);
-				ddSetColor(grid_color);
-				math::vec3 center = { 0.0f, 0.0f, 0.0f };
-				math::vec3 normal = { 0.0f, 1.0f, 0.0f };
-				ddDrawGrid(&normal, &center, grid_size / step, float(step));
-				ddPop();
-			}
+                if (should_render)
+                {
+                    const auto step = static_cast<std::uint32_t>(math::pow<int>(
+                                      static_cast<int>(size_intervals),
+                                      static_cast<int>(iteration)));
+                    const auto grid_size = static_cast<std::uint32_t>(math::pow(size_intervals, max_iterations));
+                    const auto sz = grid_size / step;
 
-		};
+                    ddPush();
+                    ddSetState(true, false, true);
+                    ddSetColor(grid_color);
+                    math::vec3 center = { 0.0f, 0.0f, 0.0f };
+                    math::vec3 normal = { 0.0f, 1.0f, 0.0f };
 
-		if (es.show_grid)
-		{
-			static const auto far_clip = 200;
-			static const auto height = 40.0f;
-			static const auto divison = 10;
-			const auto iterations = math::power_of_n_round_down(far_clip, divison);
+                    ddDrawGrid(&normal, &center, sz, float(step));
+                    ddPop();
+                }
+
+            };
+
+            static const auto divison = 5;
+            static const auto iterations = 3;
+            static const auto height = 40.0f;
+
 			for (std::uint32_t i = 0; i < iterations; ++i)
 			{
-				draw_grid(0xff808080, math::abs(camera_posiiton.y), height, far_clip, divison, i, iterations);
+                draw_grid(0xff808080, math::abs(camera_posiiton.y), height, divison, i, iterations);
 			}
 		}
 
@@ -188,7 +199,7 @@ namespace editor
             else if (light.type == light_type::directional)
 			{
 				ddPush();
-				ddSetLod(UINT8_MAX);
+                ddSetLod(255);
 				ddSetColor(0xff00ff00);
 				ddSetWireframe(true);
 				math::vec3 from1 = transform_comp_ptr->get_position();
@@ -253,30 +264,30 @@ namespace editor
 			// Test the bounding box of the mesh
 			if (math::frustum::test_obb(frustum, bounds, world_transform))
 			{
-				if(false)//if (es->wireframe_selection)
-				{
-					const float u_params[8] =
-					{
-						1.0f, 1.0f, 0.0f, 0.7f, //r,g,b,a
-						1.0f, 0.0f, 0.0f, 0.0f  //thickness, unused, unused, unused
-					};
-					if (!_program)
-						return;
-
-					model.render(
-						pass.id,
-						world_transform,
-						false,
-						false,
-						false,
-						BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA),
-						0,
-						_program.get(), [&u_params](program& p)
-					{
-						p.set_uniform("u_params", &u_params, 2);
-					});
-				}
-				else
+                //if(es->wireframe_selection)
+                //{
+                //	const float u_params[8] =
+                //	{
+                //		1.0f, 1.0f, 0.0f, 0.7f, //r,g,b,a
+                //		1.0f, 0.0f, 0.0f, 0.0f  //thickness, unused, unused, unused
+                //	};
+                //	if (!_program)
+                //		return;
+                //
+                //	model.render(
+                //		pass.id,
+                //		world_transform,
+                //		false,
+                //		false,
+                //		false,
+                //		BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA),
+                //		0,
+                //		_program.get(), [&u_params](program& p)
+                //	{
+                //		p.set_uniform("u_params", &u_params, 2);
+                //	});
+                //}
+                //else
 				{
 					ddPush();
 					ddSetColor(0xff00ff00);

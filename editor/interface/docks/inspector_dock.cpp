@@ -2,7 +2,7 @@
 #include "../../editing/editing_system.h"
 #include "../inspectors/inspectors.h"
 
-void inspector_dock::render(const ImVec2& area)
+void inspector_dock::render(const ImVec2&)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 

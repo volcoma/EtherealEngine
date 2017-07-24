@@ -151,7 +151,7 @@ bool inspect_array(rttr::variant& var, bool read_only)
 bool inspect_associative_container(rttr::variant& var, bool read_only)
 {
     auto associative_view = var.create_associative_view();
-    auto size = associative_view.get_size();
+    //auto size = associative_view.get_size();
     bool changed = false;
 
     return changed;

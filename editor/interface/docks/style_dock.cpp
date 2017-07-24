@@ -10,7 +10,7 @@ style_dock::style_dock(const std::string& dtitle, bool dcloseButton, ImVec2 dmin
 }
 
 
-void style_dock::render(const ImVec2& area)
+void style_dock::render(const ImVec2&)
 {
 	auto& style = gui::get_gui_style();
 	auto& setup = style.setup;

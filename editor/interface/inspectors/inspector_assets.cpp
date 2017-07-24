@@ -48,6 +48,13 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool readOnly, 
 	
 	if (selected && !selected.is_type<asset_handle<texture>>())
 	{
+        gui::SameLine();
+        if(gui::Button("REMOVE"))
+        {
+            data = asset_handle<texture>();
+            var = data;
+            return true;
+        }
 		std::string item = !data.id().empty() ? data.id() : "none";
 		rttr::variant var_str = item;
 		if (inspect_var(var_str))

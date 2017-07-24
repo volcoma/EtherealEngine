@@ -76,7 +76,7 @@ namespace core
 		/// Set maximum frames per second. The engine will sleep if fps is higher than this.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void set_max_fps(unsigned);
+        void set_max_fps(unsigned int);
 	
 		//-----------------------------------------------------------------------------
 		//  Name : set_max_inactive_fps ()
@@ -84,7 +84,7 @@ namespace core
 		/// Set maximum frames per second when the application does not have input focus.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void set_max_inactive_fps(unsigned);
+        void set_max_inactive_fps(unsigned int);
 		
 		//-----------------------------------------------------------------------------
 		//  Name : set_time_smoothing_step ()
@@ -92,7 +92,7 @@ namespace core
 		/// Set how many frames to average for timestep smoothing.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void set_time_smoothing_step(unsigned);
+        void set_time_smoothing_step(unsigned int);
 
 		//-----------------------------------------------------------------------------
 		//  Name : get_time_since_launch ()

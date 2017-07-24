@@ -6,8 +6,7 @@ namespace runtime
 {
 	struct app
 	{
-		app();
-
+        virtual ~app() = default;
 		//-----------------------------------------------------------------------------
 		//  Name : setup (virtual )
 		/// <summary>

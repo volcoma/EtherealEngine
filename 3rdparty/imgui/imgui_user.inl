@@ -152,8 +152,8 @@ namespace ImGui
 
 		ImVec2 rectMin = GetItemRectMin();
 		ImVec2 rectMax = GetItemRectMax();
-		ImVec2 rectSize = GetItemRectSize();
-		const float textHeight = GetTextLineHeight();
+        //ImVec2 rectSize = GetItemRectSize();
+        //const float textHeight = GetTextLineHeight();
 		
 		if (selected)
 		{
@@ -324,7 +324,7 @@ namespace ImGui
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, frame_padding);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
-		float padding = frame_padding.y * 2;
+        //float padding = frame_padding.y * 2;
 		ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
 			ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings;
 		ImGui::SetNextWindowSize(size);

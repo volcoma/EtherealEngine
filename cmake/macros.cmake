@@ -25,10 +25,7 @@ macro(detect_platform)
 	if(MSVC)
 		add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
 		add_definitions(-D_SCL_SECURE_NO_WARNINGS=1)
-	endif()
-
-	if(MSVC)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /bigobj")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /bigobj /W3")
 	endif()
 endmacro()
 
@@ -46,5 +43,5 @@ macro(set_output_paths)
 endmacro()
 
 macro(set_project_custom_defines)
-	add_definitions(-DENGINE_DIRECTORY="${PROJECT_SOURCE_DIR}")
+	add_definitions(-DENGINE_DIRECTORY="${PROJECT_SOURCE_DIR}" -DSHADER_INCLUDE_DIRECTORY="${BGFX_DIR}/src")
 endmacro()

@@ -9,7 +9,7 @@
 #include "runtime/ecs/scene.h"
 #include "runtime/ecs/utils.h"
 #include "runtime/input/input.h"
-#include "core/subsystem/tasks.hpp"
+#include "core/subsystem/tasksystem.h"
 #include "core/filesystem/filesystem.h"
 #include "core/filesystem/filesystem_watcher.hpp"
 #include "../../editing/editing_system.h"
@@ -17,7 +17,7 @@
 #include "filedialog/filedialog.h"
 
 template<typename T>
-asset_handle<texture> get_asset_icon(T asset)
+asset_handle<texture> get_asset_icon(T)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	return es.icons["folder"];
@@ -29,27 +29,27 @@ asset_handle<texture> get_asset_icon(asset_handle<texture> asset)
 	return asset;
 }
 template<>
-asset_handle<texture> get_asset_icon(asset_handle<prefab> asset)
+asset_handle<texture> get_asset_icon(asset_handle<prefab>)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	return es.icons["prefab"];
 }
 
 template<>
-asset_handle<texture> get_asset_icon(asset_handle<scene> asset)
+asset_handle<texture> get_asset_icon(asset_handle<scene>)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	return es.icons["scene"];
 }
 
 template<>
-asset_handle<texture> get_asset_icon(asset_handle<mesh> asset)
+asset_handle<texture> get_asset_icon(asset_handle<mesh>)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	return es.icons["mesh"];
 }
 template<>
-asset_handle<texture> get_asset_icon(asset_handle<material> asset)
+asset_handle<texture> get_asset_icon(asset_handle<material>)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	return es.icons["material"];
@@ -62,7 +62,7 @@ asset_handle<texture> get_loading_icon()
 }
 
 template<>
-asset_handle<texture> get_asset_icon(asset_handle<shader> asset)
+asset_handle<texture> get_asset_icon(asset_handle<shader>)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	return es.icons["shader"];
@@ -191,14 +191,12 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 	
 	auto& es = core::get_subsystem<editor::editing_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
-	auto& input = core::get_subsystem<runtime::input>();
 	{
 		std::unique_lock<std::mutex> lock(dir->directories_mutex);
 		for (auto& entry : dir->directories)
 		{
 			using entry_t = std::shared_ptr<editor::asset_directory>;
 			const auto& name = entry->name;
-			const auto& relative = entry->relative;
 			const auto& absolute = entry->absolute;
 			auto& selected = es.selection_data.object;
 			bool is_selected = selected.is_type<entry_t>() ? (selected.get_value<entry_t>() == entry) : false;
@@ -256,7 +254,6 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 					}
                     const auto& name = file.name;
                     const auto& relative = file.relative;
-                    const auto& absolute = file.absolute;
                     auto& selected = es.selection_data.object;
                     bool is_selected = selected.is_type<entry_t>() ? (selected.get_value<entry_t>() == entry) : false;
                     bool is_dragging = !!es.drag_data.object;
@@ -307,7 +304,6 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 					}
 					const auto& name = file.name;
 					const auto& relative = file.relative;
-					const auto& absolute = file.absolute;
 					auto& selected = es.selection_data.object;
 					bool is_selected = selected.is_type<entry_t>() ? (selected.get_value<entry_t>() == entry) : false;
 					bool is_dragging = !!es.drag_data.object;
@@ -354,7 +350,6 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 				}
 				const auto& name = file.name;
                 const auto& relative = file.relative;
-                const auto& absolute = file.absolute;
                 auto& selected = es.selection_data.object;
                 bool is_selected = selected.is_type<entry_t>() ? (selected.get_value<entry_t>() == entry) : false;
                 bool is_dragging = !!es.drag_data.object;
@@ -400,7 +395,6 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 				}
 				const auto& name = file.name;
                 const auto& relative = file.relative;
-                const auto& absolute = file.absolute;
                 auto& selected = es.selection_data.object;
                 bool is_selected = selected.is_type<entry_t>() ? (selected.get_value<entry_t>() == entry) : false;
                 bool is_dragging = !!es.drag_data.object;
@@ -446,7 +440,6 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 				}
 				const auto& name = file.name;
                 const auto& relative = file.relative;
-                const auto& absolute = file.absolute;
                 auto& selected = es.selection_data.object;
                 bool is_selected = selected.is_type<entry_t>() ? (selected.get_value<entry_t>() == entry) : false;
                 bool is_dragging = !!es.drag_data.object;
@@ -492,7 +485,6 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 				}
 				const auto& name = file.name;
                 const auto& relative = file.relative;
-                const auto& absolute = file.absolute;
                 auto& selected = es.selection_data.object;
                 bool is_selected = selected.is_type<entry_t>() ? (selected.get_value<entry_t>() == entry) : false;
                 bool is_dragging = !!es.drag_data.object;
@@ -594,7 +586,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 
 }
 
-void assets_dock::render(const ImVec2& area)
+void assets_dock::render(const ImVec2&)
 {
 	auto& project = core::get_subsystem<editor::project_manager>();
 

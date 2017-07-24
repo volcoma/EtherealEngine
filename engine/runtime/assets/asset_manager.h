@@ -6,7 +6,7 @@
 #include "core/common/nonstd/type_traits.hpp"
 #include "core/common/string.h"
 
-#include "core/subsystem/tasks.hpp"
+#include "core/subsystem/tasksystem.h"
 #include "core/filesystem/filesystem.h"
 #include "asset_flags.h"
 #include "asset_extensions.h"
@@ -380,6 +380,7 @@ namespace runtime
 			F&& load_func
 		)
 		{
+
 			std::lock_guard<std::recursive_mutex> lock(container_mutex);
 			auto it = container.find(key);
 			if (it != std::end(container))

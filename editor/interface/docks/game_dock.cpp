@@ -5,7 +5,7 @@
 #include "runtime/rendering/render_pass.h"
 #include "runtime/rendering/camera.h"
 
-void game_dock::render(const ImVec2& area)
+void game_dock::render(const ImVec2&)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	auto& editor_camera = es.camera;

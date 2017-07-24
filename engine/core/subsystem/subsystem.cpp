@@ -54,5 +54,20 @@ namespace core
 			status() = internal_status::running;
 			return true;
 		}
-	}
+    }
+
+    subsystem::~subsystem()
+    {
+
+    }
+
+    bool subsystem::initialize()
+    {
+        return true;
+    }
+
+    void subsystem::dispose()
+    {
+
+    }
 }

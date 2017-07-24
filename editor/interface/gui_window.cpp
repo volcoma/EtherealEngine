@@ -53,7 +53,7 @@ void handle_sfml_event(mml::platform_event event)
 	if (event.type == mml::platform_event::text_entered)
 	{
 		if (event.text.unicode > 0 && event.text.unicode < 0x10000)
-			io.AddInputCharacter(event.text.unicode);
+            io.AddInputCharacter(static_cast<ImWchar>(event.text.unicode));
 	}
 }
 
@@ -97,8 +97,8 @@ void imgui_frame_update(render_window& window, std::chrono::duration<float> dt, 
 	irect rect;
 	rect.left = window_pos[0];
 	rect.top = window_pos[1];
-	rect.right = window_size[0];
-	rect.bottom = window_size[1];
+    rect.right = static_cast<std::int32_t>(window_size[0]);
+    rect.bottom = static_cast<std::int32_t>(window_size[1]);
 	auto mouse_pos = mml::mouse::get_position(window);
 
 	if (window.has_focus() && rect.contains({ mouse_pos[0], mouse_pos[1] }))

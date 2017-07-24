@@ -20,11 +20,10 @@
 
 namespace editor
 {
-	void picking_system::frame_render(std::chrono::duration<float> dt)
+    void picking_system::frame_render(std::chrono::duration<float>)
 	{
 		auto& es = core::get_subsystem<editing_system>();
 		auto& input = core::get_subsystem<runtime::input>();
-		auto& engine = core::get_subsystem<runtime::engine>();
 		auto& renderer = core::get_subsystem<runtime::renderer>();
 		auto& ecs = core::get_subsystem<runtime::entity_component_system>();
 
@@ -42,8 +41,6 @@ namespace editor
 		auto& camera = camera_comp_ptr->get_camera();
 		auto near_clip = camera.get_near_clip();
 		auto far_clip = camera.get_far_clip();
-		auto view_proj = camera.get_view_projection();
-		auto inv_view_proj = math::inverse(view_proj);
 		const auto& mouse_pos = input.get_current_cursor_position();
 		const auto& frustum = camera.get_frustum();
 		math::vec2 cursor_pos = math::vec2{ mouse_pos.x, mouse_pos.y };
@@ -162,7 +159,7 @@ namespace editor
 					continue;
 				}
 
-				std::uint32_t hash_key = rr + (gg << 8) + (bb << 16);
+                std::uint32_t hash_key = static_cast<std::uint32_t>(rr + (gg << 8) + (bb << 16));
 				std::uint32_t amount = 1;
 				auto mapIter = ids.find(hash_key);
 				if (mapIter != ids.end())

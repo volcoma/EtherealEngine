@@ -1,5 +1,5 @@
-#ifndef _BINDER_HPP_
-#define _BINDER_HPP_
+#ifndef BINDER_HPP
+#define BINDER_HPP
 
 #include <memory>
 #include <string>

@@ -1,5 +1,5 @@
-#ifndef AWAITABLE_TASK_HPP
-#define AWAITABLE_TASK_HPP
+#ifndef TASK_SYSTEM_H
+#define TASK_SYSTEM_H
 
 #include <algorithm>
 #include <atomic>
@@ -413,11 +413,11 @@ namespace core
 
 		struct task_concept
 		{
-			virtual ~task_concept() noexcept {}
+            virtual ~task_concept() noexcept;
 			virtual void invoke_() = 0;
 			virtual bool ready_() const noexcept = 0;
 
-			std::uint64_t id = get_next_id();
+            const std::uint64_t id = get_next_id();
 		};
 
 		template <class> struct ready_task_model;
@@ -594,136 +594,23 @@ namespace core
 		{
 			std::deque<awaitable_task> tasks_;
 			std::condition_variable cv_;
-			std::mutex mutex_;
+            std::mutex mutex_;
 			std::atomic_bool done_{ false };
 
 			/* rotates the first element of the list onto the end */
-			void rotate_()
-			{
-				/* zero or one element list -- trivial to rotate */
-				if (tasks_.empty())
-					return;
-
-				std::rotate(tasks_.begin(), tasks_.begin() + 1, tasks_.end());
-			}
+            void rotate_();
 
 		public:
-			task_queue()
-				: tasks_{}
-			{}
-
+            task_queue();
 			task_queue(task_queue const &) = delete;
+            task_queue(task_queue && other) noexcept;
 
-			task_queue(task_queue && other) noexcept
-				: tasks_(std::move(other).tasks_)
-				, done_(other.done_.load())
-			{}
-
-			bool is_empty()
-			{
-				std::unique_lock <std::mutex> lock(mutex_);
-				return tasks_.empty();
-			}
-
-			void set_done()
-			{
-				done_.store(true);
-				cv_.notify_all();
-			}
-
-			std::pair <bool, awaitable_task> try_pop()
-			{
-				std::unique_lock <std::mutex>lock(mutex_, std::try_to_lock);
-
-				if (!lock || tasks_.empty())
-				{
-					return std::make_pair(false, awaitable_task{});
-				}
-				else if(tasks_.front().ready())
-				{
-					auto t = std::move(tasks_.front());
-					tasks_.pop_front();
-					return std::make_pair(true, std::move(t));
-				}
-
-				rotate_();
-				return std::make_pair(false, awaitable_task{});
-			}
-
-			bool try_push(awaitable_task & t)
-			{
-				{
-					std::unique_lock <std::mutex> lock(mutex_, std::try_to_lock);
-					if (!lock)
-						return false;
-
-					tasks_.emplace_back(std::move(t));
-				}
-
-				cv_.notify_one();
-				return true;
-			}
-
-			std::pair <bool, awaitable_task> pop(bool wait = true)
-			{
-				std::unique_lock <std::mutex> lock(mutex_);
-
-				if (wait)
-				{
-					while (tasks_.empty() && !done_)
-					{
-						cv_.wait(lock);
-					}
-				}
-
-				if (tasks_.empty())
-					return std::make_pair(false, awaitable_task{});
-
-				auto sz = tasks_.size();
-				for (decltype(sz) i = 0; i < sz; ++i)
-				{
-					if (tasks_.front().ready())
-					{
-						auto t = std::move(tasks_.front());
-						tasks_.pop_front();
-						return std::make_pair(true, std::move(t));
-					}
-					else
-					{
-						rotate_();
-					}
-				}
-				
-				/*
-				 * If we get to this point the best we can do is pop from the
-				 * front of the task list, release the lock, and wait for the
-				 * task to be ready.
-				 */
-				if (wait)
-				{
-					auto t = std::move(tasks_.front());
-					tasks_.pop_front();
-					lock.unlock();
-
-					while (!t.ready())
-						std::this_thread::yield();
-
-					return std::make_pair(true, std::move(t));
-				}
-				else
-				{
-					return std::make_pair(false, awaitable_task{});
-				}
-			}
-
-			void push(awaitable_task t)
-			{
-				{
-					std::unique_lock <std::mutex> lock(mutex_);
-					tasks_.emplace_back(std::move(t));
-				}
-				cv_.notify_one();
-			}
+            bool is_empty();
+            void set_done();
+            std::pair <bool, awaitable_task> try_pop();
+            bool try_push(awaitable_task& t);
+            std::pair <bool, awaitable_task> pop(bool wait = true);
+            void push(awaitable_task t);
 		};
 
 		std::vector <task_queue> queues_;
@@ -733,66 +620,17 @@ namespace core
 		std::size_t nthreads_;
 		std::atomic<std::size_t> current_index_{ 1 };
 
-		void run(std::size_t idx)
-		{
-			while (true)
-			{
-				std::pair <bool, awaitable_task> p = { false, awaitable_task() };
+        void run(std::size_t idx);
 
-				for (std::size_t k = 0; k < 10 * nthreads_; ++k)
-				{
-					const auto queue_index = get_thread_queue_idx(idx, k);
-					p = queues_[queue_index].try_pop();
-					if (p.first)
-						break;
-				}
+        std::size_t get_thread_queue_idx(std::size_t idx, std::size_t seed = 0);
 
-				if (!p.first)
-				{
-					p = queues_[idx].pop();
-					if (!p.first)
-						return;
-				}
-
-				if(p.first)
-					p.second();
-			}
-		}
-
-		std::size_t get_thread_queue_idx(std::size_t idx, std::size_t seed = 0)
-		{
-			return ((idx + seed) % nthreads_) + 1;
-		}
-
-		std::size_t get_main_thread_queue_idx()
-		{
-			return 0;
-		}
+        std::size_t get_main_thread_queue_idx();
 
 	public:
-		task_system()
-			: task_system(std::thread::hardware_concurrency())
-		{}
+        task_system();
 
-		task_system(std::size_t nthreads,
-			Allocator const & alloc = Allocator())
-			: queues_{}
-			, threads_{}
-			, alloc_(alloc)
-			, nthreads_{ nthreads }
-		{
-			// +1 for the main thread's queue
-			queues_.reserve(nthreads + 1);
-			queues_.emplace_back();
-			for (std::size_t th = 1; th < nthreads + 1; ++th)
-				queues_.emplace_back();
-
-			threads_.reserve(nthreads);
-			for (std::size_t th = 1; th < nthreads + 1; ++th)
-				threads_.emplace_back(
-					&task_system::run, this, th
-				);
-		}
+        task_system(std::size_t nthreads,
+            Allocator const & alloc = Allocator());
 
 		//-----------------------------------------------------------------------------
 		//  Name : ~task_system ()
@@ -800,15 +638,7 @@ namespace core
 		/// Notifies threads to finish and joins them.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		~task_system()
-		{
-			dispose();
-			for (auto & th : threads_)
-			{
-				if (th.joinable())
-					th.join();
-			}
-		}
+        ~task_system();
 
 		//-----------------------------------------------------------------------------
 		//  Name : initialize ()
@@ -818,10 +648,7 @@ namespace core
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		bool initialize() override
-		{
-			return true;
-		}
+        inline bool initialize() override { return true; }
 
 		//-----------------------------------------------------------------------------
 		//  Name : dispose ()
@@ -829,11 +656,7 @@ namespace core
 		/// Notify queues on threads to finish.
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void dispose() override
-		{
-			for (auto & q : queues_)
-				q.set_done();
-		}
+        void dispose() override;
 
 
 		//-----------------------------------------------------------------------------
@@ -962,7 +785,7 @@ namespace core
 				const auto queue_index = get_main_thread_queue_idx();
 				for (std::size_t k = 0; k < 10 * nthreads_; ++k)
 				{
-					if (queues_[queue_index].try_push(t.first))
+                    if (queues_[queue_index].try_push(t.first))
 						return std::move(t.second);
 				}
 
@@ -1008,7 +831,7 @@ namespace core
 				const auto queue_index = get_main_thread_queue_idx();
 				for (std::size_t k = 0; k < 10; ++k)
 				{
-					if (queues_[queue_index].try_push(t.first))
+                    if (queues_[queue_index].try_push(t.first))
 						return std::move(t.second);
 				}
 
@@ -1023,19 +846,7 @@ namespace core
 		/// Process main thread tasks
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		void run_on_main()
-		{
-			std::pair <bool, awaitable_task> p = { false, awaitable_task() };
-
-			const auto queue_index = get_main_thread_queue_idx();
-
-			p = queues_[queue_index].pop(false);
-			if (!p.first)
-				return;
-
-			if (p.first)
-				p.second();
-		}
+        void run_on_main();
 
 		static constexpr std::size_t invalid_index = 77777;
 
@@ -1088,13 +899,15 @@ namespace core
 			return true;
 		}
 		
-	};
+    };
 
-	template<typename T>
-	void task_future<T>::wait() const
-	{
-		if (!is_ready())
-		{
+    void dispose();
+
+    template<typename T>
+    void task_future<T>::wait() const
+    {
+        if (!is_ready())
+        {
 			if (_system)
 			{
 				if (!_system->processing_wait(*this))
@@ -1113,4 +926,4 @@ namespace core
 	}
 }   // namespace core
 
-#endif  // #ifndef AWAITABLE_TASK_HPP
+#endif  // #ifndef TASK_SYSTEM_H

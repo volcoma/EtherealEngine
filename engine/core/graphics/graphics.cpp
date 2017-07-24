@@ -371,7 +371,7 @@ namespace gfx
 
 	std::uint64_t clip_quad(float depth, float width, float height)
 	{
-		float texture_half = get_half_texel();
+        //float texture_half = get_half_texel();
 		bool origin_bottom_left = is_origin_bottom_left();
 
 		if (4 == getAvailTransientVertexBuffer(4, pos_texcoord0_vertex::decl))

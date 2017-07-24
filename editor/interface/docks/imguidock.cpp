@@ -70,7 +70,7 @@ namespace imguidock
 			current_container->splits[0]->active_dock = active ? ddock : current_container->splits[0]->active_dock ? current_container->splits[0]->active_dock : ddock;
 			current_container->splits[0]->docks.push_back(ddock);
 			current_container->splits[0]->parent = current_container;
-			current_container->splits[0]->size = size < 0 ? size * -1 : size;
+            current_container->splits[0]->size = size < 0 ? size * -1.0f : size;
 			ddock->container = current_container->splits[0];
 			ddock->container->parent = current_container;
 		}
@@ -78,19 +78,19 @@ namespace imguidock
 		{
 			current_container->splits[1] = child_container;
 			//node *otherSplit = current_container->splits[0];
-			if (size > 0)
+            if (size > 0.0f)
 			{
 				current_container->splits[0]->always_auto_resize = true;
-				current_container->splits[0]->size = 0;
+                current_container->splits[0]->size = 0.0f;
 				current_container->splits[1]->size = size;
 				current_container->splits[1]->always_auto_resize = false;
 			}
-			else if (size == 0) {}
+            else if (size == 0.0f) {}
 			else
 			{
 				current_container->splits[0]->always_auto_resize = false;
-				current_container->splits[0]->size = size * -1;
-				current_container->splits[1]->size = 0;
+                current_container->splits[0]->size = size * -1.0f;
+                current_container->splits[1]->size = 0.0f;
 				current_container->splits[1]->always_auto_resize = true;
 			}
 			switch (dock_slot)
@@ -115,8 +115,6 @@ namespace imguidock
 				current_container->vertical_split = false;
 				break;
 			case imguidock::slot::none:
-				break;
-			default:
 				break;
 			}
 			child_container->active_dock = active ? ddock : child_container->active_dock ? child_container->active_dock : ddock;
@@ -147,7 +145,7 @@ namespace imguidock
 					if (dock->container->docks[i] == dock)
 					{
 						dock->last_size = dock->container->active_dock->last_size;
-						dock->container->docks.erase(dock->container->docks.begin() + i);
+                        dock->container->docks.erase(dock->container->docks.begin() + static_cast<int>(i));
 						if (i != dock->container->docks.size())
 							dock->container->active_dock = dock->container->docks[i];
 						else dock->container->active_dock = dock->container->docks[i - 1];
@@ -222,19 +220,19 @@ namespace imguidock
 					if (to_delete == nodes[i])
 					{
 						delete nodes[i];
-						nodes.erase(nodes.begin() + i);
+                        nodes.erase(nodes.begin() + static_cast<int>(i));
 						break;
 					}
 					if (nodes.size() > 1 && parent_to_delete == nodes[i])
 					{
 						delete nodes[i];
-						nodes.erase(nodes.begin() + i);
+                        nodes.erase(nodes.begin() + static_cast<int>(i));
 						break;
 					}
 					if (nodes.size() > 1 && to_delete == nodes[i])
 					{
 						delete nodes[i];
-						nodes.erase(nodes.begin() + i);
+                        nodes.erase(nodes.begin() + static_cast<int>(i));
 						break;
 					}
 				}
@@ -297,7 +295,7 @@ namespace imguidock
 		idgen++;
 
 		std::string idname = "Dock##";
-		idname += idgen;
+        idname += std::to_string(idgen);
 
 		calculated_size.y -= tabbar_height;
 
@@ -358,15 +356,15 @@ namespace imguidock
 
 			if (split0 && split1)
 			{
-				float acontsizeX = split0->size ? split0->size :
-					split1->size ? size.x - split1->size - splitter_button_width : size.x / 2 - splitterButtonWidthHalf;
-				float acontsizeY = split0->size ? split0->size :
-					split1->size ? size.y - split1->size - splitter_button_width : size.y / 2 - splitterButtonWidthHalf;
+                float acontsizeX = split0->size != 0.0f ? split0->size :
+                    split1->size != 0.0f ? size.x - split1->size - splitter_button_width : size.x / 2 - splitterButtonWidthHalf;
+                float acontsizeY = split0->size != 0.0f ? split0->size :
+                    split1->size != 0.0f ? size.y - split1->size - splitter_button_width : size.y / 2 - splitterButtonWidthHalf;
 
-				float bcontsizeX = split0->size ? size.x - split0->size - splitter_button_width :
-					split1->size ? split1->size : size.x / 2 - splitterButtonWidthHalf;
-				float bcontsizeY = split0->size ? size.y - split0->size - splitter_button_width :
-					split1->size ? split1->size : size.y / 2 - splitterButtonWidthHalf;
+                float bcontsizeX = split0->size != 0.0f ? size.x - split0->size - splitter_button_width :
+                    split1->size != 0.0f ? split1->size : size.x / 2 - splitterButtonWidthHalf;
+                float bcontsizeY = split0->size != 0.0f ? size.y - split0->size - splitter_button_width :
+                    split1->size != 0.0f ? split1->size : size.y / 2 - splitterButtonWidthHalf;
 
 				calculated_size0 = ImVec2(container->vertical_split ? acontsizeX : size.x, !container->vertical_split ? acontsizeY : size.y);
 				calculated_size1 = ImVec2(container->vertical_split ? bcontsizeX : size.x, !container->vertical_split ? bcontsizeY : size.y);
@@ -390,7 +388,7 @@ namespace imguidock
 				ImGui::SetCursorPosX(calculated_cursor_pos.x - splitter_button_width);
 				ImGui::SetCursorPosY(calculated_cursor_pos.y - splitter_button_width);
 				std::string idnamesb = "##SplitterButton";
-				idnamesb += idgen++;
+                idnamesb += std::to_string(idgen++);
 
 
 				ImVec4 button_color = ImGui::GetStyle().Colors[ImGuiCol_Button];
@@ -420,7 +418,7 @@ namespace imguidock
 						{
 							ImVec2 minSize;
 							get_min_size(split0, minSize);
-							if (split0->size == 0)
+                            if (split0->size == 0.0f)
 								split0->size = container->vertical_split ? calculated_size1.x : calculated_size1.y;
 							if (split0->size + mouse_delta >= (container->vertical_split ? minSize.x : minSize.y))
 								split0->size += mouse_delta;
@@ -432,7 +430,7 @@ namespace imguidock
 						{
 							ImVec2 minSize;
 							get_min_size(split1, minSize);
-							if (split1->size == 0)
+                            if (split1->size == 0.0f)
 								split1->size = container->vertical_split ? calculated_size1.x : calculated_size1.y;
 							if (split1->size - mouse_delta >= (container->vertical_split ? minSize.x : minSize.y))
 								split1->size -= mouse_delta;
@@ -468,10 +466,11 @@ namespace imguidock
 					
 					auto& engine = core::get_subsystem<runtime::engine>();
 					auto window = std::make_unique<gui_window>(
-						mml::video_mode((unsigned int)_current_dock_to->last_size.x, (unsigned int)_current_dock_to->last_size.y),
-						"Editor Window",
-						mml::style::standard
-						);
+                        mml::video_mode(static_cast<unsigned int>(_current_dock_to->last_size.x),
+                                        static_cast<unsigned int>(_current_dock_to->last_size.y)),
+                        "Editor Window",
+                        mml::style::standard
+                                        );
 					window->get_dockspace().dock_to(_current_dock_to, slot::tab, 0, true);
 					window->set_position(mml::mouse::get_position());
 					window->request_focus();
@@ -563,11 +562,16 @@ namespace imguidock
 		ImVec2 center = parent_rect.Min + size * 0.5f;
 		switch (dock_slot)
 		{
-		default: return ImRect(center - ImVec2(20, 20), center + ImVec2(20, 20));
-		case slot::top: return ImRect(center + ImVec2(-20, -50), center + ImVec2(20, -30));
-		case slot::right: return ImRect(center + ImVec2(30, -20), center + ImVec2(50, 20));
-		case slot::bottom: return ImRect(center + ImVec2(-20, +30), center + ImVec2(20, 50));
-		case slot::left: return ImRect(center + ImVec2(-50, -20), center + ImVec2(-30, 20));
+        default:
+            return ImRect(center - ImVec2(20, 20), center + ImVec2(20, 20));
+        case slot::top:
+            return ImRect(center + ImVec2(-20, -50), center + ImVec2(20, -30));
+        case slot::right:
+            return ImRect(center + ImVec2(30, -20), center + ImVec2(50, 20));
+        case slot::bottom:
+            return ImRect(center + ImVec2(-20, +30), center + ImVec2(20, 50));
+        case slot::left:
+            return ImRect(center + ImVec2(-50, -20), center + ImVec2(-30, 20));
 		}
 	}
 
@@ -655,7 +659,7 @@ namespace imguidock
 		return false;
 	}
 
-	void dockspace::render_tab_bar(node* container, const ImVec2& size, const ImVec2& cursor_pos, float tabbar_height)
+    void dockspace::render_tab_bar(node* container, const ImVec2&, const ImVec2& cursor_pos, float tabbar_height)
 	{
 		ImGui::SetCursorPos(cursor_pos);
 

@@ -5,10 +5,6 @@
 namespace runtime
 {
 
-	app::app() : _exitcode(0)
-	{}
-
-
 	void app::setup()
 	{
 		core::add_subsystem<engine>();

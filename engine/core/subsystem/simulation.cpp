@@ -62,7 +62,7 @@ namespace core
 			if (_previous_timesteps.size() > _smoothing_step)
 			{
 				auto begin = _previous_timesteps.begin();
-				_previous_timesteps.erase(begin, begin + _previous_timesteps.size() - _smoothing_step);
+                _previous_timesteps.erase(begin, begin + int(_previous_timesteps.size() - _smoothing_step));
 				for (auto step : _previous_timesteps)
 					_timestep += step;
 				_timestep /= _previous_timesteps.size();
@@ -78,22 +78,22 @@ namespace core
 		++_frame;
 	}
 	
-	void simulation::set_min_fps(unsigned fps)
+    void simulation::set_min_fps(unsigned int fps)
 	{
-		_min_fps = std::max(fps, (unsigned)0);
+        _min_fps = std::max<unsigned int>(fps, 0);
 	}
 
-	void simulation::set_max_fps(unsigned fps)
+    void simulation::set_max_fps(unsigned int fps)
 	{
-		_max_fps = std::max(fps, (unsigned)0);
+        _max_fps = std::max<unsigned int>(fps, 0);
 	}
 
-	void simulation::set_max_inactive_fps(unsigned fps)
+    void simulation::set_max_inactive_fps(unsigned int fps)
 	{
-		_max_inactive_fps = std::max(fps, (unsigned)0);
+        _max_inactive_fps = std::max<unsigned int>(fps, 0);
 	}
 
-	void simulation::set_time_smoothing_step(unsigned step)
+    void simulation::set_time_smoothing_step(unsigned int step)
 	{
 		_smoothing_step = step;
 	}

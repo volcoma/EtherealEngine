@@ -1,5 +1,5 @@
-#ifndef _UUIDS_UUID_HPP
-#define _UUIDS_UUID_HPP
+#ifndef UUIDS_UUID_HPP
+#define UUIDS_UUID_HPP
 
 #include <algorithm>
 #include <iosfwd>
@@ -53,7 +53,7 @@ namespace uuids
 		}
 
 		template <typename InIter1, typename InIter2>
-		constexpr void static_copy(InIter1 first1, InIter1 last1, InIter2 first2) 
+        constexpr void static_copy(InIter1, InIter1, InIter2)
 		{
 			//return (first1 != last1) ?
 		}
@@ -148,11 +148,10 @@ namespace uuids
 
 		///////////////////////////////////////////////////////////////////////
 
-		constexpr bool is_nil() const noexcept 
-		{
-			return detail::static_all_of(begin(), end(),
-				[](value_type x) { return x == 0; });
-		}
+        //constexpr bool is_nil() const noexcept
+        //{
+        //    return detail::static_all_of(begin(), end(), [](value_type x) { return x == 0; });
+        //}
 
 		static constexpr size_type size() noexcept
 		{
@@ -268,7 +267,7 @@ namespace uuids
 				std::size_t i = 0;
 				for (; i != u.size(); ++i)
 				{
-					os << ::std::hex << ::std::setfill('0') << ::std::setw(2) << (int)u[i];
+                    os << ::std::hex << ::std::setfill('0') << ::std::setw(2) << static_cast<int>(u[i]);
 					if (i == 3 || i == 5 || i == 7 || i == 9)
 						os << os.widen('-');
 				}
@@ -352,5 +351,5 @@ namespace std
 	};
 }
 
-#endif // _UUIDS_UUID_HPP
+#endif // UUIDS_UUID_HPP
 

@@ -46,11 +46,11 @@ void check_context_menu(runtime::entity entity)
 	{
 		if (gui::BeginPopupContextWindow())
 		{
-			if (gui::Selectable("Create empty"))
+            if (gui::Selectable("Create empty"))
 			{
 				auto object = ecs.create();
 				object.assign<transform_component>();
-			}
+            }
 
 			gui::EndPopup();
 		}
@@ -148,7 +148,7 @@ void draw_entity(runtime::entity entity)
 	if (!entity)
 		return;
 
-	gui::PushID(entity.id().index());
+    gui::PushID(static_cast<int>(entity.id().index()));
 	gui::AlignFirstTextHeightToWidgets();
 	auto& es = core::get_subsystem<editor::editing_system>();
 	auto& input = core::get_subsystem<runtime::input>();
@@ -265,7 +265,7 @@ void draw_entity(runtime::entity entity)
 	gui::PopID();
 }
 
-void hierarchy_dock::render(const ImVec2& area)
+void hierarchy_dock::render(const ImVec2&)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	auto& ecs = core::get_subsystem<runtime::entity_component_system>();

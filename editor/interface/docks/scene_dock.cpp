@@ -291,7 +291,7 @@ void handle_camera_movement()
     }
 }
 
-void scene_dock::render(const ImVec2& area)
+void scene_dock::render(const ImVec2&)
 {
     auto& es = core::get_subsystem<editor::editing_system>();
     auto& engine = core::get_subsystem<runtime::engine>();

@@ -60,7 +60,7 @@ namespace runtime
 			return std::static_pointer_cast<T>(get(n));
 		}
 
-		virtual void destroy(std::size_t n);
+        void destroy(std::size_t n);
 
 		template <typename T, typename ... Args>
 		std::weak_ptr<T> set(unsigned int index, Args && ... args)
@@ -93,7 +93,6 @@ namespace runtime
 	class entity
 	{
 	public:
-		REFLECTABLE(entity)
 		SERIALIZABLE(entity)
 		struct id_t
 		{
@@ -116,14 +115,16 @@ namespace runtime
 			std::uint64_t id_;
 		};
 
-
 		/**
 		* Id of an invalid entity.
 		*/
 		static const id_t INVALID;
 
 		entity() = default;
-		entity(entity_component_system *manager, entity::id_t id) : manager_(manager), id_(id) {}
+        entity(entity_component_system *manager, entity::id_t id)
+            : id_(id)
+            , manager_(manager)
+        {}
 		entity(const entity &other) = default;
 		entity &operator = (const entity &other) = default;
 
@@ -219,8 +220,8 @@ namespace runtime
 		std::bitset<MAX_COMPONENTS> component_mask() const;
 
 	private:
+        entity::id_t id_ = INVALID;
 		entity_component_system *manager_ = nullptr;
-		entity::id_t id_ = INVALID;
 	};
 
 	class component : public std::enable_shared_from_this<component>
@@ -247,7 +248,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		component(const component& component) { touch(); }
+        component(const component& ) { touch(); }
 
 		//-----------------------------------------------------------------------------
 		//  Name : ~component (virtual )
@@ -257,7 +258,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		virtual ~component() = default;
+        virtual ~component();
 
 		//-----------------------------------------------------------------------------
 		//  Name : clone (virtual )
@@ -277,7 +278,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------	
-		virtual void touch() { _last_touched = core::get_subsystem<core::simulation>().get_frame() + 1; }
+        virtual void touch() { _last_touched = static_cast<std::uint32_t>(core::get_subsystem<core::simulation>().get_frame()) + 1; }
 
 		//-----------------------------------------------------------------------------
 		//  Name : is_dirty (virtual )
@@ -287,7 +288,7 @@ namespace runtime
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		virtual bool is_dirty() const { return _last_touched >= core::get_subsystem<core::simulation>().get_frame(); }
+        virtual bool is_dirty() const { return _last_touched >= static_cast<std::uint32_t>(core::get_subsystem<core::simulation>().get_frame()); }
 
 		//-----------------------------------------------------------------------------
 		//  Name : on_entity_set (virtual )
@@ -319,10 +320,10 @@ namespace runtime
 		/// </summary>
 		//-----------------------------------------------------------------------------
 		virtual rtti::type_index_sequential_t::index_t runtime_id() const = 0;
-		/// Owning entity
-		entity _entity;
-		/// Was the component touched.
-		std::uint64_t _last_touched = 0;
+        /// Was the component touched.
+        std::uint32_t _last_touched = 0;
+        /// Owning entity
+		entity _entity;		
 	};
 
     template<typename T>
@@ -449,7 +450,7 @@ namespace runtime
 					view_iterator<iterator_type, All>::next();
 				}
 
-				void next_entity(entity &entity) {}
+                void next_entity(entity &) {}
 			};
 
 			iterator_type begin() { return iterator_type(manager_, mask_, 0); }
@@ -696,10 +697,10 @@ namespace runtime
 			// We don't bother checking the component mask, as we return a nullptr anyway.
 			if (family >= component_pools_.size())
 				return chandle<C>();
-			component_storage *pool = component_pools_[family];
+            auto& pool = component_pools_[family];
 			if (!pool || !entity_component_mask_[id.index()][family])
 				return chandle<C>();
-			return chandle<C>(pool->get<C>(id.index()));
+            return chandle<C>(pool->template get<C>(id.index()));
 		}
 
 		/**
@@ -715,10 +716,10 @@ namespace runtime
 			// We don't bother checking the component mask, as we return a nullptr anyway.
 			if (family >= component_pools_.size())
 				return chandle<C>();
-			component_storage *pool = component_pools_[family];
+            auto& pool = component_pools_[family];
 			if (!pool || !entity_component_mask_[id.index()][family])
 				return chandle<C>();
-			return chandle<C>(pool->get<C>(id.index()));
+            return chandle<C>(pool->template get<C>(id.index()));
 		}
 
 		template <typename ... Components>
@@ -862,13 +863,13 @@ namespace runtime
 		}
 
 		template <typename C>
-		component_mask_t component_mask(const chandle<C> &c)
+        component_mask_t component_mask(const chandle<C>&)
 		{
 			return component_mask<C>();
 		}
 
 		template <typename C1, typename ... Components>
-		component_mask_t component_mask(const chandle<C1> &c1, const chandle<Components> &... args)
+        component_mask_t component_mask(const chandle<C1>&, const chandle<Components> &...)
 		{
 			return component_mask<C1, Components ...>();
 		}
@@ -879,39 +880,42 @@ namespace runtime
 			{
 				entity_component_mask_.resize(index + 1);
 				entity_version_.resize(index + 1);
-				for (component_storage *pool : component_pools_)
-					if (pool) pool->expand(index + 1);
+                for (auto& pool : component_pools_)
+                {
+                    if (pool)
+                        pool->expand(index + 1);
+                }
 			}
 		}
 
 		template <typename C>
-		component_storage *accomodate_component()
+        component_storage& accomodate_component()
 		{
 			auto family = rtti::type_index_sequential_t::id<component, C>();
 			return accomodate_component(family);
 		}
 
-		component_storage *accomodate_component(rtti::type_index_sequential_t::index_t family)
+        component_storage& accomodate_component(rtti::type_index_sequential_t::index_t family)
 		{
 			if (component_pools_.size() <= family)
 			{
-				component_pools_.resize(family + 1, nullptr);
+                component_pools_.resize(family + 1);
 			}
 			if (!component_pools_[family])
 			{
-				component_storage *pool = new component_storage();
-				pool->expand(index_counter_);
-				component_pools_[family] = pool;
+
+                component_pools_[family].reset(new component_storage);
+                component_pools_[family]->expand(index_counter_);
 			}
 
-			return component_pools_[family];
+            return *component_pools_[family].get();
 		}
 
 		std::uint32_t index_counter_ = 0;
 
 		// Each element in component_pools_ corresponds to a Pool for a component.
 		// The index into the vector is the component::family().
-		std::vector<component_storage*> component_pools_;
+        std::vector<std::unique_ptr<component_storage>> component_pools_;
 		// Bitmask of components associated with each entity. Index into the vector is the entity::Id.
 		std::vector<component_mask_t> entity_component_mask_;
 		// Vector of entity version numbers. Incremented each time an entity is destroyed

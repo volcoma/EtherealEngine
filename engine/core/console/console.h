@@ -92,7 +92,7 @@ private:
 template <typename... Args>
 void console::register_command(const std::string& name, const std::string& description, const std::vector<std::string>& argumentNames, const std::vector<std::string>& defaultArguments, const std::function<void(Args...)>& callback)
 {
-	const auto argCount = sizeof...(Args);
+    const std::size_t argCount = sizeof...(Args);
 	assert(argumentNames.size() <= argCount);
 	assert(defaultArguments.size() <= argCount);
 	assert(commands.find(name) == commands.end());
@@ -119,7 +119,8 @@ void console::register_command(const std::string& name, const std::string& descr
 		else
 		{
 			// append default arguments as necessary
-			arguments.insert(arguments.end(), commandRaw->default_arguments.begin() + (arguments.size() - requiredArguments), commandRaw->default_arguments.end());
+            const auto offset = int(arguments.size() - requiredArguments);
+            arguments.insert(arguments.end(), commandRaw->default_arguments.begin() + offset, commandRaw->default_arguments.end());
 			assert(arguments.size() == argCount);
 
 			bool failed = false;
@@ -191,7 +192,7 @@ std::function<void()> console::bind_callback(std::function<void(T, Args...)> cal
 * has been run
 */
 template <typename T>
-inline T console::argumentConverter<T>::convert(const std::string& s)
+inline T console::argumentConverter<T>::convert(const std::string&)
 {
 	static_assert(sizeof(T) != sizeof(T), "console commands may only take arguments of type int, float or std::string.");
 }

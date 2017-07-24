@@ -1,5 +1,5 @@
-#ifndef _REFLECTION_H_
-#define _REFLECTION_H_
+#ifndef REFLECTION_H
+#define REFLECTION_H
 
 #include "rttr/type.h"
 #include "rttr/rttr_enable.h"
@@ -12,12 +12,12 @@
 #include "rttr/enumeration.h"
 #include "rttr/registration.h"
 
-#define _CAT_IMPL(a, b) a##b
-#define _CAT(a, b) RTTR_CAT_IMPL(a, b)
+#define CAT_IMPL_(a, b) a##b
+#define CAT_(a, b) CAT_IMPL_(a, b)
 #ifdef __COUNTER__
-#define ANONYMOUS_VARIABLE(str) _CAT(str, __COUNTER__)
+#define ANONYMOUS_VARIABLE(str) CAT_(str, __COUNTER__)
 #else
-#define ANONYMOUS_VARIABLE(str) _CAT(str, __LINE__)
+#define ANONYMOUS_VARIABLE(str) CAT_(str, __LINE__)
 #endif
 
 template<typename T>

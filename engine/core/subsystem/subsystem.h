@@ -15,7 +15,7 @@ namespace core
 		subsystem() = default;
 		subsystem(const subsystem&) = delete;
 		subsystem& operator = (const subsystem&) = delete;
-		virtual ~subsystem() {}
+        virtual ~subsystem();
 
 		//-----------------------------------------------------------------------------
 		//  Name : initialize (virtual )
@@ -25,7 +25,7 @@ namespace core
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		virtual bool initialize() { return true; }
+        virtual bool initialize();
 
 		//-----------------------------------------------------------------------------
 		//  Name : dispose (virtual )
@@ -35,7 +35,7 @@ namespace core
 		/// 
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		virtual void dispose() {}
+        virtual void dispose();
 	};
 
 	struct subsystem_context

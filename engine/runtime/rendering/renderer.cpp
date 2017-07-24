@@ -86,7 +86,7 @@ namespace runtime
 		gfx::setPlatformData(pd);
 
         // auto detect
-        const auto preferred_renderer_type = gfx::RendererType::Count;
+        const auto preferred_renderer_type = gfx::RendererType::OpenGL;
         if (!gfx::init(preferred_renderer_type, 0, 0, &callback))
 			return false;
 

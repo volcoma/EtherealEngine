@@ -169,15 +169,15 @@ void process_bones(aiMesh* mesh, mesh::load_data& load_data)
 			const auto& bone_influence_to_insert = bone_influences[i];
 			bool exist = false;
 			const auto& bones = load_data.skin_data.get_bones();
-			for (auto& bone: bones)
-			{
-				if (bone.bone_id == bone_influence_to_insert.bone_id)
-				{
-					exist = true;
-					break;
-				}
+            for (auto& bone: bones)
+            {
+                if (bone.bone_id == bone_influence_to_insert.bone_id)
+                {
+                    exist = true;
+                    break;
+                }
 
-			}
+            }
 			if (!exist)
 				load_data.skin_data.add_bone(bone_influence_to_insert);
 		}
@@ -204,7 +204,7 @@ void process_material(aiMaterial* mat, mesh::load_data& load_data)
 
 	auto is_not_black = [](aiColor3D color)
 	{
-		return color.r != 0 || color.g != 0 || color.b != 0;
+        return color.r != 0.0f || color.g != 0.0f || color.b != 0.0f;
 	};
 
 	auto process_color = [](const aiColor3D& c)
@@ -225,7 +225,7 @@ void process_material(aiMaterial* mat, mesh::load_data& load_data)
 		data.base_color.value.a = opacity;
 	}
 
-	auto get_texture = [](std::size_t mat_index, aiMaterial* mat, mesh::load_data& load_data, aiTextureType t, mesh::load_data::load_material::texture_type tt)
+    auto get_texture = [](std::size_t mat_index, aiMaterial* mat, mesh::load_data& load_data, aiTextureType t, mesh::load_data::load_material::texture_type)
 	{
 		const auto textures = mat->GetTextureCount(t);
 		if (textures > 0)
@@ -268,30 +268,23 @@ void process_materials(const aiScene* scene, mesh::load_data& load_data)
 	}
 }
 
-void process_node(aiNode* node, mesh::armature_node& armature_node)
+void process_node(const aiNode* node, mesh::armature_node* armature_node, const math::transform& parent_transform)
 {
-	armature_node.children.resize(node->mNumChildren);
-
+    armature_node->children.resize(node->mNumChildren);
+    armature_node->name = node->mName.C_Str();
+    armature_node->local_transform = process_matrix(node->mTransformation);
+    armature_node->world_transform = parent_transform * armature_node->local_transform;
 	for (size_t i = 0; i < node->mNumChildren; ++i)
 	{
-		aiNode* child_node = node->mChildren[i];
-		auto child_armature = std::make_unique<mesh::armature_node>();
-		child_armature->name = child_node->mName.C_Str();
-
-		const aiMatrix4x4& assimp_matrix = child_node->mTransformation;
-        child_armature->transform = process_matrix(assimp_matrix);
-
-		armature_node.children[i] = std::move(child_armature);
-		process_node(child_node, *armature_node.children[i].get());
+        armature_node->children[i] = std::make_unique<mesh::armature_node>();
+        process_node(node->mChildren[i], armature_node->children[i].get(), armature_node->world_transform);
 	}
 }
 
 void process_nodes(const aiScene* scene, mesh::load_data& load_data)
 {
-	aiNode* root = scene->mRootNode->mChildren[0];
 	load_data.root_node = std::make_unique<mesh::armature_node>();
-	process_node(root, *load_data.root_node.get());
-
+    process_node(scene->mRootNode, load_data.root_node.get(), math::transform::identity);
 }
 
 void process_imported_scene(const aiScene* scene, mesh::load_data& load_data)

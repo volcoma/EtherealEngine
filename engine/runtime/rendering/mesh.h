@@ -216,7 +216,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	std::vector<math::transform> get_skinning_matrices(
-		const math::transform& root_transform, 
+        const math::transform& root_transform,
 		const std::vector<math::transform>& node_transforms,
 		const skin_bind_data& bind_data,
 		bool compute_inverse_transpose) const;
@@ -366,11 +366,11 @@ public:
 		/// The beginning vertex for this batch.
 		std::int32_t vertex_start = -1;
 		/// Number of vertices included in this batch.
-		std::int32_t vertex_count = 0;
+        std::uint32_t vertex_count = 0;
 		/// The initial face, from the index buffer, to render in this batch
 		std::int32_t face_start = -1;
 		/// Number of faces to render in this batch.
-		std::int32_t face_count = 0;
+        std::uint32_t face_count = 0;
 	};
 
 	struct info
@@ -395,7 +395,8 @@ public:
 	struct armature_node
 	{
 		std::string name;
-		math::transform transform;
+        math::transform local_transform;
+        math::transform world_transform;
 		std::vector<std::unique_ptr<armature_node>> children;
 
 	};
@@ -817,6 +818,8 @@ public:
 	//-----------------------------------------------------------------------------
 	const bone_palette_array_t& get_bone_palettes() const;
 
+
+    const armature_node* get_armature() const;
 	//-----------------------------------------------------------------------------
 	//  Name : get_subset ()
 	/// <summary>

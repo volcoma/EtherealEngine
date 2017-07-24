@@ -1,8 +1,8 @@
 #pragma once
 #include "core/filesystem/filesystem.h"
 
-struct asset_compiler
+namespace asset_compiler
 {
 	template<typename T>
-	static void compile(const fs::path& absolute_key);
+    extern void compile(const fs::path& absolute_key);
 };

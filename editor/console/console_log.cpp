@@ -35,13 +35,13 @@ const std::array<float, 4>& console_log::get_level_colorization(logging::level::
 {
 	static std::map<logging::level::level_enum, std::array<float, 4>> colorization_mappings
 	{
-		{ logging::level::trace,{ 1.0f, 1.0f, 1.0f, 1.0f } },
-		{ logging::level::debug,{ 1.0f, 1.0f, 1.0f, 1.0f } },
-		{ logging::level::info,{ 1.0f, 1.0f, 1.0f, 1.0f } },
-		{ logging::level::warn,{ 1.0f, 0.494f, 0.0f, 1.0f } },
-		{ logging::level::err,{ 1.0f, 0.0f, 0.0f, 1.0f } },
-		{ logging::level::critical,{ 1.0f, 1.0f, 1.0f, 1.0f } },
-		{ logging::level::off,{ 1.0f, 1.0f, 1.0f, 1.0f } },
+        { logging::level::trace, std::array<float, 4>{ {1.0f, 1.0f, 1.0f, 1.0f} } },
+        { logging::level::debug,{ {1.0f, 1.0f, 1.0f, 1.0f} } },
+        { logging::level::info,{ {1.0f, 1.0f, 1.0f, 1.0f} } },
+        { logging::level::warn,{ {1.0f, 0.494f, 0.0f, 1.0f} } },
+        { logging::level::err,{ {1.0f, 0.0f, 0.0f, 1.0f} } },
+        { logging::level::critical,{ {1.0f, 1.0f, 1.0f, 1.0f} } },
+        { logging::level::off,{ {1.0f, 1.0f, 1.0f, 1.0f} } },
 	};
 
 	return colorization_mappings[level];
