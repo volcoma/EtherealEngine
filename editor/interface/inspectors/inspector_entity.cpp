@@ -27,7 +27,8 @@ struct inspector_entity::component
 	type _type;
 };
 
-inspector_entity::component::instance::instance() : _tree('/', -1)
+inspector_entity::component::instance::instance()
+	: _tree('/', -1)
 {
 }
 
@@ -143,7 +144,8 @@ void inspector_entity::component::instance::inspect(bool& changed)
 	}
 }
 
-inspector_entity::component::type::type() : _tree('/', -1)
+inspector_entity::component::type::type()
+	: _tree('/', -1)
 {
 	auto types = rttr::type::get<runtime::component>().get_derived_classes();
 	for(auto& info : types)
@@ -231,11 +233,13 @@ void inspector_entity::component::type::inspect(ImGuiTextFilter& filter, runtime
 	}
 }
 
-inspector_entity::inspector_entity() : _component(std::make_unique<component>())
+inspector_entity::inspector_entity()
+	: _component(std::make_unique<component>())
 {
 }
 
-inspector_entity::inspector_entity(const inspector_entity& other) : _component(std::make_unique<component>())
+inspector_entity::inspector_entity(const inspector_entity& other)
+	: _component(std::make_unique<component>())
 {
 }
 

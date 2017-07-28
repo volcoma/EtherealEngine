@@ -20,13 +20,19 @@ public:
 	//-------------------------------------------------------------------------
 	// Constructors & Destructors
 	//-------------------------------------------------------------------------
-	bsphere() : position(0.0f, 0.0f, 0.0f), radius(0.0f)
+	bsphere()
+		: position(0.0f, 0.0f, 0.0f)
+		, radius(0.0f)
 	{
 	}
-	bsphere(const vec3& _position, float _radius) : position(_position), radius(_radius)
+	bsphere(const vec3& _position, float _radius)
+		: position(_position)
+		, radius(_radius)
 	{
 	}
-	bsphere(float x, float y, float z, float _radius) : position(x, y, z), radius(_radius)
+	bsphere(float x, float y, float z, float _radius)
+		: position(x, y, z)
+		, radius(_radius)
 	{
 	}
 

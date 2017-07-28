@@ -78,7 +78,9 @@ protected:
 
 ///
 
-inline handle::handle(index_t index, index_t version) : _index(index), _version(version)
+inline handle::handle(index_t index, index_t version)
+	: _index(index)
+	, _version(version)
 {
 }
 

@@ -102,10 +102,12 @@ public:
 	SERIALIZABLE(entity)
 	struct id_t
 	{
-		id_t() : id_(0)
+		id_t()
+			: id_(0)
 		{
 		}
-		explicit id_t(std::uint64_t id) : id_(id)
+		explicit id_t(std::uint64_t id)
+			: id_(id)
 		{
 		}
 		id_t(std::uint32_t index, std::uint32_t version)
@@ -152,7 +154,9 @@ public:
 	static const id_t INVALID;
 
 	entity() = default;
-	entity(entity_component_system* manager, entity::id_t id) : id_(id), manager_(manager)
+	entity(entity_component_system* manager, entity::id_t id)
+		: id_(id)
+		, manager_(manager)
 	{
 	}
 	entity(const entity& other) = default;
@@ -447,7 +451,10 @@ public:
 
 	protected:
 		view_iterator(entity_component_system* manager, std::uint32_t index)
-			: manager_(manager), i_(index), capacity_(manager_->capacity()), free_cursor_(~0UL)
+			: manager_(manager)
+			, i_(index)
+			, capacity_(manager_->capacity())
+			, free_cursor_(~0UL)
 		{
 			if(All)
 			{
@@ -456,7 +463,11 @@ public:
 			}
 		}
 		view_iterator(entity_component_system* manager, const component_mask_t mask, std::uint32_t index)
-			: manager_(manager), mask_(mask), i_(index), capacity_(manager_->capacity()), free_cursor_(~0UL)
+			: manager_(manager)
+			, mask_(mask)
+			, i_(index)
+			, capacity_(manager_->capacity())
+			, free_cursor_(~0UL)
 		{
 			if(All)
 			{
@@ -540,11 +551,14 @@ public:
 	private:
 		friend class entity_component_system;
 
-		explicit base_view(entity_component_system* manager) : manager_(manager)
+		explicit base_view(entity_component_system* manager)
+			: manager_(manager)
 		{
 			mask_.set();
 		}
-		base_view(entity_component_system* manager, component_mask_t mask) : manager_(manager), mask_(mask)
+		base_view(entity_component_system* manager, component_mask_t mask)
+			: manager_(manager)
+			, mask_(mask)
 		{
 		}
 
@@ -571,10 +585,12 @@ public:
 	private:
 		friend class entity_component_system;
 
-		explicit typed_view(entity_component_system* manager) : base_view<All>(manager)
+		explicit typed_view(entity_component_system* manager)
+			: base_view<All>(manager)
 		{
 		}
-		typed_view(entity_component_system* manager, component_mask_t mask) : base_view<All>(manager, mask)
+		typed_view(entity_component_system* manager, component_mask_t mask)
+			: base_view<All>(manager, mask)
 		{
 		}
 	};
@@ -620,7 +636,8 @@ public:
 		public:
 			iterator_type(entity_component_system* manager, const component_mask_t mask, std::uint32_t index,
 						  const unpacker& unpacker)
-				: view_iterator<iterator_type>(manager, mask, index), unpacker_(unpacker)
+				: view_iterator<iterator_type>(manager, mask, index)
+				, unpacker_(unpacker)
 			{
 				view_iterator<iterator_type>::next();
 			}
@@ -658,7 +675,9 @@ public:
 
 		unpacking_view(entity_component_system* manager, component_mask_t mask,
 					   chandle<Components>&... handles)
-			: manager_(manager), mask_(mask), unpacker_(handles...)
+			: manager_(manager)
+			, mask_(mask)
+			, unpacker_(handles...)
 		{
 		}
 

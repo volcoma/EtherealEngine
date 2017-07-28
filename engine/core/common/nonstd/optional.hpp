@@ -165,10 +165,12 @@ using in_place_t = in_place_tag (&)();
 class bad_optional_access : public std::logic_error
 {
 public:
-	bad_optional_access(const std::string& what_arg) : std::logic_error(what_arg)
+	bad_optional_access(const std::string& what_arg)
+		: std::logic_error(what_arg)
 	{
 	}
-	bad_optional_access(const char* what_arg) : std::logic_error(what_arg)
+	bad_optional_access(const char* what_arg)
+		: std::logic_error(what_arg)
 	{
 	}
 };
@@ -217,7 +219,9 @@ public:
 
 	// Copy constructor
 	optional(const optional& obj) _NONSTD_OPT_NOEXCEPTEX(std::is_nothrow_copy_constructible<T>::value)
-		: stg_(), pval_(reinterpret_cast<T*>(&stg_)), has_value_(obj.has_value_)
+		: stg_()
+		, pval_(reinterpret_cast<T*>(&stg_))
+		, has_value_(obj.has_value_)
 	{
 		if(has_value_)
 		{
@@ -227,7 +231,9 @@ public:
 
 	// Move constructor (note: does not steal has_value_, see API)
 	optional(optional&& obj) _NONSTD_OPT_NOEXCEPTEX(std::is_nothrow_move_constructible<T>::value)
-		: stg_(), pval_(reinterpret_cast<T*>(&stg_)), has_value_(obj.has_value_)
+		: stg_()
+		, pval_(reinterpret_cast<T*>(&stg_))
+		, has_value_(obj.has_value_)
 	{
 		if(has_value_)
 		{
@@ -237,12 +243,16 @@ public:
 
 	// Constructors of optional with a value
 	optional(const T& val) _NONSTD_OPT_NOEXCEPTEX(std::is_nothrow_copy_constructible<T>::value)
-		: stg_(), pval_(reinterpret_cast<T*>(&stg_)), has_value_(true)
+		: stg_()
+		, pval_(reinterpret_cast<T*>(&stg_))
+		, has_value_(true)
 	{
 		new(pval_) T(val);
 	}
 	optional(T&& val) _NONSTD_OPT_NOEXCEPTEX(std::is_nothrow_move_constructible<T>::value)
-		: stg_(), pval_(reinterpret_cast<T*>(&stg_)), has_value_(true)
+		: stg_()
+		, pval_(reinterpret_cast<T*>(&stg_))
+		, has_value_(true)
 	{
 		new(pval_) T(std::move(val));
 	}
@@ -252,7 +262,9 @@ public:
 	template <typename... Args>
 	_NONSTD_OPT_CONSTEXPR explicit optional(in_place_t, Args&&... args)
 		_NONSTD_OPT_NOEXCEPTEX(std::is_nothrow_constructible<T, Args&&...>::value)
-		: stg_(), pval_(reinterpret_cast<T*>(&stg_)), has_value_(true)
+		: stg_()
+		, pval_(reinterpret_cast<T*>(&stg_))
+		, has_value_(true)
 	{
 		new(pval_) T(std::forward<Args>(args)...);
 	}
@@ -263,7 +275,9 @@ public:
 				  std::is_constructible<T, std::initializer_list<U>&, Args&&...>::value, void>::type>
 	_NONSTD_OPT_CONSTEXPR explicit optional(in_place_t, std::initializer_list<U> ilist, Args&&... args)
 		_NONSTD_OPT_NOEXCEPTEX(std::is_nothrow_constructible<T, std::initializer_list<U>&, Args&&...>::value)
-		: stg_(), pval_(reinterpret_cast<T*>(&stg_)), has_value_(true)
+		: stg_()
+		, pval_(reinterpret_cast<T*>(&stg_))
+		, has_value_(true)
 	{
 		new(pval_) T(ilist, std::forward<Args>(args)...);
 	}

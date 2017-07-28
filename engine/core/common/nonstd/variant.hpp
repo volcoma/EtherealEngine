@@ -68,11 +68,13 @@ class bad_variant_access : public std::runtime_error
 {
 
 public:
-	explicit bad_variant_access(const std::string& what_arg) : runtime_error(what_arg)
+	explicit bad_variant_access(const std::string& what_arg)
+		: runtime_error(what_arg)
 	{
 	}
 
-	explicit bad_variant_access(const char* what_arg) : runtime_error(what_arg)
+	explicit bad_variant_access(const char* what_arg)
+		: runtime_error(what_arg)
 	{
 	}
 
@@ -563,7 +565,8 @@ template <typename Variant, typename Comp>
 class comparer
 {
 public:
-	explicit comparer(Variant const& lhs) noexcept : lhs_(lhs)
+	explicit comparer(Variant const& lhs) noexcept
+		: lhs_(lhs)
 	{
 	}
 	comparer& operator=(comparer const&) = delete;
@@ -633,7 +636,8 @@ public:
 		new(&data) first_type();
 	}
 
-	VARIANT_INLINE variant(no_init) noexcept : type_index(detail::invalid_value)
+	VARIANT_INLINE variant(no_init) noexcept
+		: type_index(detail::invalid_value)
 	{
 	}
 
@@ -649,12 +653,14 @@ public:
 		new(&data) typename Traits::target_type(std::forward<T>(val));
 	}
 
-	VARIANT_INLINE variant(variant<Types...> const& old) : type_index(old.type_index)
+	VARIANT_INLINE variant(variant<Types...> const& old)
+		: type_index(old.type_index)
 	{
 		helper_type::copy(old.type_index, &old.data, &data);
 	}
 
-	VARIANT_INLINE variant(variant<Types...>&& old) noexcept(
+	VARIANT_INLINE
+	variant(variant<Types...>&& old) noexcept(
 		detail::conjunction<std::is_nothrow_move_constructible<Types>...>::value)
 		: type_index(old.type_index)
 	{

@@ -30,7 +30,8 @@ public:
 	 *         of type T.
 	 * @throws any exception thrown by the default constructur of T.
 	 */
-	recursive_wrapper() : p_(new T)
+	recursive_wrapper()
+		: p_(new T)
 	{
 	}
 
@@ -39,19 +40,23 @@ public:
 		delete p_;
 	}
 
-	recursive_wrapper(recursive_wrapper const& operand) : p_(new T(operand.get()))
+	recursive_wrapper(recursive_wrapper const& operand)
+		: p_(new T(operand.get()))
 	{
 	}
 
-	recursive_wrapper(T const& operand) : p_(new T(operand))
+	recursive_wrapper(T const& operand)
+		: p_(new T(operand))
 	{
 	}
 
-	recursive_wrapper(recursive_wrapper&& operand) : p_(new T(std::move(operand.get())))
+	recursive_wrapper(recursive_wrapper&& operand)
+		: p_(new T(std::move(operand.get())))
 	{
 	}
 
-	recursive_wrapper(T&& operand) : p_(new T(std::move(operand)))
+	recursive_wrapper(T&& operand)
+		: p_(new T(std::move(operand)))
 	{
 	}
 

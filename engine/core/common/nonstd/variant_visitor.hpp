@@ -13,7 +13,8 @@ struct visitor<Fn> : Fn
 	using type = Fn;
 	using Fn::operator();
 
-	visitor(Fn fn) : Fn(fn)
+	visitor(Fn fn)
+		: Fn(fn)
 	{
 	}
 };
@@ -25,7 +26,9 @@ struct visitor<Fn, Fns...> : Fn, visitor<Fns...>
 	using Fn::operator();
 	using visitor<Fns...>::operator();
 
-	visitor(Fn fn, Fns... fns) : Fn(fn), visitor<Fns...>(fns...)
+	visitor(Fn fn, Fns... fns)
+		: Fn(fn)
+		, visitor<Fns...>(fns...)
 	{
 	}
 };

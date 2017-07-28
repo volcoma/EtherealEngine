@@ -62,7 +62,9 @@ public:
 		vertex_influence()
 		{
 		}
-		vertex_influence(std::uint32_t _index, float _weight) : vertex_index(_index), weight(_weight)
+		vertex_influence(std::uint32_t _index, float _weight)
+			: vertex_index(_index)
+			, weight(_weight)
 		{
 		}
 	};
@@ -917,10 +919,12 @@ protected:
 		std::uint32_t data_group_id = 0;
 
 		// Constructors
-		mesh_subset_key() : data_group_id(0)
+		mesh_subset_key()
+			: data_group_id(0)
 		{
 		}
-		mesh_subset_key(std::uint32_t _dataGroupId) : data_group_id(_dataGroupId)
+		mesh_subset_key(std::uint32_t _dataGroupId)
+			: data_group_id(_dataGroupId)
 		{
 		}
 
@@ -956,7 +960,8 @@ protected:
 		face_influences* influences = nullptr;
 
 		// Constructor
-		bone_combination_key(face_influences* _influences) : influences(_influences)
+		bone_combination_key(face_influences* _influences)
+			: influences(_influences)
 		{
 		}
 	};

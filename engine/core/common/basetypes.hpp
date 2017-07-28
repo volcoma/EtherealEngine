@@ -49,7 +49,8 @@ public:
 		_data = (std::uint16_t)((signBit << 15) | (exponent << 10) | (mantissa >> 13));
 	}
 
-	half(const half& h) : _data(h._data)
+	half(const half& h)
+		: _data(h._data)
 	{
 	}
 
@@ -89,7 +90,9 @@ template <typename T>
 struct range
 {
 	range() = default;
-	range(T _min, T _max) : Min(_min), Max(_max)
+	range(T _min, T _max)
+		: Min(_min)
+		, Max(_max)
 	{
 	}
 	T Min;
@@ -110,7 +113,9 @@ template <typename T>
 struct size
 {
 	size() = default;
-	size(T _width, T _height) : width(_width), height(_height)
+	size(T _width, T _height)
+		: width(_width)
+		, height(_height)
 	{
 	}
 	T width;
@@ -154,7 +159,9 @@ struct point
 	point()
 	{
 	}
-	point(T _x, T _y) : x(_x), y(_y)
+	point(T _x, T _y)
+		: x(_x)
+		, y(_y)
 	{
 	}
 	T x;
@@ -178,7 +185,11 @@ struct rect
 	rect()
 	{
 	}
-	rect(T _left, T _top, T _right, T _bottom) : left(_left), top(_top), right(_right), bottom(_bottom)
+	rect(T _left, T _top, T _right, T _bottom)
+		: left(_left)
+		, top(_top)
+		, right(_right)
+		, bottom(_bottom)
 	{
 	}
 	T left;

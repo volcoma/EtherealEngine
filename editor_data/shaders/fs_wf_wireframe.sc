@@ -1,6 +1,6 @@
 $input v_bc
 
-#include "common.sh"
+#include <bgfx_shader.sh>
 
 uniform vec4 u_params[2];
 #define u_wfColor      u_params[0].xyz

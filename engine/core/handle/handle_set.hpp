@@ -291,7 +291,8 @@ inline size_t dynamic_handle_set::size() const
 
 template <typename T>
 inline hash_set_iterator<T>::hash_set_iterator(const T& handles, handle position)
-	: _handles(handles), _position(position)
+	: _handles(handles)
+	, _position(position)
 {
 }
 

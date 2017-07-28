@@ -5,8 +5,10 @@ model_component::model_component()
 }
 
 model_component::model_component(const model_component& component)
-	: _model(component._model), _static(component._static), _casts_shadow(component._casts_shadow),
-	  _casts_reflection(component._casts_reflection)
+	: _model(component._model)
+	, _static(component._static)
+	, _casts_shadow(component._casts_shadow)
+	, _casts_reflection(component._casts_reflection)
 {
 }
 

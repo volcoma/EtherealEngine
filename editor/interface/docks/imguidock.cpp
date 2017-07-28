@@ -6,7 +6,8 @@
 
 namespace imguidock
 {
-dockspace::dockspace(gui_window* owner) : owner(owner)
+dockspace::dockspace(gui_window* owner)
+	: owner(owner)
 {
 }
 

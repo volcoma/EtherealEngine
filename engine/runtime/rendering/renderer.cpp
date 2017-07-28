@@ -6,9 +6,9 @@
 #include "render_pass.h"
 #include <cstdarg>
 
-struct GfxCallback : public gfx::CallbackI
+struct gfx_callback : public gfx::CallbackI
 {
-	virtual ~GfxCallback()
+	virtual ~gfx_callback()
 	{
 	}
 
@@ -73,7 +73,7 @@ void renderer::dispose()
 
 bool renderer::init_backend(mml::window& main_window)
 {
-	static GfxCallback callback;
+	static gfx_callback callback;
 
 	gfx::PlatformData pd{
 		reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(main_window.get_system_handle_specific())),

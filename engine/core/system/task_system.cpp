@@ -13,12 +13,14 @@ void task_system::task_queue::rotate_()
 	std::rotate(tasks_.begin(), tasks_.begin() + 1, tasks_.end());
 }
 
-task_system::task_queue::task_queue() : tasks_{}
+task_system::task_queue::task_queue()
+	: tasks_{}
 {
 }
 
 task_system::task_queue::task_queue(task_system::task_queue&& other) noexcept
-	: tasks_(std::move(other).tasks_), done_(other.done_.load())
+	: tasks_(std::move(other).tasks_)
+	, done_(other.done_.load())
 {
 }
 
@@ -166,12 +168,16 @@ std::size_t task_system::get_main_thread_queue_idx()
 	return 0;
 }
 
-task_system::task_system() : task_system(std::thread::hardware_concurrency())
+task_system::task_system()
+	: task_system(std::thread::hardware_concurrency())
 {
 }
 
 task_system::task_system(std::size_t nthreads, const task_system::Allocator& alloc)
-	: queues_{}, threads_{}, alloc_(alloc), nthreads_{nthreads}
+	: queues_{}
+	, threads_{}
+	, alloc_(alloc)
+	, nthreads_{nthreads}
 {
 	// +1 for the main thread's queue
 	queues_.reserve(nthreads + 1);

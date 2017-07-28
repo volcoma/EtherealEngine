@@ -21,12 +21,14 @@ class any final
 {
 public:
 	/// Constructs an object of type any with an empty state.
-	any() : vtable(nullptr)
+	any()
+		: vtable(nullptr)
 	{
 	}
 
 	/// Constructs an object of type any with an equivalent state as other.
-	any(const any& rhs) : vtable(rhs.vtable)
+	any(const any& rhs)
+		: vtable(rhs.vtable)
 	{
 		if(!rhs.empty())
 		{
@@ -37,7 +39,8 @@ public:
 	/// Constructs an object of type any with a state equivalent to the original
 	/// state of other.
 	/// rhs is left in a valid but otherwise unspecified state.
-	any(any&& rhs) noexcept : vtable(rhs.vtable)
+	any(any&& rhs) noexcept
+		: vtable(rhs.vtable)
 	{
 		if(!rhs.empty())
 		{

@@ -20,7 +20,8 @@ public:
 	//---------------------------------------------------------------------
 	// Constructors & Destructors
 	//---------------------------------------------------------------------
-	StrICmp(const char* lpszLang) : mLocale(lpszLang)
+	StrICmp(const char* lpszLang)
+		: mLocale(lpszLang)
 	{
 	}
 
@@ -37,7 +38,8 @@ public:
 		//-----------------------------------------------------------------
 		// Constructors & Destructors
 		//-----------------------------------------------------------------
-		CharLessI(std::locale& Locale) : mLocale(Locale)
+		CharLessI(std::locale& Locale)
+			: mLocale(Locale)
 		{
 		}
 

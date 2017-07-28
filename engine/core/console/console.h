@@ -52,8 +52,11 @@ private:
 		explicit command(const std::string& name, const std::string& description, unsigned int numArguments,
 						 const std::vector<std::string>& argumentNames,
 						 const std::vector<std::string>& defaultArguments)
-			: name(name), description(description), num_arguments(numArguments),
-			  argument_names(argumentNames), default_arguments(defaultArguments)
+			: name(name)
+			, description(description)
+			, num_arguments(numArguments)
+			, argument_names(argumentNames)
+			, default_arguments(defaultArguments)
 		{
 		}
 

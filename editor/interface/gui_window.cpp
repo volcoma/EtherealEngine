@@ -153,14 +153,16 @@ void imgui_set_context(ImGuiContext* pContext)
 	gui::SetCurrentContext(pContext);
 }
 
-gui_window::gui_window() : _dockspace(this)
+gui_window::gui_window()
+	: _dockspace(this)
 {
 	_gui_context = imgui_create_context();
 }
 
 gui_window::gui_window(mml::video_mode mode, const std::string& title,
 					   std::uint32_t style /*= mml::style::Default*/)
-	: render_window(mode, title, style), _dockspace(this)
+	: render_window(mode, title, style)
+	, _dockspace(this)
 {
 	_gui_context = imgui_create_context();
 }

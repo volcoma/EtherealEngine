@@ -605,7 +605,13 @@ enum MOVETYPE
 
 struct Context
 {
-	Context() : mbUsing(false), mbEnable(true), mX(0.0f), mY(0.0f), mWidth(0.0f), mHeight(0.0f)
+	Context()
+		: mbUsing(false)
+		, mbEnable(true)
+		, mX(0.0f)
+		, mY(0.0f)
+		, mWidth(0.0f)
+		, mHeight(0.0f)
 	{
 	}
 

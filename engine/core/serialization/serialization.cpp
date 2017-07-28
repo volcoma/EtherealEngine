@@ -2,7 +2,7 @@
 
 namespace serialization
 {
-std::function<void(const std::string& log_msg)> warning_logger;
+static std::function<void(const std::string& log_msg)> warning_logger;
 void set_warning_logger(std::function<void(const std::string& log_msg)> logger)
 {
 	warning_logger = logger;

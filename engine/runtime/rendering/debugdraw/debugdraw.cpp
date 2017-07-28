@@ -143,8 +143,10 @@ uint32_t genSphere(uint8_t _subdiv0, void* _pos0 = NULL, uint16_t _posStride0 = 
 		struct Gen
 		{
 			Gen(void* _pos, uint16_t _posStride, void* _normals, uint16_t _normalStride, uint8_t _subdiv)
-				: m_pos((uint8_t*)_pos), m_normals((uint8_t*)_normals), m_posStride(_posStride),
-				  m_normalStride(_normalStride)
+				: m_pos((uint8_t*)_pos)
+				, m_normals((uint8_t*)_normals)
+				, m_posStride(_posStride)
+				, m_normalStride(_normalStride)
 			{
 				static const float scale = 1.0f;
 				static const float golden = 1.6180339887f;
@@ -309,7 +311,8 @@ static const bgfx::EmbeddedShader s_embeddedShaders[] = {BGFX_EMBEDDED_SHADER(vs
 template <uint16_t MaxHandlesT = 256, uint16_t TextureSizeT = 1024>
 struct SpriteT
 {
-	SpriteT() : m_ra(TextureSizeT, TextureSizeT)
+	SpriteT()
+		: m_ra(TextureSizeT, TextureSizeT)
 	{
 	}
 
@@ -349,7 +352,9 @@ struct SpriteT
 
 struct DebugDraw
 {
-	DebugDraw() : m_depthTestLess(true), m_state(State::Count)
+	DebugDraw()
+		: m_depthTestLess(true)
+		, m_state(State::Count)
 	{
 	}
 

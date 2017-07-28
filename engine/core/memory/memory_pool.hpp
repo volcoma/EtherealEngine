@@ -51,7 +51,8 @@ struct memory_pool_t : public memory_pool
 {
 	using aligned_storage_t = typename std::aligned_storage<sizeof(T), alignof(T)>::type;
 
-	memory_pool_t() : memory_pool(sizeof(aligned_storage_t), Growth)
+	memory_pool_t()
+		: memory_pool(sizeof(aligned_storage_t), Growth)
 	{
 	}
 };

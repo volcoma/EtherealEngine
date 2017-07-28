@@ -7,7 +7,10 @@
 namespace cfg
 {
 
-parser::parser(config& c) : conf(c), in(nullptr), next_token(NO_TOKEN)
+parser::parser(config& c)
+	: conf(c)
+	, in(nullptr)
+	, next_token(NO_TOKEN)
 {
 }
 

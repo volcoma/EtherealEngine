@@ -194,11 +194,13 @@ public:
 	using delegate_t = delegate<typename nonstd::function_traits<F>::function_type>;
 
 	template <typename C>
-	function_wrapper(C* const object_ptr, F&& f) : _function(object_ptr, f)
+	function_wrapper(C* const object_ptr, F&& f)
+		: _function(object_ptr, f)
 	{
 	}
 
-	function_wrapper(F&& f) : _function(f)
+	function_wrapper(F&& f)
+		: _function(f)
 	{
 	}
 
@@ -244,7 +246,9 @@ class signals_t
 		info_t() = default;
 
 		info_t(info_t&& rhs)
-			: priority(rhs.priority), sentinel(rhs.sentinel), function(rhs.function.release())
+			: priority(rhs.priority)
+			, sentinel(rhs.sentinel)
+			, function(rhs.function.release())
 		{
 		}
 
@@ -399,7 +403,9 @@ class functions_t
 	{
 		info_t() = default;
 
-		info_t(info_t&& rhs) : sentinel(rhs.sentinel), function(rhs.function.release())
+		info_t(info_t&& rhs)
+			: sentinel(rhs.sentinel)
+			, function(rhs.function.release())
 		{
 		}
 

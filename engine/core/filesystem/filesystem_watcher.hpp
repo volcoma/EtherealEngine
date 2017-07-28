@@ -138,7 +138,8 @@ protected:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	filesystem_watcher() : _watching(false)
+	filesystem_watcher()
+		: _watching(false)
 	{
 	}
 
@@ -389,7 +390,8 @@ protected:
 		//-----------------------------------------------------------------------------
 		watcher_impl(const fs::path& path, const std::string& filter, bool initialList,
 					 const std::function<void(const std::vector<entry>&, bool)>& listCallback)
-			: _filter(filter), _callback(listCallback)
+			: _filter(filter)
+			, _callback(listCallback)
 		{
 			_root = path;
 			std::vector<entry> entries;

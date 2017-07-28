@@ -3,11 +3,13 @@
 namespace rnd
 {
 
-engine::engine(result_type value) : impl(value)
+engine::engine(result_type value)
+	: impl(value)
 {
 }
 
-engine::engine(const engine& rhs) : impl(rhs.impl)
+engine::engine(const engine& rhs)
+	: impl(rhs.impl)
 {
 }
 

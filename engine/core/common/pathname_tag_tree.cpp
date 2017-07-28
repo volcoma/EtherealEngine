@@ -1,15 +1,20 @@
 #include "pathname_tag_tree.h"
 #include <deque>
 
-path_name_tag_tree::node::node() : _nodes(), _tag(-1)
+path_name_tag_tree::node::node()
+	: _nodes()
+	, _tag(-1)
 {
 }
-path_name_tag_tree::node::node(const node& krs) : _nodes(krs._nodes), _tag(krs._tag)
+path_name_tag_tree::node::node(const node& krs)
+	: _nodes(krs._nodes)
+	, _tag(krs._tag)
 {
 }
 
 path_name_tag_tree::path_name_tag_tree(const char sep_char, const size_t invalid_tag)
-	: _invalid_tag(invalid_tag), _sep_char(sep_char)
+	: _invalid_tag(invalid_tag)
+	, _sep_char(sep_char)
 {
 	_root_node._tag = _invalid_tag;
 }
@@ -218,7 +223,8 @@ path_name_tag_tree::iterator::iterator(void* p)
 {
 	setup(p);
 }
-path_name_tag_tree::iterator::iterator(const iterator& krc) : _steps(krc._steps)
+path_name_tag_tree::iterator::iterator(const iterator& krc)
+	: _steps(krc._steps)
 {
 }
 

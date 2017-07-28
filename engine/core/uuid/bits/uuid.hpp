@@ -111,7 +111,8 @@ struct uuid
 
 	///////////////////////////////////////////////////////////////////////
 
-	constexpr uuid() : _data{0}
+	constexpr uuid()
+		: _data{0}
 	{
 	}
 
@@ -119,21 +120,25 @@ struct uuid
 
 	constexpr uuid(uuid const&) = default;
 
-	constexpr explicit uuid(char const* cstr) : uuid(cstr, detail::static_strlen(cstr))
+	constexpr explicit uuid(char const* cstr)
+		: uuid(cstr, detail::static_strlen(cstr))
 	{
 	}
 
-	constexpr uuid(char const*, size_type) : uuid()
+	constexpr uuid(char const*, size_type)
+		: uuid()
 	{
 		// std::isxdigit(ch)..
 	}
 
-	explicit uuid(std::string const& str) : uuid(str.c_str(), str.size())
+	explicit uuid(std::string const& str)
+		: uuid(str.c_str(), str.size())
 	{
 	}
 
 	// constexpr pl0x!
-	uuid(std::initializer_list<value_type> ilist) : uuid(ilist.begin(), ilist.end())
+	uuid(std::initializer_list<value_type> ilist)
+		: uuid(ilist.begin(), ilist.end())
 	{
 	}
 

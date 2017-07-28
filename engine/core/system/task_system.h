@@ -383,13 +383,15 @@ private:
 	{
 		template <class F>
 		explicit ready_task_model(F&& f, Args&&... args)
-			: _f(std::forward<F>(f)), _args(std::forward<Args>(args)...)
+			: _f(std::forward<F>(f))
+			, _args(std::forward<Args>(args)...)
 		{
 		}
 
 		template <class Allocator, class F>
 		explicit ready_task_model(std::allocator_arg_t, Allocator const& alloc, F&& f, Args&&... args)
-			: _f(std::allocator_arg_t(), alloc, std::forward<F>(f)), _args(std::forward<Args>(args)...)
+			: _f(std::allocator_arg_t(), alloc, std::forward<F>(f))
+			, _args(std::forward<Args>(args)...)
 		{
 		}
 
@@ -429,13 +431,15 @@ private:
 	{
 		template <class F, class... Args>
 		explicit awaitable_task_model(F&& f, Args&&... args)
-			: _f(std::forward<F>(f)), _args(std::forward<Args>(args)...)
+			: _f(std::forward<F>(f))
+			, _args(std::forward<Args>(args)...)
 		{
 		}
 
 		template <class Allocator, class F, class... Args>
 		explicit awaitable_task_model(std::allocator_arg_t, Allocator const& alloc, F&& f, Args&&... args)
-			: _f(std::allocator_arg_t(), alloc, std::forward<F>(f)), _args(std::forward<Args>(args)...)
+			: _f(std::allocator_arg_t(), alloc, std::forward<F>(f))
+			, _args(std::forward<Args>(args)...)
 		{
 		}
 

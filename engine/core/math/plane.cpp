@@ -111,11 +111,13 @@ plane::plane()
 {
 }
 
-plane::plane(const vec4& p) : data(p)
+plane::plane(const vec4& p)
+	: data(p)
 {
 }
 
-plane::plane(float _a, float _b, float _c, float _d) : data(_a, _b, _c, _d)
+plane::plane(float _a, float _b, float _c, float _d)
+	: data(_a, _b, _c, _d)
 {
 }
 }

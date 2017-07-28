@@ -21,7 +21,8 @@ const transform transform::identity; // Defaults to identity
 /// transform Class Constructor
 /// </summary>
 //-----------------------------------------------------------------------------
-transform::transform() : _matrix(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+transform::transform()
+	: _matrix(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
 {
 }
 
@@ -31,7 +32,8 @@ transform::transform() : _matrix(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
 /// transform Class Constructor
 /// </summary>
 //-----------------------------------------------------------------------------
-transform::transform(const transform& t) : _matrix(t._matrix)
+transform::transform(const transform& t)
+	: _matrix(t._matrix)
 {
 }
 
@@ -41,7 +43,8 @@ transform::transform(const transform& t) : _matrix(t._matrix)
 /// transform Class Constructor
 /// </summary>
 //-----------------------------------------------------------------------------
-transform::transform(const mat4& m) : _matrix(m)
+transform::transform(const mat4& m)
+	: _matrix(m)
 {
 }
 
