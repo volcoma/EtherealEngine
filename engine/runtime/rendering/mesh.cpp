@@ -186,13 +186,14 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 		// determine if any faces with identical influences already exist and
 		// add it to the list. Alternatively this may be the first face with
 		// these exact influences, in which case a new entry will be created.
-		auto it_combination = bone_combinations.find(bone_combination_key(&used_bones));
+		const auto tri_data_group_id = tri_data[i].data_group_id;
+		auto it_combination = bone_combinations.find(bone_combination_key(&used_bones, tri_data_group_id));
 		if(it_combination == bone_combinations.end())
 		{
 			std::vector<std::uint32_t>* face_list_ptr = new std::vector<std::uint32_t>();
 			face_influences* influences_ptr = new face_influences(used_bones);
-			bone_combinations.insert(
-				bone_combination_map_t::value_type(bone_combination_key(influences_ptr), face_list_ptr));
+			bone_combinations.insert(bone_combination_map_t::value_type(
+				bone_combination_key(influences_ptr, tri_data_group_id), face_list_ptr));
 
 			// Assign face to this combination.
 			face_list_ptr->push_back(i);
@@ -213,120 +214,132 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 	// as many bones as possible. To do so, we must continuously search for
 	// face influence combinations that will fit into any existing palettes.
 
-	// Keep searching until we have consumed all unique face influence
-	// combinations.
-	for(; bone_combinations.empty() == false;)
+	const auto materials_count = _mesh_subsets.size();
+	for(auto data_group_id = 0u; data_group_id < materials_count; ++data_group_id)
 	{
-		bone_combination_map_t::iterator it_combination;
-		bone_combination_map_t::iterator it_best_combination = bone_combinations.end();
-		bone_combination_map_t::iterator it_largest_combination = bone_combinations.end();
-		int max_common = -1, max_bones = -1;
-		int palette_id = -1;
 
-		// Search face influences for the next best combination to add to a palette.
-		// We search
-		// for two specific properties; A) does it share a large amount in common
-		// with an existing
-		// palette and B) does this have the largest list of bones. We'll work out
-		// which of these
-		// properties we're interested in later.
-		for(it_combination = bone_combinations.begin(); it_combination != bone_combinations.end();
-			++it_combination)
+		// Keep searching until we have consumed all unique face influence
+		// combinations.
+		for(; bone_combinations.empty() == false;)
 		{
-			face_influences* influences_ptr = it_combination->first.influences;
-			// std::vector<std::uint32_t>* face_list_ptr = it_combination->second;
-			int bones_size = static_cast<int>(influences_ptr->bones.size());
-			// Record the combination with the largest set of bones in case we can't
-			// find a suitable palette to insert any influence into at this point.
-			if(bones_size > max_bones)
+			bone_combination_map_t::iterator it_combination;
+			bone_combination_map_t::iterator it_best_combination = bone_combinations.end();
+			bone_combination_map_t::iterator it_largest_combination = bone_combinations.end();
+			int max_common = -1, max_bones = -1;
+			int palette_id = -1;
+
+			// Search face influences for the next best combination to add to a palette.
+			// We search
+			// for two specific properties; A) does it share a large amount in common
+			// with an existing
+			// palette and B) does this have the largest list of bones. We'll work out
+			// which of these
+			// properties we're interested in later.
+			for(it_combination = bone_combinations.begin(); it_combination != bone_combinations.end();
+				++it_combination)
 			{
-				it_largest_combination = it_combination;
-				max_bones = bones_size;
+				face_influences* influences_ptr = it_combination->first.influences;
+				const auto combination_group_id = it_combination->first.data_group_id;
 
-			} // End if largest
+				if(data_group_id != combination_group_id)
+					continue;
 
-			// Test against each palette
-			for(size_t i = 0; i < _bone_palettes.size(); ++i)
-			{
-				std::int32_t common_bones, additional_bones, remaining_space;
-				auto& palette = _bone_palettes[i];
+				// std::vector<std::uint32_t>* face_list_ptr = it_combination->second;
+				int bones_size = static_cast<int>(influences_ptr->bones.size());
+				// Record the combination with the largest set of bones in case we can't
+				// find a suitable palette to insert any influence into at this point.
 
-				// Also compute how the combination might fit into this palette if at
-				// all
-				palette.compute_palette_fit(influences_ptr->bones, remaining_space, common_bones,
-											additional_bones);
-
-				// Now that we know how many bones this batch of faces has in common
-				// with the
-				// palette, and how many new bones it will add, we can work out if it's
-				// a good
-				// idea to use this batch next (assuming it will fit at all).
-				if(additional_bones <= remaining_space)
+				if(bones_size > max_bones)
 				{
-					// Does it have the most in common so far with this palette?
-					if(common_bones > max_common)
+					it_largest_combination = it_combination;
+					max_bones = bones_size;
+				} // End if largest
+
+				// Test against each palette
+				for(size_t i = 0; i < _bone_palettes.size(); ++i)
+				{
+					std::int32_t common_bones, additional_bones, remaining_space;
+					auto& palette = _bone_palettes[i];
+
+					if(data_group_id != palette.get_data_group())
+						continue;
+					// Also compute how the combination might fit into this palette if at
+					// all
+					palette.compute_palette_fit(influences_ptr->bones, remaining_space, common_bones,
+												additional_bones);
+
+					// Now that we know how many bones this batch of faces has in common
+					// with the
+					// palette, and how many new bones it will add, we can work out if it's
+					// a good
+					// idea to use this batch next (assuming it will fit at all).
+					if(additional_bones <= remaining_space)
 					{
-						max_common = common_bones;
-						it_best_combination = it_combination;
-						palette_id = static_cast<int>(i);
+						// Does it have the most in common so far with this palette?
+						if(common_bones > max_common)
+						{
+							max_common = common_bones;
+							it_best_combination = it_combination;
+							palette_id = static_cast<int>(i);
 
-					} // End if better choice
+						} // End if better choice
 
-				} // End if smaller
+					} // End if smaller
 
-			} // Next Palette
+				} // Next Palette
 
-		} // Next influence combination
+			} // Next influence combination
 
-		// If nothing was found then we have run out of influences relevant to the
-		// source material
-		if(it_largest_combination == bone_combinations.end())
-			break;
+			// If nothing was found then we have run out of influences relevant to the
+			// source material
+			if(it_largest_combination == bone_combinations.end())
+				break;
 
-		// We should hopefully have selected at least one good candidate for
-		// insertion
-		// into an existing palette that we can now process. If not, we must create
-		// a new palette into which we will store the combination with the largest
-		// number of bones discovered.
-		if(palette_id >= 0)
-		{
-			face_influences* influences_ptr = it_best_combination->first.influences;
-			std::vector<std::uint32_t>* face_list_ptr = it_best_combination->second;
+			// We should hopefully have selected at least one good candidate for
+			// insertion
+			// into an existing palette that we can now process. If not, we must create
+			// a new palette into which we will store the combination with the largest
+			// number of bones discovered.
+			if(palette_id >= 0)
+			{
+				face_influences* influences_ptr = it_best_combination->first.influences;
+				std::vector<std::uint32_t>* face_list_ptr = it_best_combination->second;
 
-			// At least one good combination was found that can be added to an
-			// existing palette.
-			_bone_palettes[static_cast<std::size_t>(palette_id)].assign_bones(influences_ptr->bones,
-																			  *face_list_ptr);
+				// At least one good combination was found that can be added to an
+				// existing palette.
+				auto& palette = _bone_palettes[static_cast<std::size_t>(palette_id)];
+				palette.assign_bones(influences_ptr->bones, *face_list_ptr);
 
-			// We should now remove the selected combination.
-			bone_combinations.erase(it_best_combination);
-			checked_delete(influences_ptr);
-			checked_delete(face_list_ptr);
+				// We should now remove the selected combination.
+				bone_combinations.erase(it_best_combination);
+				checked_delete(influences_ptr);
+				checked_delete(face_list_ptr);
 
-		} // End if found fit
-		else
-		{
-			face_influences* influences_ptr = it_largest_combination->first.influences;
-			std::vector<std::uint32_t>* face_list_ptr = it_largest_combination->second;
+			} // End if found fit
+			else
+			{
+				const auto data_group = it_largest_combination->first.data_group_id;
+				face_influences* influences_ptr = it_largest_combination->first.influences;
+				std::vector<std::uint32_t>* face_list_ptr = it_largest_combination->second;
 
-			// No combination of face influences was able to fit into an existing
-			// palette.
-			// We must generate a new one and store the largest combination
-			// discovered.
-			bone_palette new_palette(palette_size);
-			new_palette.set_data_group(static_cast<std::uint32_t>(_bone_palettes.size()));
-			new_palette.assign_bones(influences_ptr->bones, *face_list_ptr);
-			_bone_palettes.push_back(new_palette);
+				// No combination of face influences was able to fit into an existing
+				// palette.
+				// We must generate a new one and store the largest combination
+				// discovered.
+				bone_palette new_palette(palette_size);
+				new_palette.set_data_group(data_group);
+				new_palette.assign_bones(influences_ptr->bones, *face_list_ptr);
+				_bone_palettes.push_back(new_palette);
 
-			// We should now remove the selected combination.
-			bone_combinations.erase(it_largest_combination);
-			checked_delete(influences_ptr);
-			checked_delete(face_list_ptr);
+				// We should now remove the selected combination.
+				bone_combinations.erase(it_largest_combination);
+				checked_delete(influences_ptr);
+				checked_delete(face_list_ptr);
 
-		} // End if none found
+			} // End if none found
 
-	} // Next iteration
-
+		} // Next iteration
+	}
 	// Bone palettes are now fully constructed. mesh vertices must now be split as
 	// necessary in cases where they are shared by faces in alternate palettes.
 	for(size_t i = 0; i < _bone_palettes.size(); ++i)
@@ -496,6 +509,12 @@ bool mesh::bind_armature(std::unique_ptr<armature_node>& root)
 {
 	_root = std::move(root);
 	return true;
+}
+
+void mesh::set_subset_count(uint32_t count)
+{
+	if(count > 0)
+		_mesh_subsets.resize(count);
 }
 
 bool mesh::prepare_mesh(const gfx::VertexDecl& format)
@@ -4863,6 +4882,10 @@ bool operator<(const mesh::weld_key& key1, const mesh::weld_key& key2)
 
 bool operator<(const mesh::bone_combination_key& key1, const mesh::bone_combination_key& key2)
 {
+	// Data group id must match.
+	if(key1.data_group_id != key2.data_group_id)
+		return key1.data_group_id < key2.data_group_id;
+
 	const mesh::face_influences* p1 = key1.influences;
 	const mesh::face_influences* p2 = key2.influences;
 

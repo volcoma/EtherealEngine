@@ -2,6 +2,17 @@
 #include "core/meta/math/transform.hpp"
 #include "core/serialization/binary_archive.h"
 
+REFLECT(mesh::info)
+{
+	rttr::registration::class_<mesh::info>("info")
+		.property_readonly("vertices", &mesh::info::vertices)(rttr::metadata("pretty_name", "Vertices"),
+															  rttr::metadata("Tooltip", "Vertices count."))
+		.property_readonly("primitives", &mesh::info::primitives)(
+			rttr::metadata("pretty_name", "Primitives"), rttr::metadata("Tooltip", "Primitives count."))
+		.property_readonly("subsets", &mesh::info::subsets)(rttr::metadata("pretty_name", "Subsets"),
+															rttr::metadata("Tooltip", "Subsets count."));
+}
+
 namespace bgfx
 {
 SAVE(VertexDecl)
@@ -106,6 +117,7 @@ SAVE(mesh::load_data)
 	try_save(ar, cereal::make_nvp("vertex_data", obj.vertex_data));
 	try_save(ar, cereal::make_nvp("triangle_count", obj.triangle_count));
 	try_save(ar, cereal::make_nvp("triangle_data", obj.triangle_data));
+	try_save(ar, cereal::make_nvp("material_count", obj.material_count));
 	try_save(ar, cereal::make_nvp("skin_data", obj.skin_data));
 	try_save(ar, cereal::make_nvp("root_node", obj.root_node));
 }
@@ -118,6 +130,7 @@ LOAD(mesh::load_data)
 	try_load(ar, cereal::make_nvp("vertex_data", obj.vertex_data));
 	try_load(ar, cereal::make_nvp("triangle_count", obj.triangle_count));
 	try_load(ar, cereal::make_nvp("triangle_data", obj.triangle_data));
+	try_load(ar, cereal::make_nvp("material_count", obj.material_count));
 	try_load(ar, cereal::make_nvp("skin_data", obj.skin_data));
 	try_load(ar, cereal::make_nvp("root_node", obj.root_node));
 }

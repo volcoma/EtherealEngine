@@ -19,7 +19,6 @@ void log_warning(const std::string& log_msg);
 }
 
 #define SERIALIZABLE(T)                                                                                      \
-	\
 public:                                                                                                      \
 	friend class serialization::access;                                                                      \
 	template <typename Archive>                                                                              \

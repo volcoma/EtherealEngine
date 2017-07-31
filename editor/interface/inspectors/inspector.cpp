@@ -1,5 +1,10 @@
 #include "inspector.h"
 
+REFLECT(inspector)
+{
+	rttr::registration::class_<inspector>("inspector");
+}
+
 void Tooltip(const rttr::property& prop)
 {
 	if(gui::IsItemHovered())

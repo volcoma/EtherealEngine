@@ -16,7 +16,7 @@ class material;
 class model_component : public runtime::component_impl<model_component>
 {
 	SERIALIZABLE(model_component)
-	REFLECTABLE(model_component, component)
+	REFLECTABLEV(model_component, component)
 
 public:
 	//-------------------------------------------------------------------------

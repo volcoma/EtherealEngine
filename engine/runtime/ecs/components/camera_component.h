@@ -24,7 +24,7 @@
 class camera_component : public runtime::component_impl<camera_component>
 {
 	SERIALIZABLE(camera_component)
-	REFLECTABLE(camera_component, runtime::component)
+	REFLECTABLEV(camera_component, runtime::component)
 public:
 	//-------------------------------------------------------------------------
 	// Constructors & Destructors

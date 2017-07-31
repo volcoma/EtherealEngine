@@ -17,7 +17,7 @@
 class transform_component : public runtime::component_impl<transform_component>
 {
 	SERIALIZABLE(transform_component)
-	REFLECTABLE(transform_component, runtime::component)
+	REFLECTABLEV(transform_component, runtime::component)
 
 public:
 	//-------------------------------------------------------------------------

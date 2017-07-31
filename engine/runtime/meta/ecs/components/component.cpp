@@ -2,6 +2,11 @@
 #include "../entity.hpp"
 #include "core/serialization/associative_archive.h"
 
+REFLECT(runtime::component)
+{
+	rttr::registration::class_<runtime::component>("component");
+}
+
 namespace runtime
 {
 SAVE(component)

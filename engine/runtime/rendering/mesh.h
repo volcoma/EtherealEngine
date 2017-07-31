@@ -416,24 +416,6 @@ public:
 	// mesh Construction Structures
 	struct load_data
 	{
-		struct load_material
-		{
-			enum texture_type
-			{
-				BaseColor,
-				Emissive,
-				Normal,
-				AO,
-				Roughness,
-				Metalness,
-				Count
-			};
-
-			math::color base_color = {0.0f, 0.0f, 0.0f, 0.0f};
-			math::color emissive_color = {0.0f, 0.0f, 0.0f, 0.0f};
-			std::vector<std::string> textures = std::vector<std::string>(texture_type::Count);
-		};
-
 		/// The format of the vertex data currently being used to prepare the mesh.
 		gfx::VertexDecl vertex_format;
 		/// Final vertex buffer currently being prepared.
@@ -444,12 +426,12 @@ public:
 		triangle_array_t triangle_data;
 		/// Total number of triangles currently stored here.
 		std::uint32_t triangle_count = 0;
+		/// Total number of materials
+		std::uint32_t material_count = 0;
 		/// Skin data for this import
 		skin_bind_data skin_data;
 		/// Imported nodes
 		std::unique_ptr<armature_node> root_node = nullptr;
-		/// Use texture_type as index
-		std::vector<load_material> materials;
 	};
 
 	//-------------------------------------------------------------------------
@@ -552,6 +534,14 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	bool bind_armature(std::unique_ptr<armature_node>& root);
+
+	//-----------------------------------------------------------------------------
+	//  Name : set_material_count ()
+	/// <summary>
+	///
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	void set_subset_count(std::uint32_t count);
 
 	//-----------------------------------------------------------------------------
 	//  Name : create_cube ()
@@ -958,10 +948,11 @@ protected:
 	struct bone_combination_key
 	{
 		face_influences* influences = nullptr;
-
+		std::uint32_t data_group_id = 0;
 		// Constructor
-		bone_combination_key(face_influences* _influences)
+		bone_combination_key(face_influences* _influences, std::uint32_t group_id)
 			: influences(_influences)
+			, data_group_id(group_id)
 		{
 		}
 	};

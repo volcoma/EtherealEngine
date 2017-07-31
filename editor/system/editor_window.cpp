@@ -447,6 +447,11 @@ void main_editor_window::on_start_page()
 	gui::EndGroup();
 }
 
+void main_editor_window::show_start_page(bool show)
+{
+	_show_start_page = show;
+}
+
 void main_editor_window::set_log(const std::string& name, std::shared_ptr<console_log> log)
 {
 	_console_dock_name = name;

@@ -13,7 +13,7 @@ public:
 	inspector_entity(const inspector_entity& other);
 	virtual ~inspector_entity();
 
-	REFLECTABLE(inspector_entity, inspector)
+	REFLECTABLEV(inspector_entity, inspector)
 
 	bool inspect(rttr::variant& var, bool readOnly,
 				 std::function<rttr::variant(const rttr::variant&)> get_metadata);

@@ -6,7 +6,7 @@
 
 struct inspector
 {
-	REFLECTABLE(inspector)
+	REFLECTABLEV(inspector)
 
 	virtual ~inspector() = default;
 
@@ -25,15 +25,12 @@ struct property_layout
 	~property_layout();
 };
 
-REFLECT(inspector)
-{
-	rttr::registration::class_<inspector>("inspector");
-}
+REFLECT_EXTERN(inspector);
 
 #define INSPECTED_TYPE "inspected_type"
 
 #define INSPECTOR_REFLECT(inspector_type, inspected_type)                                                    \
-	REFLECT(inspector_type)                                                                                  \
+	REFLECT_INLINE(inspector_type)                                                                           \
 	{                                                                                                        \
 		rttr::registration::class_<inspector_type>(#inspector_type)(                                         \
 			rttr::metadata(INSPECTED_TYPE, rttr::type::get<inspected_type>()))                               \

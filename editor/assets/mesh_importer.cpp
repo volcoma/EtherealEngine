@@ -124,6 +124,7 @@ void process_faces(aiMesh* mesh, mesh::load_data& load_data)
 		mesh::triangle triangle;
 
 		triangle.data_group_id = mesh->mMaterialIndex;
+		load_data.material_count = std::max(load_data.material_count, triangle.data_group_id + 1);
 
 		auto num_indices = std::min<size_t>(face.mNumIndices, 3);
 
@@ -190,72 +191,12 @@ void process_mesh(aiMesh* mesh, mesh::load_data& load_data)
 	process_bones(mesh, load_data);
 }
 
-void process_material(aiMaterial* mat, mesh::load_data& load_data)
-{
-	auto mat_index = load_data.materials.size();
-	load_data.materials.push_back({});
-	// Build the material Diffuse, Specular, NormalMap and DisplacementColor surfaces.
-	aiColor3D color;
-	float opacity = 0.0f;
-
-	mesh::load_data::load_material data;
-
-	auto is_not_black = [](aiColor3D color) { return color.r != 0.0f || color.g != 0.0f || color.b != 0.0f; };
-
-	auto process_color = [](const aiColor3D& c) { return math::color(c.r, c.g, c.b, 1.0f); };
-
-	if(mat->Get(AI_MATKEY_COLOR_DIFFUSE, color) == AI_SUCCESS) // always keep black color for diffuse
-	{
-		data.base_color = process_color(color);
-	}
-	if(mat->Get(AI_MATKEY_COLOR_EMISSIVE, color) == AI_SUCCESS && is_not_black(color))
-	{
-		data.emissive_color = process_color(color);
-	}
-	if(mat->Get(AI_MATKEY_OPACITY, opacity) == AI_SUCCESS)
-	{
-		data.base_color.value.a = opacity;
-	}
-
-	auto get_texture = [](std::size_t mat_index, aiMaterial* mat, mesh::load_data& load_data, aiTextureType t,
-						  mesh::load_data::load_material::texture_type) {
-		const auto textures = mat->GetTextureCount(t);
-		if(textures > 0)
-		{
-			aiString path;
-			aiTextureMapping mapping;
-			unsigned int index = 0;
-			float blend = 0.0f;
-			aiTextureOp textureOp;
-			aiTextureMapMode mapMode;
-			if(AI_SUCCESS == mat->GetTexture(t, 0, &path, &mapping, &index, &blend, &textureOp, &mapMode))
-			{
-				std::string relative_path = path.C_Str();
-				load_data.materials[mat_index].textures[t] = relative_path;
-			}
-		}
-	};
-
-	get_texture(mat_index, mat, load_data, aiTextureType_DIFFUSE, mesh::load_data::load_material::BaseColor);
-	get_texture(mat_index, mat, load_data, aiTextureType_NORMALS, mesh::load_data::load_material::Normal);
-	get_texture(mat_index, mat, load_data, aiTextureType_EMISSIVE, mesh::load_data::load_material::Emissive);
-}
-
 void process_meshes(const aiScene* scene, mesh::load_data& load_data)
 {
 	for(size_t i = 0; i < scene->mNumMeshes; ++i)
 	{
 		aiMesh* mesh = scene->mMeshes[i];
 		process_mesh(mesh, load_data);
-	}
-}
-
-void process_materials(const aiScene* scene, mesh::load_data& load_data)
-{
-	for(size_t i = 0; i < scene->mNumMaterials; ++i)
-	{
-		aiMaterial* mat = scene->mMaterials[i];
-		process_material(mat, load_data);
 	}
 }
 
@@ -283,7 +224,6 @@ void process_imported_scene(const aiScene* scene, mesh::load_data& load_data)
 {
 	load_data.vertex_format = gfx::mesh_vertex::decl;
 	process_meshes(scene, load_data);
-	process_materials(scene, load_data);
 	process_nodes(scene, load_data);
 }
 

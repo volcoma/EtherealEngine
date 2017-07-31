@@ -21,10 +21,8 @@
 #endif
 
 template <typename T>
-static void rttr_auto_register_reflection_function_t();
+extern void rttr_auto_register_reflection_function_t();
 
-namespace
-{
 template <typename T>
 struct rttr__auto__register__t
 {
@@ -32,11 +30,25 @@ struct rttr__auto__register__t
 	{
 		::rttr_auto_register_reflection_function_t<T>();
 	}
+
+	static const rttr__auto__register__t& get_instance()
+	{
+		static rttr__auto__register__t inst;
+		return inst;
+	}
 };
-}
+
+#define REFLECT_INLINE(cls)                                                                                  \
+	static const rttr__auto__register__t<cls>& ANONYMOUS_VARIABLE(auto_register__) =                         \
+		rttr__auto__register__t<cls>::get_instance();                                                        \
+	template <>                                                                                              \
+	inline void rttr_auto_register_reflection_function_t<cls>()
+
+#define REFLECT_EXTERN(cls)                                                                                  \
+	static const rttr__auto__register__t<cls>& ANONYMOUS_VARIABLE(auto_register__) =                         \
+		rttr__auto__register__t<cls>::get_instance()
 
 #define REFLECT(cls)                                                                                         \
-	static const rttr__auto__register__t<cls> ANONYMOUS_VARIABLE(auto_register__);                           \
 	template <>                                                                                              \
 	void rttr_auto_register_reflection_function_t<cls>()
 

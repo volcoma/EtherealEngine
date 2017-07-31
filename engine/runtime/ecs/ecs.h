@@ -264,7 +264,7 @@ private:
 
 class component : public std::enable_shared_from_this<component>
 {
-	REFLECTABLE(component)
+	REFLECTABLEV(component)
 	SERIALIZABLE(component)
 	friend class entity_component_system;
 

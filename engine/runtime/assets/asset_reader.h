@@ -31,5 +31,5 @@ inline core::task_future<asset_handle<T>> load_from_instance(const std::string& 
 
 	return create_handle;
 }
-};
+}
 }

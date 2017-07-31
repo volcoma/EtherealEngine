@@ -22,7 +22,7 @@ enum class cull_type : std::uint32_t
 class material
 {
 public:
-	REFLECTABLE(material)
+	REFLECTABLEV(material)
 	SERIALIZABLE(material)
 
 	//-----------------------------------------------------------------------------
@@ -189,8 +189,8 @@ protected:
 class standard_material : public material
 {
 public:
-	REFLECTABLE(standard_material, material)
 	SERIALIZABLE(standard_material)
+	REFLECTABLEV(standard_material, material)
 
 	//-----------------------------------------------------------------------------
 	//  Name : standard_material ()

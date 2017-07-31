@@ -163,10 +163,10 @@ core::task_future<asset_handle<mesh>> load_from_file<mesh>(const std::string& ke
 
 			try_load(ar, cereal::make_nvp("mesh", data));
 		}
-
 		wrapper->mesh->prepare_mesh(data.vertex_format);
 		wrapper->mesh->set_vertex_source(&data.vertex_data[0], data.vertex_count, data.vertex_format);
 		wrapper->mesh->add_primitives(data.triangle_data);
+		wrapper->mesh->set_subset_count(data.material_count);
 		wrapper->mesh->bind_skin(data.skin_data);
 		wrapper->mesh->bind_armature(data.root_node);
 		wrapper->mesh->end_prepare(true, false, false, false);

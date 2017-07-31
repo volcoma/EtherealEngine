@@ -22,7 +22,7 @@
 class light_component : public runtime::component_impl<light_component>
 {
 	SERIALIZABLE(light_component)
-	REFLECTABLE(light_component, runtime::component)
+	REFLECTABLEV(light_component, runtime::component)
 public:
 	//-------------------------------------------------------------------------
 	// Constructors & Destructors

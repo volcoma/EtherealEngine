@@ -3,10 +3,7 @@
 #include "core/reflection/reflection.h"
 #include "core/serialization/serialization.h"
 
-REFLECT(runtime::component)
-{
-	rttr::registration::class_<runtime::component>("component");
-}
+REFLECT_EXTERN(runtime::component);
 
 namespace runtime
 {

@@ -174,12 +174,15 @@ void model::render(std::uint8_t id, const math::transform& mtx, bool apply_cull,
 				extra_states |= mat->get_render_states(apply_cull, depth_write, depth_test);
 			}
 
-			gfx::setTransform(mtx, static_cast<std::uint16_t>(count));
+			if(mtx != nullptr)
+				gfx::setTransform(mtx, static_cast<std::uint16_t>(count));
+
 			gfx::setState(extra_states);
 
 			mesh->draw_subset(group_id);
-			gfx::submit(id, program->handle, 0,
-						mat == last_set_material && group_id < (mesh->get_subset_count() - 1));
+			const auto subset_count = mesh->get_subset_count();
+			bool preserveState = mat == last_set_material && group_id < (subset_count - 1);
+			gfx::submit(id, program->handle, 0, preserveState);
 		}
 
 		last_set_material = mat;
@@ -203,8 +206,8 @@ void model::render(std::uint8_t id, const math::transform& mtx, bool apply_cull,
 			// Apply the bone palette.
 			auto skinning_matrices = palette.get_skinning_matrices(mtx, node_transforms, skin_data, false);
 			// auto max_blend_index = palette.get_maximum_blend_index();
-			auto data_group = palette.get_data_group();
 
+			auto data_group = palette.get_data_group();
 			render_subset(id, true, data_group, reinterpret_cast<float*>(&skinning_matrices[0]),
 						  std::uint32_t(skinning_matrices.size()), apply_cull, depth_write, depth_test,
 						  extra_states, user_program, setup_params);

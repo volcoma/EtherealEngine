@@ -560,7 +560,7 @@ public:
 	/// Retrieve the bounding box of this object.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual math::bbox get_local_bounding_box();
+	math::bbox get_local_bounding_box();
 
 	//-----------------------------------------------------------------------------
 	//  Name : () touch
@@ -568,7 +568,7 @@ public:
 	/// When the camera is modified.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void touch();
+	void touch();
 
 protected:
 	//-------------------------------------------------------------------------

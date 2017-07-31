@@ -3,16 +3,7 @@
 #include "core/reflection/reflection.h"
 #include "core/serialization/serialization.h"
 
-REFLECT(mesh::info)
-{
-	rttr::registration::class_<mesh::info>("info")
-		.property_readonly("vertices", &mesh::info::vertices)(rttr::metadata("pretty_name", "Vertices"),
-															  rttr::metadata("Tooltip", "Vertices count."))
-		.property_readonly("primitives", &mesh::info::primitives)(
-			rttr::metadata("pretty_name", "Primitives"), rttr::metadata("Tooltip", "Primitives count."))
-		.property_readonly("subsets", &mesh::info::subsets)(rttr::metadata("pretty_name", "Subsets"),
-															rttr::metadata("Tooltip", "Subsets count."));
-}
+REFLECT_EXTERN(mesh::info);
 
 namespace bgfx
 {

@@ -16,7 +16,7 @@
 class tags_component : public runtime::component_impl<tags_component>
 {
 	SERIALIZABLE(tags_component)
-	REFLECTABLE(tags_component, component)
+	REFLECTABLEV(tags_component, component)
 public:
 	/**
 	 * Construct a new tags_component with the given tags.

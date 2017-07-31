@@ -3,6 +3,13 @@
 #include "component.hpp"
 #include "core/meta/math/vector.hpp"
 
+REFLECT(reflection_probe_component)
+{
+	rttr::registration::class_<reflection_probe_component>("reflection_probe_component")(
+		rttr::metadata("Category", "Lighting"), rttr::metadata("Id", "Reflection Probe"))
+		.constructor<>()(rttr::policy::ctor::as_std_shared_ptr);
+}
+
 SAVE(reflection_probe_component)
 {
 	try_save(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::component>(&obj)));
