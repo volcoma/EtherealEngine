@@ -132,7 +132,6 @@ void ColladaLoader::SetupProperties(const Importer* pImp)
     ignoreUpDirection = pImp->GetPropertyInteger(AI_CONFIG_IMPORT_COLLADA_IGNORE_UP_DIRECTION,0) != 0;
 }
 
-
 // ------------------------------------------------------------------------------------------------
 // Get file extension list
 const aiImporterDesc* ColladaLoader::GetInfo () const
@@ -729,7 +728,7 @@ aiMesh* ColladaLoader::CreateMesh( const ColladaParser& pParser, const Collada::
                                 ? aiMorphingMethod_MORPH_RELATIVE
                                 : aiMorphingMethod_MORPH_NORMALIZED;
         dstMesh->mAnimMeshes = new aiAnimMesh*[animMeshes.size()];
-        dstMesh->mNumAnimMeshes = static_cast<unsigned int>(animMeshes.size());
+        dstMesh->mNumAnimMeshes = animMeshes.size();
         for (unsigned int i = 0; i < animMeshes.size(); i++)
             dstMesh->mAnimMeshes[i] = animMeshes.at(i);
     }
@@ -1378,9 +1377,9 @@ void ColladaLoader::CreateAnimation( aiScene* pScene, const ColladaParser& pPars
         {
               aiNodeAnim* dstAnim = new aiNodeAnim;
               dstAnim->mNodeName = nodeName;
-              dstAnim->mNumPositionKeys = static_cast<unsigned int>(resultTrafos.size());
-              dstAnim->mNumRotationKeys= static_cast<unsigned int>(resultTrafos.size());
-              dstAnim->mNumScalingKeys = static_cast<unsigned int>(resultTrafos.size());
+              dstAnim->mNumPositionKeys = resultTrafos.size();
+              dstAnim->mNumRotationKeys= resultTrafos.size();
+              dstAnim->mNumScalingKeys = resultTrafos.size();
               dstAnim->mPositionKeys = new aiVectorKey[resultTrafos.size()];
               dstAnim->mRotationKeys = new aiQuatKey[resultTrafos.size()];
               dstAnim->mScalingKeys = new aiVectorKey[resultTrafos.size()];
@@ -1446,11 +1445,11 @@ void ColladaLoader::CreateAnimation( aiScene* pScene, const ColladaParser& pPars
                     ++morphAnimChannelIndex;
                 }
 
-                morphAnim->mNumKeys = static_cast<unsigned int>(morphTimeValues.size());
+                morphAnim->mNumKeys = morphTimeValues.size();
                 morphAnim->mKeys = new aiMeshMorphKey[morphAnim->mNumKeys];
                 for (unsigned int key = 0; key < morphAnim->mNumKeys; key++)
                 {
-                    morphAnim->mKeys[key].mNumValuesAndWeights = static_cast<unsigned int>(morphChannels.size());
+                    morphAnim->mKeys[key].mNumValuesAndWeights = morphChannels.size();
                     morphAnim->mKeys[key].mValues = new unsigned int [morphChannels.size()];
                     morphAnim->mKeys[key].mWeights = new double [morphChannels.size()];
 
@@ -1471,13 +1470,13 @@ void ColladaLoader::CreateAnimation( aiScene* pScene, const ColladaParser& pPars
     {
         aiAnimation* anim = new aiAnimation;
         anim->mName.Set( pName);
-        anim->mNumChannels = static_cast<unsigned int>(anims.size());
+        anim->mNumChannels = anims.size();
         if (anim->mNumChannels > 0)
         {
             anim->mChannels = new aiNodeAnim*[anims.size()];
             std::copy( anims.begin(), anims.end(), anim->mChannels);
         }
-        anim->mNumMorphMeshChannels = static_cast<unsigned int>(morphAnims.size());
+        anim->mNumMorphMeshChannels = morphAnims.size();
         if (anim->mNumMorphMeshChannels > 0)
         {
             anim->mMorphMeshChannels = new aiMeshMorphAnim*[anim->mNumMorphMeshChannels];
@@ -1904,14 +1903,13 @@ const Collada::Node* ColladaLoader::FindNodeBySID( const Collada::Node* pNode, c
 }
 
 // ------------------------------------------------------------------------------------------------
-// Finds a proper name for a node derived from the collada-node's properties
+// Finds a proper unique name for a node derived from the collada-node's properties.
+// The name must be unique for proper node-bone association.
 std::string ColladaLoader::FindNameForNode( const Collada::Node* pNode)
 {
-    // now setup the name of the node. We take the name if not empty, otherwise the collada ID
-    // FIX: Workaround for XSI calling the instanced visual scene 'untitled' by default.
-    if (!pNode->mName.empty() && pNode->mName != "untitled")
-        return pNode->mName;
-    else if (!pNode->mID.empty())
+    // Now setup the name of the assimp node. The collada name might not be
+    // unique, so we use the collada ID.
+    if (!pNode->mID.empty())
         return pNode->mID;
     else if (!pNode->mSID.empty())
     return pNode->mSID;

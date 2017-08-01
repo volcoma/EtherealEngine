@@ -159,6 +159,9 @@ void PLYImporter::InternReadFile(const std::string& pFile,
 
   // Get the file-size
   size_t fileSize = fileStream->FileSize();
+  if ( 0 == fileSize ) {
+      throw DeadlyImportError("File " + pFile + " is empty.");
+  }
 
   IOStreamBuffer<char> streamedBuffer(1024 * 1024);
   streamedBuffer.open(fileStream.get());
@@ -758,7 +761,7 @@ void PLYImporter::LoadFace(const PLY::Element* pcElement, const PLY::ElementInst
         mGeneratedMesh->mFaces[pos].mIndices = new unsigned int[3];
         mGeneratedMesh->mFaces[pos].mIndices[0] = aiTable[0];
         mGeneratedMesh->mFaces[pos].mIndices[1] = aiTable[1];
-        mGeneratedMesh->mFaces[pos].mIndices[2] = aiTable[2];
+        mGeneratedMesh->mFaces[pos].mIndices[2] = p;
 
         if ((flip = !flip)) {
           std::swap(mGeneratedMesh->mFaces[pos].mIndices[0], mGeneratedMesh->mFaces[pos].mIndices[1]);

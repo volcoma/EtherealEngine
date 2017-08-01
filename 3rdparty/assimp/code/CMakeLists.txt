@@ -59,7 +59,7 @@ SET( PUBLIC_HEADERS
   ${HEADER_PATH}/camera.h
   ${HEADER_PATH}/color4.h
   ${HEADER_PATH}/color4.inl
-  ${CMAKE_CURRENT_LIST_DIR}/../include/assimp/config.h
+  ${CMAKE_CURRENT_BINARY_DIR}/../include/assimp/config.h
   ${HEADER_PATH}/defs.h
   ${HEADER_PATH}/cfileio.h
   ${HEADER_PATH}/light.h
@@ -192,13 +192,17 @@ ENDIF ( ASSIMP_BUILD_NONFREE_C4D_IMPORTER )
 # ASSIMP_BUILD_XXX_IMPORTER to FALSE for each importer
 # if this variable is set to FALSE, the user can manually enable importers by setting
 # ASSIMP_BUILD_XXX_IMPORTER to TRUE for each importer
-OPTION(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT "default value of all ASSIMP_BUILD_XXX_IMPORTER value" TRUE)
-
+#OPTION(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT "default value of all ASSIMP_BUILD_XXX_IMPORTER value" TRUE)
+SET(ASSIMP_IMPORT_FORMATS_ENABLED "") # list of enabled importers
+LIST(APPEND ASSIMP_IMPORT_FORMATS_ENABLED FBX OBJ 3DS COLLADA)
 # macro to add the CMake Option ADD_ASSIMP_IMPORTER_<name> which enables compile of loader
 # this way selective loaders can be compiled (reduces filesize + compile time)
 MACRO(ADD_ASSIMP_IMPORTER name)
-  OPTION(ASSIMP_BUILD_${name}_IMPORTER "build the ${name} importer" ${ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT})
-  IF(ASSIMP_BUILD_${name}_IMPORTER)
+  #OPTION(ASSIMP_BUILD_${name}_IMPORTER "build the ${name} importer" ${ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT})
+  
+  #IF(ASSIMP_BUILD_${name}_IMPORTER)
+  LIST (FIND ASSIMP_IMPORT_FORMATS_ENABLED ${name} _index)
+  IF (${_index} GREATER -1)
     LIST(APPEND ASSIMP_LOADER_SRCS ${ARGN})
     SET(ASSIMP_IMPORTERS_ENABLED "${ASSIMP_IMPORTERS_ENABLED} ${name}")
     SET(${name}_SRCS ${ARGN})
@@ -224,7 +228,7 @@ ADD_ASSIMP_IMPORTER( AMF
   AMFImporter_Material.cpp
   AMFImporter_Postprocess.cpp
 )
-add_definitions(-DASSIMP_BUILD_NO_AMF_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( 3DS
   3DSConverter.cpp
   3DSHelper.h
@@ -238,36 +242,36 @@ ADD_ASSIMP_IMPORTER( AC
   ACLoader.cpp
   ACLoader.h
 )
-add_definitions(-DASSIMP_BUILD_NO_AC_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( ASE
   ASELoader.cpp
   ASELoader.h
   ASEParser.cpp
   ASEParser.h
 )
-add_definitions(-DASSIMP_BUILD_NO_ASE_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( ASSBIN
   AssbinExporter.h
   AssbinExporter.cpp
   AssbinLoader.h
   AssbinLoader.cpp
 )
-add_definitions(-DASSIMP_BUILD_NO_ASSBIN_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( ASSXML
   AssxmlExporter.h
   AssxmlExporter.cpp
 )
-add_definitions(-DASSIMP_BUILD_NO_ASSXML_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( B3D
   B3DImporter.cpp
   B3DImporter.h
 )
-add_definitions(-DASSIMP_BUILD_NO_B3D_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( BVH
   BVHLoader.cpp
   BVHLoader.h
 )
-add_definitions(-DASSIMP_BUILD_NO_BVH_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( COLLADA
   ColladaHelper.h
   ColladaLoader.cpp
@@ -283,33 +287,33 @@ ADD_ASSIMP_IMPORTER( DXF
   DXFLoader.h
   DXFHelper.h
 )
-add_definitions(-DASSIMP_BUILD_NO_DXF_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( CSM
   CSMLoader.cpp
   CSMLoader.h
 )
-add_definitions(-DASSIMP_BUILD_NO_CSM_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( HMP
   HMPFileData.h
   HMPLoader.cpp
   HMPLoader.h
   HalfLifeFileData.h
 )
-add_definitions(-DASSIMP_BUILD_NO_HMP_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( IRRMESH
   IRRMeshLoader.cpp
   IRRMeshLoader.h
   IRRShared.cpp
   IRRShared.h
 )
-add_definitions(-DASSIMP_BUILD_NO_IRRMESH_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( IRR
   IRRLoader.cpp
   IRRLoader.h
   IRRShared.cpp
   IRRShared.h
 )
-add_definitions(-DASSIMP_BUILD_NO_IRR_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( LWO
   LWOAnimation.cpp
   LWOAnimation.h
@@ -319,39 +323,39 @@ ADD_ASSIMP_IMPORTER( LWO
   LWOLoader.h
   LWOMaterial.cpp
 )
-add_definitions(-DASSIMP_BUILD_NO_LWO_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( LWS
   LWSLoader.cpp
   LWSLoader.h
 )
-add_definitions(-DASSIMP_BUILD_NO_LWS_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( MD2
   MD2FileData.h
   MD2Loader.cpp
   MD2Loader.h
   MD2NormalTable.h
 )
-add_definitions(-DASSIMP_BUILD_NO_MD2_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( MD3
   MD3FileData.h
   MD3Loader.cpp
   MD3Loader.h
 )
-add_definitions(-DASSIMP_BUILD_NO_MD3_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( MD5
   MD5Loader.cpp
   MD5Loader.h
   MD5Parser.cpp
   MD5Parser.h
 )
-add_definitions(-DASSIMP_BUILD_NO_MD5_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( MDC
   MDCFileData.h
   MDCLoader.cpp
   MDCLoader.h
   MDCNormalTable.h
 )
-add_definitions(-DASSIMP_BUILD_NO_MDC_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( MDL
   MDLDefaultColorMap.h
   MDLFileData.h
@@ -359,7 +363,7 @@ ADD_ASSIMP_IMPORTER( MDL
   MDLLoader.h
   MDLMaterialLoader.cpp
 )
-add_definitions(-DASSIMP_BUILD_NO_MDL_IMPORTER)
+
 SET( MaterialSystem_SRCS
   MaterialSystem.cpp
   MaterialSystem.h
@@ -370,17 +374,17 @@ ADD_ASSIMP_IMPORTER( NFF
   NFFLoader.cpp
   NFFLoader.h
 )
-add_definitions(-DASSIMP_BUILD_NO_NFF_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( NDO
   NDOLoader.cpp
   NDOLoader.h
 )
-add_definitions(-DASSIMP_BUILD_NO_NDO_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( OFF
   OFFLoader.cpp
   OFFLoader.h
 )
-add_definitions(-DASSIMP_BUILD_NO_OFF_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( OBJ
   ObjFileData.h
   ObjFileImporter.cpp
@@ -406,7 +410,7 @@ ADD_ASSIMP_IMPORTER( OGRE
   OgreXmlSerializer.cpp
   OgreMaterial.cpp
 )
-add_definitions(-DASSIMP_BUILD_NO_OGRE_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( OPENGEX
   OpenGEXExporter.cpp
   OpenGEXExporter.h
@@ -414,7 +418,7 @@ ADD_ASSIMP_IMPORTER( OPENGEX
   OpenGEXImporter.h
   OpenGEXStructs.h
 )
-add_definitions(-DASSIMP_BUILD_NO_OPENGEX_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( PLY
   PlyLoader.cpp
   PlyLoader.h
@@ -423,18 +427,18 @@ ADD_ASSIMP_IMPORTER( PLY
   PlyExporter.cpp
   PlyExporter.h
 )
-add_definitions(-DASSIMP_BUILD_NO_PLY_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( MS3D
   MS3DLoader.cpp
   MS3DLoader.h
 )
-add_definitions(-DASSIMP_BUILD_NO_MS3D_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( COB
   COBLoader.cpp
   COBLoader.h
   COBScene.h
 )
-add_definitions(-DASSIMP_BUILD_NO_COB_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( BLEND
   BlenderLoader.cpp
   BlenderLoader.h
@@ -480,13 +484,12 @@ if (ASSIMP_BUILD_IFC_IMPORTER)
     set_source_files_properties(IFCReaderGen1.cpp IFCReaderGen2.cpp PROPERTIES COMPILE_FLAGS "-O2 -Wa,-mbig-obj")
   endif()
 endif (ASSIMP_BUILD_IFC_IMPORTER)
-add_definitions(-DASSIMP_BUILD_NO_IFC_IMPORTER)
 
 ADD_ASSIMP_IMPORTER( XGL
   XGLLoader.cpp
   XGLLoader.h
 )
-add_definitions(-DASSIMP_BUILD_NO_XGL_IMPORTER)
+
 
 ADD_ASSIMP_IMPORTER( FBX
   FBXImporter.cpp
@@ -578,7 +581,7 @@ ADD_ASSIMP_IMPORTER( Q3D
   Q3DLoader.cpp
   Q3DLoader.h
 )
-add_definitions(-DASSIMP_BUILD_NO_Q3D_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( Q3BSP
   Q3BSPFileData.h
   Q3BSPFileParser.h
@@ -588,39 +591,39 @@ ADD_ASSIMP_IMPORTER( Q3BSP
   Q3BSPZipArchive.h
   Q3BSPZipArchive.cpp
 )
-add_definitions(-DASSIMP_BUILD_NO_Q3BSP_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( RAW
   RawLoader.cpp
   RawLoader.h
 )
-add_definitions(-DASSIMP_BUILD_NO_RAW_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( SIB
   SIBImporter.cpp
   SIBImporter.h
 )
-add_definitions(-DASSIMP_BUILD_NO_SIB_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( SMD
   SMDLoader.cpp
   SMDLoader.h
 )
-add_definitions(-DASSIMP_BUILD_NO_SMD_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( STL
   STLLoader.cpp
   STLLoader.h
   STLExporter.h
   STLExporter.cpp
 )
-add_definitions(-DASSIMP_BUILD_NO_STL_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( TERRAGEN
   TerragenLoader.cpp
   TerragenLoader.h
 )
-add_definitions(-DASSIMP_BUILD_NO_TERRAGEN_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( 3D
   UnrealLoader.cpp
   UnrealLoader.h
 )
-add_definitions(-DASSIMP_BUILD_NO_3D_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( X
   XFileHelper.h
   XFileImporter.cpp
@@ -630,7 +633,7 @@ ADD_ASSIMP_IMPORTER( X
   XFileExporter.h
   XFileExporter.cpp
 )
-add_definitions(-DASSIMP_BUILD_NO_X_IMPORTER)
+
 ADD_ASSIMP_IMPORTER(X3D
   X3DExporter.cpp
   X3DExporter.hpp
@@ -648,8 +651,11 @@ ADD_ASSIMP_IMPORTER(X3D
   X3DImporter_Rendering.cpp
   X3DImporter_Shape.cpp
   X3DImporter_Texturing.cpp
+  FIReader.hpp
+  FIReader.cpp
+  X3DVocabulary.cpp
 )
-add_definitions(-DASSIMP_BUILD_NO_X3D_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( GLTF
   glTFAsset.h
   glTFAsset.inl
@@ -659,15 +665,21 @@ ADD_ASSIMP_IMPORTER( GLTF
   glTFImporter.h
   glTFExporter.h
   glTFExporter.cpp
+  glTF2Asset.h
+  glTF2Asset.inl
+  glTF2AssetWriter.h
+  glTF2AssetWriter.inl
+  glTF2Exporter.h
+  glTF2Exporter.cpp
 )
-add_definitions(-DASSIMP_BUILD_NO_GLTF_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( 3MF
     D3MFImporter.h
     D3MFImporter.cpp
     D3MFOpcPackage.h
     D3MFOpcPackage.cpp
 )
-add_definitions(-DASSIMP_BUILD_NO_3MF_IMPORTER)
+
 ADD_ASSIMP_IMPORTER( MMD
   MMDCpp14.h
   MMDImporter.cpp
@@ -677,7 +689,7 @@ ADD_ASSIMP_IMPORTER( MMD
   MMDPmxParser.cpp
   MMDVmdParser.h
 )
-add_definitions(-DASSIMP_BUILD_NO_MMD_IMPORTER)
+
 SET( Step_SRCS
   StepExporter.h
   StepExporter.cpp
@@ -932,14 +944,25 @@ if (ASSIMP_ANDROID_JNIIOSYSTEM)
 endif(ASSIMP_ANDROID_JNIIOSYSTEM)
 
 if(MSVC AND ASSIMP_INSTALL_PDB)
-  install(FILES ${Assimp_BINARY_DIR}/code/Debug/assimp${LIBRARY_SUFFIX}${CMAKE_DEBUG_POSTFIX}.pdb
-    DESTINATION ${ASSIMP_LIB_INSTALL_DIR}
-    CONFIGURATIONS Debug
-  )
-  install(FILES ${Assimp_BINARY_DIR}/code/RelWithDebInfo/assimp${LIBRARY_SUFFIX}.pdb
-    DESTINATION ${ASSIMP_LIB_INSTALL_DIR}
-    CONFIGURATIONS RelWithDebInfo
-  )
+  IF(CMAKE_GENERATOR MATCHES "^Visual Studio")
+    install(FILES ${Assimp_BINARY_DIR}/code/Debug/assimp${LIBRARY_SUFFIX}${CMAKE_DEBUG_POSTFIX}.pdb
+      DESTINATION ${ASSIMP_LIB_INSTALL_DIR}
+      CONFIGURATIONS Debug
+    )
+    install(FILES ${Assimp_BINARY_DIR}/code/RelWithDebInfo/assimp${LIBRARY_SUFFIX}.pdb
+      DESTINATION ${ASSIMP_LIB_INSTALL_DIR}
+      CONFIGURATIONS RelWithDebInfo
+    )
+  ELSE()
+    install(FILES ${Assimp_BINARY_DIR}/code/assimp${LIBRARY_SUFFIX}${CMAKE_DEBUG_POSTFIX}.pdb
+      DESTINATION ${ASSIMP_LIB_INSTALL_DIR}
+      CONFIGURATIONS Debug
+    )
+    install(FILES ${Assimp_BINARY_DIR}/code/assimp${LIBRARY_SUFFIX}.pdb
+      DESTINATION ${ASSIMP_LIB_INSTALL_DIR}
+      CONFIGURATIONS RelWithDebInfo
+    )
+  ENDIF()
 endif ()
 
 if (ASSIMP_COVERALLS)

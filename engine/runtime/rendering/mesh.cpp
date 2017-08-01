@@ -4697,7 +4697,7 @@ bone_palette::get_skinning_matrices(const math::transform& root_transform,
 		auto bone = _bones[i];
 		const auto& bone_transform = node_transforms[bone];
 		const auto& bone_data = bind_list[bone];
-		auto& transform = transforms[bone];
+		auto& transform = transforms[i];
 		transform = root_transform * bone_transform * bone_data.bind_pose_transform;
 		if(compute_inverse_transpose)
 		{

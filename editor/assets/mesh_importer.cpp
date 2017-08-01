@@ -141,54 +141,53 @@ void process_bones(aiMesh* mesh, mesh::load_data& load_data)
 {
 	if(mesh->mBones)
 	{
-		skin_bind_data::bone_influence_array_t bone_influences;
+		auto& bone_influences = load_data.skin_data.get_bones();
+
 		for(size_t i = 0; i < mesh->mNumBones; ++i)
 		{
 			aiBone* assimp_bone = mesh->mBones[i];
-			skin_bind_data::bone_influence bone_influence;
-			bone_influence.bone_id = assimp_bone->mName.C_Str();
-			const aiMatrix4x4& assimp_matrix = assimp_bone->mOffsetMatrix;
-			bone_influence.bind_pose_transform = process_matrix(assimp_matrix);
+			const std::string bone_name = assimp_bone->mName.C_Str();
+
+			auto it = std::find_if(std::begin(bone_influences), std::end(bone_influences),
+								   [&bone_name](const auto& bone) { return bone_name == bone.bone_id; });
+
+			skin_bind_data::bone_influence* bone_ptr = nullptr;
+			if(it != std::end(bone_influences))
+			{
+				bone_ptr = &(*it);
+			}
+			else
+			{
+				const auto& assimp_matrix = assimp_bone->mOffsetMatrix;
+				skin_bind_data::bone_influence bone_influence;
+				bone_influence.bone_id = bone_name;
+				bone_influence.bind_pose_transform = process_matrix(assimp_matrix);
+				bone_influences.emplace_back(std::move(bone_influence));
+				bone_ptr = &bone_influences.back();
+			}
+
+			if(bone_ptr == nullptr)
+				continue;
 
 			for(size_t j = 0; j < assimp_bone->mNumWeights; ++j)
 			{
 				aiVertexWeight assimp_influence = assimp_bone->mWeights[j];
 
 				skin_bind_data::vertex_influence influence;
-				influence.vertex_index = assimp_influence.mVertexId;
+				influence.vertex_index = assimp_influence.mVertexId + load_data.vertex_count;
 				influence.weight = assimp_influence.mWeight;
 
-				bone_influence.influences.push_back(influence);
+				bone_ptr->influences.emplace_back(influence);
 			}
-
-			bone_influences.push_back(std::move(bone_influence));
 		}
-
-		for(size_t i = 0; i < bone_influences.size(); ++i)
-		{
-			const auto& bone_influence_to_insert = bone_influences[i];
-			bool exist = false;
-			const auto& bones = load_data.skin_data.get_bones();
-			for(auto& bone : bones)
-			{
-				if(bone.bone_id == bone_influence_to_insert.bone_id)
-				{
-					exist = true;
-					break;
-				}
-			}
-			if(!exist)
-				load_data.skin_data.add_bone(bone_influence_to_insert);
-		}
-		bone_influences.clear();
 	}
 }
 
 void process_mesh(aiMesh* mesh, mesh::load_data& load_data)
 {
 	process_faces(mesh, load_data);
-	process_vertices(mesh, load_data);
 	process_bones(mesh, load_data);
+	process_vertices(mesh, load_data);
 }
 
 void process_meshes(const aiScene* scene, mesh::load_data& load_data)
