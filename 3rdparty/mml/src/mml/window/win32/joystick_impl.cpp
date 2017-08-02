@@ -12,6 +12,7 @@
 #include <sstream>
 #include <string>
 #include <chrono>
+#include <iterator>
 
 namespace
 {

@@ -113,7 +113,7 @@ void process_vertices(aiMesh* mesh, mesh::load_data& load_data)
 	}
 }
 
-void process_faces(aiMesh* mesh, mesh::load_data& load_data)
+void process_faces(aiMesh* mesh, std::uint32_t subset_offset, mesh::load_data& load_data)
 {
 	load_data.triangle_count += mesh->mNumFaces;
 
@@ -130,14 +130,14 @@ void process_faces(aiMesh* mesh, mesh::load_data& load_data)
 
 		for(size_t j = 0; j < num_indices; ++j)
 		{
-			triangle.indices[j] = face.mIndices[j] + load_data.vertex_count;
+			triangle.indices[j] = face.mIndices[j] + subset_offset;
 		}
 
 		load_data.triangle_data.push_back(triangle);
 	}
 }
 
-void process_bones(aiMesh* mesh, mesh::load_data& load_data)
+void process_bones(aiMesh* mesh, std::uint32_t subset_offset, mesh::load_data& load_data)
 {
 	if(mesh->mBones)
 	{
@@ -174,7 +174,7 @@ void process_bones(aiMesh* mesh, mesh::load_data& load_data)
 				aiVertexWeight assimp_influence = assimp_bone->mWeights[j];
 
 				skin_bind_data::vertex_influence influence;
-				influence.vertex_index = assimp_influence.mVertexId + load_data.vertex_count;
+				influence.vertex_index = assimp_influence.mVertexId + subset_offset;
 				influence.weight = assimp_influence.mWeight;
 
 				bone_ptr->influences.emplace_back(influence);
@@ -185,8 +185,9 @@ void process_bones(aiMesh* mesh, mesh::load_data& load_data)
 
 void process_mesh(aiMesh* mesh, mesh::load_data& load_data)
 {
-	process_faces(mesh, load_data);
-	process_bones(mesh, load_data);
+	const auto mesh_vertices_offset = load_data.vertex_count;
+	process_faces(mesh, mesh_vertices_offset, load_data);
+	process_bones(mesh, mesh_vertices_offset, load_data);
 	process_vertices(mesh, load_data);
 }
 

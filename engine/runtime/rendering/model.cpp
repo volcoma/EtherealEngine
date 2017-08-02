@@ -143,9 +143,11 @@ void model::render(std::uint8_t id, const math::transform& mtx, bool apply_cull,
 		std::uint8_t id, bool skinned, std::uint32_t group_id, const float* mtx, std::uint32_t count,
 		bool apply_cull, bool depth_write, bool depth_test, std::uint64_t extra_states, program* user_program,
 		std::function<void(program&)> setup_params) {
+
 		bool valid_program = false;
 		program* program = user_program;
 		asset_handle<material> mat = get_material_for_group(group_id);
+
 		if(mat)
 		{
 			mat->skinned = skinned;

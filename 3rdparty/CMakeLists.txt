@@ -3,6 +3,7 @@ target_include_directories (filedialog PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_subdirectory_ex(assimp)
 target_include_directories (assimp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/assimp/include)
+target_include_directories (assimp PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/assimp/include)
 
 add_subdirectory_ex(bgfx)
 target_include_directories (bx PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/bgfx/bx/include)
