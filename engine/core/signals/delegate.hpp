@@ -134,7 +134,6 @@ class delegate<R(A...)>
 									   std::is_function<typename std::remove_pointer<F>::type>::value>;
 
 	public:
-
 		static void* get_pointer(const any_data& source)
 		{
 			return get_pointer_typed(source);
@@ -501,7 +500,7 @@ public:
 		if(manager_ && manager_->compare_type_(functor_, rhs.functor_))
 			return true;
 
-		return invoker_ == rhs.invoker_;
+		return false;
 	}
 
 	bool operator!=(delegate const& rhs) const noexcept
