@@ -136,7 +136,7 @@ class delegate<R(A...)>
 		// Retrieve a pointer to the function object
 		static F* get_pointer(const any_data& source)
 		{
-			const F* ptr = stored_locally ? std::__addressof(source.template access<F>())
+			const F* ptr = stored_locally ? std::addressof(source.template access<F>())
 										  /* have stored a pointer */
 										  : source.template access<F*>();
 			return const_cast<F*>(ptr);
