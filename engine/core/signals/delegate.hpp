@@ -133,124 +133,31 @@ class delegate<R(A...)>
 								   std::is_pointer<F>::value &&
 									   std::is_function<typename std::remove_pointer<F>::type>::value>;
 
-		// Retrieve a pointer to the function object
-		static F* get_pointer(const any_data& source)
-		{
-			const F* ptr = stored_locally ? std::addressof(source.template access<F>())
-										  /* have stored a pointer */
-										  : source.template access<F*>();
-			return const_cast<F*>(ptr);
-		}
-
-		// Clone a location-invariant function object that fits within
-		// an any_data structure.
-		static void clone(any_data& dest, const any_data& source, std::true_type, std::true_type)
-		{
-			new(dest.access()) F(source.template access<F>());
-		}
-
-		// Clone a function object that is not location-invariant or
-		// that cannot fit into an any_data structure.
-		static void clone(any_data& dest, const any_data& source, std::true_type, std::false_type)
-		{
-			dest.template access<F*>() = new F(*source.template access<F*>());
-		}
-
-		static void clone(any_data&, const any_data&, std::false_type, std::true_type)
-		{
-			assert(false && "TRYING TO COPY A NON-COPYABLE FUNCTOR/FUNCTION");
-		}
-
-		// Clone a function object that is not location-invariant or
-		// that cannot fit into an any_data structure.
-		static void clone(any_data&, const any_data&, std::false_type, std::false_type)
-		{
-			assert(false && "TRYING TO COPY A NON-COPYABLE FUNCTOR/FUNCTION");
-		}
-
-		// Compare a function object that is a member pair.
-		static bool compare_impl_pair(const any_data& data1, const any_data& data2)
-		{
-			const F* pair1 = get_pointer(data1);
-			const auto& obj_ptr1 = pair1->first;
-			const auto& func_ptr1 = pair1->second;
-
-			const F* pair2 = get_pointer(data2);
-			const auto& obj_ptr2 = pair2->first;
-			const auto& func_ptr2 = pair2->second;
-
-			return obj_ptr1 == obj_ptr2 && func_ptr1 == func_ptr2;
-		}
-
-		static bool compare_impl_function(const any_data& data1, const any_data& data2, std::true_type)
-		{
-			const F* ptr1 = get_pointer(data1);
-			const F* ptr2 = get_pointer(data2);
-
-			return *ptr1 == *ptr2;
-		}
-
-		static bool compare_impl_function(const any_data& data1, const any_data& data2, std::false_type)
-		{
-			const F* ptr1 = get_pointer(data1);
-			const F* ptr2 = get_pointer(data2);
-
-			return ptr1 == ptr2;
-		}
-
-		static bool compare(const any_data& data1, const any_data& data2, std::true_type)
-		{
-			return compare_impl_pair(data1, data2);
-		}
-
-		static bool compare(const any_data& data1, const any_data& data2, std::false_type)
-		{
-			return compare_impl_function(data1, data2, is_function_pointer());
-		}
-
-		// Destroying a location-invariant object may still require
-		// destruction.
-		static void destroy(any_data& victim, std::true_type)
-		{
-			victim.template access<F>().~F();
-		}
-
-		// Destroying an object located on the heap.
-		static void destroy(any_data& victim, std::false_type)
-		{
-			delete victim.template access<F*>();
-		}
-
 	public:
-		static void* manager(any_data& dest, const any_data& dest_const, const any_data& source,
-							 manager_operation op)
+
+		static void* get_pointer(const any_data& source)
 		{
-			switch(op)
-			{
-				case get_functor_ptr:
-					dest.template access<F*>() = get_pointer(source);
-					return get_pointer(source);
-
-				case compare_functor:
-					if(compare(dest_const, source, is_any_member_pair()))
-					{
-						return get_pointer(source);
-					}
-					return nullptr;
-				case clone_functor:
-					clone(dest, source, is_copiable(), local_storage());
-					return get_pointer(dest);
-
-				case destroy_functor:
-					destroy(dest, local_storage());
-					return get_pointer(dest);
-			}
-			return nullptr;
+			return get_pointer_typed(source);
 		}
 
-		static void initF(any_data& _F, F&& f)
+		static void clone(any_data& dest, const any_data& source)
 		{
-			initF(_F, std::move(f), local_storage());
+			clone_impl(dest, source, is_copiable());
+		}
+
+		static bool compare(const any_data& data1, const any_data& data2)
+		{
+			return compare_impl(data1, data2, is_any_member_pair());
+		}
+
+		static void destroy(any_data& victim)
+		{
+			destroy_impl(victim, local_storage());
+		}
+
+		static void init(any_data& _F, F&& f)
+		{
+			init_impl(_F, std::move(f), local_storage());
 		}
 
 		template <typename _Signature>
@@ -278,19 +185,120 @@ class delegate<R(A...)>
 		}
 
 	private:
-		static void initF(any_data& _F, F&& f, std::true_type)
+		// Retrieve a pointer to the function object
+		static F* get_pointer_typed(const any_data& source)
+		{
+			const F* ptr = stored_locally ? std::addressof(source.template access<F>())
+										  /* have stored a pointer */
+										  : source.template access<F*>();
+			return const_cast<F*>(ptr);
+		}
+
+		// Clone a function object that is not location-invariant or
+		// that cannot fit into an any_data structure.
+		static void clone_impl(any_data&, const any_data&, std::false_type)
+		{
+			assert(false && "TRYING TO COPY A NON-COPYABLE FUNCTOR/FUNCTION");
+		}
+
+		static void clone_impl(any_data& dest, const any_data& source, std::true_type)
+		{
+			clone_impl_local(dest, source, local_storage());
+		}
+
+		// Clone a location-invariant function object that fits within
+		// an any_data structure.
+		static void clone_impl_local(any_data& dest, const any_data& source, std::true_type)
+		{
+			new(dest.access()) F(source.template access<F>());
+		}
+
+		// Clone a function object that is not location-invariant or
+		// that cannot fit into an any_data structure.
+		static void clone_impl_local(any_data& dest, const any_data& source, std::false_type)
+		{
+			dest.template access<F*>() = new F(*source.template access<F*>());
+		}
+
+		// Compare a function object that is a member pair.
+		static bool compare_impl_pair(const any_data& data1, const any_data& data2)
+		{
+			const F* pair1 = get_pointer_typed(data1);
+			const auto& obj_ptr1 = pair1->first;
+			const auto& func_ptr1 = pair1->second;
+
+			const F* pair2 = get_pointer_typed(data2);
+			const auto& obj_ptr2 = pair2->first;
+			const auto& func_ptr2 = pair2->second;
+
+			return obj_ptr1 == obj_ptr2 && func_ptr1 == func_ptr2;
+		}
+
+		static bool compare_impl_function(const any_data& data1, const any_data& data2, std::true_type)
+		{
+			const F* ptr1 = get_pointer_typed(data1);
+			const F* ptr2 = get_pointer_typed(data2);
+
+			return *ptr1 == *ptr2;
+		}
+
+		static bool compare_impl_function(const any_data& data1, const any_data& data2, std::false_type)
+		{
+			const F* ptr1 = get_pointer_typed(data1);
+			const F* ptr2 = get_pointer_typed(data2);
+
+			return ptr1 == ptr2;
+		}
+
+		static bool compare_impl(const any_data& data1, const any_data& data2, std::true_type)
+		{
+			return compare_impl_pair(data1, data2);
+		}
+
+		static bool compare_impl(const any_data& data1, const any_data& data2, std::false_type)
+		{
+			return compare_impl_function(data1, data2, is_function_pointer());
+		}
+
+		// Destroying a location-invariant object may still require
+		// destruction.
+		static void destroy_impl(any_data& victim, std::true_type)
+		{
+			victim.template access<F>().~F();
+		}
+
+		// Destroying an object located on the heap.
+		static void destroy_impl(any_data& victim, std::false_type)
+		{
+			delete victim.template access<F*>();
+		}
+
+		static void init_impl(any_data& _F, F&& f, std::true_type)
 		{
 			new(_F.access()) F(std::move(f));
 		}
 
-		static void initF(any_data& _F, F&& f, std::false_type)
+		static void init_impl(any_data& _F, F&& f, std::false_type)
 		{
 			_F.template access<F*>() = new F(std::move(f));
 		}
 	};
 
-	using manager_type = void* (*)(any_data&, const any_data&, const any_data&, manager_operation);
+	// using manager_type = void* (*)(any_data&, const any_data&, const any_data&, manager_operation);
 	using invoker_type = R (*)(void* const, A...);
+	using get_pointer_type = void* (*)(const any_data&);
+	using clone_type = void (*)(any_data&, const any_data&);
+	using compare_type = bool (*)(const any_data&, const any_data&);
+	using destroy_type = void (*)(any_data&);
+
+	struct manager
+	{
+		get_pointer_type get_pointer_type_;
+		clone_type clone_type_;
+		compare_type compare_type_;
+		destroy_type destroy_type_;
+	};
+	using manager_type = const manager*;
 
 	any_data functor_;
 	manager_type manager_ = nullptr;
@@ -302,16 +310,16 @@ public:
 	~delegate()
 	{
 		if(manager_)
-			manager_(functor_, functor_, functor_, destroy_functor);
+			manager_->destroy_type_(functor_);
 	}
 
 	delegate(delegate const& rhs)
 	{
 		if(static_cast<bool>(rhs))
 		{
-			rhs.manager_(functor_, functor_, rhs.functor_, clone_functor);
 			invoker_ = rhs.invoker_;
 			manager_ = rhs.manager_;
+			manager_->clone_type_(functor_, rhs.functor_);
 		}
 	}
 
@@ -359,10 +367,13 @@ public:
 
 		if(handler::not_empty_function(f))
 		{
-			handler::initF(functor_, std::move(f));
+			handler::init(functor_, std::move(f));
+
+			constexpr static manager man{&handler::get_pointer, &handler::clone, &handler::compare,
+										 &handler::destroy};
 
 			invoker_ = &functor_stub<functor_type>;
-			manager_ = &handler::manager;
+			manager_ = &man;
 		}
 	}
 
@@ -382,7 +393,7 @@ public:
 	{
 		if(manager_)
 		{
-			manager_(functor_, functor_, functor_, destroy_functor);
+			manager_->destroy_type_(functor_);
 			manager_ = nullptr;
 			invoker_ = nullptr;
 		}
@@ -487,8 +498,7 @@ public:
 
 	bool operator==(delegate const& rhs) const noexcept
 	{
-		any_data dest;
-		if(manager_(dest, functor_, rhs.functor_, compare_functor))
+		if(manager_ && manager_->compare_type_(functor_, rhs.functor_))
 			return true;
 
 		return invoker_ == rhs.invoker_;
@@ -534,8 +544,7 @@ private:
 	{
 		if(manager_)
 		{
-			any_data data;
-			return manager_(data, functor_, functor_, get_functor_ptr);
+			return manager_->get_pointer_type_(functor_);
 		}
 		return nullptr;
 	}
