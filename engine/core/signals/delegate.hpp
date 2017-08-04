@@ -13,28 +13,28 @@ class delegate<R(A...)>
 {
 
 	template <class C>
-	using member_pair = ::std::pair<C* const, R (C::*const)(A...)>;
+	using member_pair = std::pair<C* const, R (C::*const)(A...)>;
 
 	template <class C>
-	using const_member_pair = ::std::pair<C const* const, R (C::*const)(A...) const>;
+	using const_member_pair = std::pair<C const* const, R (C::*const)(A...) const>;
 
 	template <typename>
-	struct is_member_pair : ::std::false_type
+	struct is_member_pair : std::false_type
 	{
 	};
 
 	template <class C>
-	struct is_member_pair<::std::pair<C* const, R (C::*const)(A...)>> : ::std::true_type
+	struct is_member_pair<std::pair<C* const, R (C::*const)(A...)>> : std::true_type
 	{
 	};
 
 	template <typename>
-	struct is_const_member_pair : ::std::false_type
+	struct is_const_member_pair : std::false_type
 	{
 	};
 
 	template <class C>
-	struct is_const_member_pair<::std::pair<C const* const, R (C::*const)(A...) const>> : ::std::true_type
+	struct is_const_member_pair<std::pair<C const* const, R (C::*const)(A...) const>> : std::true_type
 	{
 	};
 
@@ -290,7 +290,7 @@ class delegate<R(A...)>
 	};
 
 	using manager_type = void* (*)(any_data&, const any_data&, const any_data&, manager_operation);
-	using invoker_type = R (*)(void* const, A&&...);
+	using invoker_type = R (*)(void* const, A...);
 
 	any_data functor_;
 	manager_type manager_ = nullptr;
@@ -320,7 +320,7 @@ public:
 		d.swap(*this);
 	}
 
-	delegate(::std::nullptr_t const) noexcept
+	delegate(std::nullptr_t const) noexcept
 		: delegate()
 	{
 	}
@@ -350,12 +350,12 @@ public:
 	}
 
 	template <typename T,
-			  typename = typename ::std::enable_if<
-				  !::std::is_same<delegate, typename ::std::decay<T>::type>::value>::type>
+			  typename =
+				  typename std::enable_if<!std::is_same<delegate, typename std::decay<T>::type>::value>::type>
 	delegate(T&& f)
 	{
 		using handler = base_manager<typename std::decay<T>::type>;
-		using functor_type = typename ::std::decay<T>::type;
+		using functor_type = typename std::decay<T>::type;
 
 		if(handler::not_empty_function(f))
 		{
@@ -404,8 +404,8 @@ public:
 	}
 
 	template <typename T,
-			  typename = typename ::std::enable_if<
-				  !::std::is_same<delegate, typename ::std::decay<T>::type>::value>::type>
+			  typename =
+				  typename std::enable_if<!std::is_same<delegate, typename std::decay<T>::type>::value>::type>
 	delegate& operator=(T&& f)
 	{
 		delegate(std::forward<T>(f)).swap(*this);
@@ -446,7 +446,7 @@ public:
 	template <typename T>
 	static delegate from(T&& f)
 	{
-		return ::std::forward<T>(f);
+		return std::forward<T>(f);
 	}
 
 	static delegate from(R (*const function_ptr)(A...))
@@ -507,12 +507,12 @@ public:
 		return (object_ptr < rhs_object_ptr) || ((object_ptr == rhs_object_ptr) && (invoker_ < rhs.invoker_));
 	}
 
-	bool operator==(::std::nullptr_t const) const noexcept
+	bool operator==(std::nullptr_t const) const noexcept
 	{
 		return !invoker_;
 	}
 
-	bool operator!=(::std::nullptr_t const) const noexcept
+	bool operator!=(std::nullptr_t const) const noexcept
 	{
 		return invoker_;
 	}
@@ -526,7 +526,7 @@ public:
 	{
 		void* object_ptr = get_object_ptr();
 		assert(object_ptr);
-		return invoker_(object_ptr, ::std::forward<A>(args)...);
+		return invoker_(object_ptr, std::forward<A>(args)...);
 	}
 
 private:
@@ -540,39 +540,39 @@ private:
 		return nullptr;
 	}
 
-	friend struct ::std::hash<delegate>;
+	friend struct std::hash<delegate>;
 
 	template <R (*function_ptr)(A...)>
-	static R function_stub(void* const, A&&... args)
+	static R function_stub(void* const, A... args)
 	{
-		return function_ptr(::std::forward<A>(args)...);
+		return function_ptr(std::forward<A>(args)...);
 	}
 
 	template <class C, R (C::*method_ptr)(A...)>
-	static R method_stub(void* const object_ptr, A&&... args)
+	static R method_stub(void* const object_ptr, A... args)
 	{
-		return (static_cast<C*>(object_ptr)->*method_ptr)(::std::forward<A>(args)...);
+		return (static_cast<C*>(object_ptr)->*method_ptr)(std::forward<A>(args)...);
 	}
 
 	template <class C, R (C::*method_ptr)(A...) const>
-	static R const_method_stub(void* const object_ptr, A&&... args)
+	static R const_method_stub(void* const object_ptr, A... args)
 	{
-		return (static_cast<C const*>(object_ptr)->*method_ptr)(::std::forward<A>(args)...);
+		return (static_cast<C const*>(object_ptr)->*method_ptr)(std::forward<A>(args)...);
 	}
 
 	template <typename T>
-	static typename ::std::enable_if<!(is_member_pair<T>::value || is_const_member_pair<T>::value), R>::type
-	functor_stub(void* const object_ptr, A&&... args)
+	static typename std::enable_if<!(is_member_pair<T>::value || is_const_member_pair<T>::value), R>::type
+	functor_stub(void* const object_ptr, A... args)
 	{
-		return (*static_cast<T*>(object_ptr))(::std::forward<A>(args)...);
+		return (*static_cast<T*>(object_ptr))(std::forward<A>(args)...);
 	}
 
 	template <typename T>
-	static typename ::std::enable_if<is_member_pair<T>::value || is_const_member_pair<T>::value, R>::type
-	functor_stub(void* const object_ptr, A&&... args)
+	static typename std::enable_if<is_member_pair<T>::value || is_const_member_pair<T>::value, R>::type
+	functor_stub(void* const object_ptr, A... args)
 	{
 		return (static_cast<T*>(object_ptr)->first->*static_cast<T*>(object_ptr)->second)(
-			::std::forward<A>(args)...);
+			std::forward<A>(args)...);
 	}
 };
 

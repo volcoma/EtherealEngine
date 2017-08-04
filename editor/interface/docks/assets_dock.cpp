@@ -155,6 +155,11 @@ void list_entry(T& entry, const std::string& name, bool is_selected, bool is_dra
 	}
 	if(gui::IsItemHoveredRect())
 	{
+		if(on_double_click)
+		{
+			gui::SetMouseCursor(ImGuiMouseCursor_Move);
+		}
+
 		if(gui::IsMouseClicked(gui::drag_button) && !is_dragging)
 		{
 			if(on_drag)
@@ -187,7 +192,10 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 			bool is_dragging = !!es.drag_data.object;
 			list_entry(entry, name, is_selected, is_dragging, size,
 					   [&]() // on_click
-					   { es.select(entry); },
+					   {
+						   es.select(entry);
+
+					   },
 					   [&]() // on_double_click
 					   {
 						   opened_dir = entry;
@@ -206,8 +214,8 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 						   fs::error_code err;
 						   fs::remove_all(absolute, err);
 					   },
-					   []() // on_drag
-					   {});
+					   nullptr // on_drag
+					   );
 		}
 	}
 	{
@@ -235,11 +243,12 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 					bool is_dragging = !!es.drag_data.object;
 					list_entry(entry, name, is_selected, is_dragging, size,
 							   [&]() // on_click
-							   { es.select(entry); },
-							   [&]() // on_double_click
 							   {
+								   es.select(entry);
 
 							   },
+							   nullptr // on_double_click
+							   ,
 							   [&](const std::string& new_name) // on_rename
 							   {
 								   const auto asset_dir = fs::path(relative).remove_filename();
@@ -253,7 +262,10 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 
 							   },
 							   [&]() // on_drag
-							   { es.drag(entry, relative); });
+							   {
+								   es.drag(entry, relative);
+
+							   });
 				}
 			}
 			for(const auto& ext : extensions::mesh)
@@ -277,11 +289,12 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 					bool is_dragging = !!es.drag_data.object;
 					list_entry(entry, name, is_selected, is_dragging, size,
 							   [&]() // on_click
-							   { es.select(entry); },
-							   [&]() // on_double_click
 							   {
+								   es.select(entry);
 
 							   },
+							   nullptr // on_double_click
+							   ,
 							   [&](const std::string& new_name) // on_rename
 							   {
 								   const auto asset_dir = fs::path(relative).remove_filename();
@@ -290,9 +303,15 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 								   am.rename_asset<asset_t>(relative, new_relative);
 							   },
 							   [&]() // on_delete
-							   { am.delete_asset<asset_t>(relative); },
+							   {
+								   am.delete_asset<asset_t>(relative);
+
+							   },
 							   [&]() // on_drag
-							   { es.drag(entry, relative); });
+							   {
+								   es.drag(entry, relative);
+
+							   });
 				}
 			}
 			if(file.extension == extensions::material)
@@ -313,11 +332,12 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 				bool is_dragging = !!es.drag_data.object;
 				list_entry(entry, name, is_selected, is_dragging, size,
 						   [&]() // on_click
-						   { es.select(entry); },
-						   [&]() // on_double_click
 						   {
+							   es.select(entry);
 
 						   },
+						   nullptr // on_double_click
+						   ,
 						   [&](const std::string& new_name) // on_rename
 						   {
 							   const auto asset_dir = fs::path(relative).remove_filename();
@@ -326,9 +346,15 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 							   am.rename_asset<asset_t>(relative, new_relative);
 						   },
 						   [&]() // on_delete
-						   { am.delete_asset<asset_t>(relative); },
+						   {
+							   am.delete_asset<asset_t>(relative);
+
+						   },
 						   [&]() // on_drag
-						   { es.drag(entry, relative); });
+						   {
+							   es.drag(entry, relative);
+
+						   });
 			}
 			if(file.extension == extensions::shader)
 			{
@@ -348,11 +374,12 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 				bool is_dragging = !!es.drag_data.object;
 				list_entry(entry, name, is_selected, is_dragging, size,
 						   [&]() // on_click
-						   { es.select(entry); },
-						   [&]() // on_double_click
 						   {
+							   es.select(entry);
 
 						   },
+						   nullptr // on_double_click
+						   ,
 						   [&](const std::string& new_name) // on_rename
 						   {
 							   const auto asset_dir = fs::path(relative).remove_filename();
@@ -361,9 +388,15 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 							   am.rename_asset<asset_t>(relative, new_relative);
 						   },
 						   [&]() // on_delete
-						   { am.delete_asset<asset_t>(relative); },
+						   {
+							   am.delete_asset<asset_t>(relative);
+
+						   },
 						   [&]() // on_drag
-						   { es.drag(entry, relative); });
+						   {
+							   es.drag(entry, relative);
+
+						   });
 			}
 			if(file.extension == extensions::prefab)
 			{
@@ -383,11 +416,12 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 				bool is_dragging = !!es.drag_data.object;
 				list_entry(entry, name, is_selected, is_dragging, size,
 						   [&]() // on_click
-						   { es.select(entry); },
-						   [&]() // on_double_click
 						   {
+							   es.select(entry);
 
 						   },
+						   nullptr // on_double_click
+						   ,
 						   [&](const std::string& new_name) // on_rename
 						   {
 							   const auto asset_dir = fs::path(relative).remove_filename();
@@ -396,9 +430,15 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 							   am.rename_asset<asset_t>(relative, new_relative);
 						   },
 						   [&]() // on_delete
-						   { am.delete_asset<asset_t>(relative); },
+						   {
+							   am.delete_asset<asset_t>(relative);
+
+						   },
 						   [&]() // on_drag
-						   { es.drag(entry, relative); });
+						   {
+							   es.drag(entry, relative);
+
+						   });
 			}
 			if(file.extension == extensions::scene)
 			{
@@ -418,7 +458,10 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 				bool is_dragging = !!es.drag_data.object;
 				list_entry(entry, name, is_selected, is_dragging, size,
 						   [&]() // on_click
-						   { es.select(entry); },
+						   {
+							   es.select(entry);
+
+						   },
 						   [&]() // on_double_click
 						   {
 							   if(!entry)
@@ -439,9 +482,15 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 							   am.rename_asset<asset_t>(relative, new_relative);
 						   },
 						   [&]() // on_delete
-						   { am.delete_asset<asset_t>(relative); },
+						   {
+							   am.delete_asset<asset_t>(relative);
+
+						   },
 						   [&]() // on_drag
-						   { es.drag(entry, relative); });
+						   {
+							   es.drag(entry, relative);
+
+						   });
 			}
 		}
 	}
