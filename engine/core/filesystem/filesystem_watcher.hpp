@@ -54,10 +54,10 @@ public:
 	/// or a directory.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void watch(const fs::path& path, bool initialList,
+	static void watch(const fs::path& path, bool recursive, bool initialList,
 					  const std::function<void(const std::vector<entry>&, bool)>& callback)
 	{
-		watch_impl(path, initialList, callback);
+		watch_impl(path, recursive, initialList, callback);
 	}
 
 	//-----------------------------------------------------------------------------
@@ -90,7 +90,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	static void
-	touch(const fs::path& path,
+	touch(const fs::path& path, bool recursive,
 		  fs::file_time_type time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()))
 	{
 		fs::error_code err;
@@ -103,7 +103,7 @@ public:
 		// if not, visit each path if there's a wild card
 		if(path.string().find("*") != std::string::npos)
 		{
-			visit_wild_card_path(path, true, [time](const fs::path& p) {
+			visit_wild_card_path(path, recursive, true, [time](const fs::path& p) {
 				fs::error_code err;
 				fs::last_write_time(p, time, err);
 				return false;
@@ -212,7 +212,7 @@ protected:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void watch_impl(const fs::path& path, bool initialList = true,
+	static void watch_impl(const fs::path& path, bool recursive, bool initialList = true,
 						   const std::function<void(const std::vector<entry>&, bool)>& listCallback = {})
 	{
 		auto& wd = get_watcher();
@@ -232,7 +232,7 @@ protected:
 			{
 				bool found = false;
 				std::pair<fs::path, std::string> pathFilter =
-					visit_wild_card_path(path, true, [&found](const fs::path& p) {
+					visit_wild_card_path(path, recursive, true, [&found](const fs::path& p) {
 						found = true;
 						return true;
 					});
@@ -253,7 +253,8 @@ protected:
 			std::lock_guard<std::recursive_mutex> lock(wd._mutex);
 			if(wd._watchers.find(key) == wd._watchers.end())
 			{
-				wd._watchers.emplace(make_pair(key, watcher_impl(p, filter, initialList, listCallback)));
+				wd._watchers.emplace(
+					make_pair(key, watcher_impl(p, filter, recursive, initialList, listCallback)));
 			}
 		}
 	}
@@ -340,7 +341,7 @@ protected:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	static std::pair<fs::path, std::string>
-	visit_wild_card_path(const fs::path& path, bool visitEmpty,
+	visit_wild_card_path(const fs::path& path, bool recursive, bool visitEmpty,
 						 const std::function<bool(const fs::path&)>& visitor)
 	{
 		std::pair<fs::path, std::string> pathFilter = get_path_filter_pair(path);
@@ -360,6 +361,11 @@ protected:
 			{
 				for(fs::directory_iterator it(pathFilter.first, err); it != end; ++it)
 				{
+					if(it->status().type() == file_type::directory_file && recursive)
+					{
+						visit_wild_card_path(it->path() / pathFilter.second, recursive, visitEmpty, visitor);
+					}
+
 					std::string current = it->path().string();
 					size_t beforePos = current.find(before);
 					size_t afterPos = current.find(after);
@@ -388,9 +394,10 @@ protected:
 		///
 		/// </summary>
 		//-----------------------------------------------------------------------------
-		watcher_impl(const fs::path& path, const std::string& filter, bool initialList,
+		watcher_impl(const fs::path& path, const std::string& filter, bool recursive, bool initialList,
 					 const std::function<void(const std::vector<entry>&, bool)>& listCallback)
-			: _filter(filter)
+			: _recursive(recursive)
+			, _filter(filter)
 			, _callback(listCallback)
 		{
 			_root = path;
@@ -398,7 +405,7 @@ protected:
 			// make sure we store all initial write time
 			if(!_filter.empty())
 			{
-				visit_wild_card_path(path / filter, false, [this, &entries](const fs::path& p) {
+				visit_wild_card_path(path / filter, recursive, false, [this, &entries](const fs::path& p) {
 					poll_entry(p, entries);
 					return false;
 				});
@@ -434,7 +441,7 @@ protected:
 			// otherwise we check the whole parent directory
 			if(!_filter.empty())
 			{
-				visit_wild_card_path(_root / _filter, false, [this, &entries](const fs::path& p) {
+				visit_wild_card_path(_root / _filter, _recursive, false, [this, &entries](const fs::path& p) {
 					poll_entry(p, entries);
 					return false;
 				});
@@ -491,53 +498,6 @@ protected:
 			}
 		}
 
-		// void check_for_renamed(std::vector<entry>& entries)
-		//{
-		//	auto __entries = entries;
-		//	for (auto& e : __entries)
-		//	{
-		//		if (e.status == entry_status::created)
-		//		{
-		//			for (auto& other : __entries)
-		//			{
-		//				if (other.status == entry_status::removed)
-		//				{
-		//					if (e.last_mod_time == other.last_mod_time &&
-		// e.size
-		//==
-		// other.size)
-		//					{
-		//						entries.erase(std::remove_if(std::begin(entries),
-		// std::end(entries),
-		//							[&other](const entry& rhs) { return other.path
-		//==
-		// rhs.path;
-		//}
-		//						), std::end(entries));
-		//
-		//						auto it =
-		// std::find_if(std::begin(entries),
-		// std::end(entries),
-		//							[&e](const entry& rhs) { return e.path
-		//==
-		// rhs.path;
-		//}
-		//						);
-		//						if (it != std::end(entries))
-		//						{
-		//							it->status =
-		// entry_status::renamed;
-		//							it->last_path =
-		// other.path;
-		//						}
-		//					}
-		//
-		//				}
-		//			}
-		//		}
-		//	}
-		//}
-
 		//-----------------------------------------------------------------------------
 		//  Name : poll_entry ()
 		/// <summary>
@@ -587,9 +547,10 @@ protected:
 
 				modifications.push_back(fi);
 			}
-		};
+		}
 
 	protected:
+		bool _recursive = false;
 		/// Path to watch
 		fs::path _root;
 		/// Filter applied

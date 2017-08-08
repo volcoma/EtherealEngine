@@ -72,6 +72,13 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool readOnly,
 			var = data;
 			return true;
 		}
+		if(!gui::IsItemActive() && gui::IsItemHovered())
+		{
+			gui::SetMouseCursor(ImGuiMouseCursor_Help);
+			gui::BeginTooltip();
+			gui::TextUnformatted("You can drag and drop here");
+			gui::EndTooltip();
+		}
 
 		auto& dragged = es.drag_data.object;
 		if(dragged && dragged.is_type<asset_handle<texture>>())

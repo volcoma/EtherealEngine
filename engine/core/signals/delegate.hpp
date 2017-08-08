@@ -136,7 +136,7 @@ class delegate<R(A...)>
 	public:
 		static void* get_pointer(const any_data& source)
 		{
-			return get_pointer_typed(source);
+			return const_cast<F*>(get_pointer_typed(source));
 		}
 
 		static void clone(any_data& dest, const any_data& source)
@@ -185,12 +185,12 @@ class delegate<R(A...)>
 
 	private:
 		// Retrieve a pointer to the function object
-		static F* get_pointer_typed(const any_data& source)
+		static const F* get_pointer_typed(const any_data& source)
 		{
 			const F* ptr = stored_locally ? std::addressof(source.template access<F>())
 										  /* have stored a pointer */
 										  : source.template access<F*>();
-			return const_cast<F*>(ptr);
+			return ptr;
 		}
 
 		// Clone a function object that is not location-invariant or
@@ -283,7 +283,6 @@ class delegate<R(A...)>
 		}
 	};
 
-	// using manager_type = void* (*)(any_data&, const any_data&, const any_data&, manager_operation);
 	using invoker_type = R (*)(void* const, A...);
 	using get_pointer_type = void* (*)(const any_data&);
 	using clone_type = void (*)(any_data&, const any_data&);
@@ -368,8 +367,8 @@ public:
 		{
 			handler::init(functor_, std::move(f));
 
-			constexpr static manager man{&handler::get_pointer, &handler::clone, &handler::compare,
-										 &handler::destroy};
+			const static manager man{&handler::get_pointer, &handler::clone, &handler::compare,
+									 &handler::destroy};
 
 			invoker_ = &functor_stub<functor_type>;
 			manager_ = &man;

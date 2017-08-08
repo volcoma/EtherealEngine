@@ -20,6 +20,7 @@ class material;
 
 namespace editor
 {
+
 template <typename T>
 void watch_assets(const fs::path& protocol, const std::string& wildcard, bool reload_async,
 				  bool force_initial_recompile)
@@ -30,10 +31,10 @@ void watch_assets(const fs::path& protocol, const std::string& wildcard, bool re
 	const fs::path dir = fs::resolve_protocol(protocol);
 	fs::path watch_dir = dir / wildcard;
 
-	fs::watcher::watch(watch_dir, true, [&am, &ts, protocol, reload_async, force_initial_recompile](
-											const std::vector<fs::watcher::entry>& entries,
-											bool is_initial_list) {
-		for(auto& entry : entries)
+	fs::watcher::watch(watch_dir, false, true, [&am, &ts, protocol, reload_async, force_initial_recompile](
+												   const std::vector<fs::watcher::entry>& entries,
+												   bool is_initial_list) {
+		for(const auto& entry : entries)
 		{
 			const auto& p = entry.path;
 			const auto ext = p.extension().string();
@@ -124,87 +125,88 @@ void watch_assets(const fs::path& protocol, const std::string& wildcard, bool re
 
 void asset_directory::watch()
 {
-	fs::watcher::watch(absolute / fs::path("*"), true, [this](const std::vector<fs::watcher::entry>& entries,
-															  bool is_initial_list) {
-		for(auto& entry : entries)
-		{
-			const auto& p = entry.path;
-
-			if(entry.type == fs::file_type::directory_file)
+	fs::watcher::watch(
+		absolute / fs::path("*"), false, true,
+		[this](const std::vector<fs::watcher::entry>& entries, bool is_initial_list) {
+			for(auto& entry : entries)
 			{
-				if(entry.status == fs::watcher::entry_status::created)
-				{
-					std::unique_lock<std::mutex> lock(directories_mutex);
-					directories.emplace_back(
-						std::make_shared<asset_directory>(this, p, p.filename().string(), root_path));
-				}
-				else if(entry.status == fs::watcher::entry_status::modified)
-				{
-				}
-				else if(entry.status == fs::watcher::entry_status::renamed)
-				{
-					std::unique_lock<std::mutex> lock(directories_mutex);
-					auto it = std::find_if(std::begin(directories), std::end(directories),
-										   [&entry](const std::shared_ptr<asset_directory>& other) {
-											   return entry.last_path == other->absolute;
-										   });
+				const auto& p = entry.path;
 
-					if(it != std::end(directories))
+				if(entry.type == fs::file_type::directory_file)
+				{
+					if(entry.status == fs::watcher::entry_status::created)
 					{
-						auto e = *it;
-						e->populate(this, p, p.filename().string(), root_path);
+						std::unique_lock<std::mutex> lock(directories_mutex);
+						directories.emplace_back(
+							std::make_shared<asset_directory>(this, p, p.filename().string(), root_path));
+					}
+					else if(entry.status == fs::watcher::entry_status::modified)
+					{
+					}
+					else if(entry.status == fs::watcher::entry_status::renamed)
+					{
+						std::unique_lock<std::mutex> lock(directories_mutex);
+						auto it = std::find_if(std::begin(directories), std::end(directories),
+											   [&entry](const std::shared_ptr<asset_directory>& other) {
+												   return entry.last_path == other->absolute;
+											   });
+
+						if(it != std::end(directories))
+						{
+							auto e = *it;
+							e->populate(this, p, p.filename().string(), root_path);
+						}
+					}
+					else if(entry.status == fs::watcher::entry_status::removed)
+					{
+						std::unique_lock<std::mutex> lock(directories_mutex);
+						directories.erase(
+							std::remove_if(std::begin(directories), std::end(directories),
+										   [&entry](const std::shared_ptr<asset_directory>& other) {
+											   return entry.path.filename().string() == other->name;
+										   }),
+							std::end(directories));
 					}
 				}
-				else if(entry.status == fs::watcher::entry_status::removed)
+				else if(entry.type == fs::file_type::regular_file)
 				{
-					std::unique_lock<std::mutex> lock(directories_mutex);
-					directories.erase(std::remove_if(std::begin(directories), std::end(directories),
-													 [&entry](const std::shared_ptr<asset_directory>& other) {
-														 return entry.path.filename().string() == other->name;
-													 }),
-									  std::end(directories));
-				}
-			}
-			else if(entry.type == fs::file_type::regular_file)
-			{
-				if(entry.status == fs::watcher::entry_status::created)
-				{
-					std::unique_lock<std::mutex> lock(files_mutex);
-					fs::path filename = p.stem();
-					fs::path ext = p.extension();
-					files.emplace_back(asset_file(p, filename.string(), ext.string(), root_path));
-				}
-				else if(entry.status == fs::watcher::entry_status::modified)
-				{
-				}
-				else if(entry.status == fs::watcher::entry_status::renamed)
-				{
-					std::unique_lock<std::mutex> lock(files_mutex);
-					auto it =
-						std::find_if(std::begin(files), std::end(files), [&entry](const asset_file& other) {
-							return entry.last_path == other.absolute;
-						});
-
-					if(it != std::end(files))
+					if(entry.status == fs::watcher::entry_status::created)
 					{
-						auto& e = *it;
+						std::unique_lock<std::mutex> lock(files_mutex);
 						fs::path filename = p.stem();
 						fs::path ext = p.extension();
-						e.populate(p, filename.string(), ext.string(), root_path);
+						files.emplace_back(asset_file(p, filename.string(), ext.string(), root_path));
+					}
+					else if(entry.status == fs::watcher::entry_status::modified)
+					{
+					}
+					else if(entry.status == fs::watcher::entry_status::renamed)
+					{
+						std::unique_lock<std::mutex> lock(files_mutex);
+						auto it = std::find_if(
+							std::begin(files), std::end(files),
+							[&entry](const asset_file& other) { return entry.last_path == other.absolute; });
+
+						if(it != std::end(files))
+						{
+							auto& e = *it;
+							fs::path filename = p.stem();
+							fs::path ext = p.extension();
+							e.populate(p, filename.string(), ext.string(), root_path);
+						}
+					}
+					else if(entry.status == fs::watcher::entry_status::removed)
+					{
+						std::unique_lock<std::mutex> lock(files_mutex);
+						files.erase(std::remove_if(std::begin(files), std::end(files),
+												   [&entry](const asset_file& other) {
+													   return entry.path == other.absolute;
+												   }),
+									std::end(files));
 					}
 				}
-				else if(entry.status == fs::watcher::entry_status::removed)
-				{
-					std::unique_lock<std::mutex> lock(files_mutex);
-					files.erase(std::remove_if(std::begin(files), std::end(files),
-											   [&entry](const asset_file& other) {
-												   return entry.path == other.absolute;
-											   }),
-								std::end(files));
-				}
 			}
-		}
-	});
+		});
 	static const std::string wildcard = "*";
 
 	for(const auto& format : extensions::texture)
