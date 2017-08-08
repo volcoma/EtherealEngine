@@ -176,7 +176,8 @@ protected:
 		_watching = true;
 		_thread = std::thread([this]() {
 			// keep watching for modifications every ms milliseconds
-			auto ms = std::chrono::milliseconds(500);
+			using namespace std::literals;
+			const auto poll_interval = 500ms;
 			while(_watching)
 			{
 				do
@@ -190,9 +191,8 @@ protected:
 					}
 					// lock will be released before this thread goes to sleep
 				} while(false);
-
 				// make this thread sleep for a while
-				std::this_thread::sleep_for(ms);
+				std::this_thread::sleep_for(poll_interval);
 			}
 		});
 	}

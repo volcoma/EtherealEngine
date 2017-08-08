@@ -156,7 +156,7 @@ class delegate<R(A...)>
 
 		static void init(any_data& _F, F&& f)
 		{
-			init_impl(_F, std::move(f), local_storage());
+			init_impl(_F, std::forward<F>(f), local_storage());
 		}
 
 		template <typename _Signature>
@@ -274,12 +274,12 @@ class delegate<R(A...)>
 
 		static void init_impl(any_data& _F, F&& f, std::true_type)
 		{
-			new(_F.access()) F(std::move(f));
+			new(_F.access()) F(std::forward<F>(f));
 		}
 
 		static void init_impl(any_data& _F, F&& f, std::false_type)
 		{
-			_F.template access<F*>() = new F(std::move(f));
+			_F.template access<F*>() = new F(std::forward<F>(f));
 		}
 	};
 
@@ -365,7 +365,7 @@ public:
 
 		if(handler::not_empty_function(f))
 		{
-			handler::init(functor_, std::move(f));
+			handler::init(functor_, std::forward<T>(f));
 
 			const static manager man{&handler::get_pointer, &handler::clone, &handler::compare,
 									 &handler::destroy};
