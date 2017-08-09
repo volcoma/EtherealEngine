@@ -141,7 +141,7 @@ struct function_traits<R(Args...)>
 	using result_type = R;
 	using return_type = result_type;
 	typedef result_type function_type(Args...);
-	static const std::size_t arity = sizeof...(Args);
+	constexpr static const std::size_t arity = sizeof...(Args);
 
 	using arg_types = std::tuple<Args...>;
 	using arg_types_decayed = std::tuple<special_decay_t<Args>...>;

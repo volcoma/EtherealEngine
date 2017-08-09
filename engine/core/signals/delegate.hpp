@@ -291,10 +291,19 @@ class delegate<R(A...)>
 
 	struct manager
 	{
-		get_pointer_type get_pointer_type_;
-		clone_type clone_type_;
-		compare_type compare_type_;
-		destroy_type destroy_type_;
+		constexpr manager(get_pointer_type getter, clone_type cloner, compare_type comparer,
+						  destroy_type destructor)
+			: get_pointer_type_(getter)
+			, clone_type_(cloner)
+			, compare_type_(comparer)
+			, destroy_type_(destructor)
+		{
+		}
+
+		const get_pointer_type get_pointer_type_;
+		const clone_type clone_type_;
+		const compare_type compare_type_;
+		const destroy_type destroy_type_;
 	};
 	using manager_type = const manager*;
 
@@ -367,8 +376,8 @@ public:
 		{
 			handler::init(functor_, std::forward<T>(f));
 
-			const static manager man{&handler::get_pointer, &handler::clone, &handler::compare,
-									 &handler::destroy};
+			constexpr static const manager man{&handler::get_pointer, &handler::clone, &handler::compare,
+											   &handler::destroy};
 
 			invoker_ = &functor_stub<functor_type>;
 			manager_ = &man;

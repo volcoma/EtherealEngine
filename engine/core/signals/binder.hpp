@@ -18,18 +18,6 @@
 #include "../common/nonstd/type_traits.hpp"
 #include "delegate.hpp"
 
-// Used for type deduction ease
-struct void_func
-{
-	using type = void_func;
-};
-
-// Used for type deduction ease
-struct return_func
-{
-	using type = return_func;
-};
-
 template <typename T>
 std::reference_wrapper<T> make_ref(T& val)
 {
@@ -146,24 +134,25 @@ class function_wrapper;
 template <typename F, size_t... ArgCount>
 class function_wrapper<F, nonstd::index_sequence<ArgCount...>> : public base_function_wrapper
 {
+	constexpr static const bool result_is_void = std::is_same<typename nonstd::fn_result_of<F>, void>::value;
+
+	using is_void = std::integral_constant<bool, result_is_void>;
+
 	template <std::size_t... Arg_Idx>
 	nonstd::any invoke_variadic_impl(nonstd::index_sequence<Arg_Idx...>,
 									 const std::vector<nonstd::any>& arg_list) const
 	{
-		static const auto deduction_helper =
-			typename std::conditional<std::is_same<typename nonstd::fn_result_of<F>, void>::value, void_func,
-									  return_func>::type();
 		// assert(nonstd::function_traits<F>::arity == arg_list.size() &&
 		// "subscriber and invoker differ in
 		// arguments count");
-		return invoke(deduction_helper,
+		return invoke(is_void(),
 					  ((Arg_Idx < arg_list.size()) ? arg_list[Arg_Idx]
 												   : create_arg<nonstd::param_types_t<F, Arg_Idx>>())...);
 	}
 
 	// Invoke void function, "const Args&...args" are of type "any"
 	template <typename... Args>
-	nonstd::any invoke(const void_func&, const Args&... args) const
+	nonstd::any invoke(std::true_type, const Args&... args) const
 	{
 		const auto all_params_are_convertible =
 			nonstd::check_all_true(check_arg_type<nonstd::param_types_t<F, ArgCount>>(args)...);
@@ -178,7 +167,7 @@ class function_wrapper<F, nonstd::index_sequence<ArgCount...>> : public base_fun
 
 	// Invoke non void function, "const Args&...args" are of type "any"
 	template <typename... Args>
-	nonstd::any invoke(const return_func&, const Args&... args) const
+	nonstd::any invoke(std::false_type, const Args&... args) const
 	{
 		const auto all_params_are_convertible =
 			nonstd::check_all_true(check_arg_type<nonstd::param_types_t<F, ArgCount>>(args)...);
