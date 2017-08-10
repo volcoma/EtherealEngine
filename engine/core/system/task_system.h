@@ -621,7 +621,7 @@ public:
 		make_ready_task(std::allocator_arg_t{}, alloc_, std::forward<F>(f), std::forward<Args>(args)...)
 			.second)>::type
 	{
-		if(nthreads_ == 0)
+		if(nthreads_ == 1)
 		{
 			return push_ready_on_main(std::forward<F>(f), std::forward<Args>(args)...);
 		}
@@ -658,7 +658,7 @@ public:
 		make_awaitable_task(std::allocator_arg_t{}, alloc_, std::forward<F>(f), std::forward<Args>(args)...)
 			.second)>::type
 	{
-		if(nthreads_ == 0)
+		if(nthreads_ == 1)
 		{
 			return push_awaitable_on_main(std::forward<F>(f), std::forward<Args>(args)...);
 		}
@@ -710,7 +710,7 @@ public:
 		else
 		{
 			const auto queue_index = get_main_thread_queue_idx();
-			for(std::size_t k = 0; k < 10 * nthreads_; ++k)
+			for(std::size_t k = 0; k < 10; ++k)
 			{
 				if(queues_[queue_index].try_push(t.first))
 					return std::move(t.second);
@@ -785,14 +785,14 @@ public:
 		}
 		else
 		{
-			for(std::size_t i = 0; i < threads_.size(); ++i)
+			for(std::size_t i = 1; i < nthreads_; ++i)
 			{
 				auto& thread = threads_[i];
 				if(thread.get_id() == this_thread_id)
 				{
 					// thread indices are with one less than
 					// the queues
-					queue_index = i + 1;
+					queue_index = get_thread_queue_idx(i, 0);
 					break;
 				}
 			}

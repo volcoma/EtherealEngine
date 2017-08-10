@@ -148,7 +148,8 @@ void task_system::run(std::size_t idx)
 
 		if(!p.first)
 		{
-			p = queues_[idx].pop();
+			const auto queue_index = get_thread_queue_idx(idx);
+			p = queues_[queue_index].pop();
 			if(!p.first)
 				return;
 		}
@@ -160,7 +161,11 @@ void task_system::run(std::size_t idx)
 
 std::size_t task_system::get_thread_queue_idx(std::size_t idx, std::size_t seed)
 {
-	return ((idx + seed) % nthreads_) + 1;
+	auto queue_index = ((idx + seed) % nthreads_);
+	if(queue_index == 0)
+		queue_index++;
+
+	return queue_index;
 }
 
 std::size_t task_system::get_main_thread_queue_idx()
@@ -177,17 +182,23 @@ task_system::task_system(std::size_t nthreads, const task_system::Allocator& all
 	: queues_{}
 	, threads_{}
 	, alloc_(alloc)
-	, nthreads_{nthreads}
+	, nthreads_{nthreads + 1}
 {
 	// +1 for the main thread's queue
-	queues_.reserve(nthreads + 1);
+	queues_.reserve(nthreads_);
 	queues_.emplace_back();
-	for(std::size_t th = 1; th < nthreads + 1; ++th)
+	for(std::size_t th = 1; th < nthreads_; ++th)
+	{
 		queues_.emplace_back();
+	}
 
-	threads_.reserve(nthreads);
-	for(std::size_t th = 1; th < nthreads + 1; ++th)
+	// two seperate loops.
+	threads_.reserve(nthreads_);
+	threads_.emplace_back();
+	for(std::size_t th = 1; th < nthreads_; ++th)
+	{
 		threads_.emplace_back(&task_system::run, this, th);
+	}
 }
 
 task_system::~task_system()
