@@ -100,9 +100,10 @@ void compile<shader>(const fs::path& absolute_key)
 
 	fs::error_code err;
 	fs::path temp = fs::temp_directory_path(err);
-	temp.append(uuids::random_uuid(absolute_key.string()).to_string() + ".buildtemp");
+	temp.append(uuids::random_uuid().to_string() + "].buildtemp");
 
 	std::string str_output = temp.string();
+	APPLOG_INFO("Start compilation of {0}", str_output);
 	fs::path include = fs::resolve_protocol("shader_include:/");
 	std::string str_include = include.string();
 	fs::path varying = dir / (file + ".io");
@@ -189,7 +190,7 @@ void compile<texture>(const fs::path& absolute_key)
 
 	fs::error_code err;
 	fs::path temp = fs::temp_directory_path(err);
-	temp.append(uuids::random_uuid(absolute_key.string()).to_string() + ".buildtemp");
+	temp.append(uuids::random_uuid().to_string() + ".buildtemp");
 
 	std::string str_output = temp.string();
 

@@ -9,7 +9,7 @@
 namespace uuids
 {
 
-template <typename random_generator_t = ::std::default_random_engine>
+template <typename random_generator_t = ::std::mt19937>
 class random_uuid_generator
 {
 	using result_type = typename random_generator_t::result_type;

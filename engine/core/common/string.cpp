@@ -1,4 +1,6 @@
 #include "string.h"
+#include <chrono>
+#include <thread>
 
 int string_utils::compare(const std::string& s1, const std::string& s2, bool ignoreCase)
 {
@@ -286,14 +288,27 @@ std::string string_utils::word_wrap(const std::string& value, std::string::size_
 
 std::string string_utils::random_string(std::string::size_type length)
 {
+	using random_generator_t = ::std::mt19937;
+
+	static const auto make_seeded_engine = []() {
+		std::random_device r;
+		std::hash<std::thread::id> hasher;
+		std::seed_seq seed(std::initializer_list<typename random_generator_t::result_type>{
+			static_cast<typename random_generator_t::result_type>(
+				::std::chrono::system_clock::now().time_since_epoch().count()),
+			static_cast<typename random_generator_t::result_type>(hasher(std::this_thread::get_id())), r(),
+			r(), r(), r(), r(), r(), r(), r()});
+		return random_generator_t(seed);
+	};
+
 	auto randchar = []() -> char {
-		const char charset[] = "0123456789"
+		constexpr const char charset[] = "0123456789"
 							   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 							   "abcdefghijklmnopqrstuvwxyz";
-		static std::default_random_engine engine{std::random_device{}()};
+		static thread_local random_generator_t engine(make_seeded_engine());
 
 		const size_t max_index = (sizeof(charset) - 1);
-		static std::uniform_int_distribution<std::string::size_type> dist(0, max_index);
+		std::uniform_int_distribution<std::string::size_type> dist(0, max_index);
 
 		return charset[dist(engine)];
 	};
