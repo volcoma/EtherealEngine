@@ -100,7 +100,7 @@ void compile<shader>(const fs::path& absolute_key)
 
 	fs::error_code err;
 	fs::path temp = fs::temp_directory_path(err);
-	temp.append(uuids::random_uuid().to_string() + ".buildtemp");
+	temp.append(uuids::random_uuid(absolute_key.string()).to_string() + ".buildtemp");
 
 	std::string str_output = temp.string();
 	fs::path include = fs::resolve_protocol("shader_include:/");
@@ -177,8 +177,6 @@ void compile<shader>(const fs::path& absolute_key)
 	{
 		APPLOG_INFO("Successful compilation of {0}", str_input);
 		fs::copy_file(temp, output, fs::copy_option::overwrite_if_exists, err);
-		auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-		fs::last_write_time(output, now, err);
 	}
 	fs::remove(temp, err);
 }
@@ -191,7 +189,7 @@ void compile<texture>(const fs::path& absolute_key)
 
 	fs::error_code err;
 	fs::path temp = fs::temp_directory_path(err);
-	temp.append(uuids::random_uuid().to_string() + ".buildtemp");
+	temp.append(uuids::random_uuid(absolute_key.string()).to_string() + ".buildtemp");
 
 	std::string str_output = temp.string();
 
@@ -217,8 +215,6 @@ void compile<texture>(const fs::path& absolute_key)
 	{
 		APPLOG_INFO("Successful compilation of {0}", str_input);
 		fs::copy_file(temp, output, fs::copy_option::overwrite_if_exists, err);
-		auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-		fs::last_write_time(output, now, err);
 	}
 	fs::remove(temp, err);
 }
