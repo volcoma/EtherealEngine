@@ -593,9 +593,6 @@ void assets_dock::render(const ImVec2&)
 						fs::error_code err;
 						fs::path dir = opened_dir / filename;
 						fs::copy_file(path, dir, err);
-						fs::last_write_time(
-							dir, std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()), err);
-
 					},
 					p, filename);
 			}

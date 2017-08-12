@@ -152,4 +152,9 @@ bool asset_manager::initialize()
 
 	return true;
 }
+
+void asset_manager::dispose()
+{
+	clear();
+}
 }

@@ -75,7 +75,11 @@ struct asset_storage : public base_storage
 	void clear()
 	{
 		std::lock_guard<std::recursive_mutex> lock(container_mutex);
-		container.clear();
+		for(const auto& pair : container)
+		{
+			const auto& task = pair.second;
+			task.wait();
+		}
 	}
 
 	//-----------------------------------------------------------------------------
@@ -134,7 +138,7 @@ class asset_manager : public core::subsystem
 {
 public:
 	bool initialize();
-
+	void dispose();
 	//-----------------------------------------------------------------------------
 	//  Name : clear ()
 	/// <summary>
