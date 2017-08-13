@@ -100,10 +100,9 @@ void compile<shader>(const fs::path& absolute_key)
 
 	fs::error_code err;
 	fs::path temp = fs::temp_directory_path(err);
-	temp.append(uuids::random_uuid().to_string() + "].buildtemp");
+	temp.append(uuids::random_uuid(str_input).to_string() + ".buildtemp");
 
 	std::string str_output = temp.string();
-	APPLOG_INFO("Start compilation of {0}", str_output);
 	fs::path include = fs::resolve_protocol("shader_include:/");
 	std::string str_include = include.string();
 	fs::path varying = dir / (file + ".io");
@@ -190,7 +189,7 @@ void compile<texture>(const fs::path& absolute_key)
 
 	fs::error_code err;
 	fs::path temp = fs::temp_directory_path(err);
-	temp.append(uuids::random_uuid().to_string() + ".buildtemp");
+	temp.append(uuids::random_uuid(str_input).to_string() + ".buildtemp");
 
 	std::string str_output = temp.string();
 
@@ -228,6 +227,10 @@ void compile<mesh>(const fs::path& absolute_key)
 	std::string file = absolute_key.stem().string();
 	fs::path dir = absolute_key.parent_path();
 
+	fs::error_code err;
+	fs::path temp = fs::temp_directory_path(err);
+	temp.append(uuids::random_uuid(str_input).to_string() + ".buildtemp");
+
 	mesh::load_data data;
 	if(!importer::load_mesh_data_from_file(str_input, data))
 	{
@@ -235,15 +238,13 @@ void compile<mesh>(const fs::path& absolute_key)
 		return;
 	}
 
-	fs::path entry = dir / fs::path(file + ".buildtemp");
 	{
-		std::ofstream soutput(entry.string(), std::ios::out | std::ios::binary);
+		std::ofstream soutput(temp.string(), std::ios::out | std::ios::binary);
 		cereal::oarchive_binary_t ar(soutput);
 		try_save(ar, cereal::make_nvp("mesh", data));
 	}
-	fs::error_code err;
-	fs::copy_file(entry, output, fs::copy_option::overwrite_if_exists, err);
-	fs::remove(entry, err);
+	fs::copy_file(temp, output, fs::copy_option::overwrite_if_exists, err);
+	fs::remove(temp, err);
 
 	APPLOG_INFO("Successful compilation of {0}", str_input);
 }

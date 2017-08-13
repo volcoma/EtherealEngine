@@ -406,7 +406,6 @@ void main_editor_window::on_start_page()
 				if(gui::Selectable(path.c_str()))
 				{
 					pm.open_project(path);
-					es.load_editor_camera();
 					maximize();
 					_show_start_page = false;
 				}
@@ -426,7 +425,6 @@ void main_editor_window::on_start_page()
 			if(pick_folder_dialog("", path))
 			{
 				pm.create_project(path);
-				es.load_editor_camera();
 				maximize();
 				_show_start_page = false;
 			}
@@ -438,7 +436,6 @@ void main_editor_window::on_start_page()
 			if(pick_folder_dialog("", path))
 			{
 				pm.open_project(path);
-				es.load_editor_camera();
 				maximize();
 				_show_start_page = false;
 			}

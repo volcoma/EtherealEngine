@@ -279,6 +279,7 @@ void project_manager::close_project()
 	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
 	auto& es = core::get_subsystem<editing_system>();
+	es.save_editor_camera();
 	ecs.dispose();
 	es.unselect();
 	es.scene.clear();
@@ -326,6 +327,9 @@ void project_manager::open_project(const fs::path& project_path)
 	auto root = fs::resolve_protocol("app:/data");
 	root_directory.reset();
 	root_directory = std::make_shared<asset_directory>(nullptr, root, root.filename().string(), root);
+
+	auto& es = core::get_subsystem<editing_system>();
+	es.load_editor_camera();
 }
 
 void project_manager::create_project(const fs::path& project_path)
