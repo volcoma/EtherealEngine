@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <string>
 #include <thread>
+
 namespace uuids
 {
 template <typename random_generator_t = ::std::mt19937>
@@ -22,7 +23,7 @@ random_generator_t make_seeded_engine()
 template <typename random_generator_t = ::std::mt19937>
 uuid random_uuid()
 {
-	static thread_local random_uuid_generator<random_generator_t> gen(
+	random_uuid_generator<random_generator_t> gen(
 		make_seeded_engine<random_generator_t>()());
 
 	return gen();

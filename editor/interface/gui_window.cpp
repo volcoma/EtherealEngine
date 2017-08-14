@@ -91,20 +91,22 @@ void imgui_frame_update(render_window& window, std::chrono::duration<float> dt, 
 	// Setup time step
 	io.DeltaTime = dt.count();
 
-	auto window_pos = window.get_position();
 	auto window_size = window.get_size();
-	irect rect;
-	rect.left = window_pos[0];
-	rect.top = window_pos[1];
-	rect.right = static_cast<std::int32_t>(window_size[0]);
-	rect.bottom = static_cast<std::int32_t>(window_size[1]);
+	irect relative_rect;
+	relative_rect.left = 0;
+	relative_rect.top = 0;
+	relative_rect.right = static_cast<std::int32_t>(window_size[0]);
+	relative_rect.bottom = static_cast<std::int32_t>(window_size[1]);
 	auto mouse_pos = mml::mouse::get_position(window);
 
-	if(window.has_focus() && rect.contains({mouse_pos[0], mouse_pos[1]}))
+	if(window.has_focus() && relative_rect.contains({mouse_pos[0], mouse_pos[1]}))
 	{
+        static auto last_cursor_type = gui::GetMouseCursor();
 		auto cursor = map_cursor(gui::GetMouseCursor());
-		if(cursor)
+		if(cursor && last_cursor_type != gui::GetMouseCursor())
 			window.set_mouse_cursor(*cursor);
+        
+        last_cursor_type = gui::GetMouseCursor();
 	}
 
 	// Start the frame

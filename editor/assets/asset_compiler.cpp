@@ -45,14 +45,12 @@ bool run_compile_process(const std::string& process, const std::vector<std::stri
 	}
 
 	bx::Error error;
-	bx::ProcessReader processReader;
+	bx::ProcessReader process_reader;
 
 	auto executable_dir = fs::resolve_protocol("binary:/");
 	auto process_full = executable_dir / process;
-    
-    APPLOG_INFO("Input Size {0}", process_full.size() + args.size());
-  
-	processReader.open(process_full.string().c_str(), args.c_str(), &error);
+
+	process_reader.open(process_full.string().c_str(), args.c_str(), &error);
 
 	if(!error.isOk())
 	{
@@ -62,10 +60,10 @@ bool run_compile_process(const std::string& process, const std::vector<std::stri
 	else
 	{
 		char buffer[2048];
-		processReader.read(buffer, sizeof(buffer), &error);
+		process_reader.read(buffer, sizeof(buffer), &error);
 
-		processReader.close();
-		int32_t result = processReader.getExitCode();
+		process_reader.close();
+		int32_t result = process_reader.getExitCode();
 
 		if(0 != result)
 		{
@@ -103,7 +101,7 @@ void compile<shader>(const fs::path& absolute_key)
 	fs::error_code err;
 	fs::path temp = fs::temp_directory_path(err);
 	temp.append(uuids::random_uuid(str_input).to_string() + ".buildtemp");
-
+    
 	std::string str_output = temp.string();
 	fs::path include = fs::resolve_protocol("shader_include:/");
 	std::string str_include = include.string();

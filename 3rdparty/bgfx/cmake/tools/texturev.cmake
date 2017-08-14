@@ -92,7 +92,7 @@ target_link_libraries( texturev PUBLIC example-common )
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	target_link_libraries(texturev PUBLIC "-stdlib=libstdc++ -lstdc++")
-elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+elseif(MINGW)
 	target_link_libraries(texturev PUBLIC "-static")
 endif()
 

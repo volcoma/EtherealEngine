@@ -305,7 +305,7 @@ std::string string_utils::random_string(std::string::size_type length)
 		constexpr const char charset[] = "0123456789"
 							   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 							   "abcdefghijklmnopqrstuvwxyz";
-		static thread_local random_generator_t engine(make_seeded_engine());
+		random_generator_t engine(make_seeded_engine());
 
 		const size_t max_index = (sizeof(charset) - 1);
 		std::uniform_int_distribution<std::string::size_type> dist(0, max_index);

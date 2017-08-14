@@ -34,7 +34,7 @@ endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	target_link_libraries(shaderc PUBLIC "-stdlib=libstdc++ -lstdc++")
-elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+elseif(MINGW)
 	target_link_libraries(shaderc PUBLIC "-static")
 endif()
 

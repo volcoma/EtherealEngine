@@ -69,42 +69,13 @@ public:                                                                         
 
 #define LOAD_INSTANTIATE(cls, Archive) template void LOAD_FUNCTION_NAME(Archive& archive, cls& obj)
 
-template <typename Archive, typename T>
-inline bool try_save(Archive& ar, cereal::NameValuePair<T>&& t)
-{
-	try
-	{
-		ar(t);
-	}
-	catch(cereal::Exception e)
-	{
-		serialization::log_warning(e.what());
-		return false;
-	}
-	return true;
-}
-
-template <typename Archive, typename T>
-inline bool try_load(Archive& ar, cereal::NameValuePair<T>&& t)
-{
-	try
-	{
-		ar(t);
-	}
-	catch(cereal::Exception e)
-	{
-		serialization::log_warning(e.what());
-		return false;
-	}
-	return true;
-}
 
 template <typename Archive, typename T>
 inline bool try_serialize(Archive& ar, cereal::NameValuePair<T>&& t)
 {
 	try
 	{
-		ar(t);
+        ar(std::forward<cereal::NameValuePair<T>>(t));		
 	}
 	catch(cereal::Exception e)
 	{
@@ -113,3 +84,16 @@ inline bool try_serialize(Archive& ar, cereal::NameValuePair<T>&& t)
 	}
 	return true;
 }
+
+template <typename Archive, typename T>
+inline bool try_save(Archive& ar, cereal::NameValuePair<T>&& t)
+{
+    return try_serialize(ar, std::forward<cereal::NameValuePair<T>>(t));
+}
+
+template <typename Archive, typename T>
+inline bool try_load(Archive& ar, cereal::NameValuePair<T>&& t)
+{
+    return try_serialize(ar, std::forward<cereal::NameValuePair<T>>(t));	
+}
+

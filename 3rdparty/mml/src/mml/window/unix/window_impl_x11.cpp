@@ -1024,6 +1024,7 @@ void window_impl_x11::set_mouse_cursor(const cursor_impl& cursor)
 {
 	_last_cursor = cursor._cursor;
 	XDefineCursor(_display, _window, _last_cursor);
+	XFlush(_display);
 }
 
 
@@ -1048,7 +1049,7 @@ void window_impl_x11::set_mouse_cursor_grabbed(bool grabbed)
 			}
 
 			// The cursor grab failed, trying again after a small sleep
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		}
 
 		if (!_cursor_grabbed)
