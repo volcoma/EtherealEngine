@@ -25,8 +25,10 @@ project "bx"
 
 	if _OPTIONS["with-amalgamated"] then
 		excludes {
-			path.join(BX_DIR, "src/commandline.cpp"),
 			path.join(BX_DIR, "src/allocator.cpp"),
+			path.join(BX_DIR, "src/bx.cpp"),
+			path.join(BX_DIR, "src/commandline.cpp"),
+			path.join(BX_DIR, "src/crtnone.cpp"),
 			path.join(BX_DIR, "src/debug.cpp"),
 			path.join(BX_DIR, "src/dtoa.cpp"),
 			path.join(BX_DIR, "src/file.cpp"),
@@ -34,8 +36,8 @@ project "bx"
 			path.join(BX_DIR, "src/math.cpp"),
 			path.join(BX_DIR, "src/mutex.cpp"),
 			path.join(BX_DIR, "src/os.cpp"),
-			path.join(BX_DIR, "src/sem.cpp"),
 			path.join(BX_DIR, "src/process.cpp"),
+			path.join(BX_DIR, "src/semaphore.cpp"),
 			path.join(BX_DIR, "src/sort.cpp"),
 			path.join(BX_DIR, "src/string.cpp"),
 			path.join(BX_DIR, "src/thread.cpp"),

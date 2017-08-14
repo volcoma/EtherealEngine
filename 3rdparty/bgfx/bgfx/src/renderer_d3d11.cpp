@@ -833,7 +833,7 @@ namespace bgfx { namespace d3d11
 
 			if (NULL == m_d3d11dll)
 			{
-				BX_TRACE("Failed to load d3d11.dll.");
+				BX_TRACE("Init error: Failed to load d3d11.dll.");
 				goto error;
 			}
 
@@ -862,14 +862,14 @@ namespace bgfx { namespace d3d11
 			D3D11CreateDevice = (PFN_D3D11_CREATE_DEVICE)bx::dlsym(m_d3d11dll, "D3D11CreateDevice");
 			if (NULL == D3D11CreateDevice)
 			{
-				BX_TRACE("Function D3D11CreateDevice not found.");
+				BX_TRACE("Init error: Function D3D11CreateDevice not found.");
 				goto error;
 			}
 
 			m_dxgidll = bx::dlopen("dxgi.dll");
 			if (NULL == m_dxgidll)
 			{
-				BX_TRACE("Failed to load dxgi.dll.");
+				BX_TRACE("Init error: Failed to load dxgi.dll.");
 				goto error;
 			}
 
@@ -882,7 +882,7 @@ namespace bgfx { namespace d3d11
 			}
 			if (NULL == CreateDXGIFactory)
 			{
-				BX_TRACE("Function CreateDXGIFactory not found.");
+				BX_TRACE("Init error: Function CreateDXGIFactory not found.");
 				goto error;
 			}
 
@@ -917,7 +917,7 @@ namespace bgfx { namespace d3d11
 #endif // BX_PLATFORM_*
 			if (FAILED(hr) )
 			{
-				BX_TRACE("Unable to create DXGI factory.");
+				BX_TRACE("Init error: Unable to create DXGI factory.");
 				goto error;
 			}
 
@@ -1059,7 +1059,7 @@ namespace bgfx { namespace d3d11
 
 				if (FAILED(hr) )
 				{
-					BX_TRACE("Unable to create Direct3D11 device.");
+					BX_TRACE("Init error: Unable to create Direct3D11 device.");
 					goto error;
 				}
 
@@ -1074,7 +1074,7 @@ namespace bgfx { namespace d3d11
 
 				if (NULL == m_deviceCtx)
 				{
-					BX_TRACE("Unable to retrieve Direct3D11 ImmediateContext.");
+					BX_TRACE("Init error: Unable to retrieve Direct3D11 ImmediateContext.");
 					goto error;
 				}
 
@@ -1135,7 +1135,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 				if (FAILED(hr) )
 				{
-					BX_TRACE("Unable to create Direct3D11 device.");
+					BX_TRACE("Init error: Unable to create Direct3D11 device.");
 					goto error;
 				}
 
@@ -1174,7 +1174,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 					DX_RELEASE(adapter, 2);
 					if (FAILED(hr) )
 					{
-						BX_TRACE("Unable to create Direct3D11 device.");
+						BX_TRACE("Init error: Unable to create Direct3D11 device.");
 						goto error;
 					}
 
@@ -1234,7 +1234,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 					DX_RELEASE(adapter, 2);
 					if (FAILED(hr) )
 					{
-						BX_TRACE("Unable to create Direct3D11 device.");
+						BX_TRACE("Init error: Unable to create Direct3D11 device.");
 						goto error;
 					}
 
@@ -1263,7 +1263,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 #endif // BX_PLATFORM_*
 					if (FAILED(hr) )
 					{
-						BX_TRACE("Failed to create swap chain.");
+						BX_TRACE("Init error: Failed to create swap chain.");
 						goto error;
 					}
 				}
@@ -3123,7 +3123,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 				sd.AddressU       = s_textureAddress[(_flags&BGFX_TEXTURE_U_MASK)>>BGFX_TEXTURE_U_SHIFT];
 				sd.AddressV       = s_textureAddress[(_flags&BGFX_TEXTURE_V_MASK)>>BGFX_TEXTURE_V_SHIFT];
 				sd.AddressW       = s_textureAddress[(_flags&BGFX_TEXTURE_W_MASK)>>BGFX_TEXTURE_W_SHIFT];
-				sd.MipLODBias     = 0.0f;
+				sd.MipLODBias     = float(BGFX_CONFIG_MIP_LOD_BIAS);
 				sd.MaxAnisotropy  = m_maxAnisotropy;
 				sd.ComparisonFunc = 0 == cmpFunc ? D3D11_COMPARISON_NEVER : s_cmpFunc[cmpFunc];
 				sd.BorderColor[0] = _rgba[0];
@@ -4006,7 +4006,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 	};
 
 	static const UavFormat s_uavFormat[] =
-	{	//  BGFX_BUFFER_COMPUTE_TYPE_UINT, BGFX_BUFFER_COMPUTE_TYPE_INT,   BGFX_BUFFER_COMPUTE_TYPE_FLOAT
+	{	//  BGFX_BUFFER_COMPUTE_TYPE_INT,  BGFX_BUFFER_COMPUTE_TYPE_UINT,  BGFX_BUFFER_COMPUTE_TYPE_FLOAT
 		{ { DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN,            DXGI_FORMAT_UNKNOWN            },  0 }, // ignored
 		{ { DXGI_FORMAT_R8_SINT,           DXGI_FORMAT_R8_UINT,            DXGI_FORMAT_UNKNOWN            },  1 }, // BGFX_BUFFER_COMPUTE_FORMAT_8x1
 		{ { DXGI_FORMAT_R8G8_SINT,         DXGI_FORMAT_R8G8_UINT,          DXGI_FORMAT_UNKNOWN            },  2 }, // BGFX_BUFFER_COMPUTE_FORMAT_8x2

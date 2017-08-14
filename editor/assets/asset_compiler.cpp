@@ -49,7 +49,9 @@ bool run_compile_process(const std::string& process, const std::vector<std::stri
 
 	auto executable_dir = fs::resolve_protocol("binary:/");
 	auto process_full = executable_dir / process;
-
+    
+    APPLOG_INFO("Input Size {0}", process_full.size() + args.size());
+  
 	processReader.open(process_full.string().c_str(), args.c_str(), &error);
 
 	if(!error.isOk())

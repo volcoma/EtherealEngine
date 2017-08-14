@@ -1402,9 +1402,9 @@ namespace bgfx
 		uint32_t m_matrix;
 		IndirectBufferHandle m_indirectBuffer;
 
-		uint16_t m_numX;
-		uint16_t m_numY;
-		uint16_t m_numZ;
+		uint32_t m_numX;
+		uint32_t m_numY;
+		uint32_t m_numZ;
 		uint16_t m_startIndirect;
 		uint16_t m_numIndirect;
 		uint16_t m_num;
@@ -1776,7 +1776,7 @@ namespace bgfx
 			return submit(_id, _program, handle, _depth, _preserveState);
 		}
 
-		uint32_t dispatch(uint8_t _id, ProgramHandle _handle, uint16_t _ngx, uint16_t _ngy, uint16_t _ngz, uint8_t _flags);
+		uint32_t dispatch(uint8_t _id, ProgramHandle _handle, uint32_t _ngx, uint32_t _ngy, uint32_t _ngz, uint8_t _flags);
 
 		uint32_t dispatch(uint8_t _id, ProgramHandle _handle, IndirectBufferHandle _indirectHandle, uint16_t _start, uint16_t _num, uint8_t _flags)
 		{
@@ -3056,11 +3056,24 @@ namespace bgfx
 				return invalid;
 			}
 
+			const uint32_t shaderHash = bx::hashMurmur2A(_mem->data, _mem->size);
+			const uint16_t idx = m_shaderHashMap.find(shaderHash);
+			if (kInvalidHandle != idx)
+			{
+				ShaderHandle handle = { idx };
+				shaderIncRef(handle);
+				release(_mem);
+				return handle;
+			}
+
 			ShaderHandle handle = { m_shaderHandle.alloc() };
 
 			BX_WARN(isValid(handle), "Failed to allocate shader handle.");
 			if (isValid(handle) )
 			{
+				bool ok = m_shaderHashMap.insert(shaderHash, handle.idx);
+				BX_CHECK(ok, "Shader already exists!"); BX_UNUSED(ok);
+
 				uint32_t iohash;
 				bx::read(&reader, iohash);
 
@@ -3071,7 +3084,6 @@ namespace bgfx
 				sr.m_refCount = 1;
 				sr.m_hash     = iohash;
 				sr.m_num      = 0;
-				sr.m_owned    = false;
 				sr.m_uniforms = NULL;
 
 				UniformHandle* uniforms = (UniformHandle*)alloca(count*sizeof(UniformHandle) );
@@ -3157,12 +3169,7 @@ namespace bgfx
 
 		void shaderTakeOwnership(ShaderHandle _handle)
 		{
-			ShaderRef& sr = m_shaderRef[_handle.idx];
-			if (!sr.m_owned)
-			{
-				sr.m_owned = true;
-				shaderDecRef(_handle);
-			}
+			shaderDecRef(_handle);
 		}
 
 		void shaderIncRef(ShaderHandle _handle)
@@ -3194,6 +3201,8 @@ namespace bgfx
 					sr.m_uniforms = NULL;
 					sr.m_num = 0;
 				}
+
+				m_shaderHashMap.removeByHandle(_handle.idx);
 			}
 		}
 
@@ -3213,6 +3222,8 @@ namespace bgfx
 				ProgramHandle handle = { idx };
 				ProgramRef& pr = m_programRef[handle.idx];
 				++pr.m_refCount;
+				shaderIncRef(pr.m_vsh);
+				shaderIncRef(pr.m_fsh);
 				return handle;
 			}
 
@@ -3311,6 +3322,13 @@ namespace bgfx
 			BGFX_CHECK_HANDLE("destroyProgram", m_programHandle, _handle);
 
 			ProgramRef& pr = m_programRef[_handle.idx];
+			shaderDecRef(pr.m_vsh);
+
+			if (isValid(pr.m_fsh) )
+			{
+				shaderDecRef(pr.m_fsh);
+			}
+
 			int32_t refs = --pr.m_refCount;
 			if (0 == refs)
 			{
@@ -3319,15 +3337,6 @@ namespace bgfx
 
 				CommandBuffer& cmdbuf = getCommandBuffer(CommandBuffer::DestroyProgram);
 				cmdbuf.write(_handle);
-
-				shaderDecRef(pr.m_vsh);
-				uint32_t hash = pr.m_vsh.idx;
-
-				if (isValid(pr.m_fsh) )
-				{
-					shaderDecRef(pr.m_fsh);
-					hash |= pr.m_fsh.idx << 16;
-				}
 
 				m_programHashMap.removeByHandle(_handle.idx);
 			}
@@ -4156,7 +4165,7 @@ namespace bgfx
 			m_submit->setImage(_stage, _sampler, _handle, _mip, _access, _format);
 		}
 
-		BGFX_API_FUNC(uint32_t dispatch(uint8_t _id, ProgramHandle _handle, uint16_t _numX, uint16_t _numY, uint16_t _numZ, uint8_t _flags) )
+		BGFX_API_FUNC(uint32_t dispatch(uint8_t _id, ProgramHandle _handle, uint32_t _numX, uint32_t _numY, uint32_t _numZ, uint8_t _flags) )
 		{
 			BGFX_CHECK_HANDLE_INVALID_OK("dispatch", m_programHandle, _handle);
 			if (BX_ENABLED(BGFX_CONFIG_DEBUG_UNIFORM) )
@@ -4328,7 +4337,6 @@ namespace bgfx
 			uint32_t m_hash;
 			int16_t  m_refCount;
 			uint16_t m_num;
-			bool     m_owned;
 		};
 
 		struct ProgramRef
@@ -4373,6 +4381,8 @@ namespace bgfx
 		UniformHashMap m_uniformHashMap;
 		UniformRef m_uniformRef[BGFX_CONFIG_MAX_UNIFORMS];
 
+		typedef bx::HandleHashMapT<BGFX_CONFIG_MAX_SHADERS*2> ShaderHashMap;
+		ShaderHashMap m_shaderHashMap;
 		ShaderRef m_shaderRef[BGFX_CONFIG_MAX_SHADERS];
 
 		typedef bx::HandleHashMapT<BGFX_CONFIG_MAX_PROGRAMS*2> ProgramHashMap;

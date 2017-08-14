@@ -24,8 +24,9 @@
 
 #include <tinystl/allocator.h>
 #include <tinystl/vector.h>
-#include <string>
 namespace stl = tinystl;
+#include <string>
+#include <algorithm>
 
 #include <bimg/decode.h>
 
@@ -156,6 +157,8 @@ static const InputBinding s_bindingView[] =
 
 	{ entry::Key::KeyH,      entry::Modifier::None,       1, NULL, "view help"               },
 
+	{ entry::Key::Return,    entry::Modifier::None,       1, NULL, "view files"              },
+
 	{ entry::Key::KeyS,      entry::Modifier::None,       1, NULL, "view sdf"                },
 
 	{ entry::Key::Space,     entry::Modifier::None,       1, NULL, "view geo\n"
@@ -202,10 +205,14 @@ struct View
 		, m_angy(0.0f)
 		, m_zoom(1.0f)
 		, m_angle(0.0f)
+		, m_orientation(0.0f)
+		, m_flipH(0.0f)
+		, m_flipV(0.0f)
 		, m_filter(true)
 		, m_fit(true)
 		, m_alpha(false)
 		, m_help(false)
+		, m_files(false)
 		, m_sdf(false)
 	{
 	}
@@ -397,6 +404,41 @@ struct View
 					m_angle = 0.0f;
 				}
 			}
+			else if (0 == bx::strCmp(_argv[1], "orientation") )
+			{
+				if (_argc >= 3)
+				{
+					float* dst = NULL;
+					char axis = bx::toLower(_argv[2][0]);
+					switch (axis)
+					{
+					case 'x': dst = &m_flipV;       break;
+					case 'y': dst = &m_flipH;       break;
+					case 'z': dst = &m_orientation; break;
+					default:  break;
+					}
+
+					if (NULL != dst)
+					{
+						if (_argc >= 4)
+						{
+							float angle;
+							bx::fromString(&angle, _argv[3]);
+							*dst = bx::toRad(angle);
+						}
+						else
+						{
+							*dst = 0.0f;
+						}
+					}
+				}
+				else
+				{
+					m_flipH = 0.0f;
+					m_flipV = 0.0f;
+					m_orientation = 0.0f;
+				}
+			}
 			else if (0 == bx::strCmp(_argv[1], "filter") )
 			{
 				if (_argc >= 3)
@@ -486,23 +528,34 @@ struct View
 			{
 				m_help ^= true;
 			}
+			else if (0 == bx::strCmp(_argv[1], "files") )
+			{
+				m_files ^= true;
+			}
 		}
 
 		return 0;
 	}
 
-	void updateFileList(const char* _path, const bx::StringView& _fileName)
+	static bool sortNameAscending(const std::string& _lhs, const std::string& _rhs)
 	{
-		std::string path = _path;
+		return 0 > bx::strCmpV(_lhs.c_str(), _rhs.c_str() );
+	}
 
-		DIR* dir = opendir(_path);
+	void updateFileList(const bx::FilePath& _filePath)
+	{
+		DIR* dir = opendir(_filePath.get() );
 
 		if (NULL == dir)
 		{
-			path = ".";
+			m_path = _filePath.getPath();
+			dir = opendir(m_path.get() );
+		}
+		else
+		{
+			m_path = _filePath;
 		}
 
-		dir = opendir(path.c_str() );
 		if (NULL != dir)
 		{
 			for (dirent* item = readdir(dir); NULL != item; item = readdir(dir) )
@@ -525,17 +578,28 @@ struct View
 
 						if (supported)
 						{
-							if (0 == bx::strCmp(item->d_name, _fileName) )
-							{
-								m_fileIndex = uint32_t(m_fileList.size() );
-							}
-
-							std::string name = path;
-							char ch = name[name.size()-1];
-							name += '/' == ch || '\\' == ch ? "" : "/";
-							name += item->d_name;
-							m_fileList.push_back(name);
+							m_fileList.push_back(item->d_name);
 						}
+					}
+				}
+			}
+
+			std::sort(m_fileList.begin(), m_fileList.end(), sortNameAscending);
+
+			m_fileIndex = 0;
+			uint32_t idx = 0;
+			for (FileList::const_iterator it = m_fileList.begin(); it != m_fileList.end(); ++it, ++idx)
+			{
+				if (0 == bx::strCmpI(it->c_str(), _filePath.getFileName() ) )
+				{
+					// If it is case-insensitive match then might be correct one, but keep
+					// searching.
+					m_fileIndex = idx;
+
+					if (0 == bx::strCmp(it->c_str(), _filePath.getFileName() ) )
+					{
+						// If it is exact match we're done.
+						break;
 					}
 				}
 			}
@@ -543,6 +607,8 @@ struct View
 			closedir(dir);
 		}
 	}
+
+	bx::FilePath m_path;
 
 	typedef stl::vector<std::string> FileList;
 	FileList m_fileList;
@@ -560,10 +626,14 @@ struct View
 	float    m_angy;
 	float    m_zoom;
 	float    m_angle;
+	float    m_orientation;
+	float    m_flipH;
+	float    m_flipV;
 	bool     m_filter;
 	bool     m_fit;
 	bool     m_alpha;
 	bool     m_help;
+	bool     m_files;
 	bool     m_sdf;
 };
 
@@ -1063,22 +1133,11 @@ int _main_(int _argc, char** _argv)
 	InterpolatorAngle angy(0.0f);
 
 	const char* filePath = _argc < 2 ? "" : _argv[1];
-	bool directory = false;
-
-	bx::FileInfo fi;
-	bx::stat(filePath, fi);
-	directory = bx::FileInfo::Directory == fi.m_type;
 
 	std::string path = filePath;
-	if (!directory)
 	{
 		bx::FilePath fp(filePath);
-		path.assign(fp.getPath().getPtr(), fp.getPath().getTerm() );
-		view.updateFileList(path.c_str(), fp.getFileName() );
-	}
-	else
-	{
-		view.updateFileList(path.c_str(), "");
+		view.updateFileList(fp);
 	}
 
 	int exitcode = bx::kExitSuccess;
@@ -1111,8 +1170,8 @@ int _main_(int _argc, char** _argv)
 				| (mouseState.m_buttons[entry::MouseButton::Right ] ? IMGUI_MBUT_RIGHT  : 0)
 				| (mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
 				,  mouseState.m_mz
-				, uint16_t(width)
-				, uint16_t(height)
+				,  uint16_t(width)
+				,  uint16_t(height)
 				);
 
 			static bool help = false;
@@ -1162,8 +1221,9 @@ int _main_(int _argc, char** _argv)
 
 			if (ImGui::BeginPopupContextVoid("Menu") )
 			{
-//				if (ImGui::MenuItem("Open") )
+				if (ImGui::MenuItem("Files", NULL, view.m_files) )
 				{
+					cmdExec("view files");
 				}
 
 //				if (ImGui::MenuItem("Save As") )
@@ -1263,6 +1323,67 @@ int _main_(int _argc, char** _argv)
 				help = view.m_help;
 			}
 
+			if (view.m_files)
+			{
+				char temp[bx::kMaxFilePath];
+				bx::snprintf(temp, BX_COUNTOF(temp), "%s##File", view.m_path.get() );
+				if (ImGui::Begin(temp, NULL, ImVec2(400.0f, 400.0f) ) )
+				{
+					if (ImGui::BeginChild("##file_list", ImVec2(0.0f, 0.0f) ) )
+					{
+						ImGui::PushFont(ImGui::Font::Mono);
+						const float itemHeight = ImGui::GetTextLineHeightWithSpacing();
+						const float listHeight =
+							std::max(1.0f, bx::ffloor(ImGui::GetWindowHeight()/itemHeight) )
+							* itemHeight
+							;
+
+						ImGui::PushItemWidth(-1);
+						if (ImGui::ListBoxHeader("##empty", ImVec2(0.0f, listHeight) ) )
+						{
+							const int32_t itemCount  = int32_t(view.m_fileList.size() );
+
+							int32_t start, end;
+							ImGui::CalcListClipping(itemCount, itemHeight, &start, &end);
+
+							const int32_t index = int32_t(view.m_fileIndex);
+							if (index <= start)
+							{
+								ImGui::SetScrollY(ImGui::GetScrollY() - (start-index+1)*itemHeight);
+							}
+							else if (index >= end)
+							{
+								ImGui::SetScrollY(ImGui::GetScrollY() + (index-end+1)*itemHeight);
+							}
+
+							ImGuiListClipper clipper(itemCount, itemHeight);
+
+							for (int32_t pos = clipper.DisplayStart; pos < clipper.DisplayEnd; ++pos)
+							{
+								ImGui::PushID(pos);
+
+								bool isSelected = uint32_t(pos) == view.m_fileIndex;
+								if (ImGui::Selectable(view.m_fileList[pos].c_str(), &isSelected) )
+								{
+									view.m_fileIndex = pos;
+								}
+
+								ImGui::PopID();
+							}
+
+							clipper.End();
+
+							ImGui::ListBoxFooter();
+						}
+
+						ImGui::PopFont();
+						ImGui::EndChild();
+					}
+
+					ImGui::End();
+				}
+			}
+
 			if (ImGui::BeginPopupModal("Help", NULL, ImGuiWindowFlags_AlwaysAutoResize) )
 			{
 				ImGui::SetWindowFontScale(1.0f);
@@ -1335,21 +1456,37 @@ int _main_(int _argc, char** _argv)
 			{
 				if (bgfx::isValid(texture) )
 				{
-					bgfx::destroyTexture(texture);
+					bgfx::destroy(texture);
 				}
 
 				fileIndex = view.m_fileIndex;
 
-				filePath = view.m_fileList[view.m_fileIndex].c_str();
+				bx::FilePath fp = view.m_path;
+				fp.join(view.m_fileList[view.m_fileIndex].c_str() );
 
-				texture = loadTexture(filePath
+				bimg::Orientation::Enum orientation;
+				texture = loadTexture(fp.get()
 					, 0
 					| BGFX_TEXTURE_U_CLAMP
 					| BGFX_TEXTURE_V_CLAMP
 					| BGFX_TEXTURE_W_CLAMP
 					, 0
 					, &view.m_info
+					, &orientation
 					);
+
+				switch (orientation)
+				{
+				default:
+				case bimg::Orientation::R0:        cmdExec("view orientation\nview orientation z    0"); break;
+				case bimg::Orientation::R90:       cmdExec("view orientation\nview orientation z  -90"); break;
+				case bimg::Orientation::R180:      cmdExec("view orientation\nview orientation z -180"); break;
+				case bimg::Orientation::R270:      cmdExec("view orientation\nview orientation z -270"); break;
+				case bimg::Orientation::HFlip:     cmdExec("view orientation\nview orientation x -180"); break;
+				case bimg::Orientation::HFlipR90:  cmdExec("view orientation\nview orientation z  -90\nview orientation x -180");  break;
+				case bimg::Orientation::HFlipR270: cmdExec("view orientation\nview orientation z -270\nview orientation x -180"); break;
+				case bimg::Orientation::VFlip:     cmdExec("view orientation\nview orientation y -180"); break;
+				}
 
 				std::string title;
 				if (isValid(texture) )
@@ -1370,7 +1507,7 @@ int _main_(int _argc, char** _argv)
 					}
 
 					bx::stringPrintf(title, "%s (%d x %d%s, mips: %d, layers %d, %s)"
-						, filePath
+						, fp.get()
 						, view.m_info.width
 						, view.m_info.height
 						, name
@@ -1445,8 +1582,8 @@ int _main_(int _argc, char** _argv)
 				, px+width/2.0f
 				, py+height/2.0f
 				, py-height/2.0f
-				, 0.0f
-				, 1000.0f
+				, -10.0f
+				,  10.0f
 				, 0.0f
 				, caps->homogeneousDepth
 				);
@@ -1455,10 +1592,19 @@ int _main_(int _argc, char** _argv)
 
 			bgfx::dbgTextClear();
 
+			float orientation[16];
+			bx::mtxRotateXYZ(orientation, view.m_flipH, view.m_flipV, angle.getValue()+view.m_orientation);
+
 			if (view.m_fit)
 			{
-				scale.set(bx::fmin(float(width)  / float(view.m_info.width)
-					,              float(height) / float(view.m_info.height) )
+				float wh[3] = { float(view.m_info.width), float(view.m_info.height), 0.0f };
+				float result[3];
+				bx::vec3MulMtx(result, wh, orientation);
+				result[0] = bx::fround(bx::fabsolute(result[0]) );
+				result[1] = bx::fround(bx::fabsolute(result[1]) );
+
+				scale.set(bx::fmin(float(width)  / result[0]
+					,              float(height) / result[1])
 					, 0.1f
 					);
 			}
@@ -1484,13 +1630,10 @@ int _main_(int _argc, char** _argv)
 				, view.m_abgr
 				);
 
-			float rotz[16];
-			bx::mtxRotateZ(rotz, angle.getValue() );
-			bgfx::setTransform(rotz);
+			bgfx::setTransform(orientation);
 
 			float mtx[16];
 			bx::mtxRotateXY(mtx, angx.getValue(), angy.getValue() );
-
 			bgfx::setUniform(u_mtx, mtx);
 
 			mip.set(float(view.m_mip), 0.5f);
@@ -1555,19 +1698,19 @@ int _main_(int _argc, char** _argv)
 
 	if (bgfx::isValid(texture) )
 	{
-		bgfx::destroyTexture(texture);
+		bgfx::destroy(texture);
 	}
 
-	bgfx::destroyTexture(checkerBoard);
-	bgfx::destroyUniform(s_texColor);
-	bgfx::destroyUniform(u_mtx);
-	bgfx::destroyUniform(u_params);
-	bgfx::destroyProgram(textureProgram);
-	bgfx::destroyProgram(textureArrayProgram);
-	bgfx::destroyProgram(textureCubeProgram);
-	bgfx::destroyProgram(textureCube2Program);
-	bgfx::destroyProgram(textureSdfProgram);
-	bgfx::destroyProgram(texture3DProgram);
+	bgfx::destroy(checkerBoard);
+	bgfx::destroy(s_texColor);
+	bgfx::destroy(u_mtx);
+	bgfx::destroy(u_params);
+	bgfx::destroy(textureProgram);
+	bgfx::destroy(textureArrayProgram);
+	bgfx::destroy(textureCubeProgram);
+	bgfx::destroy(textureCube2Program);
+	bgfx::destroy(textureSdfProgram);
+	bgfx::destroy(texture3DProgram);
 
 	imguiDestroy();
 

@@ -86,7 +86,7 @@ void inspector_entity::component::instance::inspect(bool& changed)
 
 				if(opened)
 				{
-					gui::SetNextTreeNodeOpen(true, ImGuiSetCond_FirstUseEver);
+					gui::SetNextTreeNodeOpen(true, ImGuiCond_FirstUseEver);
 					if(gui::CollapsingHeader(name, &opened))
 					{
 						gui::PushStyleVar(ImGuiStyleVar_IndentSpacing, 8.0f);

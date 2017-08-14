@@ -131,7 +131,7 @@ struct frame_buffer
 		_textures.clear();
 
 		if(is_valid())
-			gfx::destroyFrameBuffer(handle);
+			gfx::destroy(handle);
 
 		handle = {bgfx::kInvalidHandle};
 	}

@@ -268,8 +268,9 @@ struct OcornutImguiContext
 			config.MergeMode = false;
 //			config.MergeGlyphCenterV = true;
 
-			m_font[ImGui::Font::Regular] = io.Fonts->AddFontFromMemoryTTF( (void*)s_robotoRegularTtf,     sizeof(s_robotoRegularTtf),     _fontSize,      &config);
-			m_font[ImGui::Font::Mono   ] = io.Fonts->AddFontFromMemoryTTF( (void*)s_robotoMonoRegularTtf, sizeof(s_robotoMonoRegularTtf), _fontSize-3.0f, &config);
+			const ImWchar* ranges = io.Fonts->GetGlyphRangesCyrillic();
+			m_font[ImGui::Font::Regular] = io.Fonts->AddFontFromMemoryTTF( (void*)s_robotoRegularTtf,     sizeof(s_robotoRegularTtf),     _fontSize,      &config, ranges);
+			m_font[ImGui::Font::Mono   ] = io.Fonts->AddFontFromMemoryTTF( (void*)s_robotoMonoRegularTtf, sizeof(s_robotoMonoRegularTtf), _fontSize-3.0f, &config, ranges);
 
 			config.MergeMode = true;
 			config.DstFont   = m_font[ImGui::Font::Regular];
@@ -307,12 +308,12 @@ struct OcornutImguiContext
 		ImGui::ShutdownDockContext();
 		ImGui::Shutdown();
 
-		bgfx::destroyUniform(s_tex);
-		bgfx::destroyTexture(m_texture);
+		bgfx::destroy(s_tex);
+		bgfx::destroy(m_texture);
 
-		bgfx::destroyUniform(u_imageLodEnabled);
-		bgfx::destroyProgram(m_imageProgram);
-		bgfx::destroyProgram(m_program);
+		bgfx::destroy(u_imageLodEnabled);
+		bgfx::destroy(m_imageProgram);
+		bgfx::destroy(m_program);
 
 		m_allocator = NULL;
 	}

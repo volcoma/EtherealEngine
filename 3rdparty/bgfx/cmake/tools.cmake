@@ -14,4 +14,5 @@ if( BGFX_CUSTOM_TARGETS )
 endif()
 
 include( cmake/tools/texturec.cmake )
+#include( cmake/tools/texturev.cmake )
 include( cmake/tools/shaderc.cmake )

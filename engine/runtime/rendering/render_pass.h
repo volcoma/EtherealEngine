@@ -78,7 +78,7 @@ struct render_pass
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	static std::uint8_t get_pass();
-
+    static urect get_pass_viewport();
 	///
 	std::uint8_t id;
 };

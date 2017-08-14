@@ -27,6 +27,7 @@ macro(detect_platform)
 		add_definitions(-D_SCL_SECURE_NO_WARNINGS=1)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /bigobj /W3")
 	endif()
+
 endmacro()
 
 

@@ -8,7 +8,7 @@ vertex_buffer::~vertex_buffer()
 void vertex_buffer::dispose()
 {
 	if(is_valid())
-		gfx::destroyVertexBuffer(handle);
+		gfx::destroy(handle);
 
 	handle = {bgfx::kInvalidHandle};
 }

@@ -8,7 +8,7 @@ uniform::~uniform()
 void uniform::dispose()
 {
 	if(is_valid())
-		gfx::destroyUniform(handle);
+		gfx::destroy(handle);
 
 	handle = {bgfx::kInvalidHandle};
 }

@@ -30,3 +30,48 @@ endif()
 add_library( glslang STATIC EXCLUDE_FROM_ALL ${GLSLANG_SOURCES} )
 target_include_directories( glslang PUBLIC ${BGFX_DIR}/3rdparty/glslang ${BGFX_DIR}/3rdparty/glslang/glslang/Include ${BGFX_DIR}/3rdparty/glslang/glslang/Public )
 set_target_properties( glslang PROPERTIES FOLDER "bgfx/3rdparty" )
+
+if( MSVC )
+	target_compile_options( glslang PRIVATE
+		"/wd4005"
+		"/wd4100"
+		"/wd4127"
+		"/wd4244"
+		"/wd4456"
+		"/wd4457"
+		"/wd4458"
+		"/wd4702"
+	)
+else()
+	target_compile_options( glslang PRIVATE
+		"-Wno-deprecated-register"
+		"-Wno-ignored-qualifiers"
+		"-Wno-inconsistent-missing-override"
+		"-Wno-missing-field-initializers"
+		"-Wno-reorder"
+		"-Wno-return-type"
+		"-Wno-shadow"
+		"-Wno-sign-compare"
+		"-Wno-undef"
+		"-Wno-unknown-pragmas"
+		"-Wno-unused-parameter"
+		"-Wno-unused-variable"
+	)
+endif()
+
+if( APPLE )
+	target_compile_options( glslang PRIVATE
+		"-Wno-c++11-extensions"
+		"-Wno-unused-const-variable"
+	)
+endif()
+
+if( UNIX AND NOT APPLE )
+	target_compile_options( glslang PRIVATE
+		"-Wno-unused-but-set-variable"
+	)
+endif()
+
+target_compile_definitions( glslang PRIVATE
+	"ENABLE_HLSL=1"
+)

@@ -14,6 +14,7 @@ include( cmake/3rdparty/fcpp.cmake )
 include( cmake/3rdparty/glsl-optimizer.cmake )
 include( cmake/3rdparty/glslang.cmake )
 
+
 if((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
 	if(CMAKE_BUILD_TYPE MATCHES Debug)
 	else()
@@ -23,16 +24,21 @@ if((CMAKE_CXX_COMPILER_ID STREQUAL "GNU") OR (CMAKE_CXX_COMPILER_ID MATCHES "Cla
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-strict-aliasing")
 endif()
 
-add_definitions("-DENABLE_HLSL=1")
 add_executable( shaderc ${BGFX_DIR}/tools/shaderc/shaderc.cpp ${BGFX_DIR}/tools/shaderc/shaderc.h ${BGFX_DIR}/tools/shaderc/shaderc_glsl.cpp ${BGFX_DIR}/tools/shaderc/shaderc_hlsl.cpp ${BGFX_DIR}/tools/shaderc/shaderc_pssl.cpp ${BGFX_DIR}/tools/shaderc/shaderc_spirv.cpp )
-target_compile_definitions( shaderc PRIVATE "_CRT_SECURE_NO_WARNINGS" )
-
+target_compile_definitions( shaderc PRIVATE "-D_CRT_SECURE_NO_WARNINGS" )
 set_target_properties( shaderc PROPERTIES FOLDER "bgfx/tools" )
 target_link_libraries( shaderc PUBLIC bx bimg bgfx-vertexdecl bgfx-shader-spirv fcpp glsl-optimizer glslang )
-target_include_directories( shaderc PUBLIC ${BGFX_DIR}/tools )
 if( BGFX_CUSTOM_TARGETS )
 	add_dependencies( tools shaderc )
 endif()
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+	target_link_libraries(shaderc PUBLIC "-stdlib=libstdc++ -lstdc++")
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+	target_link_libraries(shaderc PUBLIC "-static")
+endif()
+
+
 
 function( add_shader ARG_FILE )
 	# Parse arguments

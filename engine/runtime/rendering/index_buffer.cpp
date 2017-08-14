@@ -8,7 +8,7 @@ index_buffer::~index_buffer()
 void index_buffer::dispose()
 {
 	if(is_valid())
-		gfx::destroyIndexBuffer(handle);
+		gfx::destroy(handle);
 
 	handle = {bgfx::kInvalidHandle};
 }

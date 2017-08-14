@@ -103,15 +103,17 @@ function( add_example ARG_NAME )
 	# Add target
 	if( ARG_COMMON )
 		add_library( example-${ARG_NAME} STATIC EXCLUDE_FROM_ALL ${SOURCES} )
-		target_compile_definitions( example-${ARG_NAME} PRIVATE "-D_CRT_SECURE_NO_WARNINGS" "-D__STDC_FORMAT_MACROS" )
 		target_include_directories( example-${ARG_NAME} PUBLIC ${BGFX_DIR}/examples/common )
 		target_link_libraries( example-${ARG_NAME} PUBLIC bgfx ib-compress ocornut-imgui )
 		if( UNIX AND NOT APPLE )
 			target_link_libraries( example-${ARG_NAME} PUBLIC X11 )
 		endif()
 	else()
-		add_executable( example-${ARG_NAME} WIN32 EXCLUDE_FROM_ALL ${SOURCES} )
-		target_compile_definitions( example-${ARG_NAME} PRIVATE "-D_CRT_SECURE_NO_WARNINGS" "-D__STDC_FORMAT_MACROS" )
+		if( BGFX_INSTALL_EXAMPLES )
+			add_executable( example-${ARG_NAME} WIN32 ${SOURCES} )
+		else()
+			add_executable( example-${ARG_NAME} WIN32 EXCLUDE_FROM_ALL ${SOURCES} )
+		endif()
 		target_link_libraries( example-${ARG_NAME} example-common )
 		configure_debugging( example-${ARG_NAME} WORKING_DIR ${BGFX_DIR}/examples/runtime )
 		if( MSVC )
@@ -121,6 +123,7 @@ function( add_example ARG_NAME )
 			add_dependencies( examples example-${ARG_NAME} )
 		endif()
 	endif()
+	target_compile_definitions( example-${ARG_NAME} PRIVATE "-D_CRT_SECURE_NO_WARNINGS" "-D__STDC_FORMAT_MACROS" "-DENTRY_CONFIG_IMPLEMENT_MAIN=1" )
 
 	# Configure shaders
 	if( NOT ARG_COMMON )
@@ -154,37 +157,44 @@ add_example(
 )
 
 # Add examples
-add_example( 00-helloworld )
-add_example( 01-cubes )
-add_example( 02-metaballs )
-add_example( 03-raymarch )
-add_example( 04-mesh )
-add_example( 05-instancing )
-add_example( 06-bump )
-add_example( 07-callback )
-add_example( 08-update )
-add_example( 09-hdr )
-add_example( 10-font )
-add_example( 11-fontsdf )
-add_example( 12-lod )
-add_example( 13-stencil )
-add_example( 14-shadowvolumes )
-add_example( 15-shadowmaps-simple )
-add_example( 16-shadowmaps )
-add_example( 17-drawstress )
-add_example( 18-ibl )
-add_example( 19-oit )
-add_example( 20-nanovg )
-add_example( 21-deferred )
-add_example( 22-windows )
-add_example( 23-vectordisplay )
-add_example( 24-nbody )
-add_example( 25-c99 )
-add_example( 26-occlusion )
-add_example( 27-terrain )
-add_example( 28-wireframe )
-add_example( 29-debugdraw )
-add_example( 30-picking )
-add_example( 31-rsm )
-add_example( 32-particles )
-add_example( 33-pom )
+set(
+	BGFX_EXAMPLES
+	00-helloworld
+	01-cubes
+	02-metaballs
+	03-raymarch
+	04-mesh
+	05-instancing
+	06-bump
+	07-callback
+	08-update
+	09-hdr
+	10-font
+	11-fontsdf
+	12-lod
+	13-stencil
+	14-shadowvolumes
+	15-shadowmaps-simple
+	16-shadowmaps
+	17-drawstress
+	18-ibl
+	19-oit
+	20-nanovg
+	21-deferred
+	22-windows
+	23-vectordisplay
+	24-nbody
+	25-c99
+	26-occlusion
+	27-terrain
+	28-wireframe
+	29-debugdraw
+	30-picking
+	31-rsm
+	32-particles
+	33-pom
+)
+
+foreach( EXAMPLE ${BGFX_EXAMPLES} )
+	add_example( ${EXAMPLE} )
+endforeach()

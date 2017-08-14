@@ -466,31 +466,41 @@ namespace bimg
 	{
 		BX_ERROR_SCOPE(_err);
 
-		const int isHdr = stbi_is_hdr_from_memory((const uint8_t*)_data, (int)_size);
+		const int isHdr = stbi_is_hdr_from_memory( (const uint8_t*)_data, (int)_size);
 
 		void* data;
 		uint32_t width  = 0;
 		uint32_t height = 0;
 		int comp = 0;
-		if (isHdr) { data = stbi_loadf_from_memory((const uint8_t*)_data, (int)_size, (int*)&width, (int*)&height, &comp, 4); }
-		else       { data = stbi_load_from_memory ((const uint8_t*)_data, (int)_size, (int*)&width, (int*)&height, &comp, 0); }
+		if (isHdr)
+		{
+			data = stbi_loadf_from_memory( (const uint8_t*)_data, (int)_size, (int*)&width, (int*)&height, &comp, 4);
+		}
+		else
+		{
+			data = stbi_load_from_memory ( (const uint8_t*)_data, (int)_size, (int*)&width, (int*)&height, &comp, 0);
+		}
 
 		if (NULL == data)
 		{
 			return NULL;
 		}
 
-		bimg::TextureFormat::Enum format;
+		bimg::TextureFormat::Enum format = bimg::TextureFormat::RGBA8;
+
 		if (isHdr)
 		{
 			format = bimg::TextureFormat::RGBA32F;
 		}
 		else
 		{
-			if       (1 == comp)   { format = bimg::TextureFormat::R8;    }
-			else  if (2 == comp)   { format = bimg::TextureFormat::RG8;   }
-			else  if (3 == comp)   { format = bimg::TextureFormat::RGB8;  }
-			else/*if (4 == comp)*/ { format = bimg::TextureFormat::RGBA8; }
+			switch (comp)
+			{
+				case 1:  format = bimg::TextureFormat::R8;   break;
+				case 2:  format = bimg::TextureFormat::RG8;  break;
+				case 3:  format = bimg::TextureFormat::RGB8; break;
+				default: break;
+			}
 		}
 
 		ImageContainer* output = imageAlloc(_allocator
@@ -508,6 +518,139 @@ namespace bimg
 		return output;
 	}
 
+	static ImageContainer* imageParseJpeg(bx::AllocatorI* _allocator, const void* _data, uint32_t _size, bx::Error* _err)
+	{
+		bx::MemoryReader reader(_data, _size);
+
+		bx::Error err;
+
+		uint16_t magic = 0;
+		bx::readHE(&reader, magic, false, &err);
+
+		if (!err.isOk()
+		||  0xffd8 != magic)
+		{
+			return NULL;
+		}
+
+		Orientation::Enum orientation = Orientation::R0;
+
+		while (err.isOk() )
+		{
+			bx::readHE(&reader, magic, false, &err);
+
+			uint16_t size;
+			bx::readHE(&reader, size, false, &err);
+
+			if (!err.isOk() )
+			{
+				return NULL;
+			}
+
+			if (0xffe1 != magic)
+			{
+				bx::seek(&reader, size-2);
+				continue;
+			}
+
+			char exif00[6];
+			bx::read(&reader, exif00, 6, &err);
+
+			if (0 == bx::memCmp(exif00, "Exif\0\0", 6) )
+			{
+				uint16_t iimm = 0;
+				bx::read(&reader, iimm, &err);
+
+				const bool littleEndian = iimm == 0x4949; //II - Intel - little endian
+				if (!err.isOk()
+				&&  !littleEndian
+				&&   iimm != 0x4d4d) // MM - Motorola - big endian
+				{
+					return NULL;
+				}
+
+				bx::readHE(&reader, magic, littleEndian, &err);
+				if (!err.isOk()
+				||  0x2a != magic)
+				{
+					return NULL;
+				}
+
+				uint32_t ifd0;
+				bx::readHE(&reader, ifd0, littleEndian, &err);
+
+				if (!err.isOk()
+				||  8 > ifd0)
+				{
+					return NULL;
+				}
+
+				bx::seek(&reader, ifd0-8);
+
+				uint16_t numEntries;
+				bx::readHE(&reader, numEntries, littleEndian, &err);
+
+				for (uint32_t ii = 0; err.isOk() && ii < numEntries; ++ii)
+				{
+					// https://sno.phy.queensu.ca/~phil/exiftool/TagNames/EXIF.html
+					uint16_t tag;
+					bx::readHE(&reader, tag, littleEndian, &err);
+
+					uint16_t format;
+					bx::readHE(&reader, format, littleEndian, &err);
+
+					uint32_t length;
+					bx::readHE(&reader, length, littleEndian, &err);
+
+					uint32_t data;
+					bx::readHE(&reader, data, littleEndian, &err);
+
+					switch (tag)
+					{
+					case 0x112: // orientation
+						if (3 == format)
+						{
+							bx::seek(&reader, -4);
+
+							uint16_t u16;
+							bx::readHE(&reader, u16, littleEndian, &err);
+
+							uint16_t pad;
+							bx::read(&reader, pad, &err);
+
+							switch (u16)
+							{
+							default:
+							case 1: orientation = Orientation::R0;        break; // Horizontal (normal)
+							case 2: orientation = Orientation::HFlip;     break; // Mirror horizontal
+							case 3: orientation = Orientation::R180;      break; // Rotate 180
+							case 4: orientation = Orientation::VFlip;     break; // Mirror vertical
+							case 5: orientation = Orientation::HFlipR270; break; // Mirror horizontal and rotate 270 CW
+							case 6: orientation = Orientation::R90;       break; // Rotate 90 CW
+							case 7: orientation = Orientation::HFlipR90;  break; // Mirror horizontal and rotate 90 CW
+							case 8: orientation = Orientation::R270;      break; // Rotate 270 CW
+							}
+						}
+						break;
+
+					default:
+						break;
+					}
+				}
+			}
+
+			break;
+		}
+
+		ImageContainer* image = imageParseStbImage(_allocator, _data, _size, _err);
+		if (NULL != image)
+		{
+			image->m_orientation = orientation;
+		}
+
+		return image;
+	}
+
 	ImageContainer* imageParse(bx::AllocatorI* _allocator, const void* _data, uint32_t _size, TextureFormat::Enum _dstFormat, bx::Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
@@ -517,6 +660,7 @@ namespace bimg
 		input = NULL == input ? imageParsePvr3    (_allocator, _data, _size, _err) : input;
 		input = NULL == input ? imageParseLodePng (_allocator, _data, _size, _err) : input;
 		input = NULL == input ? imageParseTinyExr (_allocator, _data, _size, _err) : input;
+		input = NULL == input ? imageParseJpeg    (_allocator, _data, _size, _err) : input;
 		input = NULL == input ? imageParseStbImage(_allocator, _data, _size, _err) : input;
 
 		if (NULL == input)

@@ -498,6 +498,8 @@ namespace entry
 			mte.m_argc = _argc;
 			mte.m_argv = _argv;
 
+			bgfx::renderFrame();
+
 			bx::Thread thread;
 			thread.init(mte.threadFunc, &mte);
 			m_init = true;
@@ -509,6 +511,8 @@ namespace entry
 
 			while (!m_exit)
 			{
+				bgfx::renderFrame();
+
 				s_xinput.update(m_eventQueue);
 				WaitForInputIdle(GetCurrentProcess(), 16);
 
@@ -518,6 +522,8 @@ namespace entry
 					DispatchMessage(&msg);
 				}
 			}
+
+			while (bgfx::RenderFrame::NoContext != bgfx::renderFrame() ) {};
 
 			thread.shutdown();
 
@@ -661,13 +667,23 @@ namespace entry
 							}
 
 							// Recalculate position using different anchor points
-							switch(_wparam)
+							switch (_wparam)
 							{
-							case WMSZ_LEFT:
 							case WMSZ_TOPLEFT:
+								rect.left = rect.right - width - m_frameWidth;
+								rect.top = rect.bottom - height - m_frameHeight;
+							  break;
+
+							case WMSZ_TOP:
+							case WMSZ_TOPRIGHT:
+								rect.right = rect.left + width + m_frameWidth;
+								rect.top = rect.bottom - height - m_frameHeight;
+								break;
+
+							case WMSZ_LEFT:
 							case WMSZ_BOTTOMLEFT:
-								rect.left   = rect.right - width  - m_frameWidth;
-								rect.bottom = rect.top   + height + m_frameHeight;
+								rect.left = rect.right - width - m_frameWidth;
+								rect.bottom = rect.top + height + m_frameHeight;
 								break;
 
 							default:

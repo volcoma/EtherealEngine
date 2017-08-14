@@ -133,6 +133,23 @@ namespace bimg
 		};
 	};
 
+	///
+	struct Orientation
+	{
+		///
+		enum Enum
+		{
+			R0,
+			R90,
+			R180,
+			R270,
+			HFlip,
+			HFlipR90,
+			HFlipR270,
+			VFlip,
+		};
+	};
+
 	/// Texture info.
 	///
 	/// @attention C99 equivalent is `bgfx_texture_info_t`.
@@ -156,6 +173,7 @@ namespace bimg
 		void*           m_data;
 
 		TextureFormat::Enum m_format;
+		Orientation::Enum m_orientation;
 
 		uint32_t m_size;
 		uint32_t m_offset;

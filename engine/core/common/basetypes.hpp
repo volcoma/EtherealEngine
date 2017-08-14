@@ -83,7 +83,7 @@ public:
 
 private:
 	///
-	std::uint16_t _data;
+	std::uint16_t _data = 0;
 };
 
 template <typename T>
@@ -95,8 +95,8 @@ struct range
 		, Max(_max)
 	{
 	}
-	T Min;
-	T Max;
+	T Min = 0;
+	T Max = 0;
 
 	inline bool operator==(const range& b) const
 	{
@@ -118,8 +118,8 @@ struct size
 		, height(_height)
 	{
 	}
-	T width;
-	T height;
+	T width = 0;
+	T height = 0;
 
 	// Inline operators
 	inline bool operator==(const size& b) const
@@ -164,8 +164,8 @@ struct point
 		, y(_y)
 	{
 	}
-	T x;
-	T y;
+	T x = 0;
+	T y = 0;
 
 	// Inline operators
 	inline bool operator==(const point& b) const
@@ -192,10 +192,10 @@ struct rect
 		, bottom(_bottom)
 	{
 	}
-	T left;
-	T top;
-	T right;
-	T bottom;
+    T left = 0;
+	T top = 0;
+	T right = 0;
+	T bottom = 0;
 
 	inline T width() const
 	{

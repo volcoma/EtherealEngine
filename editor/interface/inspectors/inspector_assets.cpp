@@ -44,7 +44,7 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool readOnly,
 	gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
 	bool hoveredFrame = gui::IsItemHoveredRect();
 	auto bbMinFrame = gui::GetItemRectMin();
-	auto bbMaxFrame = gui::GetItemBoxMax();
+	auto bbMaxFrame = gui::GetItemRectMax();
 
 	if(selected && !selected.is_type<asset_handle<texture>>())
 	{

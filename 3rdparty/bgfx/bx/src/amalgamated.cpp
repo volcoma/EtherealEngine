@@ -3,8 +3,8 @@
  *  License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
-#include "bx.cpp"
 #include "allocator.cpp"
+#include "bx.cpp"
 #include "commandline.cpp"
 #include "crtnone.cpp"
 #include "debug.cpp"

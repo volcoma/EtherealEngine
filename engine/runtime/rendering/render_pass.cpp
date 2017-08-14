@@ -25,7 +25,7 @@ render_pass::render_pass(const std::string& n)
 	id = generate_id();
 	gfx::setViewName(id, n.c_str());
 }
-
+static urect viewport_rect;
 void render_pass::bind(frame_buffer* fb) const
 {
 	expects(fb != nullptr);
@@ -40,6 +40,10 @@ void render_pass::bind(frame_buffer* fb) const
 
 	gfx::setViewFrameBuffer(id, fb->handle);
 	gfx::touch(id);
+    viewport_rect.left = 0;
+    viewport_rect.top = 0;
+    viewport_rect.right = size.width;
+    viewport_rect.bottom = size.height;
 }
 
 void render_pass::clear(std::uint16_t _flags, std::uint32_t _rgba /*= 0x000000ff */, float _depth /*= 1.0f */,
@@ -77,5 +81,10 @@ void render_pass::reset()
 
 std::uint8_t render_pass::get_pass()
 {
-	return s_last_index;
+    return s_last_index;
+}
+
+urect render_pass::get_pass_viewport()
+{
+    return viewport_rect;
 }

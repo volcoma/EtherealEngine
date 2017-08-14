@@ -8,7 +8,7 @@
 #include <bx/readerwriter.h>
 
 #if BX_PLATFORM_WINDOWS
-extern "C" __declspec(dllimport) uint32_t __stdcall GetTempPathA(uint32_t _max, const char* _ptr);
+extern "C" __declspec(dllimport) uint32_t __stdcall GetTempPathA(uint32_t _max, char* _ptr);
 #endif // BX_PLATFORM_WINDOWS
 
 namespace bx

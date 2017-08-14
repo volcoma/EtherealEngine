@@ -20,7 +20,7 @@ void show_statistics(const unsigned int frameRate)
 {
 	ImVec2 pos = gui::GetCursorScreenPos();
 	gui::SetNextWindowPos(pos);
-	gui::SetNextWindowCollapsed(true, ImGuiSetCond_FirstUseEver);
+	gui::SetNextWindowCollapsed(true, ImGuiCond_FirstUseEver);
 	gui::Begin("Statistics", nullptr,
 			   ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
 

@@ -26,7 +26,7 @@ extern "C" int32_t _main_(int32_t _argc, char** _argv);
 namespace entry
 {
 	static uint32_t s_debug = BGFX_DEBUG_NONE;
-	static uint32_t s_reset = BGFX_RESET_NONE;
+	static uint32_t s_reset = BGFX_RESET_NONE;  
 	static bool s_exit = false;
 
 	static Remotery* s_rmt = NULL;

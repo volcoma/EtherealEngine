@@ -97,11 +97,13 @@ void renderFunc(ImDrawData* _drawData)
 				{
 					tex = reinterpret_cast<texture*>(cmd->TextureId);
 				}
-
-				const std::uint16_t xx = std::uint16_t(std::max(cmd->ClipRect.x, 0.0f));
-				const std::uint16_t yy = std::uint16_t(std::max(cmd->ClipRect.y, 0.0f));
-				gfx::setScissor(xx, yy, std::uint16_t(std::min(cmd->ClipRect.z, 65535.0f) - xx),
-								std::uint16_t(std::min(cmd->ClipRect.w, 65535.0f) - yy));
+				
+                const std::uint16_t x = std::uint16_t(std::max(cmd->ClipRect.x, 0.0f));
+				const std::uint16_t y = std::uint16_t(std::max(cmd->ClipRect.y, 0.0f));
+				const std::uint16_t width = std::uint16_t(std::min(cmd->ClipRect.z, 65535.0f) - x);
+				const std::uint16_t height = std::uint16_t(std::min(cmd->ClipRect.w, 65535.0f) - y);
+                                
+				gfx::setScissor(x, y, width, height);
 
 				prog->set_texture(0, "s_tex", tex);
 
@@ -205,7 +207,6 @@ bool gui_system::initialize()
 	ImFontConfig config;
 	config.FontDataOwnedByAtlas = false;
 	config.MergeMode = false;
-	config.MergeGlyphCenterV = true;
 
 	s_fonts["default"] = io.Fonts->AddFontDefault(&config);
 	s_fonts["roboto_regular"] =

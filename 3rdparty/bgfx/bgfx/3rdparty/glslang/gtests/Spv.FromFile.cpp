@@ -275,6 +275,7 @@ INSTANTIATE_TEST_CASE_P(
         "spv.noWorkgroup.comp",
         "spv.offsets.frag",
         "spv.Operations.frag",
+        "spv.paramMemory.frag",
         "spv.precision.frag",
         "spv.prepost.frag",
         "spv.qualifiers.vert",
@@ -359,6 +360,9 @@ INSTANTIATE_TEST_CASE_P(
 INSTANTIATE_TEST_CASE_P(
     Glsl, CompileOpenGLToSpirvTest,
     ::testing::ValuesIn(std::vector<std::string>({
+        "spv.460.frag",
+        "spv.460.vert",
+        "spv.460.comp",
         "spv.atomic.comp",
         "spv.glFragColor.frag",
         "spv.specConst.vert",

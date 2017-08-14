@@ -13,7 +13,7 @@ bool texture::is_valid() const
 void texture::dispose()
 {
 	if(is_valid())
-		gfx::destroyTexture(handle);
+		gfx::destroy(handle);
 
 	handle = {bgfx::kInvalidHandle};
 }

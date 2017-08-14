@@ -31,5 +31,7 @@ target_link_libraries(core PUBLIC singleton)
 target_link_libraries(core PUBLIC system)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    target_link_libraries(core PUBLIC "-stdlib=libstdc++ -lstdc++")
+	target_link_libraries(core PUBLIC "-stdlib=libstdc++ -lstdc++")
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+	target_link_libraries(core PUBLIC "-static")
 endif()
