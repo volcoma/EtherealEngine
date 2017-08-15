@@ -301,12 +301,13 @@ std::string string_utils::random_string(std::string::size_type length)
 		return random_generator_t(seed);
 	};
 
-	auto randchar = []() -> char {
+    random_generator_t engine(make_seeded_engine());
+    
+	auto randchar = [&]() -> char {
 		constexpr const char charset[] = "0123456789"
 							   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 							   "abcdefghijklmnopqrstuvwxyz";
-		random_generator_t engine(make_seeded_engine());
-
+            
 		const size_t max_index = (sizeof(charset) - 1);
 		std::uniform_int_distribution<std::string::size_type> dist(0, max_index);
 
