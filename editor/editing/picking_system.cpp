@@ -208,7 +208,7 @@ bool picking_system::initialize()
 	auto vs_picking_id = am.load<shader>("editor_data:/shaders/vs_picking_id.sc");
 	auto fs_picking_id = am.load<shader>("editor_data:/shaders/fs_picking_id.sc");
 
-	ts.push_awaitable_on_main(
+	ts.push_on_main(
 		[this](asset_handle<shader> vs, asset_handle<shader> fs) {
 			_program = std::make_unique<program>(vs, fs);
 

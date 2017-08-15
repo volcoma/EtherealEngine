@@ -108,14 +108,14 @@ struct asset_storage : public base_storage
 	}
 
 	/// key, data, size
-	std::function<core::task_future<asset_handle<T>>(const std::string&, const std::uint8_t*, std::uint32_t)>
+	std::function<bool(core::task_future<asset_handle<T>>&, const std::string&, const std::uint8_t*, std::uint32_t)>
 		load_from_memory;
 
 	/// key, mode
-	std::function<core::task_future<asset_handle<T>>(const std::string&, asset_handle<T>)> load_from_file;
+	std::function<bool(core::task_future<asset_handle<T>>&, const std::string&)> load_from_file;
 
 	/// key, mode
-	std::function<core::task_future<asset_handle<T>>(const std::string&, std::shared_ptr<T>)>
+	std::function<bool(core::task_future<asset_handle<T>>&, const std::string&, std::shared_ptr<T>)>
 		load_from_instance;
 
 	/// key, asset
@@ -319,7 +319,7 @@ private:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	template <typename T, typename F>
-	core::task_future<asset_handle<T>>&
+	core::task_future<asset_handle<T>>
 	load_asset_from_file_impl(const std::string& key, load_mode mode, load_flags flags,
 							  std::recursive_mutex& container_mutex, request_container_t<T>& container,
 							  F&& load_func)
@@ -331,9 +331,8 @@ private:
 			auto& future = it->second;
 			if(flags == load_flags::reload && future.is_ready())
 			{
-				asset_handle<T> original = future.get();
 				if(load_func)
-					future = load_func(key, original);
+					load_func(future, key);
 			}
 
 			if(mode == load_mode::sync)
@@ -347,9 +346,8 @@ private:
 		{
 			auto& future = container[key];
 			// Dispatch the loading
-			asset_handle<T> original;
 			if(load_func)
-				future = load_func(key, original);
+				load_func(future, key);
 
 			return future;
 		}
@@ -383,7 +381,7 @@ private:
 			auto& future = container[key];
 			// Dispatch the loading
 			if(load_func)
-				future = load_func(key, data, size);
+				load_func(future, key, data, size);
 
 			return future;
 		}
@@ -399,13 +397,13 @@ private:
 		auto& future = container[key];
 		// Dispatch the loading
 		if(load_func)
-			future = load_func(key, entry);
+			load_func(future, key, entry);
 
 		return future;
 	}
 
 	template <typename T>
-	core::task_future<asset_handle<T>> find_asset_impl(const std::string& key,
+	core::task_future<asset_handle<T>>& find_asset_impl(const std::string& key,
 													   std::recursive_mutex& container_mutex,
 													   request_container_t<T>& container)
 	{
@@ -417,7 +415,8 @@ private:
 		}
 		else
 		{
-			return core::task_future<asset_handle<T>>();
+            static core::task_future<asset_handle<T>> empty;
+			return empty;
 		}
 	}
 

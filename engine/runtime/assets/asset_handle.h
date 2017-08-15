@@ -77,23 +77,6 @@ struct asset_handle
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	asset_handle& operator=(const asset_handle& handle)
-	{
-		// Share the specified handle's data pointer
-		if(link != handle.link)
-			link = handle.link;
-
-		return *this;
-	}
-
-	//-----------------------------------------------------------------------------
-	//  Name : operator= ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
 	asset_handle& operator=(std::shared_ptr<T> data)
 	{
 		// Own the specified handle's data pointer

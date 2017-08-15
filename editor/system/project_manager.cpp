@@ -59,7 +59,7 @@ void watch_assets(const fs::path& protocol, const std::string& wildcard, bool re
 					if(entry.status == fs::watcher::entry_status::removed)
 					{
 						auto task =
-							ts.push_ready_on_main([reload_async, key, &am]() { am.clear_asset<T>(key); });
+							ts.push_on_main([reload_async, key, &am]() { am.clear_asset<T>(key); });
 					}
 					else if(entry.status == fs::watcher::entry_status::renamed)
 					{
@@ -72,7 +72,10 @@ void watch_assets(const fs::path& protocol, const std::string& wildcard, bool re
 
 						// created or modified
 						auto task =
-							ts.push_ready([mode, flags, key, &am]() { am.load<T>(key, mode, flags); });
+							ts.push([mode, flags, key, &am]() 
+                        {
+                            am.load<T>(key, mode, flags); 
+                        });
 					}
 				}
 			}
@@ -83,7 +86,7 @@ void watch_assets(const fs::path& protocol, const std::string& wildcard, bool re
 				{
 					if(entry.status == fs::watcher::entry_status::removed)
 					{
-						auto task = ts.push_ready_on_main([p, ext, protocol, key, &am]() {
+						auto task = ts.push_on_main([p, ext, protocol, key, &am]() {
 							am.delete_asset<T>(key);
 
 							// always add the extensions since we want the compiled asset version to be
@@ -114,7 +117,7 @@ void watch_assets(const fs::path& protocol, const std::string& wildcard, bool re
 						if(compile)
 						{
 							auto task =
-								ts.push_ready([](const fs::path& p) { asset_compiler::compile<T>(p); }, p);
+								ts.push([](const fs::path& p) { asset_compiler::compile<T>(p); }, p);
 						}
 					}
 				}
@@ -306,8 +309,8 @@ void project_manager::open_project(const fs::path& project_path)
 	save_config();
 
 	/// for debug purposes
-	watch_assets<shader>("engine_data:/shaders", "*.sc", true, true);
-	watch_assets<shader>("editor_data:/shaders", "*.sc", true, true);
+	//watch_assets<shader>("engine_data:/shaders", "*.sc", true, true);
+	//watch_assets<shader>("editor_data:/shaders", "*.sc", true, true);
 	// watch_assets<texture>("engine_data:/textures", "*.png", true);
 	// watch_assets<texture>("engine_data:/textures", "*.tga", true);
 	// watch_assets<texture>("engine_data:/textures", "*.dds", true);

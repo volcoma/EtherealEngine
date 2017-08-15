@@ -503,21 +503,21 @@ private:
 		static inline bool call_ready(const task_future<T>& t) noexcept
 		{
 			using namespace std::chrono_literals;
-			return t.wait_for(0s) == std::future_status::ready;
+			return t.valid() && t.wait_for(0s) == std::future_status::ready;
 		}
 
 		template <class T>
 		static inline bool call_ready(const std::future<T>& t) noexcept
 		{
 			using namespace std::chrono_literals;
-			return t.wait_for(0s) == std::future_status::ready;
+			return t.valid() && t.wait_for(0s) == std::future_status::ready;
 		}
 
 		template <class T>
 		static inline bool call_ready(const std::shared_future<T>& t) noexcept
 		{
 			using namespace std::chrono_literals;
-			return t.wait_for(0s) == std::future_status::ready;
+			return t.valid() && t.wait_for(0s) == std::future_status::ready;
 		}
 
 		template <std::size_t... I>
@@ -569,7 +569,7 @@ class task_system : public core::subsystem
 
 	std::size_t get_thread_queue_idx(std::size_t idx, std::size_t seed = 0);
 
-	std::size_t get_main_thread_queue_idx();
+	std::thread::id get_thread_id(std::size_t index);
 
 public:
 	task_system();
@@ -606,6 +606,61 @@ public:
 	void dispose() override;
 
 	//-----------------------------------------------------------------------------
+	//  Name : push_task ()
+	/// <summary>
+	/// Pushes a task to be executed.
+	/// Ready tasks are assumed to be immediately invokable; that is,
+	/// invoking the underlying pakcaged_task with the provided arguments
+	/// will not block.This is contrasted with async tasks where some or
+	/// all of the provided arguments may be futures waiting on results of
+	/// other tasks.
+	/// Awaitable tasks are assumed to take arguments where some or all are
+	/// backed by futures waiting on results of other tasks.This is
+	/// contrasted with ready tasks that are assumed to be immediately invokable.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	template <class T>
+	auto push_task(T&& t, std::size_t idx, bool execute_if_ready) ->
+		typename std::remove_reference<decltype(t.second)>::type
+	{
+		t.second._system = this;
+
+		std::size_t try_count = idx == 0 ? 0 : 10 * nthreads_;
+
+		for(std::size_t k = 0; k < try_count; ++k)
+		{
+			const auto queue_index = get_thread_queue_idx(idx, k);
+
+			if(execute_if_ready && t.first.ready() &&
+			   ((get_thread_id(queue_index) == std::this_thread::get_id()) || (queue_index != 0)))
+			{
+				t.first();
+
+				return std::move(t.second);
+			}
+			else
+			{
+				if(queues_[queue_index].try_push(t.first))
+					return std::move(t.second);
+			}
+		}
+
+		const auto queue_index = get_thread_queue_idx(idx);
+		if(execute_if_ready && t.first.ready() &&
+		   ((get_thread_id(queue_index) == std::this_thread::get_id()) || (queue_index != 0)))
+		{
+			t.first();
+
+			return std::move(t.second);
+		}
+		else
+		{
+			queues_[queue_index].push(std::move(t.first));
+			return std::move(t.second);
+		}
+	}
+
+	//-----------------------------------------------------------------------------
 	//  Name : push_ready ()
 	/// <summary>
 	/// Pushes a immediately invokable task to be executed.
@@ -616,33 +671,7 @@ public:
 	/// other tasks.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	template <class F, class... Args>
-	auto push_ready(F&& f, Args&&... args) -> typename std::remove_reference<decltype(
-		make_ready_task(std::allocator_arg_t{}, alloc_, std::forward<F>(f), std::forward<Args>(args)...)
-			.second)>::type
-	{
-		if(nthreads_ == 1)
-		{
-			return push_ready_on_main(std::forward<F>(f), std::forward<Args>(args)...);
-		}
-		else
-		{
-			auto t = make_ready_task(std::allocator_arg_t{}, alloc_, std::forward<F>(f),
-									 std::forward<Args>(args)...);
-			t.second._system = this;
-			auto const idx = current_index_++;
-			for(std::size_t k = 0; k < 10 * nthreads_; ++k)
-			{
-				const auto queue_index = get_thread_queue_idx(idx, k);
-				if(queues_[queue_index].try_push(t.first))
-					return std::move(t.second);
-			}
-
-			const auto queue_index = get_thread_queue_idx(idx);
-			queues_[queue_index].push(std::move(t.first));
-			return std::move(t.second);
-		}
-	}
+	
 
 	//-----------------------------------------------------------------------------
 	//  Name : push_awaitable ()
@@ -653,33 +682,7 @@ public:
 	/// contrasted with ready tasks that are assumed to be immediately invokable.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	template <class F, class... Args>
-	auto push_awaitable(F&& f, Args&&... args) -> typename std::remove_reference<decltype(
-		make_awaitable_task(std::allocator_arg_t{}, alloc_, std::forward<F>(f), std::forward<Args>(args)...)
-			.second)>::type
-	{
-		if(nthreads_ == 1)
-		{
-			return push_awaitable_on_main(std::forward<F>(f), std::forward<Args>(args)...);
-		}
-		else
-		{
-			auto t = make_awaitable_task(std::allocator_arg_t{}, alloc_, std::forward<F>(f),
-										 std::forward<Args>(args)...);
-			t.second._system = this;
-			auto const idx = current_index_++;
-			for(std::size_t k = 0; k < 10 * nthreads_; ++k)
-			{
-				const auto queue_index = get_thread_queue_idx(idx, k);
-				if(queues_[queue_index].try_push(t.first))
-					return std::move(t.second);
-			}
-
-			const auto queue_index = get_thread_queue_idx(idx);
-			queues_[queue_index].push(std::move(t.first));
-			return std::move(t.second);
-		}
-	}
+	
 
 	//-----------------------------------------------------------------------------
 	//  Name : push_ready_on_main ()
@@ -692,35 +695,61 @@ public:
 	/// other tasks.
 	/// </summary>
 	//-----------------------------------------------------------------------------
+
+    template <class F, class... Args>
+	auto push_impl(std::true_type, std::size_t idx, bool execute_if_ready, F&& f, Args&&... args)
+    {
+        return push_task(
+            make_ready_task(std::allocator_arg_t{}, alloc_, std::forward<F>(f), std::forward<Args>(args)...),
+            idx, execute_if_ready);
+    }
+    
+    template <class F, class... Args>
+	auto push_impl(std::false_type, std::size_t idx, bool execute_if_ready, F&& f, Args&&... args)
+    {
+        return push_task(make_awaitable_task(std::allocator_arg_t{}, alloc_, std::forward<F>(f),
+                                             std::forward<Args>(args)...),
+                         idx, execute_if_ready);
+    }
+    
 	template <class F, class... Args>
-	auto push_ready_on_main(F&& f, Args&&... args) -> typename std::remove_reference<decltype(
-		make_ready_task(std::allocator_arg_t{}, alloc_, std::forward<F>(f), std::forward<Args>(args)...)
-			.second)>::type
+	auto push(F&& f, Args&&... args)
 	{
-		auto t =
-			make_ready_task(std::allocator_arg_t{}, alloc_, std::forward<F>(f), std::forward<Args>(args)...);
-		t.second._system = this;
-
-		if(detail::is_main_thread() && t.first.ready())
-		{
-			t.first();
-
-			return std::move(t.second);
-		}
-		else
-		{
-			const auto queue_index = get_main_thread_queue_idx();
-			for(std::size_t k = 0; k < 10; ++k)
-			{
-				if(queues_[queue_index].try_push(t.first))
-					return std::move(t.second);
-			}
-
-			queues_[queue_index].push(std::move(t.first));
-			return std::move(t.second);
-		}
+		using ready_model = nonstd::all_true<!is_future<Args>::value...>;
+        const std::size_t idx = (nthreads_ == 1) ? 0 : current_index_++;
+        
+        return push_impl(ready_model(), idx, false, std::forward<F>(f), std::forward<Args>(args)...);
 	}
 
+    
+    template <class F, class... Args>
+	auto push_or_execute(F&& f, Args&&... args)
+	{
+        using ready_model = nonstd::all_true<!is_future<Args>::value...>;
+        const std::size_t idx = (nthreads_ == 1) ? 0 : current_index_++;
+        
+        return push_impl(ready_model(), idx, true, std::forward<F>(f), std::forward<Args>(args)...);
+	}
+    
+    template <class F, class... Args>
+	auto push_on_main(F&& f, Args&&... args)
+	{
+        using ready_model = nonstd::all_true<!is_future<Args>::value...>;
+        const std::size_t idx = 0;
+        
+        return push_impl(ready_model(), idx, false, std::forward<F>(f), std::forward<Args>(args)...);
+	}
+
+	template <class F, class... Args>
+	auto push_or_execute_on_main(F&& f, Args&&... args)
+	{
+        using ready_model = nonstd::all_true<!is_future<Args>::value...>;
+        const std::size_t idx = 0;
+        
+        return push_impl(ready_model(), idx, true, std::forward<F>(f), std::forward<Args>(args)...);
+	}
+    
+    
 	//-----------------------------------------------------------------------------
 	//  Name : push_awaitable_on_main ()
 	/// <summary>
@@ -730,35 +759,6 @@ public:
 	/// contrasted with ready tasks that are assumed to be immediately invokable.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	template <class F, class... Args>
-	auto push_awaitable_on_main(F&& f, Args&&... args) -> typename std::remove_reference<decltype(
-		make_awaitable_task(std::allocator_arg_t{}, alloc_, std::forward<F>(f), std::forward<Args>(args)...)
-			.second)>::type
-	{
-		auto t = make_awaitable_task(std::allocator_arg_t{}, alloc_, std::forward<F>(f),
-									 std::forward<Args>(args)...);
-		t.second._system = this;
-
-		if(detail::is_main_thread() && t.first.ready())
-		{
-			t.first();
-
-			return std::move(t.second);
-		}
-		else
-		{
-
-			const auto queue_index = get_main_thread_queue_idx();
-			for(std::size_t k = 0; k < 10; ++k)
-			{
-				if(queues_[queue_index].try_push(t.first))
-					return std::move(t.second);
-			}
-
-			queues_[queue_index].push(std::move(t.first));
-			return std::move(t.second);
-		}
-	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : run_on_main ()
@@ -779,22 +779,12 @@ public:
 
 		std::size_t queue_index = invalid_index;
 
-		if(detail::is_main_thread())
+		for(std::size_t i = 0; i < nthreads_; ++i)
 		{
-			queue_index = get_main_thread_queue_idx();
-		}
-		else
-		{
-			for(std::size_t i = 1; i < nthreads_; ++i)
+			if(get_thread_id(i) == this_thread_id)
 			{
-				auto& thread = threads_[i];
-				if(thread.get_id() == this_thread_id)
-				{
-					// thread indices are with one less than
-					// the queues
-					queue_index = get_thread_queue_idx(i, 0);
-					break;
-				}
+				queue_index = get_thread_queue_idx(i, 0);
+				break;
 			}
 		}
 

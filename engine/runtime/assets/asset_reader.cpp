@@ -12,6 +12,7 @@
 #include "../rendering/vertex_buffer.h"
 #include "asset_extensions.h"
 #include "core/filesystem/filesystem.h"
+#include "core/logging/logging.h"
 #include "core/serialization/associative_archive.h"
 #include "core/serialization/binary_archive.h"
 #include "core/serialization/serialization.h"
@@ -24,13 +25,30 @@ namespace runtime
 namespace asset_reader
 {
 template <>
-core::task_future<asset_handle<texture>> load_from_file<texture>(const std::string& key,
-																 asset_handle<texture> original)
+bool load_from_file<texture>(core::task_future<asset_handle<texture>>& output, const std::string& key)
 {
+    asset_handle<texture> original;
+    if(output.is_ready())
+        original = output.get();
+    
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
 	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<texture>();
-	auto read_memory = std::make_shared<fs::byte_array_t>();
 
+	auto& ts = core::get_subsystem<core::task_system>();
+
+	fs::error_code err;
+	if(!fs::exists(compiled_absolute_key, err))
+	{
+        auto create_resource_func = [ result = original, key]() mutable
+        {
+            result.link->id = key;
+            return result;
+        };
+		output = ts.push_or_execute(create_resource_func);
+		return true;
+	}
+
+	auto read_memory = std::make_shared<fs::byte_array_t>();
 	auto read_memory_func = [read_memory, compiled_absolute_key]() {
 		if(!read_memory)
 			return false;
@@ -64,19 +82,35 @@ core::task_future<asset_handle<texture>> load_from_file<texture>(const std::stri
 		return result;
 	};
 
-	auto& ts = core::get_subsystem<core::task_system>();
-
-	auto ready_memory_task = ts.push_ready(read_memory_func);
-	auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
-	return create_resource_task;
+	auto ready_memory_task = ts.push(read_memory_func);
+	output = ts.push_on_main(create_resource_func, ready_memory_task);
+	return true;
 }
 
 template <>
-core::task_future<asset_handle<shader>> load_from_file<shader>(const std::string& key,
-															   asset_handle<shader> original)
+bool load_from_file<shader>(core::task_future<asset_handle<shader>>& output, const std::string& key)
 {
+    asset_handle<shader> original;
+    if(output.is_ready())
+        original = output.get();
+    
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
 	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<shader>();
+
+	auto& ts = core::get_subsystem<core::task_system>();
+
+	fs::error_code err;
+	if(!fs::exists(compiled_absolute_key, err))
+	{
+        auto create_resource_func = [ result = original, key]() mutable
+        {
+            result.link->id = key;
+            return result;
+        };
+		output = ts.push_or_execute(create_resource_func);
+		return true;
+	}
+
 	auto read_memory = std::make_shared<fs::byte_array_t>();
 
 	auto read_memory_func = [read_memory, compiled_absolute_key]() {
@@ -128,19 +162,33 @@ core::task_future<asset_handle<shader>> load_from_file<shader>(const std::string
 		return result;
 	};
 
-	auto& ts = core::get_subsystem<core::task_system>();
-
-	auto ready_memory_task = ts.push_ready(read_memory_func);
-	auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
-	return create_resource_task;
+	auto ready_memory_task = ts.push(read_memory_func);
+	output = ts.push_on_main(create_resource_func, ready_memory_task);
+	return true;
 }
 
 template <>
-core::task_future<asset_handle<mesh>> load_from_file<mesh>(const std::string& key,
-														   asset_handle<mesh> original)
+bool load_from_file<mesh>(core::task_future<asset_handle<mesh>>& output, const std::string& key)
 {
+    asset_handle<mesh> original;
+    if(output.is_ready())
+        original = output.get();
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
 	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<mesh>();
+
+	auto& ts = core::get_subsystem<core::task_system>();
+
+	fs::error_code err;
+	if(!fs::exists(compiled_absolute_key, err))
+	{
+        auto create_resource_func = [ result = original, key]() mutable
+        {
+            result.link->id = key;
+            return result;
+        };
+		output = ts.push_or_execute(create_resource_func);
+		return true;
+	}
 
 	struct wrapper_t
 	{
@@ -193,19 +241,33 @@ core::task_future<asset_handle<mesh>> load_from_file<mesh>(const std::string& ke
 		return result;
 	};
 
-	auto& ts = core::get_subsystem<core::task_system>();
-
-	auto ready_memory_task = ts.push_ready(read_memory_func);
-	auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
-	return create_resource_task;
+	auto ready_memory_task = ts.push(read_memory_func);
+	output = ts.push_on_main(create_resource_func, ready_memory_task);
+	return true;
 }
 
 template <>
-core::task_future<asset_handle<material>> load_from_file<material>(const std::string& key,
-																   asset_handle<material> original)
+bool load_from_file<material>(core::task_future<asset_handle<material>>& output, const std::string& key)
 {
+    asset_handle<material> original;
+    if(output.is_ready())
+        original = output.get();
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
 	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<material>();
+
+	auto& ts = core::get_subsystem<core::task_system>();
+
+	fs::error_code err;
+	if(!fs::exists(compiled_absolute_key, err))
+	{
+        auto create_resource_func = [ result = original, key]() mutable
+        {
+            result.link->id = key;
+            return result;
+        };
+		output = ts.push_or_execute(create_resource_func);
+		return true;
+	}
 
 	struct wrapper_t
 	{
@@ -238,19 +300,34 @@ core::task_future<asset_handle<material>> load_from_file<material>(const std::st
 		return result;
 	};
 
-	auto& ts = core::get_subsystem<core::task_system>();
-
-	auto ready_memory_task = ts.push_ready(read_memory_func);
-	auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
-	return create_resource_task;
+	auto ready_memory_task = ts.push(read_memory_func);
+	output = ts.push_on_main(create_resource_func, ready_memory_task);
+	return true;
 }
 
 template <>
-core::task_future<asset_handle<prefab>> load_from_file<prefab>(const std::string& key,
-															   asset_handle<prefab> original)
+bool load_from_file<prefab>(core::task_future<asset_handle<prefab>>& output, const std::string& key)
 {
+    asset_handle<prefab> original;
+    if(output.is_ready())
+        original = output.get();
+    
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
 	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<prefab>();
+
+	auto& ts = core::get_subsystem<core::task_system>();
+
+	fs::error_code err;
+	if(!fs::exists(compiled_absolute_key, err))
+	{
+        auto create_resource_func = [ result = original, key]() mutable
+        {
+            result.link->id = key;
+            return result;
+        };
+		output = ts.push_or_execute(create_resource_func);
+		return true;
+	}
 
 	std::shared_ptr<std::istringstream> read_memory = std::make_shared<std::istringstream>();
 
@@ -280,19 +357,34 @@ core::task_future<asset_handle<prefab>> load_from_file<prefab>(const std::string
 		return result;
 	};
 
-	auto& ts = core::get_subsystem<core::task_system>();
-
-	auto ready_memory_task = ts.push_ready(read_memory_func);
-	auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
-	return create_resource_task;
+	auto ready_memory_task = ts.push(read_memory_func);
+	output = ts.push_on_main(create_resource_func, ready_memory_task);
+	return true;
 }
 
 template <>
-core::task_future<asset_handle<scene>> load_from_file<scene>(const std::string& key,
-															 asset_handle<scene> original)
+bool load_from_file<scene>(core::task_future<asset_handle<scene>>& output, const std::string& key)
 {
+    asset_handle<scene> original;
+    if(output.is_ready())
+        original = output.get();
+    
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
 	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<scene>();
+
+	auto& ts = core::get_subsystem<core::task_system>();
+
+	fs::error_code err;
+	if(!fs::exists(compiled_absolute_key, err))
+	{
+        auto create_resource_func = [ result = original, key]() mutable
+        {
+            result.link->id = key;
+            return result;
+        };
+		output = ts.push_or_execute(create_resource_func);
+		return true;
+	}
 
 	std::shared_ptr<std::istringstream> read_memory = std::make_shared<std::istringstream>();
 
@@ -322,20 +414,23 @@ core::task_future<asset_handle<scene>> load_from_file<scene>(const std::string& 
 		return result;
 	};
 
-	auto& ts = core::get_subsystem<core::task_system>();
-
-	auto ready_memory_task = ts.push_ready(read_memory_func);
-	auto create_resource_task = ts.push_awaitable_on_main(create_resource_func, ready_memory_task);
-	return create_resource_task;
+	auto ready_memory_task = ts.push(read_memory_func);
+	output = ts.push_on_main(create_resource_func, ready_memory_task);
+	return true;
 }
 
 template <>
-core::task_future<asset_handle<shader>> load_from_memory<shader>(const std::string& key,
+bool load_from_memory<shader>(core::task_future<asset_handle<shader>>& output, const std::string& key,
 																 const std::uint8_t* data, std::uint32_t size)
 {
-
-	auto create_resource_func = [&key, data, size]() mutable {
+    asset_handle<shader> original;
+    if(output.is_ready())
+        original = output.get();
+    
+    
+	auto create_resource_func = [&key, data, size, result = original]() mutable {
 		asset_handle<shader> result;
+        result.link->id = key;
 		// if nothing was read
 		if(!data && size == 0)
 			return result;
@@ -359,15 +454,14 @@ core::task_future<asset_handle<shader>> load_from_memory<shader>(const std::stri
 				}
 			}
 
-			result.link->id = key;
 			result.link->asset = shdr;
 		}
 		return result;
 	};
 
 	auto& ts = core::get_subsystem<core::task_system>();
-	auto create_resource_task = ts.push_ready_on_main(create_resource_func);
-	return create_resource_task;
+	output = ts.push_or_execute_on_main(create_resource_func);
+	return true;
 }
 }
 }

@@ -145,6 +145,8 @@ void draw_entity(runtime::entity entity)
 		return;
 
 	gui::PushID(static_cast<int>(entity.id().index()));
+    gui::PushID(static_cast<int>(entity.id().version()));
+    
 	gui::AlignFirstTextHeightToWidgets();
 	auto& es = core::get_subsystem<editor::editing_system>();
 	auto& input = core::get_subsystem<runtime::input>();
@@ -250,6 +252,7 @@ void draw_entity(runtime::entity entity)
 		gui::TreePop();
 	}
 
+    gui::PopID();
 	gui::PopID();
 }
 

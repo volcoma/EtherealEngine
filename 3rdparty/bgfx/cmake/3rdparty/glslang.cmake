@@ -59,14 +59,14 @@ else()
 	)
 endif()
 
-if( APPLE )
+if( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
 	target_compile_options( glslang PRIVATE
 		"-Wno-c++11-extensions"
 		"-Wno-unused-const-variable"
 	)
 endif()
 
-if( UNIX AND NOT APPLE )
+if( CMAKE_CXX_COMPILER_ID STREQUAL "GNU" )
 	target_compile_options( glslang PRIVATE
 		"-Wno-unused-but-set-variable"
 	)

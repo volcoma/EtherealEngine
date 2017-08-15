@@ -588,7 +588,7 @@ void assets_dock::render(const ImVec2&)
 				fs::path ext = p.extension().string();
 				fs::path filename = p.filename();
 
-				auto task = ts.push_ready(
+				auto task = ts.push(
 					[opened_dir](const fs::path& path, const fs::path& filename) {
 						fs::error_code err;
 						fs::path dir = opened_dir / filename;

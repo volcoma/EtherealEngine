@@ -8,18 +8,18 @@ namespace runtime
 namespace asset_reader
 {
 template <typename T>
-extern core::task_future<asset_handle<T>> load_from_file(const std::string& key, asset_handle<T> original);
+extern bool load_from_file(core::task_future<asset_handle<T>>& output, const std::string& key);
 
 template <typename T>
-extern core::task_future<asset_handle<T>> load_from_memory(const std::string& key, const std::uint8_t* data,
+extern bool load_from_memory(core::task_future<asset_handle<T>>& output, const std::string& key, const std::uint8_t* data,
 														   std::uint32_t size);
 
 template <typename T>
-inline core::task_future<asset_handle<T>> load_from_instance(const std::string& key,
+inline bool load_from_instance(core::task_future<asset_handle<T>>& output, const std::string& key,
 															 std::shared_ptr<T> instance)
 {
 	auto& ts = core::get_subsystem<core::task_system>();
-	auto create_handle = ts.push_ready_on_main(
+	output = ts.push_or_execute_on_main(
 		[](const std::string& key, std::shared_ptr<T> instance) {
 			asset_handle<T> handle;
 			handle.link->id = key;
@@ -29,7 +29,7 @@ inline core::task_future<asset_handle<T>> load_from_instance(const std::string& 
 		},
 		key, instance);
 
-	return create_handle;
+	return true;
 }
 }
 }

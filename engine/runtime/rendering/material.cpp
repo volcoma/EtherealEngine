@@ -86,14 +86,14 @@ standard_material::standard_material()
 	auto vs_deferred_geom_skinned = am.load<shader>("engine_data:/shaders/vs_deferred_geom_skinned.sc");
 	auto fs_deferred_geom = am.load<shader>("engine_data:/shaders/fs_deferred_geom.sc");
 
-	ts.push_awaitable_on_main(
+	ts.push_on_main(
 		[this](asset_handle<shader> vs, asset_handle<shader> fs) {
 			_program = std::make_unique<program>(vs, fs);
 
 		},
 		vs_deferred_geom, fs_deferred_geom);
 
-	ts.push_awaitable_on_main(
+	ts.push_on_main(
 		[this](asset_handle<shader> vs, asset_handle<shader> fs) {
 			_program_skinned = std::make_unique<program>(vs, fs);
 
