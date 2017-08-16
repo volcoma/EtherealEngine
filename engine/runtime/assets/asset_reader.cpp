@@ -429,7 +429,6 @@ bool load_from_memory<shader>(core::task_future<asset_handle<shader>>& output, c
     
     
 	auto create_resource_func = [&key, data, size, result = original]() mutable {
-		asset_handle<shader> result;
         result.link->id = key;
 		// if nothing was read
 		if(!data && size == 0)
