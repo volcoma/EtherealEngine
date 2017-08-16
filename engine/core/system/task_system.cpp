@@ -99,13 +99,12 @@ std::pair<bool, awaitable_task> task_system::task_queue::pop(bool wait)
 		}
 	}
 
-	/*
-							 * If we get to this point the best we can do is pop
-	 * from the
-							 * front of the task list, release the lock, and wait
-	 * for the
-							 * task to be ready.
-							 */
+	// If we get to this point the best we can do is pop
+	// from the
+	// front of the task list, release the lock, and wait
+	// for the
+	// task to be ready.
+
 	if(wait)
 	{
 		auto t = std::move(tasks_.front());
@@ -161,39 +160,39 @@ void task_system::run(std::size_t idx)
 
 std::size_t task_system::get_thread_queue_idx(std::size_t idx, std::size_t seed)
 {
-    // if main thread then just return
-    if(idx == 0)
-        return 0;
-    
+	// if main thread then just return
+	if(idx == get_main_thread_idx())
+		return get_main_thread_idx();
+
 	auto queue_index = ((idx + seed) % nthreads_);
-	if(queue_index == 0)
+
+	if(queue_index == get_main_thread_idx())
 		queue_index++;
 
 	return queue_index;
 }
 
-
 std::thread::id task_system::get_thread_id(std::size_t index)
 {
-    const auto& thread = threads_[index];
-    
-    const auto thread_id = (index == 0) ? detail::get_main_thread_id() : thread.get_id();
-    
-    return thread_id;
+	const auto& thread = threads_[index];
+
+	const auto thread_id = (index == get_main_thread_idx()) ? detail::get_main_thread_id() : thread.get_id();
+
+	return thread_id;
 }
 
 task_system::task_system()
-    : task_system(std::thread::hardware_concurrency())
+	: task_system(std::thread::hardware_concurrency())
 {
 }
 
 task_system::task_system(std::size_t nthreads, const task_system::Allocator& alloc)
-    : queues_{}
-    , threads_{}
-    , alloc_(alloc)
-    , nthreads_{nthreads + 1}
+	: queues_{}
+	, threads_{}
+	, alloc_(alloc)
+	, nthreads_{nthreads + 1}
 {
-    // +1 for the main thread's queue
+	// +1 for the main thread's queue
 	queues_.reserve(nthreads_);
 	queues_.emplace_back();
 	for(std::size_t th = 1; th < nthreads_; ++th)

@@ -571,40 +571,6 @@ class task_system : public core::subsystem
 
 	std::thread::id get_thread_id(std::size_t index);
 
-public:
-	task_system();
-
-	task_system(std::size_t nthreads, Allocator const& alloc = Allocator());
-
-	//-----------------------------------------------------------------------------
-	//  Name : ~task_system ()
-	/// <summary>
-	/// Notifies threads to finish and joins them.
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	~task_system();
-
-	//-----------------------------------------------------------------------------
-	//  Name : initialize ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	inline bool initialize() override
-	{
-		return true;
-	}
-
-	//-----------------------------------------------------------------------------
-	//  Name : dispose ()
-	/// <summary>
-	/// Notify queues on threads to finish.
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void dispose() override;
-
 	//-----------------------------------------------------------------------------
 	//  Name : push_task ()
 	/// <summary>
@@ -625,7 +591,7 @@ public:
 	{
 		t.second._system = this;
 
-		std::size_t try_count = idx == 0 ? 0 : 10 * nthreads_;
+		std::size_t try_count = idx == get_main_thread_idx() ? 0 : 10 * nthreads_;
 
 		for(std::size_t k = 0; k < try_count; ++k)
 		{
@@ -661,7 +627,7 @@ public:
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : push_ready ()
+	//  Name : push_impl ()
 	/// <summary>
 	/// Pushes a immediately invokable task to be executed.
 	/// Ready tasks are assumed to be immediately invokable; that is,
@@ -671,7 +637,13 @@ public:
 	/// other tasks.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	
+	template <class F, class... Args>
+	auto push_impl(std::true_type, std::size_t idx, bool execute_if_ready, F&& f, Args&&... args)
+	{
+		return push_task(
+			make_ready_task(std::allocator_arg_t{}, alloc_, std::forward<F>(f), std::forward<Args>(args)...),
+			idx, execute_if_ready);
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : push_awaitable ()
@@ -682,83 +654,105 @@ public:
 	/// contrasted with ready tasks that are assumed to be immediately invokable.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	
+	template <class F, class... Args>
+	auto push_impl(std::false_type, std::size_t idx, bool execute_if_ready, F&& f, Args&&... args)
+	{
+		return push_task(make_awaitable_task(std::allocator_arg_t{}, alloc_, std::forward<F>(f),
+											 std::forward<Args>(args)...),
+						 idx, execute_if_ready);
+	}
+
+public:
+	task_system();
+
+	task_system(std::size_t nthreads, Allocator const& alloc = Allocator());
 
 	//-----------------------------------------------------------------------------
-	//  Name : push_ready_on_main ()
+	//  Name : ~task_system ()
 	/// <summary>
-	/// Pushes a immediately invokable task to be executed.
-	/// Ready tasks are assumed to be immediately invokable; that is,
-	/// invoking the underlying pakcaged_task with the provided arguments
-	/// will not block.This is contrasted with async tasks where some or
-	/// all of the provided arguments may be futures waiting on results of
-	/// other tasks.
+	/// Notifies threads to finish and joins them.
 	/// </summary>
 	//-----------------------------------------------------------------------------
+	~task_system();
 
+	//-----------------------------------------------------------------------------
+	//  Name : initialize ()
+	/// <summary>
+	///
+	///
+	///
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	inline bool initialize() override
+	{
+		return true;
+	}
+
+	//-----------------------------------------------------------------------------
+	//  Name : dispose ()
+	/// <summary>
+	/// Notify queues on threads to finish.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	void dispose() override;
+
+	std::size_t get_main_thread_idx()
+	{
+		return 0;
+	}
+	std::size_t get_worker_thread_idx()
+	{
+		const std::size_t idx = (nthreads_ == 1) ? get_main_thread_idx() : current_index_++;
+		return idx;
+	}
+
+	//-----------------------------------------------------------------------------
+	//  Name : push ()
+	/// <summary>
+	/// Pushes a task to be executed. Either a ready task or an awaitable one
+	/// </summary>
+	//-----------------------------------------------------------------------------
     template <class F, class... Args>
-	auto push_impl(std::true_type, std::size_t idx, bool execute_if_ready, F&& f, Args&&... args)
-    {
-        return push_task(
-            make_ready_task(std::allocator_arg_t{}, alloc_, std::forward<F>(f), std::forward<Args>(args)...),
-            idx, execute_if_ready);
-    }
-    
-    template <class F, class... Args>
-	auto push_impl(std::false_type, std::size_t idx, bool execute_if_ready, F&& f, Args&&... args)
-    {
-        return push_task(make_awaitable_task(std::allocator_arg_t{}, alloc_, std::forward<F>(f),
-                                             std::forward<Args>(args)...),
-                         idx, execute_if_ready);
-    }
+	auto push(const std::size_t idx, F&& f, Args&&... args)
+	{
+		using is_ready_task = nonstd::all_true<!is_future<Args>::value...>;
+		return push_impl(is_ready_task(), idx, false, std::forward<F>(f), std::forward<Args>(args)...);
+	}
     
 	template <class F, class... Args>
 	auto push(F&& f, Args&&... args)
 	{
-		using ready_model = nonstd::all_true<!is_future<Args>::value...>;
-        const std::size_t idx = (nthreads_ == 1) ? 0 : current_index_++;
-        
-        return push_impl(ready_model(), idx, false, std::forward<F>(f), std::forward<Args>(args)...);
+		const std::size_t idx = get_worker_thread_idx();
+		return push(idx, std::forward<F>(f), std::forward<Args>(args)...);
 	}
 
-    
     template <class F, class... Args>
-	auto push_or_execute(F&& f, Args&&... args)
+	auto push_or_execute(const std::size_t idx, F&& f, Args&&... args)
 	{
-        using ready_model = nonstd::all_true<!is_future<Args>::value...>;
-        const std::size_t idx = (nthreads_ == 1) ? 0 : current_index_++;
-        
-        return push_impl(ready_model(), idx, true, std::forward<F>(f), std::forward<Args>(args)...);
+		using is_ready_task = nonstd::all_true<!is_future<Args>::value...>;
+		return push_impl(is_ready_task(), idx, true, std::forward<F>(f), std::forward<Args>(args)...);
 	}
     
-    template <class F, class... Args>
+	template <class F, class... Args>
+	auto push_or_execute(F&& f, Args&&... args)
+	{
+		const std::size_t idx = get_worker_thread_idx();
+		return push_or_execute(idx, std::forward<F>(f), std::forward<Args>(args)...);
+	}
+
+	template <class F, class... Args>
 	auto push_on_main(F&& f, Args&&... args)
 	{
-        using ready_model = nonstd::all_true<!is_future<Args>::value...>;
-        const std::size_t idx = 0;
-        
-        return push_impl(ready_model(), idx, false, std::forward<F>(f), std::forward<Args>(args)...);
+		const std::size_t idx = get_main_thread_idx();
+		return push(idx, std::forward<F>(f), std::forward<Args>(args)...);
 	}
 
 	template <class F, class... Args>
 	auto push_or_execute_on_main(F&& f, Args&&... args)
 	{
-        using ready_model = nonstd::all_true<!is_future<Args>::value...>;
-        const std::size_t idx = 0;
-        
-        return push_impl(ready_model(), idx, true, std::forward<F>(f), std::forward<Args>(args)...);
+        const std::size_t idx = get_main_thread_idx();
+		return push_or_execute(idx, std::forward<F>(f), std::forward<Args>(args)...);
 	}
-    
-    
-	//-----------------------------------------------------------------------------
-	//  Name : push_awaitable_on_main ()
-	/// <summary>
-	/// Pushes an awaitable task to be executed.
-	/// Awaitable tasks are assumed to take arguments where some or all are
-	/// backed by futures waiting on results of other tasks.This is
-	/// contrasted with ready tasks that are assumed to be immediately invokable.
-	/// </summary>
-	//-----------------------------------------------------------------------------
 
 	//-----------------------------------------------------------------------------
 	//  Name : run_on_main ()
@@ -768,7 +762,7 @@ public:
 	//-----------------------------------------------------------------------------
 	void run_on_main();
 
-	static constexpr std::size_t invalid_index = 77777;
+	constexpr static const std::size_t invalid_index = 77777;
 
 	template <typename T>
 	bool processing_wait(const task_future<T>& task)
