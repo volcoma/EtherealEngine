@@ -804,8 +804,6 @@ public:
 	}
 };
 
-void dispose();
-
 template <typename T>
 void task_future<T>::wait() const
 {
