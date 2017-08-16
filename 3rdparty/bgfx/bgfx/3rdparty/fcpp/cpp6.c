@@ -1113,7 +1113,7 @@ void domsg(struct Global *global,
 }
 
 void cerror(struct Global *global,
-            ErrorCode message,
+            int message,
             ...)        /* arguments    */
 {
   /*
@@ -1121,7 +1121,7 @@ void cerror(struct Global *global,
    */
   va_list arg;
   va_start(arg, message);
-  domsg(global, message, arg);
+  domsg(global, (ErrorCode)message, arg);
 }
 
 void Error(struct Global *global, char *format, ...)

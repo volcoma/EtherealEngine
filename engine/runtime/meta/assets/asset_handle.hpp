@@ -10,7 +10,7 @@
 #include "core/common/string.h"
 #include "core/serialization/serialization.h"
 #include "core/serialization/types/string.hpp"
-
+#include "core/logging/logging.h"
 namespace cereal
 {
 
@@ -44,10 +44,8 @@ inline void LOAD_FUNCTION_NAME(Archive& ar, asset_handle<T>& obj)
 	else
 	{
 		auto& am = core::get_subsystem<runtime::asset_manager>();
-		auto& ts = core::get_subsystem<core::task_system>();
-		auto asset_future = am.load<T>(obj.link->id, runtime::load_mode::async);
-		ts.push_or_execute(
-			[obj](asset_handle<T> handle) mutable { obj.link->asset = handle.link->asset; }, asset_future);
+		auto asset_future = am.load<T>(obj.link->id, runtime::load_mode::sync);
+        obj = asset_future.get();     
 	}
 }
 }

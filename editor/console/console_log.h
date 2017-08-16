@@ -1,10 +1,11 @@
 #pragma once
 
 #include "core/logging/logging.h"
-#include <array>
 #include <core/console/console.h>
+#include <array>
 #include <deque>
 #include <string>
+#include <atomic>
 
 class console_log : public logging::sinks::base_sink<std::mutex>, public console
 {
@@ -49,7 +50,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void clearLog();
+	void clear_log();
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_pending_entries ()
@@ -59,9 +60,9 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline int get_pending_entries() const
+	inline bool has_new_entries() const
 	{
-		return _pending;
+		return _has_new_entries;
 	}
 
 	const std::array<float, 4>& get_level_colorization(logging::level::level_enum level);
@@ -73,16 +74,17 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_pending_entries(bool val)
+	inline void set_has_new_entries(bool val)
 	{
-		_pending = val;
+		_has_new_entries = val;
 	}
 
 private:
+    std::recursive_mutex _entries_mutex;
 	///
 	entries_t _entries;
 	///
-	int _pending = 0;
+    std::atomic<bool> _has_new_entries = {false};
 	///
 	static const std::size_t _max_size = 150;
 };

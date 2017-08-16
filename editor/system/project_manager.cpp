@@ -309,8 +309,8 @@ void project_manager::open_project(const fs::path& project_path)
 	save_config();
 
 	/// for debug purposes
-	//watch_assets<shader>("engine_data:/shaders", "*.sc", true, true);
-	//watch_assets<shader>("editor_data:/shaders", "*.sc", true, true);
+	watch_assets<shader>("engine_data:/shaders", "*.sc", true, false);
+	watch_assets<shader>("editor_data:/shaders", "*.sc", true, false);
 	// watch_assets<texture>("engine_data:/textures", "*.png", true);
 	// watch_assets<texture>("engine_data:/textures", "*.tga", true);
 	// watch_assets<texture>("engine_data:/textures", "*.dds", true);

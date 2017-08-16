@@ -375,7 +375,7 @@ void Putint(struct Global *, int);
 char *savestring(struct Global *, char *);
 ReturnCode addfile(struct Global *, FILE *, char *);
 int catenate(struct Global *, ReturnCode *);
-void cerror(struct Global *, ErrorCode, ...);
+void cerror(struct Global *, int, ...);
 ReturnCode control(struct Global *, int *);
 ReturnCode dodefine(struct Global *);
 int dooptions(struct Global *, struct fppTag *);

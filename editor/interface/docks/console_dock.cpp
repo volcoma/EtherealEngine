@@ -21,7 +21,7 @@ void console_dock::render(const ImVec2&)
 	gui::SameLine();
 	if(gui::SmallButton("Clear"))
 	{
-		_console_log->clearLog();
+		_console_log->clear_log();
 	}
 	gui::Separator();
 
@@ -36,7 +36,7 @@ void console_dock::render(const ImVec2&)
 	if(gui::BeginPopupContextWindow())
 	{
 		if(gui::Selectable("Clear"))
-			_console_log->clearLog();
+			_console_log->clear_log();
 		gui::EndPopup();
 	}
 	gui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1)); // Tighten spacing
@@ -54,28 +54,28 @@ void console_dock::render(const ImVec2&)
 		gui::TextWrapped("%s", item_cstr);
 		gui::PopStyleColor();
 	}
-	if(_console_log->get_pending_entries() > 0)
+	if(_console_log->has_new_entries())
 		gui::SetScrollHere();
 
-	_console_log->set_pending_entries(0);
+	_console_log->set_has_new_entries(false);
 
 	gui::PopStyleVar();
 	gui::EndChild();
 	gui::Separator();
 
 	// Command-line
-	std::string inputBuff;
-	inputBuff.resize(64, 0);
-	inputBuff.shrink_to_fit();
+	std::string input_buff;
+	input_buff.resize(64, 0);
+	input_buff.shrink_to_fit();
 	gui::PushItemWidth(gui::GetContentRegionAvailWidth() * 0.5f);
-	if(gui::InputText("Enter Command", &inputBuff[0], inputBuff.size(), ImGuiInputTextFlags_EnterReturnsTrue))
+	if(gui::InputText("Enter Command", &input_buff[0], input_buff.size(), ImGuiInputTextFlags_EnterReturnsTrue))
 	{
 		// copy from c_str to remove trailing zeros
-		std::string command = inputBuff.c_str();
-		std::string errorMsg = _console_log->process_input(command);
-		if(errorMsg != "")
+		std::string command = input_buff.c_str();
+		std::string error_msg = _console_log->process_input(command);
+		if(error_msg != "")
 		{
-			APPLOG_WARNING(errorMsg.c_str());
+			APPLOG_WARNING(error_msg.c_str());
 		}
 		// Demonstrate keeping auto focus on the input box
 		if(gui::IsItemHovered() ||

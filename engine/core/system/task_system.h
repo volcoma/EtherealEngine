@@ -566,9 +566,7 @@ class task_system : public core::subsystem
 	std::atomic<std::size_t> current_index_{1};
 
 	void run(std::size_t idx);
-
 	std::size_t get_thread_queue_idx(std::size_t idx, std::size_t seed = 0);
-
 	std::thread::id get_thread_id(std::size_t index);
 
 	//-----------------------------------------------------------------------------
@@ -787,19 +785,28 @@ public:
 
 		auto& queue = queues_[queue_index];
 
-		while(!queue.is_empty())
-		{
-			p = queue.pop(!detail::is_main_thread());
-			if(!p.first)
-				continue;
-
-			if(p.first)
-				p.second();
-
-			if(task.is_ready())
-				break;
-		}
-
+        while(!task.is_ready())
+        {
+            bool became_ready = false;
+            while(!queue.is_empty())
+            {
+                p = queue.pop(queue_index != get_main_thread_idx());
+                if(!p.first)
+                    continue;
+    
+                if(p.first)
+                    p.second();
+    
+                became_ready = task.is_ready();
+                if(became_ready)
+                    break;
+            }
+            using namespace std::literals;
+            if(!became_ready)
+                task.wait_for(5ms);
+            else
+                break;
+        }
 		return true;
 	}
 };

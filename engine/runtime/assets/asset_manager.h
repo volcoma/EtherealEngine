@@ -324,7 +324,7 @@ private:
 							  std::recursive_mutex& container_mutex, request_container_t<T>& container,
 							  F&& load_func)
 	{
-		std::lock_guard<std::recursive_mutex> lock(container_mutex);
+		std::unique_lock<std::recursive_mutex> lock(container_mutex);
 		auto it = container.find(key);
 		if(it != std::end(container))
 		{
@@ -334,13 +334,16 @@ private:
 				if(load_func)
 					load_func(future, key);
 			}
-
+            auto future_copy = future;
+            
+            lock.unlock();
+            
 			if(mode == load_mode::sync)
 			{
-				future.wait();
+				future_copy.wait();
 			}
 
-			return future;
+			return future_copy;
 		}
 		else
 		{
@@ -403,7 +406,7 @@ private:
 	}
 
 	template <typename T>
-	core::task_future<asset_handle<T>>& find_asset_impl(const std::string& key,
+	core::task_future<asset_handle<T>> find_asset_impl(const std::string& key,
 													   std::recursive_mutex& container_mutex,
 													   request_container_t<T>& container)
 	{
@@ -415,8 +418,7 @@ private:
 		}
 		else
 		{
-            static core::task_future<asset_handle<T>> empty;
-			return empty;
+            return {};
 		}
 	}
 
