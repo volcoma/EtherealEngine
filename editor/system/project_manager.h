@@ -37,11 +37,11 @@ struct asset_directory : std::enable_shared_from_this<asset_directory>
 
 	void unwatch();
 	///
-	fs::path absolute;
+	fs::path absolute_path;
 	///
 	fs::path root_path;
 	///
-	std::string relative;
+	std::string relative_path;
 	///
 	std::string name;
 	///

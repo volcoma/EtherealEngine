@@ -186,7 +186,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 		{
 			using entry_t = std::shared_ptr<editor::asset_directory>;
 			const auto& name = entry->name;
-			const auto& absolute = entry->absolute;
+			const auto& absolute_path = entry->absolute_path;
 			auto& selected = es.selection_data.object;
 			bool is_selected = selected.is_type<entry_t>() ? (selected.get_value<entry_t>() == entry) : false;
 			bool is_dragging = !!es.drag_data.object;
@@ -203,16 +203,16 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 					   },
 					   [&](const std::string& new_name) // on_rename
 					   {
-						   fs::path new_absolute_path = absolute;
+						   fs::path new_absolute_path = absolute_path;
 						   new_absolute_path.remove_filename();
 						   new_absolute_path /= new_name;
 						   fs::error_code err;
-						   fs::rename(absolute, new_absolute_path, err);
+						   fs::rename(absolute_path, new_absolute_path, err);
 					   },
 					   [&]() // on_delete
 					   {
 						   fs::error_code err;
-						   fs::remove_all(absolute, err);
+						   fs::remove_all(absolute_path, err);
 					   },
 					   nullptr // on_drag
 					   );
@@ -507,8 +507,8 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 				{
 					int i = 0;
 					fs::error_code err;
-					while(!fs::create_directory(dir->absolute / string_utils::format("New Folder (%d)", i),
-												err))
+					while(!fs::create_directory(
+						dir->absolute_path / string_utils::format("New Folder (%d)", i), err))
 					{
 						++i;
 					}
@@ -523,13 +523,14 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 				auto dir = opened_folder_shared.get();
 				if(dir)
 				{
-					asset_handle<material> asset;
-					fs::path parent_dir = dir->relative;
+					fs::path parent_dir = dir->relative_path;
 					std::string name =
 						string_utils::format("New Material (%s)", string_utils::random_string(16).c_str());
-					asset.link->id = (parent_dir / (name + extensions::material)).generic_string();
-					asset.link->asset = std::make_shared<standard_material>();
-					am.save<material>(asset);
+					std::string key = (parent_dir / (name + extensions::material)).generic_string();
+					auto new_mat_future =
+						am.load_asset_from_instance<material>(key, std::make_shared<standard_material>());
+					asset_handle<material> asset = new_mat_future.get();
+					am.save(asset);
 				}
 			}
 
@@ -543,7 +544,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 			auto opened_folder_shared = opened_dir.lock();
 			auto dir = opened_folder_shared.get();
 			if(dir)
-				fs::show_in_graphical_env(dir->absolute);
+				fs::show_in_graphical_env(dir->absolute_path);
 		}
 
 		gui::EndPopup();
@@ -581,18 +582,18 @@ void assets_dock::render(const ImVec2&)
 
 			auto opened_folder_shared = opened_dir.lock();
 
-			fs::path opened_dir = opened_folder_shared->absolute;
+			fs::path opened_dir = opened_folder_shared->absolute_path;
 			for(auto& path : paths)
 			{
 				fs::path p = path;
 				fs::path ext = p.extension().string();
 				fs::path filename = p.filename();
 
-				auto task = ts.push(
+				auto task = ts.push_on_worker_thread(
 					[opened_dir](const fs::path& path, const fs::path& filename) {
 						fs::error_code err;
 						fs::path dir = opened_dir / filename;
-						fs::copy_file(path, dir, err);
+						fs::copy_file(path, dir, fs::copy_option::overwrite_if_exists, err);
 					},
 					p, filename);
 			}
@@ -604,7 +605,7 @@ void assets_dock::render(const ImVec2&)
 	if(gui::IsItemHovered())
 	{
 		gui::BeginTooltip();
-		gui::TextUnformatted("Scale Icons");
+		gui::TextUnformatted("SCALE ICONS");
 		gui::EndTooltip();
 	}
 	gui::PopItemWidth();
@@ -652,7 +653,7 @@ void assets_dock::render(const ImVec2&)
 				{
 					auto entity = dragged.get_value<runtime::entity>();
 					if(entity)
-						ecs::utils::save_entity(dir->absolute, entity);
+						ecs::utils::save_entity(dir->absolute_path, entity);
 					es.drop();
 				}
 			}

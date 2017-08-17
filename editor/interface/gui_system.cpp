@@ -168,7 +168,7 @@ bool gui_system::initialize()
 	auto vs_ocornut_imgui = am.load<shader>("embedded:/vs_ocornut_imgui");
 	auto fs_ocornut_imgui = am.load<shader>("embedded:/fs_ocornut_imgui");
 
-	ts.push_or_execute_on_main(
+	ts.push_or_execute_on_owner_thread(
 		[](asset_handle<shader> vs, asset_handle<shader> fs) {
 			s_program = std::make_unique<program>(vs, fs);
 

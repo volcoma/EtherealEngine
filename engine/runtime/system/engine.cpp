@@ -93,7 +93,7 @@ void engine::run_one_frame()
 	auto& tasks = core::get_subsystem<core::task_system>();
 
 	sim.run_one_frame();
-	tasks.run_on_main();
+	tasks.run_on_owner_thread();
 
 	process_pending_windows();
 

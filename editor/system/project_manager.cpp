@@ -59,7 +59,7 @@ void watch_assets(const fs::path& protocol, const std::string& wildcard, bool re
 					if(entry.status == fs::watcher::entry_status::removed)
 					{
 						auto task =
-							ts.push_on_main([reload_async, key, &am]() { am.clear_asset<T>(key); });
+							ts.push_on_owner_thread([reload_async, key, &am]() { am.clear_asset<T>(key); });
 					}
 					else if(entry.status == fs::watcher::entry_status::renamed)
 					{
@@ -71,11 +71,8 @@ void watch_assets(const fs::path& protocol, const std::string& wildcard, bool re
 						load_flags flags = is_initial_list ? load_flags::standard : load_flags::reload;
 
 						// created or modified
-						auto task =
-							ts.push([mode, flags, key, &am]() 
-                        {
-                            am.load<T>(key, mode, flags); 
-                        });
+						auto task = ts.push_on_worker_thread(
+							[mode, flags, key, &am]() { am.load<T>(key, mode, flags); });
 					}
 				}
 			}
@@ -86,7 +83,7 @@ void watch_assets(const fs::path& protocol, const std::string& wildcard, bool re
 				{
 					if(entry.status == fs::watcher::entry_status::removed)
 					{
-						auto task = ts.push_on_main([p, ext, protocol, key, &am]() {
+						auto task = ts.push_on_owner_thread([p, ext, protocol, key, &am]() {
 							am.delete_asset<T>(key);
 
 							// always add the extensions since we want the compiled asset version to be
@@ -116,8 +113,8 @@ void watch_assets(const fs::path& protocol, const std::string& wildcard, bool re
 
 						if(compile)
 						{
-							auto task =
-								ts.push([](const fs::path& p) { asset_compiler::compile<T>(p); }, p);
+							auto task = ts.push_on_worker_thread(
+								[](const fs::path& p) { asset_compiler::compile<T>(p); }, p);
 						}
 					}
 				}
@@ -129,7 +126,7 @@ void watch_assets(const fs::path& protocol, const std::string& wildcard, bool re
 void asset_directory::watch()
 {
 	fs::watcher::watch(
-		absolute / fs::path("*"), false, true,
+		absolute_path / fs::path("*"), false, true,
 		[this](const std::vector<fs::watcher::entry>& entries, bool is_initial_list) {
 			for(auto& entry : entries)
 			{
@@ -151,7 +148,7 @@ void asset_directory::watch()
 						std::unique_lock<std::mutex> lock(directories_mutex);
 						auto it = std::find_if(std::begin(directories), std::end(directories),
 											   [&entry](const std::shared_ptr<asset_directory>& other) {
-												   return entry.last_path == other->absolute;
+												   return entry.last_path == other->absolute_path;
 											   });
 
 						if(it != std::end(directories))
@@ -214,19 +211,19 @@ void asset_directory::watch()
 
 	for(const auto& format : extensions::texture)
 	{
-		watch_assets<texture>(relative, wildcard + format, true, false);
+		watch_assets<texture>(relative_path, wildcard + format, true, false);
 	}
 
-	watch_assets<shader>(relative, wildcard + extensions::shader, true, false);
+	watch_assets<shader>(relative_path, wildcard + extensions::shader, true, false);
 
 	for(const auto& format : extensions::mesh)
 	{
-		watch_assets<mesh>(relative, wildcard + format, true, false);
+		watch_assets<mesh>(relative_path, wildcard + format, true, false);
 	}
 
-	watch_assets<material>(relative, wildcard + extensions::material, true, false);
-	watch_assets<prefab>(relative, wildcard + extensions::prefab, true, false);
-	watch_assets<scene>(relative, wildcard + extensions::scene, true, false);
+	watch_assets<material>(relative_path, wildcard + extensions::material, true, false);
+	watch_assets<prefab>(relative_path, wildcard + extensions::prefab, true, false);
+	watch_assets<scene>(relative_path, wildcard + extensions::scene, true, false);
 }
 
 asset_file::asset_file(const fs::path& abs, const std::string& n, const std::string& ext, const fs::path& r)
@@ -260,21 +257,21 @@ asset_directory::~asset_directory()
 void asset_directory::populate(asset_directory* p, const fs::path& abs, const std::string& n,
 							   const fs::path& r)
 {
-	if(!absolute.empty())
+	if(!absolute_path.empty())
 		unwatch();
 
 	parent = p;
-	absolute = abs;
+	absolute_path = abs;
 	name = n;
 	root_path = r;
-	relative = string_utils::replace(absolute.generic_string(), root_path.generic_string(), "app:/data");
+	relative_path = string_utils::replace(absolute_path.generic_string(), root_path.generic_string(), "app:/data");
 
 	watch();
 }
 
 void asset_directory::unwatch()
 {
-	fs::watcher::unwatch(absolute / fs::path("*"), true);
+	fs::watcher::unwatch(absolute_path / fs::path("*"), true);
 }
 
 void project_manager::close_project()

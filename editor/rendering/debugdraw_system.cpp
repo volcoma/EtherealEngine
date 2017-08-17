@@ -308,7 +308,7 @@ bool debugdraw_system::initialize()
 	auto vs_wf_wireframe = am.load<shader>("editor_data:/shaders/vs_wf_wireframe.sc");
 	auto fs_wf_wireframe = am.load<shader>("editor_data:/shaders/fs_wf_wireframe.sc");
 
-	ts.push_or_execute_on_main(
+	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<shader> vs, asset_handle<shader> fs) {
 			_program = std::make_unique<program>(vs, fs);
 

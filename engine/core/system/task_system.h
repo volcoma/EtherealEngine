@@ -2,7 +2,6 @@
 #define TASK_SYSTEM_H
 
 #include "../common/nonstd/function_traits.hpp"
-#include "../common/nonstd/sequence.hpp"
 #include "../common/nonstd/type_traits.hpp"
 #include "subsystem.h"
 #include <algorithm>
@@ -23,41 +22,6 @@
 namespace core
 {
 class task_system;
-
-namespace detail
-{
-template <void (*ctor)()>
-struct static_initializer
-{
-	struct constructor
-	{
-		constructor()
-		{
-			ctor();
-		}
-	};
-	static constructor initializer;
-};
-
-template <void (*ctor)()>
-typename static_initializer<ctor>::constructor static_initializer<ctor>::initializer;
-
-inline std::thread::id get_main_thread_id()
-{
-	static const auto id = std::this_thread::get_id();
-	return id;
-}
-inline void init_main_thread_id()
-{
-	static auto init = static_initializer<init_main_thread_id>::initializer;
-	(void)init;
-	get_main_thread_id();
-}
-inline bool is_main_thread()
-{
-	return get_main_thread_id() == std::this_thread::get_id();
-}
-}
 
 template <typename T>
 class task_future
@@ -82,12 +46,12 @@ public:
 		return valid() && wait_for(0s) == std::future_status::ready;
 	}
 
-    //-----------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------
 	//  Name : wait ()
 	/// <summary>
 	/// Waits for a task in a smart way. Allows processing of other task on this
 	/// thread. The task is guaranteed to be ready when this function exits if
-	/// the task is executed by the main thread or any of the worker threads that
+	/// the task is executed by the owner thread or any of the worker threads that
 	/// we manage.
 	/// </summary>
 	//-----------------------------------------------------------------------------
@@ -287,7 +251,7 @@ public:
 		using model_type = ready_task_model<typename std::result_of<F(Args...)>::type(Args...)>;
 
 		task t(ready_task_tag(), std::allocator_arg_t(), alloc, std::forward<F>(f),
-						 std::forward<Args>(args)...);
+			   std::forward<Args>(args)...);
 		auto fut = static_cast<model_type&>(*t._t).get_future();
 		return pair_type(std::move(t), std::move(fut));
 	}
@@ -296,8 +260,8 @@ public:
 	friend std::pair<task, task_future<typename std::result_of<F(decay_if_future<Args>...)>::type>>
 	make_awaitable_task(F&& f, Args&&... args)
 	{
-		using pair_type = std::pair<task,
-									task_future<typename std::result_of<F(decay_if_future<Args>...)>::type>>;
+		using pair_type =
+			std::pair<task, task_future<typename std::result_of<F(decay_if_future<Args>...)>::type>>;
 		using model_type = awaitable_task_model<
 			typename std::result_of<F(decay_if_future<Args>...)>::type(decay_if_future<Args>...), Args...>;
 
@@ -310,13 +274,13 @@ public:
 	friend std::pair<task, task_future<typename std::result_of<F(decay_if_future<Args>...)>::type>>
 	make_awaitable_task(std::allocator_arg_t, Allocator const& alloc, F&& f, Args&&... args)
 	{
-		using pair_type = std::pair<task,
-									task_future<typename std::result_of<F(decay_if_future<Args>...)>::type>>;
+		using pair_type =
+			std::pair<task, task_future<typename std::result_of<F(decay_if_future<Args>...)>::type>>;
 		using model_type = awaitable_task_model<
 			typename std::result_of<F(decay_if_future<Args>...)>::type(decay_if_future<Args>...), Args...>;
 
 		task t(awaitable_task_tag(), std::allocator_arg_t(), alloc, std::forward<F>(f),
-						 std::forward<Args>(args)...);
+			   std::forward<Args>(args)...);
 		auto fut = static_cast<model_type&>(*t._t).get_future();
 		return pair_type(std::move(t), std::move(fut));
 	}
@@ -325,16 +289,14 @@ public:
 	{
 		if(_t)
 			_t->invoke_();
-		else
-			throw std::logic_error("bad task access");
 	}
 
-	bool ready() const
+	bool ready() const 
 	{
 		if(_t)
 			return _t->ready_();
 		else
-			throw std::logic_error("bad task access");
+			return false;
 	}
 
 private:
@@ -462,13 +424,13 @@ private:
 		void invoke_() override
 		{
 			constexpr const std::size_t arity = sizeof...(FutArgs);
-			do_invoke_(nonstd::make_index_sequence<arity>());
+			do_invoke_(std::make_index_sequence<arity>());
 		}
 
 		bool ready_() const noexcept override
 		{
 			constexpr const std::size_t arity = sizeof...(FutArgs);
-			return do_ready_(nonstd::make_index_sequence<arity>());
+			return do_ready_(std::make_index_sequence<arity>());
 		}
 
 	private:
@@ -497,7 +459,7 @@ private:
 		}
 
 		template <std::size_t... I>
-		inline void do_invoke_(nonstd::index_sequence<I...>)
+		inline void do_invoke_(std::index_sequence<I...>)
 		{
 			nonstd::invoke(_f, call_get(std::get<I>(std::move(_args)))...);
 		}
@@ -530,7 +492,7 @@ private:
 		}
 
 		template <std::size_t... I>
-		inline bool do_ready_(nonstd::index_sequence<I...>) const noexcept
+		inline bool do_ready_(std::index_sequence<I...>) const noexcept
 		{
 			return nonstd::check_all_true(call_ready(std::get<I>(_args))...);
 		}
@@ -584,76 +546,94 @@ public:
 	void dispose() override;
 
 	//-----------------------------------------------------------------------------
-	//  Name : run_on_main ()
+	//  Name : run_on_owner_thread ()
 	/// <summary>
-	/// Process main thread tasks
+	/// Process owner thread tasks
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void run_on_main();
+	void run_on_owner_thread();
 
 	//-----------------------------------------------------------------------------
-	//  Name : get_main_thread_idx ()
+	//  Name : get_owner_thread_idx ()
 	/// <summary>
-	/// Gets the main thread index in the list. It is a seperate function since the
-	/// main thread is a special case. Can be used to push a task directly
+	/// Gets the owner thread index in the list. It is a seperate function since the
+	/// owner thread is a special case. Can be used to push a task directly
 	/// there.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::size_t get_main_thread_idx()
+	std::size_t get_owner_thread_idx()
 	{
 		return 0;
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : get_worker_thread_idx ()
+	//  Name : get_any_worker_thread_idx ()
 	/// <summary>
 	/// Gets one of the worker threads id. Can be used to push a task directly
 	/// there.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::size_t get_worker_thread_idx()
+	std::size_t get_any_worker_thread_idx()
 	{
 		auto current_index = _current_index++;
 		current_index = current_index % _threads_count;
-		if(current_index == get_main_thread_idx())
+		if(current_index == get_owner_thread_idx())
 			current_index++;
 
 		_current_index = current_index;
 
-		const std::size_t idx = (_threads_count == 1) ? get_main_thread_idx() : current_index;
+		const std::size_t idx = (_threads_count == 1) ? get_owner_thread_idx() : current_index;
 		return idx;
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : push ()
+	//  Name : push_on_thread ()
 	/// <summary>
 	/// Pushes a task to a specific thread to be executed when it can.
 	/// Either a ready task or an awaitable one
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	template <class F, class... Args>
-	auto push(const std::size_t idx, F&& f, Args&&... args)
+	auto push_on_thread(const std::size_t idx, F&& f, Args&&... args)
 	{
 		using is_ready_task = nonstd::all_true<!is_future<Args>::value...>;
 		return push_impl(is_ready_task(), idx, false, std::forward<F>(f), std::forward<Args>(args)...);
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : push ()
+	//  Name : push_on_worker_thread ()
 	/// <summary>
 	/// Pushes a task to a worker thread to be executed when it can.
 	/// Either a ready task or an awaitable one
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	template <class F, class... Args>
-	auto push(F&& f, Args&&... args)
+	auto push_on_worker_thread(F&& f, Args&&... args)
 	{
-		const std::size_t idx = get_worker_thread_idx();
-		return push(idx, std::forward<F>(f), std::forward<Args>(args)...);
+		const std::size_t idx = get_any_worker_thread_idx();
+		return push_on_thread(idx, std::forward<F>(f), std::forward<Args>(args)...);
+	}
+    
+    //-----------------------------------------------------------------------------
+	//  Name : push_on_owner_thread ()
+	/// <summary>
+	/// Pushes a task to the owner thread to be executed when it can.
+	/// The owner's thread is the thread that the task_system operates on.
+	/// It should be the thread that created the system and that calls
+	/// run_on_owner_thread.
+	/// Either a ready task or an awaitable one
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	template <class F, class... Args>
+	auto push_on_owner_thread(F&& f, Args&&... args)
+	{
+		const std::size_t idx = get_owner_thread_idx();
+		return push_on_thread(idx, std::forward<F>(f), std::forward<Args>(args)...);
 	}
 
+    
 	//-----------------------------------------------------------------------------
-	//  Name : push_or_execute ()
+	//  Name : push_or_execute_on_thread ()
 	/// <summary>
 	/// Pushes a task to a specific thread to be executed.
 	/// If the pusher is in the same thread as the destination it will check if the
@@ -662,14 +642,14 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	template <class F, class... Args>
-	auto push_or_execute(const std::size_t idx, F&& f, Args&&... args)
+	auto push_or_execute_on_thread(const std::size_t idx, F&& f, Args&&... args)
 	{
 		using is_ready_task = nonstd::all_true<!is_future<Args>::value...>;
 		return push_impl(is_ready_task(), idx, true, std::forward<F>(f), std::forward<Args>(args)...);
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : push_or_execute ()
+	//  Name : push_or_execute_on_worker_thread ()
 	/// <summary>
 	/// Pushes a task to a worker thread to be executed.
 	/// If the pusher is in the same thread as the destination it will check if the
@@ -678,40 +658,28 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	template <class F, class... Args>
-	auto push_or_execute(F&& f, Args&&... args)
+	auto push_or_execute_on_worker_thread(F&& f, Args&&... args)
 	{
-		const std::size_t idx = get_worker_thread_idx();
-		return push_or_execute(idx, std::forward<F>(f), std::forward<Args>(args)...);
+		const std::size_t idx = get_any_worker_thread_idx();
+		return push_or_execute_on_thread(idx, std::forward<F>(f), std::forward<Args>(args)...);
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : push_on_main ()
+	//  Name : push_or_execute_on_owner_thread ()
 	/// <summary>
-	/// Pushes a task to the main thread to be executed when it can.
-	/// Either a ready task or an awaitable one
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	template <class F, class... Args>
-	auto push_on_main(F&& f, Args&&... args)
-	{
-		const std::size_t idx = get_main_thread_idx();
-		return push(idx, std::forward<F>(f), std::forward<Args>(args)...);
-	}
-
-	//-----------------------------------------------------------------------------
-	//  Name : push_or_execute_on_main ()
-	/// <summary>
-	/// Pushes a task to the main thread to be executed.
+	/// Pushes a task to the owner thread to be executed. The owner's thread is the
+	/// thread that the task_system operates on. It should be the thread that created
+	/// the system and that calls run_on_owner_thread.
 	/// If the pusher is in the same thread as the destination it will check if the
 	/// task is ready to be executed. If it is ready it will be executed immediately.
 	/// Either a ready task or an awaitable one
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	template <class F, class... Args>
-	auto push_or_execute_on_main(F&& f, Args&&... args)
+	auto push_or_execute_on_owner_thread(F&& f, Args&&... args)
 	{
-		const std::size_t idx = get_main_thread_idx();
-		return push_or_execute(idx, std::forward<F>(f), std::forward<Args>(args)...);
+		const std::size_t idx = get_owner_thread_idx();
+		return push_or_execute_on_thread(idx, std::forward<F>(f), std::forward<Args>(args)...);
 	}
 
 private:
@@ -735,7 +703,7 @@ private:
 	}
 
 	//-----------------------------------------------------------------------------
-	//  Name : push_awaitable ()
+	//  Name : push_impl ()
 	/// <summary>
 	/// Pushes an awaitable task to be executed.
 	/// Awaitable tasks are assumed to take arguments where some or all are
@@ -771,7 +739,7 @@ private:
 	{
 		t.second._system = this;
 
-		std::size_t try_count = idx == get_main_thread_idx() ? 0 : 10 * _threads_count;
+		std::size_t try_count = (idx == get_owner_thread_idx()) ? 0 : 10 * _threads_count;
 
 		for(std::size_t k = 0; k < try_count; ++k)
 		{
@@ -811,7 +779,7 @@ private:
 	/// <summary>
 	/// Waits for a task in a smart way. Allows processing of other task on this
 	/// thread. The task is guaranteed to be ready when this function exits if
-	/// the task is executed by the main thread or any of the worker threads that
+	/// the task is executed by the owner thread or any of the worker threads that
 	/// we manage.
 	/// </summary>
 	//-----------------------------------------------------------------------------
@@ -926,6 +894,8 @@ private:
 	typename Allocator::template rebind<task::task_concept>::other _alloc;
 	std::size_t _threads_count;
 	std::atomic<std::size_t> _current_index{1};
+	//
+	const std::thread::id _owner_thread_id = std::this_thread::get_id();
 };
 
 template <typename T>

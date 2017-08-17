@@ -2,6 +2,7 @@
 
 namespace core
 {
+
 task::task_concept::~task_concept() noexcept = default;
 
 void task_system::task_queue::rotate_()
@@ -160,13 +161,13 @@ void task_system::run(std::size_t idx)
 
 std::size_t task_system::get_thread_queue_idx(std::size_t idx, std::size_t seed)
 {
-	// if main thread then just return
-	if(idx == get_main_thread_idx())
-		return get_main_thread_idx();
+	// if owner thread then just return
+	if(idx == get_owner_thread_idx())
+		return get_owner_thread_idx();
 
 	auto queue_index = ((idx + seed) % _threads_count);
 
-	if(queue_index == get_main_thread_idx())
+	if(queue_index == get_owner_thread_idx())
 		queue_index++;
 
 	return queue_index;
@@ -176,7 +177,7 @@ std::thread::id task_system::get_thread_id(std::size_t index)
 {
 	const auto& thread = _threads[index];
 
-	const auto thread_id = (index == get_main_thread_idx()) ? detail::get_main_thread_id() : thread.get_id();
+	const auto thread_id = (index == get_owner_thread_idx()) ? _owner_thread_id : thread.get_id();
 
 	return thread_id;
 }
@@ -190,7 +191,7 @@ task_system::task_system(std::size_t nthreads, const task_system::Allocator& all
 	: _alloc(alloc)
 	, _threads_count{nthreads + 1}
 {
-	// +1 for the main thread's queue
+	// +1 for the owner thread's queue
 	_queues.reserve(_threads_count);
 	_queues.emplace_back();
 	for(std::size_t th = 1; th < _threads_count; ++th)
@@ -223,7 +224,7 @@ void core::task_system::dispose()
 		q.set_done();
 }
 
-void task_system::run_on_main()
+void task_system::run_on_owner_thread()
 {
 	std::pair<bool, task> p = {false, task()};
 

@@ -11,7 +11,7 @@ struct index_sequence
 	using type = index_sequence;
 	using value_type = std::size_t;
 
-	static constexpr std::size_t size(void) noexcept
+	constexpr static std::size_t size() noexcept
 	{
 		return sizeof...(I);
 	}

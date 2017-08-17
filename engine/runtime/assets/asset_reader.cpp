@@ -44,7 +44,7 @@ bool load_from_file<texture>(core::task_future<asset_handle<texture>>& output, c
             result.link->id = key;
             return result;
         };
-		output = ts.push_or_execute(create_resource_func);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func);
 		return true;
 	}
 
@@ -82,8 +82,8 @@ bool load_from_file<texture>(core::task_future<asset_handle<texture>>& output, c
 		return result;
 	};
 
-	auto ready_memory_task = ts.push(read_memory_func);
-	output = ts.push_on_main(create_resource_func, ready_memory_task);
+	auto ready_memory_task = ts.push_on_worker_thread(read_memory_func);
+	output = ts.push_on_owner_thread(create_resource_func, ready_memory_task);
 	return true;
 }
 
@@ -107,7 +107,7 @@ bool load_from_file<shader>(core::task_future<asset_handle<shader>>& output, con
             result.link->id = key;
             return result;
         };
-		output = ts.push_or_execute(create_resource_func);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func);
 		return true;
 	}
 
@@ -162,8 +162,8 @@ bool load_from_file<shader>(core::task_future<asset_handle<shader>>& output, con
 		return result;
 	};
 
-	auto ready_memory_task = ts.push(read_memory_func);
-	output = ts.push_on_main(create_resource_func, ready_memory_task);
+	auto ready_memory_task = ts.push_on_worker_thread(read_memory_func);
+	output = ts.push_on_owner_thread(create_resource_func, ready_memory_task);
 	return true;
 }
 
@@ -186,7 +186,7 @@ bool load_from_file<mesh>(core::task_future<asset_handle<mesh>>& output, const s
             result.link->id = key;
             return result;
         };
-		output = ts.push_or_execute(create_resource_func);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func);
 		return true;
 	}
 
@@ -241,8 +241,8 @@ bool load_from_file<mesh>(core::task_future<asset_handle<mesh>>& output, const s
 		return result;
 	};
 
-	auto ready_memory_task = ts.push(read_memory_func);
-	output = ts.push_on_main(create_resource_func, ready_memory_task);
+	auto ready_memory_task = ts.push_on_worker_thread(read_memory_func);
+	output = ts.push_on_owner_thread(create_resource_func, ready_memory_task);
 	return true;
 }
 
@@ -265,7 +265,7 @@ bool load_from_file<material>(core::task_future<asset_handle<material>>& output,
             result.link->id = key;
             return result;
         };
-		output = ts.push_or_execute(create_resource_func);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func);
 		return true;
 	}
 
@@ -300,8 +300,8 @@ bool load_from_file<material>(core::task_future<asset_handle<material>>& output,
 		return result;
 	};
 
-	auto ready_memory_task = ts.push(read_memory_func);
-	output = ts.push_on_main(create_resource_func, ready_memory_task);
+	auto ready_memory_task = ts.push_on_worker_thread(read_memory_func);
+	output = ts.push_on_owner_thread(create_resource_func, ready_memory_task);
 	return true;
 }
 
@@ -325,7 +325,7 @@ bool load_from_file<prefab>(core::task_future<asset_handle<prefab>>& output, con
             result.link->id = key;
             return result;
         };
-		output = ts.push_or_execute(create_resource_func);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func);
 		return true;
 	}
 
@@ -357,8 +357,8 @@ bool load_from_file<prefab>(core::task_future<asset_handle<prefab>>& output, con
 		return result;
 	};
 
-	auto ready_memory_task = ts.push(read_memory_func);
-	output = ts.push_on_main(create_resource_func, ready_memory_task);
+	auto ready_memory_task = ts.push_on_worker_thread(read_memory_func);
+	output = ts.push_on_owner_thread(create_resource_func, ready_memory_task);
 	return true;
 }
 
@@ -382,7 +382,7 @@ bool load_from_file<scene>(core::task_future<asset_handle<scene>>& output, const
             result.link->id = key;
             return result;
         };
-		output = ts.push_or_execute(create_resource_func);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func);
 		return true;
 	}
 
@@ -414,8 +414,8 @@ bool load_from_file<scene>(core::task_future<asset_handle<scene>>& output, const
 		return result;
 	};
 
-	auto ready_memory_task = ts.push(read_memory_func);
-	output = ts.push_on_main(create_resource_func, ready_memory_task);
+	auto ready_memory_task = ts.push_on_worker_thread(read_memory_func);
+	output = ts.push_on_owner_thread(create_resource_func, ready_memory_task);
 	return true;
 }
 
@@ -459,7 +459,7 @@ bool load_from_memory<shader>(core::task_future<asset_handle<shader>>& output, c
 	};
 
 	auto& ts = core::get_subsystem<core::task_system>();
-	output = ts.push_or_execute_on_main(create_resource_func);
+	output = ts.push_or_execute_on_owner_thread(create_resource_func);
 	return true;
 }
 }

@@ -745,49 +745,49 @@ bool deferred_rendering::initialize()
 	auto fs_atmospherics = am.load<shader>("engine_data:/shaders/fs_atmospherics.sc");
 	_ibl_brdf_lut = am.load<texture>("engine_data:/textures/ibl_brdf_lut.png").get();
 
-	ts.push_or_execute_on_main(
+	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<shader> vs, asset_handle<shader> fs) {
 			_point_light_program = std::make_unique<program>(vs, fs);
 
 		},
 		vs_clip_quad, fs_deferred_point_light);
 
-	ts.push_or_execute_on_main(
+	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<shader> vs, asset_handle<shader> fs) {
 			_spot_light_program = std::make_unique<program>(vs, fs);
 
 		},
 		vs_clip_quad, fs_deferred_spot_light);
 
-	ts.push_or_execute_on_main(
+	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<shader> vs, asset_handle<shader> fs) {
 			_directional_light_program = std::make_unique<program>(vs, fs);
 
 		},
 		vs_clip_quad, fs_deferred_directional_light);
 
-	ts.push_or_execute_on_main(
+	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<shader> vs, asset_handle<shader> fs) {
 			_gamma_correction_program = std::make_unique<program>(vs, fs);
 
 		},
 		vs_clip_quad, fs_gamma_correction);
 
-	ts.push_or_execute_on_main(
+	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<shader> vs, asset_handle<shader> fs) {
 			_sphere_ref_probe_program = std::make_unique<program>(vs, fs);
 
 		},
 		vs_clip_quad_ex, fs_sphere_reflection_probe);
 
-	ts.push_or_execute_on_main(
+	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<shader> vs, asset_handle<shader> fs) {
 			_box_ref_probe_program = std::make_unique<program>(vs, fs);
 
 		},
 		vs_clip_quad_ex, fs_box_reflection_probe);
 
-	ts.push_or_execute_on_main(
+	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<shader> vs, asset_handle<shader> fs) {
 			_atmospherics_program = std::make_unique<program>(vs, fs);
 
