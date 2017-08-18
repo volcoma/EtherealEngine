@@ -11,6 +11,7 @@
 #include "asset_extensions.h"
 #include "asset_flags.h"
 #include "asset_handle.h"
+#include <cassert>
 
 namespace runtime
 {

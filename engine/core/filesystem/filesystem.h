@@ -4,11 +4,19 @@
 #include <chrono>
 #include <istream>
 #include <unordered_map>
+#include <vector>
 namespace fs
 {
-using file_time_type = std::time_t;
-using error_code = boost::system::error_code;
+//using namespace std::experimental::filesystem;
+//using error_code = std::error_code;
+//using file_time_type = std::experimental::filesystem::file_time_type;
+//using copy_options = std::experimental::filesystem::copy_options;
+
 using namespace boost::filesystem;
+using error_code = boost::system::error_code;
+using file_time_type = std::time_t;
+using copy_options = boost::filesystem::copy_option;
+
 using protocols_t = std::unordered_map<std::string, std::string>;
 using byte_array_t = std::vector<char>;
 
