@@ -383,7 +383,6 @@ void main_editor_window::render_dockspace()
 
 void main_editor_window::on_start_page()
 {
-	auto& es = core::get_subsystem<editor::editing_system>();
 	auto& pm = core::get_subsystem<editor::project_manager>();
 
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove |
