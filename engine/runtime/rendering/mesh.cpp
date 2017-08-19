@@ -3526,15 +3526,15 @@ void mesh::build_optimized_index_buffer(const subset* subset, std::uint32_t* src
 	checked_array_delete(triangle_info_ptr);
 }
 
-void mesh::draw()
+void mesh::bind_render_buffers()
 {
 	for(size_t i = 0; i < _mesh_subsets.size(); ++i)
 	{
-		draw_subset(std::uint32_t(i));
+		bind_render_buffers_for_subset(std::uint32_t(i));
 	}
 }
 
-void mesh::draw_subset(std::uint32_t data_group_id)
+void mesh::bind_render_buffers_for_subset(std::uint32_t data_group_id)
 {
 	// Attempt to find a matching subset.
 	auto it = _subset_lookup.find(mesh_subset_key(data_group_id));
@@ -3572,16 +3572,11 @@ void mesh::draw_subset(std::uint32_t data_group_id)
 
 	// Render any batched data.
 	if(face_count > 0)
-		render_mesh_data(face_start, face_count, vertex_start, vertex_count);
+		bind_mesh_data(face_start, face_count, vertex_start, vertex_count);
 }
 
-void mesh::draw(std::uint32_t num_faces)
-{
-	// Draw collected data
-	render_mesh_data(0, num_faces, 0, _vertex_count);
-}
 
-void mesh::render_mesh_data(std::uint32_t face_start, std::uint32_t face_count, std::uint32_t vertex_start,
+void mesh::bind_mesh_data(std::uint32_t face_start, std::uint32_t face_count, std::uint32_t vertex_start,
 							std::uint32_t vertex_count)
 {
 	(void)vertex_start;

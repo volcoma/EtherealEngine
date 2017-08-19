@@ -458,16 +458,7 @@ public:
 	/// Draw the mesh in its entirety.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void draw();
-
-	//-----------------------------------------------------------------------------
-	//  Name : draw ()
-	/// <summary>
-	/// Draw the mesh (face count = num_faces).
-	/// Note : Used during volume rendering.
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void draw(std::uint32_t face_count);
+	void bind_render_buffers();
 
 	//-----------------------------------------------------------------------------
 	//  Name : draw_subset ()
@@ -476,7 +467,7 @@ public:
 	/// data group specified.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void draw_subset(std::uint32_t data_group_id);
+	void bind_render_buffers_for_subset(std::uint32_t data_group_id);
 
 	// mesh creation methods
 	//-----------------------------------------------------------------------------
@@ -1023,13 +1014,13 @@ protected:
 	bool sort_mesh_data(bool optimize, bool hardware_copy, bool build_buffer);
 
 	//-----------------------------------------------------------------------------
-	//  Name : render_mesh_data () (Private)
+	//  Name : bind_mesh_data () (Private)
 	/// <summary>
-	/// Given the specified subset values, simply render the selected batch
+	/// Given the specified subset values, simply bind for rendering the selected batch
 	/// of primitives the required number of times based on their material.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void render_mesh_data(std::uint32_t face_start, std::uint32_t face_count, std::uint32_t vertex_start,
+	void bind_mesh_data(std::uint32_t face_start, std::uint32_t face_count, std::uint32_t vertex_start,
 						  std::uint32_t vertex_count);
 
 	//-------------------------------------------------------------------------

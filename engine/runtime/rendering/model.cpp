@@ -138,8 +138,7 @@ void model::render(std::uint8_t id, const math::transform& mtx, bool apply_cull,
 	if(!mesh)
 		return;
 
-	asset_handle<material> last_set_material;
-	auto render_subset = [this, &mesh, &last_set_material](
+	auto render_subset = [this, &mesh](
 		std::uint8_t id, bool skinned, std::uint32_t group_id, const float* mtx, std::uint32_t count,
 		bool apply_cull, bool depth_write, bool depth_test, std::uint64_t extra_states, program* user_program,
 		std::function<void(program&)> setup_params) {
@@ -181,13 +180,11 @@ void model::render(std::uint8_t id, const math::transform& mtx, bool apply_cull,
 
 			gfx::setState(extra_states);
 
-			mesh->draw_subset(group_id);
-			const auto subset_count = mesh->get_subset_count();
-			bool preserveState = mat == last_set_material && group_id < (subset_count - 1);
-			gfx::submit(id, program->handle, 0, preserveState);
+			mesh->bind_render_buffers_for_subset(group_id);
+            
+			gfx::submit(id, program->handle);
 		}
 
-		last_set_material = mat;
 	};
 
 	const auto& skin_data = mesh->get_skin_bind_data();
