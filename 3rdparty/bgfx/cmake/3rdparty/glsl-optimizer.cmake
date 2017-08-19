@@ -34,32 +34,37 @@ endif()
 file( GLOB GLCPP_SOURCES ${BGFX_DIR}/3rdparty/glsl-optimizer/src/glsl/glcpp/*.c ${BGFX_DIR}/3rdparty/glsl-optimizer/src/util/*.c )
 add_library( glcpp ${GLCPP_SOURCES} )
 target_include_directories( glcpp PUBLIC ${GLSL-OPTIMIZER_INCLUDES} )
-target_compile_definitions( glcpp PRIVATE
-		"__STDC__"
-		"__STDC_VERSION__=199901L"
-		"strdup=_strdup"
-		"alloca=_alloca"
-		"isascii=__isascii"
-		"atoll=_atoi64"
-		"strtoll=_strtoi64"
-		"strtoull=_strtoui64" 
-	)
+if(MSVC)
+	target_compile_definitions( glcpp PRIVATE
+			"__STDC__"
+			"__STDC_VERSION__=199901L"
+			"strdup=_strdup"
+			"alloca=_alloca"
+			"isascii=__isascii"
+			"atoll=_atoi64"
+			"strtoll=_strtoi64"
+			"strtoull=_strtoui64" 
+		)
+endif()
+
 set_target_properties( glcpp PROPERTIES FOLDER "bgfx/3rdparty" )
 
 # mesa
 file( GLOB MESA_SOURCES ${BGFX_DIR}/3rdparty/glsl-optimizer/src/mesa/program/*.c ${BGFX_DIR}/3rdparty/glsl-optimizer/src/mesa/main/*.c )
 add_library( mesa ${MESA_SOURCES} )
 target_include_directories( mesa PUBLIC ${GLSL-OPTIMIZER_INCLUDES} )
-target_compile_definitions( mesa PRIVATE
-		"__STDC__"
-		"__STDC_VERSION__=199901L"
-		"strdup=_strdup"
-		"alloca=_alloca"
-		"isascii=__isascii"
-		"atoll=_atoi64"
-		"strtoll=_strtoi64"
-		"strtoull=_strtoui64" 
-	)
+if(MSVC)
+	target_compile_definitions( mesa PRIVATE
+			"__STDC__"
+			"__STDC_VERSION__=199901L"
+			"strdup=_strdup"
+			"alloca=_alloca"
+			"isascii=__isascii"
+			"atoll=_atoi64"
+			"strtoll=_strtoi64"
+			"strtoull=_strtoui64" 
+		)
+endif()
 set_target_properties( mesa PROPERTIES FOLDER "bgfx/3rdparty" )
 
 # glsl-optimizer
@@ -71,17 +76,18 @@ target_link_libraries( glsl-optimizer glcpp mesa )
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_link_libraries( glsl-optimizer m )
 endif()
-target_compile_definitions(glsl-optimizer PRIVATE
-		"__STDC__"
-		"__STDC_VERSION__=199901L"
-		"strdup=_strdup"
-		"alloca=_alloca"
-		"isascii=__isascii"
-		"atoll=_atoi64"
-		"strtoll=_strtoi64"
-		"strtoull=_strtoui64" 
-	)
-if( MSVC )
+if(MSVC)
+	target_compile_definitions(glsl-optimizer PRIVATE
+			"__STDC__"
+			"__STDC_VERSION__=199901L"
+			"strdup=_strdup"
+			"alloca=_alloca"
+			"isascii=__isascii"
+			"atoll=_atoi64"
+			"strtoll=_strtoi64"
+			"strtoull=_strtoui64" 
+		)
+
 	target_compile_options( glsl-optimizer PRIVATE
 		"/wd4291" 
 		"/wd4100" 
