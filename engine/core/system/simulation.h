@@ -127,9 +127,9 @@ protected:
 	/// minimum/maximum frames per second
 	unsigned int _min_fps = 0;
 	///
-	unsigned int _max_fps = 60;
+	unsigned int _max_fps = 0;
 	///
-	unsigned int _max_inactive_fps = 60;
+	unsigned int _max_inactive_fps = 0;
 	/// previous time steps for smoothing in seconds
 	std::vector<duration_t> _previous_timesteps;
 	/// next frame time step in seconds

@@ -56,7 +56,7 @@ void render_window::prepare_surface()
 	auto size = get_size();
 	if(_is_main)
 	{
-		gfx::reset(size[0], size[1], 0);
+		gfx::reset(size[0], size[1], BGFX_RESET_VSYNC);
 	}
 	else
 	{
