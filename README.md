@@ -46,7 +46,7 @@ public:
   //  Name : some_method ()
   /// <summary>
   /// This is a method comment description.
-  /// </summary>
+s  /// </summary>
   //-----------------------------------------------------------------------------
   void some_method();
   
@@ -75,14 +75,14 @@ inline void some_class::some_templated_method()
 ```
 
 ## LICENSE
-[LINK](LICENSE.md)
+[LINK](LICENSE.txt)
 
 ## PREVIEW
-![prev](https://cloud.githubusercontent.com/assets/1499411/23671477/0a2016fa-0374-11e7-8456-0521c78c5f12.png)
+![screenshot1](https://user-images.githubusercontent.com/1499411/29488399-e4c76a18-8512-11e7-8090-7453fea8d33f.png)
 
-![proceduralsky](https://cloud.githubusercontent.com/assets/1499411/22755670/d6cf794e-ee4c-11e6-92cd-e29ae30eefc8.png)
+![screenshot2](https://user-images.githubusercontent.com/1499411/29488400-f43a5960-8512-11e7-923e-86a0c204da31.png)
 
-![proceduralsky1](https://cloud.githubusercontent.com/assets/1499411/22755669/d6cd60fa-ee4c-11e6-9ff2-ebf0e3535e39.png)
+![screenshot3](https://user-images.githubusercontent.com/1499411/29488403-ff3c3df6-8512-11e7-869f-32a783530cc3.png)
 
 
 ## LIBRARIES
@@ -94,6 +94,8 @@ rttr - https://github.com/rttrorg/rttr
 
 spdlog - https://github.com/gabime/spdlog
 
-tracey - https://github.com/r-lyeh/tracey
-
 imgui - https://github.com/ocornut/imgui
+
+assimp - https://github.com/assimp/assimp
+
+glm - https://github.com/g-truc/glm
