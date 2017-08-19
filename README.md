@@ -16,13 +16,12 @@ MinGW          | yes     |
 GCC(5.4 +)     |         | yes
 clang(3.8 +)   |         | yes
 
-## FEATURES
-Check out the Projects tab for more information of upcomming features.
-
 ## ASSETS
+Some high quality assets: https://github.com/volcoma/Library
+
 Supported texture formats: png, tga, dds, ktx, pvr
 
-Supported mesh formats: obj, fbx, dae, 3ds, blend
+Supported mesh formats: obj, fbx, dae, 3ds
 
 ## SUGGESTIONS AND ISSUES
 Any suggestions and help will be appreciated.
