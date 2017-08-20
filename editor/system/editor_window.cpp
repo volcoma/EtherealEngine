@@ -184,7 +184,7 @@ void main_editor_window::on_gui(std::chrono::duration<float> dt)
 {
 	if(_show_start_page)
 	{
-		gui::PushFont(gui::GetFont("consolas_big"));
+		gui::PushFont(gui::GetFont("editor_big"));
 		on_start_page();
 		gui::PopFont();
 	}

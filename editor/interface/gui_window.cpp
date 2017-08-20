@@ -204,9 +204,13 @@ void gui_window::frame_render(std::chrono::duration<float> dt)
 
 	imgui_set_context(_gui_context);
 
+    gui::PushFont(gui::GetFont("editor_default"));
+    
 	on_gui(dt);
 
 	render_dockspace();
+    
+    gui::PopFont();
 }
 
 void gui_window::render_dockspace()

@@ -1,10 +1,9 @@
 #include "gui_system.h"
-#include "embedded/consolas.ttf.h"
+#include "embedded/editor_default.ttf.h"
 #include "embedded/fs_ocornut_imgui.bin.h"
-#include "embedded/roboto_regular.ttf.h"
-#include "embedded/robotomono_regular.ttf.h"
 #include "embedded/vs_ocornut_imgui.bin.h"
 
+#include "core/filesystem/filesystem.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/input/input.h"
 #include "runtime/rendering/index_buffer.h"
@@ -97,12 +96,12 @@ void renderFunc(ImDrawData* _drawData)
 				{
 					tex = reinterpret_cast<texture*>(cmd->TextureId);
 				}
-				
-                const std::uint16_t x = std::uint16_t(std::max(cmd->ClipRect.x, 0.0f));
+
+				const std::uint16_t x = std::uint16_t(std::max(cmd->ClipRect.x, 0.0f));
 				const std::uint16_t y = std::uint16_t(std::max(cmd->ClipRect.y, 0.0f));
 				const std::uint16_t width = std::uint16_t(std::min(cmd->ClipRect.z, 65535.0f) - x);
 				const std::uint16_t height = std::uint16_t(std::min(cmd->ClipRect.w, 65535.0f) - y);
-                                
+
 				gfx::setScissor(x, y, width, height);
 
 				prog->set_texture(0, "s_tex", tex);
@@ -209,16 +208,10 @@ bool gui_system::initialize()
 	config.MergeMode = false;
 
 	s_fonts["default"] = io.Fonts->AddFontDefault(&config);
-	s_fonts["roboto_regular"] =
-		io.Fonts->AddFontFromMemoryTTF((void*)s_robotoRegularTtf, sizeof(s_robotoRegularTtf), 17, &config);
-	s_fonts["roboto_regular_mono"] = io.Fonts->AddFontFromMemoryTTF(
-		(void*)s_robotoMonoRegularTtf, sizeof(s_robotoMonoRegularTtf), 14.0f, &config);
-	s_fonts["roboto_big"] =
-		io.Fonts->AddFontFromMemoryTTF((void*)s_robotoRegularTtf, sizeof(s_robotoRegularTtf), 35, &config);
-	s_fonts["consolas"] =
-		io.Fonts->AddFontFromMemoryTTF((void*)s_consolas_embedded, sizeof(s_consolas_embedded), 20, &config);
-	s_fonts["consolas_big"] =
-		io.Fonts->AddFontFromMemoryTTF((void*)s_consolas_embedded, sizeof(s_consolas_embedded), 35, &config);
+	s_fonts["editor_default"] =
+		io.Fonts->AddFontFromMemoryTTF((void*)s_font_default, sizeof(s_font_default), 20, &config);
+    s_fonts["editor_big"] =
+		io.Fonts->AddFontFromMemoryTTF((void*)s_font_default, sizeof(s_font_default), 50, &config);
 
 	io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
 
