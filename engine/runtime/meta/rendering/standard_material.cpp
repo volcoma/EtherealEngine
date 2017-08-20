@@ -39,14 +39,14 @@ REFLECT(standard_material)
 		.property("roughness_map", &standard_material::get_roughness_map,
 				  &standard_material::set_roughness_map)(
 			rttr::metadata("pretty_name", "Roughness Map"),
-			rttr::metadata("Tooltip", "black/white texture. The more white the rougher the surface."))
+			rttr::metadata("tooltip", "black/white texture. The more white the rougher the surface."))
 		.property("metalness_map", &standard_material::get_metalness_map,
 				  &standard_material::set_metalness_map)(
 			rttr::metadata("pretty_name", "Metalness Map"),
-			rttr::metadata("Tooltip", "black/white texture. The more white the "
+			rttr::metadata("tooltip", "black/white texture. The more white the "
 									  "more metallic the surface."))
 		.property("ao_map", &standard_material::get_ao_map, &standard_material::set_ao_map)(
-			rttr::metadata("pretty_name", "AO Map"), rttr::metadata("Tooltip", "black/white texture."));
+			rttr::metadata("pretty_name", "AO Map"), rttr::metadata("tooltip", "black/white texture."));
 }
 
 SAVE(standard_material)

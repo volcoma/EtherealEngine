@@ -7,8 +7,8 @@
 
 REFLECT(model_component)
 {
-	rttr::registration::class_<model_component>("model_component")(rttr::metadata("Category", "RENDERING"),
-																   rttr::metadata("Id", "Model"))
+	rttr::registration::class_<model_component>("model_component")(rttr::metadata("category", "RENDERING"),
+																   rttr::metadata("pretty_name", "Model"))
 		.constructor<>()(rttr::policy::ctor::as_std_shared_ptr)
 		.property("static", &model_component::is_static,
 				  &model_component::set_static)(rttr::metadata("pretty_name", "Static"))

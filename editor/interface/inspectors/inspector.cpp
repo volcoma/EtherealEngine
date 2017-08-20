@@ -10,7 +10,7 @@ void Tooltip(const rttr::property& prop)
 	if(gui::IsItemHovered())
 	{
 		gui::SetMouseCursor(ImGuiMouseCursor_Help);
-		auto tooltip = prop.get_metadata("Tooltip");
+		auto tooltip = prop.get_metadata("tooltip");
 		if(tooltip)
 		{
 			gui::BeginTooltip();

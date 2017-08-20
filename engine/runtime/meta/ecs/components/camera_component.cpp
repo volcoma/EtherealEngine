@@ -4,8 +4,8 @@
 
 REFLECT(camera_component)
 {
-	rttr::registration::class_<camera_component>("camera_component")(rttr::metadata("Category", "RENDERING"),
-																	 rttr::metadata("Id", "Camera"))
+	rttr::registration::class_<camera_component>("camera_component")(rttr::metadata("category", "RENDERING"),
+																	 rttr::metadata("pretty_name", "Camera"))
 		.constructor<>()(rttr::policy::ctor::as_std_shared_ptr)
 		.property("projection_mode", &camera_component::get_projection_mode,
 				  &camera_component::set_projection_mode)(rttr::metadata("pretty_name", "Projection Mode"))
@@ -14,13 +14,13 @@ REFLECT(camera_component)
 											  rttr::metadata("min", 5.0f), rttr::metadata("max", 180.0f))
 		.property("orthographic_size", &camera_component::get_ortho_size, &camera_component::set_ortho_size)(
 			rttr::metadata("pretty_name", "Orthographic Size"),
-			rttr::metadata("Tooltip", "This is half of the vertical size of the viewing volume. "
+			rttr::metadata("tooltip", "This is half of the vertical size of the viewing volume. "
 									  "Horizontal "
 									  "viewing size varies depending on viewport's aspect ratio. "
 									  "Orthographic size is ignored when camera is not orthographic."))
 		.property_readonly("pixels_per_unit", &camera_component::get_ppu)(
 			rttr::metadata("pretty_name", "Pixels Per Unit"),
-			rttr::metadata("Tooltip", "Pixels per unit only usable in orthographic mode."))
+			rttr::metadata("tooltip", "Pixels per unit only usable in orthographic mode."))
 		.property_readonly("viewport_size", &camera_component::get_viewport_size)(
 			rttr::metadata("pretty_name", "Viewport Size"))
 		.property("near_clip_distance", &camera_component::get_near_clip,
