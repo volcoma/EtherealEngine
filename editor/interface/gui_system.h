@@ -12,12 +12,12 @@ struct gui_style
 	struct hsv_setup
 	{
 		float col_main_hue = 0.0f / 255.0f;
-		float col_main_sat = 0.0f / 255.0f;
-		float col_main_val = 80.0f / 255.0f;
+		float col_main_sat = 200.0f / 255.0f;
+		float col_main_val = 170.0f / 255.0f;
 
 		float col_area_hue = 0.0f / 255.0f;
 		float col_area_sat = 0.0f / 255.0f;
-		float col_area_val = 50.0f / 255.0f;
+		float col_area_val = 80.0f / 255.0f;
 
 		float col_back_hue = 0.0f / 255.0f;
 		float col_back_sat = 0.0f / 255.0f;
@@ -33,7 +33,8 @@ struct gui_style
 	void set_style_colors(const hsv_setup& _setup);
 	void load_style();
 	void save_style();
-
+    static hsv_setup get_dark_style();
+    static hsv_setup get_lighter_red();
 	hsv_setup setup;
 };
 //-----------------------------------------------------------------------------

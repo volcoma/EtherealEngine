@@ -423,5 +423,51 @@ void gui_style::save_style()
 	std::ofstream output(absoluteKey.string());
 	cereal::oarchive_associative_t ar(output);
 
-	try_save(ar, cereal::make_nvp("style", setup));
+    try_save(ar, cereal::make_nvp("style", setup));
+}
+
+gui_style::hsv_setup gui_style::get_dark_style()
+{
+    hsv_setup result;  
+    result.col_main_hue = 0.0f / 255.0f;
+	result.col_main_sat = 0.0f / 255.0f;
+	result.col_main_val = 80.0f / 255.0f;
+
+	result.col_area_hue = 0.0f / 255.0f;
+	result.col_area_sat = 0.0f / 255.0f;
+	result.col_area_val = 50.0f / 255.0f;
+
+	result.col_back_hue = 0.0f / 255.0f;
+	result.col_back_sat = 0.0f / 255.0f;
+	result.col_back_val = 35.0f / 255.0f;
+
+	result.col_text_hue = 0.0f / 255.0f;
+	result.col_text_sat = 0.0f / 255.0f;
+	result.col_text_val = 255.0f / 255.0f;
+	result.frame_rounding = 0.0f;
+	
+    return result;
+}
+
+gui_style::hsv_setup gui_style::get_lighter_red()
+{
+    hsv_setup result;  
+    result.col_main_hue = 0.0f / 255.0f;
+	result.col_main_sat = 200.0f / 255.0f;
+	result.col_main_val = 170.0f / 255.0f;
+
+	result.col_area_hue = 0.0f / 255.0f;
+	result.col_area_sat = 0.0f / 255.0f;
+	result.col_area_val = 80.0f / 255.0f;
+
+	result.col_back_hue = 0.0f / 255.0f;
+	result.col_back_sat = 0.0f / 255.0f;
+	result.col_back_val = 35.0f / 255.0f;
+
+	result.col_text_hue = 0.0f / 255.0f;
+	result.col_text_sat = 0.0f / 255.0f;
+	result.col_text_val = 255.0f / 255.0f;
+	result.frame_rounding = 0.0f;
+	
+    return result;
 }

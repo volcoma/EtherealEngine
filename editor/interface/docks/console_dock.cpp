@@ -15,11 +15,11 @@ void console_dock::render(const ImVec2&)
 
 	gui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
 	static ImGuiTextFilter filter;
-	filter.Draw("Filter", 180);
+	filter.Draw("FILTER", 180);
 	gui::PopStyleVar();
 	// TODO: display items starting from the bottom
 	gui::SameLine();
-	if(gui::SmallButton("Clear"))
+	if(gui::SmallButton("CLEAR"))
 	{
 		_console_log->clear_log();
 	}
@@ -68,7 +68,7 @@ void console_dock::render(const ImVec2&)
 	input_buff.resize(64, 0);
 	input_buff.shrink_to_fit();
 	gui::PushItemWidth(gui::GetContentRegionAvailWidth() * 0.5f);
-	if(gui::InputText("Enter Command", &input_buff[0], input_buff.size(), ImGuiInputTextFlags_EnterReturnsTrue))
+	if(gui::InputText("ENTER COMMAND", &input_buff[0], input_buff.size(), ImGuiInputTextFlags_EnterReturnsTrue))
 	{
 		// copy from c_str to remove trailing zeros
 		std::string command = input_buff.c_str();
