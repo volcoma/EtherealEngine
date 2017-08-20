@@ -76,7 +76,7 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool readOnly,
 		{
 			gui::SetMouseCursor(ImGuiMouseCursor_Help);
 			gui::BeginTooltip();
-			gui::TextUnformatted("You can drag and drop here");
+			gui::TextUnformatted("YOU CAN DRAG AND DROP HERE");
 			gui::EndTooltip();
 		}
 

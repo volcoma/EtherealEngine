@@ -231,17 +231,17 @@ void main_editor_window::on_menubar()
 	if(gui::BeginMainMenuBar())
 	{
 
-		if(gui::BeginMenu("File"))
+		if(gui::BeginMenu("FILE"))
 		{
-			if(gui::MenuItem("New Scene", "Ctrl+N", false, current_project != ""))
+			if(gui::MenuItem("NEW SCENE", "CTRL+N", false, current_project != ""))
 			{
 				create_new_scene();
 			}
-			if(gui::MenuItem("Open Scene", "Ctrl+O", false, current_project != ""))
+			if(gui::MenuItem("OPEN SCENE", "CTRL+O", false, current_project != ""))
 			{
 				open_scene();
 			}
-			if(gui::MenuItem("Show Start Page", "Ctrl+P"))
+			if(gui::MenuItem("SHOW START PAGE", "CTRL+P"))
 			{
 				_show_start_page = true;
 				pm.close_project();
@@ -252,40 +252,40 @@ void main_editor_window::on_menubar()
 				io.MouseDown[2] = false;
 			}
 
-			if(gui::MenuItem("Save", "Ctrl+S", false, es.scene != "" && current_project != ""))
+			if(gui::MenuItem("SAVE", "CTRL+S", false, es.scene != "" && current_project != ""))
 			{
 				save_scene();
 			}
 			auto& ecs = core::get_subsystem<runtime::entity_component_system>();
 
-			if(gui::MenuItem("Save As..", "Ctrl+Shift+S", false, ecs.size() > 0 && current_project != ""))
+			if(gui::MenuItem("SAVE AS..", "CTRL+SHIFT+S", false, ecs.size() > 0 && current_project != ""))
 			{
 				save_scene_as();
 			}
 
 			gui::EndMenu();
 		}
-		if(gui::BeginMenu("Edit"))
+		if(gui::BeginMenu("EDIT"))
 		{
-			if(gui::MenuItem("Undo", "CTRL+Z"))
+			if(gui::MenuItem("UNDO", "CTRL+Z"))
 			{
 			}
-			if(gui::MenuItem("Redo", "CTRL+Y", false, false))
+			if(gui::MenuItem("REDO", "CTRL+Y", false, false))
 			{
 			}
 			gui::Separator();
-			if(gui::MenuItem("Cut", "CTRL+X"))
+			if(gui::MenuItem("CUT", "CTRL+X"))
 			{
 			}
-			if(gui::MenuItem("Copy", "CTRL+C"))
+			if(gui::MenuItem("COPY", "CTRL+C"))
 			{
 			}
-			if(gui::MenuItem("Paste", "CTRL+V"))
+			if(gui::MenuItem("PASTE", "CTRL+V"))
 			{
 			}
 			gui::EndMenu();
 		}
-		if(gui::BeginMenu("Windows"))
+		if(gui::BeginMenu("WINDOWS"))
 		{
 			gui::EndMenu();
 		}
@@ -301,55 +301,55 @@ void main_editor_window::on_toolbar()
 	auto& icons = es.icons;
 
 	float width = gui::GetContentRegionAvailWidth();
-	if(gui::ToolbarButton(icons["translate"].get(), "Translate",
+	if(gui::ToolbarButton(icons["translate"].get(), "TRANSLATE",
 						  es.operation == imguizmo::operation::translate))
 	{
 		es.operation = imguizmo::operation::translate;
 	}
 	gui::SameLine(0.0f);
-	if(gui::ToolbarButton(icons["rotate"].get(), "Rotate", es.operation == imguizmo::operation::rotate))
+	if(gui::ToolbarButton(icons["rotate"].get(), "ROTATE", es.operation == imguizmo::operation::rotate))
 	{
 		es.operation = imguizmo::operation::rotate;
 	}
 	gui::SameLine(0.0f);
-	if(gui::ToolbarButton(icons["scale"].get(), "Scale", es.operation == imguizmo::operation::scale))
+	if(gui::ToolbarButton(icons["scale"].get(), "SCALE", es.operation == imguizmo::operation::scale))
 	{
 		es.operation = imguizmo::operation::scale;
 		es.mode = imguizmo::mode::local;
 	}
 	gui::SameLine(0.0f, 50.0f);
 
-	if(gui::ToolbarButton(icons["local"].get(), "Local Coordinate System", es.mode == imguizmo::mode::local))
+	if(gui::ToolbarButton(icons["local"].get(), "LOCAL COORDINATE SYSTEM", es.mode == imguizmo::mode::local))
 	{
 		es.mode = imguizmo::mode::local;
 	}
 	gui::SameLine(0.0f);
-	if(gui::ToolbarButton(icons["global"].get(), "Global Coordinate System", es.mode == imguizmo::mode::world,
+	if(gui::ToolbarButton(icons["global"].get(), "GLOBAL COORDINATE SYSTEM", es.mode == imguizmo::mode::world,
 						  es.operation != imguizmo::operation::scale))
 	{
 		es.mode = imguizmo::mode::world;
 	}
 	gui::SameLine(0.0f);
-	if(gui::ToolbarButton(icons["grid"].get(), "Show Grid", es.show_grid))
+	if(gui::ToolbarButton(icons["grid"].get(), "SHOW GRID", es.show_grid))
 	{
 		es.show_grid = !es.show_grid;
 	}
 	gui::SameLine(0.0f);
-	if(gui::ToolbarButton(icons["wireframe"].get(), "Wireframe Selection", es.wireframe_selection))
+	if(gui::ToolbarButton(icons["wireframe"].get(), "WIREFRAME SELECTION", es.wireframe_selection))
 	{
 		es.wireframe_selection = !es.wireframe_selection;
 	}
 
 	gui::SameLine(width / 2.0f - 36.0f);
-	if(gui::ToolbarButton(icons["play"].get(), "Play", false))
+	if(gui::ToolbarButton(icons["play"].get(), "PLAY", false))
 	{
 	}
 	gui::SameLine(0.0f);
-	if(gui::ToolbarButton(icons["pause"].get(), "Pause", false))
+	if(gui::ToolbarButton(icons["pause"].get(), "PAUSE", false))
 	{
 	}
 	gui::SameLine(0.0f);
-	if(gui::ToolbarButton(icons["next"].get(), "Step", false))
+	if(gui::ToolbarButton(icons["next"].get(), "STEP", false))
 	{
 	}
 }
@@ -390,7 +390,7 @@ void main_editor_window::on_start_page()
 							 ImGuiWindowFlags_NoSavedSettings;
 
 	gui::AlignFirstTextHeightToWidgets();
-	gui::TextUnformatted("Recent Projects");
+	gui::TextUnformatted("RECENT PROJECTS");
 	gui::Separator();
 	gui::BeginGroup();
 	{

@@ -6,7 +6,7 @@
 REFLECT(reflection_probe_component)
 {
 	rttr::registration::class_<reflection_probe_component>("reflection_probe_component")(
-		rttr::metadata("Category", "Lighting"), rttr::metadata("Id", "Reflection Probe"))
+		rttr::metadata("Category", "LIGHTING"), rttr::metadata("Id", "Reflection Probe"))
 		.constructor<>()(rttr::policy::ctor::as_std_shared_ptr);
 }
 

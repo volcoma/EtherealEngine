@@ -20,13 +20,13 @@ void check_context_menu(runtime::entity entity)
 	{
 		if(gui::BeginPopupContextItem("Entity Context Menu"))
 		{
-			if(gui::Selectable("Create child"))
+			if(gui::Selectable("CREATE CHILD"))
 			{
 				auto object = ecs.create();
 				object.assign<transform_component>().lock()->set_parent(
 					entity.get_component<transform_component>());
 			}
-			if(gui::Selectable("Clone"))
+			if(gui::Selectable("CLONE"))
 			{
 				auto object = ecs.create_from_copy(entity);
 				object.get_component<transform_component>().lock()->set_parent(
@@ -34,7 +34,7 @@ void check_context_menu(runtime::entity entity)
 
 				es.select(object);
 			}
-			if(gui::Selectable("Delete"))
+			if(gui::Selectable("DELETE"))
 			{
 				entity.destroy();
 			}
@@ -46,7 +46,7 @@ void check_context_menu(runtime::entity entity)
 	{
 		if(gui::BeginPopupContextWindow())
 		{
-			if(gui::Selectable("Create empty"))
+			if(gui::Selectable("CREATE EMPTY"))
 			{
 				auto object = ecs.create();
 				object.assign<transform_component>();

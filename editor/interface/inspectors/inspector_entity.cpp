@@ -62,7 +62,7 @@ void inspector_entity::component::instance::setup(
 			}
 			else
 			{
-				name = "Default/" + name;
+				name = "DEFAULT/" + name;
 			}
 			_tree.set(name, i++);
 		}

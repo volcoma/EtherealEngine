@@ -6,7 +6,7 @@
 
 REFLECT(transform_component)
 {
-	rttr::registration::class_<transform_component>("transform_component")(rttr::metadata("Id", "Transform"))
+	rttr::registration::class_<transform_component>("transform_component")(rttr::metadata("Category", "DEFAULT"), rttr::metadata("Id", "Transform"))
 		.constructor<>()(rttr::policy::ctor::as_std_shared_ptr)
 		.property("local", &transform_component::get_local_transform,
 				  &transform_component::set_local_transform)(

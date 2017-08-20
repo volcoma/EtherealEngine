@@ -21,7 +21,7 @@ void show_statistics(const unsigned int frameRate)
 	ImVec2 pos = gui::GetCursorScreenPos();
 	gui::SetNextWindowPos(pos);
 	gui::SetNextWindowCollapsed(true, ImGuiCond_FirstUseEver);
-	gui::Begin("Statistics", nullptr,
+	gui::Begin("STATISTICS", nullptr,
 			   ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
 
 	gui::AlignFirstTextHeightToWidgets();
@@ -35,13 +35,13 @@ void show_statistics(const unsigned int frameRate)
 	uint32_t num_draws = stats->numDraw;
 	uint32_t num_computes = stats->numCompute;
 	gui::AlignFirstTextHeightToWidgets();
-	gui::Text("Draw calls: %u", num_draws);
+	gui::Text("DRAW CALLS: %u", num_draws);
 	gui::AlignFirstTextHeightToWidgets();
-	gui::Text("Compute calls: %u", num_computes);
+	gui::Text("COMPUTE CALLS: %u", num_computes);
 	gui::AlignFirstTextHeightToWidgets();
-	gui::Text("Render passes: %u", render_pass::get_pass());
+	gui::Text("RENDER PASSES: %u", render_pass::get_pass());
 	static bool more_stats = false;
-	if(gui::Checkbox("More Stats", &more_stats))
+	if(gui::Checkbox("MORE STATS", &more_stats))
 	{
 		if(more_stats)
 			gfx::setDebug(BGFX_DEBUG_STATS);
@@ -49,7 +49,7 @@ void show_statistics(const unsigned int frameRate)
 			gfx::setDebug(BGFX_DEBUG_NONE);
 	}
 	gui::Separator();
-	gui::Checkbox("Show G-Buffer", &show_gbuffer);
+	gui::Checkbox("SHOW G-BUFFER", &show_gbuffer);
 	gui::End();
 }
 

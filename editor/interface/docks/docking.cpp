@@ -14,13 +14,13 @@
 bool docking_system::initialize()
 {
 	auto log = std::make_shared<console_log>();
-	_docks.emplace_back(std::make_unique<scene_dock>("Scene", true, ImVec2(200.0f, 200.0f)));
-	_docks.emplace_back(std::make_unique<game_dock>("Game", true, ImVec2(200.0f, 200.0f)));
-	_docks.emplace_back(std::make_unique<hierarchy_dock>("Hierarchy", true, ImVec2(300.0f, 200.0f)));
-	_docks.emplace_back(std::make_unique<inspector_dock>("Inspector", true, ImVec2(300.0f, 200.0f)));
-	_docks.emplace_back(std::make_unique<assets_dock>("Assets", true, ImVec2(200.0f, 200.0f)));
-	_docks.emplace_back(std::make_unique<console_dock>("Console", true, ImVec2(200.0f, 200.0f), log));
-	_docks.emplace_back(std::make_unique<style_dock>("Style", true, ImVec2(300.0f, 200.0f)));
+	_docks.emplace_back(std::make_unique<scene_dock>("SCENE", true, ImVec2(200.0f, 200.0f)));
+	_docks.emplace_back(std::make_unique<game_dock>("GAME", true, ImVec2(200.0f, 200.0f)));
+	_docks.emplace_back(std::make_unique<hierarchy_dock>("HIERARCHY", true, ImVec2(300.0f, 200.0f)));
+	_docks.emplace_back(std::make_unique<inspector_dock>("INSPECTOR", true, ImVec2(300.0f, 200.0f)));
+	_docks.emplace_back(std::make_unique<assets_dock>("ASSETS", true, ImVec2(200.0f, 200.0f)));
+	_docks.emplace_back(std::make_unique<console_dock>("CONSOLE", true, ImVec2(200.0f, 200.0f), log));
+	_docks.emplace_back(std::make_unique<style_dock>("STYLE", true, ImVec2(300.0f, 200.0f)));
 
 	auto& scene = _docks[0];
 	auto& game = _docks[1];

@@ -497,9 +497,9 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 
 	if(gui::BeginPopupContextWindow())
 	{
-		if(gui::BeginMenu("Create"))
+		if(gui::BeginMenu("CREATE"))
 		{
-			if(gui::MenuItem("Folder"))
+			if(gui::MenuItem("FOLDER"))
 			{
 				auto opened_folder_shared = opened_dir.lock();
 				auto dir = opened_folder_shared.get();
@@ -517,7 +517,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 
 			gui::Separator();
 
-			if(gui::MenuItem("Material"))
+			if(gui::MenuItem("MATERIAL"))
 			{
 				auto opened_folder_shared = opened_dir.lock();
 				auto dir = opened_folder_shared.get();
@@ -539,7 +539,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 
 		gui::Separator();
 
-		if(gui::Selectable("Open In Environment"))
+		if(gui::Selectable("OPEN IN ENVIRONMENT"))
 		{
 			auto opened_folder_shared = opened_dir.lock();
 			auto dir = opened_folder_shared.get();
@@ -572,7 +572,7 @@ void assets_dock::render(const ImVec2&)
 		}
 	}
 
-	if(gui::Button("Import..."))
+	if(gui::Button("IMPORT..."))
 	{
 		std::vector<std::string> paths;
 		if(open_multiple_files_dialog("obj,fbx,dae,blend,3ds,mtl,png,jpg,tga,dds,ktx,pvr,sc,io,sh", "",
