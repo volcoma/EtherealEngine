@@ -44,7 +44,7 @@ bool docking_system::initialize()
 
 	auto logging_container = logging::get_mutable_logging_container();
 	logging_container->add_sink(log);
-	window.set_log("Console", log);
+	window.set_log("CONSOLE", log);
 	std::function<void()> log_version = []() { APPLOG_INFO("Version 1.0"); };
 	log->register_command("version", "Returns the current version of the Editor.", {}, {}, log_version);
 
