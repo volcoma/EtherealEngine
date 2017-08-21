@@ -358,11 +358,14 @@ void main_editor_window::render_dockspace()
 {
 	if(!_show_start_page)
 	{
+
+		float offset = gui::GetItemsLineHeightWithSpacing();
+
 		_dockspace.update_and_draw(
-			ImVec2(gui::GetContentRegionAvail().x,
-				   gui::GetContentRegionAvail().y - gui::GetItemsLineHeightWithSpacing()));
+			ImVec2(gui::GetContentRegionAvail().x, gui::GetContentRegionAvail().y - offset));
 
 		auto items = _console_log->get_items();
+
 		if(!items.empty())
 		{
 			auto& last_item = items.back();

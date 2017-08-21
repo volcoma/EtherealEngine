@@ -544,7 +544,7 @@ void activete_dock_impl(node* node, const std::string& title)
 {
 	for(auto d : node->docks)
 	{
-		if(d->title == "Console")
+		if(d->title == title)
 		{
 			node->active_dock = d;
 			return;
