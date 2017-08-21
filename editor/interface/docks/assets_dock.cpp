@@ -625,7 +625,7 @@ void assets_dock::render(const ImVec2&)
 		if(rit != hierarchy.rbegin())
 		{
 			gui::AlignFirstTextHeightToWidgets();
-			gui::TextUnformatted(">");
+			gui::TextUnformatted("/");
 			gui::SameLine();
 		}
 
