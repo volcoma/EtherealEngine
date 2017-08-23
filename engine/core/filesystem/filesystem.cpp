@@ -93,13 +93,14 @@ namespace fs
 {
 path executable_path(const char* argv0)
 {
-	char buf[1024] = {0};
-	DWORD ret = GetModuleFileNameA(NULL, buf, sizeof(buf));
-	if(ret == 0 || ret == sizeof(buf))
+    std::array<char, 1024> buf;
+    buf.fill(0);
+	DWORD ret = GetModuleFileNameA(NULL, buf.data(), buf.size());
+	if(ret == 0 || ret == buf.size())
 	{
 		return executable_path_fallback(argv0);
 	}
-	return path(std::string(buf));
+	return path(std::string(buf.data()));
 }
 void show_in_graphical_env(const path& _path)
 {
@@ -112,15 +113,16 @@ namespace fs
 {
 path executable_path(const char* argv0)
 {
-	char buf[1024] = {0};
-	uint32_t size = sizeof(buf);
-	int ret = _NSGetExecutablePath(buf, &size);
+    std::array<char, 1024> buf;
+    buf.fill(0);
+	uint32_t size = buf.size();
+	int ret = _NSGetExecutablePath(buf.data(), &size);
 	if(0 != ret)
 	{
 		return executable_path_fallback(argv0);
 	}
 	fs::error_code err;
-	path full_path(system_complete(path(std::string(buf)).normalize(), err));
+	path full_path(system_complete(path(std::string(buf.data())).normalize(), err));
 	return full_path;
 }
 void show_in_graphical_env(const path& _path)
@@ -134,13 +136,15 @@ namespace fs
 {
 path executable_path(const char* argv0)
 {
-	char buf[1024] = {0};
-	ssize_t size = readlink("/proc/self/exe", buf, sizeof(buf));
+    std::array<char, 1024> buf;
+    buf.fill(0);
+    
+	ssize_t size = readlink("/proc/self/exe", buf.data(), buf.size());
 	if(size == 0 || size == sizeof(buf))
 	{
 		return executable_path_fallback(argv0);
 	}
-	std::string p(buf, size);
+	std::string p(buf.data(), size);
 	fs::error_code err;
 	path full_path(system_complete(path(p).normalize(), err));
 	return full_path;
@@ -149,7 +153,7 @@ void show_in_graphical_env(const path& _path)
 {
 	static std::string cmd = "xdg-open";
 	static std::string space = " ";
-	const std::string cmd_args = _path.string();
+	const std::string cmd_args = "'" + _path.string() + "'";
 	const std::string whole_command = cmd + space + cmd_args;
 	system(whole_command.c_str());
 }
