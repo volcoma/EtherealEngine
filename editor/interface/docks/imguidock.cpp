@@ -746,16 +746,16 @@ void dockspace::render_tab_bar(node* container, const ImVec2&, const ImVec2& cur
 			}
 		}
         
-		if (is_dock_active && dock->close_button == true)
-		{
-             ImGui::SameLine(0, 0);
-             ImGui::SetItemAllowOverlap();
-             if(ImGui::Button(std::string("X###" + dockTitle).c_str(), ImVec2(0, tabbar_height)))
-             {
-                 _current_dock_action = eClose;
-                 _current_dock_to = dock;
-             }
-		}
+		//if (is_dock_active && dock->close_button == true)
+		//{
+        //     ImGui::SameLine(0, 0);
+        //     ImGui::SetItemAllowOverlap();
+        //     if(ImGui::Button(std::string("X###" + dockTitle).c_str(), ImVec2(0, tabbar_height)))
+        //     {
+        //         _current_dock_action = eClose;
+        //         _current_dock_to = dock;
+        //     }
+		//}
         
         ImGui::PopStyleColor(3);
         ImGui::SameLine();

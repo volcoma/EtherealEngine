@@ -32,11 +32,11 @@ byte_array_t read_stream(std::istream& stream)
 	{
 		// get length of file:
 		stream.seekg(0, stream.end);
-		size_t length = static_cast<std::size_t>(stream.tellg());
+		auto length = stream.tellg();
 		stream.seekg(0, stream.beg);
 
-		read_memory.resize(length, '\0'); // reserve space
-		char* begin = (char*)&*read_memory.begin();
+		read_memory.resize(static_cast<std::size_t>(length), '\0'); // reserve space
+		char* begin = &read_memory.front();
 
 		stream.read(begin, length);
 
@@ -95,8 +95,8 @@ path executable_path(const char* argv0)
 {
     std::array<char, 1024> buf;
     buf.fill(0);
-	DWORD ret = GetModuleFileNameA(NULL, buf.data(), buf.size());
-	if(ret == 0 || ret == buf.size())
+	DWORD ret = GetModuleFileNameA(NULL, buf.data(), DWORD(buf.size()));
+	if(ret == 0 || std::size_t(ret) == buf.size())
 	{
 		return executable_path_fallback(argv0);
 	}
