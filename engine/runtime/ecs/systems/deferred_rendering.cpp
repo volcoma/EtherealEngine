@@ -158,6 +158,46 @@ bool should_rebuild_reflections(visibility_set_models_t& visibility_set, const r
 	return false;
 }
 
+bool should_rebuild_shadows(visibility_set_models_t& visibility_set, const light& l)
+{
+	for(auto& element : visibility_set)
+	{
+		auto& e = std::get<0>(element);
+		auto& transform_comp_handle = std::get<1>(element);
+		auto& model_comp_handle = std::get<2>(element);
+		auto transform_comp_ptr = transform_comp_handle.lock();
+		auto model_comp_ptr = model_comp_handle.lock();
+		if(!transform_comp_ptr || !model_comp_ptr)
+			continue;
+
+		auto& transform_comp_ref = *transform_comp_ptr.get();
+		auto& model_comp_ref = *model_comp_ptr.get();
+
+		const auto& model = model_comp_ref.get_model();
+		if(!model.is_valid())
+			continue;
+
+		const auto mesh = model.get_lod(0);
+
+		const auto& world_transform = transform_comp_ref.get_transform();
+
+		const auto& bounds = mesh->get_bounds();
+
+		bool result = false;
+
+		//for(std::uint32_t i = 0; i < 6; ++i)
+		//{
+		//	const auto& frustum = get_face_camera(i, world_transform).get_frustum();
+		//	result |= math::frustum::test_obb(frustum, bounds, world_transform);
+		//}
+
+		if(result)
+			return true;
+	}
+
+	return false;
+}
+
 visibility_set_models_t deferred_rendering::gather_visible_models(entity_component_system& ecs,
 																  camera* camera,
 																  bool dirty_only /* = false*/,
@@ -293,6 +333,26 @@ void deferred_rendering::build_reflections_pass(entity_component_system& ecs, st
 
 void deferred_rendering::build_shadows_pass(entity_component_system& ecs, std::chrono::duration<float> dt)
 {
+    auto dirty_models = gather_visible_models(ecs, nullptr, true, true, true);
+	ecs.each<transform_component, light_component>([this, &ecs, dt, &dirty_models](
+		entity ce, transform_component& transform_comp, light_component& light_comp) {
+		const auto& world_tranform = transform_comp.get_transform();
+		const auto& light = light_comp.get_light();
+
+		bool should_rebuild = true;
+
+		if(!transform_comp.is_dirty() && !light_comp.is_dirty())
+		{
+			// If shadows shouldn't be rebuilt - continue.
+			should_rebuild = should_rebuild_shadows(dirty_models, light);
+		}
+
+		if(!should_rebuild)
+			return;
+
+		
+
+	});
 }
 
 void deferred_rendering::camera_pass(entity_component_system& ecs, std::chrono::duration<float> dt)

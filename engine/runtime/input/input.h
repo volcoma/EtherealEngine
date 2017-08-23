@@ -32,7 +32,7 @@ struct action_mapper
 
 	void handle_event(const mml::platform_event& event)
 	{
-		auto trigger_callbacks = [this](auto mapper, const mml::platform_event& event) {
+		auto trigger_callbacks = [this](auto& mapper, const mml::platform_event& event) {
 			auto mappings = mapper.get_mapping(event);
 			for(auto& action : mappings.actions)
 			{

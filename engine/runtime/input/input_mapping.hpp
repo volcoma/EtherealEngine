@@ -56,16 +56,6 @@ public:
 		_bindings[input].push_back(action);
 	}
 
-	//-----------------------------------------------------------------------------
-	//  Name : get_mapping (virtual )
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	virtual input_mapping get_mapping(const mml::platform_event& e) = 0;
-
 protected:
 	/// mappings
 	std::map<T, std::vector<std::string>> _bindings;
@@ -73,7 +63,7 @@ protected:
 
 struct keyboard_mapper : public input_mapper<mml::keyboard::key>
 {
-	virtual input_mapping get_mapping(const mml::platform_event& e)
+	input_mapping get_mapping(const mml::platform_event& e)
 	{
 		input_mapping binds;
 		if(e.type == mml::platform_event::event_type::key_pressed)
@@ -92,7 +82,7 @@ struct keyboard_mapper : public input_mapper<mml::keyboard::key>
 
 struct mouse_button_mapper : public input_mapper<mml::mouse::button>
 {
-	virtual input_mapping get_mapping(const mml::platform_event& e)
+	input_mapping get_mapping(const mml::platform_event& e)
 	{
 		input_mapping binds;
 		if(e.type == mml::platform_event::event_type::mouse_button_pressed)
@@ -111,7 +101,7 @@ struct mouse_button_mapper : public input_mapper<mml::mouse::button>
 
 struct mouse_wheel_mapper : public input_mapper<mml::mouse::wheel>
 {
-	virtual input_mapping get_mapping(const mml::platform_event& e)
+	input_mapping get_mapping(const mml::platform_event& e)
 	{
 		input_mapping binds;
 		if(e.type == mml::platform_event::event_type::mouse_wheel_scrolled)
@@ -125,7 +115,7 @@ struct mouse_wheel_mapper : public input_mapper<mml::mouse::wheel>
 
 struct touch_finger_mapper : public input_mapper<unsigned int>
 {
-	virtual input_mapping get_mapping(const mml::platform_event& e)
+	input_mapping get_mapping(const mml::platform_event& e)
 	{
 		input_mapping binds;
 		if(e.type == mml::platform_event::event_type::touch_began)
@@ -149,7 +139,7 @@ struct touch_finger_mapper : public input_mapper<unsigned int>
 
 struct joystick_button_mapper : public input_mapper<std::pair<unsigned int, unsigned int>>
 {
-	virtual input_mapping get_mapping(const mml::platform_event& e)
+	input_mapping get_mapping(const mml::platform_event& e)
 	{
 		input_mapping binds;
 		if(e.type == mml::platform_event::event_type::joystick_button_pressed)
@@ -168,7 +158,7 @@ struct joystick_button_mapper : public input_mapper<std::pair<unsigned int, unsi
 
 struct event_mapper : public input_mapper<mml::platform_event::event_type>
 {
-	virtual input_mapping get_mapping(const mml::platform_event& e)
+	input_mapping get_mapping(const mml::platform_event& e)
 	{
 		input_mapping binds;
 		binds.actions = _bindings[e.type];

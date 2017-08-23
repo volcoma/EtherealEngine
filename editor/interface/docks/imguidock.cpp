@@ -699,8 +699,8 @@ void dockspace::render_tab_bar(node* container, const ImVec2&, const ImVec2& cur
 	for(auto dock : container->docks)
 	{
 		std::string dockTitle = dock->title;
-
-		if(dock == container->active_dock)
+        bool is_dock_active = dock == container->active_dock; 
+		if(is_dock_active)
 		{
 			ImGui::PushStyleColor(ImGuiCol_Button, childBg);
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, childBg);
@@ -745,19 +745,19 @@ void dockspace::render_tab_bar(node* container, const ImVec2&, const ImVec2& cur
 				}
 			}
 		}
-        ImGui::PopStyleColor(3);
-//		if (dock->close_button == true)
-//		{
-//             ImGui::SameLine(0, 0);
-//             ImGui::SetItemAllowOverlap();
-//             if(ImGui::Button(std::string("X###" + dockTitle).c_str(), ImVec2(0, tabbar_height)))
-//             {
-//                 _current_dock_action = eClose;
-//                 _current_dock_to = dock;
-//             }
-             
-//		}
         
+		if (is_dock_active && dock->close_button == true)
+		{
+             ImGui::SameLine(0, 0);
+             ImGui::SetItemAllowOverlap();
+             if(ImGui::Button(std::string("X###" + dockTitle).c_str(), ImVec2(0, tabbar_height)))
+             {
+                 _current_dock_action = eClose;
+                 _current_dock_to = dock;
+             }
+		}
+        
+        ImGui::PopStyleColor(3);
         ImGui::SameLine();
 		
 	}

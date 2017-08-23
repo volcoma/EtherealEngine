@@ -1,7 +1,7 @@
 #include "filesystem.h"
 #include "../common/platform_config.h"
 #include "../common/string.h"
-
+#include <array>
 namespace fs
 {
 
