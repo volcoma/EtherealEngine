@@ -1,7 +1,7 @@
 #include "inspector_entity.h"
 #include "inspectors.h"
 
-bool inspector_entity::inspect(rttr::variant& var, bool readOnly,
+bool inspector_entity::inspect(rttr::variant& var, bool read_only,
 							   std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<runtime::entity>();

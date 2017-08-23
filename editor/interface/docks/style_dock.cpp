@@ -1,8 +1,8 @@
 #include "style_dock.h"
 
-style_dock::style_dock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize)
+style_dock::style_dock(const std::string& dtitle, bool close_button, const ImVec2& min_size)
 {
-	initialize(dtitle, dcloseButton, dminSize, std::bind(&style_dock::render, this, std::placeholders::_1));
+	initialize(dtitle, close_button, min_size, std::bind(&style_dock::render, this, std::placeholders::_1));
 	auto& style = gui::get_gui_style();
 	style.load_style();
 	auto& setup = style.setup;

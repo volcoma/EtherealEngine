@@ -31,8 +31,7 @@ void game_dock::render(const ImVec2&)
 	});
 }
 
-game_dock::game_dock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize)
+game_dock::game_dock(const std::string& dtitle, bool close_button, const ImVec2& min_size)
 {
-
-	initialize(dtitle, dcloseButton, dminSize, std::bind(&game_dock::render, this, std::placeholders::_1));
+	initialize(dtitle, close_button, min_size, std::bind(&game_dock::render, this, std::placeholders::_1));
 }

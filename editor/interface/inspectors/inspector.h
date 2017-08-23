@@ -10,7 +10,7 @@ struct inspector
 
 	virtual ~inspector() = default;
 
-	virtual bool inspect(rttr::variant& var, bool readOnly,
+	virtual bool inspect(rttr::variant& var, bool read_only,
 						 std::function<rttr::variant(const rttr::variant&)> get_metadata) = 0;
 };
 
@@ -41,7 +41,7 @@ REFLECT_EXTERN(inspector);
 	struct inspector_type : public inspector                                                                 \
 	{                                                                                                        \
 		REFLECTABLE(inspector_type, inspector)                                                               \
-		bool inspect(rttr::variant& var, bool readOnly,                                                      \
+		bool inspect(rttr::variant& var, bool read_only,                                                      \
 					 std::function<rttr::variant(const rttr::variant&)> get_metadata);                       \
 	};                                                                                                       \
 	INSPECTOR_REFLECT(inspector_type, inspected_type)

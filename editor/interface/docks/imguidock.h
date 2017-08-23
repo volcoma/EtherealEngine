@@ -41,7 +41,7 @@ struct node
 
 struct dock
 {
-	void initialize(const std::string& dtitle, bool dcloseButton, const ImVec2& dminSize,
+	void initialize(const std::string& dtitle, bool close_btn, const ImVec2& min_sz,
 					std::function<void(const ImVec2&)> ddrawFunction);
 
 	virtual ~dock() = default;

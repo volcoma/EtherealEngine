@@ -699,8 +699,6 @@ void dockspace::render_tab_bar(node* container, const ImVec2&, const ImVec2& cur
 	for(auto dock : container->docks)
 	{
 		std::string dockTitle = dock->title;
-		if(dock->close_button == true)
-			dockTitle += "  ";
 
 		if(dock == container->active_dock)
 		{
@@ -747,33 +745,31 @@ void dockspace::render_tab_bar(node* container, const ImVec2&, const ImVec2& cur
 				}
 			}
 		}
-
-		ImGui::SameLine();
-		// if (dock->close_button == true)
-		//{
-		//	ImVec2 backupCursorPos = ImGui::GetCursorScreenPos();
-		//	ImGui::SetCursorPosX(backupCursorPos.x - 26);
-		//	ImGui::SetCursorPosY(backupCursorPos.y + 10);
-		//	ImGui::SetItemAllowOverlap();
-		//	if(ImGui::CloseButton(5, ImVec2(backupCursorPos.x - 18, backupCursorPos.y + 10), 7))
-		//	{
-		//		_current_dock_action = eClose;
-		//		_current_dock_to = dock;
-		//	}
-		//	ImGui::SetCursorPos(backupCursorPos);
-		//}
-
-		ImGui::PopStyleColor(3);
+        ImGui::PopStyleColor(3);
+//		if (dock->close_button == true)
+//		{
+//             ImGui::SameLine(0, 0);
+//             ImGui::SetItemAllowOverlap();
+//             if(ImGui::Button(std::string("X###" + dockTitle).c_str(), ImVec2(0, tabbar_height)))
+//             {
+//                 _current_dock_action = eClose;
+//                 _current_dock_to = dock;
+//             }
+             
+//		}
+        
+        ImGui::SameLine();
+		
 	}
 	ImGui::PopStyleVar();
 }
 
-void dock::initialize(const std::string& dtitle, bool dcloseButton, const ImVec2& dminSize,
+void dock::initialize(const std::string& dtitle, bool close_btn, const ImVec2& min_sz,
 					  std::function<void(const ImVec2&)> ddrawFunction)
 {
 	title = dtitle;
-	close_button = dcloseButton;
-	min_size = dminSize;
+	close_button = close_btn;
+	min_size = min_sz;
 	draw_function = ddrawFunction;
 }
 }

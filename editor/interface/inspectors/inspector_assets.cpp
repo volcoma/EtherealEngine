@@ -8,7 +8,7 @@
 #include "runtime/rendering/mesh.h"
 #include "runtime/rendering/texture.h"
 
-bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool readOnly,
+bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 											 std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<asset_handle<texture>>();
@@ -116,7 +116,7 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool readOnly,
 	return changed;
 }
 
-bool inspector_asset_handle_material::inspect(rttr::variant& var, bool readOnly,
+bool inspector_asset_handle_material::inspect(rttr::variant& var, bool read_only,
 											  std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<asset_handle<material>>();
@@ -168,7 +168,7 @@ bool inspector_asset_handle_material::inspect(rttr::variant& var, bool readOnly,
 		return false;
 	}
 
-	if(gui::Button("Apply to Asset##top"))
+	if(gui::Button("SAVE CHANGES##top", ImVec2(-1, 0)))
 	{
 		am.save(data);
 	}
@@ -179,14 +179,14 @@ bool inspector_asset_handle_material::inspect(rttr::variant& var, bool readOnly,
 		changed |= inspect_var(vari);
 	}
 	gui::Separator();
-	if(gui::Button("Apply to Asset##bottom"))
+	if(gui::Button("SAVE CHANGES##bottom", ImVec2(-1, 0)))
 	{
 		am.save(data);
 	}
 	return changed;
 }
 
-bool inspector_asset_handle_mesh::inspect(rttr::variant& var, bool readOnly,
+bool inspector_asset_handle_mesh::inspect(rttr::variant& var, bool read_only,
 										  std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<asset_handle<mesh>>();
@@ -252,7 +252,7 @@ bool inspector_asset_handle_mesh::inspect(rttr::variant& var, bool readOnly,
 	return changed;
 }
 
-bool inspector_asset_handle_prefab::inspect(rttr::variant& var, bool readOnly,
+bool inspector_asset_handle_prefab::inspect(rttr::variant& var, bool read_only,
 											std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<asset_handle<prefab>>();

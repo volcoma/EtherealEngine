@@ -6,7 +6,7 @@ struct inspector_light_component : public inspector
 {
 	REFLECTABLEV(inspector_light_component, inspector)
 
-	bool inspect(rttr::variant& var, bool readOnly,
+	bool inspect(rttr::variant& var, bool read_only,
 				 std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
 
@@ -18,7 +18,7 @@ struct inspector_reflection_probe_component : public inspector
 {
 	REFLECTABLEV(inspector_reflection_probe_component, inspector)
 
-	bool inspect(rttr::variant& var, bool readOnly,
+	bool inspect(rttr::variant& var, bool read_only,
 				 std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
 

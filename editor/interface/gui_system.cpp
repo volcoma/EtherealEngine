@@ -221,7 +221,6 @@ bool gui_system::initialize()
 
 	// Store our identifier
 	io.Fonts->SetTexID(s_font_texture.get());
-	io.FontAllowUserScaling = true;
 	s_gui_style.load_style();
 
 	runtime::on_frame_begin.connect(this, &gui_system::frame_begin);

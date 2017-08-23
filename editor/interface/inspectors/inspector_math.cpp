@@ -1,7 +1,7 @@
 #include "inspector_math.h"
 #include "../gizmos/imguizmo.h"
 
-bool inspector_vec2::inspect(rttr::variant& var, bool readOnly,
+bool inspector_vec2::inspect(rttr::variant& var, bool read_only,
 							 std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<math::vec2>();
@@ -14,7 +14,7 @@ bool inspector_vec2::inspect(rttr::variant& var, bool readOnly,
 	return false;
 }
 
-bool inspector_vec3::inspect(rttr::variant& var, bool readOnly,
+bool inspector_vec3::inspect(rttr::variant& var, bool read_only,
 							 std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<math::vec3>();
@@ -27,7 +27,7 @@ bool inspector_vec3::inspect(rttr::variant& var, bool readOnly,
 	return false;
 }
 
-bool inspector_vec4::inspect(rttr::variant& var, bool readOnly,
+bool inspector_vec4::inspect(rttr::variant& var, bool read_only,
 							 std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<math::vec4>();
@@ -40,7 +40,7 @@ bool inspector_vec4::inspect(rttr::variant& var, bool readOnly,
 	return false;
 }
 
-bool inspector_color::inspect(rttr::variant& var, bool readOnly,
+bool inspector_color::inspect(rttr::variant& var, bool read_only,
 							  std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<math::color>();
@@ -53,7 +53,7 @@ bool inspector_color::inspect(rttr::variant& var, bool readOnly,
 	return false;
 }
 
-bool inspector_quaternion::inspect(rttr::variant& var, bool readOnly,
+bool inspector_quaternion::inspect(rttr::variant& var, bool read_only,
 								   std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<math::quat>();
@@ -77,7 +77,7 @@ bool inspector_quaternion::inspect(rttr::variant& var, bool readOnly,
 	return false;
 }
 
-bool inspector_transform::inspect(rttr::variant& var, bool readOnly,
+bool inspector_transform::inspect(rttr::variant& var, bool read_only,
 								  std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<math::transform>();

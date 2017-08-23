@@ -1,12 +1,12 @@
 #include "inspector_coretypes.h"
 #include "core/common/string.h"
 
-bool inspector_bool::inspect(rttr::variant& var, bool readOnly,
+bool inspector_bool::inspect(rttr::variant& var, bool read_only,
 							 std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<bool>();
 
-	if(readOnly)
+	if(read_only)
 	{
 		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(data ? "true" : "false");
@@ -23,11 +23,11 @@ bool inspector_bool::inspect(rttr::variant& var, bool readOnly,
 	return false;
 }
 
-bool inspector_float::inspect(rttr::variant& var, bool readOnly,
+bool inspector_float::inspect(rttr::variant& var, bool read_only,
 							  std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.to_float();
-	if(readOnly)
+	if(read_only)
 	{
 		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(std::to_string(data).c_str());
@@ -78,11 +78,11 @@ bool inspector_float::inspect(rttr::variant& var, bool readOnly,
 	return false;
 }
 
-bool inspector_double::inspect(rttr::variant& var, bool readOnly,
+bool inspector_double::inspect(rttr::variant& var, bool read_only,
 							   std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = static_cast<float>(var.to_double());
-	if(readOnly)
+	if(read_only)
 	{
 		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(std::to_string(data).c_str());
@@ -132,11 +132,11 @@ bool inspector_double::inspect(rttr::variant& var, bool readOnly,
 	return false;
 }
 
-bool inspector_int8::inspect(rttr::variant& var, bool readOnly,
+bool inspector_int8::inspect(rttr::variant& var, bool read_only,
 							 std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = static_cast<int>(var.to_int8());
-	if(readOnly)
+	if(read_only)
 	{
 		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(std::to_string(data).c_str());
@@ -177,11 +177,11 @@ bool inspector_int8::inspect(rttr::variant& var, bool readOnly,
 	return false;
 }
 
-bool inspector_int16::inspect(rttr::variant& var, bool readOnly,
+bool inspector_int16::inspect(rttr::variant& var, bool read_only,
 							  std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = static_cast<int>(var.to_int16());
-	if(readOnly)
+	if(read_only)
 	{
 		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(std::to_string(data).c_str());
@@ -222,11 +222,11 @@ bool inspector_int16::inspect(rttr::variant& var, bool readOnly,
 	return false;
 }
 
-bool inspector_int32::inspect(rttr::variant& var, bool readOnly,
+bool inspector_int32::inspect(rttr::variant& var, bool read_only,
 							  std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = static_cast<int>(var.to_int32());
-	if(readOnly)
+	if(read_only)
 	{
 		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(std::to_string(data).c_str());
@@ -267,11 +267,11 @@ bool inspector_int32::inspect(rttr::variant& var, bool readOnly,
 	return false;
 }
 
-bool inspector_int64::inspect(rttr::variant& var, bool readOnly,
+bool inspector_int64::inspect(rttr::variant& var, bool read_only,
 							  std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = static_cast<int>(var.to_int64());
-	if(readOnly)
+	if(read_only)
 	{
 		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(std::to_string(data).c_str());
@@ -312,11 +312,11 @@ bool inspector_int64::inspect(rttr::variant& var, bool readOnly,
 	return false;
 }
 
-bool inspector_uint8::inspect(rttr::variant& var, bool readOnly,
+bool inspector_uint8::inspect(rttr::variant& var, bool read_only,
 							  std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = static_cast<int>(var.to_uint8());
-	if(readOnly)
+	if(read_only)
 	{
 		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(std::to_string(data).c_str());
@@ -357,11 +357,11 @@ bool inspector_uint8::inspect(rttr::variant& var, bool readOnly,
 	return false;
 }
 
-bool inspector_uint16::inspect(rttr::variant& var, bool readOnly,
+bool inspector_uint16::inspect(rttr::variant& var, bool read_only,
 							   std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = static_cast<int>(var.to_uint16());
-	if(readOnly)
+	if(read_only)
 	{
 		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(std::to_string(data).c_str());
@@ -402,11 +402,11 @@ bool inspector_uint16::inspect(rttr::variant& var, bool readOnly,
 	return false;
 }
 
-bool inspector_uint32::inspect(rttr::variant& var, bool readOnly,
+bool inspector_uint32::inspect(rttr::variant& var, bool read_only,
 							   std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = static_cast<int>(var.to_uint32());
-	if(readOnly)
+	if(read_only)
 	{
 		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(std::to_string(data).c_str());
@@ -447,11 +447,11 @@ bool inspector_uint32::inspect(rttr::variant& var, bool readOnly,
 	return false;
 }
 
-bool inspector_uint64::inspect(rttr::variant& var, bool readOnly,
+bool inspector_uint64::inspect(rttr::variant& var, bool read_only,
 							   std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = static_cast<int>(var.to_uint64());
-	if(readOnly)
+	if(read_only)
 	{
 		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(std::to_string(data).c_str());
@@ -492,11 +492,11 @@ bool inspector_uint64::inspect(rttr::variant& var, bool readOnly,
 	return false;
 }
 
-bool inspector_string::inspect(rttr::variant& var, bool readOnly,
+bool inspector_string::inspect(rttr::variant& var, bool read_only,
 							   std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto data = var.get_value<std::string>();
-	if(readOnly)
+	if(read_only)
 	{
 		gui::AlignFirstTextHeightToWidgets();
 		gui::TextUnformatted(data.c_str());

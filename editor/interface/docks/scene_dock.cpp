@@ -453,8 +453,8 @@ void scene_dock::render(const ImVec2&)
 	}
 }
 
-scene_dock::scene_dock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize)
+scene_dock::scene_dock(const std::string& dtitle, bool close_button, const ImVec2& min_size)
 {
 
-	initialize(dtitle, dcloseButton, dminSize, std::bind(&scene_dock::render, this, std::placeholders::_1));
+	initialize(dtitle, close_button, min_size, std::bind(&scene_dock::render, this, std::placeholders::_1));
 }

@@ -5,7 +5,7 @@
 class console_log;
 struct console_dock : public imguidock::dock
 {
-	console_dock(const std::string& dtitle, bool dcloseButton, ImVec2 dminSize,
+	console_dock(const std::string& dtitle, bool close_button, const ImVec2& min_size,
 				 std::shared_ptr<console_log> log);
 
 	void render(const ImVec2& area);
