@@ -275,8 +275,8 @@ void update_drag(gui_window* window)
 		if(active_dock->draging && mouseleft)
 		{
 			auto pos = mml::mouse::get_position();
-			pos[0] -= 20;
-			pos[1] -= 40;
+			pos[0] -= 40;
+			pos[1] -= 30 + int32_t(ImGui::GetTextLineHeightWithSpacing());
 			window->set_position(pos);
 			window->set_alpha(0.3f);
 			active_dock->redock_to = nullptr;
@@ -298,15 +298,16 @@ void update_drag(gui_window* window)
 				{
 					window->set_alpha(1.0f);
 				}
-				active_dock->draging = false;
+				
 			}
+            active_dock->draging = false;
 		}
 	}
 }
 
 void dockspace::render_container(uint32_t& idgen, node* container, ImVec2 size, ImVec2 cursor_pos)
 {
-	const float tabbar_height = ImGui::GetTextLineHeightWithSpacing();
+	const float tabbar_height = ImGui::GetItemsLineHeightWithSpacing();
 	ImVec2 calculated_size = size;
 	ImVec2 calculated_cursor_pos = cursor_pos;
 
@@ -499,9 +500,13 @@ void dockspace::update_and_draw(ImVec2 dockspaceSize)
 				auto window = std::make_unique<gui_window>(
 					mml::video_mode(static_cast<unsigned int>(_current_dock_to->last_size.x),
 									static_cast<unsigned int>(_current_dock_to->last_size.y)),
-					"Editor Window", mml::style::standard);
+					"Window", mml::style::standard);
 				window->get_dockspace().dock_to(_current_dock_to, slot::tab, 0, true);
-				window->set_position(mml::mouse::get_position());
+                auto pos = mml::mouse::get_position();
+                pos[0] -= 40;
+                pos[1] -= 30 + int32_t(ImGui::GetTextLineHeightWithSpacing());
+                
+				window->set_position(pos);
 				window->request_focus();
 				engine.register_window(std::move(window));
 			}
@@ -606,14 +611,17 @@ slot dockspace::render_dock_slot_preview(const ImVec2& mouse_pos, const ImVec2& 
 	slot dock_slot = slot::none;
 
 	ImRect rect{cPos, cPos + cSize};
-
-	auto checkSlot = [&mouse_pos](ImRect rect, slot slot) -> bool {
+    ImVec4 col = ImGui::GetStyle().Colors[ImGuiCol_TitleBg];
+    col.w = 0.8f;
+    ImVec4 col_preview = ImGui::GetStyle().Colors[ImGuiCol_TitleBg];
+    col_preview.w = 0.5f;
+	auto checkSlot = [&col, &mouse_pos](ImRect rect, slot slot) -> bool {
 
 		auto slotRect = get_slot_rect(rect, slot);
 
 		ImGui::GetWindowDrawList()->AddRectFilled(
 			slotRect.Min, slotRect.Max,
-			ImGui::ColorConvertFloat4ToU32(ImVec4(0.4f, 0.4f, 0.4f, 0.8f))); // tab
+			ImGui::ColorConvertFloat4ToU32(col)); // tab
 
 		return slotRect.Contains(mouse_pos);
 
@@ -623,7 +631,7 @@ slot dockspace::render_dock_slot_preview(const ImVec2& mouse_pos, const ImVec2& 
 	{
 		ImGui::GetWindowDrawList()->AddRectFilled(
 			cPos, ImVec2(cPos.x + cSize.x, cPos.y + cSize.y),
-			ImGui::ColorConvertFloat4ToU32(ImVec4(0.4f, 0.4f, 0.4f, 0.5f))); // tab
+			ImGui::ColorConvertFloat4ToU32(col_preview)); // tab
 		dock_slot = slot::tab;
 	}
 
@@ -631,7 +639,7 @@ slot dockspace::render_dock_slot_preview(const ImVec2& mouse_pos, const ImVec2& 
 	{
 		ImGui::GetWindowDrawList()->AddRectFilled(
 			cPos, ImVec2(cPos.x + (cSize.x / 2.0f), cPos.y + cSize.y),
-			ImGui::ColorConvertFloat4ToU32(ImVec4(0.4f, 0.4f, 0.4f, 0.5f))); // tab
+			ImGui::ColorConvertFloat4ToU32(col_preview)); // tab
 		dock_slot = slot::left;
 	}
 
@@ -639,7 +647,7 @@ slot dockspace::render_dock_slot_preview(const ImVec2& mouse_pos, const ImVec2& 
 	{
 		ImGui::GetWindowDrawList()->AddRectFilled(
 			ImVec2(cPos.x + (cSize.x / 2.0f), cPos.y), ImVec2(cPos.x + cSize.x, cPos.y + cSize.y),
-			ImGui::ColorConvertFloat4ToU32(ImVec4(0.4f, 0.4f, 0.4f, 0.5f))); // tab
+			ImGui::ColorConvertFloat4ToU32(col_preview)); // tab
 		dock_slot = slot::right;
 	}
 
@@ -647,7 +655,7 @@ slot dockspace::render_dock_slot_preview(const ImVec2& mouse_pos, const ImVec2& 
 	{
 		ImGui::GetWindowDrawList()->AddRectFilled(
 			cPos, ImVec2(cPos.x + cSize.x, cPos.y + (cSize.y / 2.0f)),
-			ImGui::ColorConvertFloat4ToU32(ImVec4(0.4f, 0.4f, 0.4f, 0.5f))); // tab
+			ImGui::ColorConvertFloat4ToU32(col_preview)); // tab
 		dock_slot = slot::top;
 	}
 
@@ -655,7 +663,7 @@ slot dockspace::render_dock_slot_preview(const ImVec2& mouse_pos, const ImVec2& 
 	{
 		ImGui::GetWindowDrawList()->AddRectFilled(
 			ImVec2(cPos.x, cPos.y + (cSize.y / 2.0f)), ImVec2(cPos.x + cSize.x, cPos.y + cSize.y),
-			ImGui::ColorConvertFloat4ToU32(ImVec4(0.4f, 0.4f, 0.4f, 0.5f))); // tab
+			ImGui::ColorConvertFloat4ToU32(col_preview)); // tab
 		dock_slot = slot::bottom;
 	}
 
@@ -699,7 +707,15 @@ void dockspace::render_tab_bar(node* container, const ImVec2&, const ImVec2& cur
 	for(auto dock : container->docks)
 	{
 		std::string dockTitle = dock->title;
-        bool is_dock_active = dock == container->active_dock; 
+
+        ImVec4 button_color =
+            ImVec4(childBg.x - 0.04f, childBg.y - 0.04f, childBg.z - 0.04f, childBg.w * 0.6f);
+        ImVec4 buttonColorActive =
+            ImVec4(childBg.x + 0.10f, childBg.y + 0.10f, childBg.z + 0.10f, childBg.w);
+        ImVec4 buttonColorHovered =
+            ImVec4(childBg.x + 0.15f, childBg.y + 0.15f, childBg.z + 0.15f, childBg.w);
+        
+		bool is_dock_active = dock == container->active_dock;
 		if(is_dock_active)
 		{
 			ImGui::PushStyleColor(ImGuiCol_Button, childBg);
@@ -707,27 +723,37 @@ void dockspace::render_tab_bar(node* container, const ImVec2&, const ImVec2& cur
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, childBg);
 		}
 		else
-		{
-			ImVec4 button_color = ImVec4(childBg.x - 0.04f, childBg.y - 0.04f, childBg.z - 0.04f, childBg.w);
-			ImVec4 buttonColorActive =
-				ImVec4(childBg.x + 0.10f, childBg.y + 0.10f, childBg.z + 0.10f, childBg.w);
-			ImVec4 buttonColorHovered =
-				ImVec4(childBg.x + 0.15f, childBg.y + 0.15f, childBg.z + 0.15f, childBg.w);
+		{			
 			ImGui::PushStyleColor(ImGuiCol_Button, button_color);
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, buttonColorActive);
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, buttonColorHovered);
 		}
-		if(ImGui::Button(dockTitle.c_str(), ImVec2(0, tabbar_height)))
+
+		const auto& style = ImGui::GetStyle();
+
+		const ImVec2 title_label_size = ImGui::CalcTextSize(dockTitle.c_str(), NULL, true);
+		ImVec2 title_sz =
+			ImGui::CalcItemSize(ImVec2(0, tabbar_height), title_label_size.x + style.FramePadding.x * 2.0f,
+								title_label_size.y + style.FramePadding.y * 2.0f);
+
+		const ImVec2 close_label_size = ImGui::CalcTextSize("X", NULL, true);
+		ImVec2 close_sz =
+			ImGui::CalcItemSize(ImVec2(0, tabbar_height), close_label_size.x + style.FramePadding.x * 2.0f,
+								close_label_size.y + style.FramePadding.y * 2.0f);
+
+		if(ImGui::Button(dockTitle.c_str(), ImVec2(title_sz.x + close_sz.x * 1.5f, tabbar_height)))
 		{
 			container->active_dock = dock;
+			is_dock_active = true;
 		}
-		if(ImGui::IsItemActive())
+
+        bool is_button_active = ImGui::IsItemActive();
+		if(is_button_active)
 		{
-			float delta = ImGui::GetCursorScreenPos().y - ImGui::GetIO().MousePos.y;
 			if(dock->container->parent == &root && root.splits[1] == nullptr &&
 			   dock->container->docks.size() == 1)
 			{
-				if(delta < -2 || delta > 2)
+                if(ImGui::IsMouseDragging(0, 4.0f))
 				{
 					_current_dock_action = eDrag;
 					_current_dock_to = dock;
@@ -735,7 +761,7 @@ void dockspace::render_tab_bar(node* container, const ImVec2&, const ImVec2& cur
 			}
 			else
 			{
-				if(delta < -4 || delta > 27)
+                 if(ImGui::IsMouseDragging(0, 8.0f))
 				{
 					if(dock->undockable == false)
 					{
@@ -745,21 +771,33 @@ void dockspace::render_tab_bar(node* container, const ImVec2&, const ImVec2& cur
 				}
 			}
 		}
-        
-		//if (is_dock_active && dock->close_button == true)
-		//{
-        //     ImGui::SameLine(0, 0);
-        //     ImGui::SetItemAllowOverlap();
-        //     if(ImGui::Button(std::string("X###" + dockTitle).c_str(), ImVec2(0, tabbar_height)))
-        //     {
-        //         _current_dock_action = eClose;
-        //         _current_dock_to = dock;
-        //     }
-		//}
-        
-        ImGui::PopStyleColor(3);
-        ImGui::SameLine();
-		
+		ImGui::PopStyleColor(3);
+		bool is_hovered = ImGui::IsItemHoveredRect();
+
+		if((is_hovered || is_dock_active) && dock->close_button == true)
+		{
+			if(is_dock_active)
+			{
+				ImGui::PushStyleColor(ImGuiCol_Button, childBg);
+			}
+			else
+			{
+				ImGui::PushStyleColor(ImGuiCol_Button, is_button_active ? buttonColorActive : buttonColorHovered);
+			}
+
+			ImGui::SameLine(0, 0);
+			ImGui::SetItemAllowOverlap();
+			ImVec2 backupCursorPos = ImGui::GetCursorScreenPos();
+			ImGui::SetCursorPosX(backupCursorPos.x - close_sz.x);
+			if(ImGui::Button(std::string("X###" + dockTitle).c_str(), ImVec2(0, tabbar_height)))
+			{
+				_current_dock_action = eClose;
+				_current_dock_to = dock;
+			}
+			ImGui::PopStyleColor();
+		}
+
+		ImGui::SameLine();
 	}
 	ImGui::PopStyleVar();
 }
@@ -767,7 +805,8 @@ void dockspace::render_tab_bar(node* container, const ImVec2&, const ImVec2& cur
 void dock::initialize(const std::string& dtitle, bool close_btn, const ImVec2& min_sz,
 					  std::function<void(const ImVec2&)> ddrawFunction)
 {
-	title = dtitle;
+    static int i = 0;
+	title = dtitle + "###" + std::to_string(i++);
 	close_button = close_btn;
 	min_size = min_sz;
 	draw_function = ddrawFunction;
