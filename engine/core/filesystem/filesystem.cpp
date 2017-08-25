@@ -28,6 +28,7 @@ byte_array_t read_stream(std::istream& stream)
 {
 	// Open the stream
 	byte_array_t read_memory;
+
 	if(stream.good())
 	{
 		// get length of file:
@@ -35,10 +36,9 @@ byte_array_t read_stream(std::istream& stream)
 		auto length = stream.tellg();
 		stream.seekg(0, stream.beg);
 
-		read_memory.resize(static_cast<std::size_t>(length), '\0'); // reserve space
-		char* begin = &read_memory.front();
-
-		stream.read(begin, length);
+		read_memory.reserve(size_t(length));
+		read_memory.insert(read_memory.end(), std::istreambuf_iterator<char>(stream),
+						   std::istreambuf_iterator<char>());
 
 		stream.clear();
 		stream.seekg(0);
@@ -93,8 +93,8 @@ namespace fs
 {
 path executable_path(const char* argv0)
 {
-    std::array<char, 1024> buf;
-    buf.fill(0);
+	std::array<char, 1024> buf;
+	buf.fill(0);
 	DWORD ret = GetModuleFileNameA(NULL, buf.data(), DWORD(buf.size()));
 	if(ret == 0 || std::size_t(ret) == buf.size())
 	{
@@ -113,8 +113,8 @@ namespace fs
 {
 path executable_path(const char* argv0)
 {
-    std::array<char, 1024> buf;
-    buf.fill(0);
+	std::array<char, 1024> buf;
+	buf.fill(0);
 	uint32_t size = buf.size();
 	int ret = _NSGetExecutablePath(buf.data(), &size);
 	if(0 != ret)
@@ -136,9 +136,9 @@ namespace fs
 {
 path executable_path(const char* argv0)
 {
-    std::array<char, 1024> buf;
-    buf.fill(0);
-    
+	std::array<char, 1024> buf;
+	buf.fill(0);
+
 	ssize_t size = readlink("/proc/self/exe", buf.data(), buf.size());
 	if(size == 0 || size == sizeof(buf))
 	{

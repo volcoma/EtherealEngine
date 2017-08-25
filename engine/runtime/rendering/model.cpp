@@ -192,7 +192,6 @@ void model::render(std::uint8_t id, const math::transform& mtx, bool apply_cull,
 	// Has skinning data?
 	if(skin_data.has_bones())
 	{
-		mesh->get_armature();
 		// Build an array containing all of the bones that are required
 		// by the binding data in the skinned mesh.
 		std::vector<math::transform> node_transforms;

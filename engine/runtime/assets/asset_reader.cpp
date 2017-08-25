@@ -27,10 +27,10 @@ namespace asset_reader
 template <>
 bool load_from_file<texture>(core::task_future<asset_handle<texture>>& output, const std::string& key)
 {
-    asset_handle<texture> original;
-    if(output.is_ready())
-        original = output.get();
-    
+	asset_handle<texture> original;
+	if(output.is_ready())
+		original = output.get();
+
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
 	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<texture>();
 
@@ -39,11 +39,11 @@ bool load_from_file<texture>(core::task_future<asset_handle<texture>>& output, c
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-        auto create_resource_func = [ result = original, key]() mutable
-        {
-            result.link->id = key;
-            return result;
-        };
+		auto create_resource_func = [ result = original, key ]() mutable
+		{
+			result.link->id = key;
+			return result;
+		};
 		output = ts.push_or_execute_on_worker_thread(create_resource_func);
 		return true;
 	}
@@ -70,6 +70,7 @@ bool load_from_file<texture>(core::task_future<asset_handle<texture>>& output, c
 
 		const gfx::Memory* mem =
 			gfx::copy(read_memory->data(), static_cast<std::uint32_t>(read_memory->size()));
+
 		read_memory->clear();
 		read_memory.reset();
 
@@ -79,6 +80,7 @@ bool load_from_file<texture>(core::task_future<asset_handle<texture>>& output, c
 			result.link->id = key;
 			result.link->asset = tex;
 		}
+
 		return result;
 	};
 
@@ -90,10 +92,10 @@ bool load_from_file<texture>(core::task_future<asset_handle<texture>>& output, c
 template <>
 bool load_from_file<shader>(core::task_future<asset_handle<shader>>& output, const std::string& key)
 {
-    asset_handle<shader> original;
-    if(output.is_ready())
-        original = output.get();
-    
+	asset_handle<shader> original;
+	if(output.is_ready())
+		original = output.get();
+
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
 	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<shader>();
 
@@ -102,11 +104,11 @@ bool load_from_file<shader>(core::task_future<asset_handle<shader>>& output, con
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-        auto create_resource_func = [ result = original, key]() mutable
-        {
-            result.link->id = key;
-            return result;
-        };
+		auto create_resource_func = [ result = original, key ]() mutable
+		{
+			result.link->id = key;
+			return result;
+		};
 		output = ts.push_or_execute_on_worker_thread(create_resource_func);
 		return true;
 	}
@@ -170,9 +172,9 @@ bool load_from_file<shader>(core::task_future<asset_handle<shader>>& output, con
 template <>
 bool load_from_file<mesh>(core::task_future<asset_handle<mesh>>& output, const std::string& key)
 {
-    asset_handle<mesh> original;
-    if(output.is_ready())
-        original = output.get();
+	asset_handle<mesh> original;
+	if(output.is_ready())
+		original = output.get();
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
 	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<mesh>();
 
@@ -181,11 +183,11 @@ bool load_from_file<mesh>(core::task_future<asset_handle<mesh>>& output, const s
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-        auto create_resource_func = [ result = original, key]() mutable
-        {
-            result.link->id = key;
-            return result;
-        };
+		auto create_resource_func = [ result = original, key ]() mutable
+		{
+			result.link->id = key;
+			return result;
+		};
 		output = ts.push_or_execute_on_worker_thread(create_resource_func);
 		return true;
 	}
@@ -249,9 +251,9 @@ bool load_from_file<mesh>(core::task_future<asset_handle<mesh>>& output, const s
 template <>
 bool load_from_file<material>(core::task_future<asset_handle<material>>& output, const std::string& key)
 {
-    asset_handle<material> original;
-    if(output.is_ready())
-        original = output.get();
+	asset_handle<material> original;
+	if(output.is_ready())
+		original = output.get();
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
 	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<material>();
 
@@ -260,11 +262,11 @@ bool load_from_file<material>(core::task_future<asset_handle<material>>& output,
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-        auto create_resource_func = [ result = original, key]() mutable
-        {
-            result.link->id = key;
-            return result;
-        };
+		auto create_resource_func = [ result = original, key ]() mutable
+		{
+			result.link->id = key;
+			return result;
+		};
 		output = ts.push_or_execute_on_worker_thread(create_resource_func);
 		return true;
 	}
@@ -308,10 +310,10 @@ bool load_from_file<material>(core::task_future<asset_handle<material>>& output,
 template <>
 bool load_from_file<prefab>(core::task_future<asset_handle<prefab>>& output, const std::string& key)
 {
-    asset_handle<prefab> original;
-    if(output.is_ready())
-        original = output.get();
-    
+	asset_handle<prefab> original;
+	if(output.is_ready())
+		original = output.get();
+
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
 	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<prefab>();
 
@@ -320,11 +322,11 @@ bool load_from_file<prefab>(core::task_future<asset_handle<prefab>>& output, con
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-        auto create_resource_func = [ result = original, key]() mutable
-        {
-            result.link->id = key;
-            return result;
-        };
+		auto create_resource_func = [ result = original, key ]() mutable
+		{
+			result.link->id = key;
+			return result;
+		};
 		output = ts.push_or_execute_on_worker_thread(create_resource_func);
 		return true;
 	}
@@ -338,7 +340,7 @@ bool load_from_file<prefab>(core::task_future<asset_handle<prefab>>& output, con
 		auto stream =
 			std::fstream{compiled_absolute_key, std::fstream::in | std::fstream::out | std::ios::binary};
 		auto mem = fs::read_stream(stream);
-		*read_memory = std::istringstream(std::string(mem.data(), mem.size()));
+		*read_memory = std::istringstream(std::string(mem.begin(), mem.end()));
 
 		return true;
 	};
@@ -365,10 +367,10 @@ bool load_from_file<prefab>(core::task_future<asset_handle<prefab>>& output, con
 template <>
 bool load_from_file<scene>(core::task_future<asset_handle<scene>>& output, const std::string& key)
 {
-    asset_handle<scene> original;
-    if(output.is_ready())
-        original = output.get();
-    
+	asset_handle<scene> original;
+	if(output.is_ready())
+		original = output.get();
+
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
 	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<scene>();
 
@@ -377,11 +379,11 @@ bool load_from_file<scene>(core::task_future<asset_handle<scene>>& output, const
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-        auto create_resource_func = [ result = original, key]() mutable
-        {
-            result.link->id = key;
-            return result;
-        };
+		auto create_resource_func = [ result = original, key ]() mutable
+		{
+			result.link->id = key;
+			return result;
+		};
 		output = ts.push_or_execute_on_worker_thread(create_resource_func);
 		return true;
 	}
@@ -395,7 +397,7 @@ bool load_from_file<scene>(core::task_future<asset_handle<scene>>& output, const
 		auto stream =
 			std::fstream{compiled_absolute_key, std::fstream::in | std::fstream::out | std::ios::binary};
 		auto mem = fs::read_stream(stream);
-		*read_memory = std::istringstream(std::string(mem.data(), mem.size()));
+		*read_memory = std::istringstream(std::string(mem.begin(), mem.end()));
 
 		return true;
 	};
@@ -421,15 +423,15 @@ bool load_from_file<scene>(core::task_future<asset_handle<scene>>& output, const
 
 template <>
 bool load_from_memory<shader>(core::task_future<asset_handle<shader>>& output, const std::string& key,
-																 const std::uint8_t* data, std::uint32_t size)
+							  const std::uint8_t* data, std::uint32_t size)
 {
-    asset_handle<shader> original;
-    if(output.is_ready())
-        original = output.get();
-    
-    
-	auto create_resource_func = [&key, data, size, result = original]() mutable {
-        result.link->id = key;
+	asset_handle<shader> original;
+	if(output.is_ready())
+		original = output.get();
+
+	auto create_resource_func = [&key, data, size, result = original ]() mutable
+	{
+		result.link->id = key;
 		// if nothing was read
 		if(!data && size == 0)
 			return result;
