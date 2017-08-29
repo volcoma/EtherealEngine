@@ -26,9 +26,8 @@ std::vector<runtime::entity> gather_scene_data()
 	std::vector<runtime::entity> entities;
 	for(auto root : roots)
 	{
-		auto entity = root.lock()->get_entity();
-		if(entity != editor_camera)
-			entities.push_back(entity);
+		if(root.valid() && root != editor_camera)
+			entities.push_back(root);
 	}
 
 	return entities;

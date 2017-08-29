@@ -1,6 +1,7 @@
 #include "engine.h"
 #include "../assets/asset_manager.h"
 #include "../ecs/ecs.h"
+#include "../ecs/systems/bone_system.h"
 #include "../ecs/systems/camera_system.h"
 #include "../ecs/systems/deferred_rendering.h"
 #include "../ecs/systems/scene_graph.h"
@@ -62,6 +63,7 @@ bool engine::start(std::unique_ptr<render_window> main_window)
 	core::add_subsystem<asset_manager>();
 	core::add_subsystem<entity_component_system>();
 	core::add_subsystem<scene_graph>();
+    core::add_subsystem<bone_system>();    
 	core::add_subsystem<camera_system>();
 	core::add_subsystem<deferred_rendering>();
 

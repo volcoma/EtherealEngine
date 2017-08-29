@@ -633,3 +633,77 @@ void camera::touch()
 	_projection_dirty = true;
 	_frustum_dirty = true;
 }
+
+camera camera::get_face_camera(uint32_t face, const math::transform &transform)
+{
+    camera cam;
+    cam.set_fov(90.0f);
+    cam.set_aspect_ratio(1.0f, true);
+    cam.set_near_clip(0.01f);
+    cam.set_far_clip(256.0f);
+    
+    // Configurable axis vectors used to construct view matrices. In the
+    // case of the omni light, we align all frustums to the world axes.
+    math::vec3 X(1, 0, 0);
+    math::vec3 Y(0, 1, 0);
+    math::vec3 Z(0, 0, 1);
+    math::vec3 Zero(0, 0, 0);
+    math::transform t;
+    // Generate the correct view matrix for the frustum
+    if(!gfx::is_origin_bottom_left())
+    {
+        switch(face)
+        {
+        case 0:
+            t.set_rotation(-Z, +Y, +X);
+            break;
+        case 1:
+            t.set_rotation(+Z, +Y, -X);
+            break;
+        case 2:
+            t.set_rotation(+X, -Z, +Y);
+            break;
+        case 3:
+            t.set_rotation(+X, +Z, -Y);
+            break;
+        case 4:
+            t.set_rotation(+X, +Y, +Z);
+            break;
+        case 5:
+            t.set_rotation(-X, +Y, -Z);
+            break;
+        }
+    }
+    else
+    {
+        switch(face)
+        {
+        case 0:
+            t.set_rotation(-Z, +Y, +X);
+            break;
+        case 1:
+            t.set_rotation(+Z, +Y, -X);
+            break;
+        case 3:
+            t.set_rotation(+X, -Z, +Y);
+            break;
+        case 2:
+            t.set_rotation(+X, +Z, -Y);
+            break;
+        case 4:
+            t.set_rotation(+X, +Y, +Z);
+            break;
+        case 5:
+            t.set_rotation(-X, +Y, -Z);
+            break;
+        }
+    }
+    
+    t = transform * t;
+    // First update so the camera can cache the previous matrices
+    cam.record_current_matrices();
+    // Set new transform
+    cam.look_at(t.get_position(), t.get_position() + t.z_unit_axis(), t.y_unit_axis());
+    
+    return cam;
+}

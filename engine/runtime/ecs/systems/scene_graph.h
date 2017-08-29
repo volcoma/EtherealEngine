@@ -1,10 +1,7 @@
 #pragma once
 
 #include "../ecs.h"
-#include <chrono>
 #include <vector>
-
-class transform_component;
 
 namespace runtime
 {
@@ -31,13 +28,13 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const std::vector<chandle<transform_component>>& get_roots() const
+	const std::vector<entity>& get_roots() const
 	{
 		return _roots;
 	}
 
 private:
 	/// scene roots
-	std::vector<chandle<transform_component>> _roots;
+	std::vector<entity> _roots;
 };
 }

@@ -35,7 +35,6 @@ class component_storage
 {
 public:
 	component_storage(std::size_t size = 100);
-	~component_storage();
 
 	inline std::size_t size() const
 	{
@@ -48,16 +47,8 @@ public:
 	/// Ensure at least n elements will fit in the pool.
 	void expand(std::size_t n);
 	void reserve(std::size_t n);
-	std::shared_ptr<component> get(std::size_t n);
-	const std::shared_ptr<component> get(std::size_t n) const;
+	std::shared_ptr<component> get(std::size_t n) const;
 
-	template <typename T>
-	std::shared_ptr<T> get(std::size_t n)
-	{
-		static_assert(std::is_base_of<component, T>::value, "Invalid component type.");
-
-		return std::static_pointer_cast<T>(get(n));
-	}
 	template <typename T>
 	std::shared_ptr<T> get(std::size_t n) const
 	{
@@ -99,7 +90,8 @@ using chandle = std::weak_ptr<C>;
 class entity
 {
 public:
-	SERIALIZABLE(entity)
+    SERIALIZABLE(entity)
+    
 	struct id_t
 	{
 		id_t()
@@ -228,7 +220,7 @@ public:
 	void remove(std::shared_ptr<component> component);
 
 	template <typename C, typename = typename std::enable_if<!std::is_const<C>::value>::type>
-	chandle<C> get_component();
+	chandle<C> get_component() const;
 
 	template <typename C, typename = typename std::enable_if<std::is_const<C>::value>::type>
 	const chandle<C> get_component() const;
@@ -254,7 +246,7 @@ public:
 	* Destroy and invalidate this entity.
 	*/
 	void destroy();
-
+    entity clone() const;
 	std::bitset<MAX_COMPONENTS> component_mask() const;
 
 private:
@@ -389,10 +381,15 @@ class component_impl : public component
 private:
 	virtual rtti::type_index_sequential_t::index_t runtime_id() const
 	{
-		return rtti::type_index_sequential_t::id<component, T>();
+		return static_id();
 	}
 
 public:
+    static rtti::type_index_sequential_t::index_t static_id()
+    {
+		return rtti::type_index_sequential_t::id<component, T>();
+	}
+ 
 	chandle<T> handle()
 	{
 		return std::static_pointer_cast<T>(shared_from_this());
@@ -689,58 +686,28 @@ public:
 	/**
 	* Number of managed entities.
 	*/
-	size_t size() const
-	{
-		return entity_component_mask_.size() - free_list_.size();
-	}
+	size_t size() const;
 
 	/**
 	* Current entity capacity.
 	*/
-	size_t capacity() const
-	{
-		return entity_component_mask_.size();
-	}
+	size_t capacity() const;
 
 	/**
 	* Return true if the given entity ID is still valid.
 	*/
-	bool valid(entity::id_t id) const
-	{
-		return id.index() < entity_version_.size() && entity_version_[id.index()] == id.version();
-	}
+	bool valid(entity::id_t id) const;
 
 	/**
 	* Return true if the given entity ID is still valid.
 	*/
-	bool valid_index(std::uint32_t index) const
-	{
-		return index < entity_version_.size();
-	}
+	bool valid_index(std::uint32_t index) const;
 	/**
 	* Create a new entity::Id.
 	*
 	* Emits EntityCreatedEvent.
 	*/
-	entity create()
-	{
-		std::uint32_t index, version;
-		if(free_list_.empty())
-		{
-			index = index_counter_++;
-			accomodate_entity(index);
-			version = entity_version_[index] = 1;
-		}
-		else
-		{
-			index = free_list_.back();
-			free_list_.pop_back();
-			version = entity_version_[index];
-		}
-		entity entity(this, entity::id_t(index, version));
-		on_entity_created(entity);
-		return entity;
-	}
+	entity create();
 
 	/**
 	* Create a new entity by copying another. Copy-constructs each component.
@@ -756,11 +723,7 @@ public:
 	*/
 	void destroy(entity::id_t id);
 
-	entity get(entity::id_t id)
-	{
-		assert_valid(id);
-		return entity(this, id);
-	}
+	entity get(entity::id_t id);
 
 	/**
 	* Create an entity::Id for a slot.
@@ -768,10 +731,7 @@ public:
 	* NOTE: Does *not* check for validity, but the entity::Id constructor will
 	* fail if the ID is invalid.
 	*/
-	entity::id_t create_id(std::uint32_t index) const
-	{
-		return entity::id_t(index, entity_version_[index]);
-	}
+	entity::id_t create_id(std::uint32_t index) const;
 
 	/**
 	* Assign a component to an entity::Id, passing through component constructor
@@ -1105,7 +1065,7 @@ inline void entity::remove(std::shared_ptr<component> component)
 }
 
 template <typename C, typename>
-chandle<C> entity::get_component()
+chandle<C> entity::get_component() const
 {
 	expects(valid());
 	return manager_->get_component<C>(id_);

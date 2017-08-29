@@ -227,8 +227,7 @@ public:
 	/// drawing the skinned mesh.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::vector<math::transform> get_skinning_matrices(const math::transform& root_transform,
-													   const std::vector<math::transform>& node_transforms,
+	std::vector<math::transform> get_skinning_matrices(const std::vector<math::transform>& node_transforms,
 													   const skin_bind_data& bind_data,
 													   bool compute_inverse_transpose) const;
 

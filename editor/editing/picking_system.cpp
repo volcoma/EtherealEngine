@@ -95,7 +95,9 @@ void picking_system::frame_render(std::chrono::duration<float>)
 			std::uint32_t bb = (entity_index >> 16) & 0xff;
 			math::vec4 color_id = {rr / 255.0f, gg / 255.0f, bb / 255.0f, 1.0f};
 
-			model.render(pass.id, world_transform, true, true, true, 0, 0, _program.get(),
+			const auto& bone_transforms = model_comp_ref.get_bone_transforms();
+
+			model.render(pass.id, world_transform, bone_transforms, true, true, true, 0, 0, _program.get(),
 						 [&color_id](program& p) { p.set_uniform("u_id", &color_id); });
 		});
 	}

@@ -116,21 +116,8 @@ void model::set_lod_min_distance(float distance)
 	_min_distance = distance;
 }
 
-void process_node(const mesh::armature_node* const node, const skin_bind_data& bind_data,
-				  std::vector<math::transform>& bones)
-{
-	for(auto& child : node->children)
-	{
-		auto bone = bind_data.find_bone_by_id(child->name);
-		if(bone)
-		{
-			bones.push_back(child->world_transform);
-		}
-		process_node(child.get(), bind_data, bones);
-	}
-}
-
-void model::render(std::uint8_t id, const math::transform& mtx, bool apply_cull, bool depth_write,
+void model::render(std::uint8_t id, const math::transform& world_transform,
+				   const std::vector<math::transform>& bone_transforms, bool apply_cull, bool depth_write,
 				   bool depth_test, std::uint64_t extra_states, unsigned int lod, program* user_program,
 				   std::function<void(program&)> setup_params) const
 {
@@ -138,10 +125,10 @@ void model::render(std::uint8_t id, const math::transform& mtx, bool apply_cull,
 	if(!mesh)
 		return;
 
-	auto render_subset = [this, &mesh](
-		std::uint8_t id, bool skinned, std::uint32_t group_id, const float* mtx, std::uint32_t count,
-		bool apply_cull, bool depth_write, bool depth_test, std::uint64_t extra_states, program* user_program,
-		std::function<void(program&)> setup_params) {
+	auto render_subset = [this, &mesh](std::uint8_t id, bool skinned, std::uint32_t group_id,
+									   const float* mtx, std::uint32_t count, bool apply_cull,
+									   bool depth_write, bool depth_test, std::uint64_t extra_states,
+									   program* user_program, std::function<void(program&)> setup_params) {
 
 		bool valid_program = false;
 		program* program = user_program;
@@ -181,7 +168,7 @@ void model::render(std::uint8_t id, const math::transform& mtx, bool apply_cull,
 			gfx::setState(extra_states);
 
 			mesh->bind_render_buffers_for_subset(group_id);
-            
+
 			gfx::submit(id, program->handle);
 		}
 
@@ -190,19 +177,14 @@ void model::render(std::uint8_t id, const math::transform& mtx, bool apply_cull,
 	const auto& skin_data = mesh->get_skin_bind_data();
 
 	// Has skinning data?
-	if(skin_data.has_bones())
+	if(skin_data.has_bones() && bone_transforms.empty() == false)
 	{
-		// Build an array containing all of the bones that are required
-		// by the binding data in the skinned mesh.
-		std::vector<math::transform> node_transforms;
-		process_node(mesh->get_armature(), skin_data, node_transforms);
-
 		// Process each palette in the skin with a matching attribute.
 		const auto& palettes = mesh->get_bone_palettes();
 		for(const auto& palette : palettes)
 		{
 			// Apply the bone palette.
-			auto skinning_matrices = palette.get_skinning_matrices(mtx, node_transforms, skin_data, false);
+			auto skinning_matrices = palette.get_skinning_matrices(bone_transforms, skin_data, false);
 			// auto max_blend_index = palette.get_maximum_blend_index();
 
 			auto data_group = palette.get_data_group();
@@ -216,8 +198,8 @@ void model::render(std::uint8_t id, const math::transform& mtx, bool apply_cull,
 	{
 		for(std::size_t i = 0; i < mesh->get_subset_count(); ++i)
 		{
-			render_subset(id, false, std::uint32_t(i), mtx, 1, apply_cull, depth_write, depth_test,
-						  extra_states, user_program, setup_params);
+			render_subset(id, false, std::uint32_t(i), world_transform, 1, apply_cull, depth_write,
+						  depth_test, extra_states, user_program, setup_params);
 		}
 	}
 }

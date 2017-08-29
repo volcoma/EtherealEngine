@@ -4672,8 +4672,7 @@ bone_palette::~bone_palette()
 }
 
 std::vector<math::transform>
-bone_palette::get_skinning_matrices(const math::transform& root_transform,
-									const std::vector<math::transform>& node_transforms,
+bone_palette::get_skinning_matrices(const std::vector<math::transform>& node_transforms,
 									const skin_bind_data& bind_data, bool compute_inverse_transpose) const
 {
 	// Retrieve the main list of bones from the skin bind data that will
@@ -4693,7 +4692,7 @@ bone_palette::get_skinning_matrices(const math::transform& root_transform,
 		const auto& bone_transform = node_transforms[bone];
 		const auto& bone_data = bind_list[bone];
 		auto& transform = transforms[i];
-		transform = root_transform * bone_transform * bone_data.bind_pose_transform;
+		transform = bone_transform * bone_data.bind_pose_transform;
 		if(compute_inverse_transpose)
 		{
 			transform = math::transpose(math::inverse(transform));

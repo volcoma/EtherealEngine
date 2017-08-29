@@ -109,7 +109,8 @@ struct asset_storage : public base_storage
 	}
 
 	/// key, data, size
-	std::function<bool(core::task_future<asset_handle<T>>&, const std::string&, const std::uint8_t*, std::uint32_t)>
+	std::function<bool(core::task_future<asset_handle<T>>&, const std::string&, const std::uint8_t*,
+					   std::uint32_t)>
 		load_from_memory;
 
 	/// key, mode
@@ -148,14 +149,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void clear()
-	{
-		for(auto& pair : _storages)
-		{
-			auto& storage = pair.second;
-			storage->clear();
-		}
-	}
+	void clear();
 
 	//-----------------------------------------------------------------------------
 	//  Name : clear ()
@@ -165,14 +159,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void clear(const std::string& protocol)
-	{
-		for(auto& pair : _storages)
-		{
-			auto& storage = pair.second;
-			storage->clear(protocol);
-		}
-	}
+	void clear(const std::string& protocol);
 	//-----------------------------------------------------------------------------
 	//  Name : add_storage ()
 	/// <summary>
@@ -193,16 +180,8 @@ public:
 											load_flags flags = load_flags::standard)
 	{
 		auto& storage = get_storage<T>();
-		// if embedded resource
-		if(key.find("embedded") != std::string::npos)
-		{
-			return find_asset_impl<T>(key, storage.container_mutex, storage.container);
-		}
-		else
-		{
-			return load_asset_from_file_impl<T>(key, mode, flags, storage.container_mutex, storage.container,
-												storage.load_from_file);
-		}
+		return load_asset_from_file_impl<T>(key, mode, flags, storage.container_mutex, storage.container,
+											storage.load_from_file);
 	}
 
 	//-----------------------------------------------------------------------------
@@ -335,10 +314,10 @@ private:
 				if(load_func)
 					load_func(future, key);
 			}
-            auto future_copy = future;
-            
-            lock.unlock();
-            
+			auto future_copy = future;
+
+			lock.unlock();
+
 			if(mode == load_mode::sync)
 			{
 				future_copy.wait();
@@ -419,7 +398,7 @@ private:
 		}
 		else
 		{
-            return {};
+			return {};
 		}
 	}
 

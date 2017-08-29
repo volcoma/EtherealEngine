@@ -64,7 +64,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void resolve(bool force = false, float dt = 0.0f);
+	void resolve(bool force = false);
 
 	//-----------------------------------------------------------------------------
 	//  Name : is_dirty (virtual )
@@ -489,8 +489,8 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& set_parent(runtime::chandle<transform_component> parent,
-											bool world_position_stays, bool local_position_stays);
+	virtual transform_component& set_parent(runtime::entity parent, bool world_position_stays,
+											bool local_position_stays);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_parent (virtual )
@@ -500,7 +500,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& set_parent(runtime::chandle<transform_component> parent);
+	virtual transform_component& set_parent(runtime::entity parent);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_parent ()
@@ -510,7 +510,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const runtime::chandle<transform_component>& get_parent() const;
+	const runtime::entity& get_parent() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_children ()
@@ -520,7 +520,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const std::vector<runtime::chandle<transform_component>>& get_children() const;
+	const std::vector<runtime::entity>& get_children() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : attach_child ()
@@ -530,7 +530,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void attach_child(runtime::chandle<transform_component> child);
+	void attach_child(const runtime::entity& child);
 
 	//-----------------------------------------------------------------------------
 	//  Name : remove_child ()
@@ -540,7 +540,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void remove_child(runtime::chandle<transform_component> child);
+	void remove_child(const runtime::entity& child);
 
 	//-----------------------------------------------------------------------------
 	//  Name : cleanup_dead_children ()
@@ -552,72 +552,17 @@ public:
 	//-----------------------------------------------------------------------------
 	void cleanup_dead_children();
 
-	//-----------------------------------------------------------------------------
-	//  Name : get_slow_parenting ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	bool get_slow_parenting() const
-	{
-		return _slow_parenting;
-	}
-
-	//-----------------------------------------------------------------------------
-	//  Name : set_slow_parenting ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void set_slow_parenting(bool val)
-	{
-		_slow_parenting = val;
-	}
-
-	//-----------------------------------------------------------------------------
-	//  Name : get_slow_parenting_speed ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	float get_slow_parenting_speed() const
-	{
-		return _slow_parenting_speed;
-	}
-
-	//-----------------------------------------------------------------------------
-	//  Name : setSlowParentingSpeed ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void set_slow_parenting_speed(float val)
-	{
-		_slow_parenting_speed = val;
-	}
-
 protected:
 	//-------------------------------------------------------------------------
 	// Protected Member Variables
 	//-------------------------------------------------------------------------
 	/// Parent object.
-	runtime::chandle<transform_component> _parent;
+	runtime::entity _parent;
 	/// Children object.
-	std::vector<runtime::chandle<transform_component>> _children;
+	std::vector<runtime::entity> _children;
 	/// Local transformation relative to the parent
 	math::transform _local_transform;
 	/// Cached world transformation at pivot point.
 	math::transform _world_transform;
-	/// Is slow parenting enabled?
-	bool _slow_parenting = false;
-	/// Slow parenting speed.
-	float _slow_parenting_speed = 5.0f;
+
 };

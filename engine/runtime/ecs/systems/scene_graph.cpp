@@ -3,17 +3,20 @@
 #include "../components/transform_component.h"
 namespace runtime
 {
-void update_transform(chandle<transform_component> hTransform, std::chrono::duration<float> dt)
+void update_transform(entity e)
 {
-	auto pTransform = hTransform.lock();
-	if(pTransform)
+	if(e.valid())
 	{
-		pTransform->resolve(true, dt.count());
-
-		auto& children = pTransform->get_children();
-		for(auto& child : children)
+		auto transform_comp = e.get_component<transform_component>().lock();
+		if(transform_comp)
 		{
-			update_transform(child, dt);
+			transform_comp->resolve(true);
+
+			auto& children = transform_comp->get_children();
+			for(auto& child : children)
+			{
+				update_transform(child);
+			}
 		}
 	}
 }
@@ -22,17 +25,27 @@ void scene_graph::frame_update(std::chrono::duration<float> dt)
 {
 	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
 	_roots.clear();
-	ecs.each<transform_component>([this](runtime::entity e, transform_component& transformComponent) {
-		auto parent = transformComponent.get_parent();
-		if(parent.expired())
-		{
-			_roots.push_back(transformComponent.handle());
-		}
-	});
-
-	for(auto& hComponent : _roots)
+	auto all_entities = ecs.all_entities();
+	for(const auto entity : all_entities)
 	{
-		update_transform(hComponent, dt);
+		auto transform_comp = entity.get_component<transform_component>().lock();
+		if(transform_comp)
+		{
+			auto parent = transform_comp->get_parent();
+			if(parent.valid() == false)
+			{
+				_roots.push_back(entity);
+			}
+		}
+		else
+		{
+			_roots.push_back(entity);
+		}
+	}
+
+	for(auto& entity : _roots)
+	{
+		update_transform(entity);
 	}
 }
 
@@ -40,6 +53,8 @@ bool scene_graph::initialize()
 {
 	runtime::on_frame_update.connect(this, &scene_graph::frame_update);
 
+    transform_component::static_id();
+    
 	return true;
 }
 

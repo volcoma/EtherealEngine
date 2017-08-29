@@ -12,10 +12,6 @@ component_storage::component_storage(std::size_t size)
 	expand(size);
 }
 
-component_storage::~component_storage()
-{
-}
-
 void component_storage::expand(std::size_t n)
 {
 	data.resize(n);
@@ -26,13 +22,7 @@ void component_storage::reserve(std::size_t n)
 	data.reserve(n);
 }
 
-std::shared_ptr<component> component_storage::get(std::size_t n)
-{
-	expects(n < size());
-	return data[n];
-}
-
-const std::shared_ptr<component> component_storage::get(std::size_t n) const
+std::shared_ptr<component> component_storage::get(std::size_t n) const
 {
 	expects(n < size());
 	return data[n];
@@ -85,6 +75,12 @@ void entity::destroy()
 	invalidate();
 }
 
+entity entity::clone() const
+{
+	expects(valid());
+    return manager_->create_from_copy(*this);
+}
+
 std::bitset<MAX_COMPONENTS> entity::component_mask() const
 {
 	return manager_->component_mask(id_);
@@ -99,26 +95,66 @@ entity_component_system::~entity_component_system()
 	dispose();
 }
 
+size_t entity_component_system::size() const
+{
+    return entity_component_mask_.size() - free_list_.size();
+}
+
+size_t entity_component_system::capacity() const
+{
+    return entity_component_mask_.size();
+}
+
+bool entity_component_system::valid(entity::id_t id) const
+{
+    return id.index() < entity_version_.size() && entity_version_[id.index()] == id.version();
+}
+
+bool entity_component_system::valid_index(uint32_t index) const
+{
+    return index < entity_version_.size();
+}
+
+entity entity_component_system::create()
+{
+    std::uint32_t index, version;
+    if(free_list_.empty())
+    {
+        index = index_counter_++;
+        accomodate_entity(index);
+        version = entity_version_[index] = 1;
+    }
+    else
+    {
+        index = free_list_.back();
+        free_list_.pop_back();
+        version = entity_version_[index];
+    }
+    entity entity(this, entity::id_t(index, version));
+    on_entity_created(entity);
+    return entity;
+}
+
 void entity_component_system::set_entity_name(entity::id_t id, std::string name)
 {
-	entity_names_[id.id()] = name;
+    entity_names_[id.id()] = name;
 }
 
 const std::string& entity_component_system::get_entity_name(entity::id_t id)
 {
-	return entity_names_[id.id()];
+    return entity_names_[id.id()];
 }
 
 void entity_component_system::dispose()
 {
-	for(entity entity : all_entities())
-	{
-		entity.destroy();
-	}
-
-	component_pools_.clear();
-	entity_component_mask_.clear();
-	entity_version_.clear();
+    for(entity entity : all_entities())
+    {
+        entity.destroy();
+    }
+    
+    component_pools_.clear();
+    entity_component_mask_.clear();
+    entity_version_.clear();
 	free_list_.clear();
 	index_counter_ = 0;
 }
@@ -240,11 +276,22 @@ void entity_component_system::destroy(entity::id_t id)
 	free_list_.push_back(index);
 }
 
+entity entity_component_system::get(entity::id_t id)
+{
+    assert_valid(id);
+    return entity(this, id);
+}
+
+entity::id_t entity_component_system::create_id(uint32_t index) const
+{
+    return entity::id_t(index, entity_version_[index]);
+}
+
 entity entity_component_system::create_from_copy(entity original)
 {
-	expects(original.valid());
-	auto clone = create();
-	auto mask = original.component_mask();
+    expects(original.valid());
+    auto clone = create();
+    auto mask = original.component_mask();
 	for(size_t i = 0; i < component_pools_.size(); ++i)
 	{
 		if(mask.test(i))
@@ -261,7 +308,4 @@ entity entity_component_system::create_from_copy(entity original)
 component::~component()
 {
 }
-
-// 	EntityCreatedEvent::~EntityCreatedEvent() {}
-// 	EntityDestroyedEvent::~EntityDestroyedEvent() }
 }

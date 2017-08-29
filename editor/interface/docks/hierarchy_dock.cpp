@@ -23,8 +23,7 @@ void check_context_menu(runtime::entity entity)
 			if(gui::Selectable("CREATE CHILD"))
 			{
 				auto object = ecs.create();
-				object.assign<transform_component>().lock()->set_parent(
-					entity.get_component<transform_component>());
+				object.assign<transform_component>().lock()->set_parent(entity);
 			}
 			if(gui::Selectable("CLONE"))
 			{
@@ -88,8 +87,7 @@ void check_drag(runtime::entity entity)
 						gui::SetMouseCursor(ImGuiMouseCursor_Move);
 						if(gui::IsMouseReleased(gui::drag_button))
 						{
-							dragged_entity.get_component<transform_component>().lock()->set_parent(
-								entity.get_component<transform_component>());
+							dragged_entity.get_component<transform_component>().lock()->set_parent(entity);
 
 							es.drop();
 						}
@@ -103,8 +101,7 @@ void check_drag(runtime::entity entity)
 					{
 						auto pfab = dragged.get_value<asset_handle<prefab>>();
 						auto object = pfab->instantiate();
-						object.get_component<transform_component>().lock()->set_parent(
-							entity.get_component<transform_component>());
+						object.get_component<transform_component>().lock()->set_parent(entity);
 
 						es.drop();
 						es.select(object);
@@ -121,8 +118,7 @@ void check_drag(runtime::entity entity)
 
 						auto object = ecs.create();
 						// Add component and configure it.
-						object.assign<transform_component>().lock()->set_parent(
-							entity.get_component<transform_component>());
+						object.assign<transform_component>().lock()->set_parent(entity);
 						// Add component and configure it.
 						object.assign<model_component>()
 							.lock()
@@ -145,8 +141,8 @@ void draw_entity(runtime::entity entity)
 		return;
 
 	gui::PushID(static_cast<int>(entity.id().index()));
-    gui::PushID(static_cast<int>(entity.id().version()));
-    
+	gui::PushID(static_cast<int>(entity.id().version()));
+
 	gui::AlignFirstTextHeightToWidgets();
 	auto& es = core::get_subsystem<editor::editing_system>();
 	auto& input = core::get_subsystem<runtime::input>();
@@ -191,7 +187,6 @@ void draw_entity(runtime::entity entity)
 		std::memcpy(&inputBuff[0], name.c_str(), name.size() < 64 ? name.size() : 64);
 
 		gui::SetCursorScreenPos(pos);
-		gui::PushID(transformComponent.get());
 		gui::PushItemWidth(gui::GetContentRegionAvailWidth());
 		if(gui::InputText("", &inputBuff[0], inputBuff.size(), ImGuiInputTextFlags_EnterReturnsTrue))
 		{
@@ -204,7 +199,6 @@ void draw_entity(runtime::entity entity)
 		{
 			edit_label = false;
 		}
-		gui::PopID();
 	}
 
 	ImGuiWindow* window = gui::GetCurrentWindow();
@@ -241,18 +235,18 @@ void draw_entity(runtime::entity entity)
 	{
 		if(!no_children)
 		{
-			auto children = entity.get_component<transform_component>().lock()->get_children();
+			const auto& children = entity.get_component<transform_component>().lock()->get_children();
 			for(auto& child : children)
 			{
-				if(!child.expired())
-					draw_entity(child.lock()->get_entity());
+				if(child.valid())
+					draw_entity(child);
 			}
 		}
 
 		gui::TreePop();
 	}
 
-    gui::PopID();
+	gui::PopID();
 	gui::PopID();
 }
 
@@ -306,11 +300,10 @@ void hierarchy_dock::render(const ImVec2&)
 
 	for(auto& root : roots)
 	{
-		if(!root.expired())
+		if(root.valid())
 		{
-			auto entity = root.lock()->get_entity();
-			draw_entity(entity);
-			if(entity == editor_camera)
+			draw_entity(root);
+			if(root == editor_camera)
 				gui::Separator();
 		}
 	}
@@ -328,8 +321,7 @@ void hierarchy_dock::render(const ImVec2&)
 					auto dragged_entity = dragged.get_value<runtime::entity>();
 					if(dragged_entity)
 					{
-						dragged_entity.get_component<transform_component>().lock()->set_parent(
-							runtime::chandle<transform_component>());
+                        dragged_entity.get_component<transform_component>().lock()->set_parent({});
 					}
 
 					es.drop();

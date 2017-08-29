@@ -17,79 +17,7 @@
 
 namespace runtime
 {
-camera get_face_camera(std::uint32_t face, const math::transform& transform)
-{
-	camera cam;
-	cam.set_fov(90.0f);
-	cam.set_aspect_ratio(1.0f, true);
-	cam.set_near_clip(0.01f);
-	cam.set_far_clip(256.0f);
 
-	// Configurable axis vectors used to construct view matrices. In the
-	// case of the omni light, we align all frustums to the world axes.
-	math::vec3 X(1, 0, 0);
-	math::vec3 Y(0, 1, 0);
-	math::vec3 Z(0, 0, 1);
-	math::vec3 Zero(0, 0, 0);
-	math::transform t;
-	// Generate the correct view matrix for the frustum
-	if(!gfx::is_origin_bottom_left())
-	{
-		switch(face)
-		{
-			case 0:
-				t.set_rotation(-Z, +Y, +X);
-				break;
-			case 1:
-				t.set_rotation(+Z, +Y, -X);
-				break;
-			case 2:
-				t.set_rotation(+X, -Z, +Y);
-				break;
-			case 3:
-				t.set_rotation(+X, +Z, -Y);
-				break;
-			case 4:
-				t.set_rotation(+X, +Y, +Z);
-				break;
-			case 5:
-				t.set_rotation(-X, +Y, -Z);
-				break;
-		}
-	}
-	else
-	{
-		switch(face)
-		{
-			case 0:
-				t.set_rotation(-Z, +Y, +X);
-				break;
-			case 1:
-				t.set_rotation(+Z, +Y, -X);
-				break;
-			case 3:
-				t.set_rotation(+X, -Z, +Y);
-				break;
-			case 2:
-				t.set_rotation(+X, +Z, -Y);
-				break;
-			case 4:
-				t.set_rotation(+X, +Y, +Z);
-				break;
-			case 5:
-				t.set_rotation(-X, +Y, -Z);
-				break;
-		}
-	}
-
-	t = transform * t;
-	// First update so the camera can cache the previous matrices
-	cam.record_current_matrices();
-	// Set new transform
-	cam.look_at(t.get_position(), t.get_position() + t.z_unit_axis(), t.y_unit_axis());
-
-	return cam;
-}
 
 void update_lod_data(lod_data& data, std::size_t total_lods, float min_dist, float max_dist,
 					 float transition_time, float distance, float dt)
@@ -147,7 +75,7 @@ bool should_rebuild_reflections(visibility_set_models_t& visibility_set, const r
 
 		for(std::uint32_t i = 0; i < 6; ++i)
 		{
-			const auto& frustum = get_face_camera(i, world_transform).get_frustum();
+			const auto& frustum = camera::get_face_camera(i, world_transform).get_frustum();
 			result |= math::frustum::test_obb(frustum, bounds, world_transform);
 		}
 
@@ -187,7 +115,7 @@ bool should_rebuild_shadows(visibility_set_models_t& visibility_set, const light
 
 		//for(std::uint32_t i = 0; i < 6; ++i)
 		//{
-		//	const auto& frustum = get_face_camera(i, world_transform).get_frustum();
+		//	const auto& frustum = camera::get_face_camera(i, world_transform).get_frustum();
 		//	result |= math::frustum::test_obb(frustum, bounds, world_transform);
 		//}
 
@@ -305,7 +233,7 @@ void deferred_rendering::build_reflections_pass(entity_component_system& ecs, st
 		// iterate trough each cube face
 		for(std::uint32_t i = 0; i < 6; ++i)
 		{
-			auto camera = get_face_camera(i, world_tranform);
+			auto camera = camera::get_face_camera(i, world_tranform);
 			auto& render_view = reflection_probe_comp.get_render_view(i);
 			camera.set_viewport_size(cubemap_fbo->get_size());
 			auto& camera_lods = _lod_data[ce];
@@ -465,7 +393,9 @@ deferred_rendering::g_buffer_pass(std::shared_ptr<frame_buffer> input, camera& c
 
 		const auto params_inv = math::vec3{1.0f, 1.0f, current_time / transition_time};
 
-		model.render(pass.id, world_transform, true, true, true, 0, current_lod_index, nullptr,
+        const auto& bone_transforms = model_comp_ref.get_bone_transforms();
+
+        model.render(pass.id, world_transform, bone_transforms, true, true, true, 0, current_lod_index, nullptr,
 					 [&camera, &clip_planes, &params](program& p) {
 						 auto camera_pos = camera.get_position();
 						 p.set_uniform("u_camera_wpos", &camera_pos);
@@ -475,7 +405,7 @@ deferred_rendering::g_buffer_pass(std::shared_ptr<frame_buffer> input, camera& c
 
 		if(current_time != 0.0f)
 		{
-			model.render(pass.id, world_transform, true, true, true, 0, target_lod_index, nullptr,
+			model.render(pass.id, world_transform, bone_transforms, true, true, true, 0, target_lod_index, nullptr,
 						 [&camera, &clip_planes, &params_inv](program& p) {
 							 p.set_uniform("u_lod_params", &params_inv);
 						 });

@@ -37,5 +37,6 @@ LOAD(model_component)
 	try_load(ar, cereal::make_nvp("casts_shadow", obj._casts_shadow));
 	try_load(ar, cereal::make_nvp("casts_reflection", obj._casts_reflection));
 	try_load(ar, cereal::make_nvp("model", obj._model));
+    
 }
 LOAD_INSTANTIATE(model_component, cereal::iarchive_associative_t);

@@ -57,20 +57,19 @@ struct type_index_sequential_t
 	static index_t id()
 	{
 		static_assert(std::is_base_of<Base, Derived>::value, "D should be derived from B.");
-		static index_t sid = counter<Base>::value++;
+		static index_t sid = get_counter<Base>()++;
 		return sid;
 	}
 
 protected:
 	template <typename Base>
-	struct counter
+	static index_t& get_counter()
 	{
-		static index_t value;
-	};
+		static index_t value = 0;
+        return value;
+	}
 };
 
-template <typename B>
-type_index_sequential_t::index_t type_index_sequential_t::counter<B>::value = 0;
 }
 
 ///////////////////////////////////////////////////////

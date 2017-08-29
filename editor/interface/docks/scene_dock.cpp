@@ -407,8 +407,7 @@ void scene_dock::render(const ImVec2&)
 					auto dragged_entity = dragged.get_value<runtime::entity>();
 					if(dragged_entity)
 					{
-						dragged_entity.get_component<transform_component>().lock()->set_parent(
-							runtime::chandle<transform_component>());
+                        dragged_entity.get_component<transform_component>().lock()->set_parent({});
 					}
 
 					es.drop();
