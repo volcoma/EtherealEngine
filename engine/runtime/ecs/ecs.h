@@ -219,19 +219,14 @@ public:
 
 	void remove(std::shared_ptr<component> component);
 
-	template <typename C, typename = typename std::enable_if<!std::is_const<C>::value>::type>
+	template <typename C>
 	chandle<C> get_component() const;
 
-	template <typename C, typename = typename std::enable_if<std::is_const<C>::value>::type>
-	const chandle<C> get_component() const;
-
 	template <typename... Components>
-	std::tuple<chandle<Components>...> components();
+	std::tuple<chandle<Components>...> components() const;
 
-	template <typename... Components>
-	std::tuple<chandle<const Components>...> components() const;
-
-	std::vector<chandle<component>> all_components() const;
+    std::vector<chandle<component>> all_components() const;
+    
 	std::vector<std::shared_ptr<component>> all_components_shared() const;
 
 	template <typename C>
@@ -781,29 +776,8 @@ public:
 	* @returns Pointer to an instance of C, or nullptr if the entity::Id does not
 	* have that component.
 	*/
-	template <typename C, typename = typename std::enable_if<!std::is_const<C>::value>::type>
+	template <typename C>
 	chandle<C> get_component(entity::id_t id)
-	{
-		assert_valid(id);
-		auto family = rtti::type_index_sequential_t::id<component, C>();
-		// We don't bother checking the component mask, as we return a nullptr
-		// anyway.
-		if(family >= component_pools_.size())
-			return chandle<C>();
-		auto& pool = component_pools_[family];
-		if(!pool || !entity_component_mask_[id.index()][family])
-			return chandle<C>();
-		return chandle<C>(pool->template get<C>(id.index()));
-	}
-
-	/**
-	* Retrieve a component assigned to an entity::Id.
-	*
-	* @returns component instance, or nullptr if the entity::Id does not have that
-	* component.
-	*/
-	template <typename C, typename = typename std::enable_if<std::is_const<C>::value>::type>
-	const chandle<C> get_component(entity::id_t id) const
 	{
 		assert_valid(id);
 		auto family = rtti::type_index_sequential_t::id<component, C>();
@@ -821,12 +795,6 @@ public:
 	std::tuple<chandle<Components>...> components(entity::id_t id)
 	{
 		return std::make_tuple(get_component<Components>(id)...);
-	}
-
-	template <typename... Components>
-	std::tuple<chandle<const Components>...> components(entity::id_t id) const
-	{
-		return std::make_tuple(get_component<const Components>(id)...);
 	}
 
 	std::vector<chandle<component>> all_components(entity::id_t id) const;
@@ -1064,22 +1032,15 @@ inline void entity::remove(std::shared_ptr<component> component)
 	manager_->remove(id_, component);
 }
 
-template <typename C, typename>
+template <typename C>
 chandle<C> entity::get_component() const
 {
 	expects(valid());
 	return manager_->get_component<C>(id_);
 }
 
-template <typename C, typename>
-const chandle<C> entity::get_component() const
-{
-	expects(valid());
-	return const_cast<const entity_component_system*>(manager_)->get_component<const C>(id_);
-}
-
 template <typename... Components>
-std::tuple<chandle<Components>...> entity::components()
+std::tuple<chandle<Components>...> entity::components() const
 {
 	expects(valid());
 	return manager_->components<Components...>(id_);
@@ -1095,13 +1056,6 @@ inline std::vector<std::shared_ptr<component>> entity::all_components_shared() c
 {
 	expects(valid());
 	return manager_->all_components_shared(id_);
-}
-
-template <typename... Components>
-std::tuple<chandle<const Components>...> entity::components() const
-{
-	expects(valid());
-	return const_cast<const entity_component_system*>(manager_)->components<const Components...>(id_);
 }
 
 template <typename C>
