@@ -182,23 +182,29 @@ void draw_entity(runtime::entity entity)
 
 	if(edit_label && is_selected)
 	{
-		static std::string inputBuff(64, 0);
-		std::memset(&inputBuff[0], 0, 64);
-		std::memcpy(&inputBuff[0], name.c_str(), name.size() < 64 ? name.size() : 64);
+		static std::array<char, 64> input_buff;
+        input_buff.fill(0);
+		std::memcpy(input_buff.data(), name.c_str(), name.size() < input_buff.size() ? name.size() : input_buff.size());
 
 		gui::SetCursorScreenPos(pos);
 		gui::PushItemWidth(gui::GetContentRegionAvailWidth());
-		if(gui::InputText("", &inputBuff[0], inputBuff.size(), ImGuiInputTextFlags_EnterReturnsTrue))
+        
+        gui::PushID(static_cast<int>(entity.id().index()));
+        gui::PushID(static_cast<int>(entity.id().version()));
+		if(gui::InputText("", input_buff.data(), input_buff.size(), ImGuiInputTextFlags_EnterReturnsTrue))
 		{
-			entity.set_name(inputBuff.c_str());
+			entity.set_name(input_buff.data());
 			edit_label = false;
 		}
+        
 		gui::PopItemWidth();
 
 		if(!gui::IsItemActive() && (gui::IsMouseClicked(0) || gui::IsMouseDragging()))
 		{
 			edit_label = false;
 		}
+        gui::PopID();
+        gui::PopID();
 	}
 
 	ImGuiWindow* window = gui::GetCurrentWindow();

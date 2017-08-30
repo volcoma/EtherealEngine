@@ -541,11 +541,11 @@ transform_component& transform_component::set_parent(runtime::entity parent, boo
 
 	// Before we do anything, make sure that all pending math::transform
 	// operations are resolved (including those applied to our parent).
-	math::transform cachedWorldTranform;
+	math::transform cached_world_transform;
 	if(world_position_stays)
 	{
 		resolve(true);
-		cachedWorldTranform = get_transform();
+		cached_world_transform = get_transform();
 	}
 	if(_parent.valid())
 	{
@@ -570,7 +570,7 @@ transform_component& transform_component::set_parent(runtime::entity parent, boo
 	if(world_position_stays)
 	{
 		resolve(true);
-		set_transform(cachedWorldTranform);
+		set_transform(cached_world_transform);
 	}
 	else
 	{
