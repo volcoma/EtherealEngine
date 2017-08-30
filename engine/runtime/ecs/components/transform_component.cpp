@@ -522,22 +522,30 @@ transform_component& transform_component::set_parent(runtime::entity parent)
 	return *this;
 }
 
+bool check_parent(const runtime::entity& e, const runtime::entity& parent)
+{
+	if(e == parent)
+		return false;
+
+    auto e_transform = e.get_component<transform_component>().lock();
+	if(e_transform)
+	{    
+        for(const auto& child : e_transform->get_children())
+        {
+            if(false == check_parent(child, parent))
+                return false;
+        }
+	}
+
+	return true;
+}
+
 transform_component& transform_component::set_parent(runtime::entity parent, bool world_position_stays,
 													 bool local_position_stays)
 {
 	// Skip if this is a no-op.
-	if(_parent == parent || get_entity() == parent)
+	if(check_parent(get_entity(), parent) == false)
 		return *this;
-
-    if(parent.valid())
-    {
-        auto parent_transform = parent.get_component<transform_component>().lock();
-        if(parent_transform)
-        {
-            if(parent_transform->_parent == get_entity())
-                return *this;
-        }
-    }
 
 	// Before we do anything, make sure that all pending math::transform
 	// operations are resolved (including those applied to our parent).
@@ -656,15 +664,15 @@ void transform_component::resolve(bool force)
 			{
 				_world_transform = parent_transform->get_transform() * _local_transform;
 			}
-            else
-            {
-                _world_transform = _local_transform;
-            }
+			else
+			{
+				_world_transform = _local_transform;
+			}
 		}
-        else
-        {
-            _world_transform = _local_transform;
-        }
+		else
+		{
+			_world_transform = _local_transform;
+		}
 	}
 }
 
@@ -673,11 +681,11 @@ bool transform_component::is_dirty() const
 	bool dirty = component::is_dirty();
 	if(!dirty && _parent.valid())
 	{
-        auto parent_transform = _parent.get_component<transform_component>().lock();
-        if(parent_transform)
-        {     
-            dirty |= parent_transform->is_dirty();
-        }
+		auto parent_transform = _parent.get_component<transform_component>().lock();
+		if(parent_transform)
+		{
+			dirty |= parent_transform->is_dirty();
+		}
 	}
 
 	return dirty;
