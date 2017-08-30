@@ -527,14 +527,17 @@ bool check_parent(const runtime::entity& e, const runtime::entity& parent)
 	if(e == parent)
 		return false;
 
-    auto e_transform = e.get_component<transform_component>().lock();
-	if(e_transform)
-	{    
-        for(const auto& child : e_transform->get_children())
-        {
-            if(false == check_parent(child, parent))
-                return false;
-        }
+	if(e.valid())
+	{
+		auto e_transform = e.get_component<transform_component>().lock();
+		if(e_transform)
+		{
+			for(const auto& child : e_transform->get_children())
+			{
+				if(false == check_parent(child, parent))
+					return false;
+			}
+		}
 	}
 
 	return true;
