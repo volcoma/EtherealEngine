@@ -526,6 +526,9 @@ bool check_parent(const runtime::entity& e, const runtime::entity& parent)
 {
 	if(e == parent)
 		return false;
+    
+    if(parent.valid() && (parent.has_component<transform_component>() == false))
+        return false;
 
 	if(e.valid())
 	{
@@ -613,7 +616,7 @@ void transform_component::remove_child(const runtime::entity& child)
 void transform_component::cleanup_dead_children()
 {
 	_children.erase(std::remove_if(std::begin(_children), std::end(_children),
-								   [](const auto& other) { return other.valid() == true; }),
+								   [](const auto& other) { return other.valid() == false; }),
 					std::end(_children));
 }
 

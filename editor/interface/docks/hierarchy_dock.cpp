@@ -28,8 +28,13 @@ void check_context_menu(runtime::entity entity)
 			if(gui::Selectable("CLONE"))
 			{
 				auto object = ecs.create_from_copy(entity);
-				object.get_component<transform_component>().lock()->set_parent(
-					entity.get_component<transform_component>().lock()->get_parent(), false, true);
+
+				auto obj_trans_comp = object.get_component<transform_component>().lock();
+				auto ent_trans_comp = entity.get_component<transform_component>().lock();
+				if(obj_trans_comp && ent_trans_comp)
+				{
+					obj_trans_comp->set_parent(ent_trans_comp->get_parent(), false, true);
+				}
 
 				es.select(object);
 			}
@@ -87,8 +92,11 @@ void check_drag(runtime::entity entity)
 						gui::SetMouseCursor(ImGuiMouseCursor_Move);
 						if(gui::IsMouseReleased(gui::drag_button))
 						{
-							dragged_entity.get_component<transform_component>().lock()->set_parent(entity);
-
+							auto trans_comp = dragged_entity.get_component<transform_component>().lock();
+							if(trans_comp)
+							{
+								trans_comp->set_parent(entity);
+							}
 							es.drop();
 						}
 					}
@@ -101,8 +109,11 @@ void check_drag(runtime::entity entity)
 					{
 						auto pfab = dragged.get_value<asset_handle<prefab>>();
 						auto object = pfab->instantiate();
-						object.get_component<transform_component>().lock()->set_parent(entity);
-
+						auto trans_comp = object.get_component<transform_component>().lock();
+						if(trans_comp)
+						{
+							trans_comp->set_parent(entity);
+						}
 						es.drop();
 						es.select(object);
 					}
@@ -183,28 +194,30 @@ void draw_entity(runtime::entity entity)
 	if(edit_label && is_selected)
 	{
 		static std::array<char, 64> input_buff;
-        input_buff.fill(0);
-		std::memcpy(input_buff.data(), name.c_str(), name.size() < input_buff.size() ? name.size() : input_buff.size());
+		input_buff.fill(0);
+		std::memcpy(input_buff.data(), name.c_str(),
+					name.size() < input_buff.size() ? name.size() : input_buff.size());
 
 		gui::SetCursorScreenPos(pos);
 		gui::PushItemWidth(gui::GetContentRegionAvailWidth());
-        
-        gui::PushID(static_cast<int>(entity.id().index()));
-        gui::PushID(static_cast<int>(entity.id().version()));
-		if(gui::InputText("", input_buff.data(), input_buff.size(), ImGuiInputTextFlags_EnterReturnsTrue))
+
+		gui::PushID(static_cast<int>(entity.id().index()));
+		gui::PushID(static_cast<int>(entity.id().version()));
+		if(gui::InputText("", input_buff.data(), input_buff.size(),
+						  ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
 		{
 			entity.set_name(input_buff.data());
 			edit_label = false;
 		}
-        
+
 		gui::PopItemWidth();
 
 		if(!gui::IsItemActive() && (gui::IsMouseClicked(0) || gui::IsMouseDragging()))
 		{
 			edit_label = false;
 		}
-        gui::PopID();
-        gui::PopID();
+		gui::PopID();
+		gui::PopID();
 	}
 
 	ImGuiWindow* window = gui::GetCurrentWindow();
@@ -295,8 +308,12 @@ void hierarchy_dock::render(const ImVec2&)
 					if(sel && sel != editor_camera)
 					{
 						auto clone = ecs.create_from_copy(sel);
-						clone.get_component<transform_component>().lock()->set_parent(
-							sel.get_component<transform_component>().lock()->get_parent(), false, true);
+						auto clone_trans_comp = clone.get_component<transform_component>().lock();
+						auto sel_trans_comp = sel.get_component<transform_component>().lock();
+						if(clone_trans_comp && sel_trans_comp)
+						{
+							clone_trans_comp->set_parent(sel_trans_comp->get_parent(), false, true);
+						}
 						es.select(clone);
 					}
 				}
@@ -327,7 +344,11 @@ void hierarchy_dock::render(const ImVec2&)
 					auto dragged_entity = dragged.get_value<runtime::entity>();
 					if(dragged_entity)
 					{
-                        dragged_entity.get_component<transform_component>().lock()->set_parent({});
+						auto dragged_trans_comp = dragged_entity.get_component<transform_component>().lock();
+						if(dragged_trans_comp)
+						{
+							dragged_trans_comp->set_parent({});
+						}
 					}
 
 					es.drop();

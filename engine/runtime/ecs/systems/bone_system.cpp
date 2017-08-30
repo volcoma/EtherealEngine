@@ -35,7 +35,7 @@ void bone_system::frame_update(std::chrono::duration<float> dt)
 {
 	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
 	ecs.each<model_component>(
-		[&ecs](runtime::entity e, model_component& model_comp) {
+		[this, &ecs](runtime::entity e, model_component& model_comp) {
 
 			const auto& model = model_comp.get_model();
 			auto mesh = model.get_lod(0);
@@ -49,10 +49,11 @@ void bone_system::frame_update(std::chrono::duration<float> dt)
 			// Has skinning data?
 //			if(skin_data.has_bones())
 //			{
-//				const auto& bone_transforms = model_comp.get_bone_transforms();
-//				if(bone_transforms.size() <= 1)
-//				{
-//					const auto& armature = mesh->get_armature();
+//                const auto& bone_transforms = model_comp.get_bone_transforms();
+//                auto it = _bones.find(e);
+//                if(it == _bones.end() && bone_transforms.size() <= 1)
+//                {
+//                    const auto& armature = mesh->get_armature();
 //					if(armature->children.empty())
 //						return;
 
@@ -60,34 +61,36 @@ void bone_system::frame_update(std::chrono::duration<float> dt)
 //					process_node(mesh->get_armature()->children[0].get(), skin_data, e, be, ecs);
 //					// model_comp.set_bone_entities(be);
 //					model_comp.set_static(false);
+//                    _bones[e] = be;
+					
+//                }
+//				const auto& be = _bones[e];
+//                std::vector<math::transform> result;
+//                if(!be.empty())
+//                {
+//                    result.reserve(be.size());
+//                    for(const auto& e : be)
+//                    {
+//                        if(e.valid())
+//                        {
+//                            const auto bone_transform = e.get_component<transform_component>();
+//                            if(!bone_transform.expired())
+//                            {
+//                                result.emplace_back(bone_transform.lock()->get_transform());
+//                            }
+//                            else
+//                            {
+//                                result.emplace_back();
+//                            }
+//                        }
+//                        else
+//                        {
+//                            result.emplace_back();
+//                        }
+//                    }
+//                }
 
-//					std::vector<math::transform> result;
-//					if(!be.empty())
-//					{
-//						result.reserve(be.size());
-//						for(const auto& e : be)
-//						{
-//							if(e.valid())
-//							{
-//								const auto bone_transform = e.get_component<transform_component>();
-//								if(!bone_transform.expired())
-//								{
-//									result.emplace_back(bone_transform.lock()->get_transform());
-//								}
-//								else
-//								{
-//									result.emplace_back();
-//								}
-//							}
-//							else
-//							{
-//								result.emplace_back();
-//							}
-//						}
-//					}
-
-//					model_comp.set_bone_transforms(result);
-//				}
+//                model_comp.set_bone_transforms(result);
 //			}
 
 		});

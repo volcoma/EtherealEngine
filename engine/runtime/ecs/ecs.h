@@ -1087,13 +1087,13 @@ inline bool entity::valid() const
 
 inline std::ostream& operator<<(std::ostream& out, const entity::id_t& id)
 {
-	out << "id_" << id.index() << "_" << id.version() << "";
+	out << id.index();
 	return out;
 }
 
 inline std::ostream& operator<<(std::ostream& out, const entity& entity)
 {
-	out << "entity(" << entity.id() << ")";
+	out << "entity (" << entity.id() << ")";
 	return out;
 }
 

@@ -19,5 +19,7 @@ public:
 	//-----------------------------------------------------------------------------
 	void frame_update(std::chrono::duration<float> dt);
 
+private:
+    std::map<runtime::entity, std::vector<runtime::entity>> _bones;
 };
 }
