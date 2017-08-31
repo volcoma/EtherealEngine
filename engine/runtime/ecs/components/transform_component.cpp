@@ -56,7 +56,10 @@ transform_component::~transform_component()
 	}
 	for(auto& child : _children)
 	{
-		child.destroy();
+        if(child.valid())
+        {
+            child.destroy();        
+        }
 	}
 }
 
