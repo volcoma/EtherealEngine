@@ -51,7 +51,7 @@ transform_component::~transform_component()
 		auto parent_transform = _parent.get_component<transform_component>().lock();
 		if(parent_transform)
 		{
-			parent_transform->cleanup_dead_children();
+			parent_transform->remove_child(get_entity());
 		}
 	}
 	for(auto& child : _children)
