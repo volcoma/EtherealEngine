@@ -152,7 +152,7 @@ math::vec3 transform_component::get_scale()
 
 const math::transform& transform_component::get_transform()
 {
-	resolve();
+    // the transform should be resolved
 	return _world_transform;
 }
 
