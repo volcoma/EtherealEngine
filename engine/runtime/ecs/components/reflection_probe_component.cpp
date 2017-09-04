@@ -1,18 +1,5 @@
 #include "reflection_probe_component.h"
 
-reflection_probe_component::reflection_probe_component()
-{
-}
-
-reflection_probe_component::reflection_probe_component(const reflection_probe_component& lightComponent)
-{
-	_probe = lightComponent._probe;
-}
-
-reflection_probe_component::~reflection_probe_component()
-{
-}
-
 int reflection_probe_component::compute_projected_sphere_rect(irect& rect, const math::vec3& position,
 															  const math::transform& view,
 															  const math::transform& proj)

@@ -8,4 +8,5 @@ SAVE_EXTERN(reflection_probe_component);
 LOAD_EXTERN(reflection_probe_component);
 
 #include "core/serialization/associative_archive.h"
+#include "core/serialization/binary_archive.h"
 CEREAL_REGISTER_TYPE(reflection_probe_component)

@@ -9,4 +9,5 @@ SAVE_EXTERN(standard_material);
 LOAD_EXTERN(standard_material);
 
 #include "core/serialization/associative_archive.h"
+#include "core/serialization/binary_archive.h"
 CEREAL_REGISTER_TYPE(standard_material)

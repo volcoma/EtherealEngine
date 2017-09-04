@@ -9,4 +9,5 @@ SAVE_EXTERN(transform_component);
 LOAD_EXTERN(transform_component);
 
 #include "core/serialization/associative_archive.h"
+#include "core/serialization/binary_archive.h"
 CEREAL_REGISTER_TYPE(transform_component)

@@ -55,14 +55,14 @@ void editing_system::save_editor_camera()
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	if(es.camera)
-		ecs::utils::save_data(fs::resolve_protocol("app:/settings/editor_camera.cfg"), {es.camera});
+		ecs::utils::save_entity_to_file(fs::resolve_protocol("app:/settings/editor_camera.cfg"), es.camera);
 }
 
 void editing_system::load_editor_camera()
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	runtime::entity object;
-	ecs::utils::try_load_entity(fs::resolve_protocol("app:/settings/editor_camera.cfg"), object);
+	ecs::utils::try_load_entity_from_file(fs::resolve_protocol("app:/settings/editor_camera.cfg"), object);
 
 	if(!object.has_component<transform_component>() || !object.has_component<camera_component>())
 	{

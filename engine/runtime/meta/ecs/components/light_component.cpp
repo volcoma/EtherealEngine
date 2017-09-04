@@ -17,6 +17,7 @@ SAVE(light_component)
 	try_save(ar, cereal::make_nvp("light", obj._light));
 }
 SAVE_INSTANTIATE(light_component, cereal::oarchive_associative_t);
+SAVE_INSTANTIATE(light_component, cereal::oarchive_binary_t);
 
 LOAD(light_component)
 {
@@ -24,3 +25,4 @@ LOAD(light_component)
 	try_load(ar, cereal::make_nvp("light", obj._light));
 }
 LOAD_INSTANTIATE(light_component, cereal::iarchive_associative_t);
+LOAD_INSTANTIATE(light_component, cereal::iarchive_binary_t);

@@ -25,13 +25,6 @@ class light_component : public runtime::component_impl<light_component>
 	REFLECTABLEV(light_component, runtime::component)
 public:
 	//-------------------------------------------------------------------------
-	// Constructors & Destructors
-	//-------------------------------------------------------------------------
-	light_component();
-	light_component(const light_component& camera);
-	virtual ~light_component();
-
-	//-------------------------------------------------------------------------
 	// Public Methods
 	//-------------------------------------------------------------------------
 	//-----------------------------------------------------------------------------

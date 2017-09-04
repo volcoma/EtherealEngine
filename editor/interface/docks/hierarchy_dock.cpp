@@ -2,6 +2,7 @@
 #include "../../editing/editing_system.h"
 #include "../../system/project_manager.h"
 #include "core/filesystem/filesystem.h"
+#include "core/logging/logging.h"
 #include "runtime/assets/asset_handle.h"
 #include "runtime/ecs/components/model_component.h"
 #include "runtime/ecs/components/transform_component.h"
@@ -27,7 +28,7 @@ void check_context_menu(runtime::entity entity)
 			}
 			if(gui::Selectable("CLONE"))
 			{
-				auto object = ecs.create_from_copy(entity);
+				auto object = ecs::utils::clone_entity(entity);
 
 				auto obj_trans_comp = object.get_component<transform_component>().lock();
 				auto ent_trans_comp = entity.get_component<transform_component>().lock();
@@ -307,7 +308,7 @@ void hierarchy_dock::render(const ImVec2&)
 					auto sel = selected.get_value<runtime::entity>();
 					if(sel && sel != editor_camera)
 					{
-						auto clone = ecs.create_from_copy(sel);
+						auto clone = ecs::utils::clone_entity(sel);            
 						auto clone_trans_comp = clone.get_component<transform_component>().lock();
 						auto sel_trans_comp = sel.get_component<transform_component>().lock();
 						if(clone_trans_comp && sel_trans_comp)

@@ -27,6 +27,7 @@ SAVE(transform_component)
 	try_save(ar, cereal::make_nvp("children", obj._children));
 }
 SAVE_INSTANTIATE(transform_component, cereal::oarchive_associative_t);
+SAVE_INSTANTIATE(transform_component, cereal::oarchive_binary_t);
 
 LOAD(transform_component)
 {
@@ -47,3 +48,4 @@ LOAD(transform_component)
 	}
 }
 LOAD_INSTANTIATE(transform_component, cereal::iarchive_associative_t);
+LOAD_INSTANTIATE(transform_component, cereal::iarchive_binary_t);

@@ -8,4 +8,5 @@ SAVE_EXTERN(camera_component);
 LOAD_EXTERN(camera_component);
 
 #include "core/serialization/associative_archive.h"
+#include "core/serialization/binary_archive.h"
 CEREAL_REGISTER_TYPE(camera_component)

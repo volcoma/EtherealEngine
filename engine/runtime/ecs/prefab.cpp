@@ -3,15 +3,15 @@
 
 runtime::entity prefab::instantiate()
 {
-	std::vector<runtime::entity> outDataVec;
+	std::vector<runtime::entity> out_data;
 	if(!data)
-		return runtime::entity();
+		return {};
 
-	if(!ecs::utils::deserialize_data(*data, outDataVec))
-		return runtime::entity();
+	if(!ecs::utils::deserialize_data(*data, out_data))
+		return {};
 
-	if(outDataVec.empty())
-		return runtime::entity();
+	if(out_data.empty())
+		return {};
 	else
-		return outDataVec[0];
+		return out_data.front();
 }

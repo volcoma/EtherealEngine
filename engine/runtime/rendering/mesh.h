@@ -761,7 +761,7 @@ public:
 	//-----------------------------------------------------------------------------
 	const bone_palette_array_t& get_bone_palettes() const;
 
-	const armature_node* get_armature() const;
+	const std::unique_ptr<armature_node>& get_armature() const;
 	//-----------------------------------------------------------------------------
 	//  Name : get_subset ()
 	/// <summary>

@@ -653,7 +653,7 @@ void assets_dock::render(const ImVec2&)
 				{
 					auto entity = dragged.get_value<runtime::entity>();
 					if(entity)
-						ecs::utils::save_entity(dir->absolute_path, entity);
+						ecs::utils::save_entity_to_file(dir->absolute_path / fs::path(entity.to_string() + extensions::prefab), entity);
 					es.drop();
 				}
 			}

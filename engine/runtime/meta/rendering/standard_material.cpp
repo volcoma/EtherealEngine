@@ -61,6 +61,7 @@ SAVE(standard_material)
 	try_save(ar, cereal::make_nvp("maps", obj._maps));
 }
 SAVE_INSTANTIATE(standard_material, cereal::oarchive_associative_t);
+SAVE_INSTANTIATE(standard_material, cereal::oarchive_binary_t);
 
 LOAD(standard_material)
 {
@@ -74,3 +75,4 @@ LOAD(standard_material)
 	try_load(ar, cereal::make_nvp("maps", obj._maps));
 }
 LOAD_INSTANTIATE(standard_material, cereal::iarchive_associative_t);
+LOAD_INSTANTIATE(standard_material, cereal::iarchive_binary_t);

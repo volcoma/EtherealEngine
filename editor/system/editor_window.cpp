@@ -127,8 +127,8 @@ auto open_scene()
 		ecs.dispose();
 		es.load_editor_camera();
 
-		std::vector<runtime::entity> outData;
-		if(ecs::utils::load_data(path, outData))
+		std::vector<runtime::entity> out_data;
+		if(ecs::utils::load_entities_from_file(path, out_data))
 		{
 			es.scene = path;
 		}
@@ -142,7 +142,7 @@ auto save_scene()
 	if(path != "")
 	{
 		std::vector<runtime::entity> entities = gather_scene_data();
-		ecs::utils::save_data(path, entities);
+		ecs::utils::save_entities_to_file(path, std::move(entities));
 	}
 
 	es.save_editor_camera();

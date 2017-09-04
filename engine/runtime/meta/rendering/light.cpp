@@ -1,6 +1,7 @@
 #include "light.hpp"
 #include "core/meta/math/vector.hpp"
 #include "core/serialization/associative_archive.h"
+#include "core/serialization/binary_archive.h"
 
 REFLECT(light)
 {
@@ -73,6 +74,7 @@ SAVE(light)
 	try_save(ar, cereal::make_nvp("color", obj.color));
 }
 SAVE_INSTANTIATE(light, cereal::oarchive_associative_t);
+SAVE_INSTANTIATE(light, cereal::oarchive_binary_t);
 
 LOAD(light)
 {
@@ -94,3 +96,4 @@ LOAD(light)
 	try_load(ar, cereal::make_nvp("color", obj.color));
 }
 LOAD_INSTANTIATE(light, cereal::iarchive_associative_t);
+LOAD_INSTANTIATE(light, cereal::iarchive_binary_t);

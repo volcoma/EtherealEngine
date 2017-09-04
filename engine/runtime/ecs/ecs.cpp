@@ -62,23 +62,11 @@ void entity::invalidate()
 	manager_ = nullptr;
 }
 
-chandle<component> entity::assign_from_copy(std::shared_ptr<component> component)
-{
-	expects(valid());
-	return manager_->assign(id_, component->clone());
-}
-
 void entity::destroy()
 {
 	expects(valid());
 	manager_->destroy(id_);
 	invalidate();
-}
-
-entity entity::clone() const
-{
-	expects(valid());
-    return manager_->create_from_copy(*this);
 }
 
 std::bitset<MAX_COMPONENTS> entity::component_mask() const
@@ -285,24 +273,6 @@ entity entity_component_system::get(entity::id_t id)
 entity::id_t entity_component_system::create_id(uint32_t index) const
 {
     return entity::id_t(index, entity_version_[index]);
-}
-
-entity entity_component_system::create_from_copy(entity original)
-{
-    expects(original.valid());
-    auto clone = create();
-    auto mask = original.component_mask();
-	for(size_t i = 0; i < component_pools_.size(); ++i)
-	{
-		if(mask.test(i))
-		{
-			auto component = component_pools_[i]->get(original.id().index());
-
-			clone.assign(component->clone());
-		}
-	}
-	clone.set_name(original.get_name());
-	return clone;
 }
 
 component::~component()

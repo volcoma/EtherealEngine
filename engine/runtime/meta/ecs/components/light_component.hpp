@@ -8,4 +8,5 @@ SAVE_EXTERN(light_component);
 LOAD_EXTERN(light_component);
 
 #include "core/serialization/associative_archive.h"
+#include "core/serialization/binary_archive.h"
 CEREAL_REGISTER_TYPE(light_component)

@@ -7,7 +7,7 @@
 namespace runtime
 {
 
-void process_node(const mesh::armature_node* const node, const skin_bind_data& bind_data,
+void process_node(const std::unique_ptr<mesh::armature_node>& node, const skin_bind_data& bind_data,
 				  runtime::entity& parent, std::vector<runtime::entity>& entity_nodes,
 				  runtime::entity_component_system& ecs)
 {
@@ -27,73 +27,73 @@ void process_node(const mesh::armature_node* const node, const skin_bind_data& b
 
 	for(auto& child : node->children)
 	{
-		process_node(child.get(), bind_data, entity_node, entity_nodes, ecs);
+		process_node(child, bind_data, entity_node, entity_nodes, ecs);
 	}
+}
+
+static std::vector<math::transform>
+get_transforms_for_bones(const std::vector<runtime::entity>& bone_entities)
+{
+	std::vector<math::transform> result;
+	if(!bone_entities.empty())
+	{
+		result.reserve(bone_entities.size());
+		for(const auto& e : bone_entities)
+		{
+			if(e.valid())
+			{
+				const auto bone_transform = e.get_component<transform_component>();
+				if(!bone_transform.expired())
+				{
+					result.emplace_back(bone_transform.lock()->get_transform());
+				}
+				else
+				{
+					result.emplace_back();
+				}
+			}
+			else
+			{
+				result.emplace_back();
+			}
+		}
+	}
+
+	return result;
 }
 
 void bone_system::frame_update(std::chrono::duration<float> dt)
 {
 	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
-	ecs.each<model_component>(
-		[this, &ecs](runtime::entity e, model_component& model_comp) {
+	ecs.each<model_component>([this, &ecs](runtime::entity e, model_component& model_comp) {
 
-			const auto& model = model_comp.get_model();
-			auto mesh = model.get_lod(0);
+		const auto& model = model_comp.get_model();
+		auto mesh = model.get_lod(0);
 
-			// If mesh isnt loaded yet skip it.
-			if(!mesh)
-				return;
+		// If mesh isnt loaded yet skip it.
+		if(!mesh)
+			return;
 
-			const auto& skin_data = mesh->get_skin_bind_data();
+		const auto& skin_data = mesh->get_skin_bind_data();
 
-			// Has skinning data?
-//			if(skin_data.has_bones())
-//			{
-//                const auto& bone_transforms = model_comp.get_bone_transforms();
-//                auto it = _bones.find(e);
-//                if(it == _bones.end() && bone_transforms.size() <= 1)
-//                {
-//                    const auto& armature = mesh->get_armature();
-//					if(armature->children.empty())
-//						return;
+		// Has skinning data?
+		if(skin_data.has_bones())
+		{
+			if(model_comp.get_bone_entities().size() <= 1)
+			{
+				const auto& armature = mesh->get_armature();
+				std::vector<runtime::entity> be;
+				process_node(armature, skin_data, e, be, ecs);
+				model_comp.set_bone_entities(be);
+				model_comp.set_static(false);
+			}
 
-//					std::vector<runtime::entity> be;
-//					process_node(mesh->get_armature()->children[0].get(), skin_data, e, be, ecs);
-//					// model_comp.set_bone_entities(be);
-//					model_comp.set_static(false);
-//                    _bones[e] = be;
-					
-//                }
-//				const auto& be = _bones[e];
-//                std::vector<math::transform> result;
-//                if(!be.empty())
-//                {
-//                    result.reserve(be.size());
-//                    for(const auto& e : be)
-//                    {
-//                        if(e.valid())
-//                        {
-//                            const auto bone_transform = e.get_component<transform_component>();
-//                            if(!bone_transform.expired())
-//                            {
-//                                result.emplace_back(bone_transform.lock()->get_transform());
-//                            }
-//                            else
-//                            {
-//                                result.emplace_back();
-//                            }
-//                        }
-//                        else
-//                        {
-//                            result.emplace_back();
-//                        }
-//                    }
-//                }
+			const auto& bone_entities = model_comp.get_bone_entities();
+			auto transforms = get_transforms_for_bones(bone_entities);
+			model_comp.set_bone_transforms(std::move(transforms));
+		}
 
-//                model_comp.set_bone_transforms(result);
-//			}
-
-		});
+	});
 }
 
 bool bone_system::initialize()

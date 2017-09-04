@@ -1,6 +1,7 @@
 #include "model.hpp"
 #include "../assets/asset_handle.hpp"
 #include "core/serialization/associative_archive.h"
+#include "core/serialization/binary_archive.h"
 #include "core/serialization/types/vector.hpp"
 #include "material.hpp"
 #include "mesh.hpp"
@@ -35,6 +36,7 @@ SAVE(model)
 	try_save(ar, cereal::make_nvp("min_distance", obj._min_distance));
 }
 SAVE_INSTANTIATE(model, cereal::oarchive_associative_t);
+SAVE_INSTANTIATE(model, cereal::oarchive_binary_t);
 
 LOAD(model)
 {
@@ -46,3 +48,4 @@ LOAD(model)
 	try_load(ar, cereal::make_nvp("min_distance", obj._min_distance));
 }
 LOAD_INSTANTIATE(model, cereal::iarchive_associative_t);
+LOAD_INSTANTIATE(model, cereal::iarchive_binary_t);

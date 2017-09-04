@@ -25,12 +25,6 @@ class reflection_probe_component : public runtime::component_impl<reflection_pro
 	SERIALIZABLE(reflection_probe_component)
 	REFLECTABLEV(reflection_probe_component, runtime::component)
 public:
-	//-------------------------------------------------------------------------
-	// Constructors & Destructors
-	//-------------------------------------------------------------------------
-	reflection_probe_component();
-	reflection_probe_component(const reflection_probe_component& camera);
-	virtual ~reflection_probe_component();
 
 	//-------------------------------------------------------------------------
 	// Public Methods

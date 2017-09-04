@@ -8,4 +8,5 @@ SAVE_EXTERN(model_component);
 LOAD_EXTERN(model_component);
 
 #include "core/serialization/associative_archive.h"
+#include "core/serialization/binary_archive.h"
 CEREAL_REGISTER_TYPE(model_component)

@@ -1,6 +1,7 @@
 #include "reflection_probe.hpp"
 #include "core/meta/math/vector.hpp"
 #include "core/serialization/associative_archive.h"
+#include "core/serialization/binary_archive.h"
 
 REFLECT(reflection_probe)
 {
@@ -29,6 +30,7 @@ SAVE(reflection_probe)
 	try_save(ar, cereal::make_nvp("range", obj.sphere_data.range));
 }
 SAVE_INSTANTIATE(reflection_probe, cereal::oarchive_associative_t);
+SAVE_INSTANTIATE(reflection_probe, cereal::oarchive_binary_t);
 
 LOAD(reflection_probe)
 {
@@ -39,3 +41,4 @@ LOAD(reflection_probe)
 	try_load(ar, cereal::make_nvp("range", obj.sphere_data.range));
 }
 LOAD_INSTANTIATE(reflection_probe, cereal::iarchive_associative_t);
+LOAD_INSTANTIATE(reflection_probe, cereal::iarchive_binary_t);

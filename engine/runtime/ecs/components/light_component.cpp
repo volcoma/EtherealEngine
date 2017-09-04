@@ -1,18 +1,5 @@
 #include "light_component.h"
 
-light_component::light_component()
-{
-}
-
-light_component::light_component(const light_component& lightComponent)
-{
-	_light = lightComponent._light;
-}
-
-light_component::~light_component()
-{
-}
-
 int light_component::compute_projected_sphere_rect(irect& rect, const math::vec3& light_position,
 												   const math::vec3& light_direction,
 												   const math::transform& view, const math::transform& proj)

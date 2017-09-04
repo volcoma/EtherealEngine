@@ -2,52 +2,26 @@
 #include "../assets/asset_extensions.h"
 #include "../meta/ecs/entity.hpp"
 #include "core/serialization/associative_archive.h"
+#include "core/serialization/binary_archive.h"
 #include "core/serialization/serialization.h"
 
 namespace ecs
 {
 namespace utils
 {
-void save_entity(const fs::path& dir, const runtime::entity& data)
+
+template <typename OArchive>
+static void serialize_t(std::ostream& stream, const std::vector<runtime::entity>& data)
 {
-	const fs::path fullPath = dir / fs::path(data.to_string() + extensions::prefab);
-	save_data(fullPath, {data});
-}
-
-bool try_load_entity(const fs::path& fullPath, runtime::entity& outData)
-{
-	std::vector<runtime::entity> outDataVec;
-	if(!load_data(fullPath, outDataVec))
-		return false;
-
-	if(!outDataVec.empty())
-		outData = outDataVec[0];
-
-	return true;
-}
-
-void save_data(const fs::path& fullPath, const std::vector<runtime::entity>& data)
-{
-	std::ofstream os(fullPath.string(), std::fstream::binary | std::fstream::trunc);
-	serialize_data(os, data);
-}
-
-bool load_data(const fs::path& fullPath, std::vector<runtime::entity>& outData)
-{
-	std::ifstream is(fullPath.string(), std::fstream::binary);
-	return deserialize_data(is, outData);
-}
-
-void serialize_data(std::ostream& stream, const std::vector<runtime::entity>& data)
-{
-	cereal::oarchive_associative_t ar(stream);
+	OArchive ar(stream);
 
 	try_save(ar, cereal::make_nvp("data", data));
 
 	runtime::get_serialization_map().clear();
 }
 
-bool deserialize_data(std::istream& stream, std::vector<runtime::entity>& outData)
+template <typename IArchive>
+static bool deserialize_t(std::istream& stream, std::vector<runtime::entity>& out_data)
 {
 	// get length of file:
 	runtime::get_serialization_map().clear();
@@ -56,9 +30,9 @@ bool deserialize_data(std::istream& stream, std::vector<runtime::entity>& outDat
 	stream.seekg(0, stream.beg);
 	if(length > 0)
 	{
-		cereal::iarchive_associative_t ar(stream);
+		IArchive ar(stream);
 
-		try_load(ar, cereal::make_nvp("data", outData));
+		try_load(ar, cereal::make_nvp("data", out_data));
 
 		stream.clear();
 		stream.seekg(0);
@@ -66,6 +40,55 @@ bool deserialize_data(std::istream& stream, std::vector<runtime::entity>& outDat
 		return true;
 	}
 	return false;
+}
+
+void save_entity_to_file(const fs::path& full_path, const runtime::entity& data)
+{
+	save_entities_to_file(full_path, {data});
+}
+
+bool try_load_entity_from_file(const fs::path& full_path, runtime::entity& out_data)
+{
+	std::vector<runtime::entity> out_data_vec;
+	if(!load_entities_from_file(full_path, out_data_vec))
+		return false;
+
+	if(!out_data_vec.empty())
+		out_data = out_data_vec[0];
+
+	return true;
+}
+
+void save_entities_to_file(const fs::path& full_path, const std::vector<runtime::entity>& data)
+{
+	std::ofstream os(full_path.string(), std::fstream::binary | std::fstream::trunc);
+	serialize_t<cereal::oarchive_associative_t>(os, data);
+}
+
+bool load_entities_from_file(const fs::path& full_path, std::vector<runtime::entity>& out_data)
+{
+	std::ifstream is(full_path.string(), std::fstream::binary);
+	return deserialize_t<cereal::iarchive_associative_t>(is, out_data);
+}
+
+runtime::entity clone_entity(const runtime::entity& data)
+{
+	std::stringstream stream;
+	serialize_t<cereal::oarchive_binary_t>(stream, {data});
+
+	std::vector<runtime::entity> vec_data;
+	deserialize_t<cereal::iarchive_binary_t>(stream, vec_data);
+
+	if(!vec_data.empty())
+	{
+		return vec_data.front();
+	}
+	return {};
+}
+
+bool deserialize_data(std::istream& stream, std::vector<runtime::entity>& out_data)
+{
+	return deserialize_t<cereal::iarchive_associative_t>(stream, out_data);
 }
 }
 }

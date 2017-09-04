@@ -1,6 +1,7 @@
 #include "camera.hpp"
 #include "core/meta/common/basetypes.hpp"
 #include "core/serialization/associative_archive.h"
+#include "core/serialization/binary_archive.h"
 
 REFLECT(camera)
 {
@@ -24,6 +25,7 @@ SAVE(camera)
 	try_save(ar, cereal::make_nvp("frustum_locked", obj._frustum_locked));
 }
 SAVE_INSTANTIATE(camera, cereal::oarchive_associative_t);
+SAVE_INSTANTIATE(camera, cereal::oarchive_binary_t);
 
 LOAD(camera)
 {
@@ -44,3 +46,4 @@ LOAD(camera)
 	obj._frustum_dirty = true;
 }
 LOAD_INSTANTIATE(camera, cereal::iarchive_associative_t);
+LOAD_INSTANTIATE(camera, cereal::iarchive_binary_t);

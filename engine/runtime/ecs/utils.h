@@ -9,6 +9,7 @@ namespace ecs
 {
 namespace utils
 {
+runtime::entity clone_entity(const runtime::entity& data);
 //-----------------------------------------------------------------------------
 //  Name : save_entity ()
 /// <summary>
@@ -17,7 +18,7 @@ namespace utils
 ///
 /// </summary>
 //-----------------------------------------------------------------------------
-void save_entity(const fs::path& dir, const runtime::entity& data);
+void save_entity_to_file(const fs::path& full_path, const runtime::entity& data);
 
 //-----------------------------------------------------------------------------
 //  Name : try_load_entity ()
@@ -27,7 +28,7 @@ void save_entity(const fs::path& dir, const runtime::entity& data);
 ///
 /// </summary>
 //-----------------------------------------------------------------------------
-bool try_load_entity(const fs::path& fullPath, runtime::entity& outData);
+bool try_load_entity_from_file(const fs::path& full_path, runtime::entity& out_data);
 
 //-----------------------------------------------------------------------------
 //  Name : save_data ()
@@ -37,7 +38,7 @@ bool try_load_entity(const fs::path& fullPath, runtime::entity& outData);
 ///
 /// </summary>
 //-----------------------------------------------------------------------------
-void save_data(const fs::path& fullPath, const std::vector<runtime::entity>& data);
+void save_entities_to_file(const fs::path& full_path, const std::vector<runtime::entity>& data);
 
 //-----------------------------------------------------------------------------
 //  Name : load_data ()
@@ -47,17 +48,7 @@ void save_data(const fs::path& fullPath, const std::vector<runtime::entity>& dat
 ///
 /// </summary>
 //-----------------------------------------------------------------------------
-bool load_data(const fs::path& fullPath, std::vector<runtime::entity>& outData);
-
-//-----------------------------------------------------------------------------
-//  Name : serialize_data ()
-/// <summary>
-///
-///
-///
-/// </summary>
-//-----------------------------------------------------------------------------
-void serialize_data(std::ostream& stream, const std::vector<runtime::entity>& data);
+bool load_entities_from_file(const fs::path& full_path, std::vector<runtime::entity>& out_data);
 
 //-----------------------------------------------------------------------------
 //  Name : deserialize_data ()
@@ -67,6 +58,6 @@ void serialize_data(std::ostream& stream, const std::vector<runtime::entity>& da
 ///
 /// </summary>
 //-----------------------------------------------------------------------------
-bool deserialize_data(std::istream& stream, std::vector<runtime::entity>& outData);
+bool deserialize_data(std::istream& stream, std::vector<runtime::entity>& out_data);
 }
 }

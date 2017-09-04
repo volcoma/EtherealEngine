@@ -30,7 +30,6 @@ public:
 	// Constructors & Destructors
 	//-------------------------------------------------------------------------
 	camera_component();
-	camera_component(const camera_component& camera);
 	virtual ~camera_component();
 
 	//-------------------------------------------------------------------------

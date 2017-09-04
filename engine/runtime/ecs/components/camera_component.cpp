@@ -7,14 +7,6 @@ camera_component::camera_component()
 	_camera.set_viewport_size({stats->width, stats->height});
 }
 
-camera_component::camera_component(const camera_component& cameraComponent)
-{
-	_camera = cameraComponent.get_camera();
-	_hdr = cameraComponent._hdr;
-	auto stats = gfx::getStats();
-	_camera.set_viewport_size({stats->width, stats->height});
-}
-
 camera_component::~camera_component()
 {
 }

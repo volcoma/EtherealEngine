@@ -4484,9 +4484,9 @@ const mesh::bone_palette_array_t& mesh::get_bone_palettes() const
 	return _bone_palettes;
 }
 
-const mesh::armature_node* mesh::get_armature() const
+const std::unique_ptr<mesh::armature_node>& mesh::get_armature() const
 {
-	return _root.get();
+	return _root;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

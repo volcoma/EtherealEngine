@@ -2,33 +2,6 @@
 #include "core/logging/logging.h"
 #include <algorithm>
 
-runtime::entity create_from_component(runtime::chandle<transform_component> component)
-{
-	if(!component.expired())
-	{
-		auto entity = component.lock()->get_entity().clone();
-		return entity;
-	}
-	APPLOG_ERROR("trying to clone a null component");
-	return {};
-}
-
-transform_component::transform_component()
-{
-}
-
-transform_component::transform_component(const transform_component& rhs)
-{
-	_children.reserve(rhs._children.size());
-	for(const auto& child : rhs._children)
-	{
-		_children.push_back(child.clone());
-	}
-
-	_local_transform = rhs._local_transform;
-	_world_transform = rhs._world_transform;
-}
-
 void transform_component::on_entity_set()
 {
 	for(auto& child : _children)

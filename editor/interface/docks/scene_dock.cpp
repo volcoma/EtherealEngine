@@ -7,6 +7,7 @@
 #include "runtime/ecs/components/model_component.h"
 #include "runtime/ecs/components/transform_component.h"
 #include "runtime/ecs/prefab.h"
+#include "runtime/ecs/utils.h"
 #include "runtime/input/input.h"
 #include "runtime/rendering/camera.h"
 #include "runtime/rendering/mesh.h"
@@ -350,7 +351,7 @@ void scene_dock::render(const ImVec2&)
 						auto sel = selected.get_value<runtime::entity>();
 						if(sel && sel != editor_camera)
 						{
-							auto clone = ecs.create_from_copy(sel);
+							auto clone = ecs::utils::clone_entity(sel);
 							clone.get_component<transform_component>().lock()->set_parent(
 								sel.get_component<transform_component>().lock()->get_parent(), false, true);
 							es.select(clone);

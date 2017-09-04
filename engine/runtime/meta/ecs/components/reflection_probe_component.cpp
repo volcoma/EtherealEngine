@@ -16,6 +16,7 @@ SAVE(reflection_probe_component)
 	try_save(ar, cereal::make_nvp("probe", obj._probe));
 }
 SAVE_INSTANTIATE(reflection_probe_component, cereal::oarchive_associative_t);
+SAVE_INSTANTIATE(reflection_probe_component, cereal::oarchive_binary_t);
 
 LOAD(reflection_probe_component)
 {
@@ -23,3 +24,4 @@ LOAD(reflection_probe_component)
 	try_load(ar, cereal::make_nvp("probe", obj._probe));
 }
 LOAD_INSTANTIATE(reflection_probe_component, cereal::iarchive_associative_t);
+LOAD_INSTANTIATE(reflection_probe_component, cereal::iarchive_binary_t);

@@ -1,20 +1,6 @@
 #include "model_component.h"
 #include "transform_component.h"
-model_component::model_component()
-{
-}
 
-model_component::model_component(const model_component& component)
-	: _static(component._static)
-	, _casts_shadow(component._casts_shadow)
-	, _casts_reflection(component._casts_reflection)
-	, _model(component._model)
-{    
-}
-
-model_component::~model_component()
-{
-}
 
 model_component& model_component::set_casts_shadow(bool cast_shadow)
 {
@@ -88,8 +74,21 @@ const std::vector<math::transform>& model_component::get_bone_transforms() const
 	return _bone_transforms;
 }
 
+model_component& model_component::set_bone_entities(const std::vector<runtime::entity>& bone_entities)
+{
+	_bone_entities = bone_entities;
+
+	touch();
+
+	return *this;
+}
+
+const std::vector<runtime::entity>& model_component::get_bone_entities() const
+{
+	return _bone_entities;
+}
 
 bool model_component::casts_reflection() const
 {
-    return _casts_reflection;
+	return _casts_reflection;
 }

@@ -38,6 +38,7 @@ SAVE(camera_component)
 	try_save(ar, cereal::make_nvp("hdr", obj._hdr));
 }
 SAVE_INSTANTIATE(camera_component, cereal::oarchive_associative_t);
+SAVE_INSTANTIATE(camera_component, cereal::oarchive_binary_t);
 
 LOAD(camera_component)
 {
@@ -46,3 +47,4 @@ LOAD(camera_component)
 	try_load(ar, cereal::make_nvp("hdr", obj._hdr));
 }
 LOAD_INSTANTIATE(camera_component, cereal::iarchive_associative_t);
+LOAD_INSTANTIATE(camera_component, cereal::iarchive_binary_t);

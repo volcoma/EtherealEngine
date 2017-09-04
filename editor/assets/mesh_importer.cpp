@@ -216,8 +216,11 @@ void process_node(const aiNode* node, mesh::armature_node* armature_node,
 
 void process_nodes(const aiScene* scene, mesh::load_data& load_data)
 {
-	load_data.root_node = std::make_unique<mesh::armature_node>();
-	process_node(scene->mRootNode, load_data.root_node.get(), math::transform::identity);
+    if(scene->mRootNode->mNumChildren > 0)
+    {
+        load_data.root_node = std::make_unique<mesh::armature_node>();
+        process_node(scene->mRootNode->mChildren[0], load_data.root_node.get(), math::transform::identity);
+    }	
 }
 
 void process_imported_scene(const aiScene* scene, mesh::load_data& load_data)

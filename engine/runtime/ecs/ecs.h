@@ -210,11 +210,6 @@ public:
 	chandle<component> assign(std::shared_ptr<component> component);
 
 	template <typename C>
-	chandle<C> assign_from_copy(const chandle<C>& component);
-
-	chandle<component> assign_from_copy(std::shared_ptr<component> component);
-
-	template <typename C>
 	void remove();
 
 	void remove(std::shared_ptr<component> component);
@@ -241,7 +236,6 @@ public:
 	* Destroy and invalidate this entity.
 	*/
 	void destroy();
-    entity clone() const;
 	std::bitset<MAX_COMPONENTS> component_mask() const;
 
 private:
@@ -291,16 +285,6 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	virtual ~component();
-
-	//-----------------------------------------------------------------------------
-	//  Name : clone (virtual )
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	virtual std::shared_ptr<component> clone() const = 0;
 
 	//-----------------------------------------------------------------------------
 	//  Name : touch (virtual )
@@ -380,6 +364,10 @@ private:
 	}
 
 public:
+    component_impl() = default;
+    component_impl(component_impl& rhs) = delete;
+    component_impl& operator=(component_impl& rhs) = delete;
+    
     static rtti::type_index_sequential_t::index_t static_id()
     {
 		return rtti::type_index_sequential_t::id<component, T>();
@@ -388,10 +376,6 @@ public:
 	chandle<T> handle()
 	{
 		return std::static_pointer_cast<T>(shared_from_this());
-	}
-	virtual std::shared_ptr<component> clone() const
-	{
-		return std::static_pointer_cast<component>(std::make_shared<T>(static_cast<const T&>(*this)));
 	}
 };
 
@@ -705,13 +689,6 @@ public:
 	entity create();
 
 	/**
-	* Create a new entity by copying another. Copy-constructs each component.
-	*
-	* Emits EntityCreatedEvent.
-	*/
-	entity create_from_copy(entity original);
-
-	/**
 	* Destroy an existing entity::Id and its associated Components.
 	*
 	* Emits EntityDestroyedEvent.
@@ -1010,13 +987,6 @@ inline chandle<component> entity::assign(std::shared_ptr<component> component)
 {
 	expects(valid());
 	return manager_->assign(id_, component);
-}
-
-template <typename C>
-chandle<C> entity::assign_from_copy(const chandle<C>& component)
-{
-	expects(valid());
-	return manager_->assign(id_, component.get()->clone());
 }
 
 template <typename C>
