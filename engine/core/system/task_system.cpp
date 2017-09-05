@@ -25,10 +25,10 @@ task_system::task_queue::task_queue(task_system::task_queue&& other) noexcept
 {
 }
 
-bool task_system::task_queue::is_empty()
+std::size_t task_system::task_queue::get_pending_tasks() const
 {
-	std::unique_lock<std::mutex> lock(_mutex);
-	return _tasks.empty();
+	std::lock_guard<std::mutex> lock(_mutex);
+	return _tasks.size();
 }
 
 void task_system::task_queue::set_done()
@@ -235,6 +235,16 @@ void task_system::run_on_owner_thread()
 		return;
 
 	if(p.first)
-		p.second();
+        p.second();
+}
+
+std::size_t task_system::get_pending_tasks() const
+{
+    std::size_t tasks = 0;
+    for(const auto& queue : _queues)
+    {
+        tasks += queue.get_pending_tasks();
+    }
+    return tasks;
 }
 }

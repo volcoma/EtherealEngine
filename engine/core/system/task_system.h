@@ -553,6 +553,7 @@ public:
 	//-----------------------------------------------------------------------------
 	void run_on_owner_thread();
 
+    std::size_t get_pending_tasks() const;
 	//-----------------------------------------------------------------------------
 	//  Name : get_owner_thread_idx ()
 	/// <summary>
@@ -812,7 +813,7 @@ private:
 		while(!t.is_ready())
 		{
 			bool became_ready = false;
-			while(!queue.is_empty())
+			while(queue.get_pending_tasks() > 0)
 			{
 				p = queue.pop(false);
 				if(!p.first)
@@ -866,7 +867,7 @@ private:
 		task_queue(task_queue const&) = delete;
 		task_queue(task_queue&& other) noexcept;
 
-		bool is_empty();
+		std::size_t get_pending_tasks() const;
 		void set_done();
 		std::pair<bool, task> try_pop();
 		bool try_push(task& t);
@@ -885,7 +886,7 @@ private:
 
 		std::deque<task> _tasks;
 		std::condition_variable _cv;
-		std::mutex _mutex;
+		mutable std::mutex _mutex;
 		std::atomic_bool _done{false};
 	};
 

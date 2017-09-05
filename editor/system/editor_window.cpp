@@ -363,6 +363,16 @@ void main_editor_window::render_dockspace()
 		_dockspace.update_and_draw(
 			ImVec2(gui::GetContentRegionAvail().x, gui::GetContentRegionAvail().y - offset));
 
+        
+        auto& ts = core::get_subsystem<core::task_system>();
+        auto pending_tasks = ts.get_pending_tasks();
+        if(pending_tasks > 0)
+        {
+            gui::AlignFirstTextHeightToWidgets();        
+            gui::Text("Tasks : %d", ts.get_pending_tasks());
+            gui::SameLine();            
+        }
+
 		auto items = _console_log->get_items();
 
 		if(!items.empty())
@@ -371,15 +381,16 @@ void main_editor_window::render_dockspace()
 			const auto& colorization = _console_log->get_level_colorization(last_item.second);
 			ImVec4 col = {colorization[0], colorization[1], colorization[2], colorization[3]};
 
-			ImGui::SetCursorPosY(ImGui::GetCursorPosY());
+			gui::SetCursorPosY(ImGui::GetCursorPosY());
 			gui::PushStyleColor(ImGuiCol_Text, col);
-			ImGui::AlignFirstTextHeightToWidgets();
+			gui::AlignFirstTextHeightToWidgets();
 			if(gui::Selectable(last_item.first.c_str(), false, 0, ImVec2(0, gui::GetTextLineHeight())))
 			{
 				_dockspace.activate_dock(_console_dock_name);
 			}
 			gui::PopStyleColor();
 		}
+        
 	}
 }
 
