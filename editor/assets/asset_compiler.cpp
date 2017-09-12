@@ -14,8 +14,10 @@
 #include "mesh_importer.h"
 #include "runtime/assets/asset_extensions.h"
 #include "runtime/meta/rendering/mesh.hpp"
+#include "runtime/meta/animation/animation.hpp"
 #include "runtime/rendering/shader.h"
 #include "runtime/rendering/texture.h"
+#include "runtime/rendering/mesh.h"
 #include <array>
 #include <fstream>
 
@@ -101,7 +103,7 @@ void compile<shader>(const fs::path& absolute_key)
 	fs::error_code err;
 	fs::path temp = fs::temp_directory_path(err);
 	temp.append(uuids::random_uuid(str_input).to_string() + ".buildtemp");
-    
+
 	std::string str_output = temp.string();
 	fs::path include = fs::resolve_protocol("shader_include:/");
 	std::string str_include = include.string();
@@ -224,28 +226,49 @@ void compile<mesh>(const fs::path& absolute_key)
 {
 	fs::path output = absolute_key.string() + extensions::get_compiled_format<mesh>();
 	std::string str_input = absolute_key.string();
-	std::string file = absolute_key.stem().string();
-	fs::path dir = absolute_key.parent_path();
 
 	fs::error_code err;
 	fs::path temp = fs::temp_directory_path(err);
 	temp.append(uuids::random_uuid(str_input).to_string() + ".buildtemp");
 
 	mesh::load_data data;
-	if(!importer::load_mesh_data_from_file(str_input, data))
+	std::vector<animation> animations;
+	if(!importer::load_mesh_data_from_file(str_input, data, animations))
 	{
 		APPLOG_ERROR("Failed compilation of {0}", str_input);
 		return;
 	}
 
+	if(data.vertex_data.empty() == false)
 	{
-		std::ofstream soutput(temp.string(), std::ios::out | std::ios::binary);
-		cereal::oarchive_binary_t ar(soutput);
-		try_save(ar, cereal::make_nvp("mesh", data));
-	}
-	fs::copy_file(temp, output, fs::copy_option::overwrite_if_exists, err);
-	fs::remove(temp, err);
-
-	APPLOG_INFO("Successful compilation of {0}", str_input);
+		{
+			std::ofstream soutput(temp.string(), std::ios::out | std::ios::binary);
+			cereal::oarchive_binary_t ar(soutput);
+			try_save(ar, cereal::make_nvp("mesh", data));
+		}
+		fs::copy_file(temp, output, fs::copy_option::overwrite_if_exists, err);
+		fs::remove(temp, err);
+        
+        APPLOG_INFO("Successful compilation of {0}", str_input);
+        {
+            fs::path file = absolute_key.stem();
+            fs::path dir = absolute_key.parent_path();
+            
+            for(const auto& animation : animations)
+            {
+                temp = fs::temp_directory_path(err);
+                temp.append(uuids::random_uuid(str_input).to_string() + ".buildtemp");
+                {
+                    std::ofstream soutput(temp.string(), std::ios::out | std::ios::binary);
+                    cereal::oarchive_binary_t ar(soutput);
+                    try_save(ar, cereal::make_nvp("animation", animation));
+                }
+                output = (dir / file).string() + "_" + animation.name + extensions::animation;
+                
+                fs::copy_file(temp, output, fs::copy_option::overwrite_if_exists, err);
+                fs::remove(temp, err);
+            }
+        }
+	}    
 }
 }

@@ -10,22 +10,16 @@ class material;
 
 namespace extensions
 {
-const std::array<std::string, 6> texture = {".png", ".jpg", ".tga", ".dds", ".ktx", ".pvr"};
-const std::array<std::string, 5> mesh = {".obj", ".fbx", ".dae", ".blend", ".3ds"};
+const std::array<std::string, 6> texture = {{".png", ".jpg", ".tga", ".dds", ".ktx", ".pvr"}};
+const std::array<std::string, 5> mesh = {{".obj", ".fbx", ".dae", ".blend", ".3ds"}};
 const std::string shader = ".sc";
 const std::string material = ".mat";
+const std::string animation = ".anim";
 const std::string prefab = ".pfb";
 const std::string scene = ".sgr";
 const std::string compiled = ".asset";
 
 inline bool is_compiled_format(const std::string& extension)
-{
-	const bool is_compiled = (extension == extensions::compiled || extension == extensions::material ||
-							  extension == extensions::prefab || extension == extensions::scene);
-	return is_compiled;
-}
-
-inline bool is_has_compiled_format(const std::string& extension)
 {
 	const bool is_compiled = (extension == extensions::compiled || extension == extensions::material ||
 							  extension == extensions::prefab || extension == extensions::scene);

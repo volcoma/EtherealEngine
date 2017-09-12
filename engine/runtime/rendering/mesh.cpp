@@ -1,4 +1,5 @@
 #include "mesh.h"
+#include "camera.h"
 #include "core/logging/logging.h"
 #include "core/memory/checked_delete.h"
 #include "index_buffer.h"
@@ -3575,9 +3576,8 @@ void mesh::bind_render_buffers_for_subset(std::uint32_t data_group_id)
 		bind_mesh_data(face_start, face_count, vertex_start, vertex_count);
 }
 
-
 void mesh::bind_mesh_data(std::uint32_t face_start, std::uint32_t face_count, std::uint32_t vertex_start,
-							std::uint32_t vertex_count)
+						  std::uint32_t vertex_count)
 {
 	(void)vertex_start;
 	std::uint32_t index_start = face_start * 3;
@@ -4487,6 +4487,34 @@ const mesh::bone_palette_array_t& mesh::get_bone_palettes() const
 const std::unique_ptr<mesh::armature_node>& mesh::get_armature() const
 {
 	return _root;
+}
+
+irect mesh::calculate_screen_rect(const math::transform& world, const camera& cam) const
+{
+
+	auto bounds = math::bbox::mul(get_bounds(), world);
+	math::vec3 cen = bounds.get_center();
+	math::vec3 ext = bounds.get_extents();
+	std::array<math::vec2, 8> extentPoints = {{
+		cam.world_to_viewport(math::vec3(cen.x - ext.x, cen.y - ext.y, cen.z - ext.z)),
+		cam.world_to_viewport(math::vec3(cen.x + ext.x, cen.y - ext.y, cen.z - ext.z)),
+		cam.world_to_viewport(math::vec3(cen.x - ext.x, cen.y - ext.y, cen.z + ext.z)),
+		cam.world_to_viewport(math::vec3(cen.x + ext.x, cen.y - ext.y, cen.z + ext.z)),
+		cam.world_to_viewport(math::vec3(cen.x - ext.x, cen.y + ext.y, cen.z - ext.z)),
+		cam.world_to_viewport(math::vec3(cen.x + ext.x, cen.y + ext.y, cen.z - ext.z)),
+		cam.world_to_viewport(math::vec3(cen.x - ext.x, cen.y + ext.y, cen.z + ext.z)),
+		cam.world_to_viewport(math::vec3(cen.x + ext.x, cen.y + ext.y, cen.z + ext.z)),
+	}};
+
+	math::vec2 min = extentPoints[0];
+	math::vec2 max = extentPoints[0];
+	for(const auto& v : extentPoints)
+	{
+		min = math::min(min, v);
+		max = math::max(max, v);
+	}
+	return irect(irect::value_type(min.x), irect::value_type(min.y), irect::value_type(max.x),
+				 irect::value_type(max.y));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

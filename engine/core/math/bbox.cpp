@@ -933,32 +933,42 @@ bbox& bbox::mul(const transform& t)
 //-----------------------------------------------------------------------------
 bbox bbox::mul(const bbox& bounds, const transform& t)
 {
-	bbox result;
-	vec3 bounds_center = bounds.get_center();
+	auto xa = t.x_axis() * bounds.min.x;
+	auto xb = t.x_axis() * bounds.max.x;
+	auto ya = t.y_axis() * bounds.min.y;
+	auto yb = t.y_axis() * bounds.max.y;
+	auto za = t.z_axis() * bounds.min.z;
+	auto zb = t.z_axis() * bounds.max.z;
 
-	// Compute new extents values
-	const vec3 Ex = t.x_axis() * (bounds.max.x - bounds_center.x);
-	const vec3 Ey = t.y_axis() * (bounds.max.y - bounds_center.y);
-	const vec3 Ez = t.z_axis() * (bounds.max.z - bounds_center.z);
+	return bbox(math::min(xa, xb) + math::min(ya, yb) + math::min(za, zb) + t.get_position(),
+						   math::max(xa, xb) + math::max(ya, yb) + math::max(za, zb) + t.get_position());
 
-	// Calculate new extents actual
-	const float fEx = glm::abs<float>(Ex.x) + glm::abs<float>(Ey.x) + glm::abs<float>(Ez.x);
-	const float fEy = glm::abs<float>(Ex.y) + glm::abs<float>(Ey.y) + glm::abs<float>(Ez.y);
-	const float fEz = glm::abs<float>(Ex.z) + glm::abs<float>(Ey.z) + glm::abs<float>(Ez.z);
+//	bbox result;
+//	vec3 bounds_center = bounds.get_center();
 
-	// Compute new center (we use 'transformNormal' because we only
-	// want to apply rotation and scale).
-	t.transform_normal(bounds_center, bounds_center);
+//	// Compute new extents values
+//	const vec3 Ex = t.x_axis() * (bounds.max.x - bounds_center.x);
+//	const vec3 Ey = t.y_axis() * (bounds.max.y - bounds_center.y);
+//	const vec3 Ez = t.z_axis() * (bounds.max.z - bounds_center.z);
 
-	// Calculate final bounding box (add on translation)
-	const vec3& vTranslation = t.get_position();
-	result.min.x = (bounds_center.x - fEx) + vTranslation.x;
-	result.min.y = (bounds_center.y - fEy) + vTranslation.y;
-	result.min.z = (bounds_center.z - fEz) + vTranslation.z;
-	result.max.x = (bounds_center.x + fEx) + vTranslation.x;
-	result.max.y = (bounds_center.y + fEy) + vTranslation.y;
-	result.max.z = (bounds_center.z + fEz) + vTranslation.z;
-	return result;
+//	// Calculate new extents actual
+//	const float fEx = glm::abs<float>(Ex.x) + glm::abs<float>(Ey.x) + glm::abs<float>(Ez.x);
+//	const float fEy = glm::abs<float>(Ex.y) + glm::abs<float>(Ey.y) + glm::abs<float>(Ez.y);
+//	const float fEz = glm::abs<float>(Ex.z) + glm::abs<float>(Ey.z) + glm::abs<float>(Ez.z);
+
+//	// Compute new center (we use 'transformNormal' because we only
+//	// want to apply rotation and scale).
+//	bounds_center = t.transform_normal(bounds_center);
+
+//	// Calculate final bounding box (add on translation)
+//	const vec3& vTranslation = t.get_position();
+//	result.min.x = (bounds_center.x - fEx) + vTranslation.x;
+//	result.min.y = (bounds_center.y - fEy) + vTranslation.y;
+//	result.min.z = (bounds_center.z - fEz) + vTranslation.z;
+//	result.max.x = (bounds_center.x + fEx) + vTranslation.x;
+//	result.max.y = (bounds_center.y + fEy) + vTranslation.y;
+//	result.max.z = (bounds_center.z + fEz) + vTranslation.z;
+//	return result;
 }
 
 //-----------------------------------------------------------------------------

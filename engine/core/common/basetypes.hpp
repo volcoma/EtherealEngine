@@ -89,6 +89,7 @@ private:
 template <typename T>
 struct range
 {
+    using value_type = T;
 	range() = default;
 	range(T _min, T _max)
 		: Min(_min)
@@ -97,6 +98,11 @@ struct range
 	}
 	T Min = 0;
 	T Max = 0;
+    
+    inline bool contains(const T& val) const
+    {
+        return Min <= val && val <= Max;
+    }
 
 	inline bool operator==(const range& b) const
 	{
@@ -112,6 +118,7 @@ struct range
 template <typename T>
 struct size
 {
+    using value_type = T;
 	size() = default;
 	size(T _width, T _height)
 		: width(_width)
@@ -156,6 +163,7 @@ struct size
 template <typename T>
 struct point
 {
+    using value_type = T;
 	point()
 	{
 	}
@@ -182,6 +190,7 @@ struct point
 template <typename T>
 struct rect
 {
+    using value_type = T;
 	rect()
 	{
 	}
@@ -215,6 +224,12 @@ struct rect
 	{
 		return size<T1>(right - left, bottom - top);
 	}
+    
+    template <typename T1 = T>
+	inline point<T1> center() const
+    {
+        return {left + width() / 2, top + height() / 2};
+    }
 
 	inline bool contains(const point<T>& p) const
 	{

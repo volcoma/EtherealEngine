@@ -1,5 +1,6 @@
 #include "mesh_importer.h"
 #include "assimp/Importer.hpp"
+#include "assimp/ProgressHandler.hpp"
 #include "assimp/postprocess.h"
 #include "assimp/scene.h"
 #include "core/graphics/graphics.h"
@@ -200,42 +201,112 @@ void process_meshes(const aiScene* scene, mesh::load_data& load_data)
 	}
 }
 
-void process_node(const aiNode* node, mesh::armature_node* armature_node,
-				  const math::transform& parent_transform)
+void process_node(const aiNode* node, std::unique_ptr<mesh::armature_node>& armature_node)
 {
 	armature_node->children.resize(node->mNumChildren);
 	armature_node->name = node->mName.C_Str();
 	armature_node->local_transform = process_matrix(node->mTransformation);
-	armature_node->world_transform = parent_transform * armature_node->local_transform;
 	for(size_t i = 0; i < node->mNumChildren; ++i)
 	{
 		armature_node->children[i] = std::make_unique<mesh::armature_node>();
-		process_node(node->mChildren[i], armature_node->children[i].get(), armature_node->world_transform);
+		process_node(node->mChildren[i], armature_node->children[i]);
 	}
 }
 
 void process_nodes(const aiScene* scene, mesh::load_data& load_data)
 {
-    if(scene->mRootNode->mNumChildren > 0)
-    {
-        load_data.root_node = std::make_unique<mesh::armature_node>();
-        process_node(scene->mRootNode->mChildren[0], load_data.root_node.get(), math::transform::identity);
-    }	
+	if(scene->mRootNode)
+	{
+		load_data.root_node = std::make_unique<mesh::armature_node>();
+		process_node(scene->mRootNode, load_data.root_node);
+	}
 }
 
-void process_imported_scene(const aiScene* scene, mesh::load_data& load_data)
+void process_animation(const aiAnimation* assimp_anim, animation& anim)
+{
+	anim.name = assimp_anim->mName.C_Str();
+	anim.duration = assimp_anim->mDuration;
+	anim.ticks_per_second = assimp_anim->mTicksPerSecond;
+
+	if(assimp_anim->mNumChannels > 0)
+		anim.channels.resize(assimp_anim->mNumChannels);
+
+	for(size_t i = 0; i < assimp_anim->mNumChannels; ++i)
+	{
+		const aiNodeAnim* assimp_node_anim = assimp_anim->mChannels[i];
+		auto& node_anim = anim.channels[i];
+		node_anim.node_name = assimp_node_anim->mNodeName.C_Str();
+		node_anim.pre_state = static_cast<anim_behaviour>(assimp_node_anim->mPreState);
+		node_anim.post_state = static_cast<anim_behaviour>(assimp_node_anim->mPostState);
+
+		if(assimp_node_anim->mNumPositionKeys > 0)
+			node_anim.position_keys.resize(assimp_node_anim->mNumPositionKeys);
+
+		for(size_t idx = 0; idx < assimp_node_anim->mNumPositionKeys; ++idx)
+		{
+			const auto& anim_key = assimp_node_anim->mPositionKeys[idx];
+			auto& key = node_anim.position_keys[idx];
+			key.time = anim_key.mTime;
+			key.value.x = anim_key.mValue.x;
+			key.value.y = anim_key.mValue.y;
+			key.value.z = anim_key.mValue.z;
+		}
+
+        if(assimp_node_anim->mNumRotationKeys > 0)
+			node_anim.rotation_keys.resize(assimp_node_anim->mNumRotationKeys);
+        
+		for(size_t idx = 0; idx < assimp_node_anim->mNumRotationKeys; ++idx)
+		{
+			const auto& anim_key = assimp_node_anim->mRotationKeys[idx];
+			auto& key = node_anim.rotation_keys[idx];
+			key.time = anim_key.mTime;
+			key.value.x = anim_key.mValue.x;
+			key.value.y = anim_key.mValue.y;
+			key.value.z = anim_key.mValue.z;
+			key.value.w = anim_key.mValue.w;
+		}
+
+        if(assimp_node_anim->mNumScalingKeys > 0)
+			node_anim.scaling_keys.resize(assimp_node_anim->mNumScalingKeys);       
+        
+		for(size_t idx = 0; idx < assimp_node_anim->mNumScalingKeys; ++idx)
+		{
+			const auto& anim_key = assimp_node_anim->mScalingKeys[idx];
+			auto& pos_key = node_anim.scaling_keys[idx];
+			pos_key.time = anim_key.mTime;
+			pos_key.value.x = anim_key.mValue.x;
+			pos_key.value.y = anim_key.mValue.y;
+			pos_key.value.z = anim_key.mValue.z;
+		}
+	}
+}
+void process_animations(const aiScene* scene, std::vector<animation>& animations)
+{
+	if(scene->mNumAnimations > 0)
+		animations.resize(scene->mNumAnimations);
+
+	for(size_t i = 0; i < scene->mNumAnimations; ++i)
+	{
+		const aiAnimation* assimp_anim = scene->mAnimations[i];
+		auto& anim = animations[i];
+		process_animation(assimp_anim, anim);
+	}
+}
+
+void process_imported_scene(const aiScene* scene, mesh::load_data& load_data,
+							std::vector<animation>& animations)
 {
 	load_data.vertex_format = gfx::mesh_vertex::decl;
 	process_meshes(scene, load_data);
 	process_nodes(scene, load_data);
+	process_animations(scene, animations);
 }
 
-bool importer::load_mesh_data_from_file(const std::string& path, mesh::load_data& load_data)
+bool importer::load_mesh_data_from_file(const std::string& path, mesh::load_data& load_data,
+										std::vector<animation>& animations)
 {
 	Assimp::Importer importer;
-
 	importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, aiComponent_CAMERAS | aiComponent_LIGHTS);
-	importer.SetPropertyBool("GLOB_MEASURE_TIME", true);
 
 	const aiScene* scene = importer.ReadFile(
 		path,
@@ -251,7 +322,7 @@ bool importer::load_mesh_data_from_file(const std::string& path, mesh::load_data
 		APPLOG_ERROR(importer.GetErrorString());
 		return false;
 	}
-	process_imported_scene(scene, load_data);
+	process_imported_scene(scene, load_data, animations);
 
 	return true;
 }

@@ -125,7 +125,7 @@ bool camera::is_aspect_locked() const
 	return (get_projection_mode() == projection_mode::orthographic || _aspect_locked);
 }
 
-const math::transform& camera::get_projection()
+const math::transform& camera::get_projection() const
 {
 
 	// Only update matrix if something has changed
@@ -281,23 +281,13 @@ math::volume_query camera::bounds_in_frustum(const math::bbox& AABB, const math:
 	return math::frustum::classify_obb(f, AABB, t);
 }
 
-bool camera::world_to_viewport(const upoint& viewport_pos, const usize& viewport_size, const math::vec3& pos,
-							   math::vec3& point, bool bClipX /* = true */, bool bClipY /* = true */,
-							   bool bClipZ /* = true */)
+math::vec3 camera::world_to_viewport(const math::vec3& pos) const
 {
 	// Ensure we have an up-to-date projection and view matrix
 	auto view_proj = get_view_projection();
 
 	// Transform the point into clip space
 	math::vec4 vClip = view_proj.matrix() * math::vec4{pos.x, pos.y, pos.z, 1.0f};
-
-	// Was this clipped?
-	if(bClipX == true && (vClip.x < -vClip.w || vClip.x > vClip.w))
-		return false;
-	if(bClipY == true && (vClip.y < -vClip.w || vClip.y > vClip.w))
-		return false;
-	if(bClipZ == true && (vClip.z < 0.0f || vClip.z > vClip.w))
-		return false;
 
 	// Project!
 	const float recipW = 1.0f / vClip.w;
@@ -306,13 +296,13 @@ bool camera::world_to_viewport(const upoint& viewport_pos, const usize& viewport
 	vClip.z *= recipW;
 
 	// Transform to final screen space position
-	point.x = ((vClip.x * 0.5f) + 0.5f) * (float)viewport_size.width + _viewport_pos.x;
-	point.y = ((vClip.y * -0.5f) + 0.5f) * (float)viewport_size.height + _viewport_pos.y;
-
+    math::vec3 point;
+	point.x = ((vClip.x * 0.5f) + 0.5f) * (float)_viewport_size.width + _viewport_pos.x;
+	point.y = ((vClip.y * -0.5f) + 0.5f) * (float)_viewport_size.height + _viewport_pos.y;
 	point.z = vClip.z;
 
 	// Point on screen!
-	return true;
+	return point;
 }
 
 bool camera::viewport_to_ray(const math::vec2& point, math::vec3& vecRayStart, math::vec3& vecRayDir)
@@ -634,76 +624,76 @@ void camera::touch()
 	_frustum_dirty = true;
 }
 
-camera camera::get_face_camera(uint32_t face, const math::transform &transform)
+camera camera::get_face_camera(uint32_t face, const math::transform& transform)
 {
-    camera cam;
-    cam.set_fov(90.0f);
-    cam.set_aspect_ratio(1.0f, true);
-    cam.set_near_clip(0.01f);
-    cam.set_far_clip(256.0f);
-    
-    // Configurable axis vectors used to construct view matrices. In the
-    // case of the omni light, we align all frustums to the world axes.
-    math::vec3 X(1, 0, 0);
-    math::vec3 Y(0, 1, 0);
-    math::vec3 Z(0, 0, 1);
-    math::vec3 Zero(0, 0, 0);
-    math::transform t;
-    // Generate the correct view matrix for the frustum
-    if(!gfx::is_origin_bottom_left())
-    {
-        switch(face)
-        {
-        case 0:
-            t.set_rotation(-Z, +Y, +X);
-            break;
-        case 1:
-            t.set_rotation(+Z, +Y, -X);
-            break;
-        case 2:
-            t.set_rotation(+X, -Z, +Y);
-            break;
-        case 3:
-            t.set_rotation(+X, +Z, -Y);
-            break;
-        case 4:
-            t.set_rotation(+X, +Y, +Z);
-            break;
-        case 5:
-            t.set_rotation(-X, +Y, -Z);
-            break;
-        }
-    }
-    else
-    {
-        switch(face)
-        {
-        case 0:
-            t.set_rotation(-Z, +Y, +X);
-            break;
-        case 1:
-            t.set_rotation(+Z, +Y, -X);
-            break;
-        case 3:
-            t.set_rotation(+X, -Z, +Y);
-            break;
-        case 2:
-            t.set_rotation(+X, +Z, -Y);
-            break;
-        case 4:
-            t.set_rotation(+X, +Y, +Z);
-            break;
-        case 5:
-            t.set_rotation(-X, +Y, -Z);
-            break;
-        }
-    }
-    
-    t = transform * t;
-    // First update so the camera can cache the previous matrices
-    cam.record_current_matrices();
-    // Set new transform
-    cam.look_at(t.get_position(), t.get_position() + t.z_unit_axis(), t.y_unit_axis());
-    
-    return cam;
+	camera cam;
+	cam.set_fov(90.0f);
+	cam.set_aspect_ratio(1.0f, true);
+	cam.set_near_clip(0.01f);
+	cam.set_far_clip(256.0f);
+
+	// Configurable axis vectors used to construct view matrices. In the
+	// case of the omni light, we align all frustums to the world axes.
+	math::vec3 X(1, 0, 0);
+	math::vec3 Y(0, 1, 0);
+	math::vec3 Z(0, 0, 1);
+	math::vec3 Zero(0, 0, 0);
+	math::transform t;
+	// Generate the correct view matrix for the frustum
+	if(!gfx::is_origin_bottom_left())
+	{
+		switch(face)
+		{
+			case 0:
+				t.set_rotation(-Z, +Y, +X);
+				break;
+			case 1:
+				t.set_rotation(+Z, +Y, -X);
+				break;
+			case 2:
+				t.set_rotation(+X, -Z, +Y);
+				break;
+			case 3:
+				t.set_rotation(+X, +Z, -Y);
+				break;
+			case 4:
+				t.set_rotation(+X, +Y, +Z);
+				break;
+			case 5:
+				t.set_rotation(-X, +Y, -Z);
+				break;
+		}
+	}
+	else
+	{
+		switch(face)
+		{
+			case 0:
+				t.set_rotation(-Z, +Y, +X);
+				break;
+			case 1:
+				t.set_rotation(+Z, +Y, -X);
+				break;
+			case 3:
+				t.set_rotation(+X, -Z, +Y);
+				break;
+			case 2:
+				t.set_rotation(+X, +Z, -Y);
+				break;
+			case 4:
+				t.set_rotation(+X, +Y, +Z);
+				break;
+			case 5:
+				t.set_rotation(-X, +Y, -Z);
+				break;
+		}
+	}
+
+	t = transform * t;
+	// First update so the camera can cache the previous matrices
+	cam.record_current_matrices();
+	// Set new transform
+	cam.look_at(t.get_position(), t.get_position() + t.z_unit_axis(), t.y_unit_axis());
+
+	return cam;
 }

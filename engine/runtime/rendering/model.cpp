@@ -46,12 +46,16 @@ asset_handle<mesh> model::get_lod(std::uint32_t lod) const
 void model::set_lod(asset_handle<mesh> mesh, std::uint32_t lod)
 {
 	if(lod >= _mesh_lods.size())
+    {
 		_mesh_lods.resize(lod + 1);
-
+        recalulate_lod_limits();
+    }
 	_mesh_lods[lod] = mesh;
 
 	if(_materials.size() != mesh->get_subset_count())
+	{
 		_materials.resize(mesh->get_subset_count(), _default_material);
+	}
 }
 
 void model::set_material(asset_handle<material> material, std::uint32_t index)
@@ -69,7 +73,13 @@ const std::vector<asset_handle<mesh>>& model::get_lods() const
 
 void model::set_lods(const std::vector<asset_handle<mesh>>& lods)
 {
+	auto sz1 = lods.size();
+	auto sz2 = _mesh_lods.size();
+
 	_mesh_lods = lods;
+
+	if(sz1 != sz2)
+		recalulate_lod_limits();
 
 	if(_mesh_lods.size() > 0)
 	{
@@ -100,20 +110,9 @@ asset_handle<material> model::get_material_for_group(const size_t& group) const
 	return _materials[group];
 }
 
-void model::set_lod_max_distance(float distance)
+void model::set_lod_limits(const std::vector<urange>& limits)
 {
-	if(distance < _min_distance)
-		distance = _min_distance;
-
-	_max_distance = distance;
-}
-
-void model::set_lod_min_distance(float distance)
-{
-	if(distance > _max_distance)
-		distance = _max_distance;
-
-	_min_distance = distance;
+	_lod_limits = limits;
 }
 
 void model::render(std::uint8_t id, const math::transform& world_transform,
@@ -201,5 +200,23 @@ void model::render(std::uint8_t id, const math::transform& world_transform,
 			render_subset(id, false, std::uint32_t(i), world_transform, 1, apply_cull, depth_write,
 						  depth_test, extra_states, user_program, setup_params);
 		}
+	}
+}
+
+void model::recalulate_lod_limits()
+{
+	float upper_limit = 100.0f;
+	_lod_limits.clear();
+	_lod_limits.reserve(_mesh_lods.size());
+
+	for(size_t i = 0; i < _mesh_lods.size(); ++i)
+	{
+		float lower_limit = 0.0f;
+        
+        if(_mesh_lods.size() - 1 != i)
+            lower_limit = upper_limit * (0.6f - ((i)*0.1f));
+        
+		_lod_limits.emplace_back(urange(urange::value_type(lower_limit), urange::value_type(upper_limit)));
+		upper_limit = lower_limit;
 	}
 }

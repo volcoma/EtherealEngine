@@ -272,7 +272,7 @@ public:
 	/// Return the current projection matrix.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const math::transform& get_projection();
+	const math::transform& get_projection() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_view ()
@@ -302,7 +302,7 @@ public:
 	/// Return the current view-projection matrix.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline math::transform get_view_projection()
+	inline math::transform get_view_projection() const
 	{
 		return get_projection() * get_view();
 	}
@@ -440,8 +440,7 @@ public:
 	/// if the point was clipped off the screen.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool world_to_viewport(const upoint& viewport_pos, const usize& viewport_size, const math::vec3& pos,
-						   math::vec3& point, bool clipX = true, bool clipY = true, bool clipZ = true);
+	math::vec3 world_to_viewport(const math::vec3& pos) const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : estimate_zoom_factor ()
@@ -569,14 +568,14 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void touch();
-    
-    //-----------------------------------------------------------------------------
+
+	//-----------------------------------------------------------------------------
 	//  Name : () touch
 	/// <summary>
 	/// Get camera for one of six cube faces
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    static camera get_face_camera(std::uint32_t face, const math::transform& transform);
+	static camera get_face_camera(std::uint32_t face, const math::transform& transform);
 
 protected:
 	//-------------------------------------------------------------------------
@@ -599,7 +598,7 @@ protected:
 	/// Cached view matrix
 	math::transform _view;
 	/// Cached projection matrix.
-	math::transform _projection;
+	mutable math::transform _projection;
 	/// Cached "previous" view matrix.
 	math::transform _last_view;
 	/// Cached "previous" projection matrix.
@@ -617,9 +616,9 @@ protected:
 	/// View matrix dirty ?
 	bool _view_dirty = true;
 	/// Projection matrix dirty ?
-	bool _projection_dirty = true;
+	mutable bool _projection_dirty = true;
 	/// Has the aspect ratio changed?
-	bool _aspect_dirty = true;
+	mutable bool _aspect_dirty = true;
 	/// Are the frustum planes dirty ?
 	bool _frustum_dirty = true;
 	/// Should the aspect ratio be automatically updated by the render driver?

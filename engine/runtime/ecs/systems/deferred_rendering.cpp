@@ -18,19 +18,34 @@
 namespace runtime
 {
 
-
-void update_lod_data(lod_data& data, std::size_t total_lods, float min_dist, float max_dist,
-					 float transition_time, float distance, float dt)
+bool update_lod_data(lod_data& data, const std::vector<urange>& lod_limits, std::size_t total_lods,
+					 float transition_time, float dt, asset_handle<mesh> mesh, const math::transform& world,
+					 const camera& cam)
 {
+	if(!mesh)
+		return false;
+
 	if(total_lods <= 1)
-		return;
+		return true;
 
-	total_lods -= 1;
+	const auto& viewport = cam.get_viewport_size();
+	irect rect = mesh->calculate_screen_rect(world, cam);
 
-	const float factor = 1.0f - math::clamp((max_dist - distance) / (max_dist - min_dist), 0.0f, 1.0f);
-	const int lod = (int)math::lerp(0.0f, static_cast<float>(total_lods), factor);
+	float percent = math::clamp((float(rect.height()) / float(viewport.height)) * 100.0f, 0.0f, 100.0f);
+
+	std::size_t lod = 0;
+	for(size_t i = 0; i < lod_limits.size(); ++i)
+	{
+		const auto& range = lod_limits[i];
+		if(range.contains(urange::value_type(percent)))
+		{
+			lod = i;
+		}
+	}
+
+	lod = math::clamp<std::size_t>(lod, 0, total_lods - 1);
 	if(data.target_lod_index != lod && data.target_lod_index == data.current_lod_index)
-		data.target_lod_index = lod;
+		data.target_lod_index = static_cast<std::uint32_t>(lod);
 
 	if(data.current_lod_index != data.target_lod_index)
 		data.current_time += dt;
@@ -40,6 +55,11 @@ void update_lod_data(lod_data& data, std::size_t total_lods, float min_dist, flo
 		data.current_lod_index = data.target_lod_index;
 		data.current_time = 0.0f;
 	}
+
+	if(percent < 1.0f)
+		return false;
+
+	return true;
 }
 
 bool should_rebuild_reflections(visibility_set_models_t& visibility_set, const reflection_probe& probe)
@@ -50,7 +70,6 @@ bool should_rebuild_reflections(visibility_set_models_t& visibility_set, const r
 
 	for(auto& element : visibility_set)
 	{
-		auto& e = std::get<0>(element);
 		auto& transform_comp_handle = std::get<1>(element);
 		auto& model_comp_handle = std::get<2>(element);
 		auto transform_comp_ptr = transform_comp_handle.lock();
@@ -86,42 +105,40 @@ bool should_rebuild_reflections(visibility_set_models_t& visibility_set, const r
 	return false;
 }
 
-bool should_rebuild_shadows(visibility_set_models_t& visibility_set, const light& l)
+bool should_rebuild_shadows(visibility_set_models_t& visibility_set, const light&)
 {
-	for(auto& element : visibility_set)
-	{
-		auto& e = std::get<0>(element);
-		auto& transform_comp_handle = std::get<1>(element);
-		auto& model_comp_handle = std::get<2>(element);
-		auto transform_comp_ptr = transform_comp_handle.lock();
-		auto model_comp_ptr = model_comp_handle.lock();
-		if(!transform_comp_ptr || !model_comp_ptr)
-			continue;
+	//	for(auto& element : visibility_set)
+	//	{
+	//		auto& transform_comp_handle = std::get<1>(element);
+	//		auto& model_comp_handle = std::get<2>(element);
+	//		auto transform_comp_ptr = transform_comp_handle.lock();
+	//		auto model_comp_ptr = model_comp_handle.lock();
+	//		if(!transform_comp_ptr || !model_comp_ptr)
+	//			continue;
 
-		auto& transform_comp_ref = *transform_comp_ptr.get();
-		auto& model_comp_ref = *model_comp_ptr.get();
+	//		auto& transform_comp_ref = *transform_comp_ptr.get();
+	//		auto& model_comp_ref = *model_comp_ptr.get();
 
-		const auto& model = model_comp_ref.get_model();
-		if(!model.is_valid())
-			continue;
+	//		const auto& model = model_comp_ref.get_model();
+	//		if(!model.is_valid())
+	//			continue;
 
-		const auto mesh = model.get_lod(0);
+	//		const auto mesh = model.get_lod(0);
 
-		const auto& world_transform = transform_comp_ref.get_transform();
+	//		const auto& world_transform = transform_comp_ref.get_transform();
+	//		const auto& bounds = mesh->get_bounds();
 
-		const auto& bounds = mesh->get_bounds();
+	//		bool result = false;
 
-		bool result = false;
+	//		// for(std::uint32_t i = 0; i < 6; ++i)
+	//		//{
+	//		//	const auto& frustum = camera::get_face_camera(i, world_transform).get_frustum();
+	//		//	result |= math::frustum::test_obb(frustum, bounds, world_transform);
+	//		//}
 
-		//for(std::uint32_t i = 0; i < 6; ++i)
-		//{
-		//	const auto& frustum = camera::get_face_camera(i, world_transform).get_frustum();
-		//	result |= math::frustum::test_obb(frustum, bounds, world_transform);
-		//}
-
-		if(result)
-			return true;
-	}
+	//		if(result)
+	//			return true;
+	//	}
 
 	return false;
 }
@@ -249,7 +266,7 @@ void deferred_rendering::build_reflections_pass(entity_component_system& ecs, st
 			output = tonemapping_pass(output, camera, render_view);
 
 			render_pass pass("cubemap_fill");
-			gfx::blit(pass.id, gfx::getTexture(cubemap_fbo->handle), 0, 0, 0, i,
+			gfx::blit(pass.id, gfx::getTexture(cubemap_fbo->handle), 0, 0, 0, std::uint16_t(i),
 					  gfx::getTexture(output->handle));
 		}
 
@@ -261,10 +278,10 @@ void deferred_rendering::build_reflections_pass(entity_component_system& ecs, st
 
 void deferred_rendering::build_shadows_pass(entity_component_system& ecs, std::chrono::duration<float> dt)
 {
-    auto dirty_models = gather_visible_models(ecs, nullptr, true, true, true);
+	auto dirty_models = gather_visible_models(ecs, nullptr, true, true, true);
 	ecs.each<transform_component, light_component>([this, &ecs, dt, &dirty_models](
 		entity ce, transform_component& transform_comp, light_component& light_comp) {
-		const auto& world_tranform = transform_comp.get_transform();
+		// const auto& world_tranform = transform_comp.get_transform();
 		const auto& light = light_comp.get_light();
 
 		bool should_rebuild = true;
@@ -277,8 +294,6 @@ void deferred_rendering::build_shadows_pass(entity_component_system& ecs, std::c
 
 		if(!should_rebuild)
 			return;
-
-		
 
 	});
 }
@@ -353,9 +368,8 @@ deferred_rendering::g_buffer_pass(std::shared_ptr<frame_buffer> input, camera& c
 
 		auto& lod_data = camera_lods[e];
 		const auto transition_time = model.get_lod_transition_time();
-		const auto min_distance = model.get_lod_min_distance();
-		const auto max_distance = model.get_lod_max_distance();
 		const auto lod_count = model.get_lods().size();
+		const auto& lod_limits = model.get_lod_limits();
 		const auto current_time = lod_data.current_time;
 		const auto current_lod_index = lod_data.current_lod_index;
 		const auto target_lod_index = lod_data.target_lod_index;
@@ -363,40 +377,18 @@ deferred_rendering::g_buffer_pass(std::shared_ptr<frame_buffer> input, camera& c
 		const auto current_mesh = model.get_lod(current_lod_index);
 		if(!current_mesh)
 			continue;
-		;
 
-		if(model.get_lods().size() > 1)
-		{
-			const auto& bounds = current_mesh->get_bounds();
-
-			float t = 0.0f;
-			const auto ray_origin = camera.get_position();
-			const auto inv_world = math::inverse(world_transform);
-			const auto object_ray_origin = inv_world.transform_coord(ray_origin);
-			const auto object_ray_direction = math::normalize(bounds.get_center() - object_ray_origin);
-			bounds.intersect(object_ray_origin, object_ray_direction, t);
-
-			// Compute final object space intersection point.
-			auto intersection_point = object_ray_origin + (object_ray_direction * t);
-
-			// transform intersection point back into world space to compute
-			// the final intersection distance.
-			intersection_point = world_transform.transform_coord(intersection_point);
-			const float distance = math::length(intersection_point - ray_origin);
-
-			// Compute Lods
-			update_lod_data(lod_data, lod_count, min_distance, max_distance, transition_time, distance,
-							dt.count());
-		}
-
+		if(false == update_lod_data(lod_data, lod_limits, lod_count, transition_time, dt.count(),
+									current_mesh, world_transform, camera))
+			continue;
 		const auto params = math::vec3{0.0f, -1.0f, (transition_time - current_time) / transition_time};
 
 		const auto params_inv = math::vec3{1.0f, 1.0f, current_time / transition_time};
 
-        const auto& bone_transforms = model_comp_ref.get_bone_transforms();
+		const auto& bone_transforms = model_comp_ref.get_bone_transforms();
 
-        model.render(pass.id, world_transform, bone_transforms, true, true, true, 0, current_lod_index, nullptr,
-					 [&camera, &clip_planes, &params](program& p) {
+		model.render(pass.id, world_transform, bone_transforms, true, true, true, 0, current_lod_index,
+					 nullptr, [&camera, &clip_planes, &params](program& p) {
 						 auto camera_pos = camera.get_position();
 						 p.set_uniform("u_camera_wpos", &camera_pos);
 						 p.set_uniform("u_camera_clip_planes", &clip_planes);
@@ -405,8 +397,8 @@ deferred_rendering::g_buffer_pass(std::shared_ptr<frame_buffer> input, camera& c
 
 		if(current_time != 0.0f)
 		{
-			model.render(pass.id, world_transform, bone_transforms, true, true, true, 0, target_lod_index, nullptr,
-						 [&camera, &clip_planes, &params_inv](program& p) {
+			model.render(pass.id, world_transform, bone_transforms, true, true, true, 0, target_lod_index,
+						 nullptr, [&camera, &clip_planes, &params_inv](program& p) {
 							 p.set_uniform("u_lod_params", &params_inv);
 						 });
 		}
@@ -423,8 +415,6 @@ std::shared_ptr<frame_buffer> deferred_rendering::lighting_pass(std::shared_ptr<
 {
 	const auto& view = camera.get_view();
 	const auto& proj = camera.get_projection();
-	const auto view_proj = proj * view;
-	const auto inv_view_proj = math::inverse(view_proj);
 
 	const auto& viewport_size = camera.get_viewport_size();
 	auto g_buffer_fbo = render_view.get_g_buffer_fbo(viewport_size).get();
@@ -457,7 +447,7 @@ std::shared_ptr<frame_buffer> deferred_rendering::lighting_pass(std::shared_ptr<
 		const auto& light_position = world_transform.get_position();
 		const auto& light_direction = world_transform.z_unit_axis();
 
-		irect rect(0, 0, buffer_size.width, buffer_size.height);
+		irect rect(0, 0, irect::value_type(buffer_size.width), irect::value_type(buffer_size.height));
 		if(light_comp_ref.compute_projected_sphere_rect(rect, light_position, light_direction, view, proj) ==
 		   0)
 			return;

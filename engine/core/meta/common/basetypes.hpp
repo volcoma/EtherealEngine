@@ -27,4 +27,11 @@ inline void SERIALIZE_FUNCTION_NAME(Archive& ar, point<T>& obj)
 	try_serialize(ar, cereal::make_nvp("x", obj.x));
 	try_serialize(ar, cereal::make_nvp("y", obj.y));
 }
+
+template <typename Archive, typename T>
+inline void SERIALIZE_FUNCTION_NAME(Archive& ar, range<T>& obj)
+{
+	try_serialize(ar, cereal::make_nvp("min", obj.Min));
+	try_serialize(ar, cereal::make_nvp("max", obj.Max));
+}
 }

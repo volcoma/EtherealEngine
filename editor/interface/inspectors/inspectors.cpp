@@ -79,7 +79,7 @@ bool inspect_var(rttr::variant& var, bool read_only,
 				};
 				if(is_array)
 				{
-					changed |= inspect_array(prop_var, is_readonly);
+					changed |= inspect_array(prop_var, is_readonly, get_meta);
 				}
 				else if(is_associative_container)
 				{
@@ -109,7 +109,7 @@ bool inspect_var(rttr::variant& var, bool read_only,
 	return changed;
 }
 
-bool inspect_array(rttr::variant& var, bool read_only)
+bool inspect_array(rttr::variant& var, bool read_only, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
 	auto array_view = var.create_array_view();
 	auto size = array_view.get_size();
@@ -135,7 +135,7 @@ bool inspect_array(rttr::variant& var, bool read_only)
 
 		property_layout layout(element.data());
 
-		changed |= inspect_var(value);
+		changed |= inspect_var(value, read_only, get_metadata);
 
 		if(changed)
 			array_view.set_value(i, value);

@@ -2,15 +2,17 @@
 
 #include "core/graphics/graphics.h"
 #include "core/math/math_includes.h"
+#include "core/common/basetypes.hpp"
 #include "core/reflection/registration.h"
 #include "core/serialization/serialization.h"
+
 #include <map>
 #include <memory>
 #include <vector>
 
 struct vertex_buffer;
 struct index_buffer;
-
+class camera;
 namespace triangle_flags
 {
 enum e
@@ -408,7 +410,6 @@ public:
 	{
 		std::string name;
 		math::transform local_transform;
-		math::transform world_transform;
 		std::vector<std::unique_ptr<armature_node>> children;
 	};
 
@@ -762,7 +763,8 @@ public:
 	const bone_palette_array_t& get_bone_palettes() const;
 
 	const std::unique_ptr<armature_node>& get_armature() const;
-	//-----------------------------------------------------------------------------
+    irect calculate_screen_rect(const math::transform& world, const camera& cam) const;
+    //-----------------------------------------------------------------------------
 	//  Name : get_subset ()
 	/// <summary>
 	/// Retrieve information about the subset of the mesh that is associated with
@@ -1020,7 +1022,7 @@ protected:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void bind_mesh_data(std::uint32_t face_start, std::uint32_t face_count, std::uint32_t vertex_start,
-						  std::uint32_t vertex_count);
+						std::uint32_t vertex_count);
 
 	//-------------------------------------------------------------------------
 	// Protected Static Functions

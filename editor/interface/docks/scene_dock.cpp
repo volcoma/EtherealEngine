@@ -157,12 +157,30 @@ void manipulation_gizmos()
 				else if(operation == imguizmo::operation::scale)
 					snap = &es.snap_data.scale_snap;
 			}
-
-			imguizmo::manipulate(camera_comp->get_camera().get_view(),
-								 camera_comp->get_camera().get_projection(), operation, mode, transform,
+			const auto& camera = camera_comp->get_camera();
+			imguizmo::manipulate(camera.get_view(), camera.get_projection(), operation, mode, transform,
 								 nullptr, snap);
 
 			transform_comp->set_transform(transform);
+
+//			if(sel.has_component<model_component>())
+//			{
+//				const auto model_comp = sel.get_component<model_component>();
+//				const auto model_comp_ptr = model_comp.lock().get();
+//				const auto& model = model_comp_ptr->get_model();
+//				if(!model.is_valid())
+//					return;
+
+//				const auto mesh = model.get_lod(0);
+//				if(!mesh)
+//					return;
+
+//				irect rect = mesh->calculate_screen_rect(transform, camera);
+           
+//				gui::GetCurrentWindow()->DrawList->AddRect(ImVec2(rect.left, rect.top),
+//														   ImVec2(rect.right, rect.bottom),
+//														   gui::GetColorU32(ImVec4(1.0f, 0.0f, 0.0f, 1.0f)));
+//			}
 		}
 	}
 }
@@ -408,7 +426,7 @@ void scene_dock::render(const ImVec2&)
 					auto dragged_entity = dragged.get_value<runtime::entity>();
 					if(dragged_entity)
 					{
-                        dragged_entity.get_component<transform_component>().lock()->set_parent({});
+						dragged_entity.get_component<transform_component>().lock()->set_parent({});
 					}
 
 					es.drop();

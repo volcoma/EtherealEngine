@@ -93,12 +93,35 @@ void default_scene()
 	{
 		auto object = ecs.create();
 		object.set_name("object");
-		object.assign<transform_component>().lock()->set_local_position({0.0f, 0.5f, 0.0f});
+		object.assign<transform_component>().lock()->set_local_position({-2.0f, 0.5f, 0.0f});
 
 		auto asset_future = am.load<mesh>("embedded:/sphere");
 		model model;
 		model.set_lod(asset_future.get(), 0);
 
+		// Add component and configure it.
+		object.assign<model_component>().lock()->set_casts_shadow(true).set_casts_reflection(false).set_model(
+			model);
+	}
+
+	{
+		auto object = ecs.create();
+		object.set_name("object");
+		object.assign<transform_component>().lock()->set_local_position({2.0f, 1.0f, 0.0f});
+
+		model model;
+		{
+			auto asset_future = am.load<mesh>("embedded:/icosphere4");
+			model.set_lod(asset_future.get(), 0);
+		}
+        {
+			auto asset_future = am.load<mesh>("embedded:/icosphere3");
+			model.set_lod(asset_future.get(), 1);
+		}
+        {
+			auto asset_future = am.load<mesh>("embedded:/icosphere2");
+			model.set_lod(asset_future.get(), 2);
+		}
 		// Add component and configure it.
 		object.assign<model_component>().lock()->set_casts_shadow(true).set_casts_reflection(false).set_model(
 			model);
@@ -363,15 +386,14 @@ void main_editor_window::render_dockspace()
 		_dockspace.update_and_draw(
 			ImVec2(gui::GetContentRegionAvail().x, gui::GetContentRegionAvail().y - offset));
 
-        
-        auto& ts = core::get_subsystem<core::task_system>();
-        auto pending_tasks = ts.get_pending_tasks();
-        if(pending_tasks > 0)
-        {
-            gui::AlignFirstTextHeightToWidgets();        
-            gui::Text("Tasks : %d", ts.get_pending_tasks());
-            gui::SameLine();            
-        }
+		auto& ts = core::get_subsystem<core::task_system>();
+		auto pending_tasks = ts.get_pending_tasks();
+		if(pending_tasks > 0)
+		{
+			gui::AlignFirstTextHeightToWidgets();
+			gui::Text("Tasks : %d", ts.get_pending_tasks());
+			gui::SameLine();
+		}
 
 		auto items = _console_log->get_items();
 
@@ -390,7 +412,6 @@ void main_editor_window::render_dockspace()
 			}
 			gui::PopStyleColor();
 		}
-        
 	}
 }
 

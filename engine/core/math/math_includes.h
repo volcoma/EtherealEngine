@@ -8,9 +8,22 @@
 #include "plane.h"
 #include "transform.h"
 #include <cstdint>
-
+#include <vector>
 namespace math
 {
+
+static inline std::vector<float> log_space(std::size_t start, std::size_t end, std::size_t count)
+{
+	std::vector<float> result;
+	result.reserve(count);
+	for(std::size_t i = 0; i <= count; ++i)
+	{
+		float f = start * glm::pow(float(end) / float(start), float(i) / float(count));
+		result.push_back(f);
+	}
+
+	return result;
+}
 
 inline bool is_negative_float(const float& A)
 {
@@ -90,6 +103,7 @@ inline bool compute_projected_sphere_shaft(float light_x, float light_z, float r
 	return in_out_min_x <= in_out_max_x;
 }
 
+//@return 0: not visible, 1:use scissor rect, 2: no scissor rect needed
 inline uint32_t compute_projected_sphere_rect(std::int32_t& left, std::int32_t& right, std::int32_t& top,
 											  std::int32_t& bottom, const vec3& sphere_center, float radius,
 											  const transform& view, const transform& proj)
