@@ -244,7 +244,7 @@ int ImageButtonWithAspectAndLabel(ImTextureID texture, ImVec2 texture_size, ImVe
 		if(selected)
 			RenderFrameEx(GetItemRectMin(), GetItemRectMax(), true, 0.0f, 2.0f);
 
-		auto pos = GetCursorScreenPos();
+		auto pos = GetCursorPos();
 		PushItemWidth(size.x);
 		//			LabelTextEx("", label);
 		if(!(selected && edit))
@@ -269,7 +269,7 @@ int ImageButtonWithAspectAndLabel(ImTextureID texture, ImVec2 texture_size, ImVe
 
 		if(selected && edit)
 		{
-			SetCursorScreenPos(pos);
+			SetCursorPos(pos);
 			PushItemWidth(size.x);
 
 			if(InputText("", &buf[0], buf_size, flags))

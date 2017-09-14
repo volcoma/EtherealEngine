@@ -114,11 +114,11 @@ void default_scene()
 			auto asset_future = am.load<mesh>("embedded:/icosphere4");
 			model.set_lod(asset_future.get(), 0);
 		}
-        {
+		{
 			auto asset_future = am.load<mesh>("embedded:/icosphere3");
 			model.set_lod(asset_future.get(), 1);
 		}
-        {
+		{
 			auto asset_future = am.load<mesh>("embedded:/icosphere2");
 			model.set_lod(asset_future.get(), 2);
 		}
@@ -381,23 +381,23 @@ void main_editor_window::render_dockspace()
 	if(!_show_start_page)
 	{
 
+		auto& ts = core::get_subsystem<core::task_system>();
+		auto pending_tasks = ts.get_pending_tasks();
+		auto items = _console_log->get_items();
+
 		float offset = gui::GetItemsLineHeightWithSpacing();
 
 		_dockspace.update_and_draw(
 			ImVec2(gui::GetContentRegionAvail().x, gui::GetContentRegionAvail().y - offset));
 
-		auto& ts = core::get_subsystem<core::task_system>();
-		auto pending_tasks = ts.get_pending_tasks();
 		if(pending_tasks > 0)
 		{
 			gui::AlignFirstTextHeightToWidgets();
-			gui::Text("Tasks : %d", ts.get_pending_tasks());
+			gui::Text("Tasks : %u", ts.get_pending_tasks());
 			gui::SameLine();
 		}
 
-		auto items = _console_log->get_items();
-
-		if(!items.empty())
+		if(items.size() > 0)
 		{
 			auto& last_item = items.back();
 			const auto& colorization = _console_log->get_level_colorization(last_item.second);

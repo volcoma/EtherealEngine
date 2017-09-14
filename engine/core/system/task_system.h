@@ -18,7 +18,6 @@
 #include <thread>
 #include <utility>
 #include <vector>
-
 namespace core
 {
 class task_system;
@@ -226,7 +225,10 @@ public:
 
 	std::uint64_t get_id() const
 	{
-		return _t->id;
+        if(_t)
+            return _t->id;
+        
+        return 0;
 	}
 
 	friend class task_system;
@@ -508,7 +510,7 @@ class task_system : public core::subsystem
 {
 	template <typename T>
 	friend class task_future;
-
+    
 public:
 	using Allocator = std::allocator<task>;
 
@@ -808,31 +810,15 @@ private:
 		if(queue_index == invalid_index)
 			return false;
 
-		auto& queue = _queues[queue_index];
+        const auto condition = [&t]()
+        {
+            return !t.is_ready();
+        };
+        
+        run(queue_index, condition, 5ms);
 
-		while(!t.is_ready())
-		{
-			bool became_ready = false;
-			while(queue.get_pending_tasks() > 0)
-			{
-				p = queue.pop(false);
-				if(!p.first)
-					continue;
-
-				if(p.first)
-					p.second();
-
-				became_ready = t.is_ready();
-				if(became_ready)
-					break;
-			}
-
-			if(!became_ready)
-				t.wait_for(5ms);
-			else
-				break;
-		}
 		return true;
+        
 	}
 
 	//-----------------------------------------------------------------------------
@@ -841,7 +827,7 @@ private:
 	/// Main loop of our worker threads
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void run(std::size_t idx);
+	void run(std::size_t idx, std::function<bool()> condition, std::chrono::milliseconds pop_timeout = std::chrono::milliseconds::max());
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_thread_queue_idx ()
@@ -869,21 +855,15 @@ private:
 
 		std::size_t get_pending_tasks() const;
 		void set_done();
+        bool is_done() const;
 		std::pair<bool, task> try_pop();
 		bool try_push(task& t);
-		std::pair<bool, task> pop(bool wait = true);
+		std::pair<bool, task> pop(std::chrono::milliseconds pop_timeout = std::chrono::milliseconds::max());
 
 		void push(task t);
 
 	private:
-		//-----------------------------------------------------------------------------
-		//  Name : rotate_ ()
-		/// <summary>
-		/// Rotates the first element of the list onto the end
-		/// </summary>
-		//-----------------------------------------------------------------------------
-		void rotate_();
-
+        void sort();
 		std::deque<task> _tasks;
 		std::condition_variable _cv;
 		mutable std::mutex _mutex;
@@ -902,19 +882,19 @@ private:
 template <typename T>
 void task_future<T>::wait() const
 {
+    if(!future.valid())
+        return;
+    
 	if(!is_ready())
 	{
 		if(_system)
 		{
 			if(!_system->processing_wait(*this))
 			{
-				if(future.valid())
-				{
-					future.wait();
-				}
+				future.wait();
 			}
 		}
-		else if(future.valid())
+		else
 		{
 			future.wait();
 		}

@@ -1,17 +1,16 @@
 #include "task_system.h"
-
+#include <limits>
 namespace core
 {
 
 task::task_concept::~task_concept() noexcept = default;
 
-void task_system::task_queue::rotate_()
+void task_system::task_queue::sort()
 {
-	/* zero or one element list -- trivial to rotate */
-	if(_tasks.empty())
-		return;
-
-	std::rotate(_tasks.begin(), _tasks.begin() + 1, _tasks.end());
+	if(_tasks.size() > 1)
+	{
+		std::stable_partition(_tasks.begin(), _tasks.end(), [](const auto& task1) { return task1.ready(); });
+	}
 }
 
 task_system::task_queue::task_queue()
@@ -37,6 +36,11 @@ void task_system::task_queue::set_done()
 	_cv.notify_all();
 }
 
+bool task_system::task_queue::is_done() const
+{
+	return _done.load();
+}
+
 std::pair<bool, task> task_system::task_queue::try_pop()
 {
 	std::unique_lock<std::mutex> lock(_mutex, std::try_to_lock);
@@ -52,7 +56,7 @@ std::pair<bool, task> task_system::task_queue::try_pop()
 		return std::make_pair(true, std::move(t));
 	}
 
-	rotate_();
+	sort();
 	return std::make_pair(false, task{});
 }
 
@@ -70,13 +74,18 @@ bool task_system::task_queue::try_push(task& t)
 	return true;
 }
 
-std::pair<bool, task> task_system::task_queue::pop(bool wait)
+std::pair<bool, task> task_system::task_queue::pop(std::chrono::milliseconds pop_timeout)
 {
 	std::unique_lock<std::mutex> lock(_mutex);
-
-	if(wait)
+	bool wait = pop_timeout > decltype(pop_timeout)(0);
+	bool timed_wait = pop_timeout != decltype(pop_timeout)::max();
+	if(wait && _tasks.empty())
 	{
-		while(_tasks.empty() && !_done)
+		if(timed_wait)
+		{
+			_cv.wait_for(lock, pop_timeout);
+		}
+		else
 		{
 			_cv.wait(lock);
 		}
@@ -85,42 +94,26 @@ std::pair<bool, task> task_system::task_queue::pop(bool wait)
 	if(_tasks.empty())
 		return std::make_pair(false, task{});
 
-	auto sz = _tasks.size();
-	for(decltype(sz) i = 0; i < sz; ++i)
-	{
-		if(_tasks.front().ready())
-		{
-			auto t = std::move(_tasks.front());
-			_tasks.pop_front();
-			return std::make_pair(true, std::move(t));
-		}
-		else
-		{
-			rotate_();
-		}
-	}
-
-	// If we get to this point the best we can do is pop
-	// from the
-	// front of the task list, release the lock, and wait
-	// for the
-	// task to be ready.
-
-	if(wait)
+	if(_tasks.front().ready())
 	{
 		auto t = std::move(_tasks.front());
 		_tasks.pop_front();
-		lock.unlock();
-
-		while(!t.ready())
-			std::this_thread::yield();
-
 		return std::make_pair(true, std::move(t));
 	}
 	else
 	{
-		return std::make_pair(false, task{});
+		sort();
 	}
+
+	// try after sort
+	if(_tasks.front().ready())
+	{
+		auto t = std::move(_tasks.front());
+		_tasks.pop_front();
+		return std::make_pair(true, std::move(t));
+	}
+
+	return std::make_pair(false, task{});
 }
 
 void task_system::task_queue::push(task t)
@@ -132,27 +125,30 @@ void task_system::task_queue::push(task t)
 	_cv.notify_one();
 }
 
-void task_system::run(std::size_t idx)
+void task_system::run(std::size_t idx, std::function<bool()> condition, std::chrono::milliseconds pop_timeout)
 {
-	while(true)
+	while(condition())
 	{
+		const auto queue_index = get_thread_queue_idx(idx);
+		bool is_done = _queues[queue_index].is_done();
+		if(is_done && _queues[queue_index].get_pending_tasks() == 0)
+			return;
+
 		std::pair<bool, task> p = {false, task()};
 
-		for(std::size_t k = 0; k < 10 * _threads_count; ++k)
+		if(idx != 0)
 		{
-			const auto queue_index = get_thread_queue_idx(idx, k);
-			p = _queues[queue_index].try_pop();
-			if(p.first)
-				break;
+			for(std::size_t k = 0; k < 10 * _threads_count; ++k)
+			{
+				const auto queue_idx = get_thread_queue_idx(idx, k);
+				p = _queues[queue_idx].try_pop();
+				if(p.first)
+					break;
+			}
 		}
 
 		if(!p.first)
-		{
-			const auto queue_index = get_thread_queue_idx(idx);
-			p = _queues[queue_index].pop();
-			if(!p.first)
-				return;
-		}
+			p = _queues[queue_index].pop(pop_timeout);
 
 		if(p.first)
 			p.second();
@@ -202,9 +198,10 @@ task_system::task_system(std::size_t nthreads, const task_system::Allocator& all
 	// two seperate loops.
 	_threads.reserve(_threads_count);
 	_threads.emplace_back();
+	using namespace std::literals;
 	for(std::size_t th = 1; th < _threads_count; ++th)
 	{
-		_threads.emplace_back(&task_system::run, this, th);
+		_threads.emplace_back(&task_system::run, this, th, []() { return true; }, 50ms);
 	}
 }
 
@@ -230,21 +227,22 @@ void task_system::run_on_owner_thread()
 
 	const auto queue_index = get_thread_queue_idx(0);
 
-	p = _queues[queue_index].pop(false);
+	using namespace std::literals;
+	p = _queues[queue_index].pop(0ms);
 	if(!p.first)
 		return;
 
 	if(p.first)
-        p.second();
+		p.second();
 }
 
 std::size_t task_system::get_pending_tasks() const
 {
-    std::size_t tasks = 0;
-    for(const auto& queue : _queues)
-    {
-        tasks += queue.get_pending_tasks();
-    }
-    return tasks;
+	std::size_t tasks = 0;
+	for(const auto& queue : _queues)
+	{
+		tasks += queue.get_pending_tasks();
+	}
+	return tasks;
 }
 }
