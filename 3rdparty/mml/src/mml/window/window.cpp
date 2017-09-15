@@ -250,10 +250,10 @@ void window::restore()
 }
 
 ////////////////////////////////////////////////////////////
-void window::set_alpha(float alpha)
+void window::set_opacity(float opacity)
 {
 	if (_impl)
-		_impl->set_alpha(alpha);
+		_impl->set_opacity(opacity);
 }
 
 ////////////////////////////////////////////////////////////

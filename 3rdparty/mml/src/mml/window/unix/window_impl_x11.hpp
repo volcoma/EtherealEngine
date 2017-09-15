@@ -117,7 +117,7 @@ public:
     virtual void maximize();
     virtual void minimize();
     virtual void restore();
-    virtual void set_alpha(float alpha);
+    virtual void set_opacity(float opacity);
 
     ////////////////////////////////////////////////////////////
     /// \brief Show or hide the mouse cursor

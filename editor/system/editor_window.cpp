@@ -382,7 +382,7 @@ void main_editor_window::render_dockspace()
 	{
 
 		auto& ts = core::get_subsystem<core::task_system>();
-		auto pending_tasks = ts.get_pending_tasks();
+		auto tasks_info = ts.get_info();
 		auto items = _console_log->get_items();
 
 		float offset = gui::GetItemsLineHeightWithSpacing();
@@ -390,10 +390,23 @@ void main_editor_window::render_dockspace()
 		_dockspace.update_and_draw(
 			ImVec2(gui::GetContentRegionAvail().x, gui::GetContentRegionAvail().y - offset));
 
-		if(pending_tasks > 0)
+		if(tasks_info.pending_tasks > 0)
 		{
 			gui::AlignFirstTextHeightToWidgets();
-			gui::Text("Tasks : %u", ts.get_pending_tasks());
+			gui::Text("Tasks : %u", unsigned(tasks_info.pending_tasks));
+            if(gui::IsItemHovered())
+            {
+                gui::BeginTooltip();
+                int i = 0;
+                for(const auto& info : tasks_info.queue_infos)
+                {
+                    gui::Separator();
+                    gui::AlignFirstTextHeightToWidgets();
+                    gui::Text("Queue %d tasks : %u", i++, unsigned(info.pending_tasks));
+                }
+                
+                gui::EndTooltip();
+            }
 			gui::SameLine();
 		}
 

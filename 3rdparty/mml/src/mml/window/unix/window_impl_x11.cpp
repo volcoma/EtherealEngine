@@ -1000,13 +1000,15 @@ void window_impl_x11::restore()
 }
 
 ////////////////////////////////////////////////////////////
-void window_impl_x11::set_alpha(float alpha)
+void window_impl_x11::set_opacity(float opacity)
 {
-	unsigned long opacity = (0xffffffff / 0xff) * static_cast<unsigned char>(alpha * 255);
+	const std::uint32 fully_opaque = 0xFFFFFFFF;	
+	const long alpha = (long) ((double)opacity * (double)fully_opaque);
+	
 	Atom property = get_atom("_NET_WM_WINDOW_OPACITY", false);
 	if (property != None)
 	{
-		XChangeProperty(_display, _window, property, XA_CARDINAL, 32, PropModeReplace, (unsigned char*)&opacity, 1);
+		XChangeProperty(_display, _window, property, XA_CARDINAL, 32, PropModeReplace, (unsigned char*)&alpha, 1);
 		XFlush(_display);
 	}
 }

@@ -236,13 +236,17 @@ void task_system::run_on_owner_thread()
 		p.second();
 }
 
-std::size_t task_system::get_pending_tasks() const
+task_system::system_info task_system::get_info() const
 {
-	std::size_t tasks = 0;
+	system_info info;
+	info.queue_infos.reserve(_queues.size());
 	for(const auto& queue : _queues)
 	{
-		tasks += queue.get_pending_tasks();
+		queue_info q_info;
+		q_info.pending_tasks = queue.get_pending_tasks();
+		info.pending_tasks += q_info.pending_tasks;
+		info.queue_infos.emplace_back(std::move(q_info));
 	}
-	return tasks;
+	return info;
 }
 }

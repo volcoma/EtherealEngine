@@ -402,18 +402,18 @@ void make_opaque(HWND hwnd)
 	SetWindowLongPtrW(hwnd, GWL_EXSTYLE, GetWindowLongPtr(hwnd, GWL_EXSTYLE) & ~WS_EX_LAYERED);
 	RedrawWindow(hwnd, NULL, NULL, RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN);
 }
-void window_impl_win32::set_alpha(float alpha)
+void window_impl_win32::set_opacity(float opacity)
 {
 	HWND hwnd = get_system_handle();
-	if (alpha >= 1.0f)
+	if (opacity >= 1.0f)
 	{
 		make_opaque(hwnd);
-		return;
 	}
 	else
 	{
 		make_transparent(hwnd);
-        SetLayeredWindowAttributes(get_system_handle(), 0, (unsigned char)(alpha * 255), LWA_ALPHA);
+        const BYTE alpha = (BYTE) ((int) (opacity * 255.0f));
+        SetLayeredWindowAttributes(get_system_handle(), 0, alpha, LWA_ALPHA);
 	}
 }
 

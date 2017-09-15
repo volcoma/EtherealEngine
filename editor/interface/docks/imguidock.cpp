@@ -278,7 +278,7 @@ void update_drag(gui_window* window)
 			pos[0] -= 40;
 			pos[1] -= 30 + int32_t(ImGui::GetTextLineHeightWithSpacing());
 			window->set_position(pos);
-			window->set_alpha(0.3f);
+			window->set_opacity(0.3f);
 			active_dock->redock_to = nullptr;
 		}
 		else
@@ -296,7 +296,7 @@ void update_drag(gui_window* window)
 				}
 				else
 				{
-					window->set_alpha(1.0f);
+					window->set_opacity(1.0f);
 				}
 				
 			}

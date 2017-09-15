@@ -512,6 +512,16 @@ class task_system : public core::subsystem
 	friend class task_future;
     
 public:
+    struct queue_info
+    {
+        std::size_t pending_tasks = 0;
+    };
+    struct system_info
+    {
+        std::size_t pending_tasks = 0;
+        std::vector<queue_info> queue_infos;
+    };
+    
 	using Allocator = std::allocator<task>;
 
 	task_system();
@@ -555,7 +565,7 @@ public:
 	//-----------------------------------------------------------------------------
 	void run_on_owner_thread();
 
-    std::size_t get_pending_tasks() const;
+    system_info get_info() const;
 	//-----------------------------------------------------------------------------
 	//  Name : get_owner_thread_idx ()
 	/// <summary>
@@ -578,7 +588,7 @@ public:
 	//-----------------------------------------------------------------------------
 	std::size_t get_any_worker_thread_idx()
 	{
-		auto current_index = _current_index++;
+		auto current_index = ++_current_index;
 		current_index = current_index % _threads_count;
 		if(current_index == get_owner_thread_idx())
 			current_index++;
@@ -874,7 +884,7 @@ private:
 	std::vector<std::thread> _threads;
 	typename Allocator::template rebind<task::task_concept>::other _alloc;
 	std::size_t _threads_count;
-	std::atomic<std::size_t> _current_index{1};
+	std::atomic<std::size_t> _current_index{0};
 	//
 	const std::thread::id _owner_thread_id = std::this_thread::get_id();
 };
