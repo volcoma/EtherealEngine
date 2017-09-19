@@ -139,19 +139,7 @@ void console::register_command(const std::string& name, const std::string& descr
 			assert(arguments.size() == argCount);
 
 			bool failed = false;
-			std::function<void()> boundCallback;
-			// bind the command callback recursively while allowing type conversion
-			// errors to raise exceptions
-			// 			try
-			// 			{
-			boundCallback = bind_callback(callback, arguments, 0);
-			/*			}*/
-			// 			catch (const std::exception&)
-			//			{
-			// 				// TODO: remove this?
-			// 				std::cout << "crashed" << std::endl;
-			// 				failed = true;
-			// 			}
+			std::function<void()> boundCallback = bind_callback(callback, arguments, 0);
 
 			if(!failed)
 			{

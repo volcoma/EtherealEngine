@@ -17,7 +17,7 @@
 
 static bool show_gbuffer = false;
 
-void show_statistics(const unsigned int frameRate)
+void show_statistics(const unsigned int fps)
 {
 	ImVec2 pos = gui::GetCursorScreenPos();
 	gui::SetNextWindowPos(pos);
@@ -26,10 +26,10 @@ void show_statistics(const unsigned int frameRate)
 			   ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
 
 	gui::AlignFirstTextHeightToWidgets();
-	gui::Text("FPS  : %u", frameRate);
+	gui::Text("FPS  : %u", fps);
 	gui::Separator();
 	gui::AlignFirstTextHeightToWidgets();
-	gui::Text("MSPF : %.3f ms ", 1000.0f / float(frameRate));
+	gui::Text("MSPF : %.3f ms ", 1000.0 / double(fps));
 	gui::Separator();
 
 	auto stats = gfx::getStats();
