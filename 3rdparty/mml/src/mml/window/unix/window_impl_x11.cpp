@@ -1002,7 +1002,7 @@ void window_impl_x11::restore()
 ////////////////////////////////////////////////////////////
 void window_impl_x11::set_opacity(float opacity)
 {
-	const std::uint32 fully_opaque = 0xFFFFFFFF;	
+	const std::uint32_t fully_opaque = 0xFFFFFFFF;	
 	const long alpha = (long) ((double)opacity * (double)fully_opaque);
 	
 	Atom property = get_atom("_NET_WM_WINDOW_OPACITY", false);
