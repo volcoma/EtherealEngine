@@ -1,9 +1,9 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imguidock.h"
 #include "../gui_window.h"
+#include "core/common/string.h"
 #include "runtime/input/input.h"
 #include "runtime/system/engine.h"
-#include "core/common/string.h"
 namespace imguidock
 {
 dockspace::dockspace(gui_window* owner)
@@ -277,7 +277,11 @@ void update_drag(gui_window* window)
 			auto pos = mml::mouse::get_position();
 			pos[0] -= 40;
 			pos[1] -= 30 + int32_t(ImGui::GetTextLineHeightWithSpacing());
-			window->set_position(pos);
+			if(active_dock->redock_to == nullptr || active_dock->redock_slot == slot::none)
+            {
+				window->set_position(pos);
+                window->set_size({{640, 480}});
+            }
 			window->set_opacity(0.3f);
 			active_dock->redock_to = nullptr;
 		}
@@ -291,16 +295,15 @@ void update_drag(gui_window* window)
 					active_dock->redock_from->dock_with(active_dock, active_dock->redock_to,
 														active_dock->redock_slot, 0, true);
 					active_dock->redock_to = nullptr;
-
+					active_dock->redock_slot = slot::none;
 					window->request_close();
 				}
 				else
 				{
 					window->set_opacity(1.0f);
 				}
-				
 			}
-            active_dock->draging = false;
+			active_dock->draging = false;
 		}
 	}
 }
@@ -347,7 +350,8 @@ void dockspace::render_container(uint32_t& idgen, node* container, ImVec2 size, 
 			{
 				ImGui::BeginChild("##dockSlotPreview");
 				ImGui::PushClipRect(ImVec2(), ImGui::GetIO().DisplaySize, false);
-				slot dock_slot = render_dock_slot_preview(cursor_pos, screen_cursor_pos, size);
+				slot dock_slot =
+					render_dock_slot_preview(dragged_window, cursor_pos, screen_cursor_pos, size);
 				ImGui::PopClipRect();
 				ImGui::EndChild();
 				auto dragged_window_dock = dragged_window->get_dockspace().root.splits[0]->active_dock;
@@ -357,9 +361,9 @@ void dockspace::render_container(uint32_t& idgen, node* container, ImVec2 size, 
 					{
 						dragged_window_dock->redock_from = this;
 						dragged_window_dock->redock_to = container->active_dock;
-						dragged_window_dock->redock_slot = dock_slot;
 						dragged_window_dock->redock_from_window = owner;
 					}
+					dragged_window_dock->redock_slot = dock_slot;
 				}
 			}
 		}
@@ -502,10 +506,10 @@ void dockspace::update_and_draw(ImVec2 dockspaceSize)
 									static_cast<unsigned int>(_current_dock_to->last_size.y)),
 					"Window", mml::style::standard);
 				window->get_dockspace().dock_to(_current_dock_to, slot::tab, 0, true);
-                auto pos = mml::mouse::get_position();
-                pos[0] -= 40;
-                pos[1] -= 30 + int32_t(ImGui::GetTextLineHeightWithSpacing());
-                
+				auto pos = mml::mouse::get_position();
+				pos[0] -= 40;
+				pos[1] -= 30 + int32_t(ImGui::GetTextLineHeightWithSpacing());
+
 				window->set_position(pos);
 				window->request_focus();
 				engine.register_window(std::move(window));
@@ -587,6 +591,49 @@ gui_window* dockspace::is_any_window_dragged()
 	return nullptr;
 }
 
+static bool is_point_in_convex(ImVec2 point, const std::vector<ImVec2>& convex)
+{
+
+	if(convex.empty())
+		return false;
+
+	// n>2 Keep track of cross product sign changes
+	float pos = 0;
+	float neg = 0;
+
+	for(size_t i = 0; i < convex.size(); i++)
+	{
+
+		// Form a segment between the i'th point
+		float x1 = convex[i].x;
+		float y1 = convex[i].y;
+
+		// And the i+1'th, or if i is the last, with the first point
+		auto i2 = i < convex.size() - 1 ? i + 1 : 0;
+
+		float x2 = convex[i2].x;
+		float y2 = convex[i2].y;
+
+		float x = point.x;
+		float y = point.y;
+
+		// Compute the cross product
+		float d = (x - x1) * (y2 - y1) - (y - y1) * (x2 - x1);
+
+		if(d > 0)
+			pos++;
+		if(d < 0)
+			neg++;
+
+		// If the sign changes, then point is outside
+		if(pos > 0 && neg > 0)
+			return false;
+	}
+
+	// If no change in direction, then on same side of all segments, and thus inside
+	return true;
+}
+
 static ImRect get_slot_rect(ImRect parent_rect, slot dock_slot)
 {
 	ImVec2 size = parent_rect.Max - parent_rect.Min;
@@ -606,67 +653,162 @@ static ImRect get_slot_rect(ImRect parent_rect, slot dock_slot)
 	}
 }
 
-slot dockspace::render_dock_slot_preview(const ImVec2& mouse_pos, const ImVec2& cPos, const ImVec2& cSize)
+static void get_slot_convex(ImRect parent_rect, slot dock_slot, std::vector<ImVec2>& convex)
 {
+	convex.clear();
+	ImVec2 size = parent_rect.Max - parent_rect.Min;
+	const float tabbar_height = ImGui::GetItemsLineHeightWithSpacing();
+	ImVec2 top_left_corner = parent_rect.Min;
+	ImVec2 bottom_right_corner = parent_rect.Max;
+	ImVec2 top_right_corner = ImVec2(parent_rect.Max.x, parent_rect.Min.y);
+	ImVec2 bottom_left_corner = ImVec2(parent_rect.Min.x, parent_rect.Max.y);
+	ImVec2 sz = size * 0.18f;
+	float offset = 0.0f;
+
+	switch(dock_slot)
+	{
+		default:
+		{
+			auto top_left_offset = top_left_corner + ImVec2(offset, 0.0f);
+			auto top_right_offset = top_right_corner - ImVec2(offset, 0.0f);
+			auto bottom_right_offset = top_right_corner + ImVec2(offset, tabbar_height);
+			auto bottom_left_offset = top_left_corner + ImVec2(offset, tabbar_height);
+
+			convex.emplace_back(ImVec2(top_left_offset.x, top_left_offset.y));
+			convex.emplace_back(ImVec2(top_right_offset.x, top_right_offset.y));
+			convex.emplace_back(ImVec2(bottom_right_offset.x , bottom_right_offset.y));
+			convex.emplace_back(ImVec2(bottom_left_offset.x, bottom_left_offset.y));
+
+			return;
+		}
+		case slot::top:
+		{
+			auto top_left_offset = top_left_corner + ImVec2(offset, tabbar_height);
+			auto top_right_offset = top_right_corner - ImVec2(offset, -tabbar_height);
+			convex.emplace_back(top_left_offset);
+			convex.emplace_back(top_right_offset);
+			convex.emplace_back(ImVec2(top_right_offset.x - sz.x, top_right_offset.y + sz.y));
+			convex.emplace_back(ImVec2(top_left_offset.x + sz.x, top_left_offset.y + sz.y));
+			return;
+		}
+		case slot::right:
+		{
+			auto bottom_right_offset = bottom_right_corner - ImVec2(0.0f, offset);
+			auto top_right_offset = top_right_corner + ImVec2(0.0f, offset + tabbar_height);
+
+			convex.emplace_back(bottom_right_offset);
+			convex.emplace_back(ImVec2(bottom_right_offset.x - sz.x, bottom_right_offset.y - sz.y));
+			convex.emplace_back(ImVec2(top_right_offset.x - sz.x, top_right_offset.y + sz.y));
+			convex.emplace_back(top_right_offset);
+			return;
+		}
+		case slot::bottom:
+		{
+			auto bottom_left_offset = bottom_left_corner + ImVec2(offset, 0.0f);
+			auto bottom_right_offset = bottom_right_corner - ImVec2(offset, 0.0f);
+
+			convex.emplace_back(bottom_left_offset);
+			convex.emplace_back(ImVec2(bottom_left_offset.x + sz.x, bottom_left_offset.y - sz.y));
+			convex.emplace_back(ImVec2(bottom_right_offset.x - sz.x, bottom_right_offset.y - sz.y));
+			convex.emplace_back(bottom_right_offset);
+			return;
+		}
+		case slot::left:
+		{
+			auto top_left_offset = top_left_corner + ImVec2(0.0f, offset + tabbar_height);
+			auto bottom_left_offset = bottom_left_corner - ImVec2(0.0f, offset);
+
+			convex.emplace_back(top_left_offset);
+			convex.emplace_back(ImVec2(top_left_offset.x + sz.x, top_left_offset.y + sz.y));
+			convex.emplace_back(ImVec2(bottom_left_offset.x + sz.x, bottom_left_offset.y - sz.y));
+			convex.emplace_back(bottom_left_offset);
+			return;
+		}
+	}
+}
+
+slot dockspace::render_dock_slot_preview(gui_window* wnd, const ImVec2& mouse_pos, const ImVec2& cPos,
+										 const ImVec2& cSize)
+{
+	bool convex_slot_preview = true;
+
 	slot dock_slot = slot::none;
 
 	ImRect rect{cPos, cPos + cSize};
-    ImVec4 col = ImGui::GetStyle().Colors[ImGuiCol_TitleBg];
-    col.w = 0.8f;
+	ImVec4 col = {1.0f, 1.0f, 1.0f, 0.8f};
     ImVec4 col_preview = ImGui::GetStyle().Colors[ImGuiCol_TitleBg];
-    col_preview.w = 0.5f;
-	auto checkSlot = [&col, &mouse_pos](ImRect rect, slot slot) -> bool {
+    col_preview.w = 0.3f;
+	auto check_slot = [convex_slot_preview, &col, &mouse_pos](ImRect rect, slot slot,
+															  std::vector<ImVec2>& convex) -> bool {
 
-		auto slotRect = get_slot_rect(rect, slot);
+		if(convex_slot_preview)
+		{
+			get_slot_convex(rect, slot, convex);
+			if(!convex.empty())
+			{
+				ImGui::GetWindowDrawList()->AddPolyline(convex.data(), 4, ImGui::ColorConvertFloat4ToU32(col),
+														true, 2.0f, true);
+			}
 
-		ImGui::GetWindowDrawList()->AddRectFilled(
-			slotRect.Min, slotRect.Max,
-			ImGui::ColorConvertFloat4ToU32(col)); // tab
+			return is_point_in_convex(mouse_pos, convex);
+		}
+		else
+		{
+			auto slot_rect = get_slot_rect(rect, slot);
+			ImGui::GetWindowDrawList()->AddRectFilled(slot_rect.Min, slot_rect.Max,
+													  ImGui::ColorConvertFloat4ToU32(col));
 
-		return slotRect.Contains(mouse_pos);
+			return slot_rect.Contains(mouse_pos);
+		}
 
 	};
 
-	if(checkSlot(rect, slot::tab))
+	ImVec2 offset = ImGui::GetStyle().FramePadding * 2.0f;
+	std::vector<ImVec2> convex;
+    ImRect preview_rect = rect;
+	if(check_slot(rect, slot::tab, convex))
 	{
-		ImGui::GetWindowDrawList()->AddRectFilled(
-			cPos, ImVec2(cPos.x + cSize.x, cPos.y + cSize.y),
-			ImGui::ColorConvertFloat4ToU32(col_preview)); // tab
+		preview_rect = {cPos, ImVec2(cPos.x + cSize.x, cPos.y + cSize.y)};
 		dock_slot = slot::tab;
 	}
 
-	if(checkSlot(rect, slot::left))
+	if(check_slot(rect, slot::left, convex))
 	{
-		ImGui::GetWindowDrawList()->AddRectFilled(
-			cPos, ImVec2(cPos.x + (cSize.x / 2.0f), cPos.y + cSize.y),
-			ImGui::ColorConvertFloat4ToU32(col_preview)); // tab
+		preview_rect = {cPos, ImVec2(cPos.x + (cSize.x / 2.0f), cPos.y + cSize.y)};
 		dock_slot = slot::left;
 	}
 
-	if(checkSlot(rect, slot::right))
+	if(check_slot(rect, slot::right, convex))
 	{
-		ImGui::GetWindowDrawList()->AddRectFilled(
-			ImVec2(cPos.x + (cSize.x / 2.0f), cPos.y), ImVec2(cPos.x + cSize.x, cPos.y + cSize.y),
-			ImGui::ColorConvertFloat4ToU32(col_preview)); // tab
+
+		preview_rect = {ImVec2(cPos.x + (cSize.x / 2.0f), cPos.y), ImVec2(cPos.x + cSize.x, cPos.y + cSize.y)};
 		dock_slot = slot::right;
 	}
 
-	if(checkSlot(rect, slot::top))
+	if(check_slot(rect, slot::top, convex))
 	{
-		ImGui::GetWindowDrawList()->AddRectFilled(
-			cPos, ImVec2(cPos.x + cSize.x, cPos.y + (cSize.y / 2.0f)),
-			ImGui::ColorConvertFloat4ToU32(col_preview)); // tab
+		preview_rect = {cPos, ImVec2(cPos.x + cSize.x, cPos.y + (cSize.y / 2.0f))};
 		dock_slot = slot::top;
 	}
 
-	if(checkSlot(rect, slot::bottom))
+	if(check_slot(rect, slot::bottom, convex))
 	{
-		ImGui::GetWindowDrawList()->AddRectFilled(
-			ImVec2(cPos.x, cPos.y + (cSize.y / 2.0f)), ImVec2(cPos.x + cSize.x, cPos.y + cSize.y),
-			ImGui::ColorConvertFloat4ToU32(col_preview)); // tab
+		preview_rect = {ImVec2(cPos.x, cPos.y + (cSize.y / 2.0f)), ImVec2(cPos.x + cSize.x, cPos.y + cSize.y)};
 		dock_slot = slot::bottom;
 	}
-
+    
+    if(dock_slot != slot::none)
+    {
+        std::array<int32_t, 2> pos;
+        pos[0] = int32_t(preview_rect.Min.x - offset.x) + owner->get_position()[0];
+        pos[1] = int32_t(preview_rect.Min.y - offset.y) + owner->get_position()[1];
+        wnd->set_position(pos);
+        wnd->set_size({{uint32_t(preview_rect.GetSize().x + offset.x), uint32_t(preview_rect.GetSize().y + offset.y)}});
+        ImGui::GetWindowDrawList()->AddRectFilled(preview_rect.Min, preview_rect.Max, ImGui::ColorConvertFloat4ToU32(col_preview), false, 0);
+        
+        
+    }
+    
 	return dock_slot;
 }
 
@@ -708,13 +850,12 @@ void dockspace::render_tab_bar(node* container, const ImVec2&, const ImVec2& cur
 	{
 		std::string dockTitle = dock->title;
 
-        ImVec4 button_color =
-            ImVec4(childBg.x - 0.04f, childBg.y - 0.04f, childBg.z - 0.04f, childBg.w * 0.6f);
-        ImVec4 buttonColorActive =
-            ImVec4(childBg.x + 0.10f, childBg.y + 0.10f, childBg.z + 0.10f, childBg.w);
-        ImVec4 buttonColorHovered =
-            ImVec4(childBg.x + 0.15f, childBg.y + 0.15f, childBg.z + 0.15f, childBg.w);
-        
+		ImVec4 button_color =
+			ImVec4(childBg.x - 0.04f, childBg.y - 0.04f, childBg.z - 0.04f, childBg.w * 0.6f);
+		ImVec4 buttonColorActive = ImVec4(childBg.x + 0.10f, childBg.y + 0.10f, childBg.z + 0.10f, childBg.w);
+		ImVec4 buttonColorHovered =
+			ImVec4(childBg.x + 0.15f, childBg.y + 0.15f, childBg.z + 0.15f, childBg.w);
+
 		bool is_dock_active = dock == container->active_dock;
 		if(is_dock_active)
 		{
@@ -723,7 +864,7 @@ void dockspace::render_tab_bar(node* container, const ImVec2&, const ImVec2& cur
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, childBg);
 		}
 		else
-		{			
+		{
 			ImGui::PushStyleColor(ImGuiCol_Button, button_color);
 			ImGui::PushStyleColor(ImGuiCol_ButtonActive, buttonColorActive);
 			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, buttonColorHovered);
@@ -747,13 +888,13 @@ void dockspace::render_tab_bar(node* container, const ImVec2&, const ImVec2& cur
 			is_dock_active = true;
 		}
 
-        bool is_button_active = ImGui::IsItemActive();
+		bool is_button_active = ImGui::IsItemActive();
 		if(is_button_active)
 		{
 			if(dock->container->parent == &root && root.splits[1] == nullptr &&
 			   dock->container->docks.size() == 1)
 			{
-                if(ImGui::IsMouseDragging(0, 4.0f))
+				if(ImGui::IsMouseDragging(0, 4.0f))
 				{
 					_current_dock_action = eDrag;
 					_current_dock_to = dock;
@@ -761,7 +902,7 @@ void dockspace::render_tab_bar(node* container, const ImVec2&, const ImVec2& cur
 			}
 			else
 			{
-                 if(ImGui::IsMouseDragging(0, 8.0f))
+				if(ImGui::IsMouseDragging(0, 8.0f))
 				{
 					if(dock->undockable == false)
 					{
@@ -782,7 +923,8 @@ void dockspace::render_tab_bar(node* container, const ImVec2&, const ImVec2& cur
 			}
 			else
 			{
-				ImGui::PushStyleColor(ImGuiCol_Button, is_button_active ? buttonColorActive : buttonColorHovered);
+				ImGui::PushStyleColor(ImGuiCol_Button,
+									  is_button_active ? buttonColorActive : buttonColorHovered);
 			}
 
 			ImGui::SameLine(0, 0);
@@ -805,7 +947,7 @@ void dockspace::render_tab_bar(node* container, const ImVec2&, const ImVec2& cur
 void dock::initialize(const std::string& dtitle, bool close_btn, const ImVec2& min_sz,
 					  std::function<void(const ImVec2&)> ddrawFunction)
 {
-    static int i = 0;
+	static int i = 0;
 	title = dtitle + "###" + std::to_string(i++);
 	close_button = close_btn;
 	min_size = min_sz;

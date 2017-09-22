@@ -101,12 +101,12 @@ void imgui_frame_update(render_window& window, std::chrono::duration<float> dt, 
 
 	if(window.has_focus() && relative_rect.contains({mouse_pos[0], mouse_pos[1]}))
 	{
-        static auto last_cursor_type = gui::GetMouseCursor();
+		static auto last_cursor_type = gui::GetMouseCursor();
 		auto cursor = map_cursor(gui::GetMouseCursor());
 		if(cursor && last_cursor_type != gui::GetMouseCursor())
 			window.set_mouse_cursor(*cursor);
-        
-        last_cursor_type = gui::GetMouseCursor();
+
+		last_cursor_type = gui::GetMouseCursor();
 	}
 
 	// Start the frame
@@ -204,13 +204,11 @@ void gui_window::frame_render(std::chrono::duration<float> dt)
 
 	imgui_set_context(_gui_context);
 
-    gui::PushFont(gui::GetFont("editor_default"));
-    
+	gui::PushFont(gui::GetFont("editor_default"));
+
 	on_gui(dt);
 
 	render_dockspace();
-    
-    gui::PopFont();
 }
 
 void gui_window::render_dockspace()
@@ -220,6 +218,8 @@ void gui_window::render_dockspace()
 
 void gui_window::frame_end()
 {
+	gui::PopFont();
+
 	render_window::frame_end();
 
 	imgui_frame_end();

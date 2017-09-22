@@ -4,6 +4,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "core/common/basetypes.hpp"
+#include "core/common/nonstd/type_traits.hpp"
 #include "core/signals/event.hpp"
 #include "mml/window/window.hpp"
 #include <chrono>
@@ -160,6 +161,11 @@ public:
 		return _is_main;
 	}
 
+	std::size_t get_id() const
+	{
+		return _id;
+	}
+
 protected:
 	//-----------------------------------------------------------------------------
 	//  Name : on_resize (virtual )
@@ -170,6 +176,8 @@ protected:
 	//-----------------------------------------------------------------------------
 	virtual void on_resize();
 
+	///
+	std::size_t _id = rtti::type_index_sequential_t::id<mml::window, render_window>();
 	/// Render surface for this window.
 	std::shared_ptr<frame_buffer> _surface;
 	///
