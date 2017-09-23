@@ -336,8 +336,19 @@ typedef struct bgfx_hmd
 } bgfx_hmd_t;
 
 /**/
+typedef struct bgfx_view_stats
+{
+    char     name[256];
+    uint8_t  view;
+    uint64_t cpuTimeElapsed;
+    uint64_t gpuTimeElapsed;
+
+} bgfx_view_stats_t;
+
+/**/
 typedef struct bgfx_stats
 {
+    uint64_t cpuTimeFrame;
     uint64_t cpuTimeBegin;
     uint64_t cpuTimeEnd;
     uint64_t cpuTimerFreq;
@@ -357,6 +368,9 @@ typedef struct bgfx_stats
     uint16_t height;
     uint16_t textWidth;
     uint16_t textHeight;
+
+    uint16_t          numViews;
+    bgfx_view_stats_t viewStats[256];
 
 } bgfx_stats_t;
 
@@ -697,6 +711,9 @@ BGFX_C_API uint16_t bgfx_get_shader_uniforms(bgfx_shader_handle_t _handle, bgfx_
 BGFX_C_API void bgfx_get_uniform_info(bgfx_uniform_handle_t _handle, bgfx_uniform_info_t* _info);
 
 /**/
+BGFX_C_API void bgfx_set_shader_name(bgfx_shader_handle_t _handle, const char* _name);
+
+/**/
 BGFX_C_API void bgfx_destroy_shader(bgfx_shader_handle_t _handle);
 
 /**/
@@ -740,6 +757,9 @@ BGFX_C_API void bgfx_update_texture_cube(bgfx_texture_handle_t _handle, uint16_t
 
 /**/
 BGFX_C_API uint32_t bgfx_read_texture(bgfx_texture_handle_t _handle, void* _data, uint8_t _mip);
+
+/**/
+BGFX_C_API void bgfx_set_texture_name(bgfx_texture_handle_t _handle, const char* _name);
 
 /**/
 BGFX_C_API void bgfx_destroy_texture(bgfx_texture_handle_t _handle);

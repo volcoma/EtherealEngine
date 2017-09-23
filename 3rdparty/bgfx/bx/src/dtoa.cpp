@@ -1081,4 +1081,38 @@ namespace bx
 		return true;
 	}
 
+	bool fromString(int32_t* _out, const char* _str)
+	{
+		_str = strws(_str);
+		char ch = *_str++;
+		bool neg = false;
+		switch (ch)
+		{
+		case '-':
+		case '+': neg = '-' == ch;
+			break;
+
+		default:
+			--_str;
+			break;
+		}
+
+		int32_t result = 0;
+
+		for (ch = *_str++; isNumeric(ch); ch = *_str++)
+		{
+			result = 10*result - (ch - '0');
+		}
+
+		*_out = neg ? result : -result;
+
+		return true;
+	}
+
+	bool fromString(uint32_t* _out, const char* _str)
+	{
+		fromString( (int32_t*)_out, _str);
+		return true;
+	}
+
 } // namespace bx

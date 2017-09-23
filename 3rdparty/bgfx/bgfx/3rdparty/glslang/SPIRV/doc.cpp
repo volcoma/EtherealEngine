@@ -331,6 +331,7 @@ const char* BuiltInString(int builtIn)
     case 4424: return "BaseVertex";
     case 4425: return "BaseInstance";
     case 4426: return "DrawIndex";
+    case 5014: return "FragStencilRefEXT";
 
 #ifdef AMD_EXTENSIONS
     case 4992: return "BaryCoordNoPerspAMD";
@@ -842,8 +843,12 @@ const char* CapabilityString(int info)
     case 4437: return "DeviceGroup";
     case 4439: return "MultiView";
 
+    case 5013: return "StencilExportEXT";
+
 #ifdef AMD_EXTENSIONS
     case 5009: return "ImageGatherBiasLodAMD";
+    case 5010: return "FragmentMaskAMD";
+    case 5015: return "ImageReadWriteLodAMD";
 #endif
 
     case 4445: return "AtomicStorageOps";
@@ -1203,6 +1208,9 @@ const char* OpcodeString(int op)
     case 5005: return "OpGroupFMaxNonUniformAMD";
     case 5006: return "OpGroupUMaxNonUniformAMD";
     case 5007: return "OpGroupSMaxNonUniformAMD";
+
+    case 5011: return "OpFragmentMaskFetchAMD";
+    case 5012: return "OpFragmentFetchAMD";
 #endif
 
     case OpcodeCeiling:
@@ -2865,6 +2873,15 @@ void Parameterize()
     InstructionDesc[OpGroupFMaxNonUniformAMD].operands.push(OperandScope, "'Execution'");
     InstructionDesc[OpGroupFMaxNonUniformAMD].operands.push(OperandGroupOperation, "'Operation'");
     InstructionDesc[OpGroupFMaxNonUniformAMD].operands.push(OperandId, "X");
+
+    InstructionDesc[OpFragmentMaskFetchAMD].capabilities.push_back(CapabilityFragmentMaskAMD);
+    InstructionDesc[OpFragmentMaskFetchAMD].operands.push(OperandId, "'Image'");
+    InstructionDesc[OpFragmentMaskFetchAMD].operands.push(OperandId, "'Coordinate'");
+
+    InstructionDesc[OpFragmentFetchAMD].capabilities.push_back(CapabilityFragmentMaskAMD);
+    InstructionDesc[OpFragmentFetchAMD].operands.push(OperandId, "'Image'");
+    InstructionDesc[OpFragmentFetchAMD].operands.push(OperandId, "'Coordinate'");
+    InstructionDesc[OpFragmentFetchAMD].operands.push(OperandId, "'Fragment Index'");
 #endif
 }
 

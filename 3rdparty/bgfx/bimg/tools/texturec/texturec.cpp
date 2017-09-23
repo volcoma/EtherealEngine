@@ -26,7 +26,7 @@
 #include <string>
 
 #define BIMG_TEXTUREC_VERSION_MAJOR 1
-#define BIMG_TEXTUREC_VERSION_MINOR 6
+#define BIMG_TEXTUREC_VERSION_MINOR 10
 
 struct Options
 {
@@ -234,6 +234,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 						, mip.m_data
 						, dstMip.m_width
 						, dstMip.m_height
+						, dstMip.m_depth
 						, dstMip.m_width*16
 						, mip.m_format
 						);
@@ -264,6 +265,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 					bimg::imageRgba32f11to01(rgbaDst
 						, dstMip.m_width
 						, dstMip.m_height
+						, dstMip.m_depth
 						, dstMip.m_width*16
 						, rgba
 						);
@@ -273,6 +275,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 						, rgbaDst
 						, dstMip.m_width
 						, dstMip.m_height
+						, dstMip.m_depth
 						, outputFormat
 						, _options.quality
 						, _err
@@ -290,6 +293,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 						bimg::imageRgba32f11to01(rgbaDst
 							, dstMip.m_width
 							, dstMip.m_height
+							, dstMip.m_depth
 							, dstMip.m_width*16
 							, rgba
 							);
@@ -302,6 +306,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 							, rgbaDst
 							, dstMip.m_width
 							, dstMip.m_height
+							, dstMip.m_depth
 							, outputFormat
 							, _options.quality
 							, _err
@@ -317,7 +322,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 						  NULL
 						, uint16_t(dstMip.m_width)
 						, uint16_t(dstMip.m_height)
-						, 0
+						, uint16_t(dstMip.m_depth)
 						, false
 						, false
 						, 1
@@ -332,6 +337,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 						, mip.m_data
 						, mip.m_width
 						, mip.m_height
+						, mip.m_depth
 						, mip.m_width*16
 						, mip.m_format
 						);
@@ -341,6 +347,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 						, rgba32f
 						, dstMip.m_width
 						, dstMip.m_height
+						, dstMip.m_depth
 						, outputFormat
 						, _options.quality
 						, _err
@@ -352,6 +359,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 						bimg::imageRgba32fToLinear(rgba32f
 							, mip.m_width
 							, mip.m_height
+							, mip.m_depth
 							, mip.m_width*16
 							, rgba32f
 							);
@@ -361,6 +369,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 							bimg::imageRgba32fLinearDownsample2x2(rgba32f
 								, dstMip.m_width
 								, dstMip.m_height
+								, dstMip.m_depth
 								, dstMip.m_width*16
 								, rgba32f
 								);
@@ -371,6 +380,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 							bimg::imageRgba32fToGamma(rgbaDst
 								, mip.m_width
 								, mip.m_height
+								, mip.m_depth
 								, mip.m_width*16
 								, rgba32f
 								);
@@ -380,6 +390,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 								, rgbaDst
 								, dstMip.m_width
 								, dstMip.m_height
+								, dstMip.m_depth
 								, outputFormat
 								, _options.quality
 								, _err
@@ -395,7 +406,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 						  NULL
 						, uint16_t(dstMip.m_width)
 						, uint16_t(dstMip.m_height)
-						, 0
+						, uint16_t(dstMip.m_depth)
 						, false
 						, false
 						, 1
@@ -437,6 +448,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 						, rgba
 						, dstMip.m_width
 						, dstMip.m_height
+						, dstMip.m_depth
 						, outputFormat
 						, _options.quality
 						, _err
@@ -447,6 +459,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 						bimg::imageRgba8Downsample2x2(rgba
 							, dstMip.m_width
 							, dstMip.m_height
+							, dstMip.m_depth
 							, dstMip.m_width*4
 							, rgba
 							);
@@ -470,6 +483,7 @@ bimg::ImageContainer* convert(bx::AllocatorI* _allocator, const void* _inputData
 							, rgba
 							, dstMip.m_width
 							, dstMip.m_height
+							, dstMip.m_depth
 							, outputFormat
 							, _options.quality
 							, _err

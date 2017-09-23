@@ -194,6 +194,7 @@ namespace bimg
 		TextureFormat::Enum m_format;
 		uint32_t m_width;
 		uint32_t m_height;
+		uint32_t m_depth;
 		uint32_t m_blockSize;
 		uint32_t m_size;
 		uint8_t  m_bpp;
@@ -285,6 +286,7 @@ namespace bimg
 		  void* _dst
 		, uint32_t _width
 		, uint32_t _height
+		, uint32_t _depth
 		, uint32_t _srcPitch
 		, const void* _src
 		);
@@ -294,6 +296,7 @@ namespace bimg
 		  void* _dst
 		, uint32_t _width
 		, uint32_t _height
+		, uint32_t _depth
 		, uint32_t _srcPitch
 		, const void* _src
 		);
@@ -303,6 +306,7 @@ namespace bimg
 		  void* _dst
 		, uint32_t _width
 		, uint32_t _height
+		, uint32_t _depth
 		, uint32_t _srcPitch
 		, const void* _src
 		);
@@ -312,6 +316,7 @@ namespace bimg
 		  void* _dst
 		, uint32_t _width
 		, uint32_t _height
+		, uint32_t _depth
 		, uint32_t _srcPitch
 		, const void* _src
 		);
@@ -328,10 +333,11 @@ namespace bimg
 	///
 	void imageSwizzleBgra8(
 		  void* _dst
+		, uint32_t _dstPitch
 		, uint32_t _width
 		, uint32_t _height
-		, uint32_t _srcPitch
 		, const void* _src
+		, uint32_t _srcPitch
 		);
 
 	///
@@ -385,6 +391,7 @@ namespace bimg
 		, UnpackFn _unpack
 		, uint32_t _width
 		, uint32_t _height
+		, uint32_t _depth
 		, uint32_t _srcPitch
 		);
 
@@ -396,6 +403,7 @@ namespace bimg
 		, TextureFormat::Enum _srcFormat
 		, uint32_t _width
 		, uint32_t _height
+		, uint32_t _depth
 		);
 
 	///
@@ -433,6 +441,18 @@ namespace bimg
 
 	///
 	int32_t imageWriteTga(
+		  bx::WriterI* _writer
+		, uint32_t _width
+		, uint32_t _height
+		, uint32_t _srcPitch
+		, const void* _src
+		, bool _grayscale
+		, bool _yflip
+		, bx::Error* _err = NULL
+		);
+
+	///
+	int32_t imageWritePng(
 		  bx::WriterI* _writer
 		, uint32_t _width
 		, uint32_t _height
@@ -540,6 +560,7 @@ namespace bimg
 		, const void* _src
 		, uint32_t _width
 		, uint32_t _height
+		, uint32_t _depth
 		, uint32_t _dstPitch
 		, TextureFormat::Enum _format
 		);

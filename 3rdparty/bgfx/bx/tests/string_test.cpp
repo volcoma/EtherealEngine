@@ -291,6 +291,37 @@ TEST_CASE("fromString double", "")
 	REQUIRE(testFromString(0.0000000001,            "1e-10") );
 }
 
+static bool testFromString(int32_t _value, const char* _input)
+{
+	char tmp[1024];
+	bx::toString(tmp, BX_COUNTOF(tmp), _value);
+
+	double lhs;
+	bx::fromString(&lhs, tmp);
+
+	double rhs;
+	bx::fromString(&rhs, _input);
+
+	if (lhs == rhs)
+	{
+		return true;
+	}
+
+	printf("result '%d', input '%s'\n", _value, _input);
+	return false;
+}
+
+TEST_CASE("fromString int32_t", "")
+{
+	REQUIRE(testFromString(1389,   "1389") );
+	REQUIRE(testFromString(1389,   "  1389") );
+	REQUIRE(testFromString(1389,   "+1389") );
+	REQUIRE(testFromString(-1389,   "-1389") );
+	REQUIRE(testFromString(-1389,   " -1389") );
+	REQUIRE(testFromString(555333, "555333") );
+	REQUIRE(testFromString(-21,    "-021") );
+}
+
 TEST_CASE("StringView", "")
 {
 	bx::StringView sv("test");

@@ -269,6 +269,12 @@ namespace bx
 	///
 	bool fromString(double* _out, const char* _str);
 
+	///
+	bool fromString(int32_t* _out, const char* _str);
+
+	///
+	bool fromString(uint32_t* _out, const char* _str);
+
 } // namespace bx
 
 #include "inline/string.inl"

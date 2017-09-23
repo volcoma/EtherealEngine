@@ -113,15 +113,21 @@ namespace bgfx { namespace d3d9
 	{
 		IndexBufferD3D9()
 			: m_ptr(NULL)
+			, m_dynamic(NULL)
 			, m_size(0)
 			, m_flags(BGFX_BUFFER_NONE)
-			, m_dynamic(false)
 		{
 		}
 
 		void create(uint32_t _size, void* _data, uint16_t _flags);
 		void update(uint32_t _offset, uint32_t _size, void* _data, bool _discard = false)
 		{
+			if (NULL  != m_dynamic
+			&&  _data != m_dynamic)
+			{
+				bx::memCopy(&m_dynamic[_offset], _data, _size);
+			}
+
 			void* buffer;
 			DX_CHECK(m_ptr->Lock(_offset
 				, _size
@@ -139,7 +145,12 @@ namespace bgfx { namespace d3d9
 			if (NULL != m_ptr)
 			{
 				DX_RELEASE(m_ptr, 0);
-				m_dynamic = false;
+
+				if (NULL != m_dynamic)
+				{
+					BX_FREE(g_allocator, m_dynamic);
+					m_dynamic = NULL;
+				}
 			}
 		}
 
@@ -147,22 +158,29 @@ namespace bgfx { namespace d3d9
 		void postReset();
 
 		IDirect3DIndexBuffer9* m_ptr;
+		uint8_t* m_dynamic;
 		uint32_t m_size;
 		uint16_t m_flags;
-		bool m_dynamic;
 	};
 
 	struct VertexBufferD3D9
 	{
 		VertexBufferD3D9()
 			: m_ptr(NULL)
-			, m_dynamic(false)
+			, m_dynamic(NULL)
+			, m_size(0)
 		{
 		}
 
 		void create(uint32_t _size, void* _data, VertexDeclHandle _declHandle);
 		void update(uint32_t _offset, uint32_t _size, void* _data, bool _discard = false)
 		{
+			if (NULL  != m_dynamic
+			&&  _data != m_dynamic)
+			{
+				bx::memCopy(&m_dynamic[_offset], _data, _size);
+			}
+
 			void* buffer;
 			DX_CHECK(m_ptr->Lock(_offset
 				, _size
@@ -180,7 +198,12 @@ namespace bgfx { namespace d3d9
 			if (NULL != m_ptr)
 			{
 				DX_RELEASE(m_ptr, 0);
-				m_dynamic = false;
+
+				if (NULL != m_dynamic)
+				{
+					BX_FREE(g_allocator, m_dynamic);
+					m_dynamic = NULL;
+				}
 			}
 		}
 
@@ -188,9 +211,9 @@ namespace bgfx { namespace d3d9
 		void postReset();
 
 		IDirect3DVertexBuffer9* m_ptr;
+		uint8_t* m_dynamic;
 		uint32_t m_size;
 		VertexDeclHandle m_decl;
-		bool m_dynamic;
 	};
 
 	struct ShaderD3D9
@@ -396,30 +419,45 @@ namespace bgfx { namespace d3d9
 	struct TimerQueryD3D9
 	{
 		TimerQueryD3D9()
-			: m_control(BX_COUNTOF(m_frame) )
+			: m_control(BX_COUNTOF(m_query) )
 		{
 		}
 
 		void postReset();
 		void preReset();
-		void begin();
-		void end();
-		bool get();
+		uint32_t begin(uint32_t _resultIdx);
+		void end(uint32_t _idx);
+		bool update();
 
-		struct Frame
+		struct Query
 		{
 			IDirect3DQuery9* m_disjoint;
 			IDirect3DQuery9* m_begin;
 			IDirect3DQuery9* m_end;
 			IDirect3DQuery9* m_freq;
+			uint32_t         m_resultIdx;
+			bool             m_ready;
 		};
 
-		uint64_t m_begin;
-		uint64_t m_end;
-		uint64_t m_elapsed;
-		uint64_t m_frequency;
+		struct Result
+		{
+			void reset()
+			{
+				m_begin     = 0;
+				m_end       = 0;
+				m_frequency = 1;
+				m_pending   = 0;
+			}
 
-		Frame m_frame[4];
+			uint64_t m_begin;
+			uint64_t m_end;
+			uint64_t m_frequency;
+			uint32_t m_pending;
+		};
+
+		Result m_result[BGFX_CONFIG_MAX_VIEWS+1];
+
+		Query m_query[BGFX_CONFIG_MAX_VIEWS*4];
 		bx::RingBufferControl m_control;
 	};
 

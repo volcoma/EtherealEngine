@@ -113,7 +113,7 @@ namespace bx
 	float fsign(float _a);
 
 	///
-	float fabsolute(float _a);
+	float fabs(float _a);
 
 	///
 	float fsq(float _a);

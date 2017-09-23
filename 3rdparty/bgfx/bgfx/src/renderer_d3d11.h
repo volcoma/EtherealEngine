@@ -6,7 +6,8 @@
 #ifndef BGFX_RENDERER_D3D11_H_HEADER_GUARD
 #define BGFX_RENDERER_D3D11_H_HEADER_GUARD
 
-#define USE_D3D11_DYNAMIC_LIB BX_PLATFORM_WINDOWS
+#define USE_D3D11_DYNAMIC_LIB    BX_PLATFORM_WINDOWS
+#define USE_D3D11_STAGING_BUFFER 0
 
 #if !USE_D3D11_DYNAMIC_LIB
 #	undef  BGFX_CONFIG_DEBUG_PIX
@@ -64,6 +65,9 @@ namespace bgfx { namespace d3d11
 	{
 		BufferD3D11()
 			: m_ptr(NULL)
+#if USE_D3D11_STAGING_BUFFER
+			, m_staging(NULL)
+#endif // USE_D3D11_STAGING_BUFFER
 			, m_srv(NULL)
 			, m_uav(NULL)
 			, m_flags(BGFX_BUFFER_NONE)
@@ -82,11 +86,18 @@ namespace bgfx { namespace d3d11
 				m_dynamic = false;
 			}
 
+#if USE_D3D11_STAGING_BUFFER
+			DX_RELEASE(m_staging, 0);
+#endif // USE_D3D11_STAGING_BUFFER
+
 			DX_RELEASE(m_srv, 0);
 			DX_RELEASE(m_uav, 0);
 		}
 
 		ID3D11Buffer* m_ptr;
+#if USE_D3D11_STAGING_BUFFER
+		ID3D11Buffer* m_staging;
+#endif // USE_D3D11_STAGING_BUFFER
 		ID3D11ShaderResourceView*  m_srv;
 		ID3D11UnorderedAccessView* m_uav;
 		uint32_t m_size;
@@ -154,7 +165,7 @@ namespace bgfx { namespace d3d11
 			ID3D11ComputeShader* m_computeShader;
 			ID3D11PixelShader*   m_pixelShader;
 			ID3D11VertexShader*  m_vertexShader;
-			IUnknown*            m_ptr;
+			ID3D11DeviceChild*   m_ptr;
 		};
 		const Memory* m_code;
 		ID3D11Buffer* m_buffer;
@@ -300,29 +311,44 @@ namespace bgfx { namespace d3d11
 	struct TimerQueryD3D11
 	{
 		TimerQueryD3D11()
-			: m_control(BX_COUNTOF(m_frame) )
+			: m_control(BX_COUNTOF(m_query) )
 		{
 		}
 
 		void postReset();
 		void preReset();
-		void begin();
-		void end();
-		bool get();
+		uint32_t begin(uint32_t _resultIdx);
+		void end(uint32_t _idx);
+		bool update();
 
-		struct Frame
+		struct Query
 		{
 			ID3D11Query* m_disjoint;
 			ID3D11Query* m_begin;
 			ID3D11Query* m_end;
+			uint32_t     m_resultIdx;
+			bool         m_ready;
 		};
 
-		uint64_t m_begin;
-		uint64_t m_end;
-		uint64_t m_elapsed;
-		uint64_t m_frequency;
+		struct Result
+		{
+			void reset()
+			{
+				m_begin     = 0;
+				m_end       = 0;
+				m_frequency = 1;
+				m_pending   = 0;
+			}
 
-		Frame m_frame[4];
+			uint64_t m_begin;
+			uint64_t m_end;
+			uint64_t m_frequency;
+			uint32_t m_pending;
+		};
+
+		Result m_result[BGFX_CONFIG_MAX_VIEWS+1];
+
+		Query m_query[BGFX_CONFIG_MAX_VIEWS*4];
 		bx::RingBufferControl m_control;
 	};
 

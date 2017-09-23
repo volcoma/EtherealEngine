@@ -161,4 +161,44 @@ namespace bx
 		return hashMurmur2A(StringView(_data) );
 	}
 
+	inline void HashAdler32::begin()
+	{
+		m_a = 1;
+		m_b = 0;
+	}
+
+	inline void HashAdler32::add(const void* _data, int _len)
+	{
+		const uint32_t kModAdler = 65521;
+		const uint8_t* data = (const uint8_t*)_data;
+		for (; _len != 0; --_len)
+		{
+			m_a = (m_a + *data++) % kModAdler;
+			m_b = (m_b + m_a    ) % kModAdler;
+		}
+	}
+
+	template<typename Ty>
+	inline void HashAdler32::add(Ty _value)
+	{
+		add(&_value, sizeof(Ty) );
+	}
+
+	inline uint32_t HashAdler32::end()
+	{
+		return m_a | (m_b<<16);
+	}
+
+	template<typename Ty>
+	inline void HashCrc32::add(Ty _value)
+	{
+		add(&_value, sizeof(Ty) );
+	}
+
+	inline uint32_t HashCrc32::end()
+	{
+		m_hash ^= UINT32_MAX;
+		return m_hash;
+	}
+
 } // namespace bx

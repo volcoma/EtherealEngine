@@ -69,6 +69,9 @@ namespace bx
 	typedef float (*EaseFn)(float _t);
 
 	///
+	EaseFn getEaseFunc(Easing::Enum _enum);
+
+	///
 	float easeLinear(float _t);
 
 	///

@@ -62,6 +62,59 @@ namespace bx
 	///
 	uint32_t hashMurmur2A(const char* _data);
 
+	///
+	class HashAdler32
+	{
+	public:
+		///
+		void begin();
+
+		///
+		void add(const void* _data, int _len);
+
+		///
+		template<typename Ty>
+		void add(Ty _value);
+
+		///
+		uint32_t end();
+
+	private:
+		uint32_t m_a;
+		uint32_t m_b;
+	};
+
+	///
+	class HashCrc32
+	{
+	public:
+		enum Enum
+		{
+			Ieee,       //!< 0xedb88320
+			Castagnoli, //!< 0x82f63b78
+			Koopman,    //!< 0xeb31d82e
+
+			Count
+		};
+
+		///
+		void begin(Enum _type = Ieee);
+
+		///
+		void add(const void* _data, int _len);
+
+		///
+		template<typename Ty>
+		void add(Ty _value);
+
+		///
+		uint32_t end();
+
+	private:
+		const uint32_t* m_table;
+		uint32_t m_hash;
+	};
+
 } // namespace bx
 
 #include "inline/hash.inl"

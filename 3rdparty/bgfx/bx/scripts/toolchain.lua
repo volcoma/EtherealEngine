@@ -476,7 +476,7 @@ function toolchain(_buildDir, _libDir)
 			location (path.join(_buildDir, "projects", _ACTION .. "-xp"))
 
 		end
-			
+
 	elseif _ACTION == "xcode4" then
 
 		if "osx" == _OPTIONS["xcode"] then
@@ -723,9 +723,16 @@ function toolchain(_buildDir, _libDir)
 	configuration { "linux-gcc* or linux-clang*" }
 		buildoptions {
 			"-msse2",
+--			"-Wdouble-promotion",
+--			"-Wduplicated-branches",
+--			"-Wduplicated-cond",
+--			"-Wjump-misses-init",
+			"-Wlogical-op",
+			"-Wshadow",
+--			"-Wnull-dereference",
 			"-Wunused-value",
 			"-Wundef",
-			"-Wno-strict-overflow",
+--			"-Wuseless-cast",
 		}
 		buildoptions_cpp {
 			"-std=c++11",

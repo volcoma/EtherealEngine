@@ -1,0 +1,9 @@
+[submodule "3rdparty/bgfx/bgfx"]
+	path = 3rdparty/bgfx/bgfx
+	url = https://github.com/bkaradzic/bgfx.git
+[submodule "3rdparty/bgfx/bx"]
+	path = 3rdparty/bgfx/bx
+	url = https://github.com/bkaradzic/bx.git
+[submodule "3rdparty/bgfx/bimg"]
+	path = 3rdparty/bgfx/bimg
+	url = https://github.com/bkaradzic/bimg.git

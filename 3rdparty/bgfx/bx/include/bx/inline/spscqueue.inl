@@ -29,7 +29,7 @@ namespace bx
 
 	inline void SpScUnboundedQueue::push(void* _ptr)
 	{
-		m_last->m_next = new Node( (void*)_ptr);
+		m_last->m_next = new Node(_ptr);
 		atomicExchangePtr( (void**)&m_last, m_last->m_next);
 		while (m_first != m_divider)
 		{
@@ -106,7 +106,7 @@ namespace bx
 
 	inline void SpScBlockingUnboundedQueue::push(void* _ptr)
 	{
-		m_queue.push( (void*)_ptr);
+		m_queue.push(_ptr);
 		m_count.post();
 	}
 

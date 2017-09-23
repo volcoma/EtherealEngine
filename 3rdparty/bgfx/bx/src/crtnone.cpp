@@ -244,14 +244,16 @@ extern "C" float fmodf(float _numer, float _denom)
 
 extern "C" int atoi(const char* _str)
 {
-	BX_UNUSED(_str);
-	return 0;
+	int32_t result = 0;
+	bx::fromString(&result, _str);
+	return result;
 }
 
 extern "C" double atof(const char* _str)
 {
-	BX_UNUSED(_str);
-	return 0.0;
+	double result = 0.0;
+	bx::fromString(&result, _str);
+	return result;
 }
 
 extern "C" struct DIR* opendir(const char* dirname)

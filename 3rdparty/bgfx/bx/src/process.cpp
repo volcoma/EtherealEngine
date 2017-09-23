@@ -46,9 +46,9 @@ namespace bx
 			return false;
 		}
 
-		char tmp[kMaxFilePath*2];
-		strCopy(tmp, BX_COUNTOF(tmp), _filePath.get() );
-		strCat(tmp, BX_COUNTOF(tmp), " ");
+		char tmp[kMaxFilePath*2] = "\"";
+		strCat(tmp, BX_COUNTOF(tmp), _filePath.get() );
+		strCat(tmp, BX_COUNTOF(tmp), "\" ");
 		strCat(tmp, BX_COUNTOF(tmp), _args);
 
 		m_file = popen(tmp, "r");
@@ -117,9 +117,9 @@ namespace bx
 			return false;
 		}
 
-		char tmp[kMaxFilePath*2];
-		strCopy(tmp, BX_COUNTOF(tmp), _filePath.get() );
-		strCat(tmp, BX_COUNTOF(tmp), " ");
+		char tmp[kMaxFilePath*2] = "\"";
+		strCat(tmp, BX_COUNTOF(tmp), _filePath.get() );
+		strCat(tmp, BX_COUNTOF(tmp), "\" ");
 		strCat(tmp, BX_COUNTOF(tmp), _args);
 
 		m_file = popen(tmp, "w");

@@ -21,18 +21,7 @@
 /*
  // known metal shader generation issues:
    03-raymarch: OSX10.11.3 nothing is visible ( depth/color swap in fragment output struct fixed this )
-   14-shadowvolumes: in texture as stencil mode - columns/bunny are dark. in fs_shadowvolume_color_lighting SAMPLER2D(s_texStencil, 1) is
-      converted to "texture2d<float> s_texStencil [[texture(0)]], sampler _mtlsmp_s_texStencil [[sampler(0)]]". Slot is 1 -> 0.
-   15-shadowmaps-simple: shader compilation error
-   16-shadowmaps:  //problem with essl -> metal: SAMPLER2D(u_shadowMap0, 4);  sampler index is lost. Shadowmap is set to slot 4, but
-      metal shader uses sampler/texture slot 0. this could require changes outside of renderer_mtl?
-      packFloatToRGBA needs highp. currently it uses half.
    24-nbody: no generated compute shaders for metal
-   27-terrain: shaderc generates invalid metal shader for vs_terrain_height_texture. vertex output: half4 gl_Position [[position]], should be float4
-   31-rsm:
-      <program source>:6:23: error: type 'half4' (aka 'vector_half4') is not valid for attribute 'position'
-      half4 gl_Position [[position]];
-
 
 Known issues(driver problems??):
   OSX mac mini(late 2014), OSX10.11.3 : nanovg-rendering: color writemask off causes problem...
@@ -43,6 +32,8 @@ Known issues(driver problems??):
   Only on this device ( no problem on iPad Air 2 with iOS9.3.1)
 
   TODOs:
+ - support multiple vertex buffers: 34-mvs
+
  - framebufferMtl and TextureMtl resolve
 
  - FrameBufferMtl::postReset recreate framebuffer???
@@ -386,7 +377,7 @@ namespace bgfx { namespace mtl
 
 			if (NULL != NSClassFromString(@"CAMetalLayer") )
 			{
-                if (NULL == m_metalLayer)
+				if (NULL == m_metalLayer)
 #if BX_PLATFORM_IOS
 				{
 					CAMetalLayer* metalLayer = (CAMetalLayer*)g_platformData.nwh;
@@ -432,6 +423,7 @@ namespace bgfx { namespace mtl
 				return false;
 			}
 
+			retain(m_device);
 			m_metalLayer.device      = m_device;
 			m_metalLayer.pixelFormat = MTLPixelFormatBGRA8Unorm;
 
@@ -488,6 +480,7 @@ namespace bgfx { namespace mtl
 			}
 
 			m_screenshotBlitProgram.create(&m_screenshotBlitProgramVsh, &m_screenshotBlitProgramFsh);
+			release(lib);
 
 			reset(m_renderPipelineDescriptor);
 			m_renderPipelineDescriptor.colorAttachments[0].pixelFormat = m_metalLayer.pixelFormat;
@@ -672,6 +665,11 @@ namespace bgfx { namespace mtl
 				m_textures[ii].destroy();
 			}
 
+			m_screenshotBlitProgramVsh.destroy();
+			m_screenshotBlitProgramFsh.destroy();
+			m_screenshotBlitProgram.destroy();
+			MTL_RELEASE(m_screenshotBlitRenderPipelineState);
+
 			captureFinish();
 
 			MTL_RELEASE(m_depthStencilDescriptor);
@@ -683,10 +681,7 @@ namespace bgfx { namespace mtl
 			MTL_RELEASE(m_samplerDescriptor);
 
 			MTL_RELEASE(m_backBufferDepth);
-			if (BX_ENABLED(BX_PLATFORM_IOS) )
-			{
-				MTL_RELEASE(m_backBufferStencil);
-			}
+			MTL_RELEASE(m_backBufferStencil);
 
 			for (uint8_t i=0; i < MTL_MAX_FRAMES_IN_FLIGHT; ++i)
 			{
@@ -989,6 +984,24 @@ namespace bgfx { namespace mtl
 			m_occlusionQuery.invalidate(_handle);
 		}
 
+		virtual void setName(Handle _handle, const char* _name) override
+		{
+			switch (_handle.type)
+			{
+			case Handle::Shader:
+				m_shaders[_handle.idx].m_function.setLabel(_name);
+				break;
+
+			case Handle::Texture:
+				m_textures[_handle.idx].m_ptr.setLabel(_name);
+				break;
+
+			default:
+				BX_CHECK(false, "Invalid handle type?! %d", _handle.type);
+				break;
+			}
+		}
+
 		void submitBlit(BlitState& _bs, uint16_t _view);
 
 		void submit(Frame* _render, ClearQuad& _clearQuad, TextVideoMemBlitter& _textVideoMemBlitter) override;
@@ -1165,11 +1178,18 @@ namespace bgfx { namespace mtl
 				{
 					release(m_backBufferDepth);
 				}
+
 				m_backBufferDepth   = m_device.newTextureWithDescriptor(m_textureDescriptor);
+
+				if (NULL != m_backBufferStencil)
+				{
+					release(m_backBufferStencil);
+				}
 
 				if (m_hasPixelFormatDepth32Float_Stencil8)
 				{
 					m_backBufferStencil = m_backBufferDepth;
+					retain(m_backBufferStencil);
 				}
 				else
 				{
@@ -1257,10 +1277,11 @@ namespace bgfx { namespace mtl
 				{
 					bimg::imageSwizzleBgra8(
 						  m_capture
+						, m_resolution.m_width*4
 						, m_resolution.m_width
 						, m_resolution.m_height
-						, m_resolution.m_width*4
 						, m_capture
+						, m_resolution.m_width*4
 						);
 				}
 
@@ -1910,6 +1931,7 @@ namespace bgfx { namespace mtl
 		if (NULL != lib)
 		{
 			m_function = lib.newFunctionWithName(SHADER_FUNCTION_NAME);
+			release(lib);
 		}
 
 		BGFX_FATAL(NULL != m_function
@@ -1991,6 +2013,8 @@ namespace bgfx { namespace mtl
 		m_fshConstantBufferSize = 0;
 		m_fshConstantBufferAlignmentMask = 0;
 
+		m_samplerCount = 0;
+
 		m_processedUniforms = false;
 		m_numPredefined = 0;
 
@@ -2044,7 +2068,7 @@ namespace bgfx { namespace mtl
 			FrameBufferMtl& frameBuffer = s_renderMtl->m_frameBuffers[_fbHandle.idx];
 			murmur.add(frameBuffer.m_pixelFormatHash);
 		}
-		murmur.add(_declHandle.idx);
+		murmur.add(s_renderMtl->m_vertexDecls[_declHandle.idx].m_hash);
 		murmur.add(_numInstanceData);
 		uint32_t hash = murmur.end();
 
@@ -2309,16 +2333,25 @@ namespace bgfx { namespace mtl
 								}
 								else if (arg.type == MTLArgumentTypeTexture)
 								{
-									if (0 == shaderType)
-									{
-										m_usedVertexSamplerStages |= 1<<arg.index;
-									}
-									else
-									{
-										m_usedFragmentSamplerStages |= 1<<arg.index;
-									}
+									const char* name = utf8String(arg.name);
+									const UniformRegInfo* info = s_renderMtl->m_uniformReg.find(name);
+									BX_WARN(NULL != info, "User defined uniform '%s' is not found, it won't be set.", name);
 
-									BX_TRACE("texture: %s index:%d", utf8String(arg.name), arg.index);
+									if (NULL != info)
+									{
+										if ( m_samplerCount >= BGFX_CONFIG_MAX_TEXTURE_SAMPLERS)
+										{
+											BX_WARN(NULL != info, "Too many samplers in shader(only %d is supported). User defined uniform '%s' won't be set.", BGFX_CONFIG_MAX_TEXTURE_SAMPLERS, name);
+										}
+										else
+										{
+											m_samplers[m_samplerCount].m_index = uint32_t(arg.index);
+											m_samplers[m_samplerCount].m_uniform = info->m_handle;
+											m_samplers[m_samplerCount].m_fragment = fragmentBit ? 1 : 0;
+											++m_samplerCount;
+											BX_TRACE("texture %s %d index:%d", name, info->m_handle, uint32_t(arg.index) );
+										}
+									}
 								}
 								else if (arg.type == MTLArgumentTypeSampler)
 								{
@@ -2473,21 +2506,21 @@ namespace bgfx { namespace mtl
 			const bool writeOnly    = 0 != (_flags&BGFX_TEXTURE_RT_WRITE_ONLY);
 			const bool computeWrite = 0 != (_flags&BGFX_TEXTURE_COMPUTE_WRITE);
 			const bool renderTarget = 0 != (_flags&BGFX_TEXTURE_RT_MASK);
-			const bool srgb			= 0 != (_flags&BGFX_TEXTURE_SRGB) || imageContainer.m_srgb;
+			const bool srgb         = 0 != (_flags&BGFX_TEXTURE_SRGB);
 
 			BX_TRACE("Texture %3d: %s (requested: %s), layers %d, %dx%d%s RT[%c], WO[%c], CW[%c], sRGB[%c]"
-					 , this - s_renderMtl->m_textures
-					 , getName( (TextureFormat::Enum)m_textureFormat)
-					 , getName( (TextureFormat::Enum)m_requestedFormat)
-					 , numLayers
-					 , textureWidth
-					 , textureHeight
-					 , imageContainer.m_cubeMap ? "x6" : ""
-					 , renderTarget ? 'x' : '.'
-					 , writeOnly ? 'x' : '.'
-					 , computeWrite ? 'x' : '.'
-					 , srgb ? 'x' : '.'
-					 );
+					, this - s_renderMtl->m_textures
+					, getName( (TextureFormat::Enum)m_textureFormat)
+					, getName( (TextureFormat::Enum)m_requestedFormat)
+					, numLayers
+					, textureWidth
+					, textureHeight
+					, imageContainer.m_cubeMap ? "x6" : ""
+					, renderTarget ? 'x' : '.'
+					, writeOnly ? 'x' : '.'
+					, computeWrite ? 'x' : '.'
+					, srgb ? 'x' : '.'
+					);
 
 			const uint32_t msaaQuality = bx::uint32_satsub( (_flags&BGFX_TEXTURE_RT_MSAA_MASK)>>BGFX_TEXTURE_RT_MSAA_SHIFT, 1);
 			int sampleCount = s_msaa[msaaQuality];
@@ -2512,7 +2545,7 @@ namespace bgfx { namespace mtl
 			desc.width  = textureWidth;
 			desc.height = textureHeight;
 			desc.depth  = bx::uint32_max(1,imageContainer.m_depth);
-			desc.mipmapLevelCount = imageContainer.m_numMips;
+			desc.mipmapLevelCount = numMips;
 			desc.sampleCount      = 1;
 			desc.arrayLength = numLayers;
 
@@ -2826,6 +2859,7 @@ namespace bgfx { namespace mtl
 
 	void CommandQueueMtl::shutdown()
 	{
+		finish(true);
 		MTL_RELEASE(m_commandQueue);
 	}
 
@@ -3014,6 +3048,9 @@ namespace bgfx { namespace mtl
 
 	void RendererContextMtl::submitBlit(BlitState& _bs, uint16_t _view)
 	{
+		if (!_bs.hasItem(_view))
+			return;
+
 		if (0 != m_renderCommandEncoder)
 		{
 			m_renderCommandEncoder.endEncoding();
@@ -3102,7 +3139,7 @@ namespace bgfx { namespace mtl
 			m_commandBuffer = m_cmd.alloc();
 		}
 
-		int64_t elapsed = -bx::getHPCounter();
+		int64_t timeBegin = bx::getHPCounter();
 		int64_t captureElapsed = 0;
 
 		m_gpuTimer.addHandlers(m_commandBuffer);
@@ -3695,19 +3732,17 @@ namespace bgfx { namespace mtl
 					m_uniformBufferVertexOffset = m_uniformBufferFragmentOffset;
 				}
 
+				if (kInvalidHandle != programIdx)
 				{
-					uint32_t usedVertexSamplerStages = 0;
-					uint32_t usedFragmentSamplerStages = 0;
+					ProgramMtl& program = m_program[programIdx];
 
-					if (kInvalidHandle != programIdx)
+					for (uint32_t sampler = 0; sampler < program.m_samplerCount; ++sampler)
 					{
-						ProgramMtl& program = m_program[programIdx];
-						usedVertexSamplerStages = program.m_usedVertexSamplerStages;
-						usedFragmentSamplerStages = program.m_usedFragmentSamplerStages;
-					}
+						ProgramMtl::SamplerInfo& samplerInfo = program.m_samplers[sampler];
 
-					for (uint8_t stage = 0; stage < BGFX_CONFIG_MAX_TEXTURE_SAMPLERS; ++stage)
-					{
+						UniformHandle handle = samplerInfo.m_uniform;
+						int stage = *((int*)m_uniforms[handle.idx]);
+
 						const Binding& bind = renderBind.m_bind[stage];
 						Binding& current = currentBind.m_bind[stage];
 
@@ -3718,11 +3753,11 @@ namespace bgfx { namespace mtl
 							if (kInvalidHandle != bind.m_idx)
 							{
 								TextureMtl& texture = m_textures[bind.m_idx];
-								texture.commit(stage
-									, 0 != (usedVertexSamplerStages   & (1<<stage) )
-									, 0 != (usedFragmentSamplerStages & (1<<stage) )
-									, bind.m_un.m_draw.m_textureFlags
-									);
+								texture.commit(samplerInfo.m_index
+											   , !samplerInfo.m_fragment
+											   , samplerInfo.m_fragment
+											   , bind.m_un.m_draw.m_textureFlags
+											   );
 							}
 						}
 
@@ -3861,16 +3896,8 @@ namespace bgfx { namespace mtl
 			}
 		}
 
-		int64_t now = bx::getHPCounter();
-		elapsed += now;
-
-		static int64_t last = now;
-
-		Stats& perfStats = _render->m_perfStats;
-		perfStats.cpuTimeBegin = last;
-
-		int64_t frameTime = now - last;
-		last = now;
+		int64_t timeEnd = bx::getHPCounter();
+		int64_t frameTime = timeEnd - timeBegin;
 
 		static int64_t min = frameTime;
 		static int64_t max = frameTime;
@@ -3893,7 +3920,9 @@ namespace bgfx { namespace mtl
 
 		const int64_t timerFreq = bx::getHPFrequency();
 
-		perfStats.cpuTimeEnd    = now;
+		Stats& perfStats = _render->m_perfStats;
+		perfStats.cpuTimeBegin  = timeBegin;
+		perfStats.cpuTimeEnd    = timeEnd;
 		perfStats.cpuTimerFreq  = timerFreq;
 		perfStats.gpuTimeBegin  = m_gpuTimer.m_begin;
 		perfStats.gpuTimeEnd    = m_gpuTimer.m_end;
@@ -3909,13 +3938,13 @@ namespace bgfx { namespace mtl
 
 			TextVideoMem& tvm = m_textVideoMem;
 
-			static int64_t next = now;
+			static int64_t next = timeEnd;
 
-			if (now >= next)
+			if (timeEnd >= next)
 			{
-				next = now + bx::getHPFrequency();
+				next = timeEnd + timerFreq;
 
-				double freq = double(bx::getHPFrequency() );
+				double freq = double(timerFreq);
 				double toMs = 1000.0/freq;
 
 				tvm.clear();
@@ -3940,7 +3969,7 @@ namespace bgfx { namespace mtl
 						, !!(m_resolution.m_flags&BGFX_RESET_MAXANISOTROPY) ? '\xfe' : ' '
 						);
 
-				double elapsedCpuMs = double(elapsed)*toMs;
+				double elapsedCpuMs = double(frameTime)*toMs;
 				tvm.printf(10, pos++, 0x8e, "    Submitted: %4d (draw %4d, compute %4d) / CPU %3.4f [ms] %c GPU %3.4f [ms] (latency %d)"
 						, _render->m_num
 						, statsKeyType[0]
