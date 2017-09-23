@@ -1,4 +1,4 @@
-int signals_obj_export_symbols()
+int core_obj_export_symbols()
 {
 	return 0;
 }
