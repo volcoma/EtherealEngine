@@ -1,9 +1,0 @@
-*.o
-*.a
-*.so
-*.exe
-tags
-TAGS
-build/
-Test/localResults/
-External/googletest
