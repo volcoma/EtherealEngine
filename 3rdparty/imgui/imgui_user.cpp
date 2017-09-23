@@ -235,10 +235,10 @@ int ImageButtonWithAspectAndLabel(ImTextureID texture, ImVec2 texture_size, ImVe
 	ImGuiWindow* window = GetCurrentWindow();
 	bool inputActive = false;
 	bool label_clicked = false;
-    const float image_padding = size.x * 0.3f;
+    const float image_padding = 0.0f;//size.x * 0.3f;
 	BeginGroup();
 	{
-        SameLine(0.0f, image_padding);        
+        //SameLine(0.0f, image_padding);        
         
 		if(selected)
         {
@@ -249,8 +249,8 @@ int ImageButtonWithAspectAndLabel(ImTextureID texture, ImVec2 texture_size, ImVe
         {
 			ImageWithAspect(texture, texture_size, size, uv0, uv1);
 		}
-        SameLine(0.0f, image_padding);
-        NewLine();
+        //SameLine(0.0f, image_padding);
+        //NewLine();
 		auto pos = GetCursorPos();
 
 		if(!(selected && edit))
