@@ -235,27 +235,33 @@ int ImageButtonWithAspectAndLabel(ImTextureID texture, ImVec2 texture_size, ImVe
 	ImGuiWindow* window = GetCurrentWindow();
 	bool inputActive = false;
 	bool label_clicked = false;
+    const float image_padding = size.x * 0.3f;
 	BeginGroup();
 	{
+        SameLine(0.0f, image_padding);        
+        
 		if(selected)
+        {
 			ImageWithAspect(texture, texture_size, size, uv0, uv1, {0.7f, 0.7f, 0.7f, 1.0f});
-		else
+            RenderFrameEx(GetItemRectMin(), GetItemRectMax(), true, 0.0f, 2.0f);
+        }
+        else
+        {
 			ImageWithAspect(texture, texture_size, size, uv0, uv1);
-		if(selected)
-			RenderFrameEx(GetItemRectMin(), GetItemRectMax(), true, 0.0f, 2.0f);
-
+		}
+        SameLine(0.0f, image_padding);
+        NewLine();
 		auto pos = GetCursorPos();
-		PushItemWidth(size.x);
-		//			LabelTextEx("", label);
+
 		if(!(selected && edit))
 		{
-			PushTextWrapPos(pos.x + size.x * 0.9f);
+            float wrap_pos = pos.x + size.x + image_padding * 2.0f;//CalcWrapWidthForPos(pos, pos.x + size.x + image_padding * 2.0f);
+			PushTextWrapPos(wrap_pos);
 			AlignFirstTextHeightToWidgets();
 			TextUnformatted(label);
 			PopTextWrapPos();
 		}
 
-		PopItemWidth();
 		label_clicked = IsItemClicked(0);
 		if(!edit)
 		{
@@ -270,7 +276,7 @@ int ImageButtonWithAspectAndLabel(ImTextureID texture, ImVec2 texture_size, ImVe
 		if(selected && edit)
 		{
 			SetCursorPos(pos);
-			PushItemWidth(size.x);
+			PushItemWidth(size.x + image_padding * 2.0f);
 
 			if(InputText("", &buf[0], buf_size, flags))
 			{
