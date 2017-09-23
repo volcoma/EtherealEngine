@@ -13,9 +13,9 @@ if( NOT IS_DIRECTORY ${BGFX_DIR} )
 	message( SEND_ERROR "Could not load bgfx, directory does not exist. ${BGFX_DIR}" )
 	return()
 endif()
-
 # Grab the bgfx source files
 file( GLOB BGFX_SOURCES ${BGFX_DIR}/src/*.cpp ${BGFX_DIR}/src/*.mm ${BGFX_DIR}/src/*.h ${BGFX_DIR}/include/bgfx/*.h ${BGFX_DIR}/include/bgfx/c99/*.h )
+list(APPEND BGFX_SOURCES ${BGFX_DIR}/examples/common/debugdraw/debugdraw.cpp)
 if(BGFX_AMALGAMATED)
 	set(BGFX_NOBUILD ${BGFX_SOURCES})
 	list(REMOVE_ITEM BGFX_NOBUILD ${BGFX_DIR}/src/amalgamated.cpp)
@@ -44,7 +44,7 @@ target_include_directories( bgfx PUBLIC ${BGFX_DIR}/include )
 target_include_directories( bgfx PUBLIC ${BGFX_DIR}/src )
 
 # bgfx depends on bx and bimg
-target_link_libraries( bgfx PUBLIC bx bimg )
+target_link_libraries( bgfx PUBLIC bx bimg bgfx-debugdraw )
 
 # ovr support
 if( BGFX_USE_OVR )

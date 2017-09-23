@@ -24,6 +24,13 @@ target_sources( bgfx-bounds INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/generated/boun
 target_include_directories( bgfx-bounds INTERFACE ${BGFX_DIR}/include )
 target_include_directories( bgfx-bounds INTERFACE ${BGFX_DIR}/examples/common )
 
+add_library( bgfx-debugdraw INTERFACE )
+file( WRITE ${CMAKE_CURRENT_BINARY_DIR}/generated/bounds.cpp "#include \"${BGFX_DIR}/examples/common/bounds.cpp\"" )
+file( WRITE ${CMAKE_CURRENT_BINARY_DIR}/generated/debugdraw.cpp "#include \"${BGFX_DIR}/examples/common/debugdraw/debugdraw.cpp\"" )
+target_sources( bgfx-debugdraw INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/generated/debugdraw.cpp ${CMAKE_CURRENT_BINARY_DIR}/generated/bounds.cpp )
+target_include_directories( bgfx-debugdraw INTERFACE ${BGFX_DIR}/include )
+target_include_directories( bgfx-debugdraw INTERFACE ${BGFX_DIR}/examples/common/debugdraw )
+
 # Frameworks required on OS X
 if( APPLE )
 	find_library( COCOA_LIBRARY Cocoa )
