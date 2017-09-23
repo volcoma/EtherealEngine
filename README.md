@@ -1,3 +1,4 @@
+
 ## INFO
 Cross-platform C++ Game Engine in c++14
 
@@ -10,9 +11,14 @@ Building
 -------------
 Don't forget to update submodules
 ```
-cd your_cloned_dir
+git clone https://github.com/volcoma/EtherealEngine.git
+cd EtherealEngine
 git submodule init
 git submodule update
+
+mkdir build
+cd build
+cmake ..
 
 ```
 
@@ -56,7 +62,7 @@ public:
   //  Name : some_method ()
   /// <summary>
   /// This is a method comment description.
-s  /// </summary>
+  /// </summary>
   //-----------------------------------------------------------------------------
   void some_method();
   
