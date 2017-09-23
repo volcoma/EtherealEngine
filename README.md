@@ -6,6 +6,16 @@ WYSIWYG Editor
 ## STATUS
 WIP - not production ready in any way
 
+Building
+-------------
+Don't forget to update submodules
+```
+cd your_cloned_dir
+git submodule init
+git submodule update
+
+```
+
 ## PLATFORMS
 It is written in a cross-platform manner using c++14.
 
