@@ -161,7 +161,7 @@ public:
 		return _is_main;
 	}
 
-	std::size_t get_id() const
+	std::uint32_t get_id() const
 	{
 		return _id;
 	}
@@ -177,7 +177,7 @@ protected:
 	virtual void on_resize();
 
 	///
-	std::size_t _id = rtti::type_index_sequential_t::id<mml::window, render_window>();
+	std::uint32_t _id = 0;
 	/// Render surface for this window.
 	std::shared_ptr<frame_buffer> _surface;
 	///

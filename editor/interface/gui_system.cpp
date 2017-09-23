@@ -18,7 +18,7 @@
 
 // -------------------------------------------------------------------
 
-class UIContexts
+class contexts
 {
 public:
 	void set_initial_context(ImGuiContext* context)
@@ -37,7 +37,7 @@ private:
 };
 
 static gui_style s_gui_style;
-static UIContexts s_contexts;
+static contexts s_contexts;
 
 static gfx::VertexDecl s_decl;
 static std::unique_ptr<program> s_program;

@@ -4,6 +4,8 @@
 #include "render_window.h"
 #include "render_pass.h"
 
+static std::uint32_t s_next_id = 0;
+
 void render_window::on_resize()
 {
 	prepare_surface();
@@ -11,6 +13,7 @@ void render_window::on_resize()
 
 render_window::render_window()
 {
+    _id = s_next_id++;
 	_surface = std::make_shared<frame_buffer>();
 }
 
@@ -18,6 +21,7 @@ render_window::render_window(mml::video_mode mode, const std::string& title,
 							 std::uint32_t style /*= mml::style::default*/)
 	: mml::window(mode, title, style)
 {
+    _id = s_next_id++;
 	_surface = std::make_shared<frame_buffer>();
 }
 
