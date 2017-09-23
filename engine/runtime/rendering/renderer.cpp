@@ -1,6 +1,6 @@
 #include "renderer.h"
 #include "../system/engine.h"
-#include "core/common/string.h"
+#include "core/string_utils/string_utils.h"
 #include "core/graphics/graphics.h"
 #include "core/logging/logging.h"
 #include "render_pass.h"

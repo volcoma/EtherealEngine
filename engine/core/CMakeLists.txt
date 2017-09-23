@@ -1,4 +1,4 @@
-file(GLOB_RECURSE libsrc *.h *.cpp *.hpp *.c *.cc)
+#file(GLOB_RECURSE libsrc *.h *.cpp *.hpp *.c *.cc)
 
 add_subdirectory(config)
 add_subdirectory(console)
@@ -13,8 +13,9 @@ add_subdirectory(serialization)
 add_subdirectory(signals)
 add_subdirectory(singleton)
 add_subdirectory(system)
+add_subdirectory(string_utils)
 
-add_library (core ${libsrc})
+add_library (core core.cpp)
 
 target_link_libraries(core PUBLIC config)
 target_link_libraries(core PUBLIC console)
@@ -29,6 +30,7 @@ target_link_libraries(core PUBLIC serialization)
 target_link_libraries(core PUBLIC signals)
 target_link_libraries(core PUBLIC singleton)
 target_link_libraries(core PUBLIC system)
+target_link_libraries(core PUBLIC string_utils)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	target_link_libraries(core PUBLIC "-stdlib=libstdc++ -lstdc++")

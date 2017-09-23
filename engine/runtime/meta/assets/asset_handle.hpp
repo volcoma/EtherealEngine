@@ -7,7 +7,7 @@
 #include "../../rendering/material.h"
 #include "../../rendering/mesh.h"
 #include "../../rendering/texture.h"
-#include "core/common/string.h"
+#include "core/string_utils/string_utils.h"
 #include "core/serialization/serialization.h"
 #include "core/serialization/types/string.hpp"
 #include "core/logging/logging.h"

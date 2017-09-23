@@ -1,7 +1,7 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imguidock.h"
 #include "../gui_window.h"
-#include "core/common/string.h"
+#include "core/string_utils/string_utils.h"
 #include "runtime/input/input.h"
 #include "runtime/system/engine.h"
 namespace imguidock

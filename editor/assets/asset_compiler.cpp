@@ -2,7 +2,7 @@
 #include "bx/error.h"
 #include "bx/process.h"
 #include "bx/string.h"
-#include "core/common/string.h"
+#include "core/string_utils/string_utils.h"
 #include "core/filesystem/filesystem.h"
 #include "core/graphics/graphics.h"
 #include "core/logging/logging.h"
