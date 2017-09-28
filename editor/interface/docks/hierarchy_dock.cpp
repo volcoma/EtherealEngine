@@ -12,21 +12,37 @@
 #include "runtime/input/input.h"
 #include "runtime/rendering/mesh.h"
 
-void check_context_menu(runtime::entity entity)
+namespace
+{
+    enum class context_action
+    {
+        none,
+        rename, 
+    };
+}
+
+context_action check_context_menu(runtime::entity entity)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
 	auto& editor_camera = es.camera;
+    context_action action = context_action::none;
 	if(entity && entity != editor_camera)
 	{
 		if(gui::BeginPopupContextItem("Entity Context Menu"))
 		{
-			if(gui::Selectable("CREATE CHILD"))
+			if(gui::MenuItem("CREATE CHILD"))
 			{
 				auto object = ecs.create();
 				object.assign<transform_component>().lock()->set_parent(entity);
 			}
-			if(gui::Selectable("CLONE"))
+        
+            if(gui::MenuItem("RENAME", "F2"))
+			{
+                action = context_action::rename;
+			}
+            
+			if(gui::MenuItem("CLONE", "CTRL + D"))
 			{
 				auto object = ecs::utils::clone_entity(entity);
 
@@ -39,10 +55,11 @@ void check_context_menu(runtime::entity entity)
 
 				es.select(object);
 			}
-			if(gui::Selectable("DELETE"))
+			if(gui::MenuItem("DELETE", "DEL"))
 			{
 				entity.destroy();
 			}
+            
 
 			gui::EndPopup();
 		}
@@ -51,7 +68,7 @@ void check_context_menu(runtime::entity entity)
 	{
 		if(gui::BeginPopupContextWindow())
 		{
-			if(gui::Selectable("CREATE EMPTY"))
+			if(gui::MenuItem("CREATE EMPTY"))
 			{
 				auto object = ecs.create();
 				object.assign<transform_component>();
@@ -60,6 +77,7 @@ void check_context_menu(runtime::entity entity)
 			gui::EndPopup();
 		}
 	}
+    return action;
 }
 
 void check_drag(runtime::entity entity)
@@ -247,7 +265,11 @@ void draw_entity(runtime::entity entity)
 
 	if(!edit_label)
 	{
-		check_context_menu(entity);
+		auto action = check_context_menu(entity);
+        if(action == context_action::rename)
+        {
+            edit_label = true;
+        }
 		check_drag(entity);
 	}
 

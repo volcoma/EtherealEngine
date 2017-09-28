@@ -53,7 +53,7 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 		{
 			data = asset_handle<texture>();
 			var = data;
-			return true;
+			changed |= true;
 		}
 		std::string item = !data.id().empty() ? data.id() : "none";
 		rttr::variant var_str = item;
@@ -70,7 +70,7 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 				data = load_future.get();
 			}
 			var = data;
-			return true;
+			changed |= true;
 		}
 		if(!gui::IsItemActive() && gui::IsItemHovered())
 		{
@@ -100,11 +100,11 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 				{
 					data = dragged.get_value<asset_handle<texture>>();
 					var = data;
-					return true;
+					changed |= true;
 				}
 			}
 		}
-		return false;
+		return changed;
 	}
 
 	if(data)

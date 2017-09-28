@@ -29,8 +29,9 @@ namespace asset_compiler
 {
 std::string escape_str(const std::string& str)
 {
-	return '"' + str + '"';
+	return "\"" + str + "\"";
 }
+
 
 bool run_compile_process(const std::string& process, const std::vector<std::string>& args_array,
 						 std::string& err)
@@ -40,7 +41,14 @@ bool run_compile_process(const std::string& process, const std::vector<std::stri
 	size_t i = 0;
 	for(const auto& arg : args_array)
 	{
-		args += arg;
+        if(arg.front() == '-')
+        {
+            args += arg;
+        }
+		else
+        {
+            args += escape_str(arg);
+        }
 
 		if(i++ != args_array.size() - 1)
 			args += " ";
@@ -52,7 +60,7 @@ bool run_compile_process(const std::string& process, const std::vector<std::stri
 	auto executable_dir = fs::resolve_protocol("binary:/");
 	auto process_full = executable_dir / process;
 
-	process_reader.open(process_full.string().c_str(), args.c_str(), &error);
+	process_reader.open((process_full.string() + " " + args).c_str(), "", &error);
 
 	if(!error.isOk())
 	{
@@ -155,10 +163,10 @@ void compile<shader>(const fs::path& absolute_key)
 		str_type = "unknown";
 
 	const std::vector<std::string> args_array = {
-		"-f",			escape_str(str_input).c_str(),
-		"-o",			escape_str(str_output).c_str(),
+		"-f",			str_input.c_str(),
+		"-o",			str_output.c_str(),
 		"-i",			str_include.c_str(),
-		"--varyingdef", escape_str(str_varying).c_str(),
+		"--varyingdef", str_varying.c_str(),
 		"--platform",   str_platform.c_str(),
 		"-p",			str_profile.c_str(),
 		"--type",		str_type.c_str(),
@@ -196,8 +204,8 @@ void compile<texture>(const fs::path& absolute_key)
 	std::string str_output = temp.string();
 
 	const std::vector<std::string> args_array = {
-		"-f",	escape_str(str_input).c_str(),
-		"-o",	escape_str(str_output).c_str(),
+		"-f",	str_input.c_str(),
+		"-o",	str_output.c_str(),
 		"--as",  "ktx",
 		"-m",	"-t",
 		"BGRA8",

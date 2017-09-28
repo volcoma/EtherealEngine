@@ -26,7 +26,7 @@ public:
 					   std::uint32_t style = mml::style::standard);
 
 	//-----------------------------------------------------------------------------
-	//  Name : ~ProjectManagerWindow (virtual )
+	//  Name : ~main_editor_window (virtual )
 	/// <summary>
 	///
 	///
