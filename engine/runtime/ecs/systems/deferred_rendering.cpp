@@ -8,7 +8,8 @@
 #include "../../rendering/render_pass.h"
 #include "../../rendering/texture.h"
 #include "../../rendering/vertex_buffer.h"
-#include "../../system/engine.h"
+#include "../../rendering/renderer.h"
+#include "../../system/events.h"
 #include "../components/camera_component.h"
 #include "../components/light_component.h"
 #include "../components/model_component.h"
@@ -225,77 +226,80 @@ void deferred_rendering::frame_render(std::chrono::duration<float> dt)
 	build_reflections_pass(ecs, dt);
 	build_shadows_pass(ecs, dt);
 	camera_pass(ecs, dt);
+
 }
 
 void deferred_rendering::build_reflections_pass(entity_component_system& ecs, std::chrono::duration<float> dt)
 {
 	auto dirty_models = gather_visible_models(ecs, nullptr, true, true, true);
-	ecs.each<transform_component, reflection_probe_component>([this, &ecs, dt, &dirty_models](
-		entity ce, transform_component& transform_comp, reflection_probe_component& reflection_probe_comp) {
-		const auto& world_tranform = transform_comp.get_transform();
-		const auto& probe = reflection_probe_comp.get_probe();
+	ecs.each<transform_component, reflection_probe_component>(
+		[this, &ecs, dt, &dirty_models](entity ce, transform_component& transform_comp,
+										reflection_probe_component& reflection_probe_comp) {
+			const auto& world_tranform = transform_comp.get_transform();
+			const auto& probe = reflection_probe_comp.get_probe();
 
-		auto cubemap_fbo = reflection_probe_comp.get_cubemap_fbo();
-		bool should_rebuild = true;
+			auto cubemap_fbo = reflection_probe_comp.get_cubemap_fbo();
+			bool should_rebuild = true;
 
-		if(!transform_comp.is_dirty() && !reflection_probe_comp.is_dirty())
-		{
-			// If reflections shouldn't be rebuilt - continue.
-			should_rebuild = should_rebuild_reflections(dirty_models, probe);
-		}
+			if(!transform_comp.is_dirty() && !reflection_probe_comp.is_dirty())
+			{
+				// If reflections shouldn't be rebuilt - continue.
+				should_rebuild = should_rebuild_reflections(dirty_models, probe);
+			}
 
-		if(!should_rebuild)
-			return;
+			if(!should_rebuild)
+				return;
 
-		// iterate trough each cube face
-		for(std::uint32_t i = 0; i < 6; ++i)
-		{
-			auto camera = camera::get_face_camera(i, world_tranform);
-			auto& render_view = reflection_probe_comp.get_render_view(i);
-			camera.set_viewport_size(cubemap_fbo->get_size());
-			auto& camera_lods = _lod_data[ce];
-			visibility_set_models_t visibility_set;
+			// iterate trough each cube face
+			for(std::uint32_t i = 0; i < 6; ++i)
+			{
+				auto camera = camera::get_face_camera(i, world_tranform);
+				auto& render_view = reflection_probe_comp.get_render_view(i);
+				camera.set_viewport_size(cubemap_fbo->get_size());
+				auto& camera_lods = _lod_data[ce];
+				visibility_set_models_t visibility_set;
 
-			if(probe.method != reflect_method::environment)
-				visibility_set = gather_visible_models(ecs, &camera, !should_rebuild, true, true);
+				if(probe.method != reflect_method::environment)
+					visibility_set = gather_visible_models(ecs, &camera, !should_rebuild, true, true);
 
-			std::shared_ptr<frame_buffer> output = nullptr;
-			output = g_buffer_pass(output, camera, render_view, visibility_set, camera_lods, dt);
-			output = lighting_pass(output, camera, render_view, ecs, dt, false);
-			output = atmospherics_pass(output, camera, render_view, ecs, dt);
-			output = tonemapping_pass(output, camera, render_view);
+				std::shared_ptr<frame_buffer> output = nullptr;
+				output = g_buffer_pass(output, camera, render_view, visibility_set, camera_lods, dt);
+				output = lighting_pass(output, camera, render_view, ecs, dt, false);
+				output = atmospherics_pass(output, camera, render_view, ecs, dt);
+				output = tonemapping_pass(output, camera, render_view);
 
-			render_pass pass("cubemap_fill");
-			gfx::blit(pass.id, gfx::getTexture(cubemap_fbo->handle), 0, 0, 0, std::uint16_t(i),
-					  gfx::getTexture(output->handle));
-		}
+				render_pass pass("cubemap_fill");
+				gfx::blit(pass.id, gfx::getTexture(cubemap_fbo->handle), 0, 0, 0, std::uint16_t(i),
+						  gfx::getTexture(output->handle));
+			}
 
-		render_pass pass("cubemap_generate_mips");
-		pass.bind(cubemap_fbo.get());
+			render_pass pass("cubemap_generate_mips");
+			pass.bind(cubemap_fbo.get());
 
-	});
+		});
 }
 
 void deferred_rendering::build_shadows_pass(entity_component_system& ecs, std::chrono::duration<float> dt)
 {
 	auto dirty_models = gather_visible_models(ecs, nullptr, true, true, true);
-	ecs.each<transform_component, light_component>([this, &ecs, dt, &dirty_models](
-		entity ce, transform_component& transform_comp, light_component& light_comp) {
-		// const auto& world_tranform = transform_comp.get_transform();
-		const auto& light = light_comp.get_light();
+	ecs.each<transform_component, light_component>(
+		[this, &ecs, dt, &dirty_models](entity ce, transform_component& transform_comp,
+										light_component& light_comp) {
+			// const auto& world_tranform = transform_comp.get_transform();
+			const auto& light = light_comp.get_light();
 
-		bool should_rebuild = true;
+			bool should_rebuild = true;
 
-		if(!transform_comp.is_dirty() && !light_comp.is_dirty())
-		{
-			// If shadows shouldn't be rebuilt - continue.
-			should_rebuild = should_rebuild_shadows(dirty_models, light);
-		}
+			if(!transform_comp.is_dirty() && !light_comp.is_dirty())
+			{
+				// If shadows shouldn't be rebuilt - continue.
+				should_rebuild = should_rebuild_shadows(dirty_models, light);
+			}
 
-		if(!should_rebuild)
-			return;
+			if(!should_rebuild)
+				return;
 
-	});
+		});
 }
 
 void deferred_rendering::camera_pass(entity_component_system& ecs, std::chrono::duration<float> dt)
@@ -306,6 +310,7 @@ void deferred_rendering::camera_pass(entity_component_system& ecs, std::chrono::
 		auto& render_view = camera_comp.get_render_view();
 
 		auto output = deferred_render_full(camera, render_view, ecs, camera_lods, dt);
+ 
 	});
 }
 
@@ -441,7 +446,8 @@ std::shared_ptr<frame_buffer> deferred_rendering::lighting_pass(std::shared_ptr<
 
 	ecs.each<transform_component, light_component>([this, bind_indirect_specular, &camera, &pass,
 													&buffer_size, &view, &proj, g_buffer_fbo, refl_buffer](
-		entity e, transform_component& transform_comp_ref, light_component& light_comp_ref) {
+													   entity e, transform_component& transform_comp_ref,
+													   light_component& light_comp_ref) {
 		const auto& light = light_comp_ref.get_light();
 		const auto& world_transform = transform_comp_ref.get_transform();
 		const auto& light_position = world_transform.get_position();
@@ -538,70 +544,74 @@ std::shared_ptr<frame_buffer> deferred_rendering::reflection_probe_pass(std::sha
 	pass.clear(BGFX_CLEAR_COLOR, 0, 0.0f, 0);
 	pass.set_view_proj(view, proj);
 
-	ecs.each<transform_component, reflection_probe_component>([this, &camera, &pass, &buffer_size, &view,
-															   &proj, g_buffer_fbo](
-		entity e, transform_component& transform_comp_ref, reflection_probe_component& probe_comp_ref) {
-		const auto& probe = probe_comp_ref.get_probe();
-		const auto& world_transform = transform_comp_ref.get_transform();
-		const auto& probe_position = world_transform.get_position();
+	ecs.each<transform_component, reflection_probe_component>(
+		[this, &camera, &pass, &buffer_size, &view, &proj, g_buffer_fbo](
+			entity e, transform_component& transform_comp_ref, reflection_probe_component& probe_comp_ref) {
+			const auto& probe = probe_comp_ref.get_probe();
+			const auto& world_transform = transform_comp_ref.get_transform();
+			const auto& probe_position = world_transform.get_position();
 
-		irect rect(0, 0, buffer_size.width, buffer_size.height);
-		if(probe_comp_ref.compute_projected_sphere_rect(rect, probe_position, view, proj) == 0)
-			return;
+			irect rect(0, 0, buffer_size.width, buffer_size.height);
+			if(probe_comp_ref.compute_projected_sphere_rect(rect, probe_position, view, proj) == 0)
+				return;
 
-		const auto cubemap = probe_comp_ref.get_cubemap();
+			const auto cubemap = probe_comp_ref.get_cubemap();
 
-		program* program = nullptr;
-		float influence_radius = 0.0f;
-		if(probe.type == probe_type::sphere && _sphere_ref_probe_program)
-		{
-			program = _sphere_ref_probe_program.get();
-			program->begin_pass();
-			influence_radius = probe.sphere_data.range;
-		}
+			program* program = nullptr;
+			float influence_radius = 0.0f;
+			if(probe.type == probe_type::sphere && _sphere_ref_probe_program)
+			{
+				program = _sphere_ref_probe_program.get();
+				program->begin_pass();
+				influence_radius = probe.sphere_data.range;
+			}
 
-		if(probe.type == probe_type::box && _box_ref_probe_program)
-		{
-			math::transform t;
-			t.set_scale(probe.box_data.extents);
-			t = world_transform * t;
-			auto u_inv_world = math::inverse(t);
-			float data2[4] = {probe.box_data.extents.x, probe.box_data.extents.y, probe.box_data.extents.z,
-							  probe.box_data.transition_distance};
+			if(probe.type == probe_type::box && _box_ref_probe_program)
+			{
+				math::transform t;
+				t.set_scale(probe.box_data.extents);
+				t = world_transform * t;
+				auto u_inv_world = math::inverse(t);
+				float data2[4] = {probe.box_data.extents.x, probe.box_data.extents.y,
+								  probe.box_data.extents.z, probe.box_data.transition_distance};
 
-			program = _box_ref_probe_program.get();
-			program->begin_pass();
-			program->set_uniform("u_inv_world", &u_inv_world);
-			program->set_uniform("u_data2", data2);
+				program = _box_ref_probe_program.get();
+				program->begin_pass();
+				program->set_uniform("u_inv_world", &u_inv_world);
+				program->set_uniform("u_data2", data2);
 
-			influence_radius = math::length(t.get_scale() + probe.box_data.transition_distance);
-		}
+				influence_radius = math::length(t.get_scale() + probe.box_data.transition_distance);
+			}
 
-		if(program)
-		{
-			float mips = cubemap ? float(cubemap->info.numMips) : 1.0f;
-			float data0[4] = {
-				probe_position.x, probe_position.y, probe_position.z, influence_radius,
-			};
+			if(program)
+			{
+				float mips = cubemap ? float(cubemap->info.numMips) : 1.0f;
+				float data0[4] = {
+					probe_position.x,
+					probe_position.y,
+					probe_position.z,
+					influence_radius,
+				};
 
-			float data1[4] = {mips, 0.0f, 0.0f, 0.0f};
+				float data1[4] = {mips, 0.0f, 0.0f, 0.0f};
 
-			program->set_uniform("u_data0", data0);
-			program->set_uniform("u_data1", data1);
+				program->set_uniform("u_data0", data0);
+				program->set_uniform("u_data1", data1);
 
-			program->set_texture(0, "s_tex0", gfx::getTexture(g_buffer_fbo->handle, 0));
-			program->set_texture(1, "s_tex1", gfx::getTexture(g_buffer_fbo->handle, 1));
-			program->set_texture(2, "s_tex2", gfx::getTexture(g_buffer_fbo->handle, 2));
-			program->set_texture(3, "s_tex3", gfx::getTexture(g_buffer_fbo->handle, 3));
-			program->set_texture(4, "s_tex4", gfx::getTexture(g_buffer_fbo->handle, 4));
-			program->set_texture(5, "s_tex_cube", cubemap->handle);
-			gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
-			auto topology = gfx::clip_quad(1.0f);
-			gfx::setState(topology | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_BLEND_ALPHA);
-			gfx::submit(pass.id, program->handle);
-			gfx::setState(BGFX_STATE_DEFAULT);
-		}
-	});
+				program->set_texture(0, "s_tex0", gfx::getTexture(g_buffer_fbo->handle, 0));
+				program->set_texture(1, "s_tex1", gfx::getTexture(g_buffer_fbo->handle, 1));
+				program->set_texture(2, "s_tex2", gfx::getTexture(g_buffer_fbo->handle, 2));
+				program->set_texture(3, "s_tex3", gfx::getTexture(g_buffer_fbo->handle, 3));
+				program->set_texture(4, "s_tex4", gfx::getTexture(g_buffer_fbo->handle, 4));
+				program->set_texture(5, "s_tex_cube", cubemap->handle);
+				gfx::setScissor(rect.left, rect.top, rect.width(), rect.height());
+				auto topology = gfx::clip_quad(1.0f);
+				gfx::setState(topology | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE |
+							  BGFX_STATE_BLEND_ALPHA);
+				gfx::submit(pass.id, program->handle);
+				gfx::setState(BGFX_STATE_DEFAULT);
+			}
+		});
 
 	return r_buffer_fbo;
 }
@@ -638,20 +648,21 @@ std::shared_ptr<frame_buffer> deferred_rendering::atmospherics_pass(std::shared_
 	{
 		bool found_sun = false;
 		auto light_direction = math::normalize(math::vec3(0.2f, -0.8f, 1.0f));
-		ecs.each<transform_component, light_component>([this, &light_direction, &found_sun](
-			entity e, transform_component& transform_comp_ref, light_component& light_comp_ref) {
-			if(found_sun)
-				return;
+		ecs.each<transform_component, light_component>(
+			[this, &light_direction, &found_sun](entity e, transform_component& transform_comp_ref,
+												 light_component& light_comp_ref) {
+				if(found_sun)
+					return;
 
-			const auto& light = light_comp_ref.get_light();
+				const auto& light = light_comp_ref.get_light();
 
-			if(light.type == light_type::directional)
-			{
-				found_sun = true;
-				const auto& world_transform = transform_comp_ref.get_transform();
-				light_direction = world_transform.z_unit_axis();
-			}
-		});
+				if(light.type == light_type::directional)
+				{
+					found_sun = true;
+					const auto& world_transform = transform_comp_ref.get_transform();
+					light_direction = world_transform.z_unit_axis();
+				}
+			});
 
 		_atmospherics_program->begin_pass();
 		_atmospherics_program->set_uniform("u_light_direction", &light_direction);

@@ -8,7 +8,7 @@
 #include "runtime/rendering/mesh.h"
 #include "runtime/rendering/render_window.h"
 #include "runtime/rendering/texture.h"
-#include "runtime/system/engine.h"
+#include "runtime/system/events.h"
 
 namespace editor
 {
@@ -37,15 +37,11 @@ bool editing_system::initialize()
 	icons["loading"] = am.load<texture>("editor_data:/icons/loading.png").get();
 	icons["folder"] = am.load<texture>("editor_data:/icons/folder.png").get();
 
-	runtime::on_window_frame_render.connect(this, &editing_system::on_window_frame_render);
-
 	return true;
 }
 
 void editing_system::dispose()
 {
-	runtime::on_window_frame_render.disconnect(this, &editing_system::on_window_frame_render);
-
 	drag_data = {};
 	selection_data = {};
 	icons.clear();
@@ -99,29 +95,4 @@ void editing_system::drop()
 	drag_data = {};
 }
 
-void editing_system::on_window_frame_render(const render_window&)
-{
-	if(gui::IsMouseDragging(gui::drag_button) && drag_data.object)
-	{
-		gui::BeginTooltip();
-		gui::TextUnformatted(drag_data.description.c_str());
-		gui::EndTooltip();
-
-		if(gui::GetMouseCursor() == ImGuiMouseCursor_Arrow)
-			gui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);
-	}
-
-	if(!gui::IsAnyItemActive() && !gui::IsAnyItemHovered())
-	{
-		if(gui::IsMouseDoubleClicked(0) && !imguizmo::is_over())
-		{
-			unselect();
-			drop();
-		}
-	}
-	if(gui::IsMouseReleased(gui::drag_button))
-	{
-		drop();
-	}
-}
 }

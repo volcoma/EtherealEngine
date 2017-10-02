@@ -1,17 +1,40 @@
 #pragma once
 
 #include "runtime/system/app.h"
+namespace imguidock
+{
+    class dockspace;
+}
+class console_log;
+class render_window;
 
 namespace editor
 {
-struct app : public runtime::app
+class app : public runtime::app
 {
-	//-----------------------------------------------------------------------------
-	//  Name : start (virtual )
-	/// <summary>
-	///  setup after engine initialization and before running the main loop
-	/// </summary>
-	//-----------------------------------------------------------------------------
+public:
+    virtual ~app() = default;
+    
+    virtual void setup();
+
 	virtual void start();
+    
+    virtual void stop();
+    
+    void draw_docks(std::chrono::duration<float>);
+    
+    void draw_header(render_window& window);
+    void draw_dockspace(bool is_main, render_window& window, imguidock::dockspace& dockspace);    
+    void draw_footer(render_window& window, imguidock::dockspace& dockspace);
+    void draw_start_page(render_window& window);
+    void draw_menubar(render_window& window);
+    void draw_toolbar();
+    void handle_drag_and_drop();
+private:
+    bool _show_start_page = true;
+    ///
+    std::shared_ptr<console_log> _console_log;
+    ///
+    std::string _console_dock_name;
 };
 }

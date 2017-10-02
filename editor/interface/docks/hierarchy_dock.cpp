@@ -212,7 +212,7 @@ void draw_entity(runtime::entity entity)
 
 	if(edit_label && is_selected)
 	{
-		static std::array<char, 64> input_buff;
+		std::array<char, 64> input_buff;
 		input_buff.fill(0);
 		std::memcpy(input_buff.data(), name.c_str(),
 					name.size() < input_buff.size() ? name.size() : input_buff.size());

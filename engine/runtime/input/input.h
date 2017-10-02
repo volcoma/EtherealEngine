@@ -1,12 +1,11 @@
 #pragma once
 
+#include "core/common/basetypes.hpp"
+#include "core/signals/event.hpp"
 #include "core/system/subsystem.h"
 #include "input_mapping.hpp"
 #include <map>
 #include <unordered_map>
-
-#include "core/common/basetypes.hpp"
-#include "core/signals/event.hpp"
 
 namespace runtime
 {
@@ -94,6 +93,8 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void dispose();
+
+	void platform_events(const std::pair<std::uint32_t, bool>& info, const std::vector<mml::platform_event>& events);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_mappings ()
@@ -407,30 +408,30 @@ private:
 	///
 	ipoint _last_cursor_position;
 	///
-	std::unordered_map<unsigned int, bool> _mouse_buttons_pressed;
+	std::map<unsigned int, bool> _mouse_buttons_pressed;
 	///
-	std::unordered_map<unsigned int, bool> _mouse_buttons_down;
+	std::map<unsigned int, bool> _mouse_buttons_down;
 	///
-	std::unordered_map<unsigned int, bool> _mouse_buttons_released;
+	std::map<unsigned int, bool> _mouse_buttons_released;
 	///
-	std::unordered_map<unsigned int, bool> _keys_pressed;
+	std::map<mml::keyboard::key, bool> _keys_pressed;
 	///
-	std::unordered_map<unsigned int, bool> _keys_down;
+	std::map<mml::keyboard::key, bool> _keys_down;
 	///
-	std::unordered_map<unsigned int, bool> _keys_released;
+	std::map<mml::keyboard::key, bool> _keys_released;
 	///
-	std::unordered_map<unsigned int, bool> _joysticks_connected;
+	std::map<unsigned int, bool> _joysticks_connected;
 	///
-	std::unordered_map<unsigned int, bool> _joysticks_active;
+	std::map<unsigned int, bool> _joysticks_active;
 	///
-	std::unordered_map<unsigned int, bool> _joysticks_disconnected;
+	std::map<unsigned int, bool> _joysticks_disconnected;
 	///
-	std::unordered_map<std::pair<unsigned int, unsigned int>, bool> _joystick_buttons_pressed;
+	std::map<std::pair<unsigned int, unsigned int>, bool> _joystick_buttons_pressed;
 	///
-	std::unordered_map<std::pair<unsigned int, unsigned int>, bool> _joystick_buttons_down;
+	std::map<std::pair<unsigned int, unsigned int>, bool> _joystick_buttons_down;
 	///
-	std::unordered_map<std::pair<unsigned int, unsigned int>, bool> _joystick_buttons_released;
+	std::map<std::pair<unsigned int, unsigned int>, bool> _joystick_buttons_released;
 	///
-	std::unordered_map<std::pair<unsigned int, unsigned int>, float> _joystick_axis_positions;
+	std::map<std::pair<unsigned int, unsigned int>, float> _joystick_axis_positions;
 };
 }

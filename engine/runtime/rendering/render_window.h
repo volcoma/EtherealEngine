@@ -51,10 +51,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline std::shared_ptr<frame_buffer> get_surface()
-	{
-		return _surface;
-	}
+	std::shared_ptr<frame_buffer> get_surface();
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_surface ()
@@ -64,12 +61,22 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline std::shared_ptr<frame_buffer> get_surface() const
-	{
-		return _surface;
-	}
+	std::shared_ptr<frame_buffer> get_surface() const;
 
 	//-----------------------------------------------------------------------------
+	//  Name : frame_end (virtual )
+	/// <summary>
+	///
+	///
+	///
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	virtual std::uint8_t begin_present_pass();
+
+	std::uint32_t get_id() const;
+
+protected:
+    //-----------------------------------------------------------------------------
 	//  Name : prepare_surface (virtual )
 	/// <summary>
 	///
@@ -88,85 +95,6 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	virtual void destroy_surface();
-
-	//-----------------------------------------------------------------------------
-	//  Name : frame_begin (virtual )
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	virtual void frame_begin()
-	{
-	}
-
-	//-----------------------------------------------------------------------------
-	//  Name : frame_update (virtual )
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	virtual void frame_update(std::chrono::duration<float>)
-	{
-	}
-
-	//-----------------------------------------------------------------------------
-	//  Name : frame_render (virtual )
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	virtual void frame_render(std::chrono::duration<float>)
-	{
-	}
-
-	//-----------------------------------------------------------------------------
-	//  Name : frame_end (virtual )
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	virtual void frame_end();
-
-	//-----------------------------------------------------------------------------
-	//  Name : set_main ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	inline void set_main(bool isMain)
-	{
-		_is_main = isMain;
-	}
-
-	//-----------------------------------------------------------------------------
-	//  Name : is_main ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	inline bool is_main() const
-	{
-		return _is_main;
-	}
-
-	std::uint32_t get_id() const
-	{
-		return _id;
-	}
-
-protected:
 	//-----------------------------------------------------------------------------
 	//  Name : on_resize (virtual )
 	/// <summary>
@@ -180,6 +108,4 @@ protected:
 	std::uint32_t _id = 0;
 	/// Render surface for this window.
 	std::shared_ptr<frame_buffer> _surface;
-	///
-	bool _is_main = false;
 };

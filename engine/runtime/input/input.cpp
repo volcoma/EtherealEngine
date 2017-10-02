@@ -1,5 +1,5 @@
 #include "input.h"
-#include "../system/engine.h"
+#include "../system/events.h"
 
 namespace runtime
 {
@@ -278,6 +278,7 @@ ipoint input::get_cursor_delta_move() const
 
 bool input::initialize()
 {
+    on_platform_events.connect(this, &input::platform_events);        
 	on_frame_end.connect(this, &input::reset_state);
 
 	return true;
@@ -285,6 +286,19 @@ bool input::initialize()
 
 void input::dispose()
 {
-	on_frame_end.disconnect(this, &input::reset_state);
+    on_platform_events.disconnect(this, &input::platform_events);            
+    on_frame_end.disconnect(this, &input::reset_state);
+}
+
+void input::platform_events(const std::pair<std::uint32_t, bool>& info, const std::vector<mml::platform_event> &events)
+{
+    if(info.second)
+    {
+        for(const auto& e : events)
+        {
+            handle_event(e);
+        }
+    }
+    
 }
 }

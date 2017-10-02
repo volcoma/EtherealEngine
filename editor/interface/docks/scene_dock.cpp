@@ -13,7 +13,7 @@
 #include "runtime/rendering/mesh.h"
 #include "runtime/rendering/render_pass.h"
 #include "runtime/rendering/render_window.h"
-#include "runtime/system/engine.h"
+#include "runtime/rendering/renderer.h"
 
 static bool show_gbuffer = false;
 
@@ -41,14 +41,6 @@ void show_statistics(const unsigned int fps)
 	gui::Text("COMPUTE CALLS: %u", num_computes);
 	gui::AlignFirstTextHeightToWidgets();
 	gui::Text("RENDER PASSES: %u", render_pass::get_pass());
-	static bool more_stats = false;
-	if(gui::Checkbox("MORE STATS", &more_stats))
-	{
-		if(more_stats)
-			gfx::setDebug(BGFX_DEBUG_STATS);
-		else
-			gfx::setDebug(BGFX_DEBUG_NONE);
-	}
 	gui::Separator();
 	gui::Checkbox("SHOW G-BUFFER", &show_gbuffer);
 	gui::End();
@@ -295,12 +287,12 @@ void handle_camera_movement()
 void scene_dock::render(const ImVec2&)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
-	auto& engine = core::get_subsystem<runtime::engine>();
+	auto& renderer = core::get_subsystem<runtime::renderer>();
 	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
 	auto& input = core::get_subsystem<runtime::input>();
 	auto& sim = core::get_subsystem<core::simulation>();
 
-	auto window = engine.get_focused_window();
+	auto window = renderer.get_focused_window();
 	auto& editor_camera = es.camera;
 	auto& selected = es.selection_data.object;
 	auto& dragged = es.drag_data.object;

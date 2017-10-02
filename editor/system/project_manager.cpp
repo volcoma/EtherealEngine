@@ -4,11 +4,12 @@
 #include "../meta/system/project_manager.hpp"
 #include "core/filesystem/filesystem_watcher.hpp"
 #include "core/serialization/associative_archive.h"
+#include "core/logging/logging.h"
 #include "core/system/task_system.h"
 #include "runtime/assets/asset_extensions.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/ecs/ecs.h"
-#include "runtime/system/engine.h"
+#include "runtime/system/events.h"
 #include <fstream>
 
 class mesh;

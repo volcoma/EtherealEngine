@@ -3,6 +3,79 @@
 #include <map>
 namespace gfx
 {
+static std::map<std::string, std::function<void(const std::string& log_msg)>> loggers;
+void set_info_logger(std::function<void(const std::string& log_msg)> logger)
+{
+	loggers["info"] = logger;
+}
+static std::function<void(const std::string& log_msg)> warning_logger;
+void set_warning_logger(std::function<void(const std::string& log_msg)> logger)
+{
+	loggers["warning"] = logger;
+}
+static std::function<void(const std::string& log_msg)> error_logger;
+void set_error_logger(std::function<void(const std::string& log_msg)> logger)
+{
+	loggers["error"] = logger;
+}
+void log(const std::string& category, const std::string& log_msg)
+{
+	if(loggers["category"])
+		loggers["category"](log_msg);
+}
+
+
+struct gfx_callback : public gfx::CallbackI
+{
+	virtual ~gfx_callback()
+	{
+	}
+
+	virtual void traceVargs(const char* /*_filePath*/, std::uint16_t /*_line*/, const char* /*_format*/,
+							va_list /*_argList*/)
+	{
+        //log("info", _str);
+	}
+
+	virtual void fatal(gfx::Fatal::Enum /*_code*/, const char* _str)
+	{
+		log("error", _str);
+	}
+
+	virtual uint32_t cacheReadSize(uint64_t /*_id*/)
+	{
+		return 0;
+	}
+
+	virtual bool cacheRead(uint64_t /*_id*/, void* /*_data*/, uint32_t /*_size*/)
+	{
+		return false;
+	}
+
+	virtual void cacheWrite(uint64_t /*_id*/, const void* /*_data*/, uint32_t /*_size*/)
+	{
+	}
+
+	virtual void screenShot(const char* /*_filePath*/, uint32_t /*_width*/, uint32_t /*_height*/,
+							uint32_t /*_pitch*/, const void* /*_data*/, uint32_t /*_size*/, bool /*_yflip*/)
+	{
+	}
+
+	virtual void captureBegin(uint32_t /*_width*/, uint32_t /*_height*/, uint32_t /*_pitch*/,
+							  gfx::TextureFormat::Enum /*_format*/, bool /*_yflip*/)
+	{
+	}
+
+	virtual void captureEnd()
+	{
+	}
+
+	virtual void captureFrame(const void* /*_data*/, uint32_t /*_size*/)
+	{
+	}
+};
+
+
 VertexDecl pos_texcoord0_vertex::decl;
 VertexDecl mesh_vertex::decl;
 
@@ -305,10 +378,12 @@ void shutdown()
 }
 
 bool init(RendererType::Enum _type /*= RendererType::Count */, uint16_t _vendorId /*= BGFX_PCI_ID_NONE */,
-		  uint16_t _deviceId /*= 0 */, CallbackI* _callback /*= NULL */,
+		  uint16_t _deviceId /*= 0 */,
 		  bx::AllocatorI* _reallocator /*= NULL */)
 {
-	initted = bgfx::init(_type, _vendorId, _deviceId, _callback, _reallocator);
+    static gfx_callback callback;
+    
+	initted = bgfx::init(_type, _vendorId, _deviceId, &callback, _reallocator);
 
 	if(initted)
 	{

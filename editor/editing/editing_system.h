@@ -120,8 +120,6 @@ struct editing_system : core::subsystem
 	//-----------------------------------------------------------------------------
 	void drop();
 
-	void on_window_frame_render(const render_window& window);
-
 	/// editor camera
 	runtime::entity camera;
 	/// current scene

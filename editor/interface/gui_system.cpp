@@ -3,6 +3,7 @@
 #include "embedded/fs_ocornut_imgui.bin.h"
 #include "embedded/vs_ocornut_imgui.bin.h"
 
+#include "core/logging/logging.h"
 #include "core/filesystem/filesystem.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/input/input.h"
@@ -13,7 +14,6 @@
 #include "runtime/rendering/texture.h"
 #include "runtime/rendering/uniform.h"
 #include "runtime/rendering/vertex_buffer.h"
-#include "runtime/system/engine.h"
 #include <unordered_map>
 
 // -------------------------------------------------------------------
@@ -45,7 +45,7 @@ static asset_handle<texture> s_font_texture;
 static std::vector<std::shared_ptr<texture>> s_textures;
 static std::unordered_map<std::string, ImFont*> s_fonts;
 
-void renderFunc(ImDrawData* _drawData)
+void render_func(ImDrawData* _drawData)
 {
 	// Render command lists
 	for(int32_t ii = 0, num = _drawData->CmdListsCount; ii < num; ++ii)
@@ -117,12 +117,150 @@ void renderFunc(ImDrawData* _drawData)
 	}
 }
 
-bool gui_system::initialize()
+void imgui_handle_event(const mml::platform_event& event)
+{
+	auto& io = gui::GetIO();
+	if(event.type == mml::platform_event::lost_focus)
+	{
+		io.MouseDown[0] = false;
+		io.MouseDown[1] = false;
+		io.MouseDown[2] = false;
+	}
+
+	if(event.type == mml::platform_event::key_pressed)
+	{
+		io.KeysDown[event.key.code] = true;
+		io.KeyAlt = event.key.alt;
+		io.KeyCtrl = event.key.control;
+		io.KeyShift = event.key.shift;
+		io.KeySuper = event.key.system;
+	}
+
+	if(event.type == mml::platform_event::key_released)
+	{
+		io.KeysDown[event.key.code] = false;
+		io.KeyAlt = event.key.alt;
+		io.KeyCtrl = event.key.control;
+		io.KeyShift = event.key.shift;
+		io.KeySuper = event.key.system;
+	}
+
+	if(event.type == mml::platform_event::mouse_wheel_scrolled)
+	{
+		io.MouseWheel += event.mouse_wheel_scroll.delta;
+	}
+
+	if(event.type == mml::platform_event::mouse_button_pressed)
+	{
+		io.MouseDown[event.mouse_button.button] = true;
+	}
+
+	if(event.type == mml::platform_event::mouse_button_released)
+	{
+		io.MouseDown[event.mouse_button.button] = false;
+	}
+
+	if(event.type == mml::platform_event::mouse_moved)
+	{
+		io.MousePos.x = float(event.mouse_move.x);
+		io.MousePos.y = float(event.mouse_move.y);
+	}
+
+	if(event.type == mml::platform_event::text_entered)
+	{
+		if(event.text.unicode > 0 && event.text.unicode < 0x10000)
+			io.AddInputCharacter(static_cast<ImWchar>(event.text.unicode));
+	}
+}
+
+const mml::cursor* map_cursor(ImGuiMouseCursor cursor)
+{
+	static std::map<ImGuiMouseCursor_, mml::cursor::type> cursor_map = {
+		{ImGuiMouseCursor_Arrow, mml::cursor::arrow},
+		{ImGuiMouseCursor_Move, mml::cursor::hand},
+		{ImGuiMouseCursor_NotAllowed, mml::cursor::not_allowed},
+		{ImGuiMouseCursor_Help, mml::cursor::help},
+		{ImGuiMouseCursor_TextInput, mml::cursor::text},
+		{ImGuiMouseCursor_ResizeNS, mml::cursor::size_vertical},
+		{ImGuiMouseCursor_ResizeEW, mml::cursor::size_horizontal},
+		{ImGuiMouseCursor_ResizeNESW, mml::cursor::size_bottom_left_top_right},
+		{ImGuiMouseCursor_ResizeNWSE, mml::cursor::size_top_left_bottom_right}};
+	auto id = cursor_map[static_cast<ImGuiMouseCursor_>(cursor)];
+	static std::map<mml::cursor::type, std::unique_ptr<mml::cursor>> cursors;
+	if(cursors.find(id) == cursors.end())
+	{
+		auto cursor = std::make_unique<mml::cursor>();
+		if(cursor->load_from_system(id))
+		{
+			cursors.emplace(id, std::move(cursor));
+		}
+	}
+
+	return cursors[id].get();
+}
+
+void imgui_frame_begin()
+{
+	s_textures.clear();
+}
+
+void imgui_restore_context()
+{
+	s_contexts.restore_initial_context();
+}
+
+void imgui_frame_update(render_window& window, std::chrono::duration<float> dt)
+{
+	auto& io = gui::GetIO();
+    auto view_size = window.get_surface()->get_size();
+    auto window_size = window.get_size();
+    
+	// Setup display size (every frame to accommodate for window resizing)
+	io.DisplaySize = ImVec2(static_cast<float>(view_size.width), static_cast<float>(view_size.height));
+	// Setup time step
+	io.DeltaTime = dt.count();
+    
+	irect relative_rect;
+	relative_rect.left = 0;
+	relative_rect.top = 0;
+	relative_rect.right = static_cast<std::int32_t>(window_size[0]);
+	relative_rect.bottom = static_cast<std::int32_t>(window_size[1]);
+	auto mouse_pos = mml::mouse::get_position(window);
+
+	if(window.has_focus() && relative_rect.contains({mouse_pos[0], mouse_pos[1]}))
+	{
+		static auto last_cursor_type = gui::GetMouseCursor();
+		auto cursor = map_cursor(gui::GetMouseCursor());
+		if(cursor && last_cursor_type != gui::GetMouseCursor())
+			window.set_mouse_cursor(*cursor);
+
+		last_cursor_type = gui::GetMouseCursor();
+	}
+
+	// Start the frame
+	gui::NewFrame();
+
+	gui::SetNextWindowPos(ImVec2(0, 0));
+	gui::SetNextWindowSize(ImVec2(static_cast<float>(view_size.width), static_cast<float>(view_size.height)));
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+							 ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse |
+							 ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing;
+
+	gui::Begin("###workspace", 0, flags);
+}
+
+void imgui_frame_end()
+{
+	gui::End();
+	gui::Render();
+}
+
+void imgui_init()
 {
 	s_contexts.set_initial_context(ImGui::GetCurrentContext());
 	ImGuiIO& io = ImGui::GetIO();
 	io.IniFilename = nullptr;
-	io.RenderDrawListsFn = renderFunc;
+	io.RenderDrawListsFn = render_func;
 
 	auto& ts = core::get_subsystem<core::task_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
@@ -208,9 +346,9 @@ bool gui_system::initialize()
 	config.MergeMode = false;
 
 	s_fonts["default"] = io.Fonts->AddFontDefault(&config);
-	s_fonts["editor_default"] =
+	s_fonts["standard"] =
 		io.Fonts->AddFontFromMemoryTTF((void*)s_font_default, sizeof(s_font_default), 20, &config);
-    s_fonts["editor_big"] =
+	s_fonts["standard_big"] =
 		io.Fonts->AddFontFromMemoryTTF((void*)s_font_default, sizeof(s_font_default), 50, &config);
 
 	io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
@@ -222,30 +360,122 @@ bool gui_system::initialize()
 	// Store our identifier
 	io.Fonts->SetTexID(s_font_texture.get());
 	s_gui_style.load_style();
+}
 
+void imgui_dispose()
+{
+	s_textures.clear();
+	s_contexts.restore_initial_context();
+	s_program.reset();
+	s_font_texture.reset();
+	s_fonts.clear();
+
+	ImGuiIO& io = ImGui::GetIO();
+	io.Fonts->TexID = nullptr;
+	ImGui::Shutdown();
+}
+
+ImGuiContext* imgui_create_context()
+{
+	return gui::CreateContext();
+}
+
+void imgui_destroy_context(ImGuiContext*& context)
+{
+	if(context)
+		gui::DestroyContext(context);
+
+	context = nullptr;
+}
+
+void imgui_set_context(ImGuiContext* context)
+{
+	ImGuiContext* last_context = gui::GetCurrentContext();
+	if(last_context != nullptr && last_context != context)
+	{
+		std::memcpy(&context->Style, &last_context->Style, sizeof(ImGuiStyle));
+		std::memcpy(&context->IO.KeyMap, &last_context->IO.KeyMap, sizeof(last_context->IO.KeyMap));
+		std::memcpy(&context->MouseCursorData, &last_context->MouseCursorData,
+					sizeof(context->MouseCursorData));
+		context->IO.IniFilename = last_context->IO.IniFilename;
+		context->IO.FontAllowUserScaling = last_context->IO.FontAllowUserScaling;
+		context->IO.RenderDrawListsFn = last_context->IO.RenderDrawListsFn;
+        context->Settings = last_context->Settings;
+		context->Initialized = last_context->Initialized;
+	}
+	gui::SetCurrentContext(context);
+}
+
+bool gui_system::initialize()
+{
+	runtime::on_platform_events.connect(this, &gui_system::platform_events);
 	runtime::on_frame_begin.connect(this, &gui_system::frame_begin);
+
+	imgui_init();
 
 	return true;
 }
 
 void gui_system::dispose()
 {
+	runtime::on_platform_events.connect(this, &gui_system::platform_events);
 	runtime::on_frame_begin.disconnect(this, &gui_system::frame_begin);
 
-	s_textures.clear();
-	s_contexts.restore_initial_context();
-	s_program.reset();
-	s_font_texture.reset();
-
-	s_fonts.clear();
-	ImGuiIO& io = ImGui::GetIO();
-	io.Fonts->TexID = nullptr;
-	ImGui::Shutdown();
+	imgui_dispose();
 }
 
 void gui_system::frame_begin(std::chrono::duration<float>)
 {
-	s_textures.clear();
+	imgui_frame_begin();
+}
+
+ImGuiContext& gui_system::get_context(uint32_t id)
+{
+	return _contexts[id];
+}
+
+void gui_system::push_context(uint32_t id)
+{
+	auto& context = get_context(id);
+
+    imgui_set_context(&context);
+}
+
+
+void gui_system::draw_begin(render_window& window, std::chrono::duration<float> dt)
+{
+	imgui_frame_update(window, dt);
+}
+
+
+void gui_system::draw_end()
+{
+    imgui_frame_end();    
+}
+
+void gui_system::pop_context()
+{
+	imgui_restore_context();
+}
+
+void gui_system::platform_events(const std::pair<std::uint32_t, bool>& info, const std::vector<mml::platform_event>& events)
+{
+    const auto window_id = info.first;
+	push_context(window_id);
+	for(const auto& e : events)
+	{
+		if(e.type == mml::platform_event::closed)
+		{
+			pop_context();
+			_contexts.erase(window_id);
+			return;
+		}
+		else
+		{
+			imgui_handle_event(e);
+		}
+	}
+	pop_context();
 }
 
 namespace gui
@@ -422,13 +652,13 @@ void gui_style::save_style()
 	std::ofstream output(absoluteKey.string());
 	cereal::oarchive_associative_t ar(output);
 
-    try_save(ar, cereal::make_nvp("style", setup));
+	try_save(ar, cereal::make_nvp("style", setup));
 }
 
 gui_style::hsv_setup gui_style::get_dark_style()
 {
-    hsv_setup result;  
-    result.col_main_hue = 0.0f / 255.0f;
+	hsv_setup result;
+	result.col_main_hue = 0.0f / 255.0f;
 	result.col_main_sat = 0.0f / 255.0f;
 	result.col_main_val = 80.0f / 255.0f;
 
@@ -444,14 +674,14 @@ gui_style::hsv_setup gui_style::get_dark_style()
 	result.col_text_sat = 0.0f / 255.0f;
 	result.col_text_val = 255.0f / 255.0f;
 	result.frame_rounding = 0.0f;
-	
-    return result;
+
+	return result;
 }
 
 gui_style::hsv_setup gui_style::get_lighter_red()
 {
-    hsv_setup result;  
-    result.col_main_hue = 0.0f / 255.0f;
+	hsv_setup result;
+	result.col_main_hue = 0.0f / 255.0f;
 	result.col_main_sat = 200.0f / 255.0f;
 	result.col_main_val = 170.0f / 255.0f;
 
@@ -467,6 +697,6 @@ gui_style::hsv_setup gui_style::get_lighter_red()
 	result.col_text_sat = 0.0f / 255.0f;
 	result.col_text_val = 255.0f / 255.0f;
 	result.frame_rounding = 0.0f;
-	
-    return result;
+
+	return result;
 }

@@ -5,12 +5,16 @@
 #include "bgfx/platform.h"
 #include <cstdint>
 #include <string>
-
+#include <functional>
 namespace gfx
 {
 
 using namespace bgfx;
 using namespace bx;
+
+void set_info_logger(std::function<void(const std::string& log_msg)> logger);
+void set_warning_logger(std::function<void(const std::string& log_msg)> logger);
+void set_error_logger(std::function<void(const std::string& log_msg)> logger);
 
 struct pos_texcoord0_vertex
 {
@@ -107,7 +111,7 @@ inline std::uint32_t get_default_rt_sampler_flags()
 void shutdown();
 
 bool init(RendererType::Enum _type = RendererType::Count, uint16_t _vendorId = BGFX_PCI_ID_NONE,
-		  uint16_t _deviceId = 0, CallbackI* _callback = NULL, bx::AllocatorI* _reallocator = NULL);
+		  uint16_t _deviceId = 0, bx::AllocatorI* _reallocator = NULL);
 
 bool is_initted();
 std::uint64_t screen_quad(float dest_width, float dest_height, float depth = 0.0f, float width = 1.0f,

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/system/subsystem.h"
-#include "mml/window/window.hpp"
+#include "render_window.h"
 #include <memory>
 #include <vector>
 
@@ -36,7 +36,7 @@ struct renderer : public core::subsystem
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool init_backend(mml::window& main_window);
+	bool init_backend();
 
 	//-----------------------------------------------------------------------------
 	//  Name : frame_end ()
@@ -61,7 +61,48 @@ struct renderer : public core::subsystem
 		return _render_frame;
 	}
 
+	//-----------------------------------------------------------------------------
+	//  Name : register_window ()
+	/// <summary>
+	///
+	///
+	///
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	void register_window(std::unique_ptr<render_window> window);
+
+	//-----------------------------------------------------------------------------
+	//  Name : get_windows ()
+	/// <summary>
+	///
+	///
+	///
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	const std::vector<std::unique_ptr<render_window>>& get_windows() const;
+	const std::unique_ptr<render_window>& get_window(std::uint32_t id) const;
+	const std::unique_ptr<render_window>& get_main_window() const;
+	void hide_all_secondary_windows();
+	void show_all_secondary_windows();
+	//-----------------------------------------------------------------------------
+	//  Name : get_focused_window ()
+	/// <summary>
+	///
+	///
+	///
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	render_window* get_focused_window() const;
+	void process_pending_windows();
+
+	void platform_events(const std::pair<std::uint32_t, bool>& info, const std::vector<mml::platform_event>& events);
+
 protected:
-	std::uint32_t _render_frame;
+	std::uint32_t _render_frame = 0;
+
+	/// engine windows
+	std::unique_ptr<mml::window> _init_window;
+	std::vector<std::unique_ptr<render_window>> _windows;
+	std::vector<std::unique_ptr<render_window>> _windows_pending_addition;
 };
 }

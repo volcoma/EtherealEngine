@@ -5,7 +5,37 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui/imgui_internal.h"
 #include "imgui/imgui_user.h"
+#include "runtime/system/events.h"
+#include <map>
 #include <memory>
+//-----------------------------------------------------------------------------
+// Main Class Declarations
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//  Name : gui_system (Class)
+/// <summary>
+/// Class for the management of interface elements.
+/// </summary>
+//-----------------------------------------------------------------------------
+struct gui_system : public core::subsystem
+{
+	bool initialize();
+	void dispose();
+	void frame_begin(std::chrono::duration<float>);
+
+	ImGuiContext& get_context(std::uint32_t id);
+
+	void push_context(std::uint32_t id);
+	void draw_begin(render_window& window, std::chrono::duration<float> dt);
+
+	void draw_end();
+
+	void pop_context();
+
+private:
+	void platform_events(const std::pair<std::uint32_t, bool>& info, const std::vector<mml::platform_event>&);
+	std::map<uint32_t, ImGuiContext> _contexts;
+};
 
 struct gui_style
 {
@@ -33,31 +63,16 @@ struct gui_style
 	void set_style_colors(const hsv_setup& _setup);
 	void load_style();
 	void save_style();
-    static hsv_setup get_dark_style();
-    static hsv_setup get_lighter_red();
+	static hsv_setup get_dark_style();
+	static hsv_setup get_lighter_red();
 	hsv_setup setup;
-};
-//-----------------------------------------------------------------------------
-// Main Class Declarations
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//  Name : gui_system (Class)
-/// <summary>
-/// Class for the management of interface elements.
-/// </summary>
-//-----------------------------------------------------------------------------
-struct gui_system : public core::subsystem
-{
-	bool initialize();
-	void dispose();
-	void frame_begin(std::chrono::duration<float>);
 };
 
 struct texture;
 namespace gui
 {
 using namespace ImGui;
-static const int drag_button = 0;
+constexpr static const int drag_button = 0;
 
 ImFont* GetFont(const std::string& id);
 // Helper function for passing Texture to ImGui::Image.

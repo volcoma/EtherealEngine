@@ -133,7 +133,7 @@ struct frame_buffer
 		if(is_valid())
 			gfx::destroy(handle);
 
-		handle = {bgfx::kInvalidHandle};
+		handle = BGFX_INVALID_HANDLE;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -302,13 +302,13 @@ struct frame_buffer
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const std::size_t get_attachment_count() const
+	inline std::size_t get_attachment_count() const
 	{
 		return _textures.size();
 	}
 
 	/// Internal handle
-	gfx::FrameBufferHandle handle = {gfx::kInvalidHandle};
+	gfx::FrameBufferHandle handle = BGFX_INVALID_HANDLE;
 	/// Back buffer ratio if any.
 	gfx::BackbufferRatio::Enum _bbratio = gfx::BackbufferRatio::Equal;
 	/// Size of the surface. If {0,0} then it is controlled by backbuffer ratio

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "imguidock.h"
+#include <memory>
 
 class console_log;
 struct console_dock : public imguidock::dock

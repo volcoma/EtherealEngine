@@ -46,6 +46,21 @@ void render_pass::bind(frame_buffer* fb) const
     viewport_rect.bottom = size.height;
 }
 
+void render_pass::bind() const
+{
+    std::uint16_t width = 0;
+    std::uint16_t height = 0;
+    gfx::get_size_from_ratio(gfx::BackbufferRatio::Equal, width, height);
+    gfx::setViewRect(id, std::uint16_t(0), std::uint16_t(0), std::uint16_t(width),
+					 std::uint16_t(height));
+
+	gfx::setViewScissor(id, std::uint16_t(0), std::uint16_t(0), std::uint16_t(width),
+						std::uint16_t(height));
+
+	
+	gfx::touch(id);
+}
+
 void render_pass::clear(std::uint16_t _flags, std::uint32_t _rgba /*= 0x000000ff */, float _depth /*= 1.0f */,
 						std::uint8_t _stencil /*= 0*/) const
 {

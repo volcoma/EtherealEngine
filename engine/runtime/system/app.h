@@ -31,7 +31,9 @@ struct app
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	virtual void stop();
-
+    
+    virtual void run_one_frame();
+    
 	//-----------------------------------------------------------------------------
 	//  Name : run ()
 	/// <summary>
@@ -60,5 +62,6 @@ struct app
 protected:
 	/// exit code of the application
 	int _exitcode = 0;
+    bool _running = true;
 };
 }

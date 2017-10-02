@@ -1,13 +1,15 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imguidock.h"
-#include "../gui_window.h"
+
+//user includes
 #include "core/string_utils/string_utils.h"
+#include "docking.h"
 #include "runtime/input/input.h"
-#include "runtime/system/engine.h"
+#include "runtime/rendering/renderer.h"
+
 namespace imguidock
 {
-dockspace::dockspace(gui_window* owner)
-	: owner(owner)
+dockspace::dockspace()
 {
 }
 
@@ -263,9 +265,12 @@ bool dockspace::undock(dock* dock)
 	return false;
 }
 
-void update_drag(gui_window* window)
+void update_drag(std::uint32_t window_id)
 {
-	auto& dockspace = window->get_dockspace();
+	auto& renderer = core::get_subsystem<runtime::renderer>();
+	auto& docking = core::get_subsystem<docking_system>();
+	auto& dockspace = docking.get_dockspace(window_id);
+	auto& window = renderer.get_window(window_id);
 	auto& split = dockspace.root.splits[0];
 
 	if(split && split->active_dock)
@@ -278,10 +283,10 @@ void update_drag(gui_window* window)
 			pos[0] -= 40;
 			pos[1] -= 30 + int32_t(ImGui::GetTextLineHeightWithSpacing());
 			if(active_dock->redock_to == nullptr || active_dock->redock_slot == slot::none)
-            {
+			{
 				window->set_position(pos);
-                window->set_size({{640, 480}});
-            }
+				window->set_size({{640, 480}});
+			}
 			window->set_opacity(0.3f);
 			active_dock->redock_to = nullptr;
 		}
@@ -339,31 +344,38 @@ void dockspace::render_container(uint32_t& idgen, node* container, ImVec2 size, 
 
 		ImGui::EndChild();
 
-		gui_window* dragged_window = is_any_window_dragged();
-		if(dragged_window != nullptr &&
-		   dragged_window->get_dockspace().root.splits[0]->active_dock != container->active_dock)
+		std::uint32_t dragged_window_id = is_any_window_dragged();
+		if(dragged_window_id != INVALID_WINDOW)
 		{
-			auto mouse_pos = mml::mouse::get_position(*owner);
-			ImVec2 cursor_pos = {float(mouse_pos[0]), float(mouse_pos[1])};
-			if((mouse_pos[0] > screen_cursor_pos.x && mouse_pos[0] < (screen_cursor_pos.x + size.x)) &&
-			   (mouse_pos[1] > screen_cursor_pos.y && mouse_pos[1] < (screen_cursor_pos.y + size.y)))
+			auto& renderer = core::get_subsystem<runtime::renderer>();
+			auto& docking = core::get_subsystem<docking_system>();
+			auto& dockspace = docking.get_dockspace(dragged_window_id);
+			if(dockspace.root.splits[0]->active_dock != container->active_dock)
 			{
-				ImGui::BeginChild("##dockSlotPreview");
-				ImGui::PushClipRect(ImVec2(), ImGui::GetIO().DisplaySize, false);
-				slot dock_slot =
-					render_dock_slot_preview(dragged_window, cursor_pos, screen_cursor_pos, size);
-				ImGui::PopClipRect();
-				ImGui::EndChild();
-				auto dragged_window_dock = dragged_window->get_dockspace().root.splits[0]->active_dock;
-				if(dragged_window_dock)
+				auto& owner = renderer.get_window(owner_id);
+
+				auto mouse_pos = mml::mouse::get_position(*owner);
+				ImVec2 cursor_pos = {float(mouse_pos[0]), float(mouse_pos[1])};
+				if((mouse_pos[0] > screen_cursor_pos.x && mouse_pos[0] < (screen_cursor_pos.x + size.x)) &&
+				   (mouse_pos[1] > screen_cursor_pos.y && mouse_pos[1] < (screen_cursor_pos.y + size.y)))
 				{
-					if(dock_slot != slot::none)
+					ImGui::BeginChild("##dockSlotPreview");
+					ImGui::PushClipRect(ImVec2(), ImGui::GetIO().DisplaySize, false);
+					slot dock_slot =
+						render_dock_slot_preview(dragged_window_id, cursor_pos, screen_cursor_pos, size);
+					ImGui::PopClipRect();
+					ImGui::EndChild();
+					auto dragged_window_dock = dockspace.root.splits[0]->active_dock;
+					if(dragged_window_dock)
 					{
-						dragged_window_dock->redock_from = this;
-						dragged_window_dock->redock_to = container->active_dock;
-						dragged_window_dock->redock_from_window = owner;
+						if(dock_slot != slot::none)
+						{
+							dragged_window_dock->redock_from = this;
+							dragged_window_dock->redock_to = container->active_dock;
+							dragged_window_dock->redock_from_window = owner_id;
+						}
+						dragged_window_dock->redock_slot = dock_slot;
 					}
-					dragged_window_dock->redock_slot = dock_slot;
 				}
 			}
 		}
@@ -500,19 +512,22 @@ void dockspace::update_and_draw(ImVec2 dockspaceSize)
 				_current_dock_to->container = nullptr;
 				_current_dock_to->draging = true;
 
-				auto& engine = core::get_subsystem<runtime::engine>();
-				auto window = std::make_unique<gui_window>(
+				auto& renderer = core::get_subsystem<runtime::renderer>();
+				auto& docking = core::get_subsystem<docking_system>();
+				auto window = std::make_unique<render_window>(
 					mml::video_mode(static_cast<unsigned int>(_current_dock_to->last_size.x),
 									static_cast<unsigned int>(_current_dock_to->last_size.y)),
 					"Window", mml::style::standard);
-				window->get_dockspace().dock_to(_current_dock_to, slot::tab, 0, true);
+
+				auto& dockspace = docking.get_dockspace(window->get_id());
+				dockspace.dock_to(_current_dock_to, slot::tab, 0, true);
 				auto pos = mml::mouse::get_position();
 				pos[0] -= 40;
 				pos[1] -= 30 + int32_t(ImGui::GetTextLineHeightWithSpacing());
 
 				window->set_position(pos);
 				window->request_focus();
-				engine.register_window(std::move(window));
+				renderer.register_window(std::move(window));
 			}
 		}
 		else if(_current_dock_action == eDrag)
@@ -535,7 +550,7 @@ void dockspace::update_and_draw(ImVec2 dockspaceSize)
 		_current_dock_to = nullptr;
 		_current_dock_action = eNull;
 	}
-	update_drag(owner);
+	update_drag(owner_id);
 }
 
 void dockspace::clear()
@@ -572,23 +587,23 @@ void dockspace::activate_dock(const std::string& name)
 	activete_dock_impl(&root, name);
 }
 
-gui_window* dockspace::is_any_window_dragged()
+std::uint32_t dockspace::is_any_window_dragged()
 {
-	auto& engine = core::get_subsystem<runtime::engine>();
-	const auto& windows = engine.get_windows();
+	auto& docking = core::get_subsystem<docking_system>();
+	const auto& dockspaces = docking.get_dockspaces();
 
-	for(const auto& window : windows)
+	for(const auto& p : dockspaces)
 	{
-		gui_window* gui_wnd = static_cast<gui_window*>(window.get());
-		auto& dockspace = gui_wnd->get_dockspace();
+		auto id = p.first;
+		auto& dockspace = p.second;
 		if(dockspace.root.splits[0] && dockspace.root.splits[0]->active_dock)
 		{
 			if(dockspace.root.splits[0]->active_dock->draging)
-				return gui_wnd;
+				return id;
 		}
 	}
 
-	return nullptr;
+	return INVALID_WINDOW;
 }
 
 static bool is_point_in_convex(ImVec2 point, const std::vector<ImVec2>& convex)
@@ -676,7 +691,7 @@ static void get_slot_convex(ImRect parent_rect, slot dock_slot, std::vector<ImVe
 
 			convex.emplace_back(ImVec2(top_left_offset.x, top_left_offset.y));
 			convex.emplace_back(ImVec2(top_right_offset.x, top_right_offset.y));
-			convex.emplace_back(ImVec2(bottom_right_offset.x , bottom_right_offset.y));
+			convex.emplace_back(ImVec2(bottom_right_offset.x, bottom_right_offset.y));
 			convex.emplace_back(ImVec2(bottom_left_offset.x, bottom_left_offset.y));
 
 			return;
@@ -727,7 +742,7 @@ static void get_slot_convex(ImRect parent_rect, slot dock_slot, std::vector<ImVe
 	}
 }
 
-slot dockspace::render_dock_slot_preview(gui_window* wnd, const ImVec2& mouse_pos, const ImVec2& cPos,
+slot dockspace::render_dock_slot_preview(std::uint32_t id, const ImVec2& mouse_pos, const ImVec2& cPos,
 										 const ImVec2& cSize)
 {
 	bool convex_slot_preview = true;
@@ -736,8 +751,8 @@ slot dockspace::render_dock_slot_preview(gui_window* wnd, const ImVec2& mouse_po
 
 	ImRect rect{cPos, cPos + cSize};
 	ImVec4 col = {1.0f, 1.0f, 1.0f, 0.8f};
-    ImVec4 col_preview = ImGui::GetStyle().Colors[ImGuiCol_TitleBg];
-    col_preview.w = 0.3f;
+	ImVec4 col_preview = ImGui::GetStyle().Colors[ImGuiCol_TitleBg];
+	col_preview.w = 0.3f;
 	auto check_slot = [convex_slot_preview, &col, &mouse_pos](ImRect rect, slot slot,
 															  std::vector<ImVec2>& convex) -> bool {
 
@@ -765,7 +780,7 @@ slot dockspace::render_dock_slot_preview(gui_window* wnd, const ImVec2& mouse_po
 
 	ImVec2 offset = ImGui::GetStyle().FramePadding * 2.0f;
 	std::vector<ImVec2> convex;
-    ImRect preview_rect = rect;
+	ImRect preview_rect = rect;
 	if(check_slot(rect, slot::tab, convex))
 	{
 		preview_rect = {cPos, ImVec2(cPos.x + cSize.x, cPos.y + cSize.y)};
@@ -781,7 +796,8 @@ slot dockspace::render_dock_slot_preview(gui_window* wnd, const ImVec2& mouse_po
 	if(check_slot(rect, slot::right, convex))
 	{
 
-		preview_rect = {ImVec2(cPos.x + (cSize.x / 2.0f), cPos.y), ImVec2(cPos.x + cSize.x, cPos.y + cSize.y)};
+		preview_rect = {ImVec2(cPos.x + (cSize.x / 2.0f), cPos.y),
+						ImVec2(cPos.x + cSize.x, cPos.y + cSize.y)};
 		dock_slot = slot::right;
 	}
 
@@ -793,22 +809,27 @@ slot dockspace::render_dock_slot_preview(gui_window* wnd, const ImVec2& mouse_po
 
 	if(check_slot(rect, slot::bottom, convex))
 	{
-		preview_rect = {ImVec2(cPos.x, cPos.y + (cSize.y / 2.0f)), ImVec2(cPos.x + cSize.x, cPos.y + cSize.y)};
+		preview_rect = {ImVec2(cPos.x, cPos.y + (cSize.y / 2.0f)),
+						ImVec2(cPos.x + cSize.x, cPos.y + cSize.y)};
 		dock_slot = slot::bottom;
 	}
-    
-    if(dock_slot != slot::none)
-    {
-        std::array<int32_t, 2> pos;
-        pos[0] = int32_t(preview_rect.Min.x - offset.x) + owner->get_position()[0];
-        pos[1] = int32_t(preview_rect.Min.y - offset.y) + owner->get_position()[1];
-        wnd->set_position(pos);
-        wnd->set_size({{uint32_t(preview_rect.GetSize().x + offset.x), uint32_t(preview_rect.GetSize().y + offset.y)}});
-        ImGui::GetWindowDrawList()->AddRectFilled(preview_rect.Min, preview_rect.Max, ImGui::ColorConvertFloat4ToU32(col_preview), false, 0);
-        
-        
-    }
-    
+
+	if(dock_slot != slot::none)
+	{
+		auto& renderer = core::get_subsystem<runtime::renderer>();
+		auto& owner = renderer.get_window(owner_id);
+		auto& wnd = renderer.get_window(id);
+
+		std::array<int32_t, 2> pos;
+		pos[0] = int32_t(preview_rect.Min.x - offset.x) + owner->get_position()[0];
+		pos[1] = int32_t(preview_rect.Min.y - offset.y) + owner->get_position()[1];
+		wnd->set_position(pos);
+		wnd->set_size(
+			{{uint32_t(preview_rect.GetSize().x + offset.x), uint32_t(preview_rect.GetSize().y + offset.y)}});
+		ImGui::GetWindowDrawList()->AddRectFilled(preview_rect.Min, preview_rect.Max,
+												  ImGui::ColorConvertFloat4ToU32(col_preview), false, 0);
+	}
+
 	return dock_slot;
 }
 
@@ -931,11 +952,13 @@ void dockspace::render_tab_bar(node* container, const ImVec2&, const ImVec2& cur
 			ImGui::SetItemAllowOverlap();
 			ImVec2 backupCursorPos = ImGui::GetCursorScreenPos();
 			ImGui::SetCursorPosX(backupCursorPos.x - close_sz.x);
-			if(ImGui::Button(std::string("X###" + dockTitle).c_str(), ImVec2(0, tabbar_height)))
+			ImGui::PushID(dockTitle.c_str());
+			if(ImGui::Button("X", ImVec2(0, tabbar_height)))
 			{
 				_current_dock_action = eClose;
 				_current_dock_to = dock;
 			}
+			ImGui::PopID();
 			ImGui::PopStyleColor();
 		}
 

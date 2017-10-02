@@ -215,7 +215,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 						   fs::remove_all(absolute_path, err);
 					   },
 					   nullptr // on_drag
-					   );
+			);
 		}
 	}
 	{
@@ -622,12 +622,9 @@ void assets_dock::render(const ImVec2&)
 
 	for(auto rit = hierarchy.rbegin(); rit != hierarchy.rend(); ++rit)
 	{
-		if(rit != hierarchy.rbegin())
-		{
-			gui::AlignFirstTextHeightToWidgets();
-			gui::TextUnformatted("/");
-			gui::SameLine();
-		}
+		gui::AlignFirstTextHeightToWidgets();
+		gui::TextUnformatted("/");
+		gui::SameLine();
 
 		if(gui::Button((*rit)->name.c_str()))
 		{
@@ -653,7 +650,8 @@ void assets_dock::render(const ImVec2&)
 				{
 					auto entity = dragged.get_value<runtime::entity>();
 					if(entity)
-						ecs::utils::save_entity_to_file(dir->absolute_path / fs::path(entity.to_string() + extensions::prefab), entity);
+						ecs::utils::save_entity_to_file(
+							dir->absolute_path / fs::path(entity.to_string() + extensions::prefab), entity);
 					es.drop();
 				}
 			}

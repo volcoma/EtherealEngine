@@ -194,13 +194,16 @@ void window::set_size(const std::array<std::uint32_t, 2>& size)
 {
     if (_impl)
     {
-        _impl->set_size(size);
-
-        // Cache the new size
-        _size = size;
-
-        // Notify the derived class
-        on_resize();
+        if(_size[0] != size[0] || _size[1] != size[1])
+        {
+            _impl->set_size(size);
+    
+            // Cache the new size
+            _size = size;
+    
+            // Notify the derived class
+            on_resize();
+        }
     }
 }
 
@@ -339,11 +342,14 @@ bool window::filter_event(const platform_event& event)
     // Notify resize events to the derived class
     if (event.type == platform_event::resized)
     {
-        // Cache the new size
-		_size = { event.size.width, event.size.height };
-
-        // Notify the derived class
-        on_resize();
+        if(_size[0] != event.size.width || _size[1] != event.size.height)
+        {
+            // Cache the new size
+            _size = { event.size.width, event.size.height };
+    
+            // Notify the derived class
+            on_resize();
+        }      
     }
 
     return true;

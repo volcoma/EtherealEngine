@@ -98,6 +98,13 @@ std::shared_ptr<uniform> program::get_uniform(const std::string& _name, bool tex
 
 void program::add_shader(asset_handle<shader> shader)
 {
+    if(!shader)
+    {
+        shaders_cached.push_back(bgfx::kInvalidHandle);
+        shaders.push_back({});
+        return;
+    }
+    
 	for(auto& uniform : shader->uniforms)
 	{
 		uniforms[uniform->info.name] = uniform;

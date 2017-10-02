@@ -1,83 +1,149 @@
 #include "renderer.h"
-#include "../system/engine.h"
-#include "core/string_utils/string_utils.h"
+#include "../system/events.h"
+#include "core/common/assert.hpp"
 #include "core/graphics/graphics.h"
 #include "core/logging/logging.h"
+#include "core/string_utils/string_utils.h"
 #include "render_pass.h"
 #include <cstdarg>
-
-struct gfx_callback : public gfx::CallbackI
-{
-	virtual ~gfx_callback()
-	{
-	}
-
-	virtual void traceVargs(const char* /*_filePath*/, std::uint16_t /*_line*/, const char* /*_format*/,
-							std::va_list /*_argList*/)
-	{
-	}
-
-	virtual void fatal(gfx::Fatal::Enum /*_code*/, const char* _str)
-	{
-		APPLOG_ERROR(_str);
-	}
-
-	virtual uint32_t cacheReadSize(uint64_t /*_id*/)
-	{
-		return 0;
-	}
-
-	virtual bool cacheRead(uint64_t /*_id*/, void* /*_data*/, uint32_t /*_size*/)
-	{
-		return false;
-	}
-
-	virtual void cacheWrite(uint64_t /*_id*/, const void* /*_data*/, uint32_t /*_size*/)
-	{
-	}
-
-	virtual void screenShot(const char* /*_filePath*/, uint32_t /*_width*/, uint32_t /*_height*/,
-							uint32_t /*_pitch*/, const void* /*_data*/, uint32_t /*_size*/, bool /*_yflip*/)
-	{
-	}
-
-	virtual void captureBegin(uint32_t /*_width*/, uint32_t /*_height*/, uint32_t /*_pitch*/,
-							  gfx::TextureFormat::Enum /*_format*/, bool /*_yflip*/)
-	{
-	}
-
-	virtual void captureEnd()
-	{
-	}
-
-	virtual void captureFrame(const void* /*_data*/, uint32_t /*_size*/)
-	{
-	}
-};
 
 namespace runtime
 {
 bool renderer::initialize()
 {
+	on_platform_events.connect(this, &renderer::platform_events);
 	on_frame_end.connect(this, &renderer::frame_end);
+
+	if(!init_backend())
+	{
+		APPLOG_ERROR("Could not initialize rendering backend!");
+		return false;
+	}
+
+	mml::video_mode desktop = mml::video_mode::get_desktop_mode();
+	desktop.width = 1280;
+	desktop.height = 720;
+	auto window = std::make_unique<render_window>(desktop, "App", mml::style::standard);
+	window->request_focus();
+	register_window(std::move(window));
+	process_pending_windows();
 
 	return true;
 }
 
 void renderer::dispose()
 {
+	on_platform_events.disconnect(this, &renderer::platform_events);
 	on_frame_end.disconnect(this, &renderer::frame_end);
-
+	_windows.clear();
+	_windows_pending_addition.clear();
 	gfx::shutdown();
 }
 
-bool renderer::init_backend(mml::window& main_window)
+render_window* renderer::get_focused_window() const
 {
-	static gfx_callback callback;
+	render_window* focused_window = nullptr;
 
+	const auto& windows = get_windows();
+	auto it = std::find_if(std::begin(windows), std::end(windows),
+						   [](const auto& window) { return window->has_focus(); });
+
+	if(it != std::end(windows))
+	{
+		focused_window = it->get();
+	}
+
+	return focused_window;
+}
+
+void renderer::register_window(std::unique_ptr<render_window> window)
+{
+	_windows_pending_addition.emplace_back(std::move(window));
+}
+
+const std::vector<std::unique_ptr<render_window>>& renderer::get_windows() const
+{
+	return _windows;
+}
+
+const std::unique_ptr<render_window>& renderer::get_window(uint32_t id) const
+{
+	auto it = std::find_if(std::begin(_windows), std::end(_windows),
+						   [id](const auto& window) { return window->get_id() == id; });
+
+	ensures(it != std::end(_windows));
+
+	return *it;
+}
+
+const std::unique_ptr<render_window>& renderer::get_main_window() const
+{
+	expects(_windows.size() > 0);
+
+	return _windows.front();
+}
+
+void renderer::hide_all_secondary_windows()
+{
+	std::size_t i = 0;
+	for(auto& window : _windows)
+	{
+		if(i++ != 0)
+		{
+			window->set_visible(false);
+		}
+	}
+}
+
+void renderer::show_all_secondary_windows()
+{
+	std::size_t i = 0;
+	for(auto& window : _windows)
+	{
+		if(i++ != 0)
+		{
+			window->set_visible(true);
+		}
+	}
+}
+
+void renderer::process_pending_windows()
+{
+	for(auto& window : _windows_pending_addition)
+	{
+		_windows.emplace_back(std::move(window));
+	}
+	_windows_pending_addition.clear();
+}
+
+void renderer::platform_events(const std::pair<std::uint32_t, bool>& info,
+							   const std::vector<mml::platform_event>& events)
+{
+	for(const auto& e : events)
+	{
+		if(e.type == mml::platform_event::closed)
+		{
+			_windows.erase(std::remove_if(std::begin(_windows), std::end(_windows),
+										  [window_id = info.first](const auto& window) {
+											  return window->get_id() == window_id;
+										  }),
+						   std::end(_windows));
+			return;
+		}
+	}
+}
+
+bool renderer::init_backend()
+{
+
+	mml::video_mode desktop = mml::video_mode::get_desktop_mode();
+	desktop.width = 0;
+	desktop.height = 0;
+	_init_window = std::make_unique<mml::window>(desktop, "App", mml::style::none);
+	_init_window->set_visible(false);
 	gfx::PlatformData pd{
-		reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(main_window.get_system_handle_specific())),
-		reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(main_window.get_system_handle())),
+		reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(_init_window->get_system_handle_specific())),
+		reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(_init_window->get_system_handle())),
 		nullptr,
 		nullptr,
 		nullptr,
@@ -88,7 +154,7 @@ bool renderer::init_backend(mml::window& main_window)
 
 	// auto detect
 	const auto preferred_renderer_type = gfx::RendererType::Count;
-	if(!gfx::init(preferred_renderer_type, 0, 0, &callback))
+	if(!gfx::init(preferred_renderer_type))
 		return false;
 
 	if(gfx::getRendererType() == gfx::RendererType::Direct3D9)
@@ -96,11 +162,17 @@ bool renderer::init_backend(mml::window& main_window)
 		APPLOG_ERROR("Does not support dx9. Minimum supported is dx11.");
 		return false;
 	}
+	gfx::reset(_init_window->get_size()[0], _init_window->get_size()[1], BGFX_RESET_VSYNC);
+
 	return true;
 }
 
 void renderer::frame_end(std::chrono::duration<float>)
 {
+	render_pass pass("init_bb_update");
+	pass.bind();
+	pass.clear();
+
 	_render_frame = gfx::frame();
 
 	render_pass::reset();
