@@ -1,5 +1,4 @@
 sudo: required
-dist: trusty
 language: cpp
 
 
@@ -9,32 +8,36 @@ env:
 
 matrix:
   include:
-    - compiler: gcc
-      addons:
+
+    # 1/ Linux Clang Builds
+    - os: linux
+      compiler: clang
+      addons: &clang38
         apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-5
-            - cmake
-            - cmake-data
-      env: COMPILERC=gcc-5
-      env: COMPILERCXX=g++-5
-
-
-    - compiler: clang
-      addons:
+          sources: ['llvm-toolchain-precise-3.8', 'ubuntu-toolchain-r-test']
+          packages: ['clang-3.8', 'cmake', 'cmake-data']
+      env: COMPILERCXX='clang++-3.8'
+      env: COMPILERC='clang-3.8'
+    
+    
+    # 2/ Linux GCC Builds
+    - os: linux
+      compiler: gcc
+      addons: &gcc5
         apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-3.8
-          packages:
-            - clang-3.8
-            - cmake
-            - cmake-data
-      env: COMPILERC=clang-3.8
-      env: COMPILERCXX=clang++-3.8
-
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['g++-5', 'cmake', 'cmake-data']
+      env: COMPILERCXX='g++-5'
+      env: COMPILERC='gcc-5'
+#    - os: linux
+#      compiler: gcc
+#      addons: &gcc6
+#        apt:
+#          sources: ['ubuntu-toolchain-r-test']
+#          packages: ['g++-6', 'cmake', 'cmake-data']
+#      env: COMPILERCXX='g++-6'
+   
+   
 
 before_install:
   - sudo apt-get update -qq
@@ -42,6 +45,20 @@ before_install:
   - sudo apt-get install libgtk-3-dev
   - sudo apt-get install libudev-dev
   - sudo apt-get install libc++-dev
+  
+ install:
+  - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
+  - mkdir ${DEPS_DIR} && cd ${DEPS_DIR}
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+      CMAKE_URL="http://www.cmake.org/files/v3.3/cmake-3.3.2-Linux-x86_64.tar.gz"
+      mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
+      export PATH=${DEPS_DIR}/cmake/bin:${PATH}
+    elif [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+      which cmake || brew install cmake
+    fi
+  - cd ${TRAVIS_BUILD_DIR}
+
 
 script:
   - git submodule init
