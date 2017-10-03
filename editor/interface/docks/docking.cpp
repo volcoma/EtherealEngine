@@ -41,7 +41,7 @@ void docking_system::register_dock(std::unique_ptr<imguidock::dock> dock)
 void docking_system::platform_events(const std::pair<std::uint32_t, bool>& info,
 									 const std::vector<mml::platform_event>& events)
 {
-    const auto window_id = info.first;
+	const auto window_id = info.first;
 	for(const auto& e : events)
 	{
 		if(e.type == mml::platform_event::closed)

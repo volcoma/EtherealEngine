@@ -3,8 +3,8 @@
 #include "embedded/fs_ocornut_imgui.bin.h"
 #include "embedded/vs_ocornut_imgui.bin.h"
 
-#include "core/logging/logging.h"
 #include "core/filesystem/filesystem.h"
+#include "core/logging/logging.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/input/input.h"
 #include "runtime/rendering/index_buffer.h"
@@ -212,14 +212,14 @@ void imgui_restore_context()
 void imgui_frame_update(render_window& window, std::chrono::duration<float> dt)
 {
 	auto& io = gui::GetIO();
-    auto view_size = window.get_surface()->get_size();
-    auto window_size = window.get_size();
-    
+	auto view_size = window.get_surface()->get_size();
+	auto window_size = window.get_size();
+
 	// Setup display size (every frame to accommodate for window resizing)
 	io.DisplaySize = ImVec2(static_cast<float>(view_size.width), static_cast<float>(view_size.height));
 	// Setup time step
 	io.DeltaTime = dt.count();
-    
+
 	irect relative_rect;
 	relative_rect.left = 0;
 	relative_rect.top = 0;
@@ -400,7 +400,7 @@ void imgui_set_context(ImGuiContext* context)
 		context->IO.IniFilename = last_context->IO.IniFilename;
 		context->IO.FontAllowUserScaling = last_context->IO.FontAllowUserScaling;
 		context->IO.RenderDrawListsFn = last_context->IO.RenderDrawListsFn;
-        context->Settings = last_context->Settings;
+		context->Settings = last_context->Settings;
 		context->Initialized = last_context->Initialized;
 	}
 	gui::SetCurrentContext(context);
@@ -438,19 +438,17 @@ void gui_system::push_context(uint32_t id)
 {
 	auto& context = get_context(id);
 
-    imgui_set_context(&context);
+	imgui_set_context(&context);
 }
-
 
 void gui_system::draw_begin(render_window& window, std::chrono::duration<float> dt)
 {
 	imgui_frame_update(window, dt);
 }
 
-
 void gui_system::draw_end()
 {
-    imgui_frame_end();    
+	imgui_frame_end();
 }
 
 void gui_system::pop_context()
@@ -458,9 +456,10 @@ void gui_system::pop_context()
 	imgui_restore_context();
 }
 
-void gui_system::platform_events(const std::pair<std::uint32_t, bool>& info, const std::vector<mml::platform_event>& events)
+void gui_system::platform_events(const std::pair<std::uint32_t, bool>& info,
+								 const std::vector<mml::platform_event>& events)
 {
-    const auto window_id = info.first;
+	const auto window_id = info.first;
 	push_context(window_id);
 	for(const auto& e : events)
 	{

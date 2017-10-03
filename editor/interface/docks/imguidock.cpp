@@ -1,7 +1,7 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imguidock.h"
 
-//user includes
+// user includes
 #include "core/string_utils/string_utils.h"
 #include "docking.h"
 #include "runtime/input/input.h"

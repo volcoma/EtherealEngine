@@ -38,4 +38,4 @@ script:
   - mkdir build
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX=./install -DCMAKE_CXX_COMPILER=$COMPILER ..
-  - cmake --build . --target all
+  - cmake --build .
