@@ -202,24 +202,23 @@ void save_scene_as()
 	es.save_editor_camera();
 }
 
-template<typename T>
+template <typename T>
 void create_window_with_dock(const std::string& dock_name)
 {
-    auto& rend = core::get_subsystem<runtime::renderer>();
-    auto& docking = core::get_subsystem<docking_system>();
-    mml::video_mode desktop = mml::video_mode::get_desktop_mode();
+	auto& rend = core::get_subsystem<runtime::renderer>();
+	auto& docking = core::get_subsystem<docking_system>();
+	mml::video_mode desktop = mml::video_mode::get_desktop_mode();
 	desktop.width = 1280;
 	desktop.height = 720;
 	auto window = std::make_unique<render_window>(desktop, "App", mml::style::standard);
 	window->request_focus();
-    
-    auto dock = std::make_unique<T>(dock_name, true, ImVec2(200.0f, 200.0f));
+
+	auto dock = std::make_unique<T>(dock_name, true, ImVec2(200.0f, 200.0f));
 
 	auto& dockspace = docking.get_dockspace(window->get_id());
 	dockspace.dock_to(dock.get(), imguidock::slot::tab, 200, true);
-    rend.register_window(std::move(window));
-    docking.register_dock(std::move(dock));
-    
+	rend.register_window(std::move(window));
+	docking.register_dock(std::move(dock));
 }
 
 void app::draw_menubar(render_window& window)
@@ -314,29 +313,29 @@ void app::draw_menubar(render_window& window)
 		}
 		if(gui::BeginMenu("WINDOWS"))
 		{
-            if(gui::MenuItem("HIERARCHY"))
+			if(gui::MenuItem("HIERARCHY"))
 			{
-                create_window_with_dock<hierarchy_dock>("HIERARCHY");                
+				create_window_with_dock<hierarchy_dock>("HIERARCHY");
 			}
-            if(gui::MenuItem("INSPECTOR"))
+			if(gui::MenuItem("INSPECTOR"))
 			{
-                create_window_with_dock<inspector_dock>("INSPECTOR");                
+				create_window_with_dock<inspector_dock>("INSPECTOR");
 			}
-            if(gui::MenuItem("SCENE"))
+			if(gui::MenuItem("SCENE"))
 			{
-                create_window_with_dock<scene_dock>("SCENE");                
+				create_window_with_dock<scene_dock>("SCENE");
 			}
-            if(gui::MenuItem("GAME"))
+			if(gui::MenuItem("GAME"))
 			{
-                create_window_with_dock<game_dock>("GAME");                
+				create_window_with_dock<game_dock>("GAME");
 			}
-            if(gui::MenuItem("ASSETS"))
+			if(gui::MenuItem("ASSETS"))
 			{
-                create_window_with_dock<assets_dock>("ASSETS");                
+				create_window_with_dock<assets_dock>("ASSETS");
 			}
-            if(gui::MenuItem("STYLE"))
+			if(gui::MenuItem("STYLE"))
 			{
-                create_window_with_dock<style_dock>("STYLE");                
+				create_window_with_dock<style_dock>("STYLE");
 			}
 			gui::EndMenu();
 		}
@@ -578,16 +577,15 @@ void app::draw_start_page(render_window& window)
 {
 	auto& pm = core::get_subsystem<editor::project_manager>();
 
-    auto on_open_project = [&](const std::string& path)
-    {
-        auto& rend = core::get_subsystem<runtime::renderer>();   
-        pm.open_project(path);
-        window.maximize();
-        rend.show_all_secondary_windows();
-        _show_start_page = false;
-    };
-    
-    gui::PushFont(gui::GetFont("standard_big"));
+	auto on_open_project = [&](const std::string& path) {
+		auto& rend = core::get_subsystem<runtime::renderer>();
+		pm.open_project(path);
+		window.maximize();
+		rend.show_all_secondary_windows();
+		_show_start_page = false;
+	};
+
+	gui::PushFont(gui::GetFont("standard_big"));
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove |
 							 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_HorizontalScrollbar |
 							 ImGuiWindowFlags_NoSavedSettings;
@@ -638,7 +636,7 @@ void app::draw_start_page(render_window& window)
 		}
 	}
 	gui::EndGroup();
-    gui::PopFont();
+	gui::PopFont();
 }
 
 void app::handle_drag_and_drop()
