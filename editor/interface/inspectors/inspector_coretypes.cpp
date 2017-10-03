@@ -503,7 +503,7 @@ bool inspector_string::inspect(rttr::variant& var, bool read_only,
 	}
 	else
 	{
-        static std::array<char, 64> input_buff;
+		static std::array<char, 64> input_buff;
 		input_buff.fill(0);
 		std::memcpy(input_buff.data(), data.c_str(), data.size() < 64 ? data.size() : 64);
 		if(gui::InputText("", input_buff.data(), input_buff.size(), ImGuiInputTextFlags_EnterReturnsTrue))
