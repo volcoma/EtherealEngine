@@ -19,7 +19,7 @@ matrix:
       env: 
         - COMPILERCXX='clang++-3.8'
         - COMPILERC='clang-3.8'
-        - EXTRA_FLAGS='-stdlib=libc++ -lc++'
+        #- EXTRA_FLAGS='-stdlib=libc++ -lc++'
     
     
     # 2/ Linux GCC Builds

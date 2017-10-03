@@ -2,7 +2,6 @@
 #include "bx/error.h"
 #include "bx/process.h"
 #include "bx/string.h"
-#include "core/string_utils/string_utils.h"
 #include "core/filesystem/filesystem.h"
 #include "core/graphics/graphics.h"
 #include "core/logging/logging.h"
@@ -10,14 +9,15 @@
 #include "core/serialization/serialization.h"
 #include "core/serialization/types/unordered_map.hpp"
 #include "core/serialization/types/vector.hpp"
+#include "core/string_utils/string_utils.h"
 #include "core/uuid/uuid.hpp"
 #include "mesh_importer.h"
 #include "runtime/assets/asset_extensions.h"
-#include "runtime/meta/rendering/mesh.hpp"
 #include "runtime/meta/animation/animation.hpp"
+#include "runtime/meta/rendering/mesh.hpp"
+#include "runtime/rendering/mesh.h"
 #include "runtime/rendering/shader.h"
 #include "runtime/rendering/texture.h"
-#include "runtime/rendering/mesh.h"
 #include <array>
 #include <fstream>
 
@@ -32,7 +32,6 @@ std::string escape_str(const std::string& str)
 	return "\"" + str + "\"";
 }
 
-
 bool run_compile_process(const std::string& process, const std::vector<std::string>& args_array,
 						 std::string& err)
 {
@@ -41,14 +40,14 @@ bool run_compile_process(const std::string& process, const std::vector<std::stri
 	size_t i = 0;
 	for(const auto& arg : args_array)
 	{
-        if(arg.front() == '-')
-        {
-            args += arg;
-        }
+		if(arg.front() == '-')
+		{
+			args += arg;
+		}
 		else
-        {
-            args += escape_str(arg);
-        }
+		{
+			args += escape_str(arg);
+		}
 
 		if(i++ != args_array.size() - 1)
 			args += " ";
@@ -163,14 +162,10 @@ void compile<shader>(const fs::path& absolute_key)
 		str_type = "unknown";
 
 	const std::vector<std::string> args_array = {
-		"-f",			str_input.c_str(),
-		"-o",			str_output.c_str(),
-		"-i",			str_include.c_str(),
-		"--varyingdef", str_varying.c_str(),
-		"--platform",   str_platform.c_str(),
-		"-p",			str_profile.c_str(),
-		"--type",		str_type.c_str(),
-		"-O",			"3",
+		"-f",		  str_input.c_str(),	"-o",			str_output.c_str(),
+		"-i",		  str_include.c_str(),  "--varyingdef", str_varying.c_str(),
+		"--platform", str_platform.c_str(), "-p",			str_profile.c_str(),
+		"--type",	 str_type.c_str(),		"-O",			"3",
 	};
 
 	std::string error;
@@ -204,11 +199,7 @@ void compile<texture>(const fs::path& absolute_key)
 	std::string str_output = temp.string();
 
 	const std::vector<std::string> args_array = {
-		"-f",	str_input.c_str(),
-		"-o",	str_output.c_str(),
-		"--as",  "ktx",
-		"-m",	"-t",
-		"BGRA8",
+		"-f", str_input.c_str(), "-o", str_output.c_str(), "--as", "ktx", "-m", "-t", "BGRA8",
 	};
 
 	std::string error;
@@ -256,27 +247,27 @@ void compile<mesh>(const fs::path& absolute_key)
 		}
 		fs::copy_file(temp, output, fs::copy_option::overwrite_if_exists, err);
 		fs::remove(temp, err);
-        
-        APPLOG_INFO("Successful compilation of {0}", str_input);
-        {
-            fs::path file = absolute_key.stem();
-            fs::path dir = absolute_key.parent_path();
-            
-            for(const auto& animation : animations)
-            {
-                temp = fs::temp_directory_path(err);
-                temp.append(uuids::random_uuid(str_input).to_string() + ".buildtemp");
-                {
-                    std::ofstream soutput(temp.string(), std::ios::out | std::ios::binary);
-                    cereal::oarchive_binary_t ar(soutput);
-                    try_save(ar, cereal::make_nvp("animation", animation));
-                }
-                output = (dir / file).string() + "_" + animation.name + extensions::animation;
-                
-                fs::copy_file(temp, output, fs::copy_option::overwrite_if_exists, err);
-                fs::remove(temp, err);
-            }
-        }
-	}    
+
+		APPLOG_INFO("Successful compilation of {0}", str_input);
+		{
+			fs::path file = absolute_key.stem();
+			fs::path dir = absolute_key.parent_path();
+
+			for(const auto& animation : animations)
+			{
+				temp = fs::temp_directory_path(err);
+				temp.append(uuids::random_uuid(str_input).to_string() + ".buildtemp");
+				{
+					std::ofstream soutput(temp.string(), std::ios::out | std::ios::binary);
+					cereal::oarchive_binary_t ar(soutput);
+					try_save(ar, cereal::make_nvp("animation", animation));
+				}
+				output = (dir / file).string() + "_" + animation.name + extensions::animation;
+
+				fs::copy_file(temp, output, fs::copy_option::overwrite_if_exists, err);
+				fs::remove(temp, err);
+			}
+		}
+	}
 }
 }

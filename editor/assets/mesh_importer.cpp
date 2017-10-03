@@ -252,9 +252,9 @@ void process_animation(const aiAnimation* assimp_anim, animation& anim)
 			key.value.z = anim_key.mValue.z;
 		}
 
-        if(assimp_node_anim->mNumRotationKeys > 0)
+		if(assimp_node_anim->mNumRotationKeys > 0)
 			node_anim.rotation_keys.resize(assimp_node_anim->mNumRotationKeys);
-        
+
 		for(size_t idx = 0; idx < assimp_node_anim->mNumRotationKeys; ++idx)
 		{
 			const auto& anim_key = assimp_node_anim->mRotationKeys[idx];
@@ -266,9 +266,9 @@ void process_animation(const aiAnimation* assimp_anim, animation& anim)
 			key.value.w = anim_key.mValue.w;
 		}
 
-        if(assimp_node_anim->mNumScalingKeys > 0)
-			node_anim.scaling_keys.resize(assimp_node_anim->mNumScalingKeys);       
-        
+		if(assimp_node_anim->mNumScalingKeys > 0)
+			node_anim.scaling_keys.resize(assimp_node_anim->mNumScalingKeys);
+
 		for(size_t idx = 0; idx < assimp_node_anim->mNumScalingKeys; ++idx)
 		{
 			const auto& anim_key = assimp_node_anim->mScalingKeys[idx];
@@ -309,13 +309,12 @@ bool importer::load_mesh_data_from_file(const std::string& path, mesh::load_data
 	importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, aiComponent_CAMERAS | aiComponent_LIGHTS);
 
 	const aiScene* scene = importer.ReadFile(
-		path,
-		aiProcess_ConvertToLeftHanded | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals |
-			aiProcess_JoinIdenticalVertices | aiProcess_ImproveCacheLocality | aiProcess_LimitBoneWeights |
-			aiProcess_RemoveRedundantMaterials | aiProcess_SplitLargeMeshes | aiProcess_Triangulate |
-			aiProcess_GenUVCoords | aiProcess_SortByPType | aiProcess_FindDegenerates |
-			aiProcess_FindInvalidData | aiProcess_FindInstances | aiProcess_ValidateDataStructure |
-			aiProcess_OptimizeMeshes);
+		path, aiProcess_ConvertToLeftHanded | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals |
+				  aiProcess_JoinIdenticalVertices | aiProcess_ImproveCacheLocality |
+				  aiProcess_LimitBoneWeights | aiProcess_RemoveRedundantMaterials |
+				  aiProcess_SplitLargeMeshes | aiProcess_Triangulate | aiProcess_GenUVCoords |
+				  aiProcess_SortByPType | aiProcess_FindDegenerates | aiProcess_FindInvalidData |
+				  aiProcess_FindInstances | aiProcess_ValidateDataStructure | aiProcess_OptimizeMeshes);
 
 	if(!scene)
 	{

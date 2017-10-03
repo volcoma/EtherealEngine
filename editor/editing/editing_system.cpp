@@ -94,5 +94,4 @@ void editing_system::drop()
 {
 	drag_data = {};
 }
-
 }
