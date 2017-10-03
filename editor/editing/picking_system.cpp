@@ -70,36 +70,37 @@ void picking_system::frame_render(std::chrono::duration<float>)
 
 		pass.set_view_proj(pick_view, pick_proj);
 
-		ecs.each<transform_component, model_component>([this, &pass, &camera](
-			runtime::entity e, transform_component& transform_comp_ref, model_component& model_comp_ref) {
-			auto& model = model_comp_ref.get_model();
-			if(!model.is_valid())
-				return;
+		ecs.each<transform_component, model_component>(
+			[this, &pass, &camera](runtime::entity e, transform_component& transform_comp_ref,
+								   model_component& model_comp_ref) {
+				auto& model = model_comp_ref.get_model();
+				if(!model.is_valid())
+					return;
 
-			const auto& world_transform = transform_comp_ref.get_transform();
+				const auto& world_transform = transform_comp_ref.get_transform();
 
-			auto mesh = model.get_lod(0);
-			if(!mesh)
-				return;
+				auto mesh = model.get_lod(0);
+				if(!mesh)
+					return;
 
-			const auto& frustum = camera.get_frustum();
-			const auto& bounds = mesh->get_bounds();
+				const auto& frustum = camera.get_frustum();
+				const auto& bounds = mesh->get_bounds();
 
-			// Test the bounding box of the mesh
-			if(!math::frustum::test_obb(frustum, bounds, world_transform))
-				return;
+				// Test the bounding box of the mesh
+				if(!math::frustum::test_obb(frustum, bounds, world_transform))
+					return;
 
-			auto entity_index = e.id().index();
-			std::uint32_t rr = (entity_index)&0xff;
-			std::uint32_t gg = (entity_index >> 8) & 0xff;
-			std::uint32_t bb = (entity_index >> 16) & 0xff;
-			math::vec4 color_id = {rr / 255.0f, gg / 255.0f, bb / 255.0f, 1.0f};
+				auto entity_index = e.id().index();
+				std::uint32_t rr = (entity_index)&0xff;
+				std::uint32_t gg = (entity_index >> 8) & 0xff;
+				std::uint32_t bb = (entity_index >> 16) & 0xff;
+				math::vec4 color_id = {rr / 255.0f, gg / 255.0f, bb / 255.0f, 1.0f};
 
-			const auto& bone_transforms = model_comp_ref.get_bone_transforms();
+				const auto& bone_transforms = model_comp_ref.get_bone_transforms();
 
-			model.render(pass.id, world_transform, bone_transforms, true, true, true, 0, 0, _program.get(),
-						 [&color_id](program& p) { p.set_uniform("u_id", &color_id); });
-		});
+				model.render(pass.id, world_transform, bone_transforms, true, true, true, 0, 0,
+							 _program.get(), [&color_id](program& p) { p.set_uniform("u_id", &color_id); });
+			});
 	}
 
 	// If the user previously clicked, and we're done reading data from GPU, look at ID buffer on CPU

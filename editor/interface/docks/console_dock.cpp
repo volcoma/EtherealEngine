@@ -64,11 +64,12 @@ void console_dock::render(const ImVec2&)
 	gui::Separator();
 
 	// Command-line
-    static std::array<char, 64> input_buff;
-    input_buff.fill(0);
+	static std::array<char, 64> input_buff;
+	input_buff.fill(0);
 
 	gui::PushItemWidth(gui::GetContentRegionAvailWidth() * 0.5f);
-	if(gui::InputText("ENTER COMMAND", input_buff.data(), input_buff.size(), ImGuiInputTextFlags_EnterReturnsTrue))
+	if(gui::InputText("ENTER COMMAND", input_buff.data(), input_buff.size(),
+					  ImGuiInputTextFlags_EnterReturnsTrue))
 	{
 		// copy from c_str to remove trailing zeros
 		std::string command = input_buff.data();
