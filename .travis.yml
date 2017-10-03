@@ -49,5 +49,5 @@ script:
   - git submodule update
   - mkdir build
   - cd build
-  - cmake -DCMAKE_INSTALL_PREFIX=./install -DCMAKE_C_COMPILER=$COMPILERC -DCMAKE_CXX_COMPILER=$COMPILERCXX -STDLIB -STDLIBLINK ..
+  - cmake -DCMAKE_INSTALL_PREFIX=./install -DCMAKE_C_COMPILER=$COMPILERC -DCMAKE_CXX_COMPILER=$COMPILERCXX -$STDLIB -$STDLIBLINK ..
   - cmake --build .
