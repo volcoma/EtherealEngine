@@ -1,5 +1,5 @@
 sudo: required
-dist: precise
+dist: trusty
 language: cpp
 
 
@@ -14,29 +14,27 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - george-edison55-precise-backports
           packages:
             - g++-5
             - cmake
             - cmake-data
       env: COMPILERC=gcc-5
       env: COMPILERCXX=g++-5
-      env: STDLIB=libstdc++ 
+
 
     - compiler: clang
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.8
-            - george-edison55-precise-backports
+            - llvm-toolchain-trusty-3.8
           packages:
             - clang-3.8
             - cmake
             - cmake-data
       env: COMPILERC=clang-3.8
       env: COMPILERCXX=clang++-3.8
-      env: STDLIB=libc++ 
+
 
 before_install:
   - sudo apt-get update -qq
@@ -50,5 +48,5 @@ script:
   - git submodule update
   - mkdir build
   - cd build
-  - cmake -DCMAKE_INSTALL_PREFIX=./install -DCMAKE_C_COMPILER=$COMPILERC -DCMAKE_CXX_COMPILER=$COMPILERCXX -stdlib=$STDLIB ..
+  - cmake -DCMAKE_INSTALL_PREFIX=./install -DCMAKE_C_COMPILER=$COMPILERC -DCMAKE_CXX_COMPILER=$COMPILERCXX ..
   - cmake --build .
