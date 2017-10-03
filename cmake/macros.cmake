@@ -22,10 +22,7 @@ macro(detect_platform)
 
 	message(STATUS "BUILD_SHARED_LIBS >>> ${BUILD_SHARED_LIBS}")
 
-	if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")		
-		set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -stdlib=libc++ -lc++abi")
-	elseif(MSVC)
+	if(MSVC)
 		add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
 		add_definitions(-D_SCL_SECURE_NO_WARNINGS=1)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /bigobj /W3")
