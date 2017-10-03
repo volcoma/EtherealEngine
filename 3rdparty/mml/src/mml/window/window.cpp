@@ -17,7 +17,8 @@ namespace mml
 ////////////////////////////////////////////////////////////
 window::window() :
 _impl          (NULL),
-_size          ({0, 0})
+_size          ({0, 0}),
+_visible(false)
 {
 
 }
@@ -26,7 +27,8 @@ _size          ({0, 0})
 ////////////////////////////////////////////////////////////
 window::window(video_mode mode, const std::string& title, std::uint32_t style) :
 _impl          (NULL),
-_size          ({0, 0})
+_size          ({0, 0}),
+_visible(true)
 {
     create(mode, title, style);
 }
@@ -35,7 +37,8 @@ _size          ({0, 0})
 ////////////////////////////////////////////////////////////
 window::window(window_handle handle) :
 _impl          (NULL),
-_size          ({0, 0})
+_size          ({0, 0}),
+_visible(true)
 {
     create(handle);
 }
@@ -229,6 +232,14 @@ void window::set_visible(bool visible)
 {
     if (_impl)
         _impl->set_visible(visible);
+    
+    _visible = visible;
+}
+
+////////////////////////////////////////////////////////////
+bool window::is_visible() const
+{
+    return _visible;
 }
 
 ////////////////////////////////////////////////////////////

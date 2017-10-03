@@ -288,6 +288,7 @@ public:
     ///
     ////////////////////////////////////////////////////////////
     void set_visible(bool visible);
+    bool is_visible() const;
 
 	////////////////////////////////////////////////////////////
 	/// \brief Request to maxiize the window
@@ -467,6 +468,7 @@ private:
     ////////////////////////////////////////////////////////////
     priv::window_impl* _impl;           ///< Platform-specific implementation of the window
     std::array<std::uint32_t, 2> _size;           ///< Current size of the window
+    bool _visible;
 };
 
 } // namespace mml

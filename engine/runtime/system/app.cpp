@@ -27,10 +27,9 @@ void app::setup()
 
 	serialization::set_warning_logger([](const std::string& msg) { APPLOG_WARNING(msg); });
 
-    gfx::set_info_logger([](const std::string& msg) { APPLOG_INFO(msg); });
-    gfx::set_warning_logger([](const std::string& msg) { APPLOG_WARNING(msg); });
-    gfx::set_error_logger([](const std::string& msg) { APPLOG_ERROR(msg); });
-
+	gfx::set_info_logger([](const std::string& msg) { APPLOG_INFO(msg); });
+	gfx::set_warning_logger([](const std::string& msg) { APPLOG_WARNING(msg); });
+	gfx::set_error_logger([](const std::string& msg) { APPLOG_ERROR(msg); });
 }
 
 void app::start()
@@ -51,66 +50,67 @@ void app::stop()
 {
 }
 
-
 void poll_events()
 {
-    auto& renderer = core::get_subsystem<runtime::renderer>();
-    const auto& windows = renderer.get_windows();
+	auto& renderer = core::get_subsystem<runtime::renderer>();
+	const auto& windows = renderer.get_windows();
 
-    std::uint32_t focused_id = 0;
-    std::map<std::uint32_t, std::vector<mml::platform_event>> collected_events;
-    for(const auto& window : windows)
-    {
-        const auto id = window->get_id();
-        std::vector<mml::platform_event> events;
-        mml::platform_event e;
-        while (window->poll_event(e))
-        {
-            events.emplace_back(std::move(e));
-        }
-        
-        if(window->has_focus())
-        {
-            focused_id = id;
-        }
-        
-        if(!events.empty())
-        {
-            collected_events.emplace(id, std::move(events));
-        }
-    }
-    
-    for(const auto& event_pair : collected_events)
-    {
-        const auto id = event_pair.first;
-        const auto& events = event_pair.second;
-        std::pair<std::uint32_t, bool> info {id, (id == focused_id)};
-        on_platform_events(info, events);
-    }
+	std::uint32_t focused_id = 0;
+	std::map<std::uint32_t, std::vector<mml::platform_event>> collected_events;
+	for(const auto& window : windows)
+	{
+		const auto id = window->get_id();
+		std::vector<mml::platform_event> events;
+		mml::platform_event e;
+		while(window->poll_event(e))
+		{
+			events.emplace_back(std::move(e));
+		}
+
+		if(window->has_focus())
+		{
+			focused_id = id;
+		}
+
+		if(!events.empty())
+		{
+			collected_events.emplace(id, std::move(events));
+		}
+	}
+
+	for(const auto& event_pair : collected_events)
+	{
+		const auto id = event_pair.first;
+		const auto& events = event_pair.second;
+		std::pair<std::uint32_t, bool> info{id, (id == focused_id)};
+		on_platform_events(info, events);
+	}
 }
-
 
 void app::run_one_frame()
 {
 	auto& sim = core::get_subsystem<core::simulation>();
 	auto& tasks = core::get_subsystem<core::task_system>();
-    auto& renderer = core::get_subsystem<runtime::renderer>();
-    
+	auto& renderer = core::get_subsystem<runtime::renderer>();
+
 	sim.run_one_frame();
 	tasks.run_on_owner_thread();
 
 	auto dt = sim.get_delta_time();
 
-    poll_events();
- 
-    renderer.process_pending_windows();
-    
-    if(renderer.get_windows().empty())
-    {
-        quit(0);
-        return;
-    }
-    
+	poll_events();
+
+	renderer.process_pending_windows();
+
+	const auto& windows = renderer.get_windows();
+	bool should_quit = std::all_of(std::begin(windows), std::end(windows),
+								   [](const auto& window) { return !window->is_visible(); });
+	if(should_quit)
+	{
+		quit(0);
+		return;
+	}
+
 	on_frame_begin(dt);
 
 	on_frame_update(dt);
@@ -118,7 +118,6 @@ void app::run_one_frame()
 	on_frame_render(dt);
 
 	on_frame_end(dt);
-    
 }
 
 int app::run()
