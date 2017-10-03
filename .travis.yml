@@ -16,8 +16,9 @@ matrix:
         apt:
           sources: ['llvm-toolchain-precise-3.8', 'ubuntu-toolchain-r-test']
           packages: ['clang-3.8', 'cmake', 'cmake-data']
-      - env: COMPILERCXX='clang++-3.8'
-      - env: COMPILERC='clang-3.8'
+      env: 
+        - COMPILERCXX='clang++-3.8'
+        - COMPILERC='clang-3.8'
     
     
     # 2/ Linux GCC Builds
@@ -27,16 +28,18 @@ matrix:
         apt:
           sources: ['ubuntu-toolchain-r-test']
           packages: ['g++-5', 'cmake', 'cmake-data']
-      - env: COMPILERCXX='g++-5'
-      - env: COMPILERC='gcc-5'
+      env:
+        - COMPILERCXX='g++-5'
+        - COMPILERC='gcc-5'
 #    - os: linux
 #      compiler: gcc
 #      addons: &gcc6
 #        apt:
 #          sources: ['ubuntu-toolchain-r-test']
 #          packages: ['g++-6', 'cmake', 'cmake-data']
-#      - env: COMPILERCXX='g++-6'
-#      - env: COMPILERC='gcc-6'
+#      env:
+#        - COMPILERCXX='g++-5'
+#        - COMPILERC='gcc-5'
    
    
 
