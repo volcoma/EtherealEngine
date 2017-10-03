@@ -46,7 +46,7 @@ before_install:
   - sudo apt-get install libudev-dev
   - sudo apt-get install libc++-dev
   
- install:
+install:
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
   - mkdir ${DEPS_DIR} && cd ${DEPS_DIR}
   - |
