@@ -74,7 +74,7 @@ install:
       elif [[ "${COMPILERCXX}" == "clang++-3.8" ]]; then LLVM_VERSION="3.8.0";
       elif [[ "${COMPILERCXX}" == "clang++-3.9" ]]; then LLVM_VERSION="3.9.0";
       elif [[ "${COMPILERCXX}" == "clang++-4.0" ]]; then LLVM_VERSION="4.0.0"; fi
-      if [[ "${COMPILERCXX}" == "clang++-3.8" ]]; then
+      if [[ "${LLVM_VERSION}" != "" ]]; then
         LLVM_URL="http://llvm.org/releases/${LLVM_VERSION}/llvm-${LLVM_VERSION}.src.tar.xz"
         LIBCXX_URL="http://llvm.org/releases/${LLVM_VERSION}/libcxx-${LLVM_VERSION}.src.tar.xz"
         LIBCXXABI_URL="http://llvm.org/releases/${LLVM_VERSION}/libcxxabi-${LLVM_VERSION}.src.tar.xz"
