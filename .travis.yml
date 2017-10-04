@@ -99,8 +99,8 @@ install:
         export PATH="${LLVM_DIR}/clang/bin:${PATH}"
       fi
 
-      - ${CXX} --version
-    fi
+    - ${CXX} --version
+    
 
 
 script:
