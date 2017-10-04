@@ -1,6 +1,8 @@
 #pragma once
 
 #include "runtime/system/app.h"
+#include <string>
+
 namespace imguidock
 {
     class dockspace;
