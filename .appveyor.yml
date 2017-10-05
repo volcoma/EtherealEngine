@@ -1,0 +1,21 @@
+clone_folder: c:\dev\EtherealEngine
+
+os:
+  - Visual Studio 2015
+  - Visual Studio 2017
+
+platform:
+  - x86
+  - x86_64
+
+build_script:
+- md build_debug
+- cd build_debug
+- cmake -DCMAKE_CXX_COMPILER=$COMPILER ..
+- cmake --build . --config Debug
+- cd ..
+- md build_release
+- cd build_release
+- cmake -DCMAKE_CXX_COMPILER=$COMPILER ..
+- cmake --build . --config Release
+
