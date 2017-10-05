@@ -1,6 +1,9 @@
-
+[Etheral Engine](https://github.com/volcoma/EtheraelEngine) - Cross-platform C++ Game Engine
+============================================================================
+[![Build Status](https://travis-ci.org/volcoma/EtherealEngine.svg?branch=master)](https://travis-ci.org/volcoma/EtherealEngine)
+[![Build status](https://ci.appveyor.com/api/projects/status/18pxyag4wok2fscl?svg=true)](https://ci.appveyor.com/project/volcoma/etherealengine)
 ## INFO
-Cross-platform C++ Game Engine in c++14
+Using c++14
 
 WYSIWYG Editor
 
