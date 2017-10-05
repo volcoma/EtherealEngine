@@ -173,8 +173,8 @@ std::string string_utils::format(const char* format, va_list args)
 	if(length == 0)
 		return std::string();
 
-	char* buf = new char[length + 1];
-	std::vsnprintf(buf, length + 1, format, args);
+	char* buf = new char[static_cast<size_t>(length) + 1];
+	std::vsnprintf(buf, static_cast<size_t>(length) + 1, format, args);
 
 	std::string str(buf);
 	delete[] buf;
@@ -207,7 +207,7 @@ std::string string_utils::word_wrap(const std::string& value, std::string::size_
 					wrapString += currentLine + "\n";
 					currentLine = std::string();
 					lineLength = 0;
-					lastSpace = -1;
+					lastSpace = std::string::size_type(-1);
 
 				} // End if will exceed line length
 				else
@@ -216,7 +216,7 @@ std::string string_utils::word_wrap(const std::string& value, std::string::size_
 					if(wrapString.empty() == false && lineLength == 0)
 					{
 						currentLine = linePadding;
-						lineLength = (int)currentLine.length();
+						lineLength = currentLine.length();
 
 					} // End if padding required
 
@@ -233,7 +233,7 @@ std::string string_utils::word_wrap(const std::string& value, std::string::size_
 				wrapString += currentLine + "\n";
 				currentLine = std::string();
 				lineLength = 0;
-				lastSpace = -1;
+				lastSpace = std::string::size_type(-1);
 				break;
 
 			default:
@@ -241,13 +241,13 @@ std::string string_utils::word_wrap(const std::string& value, std::string::size_
 				if(lineLength == maximumLength)
 				{
 					// No space found on this line yet?
-					if(lastSpace == -1)
+					if(lastSpace == std::string::size_type(-1))
 					{
 						// Just break onto a new line
 						wrapString += currentLine + "\n";
 						currentLine = std::string();
 						lineLength = 0;
-						lastSpace = -1;
+						lastSpace = std::string::size_type(-1);
 
 					} // End if no space found
 					else
@@ -257,7 +257,7 @@ std::string string_utils::word_wrap(const std::string& value, std::string::size_
 							wrapString += currentLine.substr(0, lastSpace) + "\n";
 						currentLine = linePadding + currentLine.substr(lastSpace + 1);
 						lineLength = currentLine.length();
-						lastSpace = -1;
+						lastSpace = std::string::size_type(-1);
 
 					} // End if space found on line
 
@@ -301,13 +301,13 @@ std::string string_utils::random_string(std::string::size_type length)
 		return random_generator_t(seed);
 	};
 
-    random_generator_t engine(make_seeded_engine());
-    
+	random_generator_t engine(make_seeded_engine());
+
 	auto randchar = [&]() -> char {
 		constexpr const char charset[] = "0123456789"
-							   "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-							   "abcdefghijklmnopqrstuvwxyz";
-            
+										 "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+										 "abcdefghijklmnopqrstuvwxyz";
+
 		const size_t max_index = (sizeof(charset) - 1);
 		std::uniform_int_distribution<std::string::size_type> dist(0, max_index);
 
