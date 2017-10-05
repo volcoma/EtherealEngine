@@ -15,9 +15,4 @@ build_script:
 - cd build_debug
 - cmake -DCMAKE_CXX_COMPILER=$COMPILER ..
 - cmake --build . --config Debug
-- cd ..
-- md build_release
-- cd build_release
-- cmake -DCMAKE_CXX_COMPILER=$COMPILER ..
-- cmake --build . --config Release
 
