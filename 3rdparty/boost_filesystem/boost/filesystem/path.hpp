@@ -142,13 +142,12 @@ namespace filesystem
         typename boost::decay<Source>::type> >::type* =0)
     {
       path_traits::dispatch(source, m_pathname);
-	  make_preferred();
     }
 
-    path(const value_type* s) : m_pathname(s) { make_preferred(); }
-    path(value_type* s) : m_pathname(s) { make_preferred(); }
-    path(const string_type& s) : m_pathname(s) { make_preferred(); }
-    path(string_type& s) : m_pathname(s) { make_preferred(); }
+    path(const value_type* s) : m_pathname(s) {}
+    path(value_type* s) : m_pathname(s) {}
+    path(const string_type& s) : m_pathname(s) {}
+    path(string_type& s) : m_pathname(s) {}
 
   //  As of October 2015 the interaction between noexcept and =default is so troublesome
   //  for VC++, GCC, and probably other compilers, that =default is not used with noexcept
@@ -164,7 +163,6 @@ namespace filesystem
     path(Source const& source, const codecvt_type& cvt)
     {
       path_traits::dispatch(source, m_pathname, cvt);
-	  make_preferred();
     }
 
     template <class InputIterator>
@@ -176,7 +174,6 @@ namespace filesystem
         std::basic_string<typename std::iterator_traits<InputIterator>::value_type>
           seq(begin, end);
         path_traits::convert(seq.c_str(), seq.c_str()+seq.size(), m_pathname);
-		make_preferred();
       }
     }
 
@@ -189,7 +186,6 @@ namespace filesystem
         std::basic_string<typename std::iterator_traits<InputIterator>::value_type>
           seq(begin, end);
         path_traits::convert(seq.c_str(), seq.c_str()+seq.size(), m_pathname, cvt);
-		make_preferred();
       }
     }
 
@@ -208,7 +204,6 @@ namespace filesystem
     {
       m_pathname.clear();
       path_traits::dispatch(source, m_pathname);
-	  make_preferred();
       return *this;
     }
 
@@ -217,32 +212,27 @@ namespace filesystem
     path& operator=(const value_type* ptr)  // required in case ptr overlaps *this                                    
 	{
 		m_pathname = ptr;
-		make_preferred();
 		return *this;
 	}
     path& operator=(value_type* ptr)  // required in case ptr overlaps *this
     {
 		m_pathname = ptr;
-		make_preferred();
 		return *this;
 	}
     path& operator=(const string_type& s) 
 	{
 		m_pathname = s;
-		make_preferred();
 		return *this;
 	}
     path& operator=(string_type& s)       
 	{
 		m_pathname = s; 
-		make_preferred();
 		return *this;
 	}
 
     path& assign(const value_type* ptr, const codecvt_type&)  // required in case ptr overlaps *this                                       
 	{
 		m_pathname = ptr; 
-		make_preferred();
 		return *this;
 	}
     template <class Source>
@@ -250,7 +240,6 @@ namespace filesystem
     {
       m_pathname.clear();
       path_traits::dispatch(source, m_pathname, cvt);
-	  make_preferred();
       return *this;
     }
 
@@ -312,7 +301,6 @@ namespace filesystem
     path& concat(Source const& source)
     {
       path_traits::dispatch(source, m_pathname);
-	  make_preferred();
       return *this;
     }
 
@@ -320,7 +308,6 @@ namespace filesystem
     path& concat(Source const& source, const codecvt_type& cvt)
     {
       path_traits::dispatch(source, m_pathname, cvt);
-	  make_preferred();
       return *this;
     }
 
@@ -332,7 +319,6 @@ namespace filesystem
       std::basic_string<typename std::iterator_traits<InputIterator>::value_type>
         seq(begin, end);
       path_traits::convert(seq.c_str(), seq.c_str()+seq.size(), m_pathname);
-	  make_preferred();
       return *this;
     }
 
@@ -344,7 +330,6 @@ namespace filesystem
       std::basic_string<typename std::iterator_traits<InputIterator>::value_type>
         seq(begin, end);
       path_traits::convert(seq.c_str(), seq.c_str()+seq.size(), m_pathname, cvt);
-	  make_preferred();
       return *this;
     }
 
@@ -946,7 +931,6 @@ namespace filesystem
     path_traits::dispatch(source, m_pathname);
     if (sep_pos)
       m_erase_redundant_separator(sep_pos);
-	make_preferred();
     return *this;
   }
 
@@ -959,7 +943,6 @@ namespace filesystem
     path_traits::dispatch(source, m_pathname, cvt);
     if (sep_pos)
       m_erase_redundant_separator(sep_pos);
-	make_preferred();
     return *this;
   }
 

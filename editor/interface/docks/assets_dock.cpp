@@ -251,7 +251,8 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 							   ,
 							   [&](const std::string& new_name) // on_rename
 							   {
-								   const auto asset_dir = fs::path(relative).remove_filename();
+								   const auto asset_dir =
+									   fs::path(relative).make_preferred().remove_filename();
 								   const auto new_relative =
 									   (asset_dir / new_name).generic_string() + file.extension;
 								   am.rename_asset<asset_t>(relative, new_relative);
@@ -297,7 +298,8 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 							   ,
 							   [&](const std::string& new_name) // on_rename
 							   {
-								   const auto asset_dir = fs::path(relative).remove_filename();
+								   const auto asset_dir =
+									   fs::path(relative).make_preferred().remove_filename();
 								   const auto new_relative =
 									   (asset_dir / new_name).generic_string() + file.extension;
 								   am.rename_asset<asset_t>(relative, new_relative);
@@ -340,7 +342,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 						   ,
 						   [&](const std::string& new_name) // on_rename
 						   {
-							   const auto asset_dir = fs::path(relative).remove_filename();
+							   const auto asset_dir = fs::path(relative).make_preferred().remove_filename();
 							   const auto new_relative =
 								   (asset_dir / new_name).generic_string() + file.extension;
 							   am.rename_asset<asset_t>(relative, new_relative);
@@ -382,7 +384,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 						   ,
 						   [&](const std::string& new_name) // on_rename
 						   {
-							   const auto asset_dir = fs::path(relative).remove_filename();
+							   const auto asset_dir = fs::path(relative).make_preferred().remove_filename();
 							   const auto new_relative =
 								   (asset_dir / new_name).generic_string() + file.extension;
 							   am.rename_asset<asset_t>(relative, new_relative);
@@ -424,7 +426,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 						   ,
 						   [&](const std::string& new_name) // on_rename
 						   {
-							   const auto asset_dir = fs::path(relative).remove_filename();
+							   const auto asset_dir = fs::path(relative).make_preferred().remove_filename();
 							   const auto new_relative =
 								   (asset_dir / new_name).generic_string() + file.extension;
 							   am.rename_asset<asset_t>(relative, new_relative);
@@ -476,7 +478,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 						   },
 						   [&](const std::string& new_name) // on_rename
 						   {
-							   const auto asset_dir = fs::path(relative).remove_filename();
+							   const auto asset_dir = fs::path(relative).make_preferred().remove_filename();
 							   const auto new_relative =
 								   (asset_dir / new_name).generic_string() + file.extension;
 							   am.rename_asset<asset_t>(relative, new_relative);
@@ -523,7 +525,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 				auto dir = opened_folder_shared.get();
 				if(dir)
 				{
-					fs::path parent_dir = dir->relative_path;
+					fs::path parent_dir = fs::path(dir->relative_path).make_preferred();
 					std::string name =
 						string_utils::format("New Material (%s)", string_utils::random_string(16).c_str());
 					std::string key = (parent_dir / (name + extensions::material)).generic_string();
@@ -585,8 +587,7 @@ void assets_dock::render(const ImVec2&)
 			fs::path opened_dir = opened_folder_shared->absolute_path;
 			for(auto& path : paths)
 			{
-				fs::path p = path;
-				fs::path ext = p.extension().string();
+				fs::path p = fs::path(path).make_preferred();
 				fs::path filename = p.filename();
 
 				auto task = ts.push_on_worker_thread(
@@ -651,7 +652,7 @@ void assets_dock::render(const ImVec2&)
 					auto entity = dragged.get_value<runtime::entity>();
 					if(entity)
 						ecs::utils::save_entity_to_file(
-							dir->absolute_path / fs::path(entity.to_string() + extensions::prefab), entity);
+							dir->absolute_path / fs::path(entity.to_string() + extensions::prefab).make_preferred(), entity);
 					es.drop();
 				}
 			}

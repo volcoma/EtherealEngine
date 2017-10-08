@@ -580,8 +580,17 @@ void app::draw_start_page(render_window& window)
 {
 	auto& pm = core::get_subsystem<editor::project_manager>();
 
-	auto on_open_project = [&](const std::string& path) {
+    auto on_create_project = [&](const std::string& p) {
 		auto& rend = core::get_subsystem<runtime::renderer>();
+        auto path = fs::path(p).make_preferred();
+		pm.create_project(path);
+		window.maximize();
+		rend.show_all_secondary_windows();
+		_show_start_page = false;
+	};
+	auto on_open_project = [&](const std::string& p) {
+		auto& rend = core::get_subsystem<runtime::renderer>();
+        auto path = fs::path(p).make_preferred();
 		pm.open_project(path);
 		window.maximize();
 		rend.show_all_secondary_windows();
@@ -625,7 +634,7 @@ void app::draw_start_page(render_window& window)
 			std::string path;
 			if(pick_folder_dialog("", path))
 			{
-				on_open_project(path);
+				on_create_project(path);
 			}
 		}
 

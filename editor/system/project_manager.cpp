@@ -30,7 +30,7 @@ void watch_assets(const fs::path& protocol, const std::string& wildcard, bool re
 	auto& ts = core::get_subsystem<core::task_system>();
 
 	const fs::path dir = fs::resolve_protocol(protocol);
-	fs::path watch_dir = dir / wildcard;
+	fs::path watch_dir = (dir / wildcard).make_preferred();
 
 	fs::watcher::watch(watch_dir, false, true, [&am, &ts, protocol, reload_async, force_initial_recompile](
 												   const std::vector<fs::watcher::entry>& entries,
@@ -240,8 +240,7 @@ void asset_file::populate(const fs::path& abs, const std::string& n, const std::
 	extension = ext;
 	root_path = r;
 
-	fs::path a = absolute;
-	relative = string_utils::replace(a.generic_string(), root_path.generic_string(), "app:/data");
+	relative = string_utils::replace(absolute.generic_string(), root_path.generic_string(), "app:/data");
 }
 
 asset_directory::asset_directory(asset_directory* p, const fs::path& abs, const std::string& n,

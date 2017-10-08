@@ -23,7 +23,7 @@ inline void rename_asset_file(const std::string& key, const std::string& new_key
 template <typename T>
 inline void delete_asset_file(const std::string& key)
 {
-	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
+	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string()).make_preferred();
 	fs::error_code err;
 	fs::remove(absolute_key, err);
 }
