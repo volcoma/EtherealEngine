@@ -31,8 +31,8 @@ It is written in a cross-platform manner using c++14.
 Compilers      | Windows | Linux
 ---------------| --------|--------
 MSVC(2015 +)   | yes     |
-MinGW          | yes     |
-GCC(5.4 +)     |         | yes
+MinGW(5.3 +)   | yes     |
+GCC(5.0 +)     |         | yes
 clang(3.8 +)   |         | yes
 
 ## ASSETS
