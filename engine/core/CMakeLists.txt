@@ -1,5 +1,6 @@
 #file(GLOB_RECURSE libsrc *.h *.cpp *.hpp *.c *.cc)
 
+add_subdirectory(cmd_line)
 add_subdirectory(config)
 add_subdirectory(console)
 add_subdirectory(filesystem)
@@ -17,6 +18,7 @@ add_subdirectory(string_utils)
 
 add_library (core core.cpp)
 
+target_link_libraries(core PUBLIC cmd_line)
 target_link_libraries(core PUBLIC config)
 target_link_libraries(core PUBLIC console)
 target_link_libraries(core PUBLIC filesystem)
