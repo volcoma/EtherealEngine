@@ -552,7 +552,7 @@ public:
 			typedef T type;
 		};
 
-		void each(typename identity<std::function<void(entity entity, Components&...)>>::type f)
+		void for_each(typename identity<std::function<void(entity entity, Components&...)>>::type f)
 		{
 			for(auto it : *this)
 				f(it, *(it.template get_component<Components>().lock().get())...);
@@ -803,9 +803,9 @@ public:
 	};
 
 	template <typename... Components>
-	void each(typename identity<std::function<void(entity entity, Components&...)>>::type f)
+	void for_each(typename identity<std::function<void(entity entity, Components&...)>>::type f)
 	{
-		return entities_with_components<Components...>().each(f);
+		return entities_with_components<Components...>().for_each(f);
 	}
 
 	/**

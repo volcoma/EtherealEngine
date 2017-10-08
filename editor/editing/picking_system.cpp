@@ -70,7 +70,7 @@ void picking_system::frame_render(std::chrono::duration<float>)
 
 		pass.set_view_proj(pick_view, pick_proj);
 
-		ecs.each<transform_component, model_component>(
+		ecs.for_each<transform_component, model_component>(
 			[this, &pass, &camera](runtime::entity e, transform_component& transform_comp_ref,
 								   model_component& model_comp_ref) {
 				auto& model = model_comp_ref.get_model();

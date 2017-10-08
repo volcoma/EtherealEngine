@@ -17,7 +17,7 @@
 namespace runtime
 {
 
-void app::setup()
+void app::setup(cmd_line::options_parser&)
 {
 	auto logging_container = logging::get_mutable_logging_container();
 	logging_container->add_sink(std::make_shared<logging::sinks::platform_sink_mt>());
@@ -30,9 +30,10 @@ void app::setup()
 	gfx::set_info_logger([](const std::string& msg) { APPLOG_INFO(msg); });
 	gfx::set_warning_logger([](const std::string& msg) { APPLOG_WARNING(msg); });
 	gfx::set_error_logger([](const std::string& msg) { APPLOG_ERROR(msg); });
+    
 }
 
-void app::start()
+void app::start(cmd_line::options_parser&)
 {
 	core::add_subsystem<core::simulation>();
 	core::add_subsystem<core::task_system>();
@@ -120,18 +121,21 @@ void app::run_one_frame()
 	on_frame_end(dt);
 }
 
-int app::run()
+int app::run(int argc, char* argv[])
 {
 	core::details::initialize();
-
-	setup();
+    
+    cmd_line::options_parser parser("App");
+    
+	setup(parser);
 	if(_exitcode != 0)
 	{
 		core::details::dispose();
 		return _exitcode;
 	}
-
-	start();
+    parser.help();
+    parser.parse(argc, argv);
+	start(parser);
 	if(_exitcode != 0)
 	{
 		core::details::dispose();

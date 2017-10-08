@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/system/subsystem.h"
+#include "core/cmd_line/args.h"
 
 namespace runtime
 {
@@ -15,14 +16,14 @@ struct app
 	/// </summary>
 	//-----------------------------------------------------------------------------
 
-	virtual void setup();
+	virtual void setup(cmd_line::options_parser& parser);
 	//-----------------------------------------------------------------------------
 	//  Name : start (virtual )
 	/// <summary>
 	///  setup after engine initialization and before running the main loop
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void start();
+	virtual void start(cmd_line::options_parser& parser);
 
 	//-----------------------------------------------------------------------------
 	//  Name : stop (virtual )
@@ -41,7 +42,7 @@ struct app
 	/// application exit code.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	int run();
+	int run(int argc, char* argv[]);
 
 	//-----------------------------------------------------------------------------
 	//  Name : quit_with_error ()

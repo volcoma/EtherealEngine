@@ -65,7 +65,7 @@ get_transforms_for_bones(const std::vector<runtime::entity>& bone_entities)
 void bone_system::frame_update(std::chrono::duration<float> dt)
 {
 	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
-	ecs.each<model_component>([this, &ecs](runtime::entity e, model_component& model_comp) {
+	ecs.for_each<model_component>([this, &ecs](runtime::entity e, model_component& model_comp) {
 
 		const auto& model = model_comp.get_model();
 		auto mesh = model.get_lod(0);

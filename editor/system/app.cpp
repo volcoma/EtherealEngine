@@ -404,23 +404,26 @@ void app::draw_toolbar()
 	}
 }
 
-void app::setup()
+
+//-----------------------------------------------------------------------------
+
+void app::setup(cmd_line::options_parser& parser)
 {
-	runtime::app::setup();
+	runtime::app::setup(parser);
 
 	runtime::on_frame_end.connect(this, &editor::app::draw_docks);
 }
 
-void app::start()
+void app::start(cmd_line::options_parser& parser)
 {
-	runtime::app::start();
+	runtime::app::start(parser);
 
 	core::add_subsystem<gui_system>();
 	auto& docking = core::add_subsystem<docking_system>();
 	core::add_subsystem<editing_system>();
 	core::add_subsystem<picking_system>();
 	core::add_subsystem<debugdraw_system>();
-	auto& pm = core::add_subsystem<project_manager>();
+	core::add_subsystem<project_manager>();
 
 	auto& rend = core::get_subsystem<runtime::renderer>();
 	auto& main_window = rend.get_main_window();

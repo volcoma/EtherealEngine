@@ -17,9 +17,9 @@ class app : public runtime::app
 public:
     virtual ~app() = default;
     
-    virtual void setup();
+    virtual void setup(cmd_line::options_parser& parser);
 
-	virtual void start();
+	virtual void start(cmd_line::options_parser& parser);
     
     virtual void stop();
     

@@ -372,9 +372,9 @@ public:
 		using handler = base_manager<typename std::decay<T>::type>;
 		using functor_type = typename std::decay<T>::type;
 
-		if(handler::not_empty_function(f))
+		if(handler::not_empty_function(std::forward<T>(f)))
 		{
-			handler::init(functor_, std::forward<T>(f));
+			handler::init(functor_, std::move(f));
 
 			constexpr static const manager man{&handler::get_pointer, &handler::clone, &handler::compare,
 											   &handler::destroy};

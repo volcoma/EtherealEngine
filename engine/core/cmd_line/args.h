@@ -1,739 +1,1339 @@
-#ifndef args_hpp_included
-#define args_hpp_included
-//
-//  **args** is a fast, small, simple, powerful, single-header library for parsing command line arguments in C++
-//  using more-or-less POSIX parsing rules.
-//
-//  To use:
-//
-//  	1.	Include the header:
-//
-//  			#include "args.hpp"
-//
-//  		There's no .lib or .so or .cpp or anything else to muck around with. It's all here.
-//
-//  	2.	Create a parser object and give it your program name and description (for the "usage" output):
-//
-//  			args::parser parser( "<my-prog>", "<description>" );
-//
-//  	3.	Add your arguments, templated on the desired type. Example:
-//
-//  			const auto& myArgument = parser.add< float >( ... );
-//
-//  	4.	In the add() function you'll indicate the long-form ("--example") and short-form ("-e") switches for this 
-//  		argument. You can nullify one or the other if you want.
-//  		You should specify a description (the second argument).
-//  		You may also specify whether the argument is optional or required, and what the default value is (the value
-//  		to be used if the user doesn't supply it):
-//
-//  			... parser.add< float >(
-//  					"<long-form>",			// Use "example" if you want the user to say "--example", 
-//  											// or leave blank for no long-form.
-//  					"<description>",		// For "usage" output.
-//  					'<short-form>', 		// A character. Use '\0' for no short-form.
-//  					[args::optional|args::required], // To indicate whether it's required.
-//  					[default-value] 		// The default value. Defaults to 0 or its equivalent for this type.
-//  				);
-//
-//  	5.	Let 'er rip:
-//
-//  			parser.parse( argc, argv );
-//
-//  		Use try...catch... if you want to catch problems in a healthy way.
-//
-//  	6.	Access argument values:
-//
-//  			myArgument.value()		// Returns a float if we templated on <float>.
-//
-//  		try...catch... helps here too because users may give invalid strings for non-string types.
-//
-//  	7.	Call parser.show_usage() if you want to print help text.
-//
-//  	8.	Do other stuff. See "Example usage" below for "unlabeled" arguments, the "--" marker, and such.
-//
-//  Example usage:
-//
-//  ------------------------------------------------------------------------------------------------------------------
-//
-//  #include "args.hpp"
-//
-//  int main( int argc, const char* argv[] )
-//  {
-//  	args::parser parser( "argssample", "Parses a mix of many argument types and combinations." );
-//  	
-//  	const auto& useAscii = parser.add< bool >( "ascii",
-//  											  "Use ASCII instead of that UNICORN thing or whatever it is.",
-//  											  'a',
-//  											  args::optional,
-//  											  true /* defaults to true */ );
-//  	const auto& runFast = parser.add< bool >( "fast", "Should this program run fast?", 'f' );
-//  	const auto& doCalibrate = parser.add< bool >( "calibrate", "Calibrate sensors." /* no short-form */ );
-//  	const auto& kindaOdd = parser.add< bool >( "", "No long-form argument for this one.", 'o' );
-//  	const auto& mass = parser.add< float >( "mass", "The mass of the thing.", 'm', args::optional, 3.141f );
-//  	const auto& mana = parser.add< float >( "mana", "The mana of the thing.", 'M' );
-//  	const auto& height = parser.add< int >( "height", "The height of the thing.", 'h', args::required );
-//  	const auto& name = parser.add< std::string >( "name", "The name of the wind.", 's', args::required );
-//  	
-//  	// Unleash the hounds.
-//  	//
-//  	try
-//  	{
-//  		// Example command line:
-//  		//	argssample --height=16.25 -fo unlabeled --name="Absolom, Absolom" -h=8 -- --weirdly-unlabeled
-//  		parser.parse( argc, argv );
-//  	}
-//  	catch( const std::exception& e )
-//  	{
-//  		std::cerr << "Error parsing arguments: " << e.what() << std::endl;
-//  		parser.show_usage( std::cerr );
-//  		exit( 1 );
-//  	}
-//
-//  	// Get argument values.
-//  	//
-//  	try
-//  	{
-//  		std::cout << std::boolalpha;	// So that bool values come through as "true/false" rather than "1/0".
-//  		std::cout << "useAscii=" << useAscii.value() << std::endl;
-//  		std::cout << "runFast=" << runFast.value() << std::endl;
-//  		std::cout << "doCalibrate=" << doCalibrate.value() << std::endl;
-//  		std::cout << "kindaOdd=" << kindaOdd.value() << std::endl;
-//  		std::cout << "mass=" << mass.value() << std::endl;
-//  		std::cout << "mana=" << mana.value() << std::endl;
-//  		std::cout << "height=" << height.value() << std::endl;
-//  		std::cout << "name=" << name.value() << std::endl;
-//  		
-//  		// What about unlabeled arguments?
-//  		//
-//  		// Notice that "--weirdly-unlabeled" looks like a switch but comes through nicely as unlabeled.
-//  		// That's because the example command line indicated "--" before it, which ends switch parsing
-//  		// (everything else becomes unlabeled).
-//  		//
-//  		std::cout << "Unlabeled:\n";
-//  		parser.each_unlabeled_argument( []( const std::string& arg ) { std::cout << "\t" << arg << std::endl; } );
-//  	}
-//  	catch( const std::exception& e )
-//  	{
-//  		std::cerr << "Error reading argument values: " << e.what() << std::endl;
-//  	}
-//  	
-//  	return 0;
-//  }
-//
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#ifndef ARGS_HPP
+#define ARGS_HPP
 
-#include <algorithm>
-#include <cassert>
 #include <cctype>
-#include <iomanip>
+#include <cstring>
+#include <exception>
 #include <iostream>
+#include <map>
 #include <memory>
+#include <regex>
 #include <sstream>
+#include <string>
+#include <unordered_set>
 #include <vector>
 
-namespace args
+#ifdef _MSC_VER
+#ifndef __cpp_rtti
+#define __cpp_rtti _CPPRTTI
+#endif // !__cpp_rtti
+#endif
+
+#define CMD_LINE_HAS_RTTI __cpp_rtti
+
+namespace cmd_line
 {
-	// Utility functions and macros.
-	//
-	template< typename Function >
-	std::string collect_string( Function&& fn )
+template <typename T>
+T to_local_string(T&& t)
+{
+	return t;
+}
+
+inline size_t string_length(const std::string& s)
+{
+	return s.length();
+}
+
+inline std::string& string_append(std::string& s, std::string a)
+{
+	return s.append(std::move(a));
+}
+
+inline std::string& string_append(std::string& s, size_t n, char c)
+{
+	return s.append(n, c);
+}
+
+template <typename Iterator>
+std::string& string_append(std::string& s, Iterator begin, Iterator end)
+{
+	return s.append(begin, end);
+}
+
+template <typename T>
+std::string to_utf8_string(T&& t)
+{
+	return std::forward<T>(t);
+}
+
+inline bool empty(const std::string& s)
+{
+	return s.empty();
+}
+}
+
+namespace cmd_line
+{
+namespace
+{
+#ifdef _WIN32
+const std::string LQUOTE("\'");
+const std::string RQUOTE("\'");
+#else
+const std::string LQUOTE("‘");
+const std::string RQUOTE("’");
+#endif
+}
+
+class abstract_value : public std::enable_shared_from_this<abstract_value>
+{
+public:
+	virtual ~abstract_value() = default;
+	virtual void parse(const std::string& text) const = 0;
+
+	virtual void parse() const = 0;
+
+	virtual bool has_arg() const = 0;
+
+	virtual bool has_default() const = 0;
+
+	virtual bool is_container() const = 0;
+
+	virtual bool has_implicit() const = 0;
+
+	virtual std::string get_default_value() const = 0;
+
+	virtual std::string get_implicit_value() const = 0;
+
+	virtual std::shared_ptr<abstract_value> default_value(const std::string& value) = 0;
+
+	virtual std::shared_ptr<abstract_value> implicit_value(const std::string& value) = 0;
+};
+
+class option_exception : public std::exception
+{
+public:
+	option_exception(const std::string& message)
+		: m_message(message)
 	{
-		return fn();
 	}
-#define args_collect_string( expression )	\
-	args::collect_string( [&]() { std::ostringstream stream; stream << expression; return stream.str(); } )
-	
-#define ARGS_EXCEPTION( exception_class ) \
-	struct exception_class : public std::runtime_error { using runtime_error::runtime_error;  };
-	
-	enum requirement
+
+	virtual const char* what() const noexcept
 	{
-		optional,
-		required
-	};
-	
-	template< typename ValueT >
-	struct type_traits
+		return m_message.c_str();
+	}
+
+private:
+	std::string m_message;
+};
+
+class option_spec_exception : public option_exception
+{
+public:
+	option_spec_exception(const std::string& message)
+		: option_exception(message)
 	{
-		static constexpr bool always_requires_value() { return false; }
-		static constexpr const char* name();
-	};
-	
-	// argument classes.
-	//
-	class argument_abstract
+	}
+};
+
+class option_parse_exception : public option_exception
+{
+public:
+	option_parse_exception(const std::string& message)
+		: option_exception(message)
 	{
-	public:
-		
-		ARGS_EXCEPTION( MissingValue )
-		ARGS_EXCEPTION( Nameless )
-		
-		std::string best_name() const
+	}
+};
+
+class option_exists_error : public option_spec_exception
+{
+public:
+	option_exists_error(const std::string& option)
+		: option_spec_exception(u8"Option " + LQUOTE + option + RQUOTE + u8" already exists")
+	{
+	}
+};
+
+class invalid_option_format_error : public option_spec_exception
+{
+public:
+	invalid_option_format_error(const std::string& format)
+		: option_spec_exception(u8"Invalid option format " + LQUOTE + format + RQUOTE)
+	{
+	}
+};
+
+class option_not_exists_exception : public option_parse_exception
+{
+public:
+	option_not_exists_exception(const std::string& option)
+		: option_parse_exception(u8"Option " + LQUOTE + option + RQUOTE + u8" does not exist")
+	{
+	}
+};
+
+class missing_argument_exception : public option_parse_exception
+{
+public:
+	missing_argument_exception(const std::string& option)
+		: option_parse_exception(u8"Option " + LQUOTE + option + RQUOTE + u8" is missing an argument")
+	{
+	}
+};
+
+class option_requires_argument_exception : public option_parse_exception
+{
+public:
+	option_requires_argument_exception(const std::string& option)
+		: option_parse_exception(u8"Option " + LQUOTE + option + RQUOTE + u8" requires an argument")
+	{
+	}
+};
+
+class option_not_has_argument_exception : public option_parse_exception
+{
+public:
+	option_not_has_argument_exception(const std::string& option, const std::string& arg)
+		: option_parse_exception(u8"Option " + LQUOTE + option + RQUOTE +
+								 u8" does not take an argument, but argument" + LQUOTE + arg + RQUOTE +
+								 " given")
+	{
+	}
+};
+
+class option_not_present_exception : public option_parse_exception
+{
+public:
+	option_not_present_exception(const std::string& option)
+		: option_parse_exception(u8"Option " + LQUOTE + option + RQUOTE + u8" not present")
+	{
+	}
+};
+
+class argument_incorrect_type : public option_parse_exception
+{
+public:
+	argument_incorrect_type(const std::string& arg)
+		: option_parse_exception(u8"Argument " + LQUOTE + arg + RQUOTE + u8" failed to parse")
+	{
+	}
+};
+
+class option_required_exception : public option_parse_exception
+{
+public:
+	option_required_exception(const std::string& option)
+		: option_parse_exception(u8"Option " + LQUOTE + option + RQUOTE + u8" is required but not present")
+	{
+	}
+};
+
+namespace values
+{
+namespace
+{
+std::basic_regex<char> integer_pattern("(-)?(0x)?([1-9a-zA-Z][0-9a-zA-Z]*)|(0)");
+}
+
+namespace detail
+{
+template <typename T, bool B>
+struct signed_check;
+
+template <typename T>
+struct signed_check<T, true>
+{
+	template <typename U>
+	void operator()(bool negative, U u, const std::string& text)
+	{
+		if(negative)
 		{
-			if( _long_form.empty() )
+			if(u > static_cast<U>(-std::numeric_limits<T>::min()))
 			{
-				return std::string{ _short_form };
+				throw argument_incorrect_type(text);
+			}
+		}
+		else
+		{
+			if(u > static_cast<U>(std::numeric_limits<T>::max()))
+			{
+				throw argument_incorrect_type(text);
+			}
+		}
+	}
+};
+
+template <typename T>
+struct signed_check<T, false>
+{
+	template <typename U>
+	void operator()(bool, U, const std::string&)
+	{
+	}
+};
+
+template <typename T, typename U>
+void check_signed_range(bool negative, U value, const std::string& text)
+{
+	signed_check<T, std::numeric_limits<T>::is_signed>()(negative, value, text);
+}
+}
+
+template <typename R, typename T>
+R checked_negate(T&& t, const std::string&, std::true_type)
+{
+	// if we got to here, then `t` is a positive number that fits into
+	// `R`. So to avoid MSVC C4146, we first cast it to `R`.
+	return -static_cast<R>(t);
+}
+
+template <typename R, typename T>
+T checked_negate(T&&, const std::string& text, std::false_type)
+{
+	throw argument_incorrect_type(text);
+}
+
+template <typename T>
+void integer_parser(const std::string& text, T& value)
+{
+	std::smatch match;
+	std::regex_match(text, match, integer_pattern);
+
+	if(match.length() == 0)
+	{
+		throw argument_incorrect_type(text);
+	}
+
+	if(match.length(4) > 0)
+	{
+		value = 0;
+		return;
+	}
+
+	using US = typename std::make_unsigned<T>::type;
+
+	constexpr auto umax = std::numeric_limits<US>::max();
+	constexpr bool is_signed = std::numeric_limits<T>::is_signed;
+	const bool negative = match.length(1) > 0;
+	const auto base = match.length(2) > 0 ? 16 : 10;
+
+	auto value_match = match[3];
+
+	US result = 0;
+
+	for(auto iter = value_match.first; iter != value_match.second; ++iter)
+	{
+		int digit = 0;
+
+		if(*iter >= '0' && *iter <= '9')
+		{
+			digit = *iter - '0';
+		}
+		else if(*iter >= 'a' && *iter <= 'f')
+		{
+			digit = *iter - 'a' + 10;
+		}
+		else if(*iter >= 'A' && *iter <= 'F')
+		{
+			digit = *iter - 'A' + 10;
+		}
+
+		if(umax - digit < result * base)
+		{
+			throw argument_incorrect_type(text);
+		}
+
+		result = result * base + digit;
+	}
+
+	detail::check_signed_range<T>(negative, result, text);
+
+	if(negative)
+	{
+		value = checked_negate<T>(result, text, std::integral_constant<bool, is_signed>());
+		// if (!is_signed)
+		//{
+		//  throw argument_incorrect_type(text);
+		//}
+		// value = -result;
+	}
+	else
+	{
+		value = static_cast<T>(result);
+	}
+}
+
+template <typename T>
+void stringstream_parser(const std::string& text, T& value)
+{
+	std::stringstream in(text);
+	in >> value;
+	if(!in)
+	{
+		throw argument_incorrect_type(text);
+	}
+}
+
+inline void parse_value(const std::string& text, uint8_t& value)
+{
+	integer_parser(text, value);
+}
+
+inline void parse_value(const std::string& text, int8_t& value)
+{
+	integer_parser(text, value);
+}
+
+inline void parse_value(const std::string& text, uint16_t& value)
+{
+	integer_parser(text, value);
+}
+
+inline void parse_value(const std::string& text, int16_t& value)
+{
+	integer_parser(text, value);
+}
+
+inline void parse_value(const std::string& text, uint32_t& value)
+{
+	integer_parser(text, value);
+}
+
+inline void parse_value(const std::string& text, int32_t& value)
+{
+	integer_parser(text, value);
+}
+
+inline void parse_value(const std::string& text, uint64_t& value)
+{
+	integer_parser(text, value);
+}
+
+inline void parse_value(const std::string& text, int64_t& value)
+{
+	integer_parser(text, value);
+}
+
+inline void parse_value(const std::string& /*text*/, bool& value)
+{
+	// TODO recognise on, off, yes, no, enable, disable
+	// so that we can write --long=yes explicitly
+	value = true;
+}
+
+inline void parse_value(const std::string& text, std::string& value)
+{
+	value = text;
+}
+
+// The fallback parser. It uses the stringstream parser to parse all types
+// that have not been overloaded explicitly.  It has to be placed in the
+// source code before all other more specialized templates.
+template <typename T>
+void parse_value(const std::string& text, T& value)
+{
+	stringstream_parser(text, value);
+}
+
+template <typename T>
+void parse_value(const std::string& text, std::vector<T>& value)
+{
+	T v;
+	parse_value(text, v);
+	value.push_back(v);
+}
+
+template <typename T>
+struct value_has_arg
+{
+	static constexpr bool value = true;
+};
+
+template <>
+struct value_has_arg<bool>
+{
+	static constexpr bool value = false;
+};
+
+template <typename T>
+struct type_is_container
+{
+	static constexpr bool value = false;
+};
+
+template <typename T>
+struct type_is_container<std::vector<T>>
+{
+	static constexpr bool value = true;
+};
+
+template <typename T>
+class standard_value : public abstract_value
+{
+public:
+	standard_value()
+		: m_result(std::make_shared<T>())
+		, m_store(m_result.get())
+	{
+	}
+
+	standard_value(T* t)
+		: m_store(t)
+	{
+	}
+
+	void parse(const std::string& text) const
+	{
+		parse_value(text, *m_store);
+	}
+
+	bool is_container() const
+	{
+		return type_is_container<T>::value;
+	}
+
+	void parse() const
+	{
+		parse_value(m_default_value, *m_store);
+	}
+
+	bool has_arg() const
+	{
+		return value_has_arg<T>::value;
+	}
+
+	bool has_default() const
+	{
+		return m_default;
+	}
+
+	bool has_implicit() const
+	{
+		return m_implicit;
+	}
+
+	virtual std::shared_ptr<abstract_value> default_value(const std::string& value)
+	{
+		m_default = true;
+		m_default_value = value;
+		return shared_from_this();
+	}
+
+	virtual std::shared_ptr<abstract_value> implicit_value(const std::string& value)
+	{
+		m_implicit = true;
+		m_implicit_value = value;
+		return shared_from_this();
+	}
+
+	std::string get_default_value() const
+	{
+		return m_default_value;
+	}
+
+	std::string get_implicit_value() const
+	{
+		return m_implicit_value;
+	}
+
+	const T& get() const
+	{
+		if(m_store == nullptr)
+		{
+			return *m_result;
+		}
+		else
+		{
+			return *m_store;
+		}
+	}
+
+protected:
+	std::shared_ptr<T> m_result;
+	T* m_store;
+	bool m_default = false;
+	std::string m_default_value;
+	bool m_implicit = false;
+	std::string m_implicit_value;
+};
+}
+
+template <typename T>
+std::shared_ptr<abstract_value> value()
+{
+	return std::make_shared<values::standard_value<T>>();
+}
+
+template <typename T>
+std::shared_ptr<abstract_value> value(T& t)
+{
+	return std::make_shared<values::standard_value<T>>(&t);
+}
+
+class option_adder;
+
+class option_details
+{
+public:
+	option_details(const std::string& desc, std::shared_ptr<const abstract_value> val)
+		: m_desc(desc)
+		, m_value(val)
+		, m_count(0)
+	{
+	}
+
+	const std::string& description() const
+	{
+		return m_desc;
+	}
+
+	bool has_arg() const
+	{
+		return m_value->has_arg();
+	}
+
+	void parse(const std::string& text)
+	{
+		m_value->parse(text);
+		++m_count;
+	}
+
+	void parse_default()
+	{
+		m_value->parse();
+	}
+
+	int count() const
+	{
+		return m_count;
+	}
+
+	const abstract_value& value() const
+	{
+		return *m_value;
+	}
+
+	template <typename T>
+	const T& as() const
+	{
+#ifdef CMD_LINE_HAS_RTTI
+		return dynamic_cast<const values::standard_value<T>&>(*m_value).get();
+#else
+		return static_cast<const values::standard_value<T>&>(*m_value).get();
+#endif
+	}
+
+private:
+	std::string m_desc;
+	std::shared_ptr<const abstract_value> m_value;
+	int m_count;
+};
+
+struct help_option_details
+{
+	std::string s;
+	std::string l;
+	std::string desc;
+	bool has_arg;
+	bool has_default;
+	std::string default_value;
+	bool has_implicit;
+	std::string implicit_value;
+	std::string arg_help;
+	bool is_container;
+};
+
+struct help_group_details
+{
+	std::string name;
+	std::string description;
+	std::vector<help_option_details> options;
+};
+
+class options_parser
+{
+public:
+	options_parser(std::string program, std::string help_string = "")
+		: m_program(std::move(program))
+		, m_help_string(to_local_string(std::move(help_string)))
+		, m_positional_help("positional parameters")
+		, m_next_positional(m_positional.end())
+	{
+	}
+
+	inline options_parser& positional_help(std::string help_text)
+	{
+		m_positional_help = std::move(help_text);
+		return *this;
+	}
+
+	inline void parse(int& argc, char**& argv);
+
+	inline option_adder add_options(std::string group = "");
+
+	inline void add_option(const std::string& group, const std::string& s, const std::string& l,
+						   std::string desc, std::shared_ptr<const abstract_value> value,
+						   std::string arg_help);
+
+	int count(const std::string& o) const
+	{
+		auto iter = m_options.find(o);
+		if(iter == m_options.end())
+		{
+			return 0;
+		}
+
+		return iter->second->count();
+	}
+
+	const option_details& operator[](const std::string& option) const
+	{
+		auto iter = m_options.find(option);
+
+		if(iter == m_options.end())
+		{
+			throw option_not_present_exception(option);
+		}
+
+		return *iter->second;
+	}
+
+	// parse positional arguments into the given option
+	inline void parse_positional(std::string option);
+
+	inline void parse_positional(std::vector<std::string> options);
+
+	inline std::string help(const std::vector<std::string>& groups = {""}) const;
+
+	inline const std::vector<std::string> groups() const;
+
+	inline const help_group_details& group_help(const std::string& group) const;
+
+private:
+	inline void add_one_option(const std::string& option, std::shared_ptr<option_details> details);
+
+	inline bool consume_positional(std::string a);
+
+	inline void add_to_option(const std::string& option, const std::string& arg);
+
+	inline void parse_option(std::shared_ptr<option_details> value, const std::string& name,
+							 const std::string& arg = "");
+
+	inline void checked_parse_arg(int argc, char* argv[], int& current, std::shared_ptr<option_details> value,
+								  const std::string& name);
+
+	inline std::string help_one_group(const std::string& group) const;
+
+	inline void generate_group_help(std::string& result, const std::vector<std::string>& groups) const;
+
+	inline void generate_all_groups_help(std::string& result) const;
+
+	std::string m_program;
+	std::string m_help_string;
+	std::string m_positional_help;
+
+	std::map<std::string, std::shared_ptr<option_details>> m_options;
+	std::vector<std::string> m_positional;
+	std::vector<std::string>::iterator m_next_positional;
+	std::unordered_set<std::string> m_positional_set;
+
+	// mapping from groups to help options
+	std::map<std::string, help_group_details> m_help;
+};
+
+class option_adder
+{
+public:
+	option_adder(options_parser& options, std::string group)
+		: m_options(options)
+		, m_group(std::move(group))
+	{
+	}
+
+	inline option_adder& operator()(const std::string& opts, const std::string& desc,
+									std::shared_ptr<const abstract_value> value = ::cmd_line::value<bool>(),
+									std::string arg_help = "");
+
+private:
+	options_parser& m_options;
+	std::string m_group;
+};
+
+// A helper function for setting required arguments
+inline void check_required(const options_parser& options, const std::vector<std::string>& required)
+{
+	for(auto& r : required)
+	{
+		if(options.count(r) == 0)
+		{
+			throw option_required_exception(r);
+		}
+	}
+}
+
+namespace
+{
+constexpr int OPTION_LONGEST = 30;
+constexpr int OPTION_DESC_GAP = 2;
+
+std::basic_regex<char> option_matcher("--([[:alnum:]][-_[:alnum:]]+)(=(.*))?|-([[:alnum:]]+)");
+
+std::basic_regex<char> option_specifier("(([[:alnum:]]),)?[ ]*([[:alnum:]][-_[:alnum:]]*)?");
+
+std::string format_option(const help_option_details& o)
+{
+	auto& s = o.s;
+	auto& l = o.l;
+
+	std::string result = "  ";
+
+	if(s.size() > 0)
+	{
+		result += "-" + to_local_string(s) + ",";
+	}
+	else
+	{
+		result += "   ";
+	}
+
+	if(l.size() > 0)
+	{
+		result += " --" + to_local_string(l);
+	}
+
+	if(o.has_arg)
+	{
+		auto arg = o.arg_help.size() > 0 ? to_local_string(o.arg_help) : "arg";
+
+		if(o.has_implicit)
+		{
+			result += " [=" + arg + "(=" + to_local_string(o.implicit_value) + ")]";
+		}
+		else
+		{
+			result += " " + arg;
+		}
+	}
+
+	return result;
+}
+
+std::string format_description(const help_option_details& o, size_t start, size_t width)
+{
+	auto desc = o.desc;
+
+	if(o.has_default)
+	{
+		desc += to_local_string(" (default: " + o.default_value + ")");
+	}
+
+	std::string result;
+
+	auto current = std::begin(desc);
+	auto startLine = current;
+	auto lastSpace = current;
+
+	auto size = size_t{};
+
+	while(current != std::end(desc))
+	{
+		if(*current == ' ')
+		{
+			lastSpace = current;
+		}
+
+		if(size > width)
+		{
+			if(lastSpace == startLine)
+			{
+				string_append(result, startLine, current + 1);
+				string_append(result, "\n");
+				string_append(result, start, ' ');
+				startLine = current + 1;
+				lastSpace = startLine;
 			}
 			else
 			{
-				return _long_form;
+				string_append(result, startLine, lastSpace);
+				string_append(result, "\n");
+				string_append(result, start, ' ');
+				startLine = lastSpace + 1;
 			}
+			size = 0;
 		}
-		
-		bool assigned() const
+		else
 		{
-			return _assigned;
-		}
-		
-		const std::string& value_string() const
-		{
-			return _value;
-		}
-		
-		void clear_value()
-		{
-			_assigned = false;
-			_value.clear();
+			++size;
 		}
 
-		// FOR TESTING.
-		// Gets the string value of the argument as a result of its conversion to the
-		// templated value_t for that particular argument subclass.
-		//
-		virtual std::string converted_value_string() const = 0;
-		virtual bool has_default_value() const = 0;
-		
-	protected:
-		
-		bool _assigned;
-		
-		explicit argument_abstract( const std::string& longForm,
-								    const std::string& explanation,
-								    char letter,
-								    requirement required )
-		:	_assigned( false )
-		,	_long_form( longForm )
-		,	_explanation( explanation )
-		,	_short_form( letter )
-		,	_requirement( required )
-		{
-			assert( !_long_form.empty() || _short_form != '\0' );		// Gotta specify at least one.
-			assert( _long_form.empty() || _long_form[ 0 ] != '-' );	// Don't start your switch names with -.
-			assert( _short_form == '\0' || is_valid_short_form( _short_form ));	// Has to be valid or nothing.
-		}
-		
-		bool has_long_form( const std::string& longForm ) const
-		{
-			return !_long_form.empty() && _long_form == longForm;
-		}
-		
-		bool has_short_form( char shortForm ) const
-		{
-			return _short_form != '\0' && _short_form == shortForm;
-		}
+		++current;
+	}
 
-		bool required() const
-		{
-			return _requirement == requirement::required;
-		}
-		
-		virtual bool required_value() const = 0;
+	// append whatever is left
+	string_append(result, startLine, current);
 
-		void assign( const std::string& givenKey, std::string&& valueString )
-		{
-			_assigned = true;
-			
-			_value = std::move( valueString );
-			
-			if( _value.empty() && required_value() )
-			{
-				throw MissingValue{ args_collect_string( "Argument required a value but received none." ) };
-			}
-		}
-								
-		void print( std::ostream& out ) const
-		{
-			out << "    ";
-			
-			bool hasLetter = _short_form != '\0';
-			if( hasLetter )
-			{
-				out << "-" << _short_form;
-			}
-			
-			bool hasLong = !_long_form.empty();
-			
-			if( hasLetter && hasLong )
-			{
-				out << ", ";
-			}
-			
-			if( hasLong )
-			{
-				out << "--" << _long_form;
-			}
-			
-			if( required_value() )
-			{
-				out << "=<" << value_type_name() << ">";
-			}
-			
-			out << "\n\t\t";
-			
-			if( _requirement == requirement::required )
-			{
-				out << "[required] ";
-			}
-			
-			out << _explanation;
-		}
+	return result;
+}
+}
 
-		static bool is_valid_short_form( char c )
-		{
-			return std::isalpha( c );
-		}
-		
-		virtual std::string value_type_name() const = 0;
-		
-	private:
-		
-		std::string _long_form;
-		std::string _explanation;
-		char _short_form;
-		requirement _requirement;
-		
-		std::string _value;
-		
-		friend class parser;
-	};
-	
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	template< typename ValueType >
-	class argument : public argument_abstract
+option_adder options_parser::add_options(std::string group)
+{
+	return option_adder(*this, std::move(group));
+}
+
+option_adder& option_adder::operator()(const std::string& opts, const std::string& desc,
+									   std::shared_ptr<const abstract_value> value, std::string arg_help)
+{
+	std::match_results<const char*> result;
+	std::regex_match(opts.c_str(), result, option_specifier);
+
+	if(result.empty())
 	{
-	public:
-		typedef ValueType value_t;
-		
-		// Exception types.
-		//
-		ARGS_EXCEPTION( ValueConversionError )
+		throw invalid_option_format_error(opts);
+	}
 
-		operator value_t() const
-		{
-			value_t result = _default_value;
-			
-			if( _assigned )
-			{
-				std::istringstream stream( value_string() );
-				stream >> std::boolalpha >> result;
-				
-				if( stream.fail() )
-				{
-					throw ValueConversionError{
-						args_collect_string( "Could not convert value '" << value_string()
-						<< "' to the desired argument type." )};
-				}
-			}
-			
-			return result;
-		}
-		
-		value_t value() const { return operator value_t(); }
-		
-	private:
-		
-		value_t _default_value = value_t{};
+	const auto& short_match = result[2];
+	const auto& long_match = result[3];
 
-		explicit argument( const std::string& longForm,
-						   const std::string& explanation,
-						   char letter,
-						   requirement required,
-						   const value_t& defaultValue )
-		:	argument_abstract( longForm, explanation, letter, required )
-		,	_default_value( defaultValue )
-		{}
-		
-		virtual std::string value_type_name() const override
-		{
-			return type_traits< value_t >::name();
-		}
-		
-		virtual std::string converted_value_string() const override
-		{
-			std::ostringstream stream;
-			stream << std::boolalpha << value();
-			return stream.str();
-		}
-		
-		virtual bool has_default_value() const override
-		{
-			return value() == _default_value;
-		}
-		
-		virtual bool required_value() const override
-		{
-			return type_traits< value_t >::always_requires_value();
-		}
-
-		friend class parser;
-	};
-	
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		
-	class parser
+	if(!short_match.length() && !long_match.length())
 	{
-	public:
-		
-		// Exception classes.
-		//
-		ARGS_EXCEPTION( InvalidParameters )
-		ARGS_EXCEPTION( UnknownArgument )
-		ARGS_EXCEPTION( FoundDoubleHyphensLeadingNowhere )
-		ARGS_EXCEPTION( InvalidArgumentCharacter )
-		ARGS_EXCEPTION( MissingRequiredArguments )
-		
-		explicit parser( const std::string& programName, const std::string& programDescription )
-		:	_program( programName )
-		,	_description( programDescription )
-		{}
+		throw invalid_option_format_error(opts);
+	}
+	else if(long_match.length() == 1 && short_match.length())
+	{
+		throw invalid_option_format_error(opts);
+	}
 
-		template< typename ValueT >
-		argument< ValueT >& add( const std::string& longForm,
-								 const std::string& explanation,
-								 char letter = '\0',
-								 requirement required = requirement::optional,
-								 const ValueT& defaultValue = ValueT{} )
+	auto option_names = [](const std::sub_match<const char*>& short_,
+						   const std::sub_match<const char*>& long_) {
+		if(long_.length() == 1)
 		{
-			// Verify that no other argument has this longForm or letter.
-			//
-			assert( !has_long_form_argument( longForm ));
-			assert( !has_letter_argument( letter ));
-			
-			argument< ValueT >* arg = new argument< ValueT >{
-				longForm,
-				explanation,
-				letter,
-				required,
-				defaultValue };
-			
-			_args.emplace_back( arg );
-			
-			return *arg;
+			return std::make_tuple(long_.str(), short_.str());
 		}
-		
-		bool has_long_form_argument( const std::string& longForm ) const
+		else
 		{
-			return std::any_of( _args.begin(), _args.end(),
-						[&]( const std::unique_ptr< argument_abstract >& arg )
-						{
-							assert( arg );
-							return arg->has_long_form( longForm );
-						} );
+			return std::make_tuple(short_.str(), long_.str());
 		}
-		
-		bool has_letter_argument( char letter ) const
-		{
-			return std::any_of( _args.begin(), _args.end(),
-							   [&]( const std::unique_ptr< argument_abstract >& arg )
-							   {
-								   assert( arg );
-								   return arg->has_short_form( letter );
-							   } );
-		}
-		
-		void parse( const int argc, const char* argv[] )
-		{
-			if( argc == 0 || !argv )
-			{
-				throw InvalidParameters{ "Received no arguments." };
-			}
+	}(short_match, long_match);
 
-			// If there's no help argument, add one.
-			//
-			if( !has_long_form_argument( "help" ))
+	m_options.add_option(m_group, std::get<0>(option_names), std::get<1>(option_names), desc, value,
+						 std::move(arg_help));
+
+	return *this;
+}
+
+void options_parser::parse_option(std::shared_ptr<option_details> value, const std::string& /*name*/,
+								  const std::string& arg)
+{
+	value->parse(arg);
+}
+
+void options_parser::checked_parse_arg(int argc, char* argv[], int& current,
+									   std::shared_ptr<option_details> value, const std::string& name)
+{
+	if(current + 1 >= argc)
+	{
+		if(value->value().has_implicit())
+		{
+			parse_option(value, name, value->value().get_implicit_value());
+		}
+		else
+		{
+			throw missing_argument_exception(name);
+		}
+	}
+	else
+	{
+		if(argv[current + 1][0] == '-' && value->value().has_implicit())
+		{
+			parse_option(value, name, value->value().get_implicit_value());
+		}
+		else
+		{
+			parse_option(value, name, argv[current + 1]);
+			++current;
+		}
+	}
+}
+
+void options_parser::add_to_option(const std::string& option, const std::string& arg)
+{
+	auto iter = m_options.find(option);
+
+	if(iter == m_options.end())
+	{
+		throw option_not_exists_exception(option);
+	}
+
+	parse_option(iter->second, option, arg);
+}
+
+bool options_parser::consume_positional(std::string a)
+{
+	while(m_next_positional != m_positional.end())
+	{
+		auto iter = m_options.find(*m_next_positional);
+		if(iter != m_options.end())
+		{
+			if(!iter->second->value().is_container())
 			{
-				add< bool >( "help",
-							 "Prints this help message.",
-							 !has_letter_argument( 'h' ) ? 'h' : '\0' );
-			}
-			
-			auto iterHelpArg = std::find_if( _args.begin(), _args.end(), []( const std::unique_ptr< argument_abstract >& arg )
-										 {
-											 return arg->has_long_form( "help" );
-										 } );
-			assert( _args.end() != iterHelpArg );
-			
-			const argument< bool >& helpArg = *static_cast< const argument< bool >* >( iterHelpArg->get() );
-						
-			bool doneWithSwitches = false;		// When false, still looking for switches. When true, all arguments
-												// are considered "unlabeled."
-			
-			for( int i = 1; i < argc; ++i )
-			{
-				assert( argv[ i ] );
-				
-				const std::string arg{ argv[ i ] };
-				assert( !arg.empty() );
-				
-				// Determine which configured argument corresponds to this program argument, if any,
-				// and parse any value it might have.
-				
-				// Do we have a leading hyphen?
-				//
-				if( !doneWithSwitches && arg[ 0 ] == '-' )
+				if(iter->second->count() == 0)
 				{
-					// Yes we do.
-					
-					// Do we have two?
-					//
-					if( arg.size() > 1 && arg[ 1 ] == '-' )
-					{
-						// Yes. So we're expecting a long-form argument.
-						
-						// Read to the end or to the = sign.
-						//
-						const auto keyEnd = arg.find_first_of( '=' );
-						
-						const auto key = arg.substr( 2, keyEnd - 2 );
-						
-						std::string value;
-						
-						if( keyEnd < arg.size() )
-						{
-							value = arg.substr( keyEnd + 1 );
-						}
-						
-						if( key.empty() )
-						{
-							// This is either "--" or, more troublingly, "--=..."
-							
-							// Either way, don't look for arguments any more:
-							// anything else is "unlabeled."
-							//
-							doneWithSwitches = true;
-							continue;
-						}
-						
-						// Find this argument.
-						//
-						auto& argument = find_matching_argument( key, true /* long form */ );
-						process_argument( argument, arg, std::move( value ));
-					}
-					else
-					{
-						// No we don't. Just one.
-						
-						// Consider each following letter to be a short-form argument letter.
-						//
-						for( size_t i = 1; i < arg.size(); ++i )
-						{
-							const char c = arg[ i ];
-							
-							// Is this a reasonable argument character?
-							//
-							if( argument_abstract::is_valid_short_form( c ))
-							{
-								// This is a legitimate argument.
-								
-								// Does it have a value?
-								//
-								std::string value;
-								bool hasAssignment = i + 1 < arg.size() && arg[ i + 1 ] == '=';
-								if( hasAssignment )
-								{
-									// Looks like it. Read it.
-									//
-									value = arg.substr( i + 2 );
-								}
-								auto& argument = find_matching_argument( std::string{ c }, false /* short form */ );
-								process_argument( argument, arg, std::move( value ));
-								
-								if( hasAssignment )
-								{
-									break;
-								}
-							}
-							else
-							{
-								throw InvalidArgumentCharacter{
-									args_collect_string( "Invalid argument with character '" << c << "'." ) };
-							}
-						}
-					}
+					add_to_option(*m_next_positional, a);
+					++m_next_positional;
+					return true;
 				}
 				else
 				{
-					// No we don't. This is an unlabeled argument.
-					//
-					_unlabeled_args.emplace_back( std::move( arg ));
+					++m_next_positional;
+					continue;
 				}
-			}
-			
-			// Did each of the *required* arguments get assigned?
-			//
-			if( std::any_of( _args.begin(), _args.end(),
-							[&]( const std::unique_ptr< argument_abstract >& arg )
-							{
-								assert( arg );
-								return !arg->assigned() && arg->required();
-							} ))
-			{
-				throw MissingRequiredArguments{ "Some required arguments were missing." };
-			}
-			
-			// Did our help argument get set?
-			//
-			if( helpArg.value() )
-			{
-				show_usage();
-			}
-		}
-		
-		void show_usage( std::ostream& out = std::cout ) const
-		{
-			out << _program << ": " << _description << std::endl;
-			out << "usage: " << _program << std::endl;
-			
-			for( const auto& arg : _args )
-			{
-				assert( arg );
-				arg->print( out );
-				out << std::endl;
-			}
-			out << std::endl;
-		}
-		
-		template< typename Function >
-		void each_argument( Function&& fn ) const
-		{
-			std::for_each( _args.begin(), _args.end(),
-						  [&]( const std::unique_ptr< argument_abstract >& arg )
-						  {
-							  assert( arg );
-							  fn( *arg );
-						  } );
-		}
-		
-
-		template< typename Function >
-		void each_unlabeled_argument( Function&& fn ) const
-		{
-			std::for_each( _unlabeled_args.begin(), _unlabeled_args.end(), fn );
-		}
-		
-		void clear_values()
-		{
-			std::for_each( _args.begin(), _args.end(),
-						  []( const std::unique_ptr< argument_abstract >& arg )
-						  {
-							  assert( arg );
-							  arg->clear_value();
-						  } );
-			
-			_unlabeled_args.clear();
-		}
-		
-	protected:
-		
-		argument_abstract& find_matching_argument( const std::string& argString, bool longForm )
-		{
-			auto iterFound = std::find_if( _args.begin(), _args.end(),
-										  [&]( const std::unique_ptr< argument_abstract >& arg )
-										  {
-											  assert( arg );
-											  if( longForm )
-											  {
-												  return arg->has_long_form( argString );
-											  }
-											  else
-											  {
-												  return arg->has_short_form( argString[ 0 ] );
-											  }
-											
-										  } );
-			
-			if( iterFound != _args.end() )
-			{
-				return **iterFound;
 			}
 			else
 			{
-				throw UnknownArgument{ args_collect_string( "Unrecognized argument \"-" << ( longForm ? "-" : "" )
-															 << argString << "\"." ) };
+				add_to_option(*m_next_positional, a);
+				return true;
 			}
 		}
-		
-		void process_argument( argument_abstract& argument, const std::string& key, std::string&& value )
-		{
-			argument.assign( key, std::move( value ));
-		}
-		
-	private:
-
-		std::string _program;
-		std::string _description;
-		std::vector< std::unique_ptr< argument_abstract >> _args;
-		std::vector< std::string > _unlabeled_args;
-	};
-	
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Specializations
-	//
-    template<>
-	inline argument< std::string >::operator std::string() const
-	{
-		return _assigned ? value_string() : _default_value;
+		++m_next_positional;
 	}
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// args::type_traits
-	//
-	template<>
-	struct type_traits< bool >
-	{
-		static constexpr bool always_requires_value() { return false; }
-		static constexpr const char* name() { return "bool"; }
-	};
-
-	template<>
-	struct type_traits< std::string >
-	{
-		static constexpr bool always_requires_value() { return true; }
-		static constexpr const char* name() { return "string"; }
-	};
-	
-	template<>
-	struct type_traits< float >
-	{
-		static constexpr bool always_requires_value() { return true; }
-		static constexpr const char* name() { return "number"; }
-	};
-	
-	template<>
-	struct type_traits< double >
-	{
-		static constexpr bool always_requires_value() { return true; }
-		static constexpr const char* name() { return "number"; }
-	};
-	
-	template<>
-	struct type_traits< int >
-	{
-		static constexpr bool always_requires_value() { return true; }
-		static constexpr const char* name() { return "int"; }
-	};
-
-	template<>
-	struct type_traits< size_t >
-	{
-		static constexpr bool always_requires_value() { return true; }
-		static constexpr const char* name() { return "size_t"; }
-	};
-	
-#undef args_collect_string
-#undef ARGS_EXCEPTION
-
+	return false;
 }
 
-#endif
+void options_parser::parse_positional(std::string option)
+{
+	parse_positional(std::vector<std::string>{option});
+}
+
+void options_parser::parse_positional(std::vector<std::string> options)
+{
+	m_positional = std::move(options);
+	m_next_positional = m_positional.begin();
+
+	m_positional_set.insert(m_positional.begin(), m_positional.end());
+}
+
+void options_parser::parse(int& argc, char**& argv)
+{
+	int current = 1;
+
+	int nextKeep = 1;
+
+	bool consume_remaining = false;
+
+	while(current != argc)
+	{
+		if(strcmp(argv[current], "--") == 0)
+		{
+			consume_remaining = true;
+			++current;
+			break;
+		}
+
+		std::match_results<const char*> result;
+		std::regex_match(argv[current], result, option_matcher);
+
+		if(result.empty())
+		{
+			// not a flag
+
+			// if true is returned here then it was consumed, otherwise it is
+			// ignored
+			if(consume_positional(argv[current]))
+			{
+			}
+			else
+			{
+				argv[nextKeep] = argv[current];
+				++nextKeep;
+			}
+			// if we return from here then it was parsed successfully, so continue
+		}
+		else
+		{
+			// short or long option?
+			if(result[4].length() != 0)
+			{
+				const std::string& s = result[4];
+
+				for(std::size_t i = 0; i != s.size(); ++i)
+				{
+					std::string name(1, s[i]);
+					auto iter = m_options.find(name);
+
+					if(iter == m_options.end())
+					{
+						throw option_not_exists_exception(name);
+					}
+
+					auto value = iter->second;
+
+					// if no argument then just add it
+					if(!value->has_arg())
+					{
+						parse_option(value, name);
+					}
+					else
+					{
+						// it must be the last argument
+						if(i + 1 == s.size())
+						{
+							checked_parse_arg(argc, argv, current, value, name);
+						}
+						else if(value->value().has_implicit())
+						{
+							parse_option(value, name, value->value().get_implicit_value());
+						}
+						else
+						{
+							// error
+							throw option_requires_argument_exception(name);
+						}
+					}
+				}
+			}
+			else if(result[1].length() != 0)
+			{
+				const std::string& name = result[1];
+
+				auto iter = m_options.find(name);
+
+				if(iter == m_options.end())
+				{
+					throw option_not_exists_exception(name);
+				}
+
+				auto opt = iter->second;
+
+				// equals provided for long option?
+				if(result[3].length() != 0)
+				{
+					// parse the option given
+
+					// but if it doesn't take an argument, this is an error
+					if(!opt->has_arg())
+					{
+						throw option_not_has_argument_exception(name, result[3]);
+					}
+
+					parse_option(opt, name, result[3]);
+				}
+				else
+				{
+					if(opt->has_arg())
+					{
+						// parse the next argument
+						checked_parse_arg(argc, argv, current, opt, name);
+					}
+					else
+					{
+						// parse with empty argument
+						parse_option(opt, name);
+					}
+				}
+			}
+		}
+
+		++current;
+	}
+
+	for(auto& opt : m_options)
+	{
+		auto& detail = opt.second;
+		auto& value = detail->value();
+
+		if(!detail->count() && value.has_default())
+		{
+			detail->parse_default();
+		}
+	}
+
+	if(consume_remaining)
+	{
+		while(current < argc)
+		{
+			if(!consume_positional(argv[current]))
+			{
+				break;
+			}
+			++current;
+		}
+
+		// adjust argv for any that couldn't be swallowed
+		while(current != argc)
+		{
+			argv[nextKeep] = argv[current];
+			++nextKeep;
+			++current;
+		}
+	}
+
+	argc = nextKeep;
+}
+
+void options_parser::add_option(const std::string& group, const std::string& s, const std::string& l,
+								std::string desc, std::shared_ptr<const abstract_value> value,
+								std::string arg_help)
+{
+	auto stringDesc = to_local_string(std::move(desc));
+	auto option = std::make_shared<option_details>(stringDesc, value);
+
+	if(s.size() > 0)
+	{
+		add_one_option(s, option);
+	}
+
+	if(l.size() > 0)
+	{
+		add_one_option(l, option);
+	}
+
+	// add the help details
+	auto& options = m_help[group];
+
+	options.options.emplace_back(help_option_details{
+		s, l, stringDesc, value->has_arg(), value->has_default(), value->get_default_value(),
+		value->has_implicit(), value->get_implicit_value(), std::move(arg_help), value->is_container()});
+}
+
+void options_parser::add_one_option(const std::string& option, std::shared_ptr<option_details> details)
+{
+	auto in = m_options.emplace(option, details);
+
+	if(!in.second)
+	{
+		throw option_exists_error(option);
+	}
+}
+
+std::string options_parser::help_one_group(const std::string& g) const
+{
+	typedef std::vector<std::pair<std::string, std::string>> OptionHelp;
+
+	auto group = m_help.find(g);
+	if(group == m_help.end())
+	{
+		return "";
+	}
+
+	OptionHelp format;
+
+	size_t longest = 0;
+
+	std::string result;
+
+	if(!g.empty())
+	{
+		result += to_local_string(" " + g + " options:\n");
+	}
+
+	for(const auto& o : group->second.options)
+	{
+		if(o.is_container && m_positional_set.find(o.l) != m_positional_set.end())
+		{
+			continue;
+		}
+
+		auto s = format_option(o);
+		longest = std::max(longest, string_length(s));
+		format.push_back(std::make_pair(s, std::string()));
+	}
+
+	longest = std::min(longest, static_cast<size_t>(OPTION_LONGEST));
+
+	// widest allowed description
+	auto allowed = size_t{76} - longest - OPTION_DESC_GAP;
+
+	auto fiter = format.begin();
+	for(const auto& o : group->second.options)
+	{
+		if(o.is_container && m_positional_set.find(o.l) != m_positional_set.end())
+		{
+			continue;
+		}
+
+		auto d = format_description(o, longest + OPTION_DESC_GAP, allowed);
+
+		result += fiter->first;
+		if(string_length(fiter->first) > longest)
+		{
+			result += '\n';
+			result += to_local_string(std::string(longest + OPTION_DESC_GAP, ' '));
+		}
+		else
+		{
+			result +=
+				to_local_string(std::string(longest + OPTION_DESC_GAP - string_length(fiter->first), ' '));
+		}
+		result += d;
+		result += '\n';
+
+		++fiter;
+	}
+
+	return result;
+}
+
+void options_parser::generate_group_help(std::string& result,
+										 const std::vector<std::string>& print_groups) const
+{
+	for(size_t i = 0; i != print_groups.size(); ++i)
+	{
+		const std::string& group_help_text = help_one_group(print_groups[i]);
+		if(empty(group_help_text))
+		{
+			continue;
+		}
+		result += group_help_text;
+		if(i < print_groups.size() - 1)
+		{
+			result += '\n';
+		}
+	}
+}
+
+void options_parser::generate_all_groups_help(std::string& result) const
+{
+	std::vector<std::string> all_groups;
+	all_groups.reserve(m_help.size());
+
+	for(auto& group : m_help)
+	{
+		all_groups.push_back(group.first);
+	}
+
+	generate_group_help(result, all_groups);
+}
+
+std::string options_parser::help(const std::vector<std::string>& help_groups) const
+{
+	std::string result = m_help_string + "\nUsage:\n  " + to_local_string(m_program) + " [OPTION...]";
+
+	if(m_positional.size() > 0)
+	{
+		result += " " + to_local_string(m_positional_help);
+	}
+
+	result += "\n\n";
+
+	if(help_groups.size() == 0)
+	{
+		generate_all_groups_help(result);
+	}
+	else
+	{
+		generate_group_help(result, help_groups);
+	}
+
+	return to_utf8_string(result);
+}
+
+const std::vector<std::string> options_parser::groups() const
+{
+	std::vector<std::string> g;
+
+	std::transform(
+		m_help.begin(), m_help.end(), std::back_inserter(g),
+		[](const std::map<std::string, help_group_details>::value_type& pair) { return pair.first; });
+
+	return g;
+}
+
+const help_group_details& options_parser::group_help(const std::string& group) const
+{
+	return m_help.at(group);
+}
+}
+
+#endif // ARGS_HPP

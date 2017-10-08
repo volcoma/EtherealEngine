@@ -232,7 +232,7 @@ void deferred_rendering::frame_render(std::chrono::duration<float> dt)
 void deferred_rendering::build_reflections_pass(entity_component_system& ecs, std::chrono::duration<float> dt)
 {
 	auto dirty_models = gather_visible_models(ecs, nullptr, true, true, true);
-	ecs.each<transform_component, reflection_probe_component>(
+	ecs.for_each<transform_component, reflection_probe_component>(
 		[this, &ecs, dt, &dirty_models](entity ce, transform_component& transform_comp,
 										reflection_probe_component& reflection_probe_comp) {
 			const auto& world_tranform = transform_comp.get_transform();
@@ -282,7 +282,7 @@ void deferred_rendering::build_reflections_pass(entity_component_system& ecs, st
 void deferred_rendering::build_shadows_pass(entity_component_system& ecs, std::chrono::duration<float> dt)
 {
 	auto dirty_models = gather_visible_models(ecs, nullptr, true, true, true);
-	ecs.each<transform_component, light_component>(
+	ecs.for_each<transform_component, light_component>(
 		[this, &ecs, dt, &dirty_models](entity ce, transform_component& transform_comp,
 										light_component& light_comp) {
 			// const auto& world_tranform = transform_comp.get_transform();
@@ -304,7 +304,7 @@ void deferred_rendering::build_shadows_pass(entity_component_system& ecs, std::c
 
 void deferred_rendering::camera_pass(entity_component_system& ecs, std::chrono::duration<float> dt)
 {
-	ecs.each<camera_component>([this, &ecs, dt](entity ce, camera_component& camera_comp) {
+	ecs.for_each<camera_component>([this, &ecs, dt](entity ce, camera_component& camera_comp) {
 		auto& camera_lods = _lod_data[ce];
 		auto& camera = camera_comp.get_camera();
 		auto& render_view = camera_comp.get_render_view();
@@ -444,7 +444,7 @@ std::shared_ptr<frame_buffer> deferred_rendering::lighting_pass(std::shared_ptr<
 			.get_texture("RBUFFER", viewport_size.width, viewport_size.height, false, 1, light_buffer_format)
 			.get();
 
-	ecs.each<transform_component, light_component>([this, bind_indirect_specular, &camera, &pass,
+	ecs.for_each<transform_component, light_component>([this, bind_indirect_specular, &camera, &pass,
 													&buffer_size, &view, &proj, g_buffer_fbo, refl_buffer](
 													   entity e, transform_component& transform_comp_ref,
 													   light_component& light_comp_ref) {
@@ -544,7 +544,7 @@ std::shared_ptr<frame_buffer> deferred_rendering::reflection_probe_pass(std::sha
 	pass.clear(BGFX_CLEAR_COLOR, 0, 0.0f, 0);
 	pass.set_view_proj(view, proj);
 
-	ecs.each<transform_component, reflection_probe_component>(
+	ecs.for_each<transform_component, reflection_probe_component>(
 		[this, &camera, &pass, &buffer_size, &view, &proj, g_buffer_fbo](
 			entity e, transform_component& transform_comp_ref, reflection_probe_component& probe_comp_ref) {
 			const auto& probe = probe_comp_ref.get_probe();
@@ -648,7 +648,7 @@ std::shared_ptr<frame_buffer> deferred_rendering::atmospherics_pass(std::shared_
 	{
 		bool found_sun = false;
 		auto light_direction = math::normalize(math::vec3(0.2f, -0.8f, 1.0f));
-		ecs.each<transform_component, light_component>(
+		ecs.for_each<transform_component, light_component>(
 			[this, &light_direction, &found_sun](entity e, transform_component& transform_comp_ref,
 												 light_component& light_comp_ref) {
 				if(found_sun)

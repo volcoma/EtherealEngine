@@ -11,7 +11,7 @@ void game_dock::render(const ImVec2&)
 	auto& editor_camera = es.camera;
 
 	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
-	ecs.each<camera_component>([&editor_camera](runtime::entity e, camera_component& camera_comp) {
+	ecs.for_each<camera_component>([&editor_camera](runtime::entity e, camera_component& camera_comp) {
 		if(e == editor_camera)
 			return;
 

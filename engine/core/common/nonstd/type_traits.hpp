@@ -29,7 +29,7 @@ struct decay_reference_wrapper<std::reference_wrapper<T>>
 	using type = T;
 };
 
-static bool check_all_true()
+static inline bool check_all_true()
 {
 	return true;
 }
