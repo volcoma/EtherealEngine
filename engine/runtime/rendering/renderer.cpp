@@ -137,8 +137,8 @@ bool renderer::init_backend()
 {
 
 	mml::video_mode desktop = mml::video_mode::get_desktop_mode();
-	desktop.width = 0;
-	desktop.height = 0;
+	desktop.width = 100;
+	desktop.height = 100;
 	_init_window = std::make_unique<mml::window>(desktop, "App", mml::style::none);
 	_init_window->set_visible(false);
 	gfx::PlatformData pd{
