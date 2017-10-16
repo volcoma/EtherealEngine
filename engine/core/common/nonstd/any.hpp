@@ -8,6 +8,7 @@
 
 namespace nonstd
 {
+	
 class bad_any_cast : public std::bad_cast
 {
 public:
