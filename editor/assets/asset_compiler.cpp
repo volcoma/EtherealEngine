@@ -58,9 +58,11 @@ bool run_compile_process(const std::string& process, const std::vector<std::stri
 
 	auto executable_dir = fs::resolve_protocol("binary:/");
 	auto process_full = executable_dir / process;
-
+#if($on($windows))
 	process_reader.open((process_full.string() + " " + args).c_str(), "", &error);
-
+#else
+    process_reader.open(process_full.string().c_str(), args.c_str(), &error);    
+#endif
 	if(!error.isOk())
 	{
 		err = std::string(error.getMessage().getPtr());
