@@ -18,26 +18,8 @@
 
 // -------------------------------------------------------------------
 
-class contexts
-{
-public:
-	void set_initial_context(ImGuiContext* context)
-	{
-		_initial_context = context;
-	}
-
-	void restore_initial_context()
-	{
-		if(_initial_context)
-			gui::SetCurrentContext(_initial_context);
-	}
-
-private:
-	ImGuiContext* _initial_context = nullptr;
-};
-
 static gui_style s_gui_style;
-static contexts s_contexts;
+ImGuiContext* s_initial_context = nullptr;
 
 static gfx::VertexDecl s_decl;
 static std::unique_ptr<program> s_program;
@@ -204,9 +186,39 @@ void imgui_frame_begin()
 	s_textures.clear();
 }
 
+void set_initial_context(ImGuiContext* context)
+{
+	s_initial_context = context;
+}
+
+void imgui_set_context(ImGuiContext* context)
+{
+	ImGuiContext* last_context = gui::GetCurrentContext();
+	if(last_context != nullptr && last_context != context)
+	{
+		std::memcpy(&context->Style, &last_context->Style, sizeof(ImGuiStyle));
+		std::memcpy(&context->IO.KeyMap, &last_context->IO.KeyMap, sizeof(last_context->IO.KeyMap));
+		std::memcpy(&context->MouseCursorData, &last_context->MouseCursorData,
+					sizeof(context->MouseCursorData));
+		context->IO.IniFilename = last_context->IO.IniFilename;
+		context->IO.FontAllowUserScaling = last_context->IO.FontAllowUserScaling;
+		context->IO.RenderDrawListsFn = last_context->IO.RenderDrawListsFn;
+		context->Settings = last_context->Settings;
+		context->Initialized = last_context->Initialized;
+	}
+	gui::SetCurrentContext(context);
+}
+
+void restore_initial_context()
+{
+	if(s_initial_context)
+        imgui_set_context(s_initial_context);
+}
+
+
 void imgui_restore_context()
 {
-	s_contexts.restore_initial_context();
+	restore_initial_context();
 }
 
 void imgui_frame_update(render_window& window, std::chrono::duration<float> dt)
@@ -257,7 +269,7 @@ void imgui_frame_end()
 
 void imgui_init()
 {
-	s_contexts.set_initial_context(ImGui::GetCurrentContext());
+	set_initial_context(ImGui::GetCurrentContext());
 	ImGuiIO& io = ImGui::GetIO();
 	io.IniFilename = nullptr;
 	io.RenderDrawListsFn = render_func;
@@ -365,7 +377,7 @@ void imgui_init()
 void imgui_dispose()
 {
 	s_textures.clear();
-	s_contexts.restore_initial_context();
+	restore_initial_context();
 	s_program.reset();
 	s_font_texture.reset();
 	s_fonts.clear();
@@ -386,24 +398,6 @@ void imgui_destroy_context(ImGuiContext*& context)
 		gui::DestroyContext(context);
 
 	context = nullptr;
-}
-
-void imgui_set_context(ImGuiContext* context)
-{
-	ImGuiContext* last_context = gui::GetCurrentContext();
-	if(last_context != nullptr && last_context != context)
-	{
-		std::memcpy(&context->Style, &last_context->Style, sizeof(ImGuiStyle));
-		std::memcpy(&context->IO.KeyMap, &last_context->IO.KeyMap, sizeof(last_context->IO.KeyMap));
-		std::memcpy(&context->MouseCursorData, &last_context->MouseCursorData,
-					sizeof(context->MouseCursorData));
-		context->IO.IniFilename = last_context->IO.IniFilename;
-		context->IO.FontAllowUserScaling = last_context->IO.FontAllowUserScaling;
-		context->IO.RenderDrawListsFn = last_context->IO.RenderDrawListsFn;
-		context->Settings = last_context->Settings;
-		context->Initialized = last_context->Initialized;
-	}
-	gui::SetCurrentContext(context);
 }
 
 bool gui_system::initialize()
