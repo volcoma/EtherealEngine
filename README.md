@@ -2,6 +2,8 @@
 ============================================================================
 [![Build Status](https://travis-ci.org/volcoma/EtherealEngine.svg?branch=master)](https://travis-ci.org/volcoma/EtherealEngine)
 [![Build status](https://ci.appveyor.com/api/projects/status/18pxyag4wok2fscl?svg=true)](https://ci.appveyor.com/project/volcoma/etherealengine)
+[![](https://codescene.io/projects/1800/status.svg) Get more details at **codescene.io**.](https://codescene.io/projects/1800/jobs/latest-successful/results)
+
 ## INFO
 Using c++14
 
