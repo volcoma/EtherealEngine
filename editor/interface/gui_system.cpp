@@ -203,7 +203,6 @@ void imgui_set_context(ImGuiContext* context)
 		context->IO.IniFilename = last_context->IO.IniFilename;
 		context->IO.FontAllowUserScaling = last_context->IO.FontAllowUserScaling;
 		context->IO.RenderDrawListsFn = last_context->IO.RenderDrawListsFn;
-		context->Settings = last_context->Settings;
 		context->Initialized = last_context->Initialized;
 	}
 	gui::SetCurrentContext(context);
