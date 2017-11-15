@@ -2,7 +2,7 @@
 #include "../assets/asset_compiler.h"
 #include "../editing/editing_system.h"
 #include "../meta/system/project_manager.hpp"
-#include "core/filesystem/filesystem_watcher.hpp"
+#include "core/filesystem/filesystem_watcher.h"
 #include "core/serialization/associative_archive.h"
 #include "core/logging/logging.h"
 #include "core/system/task_system.h"

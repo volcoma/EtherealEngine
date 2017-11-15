@@ -1,5 +1,6 @@
 #include "task_system.h"
 #include <limits>
+
 namespace core
 {
 
@@ -136,14 +137,20 @@ void task_system::run(std::size_t idx, std::function<bool()> condition, std::chr
 
 		std::pair<bool, task> p = {false, task()};
 
-		if(idx != 0)
+		if(idx != 0 && _queues[queue_index].get_pending_tasks() == 0)
 		{
 			for(std::size_t k = 0; k < 10 * _threads_count; ++k)
 			{
 				const auto queue_idx = get_thread_queue_idx(idx, k);
-				p = _queues[queue_idx].try_pop();
-				if(p.first)
-					break;
+                if(queue_index != queue_idx)
+                {
+                    p = _queues[queue_idx].try_pop();
+                    if(p.first)
+                    {
+                        break;
+                    }
+                }
+				
 			}
 		}
 

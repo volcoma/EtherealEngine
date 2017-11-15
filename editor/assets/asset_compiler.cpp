@@ -183,7 +183,7 @@ void compile<shader>(const fs::path& absolute_key)
 	else
 	{
 		APPLOG_INFO("Successful compilation of {0}", str_input);
-		fs::copy_file(temp, output, fs::copy_option::overwrite_if_exists, err);
+		fs::copy_file(temp, output, fs::copy_options::overwrite_if_exists, err);
 	}
 	fs::remove(temp, err);
 }
@@ -217,7 +217,7 @@ void compile<texture>(const fs::path& absolute_key)
 	else
 	{
 		APPLOG_INFO("Successful compilation of {0}", str_input);
-		fs::copy_file(temp, output, fs::copy_option::overwrite_if_exists, err);
+		fs::copy_file(temp, output, fs::copy_options::overwrite_if_exists, err);
 	}
 	fs::remove(temp, err);
 }
@@ -247,7 +247,7 @@ void compile<mesh>(const fs::path& absolute_key)
 			cereal::oarchive_binary_t ar(soutput);
 			try_save(ar, cereal::make_nvp("mesh", data));
 		}
-		fs::copy_file(temp, output, fs::copy_option::overwrite_if_exists, err);
+		fs::copy_file(temp, output, fs::copy_options::overwrite_if_exists, err);
 		fs::remove(temp, err);
 
 		APPLOG_INFO("Successful compilation of {0}", str_input);
@@ -266,7 +266,7 @@ void compile<mesh>(const fs::path& absolute_key)
 				}
 				output = (dir / file).string() + "_" + animation.name + extensions::animation;
 
-				fs::copy_file(temp, output, fs::copy_option::overwrite_if_exists, err);
+				fs::copy_file(temp, output, fs::copy_options::overwrite_if_exists, err);
 				fs::remove(temp, err);
 			}
 		}

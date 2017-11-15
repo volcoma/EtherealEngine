@@ -2,7 +2,7 @@
 #include "../../editing/editing_system.h"
 #include "../../system/project_manager.h"
 #include "core/filesystem/filesystem.h"
-#include "core/filesystem/filesystem_watcher.hpp"
+#include "core/filesystem/filesystem_watcher.h"
 #include "core/system/task_system.h"
 #include "filedialog/filedialog.h"
 #include "runtime/assets/asset_extensions.h"
@@ -594,7 +594,7 @@ void assets_dock::render(const ImVec2&)
 					[opened_dir](const fs::path& path, const fs::path& filename) {
 						fs::error_code err;
 						fs::path dir = opened_dir / filename;
-						fs::copy_file(path, dir, fs::copy_option::overwrite_if_exists, err);
+						fs::copy_file(path, dir, fs::copy_options::overwrite_if_exists, err);
 					},
 					p, filename);
 			}
