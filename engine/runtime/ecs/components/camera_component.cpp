@@ -3,8 +3,7 @@
 
 camera_component::camera_component()
 {
-	auto stats = gfx::getStats();
-	_camera.set_viewport_size({stats->width, stats->height});
+	_camera.set_viewport_size({640, 480});
 }
 
 camera_component::~camera_component()
@@ -19,13 +18,6 @@ void camera_component::update(const math::transform& t)
 	_camera.record_current_matrices();
 	// Set new transform
 	_camera.look_at(t.get_position(), t.get_position() + t.z_unit_axis(), t.y_unit_axis());
-
-	const auto& viewport_size = _camera.get_viewport_size();
-	if(viewport_size.width == 0 && viewport_size.height == 0)
-	{
-		auto stats = gfx::getStats();
-		_camera.set_viewport_size({stats->width, stats->height});
-	}
 }
 
 bool camera_component::get_hdr() const

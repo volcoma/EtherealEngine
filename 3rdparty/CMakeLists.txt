@@ -7,5 +7,4 @@ add_subdirectory_ex(boost_filesystem)
 add_subdirectory_ex(spdlog)
 add_subdirectory_ex(filedialog)
 add_subdirectory_ex(imgui)
-
 add_subdirectory_ex(glm)
