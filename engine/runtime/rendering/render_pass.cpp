@@ -79,9 +79,8 @@ void render_pass::set_view_proj(const math::transform& v, const math::transform&
 
 void render_pass::set_view_proj_ortho_full(float depth)
 {
-	static const math::transform p = gfx::is_homogeneous_depth() ? 
-		math::orthoNO(0.0f, 1.0f, 1.0f, 0.0f, 0.0f, depth) : 
-		math::orthoZO(0.0f, 1.0f, 1.0f, 0.0f, 0.0f, depth);
+	static const auto ortho_ = gfx::is_homogeneous_depth() ? math::orthoNO<float> : math::orthoZO<float>;
+	static const math::transform p = ortho_(0.0f, 1.0f, 1.0f, 0.0f, 0.0f, depth);
 
 	gfx::setViewTransform(id, {}, &p);
 }

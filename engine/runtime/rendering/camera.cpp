@@ -135,9 +135,9 @@ const math::transform& camera::get_projection() const
 		{
 			// Generate the updated perspective projection matrix
 			float fov_radians = math::radians<float>(get_fov());
-			_projection = gfx::is_homogeneous_depth() ?
-				math::perspectiveNO(fov_radians, _aspect_ratio, _near_clip, _far_clip) :
-				math::perspectiveZO(fov_radians, _aspect_ratio, _near_clip, _far_clip);
+			static const auto perspective_ = gfx::is_homogeneous_depth() ? math::perspectiveNO<float> : math::perspectiveZO<float>;
+
+			_projection = perspective_(fov_radians, _aspect_ratio, _near_clip, _far_clip);
 	
 			_projection[2][0] += _aa_data.z;
 			_projection[2][1] += _aa_data.w;
@@ -165,10 +165,9 @@ const math::transform& camera::get_projection() const
 			float zoom = get_zoom_factor();
 			const frect rect = {-(float)_viewport_size.width / 2.0f, (float)_viewport_size.height / 2.0f,
 								(float)_viewport_size.width / 2.0f, -(float)_viewport_size.height / 2.0f};
-			_projection = gfx::is_homogeneous_depth() ? 
-				math::orthoNO(rect.left * zoom, rect.right * zoom, rect.bottom * zoom, rect.top * zoom,
-							get_near_clip(), get_far_clip()) :
-				math::orthoZO(rect.left * zoom, rect.right * zoom, rect.bottom * zoom, rect.top * zoom,
+			static const auto ortho_ = gfx::is_homogeneous_depth() ? math::orthoNO<float> : math::orthoZO<float>;
+
+			_projection = ortho_(rect.left * zoom, rect.right * zoom, rect.bottom * zoom, rect.top * zoom,
 							get_near_clip(), get_far_clip());
 			_projection[2][0] += _aa_data.z;
 			_projection[2][1] += _aa_data.w;

@@ -60,9 +60,9 @@ void picking_system::frame_render(std::chrono::duration<float>)
 		_reading = 0;
 		_start_readback = true;
 		auto pick_view = math::lookAt(pick_eye, pick_at, pick_up);
-		auto pick_proj = gfx::is_homogeneous_depth() ?
-			math::perspectiveNO(math::radians(1.0f), 1.0f, near_clip, far_clip) :
-			math::perspectiveZO(math::radians(1.0f), 1.0f, near_clip, far_clip);
+
+		static const auto perspective_ = gfx::is_homogeneous_depth() ? math::perspectiveNO<float> : math::perspectiveZO<float>;
+		auto pick_proj = perspective_(math::radians(1.0f), 1.0f, near_clip, far_clip);
 
 		render_pass pass("picking_buffer_fill");
 		pass.bind(_surface.get());
