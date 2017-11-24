@@ -622,7 +622,7 @@ std::shared_ptr<frame_buffer> deferred_rendering::atmospherics_pass(std::shared_
 																	std::chrono::duration<float> dt)
 {
 	auto far_clip_cache = camera.get_far_clip();
-	camera.set_far_clip(1000.0f);
+	camera.set_far_clip(10000.0f);
 	const auto& view = camera.get_view();
 	const auto& proj = camera.get_projection();
 	camera.set_far_clip(far_clip_cache);

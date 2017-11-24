@@ -38,7 +38,7 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 		ImRect bb(window->DC.CursorPos,
 				  ImVec2(window->DC.CursorPos.x + size.x, window->DC.CursorPos.y + size.y));
 		gui::ItemSize(bb);
-		if(!gui::ItemAdd(bb, nullptr))
+		if(!gui::ItemAdd(bb, 0))
 			return false;
 	}
 	gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
@@ -72,9 +72,9 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 			var = data;
 			changed |= true;
 		}
-		if(!gui::IsItemActive() && gui::IsItemHovered())
+		if(!gui::IsItemActive() && gui::IsItemHovered() || hoveredFrame)
 		{
-			gui::SetMouseCursor(ImGuiMouseCursor_Help);
+			//gui::SetMouseCursor(ImGuiMouseCursor_Help);
 			gui::BeginTooltip();
 			gui::TextUnformatted("YOU CAN DRAG AND DROP HERE");
 			gui::EndTooltip();

@@ -26,16 +26,14 @@ template <typename T>
 class task_future
 {
 public:
-	std::shared_future<T> future;
-
-	auto get() const -> decltype(future.get())
+	decltype(auto) get() const
 	{
 		wait();
 
 		return future.get();
 	}
 
-	auto valid() const -> decltype(future.valid())
+	decltype(auto) valid() const
 	{
 		return future.valid();
 	}
@@ -56,20 +54,40 @@ public:
 	//-----------------------------------------------------------------------------
 	void wait() const;
 
-	template <class _Rep, class _Per>
-	std::future_status wait_for(const std::chrono::duration<_Rep, _Per>& rel_time) const
+	template <class Rep, class Per>
+	std::future_status wait_for(const std::chrono::duration<Rep, Per>& rel_time) const
 	{ // wait for duration
 		return future.wait_for(rel_time);
 	}
 
-	template <class _Clock, class _Dur>
-	std::future_status wait_until(const std::chrono::time_point<_Clock, _Dur>& abs_time) const
+	template <class Clock, class Dur>
+	std::future_status wait_until(const std::chrono::time_point<Clock, Dur>& abs_time) const
 	{ // wait until time point
 		return future.wait_until(abs_time);
 	}
 
+	static task_future<T> from_shared_future(const std::shared_future<T>& fut)
+	{
+		task_future<T> res;
+		res.future = fut;
+		return res;
+	}
+	static task_future<T> from_shared_future(std::shared_future<T>&& fut)
+	{
+		task_future<T> res;
+		res.future = std::move(fut);
+		return res;
+	}
+	static task_future<T> from_future(std::future<T>&& fut)
+	{
+		task_future<T> res;
+		res.future = fut.share();
+		return res;
+	}
+
 private:
 	friend class task_system;
+	std::shared_future<T> future;
 	task_system* _system = nullptr;
 };
 
@@ -157,15 +175,6 @@ struct decay_future<const task_future<T>&>
 	using type = T;
 };
 
-namespace
-{
-inline std::uint64_t get_next_id()
-{
-	static std::atomic<std::uint64_t> counter{0};
-	return counter++;
-}
-}
-
 /*
  * awaitable_task; a type-erased, allocator-aware std::packaged_task that
  * also contains its own arguments. The underlying packaged_task and the
@@ -221,14 +230,6 @@ public:
 	operator bool() const noexcept
 	{
 		return static_cast<bool>(_t);
-	}
-
-	std::uint64_t get_id() const
-	{
-        if(_t)
-            return _t->id;
-        
-        return 0;
 	}
 
 	friend class task_system;
@@ -337,20 +338,21 @@ private:
 		virtual ~task_concept() noexcept;
 		virtual void invoke_() = 0;
 		virtual bool ready_() const noexcept = 0;
-
-		const std::uint64_t id = get_next_id();
 	};
 
 	template <class>
 	struct ready_task_model;
 
-	/*
-	 * Ready tasks are assumed to be immediately invokable; that is,
-	 * invoking the underlying pakcaged_task with the provided arguments
-	 * will not block. This is contrasted with async tasks where some or all
-	 * of the provided arguments may be futures waiting on results of other
-	 * tasks.
-	 */
+	//-----------------------------------------------------------------------------
+	//  Name : ready_task_model ()
+	/// <summary>
+	/// Ready tasks are assumed to be immediately invokable, that is,
+	/// invoking the underlying pakcaged_task with the provided arguments
+	/// will not block. This is contrasted with async tasks where some or all
+	/// of the provided arguments may be futures waiting on results of other
+	/// tasks.
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	template <class R, class... Args>
 	struct ready_task_model<R(Args...)> : task_concept
 	{
@@ -370,9 +372,7 @@ private:
 
 		task_future<R> get_future()
 		{
-			task_future<R> result;
-			result.future = _f.get_future().share();
-			return result;
+			return task_future<R>::from_shared_future(_f.get_future().share());
 		}
 
 		void invoke_() override
@@ -393,12 +393,15 @@ private:
 	template <class...>
 	struct awaitable_task_model;
 
-	/*
-	 * Async tasks are assumed to take arguments where some or all are
-	 * backed by futures waiting on results of other tasks. This is
-	 * contrasted with ready tasks that are assumed to be immediately
-	 * invokable.
-	 */
+	//-----------------------------------------------------------------------------
+	//  Name : awaitable_task_model ()
+	/// <summary>
+	/// Async tasks are assumed to take arguments where some or all are
+	/// backed by futures waiting on results of other tasks. This is
+	/// contrasted with ready tasks that are assumed to be immediately
+	/// invokable.
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	template <class R, class... CallArgs, class... FutArgs>
 	struct awaitable_task_model<R(CallArgs...), FutArgs...> : task_concept
 	{
@@ -418,9 +421,7 @@ private:
 
 		task_future<R> get_future()
 		{
-			task_future<R> result;
-			result.future = _f.get_future().share();
-			return result;
+			return task_future<R>::from_shared_future(_f.get_future().share());
 		}
 
 		void invoke_() override
@@ -437,25 +438,25 @@ private:
 
 	private:
 		template <class T>
-		static inline auto call_get(T&& t) noexcept -> decltype(std::forward<T>(t))
+		static inline decltype(auto) call_get(T&& t) noexcept
 		{
 			return std::forward<T>(t);
 		}
 
 		template <class T>
-		static inline auto call_get(task_future<T>&& t) noexcept -> decltype(t.future.get())
-		{
-			return t.future.get();
-		}
-
-		template <class T>
-		static inline auto call_get(std::future<T>&& t) noexcept -> decltype(t.get())
+		static inline decltype(auto) call_get(task_future<T>&& t) noexcept
 		{
 			return t.get();
 		}
 
 		template <class T>
-		static inline auto call_get(std::shared_future<T>&& t) noexcept -> decltype(t.get())
+		static inline decltype(auto) call_get(std::future<T>&& t) noexcept
+		{
+			return t.get();
+		}
+
+		template <class T>
+		static inline decltype(auto) call_get(std::shared_future<T>&& t) noexcept
 		{
 			return t.get();
 		}
@@ -475,8 +476,7 @@ private:
 		template <class T>
 		static inline bool call_ready(const task_future<T>& t) noexcept
 		{
-			using namespace std::chrono_literals;
-			return t.valid() && t.wait_for(0s) == std::future_status::ready;
+			return t.is_ready();
 		}
 
 		template <class T>
@@ -508,6 +508,7 @@ private:
 
 class task_system : public core::subsystem
 {
+	using duration_t = std::chrono::steady_clock::duration;
 	template <typename T>
 	friend class task_future;
     
@@ -522,11 +523,11 @@ public:
         std::vector<queue_info> queue_infos;
     };
     
-	using Allocator = std::allocator<task>;
+	using allocator_t = std::allocator<task>;
 
 	task_system();
 
-	task_system(std::size_t nthreads, Allocator const& alloc = Allocator());
+	task_system(std::size_t nthreads, allocator_t const& alloc = {});
 
 	//-----------------------------------------------------------------------------
 	//  Name : ~task_system ()
@@ -574,7 +575,7 @@ public:
 	/// there.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::size_t get_owner_thread_idx()
+	std::size_t get_owner_thread_idx() const
 	{
 		return 0;
 	}
@@ -586,19 +587,58 @@ public:
 	/// there.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::size_t get_any_worker_thread_idx()
+	std::size_t get_any_worker_thread_idx() const
 	{
-		auto current_index = ++_current_index;
-		current_index = current_index % _threads_count;
-		if(current_index == get_owner_thread_idx())
-			current_index++;
-
-		_current_index = current_index;
-
-		const std::size_t idx = (_threads_count == 1) ? get_owner_thread_idx() : current_index;
-		return idx;
+		return get_most_free_queue_idx(true);
 	}
 
+	//-----------------------------------------------------------------------------
+	//  Name : get_most_busy_queue_idx ()
+	/// <summary>
+	/// Gets the most busy queue idx. This is basicly used by the work stealing
+	/// mechanism.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	std::size_t get_most_busy_queue_idx(bool skip_owner) const
+	{
+		if (_threads_count == 1)
+			return get_owner_thread_idx();
+
+		auto info = get_info();
+		auto begin_it = skip_owner ? std::begin(info.queue_infos) + 1 : std::begin(info.queue_infos);
+		auto end_it = std::end(info.queue_infos);
+		auto min_el = std::min_element(begin_it, end_it,
+			[](const auto& lhs, const auto& rhs)
+		{
+			return lhs.pending_tasks > rhs.pending_tasks;
+		});
+		const std::size_t most_busy_idx = std::distance(std::begin(info.queue_infos), min_el);
+		return most_busy_idx;
+	}
+
+	//-----------------------------------------------------------------------------
+	//  Name : get_most_free_queue_idx ()
+	/// <summary>
+	/// Gets the most free queue idx. This is basicly used by the load balancing
+	/// mechanism.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	std::size_t get_most_free_queue_idx(bool skip_owner) const
+	{
+		if (_threads_count == 1)
+			return get_owner_thread_idx();
+
+		auto info = get_info();
+		auto begin_it = skip_owner ? std::begin(info.queue_infos) + 1 : std::begin(info.queue_infos);
+		auto end_it = std::end(info.queue_infos);
+		auto min_el = std::min_element(begin_it, end_it,
+			[](const auto& lhs, const auto& rhs)
+		{
+			return lhs.pending_tasks < rhs.pending_tasks;
+		});
+		const std::size_t idx = std::distance(std::begin(info.queue_infos), min_el);
+		return idx;
+	}
 	//-----------------------------------------------------------------------------
 	//  Name : push_on_thread ()
 	/// <summary>
@@ -752,26 +792,6 @@ private:
 	{
 		t.second._system = this;
 
-		std::size_t try_count = (idx == get_owner_thread_idx()) ? 0 : 10 * _threads_count;
-
-		for(std::size_t k = 0; k < try_count; ++k)
-		{
-			const auto queue_index = get_thread_queue_idx(idx, k);
-
-			if(execute_if_ready && t.first.ready() &&
-			   ((get_thread_id(queue_index) == std::this_thread::get_id()) || (queue_index != 0)))
-			{
-				t.first();
-
-				return std::move(t.second);
-			}
-			else
-			{
-				if(_queues[queue_index].try_push(t.first))
-					return std::move(t.second);
-			}
-		}
-
 		const auto queue_index = get_thread_queue_idx(idx);
 		if(execute_if_ready && t.first.ready() &&
 		   ((get_thread_id(queue_index) == std::this_thread::get_id()) || (queue_index != 0)))
@@ -837,7 +857,7 @@ private:
 	/// Main loop of our worker threads
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void run(std::size_t idx, std::function<bool()> condition, std::chrono::milliseconds pop_timeout = std::chrono::milliseconds::max());
+	void run(std::size_t idx, std::function<bool()> condition, duration_t pop_timeout = duration_t::max());
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_thread_queue_idx ()
@@ -868,7 +888,7 @@ private:
         bool is_done() const;
 		std::pair<bool, task> try_pop();
 		bool try_push(task& t);
-		std::pair<bool, task> pop(std::chrono::milliseconds pop_timeout = std::chrono::milliseconds::max());
+		std::pair<bool, task> pop(duration_t pop_timeout = duration_t::max());
 
 		void push(task t);
 
@@ -882,9 +902,8 @@ private:
 
 	std::vector<task_queue> _queues;
 	std::vector<std::thread> _threads;
-	typename Allocator::template rebind<task::task_concept>::other _alloc;
+	typename allocator_t::template rebind<task::task_concept>::other _alloc;
 	std::size_t _threads_count;
-	std::atomic<std::size_t> _current_index{0};
 	//
 	const std::thread::id _owner_thread_id = std::this_thread::get_id();
 };

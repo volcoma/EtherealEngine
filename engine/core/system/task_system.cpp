@@ -75,7 +75,7 @@ bool task_system::task_queue::try_push(task& t)
 	return true;
 }
 
-std::pair<bool, task> task_system::task_queue::pop(std::chrono::milliseconds pop_timeout)
+std::pair<bool, task> task_system::task_queue::pop(duration_t pop_timeout)
 {
 	std::unique_lock<std::mutex> lock(_mutex);
 	bool wait = pop_timeout > decltype(pop_timeout)(0);
@@ -126,22 +126,24 @@ void task_system::task_queue::push(task t)
 	_cv.notify_one();
 }
 
-void task_system::run(std::size_t idx, std::function<bool()> condition, std::chrono::milliseconds pop_timeout)
+void task_system::run(std::size_t idx, std::function<bool()> condition, duration_t pop_timeout)
 {
 	while(condition())
 	{
 		const auto queue_index = get_thread_queue_idx(idx);
 		bool is_done = _queues[queue_index].is_done();
-		if(is_done && _queues[queue_index].get_pending_tasks() == 0)
+		bool is_empty = _queues[queue_index].get_pending_tasks() == 0;
+		if(is_done && is_empty)
 			return;
 
 		std::pair<bool, task> p = {false, task()};
 
-		if(idx != 0 && _queues[queue_index].get_pending_tasks() == 0)
+		if(idx != 0 && is_empty)
 		{
-			for(std::size_t k = 0; k < 10 * _threads_count; ++k)
+			std::size_t steal_attempts = _threads_count;
+			const auto queue_idx = get_most_free_queue_idx(true);
+			for(std::size_t k = 0; k < steal_attempts; ++k)
 			{
-				const auto queue_idx = get_thread_queue_idx(idx, k);
                 if(queue_index != queue_idx)
                 {
                     p = _queues[queue_idx].try_pop();
@@ -186,15 +188,14 @@ std::thread::id task_system::get_thread_id(std::size_t index)
 }
 
 task_system::task_system()
-	: task_system(std::thread::hardware_concurrency() - 1)
+	: task_system(std::thread::hardware_concurrency())
 {
 }
 
-task_system::task_system(std::size_t nthreads, const task_system::Allocator& alloc)
+task_system::task_system(std::size_t nthreads, const task_system::allocator_t& alloc)
 	: _alloc(alloc)
-	, _threads_count{nthreads + 1}
+	, _threads_count{nthreads}
 {
-	// +1 for the owner thread's queue
 	_queues.reserve(_threads_count);
 	_queues.emplace_back();
 	for(std::size_t th = 1; th < _threads_count; ++th)

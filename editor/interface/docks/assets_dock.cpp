@@ -623,7 +623,7 @@ void assets_dock::render(const ImVec2&)
 
 	for(auto rit = hierarchy.rbegin(); rit != hierarchy.rend(); ++rit)
 	{
-		gui::AlignFirstTextHeightToWidgets();
+		gui::AlignTextToFramePadding();
 		gui::TextUnformatted("/");
 		gui::SameLine();
 

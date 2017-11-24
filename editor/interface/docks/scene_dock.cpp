@@ -25,21 +25,21 @@ void show_statistics(const unsigned int fps)
 	gui::Begin("STATISTICS", nullptr,
 			   ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
 
-	gui::AlignFirstTextHeightToWidgets();
+	gui::AlignTextToFramePadding();
 	gui::Text("FPS  : %u", fps);
 	gui::Separator();
-	gui::AlignFirstTextHeightToWidgets();
+	gui::AlignTextToFramePadding();
 	gui::Text("MSPF : %.3f ms ", 1000.0 / double(fps));
 	gui::Separator();
 
 	auto stats = gfx::getStats();
 	uint32_t num_draws = stats->numDraw;
 	uint32_t num_computes = stats->numCompute;
-	gui::AlignFirstTextHeightToWidgets();
+	gui::AlignTextToFramePadding();
 	gui::Text("DRAW CALLS: %u", num_draws);
-	gui::AlignFirstTextHeightToWidgets();
+	gui::AlignTextToFramePadding();
 	gui::Text("COMPUTE CALLS: %u", num_computes);
-	gui::AlignFirstTextHeightToWidgets();
+	gui::AlignTextToFramePadding();
 	gui::Text("RENDER PASSES: %u", render_pass::get_pass());
 	gui::Separator();
 	gui::Checkbox("SHOW G-BUFFER", &show_gbuffer);
@@ -73,7 +73,7 @@ void draw_selected_camera(const ImVec2& size)
 			p.y += size.y - bounds.y - 40.0f;
 			gui::SetNextWindowPos(p);
 			if(gui::Begin("Camera Preview", nullptr,
-						  ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_ShowBorders |
+						  ImGuiWindowFlags_NoFocusOnAppearing |
 							  ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove |
 							  ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
 			{

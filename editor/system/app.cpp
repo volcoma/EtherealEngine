@@ -541,7 +541,7 @@ void app::draw_footer(render_window&, imguidock::dockspace& dockspace)
 
 	if(tasks_info.pending_tasks > 0)
 	{
-		gui::AlignFirstTextHeightToWidgets();
+		gui::AlignTextToFramePadding();
 		gui::Text("Tasks : %u", unsigned(tasks_info.pending_tasks));
 		if(gui::IsItemHovered())
 		{
@@ -550,7 +550,7 @@ void app::draw_footer(render_window&, imguidock::dockspace& dockspace)
 			for(const auto& info : tasks_info.queue_infos)
 			{
 				gui::Separator();
-				gui::AlignFirstTextHeightToWidgets();
+				gui::AlignTextToFramePadding();
 				gui::Text("Queue %d tasks : %u", idx++, unsigned(info.pending_tasks));
 			}
 
@@ -567,7 +567,7 @@ void app::draw_footer(render_window&, imguidock::dockspace& dockspace)
 
 		gui::SetCursorPosY(ImGui::GetCursorPosY());
 		gui::PushStyleColor(ImGuiCol_Text, col);
-		gui::AlignFirstTextHeightToWidgets();
+		gui::AlignTextToFramePadding();
 		if(gui::Selectable(last_item.first.c_str(), false, 0, ImVec2(0, gui::GetTextLineHeight())))
 		{
 			dockspace.activate_dock(_console_dock_name);
@@ -602,7 +602,7 @@ void app::draw_start_page(render_window& window)
 							 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_HorizontalScrollbar |
 							 ImGuiWindowFlags_NoSavedSettings;
 
-	gui::AlignFirstTextHeightToWidgets();
+	gui::AlignTextToFramePadding();
 	gui::TextUnformatted("RECENT PROJECTS");
 	gui::Separator();
 	gui::BeginGroup();
@@ -661,8 +661,8 @@ void app::handle_drag_and_drop()
 		gui::TextUnformatted(es.drag_data.description.c_str());
 		gui::EndTooltip();
 
-		if(gui::GetMouseCursor() == ImGuiMouseCursor_Arrow)
-			gui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);
+		//if(gui::GetMouseCursor() == ImGuiMouseCursor_Arrow)
+		//	gui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);
 	}
 
 	if(!gui::IsAnyItemActive() && !gui::IsAnyItemHovered())

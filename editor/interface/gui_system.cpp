@@ -160,8 +160,8 @@ const mml::cursor* map_cursor(ImGuiMouseCursor cursor)
 	static std::map<ImGuiMouseCursor_, mml::cursor::type> cursor_map = {
 		{ImGuiMouseCursor_Arrow, mml::cursor::arrow},
 		{ImGuiMouseCursor_Move, mml::cursor::hand},
-		{ImGuiMouseCursor_NotAllowed, mml::cursor::not_allowed},
-		{ImGuiMouseCursor_Help, mml::cursor::help},
+		//{ImGuiMouseCursor_NotAllowed, mml::cursor::not_allowed},
+		//{ImGuiMouseCursor_Help, mml::cursor::help},
 		{ImGuiMouseCursor_TextInput, mml::cursor::text},
 		{ImGuiMouseCursor_ResizeNS, mml::cursor::size_vertical},
 		{ImGuiMouseCursor_ResizeEW, mml::cursor::size_horizontal},
@@ -590,7 +590,6 @@ void gui_style::set_style_colors(const hsv_setup& _setup)
 	style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(col_main.x, col_main.y, col_main.z, 0.31f);
 	style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.78f);
 	style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
-	style.Colors[ImGuiCol_ComboBg] = ImVec4(col_area.x, col_area.y, col_area.z, 1.00f);
 	style.Colors[ImGuiCol_CheckMark] = ImVec4(col_text.x, col_text.y, col_text.z, 0.80f);
 	style.Colors[ImGuiCol_SliderGrab] = ImVec4(col_main.x, col_main.y, col_main.z, 0.54f);
 	style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);

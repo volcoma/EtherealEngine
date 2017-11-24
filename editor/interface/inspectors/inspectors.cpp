@@ -58,8 +58,8 @@ bool inspect_var(rttr::variant& var, bool read_only,
 		{
 			auto prop_var = prop.get_value(object);
 			bool is_readonly = prop.is_readonly();
-			bool is_array = prop.is_array();
-			bool is_associative_container = prop.get_type().is_associative_container();
+			bool is_array = prop_var.is_sequential_container();
+			bool is_associative_container = prop_var.is_associative_container();
 			bool is_enum = prop.is_enumeration();
 			rttr::instance prop_object = prop_var;
 			bool has_inspector = !!get_inspector(prop_object.get_derived_type());
@@ -68,7 +68,7 @@ bool inspect_var(rttr::variant& var, bool read_only,
 			bool open = true;
 			if(details)
 			{
-				gui::AlignFirstTextHeightToWidgets();
+				gui::AlignTextToFramePadding();
 				open = gui::TreeNode("details");
 			}
 
@@ -95,7 +95,7 @@ bool inspect_var(rttr::variant& var, bool read_only,
 					changed |= inspect_var(prop_var, is_readonly, get_meta);
 				}
 
-				if(details)
+				if(details && open)
 					gui::TreePop();
 			}
 
@@ -111,12 +111,12 @@ bool inspect_var(rttr::variant& var, bool read_only,
 
 bool inspect_array(rttr::variant& var, bool read_only, std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto array_view = var.create_array_view();
-	auto size = array_view.get_size();
+	auto view = var.create_sequential_view();
+	auto size = view.get_size();
 	bool changed = false;
 	auto int_size = static_cast<int>(size);
 
-	if(array_view.is_dynamic())
+	if(view.is_dynamic())
 	{
 		property_layout layout("Size");
 		if(gui::InputInt("", &int_size))
@@ -124,12 +124,13 @@ bool inspect_array(rttr::variant& var, bool read_only, std::function<rttr::varia
 			if(int_size < 0)
 				int_size = 0;
 			size = static_cast<std::size_t>(int_size);
-			changed |= array_view.set_size(size);
+			changed |= view.set_size(size);
 		}
 	}
+
 	for(std::size_t i = 0; i < size; ++i)
 	{
-		auto value = array_view.get_value(i);
+		auto value = view.get_value(i).extract_wrapped_value();
 		std::string element = "Element ";
 		element += std::to_string(i);
 
@@ -138,7 +139,7 @@ bool inspect_array(rttr::variant& var, bool read_only, std::function<rttr::varia
 		changed |= inspect_var(value, read_only, get_metadata);
 
 		if(changed)
-			array_view.set_value(i, value);
+			view.set_value(i, value);
 	}
 
 	return changed;
@@ -165,7 +166,7 @@ bool inspect_enum(rttr::variant& var, rttr::enumeration& data, bool read_only)
 	if(read_only)
 	{
 		int listbox_item_current = var.to_int();
-		gui::AlignFirstTextHeightToWidgets();
+		gui::AlignTextToFramePadding();
 		gui::TextUnformatted(cstrings[listbox_item_current]);
 	}
 	else

@@ -7,3 +7,18 @@
 [submodule "3rdparty/bgfx/bimg"]
 	path = 3rdparty/bgfx/bimg
 	url = https://github.com/bkaradzic/bimg.git
+[submodule "3rdparty/assimp/assimp"]
+	path = 3rdparty/assimp/assimp
+	url = https://github.com/assimp/assimp.git
+[submodule "3rdparty/cereal/cereal"]
+	path = 3rdparty/cereal/cereal
+	url = https://github.com/USCiLab/cereal.git
+[submodule "3rdparty/rttr/rttr"]
+	path = 3rdparty/rttr/rttr
+	url = https://github.com/rttrorg/rttr.git
+[submodule "3rdparty/spdlog/spdlog"]
+	path = 3rdparty/spdlog/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "3rdparty/imgui/imgui"]
+	path = 3rdparty/imgui/imgui
+	url = https://github.com/ocornut/imgui.git

@@ -173,7 +173,7 @@ void draw_entity(runtime::entity entity)
 	gui::PushID(static_cast<int>(entity.id().index()));
 	gui::PushID(static_cast<int>(entity.id().version()));
 
-	gui::AlignFirstTextHeightToWidgets();
+	gui::AlignTextToFramePadding();
 	auto& es = core::get_subsystem<editor::editing_system>();
 	auto& input = core::get_subsystem<runtime::input>();
 	auto& selected = es.selection_data.object;
@@ -207,7 +207,7 @@ void draw_entity(runtime::entity entity)
 		flags |= ImGuiTreeNodeFlags_Leaf;
 
 	auto pos = gui::GetCursorScreenPos();
-	gui::AlignFirstTextHeightToWidgets();
+	gui::AlignTextToFramePadding();
 	bool opened = gui::TreeNodeEx(name.c_str(), flags);
 
 	if(edit_label && is_selected)

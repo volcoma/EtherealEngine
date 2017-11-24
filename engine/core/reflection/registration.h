@@ -2,6 +2,7 @@
 #define REFLECTION_REGISTRATION_H
 
 #include "rttr/rttr_enable.h"
+#include "rttr/registration_friend.h"
 
 template <typename T>
 extern void rttr_auto_register_reflection_function_t();
@@ -16,9 +17,7 @@ struct constructor_invoker;
 
 #define RTTR_REGISTRATION_FRIEND_NON_INTRUSIVE(cls)                                                          \
 	friend void ::rttr_auto_register_reflection_function_t<cls>();                                           \
-	friend void ::rttr_auto_register_reflection_function_();                                                 \
-	template <typename Ctor_Type, typename Policy, typename Accessor, typename Arg_Indexer>                  \
-	friend struct rttr::detail::constructor_invoker;
+	RTTR_REGISTRATION_FRIEND
 
 #define EXPAND(x) x
 #define REFLECTABLE_VIRTUAL_IMPL(cls, ...)                                                                   \
