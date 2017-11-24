@@ -531,7 +531,7 @@ transform& transform::compose(const vec3& vScale, const vec3& vShear, const quat
 							  const vec3& vTranslation)
 {
 	float a1, a2;
-	mat4 m, mR;
+	mat4 mR;
 	// Convert rotation quat to matrix form.
 	mR = glm::mat4_cast(qRotation);
 

@@ -294,7 +294,7 @@ void bbox_extruded::extrude(const bbox& AABB, const vec3& vecOrigin, float fRang
 		// Record the edge data we used
 		silhouette_edges[edge_count][0] = nPoint1;
 		silhouette_edges[edge_count][1] = nPoint2;
-		extruded_planes[edge_count++] = plane::fromPoints(vecOrigin, vPoint1, vPoint2);
+		extruded_planes[edge_count++] = plane::from_points(vecOrigin, vPoint1, vPoint2);
 
 	} // Next Potential
 }
@@ -345,8 +345,8 @@ bool bbox_extruded::test_line(const vec3& v1, const vec3& v2) const
 	for(i = 0; i < edge_count; ++i)
 	{
 		// Classify each point of the line against the plane.
-		fDist1 = plane::dotCoord(extruded_planes[i], v1);
-		fDist2 = plane::dotCoord(extruded_planes[i], v2);
+		fDist1 = plane::dot_coord(extruded_planes[i], v1);
+		fDist2 = plane::dot_coord(extruded_planes[i], v2);
 		nSide1 = (fDist1 >= 0) ? 1 : 0;
 		nSide2 = (fDist2 >= 0) ? 1 : 0;
 
@@ -365,7 +365,7 @@ bool bbox_extruded::test_line(const vec3& v1, const vec3& v2) const
 		{
 			// Compute the point at which the line intersects this plane.
 			vDir = v2 - v1;
-			t = -plane::dotCoord(extruded_planes[i], v1) / plane::dotNormal(extruded_planes[i], vDir);
+			t = -plane::dot_coord(extruded_planes[i], v1) / plane::dot_normal(extruded_planes[i], vDir);
 
 			// Truly spanning?
 			if((t >= 0.0f) && (t <= 1.0f))
@@ -397,7 +397,7 @@ bool bbox_extruded::test_sphere(const vec3& vecCenter, float fRadius) const
 	// Test box planes
 	for(i = 0; i < edge_count; ++i)
 	{
-		float fDot = plane::dotCoord(extruded_planes[i], vecCenter);
+		float fDot = plane::dot_coord(extruded_planes[i], vecCenter);
 
 		// Sphere entirely in front of plane
 		if(fDot >= fRadius)

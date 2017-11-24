@@ -9,4 +9,3 @@ add_subdirectory_ex(filedialog)
 add_subdirectory_ex(imgui)
 
 add_subdirectory_ex(glm)
-target_include_directories (glm_static PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/glm)

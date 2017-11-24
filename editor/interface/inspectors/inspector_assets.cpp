@@ -72,7 +72,7 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 			var = data;
 			changed |= true;
 		}
-		if(!gui::IsItemActive() && gui::IsItemHovered() || hoveredFrame)
+		if((!gui::IsItemActive() && gui::IsItemHovered()) || hoveredFrame)
 		{
 			//gui::SetMouseCursor(ImGuiMouseCursor_Help);
 			gui::BeginTooltip();

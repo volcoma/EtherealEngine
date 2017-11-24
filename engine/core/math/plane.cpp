@@ -8,29 +8,29 @@ float plane::dot(const plane& p, const vec4& v)
 
 	return result;
 }
-float plane::dotCoord(const plane& p, const vec3& v)
+float plane::dot_coord(const plane& p, const vec3& v)
 {
 	float result = p.data[0] * v[0] + p.data[1] * v[1] + p.data[2] * v[2] + p.data[3];
 
 	return result;
 }
-float plane::dotNormal(const plane& p, const vec3& v)
+float plane::dot_normal(const plane& p, const vec3& v)
 {
 	float result = glm::dot(vec3{p.data}, v);
 
 	return result;
 }
-plane plane::fromPointNormal(const vec3& point, const vec3& normal)
+plane plane::from_point_normal(const vec3& point, const vec3& normal)
 {
 	vec3 normalizedNormal = glm::normalize(normal);
 	plane result(normalizedNormal.x, normalizedNormal.y, normalizedNormal.z,
 				 -glm::dot(point, normalizedNormal));
 	return result;
 }
-plane plane::fromPoints(const vec3& v1, const vec3& v2, const vec3& v3)
+plane plane::from_points(const vec3& v1, const vec3& v2, const vec3& v3)
 {
 	vec3 Normal = glm::normalize(glm::cross(v2 - v1, v3 - v1));
-	return fromPointNormal(v1, Normal);
+	return from_point_normal(v1, Normal);
 }
 
 plane plane::mul(const plane& p, const mat4& m)

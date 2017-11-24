@@ -14,8 +14,8 @@ namespace math
 frustum::frustum()
 {
 	// Initialize values
-	memset(planes, 0, 6 * sizeof(plane));
-	memset(points, 0, 8 * sizeof(vec3));
+	planes.fill(vec4(0.0f, 0.0f, 0.0f, 0.0f));
+	points.fill(vec3(0.0f, 0.0f, 0.0f));
 	position = vec3(0, 0, 0);
 }
 
@@ -133,8 +133,8 @@ void frustum::update(const transform& View, const transform& Proj, bool _oglNDC)
 	}
 
 	// Copy and normalize the planes
-	for(int i = 0; i < 6; i++)
-		planes[i].data *= -1.0f;
+	for (auto& plane : planes)
+		plane.data *= -1.0f;
 
 	// Normalize and compute additional information.
 	set_planes(planes);
@@ -153,11 +153,12 @@ void frustum::update(const transform& View, const transform& Proj, bool _oglNDC)
 /// based on the supplied planes.
 /// </summary>
 //-----------------------------------------------------------------------------
-void frustum::set_planes(const plane _Planes[])
+void frustum::set_planes(const std::array<plane, 6>& new_planes)
 {
+	planes = new_planes;
 	// Copy and normalize the planes
-	for(int i = 0; i < 6; i++)
-		planes[i] = plane::normalize(_Planes[i]);
+	for(auto& plane : planes)
+		plane = plane::normalize(plane);
 
 	// Recompute the frustum corner points.
 	recompute_points();
@@ -215,11 +216,8 @@ volume_query frustum::classify_aabb(const bbox& AABB) const
 {
 	volume_query Result = volume_query::inside;
 	vec3 NearPoint, FarPoint;
-	for(size_t i = 0; i < 6; i++)
+	for(const auto& plane : planes)
 	{
-		// Store the plane
-		const plane& plane = planes[i];
-
 		// Calculate near / far extreme points
 		if(plane.data.x > 0.0f)
 		{
@@ -256,12 +254,12 @@ volume_query frustum::classify_aabb(const bbox& AABB) const
 
 		// If near extreme point is outside, then the AABB is totally outside the
 		// frustum
-		if(plane::dotCoord(plane, NearPoint) > 0.0f)
+		if(plane::dot_coord(plane, NearPoint) > 0.0f)
 			return volume_query::outside;
 
 		// If far extreme point is outside, then the AABB is intersecting the
 		// frustum
-		if(plane::dotCoord(plane, FarPoint) > 0.0f)
+		if(plane::dot_coord(plane, FarPoint) > 0.0f)
 			Result = volume_query::intersect;
 
 	} // Next plane
@@ -334,12 +332,12 @@ volume_query frustum::classify_aabb(const bbox& AABB, unsigned int& FrustumBits,
 
 		// If near extreme point is outside, then the AABB is totally outside the
 		// frustum
-		if(plane::dotCoord(plane, NearPoint) > 0.0f)
+		if(plane::dot_coord(plane, NearPoint) > 0.0f)
 			return volume_query::outside;
 
 		// If far extreme point is outside, then the AABB is intersecting the
 		// frustum
-		if(plane::dotCoord(plane, FarPoint) > 0.0f)
+		if(plane::dot_coord(plane, FarPoint) > 0.0f)
 			Result = volume_query::intersect;
 		else
 			FrustumBits |= (0x1 << LastOutside); // We were totally inside this
@@ -348,7 +346,7 @@ volume_query frustum::classify_aabb(const bbox& AABB, unsigned int& FrustumBits,
 	} // End if last outside plane specified
 
 	// Loop through all the planes
-	for(size_t i = 0; i < 6; i++)
+	for(size_t i = 0; i < planes.size(); i++)
 	{
 		// Check the bit in the uchar passed to see if it should be tested (if it's
 		// 1, it's already passed)
@@ -397,7 +395,7 @@ volume_query frustum::classify_aabb(const bbox& AABB, unsigned int& FrustumBits,
 
 		// If near extreme point is outside, then the AABB is totally outside the
 		// frustum
-		if(plane::dotCoord(plane, NearPoint) > 0.0f)
+		if(plane::dot_coord(plane, NearPoint) > 0.0f)
 		{
 			// Update the 'last outside' index and return.
 			LastOutside = (int)i;
@@ -407,7 +405,7 @@ volume_query frustum::classify_aabb(const bbox& AABB, unsigned int& FrustumBits,
 
 		// If far extreme point is outside, then the AABB is intersecting the
 		// frustum
-		if(plane::dotCoord(plane, FarPoint) > 0.0f)
+		if(plane::dot_coord(plane, FarPoint) > 0.0f)
 			Result = volume_query::intersect;
 		else
 			FrustumBits |= (0x1 << i); // We were totally inside this frustum plane,
@@ -446,10 +444,8 @@ bool frustum::test_aabb(const bbox& AABB) const
 {
 	// Loop through all the planes
 	vec3 NearPoint;
-	for(size_t i = 0; i < 6; i++)
+	for(const auto& plane : planes)
 	{
-		const plane& plane = planes[i];
-
 		// Calculate near / far extreme points
 		if(plane.data.x > 0.0f)
 			NearPoint.x = AABB.min.x;
@@ -468,7 +464,7 @@ bool frustum::test_aabb(const bbox& AABB) const
 
 		// If near extreme point is outside, then the AABB is totally outside the
 		// frustum
-		if(plane::dotCoord(plane, NearPoint) > 0.0f)
+		if(plane::dot_coord(plane, NearPoint) > 0.0f)
 			return false;
 
 	} // Next plane
@@ -587,9 +583,9 @@ volume_query frustum::classify_sphere(const vec3& vecCenter, float fRadius) cons
 	volume_query Result = volume_query::inside;
 
 	// Test frustum planes
-	for(unsigned int i = 0; i < 6; ++i)
+	for(const auto& plane : planes)
 	{
-		float fDot = plane::dotCoord(planes[i], vecCenter);
+		float fDot = plane::dot_coord(plane, vecCenter);
 
 		// Sphere entirely in front of plane
 		if(fDot >= fRadius)
@@ -614,9 +610,9 @@ volume_query frustum::classify_sphere(const vec3& vecCenter, float fRadius) cons
 bool frustum::test_sphere(const vec3& vecCenter, float fRadius) const
 {
 	// Test frustum planes
-	for(int i = 0; i < 6; ++i)
+	for (const auto& plane : planes)
 	{
-		float fDot = plane::dotCoord(planes[i], vecCenter);
+		float fDot = plane::dot_coord(plane, vecCenter);
 
 		// Sphere entirely in front of plane
 		if(fDot >= fRadius)
@@ -638,8 +634,8 @@ bool frustum::test_sphere(const vec3& vecCenter, float fRadius) const
 bool frustum::swept_sphere_intersect_plane(float& t0, float& t1, const plane& plane, const vec3& vecCenter,
 										   float fRadius, const vec3& vecSweepDirection)
 {
-	float b_dot_n = plane::dotCoord(plane, vecCenter);
-	float d_dot_n = plane::dotNormal(plane, vecSweepDirection);
+	float b_dot_n = plane::dot_coord(plane, vecCenter);
+	float d_dot_n = plane::dot_normal(plane, vecSweepDirection);
 
 	if(d_dot_n == 0.0f)
 	{
@@ -647,7 +643,7 @@ bool frustum::swept_sphere_intersect_plane(float& t0, float& t1, const plane& pl
 		{
 			//  Effectively infinity
 			t0 = 0.0f;
-			t1 = FLT_MAX;
+			t1 = std::numeric_limits<float>::max();
 			return true;
 
 		} // End if infinity
@@ -683,10 +679,10 @@ bool frustum::test_swept_sphere(const vec3& vecCenter, float fRadius, const vec3
 
 	// Determine all 12 intersection points of the swept sphere with the view
 	// frustum.
-	for(i = 0; i < 6; ++i)
+	for(const auto& plane : planes)
 	{
 		// Intersects frustum plane?
-		if(swept_sphere_intersect_plane(t0, t1, planes[i], vecCenter, fRadius, vecSweepDirection) == true)
+		if(swept_sphere_intersect_plane(t0, t1, plane, vecCenter, fRadius, vecSweepDirection) == true)
 		{
 			// TODO: Possibly needs to be < 0?
 			if(t0 >= 0.0f)
@@ -743,8 +739,8 @@ bool frustum::test_line(const vec3& v1, const vec3& v2) const
 	for(i = 0; i < 6; ++i)
 	{
 		// Classify each point of the line against the plane.
-		fDist1 = plane::dotCoord(planes[i], v1);
-		fDist2 = plane::dotCoord(planes[i], v2);
+		fDist1 = plane::dot_coord(planes[i], v1);
+		fDist2 = plane::dot_coord(planes[i], v2);
 		nSide1 = (fDist1 >= 0) ? 1 : 0;
 		nSide2 = (fDist2 >= 0) ? 1 : 0;
 
@@ -763,7 +759,7 @@ bool frustum::test_line(const vec3& v1, const vec3& v2) const
 		{
 			// Compute the point at which the line intersects this plane.
 			vDir = v2 - v1;
-			t = -plane::dotCoord(planes[i], v1) / plane::dotNormal(planes[i], vDir);
+			t = -plane::dot_coord(planes[i], v1) / plane::dot_normal(planes[i], vDir);
 
 			// Truly spanning?
 			if((t >= 0.0f) && (t <= 1.0f))
@@ -796,7 +792,7 @@ volume_query frustum::classify_plane(const plane& plane) const
 	// Test frustum points
 	for(unsigned int i = 0; i < 8; ++i)
 	{
-		float fDot = plane::dotCoord(plane, points[i]);
+		float fDot = plane::dot_coord(plane, points[i]);
 		if(fDot > 0.0f)
 			nInFrontCount++;
 		else if(fDot < 0.0f)
@@ -895,22 +891,17 @@ bool frustum::test_frustum(const frustum& f) const
 //-----------------------------------------------------------------------------
 frustum& frustum::mul(const transform& t)
 {
-	plane NewPlane;
 	transform mtxIT, mtx = t;
 	mtxIT = inverse(mtx);
 	mtxIT = transpose(mtxIT);
 
 	// transform planes
-	for(unsigned int i = 0; i < 6; ++i)
-	{
-		NewPlane = plane::mul(planes[i], mtxIT);
-		planes[i] = plane::normalize(NewPlane);
-
-	} // Next plane
+	for(auto& plane : planes)
+		plane = plane::normalize(plane::mul(plane, mtxIT));
 
 	// transform points
-	for(unsigned int i = 0; i < 8; ++i)
-		points[i] = transform::transform_coord(points[i], mtx);
+	for(auto& point : points)
+		point = transform::transform_coord(point, mtx);
 
 	// transform originating position.
 	position = transform::transform_coord(position, mtx);
@@ -940,7 +931,7 @@ frustum frustum::mul(frustum f, const transform& t)
 bool frustum::operator==(const frustum& frustum) const
 {
 	// Compare planes.
-	for(int i = 0; i < 6; ++i)
+	for(size_t i = 0; i < planes.size(); ++i)
 	{
 		const plane& p1 = planes[i];
 		const plane& p2 = frustum.planes[i];

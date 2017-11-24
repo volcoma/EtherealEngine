@@ -5,14 +5,14 @@
 
 namespace cereal
 {
-template <typename Archive, typename T, math::precision P>
+template <typename Archive, typename T, math::qualifier P>
 inline void SERIALIZE_FUNCTION_NAME(Archive& ar, math::tvec2<T, P>& obj)
 {
 	try_serialize(ar, cereal::make_nvp("x", obj.x));
 	try_serialize(ar, cereal::make_nvp("y", obj.y));
 }
 
-template <typename Archive, typename T, math::precision P>
+template <typename Archive, typename T, math::qualifier P>
 inline void SERIALIZE_FUNCTION_NAME(Archive& ar, math::tvec3<T, P>& obj)
 {
 	try_serialize(ar, cereal::make_nvp("x", obj.x));
@@ -20,7 +20,7 @@ inline void SERIALIZE_FUNCTION_NAME(Archive& ar, math::tvec3<T, P>& obj)
 	try_serialize(ar, cereal::make_nvp("z", obj.z));
 }
 
-template <typename Archive, typename T, math::precision P>
+template <typename Archive, typename T, math::qualifier P>
 inline void SERIALIZE_FUNCTION_NAME(Archive& ar, math::tvec4<T, P>& obj)
 {
 	try_serialize(ar, cereal::make_nvp("x", obj.x));

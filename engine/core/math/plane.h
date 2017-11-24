@@ -30,10 +30,10 @@ struct plane
 	// Public Static Methods
 	//-------------------------------------------------------------------------
 	static float dot(const plane& p, const vec4& v);
-	static float dotCoord(const plane& p, const vec3& v);
-	static float dotNormal(const plane& p, const vec3& v);
-	static plane fromPointNormal(const vec3& point, const vec3& normal);
-	static plane fromPoints(const vec3& v1, const vec3& v2, const vec3& v3);
+	static float dot_coord(const plane& p, const vec3& v);
+	static float dot_normal(const plane& p, const vec3& v);
+	static plane from_point_normal(const vec3& point, const vec3& normal);
+	static plane from_points(const vec3& v1, const vec3& v2, const vec3& v3);
 	static plane mul(const plane& p, const mat4& m);
 	static plane normalize(const plane& p);
 	static plane scale(const plane& p, float s);
@@ -54,7 +54,7 @@ struct plane
 	//-------------------------------------------------------------------------
 	// Public Members
 	//-------------------------------------------------------------------------
-	vec4 data;
+	vec4 data = { 0.0f, 0.0f, 0.0f, 0.0f };
 };
 
 //-----------------------------------------------------------------------------

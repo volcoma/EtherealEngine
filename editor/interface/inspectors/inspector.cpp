@@ -39,8 +39,8 @@ property_layout::property_layout(const rttr::property& prop, bool columns /*= tr
 
 	if (columns)
 	{
-		if (gui::GetColumnsCount() != 2)
-			gui::Columns(2, nullptr, false);
+		gui::Columns(1);
+		gui::Columns(2, nullptr, false);
 	}
 
 	gui::AlignTextToFramePadding();
@@ -58,8 +58,8 @@ property_layout::property_layout(const std::string& name, bool columns /*= true*
 {
 	if (columns)
 	{
-		if (gui::GetColumnsCount() != 2)
-			gui::Columns(2, nullptr, false);
+		gui::Columns(1);
+		gui::Columns(2, nullptr, false);
 	}
 
 	gui::AlignTextToFramePadding();
@@ -75,8 +75,8 @@ property_layout::property_layout(const std::string& name, const std::string& too
 {
 	if (columns)
 	{
-		if (gui::GetColumnsCount() != 2)
-			gui::Columns(2, nullptr, false);
+		gui::Columns(1);
+		gui::Columns(2, nullptr, false);
 	}
 
 	gui::AlignTextToFramePadding();

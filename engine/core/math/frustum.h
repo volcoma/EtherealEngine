@@ -5,6 +5,7 @@
 #include "math_types.h"
 #include "plane.h"
 #include "transform.h"
+#include <array>
 
 namespace math
 {
@@ -33,7 +34,7 @@ public:
 	// Public Methods
 	//-------------------------------------------------------------------------
 	void update(const transform& view, const transform& proj, bool _oglNDC);
-	void set_planes(const plane newPlanes[]);
+	void set_planes(const std::array<plane, 6>& new_planes);
 	void recompute_points();
 	volume_query classify_aabb(const bbox& bounds) const;
 	volume_query classify_aabb(const bbox& bounds, unsigned int& frustumBits, int& lastOutside) const;
@@ -65,9 +66,9 @@ public:
 	//-------------------------------------------------------------------------
 	// Public Variables
 	//-------------------------------------------------------------------------
-	plane planes[6]; // The 6 planes of the frustum.
-	vec3 points[8];  // The 8 corner points of the frustum.
-	vec3 position;   // The originating position of the frustum.
+	std::array<plane, 6> planes; // The 6 planes of the frustum.
+	std::array<vec3, 8> points;  // The 8 corner points of the frustum.
+	vec3 position = { 0.0f, 0.0f, 0.0f };   // The originating position of the frustum.
 
 private:
 	//-------------------------------------------------------------------------

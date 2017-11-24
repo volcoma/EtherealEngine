@@ -5,7 +5,7 @@
 
 namespace cereal
 {
-template <typename Archive, typename T, math::precision P>
+template <typename Archive, typename T, math::qualifier P>
 inline void SERIALIZE_FUNCTION_NAME(Archive& ar, math::tquat<T, P>& obj)
 {
 	try_serialize(ar, cereal::make_nvp("x", obj.x));

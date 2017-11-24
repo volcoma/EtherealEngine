@@ -162,7 +162,8 @@ bool renderer::init_backend()
 		APPLOG_ERROR("Does not support dx9. Minimum supported is dx11.");
 		return false;
 	}
-	gfx::reset(_init_window->get_size()[0], _init_window->get_size()[1], BGFX_RESET_VSYNC);
+	const auto sz = _init_window->get_size();
+	gfx::reset(sz[0], sz[1], BGFX_RESET_VSYNC);
 
 	return true;
 }

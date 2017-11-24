@@ -135,8 +135,10 @@ const math::transform& camera::get_projection() const
 		{
 			// Generate the updated perspective projection matrix
 			float fov_radians = math::radians<float>(get_fov());
-			_projection = math::perspective(fov_radians, _aspect_ratio, _near_clip, _far_clip,
-											gfx::is_homogeneous_depth());
+			_projection = gfx::is_homogeneous_depth() ?
+				math::perspectiveNO(fov_radians, _aspect_ratio, _near_clip, _far_clip) :
+				math::perspectiveZO(fov_radians, _aspect_ratio, _near_clip, _far_clip);
+	
 			_projection[2][0] += _aa_data.z;
 			_projection[2][1] += _aa_data.w;
 			// Matrix has been updated
@@ -163,9 +165,11 @@ const math::transform& camera::get_projection() const
 			float zoom = get_zoom_factor();
 			const frect rect = {-(float)_viewport_size.width / 2.0f, (float)_viewport_size.height / 2.0f,
 								(float)_viewport_size.width / 2.0f, -(float)_viewport_size.height / 2.0f};
-			_projection =
-				math::ortho(rect.left * zoom, rect.right * zoom, rect.bottom * zoom, rect.top * zoom,
-							get_near_clip(), get_far_clip(), gfx::is_homogeneous_depth());
+			_projection = gfx::is_homogeneous_depth() ? 
+				math::orthoNO(rect.left * zoom, rect.right * zoom, rect.bottom * zoom, rect.top * zoom,
+							get_near_clip(), get_far_clip()) :
+				math::orthoZO(rect.left * zoom, rect.right * zoom, rect.bottom * zoom, rect.top * zoom,
+							get_near_clip(), get_far_clip());
 			_projection[2][0] += _aa_data.z;
 			_projection[2][1] += _aa_data.w;
 			// Matrix has been updated
@@ -431,7 +435,7 @@ bool camera::viewport_to_major_axis(const math::vec2& point, const math::vec3& O
 
 	// Generate the intersection plane based on this information
 	// and pass through to the standard viewportToWorld method
-	math::plane p = math::plane::fromPointNormal(Origin, MajorAxis);
+	math::plane p = math::plane::from_point_normal(Origin, MajorAxis);
 	return viewport_to_world(point, p, WorldPos, false);
 }
 

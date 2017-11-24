@@ -406,7 +406,7 @@ void scene_dock::render(const ImVec2&)
 				auto cursor_pos = gui::GetMousePos();
 				camera_comp->get_camera().viewport_to_world(
 					math::vec2{cursor_pos.x, cursor_pos.y},
-					math::plane::fromPointNormal(math::vec3{0.0f, 0.0f, 0.0f}, math::vec3{0.0f, 1.0f, 0.0f}),
+					math::plane::from_point_normal(math::vec3{0.0f, 0.0f, 0.0f}, math::vec3{0.0f, 1.0f, 0.0f}),
 					projected_pos, false);
 			}
 
