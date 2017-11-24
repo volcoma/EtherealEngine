@@ -22,3 +22,6 @@
 [submodule "3rdparty/imgui/imgui"]
 	path = 3rdparty/imgui/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "3rdparty/glm/glm"]
+	path = 3rdparty/glm/glm
+	url = https://github.com/g-truc/glm.git
