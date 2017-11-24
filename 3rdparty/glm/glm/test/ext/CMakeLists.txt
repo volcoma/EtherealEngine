@@ -1,2 +1,0 @@
-glmCreateTestGTC(ext_vec1)
-glmCreateTestGTC(ext_vector_relational)
