@@ -214,7 +214,7 @@ void model::recalulate_lod_limits()
 		float lower_limit = 0.0f;
         
         if(_mesh_lods.size() - 1 != i)
-            lower_limit = upper_limit * (0.6f - ((i)*0.1f));
+            lower_limit = upper_limit * (0.5f - ((i)*0.1f));
         
 		_lod_limits.emplace_back(urange(urange::value_type(lower_limit), urange::value_type(upper_limit)));
 		upper_limit = lower_limit;

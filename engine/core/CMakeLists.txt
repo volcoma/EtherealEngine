@@ -1,5 +1,3 @@
-#file(GLOB_RECURSE libsrc *.h *.cpp *.hpp *.c *.cc)
-
 add_subdirectory(cmd_line)
 add_subdirectory(config)
 add_subdirectory(console)

@@ -32,45 +32,67 @@ struct gfx_callback : public gfx::CallbackI
 	}
 
 	virtual void traceVargs(const char* /*_filePath*/, std::uint16_t /*_line*/, const char* /*_format*/,
-							va_list /*_argList*/)
+							va_list /*_argList*/) final
 	{
-        //log("info", _str);
 	}
 
-	virtual void fatal(gfx::Fatal::Enum /*_code*/, const char* _str)
+	virtual void profilerBegin(
+		const char* _name
+		, uint32_t _abgr
+		, const char* _filePath
+		, uint16_t _line
+	) final
+	{
+	}
+
+	virtual void profilerBeginLiteral(
+		const char* _name
+		, uint32_t _abgr
+		, const char* _filePath
+		, uint16_t _line
+	) final
+	{
+
+	}
+
+	virtual void profilerEnd() final
+	{
+
+	}
+	virtual void fatal(gfx::Fatal::Enum /*_code*/, const char* _str) final
 	{
 		log("error", _str);
 	}
 
-	virtual uint32_t cacheReadSize(uint64_t /*_id*/)
+	virtual uint32_t cacheReadSize(uint64_t /*_id*/) final
 	{
 		return 0;
 	}
 
-	virtual bool cacheRead(uint64_t /*_id*/, void* /*_data*/, uint32_t /*_size*/)
+	virtual bool cacheRead(uint64_t /*_id*/, void* /*_data*/, uint32_t /*_size*/) final
 	{
 		return false;
 	}
 
-	virtual void cacheWrite(uint64_t /*_id*/, const void* /*_data*/, uint32_t /*_size*/)
+	virtual void cacheWrite(uint64_t /*_id*/, const void* /*_data*/, uint32_t /*_size*/) final
 	{
 	}
 
 	virtual void screenShot(const char* /*_filePath*/, uint32_t /*_width*/, uint32_t /*_height*/,
-							uint32_t /*_pitch*/, const void* /*_data*/, uint32_t /*_size*/, bool /*_yflip*/)
+							uint32_t /*_pitch*/, const void* /*_data*/, uint32_t /*_size*/, bool /*_yflip*/) final
 	{
 	}
 
 	virtual void captureBegin(uint32_t /*_width*/, uint32_t /*_height*/, uint32_t /*_pitch*/,
-							  gfx::TextureFormat::Enum /*_format*/, bool /*_yflip*/)
+							  gfx::TextureFormat::Enum /*_format*/, bool /*_yflip*/) final
 	{
 	}
 
-	virtual void captureEnd()
+	virtual void captureEnd() final
 	{
 	}
 
-	virtual void captureFrame(const void* /*_data*/, uint32_t /*_size*/)
+	virtual void captureFrame(const void* /*_data*/, uint32_t /*_size*/) final
 	{
 	}
 };
