@@ -120,7 +120,7 @@ void default_scene()
 
 	{
 		auto object = ecs.create();
-		object.set_name("object");
+		object.set_name("object_with_lods");
 		object.assign<transform_component>().lock()->set_local_position({2.0f, 1.0f, 0.0f});
 
 		model model;

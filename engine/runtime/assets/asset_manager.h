@@ -73,7 +73,7 @@ struct asset_storage : public base_storage
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void clear()
+	void clear() final
 	{
 		std::lock_guard<std::recursive_mutex> lock(container_mutex);
 		for(const auto& pair : container)
@@ -91,7 +91,7 @@ struct asset_storage : public base_storage
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void clear(const std::string& protocol)
+	void clear(const std::string& protocol) final
 	{
 		std::lock_guard<std::recursive_mutex> lock(container_mutex);
 		auto container_copy = container;
