@@ -11,10 +11,6 @@ template <typename T>
 extern bool load_from_file(core::task_future<asset_handle<T>>& output, const std::string& key);
 
 template <typename T>
-extern bool load_from_memory(core::task_future<asset_handle<T>>& output, const std::string& key, const std::uint8_t* data,
-														   std::uint32_t size);
-
-template <typename T>
 inline bool load_from_instance(core::task_future<asset_handle<T>>& output, const std::string& key,
 															 std::shared_ptr<T> instance)
 {

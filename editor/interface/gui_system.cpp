@@ -9,6 +9,7 @@
 #include "runtime/input/input.h"
 #include "runtime/rendering/index_buffer.h"
 #include "runtime/rendering/program.h"
+#include "runtime/rendering/shader.h"
 #include "runtime/rendering/render_pass.h"
 #include "runtime/rendering/render_window.h"
 #include "runtime/rendering/texture.h"
@@ -16,6 +17,17 @@
 #include "runtime/rendering/vertex_buffer.h"
 #include <unordered_map>
 
+
+//////////////////////////////////////////////////////////////////////////
+#include "../meta/interface/gui_system.hpp"
+#include "core/serialization/associative_archive.h"
+
+static const gfx::EmbeddedShader s_embedded_shaders[] =
+{
+	BGFX_EMBEDDED_SHADER(vs_ocornut_imgui),
+	BGFX_EMBEDDED_SHADER(fs_ocornut_imgui),
+	BGFX_EMBEDDED_SHADER_END()
+};
 // -------------------------------------------------------------------
 
 static gui_style s_gui_style;
@@ -276,45 +288,11 @@ void imgui_init()
 	auto& ts = core::get_subsystem<core::task_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
 
-	switch(gfx::getRendererType())
-	{
-		case gfx::RendererType::Direct3D9:
-			am.create_asset_from_memory<shader>("embedded:/vs_ocornut_imgui", &vs_ocornut_imgui_dx9[0],
-												sizeof(vs_ocornut_imgui_dx9));
-			am.create_asset_from_memory<shader>("embedded:/fs_ocornut_imgui", &fs_ocornut_imgui_dx9[0],
-												sizeof(fs_ocornut_imgui_dx9));
-			break;
+	auto vs_instance = std::make_shared<shader>(s_embedded_shaders, "vs_ocornut_imgui");
+	auto fs_instance = std::make_shared<shader>(s_embedded_shaders, "fs_ocornut_imgui");
 
-		case gfx::RendererType::Direct3D11:
-		case gfx::RendererType::Direct3D12:
-			am.create_asset_from_memory<shader>("embedded:/vs_ocornut_imgui", &vs_ocornut_imgui_dx11[0],
-												sizeof(vs_ocornut_imgui_dx11));
-			am.create_asset_from_memory<shader>("embedded:/fs_ocornut_imgui", &fs_ocornut_imgui_dx11[0],
-												sizeof(fs_ocornut_imgui_dx11));
-
-			break;
-		case gfx::RendererType::Metal:
-			am.create_asset_from_memory<shader>("embedded:/vs_ocornut_imgui", &vs_ocornut_imgui_mtl[0],
-												sizeof(vs_ocornut_imgui_mtl));
-			am.create_asset_from_memory<shader>("embedded:/fs_ocornut_imgui", &fs_ocornut_imgui_mtl[0],
-												sizeof(fs_ocornut_imgui_mtl));
-
-			break;
-		case gfx::RendererType::OpenGL:
-		case gfx::RendererType::OpenGLES:
-			am.create_asset_from_memory<shader>("embedded:/vs_ocornut_imgui", &vs_ocornut_imgui_glsl[0],
-												sizeof(vs_ocornut_imgui_glsl));
-			am.create_asset_from_memory<shader>("embedded:/fs_ocornut_imgui", &fs_ocornut_imgui_glsl[0],
-												sizeof(fs_ocornut_imgui_glsl));
-
-			break;
-		default:
-
-			break;
-	}
-
-	auto vs_ocornut_imgui = am.load<shader>("embedded:/vs_ocornut_imgui");
-	auto fs_ocornut_imgui = am.load<shader>("embedded:/fs_ocornut_imgui");
+	auto vs_ocornut_imgui = am.load_asset_from_instance<shader>("embedded:/vs_ocornut_imgui", vs_instance);
+	auto fs_ocornut_imgui = am.load_asset_from_instance<shader>("embedded:/fs_ocornut_imgui", fs_instance);
 
 	ts.push_or_execute_on_owner_thread(
 		[](asset_handle<shader> vs, asset_handle<shader> fs) {
@@ -616,9 +594,6 @@ void gui_style::set_style_colors(const hsv_setup& _setup)
 	style.Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(0.10f, 0.10f, 0.10f, 0.55f);
 }
 
-//////////////////////////////////////////////////////////////////////////
-#include "../meta/interface/gui_system.hpp"
-#include "core/serialization/associative_archive.h"
 
 void gui_style::load_style()
 {

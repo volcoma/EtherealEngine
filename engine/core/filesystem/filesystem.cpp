@@ -69,6 +69,23 @@ path resolve_protocol(const path& _path)
 	auto result = resolved / relative_path.make_preferred();
 	return result;
 }
+
+bool has_known_protocol(const path& _path)
+{
+	const auto string_path = _path.generic_string();
+	auto pos = string_path.find(':', 0) + 1;
+	if (pos == std::string::npos)
+		return false;
+
+	const auto root = string_path.substr(0, pos);
+
+	fs::path relative_path = string_path.substr(pos + 1);
+	// Matching path protocol in our list?
+	auto& protocols = get_path_protocols();
+
+	return (protocols.find(root) != std::end(protocols));
+}
+
 }
 
 #include <stdio.h>

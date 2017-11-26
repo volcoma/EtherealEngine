@@ -34,7 +34,6 @@
 // When enabled, Tracey shows a report automatically on application exit.
 #define kTraceyReportOnExit                $is($debug)
 // When enabled, Tracey is enabled
-#define kTraceyEnabled                     $is($debug) && false
 // When >0, Tracey web service is enabled. Note: requires C++11
 #define kTraceyWebserverPort               2001
 // When enabled, Tracey will hook up C CRT as well (@todo)

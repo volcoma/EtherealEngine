@@ -67,7 +67,10 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 			else
 			{
 				auto load_future = am.load<texture>(item);
-				data = load_future.get();
+				if (load_future.valid())
+				{
+					data = load_future.get();
+				}
 			}
 			var = data;
 			changed |= true;
@@ -138,7 +141,10 @@ bool inspector_asset_handle_material::inspect(rttr::variant& var, bool read_only
 			else
 			{
 				auto load_future = am.load<material>(item);
-				data = load_future.get();
+				if (load_future.valid())
+				{
+					data = load_future.get();
+				}
 			}
 			var = data;
 			return true;
@@ -208,7 +214,10 @@ bool inspector_asset_handle_mesh::inspect(rttr::variant& var, bool read_only,
 			else
 			{
 				auto load_future = am.load<mesh>(item);
-				data = load_future.get();
+				if (load_future.valid())
+				{
+					data = load_future.get();
+				}
 			}
 			var = data;
 			return true;
@@ -274,7 +283,10 @@ bool inspector_asset_handle_prefab::inspect(rttr::variant& var, bool read_only,
 			else
 			{
 				auto load_future = am.load<prefab>(item);
-				data = load_future.get();
+				if (load_future.valid())
+				{
+					data = load_future.get();
+				}
 			}
 			var = data;
 			return true;

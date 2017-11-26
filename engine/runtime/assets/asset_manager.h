@@ -108,11 +108,6 @@ struct asset_storage : public base_storage
 		}
 	}
 
-	/// key, data, size
-	std::function<bool(core::task_future<asset_handle<T>>&, const std::string&, const std::uint8_t*,
-					   std::uint32_t)>
-		load_from_memory;
-
 	/// key, mode
 	std::function<bool(core::task_future<asset_handle<T>>&, const std::string&)> load_from_file;
 

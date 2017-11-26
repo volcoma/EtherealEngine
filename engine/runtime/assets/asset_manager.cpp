@@ -17,7 +17,6 @@ bool asset_manager::initialize()
 	{
 		auto& storage = add_storage<shader>();
 		storage.load_from_file = asset_reader::load_from_file<shader>;
-		storage.load_from_memory = asset_reader::load_from_memory<shader>;
 		storage.load_from_instance = asset_reader::load_from_instance<shader>;
 		storage.rename_asset_file = asset_writer::rename_asset_file<shader>;
 		storage.delete_asset_file = asset_writer::delete_asset_file<shader>;

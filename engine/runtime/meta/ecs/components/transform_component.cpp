@@ -46,6 +46,7 @@ LOAD(transform_component)
 			}
 		}
 	}
+	obj.resolve();
 }
 LOAD_INSTANTIATE(transform_component, cereal::iarchive_associative_t);
 LOAD_INSTANTIATE(transform_component, cereal::iarchive_binary_t);

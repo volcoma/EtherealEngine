@@ -148,6 +148,7 @@ bool inspector_transform::inspect(rttr::variant& var, bool read_only,
 	}
 	gui::SameLine();
 	gui::PushID("Scale");
+
 	if(gui::DragFloatNEx(names, &scale[0], 3, 0.05f))
 	{
 		data.set_scale(scale);

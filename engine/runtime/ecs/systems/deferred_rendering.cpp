@@ -6,6 +6,7 @@
 #include "../../rendering/mesh.h"
 #include "../../rendering/model.h"
 #include "../../rendering/render_pass.h"
+#include "../../rendering/render_view.h"
 #include "../../rendering/texture.h"
 #include "../../rendering/vertex_buffer.h"
 #include "../../rendering/renderer.h"

@@ -6,6 +6,10 @@
 
 struct shader
 {
+	shader() = default;
+	shader(const gfx::Memory* _mem);
+	shader(const gfx::EmbeddedShader* _es, const char* name);
+	shader(gfx::ShaderHandle hndl);
 	//-----------------------------------------------------------------------------
 	//  Name : ~shader ()
 	/// <summary>
@@ -45,6 +49,8 @@ struct shader
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void populate(const gfx::Memory* _mem);
+	void populate(const gfx::EmbeddedShader* _es, const char* name);
+	void populate(gfx::ShaderHandle hndl);
 
 	/// Uniforms for this shader
 	std::vector<std::shared_ptr<uniform>> uniforms;

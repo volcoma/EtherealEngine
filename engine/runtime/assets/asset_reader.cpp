@@ -31,20 +31,29 @@ bool load_from_file<texture>(core::task_future<asset_handle<texture>>& output, c
 	if(output.is_ready())
 		original = output.get();
 
+	auto& ts = core::get_subsystem<core::task_system>();
+
+	auto create_resource_func_fallback = [result = original, key]() mutable
+	{
+		result.link->id = key;
+		return result;
+	};
+
+	if (!fs::has_known_protocol(key))
+	{
+		APPLOG_ERROR("Asset {0} has uknown protocol!", key);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
+		return true;
+	}
+
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
 	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<texture>();
-
-	auto& ts = core::get_subsystem<core::task_system>();
 
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-		auto create_resource_func = [ result = original, key ]() mutable
-		{
-			result.link->id = key;
-			return result;
-		};
-		output = ts.push_or_execute_on_worker_thread(create_resource_func);
+		APPLOG_ERROR("Asset {0} does not exist!", key);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
 
@@ -96,20 +105,29 @@ bool load_from_file<shader>(core::task_future<asset_handle<shader>>& output, con
 	if(output.is_ready())
 		original = output.get();
 
+	auto& ts = core::get_subsystem<core::task_system>();
+
+	auto create_resource_func_fallback = [result = original, key]() mutable
+	{
+		result.link->id = key;
+		return result;
+	};
+
+	if (!fs::has_known_protocol(key))
+	{
+		APPLOG_ERROR("Asset {0} has uknown protocol!", key);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
+		return true;
+	}
+
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
 	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<shader>();
-
-	auto& ts = core::get_subsystem<core::task_system>();
 
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-		auto create_resource_func = [ result = original, key ]() mutable
-		{
-			result.link->id = key;
-			return result;
-		};
-		output = ts.push_or_execute_on_worker_thread(create_resource_func);
+		APPLOG_ERROR("Asset {0} does not exist!", key);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
 
@@ -141,24 +159,8 @@ bool load_from_file<shader>(core::task_future<asset_handle<shader>>& output, con
 
 		if(nullptr != mem)
 		{
-			auto shdr = std::make_shared<shader>();
-			shdr->populate(mem);
-			auto uniform_count = gfx::getShaderUniforms(shdr->handle);
-			if(uniform_count > 0)
-			{
-				std::vector<gfx::UniformHandle> uniforms(uniform_count);
-				gfx::getShaderUniforms(shdr->handle, &uniforms[0], uniform_count);
-				shdr->uniforms.reserve(uniform_count);
-				for(auto& uni : uniforms)
-				{
-					auto hUniform = std::make_shared<uniform>();
-					hUniform->populate(uni);
-
-					shdr->uniforms.push_back(hUniform);
-				}
-			}
 			result.link->id = key;
-			result.link->asset = shdr;
+			result.link->asset = std::make_shared<shader>(mem);
 		}
 
 		return result;
@@ -175,20 +177,30 @@ bool load_from_file<mesh>(core::task_future<asset_handle<mesh>>& output, const s
 	asset_handle<mesh> original;
 	if(output.is_ready())
 		original = output.get();
-	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
-	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<mesh>();
 
 	auto& ts = core::get_subsystem<core::task_system>();
+
+	auto create_resource_func_fallback = [result = original, key]() mutable
+	{
+		result.link->id = key;
+		return result;
+	};
+
+	if (!fs::has_known_protocol(key))
+	{
+		APPLOG_ERROR("Asset {0} has uknown protocol!", key);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
+		return true;
+	}
+
+	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
+	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<mesh>();
 
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-		auto create_resource_func = [ result = original, key ]() mutable
-		{
-			result.link->id = key;
-			return result;
-		};
-		output = ts.push_or_execute_on_worker_thread(create_resource_func);
+		APPLOG_ERROR("Asset {0} does not exist!", key);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
 
@@ -254,20 +266,31 @@ bool load_from_file<material>(core::task_future<asset_handle<material>>& output,
 	asset_handle<material> original;
 	if(output.is_ready())
 		original = output.get();
+
+	auto& ts = core::get_subsystem<core::task_system>();
+
+	auto create_resource_func_fallback = [result = original, key]() mutable
+	{
+		result.link->id = key;
+		return result;
+	};
+
+	if (!fs::has_known_protocol(key))
+	{
+		APPLOG_ERROR("Asset {0} has uknown protocol!", key);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
+		return true;
+	}
+
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
 	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<material>();
 
-	auto& ts = core::get_subsystem<core::task_system>();
 
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-		auto create_resource_func = [ result = original, key ]() mutable
-		{
-			result.link->id = key;
-			return result;
-		};
-		output = ts.push_or_execute_on_worker_thread(create_resource_func);
+		APPLOG_ERROR("Asset {0} does not exist!", key);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
 
@@ -314,20 +337,29 @@ bool load_from_file<prefab>(core::task_future<asset_handle<prefab>>& output, con
 	if(output.is_ready())
 		original = output.get();
 
+	auto& ts = core::get_subsystem<core::task_system>();
+
+	auto create_resource_func_fallback = [result = original, key]() mutable
+	{
+		result.link->id = key;
+		return result;
+	};
+
+	if (!fs::has_known_protocol(key))
+	{
+		APPLOG_ERROR("Asset {0} has uknown protocol!", key);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
+		return true;
+	}
+
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
 	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<prefab>();
-
-	auto& ts = core::get_subsystem<core::task_system>();
 
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-		auto create_resource_func = [ result = original, key ]() mutable
-		{
-			result.link->id = key;
-			return result;
-		};
-		output = ts.push_or_execute_on_worker_thread(create_resource_func);
+		APPLOG_ERROR("Asset {0} does not exist!", key);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
 
@@ -371,20 +403,29 @@ bool load_from_file<scene>(core::task_future<asset_handle<scene>>& output, const
 	if(output.is_ready())
 		original = output.get();
 
+	auto& ts = core::get_subsystem<core::task_system>();
+
+	auto create_resource_func_fallback = [result = original, key]() mutable
+	{
+		result.link->id = key;
+		return result;
+	};
+
+	if (!fs::has_known_protocol(key))
+	{
+		APPLOG_ERROR("Asset {0} has uknown protocol!", key);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
+		return true;
+	}
+
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
 	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<scene>();
-
-	auto& ts = core::get_subsystem<core::task_system>();
 
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-		auto create_resource_func = [ result = original, key ]() mutable
-		{
-			result.link->id = key;
-			return result;
-		};
-		output = ts.push_or_execute_on_worker_thread(create_resource_func);
+		APPLOG_ERROR("Asset {0} does not exist!", key);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
 
@@ -418,50 +459,6 @@ bool load_from_file<scene>(core::task_future<asset_handle<scene>>& output, const
 
 	auto ready_memory_task = ts.push_on_worker_thread(read_memory_func);
 	output = ts.push_on_owner_thread(create_resource_func, ready_memory_task);
-	return true;
-}
-
-template <>
-bool load_from_memory<shader>(core::task_future<asset_handle<shader>>& output, const std::string& key,
-							  const std::uint8_t* data, std::uint32_t size)
-{
-	asset_handle<shader> original;
-	if(output.is_ready())
-		original = output.get();
-
-	auto create_resource_func = [&key, data, size, result = original ]() mutable
-	{
-		result.link->id = key;
-		// if nothing was read
-		if(!data && size == 0)
-			return result;
-		const gfx::Memory* mem = gfx::copy(data, size);
-		if(nullptr != mem)
-		{
-			auto shdr = std::make_shared<shader>();
-			shdr->populate(mem);
-			auto uniform_count = gfx::getShaderUniforms(shdr->handle);
-			if(uniform_count > 0)
-			{
-				std::vector<gfx::UniformHandle> uniforms(uniform_count);
-				gfx::getShaderUniforms(shdr->handle, &uniforms[0], uniform_count);
-				shdr->uniforms.reserve(uniform_count);
-				for(auto& uni : uniforms)
-				{
-					auto hUniform = std::make_shared<uniform>();
-					hUniform->populate(uni);
-
-					shdr->uniforms.push_back(hUniform);
-				}
-			}
-
-			result.link->asset = shdr;
-		}
-		return result;
-	};
-
-	auto& ts = core::get_subsystem<core::task_system>();
-	output = ts.push_or_execute_on_owner_thread(create_resource_func);
 	return true;
 }
 }
