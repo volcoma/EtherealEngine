@@ -16,8 +16,8 @@
 #include "runtime/meta/animation/animation.hpp"
 #include "runtime/meta/rendering/mesh.hpp"
 #include "runtime/rendering/mesh.h"
-#include "runtime/rendering/shader.h"
-#include "runtime/rendering/texture.h"
+#include "core/graphics/shader.h"
+#include "core/graphics/texture.h"
 #include <array>
 #include <fstream>
 

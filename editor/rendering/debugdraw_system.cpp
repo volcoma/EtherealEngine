@@ -1,6 +1,7 @@
 #include "debugdraw_system.h"
 #include "../editing/editing_system.h"
 #include "core/graphics/debugdraw.h"
+#include "core/graphics/render_pass.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/ecs/components/camera_component.h"
 #include "runtime/ecs/components/light_component.h"
@@ -8,14 +9,9 @@
 #include "runtime/ecs/components/reflection_probe_component.h"
 #include "runtime/ecs/components/transform_component.h"
 #include "runtime/rendering/camera.h"
-#include "runtime/rendering/index_buffer.h"
-#include "runtime/rendering/material.h"
 #include "runtime/rendering/mesh.h"
 #include "runtime/rendering/model.h"
 #include "runtime/rendering/program.h"
-#include "runtime/rendering/render_pass.h"
-#include "runtime/rendering/texture.h"
-#include "runtime/rendering/vertex_buffer.h"
 #include "runtime/system/events.h"
 
 namespace editor
@@ -41,7 +37,7 @@ void debugdraw_system::frame_render(std::chrono::duration<float>)
 	render_pass pass("debug_draw_pass");
 	pass.bind(surface.get());
 	pass.set_view_proj(view, proj);
-	ddRAII dd(pass.id);
+	dd_raii dd(pass.id);
 
 	if(es.show_grid)
 	{

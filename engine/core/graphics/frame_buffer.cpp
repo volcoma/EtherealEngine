@@ -88,7 +88,7 @@ void frame_buffer::populate(const std::vector<fbo_attachment>& textures)
 	std::vector<gfx::Attachment> buffer;
 	buffer.reserve(textures.size());
 
-	usize size;
+	usize size = {0, 0};
 	gfx::BackbufferRatio::Enum ratio = gfx::BackbufferRatio::Enum::Count;
 	for (auto& tex : textures)
 	{

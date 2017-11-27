@@ -1,12 +1,11 @@
 #pragma once
 
+#include <cstdint>
 #include "bgfx/bgfx.h"
 #include "common/debugdraw/debugdraw.h"
-#include <cstdint>
-
-struct ddRAII
+struct dd_raii
 {
-	ddRAII(uint8_t _viewId);
+	dd_raii(uint8_t _viewId);
 
-	ddRAII();
+	dd_raii();
 };

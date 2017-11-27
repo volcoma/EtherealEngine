@@ -3,7 +3,7 @@
 ////////////////////////////////////////////////////////////
 #include "render_window.h"
 #include "core/logging/logging.h"
-#include "render_pass.h"
+#include "core/graphics/render_pass.h"
 static std::uint32_t s_next_id = 0;
 
 void render_window::on_resize()

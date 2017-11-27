@@ -1,19 +1,18 @@
 #pragma once
 
-#include "core/graphics/graphics.h"
+#include "graphics.h"
 
-struct vertex_buffer
+struct index_buffer
 {
 	//-----------------------------------------------------------------------------
-	//  Name : ~vertex_buffer ()
+	//  Name : ~index_buffer ()
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	~vertex_buffer();
-
+	~index_buffer();
 	//-----------------------------------------------------------------------------
 	//  Name : dispose ()
 	/// <summary>
@@ -42,9 +41,8 @@ struct vertex_buffer
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void populate(const gfx::Memory* _mem, const gfx::VertexDecl& _decl,
-				  std::uint16_t _flags = BGFX_BUFFER_NONE);
+	void populate(const gfx::Memory* _mem, std::uint16_t _flags = BGFX_BUFFER_NONE);
 
 	/// Internal handle
-	gfx::VertexBufferHandle handle = {gfx::kInvalidHandle};
+	gfx::IndexBufferHandle handle = {gfx::kInvalidHandle};
 };

@@ -169,15 +169,15 @@ std::shared_ptr<frame_buffer> render_view::get_fbo(const std::string& id,
 std::shared_ptr<texture> render_view::get_depth_stencil_buffer(const usize& viewport_size)
 {
 	static auto format = gfx::get_best_format(BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER,
-		gfx::format_search_flags::RequireDepth |
-		gfx::format_search_flags::RequireStencil);
+		gfx::format_search_flags::requires_depth |
+		gfx::format_search_flags::requires_stencil);
 	return get_texture("DEPTH", viewport_size.width, viewport_size.height, false, 1, format);
 }
 std::shared_ptr<texture> render_view::get_output_buffer(const usize& viewport_size)
 {
 	static auto format = gfx::get_best_format(BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER,
-		gfx::format_search_flags::FourChannels |
-		gfx::format_search_flags::RequireAlpha);
+		gfx::format_search_flags::four_channels |
+		gfx::format_search_flags::requires_alpha);
 	return get_texture("OUTPUT", viewport_size.width, viewport_size.height, false, 1, format);
 }
 std::shared_ptr<frame_buffer> render_view::get_output_fbo(const usize& viewport_size)
@@ -187,12 +187,12 @@ std::shared_ptr<frame_buffer> render_view::get_output_fbo(const usize& viewport_
 std::shared_ptr<frame_buffer> render_view::get_g_buffer_fbo(const usize& viewport_size)
 {
 	static auto format = gfx::get_best_format(BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER,
-		gfx::format_search_flags::FourChannels |
-		gfx::format_search_flags::RequireAlpha);
+		gfx::format_search_flags::four_channels |
+		gfx::format_search_flags::requires_alpha);
 	static auto normal_format = gfx::get_best_format(BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER,
-		gfx::format_search_flags::FourChannels |
-		gfx::format_search_flags::RequireAlpha |
-		gfx::format_search_flags::HalfPrecisionFloat);
+		gfx::format_search_flags::four_channels |
+		gfx::format_search_flags::requires_alpha |
+		gfx::format_search_flags::half_precision_float);
 	auto depth_buffer = get_depth_stencil_buffer(viewport_size);
 	auto buffer0 = get_texture("GBUFFER0", viewport_size.width, viewport_size.height, false, 1, format);
 	auto buffer1 =

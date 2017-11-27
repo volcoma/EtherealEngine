@@ -6,7 +6,7 @@
 #include "runtime/ecs/prefab.h"
 #include "runtime/rendering/material.h"
 #include "runtime/rendering/mesh.h"
-#include "runtime/rendering/texture.h"
+#include "core/graphics/texture.h"
 
 bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 											 std::function<rttr::variant(const rttr::variant&)> get_metadata)
@@ -24,8 +24,9 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 	ImVec2 size = {available, available};
 	if(data)
 	{
-		float w = float(data.link->asset->get_size().width);
-		float h = float(data.link->asset->get_size().height);
+		auto asset_sz = data.link->asset->get_size();
+		float w = float(asset_sz.width);
+		float h = float(asset_sz.height);
 
 		gui::ImageWithAspect(data.link->asset, ImVec2(w, h), size);
 	}

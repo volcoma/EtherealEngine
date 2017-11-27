@@ -2,9 +2,9 @@
 #include "../system/events.h"
 #include "core/common/assert.hpp"
 #include "core/graphics/graphics.h"
+#include "core/graphics/render_pass.h"
 #include "core/logging/logging.h"
 #include "core/string_utils/string_utils.h"
-#include "render_pass.h"
 #include <cstdarg>
 
 namespace runtime

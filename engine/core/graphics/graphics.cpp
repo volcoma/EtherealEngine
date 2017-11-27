@@ -98,13 +98,10 @@ struct gfx_callback : public gfx::CallbackI
 };
 
 
-VertexDecl pos_texcoord0_vertex::decl;
-VertexDecl mesh_vertex::decl;
-
 TextureFormat::Enum get_best_format(std::uint16_t type_flags, std::uint32_t search_flags)
 {
 	//( "DX11", "Go back over the list and find good formats for DX11" )
-	bool is_depth = ((search_flags & format_search_flags::RequireDepth) != 0);
+	bool is_depth = ((search_flags & format_search_flags::requires_depth) != 0);
 	// Get best format for the target case.
 
 	if(!is_depth)
@@ -115,12 +112,12 @@ TextureFormat::Enum get_best_format(std::uint16_t type_flags, std::uint32_t sear
 		// Does the user prefer compressed textures in this case?
 		// We will select compressed formats only in the
 		// four channel non-floating point cases.
-		if((search_flags & format_search_flags::PreferCompressed) &&
-		   (search_flags & format_search_flags::FourChannels) &&
-		   !(search_flags & format_search_flags::FloatingPoint))
+		if((search_flags & format_search_flags::prefer_compressed) &&
+		   (search_flags & format_search_flags::four_channels) &&
+		   !(search_flags & format_search_flags::floating_point))
 		{
 			// Alpha is required?
-			if((search_flags & format_search_flags::RequireAlpha))
+			if((search_flags & format_search_flags::requires_alpha))
 			{
 				if(is_format_supported(type_flags, TextureFormat::BC2))
 					return TextureFormat::BC2;
@@ -138,16 +135,16 @@ TextureFormat::Enum get_best_format(std::uint16_t type_flags, std::uint32_t sear
 		} // End if prefer compressed formats
 
 		// Standard formats, and fallback for compression unsupported case
-		bool accept_padding = ((search_flags & format_search_flags::AllowPaddingChannels) != 0);
-		bool requires_alpha = ((search_flags & format_search_flags::RequireAlpha) != 0);
-		if((search_flags & format_search_flags::FloatingPoint))
+		bool accept_padding = ((search_flags & format_search_flags::allow_padding_channels) != 0);
+		bool requires_alpha = ((search_flags & format_search_flags::requires_alpha) != 0);
+		if((search_flags & format_search_flags::floating_point))
 		{
 			// Floating point formats ONLY!
-			bool accept_half = ((search_flags & format_search_flags::HalfPrecisionFloat) != 0);
-			bool accept_full = ((search_flags & format_search_flags::FullPrecisionFloat) != 0);
+			bool accept_half = ((search_flags & format_search_flags::half_precision_float) != 0);
+			bool accept_full = ((search_flags & format_search_flags::full_precision_float) != 0);
 
 			// How many channels?
-			if((search_flags & format_search_flags::FourChannels))
+			if((search_flags & format_search_flags::four_channels))
 			{
 				if(accept_full && is_format_supported(type_flags, TextureFormat::RGBA32F))
 					return TextureFormat::RGBA32F;
@@ -155,7 +152,7 @@ TextureFormat::Enum get_best_format(std::uint16_t type_flags, std::uint32_t sear
 					return TextureFormat::RGBA16F;
 
 			} // End if FourChannel
-			else if((search_flags & format_search_flags::TwoChannels))
+			else if((search_flags & format_search_flags::two_channels))
 			{
 				if(!requires_alpha)
 				{
@@ -183,7 +180,7 @@ TextureFormat::Enum get_best_format(std::uint16_t type_flags, std::uint32_t sear
 				} // End if requires_alpha
 
 			} // End if TwoChannel
-			else if((search_flags & format_search_flags::OneChannel))
+			else if((search_flags & format_search_flags::one_channel))
 			{
 				if(!requires_alpha)
 				{
@@ -216,13 +213,13 @@ TextureFormat::Enum get_best_format(std::uint16_t type_flags, std::uint32_t sear
 
 				} // End if requires_alpha
 
-			} // End if OneChannel
+			} // End if one_channel
 
 		} // End if float
 		else
 		{
 			// How many channels?
-			if((search_flags & format_search_flags::FourChannels))
+			if((search_flags & format_search_flags::four_channels))
 			{
 				if(!requires_alpha)
 				{
@@ -254,7 +251,7 @@ TextureFormat::Enum get_best_format(std::uint16_t type_flags, std::uint32_t sear
 				} // End if requires_alpha
 
 			} // End if FourChannel
-			else if((search_flags & format_search_flags::TwoChannels))
+			else if((search_flags & format_search_flags::two_channels))
 			{
 				if(!requires_alpha)
 				{
@@ -291,8 +288,8 @@ TextureFormat::Enum get_best_format(std::uint16_t type_flags, std::uint32_t sear
 
 				} // End if requires_alpha
 
-			} // End if TwoChannel
-			else if((search_flags & format_search_flags::OneChannel))
+			} // End if two_channels
+			else if((search_flags & format_search_flags::one_channel))
 			{
 				if(!requires_alpha)
 				{
@@ -333,20 +330,20 @@ TextureFormat::Enum get_best_format(std::uint16_t type_flags, std::uint32_t sear
 
 				} // End if requires_alpha
 
-			} // End if OneChannel
+			} // End if one_channel
 
 		} // End if !float
 
 	} // End if color formats
 	else
 	{
-		bool requires_stencil = ((search_flags & format_search_flags::RequireStencil) != 0);
-		if((search_flags & format_search_flags::FloatingPoint))
+		bool requires_stencil = ((search_flags & format_search_flags::requires_stencil) != 0);
+		if((search_flags & format_search_flags::floating_point))
 		{
 			// Floating point formats ONLY!
 			// bool accept_half = ((search_flags &
-			// format_search_flags::HalfPrecisionFloat) != 0);
-			bool accept_full = ((search_flags & format_search_flags::FullPrecisionFloat) != 0);
+			// format_search_flags::half_precision_float) != 0);
+			bool accept_full = ((search_flags & format_search_flags::full_precision_float) != 0);
 			if(!requires_stencil)
 			{
 				if(accept_full && is_format_supported(type_flags, TextureFormat::D32F))
@@ -407,12 +404,6 @@ bool init(RendererType::Enum _type /*= RendererType::Count */, uint16_t _vendorI
     
 	initted = bgfx::init(_type, _vendorId, _deviceId, &callback, _reallocator);
 
-	if(initted)
-	{
-		pos_texcoord0_vertex::init();
-		mesh_vertex::init();
-	}
-
 	return initted;
 }
 
@@ -426,10 +417,10 @@ std::uint64_t screen_quad(float dest_width, float dest_height, float depth, floa
 	float texture_half = get_half_texel();
 	bool origin_bottom_left = is_origin_bottom_left();
 
-	if(3 == getAvailTransientVertexBuffer(3, pos_texcoord0_vertex::decl))
+	if(3 == getAvailTransientVertexBuffer(3, pos_texcoord0_vertex::get_decl()))
 	{
 		TransientVertexBuffer vb;
-		allocTransientVertexBuffer(&vb, 3, pos_texcoord0_vertex::decl);
+		allocTransientVertexBuffer(&vb, 3, pos_texcoord0_vertex::get_decl());
 		pos_texcoord0_vertex* vertex = (pos_texcoord0_vertex*)vb.data;
 
 		const float minx = -width;
@@ -486,10 +477,10 @@ std::uint64_t clip_quad(float depth, float width, float height)
 	// float texture_half = get_half_texel();
 	bool origin_bottom_left = is_origin_bottom_left();
 
-	if(4 == getAvailTransientVertexBuffer(4, pos_texcoord0_vertex::decl))
+	if(4 == getAvailTransientVertexBuffer(4, pos_texcoord0_vertex::get_decl()))
 	{
 		TransientVertexBuffer vb;
-		allocTransientVertexBuffer(&vb, 4, pos_texcoord0_vertex::decl);
+		allocTransientVertexBuffer(&vb, 4, pos_texcoord0_vertex::get_decl());
 		pos_texcoord0_vertex* vertex = (pos_texcoord0_vertex*)vb.data;
 
 		const float minx = -width;
@@ -581,12 +572,18 @@ void get_size_from_ratio(BackbufferRatio::Enum _ratio, uint16_t& _width, uint16_
 
 const std::string& get_renderer_filename_extension()
 {
-	static std::map<gfx::RendererType::Enum, std::string> types = {
+	static const std::map<gfx::RendererType::Enum, std::string> types = {
 		{RendererType::Direct3D9, ".dx9"},   {RendererType::Direct3D11, ".dx11"},
 		{RendererType::Direct3D12, ".dx12"}, {RendererType::Gnm, ".gnm"},
 		{RendererType::Metal, ".metal"},	 {RendererType::OpenGL, ".gl"},
 		{RendererType::OpenGLES, ".gles"},   {RendererType::Noop, ".noop"}};
 
-	return types[getRendererType()];
+	const auto it = types.find(getRendererType());
+	if (it != types.cend())
+	{
+		return it->second;
+	}
+	static std::string unknown = ".unknown";
+	return unknown;
 }
 }

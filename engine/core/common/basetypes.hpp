@@ -1,19 +1,8 @@
 #pragma once
 
-#include <algorithm>
 #include <cstdint>
-#include <deque>
-#include <fstream>
-#include <list>
-#include <map>
-#include <mutex>
-#include <queue>
-#include <set>
-#include <sstream>
-#include <stack>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
+#include <array>
+#include <type_traits>
 
 struct half
 {
@@ -96,6 +85,13 @@ struct range
 		, Max(_max)
 	{
 	}
+
+	template<typename U, typename = typename std::enable_if<std::is_convertible<U, T>::value, void>::type>
+	range(const std::array<U, 2>& data)
+		: Min(data[0])
+		, Max(data[1])
+	{
+	}
 	T Min = 0;
 	T Max = 0;
     
@@ -123,6 +119,13 @@ struct size
 	size(T _width, T _height)
 		: width(_width)
 		, height(_height)
+	{
+	}
+
+	template<typename U, typename = typename std::enable_if<std::is_convertible<U, T>::value, void>::type>
+	size(const std::array<U, 2>& data)
+		: width(data[0])
+		, height(data[1])
 	{
 	}
 	T width = 0;
@@ -170,6 +173,12 @@ struct point
 	point(T _x, T _y)
 		: x(_x)
 		, y(_y)
+	{
+	}
+	template<typename U, typename = typename std::enable_if<std::is_convertible<U, T>::value, void>::type>
+	point(const std::array<U, 2>& data)
+		: x(data[0])
+		, y(data[1])
 	{
 	}
 	T x = 0;

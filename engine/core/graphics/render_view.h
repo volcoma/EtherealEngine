@@ -1,9 +1,12 @@
 #pragma once
 
+#include "../common/hash.hpp"
+#include "../common/basetypes.hpp"
 #include "frame_buffer.h"
-#include "core/common/hash.hpp"
 #include <chrono>
 #include <functional>
+#include <memory>
+#include <unordered_map>
 
 struct texture_key
 {

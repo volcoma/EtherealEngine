@@ -3,9 +3,9 @@
 // camera_component Header Includes
 //-----------------------------------------------------------------------------
 #include "../../rendering/camera.h"
-#include "../../rendering/render_pass.h"
-#include "../../rendering/render_view.h"
 #include "../ecs.h"
+#include "core/graphics/render_pass.h"
+#include "core/graphics/render_view.h"
 #include "core/common/basetypes.hpp"
 #include "core/math/math_includes.h"
 //-----------------------------------------------------------------------------

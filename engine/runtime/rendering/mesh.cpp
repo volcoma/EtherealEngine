@@ -2,9 +2,9 @@
 #include "camera.h"
 #include "core/logging/logging.h"
 #include "core/memory/checked_delete.h"
-#include "index_buffer.h"
+#include "core/graphics/vertex_buffer.h"
+#include "core/graphics/index_buffer.h"
 #include "mesh_tools.h"
-#include "vertex_buffer.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>

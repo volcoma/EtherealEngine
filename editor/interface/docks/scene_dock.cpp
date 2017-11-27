@@ -2,6 +2,7 @@
 #include "../../editing/editing_system.h"
 #include "../../system/project_manager.h"
 #include "core/system/simulation.h"
+#include "core/graphics/render_pass.h"
 #include "runtime/assets/asset_handle.h"
 #include "runtime/ecs/components/camera_component.h"
 #include "runtime/ecs/components/model_component.h"
@@ -11,7 +12,6 @@
 #include "runtime/input/input.h"
 #include "runtime/rendering/camera.h"
 #include "runtime/rendering/mesh.h"
-#include "runtime/rendering/render_pass.h"
 #include "runtime/rendering/render_window.h"
 #include "runtime/rendering/renderer.h"
 

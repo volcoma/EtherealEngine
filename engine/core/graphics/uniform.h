@@ -1,18 +1,20 @@
 #pragma once
 
-#include "core/graphics/graphics.h"
+#include "graphics.h"
+#include <string>
 
-struct index_buffer
+struct uniform
 {
 	//-----------------------------------------------------------------------------
-	//  Name : ~index_buffer ()
+	//  Name : ~Uniform ()
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	~index_buffer();
+	~uniform();
+
 	//-----------------------------------------------------------------------------
 	//  Name : dispose ()
 	/// <summary>
@@ -41,8 +43,20 @@ struct index_buffer
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void populate(const gfx::Memory* _mem, std::uint16_t _flags = BGFX_BUFFER_NONE);
+	void populate(const std::string& _name, gfx::UniformType::Enum _type, std::uint16_t _num = 1);
 
+	//-----------------------------------------------------------------------------
+	//  Name : populate ()
+	/// <summary>
+	///
+	///
+	///
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	void populate(gfx::UniformHandle _handle);
+
+	/// Uniform info
+	gfx::UniformInfo info;
 	/// Internal handle
-	gfx::IndexBufferHandle handle = {gfx::kInvalidHandle};
+	gfx::UniformHandle handle = {gfx::kInvalidHandle};
 };

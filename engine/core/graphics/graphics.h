@@ -16,37 +16,48 @@ void set_info_logger(std::function<void(const std::string& log_msg)> logger);
 void set_warning_logger(std::function<void(const std::string& log_msg)> logger);
 void set_error_logger(std::function<void(const std::string& log_msg)> logger);
 
-struct pos_texcoord0_vertex
+template<typename T>
+struct vertex
+{
+	static VertexDecl get_decl()
+	{
+		static VertexDecl s_decl = []()
+		{
+			VertexDecl decl;
+			T::init(decl);
+			return decl;
+		}();
+		return s_decl;
+	}
+};
+
+struct pos_texcoord0_vertex : vertex<pos_texcoord0_vertex>
 {
 	float x, y, z;
 	float u, v;
 
-	static void init()
+	static void init(VertexDecl& decl)
 	{
 		decl.begin()
-			.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-			.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+			.add(Attrib::Position, 3, AttribType::Float)
+			.add(Attrib::TexCoord0, 2, AttribType::Float)
 			.end();
 	}
-
-	static bgfx::VertexDecl decl;
 };
 
-struct mesh_vertex
+struct mesh_vertex : vertex<mesh_vertex>
 {
-	static void init()
+	static void init(VertexDecl& decl)
 	{
 		decl.begin()
-			.add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
-			.add(bgfx::Attrib::Color1, 4, bgfx::AttribType::Uint8, true)
-			.add(bgfx::Attrib::Normal, 4, bgfx::AttribType::Uint8, true, true)
-			.add(bgfx::Attrib::Tangent, 4, bgfx::AttribType::Uint8, true, true)
-			.add(bgfx::Attrib::Bitangent, 4, bgfx::AttribType::Uint8, true, true)
-			.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+			.add(Attrib::Position, 3, AttribType::Float)
+			.add(Attrib::Color1, 4, AttribType::Uint8, true)
+			.add(Attrib::Normal, 4, AttribType::Uint8, true, true)
+			.add(Attrib::Tangent, 4, AttribType::Uint8, true, true)
+			.add(Attrib::Bitangent, 4, AttribType::Uint8, true, true)
+			.add(Attrib::TexCoord0, 2, AttribType::Float)
 			.end();
 	}
-
-	static bgfx::VertexDecl decl;
 };
 
 inline float get_half_texel()
@@ -58,7 +69,6 @@ inline float get_half_texel()
 
 inline std::uint32_t get_max_blend_transforms()
 {
-	// BGFX_CONFIG_MAX_BONES
 	return 128;
 }
 
@@ -69,7 +79,7 @@ inline bool is_origin_bottom_left()
 
 inline bool is_homogeneous_depth()
 {
-	return gfx::getCaps()->homogeneousDepth;
+	return getCaps()->homogeneousDepth;
 }
 
 inline bool is_format_supported(std::uint16_t flags, TextureFormat::Enum format)
@@ -82,19 +92,19 @@ namespace format_search_flags
 {
 enum e
 {
-	OneChannel = 0x1,
-	TwoChannels = 0x2,
-	FourChannels = 0x8,
-	RequireAlpha = 0x10,
-	RequireStencil = 0x20,
-	PreferCompressed = 0x40,
+	one_channel = 0x1,
+	two_channels = 0x2,
+	four_channels = 0x8,
+	requires_alpha = 0x10,
+	requires_stencil = 0x20,
+	prefer_compressed = 0x40,
 
-	AllowPaddingChannels = 0x100,
-	RequireDepth = 0x200,
+	allow_padding_channels = 0x100,
+	requires_depth = 0x200,
 
-	HalfPrecisionFloat = 0x1000,
-	FullPrecisionFloat = 0x2000,
-	FloatingPoint = 0xF000,
+	half_precision_float = 0x1000,
+	full_precision_float = 0x2000,
+	floating_point = 0xF000,
 };
 
 }; // End Namespace : format_search_flags

@@ -1,6 +1,4 @@
 #pragma once
-#include "core/common/basetypes.hpp"
-#include "core/math/math_includes.h"
 #include "frame_buffer.h"
 #include <string>
 #include <unordered_map>
@@ -26,7 +24,7 @@ struct render_pass
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void bind(frame_buffer* fb) const;
+	void bind(const frame_buffer* fb) const;
     void bind() const;
 	//-----------------------------------------------------------------------------
 	//  Name : clear ()
@@ -57,8 +55,8 @@ struct render_pass
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_view_proj(const math::transform& v, const math::transform& p);
-	void set_view_proj_ortho_full(float depth);
+	void set_view_proj(const float* v, const float* p);
+
 	//-----------------------------------------------------------------------------
 	//  Name : reset ()
 	/// <summary>
@@ -78,7 +76,6 @@ struct render_pass
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	static std::uint8_t get_pass();
-    static urect get_pass_viewport();
 	///
 	std::uint8_t id;
 };

@@ -3,7 +3,6 @@
 #include "runtime/ecs/components/camera_component.h"
 #include "runtime/ecs/ecs.h"
 #include "runtime/rendering/camera.h"
-#include "runtime/rendering/render_pass.h"
 
 void game_dock::render(const ImVec2&)
 {

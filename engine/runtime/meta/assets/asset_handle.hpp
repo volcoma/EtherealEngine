@@ -6,7 +6,7 @@
 #include "../../ecs/scene.h"
 #include "../../rendering/material.h"
 #include "../../rendering/mesh.h"
-#include "../../rendering/texture.h"
+#include "core/graphics/texture.h"
 #include "core/string_utils/string_utils.h"
 #include "core/serialization/serialization.h"
 #include "core/serialization/types/string.hpp"

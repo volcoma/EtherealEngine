@@ -6,16 +6,14 @@
 #include "runtime/ecs/components/transform_component.h"
 #include "runtime/input/input.h"
 #include "runtime/rendering/camera.h"
-#include "runtime/rendering/index_buffer.h"
 #include "runtime/rendering/material.h"
 #include "runtime/rendering/mesh.h"
 #include "runtime/rendering/model.h"
-#include "runtime/rendering/render_pass.h"
 #include "runtime/rendering/render_window.h"
 #include "runtime/rendering/renderer.h"
-#include "runtime/rendering/texture.h"
-#include "runtime/rendering/vertex_buffer.h"
 #include "runtime/system/events.h"
+#include "core/graphics/render_pass.h"
+#include "core/graphics/texture.h"
 
 namespace editor
 {
@@ -69,7 +67,7 @@ void picking_system::frame_render(std::chrono::duration<float>)
 		// ID buffer clears to black, which represents clicking on nothing (background)
 		pass.clear(BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
 
-		pass.set_view_proj(pick_view, pick_proj);
+		pass.set_view_proj(math::value_ptr(pick_view), math::value_ptr(pick_proj));
 
 		ecs.for_each<transform_component, model_component>(
 			[this, &pass, &camera](runtime::entity e, transform_component& transform_comp_ref,

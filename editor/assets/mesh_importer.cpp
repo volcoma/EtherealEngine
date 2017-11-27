@@ -296,7 +296,7 @@ void process_animations(const aiScene* scene, std::vector<animation>& animations
 void process_imported_scene(const aiScene* scene, mesh::load_data& load_data,
 							std::vector<animation>& animations)
 {
-	load_data.vertex_format = gfx::mesh_vertex::decl;
+	load_data.vertex_format = gfx::mesh_vertex::get_decl();
 	process_meshes(scene, load_data);
 	process_nodes(scene, load_data);
 	process_animations(scene, animations);

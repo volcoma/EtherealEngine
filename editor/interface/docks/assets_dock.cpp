@@ -13,8 +13,8 @@
 #include "runtime/input/input.h"
 #include "runtime/rendering/material.h"
 #include "runtime/rendering/mesh.h"
-#include "runtime/rendering/shader.h"
-#include "runtime/rendering/texture.h"
+#include "core/graphics/shader.h"
+#include "core/graphics/texture.h"
 
 template <typename T>
 asset_handle<texture> get_asset_icon(T)

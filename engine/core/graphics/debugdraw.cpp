@@ -1,11 +1,12 @@
 #include "debugdraw.h"
 
-ddRAII::ddRAII(uint8_t _viewId)
+
+dd_raii::dd_raii(uint8_t _viewId)
 {
     ddBegin(_viewId);
 }
 
-ddRAII::ddRAII()
+dd_raii::dd_raii()
 {
     ddEnd();
 }

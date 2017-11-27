@@ -25,7 +25,6 @@
 #include "runtime/ecs/systems/scene_graph.h"
 #include "runtime/ecs/utils.h"
 #include "runtime/input/input.h"
-#include "runtime/rendering/frame_buffer.h"
 #include "runtime/rendering/renderer.h"
 #include "runtime/system/events.h"
 namespace editor

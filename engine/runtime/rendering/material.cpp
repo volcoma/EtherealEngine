@@ -1,7 +1,7 @@
 #include "material.h"
 #include "program.h"
-#include "texture.h"
-#include "uniform.h"
+#include "core/graphics/texture.h"
+#include "core/graphics/uniform.h"
 
 #include "../assets/asset_manager.h"
 

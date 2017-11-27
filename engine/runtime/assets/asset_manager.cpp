@@ -2,13 +2,12 @@
 #include "asset_extensions.h"
 #include "asset_reader.h"
 #include "asset_writer.h"
-#include "core/graphics/graphics.h"
 
 #include "../ecs/prefab.h"
 #include "../ecs/scene.h"
 #include "../rendering/material.h"
 #include "../rendering/mesh.h"
-#include "../rendering/shader.h"
+#include "core/graphics/shader.h"
 
 namespace runtime
 {
@@ -37,79 +36,79 @@ bool asset_manager::initialize()
 		{
 			const auto id = "embedded:/sphere";
 			auto instance = std::make_shared<mesh>();
-			instance->create_sphere(gfx::mesh_vertex::decl, 0.5f, 20, 20, false, mesh_create_origin::center);
+			instance->create_sphere(gfx::mesh_vertex::get_decl(), 0.5f, 20, 20, false, mesh_create_origin::center);
 			load_asset_from_instance(id, instance);
 		}
 		{
 			const auto id = "embedded:/cube";
 			auto instance = std::make_shared<mesh>();
-			instance->create_cube(gfx::mesh_vertex::decl, 1.0f, 1.0f, 1.0f, 1, 1, 1, false,
+			instance->create_cube(gfx::mesh_vertex::get_decl(), 1.0f, 1.0f, 1.0f, 1, 1, 1, false,
 								  mesh_create_origin::center);
 			load_asset_from_instance(id, instance);
 		}
 		{
 			const auto id = "embedded:/plane";
 			auto instance = std::make_shared<mesh>();
-			instance->create_cube(gfx::mesh_vertex::decl, 10.0f, 0.01f, 10.0f, 1, 1, 1, false,
+			instance->create_cube(gfx::mesh_vertex::get_decl(), 10.0f, 0.01f, 10.0f, 1, 1, 1, false,
 								  mesh_create_origin::center);
 			load_asset_from_instance(id, instance);
 		}
 		{
 			const auto id = "embedded:/cylinder";
 			auto instance = std::make_shared<mesh>();
-			instance->create_cylinder(gfx::mesh_vertex::decl, 0.5f, 2.0f, 20, 20, false,
+			instance->create_cylinder(gfx::mesh_vertex::get_decl(), 0.5f, 2.0f, 20, 20, false,
 									  mesh_create_origin::center);
 			load_asset_from_instance(id, instance);
 		}
 		{
 			const auto id = "embedded:/capsule";
 			auto instance = std::make_shared<mesh>();
-			instance->create_capsule(gfx::mesh_vertex::decl, 0.5f, 2.0f, 20, 20, false,
+			instance->create_capsule(gfx::mesh_vertex::get_decl(), 0.5f, 2.0f, 20, 20, false,
 									 mesh_create_origin::center);
 			load_asset_from_instance(id, instance);
 		}
 		{
 			const auto id = "embedded:/cone";
 			auto instance = std::make_shared<mesh>();
-			instance->create_cone(gfx::mesh_vertex::decl, 0.5f, 0.0f, 2, 20, 20, false,
+			instance->create_cone(gfx::mesh_vertex::get_decl(), 0.5f, 0.0f, 2, 20, 20, false,
 								  mesh_create_origin::bottom);
 			load_asset_from_instance(id, instance);
 		}
 		{
 			const auto id = "embedded:/torus";
 			auto instance = std::make_shared<mesh>();
-			instance->create_torus(gfx::mesh_vertex::decl, 1.0f, 0.5f, 20, 20, false,
+			instance->create_torus(gfx::mesh_vertex::get_decl(), 1.0f, 0.5f, 20, 20, false,
 								   mesh_create_origin::center);
 			load_asset_from_instance(id, instance);
 		}
 		{
 			const auto id = "embedded:/teapot";
 			auto instance = std::make_shared<mesh>();
-			instance->create_teapot(gfx::mesh_vertex::decl);
+			instance->create_teapot(gfx::mesh_vertex::get_decl());
 			load_asset_from_instance(id, instance);
 		}
 		{
 			const auto id = "embedded:/tetrahedron";
 			auto msh = std::make_shared<mesh>();
-			msh->create_tetrahedron(gfx::mesh_vertex::decl);
+			msh->create_tetrahedron(gfx::mesh_vertex::get_decl());
 			load_asset_from_instance(id, msh);
 		}
 		{
 			const auto id = "embedded:/octahedron";
 			auto instance = std::make_shared<mesh>();
-			instance->create_octahedron(gfx::mesh_vertex::decl);
+			instance->create_octahedron(gfx::mesh_vertex::get_decl());
 			load_asset_from_instance(id, instance);
 		}
 		{
 			const auto id = "embedded:/icosahedron";
 			auto instance = std::make_shared<mesh>();
-			instance->create_icosahedron(gfx::mesh_vertex::decl);
+			instance->create_icosahedron(gfx::mesh_vertex::get_decl());
 			load_asset_from_instance(id, instance);
 		}
 		{
 			const auto id = "embedded:/dodecahedron";
 			auto instance = std::make_shared<mesh>();
-			instance->create_dodecahedron(gfx::mesh_vertex::decl);
+			instance->create_dodecahedron(gfx::mesh_vertex::get_decl());
 			load_asset_from_instance(id, instance);
 		}
 
@@ -117,7 +116,7 @@ bool asset_manager::initialize()
 		{
 			const auto id = std::string("embedded:/icosphere") + std::to_string(i);
 			auto instance = std::make_shared<mesh>();
-			instance->create_icosphere(gfx::mesh_vertex::decl, i);
+			instance->create_icosphere(gfx::mesh_vertex::get_decl(), i);
 			load_asset_from_instance(id, instance);
 		}
 	}

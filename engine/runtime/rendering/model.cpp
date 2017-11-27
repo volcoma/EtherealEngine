@@ -1,11 +1,9 @@
 #include "model.h"
 #include "../assets/asset_manager.h"
 #include "core/math/math_includes.h"
-#include "index_buffer.h"
 #include "material.h"
 #include "mesh.h"
 #include "program.h"
-#include "vertex_buffer.h"
 
 model::model()
 {

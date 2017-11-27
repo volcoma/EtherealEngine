@@ -1,16 +1,18 @@
 #pragma once
 
-#include "core/graphics/graphics.h"
+#include "graphics.h"
 #include "texture.h"
+#include <memory>
+#include <vector>
 
 struct fbo_attachment
 {
 	/// Texture handle.
 	std::shared_ptr<::texture> texture;
 	/// Mip level.
-	uint16_t mip = 0;
+	std::uint16_t mip = 0;
 	/// Cubemap side or depth layer/slice.
-	uint16_t layer = 0;
+	std::uint16_t layer = 0;
 };
 
 struct frame_buffer

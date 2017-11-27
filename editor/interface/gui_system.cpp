@@ -1,22 +1,23 @@
 #include "gui_system.h"
-#include "embedded/editor_default.ttf.h"
-#include "embedded/fs_ocornut_imgui.bin.h"
-#include "embedded/vs_ocornut_imgui.bin.h"
 
 #include "core/filesystem/filesystem.h"
 #include "core/logging/logging.h"
+#include "core/graphics/texture.h"
+#include "core/graphics/index_buffer.h"
+#include "core/graphics/vertex_buffer.h"
+#include "core/graphics/uniform.h"
+#include "core/graphics/shader.h"
+#include "core/graphics/render_pass.h"
+
 #include "runtime/assets/asset_manager.h"
 #include "runtime/input/input.h"
-#include "runtime/rendering/index_buffer.h"
 #include "runtime/rendering/program.h"
-#include "runtime/rendering/shader.h"
-#include "runtime/rendering/render_pass.h"
 #include "runtime/rendering/render_window.h"
-#include "runtime/rendering/texture.h"
-#include "runtime/rendering/uniform.h"
-#include "runtime/rendering/vertex_buffer.h"
 #include <unordered_map>
 
+#include "embedded/editor_default.ttf.h"
+#include "embedded/fs_ocornut_imgui.bin.h"
+#include "embedded/vs_ocornut_imgui.bin.h"
 
 //////////////////////////////////////////////////////////////////////////
 #include "../meta/interface/gui_system.hpp"
@@ -264,7 +265,7 @@ void imgui_frame_update(render_window& window, std::chrono::duration<float> dt)
 	gui::NewFrame();
 
 	gui::SetNextWindowPos(ImVec2(0, 0));
-	gui::SetNextWindowSize(ImVec2(static_cast<float>(view_size.width), static_cast<float>(view_size.height)));
+	gui::SetNextWindowSize(io.DisplaySize);
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
 							 ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse |
 							 ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing;

@@ -1,12 +1,11 @@
 #pragma once
 
-#include "core/common/basetypes.hpp"
-#include "core/graphics/graphics.h"
+#include "../common/basetypes.hpp"
+#include "graphics.h"
 #include <memory>
 
 struct texture
 {
-
 	//-----------------------------------------------------------------------------
 	//  Name : Texture ()
 	/// <summary>

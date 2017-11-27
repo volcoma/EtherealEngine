@@ -1,14 +1,14 @@
 #include "deferred_rendering.h"
+#include "core/graphics/texture.h"
+#include "core/graphics/index_buffer.h"
+#include "core/graphics/vertex_buffer.h"
+#include "core/graphics/render_pass.h"
+#include "core/graphics/render_view.h"
 #include "../../assets/asset_manager.h"
 #include "../../rendering/camera.h"
-#include "../../rendering/index_buffer.h"
 #include "../../rendering/material.h"
 #include "../../rendering/mesh.h"
 #include "../../rendering/model.h"
-#include "../../rendering/render_pass.h"
-#include "../../rendering/render_view.h"
-#include "../../rendering/texture.h"
-#include "../../rendering/vertex_buffer.h"
 #include "../../rendering/renderer.h"
 #include "../../system/events.h"
 #include "../components/camera_component.h"
@@ -256,7 +256,7 @@ void deferred_rendering::build_reflections_pass(entity_component_system& ecs, st
 			{
 				auto camera = camera::get_face_camera(i, world_tranform);
 				auto& render_view = reflection_probe_comp.get_render_view(i);
-				camera.set_viewport_size(cubemap_fbo->get_size());
+				camera.set_viewport_size(usize(cubemap_fbo->get_size()));
 				auto& camera_lods = _lod_data[ce];
 				visibility_set_models_t visibility_set;
 
@@ -427,8 +427,8 @@ std::shared_ptr<frame_buffer> deferred_rendering::lighting_pass(std::shared_ptr<
 
 	static auto light_buffer_format =
 		gfx::get_best_format(BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER,
-							 gfx::format_search_flags::FourChannels | gfx::format_search_flags::RequireAlpha |
-								 gfx::format_search_flags::HalfPrecisionFloat);
+							 gfx::format_search_flags::four_channels | gfx::format_search_flags::requires_alpha |
+								 gfx::format_search_flags::half_precision_float);
 
 	auto light_buffer = render_view.get_texture("LBUFFER", viewport_size.width, viewport_size.height, false,
 												1, light_buffer_format);
@@ -532,8 +532,8 @@ std::shared_ptr<frame_buffer> deferred_rendering::reflection_probe_pass(std::sha
 
 	static auto refl_buffer_format =
 		gfx::get_best_format(BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER,
-							 gfx::format_search_flags::FourChannels | gfx::format_search_flags::RequireAlpha |
-								 gfx::format_search_flags::HalfPrecisionFloat);
+							 gfx::format_search_flags::four_channels | gfx::format_search_flags::requires_alpha |
+								 gfx::format_search_flags::half_precision_float);
 
 	auto refl_buffer = render_view.get_texture("RBUFFER", viewport_size.width, viewport_size.height, false, 1,
 											   refl_buffer_format);
@@ -631,8 +631,8 @@ std::shared_ptr<frame_buffer> deferred_rendering::atmospherics_pass(std::shared_
 
 	static auto light_buffer_format =
 		gfx::get_best_format(BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER,
-							 gfx::format_search_flags::FourChannels | gfx::format_search_flags::RequireAlpha |
-								 gfx::format_search_flags::HalfPrecisionFloat);
+							 gfx::format_search_flags::four_channels | gfx::format_search_flags::requires_alpha |
+								 gfx::format_search_flags::half_precision_float);
 
 	auto light_buffer = render_view.get_texture("LBUFFER", viewport_size.width, viewport_size.height, false,
 												1, light_buffer_format, gfx::get_default_rt_sampler_flags());
