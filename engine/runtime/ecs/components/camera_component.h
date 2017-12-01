@@ -230,7 +230,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline render_view& get_render_view()
+	inline gfx::render_view& get_render_view()
 	{
 		return _render_view;
 	}
@@ -242,7 +242,7 @@ private:
 	/// The camera object this component represents
 	camera _camera;
 	/// The render view for this component
-	render_view _render_view;
+	gfx::render_view _render_view;
 	/// Is the camera HDR?
 	bool _hdr = true;
 };

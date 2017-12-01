@@ -4,16 +4,16 @@
 #include "core/serialization/binary_archive.h"
 #include "core/serialization/types/vector.hpp"
 
-SAVE(program)
+SAVE(gpu_program)
 {
-	try_save(ar, cereal::make_nvp("shaders", obj.shaders));
+	try_save(ar, cereal::make_nvp("shaders", obj.get_shaders()));
 }
-SAVE_INSTANTIATE(program, cereal::oarchive_associative_t);
-SAVE_INSTANTIATE(program, cereal::oarchive_binary_t);
+SAVE_INSTANTIATE(gpu_program, cereal::oarchive_associative_t);
+SAVE_INSTANTIATE(gpu_program, cereal::oarchive_binary_t);
 
-LOAD(program)
+LOAD(gpu_program)
 {
-	std::vector<asset_handle<shader>> shaders;
+	std::vector<asset_handle<gfx::shader>> shaders;
 
 	try_load(ar, cereal::make_nvp("shaders", shaders));
 
@@ -23,5 +23,5 @@ LOAD(program)
 	}
 	obj.populate();
 }
-LOAD_INSTANTIATE(program, cereal::iarchive_associative_t);
-LOAD_INSTANTIATE(program, cereal::iarchive_binary_t);
+LOAD_INSTANTIATE(gpu_program, cereal::iarchive_associative_t);
+LOAD_INSTANTIATE(gpu_program, cereal::iarchive_binary_t);

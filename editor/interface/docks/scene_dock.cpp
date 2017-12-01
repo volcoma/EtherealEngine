@@ -32,7 +32,7 @@ void show_statistics(const unsigned int fps)
 	gui::Text("MSPF : %.3f ms ", 1000.0 / double(fps));
 	gui::Separator();
 
-	auto stats = gfx::getStats();
+	auto stats = gfx::get_stats();
 	uint32_t num_draws = stats->numDraw;
 	uint32_t num_computes = stats->numCompute;
 	gui::AlignTextToFramePadding();
@@ -40,7 +40,7 @@ void show_statistics(const unsigned int fps)
 	gui::AlignTextToFramePadding();
 	gui::Text("COMPUTE CALLS: %u", num_computes);
 	gui::AlignTextToFramePadding();
-	gui::Text("RENDER PASSES: %u", render_pass::get_pass());
+	gui::Text("RENDER PASSES: %u", gfx::render_pass::get_pass());
 	gui::Separator();
 	gui::Checkbox("SHOW G-BUFFER", &show_gbuffer);
 	gui::End();

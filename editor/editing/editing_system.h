@@ -8,7 +8,12 @@
 #include <chrono>
 
 class render_window;
+
+namespace gfx
+{
 struct texture;
+}
+
 namespace editor
 {
 struct editing_system : core::subsystem
@@ -139,6 +144,6 @@ struct editing_system : core::subsystem
 	/// snap data containging various snap options
 	snap snap_data;
 	/// editor icons lookup map
-	std::unordered_map<std::string, asset_handle<texture>> icons;
+	std::unordered_map<std::string, asset_handle<gfx::texture>> icons;
 };
 }

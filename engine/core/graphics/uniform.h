@@ -1,39 +1,22 @@
 #pragma once
 
-#include "graphics.h"
+#include "handle_impl.h"
 #include <string>
 
-struct uniform
+namespace gfx
 {
+struct uniform : public handle_impl<uniform_handle>
+{
+    uniform() = default;
 	//-----------------------------------------------------------------------------
-	//  Name : ~Uniform ()
+	//  Name : populate ()
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	~uniform();
-
-	//-----------------------------------------------------------------------------
-	//  Name : dispose ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void dispose();
-
-	//-----------------------------------------------------------------------------
-	//  Name : is_valid ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	bool is_valid() const;
+	uniform(const std::string& _name, uniform_type _type, std::uint16_t _num = 1);
 
 	//-----------------------------------------------------------------------------
 	//  Name : populate ()
@@ -43,20 +26,9 @@ struct uniform
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void populate(const std::string& _name, gfx::UniformType::Enum _type, std::uint16_t _num = 1);
-
-	//-----------------------------------------------------------------------------
-	//  Name : populate ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void populate(gfx::UniformHandle _handle);
+	uniform(handle_type_t _handle);
 
 	/// Uniform info
-	gfx::UniformInfo info;
-	/// Internal handle
-	gfx::UniformHandle handle = {gfx::kInvalidHandle};
+	uniform_info info;
 };
+}

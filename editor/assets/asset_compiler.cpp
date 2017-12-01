@@ -4,6 +4,8 @@
 #include "bx/string.h"
 #include "core/filesystem/filesystem.h"
 #include "core/graphics/graphics.h"
+#include "core/graphics/shader.h"
+#include "core/graphics/texture.h"
 #include "core/logging/logging.h"
 #include "core/serialization/binary_archive.h"
 #include "core/serialization/serialization.h"
@@ -16,8 +18,6 @@
 #include "runtime/meta/animation/animation.hpp"
 #include "runtime/meta/rendering/mesh.hpp"
 #include "runtime/rendering/mesh.h"
-#include "core/graphics/shader.h"
-#include "core/graphics/texture.h"
 #include <array>
 #include <fstream>
 
@@ -61,7 +61,7 @@ bool run_compile_process(const std::string& process, const std::vector<std::stri
 #if($on($windows))
 	process_reader.open((process_full.string() + " " + args).c_str(), "", &error);
 #else
-    process_reader.open(process_full.string().c_str(), args.c_str(), &error);    
+	process_reader.open(process_full.string().c_str(), args.c_str(), &error);
 #endif
 	if(!error.isOk())
 	{
@@ -102,9 +102,9 @@ void compile<material>(const fs::path&)
 }
 
 template <>
-void compile<shader>(const fs::path& absolute_key)
+void compile<gfx::shader>(const fs::path& absolute_key)
 {
-	fs::path output = absolute_key.string() + extensions::get_compiled_format<shader>();
+	fs::path output = absolute_key.string() + extensions::get_compiled_format<gfx::shader>();
 	std::string str_input = absolute_key.string();
 	std::string file = absolute_key.stem().string();
 	fs::path dir = absolute_key.parent_path();
@@ -127,8 +127,8 @@ void compile<shader>(const fs::path& absolute_key)
 	bool fs = string_utils::begins_with(file, "fs_");
 	bool cs = string_utils::begins_with(file, "cs_");
 
-	auto renderer = gfx::getRendererType();
-	if(renderer == gfx::RendererType::Direct3D11 || renderer == gfx::RendererType::Direct3D12)
+	auto renderer = gfx::get_renderer_type();
+	if(renderer == gfx::renderer_type::Direct3D11 || renderer == gfx::renderer_type::Direct3D12)
 	{
 		str_platform = "windows";
 
@@ -139,7 +139,7 @@ void compile<shader>(const fs::path& absolute_key)
 		else if(cs)
 			str_profile = "cs_5_0";
 	}
-	else if(renderer == gfx::RendererType::OpenGL)
+	else if(renderer == gfx::renderer_type::OpenGL)
 	{
 		str_platform = "linux";
 
@@ -148,7 +148,7 @@ void compile<shader>(const fs::path& absolute_key)
 		else if(cs)
 			str_profile = "430";
 	}
-	else if(renderer == gfx::RendererType::Metal)
+	else if(renderer == gfx::renderer_type::Metal)
 	{
 		str_platform = "osx";
 		str_profile = "metal";
@@ -189,15 +189,15 @@ void compile<shader>(const fs::path& absolute_key)
 }
 
 template <>
-void compile<texture>(const fs::path& absolute_key)
+void compile<gfx::texture>(const fs::path& absolute_key)
 {
-	fs::path output = absolute_key.string() + extensions::get_compiled_format<texture>();
+	fs::path output = absolute_key.string() + extensions::get_compiled_format<gfx::texture>();
 	std::string str_input = absolute_key.string();
 
 	fs::error_code err;
 	fs::path temp = fs::temp_directory_path(err);
-    temp /= uuids::random_uuid(str_input).to_string() + ".buildtemp";
-    
+	temp /= uuids::random_uuid(str_input).to_string() + ".buildtemp";
+
 	std::string str_output = temp.string();
 
 	const std::vector<std::string> args_array = {
@@ -230,7 +230,7 @@ void compile<mesh>(const fs::path& absolute_key)
 
 	fs::error_code err;
 	fs::path temp = fs::temp_directory_path(err);
-    temp /= uuids::random_uuid(str_input).to_string() + ".buildtemp";
+	temp /= uuids::random_uuid(str_input).to_string() + ".buildtemp";
 
 	mesh::load_data data;
 	std::vector<animation> animations;

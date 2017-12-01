@@ -1,84 +1,95 @@
 #pragma once
-#include "frame_buffer.h"
-#include <string>
+
+#include "handle_impl.h"
+#include <limits>
 #include <unordered_map>
 #include <vector>
+#include <memory>
 
 namespace gfx
 {
-struct render_pass
+struct frame_buffer;
+struct texture;
+struct shader;
+struct uniform;
+
+struct program : public handle_impl<program_handle>
 {
 	//-----------------------------------------------------------------------------
-	//  Name : render_pass ()
+	//  Name : Program ()
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	render_pass(const std::string& n);
+	program() = default;
 
 	//-----------------------------------------------------------------------------
-	//  Name : bind ()
+	//  Name : Program ()
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void bind(const frame_buffer* fb) const;
-	void bind() const;
-	//-----------------------------------------------------------------------------
-	//  Name : clear ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void clear(std::uint16_t _flags, std::uint32_t _rgba = 0x000000ff, float _depth = 1.0f,
-			   std::uint8_t _stencil = 0) const;
+	program(std::shared_ptr<shader> compute_shader);
 
 	//-----------------------------------------------------------------------------
-	//  Name : clear ()
+	//  Name : Program ()
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void clear() const;
+	program(std::shared_ptr<shader> vertex_shader, std::shared_ptr<shader> fragment_shader);
 
 	//-----------------------------------------------------------------------------
-	//  Name : set_view_proj ()
+	//  Name : set_texture ()
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_view_proj(const float* v, const float* p);
+	void set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::frame_buffer* _handle,
+					 uint8_t _attachment = 0,
+					 std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
 
 	//-----------------------------------------------------------------------------
-	//  Name : reset ()
+	//  Name : set_texture ()
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void reset();
+	void set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::texture* _texture,
+					 std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
+
 
 	//-----------------------------------------------------------------------------
-	//  Name : get_pass ()
+	//  Name : set_uniform ()
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static std::uint8_t get_pass();
+	void set_uniform(const std::string& _name, const void* _value, std::uint16_t _num = 1);
+
+	//-----------------------------------------------------------------------------
+	//  Name : get_uniform ()
+	/// <summary>
 	///
-	std::uint8_t id;
+	///
+	///
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	std::shared_ptr<gfx::uniform> get_uniform(const std::string& _name, bool texture = false);
+
+	/// All uniforms for this program.
+	std::unordered_map<std::string, std::shared_ptr<gfx::uniform>> uniforms;
 };
 }

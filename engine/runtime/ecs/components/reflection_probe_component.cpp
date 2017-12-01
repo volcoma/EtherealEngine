@@ -26,7 +26,7 @@ int reflection_probe_component::compute_projected_sphere_rect(irect& rect, const
 	}
 }
 
-std::shared_ptr<texture> reflection_probe_component::get_cubemap()
+std::shared_ptr<gfx::texture> reflection_probe_component::get_cubemap()
 {
 	static auto buffer_format =
 		gfx::get_best_format(BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER | BGFX_CAPS_FORMAT_TEXTURE_CUBE |
@@ -39,7 +39,7 @@ std::shared_ptr<texture> reflection_probe_component::get_cubemap()
 	return _render_view[0].get_texture("CUBEMAP", size, true, 1, buffer_format, flags);
 }
 
-std::shared_ptr<frame_buffer> reflection_probe_component::get_cubemap_fbo()
+std::shared_ptr<gfx::frame_buffer> reflection_probe_component::get_cubemap_fbo()
 {
 	return _render_view[0].get_fbo("CUBEMAP", {get_cubemap()});
 }

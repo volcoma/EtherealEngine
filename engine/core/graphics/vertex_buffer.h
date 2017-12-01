@@ -1,50 +1,22 @@
 #pragma once
 
-#include "graphics.h"
+#include "handle_impl.h"
 
-struct vertex_buffer
+namespace gfx
 {
+struct vertex_buffer : public handle_impl<vertex_buffer_handle>
+{
+    vertex_buffer() = default;
 	//-----------------------------------------------------------------------------
-	//  Name : ~vertex_buffer ()
+	//  Name : vertex_buffer ()
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	~vertex_buffer();
-
-	//-----------------------------------------------------------------------------
-	//  Name : dispose ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void dispose();
-
-	//-----------------------------------------------------------------------------
-	//  Name : is_valid ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	bool is_valid() const;
-
-	//-----------------------------------------------------------------------------
-	//  Name : populate ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void populate(const gfx::Memory* _mem, const gfx::VertexDecl& _decl,
+	vertex_buffer(const memory_view* _mem, const vertex_layout& _decl,
 				  std::uint16_t _flags = BGFX_BUFFER_NONE);
 
-	/// Internal handle
-	gfx::VertexBufferHandle handle = {gfx::kInvalidHandle};
 };
+}

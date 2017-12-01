@@ -62,7 +62,7 @@ void picking_system::frame_render(std::chrono::duration<float>)
 		static const auto perspective_ = gfx::is_homogeneous_depth() ? math::perspectiveNO<float> : math::perspectiveZO<float>;
 		auto pick_proj = perspective_(math::radians(1.0f), 1.0f, near_clip, far_clip);
 
-		render_pass pass("picking_buffer_fill");
+		gfx::render_pass pass("picking_buffer_fill");
 		pass.bind(_surface.get());
 		// ID buffer clears to black, which represents clicking on nothing (background)
 		pass.clear(BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
@@ -98,7 +98,7 @@ void picking_system::frame_render(std::chrono::duration<float>)
 				const auto& bone_transforms = model_comp_ref.get_bone_transforms();
 
 				model.render(pass.id, world_transform, bone_transforms, true, true, true, 0, 0,
-							 _program.get(), [&color_id](program& p) { p.set_uniform("u_id", &color_id); });
+							 _program.get(), [&color_id](auto& p) { p.set_uniform("u_id", &color_id); });
 			});
 	}
 
@@ -106,10 +106,10 @@ void picking_system::frame_render(std::chrono::duration<float>)
 	// Whatever mesh has the most pixels in the ID buffer is the one the user clicked on.
 	if(!_reading && _start_readback)
 	{
-		render_pass pass("picking_buffer_blit");
+		gfx::render_pass pass("picking_buffer_blit");
 		// Blit and read
-		gfx::blit(pass.id, _blit_tex->handle, 0, 0, gfx::getTexture(_surface->handle));
-		_reading = gfx::readTexture(_blit_tex->handle, _blit_data);
+		gfx::blit(pass.id, _blit_tex->native_handle(), 0, 0, _surface->get_texture()->native_handle());
+		_reading = gfx::read_texture(_blit_tex->native_handle(), _blit_data);
 		_start_readback = false;
 	}
 
@@ -126,8 +126,7 @@ void picking_system::frame_render(std::chrono::duration<float>)
 			x++;
 			/*std::uint8_t aa = *x++*/;
 
-			const gfx::Caps* caps = gfx::getCaps();
-			if(gfx::RendererType::Direct3D9 == caps->rendererType)
+			if(gfx::renderer_type::Direct3D9 == gfx::get_renderer_type())
 			{
 				// Comes back as BGRA
 				std::swap(rr, bb);
@@ -183,36 +182,36 @@ bool picking_system::initialize()
 	runtime::on_frame_render.connect(this, &picking_system::frame_render);
 	// Set up ID buffer, which has a color target and depth buffer
 	auto picking_rt =
-		std::make_shared<texture>(tex_id_dim, tex_id_dim, false, 1, gfx::TextureFormat::RGBA8,
+		std::make_shared<gfx::texture>(tex_id_dim, tex_id_dim, false, 1, gfx::texture_format::RGBA8,
 								  0 | BGFX_TEXTURE_RT | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT |
 									  BGFX_TEXTURE_MIP_POINT | BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
 
 	auto picking_rt_depth =
-		std::make_shared<texture>(tex_id_dim, tex_id_dim, false, 1, gfx::TextureFormat::D24S8,
+		std::make_shared<gfx::texture>(tex_id_dim, tex_id_dim, false, 1, gfx::texture_format::D24S8,
 								  0 | BGFX_TEXTURE_RT | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT |
 									  BGFX_TEXTURE_MIP_POINT | BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
 
 	_surface =
-		std::make_shared<frame_buffer>(std::vector<std::shared_ptr<texture>>{picking_rt, picking_rt_depth});
+		std::make_shared<gfx::frame_buffer>(std::vector<std::shared_ptr<gfx::texture>>{picking_rt, picking_rt_depth});
 
 	// CPU texture for blitting to and reading ID buffer so we can see what was clicked on.
 	// Impossible to read directly from a render target, you *must* blit to a CPU texture
 	// first. Algorithm Overview: Render on GPU -> Blit to CPU texture -> Read from CPU
 	// texture.
-	_blit_tex = std::make_shared<texture>(
-		tex_id_dim, tex_id_dim, false, 1, gfx::TextureFormat::RGBA8,
+	_blit_tex = std::make_shared<gfx::texture>(
+		tex_id_dim, tex_id_dim, false, 1, gfx::texture_format::RGBA8,
 		0 | BGFX_TEXTURE_BLIT_DST | BGFX_TEXTURE_READ_BACK | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT |
 			BGFX_TEXTURE_MIP_POINT | BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
 
 	auto& ts = core::get_subsystem<core::task_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
 
-	auto vs_picking_id = am.load<shader>("editor_data:/shaders/vs_picking_id.sc");
-	auto fs_picking_id = am.load<shader>("editor_data:/shaders/fs_picking_id.sc");
+	auto vs_picking_id = am.load<gfx::shader>("editor_data:/shaders/vs_picking_id.sc");
+	auto fs_picking_id = am.load<gfx::shader>("editor_data:/shaders/fs_picking_id.sc");
 
 	ts.push_or_execute_on_owner_thread(
-		[this](asset_handle<shader> vs, asset_handle<shader> fs) {
-			_program = std::make_unique<program>(vs, fs);
+		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
+			_program = std::make_unique<gpu_program>(vs, fs);
 
 		},
 		vs_picking_id, fs_picking_id);

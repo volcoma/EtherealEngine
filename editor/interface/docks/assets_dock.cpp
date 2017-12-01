@@ -17,60 +17,60 @@
 #include "core/graphics/texture.h"
 
 template <typename T>
-asset_handle<texture> get_asset_icon(T)
+asset_handle<gfx::texture> get_asset_icon(T)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	return es.icons["folder"];
 }
 
 template <>
-asset_handle<texture> get_asset_icon(asset_handle<texture> asset)
+asset_handle<gfx::texture> get_asset_icon(asset_handle<gfx::texture> asset)
 {
 	return asset;
 }
 template <>
-asset_handle<texture> get_asset_icon(asset_handle<prefab>)
+asset_handle<gfx::texture> get_asset_icon(asset_handle<prefab>)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	return es.icons["prefab"];
 }
 
 template <>
-asset_handle<texture> get_asset_icon(asset_handle<scene>)
+asset_handle<gfx::texture> get_asset_icon(asset_handle<scene>)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	return es.icons["scene"];
 }
 
 template <>
-asset_handle<texture> get_asset_icon(asset_handle<mesh>)
+asset_handle<gfx::texture> get_asset_icon(asset_handle<mesh>)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	return es.icons["mesh"];
 }
 template <>
-asset_handle<texture> get_asset_icon(asset_handle<material>)
+asset_handle<gfx::texture> get_asset_icon(asset_handle<material>)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	return es.icons["material"];
 }
 
-asset_handle<texture> get_loading_icon()
+asset_handle<gfx::texture> get_loading_icon()
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	return es.icons["loading"];
 }
 
 template <>
-asset_handle<texture> get_asset_icon(asset_handle<shader>)
+asset_handle<gfx::texture> get_asset_icon(asset_handle<gfx::shader>)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	return es.icons["shader"];
 }
 
-asset_handle<texture>& get_icon()
+asset_handle<gfx::texture>& get_icon()
 {
-	static asset_handle<texture> tex;
+	static asset_handle<gfx::texture> tex;
 	return tex;
 }
 
@@ -227,7 +227,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 			{
 				if(file.extension == ext)
 				{
-					using asset_t = texture;
+					using asset_t = gfx::texture;
 					using entry_t = asset_handle<asset_t>;
 					auto entry = entry_t{};
 					auto entry_future = am.find_asset_entry<asset_t>(file.relative);
@@ -360,7 +360,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 			}
 			if(file.extension == extensions::shader)
 			{
-				using asset_t = shader;
+				using asset_t = gfx::shader;
 				using entry_t = asset_handle<asset_t>;
 				auto entry = entry_t{};
 				auto entry_future = am.find_asset_entry<asset_t>(file.relative);
@@ -658,9 +658,9 @@ void assets_dock::render(const ImVec2&)
 			}
 		}
 
-		get_icon() = asset_handle<texture>();
+		get_icon() = asset_handle<gfx::texture>();
 		list_dir(opened_dir, 88.0f * scale_icons);
-		get_icon() = asset_handle<texture>();
+		get_icon() = asset_handle<gfx::texture>();
 		gui::EndChild();
 	}
 }

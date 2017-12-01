@@ -141,7 +141,7 @@ bool renderer::init_backend()
 	desktop.height = 100;
 	_init_window = std::make_unique<mml::window>(desktop, "App", mml::style::none);
 	_init_window->set_visible(false);
-	gfx::PlatformData pd{
+	gfx::platform_data pd{
 		reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(_init_window->get_system_handle_specific())),
 		reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(_init_window->get_system_handle())),
 		nullptr,
@@ -150,14 +150,14 @@ bool renderer::init_backend()
 		nullptr,
 	};
 
-	gfx::setPlatformData(pd);
+	gfx::set_platform_data(pd);
 
 	// auto detect
-	const auto preferred_renderer_type = gfx::RendererType::Count;
+	const auto preferred_renderer_type = gfx::renderer_type::Count;
 	if(!gfx::init(preferred_renderer_type))
 		return false;
 
-	if(gfx::getRendererType() == gfx::RendererType::Direct3D9)
+	if(gfx::get_renderer_type() == gfx::renderer_type::Direct3D9)
 	{
 		APPLOG_ERROR("Does not support dx9. Minimum supported is dx11.");
 		return false;
@@ -170,12 +170,12 @@ bool renderer::init_backend()
 
 void renderer::frame_end(std::chrono::duration<float>)
 {
-	render_pass pass("init_bb_update");
+	gfx::render_pass pass("init_bb_update");
 	pass.bind();
 	pass.clear();
 
 	_render_frame = gfx::frame();
 
-	render_pass::reset();
+	gfx::render_pass::reset();
 }
 }

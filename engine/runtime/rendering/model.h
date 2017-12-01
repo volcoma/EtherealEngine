@@ -7,8 +7,9 @@
 #include "core/serialization/serialization.h"
 #include <vector>
 
+
+class gpu_program;
 class mesh;
-struct program;
 class material;
 
 class model
@@ -175,8 +176,8 @@ public:
 	//-----------------------------------------------------------------------------
 	void render(std::uint8_t id, const math::transform& world_transform,
 				const std::vector<math::transform>& bone_transforms, bool apply_cull, bool depth_write,
-				bool depth_test, std::uint64_t extra_states, unsigned int lod, program* user_program,
-				std::function<void(program&)> setup_params) const;
+				bool depth_test, std::uint64_t extra_states, unsigned int lod, gpu_program* user_program,
+				std::function<void(gpu_program&)> setup_params) const;
 
 private:
 	void recalulate_lod_limits();

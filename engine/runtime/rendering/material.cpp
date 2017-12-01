@@ -1,5 +1,5 @@
 #include "material.h"
-#include "program.h"
+#include "gpu_program.h"
 #include "core/graphics/texture.h"
 #include "core/graphics/uniform.h"
 
@@ -8,10 +8,10 @@
 material::material()
 {
 	auto& am = core::get_subsystem<runtime::asset_manager>();
-	auto default_color = am.load<texture>("engine_data:/textures/default_color.dds");
+	auto default_color = am.load<gfx::texture>("engine_data:/textures/default_color.dds");
 	_default_color_map = default_color.get();
 
-	auto default_normal = am.load<texture>("engine_data:/textures/default_normal.dds");
+	auto default_normal = am.load<gfx::texture>("engine_data:/textures/default_normal.dds");
 	_default_normal_map = default_normal.get();
 }
 
@@ -19,26 +19,13 @@ material::~material()
 {
 }
 
-void material::set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::TextureHandle _texture,
+void material::set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::texture* _texture,
 						   std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
 	get_program()->set_texture(_stage, _sampler, _texture, _flags);
 }
 
-void material::set_texture(std::uint8_t _stage, const std::string& _sampler, texture* _texture,
-						   std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
-{
-	get_program()->set_texture(_stage, _sampler, _texture, _flags);
-}
-
-void material::set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::FrameBufferHandle _handle,
-						   uint8_t _attachment /*= 0 */,
-						   std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
-{
-	get_program()->set_texture(_stage, _sampler, _handle, _attachment, _flags);
-}
-
-void material::set_texture(std::uint8_t _stage, const std::string& _sampler, frame_buffer* _handle,
+void material::set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::frame_buffer* _handle,
 						   uint8_t _attachment /*= 0 */,
 						   std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
@@ -50,7 +37,7 @@ void material::set_uniform(const std::string& _name, const void* _value, std::ui
 	get_program()->set_uniform(_name, _value, _num);
 }
 
-program* material::get_program() const
+gpu_program* material::get_program() const
 {
 	return skinned ? _program_skinned.get() : _program.get();
 }
@@ -82,20 +69,20 @@ standard_material::standard_material()
 {
 	auto& ts = core::get_subsystem<core::task_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
-	auto vs_deferred_geom = am.load<shader>("engine_data:/shaders/vs_deferred_geom.sc");
-	auto vs_deferred_geom_skinned = am.load<shader>("engine_data:/shaders/vs_deferred_geom_skinned.sc");
-	auto fs_deferred_geom = am.load<shader>("engine_data:/shaders/fs_deferred_geom.sc");
+	auto vs_deferred_geom = am.load<gfx::shader>("engine_data:/shaders/vs_deferred_geom.sc");
+	auto vs_deferred_geom_skinned = am.load<gfx::shader>("engine_data:/shaders/vs_deferred_geom_skinned.sc");
+	auto fs_deferred_geom = am.load<gfx::shader>("engine_data:/shaders/fs_deferred_geom.sc");
 
 	ts.push_or_execute_on_owner_thread(
-		[this](asset_handle<shader> vs, asset_handle<shader> fs) {
-			_program = std::make_unique<program>(vs, fs);
+		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
+			_program = std::make_unique<gpu_program>(vs, fs);
 
 		},
 		vs_deferred_geom, fs_deferred_geom);
 
 	ts.push_or_execute_on_owner_thread(
-		[this](asset_handle<shader> vs, asset_handle<shader> fs) {
-			_program_skinned = std::make_unique<program>(vs, fs);
+		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
+			_program_skinned = std::make_unique<gpu_program>(vs, fs);
 
 		},
 		vs_deferred_geom_skinned, fs_deferred_geom);

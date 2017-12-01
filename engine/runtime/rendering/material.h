@@ -8,9 +8,12 @@
 
 #include <unordered_map>
 
-struct program;
+class gpu_program;
+namespace gfx
+{
 struct texture;
 struct frame_buffer;
+}
 
 enum class cull_type : std::uint32_t
 {
@@ -66,21 +69,10 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_texture(std::uint8_t _stage, const std::string& _sampler, frame_buffer* _handle,
+	void set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::frame_buffer* _handle,
 					 uint8_t _attachment = 0,
 					 std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
 
-	//-----------------------------------------------------------------------------
-	//  Name : set_texture ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::FrameBufferHandle _handle,
-					 uint8_t _attachment = 0,
-					 std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_texture ()
@@ -90,18 +82,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_texture(std::uint8_t _stage, const std::string& _sampler, texture* _texture,
-					 std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
-
-	//-----------------------------------------------------------------------------
-	//  Name : set_texture ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::TextureHandle _texture,
+	void set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::texture* _texture,
 					 std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
 
 	//-----------------------------------------------------------------------------
@@ -122,7 +103,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	program* get_program() const;
+	gpu_program* get_program() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : submit (virtual )
@@ -175,15 +156,15 @@ public:
 
 protected:
 	/// Program that is responsible for rendering.
-	std::unique_ptr<program> _program;
+	std::unique_ptr<gpu_program> _program;
 	/// Program that is responsible for rendering.
-	std::unique_ptr<program> _program_skinned;
+	std::unique_ptr<gpu_program> _program_skinned;
 	/// Cull type for this material.
 	cull_type _cull_type = cull_type::counter_clockwise;
 	/// Default color texture
-	asset_handle<texture> _default_color_map;
+	asset_handle<gfx::texture> _default_color_map;
 	/// Default normal texture
-	asset_handle<texture> _default_normal_map;
+	asset_handle<gfx::texture> _default_normal_map;
 };
 
 class standard_material : public material
@@ -444,7 +425,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline asset_handle<texture> get_color_map()
+	inline asset_handle<gfx::texture> get_color_map()
 	{
 		return _maps["color"];
 	}
@@ -457,7 +438,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_color_map(asset_handle<texture> val)
+	inline void set_color_map(asset_handle<gfx::texture> val)
 	{
 		_maps["color"] = val;
 	}
@@ -470,7 +451,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline asset_handle<texture> get_normal_map()
+	inline asset_handle<gfx::texture> get_normal_map()
 	{
 		return _maps["normal"];
 	}
@@ -483,7 +464,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_normal_map(asset_handle<texture> val)
+	inline void set_normal_map(asset_handle<gfx::texture> val)
 	{
 		_maps["normal"] = val;
 	}
@@ -496,7 +477,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline asset_handle<texture> get_roughness_map()
+	inline asset_handle<gfx::texture> get_roughness_map()
 	{
 		return _maps["roughness"];
 	}
@@ -509,7 +490,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_roughness_map(asset_handle<texture> val)
+	inline void set_roughness_map(asset_handle<gfx::texture> val)
 	{
 		_maps["roughness"] = val;
 	}
@@ -522,7 +503,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline asset_handle<texture> get_metalness_map()
+	inline asset_handle<gfx::texture> get_metalness_map()
 	{
 		return _maps["metalness"];
 	}
@@ -535,7 +516,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_metalness_map(asset_handle<texture> val)
+	inline void set_metalness_map(asset_handle<gfx::texture> val)
 	{
 		_maps["metalness"] = val;
 	}
@@ -548,7 +529,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline asset_handle<texture> get_ao_map()
+	inline asset_handle<gfx::texture> get_ao_map()
 	{
 		return _maps["ao"];
 	}
@@ -561,7 +542,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_ao_map(asset_handle<texture> val)
+	inline void set_ao_map(asset_handle<gfx::texture> val)
 	{
 		_maps["ao"] = val;
 	}
@@ -610,5 +591,5 @@ private:
 	};
 
 	/// Texture maps
-	std::unordered_map<std::string, asset_handle<texture>> _maps;
+	std::unordered_map<std::string, asset_handle<gfx::texture>> _maps;
 };

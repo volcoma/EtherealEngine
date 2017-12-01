@@ -10,8 +10,12 @@
 #include <memory>
 #include <vector>
 
+namespace gfx
+{
 struct vertex_buffer;
 struct index_buffer;
+}
+
 class camera;
 namespace triangle_flags
 {
@@ -417,7 +421,7 @@ public:
 	struct load_data
 	{
 		/// The format of the vertex data currently being used to prepare the mesh.
-		gfx::VertexDecl vertex_format;
+		gfx::vertex_layout vertex_format;
 		/// Final vertex buffer currently being prepared.
 		std::vector<std::uint8_t> vertex_data;
 		/// Total number of vertices currently stored here.
@@ -476,7 +480,7 @@ public:
 	/// Prepare the mesh immediately with the specified data.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool prepare_mesh(const gfx::VertexDecl& vertex_format);
+	bool prepare_mesh(const gfx::vertex_layout& vertex_format);
 
 	//-----------------------------------------------------------------------------
 	//  Name : prepare_mesh ()
@@ -484,7 +488,7 @@ public:
 	/// Prepare the mesh immediately with the specified data.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool prepare_mesh(const gfx::VertexDecl& vertex_format, void* vertices, std::uint32_t vertex_count,
+	bool prepare_mesh(const gfx::vertex_layout& vertex_format, void* vertices, std::uint32_t vertex_count,
 					  const triangle_array_t& faces, bool hardware_copy = true, bool weld = true,
 					  bool optimize = true);
 
@@ -495,7 +499,7 @@ public:
 	/// specify the source of the vertex buffer to pull data from.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool set_vertex_source(void* source, std::uint32_t vertex_count, const gfx::VertexDecl& source_format);
+	bool set_vertex_source(void* source, std::uint32_t vertex_count, const gfx::vertex_layout& source_format);
 
 	//-----------------------------------------------------------------------------
 	//  Name : add_primitives ()
@@ -540,7 +544,7 @@ public:
 	/// Create cube geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool create_cube(const gfx::VertexDecl& format, float width, float height, float depth,
+	bool create_cube(const gfx::vertex_layout& format, float width, float height, float depth,
 					 std::uint32_t width_segments, std::uint32_t height_segments,
 					 std::uint32_t depth_segments, bool inverted, mesh_create_origin origin,
 					 bool hardware_copy = true);
@@ -551,7 +555,7 @@ public:
 	/// Create cube geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool create_cube(const gfx::VertexDecl& format, float width, float height, float depth,
+	bool create_cube(const gfx::vertex_layout& format, float width, float height, float depth,
 					 std::uint32_t width_segments, std::uint32_t height_segments,
 					 std::uint32_t depth_segments, float tex_u_scale, float tex_v_scale, bool inverted,
 					 mesh_create_origin origin, bool hardware_copy = true);
@@ -562,7 +566,7 @@ public:
 	/// Create sphere geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool create_sphere(const gfx::VertexDecl& format, float radius, std::uint32_t stacks,
+	bool create_sphere(const gfx::vertex_layout& format, float radius, std::uint32_t stacks,
 					   std::uint32_t slices, bool inverted, mesh_create_origin origin,
 					   bool hardware_copy = true);
 
@@ -572,7 +576,7 @@ public:
 	/// Create cylinder geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool create_cylinder(const gfx::VertexDecl& format, float radius, float height, std::uint32_t stacks,
+	bool create_cylinder(const gfx::vertex_layout& format, float radius, float height, std::uint32_t stacks,
 						 std::uint32_t slices, bool inverted, mesh_create_origin origin,
 						 bool hardware_copy = true);
 
@@ -582,7 +586,7 @@ public:
 	/// Create capsule geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool create_capsule(const gfx::VertexDecl& format, float radius, float height, std::uint32_t stacks,
+	bool create_capsule(const gfx::vertex_layout& format, float radius, float height, std::uint32_t stacks,
 						std::uint32_t slices, bool inverted, mesh_create_origin origin,
 						bool hardware_copy = true);
 
@@ -592,7 +596,7 @@ public:
 	/// Create cone geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool create_cone(const gfx::VertexDecl& format, float radius, float radiusTip, float height,
+	bool create_cone(const gfx::vertex_layout& format, float radius, float radiusTip, float height,
 					 std::uint32_t stacks, std::uint32_t slices, bool inverted, mesh_create_origin origin,
 					 bool hardware_copy = true);
 
@@ -602,7 +606,7 @@ public:
 	/// Create torus geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool create_torus(const gfx::VertexDecl& format, float outer_radius, float inner_radius,
+	bool create_torus(const gfx::vertex_layout& format, float outer_radius, float inner_radius,
 					  std::uint32_t bands, std::uint32_t sides, bool inverted, mesh_create_origin origin,
 					  bool hardware_copy = true);
 
@@ -612,7 +616,7 @@ public:
 	/// Create teapot geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool create_teapot(const gfx::VertexDecl& format, bool hardware_copy = true);
+	bool create_teapot(const gfx::vertex_layout& format, bool hardware_copy = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : create_tetrahedron ()
@@ -620,7 +624,7 @@ public:
 	/// Create tetrahedron geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool create_tetrahedron(const gfx::VertexDecl& format, bool hardware_copy = true);
+	bool create_tetrahedron(const gfx::vertex_layout& format, bool hardware_copy = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : create_octahedron ()
@@ -628,7 +632,7 @@ public:
 	/// Create octahedron geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool create_octahedron(const gfx::VertexDecl& format, bool hardware_copy = true);
+	bool create_octahedron(const gfx::vertex_layout& format, bool hardware_copy = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : create_icosahedron ()
@@ -636,7 +640,7 @@ public:
 	/// Create icosahedron geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool create_icosahedron(const gfx::VertexDecl& format, bool hardware_copy = true);
+	bool create_icosahedron(const gfx::vertex_layout& format, bool hardware_copy = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : create_dodecahedron ()
@@ -644,7 +648,7 @@ public:
 	/// Create dodecahedron geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool create_dodecahedron(const gfx::VertexDecl& format, bool hardware_copy = true);
+	bool create_dodecahedron(const gfx::vertex_layout& format, bool hardware_copy = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : create_dodecahedron ()
@@ -652,7 +656,7 @@ public:
 	/// Create icosphere geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool create_icosphere(const gfx::VertexDecl& format, int tesselation_level, bool hardware_copy = true);
+	bool create_icosphere(const gfx::vertex_layout& format, int tesselation_level, bool hardware_copy = true);
 	//-----------------------------------------------------------------------------
 	//  Name : end_prepare ()
 	/// <summary>
@@ -742,7 +746,7 @@ public:
 	/// Retrieve the format of the underlying mesh vertex data.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const gfx::VertexDecl& get_vertex_format() const;
+	const gfx::vertex_layout& get_vertex_format() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_skin_bind_data ()
@@ -831,7 +835,7 @@ protected:
 		/// Do we own the source data?
 		bool owns_source = false;
 		/// The format of the vertex data currently being used to prepare the mesh.
-		gfx::VertexDecl source_format;
+		gfx::vertex_layout source_format;
 		/// Records the location in the vertex buffer that each vertex has been
 		/// placed during data insertion.
 		std::vector<std::uint32_t> vertex_records;
@@ -923,7 +927,7 @@ protected:
 		// Pointer to the vertex for easy access.
 		std::uint8_t* vertex;
 		// Format of the above vertex for easy access.
-		gfx::VertexDecl format;
+		gfx::vertex_layout format;
 		// The tolerance we're using to weld (transport only, these should be the
 		// same for every key).
 		float tolerance;
@@ -1077,17 +1081,17 @@ protected:
 	/// system memory copy.
 	std::uint8_t* _system_vb = nullptr;
 	/// Vertex format used for the mesh internal vertex data.
-	gfx::VertexDecl _vertex_format;
+	gfx::vertex_layout _vertex_format;
 	/// The final system memory copy of the index buffer.
 	std::uint32_t* _system_ib = nullptr;
 	/// Material and data group information for each triangle.
 	subset_key_array_t _triangle_data;
 	/// After constructing the mesh, this will contain the actual hardware vertex
 	/// buffer resource
-	std::shared_ptr<vertex_buffer> _hardware_vb;
+	std::shared_ptr<gfx::vertex_buffer> _hardware_vb;
 	/// After constructing the mesh, this will contain the actual hardware index
 	/// buffer resource
-	std::shared_ptr<index_buffer> _hardware_ib;
+	std::shared_ptr<gfx::index_buffer> _hardware_ib;
 
 	// mesh data look up tables
 	/// The actual list of subsets maintained by this mesh.

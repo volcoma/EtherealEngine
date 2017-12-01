@@ -3,7 +3,10 @@
 #include "inspector.h"
 #include "runtime/assets/asset_handle.h"
 
+namespace gfx
+{
 struct texture;
+}
 class mesh;
 struct prefab;
 class material;
@@ -15,7 +18,7 @@ struct inspector_asset_handle_texture : public inspector
 	bool inspect(rttr::variant& var, bool read_only,
 				 std::function<rttr::variant(const rttr::variant&)> get_metadata);
 };
-INSPECTOR_REFLECT(inspector_asset_handle_texture, asset_handle<texture>)
+INSPECTOR_REFLECT(inspector_asset_handle_texture, asset_handle<gfx::texture>)
 
 struct inspector_asset_handle_material : public inspector
 {

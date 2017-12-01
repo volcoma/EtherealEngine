@@ -1,16 +1,23 @@
 #pragma once
 
-#include "../../rendering/program.h"
+#include "../../rendering/gpu_program.h"
 #include "../components/model_component.h"
 #include "../components/transform_component.h"
 #include "../ecs.h"
+
 #include <chrono>
 #include <memory>
 #include <tuple>
 #include <vector>
 
 class camera;
+
+namespace gfx
+{
+struct texture;
+struct frame_buffer;
 class render_view;
+}
 
 namespace runtime
 {
@@ -116,10 +123,10 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::shared_ptr<frame_buffer> deferred_render_full(camera& camera, render_view& render_view,
-													   entity_component_system& ecs,
-													   std::unordered_map<entity, lod_data>& camera_lods,
-													   std::chrono::duration<float> dt);
+	std::shared_ptr<gfx::frame_buffer> deferred_render_full(camera& camera, gfx::render_view& render_view,
+															entity_component_system& ecs,
+															std::unordered_map<entity, lod_data>& camera_lods,
+															std::chrono::duration<float> dt);
 
 	//-----------------------------------------------------------------------------
 	//  Name : g_buffer_pass ()
@@ -129,11 +136,11 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::shared_ptr<frame_buffer> g_buffer_pass(std::shared_ptr<frame_buffer> input, camera& camera,
-												render_view& render_view,
-												visibility_set_models_t& visibility_set,
-												std::unordered_map<entity, lod_data>& camera_lods,
-												std::chrono::duration<float> dt);
+	std::shared_ptr<gfx::frame_buffer> g_buffer_pass(std::shared_ptr<gfx::frame_buffer> input, camera& camera,
+													 gfx::render_view& render_view,
+													 visibility_set_models_t& visibility_set,
+													 std::unordered_map<entity, lod_data>& camera_lods,
+													 std::chrono::duration<float> dt);
 
 	//-----------------------------------------------------------------------------
 	//  Name : lighting_pass ()
@@ -143,9 +150,9 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::shared_ptr<frame_buffer> lighting_pass(std::shared_ptr<frame_buffer> input, camera& camera,
-												render_view& render_view, entity_component_system& ecs,
-												std::chrono::duration<float> dt, bool bind_indirect_specular);
+	std::shared_ptr<gfx::frame_buffer>
+	lighting_pass(std::shared_ptr<gfx::frame_buffer> input, camera& camera, gfx::render_view& render_view,
+				  entity_component_system& ecs, std::chrono::duration<float> dt, bool bind_indirect_specular);
 
 	//-----------------------------------------------------------------------------
 	//  Name : reflection_probe ()
@@ -155,10 +162,10 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::shared_ptr<frame_buffer> reflection_probe_pass(std::shared_ptr<frame_buffer> input, camera& camera,
-														render_view& render_view,
-														entity_component_system& ecs,
-														std::chrono::duration<float> dt);
+	std::shared_ptr<gfx::frame_buffer> reflection_probe_pass(std::shared_ptr<gfx::frame_buffer> input,
+															 camera& camera, gfx::render_view& render_view,
+															 entity_component_system& ecs,
+															 std::chrono::duration<float> dt);
 
 	//-----------------------------------------------------------------------------
 	//  Name : atmospherics_pass ()
@@ -168,9 +175,10 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::shared_ptr<frame_buffer> atmospherics_pass(std::shared_ptr<frame_buffer> input, camera& camera,
-													render_view& render_view, entity_component_system& ecs,
-													std::chrono::duration<float> dt);
+	std::shared_ptr<gfx::frame_buffer> atmospherics_pass(std::shared_ptr<gfx::frame_buffer> input,
+														 camera& camera, gfx::render_view& render_view,
+														 entity_component_system& ecs,
+														 std::chrono::duration<float> dt);
 
 	//-----------------------------------------------------------------------------
 	//  Name : tonemapping_pass ()
@@ -180,26 +188,26 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::shared_ptr<frame_buffer> tonemapping_pass(std::shared_ptr<frame_buffer> input, camera& camera,
-												   render_view& render_view);
+	std::shared_ptr<gfx::frame_buffer> tonemapping_pass(std::shared_ptr<gfx::frame_buffer> input,
+														camera& camera, gfx::render_view& render_view);
 
 private:
 	std::unordered_map<entity, std::unordered_map<entity, lod_data>> _lod_data;
 	/// Program that is responsible for rendering.
-	std::unique_ptr<program> _directional_light_program;
+	std::unique_ptr<gpu_program> _directional_light_program;
 	/// Program that is responsible for rendering.
-	std::unique_ptr<program> _point_light_program;
+	std::unique_ptr<gpu_program> _point_light_program;
 	/// Program that is responsible for rendering.
-	std::unique_ptr<program> _spot_light_program;
+	std::unique_ptr<gpu_program> _spot_light_program;
 	/// Program that is responsible for rendering.
-	std::unique_ptr<program> _box_ref_probe_program;
+	std::unique_ptr<gpu_program> _box_ref_probe_program;
 	/// Program that is responsible for rendering.
-	std::unique_ptr<program> _sphere_ref_probe_program;
+	std::unique_ptr<gpu_program> _sphere_ref_probe_program;
 	/// Program that is responsible for rendering.
-	std::unique_ptr<program> _gamma_correction_program;
+	std::unique_ptr<gpu_program> _gamma_correction_program;
 	/// Program that is responsible for rendering.
-	std::unique_ptr<program> _atmospherics_program;
+	std::unique_ptr<gpu_program> _atmospherics_program;
 
-	asset_handle<texture> _ibl_brdf_lut;
+	asset_handle<gfx::texture> _ibl_brdf_lut;
 };
 }

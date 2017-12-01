@@ -11,11 +11,11 @@
 bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 											 std::function<rttr::variant(const rttr::variant&)> get_metadata)
 {
-	auto data = var.get_value<asset_handle<texture>>();
+	auto data = var.get_value<asset_handle<gfx::texture>>();
 	auto& es = core::get_subsystem<editor::editing_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
 	auto& selected = es.selection_data.object;
-	bool is_selected = selected && selected.is_type<asset_handle<texture>>();
+	bool is_selected = selected && selected.is_type<asset_handle<gfx::texture>>();
 	bool changed = false;
 	float available = math::min(64.0f, gui::GetContentRegionAvailWidth() / 1.5f);
 	if(is_selected)
@@ -47,12 +47,12 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 	auto bbMinFrame = gui::GetItemRectMin();
 	auto bbMaxFrame = gui::GetItemRectMax();
 
-	if(selected && !selected.is_type<asset_handle<texture>>())
+	if(selected && !selected.is_type<asset_handle<gfx::texture>>())
 	{
 		gui::SameLine();
 		if(gui::Button("REMOVE"))
 		{
-			data = asset_handle<texture>();
+			data = asset_handle<gfx::texture>();
 			var = data;
 			changed |= true;
 		}
@@ -63,11 +63,11 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 			item = var_str.to_string();
 			if(item.empty())
 			{
-				data = asset_handle<texture>();
+				data = asset_handle<gfx::texture>();
 			}
 			else
 			{
-				auto load_future = am.load<texture>(item);
+				auto load_future = am.load<gfx::texture>(item);
 				if (load_future.valid())
 				{
 					data = load_future.get();
@@ -85,7 +85,7 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 		}
 
 		auto& dragged = es.drag_data.object;
-		if(dragged && dragged.is_type<asset_handle<texture>>())
+		if(dragged && dragged.is_type<asset_handle<gfx::texture>>())
 		{
 			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.9f));
 			gui::RenderFrameEx(bbMinFrame, bbMaxFrame, true, 0.0f, 1.0f);
@@ -102,7 +102,7 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 
 				if(gui::IsMouseReleased(gui::drag_button))
 				{
-					data = dragged.get_value<asset_handle<texture>>();
+					data = dragged.get_value<asset_handle<gfx::texture>>();
 					var = data;
 					changed |= true;
 				}
@@ -113,7 +113,7 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 
 	if(data)
 	{
-		gfx::TextureInfo info = data.get()->info;
+		auto info = data.get()->info;
 		rttr::variant vari = info;
 		changed |= inspect_var(vari);
 	}

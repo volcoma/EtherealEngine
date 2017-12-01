@@ -72,7 +72,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline render_view& get_render_view(size_t idx)
+	inline gfx::render_view& get_render_view(size_t idx)
 	{
 		return _render_view[idx];
 	}
@@ -85,7 +85,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::shared_ptr<texture> get_cubemap();
+	std::shared_ptr<gfx::texture> get_cubemap();
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_cubemap_fbo ()
@@ -95,7 +95,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::shared_ptr<frame_buffer> get_cubemap_fbo();
+	std::shared_ptr<gfx::frame_buffer> get_cubemap_fbo();
 
 private:
 	//-------------------------------------------------------------------------
@@ -104,5 +104,5 @@ private:
 	/// The probe object this component represents
 	reflection_probe _probe;
 	/// The render view for this component
-	render_view _render_view[6];
+	gfx::render_view _render_view[6];
 };

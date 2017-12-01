@@ -1,67 +1,33 @@
 #include "shader.h"
 
-shader::shader(const gfx::Memory* mem)
+namespace gfx
 {
-	populate(mem);
+shader::shader(const memory_view* mem)
+    : shader(create_shader(mem))
+{
 }
 
-shader::shader(gfx::ShaderHandle hndl)
+shader::shader(const embedded_shader* es, const char* name)
+    : shader(create_embedded_shader(es, get_renderer_type(), name))
 {
-	populate(hndl);
 }
 
-shader::shader(const gfx::EmbeddedShader* es, const char* name)
+shader::shader(handle_type_t hndl)
 {
-	populate(es, name);
-}
+    handle = hndl;
 
-shader::~shader()
-{
-	dispose();
-}
-
-void shader::dispose()
-{
-	uniforms.clear();
-
-	if(is_valid())
-		gfx::destroy(handle);
-
-	handle = {bgfx::kInvalidHandle};
-}
-
-bool shader::is_valid() const
-{
-	return gfx::isValid(handle);
-}
-
-void shader::populate(const gfx::Memory* mem)
-{
-	populate(gfx::createShader(mem));
-}
-
-void shader::populate(const gfx::EmbeddedShader* es, const char* name)
-{
-	populate(gfx::createEmbeddedShader(es, gfx::getRendererType(), name));
-}
-
-void shader::populate(gfx::ShaderHandle hndl)
-{
-	dispose();
-
-	handle = hndl;
-
-	auto uniform_count = gfx::getShaderUniforms(handle);
-	if (uniform_count > 0)
+	auto uniform_count = get_shader_uniforms(handle);
+	if(uniform_count > 0)
 	{
-		std::vector<gfx::UniformHandle> uniforms_handles(uniform_count);
-		gfx::getShaderUniforms(handle, &uniforms_handles[0], uniform_count);
+		std::vector<uniform::handle_type_t> uniforms_handles(uniform_count);
+		get_shader_uniforms(handle, &uniforms_handles[0], uniform_count);
 		uniforms.reserve(uniform_count);
-		for (auto& uni : uniforms_handles)
+		for(auto& uni : uniforms_handles)
 		{
-			auto uniform_var = std::make_shared<uniform>();
-			uniform_var->populate(uni);
+			auto uniform_var = std::make_shared<uniform>(uni);
 			uniforms.emplace_back(uniform_var);
 		}
 	}
+}
+
 }

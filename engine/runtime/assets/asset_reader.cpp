@@ -6,12 +6,12 @@
 #include "../rendering/material.h"
 #include "../rendering/mesh.h"
 #include "asset_extensions.h"
+#include "core/filesystem/filesystem.h"
+#include "core/graphics/index_buffer.h"
 #include "core/graphics/shader.h"
 #include "core/graphics/texture.h"
 #include "core/graphics/uniform.h"
 #include "core/graphics/vertex_buffer.h"
-#include "core/graphics/index_buffer.h"
-#include "core/filesystem/filesystem.h"
 #include "core/logging/logging.h"
 #include "core/serialization/associative_archive.h"
 #include "core/serialization/binary_archive.h"
@@ -25,21 +25,22 @@ namespace runtime
 namespace asset_reader
 {
 template <>
-bool load_from_file<texture>(core::task_future<asset_handle<texture>>& output, const std::string& key)
+bool load_from_file<gfx::texture>(core::task_future<asset_handle<gfx::texture>>& output,
+								  const std::string& key)
 {
-	asset_handle<texture> original;
+	asset_handle<gfx::texture> original;
 	if(output.is_ready())
 		original = output.get();
 
 	auto& ts = core::get_subsystem<core::task_system>();
 
-	auto create_resource_func_fallback = [result = original, key]() mutable
+	auto create_resource_func_fallback = [ result = original, key ]() mutable
 	{
 		result.link->id = key;
 		return result;
 	};
 
-	if (!fs::has_known_protocol(key))
+	if(!fs::has_known_protocol(key))
 	{
 		APPLOG_ERROR("Asset {0} has uknown protocol!", key);
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
@@ -47,7 +48,7 @@ bool load_from_file<texture>(core::task_future<asset_handle<texture>>& output, c
 	}
 
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
-	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<texture>();
+	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<gfx::texture>();
 
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
@@ -77,7 +78,7 @@ bool load_from_file<texture>(core::task_future<asset_handle<texture>>& output, c
 		if(read_memory->empty())
 			return result;
 
-		const gfx::Memory* mem =
+		const gfx::memory_view* mem =
 			gfx::copy(read_memory->data(), static_cast<std::uint32_t>(read_memory->size()));
 
 		read_memory->clear();
@@ -85,7 +86,7 @@ bool load_from_file<texture>(core::task_future<asset_handle<texture>>& output, c
 
 		if(nullptr != mem)
 		{
-			auto tex = std::make_shared<texture>(mem, 0, 0, nullptr);
+			auto tex = std::make_shared<gfx::texture>(mem, 0, 0, nullptr);
 			result.link->id = key;
 			result.link->asset = tex;
 		}
@@ -99,21 +100,21 @@ bool load_from_file<texture>(core::task_future<asset_handle<texture>>& output, c
 }
 
 template <>
-bool load_from_file<shader>(core::task_future<asset_handle<shader>>& output, const std::string& key)
+bool load_from_file<gfx::shader>(core::task_future<asset_handle<gfx::shader>>& output, const std::string& key)
 {
-	asset_handle<shader> original;
+	asset_handle<gfx::shader> original;
 	if(output.is_ready())
 		original = output.get();
 
 	auto& ts = core::get_subsystem<core::task_system>();
 
-	auto create_resource_func_fallback = [result = original, key]() mutable
+	auto create_resource_func_fallback = [ result = original, key ]() mutable
 	{
 		result.link->id = key;
 		return result;
 	};
 
-	if (!fs::has_known_protocol(key))
+	if(!fs::has_known_protocol(key))
 	{
 		APPLOG_ERROR("Asset {0} has uknown protocol!", key);
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
@@ -121,7 +122,7 @@ bool load_from_file<shader>(core::task_future<asset_handle<shader>>& output, con
 	}
 
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
-	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<shader>();
+	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<gfx::shader>();
 
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
@@ -152,7 +153,7 @@ bool load_from_file<shader>(core::task_future<asset_handle<shader>>& output, con
 		if(read_memory->empty())
 			return result;
 
-		const gfx::Memory* mem =
+		const gfx::memory_view* mem =
 			gfx::copy(read_memory->data(), static_cast<std::uint32_t>(read_memory->size()));
 		read_memory->clear();
 		read_memory.reset();
@@ -160,7 +161,7 @@ bool load_from_file<shader>(core::task_future<asset_handle<shader>>& output, con
 		if(nullptr != mem)
 		{
 			result.link->id = key;
-			result.link->asset = std::make_shared<shader>(mem);
+			result.link->asset = std::make_shared<gfx::shader>(mem);
 		}
 
 		return result;
@@ -180,13 +181,13 @@ bool load_from_file<mesh>(core::task_future<asset_handle<mesh>>& output, const s
 
 	auto& ts = core::get_subsystem<core::task_system>();
 
-	auto create_resource_func_fallback = [result = original, key]() mutable
+	auto create_resource_func_fallback = [ result = original, key ]() mutable
 	{
 		result.link->id = key;
 		return result;
 	};
 
-	if (!fs::has_known_protocol(key))
+	if(!fs::has_known_protocol(key))
 	{
 		APPLOG_ERROR("Asset {0} has uknown protocol!", key);
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
@@ -269,13 +270,13 @@ bool load_from_file<material>(core::task_future<asset_handle<material>>& output,
 
 	auto& ts = core::get_subsystem<core::task_system>();
 
-	auto create_resource_func_fallback = [result = original, key]() mutable
+	auto create_resource_func_fallback = [ result = original, key ]() mutable
 	{
 		result.link->id = key;
 		return result;
 	};
 
-	if (!fs::has_known_protocol(key))
+	if(!fs::has_known_protocol(key))
 	{
 		APPLOG_ERROR("Asset {0} has uknown protocol!", key);
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
@@ -284,7 +285,6 @@ bool load_from_file<material>(core::task_future<asset_handle<material>>& output,
 
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
 	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<material>();
-
 
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
@@ -339,13 +339,13 @@ bool load_from_file<prefab>(core::task_future<asset_handle<prefab>>& output, con
 
 	auto& ts = core::get_subsystem<core::task_system>();
 
-	auto create_resource_func_fallback = [result = original, key]() mutable
+	auto create_resource_func_fallback = [ result = original, key ]() mutable
 	{
 		result.link->id = key;
 		return result;
 	};
 
-	if (!fs::has_known_protocol(key))
+	if(!fs::has_known_protocol(key))
 	{
 		APPLOG_ERROR("Asset {0} has uknown protocol!", key);
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
@@ -405,13 +405,13 @@ bool load_from_file<scene>(core::task_future<asset_handle<scene>>& output, const
 
 	auto& ts = core::get_subsystem<core::task_system>();
 
-	auto create_resource_func_fallback = [result = original, key]() mutable
+	auto create_resource_func_fallback = [ result = original, key ]() mutable
 	{
 		result.link->id = key;
 		return result;
 	};
 
-	if (!fs::has_known_protocol(key))
+	if(!fs::has_known_protocol(key))
 	{
 		APPLOG_ERROR("Asset {0} has uknown protocol!", key);
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);

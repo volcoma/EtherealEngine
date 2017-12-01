@@ -4,7 +4,7 @@
 #include <chrono>
 #include <memory>
 
-struct program;
+class gpu_program;
 
 namespace editor
 {
@@ -43,6 +43,6 @@ public:
 
 private:
 	///
-	std::unique_ptr<program> _program;
+	std::unique_ptr<gpu_program> _program;
 };
 }

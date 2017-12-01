@@ -8,8 +8,11 @@
 #include "core/signals/event.hpp"
 #include "mml/window/window.hpp"
 #include <chrono>
-
+namespace gfx
+{
 struct frame_buffer;
+}
+
 class render_window : public mml::window
 {
 public:
@@ -51,7 +54,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::shared_ptr<frame_buffer> get_surface();
+	std::shared_ptr<gfx::frame_buffer> get_surface();
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_surface ()
@@ -61,7 +64,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::shared_ptr<frame_buffer> get_surface() const;
+	std::shared_ptr<gfx::frame_buffer> get_surface() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : frame_end (virtual )
@@ -107,5 +110,5 @@ protected:
 	///
 	std::uint32_t _id = 0;
 	/// Render surface for this window.
-	std::shared_ptr<frame_buffer> _surface;
+	std::shared_ptr<gfx::frame_buffer> _surface;
 };

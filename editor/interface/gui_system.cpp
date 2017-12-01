@@ -11,7 +11,7 @@
 
 #include "runtime/assets/asset_manager.h"
 #include "runtime/input/input.h"
-#include "runtime/rendering/program.h"
+#include "runtime/rendering/gpu_program.h"
 #include "runtime/rendering/render_window.h"
 #include <unordered_map>
 
@@ -23,7 +23,7 @@
 #include "../meta/interface/gui_system.hpp"
 #include "core/serialization/associative_archive.h"
 
-static const gfx::EmbeddedShader s_embedded_shaders[] =
+static const gfx::embedded_shader s_embedded_shaders[] =
 {
 	BGFX_EMBEDDED_SHADER(vs_ocornut_imgui),
 	BGFX_EMBEDDED_SHADER(fs_ocornut_imgui),
@@ -34,33 +34,38 @@ static const gfx::EmbeddedShader s_embedded_shaders[] =
 static gui_style s_gui_style;
 ImGuiContext* s_initial_context = nullptr;
 
-static gfx::VertexDecl s_decl;
-static std::unique_ptr<program> s_program;
-static asset_handle<texture> s_font_texture;
-static std::vector<std::shared_ptr<texture>> s_textures;
+static std::unique_ptr<gpu_program> s_program;
+static asset_handle<gfx::texture> s_font_texture;
+static std::vector<std::shared_ptr<gfx::texture>> s_textures;
 static std::unordered_map<std::string, ImFont*> s_fonts;
 
 void render_func(ImDrawData* _drawData)
 {
+    auto prog = s_program.get();
+    if(!prog)
+        return;
+    prog->begin();
 	// Render command lists
 	for(int32_t ii = 0, num = _drawData->CmdListsCount; ii < num; ++ii)
 	{
-		gfx::TransientVertexBuffer tvb;
-		gfx::TransientIndexBuffer tib;
+		gfx::transient_vertex_buffer tvb;
+		gfx::transient_index_buffer tib;
 
 		const ImDrawList* drawList = _drawData->CmdLists[ii];
 		std::uint32_t numVertices = static_cast<std::uint32_t>(drawList->VtxBuffer.size());
 		std::uint32_t numIndices = static_cast<std::uint32_t>(drawList->IdxBuffer.size());
 
-		if(!(gfx::getAvailTransientVertexBuffer(numVertices, s_decl) == numVertices) ||
-		   !(gfx::getAvailTransientIndexBuffer(numIndices) == numIndices))
+        const auto& layout = gfx::pos_texcoord0_color0_vertex::get_layout();
+        
+		if(!(gfx::get_avail_transient_vertex_buffer(numVertices, layout) == numVertices) ||
+		   !(gfx::get_avail_transient_index_buffer(numIndices) == numIndices))
 		{
 			// not enough space in transient buffer just quit drawing the rest...
 			break;
 		}
 
-		gfx::allocTransientVertexBuffer(&tvb, numVertices, s_decl);
-		gfx::allocTransientIndexBuffer(&tib, numIndices);
+		gfx::alloc_transient_vertex_buffer(&tvb, numVertices, layout);
+		gfx::alloc_transient_index_buffer(&tib, numIndices);
 
 		ImDrawVert* verts = reinterpret_cast<ImDrawVert*>(tvb.data);
 		std::memcpy(verts, drawList->VtxBuffer.begin(), numVertices * sizeof(ImDrawVert));
@@ -81,15 +86,11 @@ void render_func(ImDrawData* _drawData)
 				std::uint64_t state =
 					0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_MSAA |
 					BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA);
-
-				texture* tex = s_font_texture.get();
-				program* prog = s_program.get();
-				if(!prog)
-					return;
+                auto tex = s_font_texture.get();
 
 				if(nullptr != cmd->TextureId)
 				{
-					tex = reinterpret_cast<texture*>(cmd->TextureId);
+					tex = reinterpret_cast<gfx::texture*>(cmd->TextureId);
 				}
 
 				const std::uint16_t x = std::uint16_t(std::max(cmd->ClipRect.x, 0.0f));
@@ -97,19 +98,19 @@ void render_func(ImDrawData* _drawData)
 				const std::uint16_t width = std::uint16_t(std::min(cmd->ClipRect.z, 65535.0f) - x);
 				const std::uint16_t height = std::uint16_t(std::min(cmd->ClipRect.w, 65535.0f) - y);
 
-				gfx::setScissor(x, y, width, height);
-
+				gfx::set_scissor(x, y, width, height);
 				prog->set_texture(0, "s_tex", tex);
 
-				gfx::setVertexBuffer(0, &tvb, 0, numVertices);
-				gfx::setIndexBuffer(&tib, offset, cmd->ElemCount);
-				gfx::setState(state);
-				gfx::submit(render_pass::get_pass(), prog->handle);
-			}
+                gfx::set_vertex_buffer(0, &tvb, 0, numVertices);
+				gfx::set_index_buffer(&tib, offset, cmd->ElemCount);
+				gfx::set_state(state);
+				gfx::submit(gfx::render_pass::get_pass(), prog->native_handle());
+            }
 
 			offset += cmd->ElemCount;
 		}
 	}
+    prog->end();    
 }
 
 void imgui_handle_event(const mml::platform_event& event)
@@ -289,24 +290,18 @@ void imgui_init()
 	auto& ts = core::get_subsystem<core::task_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
 
-	auto vs_instance = std::make_shared<shader>(s_embedded_shaders, "vs_ocornut_imgui");
-	auto fs_instance = std::make_shared<shader>(s_embedded_shaders, "fs_ocornut_imgui");
+	auto vs_instance = std::make_shared<gfx::shader>(s_embedded_shaders, "vs_ocornut_imgui");
+	auto fs_instance = std::make_shared<gfx::shader>(s_embedded_shaders, "fs_ocornut_imgui");
 
-	auto vs_ocornut_imgui = am.load_asset_from_instance<shader>("embedded:/vs_ocornut_imgui", vs_instance);
-	auto fs_ocornut_imgui = am.load_asset_from_instance<shader>("embedded:/fs_ocornut_imgui", fs_instance);
+	auto vs_ocornut_imgui = am.load_asset_from_instance<gfx::shader>("embedded:/vs_ocornut_imgui", vs_instance);
+	auto fs_ocornut_imgui = am.load_asset_from_instance<gfx::shader>("embedded:/fs_ocornut_imgui", fs_instance);
 
 	ts.push_or_execute_on_owner_thread(
-		[](asset_handle<shader> vs, asset_handle<shader> fs) {
-			s_program = std::make_unique<program>(vs, fs);
+		[](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
+			s_program = std::make_unique<gpu_program>(vs, fs);
 
 		},
 		vs_ocornut_imgui, fs_ocornut_imgui);
-
-	s_decl.begin()
-		.add(gfx::Attrib::Position, 2, gfx::AttribType::Float)
-		.add(gfx::Attrib::TexCoord0, 2, gfx::AttribType::Float)
-		.add(gfx::Attrib::Color0, 4, gfx::AttribType::Uint8, true)
-		.end();
 
 	// init keyboard mapping
 	io.KeyMap[ImGuiKey_Tab] = mml::keyboard::Tab;
@@ -343,9 +338,9 @@ void imgui_init()
 
 	io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
 
-	s_font_texture = std::make_shared<texture>(
+	s_font_texture = std::make_shared<gfx::texture>(
 		static_cast<std::uint16_t>(width), static_cast<std::uint16_t>(height), false, 1,
-		gfx::TextureFormat::BGRA8, 0, gfx::copy(data, static_cast<std::uint32_t>(width * height * 4)));
+		gfx::texture_format::BGRA8, 0, gfx::copy(data, static_cast<std::uint32_t>(width * height * 4)));
 
 	// Store our identifier
 	io.Fonts->SetTexID(s_font_texture.get());
@@ -460,7 +455,7 @@ ImFont* GetFont(const std::string& id)
 	return nullptr;
 }
 
-void Image(std::shared_ptr<texture> texture, const ImVec2& _size,
+void Image(std::shared_ptr<gfx::texture> texture, const ImVec2& _size,
 		   const ImVec2& _uv0 /*= ImVec2(0.0f, 0.0f) */, const ImVec2& _uv1 /*= ImVec2(1.0f, 1.0f) */,
 		   const ImVec4& _tintCol /*= ImVec4(1.0f, 1.0f, 1.0f, 1.0f) */,
 		   const ImVec4& _borderCol /*= ImVec4(0.0f, 0.0f, 0.0f, 0.0f) */)
@@ -482,7 +477,7 @@ void Image(std::shared_ptr<texture> texture, const ImVec2& _size,
 	ImGui::Image(texture.get(), _size, uv0, uv1, _tintCol, _borderCol);
 }
 
-bool ImageButton(std::shared_ptr<texture> texture, const ImVec2& _size,
+bool ImageButton(std::shared_ptr<gfx::texture> texture, const ImVec2& _size,
 				 const ImVec2& _uv0 /*= ImVec2(0.0f, 0.0f) */, const ImVec2& _uv1 /*= ImVec2(1.0f, 1.0f) */,
 				 int _framePadding /*= -1 */, const ImVec4& _bgCol /*= ImVec4(0.0f, 0.0f, 0.0f, 0.0f) */,
 				 const ImVec4& _tintCol /*= ImVec4(1.0f, 1.0f, 1.0f, 1.0f) */)
@@ -504,21 +499,21 @@ bool ImageButton(std::shared_ptr<texture> texture, const ImVec2& _size,
 	return ImGui::ImageButton(texture.get(), _size, uv0, uv1, _framePadding, _bgCol, _tintCol);
 }
 
-bool ImageButtonEx(std::shared_ptr<texture> texture, const ImVec2& size, const char* tooltip, bool selected,
+bool ImageButtonEx(std::shared_ptr<gfx::texture> texture, const ImVec2& size, const char* tooltip, bool selected,
 				   bool enabled)
 {
 	s_textures.push_back(texture);
 	return ImGui::ImageButtonEx(texture.get(), size, tooltip, selected, enabled);
 }
 
-void ImageWithAspect(std::shared_ptr<texture> texture, const ImVec2& texture_size, const ImVec2& size,
+void ImageWithAspect(std::shared_ptr<gfx::texture> texture, const ImVec2& texture_size, const ImVec2& size,
 					 const ImVec2& uv0, const ImVec2& uv1, const ImVec4& tint_col, const ImVec4& border_col)
 {
 	s_textures.push_back(texture);
 	return ImGui::ImageWithAspect(texture.get(), texture_size, size, uv0, uv1, tint_col, border_col);
 }
 
-int ImageButtonWithAspectAndLabel(std::shared_ptr<texture> texture, const ImVec2& texture_size,
+int ImageButtonWithAspectAndLabel(std::shared_ptr<gfx::texture> texture, const ImVec2& texture_size,
 								  const ImVec2& size, const ImVec2& uv0, const ImVec2& uv1, bool selected,
 								  bool* edit_label, const char* label, char* buf, size_t buf_size,
 								  ImGuiInputTextFlags flags /*= 0*/)

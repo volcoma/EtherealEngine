@@ -3,8 +3,8 @@
 #include "../editing/editing_system.h"
 #include "../meta/system/project_manager.hpp"
 #include "core/filesystem/filesystem_watcher.h"
-#include "core/serialization/associative_archive.h"
 #include "core/logging/logging.h"
+#include "core/serialization/associative_archive.h"
 #include "core/system/task_system.h"
 #include "runtime/assets/asset_extensions.h"
 #include "runtime/assets/asset_manager.h"
@@ -15,9 +15,13 @@
 class mesh;
 struct prefab;
 struct scene;
+class material;
+
+namespace gfx
+{
 struct texture;
 struct shader;
-class material;
+}
 
 namespace editor
 {
@@ -32,96 +36,97 @@ void watch_assets(const fs::path& protocol, const std::string& wildcard, bool re
 	const fs::path dir = fs::resolve_protocol(protocol);
 	fs::path watch_dir = (dir / wildcard).make_preferred();
 
-	fs::watcher::watch(watch_dir, false, true, [&am, &ts, protocol, reload_async, force_initial_recompile](
-												   const std::vector<fs::watcher::entry>& entries,
-												   bool is_initial_list) {
-		for(const auto& entry : entries)
-		{
-			const auto& p = entry.path;
-			const auto ext = p.extension().string();
-			const bool is_compiled = extensions::is_compiled_format(ext);
-			if(is_compiled)
+	fs::watcher::watch(
+		watch_dir, false, true,
+		[&am, &ts, protocol, reload_async,
+		 force_initial_recompile](const std::vector<fs::watcher::entry>& entries, bool is_initial_list) {
+			for(const auto& entry : entries)
 			{
-				auto filename = p.filename();
-
-				// remove the compiled extension if we have one
-				if(ext == extensions::compiled)
+				const auto& p = entry.path;
+				const auto ext = p.extension().string();
+				const bool is_compiled = extensions::is_compiled_format(ext);
+				if(is_compiled)
 				{
-					for(auto temp = filename; temp.has_extension(); temp = filename.stem())
-					{
-						filename = temp;
-					}
-				}
-				auto path = (protocol / filename);
-				auto key = path.generic_string();
+					auto filename = p.filename();
 
-				if(entry.type == fs::file_type::regular_file)
-				{
-					if(entry.status == fs::watcher::entry_status::removed)
+					// remove the compiled extension if we have one
+					if(ext == extensions::compiled)
 					{
-						auto task =
-							ts.push_on_owner_thread([reload_async, key, &am]() { am.clear_asset<T>(key); });
-					}
-					else if(entry.status == fs::watcher::entry_status::renamed)
-					{
-					}
-					else
-					{
-						using namespace runtime;
-						load_mode mode = reload_async ? load_mode::async : load_mode::sync;
-						load_flags flags = is_initial_list ? load_flags::standard : load_flags::reload;
-
-						// created or modified
-						auto task = ts.push_on_worker_thread(
-							[mode, flags, key, &am]() { am.load<T>(key, mode, flags); });
-					}
-				}
-			}
-			else
-			{
-				auto key = (protocol / p.filename()).generic_string();
-				if(entry.type == fs::file_type::regular_file)
-				{
-					if(entry.status == fs::watcher::entry_status::removed)
-					{
-						auto task = ts.push_on_owner_thread([p, ext, protocol, key, &am]() {
-							am.delete_asset<T>(key);
-
-							// always add the extensions since we want the compiled asset version to be
-							// removed too.
-							auto path_to_remove = p;
-							path_to_remove.concat(extensions::get_compiled_format<T>());
-							fs::error_code err;
-							fs::remove(path_to_remove, err);
-
-						});
-					}
-					else if(entry.status == fs::watcher::entry_status::renamed)
-					{
-					}
-					else
-					{
-						// created or modified or renamed
-
-						bool compile = true;
-
-						if(is_initial_list && !force_initial_recompile)
+						for(auto temp = filename; temp.has_extension(); temp = filename.stem())
 						{
-							fs::path compiled_file = p.string() + extensions::get_compiled_format<T>();
-							fs::error_code err;
-							compile = !fs::exists(compiled_file, err);
+							filename = temp;
 						}
+					}
+					auto path = (protocol / filename);
+					auto key = path.generic_string();
 
-						if(compile)
+					if(entry.type == fs::file_type::regular_file)
+					{
+						if(entry.status == fs::watcher::entry_status::removed)
 						{
+							auto task = ts.push_on_owner_thread(
+								[reload_async, key, &am]() { am.clear_asset<T>(key); });
+						}
+						else if(entry.status == fs::watcher::entry_status::renamed)
+						{
+						}
+						else
+						{
+							using namespace runtime;
+							load_mode mode = reload_async ? load_mode::async : load_mode::sync;
+							load_flags flags = is_initial_list ? load_flags::standard : load_flags::reload;
+
+							// created or modified
 							auto task = ts.push_on_worker_thread(
-								[](const fs::path& p) { asset_compiler::compile<T>(p); }, p);
+								[mode, flags, key, &am]() { am.load<T>(key, mode, flags); });
+						}
+					}
+				}
+				else
+				{
+					auto key = (protocol / p.filename()).generic_string();
+					if(entry.type == fs::file_type::regular_file)
+					{
+						if(entry.status == fs::watcher::entry_status::removed)
+						{
+							auto task = ts.push_on_owner_thread([p, ext, protocol, key, &am]() {
+								am.delete_asset<T>(key);
+
+								// always add the extensions since we want the compiled asset version to be
+								// removed too.
+								auto path_to_remove = p;
+								path_to_remove.concat(extensions::get_compiled_format<T>());
+								fs::error_code err;
+								fs::remove(path_to_remove, err);
+
+							});
+						}
+						else if(entry.status == fs::watcher::entry_status::renamed)
+						{
+						}
+						else
+						{
+							// created or modified or renamed
+
+							bool compile = true;
+
+							if(is_initial_list && !force_initial_recompile)
+							{
+								fs::path compiled_file = p.string() + extensions::get_compiled_format<T>();
+								fs::error_code err;
+								compile = !fs::exists(compiled_file, err);
+							}
+
+							if(compile)
+							{
+								auto task = ts.push_on_worker_thread(
+									[](const fs::path& p) { asset_compiler::compile<T>(p); }, p);
+							}
 						}
 					}
 				}
 			}
-		}
-	});
+		});
 }
 
 void asset_directory::watch()
@@ -212,10 +217,10 @@ void asset_directory::watch()
 
 	for(const auto& format : extensions::texture)
 	{
-		watch_assets<texture>(relative_path, wildcard + format, true, false);
+		watch_assets<gfx::texture>(relative_path, wildcard + format, true, false);
 	}
 
-	watch_assets<shader>(relative_path, wildcard + extensions::shader, true, false);
+	watch_assets<gfx::shader>(relative_path, wildcard + extensions::shader, true, false);
 
 	for(const auto& format : extensions::mesh)
 	{
@@ -264,7 +269,8 @@ void asset_directory::populate(asset_directory* p, const fs::path& abs, const st
 	absolute_path = abs;
 	name = n;
 	root_path = r;
-	relative_path = string_utils::replace(absolute_path.generic_string(), root_path.generic_string(), "app:/data");
+	relative_path =
+		string_utils::replace(absolute_path.generic_string(), root_path.generic_string(), "app:/data");
 
 	watch();
 }
@@ -306,18 +312,18 @@ void project_manager::open_project(const fs::path& project_path)
 	save_config();
 
 	/// for debug purposes
-	watch_assets<shader>("engine_data:/shaders", "*.sc", true, false);
-	watch_assets<shader>("editor_data:/shaders", "*.sc", true, false);
-	// watch_assets<texture>("engine_data:/textures", "*.png", true);
-	// watch_assets<texture>("engine_data:/textures", "*.tga", true);
-	// watch_assets<texture>("engine_data:/textures", "*.dds", true);
-	// watch_assets<texture>("engine_data:/textures", "*.ktx", true);
-	// watch_assets<texture>("engine_data:/textures", "*.pvr", true);
-	// watch_assets<texture>("editor_data:/icons", "*.png", true);
-	// watch_assets<texture>("editor_data:/icons", "*.tga", true);
-	// watch_assets<texture>("editor_data:/icons", "*.dds", true);
-	// watch_assets<texture>("editor_data:/icons", "*.ktx", true);
-	// watch_assets<texture>("editor_data:/icons", "*.pvr", true);
+	watch_assets<gfx::shader>("engine_data:/shaders", "*.sc", true, false);
+	watch_assets<gfx::shader>("editor_data:/shaders", "*.sc", true, false);
+	// watch_assets<gfx::texture>("engine_data:/textures", "*.png", true);
+	// watch_assets<gfx::texture>("engine_data:/textures", "*.tga", true);
+	// watch_assets<gfx::texture>("engine_data:/textures", "*.dds", true);
+	// watch_assets<gfx::texture>("engine_data:/textures", "*.ktx", true);
+	// watch_assets<gfx::texture>("engine_data:/textures", "*.pvr", true);
+	// watch_assets<gfx::texture>("editor_data:/icons", "*.png", true);
+	// watch_assets<gfx::texture>("editor_data:/icons", "*.tga", true);
+	// watch_assets<gfx::texture>("editor_data:/icons", "*.dds", true);
+	// watch_assets<gfx::texture>("editor_data:/icons", "*.ktx", true);
+	// watch_assets<gfx::texture>("editor_data:/icons", "*.pvr", true);
 	// watch_assets<mesh>("engine_data:/meshes", "*.obj", true);
 	// watch_assets<mesh>("engine_data:/meshes", "*.fbx", true);
 	// watch_assets<mesh>("engine_data:/meshes", "*.dae", true);

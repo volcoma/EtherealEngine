@@ -39,11 +39,11 @@ math::transform process_matrix(const aiMatrix4x4& assimp_matrix)
 void process_vertices(aiMesh* mesh, mesh::load_data& load_data)
 {
 	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = load_data.vertex_format.has(gfx::Attrib::Position);
-	bool has_normal = load_data.vertex_format.has(gfx::Attrib::Normal);
-	bool has_bitangent = load_data.vertex_format.has(gfx::Attrib::Bitangent);
-	bool has_tangent = load_data.vertex_format.has(gfx::Attrib::Tangent);
-	bool has_texcoord0 = load_data.vertex_format.has(gfx::Attrib::TexCoord0);
+	bool has_position = load_data.vertex_format.has(gfx::attribute::Position);
+	bool has_normal = load_data.vertex_format.has(gfx::attribute::Normal);
+	bool has_bitangent = load_data.vertex_format.has(gfx::attribute::Bitangent);
+	bool has_tangent = load_data.vertex_format.has(gfx::attribute::Tangent);
+	bool has_texcoord0 = load_data.vertex_format.has(gfx::attribute::TexCoord0);
 	auto vertex_stride = load_data.vertex_format.getStride();
 
 	std::uint32_t current_vertex = load_data.vertex_count;
@@ -61,7 +61,7 @@ void process_vertices(aiMesh* mesh, mesh::load_data& load_data)
 			std::memcpy(position, &mesh->mVertices[i], sizeof(math::vec3));
 
 			if(has_position)
-				gfx::vertexPack(position, false, gfx::Attrib::Position, load_data.vertex_format,
+				gfx::vertex_pack(position, false, gfx::attribute::Position, load_data.vertex_format,
 								current_vertex_ptr);
 		}
 
@@ -72,7 +72,7 @@ void process_vertices(aiMesh* mesh, mesh::load_data& load_data)
 			std::memcpy(textureCoords, &mesh->mTextureCoords[0][i], sizeof(math::vec2));
 
 			if(has_texcoord0)
-				gfx::vertexPack(textureCoords, true, gfx::Attrib::TexCoord0, load_data.vertex_format,
+				gfx::vertex_pack(textureCoords, true, gfx::attribute::TexCoord0, load_data.vertex_format,
 								current_vertex_ptr);
 		}
 
@@ -83,7 +83,7 @@ void process_vertices(aiMesh* mesh, mesh::load_data& load_data)
 			std::memcpy(math::value_ptr(normal), &mesh->mNormals[i], sizeof(math::vec3));
 
 			if(has_normal)
-				gfx::vertexPack(math::value_ptr(normal), true, gfx::Attrib::Normal, load_data.vertex_format,
+				gfx::vertex_pack(math::value_ptr(normal), true, gfx::attribute::Normal, load_data.vertex_format,
 								current_vertex_ptr);
 		}
 
@@ -94,7 +94,7 @@ void process_vertices(aiMesh* mesh, mesh::load_data& load_data)
 			std::memcpy(math::value_ptr(tangent), &mesh->mTangents[i], sizeof(math::vec3));
 			tangent.w = 1.0f;
 			if(has_tangent)
-				gfx::vertexPack(math::value_ptr(tangent), true, gfx::Attrib::Tangent, load_data.vertex_format,
+				gfx::vertex_pack(math::value_ptr(tangent), true, gfx::attribute::Tangent, load_data.vertex_format,
 								current_vertex_ptr);
 		}
 
@@ -108,7 +108,7 @@ void process_vertices(aiMesh* mesh, mesh::load_data& load_data)
 			tangent.w = handedness;
 
 			if(has_bitangent)
-				gfx::vertexPack(math::value_ptr(bitangent), true, gfx::Attrib::Bitangent,
+				gfx::vertex_pack(math::value_ptr(bitangent), true, gfx::attribute::Bitangent,
 								load_data.vertex_format, current_vertex_ptr);
 		}
 	}
@@ -296,7 +296,7 @@ void process_animations(const aiScene* scene, std::vector<animation>& animations
 void process_imported_scene(const aiScene* scene, mesh::load_data& load_data,
 							std::vector<animation>& animations)
 {
-	load_data.vertex_format = gfx::mesh_vertex::get_decl();
+	load_data.vertex_format = gfx::mesh_vertex::get_layout();
 	process_meshes(scene, load_data);
 	process_nodes(scene, load_data);
 	process_animations(scene, animations);

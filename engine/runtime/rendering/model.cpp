@@ -1,9 +1,9 @@
 #include "model.h"
 #include "../assets/asset_manager.h"
+#include "gpu_program.h"
 #include "core/math/math_includes.h"
 #include "material.h"
 #include "mesh.h"
-#include "program.h"
 
 model::model()
 {
@@ -44,10 +44,10 @@ asset_handle<mesh> model::get_lod(std::uint32_t lod) const
 void model::set_lod(asset_handle<mesh> mesh, std::uint32_t lod)
 {
 	if(lod >= _mesh_lods.size())
-    {
+	{
 		_mesh_lods.resize(lod + 1);
-        recalulate_lod_limits();
-    }
+		recalulate_lod_limits();
+	}
 	_mesh_lods[lod] = mesh;
 
 	if(_materials.size() != mesh->get_subset_count())
@@ -115,8 +115,8 @@ void model::set_lod_limits(const std::vector<urange>& limits)
 
 void model::render(std::uint8_t id, const math::transform& world_transform,
 				   const std::vector<math::transform>& bone_transforms, bool apply_cull, bool depth_write,
-				   bool depth_test, std::uint64_t extra_states, unsigned int lod, program* user_program,
-				   std::function<void(program&)> setup_params) const
+				   bool depth_test, std::uint64_t extra_states, unsigned int lod, gpu_program* user_program,
+				   std::function<void(gpu_program&)> setup_params) const
 {
 	const auto mesh = get_lod(lod);
 	if(!mesh)
@@ -125,10 +125,11 @@ void model::render(std::uint8_t id, const math::transform& world_transform,
 	auto render_subset = [this, &mesh](std::uint8_t id, bool skinned, std::uint32_t group_id,
 									   const float* mtx, std::uint32_t count, bool apply_cull,
 									   bool depth_write, bool depth_test, std::uint64_t extra_states,
-									   program* user_program, std::function<void(program&)> setup_params) {
+									   gpu_program* user_program,
+									   std::function<void(gpu_program&)> setup_params) {
 
 		bool valid_program = false;
-		program* program = user_program;
+		gpu_program* program = user_program;
 		asset_handle<material> mat = get_material_for_group(group_id);
 
 		if(mat)
@@ -142,7 +143,7 @@ void model::render(std::uint8_t id, const math::transform& world_transform,
 
 		if(program)
 		{
-			valid_program = program->begin_pass();
+			valid_program = program->begin();
 			if(valid_program)
 				setup_params(*program);
 		}
@@ -160,14 +161,19 @@ void model::render(std::uint8_t id, const math::transform& world_transform,
 			}
 
 			if(mtx != nullptr)
-				gfx::setTransform(mtx, static_cast<std::uint16_t>(count));
+				gfx::set_transform(mtx, static_cast<std::uint16_t>(count));
 
-			gfx::setState(extra_states);
+			gfx::set_state(extra_states);
 
 			mesh->bind_render_buffers_for_subset(group_id);
 
-			gfx::submit(id, program->handle);
+			gfx::submit(id, program->native_handle());
 		}
+        
+        if(program)
+		{
+			program->end();
+        }
 
 	};
 
@@ -210,10 +216,10 @@ void model::recalulate_lod_limits()
 	for(size_t i = 0; i < _mesh_lods.size(); ++i)
 	{
 		float lower_limit = 0.0f;
-        
-        if(_mesh_lods.size() - 1 != i)
-            lower_limit = upper_limit * (0.5f - ((i)*0.1f));
-        
+
+		if(_mesh_lods.size() - 1 != i)
+			lower_limit = upper_limit * (0.5f - ((i)*0.1f));
+
 		_lod_limits.emplace_back(urange(urange::value_type(lower_limit), urange::value_type(upper_limit)));
 		upper_limit = lower_limit;
 	}

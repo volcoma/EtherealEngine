@@ -2,7 +2,6 @@
 #include "core/math/math_includes.h"
 #include "core/reflection/registration.h"
 #include "core/serialization/serialization.h"
-#include "program.h"
 #include <cstdint>
 
 enum class light_type : std::uint8_t

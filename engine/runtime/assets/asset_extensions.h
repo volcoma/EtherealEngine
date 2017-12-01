@@ -3,7 +3,11 @@
 #include <string>
 
 #include "core/graphics/graphics.h"
+
+namespace gfx
+{
 struct shader;
+}
 struct scene;
 struct prefab;
 class material;
@@ -33,7 +37,7 @@ inline std::string get_compiled_format()
 }
 
 template <>
-inline std::string get_compiled_format<::shader>()
+inline std::string get_compiled_format<gfx::shader>()
 {
 	const auto& renderer_extension = gfx::get_renderer_filename_extension();
 	return renderer_extension + extensions::compiled;

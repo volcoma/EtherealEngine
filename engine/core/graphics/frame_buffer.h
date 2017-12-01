@@ -5,17 +5,19 @@
 #include <memory>
 #include <vector>
 
+namespace gfx
+{
 struct fbo_attachment
 {
 	/// Texture handle.
-	std::shared_ptr<::texture> texture;
+	std::shared_ptr<gfx::texture> texture;
 	/// Mip level.
 	std::uint16_t mip = 0;
 	/// Cubemap side or depth layer/slice.
 	std::uint16_t layer = 0;
 };
 
-struct frame_buffer
+struct frame_buffer : public handle_impl<frame_buffer_handle>
 {
 	//-----------------------------------------------------------------------------
 	//  Name : frame_buffer ()
@@ -35,8 +37,8 @@ struct frame_buffer
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	frame_buffer(std::uint16_t _width, std::uint16_t _height, gfx::TextureFormat::Enum _format,
-		std::uint32_t _textureFlags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
+	frame_buffer(std::uint16_t _width, std::uint16_t _height, texture_format _format,
+				 std::uint32_t _texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
 
 	//-----------------------------------------------------------------------------
 	//  Name : frame_buffer ()
@@ -46,8 +48,8 @@ struct frame_buffer
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	frame_buffer(gfx::BackbufferRatio::Enum _ratio, gfx::TextureFormat::Enum _format,
-		std::uint32_t _textureFlags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
+	frame_buffer(backbuffer_ratio _ratio, texture_format _format,
+				 std::uint32_t _textureFlags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
 
 	//-----------------------------------------------------------------------------
 	//  Name : frame_buffer ()
@@ -78,69 +80,9 @@ struct frame_buffer
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	frame_buffer(void* _nwh, std::uint16_t _width, std::uint16_t _height,
-		gfx::TextureFormat::Enum _depthFormat = gfx::TextureFormat::UnknownDepth);
-	//-----------------------------------------------------------------------------
-	//  Name : ~frame_buffer ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	~frame_buffer();
+				 texture_format _depth_format = texture_format::UnknownDepth);
 
-	//-----------------------------------------------------------------------------
-	//  Name : is_valid ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	bool is_valid() const;
-
-	//-----------------------------------------------------------------------------
-	//  Name : dispose ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void dispose();
-
-	//-----------------------------------------------------------------------------
-	//  Name : populate ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void populate(std::uint16_t _width, std::uint16_t _height, gfx::TextureFormat::Enum _format,
-		std::uint32_t _textureFlags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
-
-	//-----------------------------------------------------------------------------
-	//  Name : populate ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void populate(gfx::BackbufferRatio::Enum _ratio, gfx::TextureFormat::Enum _format,
-		std::uint32_t _textureFlags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
-	//-----------------------------------------------------------------------------
-	//  Name : populate ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void populate(const std::vector<std::shared_ptr<texture>>& textures);
-
-	//-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
 	//  Name : populate ()
 	/// <summary>
 	///
@@ -149,18 +91,7 @@ struct frame_buffer
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void populate(const std::vector<fbo_attachment>& textures);
-
-	//-----------------------------------------------------------------------------
-	//  Name : populate ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void populate(void* _nwh, std::uint16_t _width, std::uint16_t _height,
-		gfx::TextureFormat::Enum _depthFormat = gfx::TextureFormat::UnknownDepth);
-
+    
 	//-----------------------------------------------------------------------------
 	//  Name : get_size ()
 	/// <summary>
@@ -179,7 +110,17 @@ struct frame_buffer
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const fbo_attachment& get_attachment(std::uint32_t index) const;
+	const fbo_attachment& get_attachment(std::uint32_t index = 0) const;
+    
+    //-----------------------------------------------------------------------------
+	//  Name : get_attachment ()
+	/// <summary>
+	///
+	///
+	///
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	const std::shared_ptr<gfx::texture>& get_texture(std::uint32_t index = 0) const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_attachment_count ()
@@ -191,12 +132,11 @@ struct frame_buffer
 	//-----------------------------------------------------------------------------
 	std::size_t get_attachment_count() const;
 
-	/// Internal handle
-	gfx::FrameBufferHandle handle = BGFX_INVALID_HANDLE;
 	/// Back buffer ratio if any.
-	gfx::BackbufferRatio::Enum _bbratio = gfx::BackbufferRatio::Equal;
+	backbuffer_ratio _bbratio = backbuffer_ratio::Equal;
 	/// Size of the surface. If {0,0} then it is controlled by backbuffer ratio
 	usize _cached_size = {0, 0};
 	/// Texture attachments to the frame buffer
 	std::vector<fbo_attachment> _textures;
 };
+}

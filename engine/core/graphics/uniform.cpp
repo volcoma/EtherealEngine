@@ -1,35 +1,17 @@
 #include "uniform.h"
 
-uniform::~uniform()
+namespace gfx
 {
-	dispose();
+
+uniform::uniform(const std::string& _name, uniform_type _type, std::uint16_t _num /*= 1*/)
+{
+	handle = gfx::create_uniform(_name.c_str(), _type, _num);
+	gfx::get_uniform_info(handle, info);
 }
 
-void uniform::dispose()
+uniform::uniform(handle_type_t _handle)
 {
-	if(is_valid())
-		gfx::destroy(handle);
-
-	handle = {bgfx::kInvalidHandle};
+	gfx::get_uniform_info(_handle, info);
+	handle = gfx::create_uniform(info.name, info.type, info.num);
 }
-
-bool uniform::is_valid() const
-{
-	return gfx::isValid(handle);
-}
-
-void uniform::populate(const std::string& _name, gfx::UniformType::Enum _type, std::uint16_t _num /*= 1*/)
-{
-	dispose();
-
-	handle = gfx::createUniform(_name.c_str(), _type, _num);
-	gfx::getUniformInfo(handle, info);
-}
-
-void uniform::populate(gfx::UniformHandle _handle)
-{
-	dispose();
-
-	gfx::getUniformInfo(_handle, info);
-	handle = gfx::createUniform(info.name, info.type, info.num);
 }

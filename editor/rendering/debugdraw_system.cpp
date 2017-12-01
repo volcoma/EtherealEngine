@@ -11,7 +11,7 @@
 #include "runtime/rendering/camera.h"
 #include "runtime/rendering/mesh.h"
 #include "runtime/rendering/model.h"
-#include "runtime/rendering/program.h"
+#include "runtime/rendering/gpu_program.h"
 #include "runtime/system/events.h"
 
 namespace editor
@@ -34,7 +34,7 @@ void debugdraw_system::frame_render(std::chrono::duration<float>)
 	const auto surface = render_view.get_output_fbo(viewport_size);
 	const auto camera_posiiton = camera.get_position();
 
-	render_pass pass("debug_draw_pass");
+	gfx::render_pass pass("debug_draw_pass");
 	pass.bind(surface.get());
 	pass.set_view_proj(view, proj);
 	dd_raii dd(pass.id);
@@ -301,12 +301,12 @@ bool debugdraw_system::initialize()
 	auto& ts = core::get_subsystem<core::task_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
 
-	auto vs_wf_wireframe = am.load<shader>("editor_data:/shaders/vs_wf_wireframe.sc");
-	auto fs_wf_wireframe = am.load<shader>("editor_data:/shaders/fs_wf_wireframe.sc");
+	auto vs_wf_wireframe = am.load<gfx::shader>("editor_data:/shaders/vs_wf_wireframe.sc");
+	auto fs_wf_wireframe = am.load<gfx::shader>("editor_data:/shaders/fs_wf_wireframe.sc");
 
 	ts.push_or_execute_on_owner_thread(
-		[this](asset_handle<shader> vs, asset_handle<shader> fs) {
-			_program = std::make_unique<program>(vs, fs);
+		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
+			_program = std::make_unique<gpu_program>(vs, fs);
 
 		},
 		vs_wf_wireframe, fs_wf_wireframe);
