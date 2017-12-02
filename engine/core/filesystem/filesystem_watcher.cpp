@@ -88,17 +88,19 @@ public:
 	{
 		_root = path;
 		std::vector<filesystem_watcher::entry> entries;
+        std::vector<size_t> created;
+        std::vector<size_t> modified;
 		// make sure we store all initial write time
 		if(!_filter.empty())
 		{
-			visit_wild_card_path(path / filter, recursive, false, [this, &entries](const fs::path& p) {
-				poll_entry(p, entries);
+			visit_wild_card_path(path / filter, recursive, false, [this, &entries, &created, &modified](const fs::path& p) {
+				poll_entry(p, entries, created, modified);
 				return false;
 			});
 		}
 		else
 		{
-			poll_entry(_root, entries);
+			poll_entry(_root, entries, created, modified);
 		}
 
 		if(initialList)
@@ -124,20 +126,22 @@ public:
 	{
 
 		std::vector<filesystem_watcher::entry> entries;
+        std::vector<size_t> created;
+        std::vector<size_t> modified;
 		// otherwise we check the whole parent directory
 		if(!_filter.empty())
 		{
-			visit_wild_card_path(_root / _filter, _recursive, false, [this, &entries](const fs::path& p) {
-				poll_entry(p, entries);
+			visit_wild_card_path(_root / _filter, _recursive, false, [this, &entries, &created, &modified](const fs::path& p) {
+				poll_entry(p, entries, created, modified);
 				return false;
 			});
 		}
 		else
 		{
-			poll_entry(_root, entries);
+			poll_entry(_root, entries, created, modified);
 		}
 
-		process_modifications(entries);
+		process_modifications(entries, created, modified);
 
 		if(entries.size() > 0 && _callback)
 		{
@@ -145,7 +149,9 @@ public:
 		}
 	}
 
-	void process_modifications(std::vector<filesystem_watcher::entry>& entries)
+	void process_modifications(std::vector<filesystem_watcher::entry>& entries,
+                               const std::vector<size_t>& created,
+                               const std::vector<size_t>&)
 	{
 		auto it = std::begin(_entries);
 		while(it != std::end(_entries))
@@ -155,18 +161,16 @@ public:
 			if(!fs::exists(fi.path, err))
 			{
 				bool was_removed = true;
-				for(auto& e : entries)
+				for(auto idx : created)
 				{
-					if(e.status == filesystem_watcher::entry_status::created)
+                    auto& e = entries[idx];
+					if(e.last_mod_time == fi.last_mod_time && e.size == fi.size)
 					{
-						if(e.last_mod_time == fi.last_mod_time && e.size == fi.size)
-						{
-							e.status = filesystem_watcher::entry_status::renamed;
-							e.last_path = fi.path;
-							was_removed = false;
-							break;
-						}
-					}
+						e.status = filesystem_watcher::entry_status::renamed;
+						e.last_path = fi.path;
+						was_removed = false;
+						break;
+					}			
 				}
 
 				if(was_removed)
@@ -192,7 +196,9 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void poll_entry(const fs::path& path, std::vector<filesystem_watcher::entry>& modifications)
+	void poll_entry(const fs::path& path, std::vector<filesystem_watcher::entry>& modifications,
+                    std::vector<size_t>& created,
+                    std::vector<size_t>& modified)
 	{
 		// get the last modification time
 		fs::error_code err;
@@ -213,6 +219,7 @@ public:
 				fi.status = filesystem_watcher::entry_status::modified;
 				fi.type = status.type();
 				modifications.push_back(fi);
+                modified.push_back(modifications.size() - 1);
 			}
 			else
 			{
@@ -232,6 +239,7 @@ public:
 			fi.type = status.type();
 
 			modifications.push_back(fi);
+            created.push_back(modifications.size() - 1);
 		}
 	}
 
