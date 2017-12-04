@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../gui_system.h"
 #include "core/reflection/reflection.h"
 #include "core/reflection/registration.h"
+#include "editor_core/gui/gui.h"
 
 struct inspector
 {
@@ -41,7 +41,7 @@ REFLECT_EXTERN(inspector);
 	struct inspector_type : public inspector                                                                 \
 	{                                                                                                        \
 		REFLECTABLE(inspector_type, inspector)                                                               \
-		bool inspect(rttr::variant& var, bool read_only,                                                      \
+		bool inspect(rttr::variant& var, bool read_only,                                                     \
 					 std::function<rttr::variant(const rttr::variant&)> get_metadata);                       \
 	};                                                                                                       \
 	INSPECTOR_REFLECT(inspector_type, inspected_type)

@@ -2,6 +2,9 @@
 
 namespace imguizmo
 {
+// call inside your own window and before Manipulate() in order to draw gizmo to that window.
+void set_draw_list();
+
 // call BeginFrame right after ImGui_XXXX_NewFrame();
 void set_view_rect(float x, float y, float width, float height);
 
@@ -37,5 +40,6 @@ enum mode
 };
 
 void manipulate(const float* view, const float* projection, operation op, mode mod, float* matrix,
-				float* deltaMatrix = 0, float* snap = 0);
+				float* deltaMatrix = 0, float* snap = 0, float* localBounds = nullptr,
+				float* boundsSnap = nullptr);
 };

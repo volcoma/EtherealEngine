@@ -38,6 +38,7 @@ struct editing_system : core::subsystem
 		///
 		float scale_snap = 0.1f;
 	};
+    virtual ~editing_system() = default;
 	//-----------------------------------------------------------------------------
 	//  Name : initialize ()
 	/// <summary>

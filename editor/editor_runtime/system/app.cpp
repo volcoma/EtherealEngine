@@ -14,7 +14,7 @@
 #include "../rendering/debugdraw_system.h"
 #include "../system/project_manager.h"
 #include "core/logging/logging.h"
-#include "filedialog/filedialog.h"
+#include "editor_core/nativefd/filedialog.h"
 #include "runtime/assets/asset_extensions.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/ecs/components/camera_component.h"
@@ -157,7 +157,8 @@ auto open_scene()
 	auto& es = core::get_subsystem<editor::editing_system>();
 	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
 	std::string path;
-	if(open_file_dialog(extensions::scene.substr(1), fs::resolve_protocol("app:/data").string(), path))
+	if(native::open_file_dialog(extensions::scene.substr(1), fs::resolve_protocol("app:/data").string(),
+								path))
 	{
 		es.save_editor_camera();
 		ecs.dispose();
@@ -189,7 +190,8 @@ void save_scene_as()
 	auto& es = core::get_subsystem<editor::editing_system>();
 
 	std::string path;
-	if(save_file_dialog(extensions::scene.substr(1), fs::resolve_protocol("app:/data").string(), path))
+	if(native::save_file_dialog(extensions::scene.substr(1), fs::resolve_protocol("app:/data").string(),
+								path))
 	{
 		es.scene = path;
 		if(!fs::path(path).has_extension())
@@ -403,7 +405,6 @@ void app::draw_toolbar()
 	}
 }
 
-
 //-----------------------------------------------------------------------------
 
 void app::setup(cmd_line::options_parser& parser)
@@ -579,9 +580,9 @@ void app::draw_start_page(render_window& window)
 {
 	auto& pm = core::get_subsystem<editor::project_manager>();
 
-    auto on_create_project = [&](const std::string& p) {
+	auto on_create_project = [&](const std::string& p) {
 		auto& rend = core::get_subsystem<runtime::renderer>();
-        auto path = fs::path(p).make_preferred();
+		auto path = fs::path(p).make_preferred();
 		pm.create_project(path);
 		window.maximize();
 		rend.show_all_secondary_windows();
@@ -589,7 +590,7 @@ void app::draw_start_page(render_window& window)
 	};
 	auto on_open_project = [&](const std::string& p) {
 		auto& rend = core::get_subsystem<runtime::renderer>();
-        auto path = fs::path(p).make_preferred();
+		auto path = fs::path(p).make_preferred();
 		pm.open_project(path);
 		window.maximize();
 		rend.show_all_secondary_windows();
@@ -631,7 +632,7 @@ void app::draw_start_page(render_window& window)
 		if(gui::Button("NEW PROJECT", ImVec2(gui::GetContentRegionAvailWidth(), 0.0f)))
 		{
 			std::string path;
-			if(pick_folder_dialog("", path))
+			if(native::pick_folder_dialog("", path))
 			{
 				on_create_project(path);
 			}
@@ -640,7 +641,7 @@ void app::draw_start_page(render_window& window)
 		if(gui::Button("OPEN OTHER", ImVec2(gui::GetContentRegionAvailWidth(), 0.0f)))
 		{
 			std::string path;
-			if(pick_folder_dialog("", path))
+			if(native::pick_folder_dialog("", path))
 			{
 				on_open_project(path);
 			}
@@ -660,7 +661,7 @@ void app::handle_drag_and_drop()
 		gui::TextUnformatted(es.drag_data.description.c_str());
 		gui::EndTooltip();
 
-		//if(gui::GetMouseCursor() == ImGuiMouseCursor_Arrow)
+		// if(gui::GetMouseCursor() == ImGuiMouseCursor_Arrow)
 		//	gui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);
 	}
 

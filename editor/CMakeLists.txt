@@ -1,8 +1,7 @@
-file(GLOB_RECURSE libsrc *.h *.cpp *.hpp *.c *.cc)
+add_subdirectory_ex(editor_core)
+add_subdirectory_ex(editor_runtime)
 
-add_executable(editor ${libsrc})
-
-target_link_libraries(editor PUBLIC runtime)
-target_link_libraries(editor PUBLIC filedialog)
-target_link_libraries(editor PUBLIC assimp)
-target_link_libraries(editor PUBLIC imgui)
+# Make sure the compiler can find include files for our library
+# when other libraries or executables link to it
+target_include_directories (editor_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories (editor PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

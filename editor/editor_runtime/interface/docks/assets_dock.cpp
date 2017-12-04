@@ -3,8 +3,10 @@
 #include "../../system/project_manager.h"
 #include "core/filesystem/filesystem.h"
 #include "core/filesystem/filesystem_watcher.h"
+#include "core/graphics/shader.h"
+#include "core/graphics/texture.h"
 #include "core/system/task_system.h"
-#include "filedialog/filedialog.h"
+#include "editor_core/nativefd/filedialog.h"
 #include "runtime/assets/asset_extensions.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/ecs/prefab.h"
@@ -13,8 +15,6 @@
 #include "runtime/input/input.h"
 #include "runtime/rendering/material.h"
 #include "runtime/rendering/mesh.h"
-#include "core/graphics/shader.h"
-#include "core/graphics/texture.h"
 
 template <typename T>
 asset_handle<gfx::texture> get_asset_icon(T)
@@ -577,7 +577,7 @@ void assets_dock::render(const ImVec2&)
 	if(gui::Button("IMPORT..."))
 	{
 		std::vector<std::string> paths;
-		if(open_multiple_files_dialog("obj,fbx,dae,blend,3ds,mtl,png,jpg,tga,dds,ktx,pvr,sc,io,sh", "",
+		if(native::open_multiple_files_dialog("obj,fbx,dae,blend,3ds,mtl,png,jpg,tga,dds,ktx,pvr,sc,io,sh", "",
 									  paths))
 		{
 			auto& ts = core::get_subsystem<core::task_system>();
@@ -652,7 +652,9 @@ void assets_dock::render(const ImVec2&)
 					auto entity = dragged.get_value<runtime::entity>();
 					if(entity)
 						ecs::utils::save_entity_to_file(
-							dir->absolute_path / fs::path(entity.to_string() + extensions::prefab).make_preferred(), entity);
+							dir->absolute_path /
+								fs::path(entity.to_string() + extensions::prefab).make_preferred(),
+							entity);
 					es.drop();
 				}
 			}

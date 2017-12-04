@@ -1,14 +1,14 @@
-#pragma once
-#include <string>
-#include <vector>
-#include "nfd/nfd.h"
-#include "nfd/nfd_common.h"
+#include "filedialog.h"
+#include "filedialog/nfd/nfd.h"
+#include "filedialog/nfd/nfd_common.h"
 
-inline bool open_file_dialog(const std::string& filterList, const std::string& defaultPath, std::string& outPath)
+namespace native
 {
-	nfdchar_t *out = nullptr;
+bool open_file_dialog(const std::string& filterList, const std::string& defaultPath, std::string& outPath)
+{
+	nfdchar_t* out = nullptr;
 	nfdresult_t result = NFD_OpenDialog(filterList.c_str(), defaultPath.c_str(), &out);
-	if (result == NFD_OKAY)
+	if(result == NFD_OKAY)
 	{
 		outPath = out;
 		free(out);
@@ -18,14 +18,15 @@ inline bool open_file_dialog(const std::string& filterList, const std::string& d
 	return false;
 }
 
-inline bool open_multiple_files_dialog(const std::string& filterList, const std::string& defaultPath, std::vector<std::string>& outPaths)
+bool open_multiple_files_dialog(const std::string& filterList, const std::string& defaultPath,
+								std::vector<std::string>& outPaths)
 {
 	nfdpathset_t out;
 	nfdresult_t result = NFD_OpenDialogMultiple(filterList.c_str(), defaultPath.c_str(), &out);
-	if (result == NFD_OKAY)
+	if(result == NFD_OKAY)
 	{
 		auto selected_count = NFD_PathSet_GetCount(&out);
-		for (size_t i = 0; i < selected_count; ++i)
+		for(size_t i = 0; i < selected_count; ++i)
 		{
 			nfdchar_t* path = NFD_PathSet_GetPath(&out, i);
 			outPaths.push_back(path);
@@ -37,11 +38,11 @@ inline bool open_multiple_files_dialog(const std::string& filterList, const std:
 	return false;
 }
 
-inline bool pick_folder_dialog(const std::string& defaultPath, std::string& outPath)
+bool pick_folder_dialog(const std::string& defaultPath, std::string& outPath)
 {
-	nfdchar_t *out = nullptr;
+	nfdchar_t* out = nullptr;
 	nfdresult_t result = NFD_PickFolder(defaultPath.c_str(), &out);
-	if (result == NFD_OKAY)
+	if(result == NFD_OKAY)
 	{
 		outPath = out;
 		free(out);
@@ -51,11 +52,11 @@ inline bool pick_folder_dialog(const std::string& defaultPath, std::string& outP
 	return false;
 }
 
-inline bool save_file_dialog(const std::string& filterList, const std::string& defaultPath, std::string& outPath)
+bool save_file_dialog(const std::string& filterList, const std::string& defaultPath, std::string& outPath)
 {
-	nfdchar_t *out = nullptr;
+	nfdchar_t* out = nullptr;
 	nfdresult_t result = NFD_SaveDialog(filterList.c_str(), defaultPath.c_str(), &out);
-	if (result == NFD_OKAY)
+	if(result == NFD_OKAY)
 	{
 		outPath = std::string(out);
 		NFDi_Free(out);
@@ -63,4 +64,5 @@ inline bool save_file_dialog(const std::string& filterList, const std::string& d
 	}
 
 	return false;
+}
 }

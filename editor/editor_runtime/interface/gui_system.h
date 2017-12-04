@@ -1,10 +1,7 @@
 #pragma once
 
 #include "core/system/subsystem.h"
-#include "imgui/imgui.h"
-#define IMGUI_DEFINE_MATH_OPERATORS
-#include "imgui/imgui_internal.h"
-#include "imgui_user/imgui_user.h"
+#include "editor_core/gui/gui.h"
 #include "runtime/system/events.h"
 #include <map>
 #include <memory>
