@@ -11,7 +11,7 @@ bool open_file_dialog(const std::string& filterList, const std::string& defaultP
 	if(result == NFD_OKAY)
 	{
 		outPath = out;
-		free(out);
+		NFDi_Free(out);
 		return true;
 	}
 
@@ -45,7 +45,7 @@ bool pick_folder_dialog(const std::string& defaultPath, std::string& outPath)
 	if(result == NFD_OKAY)
 	{
 		outPath = out;
-		free(out);
+		NFDi_Free(out);
 		return true;
 	}
 
