@@ -1,6 +1,7 @@
 [Ethereal Engine](https://github.com/volcoma/EtherealEngine) - Cross-platform C++ Game Engine
 ============================================================================
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/1c46ea696a3a43e4a0199673de0db4bb)](https://www.codacy.com/app/volcoma/EtherealEngine?utm_source=github.com&utm_medium=referral&utm_content=volcoma/EtherealEngine&utm_campaign=badger)
 [![Join the chat at https://gitter.im/EtherealEngine/Lobby](https://badges.gitter.im/EtherealEngine/Lobby.svg)](https://gitter.im/EtherealEngine/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/volcoma/EtherealEngine.svg?branch=master)](https://travis-ci.org/volcoma/EtherealEngine)
 [![Build status](https://ci.appveyor.com/api/projects/status/18pxyag4wok2fscl?svg=true)](https://ci.appveyor.com/project/volcoma/etherealengine)
