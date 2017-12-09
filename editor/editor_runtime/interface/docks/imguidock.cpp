@@ -413,8 +413,7 @@ void dockspace::render_container(uint32_t& idgen, node* container, ImVec2 size, 
 		}
 		if(split0)
 		{
-			if(split0 == nullptr)
-				size.x = 1;
+			
 			render_container(idgen, split0, calculated_size0, calculated_cursor_pos);
 			if(container->vertical_split)
 			{
@@ -429,6 +428,8 @@ void dockspace::render_container(uint32_t& idgen, node* container, ImVec2 size, 
 		}
 		if(split1)
 		{
+            if(split0 == nullptr)
+				size.x = 1;
 			ImGui::SetCursorPosX(calculated_cursor_pos.x - splitter_button_width);
 			ImGui::SetCursorPosY(calculated_cursor_pos.y - splitter_button_width);
 			std::string idnamesb = "##SplitterButton";

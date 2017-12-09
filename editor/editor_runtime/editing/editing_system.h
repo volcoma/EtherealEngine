@@ -1,6 +1,5 @@
 #pragma once
 #include "../interface/docks/imguidock.h"
-#include "../interface/gizmos/imguizmo.h"
 #include "core/math/math_includes.h"
 #include "core/system/subsystem.h"
 #include "runtime/assets/asset_handle.h"

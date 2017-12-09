@@ -511,8 +511,8 @@ deferred_rendering::lighting_pass(std::shared_ptr<gfx::frame_buffer> input, came
 							   BGFX_STATE_BLEND_ADD);
 				gfx::submit(pass.id, program->native_handle());
 				gfx::set_state(BGFX_STATE_DEFAULT);
-                
-                program->end();
+
+				program->end();
 			}
 		});
 
@@ -611,7 +611,7 @@ deferred_rendering::reflection_probe_pass(std::shared_ptr<gfx::frame_buffer> inp
 							   BGFX_STATE_BLEND_ALPHA);
 				gfx::submit(pass.id, program->native_handle());
 				gfx::set_state(BGFX_STATE_DEFAULT);
-                program->end();
+				program->end();
 			}
 		});
 
@@ -676,7 +676,7 @@ deferred_rendering::atmospherics_pass(std::shared_ptr<gfx::frame_buffer> input, 
 					   BGFX_STATE_DEPTH_TEST_LEQUAL | BGFX_STATE_BLEND_ADD);
 		gfx::submit(pass.id, _atmospherics_program->native_handle());
 		gfx::set_state(BGFX_STATE_DEFAULT);
-        _atmospherics_program->end();
+		_atmospherics_program->end();
 	}
 
 	return input;
@@ -708,7 +708,7 @@ deferred_rendering::tonemapping_pass(std::shared_ptr<gfx::frame_buffer> input, c
 		gfx::set_state(topology | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
 		gfx::submit(pass.id, _gamma_correction_program->native_handle());
 		gfx::set_state(BGFX_STATE_DEFAULT);
-        _gamma_correction_program->end();
+		_gamma_correction_program->end();
 	}
 
 	return surface;

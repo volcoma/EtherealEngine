@@ -54,7 +54,7 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 		{
 			data = asset_handle<gfx::texture>();
 			var = data;
-			changed |= true;
+			changed = true;
 		}
 		std::string item = !data.id().empty() ? data.id() : "none";
 		rttr::variant var_str = item;
@@ -74,7 +74,7 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 				}
 			}
 			var = data;
-			changed |= true;
+			changed = true;
 		}
 		if((!gui::IsItemActive() && gui::IsItemHovered()) || hoveredFrame)
 		{
@@ -104,7 +104,7 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 				{
 					data = dragged.get_value<asset_handle<gfx::texture>>();
 					var = data;
-					changed |= true;
+					changed = true;
 				}
 			}
 		}

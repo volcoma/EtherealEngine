@@ -137,7 +137,7 @@ struct uuid
 	}
 
 	// constexpr pl0x!
-	uuid(const std::initializer_list<value_type>& ilist)
+	explicit uuid(const std::initializer_list<value_type>& ilist)
 		: uuid(ilist.begin(), ilist.end())
 	{
 	}

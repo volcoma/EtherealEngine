@@ -5,6 +5,8 @@
 #include <map>
 #include <sstream>
 #include <string>
+#include <type_traits>
+
 namespace cfg
 {
 class config
@@ -29,7 +31,7 @@ public:
 
 		const auto& value = get(section, name);
 
-		T result;
+		typename std::decay<T>::type result;
 		std::istringstream(value) >> result;
 		return result;
 	}

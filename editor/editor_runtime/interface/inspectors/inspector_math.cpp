@@ -1,5 +1,4 @@
 #include "inspector_math.h"
-#include "../gizmos/imguizmo.h"
 
 bool inspector_vec2::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {

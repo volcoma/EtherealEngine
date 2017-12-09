@@ -45,7 +45,7 @@ public:
 	{
 	}
 
-	recursive_wrapper(T const& operand)
+	explicit recursive_wrapper(T const& operand)
 		: p_(new T(operand))
 	{
 	}
@@ -55,7 +55,7 @@ public:
 	{
 	}
 
-	recursive_wrapper(T&& operand)
+	explicit recursive_wrapper(T&& operand)
 		: p_(new T(std::move(operand)))
 	{
 	}

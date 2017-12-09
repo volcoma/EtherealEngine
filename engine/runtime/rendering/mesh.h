@@ -1065,15 +1065,14 @@ protected:
 	//-------------------------------------------------------------------------
 	// Resource loading properties.
 	/// Should we force the re-generation of tangent space vectors?
-	bool _force_tangent_generation;
+	bool _force_tangent_generation = false;
 	/// Should we force the re-generation of vertex normals?
-	bool _force_normal_generation;
+	bool _force_normal_generation = false;
 	/// Should we force the re-generation of vertex barycentric coords?
-	bool _force_barycentric_generation;
+	bool _force_barycentric_generation = false;
 	/// Allows derived classes to disable / enable the automatic re-sort operation
-	/// that happens during several
-	/// operations such as setFaceMaterial(), etc.
-	bool _disable_final_sort;
+	/// that happens during several operations
+	bool _disable_final_sort = false;
 
 	// mesh data
 	/// The vertex data as it exists during data insertion (prior to the actual
@@ -1105,19 +1104,19 @@ protected:
 
 	// mesh properties
 	/// Does the mesh use a hardware vertex/index buffer?
-	bool _hardware_mesh;
+	bool _hardware_mesh = true;
 	/// Was the mesh optimized when it was prepared?
-	bool _optimize_mesh;
+	bool _optimize_mesh = false;
 	/// Axis aligned bounding box describing object dimensions (in object space)
 	math::bbox _bbox;
 	/// Total number of faces in the prepared mesh.
-	std::uint32_t _face_count;
+	std::uint32_t _face_count = 0;
 	/// Total number of vertices in the prepared mesh.
-	std::uint32_t _vertex_count;
+	std::uint32_t _vertex_count = 0;
 
 	// mesh data preparation
 	/// Preparation status of the mesh (i.e. has it been constructed yet).
-	mesh_status _prepare_status;
+	mesh_status _prepare_status = mesh_status::not_prepared;
 	/// Input data used for constructing the final mesh.
 	preparation_data _preparation_data;
 

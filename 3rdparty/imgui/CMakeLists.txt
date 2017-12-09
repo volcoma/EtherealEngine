@@ -1,8 +1,12 @@
 set(libsrc 
 imgui/imgui.cpp
+imgui/imgui.h
 imgui/imgui_draw.cpp
 imgui/imgui_demo.cpp
-imgui_user/imgui_user.cpp)
+imgui_user/imgui_user.cpp
+imgui_user/imgui_user.h
+imguizmo/imguizmo.cpp
+imguizmo/imguizmo.h)
 
 add_library (imgui ${libsrc})
 

@@ -53,8 +53,8 @@ bool scene_graph::initialize()
 {
 	runtime::on_frame_update.connect(this, &scene_graph::frame_update);
 
-    transform_component::static_id();
-    
+	transform_component::static_id();
+
 	return true;
 }
 
