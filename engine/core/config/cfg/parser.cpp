@@ -10,6 +10,7 @@ namespace cfg
 parser::parser(config& c)
 	: conf(c)
 	, in(nullptr)
+    , line(0)
 	, next_token(NO_TOKEN)
 {
 }

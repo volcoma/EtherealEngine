@@ -366,10 +366,8 @@ void filesystem_watcher::watch_impl(
 		// try to see if there's a match for the wild card
 		if(path.string().find("*") != std::string::npos)
 		{
-			bool found = false;
 			std::pair<fs::path, std::string> pathFilter =
-				visit_wild_card_path(path, recursive, true, [&found](const fs::path& p) {
-					found = true;
+				visit_wild_card_path(path, recursive, true, [](const fs::path& p) {
 					return true;
 				});
 

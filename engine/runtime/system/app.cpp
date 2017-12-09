@@ -17,7 +17,7 @@
 namespace runtime
 {
 
-void app::setup(cmd_line::options_parser&)
+void app::setup(cmd_line::options_parser& parser)
 {
 	auto logging_container = logging::get_mutable_logging_container();
 	logging_container->add_sink(std::make_shared<logging::sinks::platform_sink_mt>());
@@ -31,13 +31,24 @@ void app::setup(cmd_line::options_parser&)
 	gfx::set_warning_logger([](const std::string& msg) { APPLOG_WARNING(msg); });
 	gfx::set_error_logger([](const std::string& msg) { APPLOG_ERROR(msg); });
     
+    
+    {
+        auto value = cmd_line::value<std::string>();
+        value->default_value("auto");
+        parser.add_option("renderer",
+                          "r", 
+                          "renderer", 
+                          "Select preferred renderer.",
+                          value,
+                          "Select preferred renderer.");
+    }
 }
 
-void app::start(cmd_line::options_parser&)
+void app::start(cmd_line::options_parser& parser)
 {
 	core::add_subsystem<core::simulation>();
 	core::add_subsystem<core::task_system>();
-	core::add_subsystem<renderer>();
+	core::add_subsystem<renderer>(parser);
 	core::add_subsystem<input>();
 	core::add_subsystem<asset_manager>();
 	core::add_subsystem<entity_component_system>();
@@ -134,7 +145,14 @@ int app::run(int argc, char* argv[])
 		return _exitcode;
 	}
     parser.help();
-    parser.parse(argc, argv);
+    try
+    {
+        parser.parse(argc, argv);        
+    } 
+    catch (const cmd_line::option_exception& e)
+    {
+        APPLOG_ERROR(e.what());        
+    }
 	start(parser);
 	if(_exitcode != 0)
 	{

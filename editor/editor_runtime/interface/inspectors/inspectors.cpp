@@ -30,8 +30,7 @@ std::shared_ptr<inspector> get_inspector(rttr::type type)
 	return registry.type_map[type];
 }
 
-bool inspect_var(rttr::variant& var, bool read_only,
-				 std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspect_var(rttr::variant& var, bool read_only, const inspector::meta_getter& get_metadata)
 {
 	rttr::instance object = var;
 	auto type = object.get_derived_type();
@@ -109,7 +108,7 @@ bool inspect_var(rttr::variant& var, bool read_only,
 	return changed;
 }
 
-bool inspect_array(rttr::variant& var, bool read_only, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspect_array(rttr::variant& var, bool read_only, const inspector::meta_getter& get_metadata)
 {
 	auto view = var.create_sequential_view();
 	auto size = view.get_size();
@@ -167,7 +166,7 @@ bool inspect_enum(rttr::variant& var, rttr::enumeration& data, bool read_only)
 	{
 		int listbox_item_current = var.to_int();
 		gui::AlignTextToFramePadding();
-		gui::TextUnformatted(cstrings[listbox_item_current]);
+		gui::TextUnformatted(cstrings[std::size_t(listbox_item_current)]);
 	}
 	else
 	{

@@ -1,8 +1,7 @@
 #include "inspector_coretypes.h"
 #include "core/string_utils/string_utils.h"
 
-bool inspector_bool::inspect(rttr::variant& var, bool read_only,
-							 std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_bool::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<bool>();
 
@@ -23,8 +22,7 @@ bool inspector_bool::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_float::inspect(rttr::variant& var, bool read_only,
-							  std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_float::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.to_float();
 	if(read_only)
@@ -78,8 +76,7 @@ bool inspector_float::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_double::inspect(rttr::variant& var, bool read_only,
-							   std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_double::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = static_cast<float>(var.to_double());
 	if(read_only)
@@ -132,8 +129,7 @@ bool inspector_double::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_int8::inspect(rttr::variant& var, bool read_only,
-							 std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_int8::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = static_cast<int>(var.to_int8());
 	if(read_only)
@@ -177,8 +173,7 @@ bool inspector_int8::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_int16::inspect(rttr::variant& var, bool read_only,
-							  std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_int16::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = static_cast<int>(var.to_int16());
 	if(read_only)
@@ -222,8 +217,7 @@ bool inspector_int16::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_int32::inspect(rttr::variant& var, bool read_only,
-							  std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_int32::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = static_cast<int>(var.to_int32());
 	if(read_only)
@@ -267,8 +261,7 @@ bool inspector_int32::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_int64::inspect(rttr::variant& var, bool read_only,
-							  std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_int64::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = static_cast<int>(var.to_int64());
 	if(read_only)
@@ -312,8 +305,7 @@ bool inspector_int64::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_uint8::inspect(rttr::variant& var, bool read_only,
-							  std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_uint8::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = static_cast<int>(var.to_uint8());
 	if(read_only)
@@ -357,8 +349,7 @@ bool inspector_uint8::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_uint16::inspect(rttr::variant& var, bool read_only,
-							   std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_uint16::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = static_cast<int>(var.to_uint16());
 	if(read_only)
@@ -402,8 +393,7 @@ bool inspector_uint16::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_uint32::inspect(rttr::variant& var, bool read_only,
-							   std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_uint32::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = static_cast<int>(var.to_uint32());
 	if(read_only)
@@ -447,8 +437,7 @@ bool inspector_uint32::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_uint64::inspect(rttr::variant& var, bool read_only,
-							   std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_uint64::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = static_cast<int>(var.to_uint64());
 	if(read_only)
@@ -492,8 +481,7 @@ bool inspector_uint64::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_string::inspect(rttr::variant& var, bool read_only,
-							   std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_string::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<std::string>();
 	if(read_only)

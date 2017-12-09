@@ -58,7 +58,7 @@ bool isalnum(const std::string& name)
 	return true;
 }
 
-bool is_number(std::string token)
+bool is_number(const std::string& token)
 {
 	return std::regex_match(token, std::regex("((\\+|-)?[[:digit:]]+)(\\.(([[:digit:]]+)?))?"));
 }
@@ -86,7 +86,7 @@ void config::set(const std::string& section, const std::string& name, const std:
 	values[section][name] = value;
 }
 
-std::string escape(const std::string value)
+std::string escape(const std::string& value)
 {
 	// pure numeric values can be simply written
 	if(is_number(value))

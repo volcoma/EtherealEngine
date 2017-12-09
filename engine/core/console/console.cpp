@@ -43,7 +43,7 @@ void console::register_alias(const std::string& alias, const std::string& comman
 */
 std::string console::process_input(const std::string& line)
 {
-	printBuffer.str(std::string()); // clear()
+	print_buffer.str(std::string()); // clear()
 	std::vector<std::string> tokens = tokenize_line(line);
 
 	if(tokens.size() == 0)
@@ -62,7 +62,7 @@ std::string console::process_input(const std::string& line)
 		// TODO: we might want a more flexible way to give feedback
 		print("Unknown command \"" + identifier + "\".");
 	}
-	return printBuffer.str();
+	return print_buffer.str();
 }
 
 /**

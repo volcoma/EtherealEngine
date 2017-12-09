@@ -77,7 +77,7 @@ inline bool try_serialize(Archive& ar, cereal::NameValuePair<T>&& t)
 	{
         ar(std::forward<cereal::NameValuePair<T>>(t));		
 	}
-	catch(cereal::Exception e)
+	catch(const cereal::Exception& e)
 	{
 		serialization::log_warning(e.what());
 		return false;

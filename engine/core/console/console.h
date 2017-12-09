@@ -90,10 +90,10 @@ private:
 									  unsigned int requiredArguments);
 	};
 
-	std::stringstream printBuffer;
-	void print(std::string output)
+	std::stringstream print_buffer;
+	void print(const std::string& output)
 	{
-		printBuffer << output << "\n";
+		print_buffer << output << "\n";
 	}
 
 private:
@@ -192,13 +192,13 @@ std::function<void()> console::bind_callback(std::function<void(T, Args...)> cal
 * default argument converter: fail if none of the specific converters
 * has been run
 */
-template <typename T>
-inline T console::argumentConverter<T>::convert(const std::string&)
-{
-	static_assert(sizeof(T) != sizeof(T), "console commands may only take "
-										  "arguments of type int, float or "
-										  "std::string.");
-}
+//template <typename T>
+//inline T console::argumentConverter<T>::convert(const std::string&)
+//{
+//	static_assert(false, "console commands may only take "
+//										  "arguments of type int, float or "
+//										  "std::string.");
+//}
 
 /**
 * convert arguments from string to int

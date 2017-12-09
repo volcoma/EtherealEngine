@@ -1,8 +1,7 @@
 #include "inspector_entity.h"
 #include "inspectors.h"
 
-bool inspector_entity::inspect(rttr::variant& var, bool read_only,
-							   std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_entity::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<runtime::entity>();
 	if(!data)
@@ -27,14 +26,14 @@ bool inspector_entity::inspect(rttr::variant& var, bool read_only,
 		bool opened = true;
 		auto component = component_ptr.lock().get();
 		auto component_type = rttr::type::get(*component);
-        
-        std::string name = component_type.get_name().data();
-        auto meta_id = component_type.get_metadata("pretty_name");
-        if(meta_id)
-        {
-            name = meta_id.to_string();
-        }
-              
+
+		std::string name = component_type.get_name().data();
+		auto meta_id = component_type.get_metadata("pretty_name");
+		if(meta_id)
+		{
+			name = meta_id.to_string();
+		}
+
 		gui::SetNextTreeNodeOpen(true, ImGuiCond_FirstUseEver);
 		if(gui::CollapsingHeader(name.c_str(), &opened))
 		{
@@ -76,12 +75,12 @@ bool inspector_entity::inspect(rttr::variant& var, bool read_only,
 			auto cstructor = component_type.get_constructor();
 			if(cstructor)
 			{
-                std::string name = component_type.get_name().data();
-                auto meta_id = component_type.get_metadata("pretty_name");
-                if(meta_id)
-                {
-                    name = meta_id.to_string();
-                }
+				std::string name = component_type.get_name().data();
+				auto meta_id = component_type.get_metadata("pretty_name");
+				if(meta_id)
+				{
+					name = meta_id.to_string();
+				}
 				if(!filter.PassFilter(name.c_str()))
 					continue;
 

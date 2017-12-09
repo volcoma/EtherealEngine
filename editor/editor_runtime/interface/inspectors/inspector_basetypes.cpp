@@ -1,7 +1,6 @@
 #include "inspector_basetypes.h"
 
-bool inspector_irect::inspect(rttr::variant& var, bool read_only,
-							  std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_irect::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<irect>();
 	bool changed = false;
@@ -32,8 +31,7 @@ bool inspector_irect::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_urect::inspect(rttr::variant& var, bool read_only,
-							  std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_urect::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<urect>();
 	bool changed = false;
@@ -64,8 +62,7 @@ bool inspector_urect::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_frect::inspect(rttr::variant& var, bool read_only,
-							  std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_frect::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<frect>();
 	bool changed = false;
@@ -96,8 +93,7 @@ bool inspector_frect::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_ipoint::inspect(rttr::variant& var, bool read_only,
-							   std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_ipoint::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<ipoint>();
 	bool changed = false;
@@ -126,8 +122,7 @@ bool inspector_ipoint::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_upoint::inspect(rttr::variant& var, bool read_only,
-							   std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_upoint::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<upoint>();
 	bool changed = false;
@@ -156,8 +151,7 @@ bool inspector_upoint::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_fpoint::inspect(rttr::variant& var, bool read_only,
-							   std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_fpoint::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<fpoint>();
 	bool changed = false;
@@ -186,8 +180,7 @@ bool inspector_fpoint::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_isize::inspect(rttr::variant& var, bool read_only,
-							  std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_isize::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<isize>();
 	bool changed = false;
@@ -216,8 +209,7 @@ bool inspector_isize::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_usize::inspect(rttr::variant& var, bool read_only,
-							  std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_usize::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<usize>();
 	bool changed = false;
@@ -246,8 +238,7 @@ bool inspector_usize::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_fsize::inspect(rttr::variant& var, bool read_only,
-							  std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_fsize::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<fsize>();
 	bool changed = false;
@@ -275,8 +266,7 @@ bool inspector_fsize::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_irange::inspect(rttr::variant& var, bool read_only,
-							   std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_irange::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<irange>();
 	bool changed = false;
@@ -305,8 +295,7 @@ bool inspector_irange::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_urange::inspect(rttr::variant& var, bool read_only,
-							   std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_urange::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<urange>();
 	bool changed = false;
@@ -335,8 +324,7 @@ bool inspector_urange::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_frange::inspect(rttr::variant& var, bool read_only,
-							   std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_frange::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<frange>();
 	bool changed = false;

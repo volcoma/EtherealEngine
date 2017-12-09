@@ -1,8 +1,7 @@
 #include "inspector_math.h"
 #include "../gizmos/imguizmo.h"
 
-bool inspector_vec2::inspect(rttr::variant& var, bool read_only,
-							 std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_vec2::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<math::vec2>();
 	const char* names[] = {"X", "Y"};
@@ -14,8 +13,7 @@ bool inspector_vec2::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_vec3::inspect(rttr::variant& var, bool read_only,
-							 std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_vec3::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<math::vec3>();
 	const char* names[] = {"X", "Y", "Z"};
@@ -27,8 +25,7 @@ bool inspector_vec3::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_vec4::inspect(rttr::variant& var, bool read_only,
-							 std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_vec4::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<math::vec4>();
 	const char* names[] = {"X", "Y", "Z", "W"};
@@ -40,8 +37,7 @@ bool inspector_vec4::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_color::inspect(rttr::variant& var, bool read_only,
-							  std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_color::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<math::color>();
 	if(gui::ColorEdit4("", &data.value.x))
@@ -53,8 +49,7 @@ bool inspector_color::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_quaternion::inspect(rttr::variant& var, bool read_only,
-								   std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_quaternion::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<math::quat>();
 	const char* names[] = {"X", "Y", "Z"};
@@ -77,8 +72,7 @@ bool inspector_quaternion::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_transform::inspect(rttr::variant& var, bool read_only,
-								  std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_transform::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<math::transform>();
 	const char* names[] = {"X", "Y", "Z"};
@@ -99,7 +93,8 @@ bool inspector_transform::inspect(rttr::variant& var, bool read_only,
 		old_quat = rotation;
 	}
 	gui::Columns(1);
-	if(gui::Button("P", ImVec2(ImGui::GetItemsLineHeightWithSpacing(), ImGui::GetItemsLineHeightWithSpacing())))
+	if(gui::Button("P",
+				   ImVec2(ImGui::GetItemsLineHeightWithSpacing(), ImGui::GetItemsLineHeightWithSpacing())))
 	{
 		data.set_position({0.0f, 0.0f, 0.0f});
 		changed = true;
@@ -118,7 +113,8 @@ bool inspector_transform::inspect(rttr::variant& var, bool read_only,
 	}
 	gui::PopID();
 
-	if(gui::Button("R", ImVec2(ImGui::GetItemsLineHeightWithSpacing(), ImGui::GetItemsLineHeightWithSpacing())))
+	if(gui::Button("R",
+				   ImVec2(ImGui::GetItemsLineHeightWithSpacing(), ImGui::GetItemsLineHeightWithSpacing())))
 	{
 		data.set_rotation(math::quat());
 		euler_angles = {0.0f, 0.0f, 0.0f};
@@ -141,7 +137,8 @@ bool inspector_transform::inspect(rttr::variant& var, bool read_only,
 
 	gui::PopID();
 
-	if(gui::Button("S", ImVec2(ImGui::GetItemsLineHeightWithSpacing(), ImGui::GetItemsLineHeightWithSpacing())))
+	if(gui::Button("S",
+				   ImVec2(ImGui::GetItemsLineHeightWithSpacing(), ImGui::GetItemsLineHeightWithSpacing())))
 	{
 		data.set_scale({1.0f, 1.0f, 1.0f});
 		changed = true;

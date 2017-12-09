@@ -70,8 +70,8 @@ bool run_compile_process(const std::string& process, const std::vector<std::stri
 	}
 	else
 	{
-		char buffer[2048];
-		process_reader.read(buffer, sizeof(buffer), &error);
+		std::array<char, 2048> buffer;
+		process_reader.read(buffer.data(), buffer.size(), &error);
 
 		process_reader.close();
 		int32_t result = process_reader.getExitCode();
@@ -174,6 +174,7 @@ void compile<gfx::shader>(const fs::path& absolute_key)
 
 	{
 		std::ofstream output_file(str_output);
+        (void)output_file;
 	}
 
 	if(!run_compile_process("shaderc", args_array, error))
@@ -208,6 +209,7 @@ void compile<gfx::texture>(const fs::path& absolute_key)
 
 	{
 		std::ofstream output_file(str_output);
+        (void)output_file;        
 	}
 
 	if(!run_compile_process("texturec", args_array, error))

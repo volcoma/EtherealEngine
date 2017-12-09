@@ -620,9 +620,9 @@ public:
 	const option_details& operator[](const std::string& option) const;
 
 	// parse positional arguments into the given option
-	void parse_positional(std::string option);
+	void parse_positional(const std::string& option);
 
-	void parse_positional(std::vector<std::string> options);
+	void parse_positional(const std::vector<std::string>& options);
 
 	std::string help(const std::vector<std::string>& groups = {""}) const;
 
@@ -633,7 +633,7 @@ public:
 private:
 	void add_one_option(const std::string& option, std::shared_ptr<option_details> details);
 
-	bool consume_positional(std::string a);
+	bool consume_positional(const std::string& a);
 
 	void add_to_option(const std::string& option, const std::string& arg);
 

@@ -1,8 +1,7 @@
 #include "inspector_light.h"
 #include "inspectors.h"
 
-bool inspector_light_component::inspect(rttr::variant& var, bool read_only,
-										std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_light_component::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<light_component*>();
 	auto light_val = data->get_light();
@@ -44,8 +43,8 @@ bool inspector_light_component::inspect(rttr::variant& var, bool read_only,
 	return false;
 }
 
-bool inspector_reflection_probe_component::inspect(
-	rttr::variant& var, bool read_only, std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_reflection_probe_component::inspect(rttr::variant& var, bool read_only,
+												   const meta_getter& get_metadata)
 {
 	auto data = var.get_value<reflection_probe_component*>();
 	auto probe = data->get_probe();

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/system/subsystem.h"
+#include "core/cmd_line/args.h"
 #include "render_window.h"
 #include <memory>
 #include <vector>
@@ -9,6 +10,7 @@ namespace runtime
 {
 struct renderer : public core::subsystem
 {
+    renderer(cmd_line::options_parser& parser);
 	//-----------------------------------------------------------------------------
 	//  Name : initialize ()
 	/// <summary>
@@ -104,5 +106,7 @@ protected:
 	std::unique_ptr<mml::window> _init_window;
 	std::vector<std::unique_ptr<render_window>> _windows;
 	std::vector<std::unique_ptr<render_window>> _windows_pending_addition;
+    
+    cmd_line::options_parser& _parser;
 };
 }

@@ -431,7 +431,7 @@ void options_parser::add_to_option(const std::string& option, const std::string&
 	parse_option(iter->second, option, arg);
 }
 
-bool options_parser::consume_positional(std::string a)
+bool options_parser::consume_positional(const std::string& a)
 {
 	while(m_next_positional != m_positional.end())
 	{
@@ -464,14 +464,14 @@ bool options_parser::consume_positional(std::string a)
 	return false;
 }
 
-void options_parser::parse_positional(std::string option)
+void options_parser::parse_positional(const std::string& option)
 {
 	parse_positional(std::vector<std::string>{option});
 }
 
-void options_parser::parse_positional(std::vector<std::string> options)
+void options_parser::parse_positional(const std::vector<std::string>& options)
 {
-	m_positional = std::move(options);
+	m_positional = options;
 	m_next_positional = m_positional.begin();
 
 	m_positional_set.insert(m_positional.begin(), m_positional.end());

@@ -414,10 +414,6 @@ void triangle_mesh_tools::create_cylinder(std::vector<math::vec3>& out_vertices,
 	// Now construct all segments
 	const float angle_delta = math::pi<float>() * 2.0f / tessellation;
 
-	float s = 1.0f; // cos(angle == 0);
-	float t = 0.0f; // sin(angle == 0);
-	float angle = 0.0f;
-
 	const math::vec3 vT = math::vec3(0.0f, 0.0f, half_height);
 	const math::vec3 vB = math::vec3(0.0f, 0.0f, -half_height);
 	int iB = 0;
@@ -436,10 +432,12 @@ void triangle_mesh_tools::create_cylinder(std::vector<math::vec3>& out_vertices,
 		iB = triangle_mesh_tools::add_vertex(out_vertices, vB);
 	}
 
+	float angle = 0.0f;
+    
 	for(int i = 0; i < tessellation; i++)
 	{
-		s = math::cos(angle);
-		t = math::sin(angle);
+		float s = math::cos(angle);
+		float t = math::sin(angle);
 		angle += angle_delta;
 
 		vTs.push_back(math::vec3(s * radius_top, t * radius_top, half_height));

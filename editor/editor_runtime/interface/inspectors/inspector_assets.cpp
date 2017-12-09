@@ -1,15 +1,15 @@
 #include "inspector_assets.h"
 #include "../../editing/editing_system.h"
 #include "core/filesystem/filesystem.h"
+#include "core/graphics/texture.h"
 #include "inspectors.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/ecs/prefab.h"
 #include "runtime/rendering/material.h"
 #include "runtime/rendering/mesh.h"
-#include "core/graphics/texture.h"
 
 bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
-											 std::function<rttr::variant(const rttr::variant&)> get_metadata)
+											 const meta_getter& get_metadata)
 {
 	auto data = var.get_value<asset_handle<gfx::texture>>();
 	auto& es = core::get_subsystem<editor::editing_system>();
@@ -68,7 +68,7 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 			else
 			{
 				auto load_future = am.load<gfx::texture>(item);
-				if (load_future.valid())
+				if(load_future.valid())
 				{
 					data = load_future.get();
 				}
@@ -78,7 +78,7 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 		}
 		if((!gui::IsItemActive() && gui::IsItemHovered()) || hoveredFrame)
 		{
-			//gui::SetMouseCursor(ImGuiMouseCursor_Help);
+			// gui::SetMouseCursor(ImGuiMouseCursor_Help);
 			gui::BeginTooltip();
 			gui::TextUnformatted("YOU CAN DRAG AND DROP HERE");
 			gui::EndTooltip();
@@ -121,7 +121,7 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 }
 
 bool inspector_asset_handle_material::inspect(rttr::variant& var, bool read_only,
-											  std::function<rttr::variant(const rttr::variant&)> get_metadata)
+											  const meta_getter& get_metadata)
 {
 	auto data = var.get_value<asset_handle<material>>();
 
@@ -142,7 +142,7 @@ bool inspector_asset_handle_material::inspect(rttr::variant& var, bool read_only
 			else
 			{
 				auto load_future = am.load<material>(item);
-				if (load_future.valid())
+				if(load_future.valid())
 				{
 					data = load_future.get();
 				}
@@ -193,8 +193,7 @@ bool inspector_asset_handle_material::inspect(rttr::variant& var, bool read_only
 	return changed;
 }
 
-bool inspector_asset_handle_mesh::inspect(rttr::variant& var, bool read_only,
-										  std::function<rttr::variant(const rttr::variant&)> get_metadata)
+bool inspector_asset_handle_mesh::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<asset_handle<mesh>>();
 
@@ -215,7 +214,7 @@ bool inspector_asset_handle_mesh::inspect(rttr::variant& var, bool read_only,
 			else
 			{
 				auto load_future = am.load<mesh>(item);
-				if (load_future.valid())
+				if(load_future.valid())
 				{
 					data = load_future.get();
 				}
@@ -263,7 +262,7 @@ bool inspector_asset_handle_mesh::inspect(rttr::variant& var, bool read_only,
 }
 
 bool inspector_asset_handle_prefab::inspect(rttr::variant& var, bool read_only,
-											std::function<rttr::variant(const rttr::variant&)> get_metadata)
+											const meta_getter& get_metadata)
 {
 	auto data = var.get_value<asset_handle<prefab>>();
 
@@ -284,7 +283,7 @@ bool inspector_asset_handle_prefab::inspect(rttr::variant& var, bool read_only,
 			else
 			{
 				auto load_future = am.load<prefab>(item);
-				if (load_future.valid())
+				if(load_future.valid())
 				{
 					data = load_future.get();
 				}
