@@ -25,5 +25,4 @@ LOAD(component)
 }
 LOAD_INSTANTIATE(component, cereal::iarchive_associative_t);
 LOAD_INSTANTIATE(component, cereal::iarchive_binary_t);
-
 }

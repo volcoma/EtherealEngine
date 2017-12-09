@@ -569,18 +569,18 @@ inline constexpr auto invoke(F&& f, As&&... as) RETURN(lib::forward<F>(f)(lib::f
 	template <typename B, typename T, typename D>
 	inline constexpr auto invoke(T B::*pmv, D&& d) RETURN(lib::forward<D>(d).*pmv)
 
-	template <typename Pmv, typename Ptr>
-	inline constexpr auto invoke(Pmv pmv, Ptr&& ptr) RETURN((*lib::forward<Ptr>(ptr)).*pmv)
+		template <typename Pmv, typename Ptr>
+		inline constexpr auto invoke(Pmv pmv, Ptr&& ptr) RETURN((*lib::forward<Ptr>(ptr)).*pmv)
 
-	template <typename B, typename T, typename D, typename... As>
-	inline constexpr auto invoke(T B::*pmf, D&& d, As&&... as)
-        RETURN((lib::forward<D>(d).*pmf)(lib::forward<As>(as)...))
+			template <typename B, typename T, typename D, typename... As>
+			inline constexpr auto invoke(T B::*pmf, D&& d, As&&... as)
+				RETURN((lib::forward<D>(d).*pmf)(lib::forward<As>(as)...))
 
-	template <typename Pmf, typename Ptr, typename... As>
-	inline constexpr auto invoke(Pmf pmf, Ptr&& ptr, As&&... as)
-		RETURN(((*lib::forward<Ptr>(ptr)).*pmf)(lib::forward<As>(as)...))
+					template <typename Pmf, typename Ptr, typename... As>
+					inline constexpr auto invoke(Pmf pmf, Ptr&& ptr, As&&... as)
+						RETURN(((*lib::forward<Ptr>(ptr)).*pmf)(lib::forward<As>(as)...))
 
-namespace detail
+							namespace detail
 {
 
 	template <typename Void, typename, typename...>
@@ -1327,7 +1327,7 @@ template <Trait DestructibleTrait, std::size_t Index>
 union recursive_union<DestructibleTrait, Index> {
 };
 
-#define NONSTD_VARIANT_RECURSIVE_UNION(destructible_trait, destructor)                                        \
+#define NONSTD_VARIANT_RECURSIVE_UNION(destructible_trait, destructor)                                       \
 	template <std::size_t Index, typename T, typename... Ts>                                                 \
 	union recursive_union<destructible_trait, Index, T, Ts...> {                                             \
 	public:                                                                                                  \
@@ -1479,7 +1479,7 @@ struct dtor
 template <typename Traits, Trait = Traits::destructible_trait>
 class destructor;
 
-#define NONSTD_VARIANT_DESTRUCTOR(destructible_trait, definition, destroy)                                    \
+#define NONSTD_VARIANT_DESTRUCTOR(destructible_trait, definition, destroy)                                   \
 	template <typename... Ts>                                                                                \
 	class destructor<traits<Ts...>, destructible_trait> : public base<destructible_trait, Ts...>             \
 	{                                                                                                        \
@@ -1499,19 +1499,19 @@ class destructor;
 	}
 
 NONSTD_VARIANT_DESTRUCTOR(Trait::TriviallyAvailable, ~destructor() = default;
-						 , inline void destroy() noexcept { this->index_ = static_cast<index_t>(-1); });
+						  , inline void destroy() noexcept { this->index_ = static_cast<index_t>(-1); });
 
 NONSTD_VARIANT_DESTRUCTOR(Trait::Available, ~destructor() { destroy(); },
-						 inline void destroy() noexcept {
-							 if(!this->valueless_by_exception())
-							 {
-								 visitation::base::visit_alt(dtor{}, *this);
-							 }
-							 this->index_ = static_cast<index_t>(-1);
-						 });
+						  inline void destroy() noexcept {
+							  if(!this->valueless_by_exception())
+							  {
+								  visitation::base::visit_alt(dtor{}, *this);
+							  }
+							  this->index_ = static_cast<index_t>(-1);
+						  });
 
 NONSTD_VARIANT_DESTRUCTOR(Trait::Unavailable, ~destructor() = delete;
-						 , inline void destroy() noexcept = delete;);
+						  , inline void destroy() noexcept = delete;);
 
 #undef NONSTD_VARIANT_DESTRUCTOR
 
@@ -1568,7 +1568,7 @@ protected:
 template <typename Traits, Trait = Traits::move_constructible_trait>
 class move_constructor;
 
-#define NONSTD_VARIANT_MOVE_CONSTRUCTOR(move_constructible_trait, definition)                                 \
+#define NONSTD_VARIANT_MOVE_CONSTRUCTOR(move_constructible_trait, definition)                                \
 	template <typename... Ts>                                                                                \
 	class move_constructor<traits<Ts...>, move_constructible_trait> : public constructor<traits<Ts...>>      \
 	{                                                                                                        \
@@ -1585,14 +1585,14 @@ class move_constructor;
 	}
 
 NONSTD_VARIANT_MOVE_CONSTRUCTOR(Trait::TriviallyAvailable,
-							   move_constructor(move_constructor&& that) = default;);
+								move_constructor(move_constructor&& that) = default;);
 
 NONSTD_VARIANT_MOVE_CONSTRUCTOR(Trait::Available,
-							   move_constructor(move_constructor&& that) noexcept(
-								   lib::all<std::is_nothrow_move_constructible<Ts>::value...>::value)
-							   : move_constructor(valueless_t{}) {
-								   this->generic_construct(*this, lib::move(that));
-							   });
+								move_constructor(move_constructor&& that) noexcept(
+									lib::all<std::is_nothrow_move_constructible<Ts>::value...>::value)
+								: move_constructor(valueless_t{}) {
+									this->generic_construct(*this, lib::move(that));
+								});
 
 NONSTD_VARIANT_MOVE_CONSTRUCTOR(Trait::Unavailable, move_constructor(move_constructor&&) = delete;);
 
@@ -1601,7 +1601,7 @@ NONSTD_VARIANT_MOVE_CONSTRUCTOR(Trait::Unavailable, move_constructor(move_constr
 template <typename Traits, Trait = Traits::copy_constructible_trait>
 class copy_constructor;
 
-#define NONSTD_VARIANT_COPY_CONSTRUCTOR(copy_constructible_trait, definition)                                 \
+#define NONSTD_VARIANT_COPY_CONSTRUCTOR(copy_constructible_trait, definition)                                \
 	template <typename... Ts>                                                                                \
 	class copy_constructor<traits<Ts...>, copy_constructible_trait> : public move_constructor<traits<Ts...>> \
 	{                                                                                                        \
@@ -1618,10 +1618,10 @@ class copy_constructor;
 	}
 
 NONSTD_VARIANT_COPY_CONSTRUCTOR(Trait::TriviallyAvailable,
-							   copy_constructor(const copy_constructor& that) = default;);
+								copy_constructor(const copy_constructor& that) = default;);
 
 NONSTD_VARIANT_COPY_CONSTRUCTOR(Trait::Available, copy_constructor(const copy_constructor& that)
-							   : copy_constructor(valueless_t{}) { this->generic_construct(*this, that); });
+								: copy_constructor(valueless_t{}) { this->generic_construct(*this, that); });
 
 NONSTD_VARIANT_COPY_CONSTRUCTOR(Trait::Unavailable, copy_constructor(const copy_constructor&) = delete;);
 
@@ -1725,7 +1725,7 @@ protected:
 template <typename Traits, Trait = Traits::move_assignable_trait>
 class move_assignment;
 
-#define NONSTD_VARIANT_MOVE_ASSIGNMENT(move_assignable_trait, definition)                                     \
+#define NONSTD_VARIANT_MOVE_ASSIGNMENT(move_assignable_trait, definition)                                    \
 	template <typename... Ts>                                                                                \
 	class move_assignment<traits<Ts...>, move_assignable_trait> : public assignment<traits<Ts...>>           \
 	{                                                                                                        \
@@ -1743,15 +1743,15 @@ class move_assignment;
 	}
 
 NONSTD_VARIANT_MOVE_ASSIGNMENT(Trait::TriviallyAvailable,
-							  move_assignment& operator=(move_assignment&& that) = default;);
+							   move_assignment& operator=(move_assignment&& that) = default;);
 
 NONSTD_VARIANT_MOVE_ASSIGNMENT(Trait::Available,
-							  move_assignment& operator=(move_assignment&& that) noexcept(
-								  lib::all<(std::is_nothrow_move_constructible<Ts>::value &&
-											std::is_nothrow_move_assignable<Ts>::value)...>::value) {
-								  this->generic_assign(lib::move(that));
-								  return *this;
-							  });
+							   move_assignment& operator=(move_assignment&& that) noexcept(
+								   lib::all<(std::is_nothrow_move_constructible<Ts>::value &&
+											 std::is_nothrow_move_assignable<Ts>::value)...>::value) {
+								   this->generic_assign(lib::move(that));
+								   return *this;
+							   });
 
 NONSTD_VARIANT_MOVE_ASSIGNMENT(Trait::Unavailable, move_assignment& operator=(move_assignment&&) = delete;);
 
@@ -1760,7 +1760,7 @@ NONSTD_VARIANT_MOVE_ASSIGNMENT(Trait::Unavailable, move_assignment& operator=(mo
 template <typename Traits, Trait = Traits::copy_assignable_trait>
 class copy_assignment;
 
-#define NONSTD_VARIANT_COPY_ASSIGNMENT(copy_assignable_trait, definition)                                     \
+#define NONSTD_VARIANT_COPY_ASSIGNMENT(copy_assignable_trait, definition)                                    \
 	template <typename... Ts>                                                                                \
 	class copy_assignment<traits<Ts...>, copy_assignable_trait> : public move_assignment<traits<Ts...>>      \
 	{                                                                                                        \
@@ -1777,7 +1777,7 @@ class copy_assignment;
 	}
 
 NONSTD_VARIANT_COPY_ASSIGNMENT(Trait::TriviallyAvailable,
-							  copy_assignment& operator=(const copy_assignment& that) = default;);
+							   copy_assignment& operator=(const copy_assignment& that) = default;);
 
 NONSTD_VARIANT_COPY_ASSIGNMENT(Trait::Available, copy_assignment& operator=(const copy_assignment& that) {
 	this->generic_assign(that);
@@ -1785,7 +1785,7 @@ NONSTD_VARIANT_COPY_ASSIGNMENT(Trait::Available, copy_assignment& operator=(cons
 });
 
 NONSTD_VARIANT_COPY_ASSIGNMENT(Trait::Unavailable,
-							  copy_assignment& operator=(const copy_assignment&) = delete;);
+							   copy_assignment& operator=(const copy_assignment&) = delete;);
 
 #undef NONSTD_VARIANT_COPY_ASSIGNMENT
 
@@ -2448,8 +2448,8 @@ namespace std
 
 template <typename... Ts>
 struct hash<nonstd::detail::enabled_type<
-	nonstd::variant<Ts...>, nonstd::lib::enable_if_t<nonstd::lib::all<
-							   nonstd::detail::hash::is_enabled<nonstd::lib::remove_const_t<Ts>>()...>::value>>>
+	nonstd::variant<Ts...>, nonstd::lib::enable_if_t<nonstd::lib::all<nonstd::detail::hash::is_enabled<
+								nonstd::lib::remove_const_t<Ts>>()...>::value>>>
 {
 	using argument_type = nonstd::variant<Ts...>;
 	using result_type = std::size_t;

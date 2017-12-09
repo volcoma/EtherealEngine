@@ -7,10 +7,10 @@
 #include "../../rendering/material.h"
 #include "../../rendering/mesh.h"
 #include "core/graphics/texture.h"
-#include "core/string_utils/string_utils.h"
+#include "core/logging/logging.h"
 #include "core/serialization/serialization.h"
 #include "core/serialization/types/string.hpp"
-#include "core/logging/logging.h"
+#include "core/string_utils/string_utils.h"
 namespace cereal
 {
 
@@ -45,7 +45,7 @@ inline void LOAD_FUNCTION_NAME(Archive& ar, asset_handle<T>& obj)
 	{
 		auto& am = core::get_subsystem<runtime::asset_manager>();
 		auto asset_future = am.load<T>(obj.link->id, runtime::load_mode::sync);
-        obj = asset_future.get();     
+		obj = asset_future.get();
 	}
 }
 }

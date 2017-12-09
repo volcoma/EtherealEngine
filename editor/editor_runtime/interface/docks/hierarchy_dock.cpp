@@ -14,11 +14,11 @@
 
 namespace
 {
-    enum class context_action
-    {
-        none,
-        rename, 
-    };
+enum class context_action
+{
+	none,
+	rename,
+};
 }
 
 context_action check_context_menu(runtime::entity entity)
@@ -26,7 +26,7 @@ context_action check_context_menu(runtime::entity entity)
 	auto& es = core::get_subsystem<editor::editing_system>();
 	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
 	auto& editor_camera = es.camera;
-    context_action action = context_action::none;
+	context_action action = context_action::none;
 	if(entity && entity != editor_camera)
 	{
 		if(gui::BeginPopupContextItem("Entity Context Menu"))
@@ -36,12 +36,12 @@ context_action check_context_menu(runtime::entity entity)
 				auto object = ecs.create();
 				object.assign<transform_component>().lock()->set_parent(entity);
 			}
-        
-            if(gui::MenuItem("RENAME", "F2"))
+
+			if(gui::MenuItem("RENAME", "F2"))
 			{
-                action = context_action::rename;
+				action = context_action::rename;
 			}
-            
+
 			if(gui::MenuItem("CLONE", "CTRL + D"))
 			{
 				auto object = ecs::utils::clone_entity(entity);
@@ -59,7 +59,6 @@ context_action check_context_menu(runtime::entity entity)
 			{
 				entity.destroy();
 			}
-            
 
 			gui::EndPopup();
 		}
@@ -77,7 +76,7 @@ context_action check_context_menu(runtime::entity entity)
 			gui::EndPopup();
 		}
 	}
-    return action;
+	return action;
 }
 
 void check_drag(runtime::entity entity)
@@ -266,10 +265,10 @@ void draw_entity(runtime::entity entity)
 	if(!edit_label)
 	{
 		auto action = check_context_menu(entity);
-        if(action == context_action::rename)
-        {
-            edit_label = true;
-        }
+		if(action == context_action::rename)
+		{
+			edit_label = true;
+		}
 		check_drag(entity);
 	}
 
@@ -330,7 +329,7 @@ void hierarchy_dock::render(const ImVec2&)
 					auto sel = selected.get_value<runtime::entity>();
 					if(sel && sel != editor_camera)
 					{
-						auto clone = ecs::utils::clone_entity(sel);            
+						auto clone = ecs::utils::clone_entity(sel);
 						auto clone_trans_comp = clone.get_component<transform_component>().lock();
 						auto sel_trans_comp = sel.get_component<transform_component>().lock();
 						if(clone_trans_comp && sel_trans_comp)

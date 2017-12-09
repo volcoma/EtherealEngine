@@ -18,6 +18,5 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void frame_update(std::chrono::duration<float> dt);
-
 };
 }

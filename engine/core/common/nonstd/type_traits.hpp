@@ -66,10 +66,9 @@ protected:
 	static index_t& get_counter()
 	{
 		static index_t value = 0;
-        return value;
+		return value;
 	}
 };
-
 }
 
 ///////////////////////////////////////////////////////

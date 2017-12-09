@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cstdint>
 #include <array>
+#include <cstdint>
 #include <type_traits>
 
 struct half
@@ -78,7 +78,7 @@ private:
 template <typename T>
 struct range
 {
-    using value_type = T;
+	using value_type = T;
 	range() = default;
 	range(T _min, T _max)
 		: Min(_min)
@@ -86,7 +86,7 @@ struct range
 	{
 	}
 
-	template<typename U, typename = typename std::enable_if<std::is_convertible<U, T>::value, void>::type>
+	template <typename U, typename = typename std::enable_if<std::is_convertible<U, T>::value, void>::type>
 	range(const std::array<U, 2>& data)
 		: Min(data[0])
 		, Max(data[1])
@@ -94,11 +94,11 @@ struct range
 	}
 	T Min = 0;
 	T Max = 0;
-    
-    inline bool contains(const T& val) const
-    {
-        return Min <= val && val <= Max;
-    }
+
+	inline bool contains(const T& val) const
+	{
+		return Min <= val && val <= Max;
+	}
 
 	inline bool operator==(const range& b) const
 	{
@@ -114,7 +114,7 @@ struct range
 template <typename T>
 struct size
 {
-    using value_type = T;
+	using value_type = T;
 	size() = default;
 	size(T _width, T _height)
 		: width(_width)
@@ -122,7 +122,7 @@ struct size
 	{
 	}
 
-	template<typename U, typename = typename std::enable_if<std::is_convertible<U, T>::value, void>::type>
+	template <typename U, typename = typename std::enable_if<std::is_convertible<U, T>::value, void>::type>
 	size(const std::array<U, 2>& data)
 		: width(data[0])
 		, height(data[1])
@@ -166,7 +166,7 @@ struct size
 template <typename T>
 struct point
 {
-    using value_type = T;
+	using value_type = T;
 	point()
 	{
 	}
@@ -175,7 +175,7 @@ struct point
 		, y(_y)
 	{
 	}
-	template<typename U, typename = typename std::enable_if<std::is_convertible<U, T>::value, void>::type>
+	template <typename U, typename = typename std::enable_if<std::is_convertible<U, T>::value, void>::type>
 	point(const std::array<U, 2>& data)
 		: x(data[0])
 		, y(data[1])
@@ -199,7 +199,7 @@ struct point
 template <typename T>
 struct rect
 {
-    using value_type = T;
+	using value_type = T;
 	rect()
 	{
 	}
@@ -210,7 +210,7 @@ struct rect
 		, bottom(_bottom)
 	{
 	}
-    T left = 0;
+	T left = 0;
 	T top = 0;
 	T right = 0;
 	T bottom = 0;
@@ -233,12 +233,12 @@ struct rect
 	{
 		return size<T1>(right - left, bottom - top);
 	}
-    
-    template <typename T1 = T>
+
+	template <typename T1 = T>
 	inline point<T1> center() const
-    {
-        return {left + width() / 2, top + height() / 2};
-    }
+	{
+		return {left + width() / 2, top + height() / 2};
+	}
 
 	inline bool contains(const point<T>& p) const
 	{

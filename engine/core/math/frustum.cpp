@@ -133,7 +133,7 @@ void frustum::update(const transform& View, const transform& Proj, bool _oglNDC)
 	}
 
 	// Copy and normalize the planes
-	for (auto& plane : planes)
+	for(auto& plane : planes)
 		plane.data *= -1.0f;
 
 	// Normalize and compute additional information.
@@ -610,7 +610,7 @@ volume_query frustum::classify_sphere(const vec3& vecCenter, float fRadius) cons
 bool frustum::test_sphere(const vec3& vecCenter, float fRadius) const
 {
 	// Test frustum planes
-	for (const auto& plane : planes)
+	for(const auto& plane : planes)
 	{
 		float fDot = plane::dot_coord(plane, vecCenter);
 

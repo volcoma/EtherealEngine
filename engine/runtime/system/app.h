@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/system/subsystem.h"
 #include "core/cmd_line/args.h"
+#include "core/system/subsystem.h"
 
 namespace runtime
 {
@@ -32,9 +32,9 @@ struct app
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	virtual void stop();
-    
-    virtual void run_one_frame();
-    
+
+	virtual void run_one_frame();
+
 	//-----------------------------------------------------------------------------
 	//  Name : run ()
 	/// <summary>
@@ -63,6 +63,6 @@ struct app
 protected:
 	/// exit code of the application
 	int _exitcode = 0;
-    bool _running = true;
+	bool _running = true;
 };
 }

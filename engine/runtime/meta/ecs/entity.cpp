@@ -18,7 +18,7 @@ SAVE(entity)
 
 	auto id = obj.id().id();
 	try_save(ar, cereal::make_nvp("entity_id", id));
-    
+
 	if(obj.valid())
 	{
 		auto& serialization_map = get_serialization_map();
@@ -43,35 +43,35 @@ LOAD(entity)
 
 	try_load(ar, cereal::make_nvp("entity_id", id));
 
-    if(id != entity::INVALID.id())
-    {
-        auto& serialization_map = get_serialization_map();
-        auto it = serialization_map.find(id);
-        if(it != serialization_map.end())
-        {
-            obj = it->second;
-        }
-        else
-        {
-            auto& ecs = core::get_subsystem<entity_component_system>();
-            obj = ecs.create();
-            serialization_map[id] = obj;
-    
-            try_load(ar, cereal::make_nvp("name", name));
-            try_load(ar, cereal::make_nvp("components", components));
-    
-            obj.set_name(name);
-            for(auto component : components)
-            {
-                auto component_shared = component.lock();
-                if(component_shared)
-                {
-                    obj.assign(component_shared);
-                    component_shared->touch();
-                }
-            }
-        }
-    }	
+	if(id != entity::INVALID.id())
+	{
+		auto& serialization_map = get_serialization_map();
+		auto it = serialization_map.find(id);
+		if(it != serialization_map.end())
+		{
+			obj = it->second;
+		}
+		else
+		{
+			auto& ecs = core::get_subsystem<entity_component_system>();
+			obj = ecs.create();
+			serialization_map[id] = obj;
+
+			try_load(ar, cereal::make_nvp("name", name));
+			try_load(ar, cereal::make_nvp("components", components));
+
+			obj.set_name(name);
+			for(auto component : components)
+			{
+				auto component_shared = component.lock();
+				if(component_shared)
+				{
+					obj.assign(component_shared);
+					component_shared->touch();
+				}
+			}
+		}
+	}
 }
 
 LOAD_INSTANTIATE(entity, cereal::iarchive_associative_t);

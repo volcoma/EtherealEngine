@@ -77,8 +77,9 @@ constexpr static const int drag_button = 0;
 
 ImFont* GetFont(const std::string& id);
 // Helper function for passing Texture to ImGui::Image.
-void Image(std::shared_ptr<gfx::texture> texture, const ImVec2& _size, const ImVec2& _uv0 = ImVec2(0.0f, 0.0f),
-		   const ImVec2& _uv1 = ImVec2(1.0f, 1.0f), const ImVec4& _tintCol = ImVec4(1.0f, 1.0f, 1.0f, 1.0f),
+void Image(std::shared_ptr<gfx::texture> texture, const ImVec2& _size,
+		   const ImVec2& _uv0 = ImVec2(0.0f, 0.0f), const ImVec2& _uv1 = ImVec2(1.0f, 1.0f),
+		   const ImVec4& _tintCol = ImVec4(1.0f, 1.0f, 1.0f, 1.0f),
 		   const ImVec4& _borderCol = ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
 
 // Helper function for passing Texture to ImGui::ImageButton.

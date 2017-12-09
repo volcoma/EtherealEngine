@@ -4,8 +4,8 @@
 #include <unordered_map>
 
 #include "core/common/nonstd/type_traits.hpp"
-#include "core/string_utils/string_utils.h"
 #include "core/filesystem/filesystem.h"
+#include "core/string_utils/string_utils.h"
 #include "core/system/task_system.h"
 
 #include "asset_extensions.h"

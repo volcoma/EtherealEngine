@@ -2,8 +2,8 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "render_window.h"
-#include "core/logging/logging.h"
 #include "core/graphics/render_pass.h"
+#include "core/logging/logging.h"
 static std::uint32_t s_next_id = 0;
 
 void render_window::on_resize()
@@ -69,6 +69,7 @@ void render_window::prepare_surface()
 {
 	auto size = get_size();
 
-	_surface = std::make_shared<gfx::frame_buffer>(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(get_system_handle())),
-					   static_cast<std::uint16_t>(size[0]), static_cast<std::uint16_t>(size[1]));
+	_surface = std::make_shared<gfx::frame_buffer>(
+		reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(get_system_handle())),
+		static_cast<std::uint16_t>(size[0]), static_cast<std::uint16_t>(size[1]));
 }

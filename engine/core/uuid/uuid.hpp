@@ -23,8 +23,7 @@ random_generator_t make_seeded_engine()
 template <typename random_generator_t = ::std::mt19937>
 uuid random_uuid()
 {
-	random_uuid_generator<random_generator_t> gen(
-		make_seeded_engine<random_generator_t>()());
+	random_uuid_generator<random_generator_t> gen(make_seeded_engine<random_generator_t>()());
 
 	return gen();
 }

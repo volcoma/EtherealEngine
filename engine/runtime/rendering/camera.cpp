@@ -31,7 +31,7 @@ void camera::set_orthographic_size(float size)
 void camera::set_fov(float fFOVY)
 {
 	// Skip if no-op
-    if(math::epsilonEqual(fFOVY, _fov, math::epsilon<float>()))    
+	if(math::epsilonEqual(fFOVY, _fov, math::epsilon<float>()))
 		return;
 
 	// Update projection matrix and view frustum
@@ -55,7 +55,7 @@ void camera::set_projection_mode(projection_mode Mode)
 void camera::set_near_clip(float fDistance)
 {
 	// Skip if this is a no-op
-    if(math::epsilonEqual(fDistance, _near_clip, math::epsilon<float>()))    
+	if(math::epsilonEqual(fDistance, _near_clip, math::epsilon<float>()))
 		return;
 
 	// Store value
@@ -71,7 +71,7 @@ void camera::set_near_clip(float fDistance)
 void camera::set_far_clip(float fDistance)
 {
 	// Skip if this is a no-op
-    if(math::epsilonEqual(fDistance, _far_clip, math::epsilon<float>()))    
+	if(math::epsilonEqual(fDistance, _far_clip, math::epsilon<float>()))
 		return;
 
 	// Store value

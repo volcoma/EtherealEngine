@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/system/subsystem.h"
 #include "core/cmd_line/args.h"
+#include "core/system/subsystem.h"
 #include "render_window.h"
 #include <memory>
 #include <vector>
@@ -10,7 +10,7 @@ namespace runtime
 {
 struct renderer : public core::subsystem
 {
-    renderer(cmd_line::options_parser& parser);
+	renderer(cmd_line::options_parser& parser);
 	//-----------------------------------------------------------------------------
 	//  Name : initialize ()
 	/// <summary>
@@ -97,7 +97,8 @@ struct renderer : public core::subsystem
 	render_window* get_focused_window() const;
 	void process_pending_windows();
 
-	void platform_events(const std::pair<std::uint32_t, bool>& info, const std::vector<mml::platform_event>& events);
+	void platform_events(const std::pair<std::uint32_t, bool>& info,
+						 const std::vector<mml::platform_event>& events);
 
 protected:
 	std::uint32_t _render_frame = 0;
@@ -106,7 +107,7 @@ protected:
 	std::unique_ptr<mml::window> _init_window;
 	std::vector<std::unique_ptr<render_window>> _windows;
 	std::vector<std::unique_ptr<render_window>> _windows_pending_addition;
-    
-    cmd_line::options_parser& _parser;
+
+	cmd_line::options_parser& _parser;
 };
 }

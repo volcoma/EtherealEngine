@@ -7,7 +7,6 @@
 #include "core/serialization/serialization.h"
 #include <vector>
 
-
 class gpu_program;
 class mesh;
 class material;

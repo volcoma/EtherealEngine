@@ -48,7 +48,7 @@ texture::texture(std::uint16_t _size, bool _hasMips, std::uint16_t _numLayers, t
 {
 	handle = create_texture_cube(_size, _hasMips, _numLayers, _format, _flags, _mem);
 
-    calc_texture_size(info, _size, _size, _size, false, _hasMips, _numLayers, _format);
+	calc_texture_size(info, _size, _size, _size, false, _hasMips, _numLayers, _format);
 
 	flags = _flags;
 	ratio = backbuffer_ratio::Count;

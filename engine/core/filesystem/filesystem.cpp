@@ -74,7 +74,7 @@ bool has_known_protocol(const path& _path)
 {
 	const auto string_path = _path.generic_string();
 	auto pos = string_path.find(':', 0) + 1;
-	if (pos == std::string::npos)
+	if(pos == std::string::npos)
 		return false;
 
 	const auto root = string_path.substr(0, pos);
@@ -85,7 +85,6 @@ bool has_known_protocol(const path& _path)
 
 	return (protocols.find(root) != std::end(protocols));
 }
-
 }
 
 #include <stdio.h>

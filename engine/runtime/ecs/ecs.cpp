@@ -85,64 +85,64 @@ entity_component_system::~entity_component_system()
 
 size_t entity_component_system::size() const
 {
-    return entity_component_mask_.size() - free_list_.size();
+	return entity_component_mask_.size() - free_list_.size();
 }
 
 size_t entity_component_system::capacity() const
 {
-    return entity_component_mask_.size();
+	return entity_component_mask_.size();
 }
 
 bool entity_component_system::valid(entity::id_t id) const
 {
-    return id.index() < entity_version_.size() && entity_version_[id.index()] == id.version();
+	return id.index() < entity_version_.size() && entity_version_[id.index()] == id.version();
 }
 
 bool entity_component_system::valid_index(uint32_t index) const
 {
-    return index < entity_version_.size();
+	return index < entity_version_.size();
 }
 
 entity entity_component_system::create()
 {
-    std::uint32_t index, version;
-    if(free_list_.empty())
-    {
-        index = index_counter_++;
-        accomodate_entity(index);
-        version = entity_version_[index] = 1;
-    }
-    else
-    {
-        index = free_list_.back();
-        free_list_.pop_back();
-        version = entity_version_[index];
-    }
-    entity entity(this, entity::id_t(index, version));
-    on_entity_created(entity);
-    return entity;
+	std::uint32_t index, version;
+	if(free_list_.empty())
+	{
+		index = index_counter_++;
+		accomodate_entity(index);
+		version = entity_version_[index] = 1;
+	}
+	else
+	{
+		index = free_list_.back();
+		free_list_.pop_back();
+		version = entity_version_[index];
+	}
+	entity entity(this, entity::id_t(index, version));
+	on_entity_created(entity);
+	return entity;
 }
 
 void entity_component_system::set_entity_name(entity::id_t id, std::string name)
 {
-    entity_names_[id.id()] = name;
+	entity_names_[id.id()] = name;
 }
 
 const std::string& entity_component_system::get_entity_name(entity::id_t id)
 {
-    return entity_names_[id.id()];
+	return entity_names_[id.id()];
 }
 
 void entity_component_system::dispose()
 {
-    for(entity entity : all_entities())
-    {
-        entity.destroy();
-    }
-    
-    component_pools_.clear();
-    entity_component_mask_.clear();
-    entity_version_.clear();
+	for(entity entity : all_entities())
+	{
+		entity.destroy();
+	}
+
+	component_pools_.clear();
+	entity_component_mask_.clear();
+	entity_version_.clear();
 	free_list_.clear();
 	index_counter_ = 0;
 }
@@ -266,13 +266,13 @@ void entity_component_system::destroy(entity::id_t id)
 
 entity entity_component_system::get(entity::id_t id)
 {
-    assert_valid(id);
-    return entity(this, id);
+	assert_valid(id);
+	return entity(this, id);
 }
 
 entity::id_t entity_component_system::create_id(uint32_t index) const
 {
-    return entity::id_t(index, entity_version_[index]);
+	return entity::id_t(index, entity_version_[index]);
 }
 
 component::~component()

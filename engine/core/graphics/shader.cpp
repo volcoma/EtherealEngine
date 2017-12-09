@@ -3,18 +3,18 @@
 namespace gfx
 {
 shader::shader(const memory_view* mem)
-    : shader(create_shader(mem))
+	: shader(create_shader(mem))
 {
 }
 
 shader::shader(const embedded_shader* es, const char* name)
-    : shader(create_embedded_shader(es, get_renderer_type(), name))
+	: shader(create_embedded_shader(es, get_renderer_type(), name))
 {
 }
 
 shader::shader(handle_type_t hndl)
 {
-    handle = hndl;
+	handle = hndl;
 
 	auto uniform_count = get_shader_uniforms(handle);
 	if(uniform_count > 0)
@@ -29,5 +29,4 @@ shader::shader(handle_type_t hndl)
 		}
 	}
 }
-
 }

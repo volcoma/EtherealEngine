@@ -4,23 +4,23 @@
 #include <string>
 #include <vector>
 
-//imgui includes
+// imgui includes
 #include "../gui_system.h"
 
-//OS SPECIFIC NEEDS
-//Platform window creation
-//Getting a dockspace associated with that window from somewhere
-//Query global mouse position
-//Query local inside the window mouse position
-//Query if mouse button is pressed
-//Set window position
-//Set window size
-//Set window opacity (optional but preferred)
-//Request window close
-//Request focus(maybe optional)
+// OS SPECIFIC NEEDS
+// Platform window creation
+// Getting a dockspace associated with that window from somewhere
+// Query global mouse position
+// Query local inside the window mouse position
+// Query if mouse button is pressed
+// Set window position
+// Set window size
+// Set window opacity (optional but preferred)
+// Request window close
+// Request focus(maybe optional)
 
-//For the window itself it should somehow have an imgui context
-//associated with it.
+// For the window itself it should somehow have an imgui context
+// associated with it.
 
 namespace imguidock
 {

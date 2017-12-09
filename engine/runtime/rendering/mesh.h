@@ -1,8 +1,8 @@
 #pragma once
 
+#include "core/common/basetypes.hpp"
 #include "core/graphics/graphics.h"
 #include "core/math/math_includes.h"
-#include "core/common/basetypes.hpp"
 #include "core/reflection/registration.h"
 #include "core/serialization/serialization.h"
 
@@ -767,8 +767,8 @@ public:
 	const bone_palette_array_t& get_bone_palettes() const;
 
 	const std::unique_ptr<armature_node>& get_armature() const;
-    irect calculate_screen_rect(const math::transform& world, const camera& cam) const;
-    //-----------------------------------------------------------------------------
+	irect calculate_screen_rect(const math::transform& world, const camera& cam) const;
+	//-----------------------------------------------------------------------------
 	//  Name : get_subset ()
 	/// <summary>
 	/// Retrieve information about the subset of the mesh that is associated with

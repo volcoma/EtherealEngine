@@ -361,9 +361,8 @@ public:
 
 #if _NONSTD_OPT_TEMPL_FUNC_DEF_PARAMS
 	// Assignment from a value
-	template <
-		typename U,
-		typename = typename std::enable_if<std::is_same<typename std::decay<U>::type, T>::value, void>::type>
+	template <typename U, typename = typename std::enable_if<
+							  std::is_same<typename std::decay<U>::type, T>::value, void>::type>
 	optional& operator=(U&& val) _NONSTD_OPT_NOEXCEPTEX(
 		std::is_nothrow_constructible<T, U>::value&& std::is_nothrow_assignable<T, U>::value)
 	{

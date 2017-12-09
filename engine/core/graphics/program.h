@@ -2,9 +2,9 @@
 
 #include "handle_impl.h"
 #include <limits>
+#include <memory>
 #include <unordered_map>
 #include <vector>
-#include <memory>
 
 namespace gfx
 {
@@ -67,7 +67,6 @@ struct program : public handle_impl<program_handle>
 	//-----------------------------------------------------------------------------
 	void set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::texture* _texture,
 					 std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
-
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_uniform ()

@@ -23,11 +23,11 @@ public:
 	console& operator=(const console&) = delete;
 
 	/**
-	* @brief Registers a new command with the given name and callback.
-	*
-	* The callback's signature determines what arguments the command
-	* requires and may only consist of int, float and std::string arguments.
-	*/
+	 * @brief Registers a new command with the given name and callback.
+	 *
+	 * The callback's signature determines what arguments the command
+	 * requires and may only consist of int, float and std::string arguments.
+	 */
 	template <typename... Args>
 	void register_command(const std::string& name, const std::string& description,
 						  const std::vector<std::string>& argumentNames,
@@ -166,8 +166,8 @@ void console::register_command(const std::string& name, const std::string& descr
 }
 
 /**
-* bindCallback, base case
-*/
+ * bindCallback, base case
+ */
 inline std::function<void()> console::bind_callback(std::function<void()> callback,
 													const std::vector<std::string>&, int)
 {
@@ -175,10 +175,10 @@ inline std::function<void()> console::bind_callback(std::function<void()> callba
 }
 
 /**
-* bindCallback, recursion step.
-*
-* Run the "bind" code for each argument.
-*/
+ * bindCallback, recursion step.
+ *
+ * Run the "bind" code for each argument.
+ */
 template <typename T, typename... Args>
 std::function<void()> console::bind_callback(std::function<void(T, Args...)> callback,
 											 const std::vector<std::string>& arguments, int argumentIndex)
@@ -189,11 +189,11 @@ std::function<void()> console::bind_callback(std::function<void(T, Args...)> cal
 }
 
 /**
-* default argument converter: fail if none of the specific converters
-* has been run
-*/
-//template <typename T>
-//inline T console::argumentConverter<T>::convert(const std::string&)
+ * default argument converter: fail if none of the specific converters
+ * has been run
+ */
+// template <typename T>
+// inline T console::argumentConverter<T>::convert(const std::string&)
 //{
 //	static_assert(false, "console commands may only take "
 //										  "arguments of type int, float or "
@@ -201,8 +201,8 @@ std::function<void()> console::bind_callback(std::function<void(T, Args...)> cal
 //}
 
 /**
-* convert arguments from string to int
-*/
+ * convert arguments from string to int
+ */
 template <>
 inline int console::argumentConverter<int>::convert(const std::string& s)
 {
@@ -210,8 +210,8 @@ inline int console::argumentConverter<int>::convert(const std::string& s)
 }
 
 /**
-* convert arguments from string to float
-*/
+ * convert arguments from string to float
+ */
 template <>
 inline float console::argumentConverter<float>::convert(const std::string& s)
 {
@@ -219,8 +219,8 @@ inline float console::argumentConverter<float>::convert(const std::string& s)
 }
 
 /**
-*  (dummy)convert arguments from string to string
-*/
+ *  (dummy)convert arguments from string to string
+ */
 template <>
 inline std::string console::argumentConverter<std::string>::convert(const std::string& s)
 {
@@ -228,8 +228,8 @@ inline std::string console::argumentConverter<std::string>::convert(const std::s
 }
 
 /**
-* Return the list of the arguments of a command pretty printed. Base case.
-*/
+ * Return the list of the arguments of a command pretty printed. Base case.
+ */
 template <>
 struct console::NameArguments<>
 {
@@ -249,8 +249,8 @@ struct console::NameArguments<>
 };
 
 /**
-* Return the list of the arguments of a command pretty printed. Recursion step.
-*/
+ * Return the list of the arguments of a command pretty printed. Recursion step.
+ */
 template <typename T, typename... Args>
 struct console::NameArguments<T, Args...>
 {

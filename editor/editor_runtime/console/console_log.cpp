@@ -2,7 +2,7 @@
 
 void console_log::_sink_it(const logging::details::log_msg& msg)
 {
-    std::lock_guard<std::recursive_mutex> lock(_entries_mutex);
+	std::lock_guard<std::recursive_mutex> lock(_entries_mutex);
 	_entries.push_back({msg.formatted.c_str(), msg.level});
 	if(_entries.size() > _max_size)
 		_entries.pop_front();
@@ -18,7 +18,7 @@ console_log::entries_t console_log::get_items()
 {
 	entries_t items_copy;
 	{
-        std::lock_guard<std::recursive_mutex> lock(_entries_mutex);
+		std::lock_guard<std::recursive_mutex> lock(_entries_mutex);
 		items_copy = _entries;
 	}
 	return items_copy;

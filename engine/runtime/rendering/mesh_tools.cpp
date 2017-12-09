@@ -433,7 +433,7 @@ void triangle_mesh_tools::create_cylinder(std::vector<math::vec3>& out_vertices,
 	}
 
 	float angle = 0.0f;
-    
+
 	for(int i = 0; i < tessellation; i++)
 	{
 		float s = math::cos(angle);

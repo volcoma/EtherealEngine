@@ -15,8 +15,8 @@ console::~console()
 }
 
 /**
-* @brief Add an alias to the command.
-*/
+ * @brief Add an alias to the command.
+ */
 void console::register_alias(const std::string& alias, const std::string& command)
 {
 	assert(commands.find(command) != commands.end());
@@ -27,20 +27,20 @@ void console::register_alias(const std::string& alias, const std::string& comman
 }
 
 /**
-* @brief process an input line possibly containing commands
-*
-* Tokenize the line and process the tokens.
-*
-* The first token is the command to be run, the other tokens are
-* the arguments.
-*
-* If the second token is a question mark, output the command's
-* description.
-*
-* TODO:
-* - create an history of inputs
-* - eventually make the commands lowercase / case insensitive
-*/
+ * @brief process an input line possibly containing commands
+ *
+ * Tokenize the line and process the tokens.
+ *
+ * The first token is the command to be run, the other tokens are
+ * the arguments.
+ *
+ * If the second token is a question mark, output the command's
+ * description.
+ *
+ * TODO:
+ * - create an history of inputs
+ * - eventually make the commands lowercase / case insensitive
+ */
 std::string console::process_input(const std::string& line)
 {
 	print_buffer.str(std::string()); // clear()
@@ -66,11 +66,11 @@ std::string console::process_input(const std::string& line)
 }
 
 /**
-* @brief Separate a string by spaces into words
-*
-* TODO:
-* - Find if there is a better way to tokenize a string.
-*/
+ * @brief Separate a string by spaces into words
+ *
+ * TODO:
+ * - Find if there is a better way to tokenize a string.
+ */
 std::vector<std::string> console::tokenize_line(const std::string& line)
 {
 	std::vector<std::string> out;
@@ -151,9 +151,9 @@ void console::register_help_command()
 }
 
 /**
-* TODO:
-* - if the commands will ever be case insensitive, the filter should also be
-*/
+ * TODO:
+ * - if the commands will ever be case insensitive, the filter should also be
+ */
 void console::help_command(const std::string& term)
 {
 	if(term.empty())
@@ -190,9 +190,9 @@ void console::help_command(const std::string& term)
 }
 
 /**
-* TODO:
-* - if the commands will ever be case insensitive, the filter should also be
-*/
+ * TODO:
+ * - if the commands will ever be case insensitive, the filter should also be
+ */
 std::vector<std::string> console::list_of_commands(const std::string& filter)
 {
 	std::vector<std::string> list{};

@@ -62,7 +62,7 @@ void process_vertices(aiMesh* mesh, mesh::load_data& load_data)
 
 			if(has_position)
 				gfx::vertex_pack(position, false, gfx::attribute::Position, load_data.vertex_format,
-								current_vertex_ptr);
+								 current_vertex_ptr);
 		}
 
 		// tex coords
@@ -73,7 +73,7 @@ void process_vertices(aiMesh* mesh, mesh::load_data& load_data)
 
 			if(has_texcoord0)
 				gfx::vertex_pack(textureCoords, true, gfx::attribute::TexCoord0, load_data.vertex_format,
-								current_vertex_ptr);
+								 current_vertex_ptr);
 		}
 
 		////normals
@@ -83,8 +83,8 @@ void process_vertices(aiMesh* mesh, mesh::load_data& load_data)
 			std::memcpy(math::value_ptr(normal), &mesh->mNormals[i], sizeof(math::vec3));
 
 			if(has_normal)
-				gfx::vertex_pack(math::value_ptr(normal), true, gfx::attribute::Normal, load_data.vertex_format,
-								current_vertex_ptr);
+				gfx::vertex_pack(math::value_ptr(normal), true, gfx::attribute::Normal,
+								 load_data.vertex_format, current_vertex_ptr);
 		}
 
 		math::vec4 tangent;
@@ -94,8 +94,8 @@ void process_vertices(aiMesh* mesh, mesh::load_data& load_data)
 			std::memcpy(math::value_ptr(tangent), &mesh->mTangents[i], sizeof(math::vec3));
 			tangent.w = 1.0f;
 			if(has_tangent)
-				gfx::vertex_pack(math::value_ptr(tangent), true, gfx::attribute::Tangent, load_data.vertex_format,
-								current_vertex_ptr);
+				gfx::vertex_pack(math::value_ptr(tangent), true, gfx::attribute::Tangent,
+								 load_data.vertex_format, current_vertex_ptr);
 		}
 
 		// binormals
@@ -109,7 +109,7 @@ void process_vertices(aiMesh* mesh, mesh::load_data& load_data)
 
 			if(has_bitangent)
 				gfx::vertex_pack(math::value_ptr(bitangent), true, gfx::attribute::Bitangent,
-								load_data.vertex_format, current_vertex_ptr);
+								 load_data.vertex_format, current_vertex_ptr);
 		}
 	}
 }

@@ -1,8 +1,8 @@
 #include "scene_dock.h"
 #include "../../editing/editing_system.h"
 #include "../../system/project_manager.h"
-#include "core/system/simulation.h"
 #include "core/graphics/render_pass.h"
+#include "core/system/simulation.h"
 #include "runtime/assets/asset_handle.h"
 #include "runtime/ecs/components/camera_component.h"
 #include "runtime/ecs/components/model_component.h"
@@ -73,9 +73,9 @@ void draw_selected_camera(const ImVec2& size)
 			p.y += size.y - bounds.y - 40.0f;
 			gui::SetNextWindowPos(p);
 			if(gui::Begin("Camera Preview", nullptr,
-						  ImGuiWindowFlags_NoFocusOnAppearing |
-							  ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove |
-							  ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
+						  ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoCollapse |
+							  ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+							  ImGuiWindowFlags_AlwaysAutoResize))
 			{
 				gui::Image(surface->get_attachment(0).texture, bounds);
 			}
@@ -155,24 +155,25 @@ void manipulation_gizmos()
 
 			transform_comp->set_transform(transform);
 
-//			if(sel.has_component<model_component>())
-//			{
-//				const auto model_comp = sel.get_component<model_component>();
-//				const auto model_comp_ptr = model_comp.lock().get();
-//				const auto& model = model_comp_ptr->get_model();
-//				if(!model.is_valid())
-//					return;
+			//			if(sel.has_component<model_component>())
+			//			{
+			//				const auto model_comp = sel.get_component<model_component>();
+			//				const auto model_comp_ptr = model_comp.lock().get();
+			//				const auto& model = model_comp_ptr->get_model();
+			//				if(!model.is_valid())
+			//					return;
 
-//				const auto mesh = model.get_lod(0);
-//				if(!mesh)
-//					return;
+			//				const auto mesh = model.get_lod(0);
+			//				if(!mesh)
+			//					return;
 
-//				irect rect = mesh->calculate_screen_rect(transform, camera);
-           
-//				gui::GetCurrentWindow()->DrawList->AddRect(ImVec2(rect.left, rect.top),
-//														   ImVec2(rect.right, rect.bottom),
-//														   gui::GetColorU32(ImVec4(1.0f, 0.0f, 0.0f, 1.0f)));
-//			}
+			//				irect rect = mesh->calculate_screen_rect(transform, camera);
+
+			//				gui::GetCurrentWindow()->DrawList->AddRect(ImVec2(rect.left, rect.top),
+			//														   ImVec2(rect.right, rect.bottom),
+			//														   gui::GetColorU32(ImVec4(1.0f, 0.0f,
+			//0.0f, 1.0f)));
+			//			}
 		}
 	}
 }
@@ -406,7 +407,8 @@ void scene_dock::render(const ImVec2&)
 				auto cursor_pos = gui::GetMousePos();
 				camera_comp->get_camera().viewport_to_world(
 					math::vec2{cursor_pos.x, cursor_pos.y},
-					math::plane::from_point_normal(math::vec3{0.0f, 0.0f, 0.0f}, math::vec3{0.0f, 1.0f, 0.0f}),
+					math::plane::from_point_normal(math::vec3{0.0f, 0.0f, 0.0f},
+												   math::vec3{0.0f, 1.0f, 0.0f}),
 					projected_pos, false);
 			}
 

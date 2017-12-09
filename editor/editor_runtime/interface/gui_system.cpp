@@ -1,13 +1,13 @@
 #include "gui_system.h"
 
 #include "core/filesystem/filesystem.h"
-#include "core/logging/logging.h"
-#include "core/graphics/texture.h"
 #include "core/graphics/index_buffer.h"
-#include "core/graphics/vertex_buffer.h"
-#include "core/graphics/uniform.h"
-#include "core/graphics/shader.h"
 #include "core/graphics/render_pass.h"
+#include "core/graphics/shader.h"
+#include "core/graphics/texture.h"
+#include "core/graphics/uniform.h"
+#include "core/graphics/vertex_buffer.h"
+#include "core/logging/logging.h"
 
 #include "runtime/assets/asset_manager.h"
 #include "runtime/input/input.h"
@@ -23,12 +23,9 @@
 #include "../meta/interface/gui_system.hpp"
 #include "core/serialization/associative_archive.h"
 
-static const gfx::embedded_shader s_embedded_shaders[] =
-{
-	BGFX_EMBEDDED_SHADER(vs_ocornut_imgui),
-	BGFX_EMBEDDED_SHADER(fs_ocornut_imgui),
-	BGFX_EMBEDDED_SHADER_END()
-};
+static const gfx::embedded_shader s_embedded_shaders[] = {BGFX_EMBEDDED_SHADER(vs_ocornut_imgui),
+														  BGFX_EMBEDDED_SHADER(fs_ocornut_imgui),
+														  BGFX_EMBEDDED_SHADER_END()};
 // -------------------------------------------------------------------
 
 static gui_style s_gui_style;
@@ -41,10 +38,10 @@ static std::unordered_map<std::string, ImFont*> s_fonts;
 
 void render_func(ImDrawData* _drawData)
 {
-    auto prog = s_program.get();
-    if(!prog)
-        return;
-    prog->begin();
+	auto prog = s_program.get();
+	if(!prog)
+		return;
+	prog->begin();
 	// Render command lists
 	for(int32_t ii = 0, num = _drawData->CmdListsCount; ii < num; ++ii)
 	{
@@ -55,8 +52,8 @@ void render_func(ImDrawData* _drawData)
 		std::uint32_t numVertices = static_cast<std::uint32_t>(drawList->VtxBuffer.size());
 		std::uint32_t numIndices = static_cast<std::uint32_t>(drawList->IdxBuffer.size());
 
-        const auto& layout = gfx::pos_texcoord0_color0_vertex::get_layout();
-        
+		const auto& layout = gfx::pos_texcoord0_color0_vertex::get_layout();
+
 		if(!(gfx::get_avail_transient_vertex_buffer(numVertices, layout) == numVertices) ||
 		   !(gfx::get_avail_transient_index_buffer(numIndices) == numIndices))
 		{
@@ -86,7 +83,7 @@ void render_func(ImDrawData* _drawData)
 				std::uint64_t state =
 					0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_MSAA |
 					BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA);
-                auto tex = s_font_texture.get();
+				auto tex = s_font_texture.get();
 
 				if(nullptr != cmd->TextureId)
 				{
@@ -101,16 +98,16 @@ void render_func(ImDrawData* _drawData)
 				gfx::set_scissor(x, y, width, height);
 				prog->set_texture(0, "s_tex", tex);
 
-                gfx::set_vertex_buffer(0, &tvb, 0, numVertices);
+				gfx::set_vertex_buffer(0, &tvb, 0, numVertices);
 				gfx::set_index_buffer(&tib, offset, cmd->ElemCount);
 				gfx::set_state(state);
 				gfx::submit(gfx::render_pass::get_pass(), prog->native_handle());
-            }
+			}
 
 			offset += cmd->ElemCount;
 		}
 	}
-    prog->end();    
+	prog->end();
 }
 
 void imgui_handle_event(const mml::platform_event& event)
@@ -225,9 +222,8 @@ void imgui_set_context(ImGuiContext* context)
 void restore_initial_context()
 {
 	if(s_initial_context)
-        imgui_set_context(s_initial_context);
+		imgui_set_context(s_initial_context);
 }
-
 
 void imgui_restore_context()
 {
@@ -293,8 +289,10 @@ void imgui_init()
 	auto vs_instance = std::make_shared<gfx::shader>(s_embedded_shaders, "vs_ocornut_imgui");
 	auto fs_instance = std::make_shared<gfx::shader>(s_embedded_shaders, "fs_ocornut_imgui");
 
-	auto vs_ocornut_imgui = am.load_asset_from_instance<gfx::shader>("embedded:/vs_ocornut_imgui", vs_instance);
-	auto fs_ocornut_imgui = am.load_asset_from_instance<gfx::shader>("embedded:/fs_ocornut_imgui", fs_instance);
+	auto vs_ocornut_imgui =
+		am.load_asset_from_instance<gfx::shader>("embedded:/vs_ocornut_imgui", vs_instance);
+	auto fs_ocornut_imgui =
+		am.load_asset_from_instance<gfx::shader>("embedded:/fs_ocornut_imgui", fs_instance);
 
 	ts.push_or_execute_on_owner_thread(
 		[](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
@@ -499,8 +497,8 @@ bool ImageButton(std::shared_ptr<gfx::texture> texture, const ImVec2& _size,
 	return ImGui::ImageButton(texture.get(), _size, uv0, uv1, _framePadding, _bgCol, _tintCol);
 }
 
-bool ImageButtonEx(std::shared_ptr<gfx::texture> texture, const ImVec2& size, const char* tooltip, bool selected,
-				   bool enabled)
+bool ImageButtonEx(std::shared_ptr<gfx::texture> texture, const ImVec2& size, const char* tooltip,
+				   bool selected, bool enabled)
 {
 	s_textures.push_back(texture);
 	return ImGui::ImageButtonEx(texture.get(), size, tooltip, selected, enabled);
@@ -589,7 +587,6 @@ void gui_style::set_style_colors(const hsv_setup& _setup)
 	style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(col_main.x, col_main.y, col_main.z, 0.43f);
 	style.Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(0.10f, 0.10f, 0.10f, 0.55f);
 }
-
 
 void gui_style::load_style()
 {

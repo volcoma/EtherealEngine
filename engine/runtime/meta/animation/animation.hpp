@@ -17,6 +17,5 @@ inline void SERIALIZE_FUNCTION_NAME(Archive& ar, node_animation::key<T>& obj)
 {
 	try_serialize(ar, cereal::make_nvp("time", obj.time));
 	try_serialize(ar, cereal::make_nvp("value", obj.value));
-
 }
 }

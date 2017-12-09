@@ -82,7 +82,7 @@ struct frame_buffer : public handle_impl<frame_buffer_handle>
 	frame_buffer(void* _nwh, std::uint16_t _width, std::uint16_t _height,
 				 texture_format _depth_format = texture_format::UnknownDepth);
 
-    //-----------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------
 	//  Name : populate ()
 	/// <summary>
 	///
@@ -91,7 +91,7 @@ struct frame_buffer : public handle_impl<frame_buffer_handle>
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void populate(const std::vector<fbo_attachment>& textures);
-    
+
 	//-----------------------------------------------------------------------------
 	//  Name : get_size ()
 	/// <summary>
@@ -111,8 +111,8 @@ struct frame_buffer : public handle_impl<frame_buffer_handle>
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	const fbo_attachment& get_attachment(std::uint32_t index = 0) const;
-    
-    //-----------------------------------------------------------------------------
+
+	//-----------------------------------------------------------------------------
 	//  Name : get_attachment ()
 	/// <summary>
 	///

@@ -94,7 +94,8 @@ public:
 	//-----------------------------------------------------------------------------
 	void dispose();
 
-	void platform_events(const std::pair<std::uint32_t, bool>& info, const std::vector<mml::platform_event>& events);
+	void platform_events(const std::pair<std::uint32_t, bool>& info,
+						 const std::vector<mml::platform_event>& events);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_mappings ()

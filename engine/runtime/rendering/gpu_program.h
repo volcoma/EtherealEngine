@@ -11,7 +11,7 @@ public:
 	gpu_program(asset_handle<gfx::shader> vertex_shader, asset_handle<gfx::shader> fragment_shader);
 
 	bool begin();
-    void end();
+	void end();
 	void add_shader(asset_handle<gfx::shader> shader);
 
 	void populate();
@@ -59,9 +59,10 @@ public:
 	//-----------------------------------------------------------------------------
 	std::shared_ptr<gfx::uniform> get_uniform(const std::string& _name, bool texture = false);
 
-    gfx::program::handle_type_t native_handle() const;
-    
-    const std::vector<asset_handle<gfx::shader>>& get_shaders() const;
+	gfx::program::handle_type_t native_handle() const;
+
+	const std::vector<asset_handle<gfx::shader>>& get_shaders() const;
+
 private:
 	/// Shaders that created this program.
 	std::vector<asset_handle<gfx::shader>> _shaders;

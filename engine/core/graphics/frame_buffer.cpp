@@ -20,7 +20,7 @@ frame_buffer::frame_buffer(backbuffer_ratio _ratio, texture_format _format, std:
 
 frame_buffer::frame_buffer(const std::vector<std::shared_ptr<texture>>& textures)
 {
-    std::vector<fbo_attachment> texDescs;
+	std::vector<fbo_attachment> texDescs;
 	texDescs.reserve(textures.size());
 	for(auto& tex : textures)
 	{
@@ -34,12 +34,12 @@ frame_buffer::frame_buffer(const std::vector<std::shared_ptr<texture>>& textures
 
 frame_buffer::frame_buffer(const std::vector<fbo_attachment>& textures)
 {
-    populate(textures);
+	populate(textures);
 }
 
-frame_buffer::frame_buffer(void *_nwh, uint16_t _width, uint16_t _height, texture_format _depth_format)
+frame_buffer::frame_buffer(void* _nwh, uint16_t _width, uint16_t _height, texture_format _depth_format)
 {
-    handle = create_frame_buffer(_nwh, _width, _height, _depth_format);
+	handle = create_frame_buffer(_nwh, _width, _height, _depth_format);
 
 	_cached_size = {_width, _height};
 	_bbratio = backbuffer_ratio::Count;
@@ -98,12 +98,12 @@ usize frame_buffer::get_size() const
 
 const fbo_attachment& frame_buffer::get_attachment(std::uint32_t index) const
 {
-    return _textures[index];
+	return _textures[index];
 }
 
-const std::shared_ptr<texture> &frame_buffer::get_texture(uint32_t index) const
+const std::shared_ptr<texture>& frame_buffer::get_texture(uint32_t index) const
 {
-    return get_attachment(index).texture;
+	return get_attachment(index).texture;
 }
 
 std::size_t frame_buffer::get_attachment_count() const

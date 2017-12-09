@@ -73,7 +73,6 @@ public:
 					 uint8_t _attachment = 0,
 					 std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
 
-
 	//-----------------------------------------------------------------------------
 	//  Name : set_texture ()
 	/// <summary>

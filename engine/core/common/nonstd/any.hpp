@@ -8,7 +8,7 @@
 
 namespace nonstd
 {
-	
+
 class bad_any_cast : public std::bad_cast
 {
 public:
@@ -63,9 +63,8 @@ public:
 	/// is ill-formed.
 	/// This is because an `any` may be copy constructed into another `any` at any
 	/// time, so a copy should always be allowed.
-	template <typename ValueType,
-			  typename = typename std::enable_if<
-				  !std::is_same<typename std::decay<ValueType>::type, any>::value>::type>
+	template <typename ValueType, typename = typename std::enable_if<
+									  !std::is_same<typename std::decay<ValueType>::type, any>::value>::type>
 	any(ValueType&& value)
 	{
 		static_assert(std::is_copy_constructible<typename std::decay<ValueType>::type>::value,
@@ -99,9 +98,8 @@ public:
 	/// is ill-formed.
 	/// This is because an `any` may be copy constructed into another `any` at any
 	/// time, so a copy should always be allowed.
-	template <typename ValueType,
-			  typename = typename std::enable_if<
-				  !std::is_same<typename std::decay<ValueType>::type, any>::value>::type>
+	template <typename ValueType, typename = typename std::enable_if<
+									  !std::is_same<typename std::decay<ValueType>::type, any>::value>::type>
 	any& operator=(ValueType&& value)
 	{
 		static_assert(std::is_copy_constructible<typename std::decay<ValueType>::type>::value,
@@ -418,8 +416,8 @@ inline ValueType any_cast(any&& operand)
 {
 #ifdef ANY_IMPL_ANY_CAST_MOVEABLE
 	// https://cplusplus.github.io/LWG/lwg-active.html#2509
-	using can_move = std::integral_constant<
-		bool, std::is_move_constructible<ValueType>::value && !std::is_lvalue_reference<ValueType>::value>;
+	using can_move = std::integral_constant<bool, std::is_move_constructible<ValueType>::value &&
+													  !std::is_lvalue_reference<ValueType>::value>;
 #else
 	using can_move = std::false_type;
 #endif

@@ -3020,11 +3020,11 @@ void mesh::build_ib(bool hardware_copy)
 			const gfx::memory_view* mem = gfx::copy(_system_ib, static_cast<std::uint32_t>(buffer_size));
 			_hardware_ib = std::make_shared<gfx::index_buffer>(mem, BGFX_BUFFER_INDEX32);
 		} // End if not allocated
-        else if(_hardware_ib && !_hardware_ib->is_valid())
-        {
-            const gfx::memory_view* mem = gfx::copy(_system_ib, static_cast<std::uint32_t>(buffer_size));
+		else if(_hardware_ib && !_hardware_ib->is_valid())
+		{
+			const gfx::memory_view* mem = gfx::copy(_system_ib, static_cast<std::uint32_t>(buffer_size));
 			_hardware_ib = std::make_shared<gfx::index_buffer>(mem, BGFX_BUFFER_INDEX32);
-        }
+		}
 
 	} // End if hardware buffer required
 }
@@ -4660,9 +4660,9 @@ const skin_bind_data::bone_influence* skin_bind_data::find_bone_by_id(const std:
 /// </summary>
 //-----------------------------------------------------------------------------
 bone_palette::bone_palette(std::uint32_t palette_size)
-    : _data_group_id(0)
-    , _maximum_size(palette_size)
-    , _maximum_blend_index(-1)
+	: _data_group_id(0)
+	, _maximum_size(palette_size)
+	, _maximum_blend_index(-1)
 {
 }
 
@@ -4680,7 +4680,6 @@ bone_palette::bone_palette(const bone_palette& rhs)
 	, _maximum_size(rhs._maximum_size)
 	, _maximum_blend_index(rhs._maximum_blend_index)
 {
-
 }
 
 //-----------------------------------------------------------------------------

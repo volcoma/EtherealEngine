@@ -7,7 +7,7 @@ namespace gfx
 {
 struct uniform : public handle_impl<uniform_handle>
 {
-    uniform() = default;
+	uniform() = default;
 	//-----------------------------------------------------------------------------
 	//  Name : populate ()
 	/// <summary>

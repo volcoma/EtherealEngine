@@ -9,9 +9,9 @@
 #include "runtime/ecs/components/reflection_probe_component.h"
 #include "runtime/ecs/components/transform_component.h"
 #include "runtime/rendering/camera.h"
+#include "runtime/rendering/gpu_program.h"
 #include "runtime/rendering/mesh.h"
 #include "runtime/rendering/model.h"
-#include "runtime/rendering/gpu_program.h"
 #include "runtime/system/events.h"
 
 namespace editor

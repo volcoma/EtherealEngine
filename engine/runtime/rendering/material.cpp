@@ -1,7 +1,7 @@
 #include "material.h"
-#include "gpu_program.h"
 #include "core/graphics/texture.h"
 #include "core/graphics/uniform.h"
+#include "gpu_program.h"
 
 #include "../assets/asset_manager.h"
 

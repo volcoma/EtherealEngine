@@ -1,7 +1,6 @@
 #include "model_component.h"
 #include "transform_component.h"
 
-
 model_component& model_component::set_casts_shadow(bool cast_shadow)
 {
 	if(_casts_shadow == cast_shadow)

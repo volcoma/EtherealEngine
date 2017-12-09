@@ -1,4 +1,6 @@
 #include "picking_system.h"
+#include "core/graphics/render_pass.h"
+#include "core/graphics/texture.h"
 #include "editing_system.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/ecs/components/camera_component.h"
@@ -12,8 +14,6 @@
 #include "runtime/rendering/render_window.h"
 #include "runtime/rendering/renderer.h"
 #include "runtime/system/events.h"
-#include "core/graphics/render_pass.h"
-#include "core/graphics/texture.h"
 
 namespace editor
 {
@@ -59,7 +59,8 @@ void picking_system::frame_render(std::chrono::duration<float>)
 		_start_readback = true;
 		auto pick_view = math::lookAt(pick_eye, pick_at, pick_up);
 
-		static const auto perspective_ = gfx::is_homogeneous_depth() ? math::perspectiveNO<float> : math::perspectiveZO<float>;
+		static const auto perspective_ =
+			gfx::is_homogeneous_depth() ? math::perspectiveNO<float> : math::perspectiveZO<float>;
 		auto pick_proj = perspective_(math::radians(1.0f), 1.0f, near_clip, far_clip);
 
 		gfx::render_pass pass("picking_buffer_fill");
@@ -181,18 +182,18 @@ bool picking_system::initialize()
 {
 	runtime::on_frame_render.connect(this, &picking_system::frame_render);
 	// Set up ID buffer, which has a color target and depth buffer
-	auto picking_rt =
-		std::make_shared<gfx::texture>(tex_id_dim, tex_id_dim, false, 1, gfx::texture_format::RGBA8,
-								  0 | BGFX_TEXTURE_RT | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT |
-									  BGFX_TEXTURE_MIP_POINT | BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
+	auto picking_rt = std::make_shared<gfx::texture>(
+		tex_id_dim, tex_id_dim, false, 1, gfx::texture_format::RGBA8,
+		0 | BGFX_TEXTURE_RT | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT |
+			BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
 
-	auto picking_rt_depth =
-		std::make_shared<gfx::texture>(tex_id_dim, tex_id_dim, false, 1, gfx::texture_format::D24S8,
-								  0 | BGFX_TEXTURE_RT | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT |
-									  BGFX_TEXTURE_MIP_POINT | BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
+	auto picking_rt_depth = std::make_shared<gfx::texture>(
+		tex_id_dim, tex_id_dim, false, 1, gfx::texture_format::D24S8,
+		0 | BGFX_TEXTURE_RT | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT |
+			BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
 
-	_surface =
-		std::make_shared<gfx::frame_buffer>(std::vector<std::shared_ptr<gfx::texture>>{picking_rt, picking_rt_depth});
+	_surface = std::make_shared<gfx::frame_buffer>(
+		std::vector<std::shared_ptr<gfx::texture>>{picking_rt, picking_rt_depth});
 
 	// CPU texture for blitting to and reading ID buffer so we can see what was clicked on.
 	// Impossible to read directly from a render target, you *must* blit to a CPU texture

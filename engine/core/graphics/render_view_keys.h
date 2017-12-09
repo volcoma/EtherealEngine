@@ -2,10 +2,10 @@
 
 #include "../common/hash.hpp"
 #include "texture.h"
-#include <string>
-#include <memory>
-#include <vector>
 #include <cstdint>
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace gfx
 {

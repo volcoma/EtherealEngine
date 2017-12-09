@@ -1,7 +1,7 @@
 #pragma once
-#include <vector>
-#include <string>
 #include "core/math/math_includes.h"
+#include <string>
+#include <vector>
 enum class anim_behaviour
 {
 	/// The value from the default node transformation is taken.

@@ -1,11 +1,11 @@
 #pragma once
 
 #include "core/logging/logging.h"
-#include <core/console/console.h>
 #include <array>
+#include <atomic>
+#include <core/console/console.h>
 #include <deque>
 #include <string>
-#include <atomic>
 
 class console_log : public logging::sinks::base_sink<std::mutex>, public console
 {
@@ -80,11 +80,11 @@ public:
 	}
 
 private:
-    std::recursive_mutex _entries_mutex;
+	std::recursive_mutex _entries_mutex;
 	///
 	entries_t _entries;
 	///
-    std::atomic<bool> _has_new_entries = {false};
+	std::atomic<bool> _has_new_entries = {false};
 	///
 	static const std::size_t _max_size = 150;
 };

@@ -79,19 +79,19 @@ template <typename C>
 using chandle = std::weak_ptr<C>;
 
 /** A convenience handle around an entity::Id.
-*
-* If an entity is destroyed, any copies will be invalidated. Use valid() to
-* check for validity before using.
-*
-* Create entities with `entity_component_system`:
-*
-*     entity entity = entity_manager->create();
-*/
+ *
+ * If an entity is destroyed, any copies will be invalidated. Use valid() to
+ * check for validity before using.
+ *
+ * Create entities with `entity_component_system`:
+ *
+ *     entity entity = entity_manager->create();
+ */
 class entity
 {
 public:
-    SERIALIZABLE(entity)
-    
+	SERIALIZABLE(entity)
+
 	struct id_t
 	{
 		id_t()
@@ -141,8 +141,8 @@ public:
 	};
 
 	/**
-	* Id of an invalid entity.
-	*/
+	 * Id of an invalid entity.
+	 */
 	static const id_t INVALID;
 
 	entity() = default;
@@ -155,8 +155,8 @@ public:
 	entity& operator=(const entity& other) = default;
 
 	/**
-	* Check if entity handle is invalid.
-	*/
+	 * Check if entity handle is invalid.
+	 */
 	operator bool() const
 	{
 		return valid();
@@ -179,22 +179,22 @@ public:
 	void set_name(std::string name);
 	const std::string& get_name() const;
 	/**
-	* Is this entity handle valid?
-	*
-	* In older versions of EntityX, there were no guarantees around entity
-	* validity if a previously allocated entity slot was reassigned. That is no
-	* longer the case: if a slot is reassigned, old entity::Id's will be
-	* invalid.
-	*/
+	 * Is this entity handle valid?
+	 *
+	 * In older versions of EntityX, there were no guarantees around entity
+	 * validity if a previously allocated entity slot was reassigned. That is no
+	 * longer the case: if a slot is reassigned, old entity::Id's will be
+	 * invalid.
+	 */
 	bool valid() const;
 
 	/**
-	* Invalidate entity handle, disassociating it from an entity_component_system
-	* and invalidating its ID.
-	*
-	* Note that this does *not* affect the underlying entity and its
-	* components. Use destroy() to destroy the associated entity and components.
-	*/
+	 * Invalidate entity handle, disassociating it from an entity_component_system
+	 * and invalidating its ID.
+	 *
+	 * Note that this does *not* affect the underlying entity and its
+	 * components. Use destroy() to destroy the associated entity and components.
+	 */
 	void invalidate();
 
 	std::string to_string() const;
@@ -220,8 +220,8 @@ public:
 	template <typename... Components>
 	std::tuple<chandle<Components>...> components() const;
 
-    std::vector<chandle<component>> all_components() const;
-    
+	std::vector<chandle<component>> all_components() const;
+
 	std::vector<std::shared_ptr<component>> all_components_shared() const;
 
 	template <typename C>
@@ -233,8 +233,8 @@ public:
 	void unpack(chandle<A>& a, chandle<Args>&... args);
 
 	/**
-	* Destroy and invalidate this entity.
-	*/
+	 * Destroy and invalidate this entity.
+	 */
 	void destroy();
 	std::bitset<MAX_COMPONENTS> component_mask() const;
 
@@ -364,15 +364,15 @@ private:
 	}
 
 public:
-    component_impl() = default;
-    component_impl(component_impl& rhs) = delete;
-    component_impl& operator=(component_impl& rhs) = delete;
-    
-    static rtti::type_index_sequential_t::index_t static_id()
-    {
+	component_impl() = default;
+	component_impl(component_impl& rhs) = delete;
+	component_impl& operator=(component_impl& rhs) = delete;
+
+	static rtti::type_index_sequential_t::index_t static_id()
+	{
 		return rtti::type_index_sequential_t::id<component, T>();
 	}
- 
+
 	chandle<T> handle()
 	{
 		return std::static_pointer_cast<T>(shared_from_this());
@@ -385,8 +385,8 @@ extern event<void(entity, chandle<component>)> on_component_added;
 extern event<void(entity, chandle<component>)> on_component_removed;
 
 /**
-* Manages entity::Id creation and component assignment.
-*/
+ * Manages entity::Id creation and component assignment.
+ */
 class entity_component_system : public core::subsystem
 {
 public:
@@ -663,56 +663,56 @@ public:
 	};
 
 	/**
-	* Number of managed entities.
-	*/
+	 * Number of managed entities.
+	 */
 	size_t size() const;
 
 	/**
-	* Current entity capacity.
-	*/
+	 * Current entity capacity.
+	 */
 	size_t capacity() const;
 
 	/**
-	* Return true if the given entity ID is still valid.
-	*/
+	 * Return true if the given entity ID is still valid.
+	 */
 	bool valid(entity::id_t id) const;
 
 	/**
-	* Return true if the given entity ID is still valid.
-	*/
+	 * Return true if the given entity ID is still valid.
+	 */
 	bool valid_index(std::uint32_t index) const;
 	/**
-	* Create a new entity::Id.
-	*
-	* Emits EntityCreatedEvent.
-	*/
+	 * Create a new entity::Id.
+	 *
+	 * Emits EntityCreatedEvent.
+	 */
 	entity create();
 
 	/**
-	* Destroy an existing entity::Id and its associated Components.
-	*
-	* Emits EntityDestroyedEvent.
-	*/
+	 * Destroy an existing entity::Id and its associated Components.
+	 *
+	 * Emits EntityDestroyedEvent.
+	 */
 	void destroy(entity::id_t id);
 
 	entity get(entity::id_t id);
 
 	/**
-	* Create an entity::Id for a slot.
-	*
-	* NOTE: Does *not* check for validity, but the entity::Id constructor will
-	* fail if the ID is invalid.
-	*/
+	 * Create an entity::Id for a slot.
+	 *
+	 * NOTE: Does *not* check for validity, but the entity::Id constructor will
+	 * fail if the ID is invalid.
+	 */
 	entity::id_t create_id(std::uint32_t index) const;
 
 	/**
-	* Assign a component to an entity::Id, passing through component constructor
-	* arguments.
-	*
-	*     Position &position = em.assign<Position>(e, x, y);
-	*
-	* @returns Smart pointer to newly created component.
-	*/
+	 * Assign a component to an entity::Id, passing through component constructor
+	 * arguments.
+	 *
+	 *     Position &position = em.assign<Position>(e, x, y);
+	 *
+	 * @returns Smart pointer to newly created component.
+	 */
 	template <typename C, typename... Args>
 	chandle<C> assign(entity::id_t id, Args&&... args)
 	{
@@ -723,10 +723,10 @@ public:
 	chandle<component> assign(entity::id_t id, std::shared_ptr<component> comp);
 
 	/**
-	* Remove a component from an entity::Id
-	*
-	* Emits a ComponentRemovedEvent<C> event.
-	*/
+	 * Remove a component from an entity::Id
+	 *
+	 * Emits a ComponentRemovedEvent<C> event.
+	 */
 	template <typename C>
 	void remove(entity::id_t id)
 	{
@@ -736,8 +736,8 @@ public:
 	void remove(entity::id_t id, const rtti::type_index_sequential_t::index_t family);
 
 	/**
-	* Check if an entity has a component.
-	*/
+	 * Check if an entity has a component.
+	 */
 	template <typename C>
 	bool has_component(entity::id_t id) const
 	{
@@ -748,11 +748,11 @@ public:
 
 	bool has_component(entity::id_t id, rtti::type_index_sequential_t::index_t family) const;
 	/**
-	* Retrieve a component assigned to an entity::Id.
-	*
-	* @returns Pointer to an instance of C, or nullptr if the entity::Id does not
-	* have that component.
-	*/
+	 * Retrieve a component assigned to an entity::Id.
+	 *
+	 * @returns Pointer to an instance of C, or nullptr if the entity::Id does not
+	 * have that component.
+	 */
 	template <typename C>
 	chandle<C> get_component(entity::id_t id)
 	{
@@ -777,18 +777,18 @@ public:
 	std::vector<chandle<component>> all_components(entity::id_t id) const;
 	std::vector<std::shared_ptr<component>> all_components_shared(entity::id_t id) const;
 	/**
-	* Find Entities that have all of the specified Components.
-	*
-	* @code
-	* for (entity entity : entity_manager.entities_with_components<Position,
-	* Direction>()) {
-	*   chandle<Position> position = entity.get_component<Position>();
-	*   chandle<Direction> direction = entity.get_component<Direction>();
-	*
-	*   ...
-	* }
-	* @endcode
-	*/
+	 * Find Entities that have all of the specified Components.
+	 *
+	 * @code
+	 * for (entity entity : entity_manager.entities_with_components<Position,
+	 * Direction>()) {
+	 *   chandle<Position> position = entity.get_component<Position>();
+	 *   chandle<Direction> direction = entity.get_component<Direction>();
+	 *
+	 *   ...
+	 * }
+	 * @endcode
+	 */
 	template <typename... Components>
 	View<Components...> entities_with_components()
 	{
@@ -809,18 +809,18 @@ public:
 	}
 
 	/**
-	* Find Entities that have all of the specified Components and assign them
-	* to the given parameters.
-	*
-	* @code
-	* chandle<Position> position;
-	* chandle<Direction> direction;
-	* for (entity entity : entity_manager.entities_with_components(position,
-	* direction)) {
-	*   // Use position and component here.
-	* }
-	* @endcode
-	*/
+	 * Find Entities that have all of the specified Components and assign them
+	 * to the given parameters.
+	 *
+	 * @code
+	 * chandle<Position> position;
+	 * chandle<Direction> direction;
+	 * for (entity entity : entity_manager.entities_with_components(position,
+	 * direction)) {
+	 *   // Use position and component here.
+	 * }
+	 * @endcode
+	 */
 	template <typename... Components>
 	unpacking_view<Components...> entities_with_components(chandle<Components>&... components)
 	{
@@ -829,13 +829,13 @@ public:
 	}
 
 	/**
-	* Iterate over all *valid* entities (ie. not in the free list). Not fast
-	*
-	* @code
-	* for (entity entity : entity_manager.all_entities()) {}
-	*
-	* @return An iterator view over all valid entities.
-	*/
+	 * Iterate over all *valid* entities (ie. not in the free list). Not fast
+	 *
+	 * @code
+	 * for (entity entity : entity_manager.all_entities()) {}
+	 *
+	 * @return An iterator view over all valid entities.
+	 */
 	base_view<true> all_entities()
 	{
 		return base_view<true>(this);
@@ -849,16 +849,16 @@ public:
 	}
 
 	/**
-	* Unpack components directly into pointers.
-	*
-	* Components missing from the entity will be set to nullptr.
-	*
-	* Useful for fast bulk iterations.
-	*
-	* chandle<Position> p;
-	* chandle<Direction> d;
-	* unpack<Position, Direction>(e, p, d);
-	*/
+	 * Unpack components directly into pointers.
+	 *
+	 * Components missing from the entity will be set to nullptr.
+	 *
+	 * Useful for fast bulk iterations.
+	 *
+	 * chandle<Position> p;
+	 * chandle<Direction> d;
+	 * unpack<Position, Direction>(e, p, d);
+	 */
 	template <typename A, typename... Args>
 	void unpack(entity::id_t id, chandle<A>& a, chandle<Args>&... args)
 	{
@@ -868,8 +868,8 @@ public:
 	}
 
 	/**
-	* Destroy all entities and reset the entity_component_system.
-	*/
+	 * Destroy all entities and reset the entity_component_system.
+	 */
 	void dispose();
 
 	void set_entity_name(entity::id_t id, std::string name);

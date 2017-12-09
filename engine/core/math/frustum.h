@@ -66,9 +66,9 @@ public:
 	//-------------------------------------------------------------------------
 	// Public Variables
 	//-------------------------------------------------------------------------
-	std::array<plane, 6> planes; // The 6 planes of the frustum.
-	std::array<vec3, 8> points;  // The 8 corner points of the frustum.
-	vec3 position = { 0.0f, 0.0f, 0.0f };   // The originating position of the frustum.
+	std::array<plane, 6> planes;		// The 6 planes of the frustum.
+	std::array<vec3, 8> points;			// The 8 corner points of the frustum.
+	vec3 position = {0.0f, 0.0f, 0.0f}; // The originating position of the frustum.
 
 private:
 	//-------------------------------------------------------------------------

@@ -25,11 +25,11 @@ struct asset_handle
 	{
 		return link->asset.get();
 	}
-    
-    inline std::shared_ptr<T> get_asset() const
-    {
-        return link->asset;
-    }
+
+	inline std::shared_ptr<T> get_asset() const
+	{
+		return link->asset;
+	}
 
 	//-----------------------------------------------------------------------------
 	//  Name : reset ()

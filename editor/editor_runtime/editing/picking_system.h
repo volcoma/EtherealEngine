@@ -15,8 +15,8 @@ namespace editor
 class picking_system : public core::subsystem
 {
 public:
-    virtual ~picking_system() = default;
-    
+	virtual ~picking_system() = default;
+
 	constexpr static int tex_id_dim = 1;
 	//-----------------------------------------------------------------------------
 	//  Name : initialize ()

@@ -5,13 +5,13 @@
 #include <cstring>
 #include <exception>
 #include <iostream>
+#include <limits>
 #include <map>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <unordered_set>
 #include <vector>
-#include <limits>
 
 #ifdef _MSC_VER
 #ifndef __cpp_rtti
@@ -267,7 +267,7 @@ T checked_negate(T&&, const std::string& text, std::false_type)
 	throw argument_incorrect_type(text);
 }
 
-bool match_impl(const std::string &text, unsigned long long umax, unsigned long long& result, bool& negative);
+bool match_impl(const std::string& text, unsigned long long umax, unsigned long long& result, bool& negative);
 
 template <typename T>
 void integer_parser(const std::string& text, T& value)
@@ -277,15 +277,14 @@ void integer_parser(const std::string& text, T& value)
 
 	constexpr auto umax = std::numeric_limits<US>::max();
 	constexpr bool is_signed = std::numeric_limits<T>::is_signed;
-    unsigned long long result = 0;
-    bool negative = false;
-    if(!match_impl(text, umax, result, negative))
-    {
-        value = 0;
-        return;
-    }
-    
-	
+	unsigned long long result = 0;
+	bool negative = false;
+	if(!match_impl(text, umax, result, negative))
+	{
+		value = 0;
+		return;
+	}
+
 	detail::check_signed_range<T>(negative, result, text);
 
 	if(negative)
@@ -611,9 +610,8 @@ public:
 
 	option_adder add_options(std::string group = "");
 
-	void add_option(const std::string& group, const std::string& s, const std::string& l,
-						   std::string desc, std::shared_ptr<const abstract_value> value,
-						   std::string arg_help);
+	void add_option(const std::string& group, const std::string& s, const std::string& l, std::string desc,
+					std::shared_ptr<const abstract_value> value, std::string arg_help);
 
 	int count(const std::string& o) const;
 
@@ -638,10 +636,10 @@ private:
 	void add_to_option(const std::string& option, const std::string& arg);
 
 	void parse_option(std::shared_ptr<option_details> value, const std::string& name,
-							 const std::string& arg = "");
+					  const std::string& arg = "");
 
 	void checked_parse_arg(int argc, char* argv[], int& current, std::shared_ptr<option_details> value,
-								  const std::string& name);
+						   const std::string& name);
 
 	std::string help_one_group(const std::string& group) const;
 
@@ -672,8 +670,8 @@ public:
 	}
 
 	option_adder& operator()(const std::string& opts, const std::string& desc,
-									std::shared_ptr<const abstract_value> value = ::cmd_line::value<bool>(),
-									std::string arg_help = "");
+							 std::shared_ptr<const abstract_value> value = ::cmd_line::value<bool>(),
+							 std::string arg_help = "");
 
 private:
 	options_parser& m_options;
@@ -691,8 +689,6 @@ inline void check_required(const options_parser& options, const std::vector<std:
 		}
 	}
 }
-
-
 }
 
 #endif // ARGS_HPP

@@ -19,7 +19,6 @@ class model_component : public runtime::component_impl<model_component>
 	REFLECTABLEV(model_component, component)
 
 public:
-
 	//-------------------------------------------------------------------------
 	// Public Virtual Methods (Override)
 
@@ -106,10 +105,11 @@ public:
 	//-----------------------------------------------------------------------------
 	model_component& set_model(const model& model);
 
-	model_component& set_bone_entities(const std::vector<runtime::entity>& bone_entities);   
+	model_component& set_bone_entities(const std::vector<runtime::entity>& bone_entities);
 	const std::vector<runtime::entity>& get_bone_entities() const;
-    model_component& set_bone_transforms(const std::vector<math::transform>& bone_transforms);   
+	model_component& set_bone_transforms(const std::vector<math::transform>& bone_transforms);
 	const std::vector<math::transform>& get_bone_transforms() const;
+
 private:
 	//-------------------------------------------------------------------------
 	// Private Member Variables.
@@ -124,5 +124,5 @@ private:
 	model _model;
 	///
 	std::vector<runtime::entity> _bone_entities;
-    std::vector<math::transform> _bone_transforms;
+	std::vector<math::transform> _bone_transforms;
 };

@@ -1,4 +1,5 @@
 #include "editing_system.h"
+#include "core/graphics/texture.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/ecs/components/camera_component.h"
 #include "runtime/ecs/components/transform_component.h"
@@ -8,7 +9,6 @@
 #include "runtime/rendering/mesh.h"
 #include "runtime/rendering/render_window.h"
 #include "runtime/system/events.h"
-#include "core/graphics/texture.h"
 
 namespace editor
 {

@@ -19,6 +19,7 @@ void log_warning(const std::string& log_msg);
 }
 
 #define SERIALIZABLE(T)                                                                                      \
+	\
 public:                                                                                                      \
 	friend class serialization::access;                                                                      \
 	template <typename Archive>                                                                              \
@@ -69,13 +70,12 @@ public:                                                                         
 
 #define LOAD_INSTANTIATE(cls, Archive) template void LOAD_FUNCTION_NAME(Archive& archive, cls& obj)
 
-
 template <typename Archive, typename T>
 inline bool try_serialize(Archive& ar, cereal::NameValuePair<T>&& t)
 {
 	try
 	{
-        ar(std::forward<cereal::NameValuePair<T>>(t));		
+		ar(std::forward<cereal::NameValuePair<T>>(t));
 	}
 	catch(const cereal::Exception& e)
 	{
@@ -88,12 +88,11 @@ inline bool try_serialize(Archive& ar, cereal::NameValuePair<T>&& t)
 template <typename Archive, typename T>
 inline bool try_save(Archive& ar, cereal::NameValuePair<T>&& t)
 {
-    return try_serialize(ar, std::forward<cereal::NameValuePair<T>>(t));
+	return try_serialize(ar, std::forward<cereal::NameValuePair<T>>(t));
 }
 
 template <typename Archive, typename T>
 inline bool try_load(Archive& ar, cereal::NameValuePair<T>&& t)
 {
-    return try_serialize(ar, std::forward<cereal::NameValuePair<T>>(t));	
+	return try_serialize(ar, std::forward<cereal::NameValuePair<T>>(t));
 }
-

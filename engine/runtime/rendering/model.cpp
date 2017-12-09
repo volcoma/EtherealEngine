@@ -1,7 +1,7 @@
 #include "model.h"
 #include "../assets/asset_manager.h"
-#include "gpu_program.h"
 #include "core/math/math_includes.h"
+#include "gpu_program.h"
 #include "material.h"
 #include "mesh.h"
 
@@ -169,11 +169,11 @@ void model::render(std::uint8_t id, const math::transform& world_transform,
 
 			gfx::submit(id, program->native_handle());
 		}
-        
-        if(program)
+
+		if(program)
 		{
 			program->end();
-        }
+		}
 
 	};
 

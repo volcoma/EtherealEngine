@@ -28,10 +28,10 @@ int reflection_probe_component::compute_projected_sphere_rect(irect& rect, const
 
 std::shared_ptr<gfx::texture> reflection_probe_component::get_cubemap()
 {
-	static auto buffer_format =
-		gfx::get_best_format(BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER | BGFX_CAPS_FORMAT_TEXTURE_CUBE |
-								 BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN,
-							 gfx::format_search_flags::four_channels | gfx::format_search_flags::requires_alpha);
+	static auto buffer_format = gfx::get_best_format(
+		BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER | BGFX_CAPS_FORMAT_TEXTURE_CUBE |
+			BGFX_CAPS_FORMAT_TEXTURE_MIP_AUTOGEN,
+		gfx::format_search_flags::four_channels | gfx::format_search_flags::requires_alpha);
 
 	static auto flags = gfx::get_default_rt_sampler_flags() | BGFX_TEXTURE_BLIT_DST;
 

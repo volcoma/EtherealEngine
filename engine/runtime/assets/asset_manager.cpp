@@ -36,7 +36,8 @@ bool asset_manager::initialize()
 		{
 			const auto id = "embedded:/sphere";
 			auto instance = std::make_shared<mesh>();
-			instance->create_sphere(gfx::mesh_vertex::get_layout(), 0.5f, 20, 20, false, mesh_create_origin::center);
+			instance->create_sphere(gfx::mesh_vertex::get_layout(), 0.5f, 20, 20, false,
+									mesh_create_origin::center);
 			load_asset_from_instance(id, instance);
 		}
 		{
@@ -158,19 +159,19 @@ void asset_manager::dispose()
 
 void asset_manager::clear()
 {
-    for(auto& pair : _storages)
-    {
-        auto& storage = pair.second;
-        storage->clear();
-    }
+	for(auto& pair : _storages)
+	{
+		auto& storage = pair.second;
+		storage->clear();
+	}
 }
 
-void asset_manager::clear(const std::string &protocol)
+void asset_manager::clear(const std::string& protocol)
 {
-    for(auto& pair : _storages)
-    {
-        auto& storage = pair.second;
-        storage->clear(protocol);
-    }
+	for(auto& pair : _storages)
+	{
+		auto& storage = pair.second;
+		storage->clear(protocol);
+	}
 }
 }

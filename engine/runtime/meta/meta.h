@@ -18,8 +18,8 @@
 #include "rendering/mesh.hpp"
 #include "rendering/model.hpp"
 #include "rendering/program.hpp"
-#include "rendering/texture.hpp"
 #include "rendering/reflection_probe.hpp"
 #include "rendering/standard_material.hpp"
+#include "rendering/texture.hpp"
 
 #include "animation/animation.hpp"

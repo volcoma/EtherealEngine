@@ -577,8 +577,8 @@ void assets_dock::render(const ImVec2&)
 	if(gui::Button("IMPORT..."))
 	{
 		std::vector<std::string> paths;
-		if(native::open_multiple_files_dialog("obj,fbx,dae,blend,3ds,mtl,png,jpg,tga,dds,ktx,pvr,sc,io,sh", "",
-									  paths))
+		if(native::open_multiple_files_dialog("obj,fbx,dae,blend,3ds,mtl,png,jpg,tga,dds,ktx,pvr,sc,io,sh",
+											  "", paths))
 		{
 			auto& ts = core::get_subsystem<core::task_system>();
 

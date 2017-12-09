@@ -129,9 +129,8 @@ class delegate<R(A...)>
 			std::integral_constant<bool, is_const_member_pair<F>::value || is_member_pair<F>::value>;
 
 		using is_function_pointer =
-			std::integral_constant<bool,
-								   std::is_pointer<F>::value &&
-									   std::is_function<typename std::remove_pointer<F>::type>::value>;
+			std::integral_constant<bool, std::is_pointer<F>::value &&
+											 std::is_function<typename std::remove_pointer<F>::type>::value>;
 
 	public:
 		static void* get_pointer(const any_data& source)
@@ -364,9 +363,8 @@ public:
 		*this = from(object, method_ptr);
 	}
 
-	template <typename T,
-			  typename =
-				  typename std::enable_if<!std::is_same<delegate, typename std::decay<T>::type>::value>::type>
+	template <typename T, typename = typename std::enable_if<
+							  !std::is_same<delegate, typename std::decay<T>::type>::value>::type>
 	delegate(T&& f)
 	{
 		using handler = base_manager<typename std::decay<T>::type>;
@@ -421,9 +419,8 @@ public:
 		return *this = from(static_cast<C const*>(object_ptr), rhs);
 	}
 
-	template <typename T,
-			  typename =
-				  typename std::enable_if<!std::is_same<delegate, typename std::decay<T>::type>::value>::type>
+	template <typename T, typename = typename std::enable_if<
+							  !std::is_same<delegate, typename std::decay<T>::type>::value>::type>
 	delegate& operator=(T&& f)
 	{
 		delegate(std::forward<T>(f)).swap(*this);

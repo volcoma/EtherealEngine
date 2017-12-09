@@ -29,10 +29,10 @@ transform_component::~transform_component()
 	}
 	for(auto& child : _children)
 	{
-        if(child.valid())
-        {
-            child.destroy();        
-        }
+		if(child.valid())
+		{
+			child.destroy();
+		}
 	}
 }
 
@@ -152,7 +152,7 @@ math::vec3 transform_component::get_scale()
 
 const math::transform& transform_component::get_transform()
 {
-    // the transform should be resolved
+	// the transform should be resolved
 	return _world_transform;
 }
 
@@ -502,9 +502,9 @@ bool check_parent(const runtime::entity& e, const runtime::entity& parent)
 {
 	if(e == parent)
 		return false;
-    
-    if(parent.valid() && (parent.has_component<transform_component>() == false))
-        return false;
+
+	if(parent.valid() && (parent.has_component<transform_component>() == false))
+		return false;
 
 	if(e.valid())
 	{

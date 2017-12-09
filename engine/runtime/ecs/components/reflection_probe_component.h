@@ -3,10 +3,10 @@
 // reflection_probe_component Header Includes
 //-----------------------------------------------------------------------------
 #include "../../rendering/reflection_probe.h"
-#include "core/graphics/render_pass.h"
-#include "core/graphics/render_view.h"
 #include "../ecs.h"
 #include "core/common/basetypes.hpp"
+#include "core/graphics/render_pass.h"
+#include "core/graphics/render_view.h"
 //-----------------------------------------------------------------------------
 // Forward Declarations
 //-----------------------------------------------------------------------------
@@ -26,7 +26,6 @@ class reflection_probe_component : public runtime::component_impl<reflection_pro
 	SERIALIZABLE(reflection_probe_component)
 	REFLECTABLEV(reflection_probe_component, runtime::component)
 public:
-
 	//-------------------------------------------------------------------------
 	// Public Methods
 	//-------------------------------------------------------------------------

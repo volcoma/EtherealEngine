@@ -294,7 +294,7 @@ public:
 			_t->invoke_();
 	}
 
-	bool ready() const 
+	bool ready() const
 	{
 		if(_t)
 			return _t->ready_();
@@ -511,18 +511,18 @@ class task_system : public core::subsystem
 	using duration_t = std::chrono::steady_clock::duration;
 	template <typename T>
 	friend class task_future;
-    
+
 public:
-    struct queue_info
-    {
-        std::size_t pending_tasks = 0;
-    };
-    struct system_info
-    {
-        std::size_t pending_tasks = 0;
-        std::vector<queue_info> queue_infos;
-    };
-    
+	struct queue_info
+	{
+		std::size_t pending_tasks = 0;
+	};
+	struct system_info
+	{
+		std::size_t pending_tasks = 0;
+		std::vector<queue_info> queue_infos;
+	};
+
 	using allocator_t = std::allocator<task>;
 
 	task_system();
@@ -566,7 +566,7 @@ public:
 	//-----------------------------------------------------------------------------
 	void run_on_owner_thread();
 
-    system_info get_info() const;
+	system_info get_info() const;
 	//-----------------------------------------------------------------------------
 	//  Name : get_owner_thread_idx ()
 	/// <summary>
@@ -601,15 +601,13 @@ public:
 	//-----------------------------------------------------------------------------
 	std::size_t get_most_busy_queue_idx(bool skip_owner) const
 	{
-		if (_threads_count == 1)
+		if(_threads_count == 1)
 			return get_owner_thread_idx();
 
 		auto info = get_info();
 		auto begin_it = skip_owner ? std::begin(info.queue_infos) + 1 : std::begin(info.queue_infos);
 		auto end_it = std::end(info.queue_infos);
-		auto min_el = std::min_element(begin_it, end_it,
-			[](const auto& lhs, const auto& rhs)
-		{
+		auto min_el = std::min_element(begin_it, end_it, [](const auto& lhs, const auto& rhs) {
 			return lhs.pending_tasks > rhs.pending_tasks;
 		});
 		const std::size_t most_busy_idx = std::distance(std::begin(info.queue_infos), min_el);
@@ -625,15 +623,13 @@ public:
 	//-----------------------------------------------------------------------------
 	std::size_t get_most_free_queue_idx(bool skip_owner) const
 	{
-		if (_threads_count == 1)
+		if(_threads_count == 1)
 			return get_owner_thread_idx();
 
 		auto info = get_info();
 		auto begin_it = skip_owner ? std::begin(info.queue_infos) + 1 : std::begin(info.queue_infos);
 		auto end_it = std::end(info.queue_infos);
-		auto min_el = std::min_element(begin_it, end_it,
-			[](const auto& lhs, const auto& rhs)
-		{
+		auto min_el = std::min_element(begin_it, end_it, [](const auto& lhs, const auto& rhs) {
 			return lhs.pending_tasks < rhs.pending_tasks;
 		});
 		const std::size_t idx = std::distance(std::begin(info.queue_infos), min_el);
@@ -666,8 +662,8 @@ public:
 		const std::size_t idx = get_any_worker_thread_idx();
 		return push_on_thread(idx, std::forward<F>(f), std::forward<Args>(args)...);
 	}
-    
-    //-----------------------------------------------------------------------------
+
+	//-----------------------------------------------------------------------------
 	//  Name : push_on_owner_thread ()
 	/// <summary>
 	/// Pushes a task to the owner thread to be executed when it can.
@@ -684,7 +680,6 @@ public:
 		return push_on_thread(idx, std::forward<F>(f), std::forward<Args>(args)...);
 	}
 
-    
 	//-----------------------------------------------------------------------------
 	//  Name : push_or_execute_on_thread ()
 	/// <summary>
@@ -840,15 +835,11 @@ private:
 		if(queue_index == invalid_index)
 			return false;
 
-        const auto condition = [&t]()
-        {
-            return !t.is_ready();
-        };
-        
-        run(queue_index, condition, 5ms);
+		const auto condition = [&t]() { return !t.is_ready(); };
+
+		run(queue_index, condition, 5ms);
 
 		return true;
-        
 	}
 
 	//-----------------------------------------------------------------------------
@@ -885,7 +876,7 @@ private:
 
 		std::size_t get_pending_tasks() const;
 		void set_done();
-        bool is_done() const;
+		bool is_done() const;
 		std::pair<bool, task> try_pop();
 		bool try_push(task& t);
 		std::pair<bool, task> pop(duration_t pop_timeout = duration_t::max());
@@ -893,7 +884,7 @@ private:
 		void push(task t);
 
 	private:
-        void sort();
+		void sort();
 		std::deque<task> _tasks;
 		std::condition_variable _cv;
 		mutable std::mutex _mutex;
@@ -911,9 +902,9 @@ private:
 template <typename T>
 void task_future<T>::wait() const
 {
-    if(!future.valid())
-        return;
-    
+	if(!future.valid())
+		return;
+
 	if(!is_ready())
 	{
 		if(_system)

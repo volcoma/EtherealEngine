@@ -554,5 +554,4 @@ protected:
 	math::transform _local_transform;
 	/// Cached world transformation at pivot point.
 	math::transform _world_transform;
-
 };

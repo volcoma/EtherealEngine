@@ -52,9 +52,8 @@ public:
 		_slots.emplace_back(slot_type(object, method_ptr));
 	}
 
-	template <typename T,
-			  typename = typename ::std::enable_if<
-				  !::std::is_same<event, typename ::std::decay<T>::type>::value>::type>
+	template <typename T, typename = typename ::std::enable_if<
+							  !::std::is_same<event, typename ::std::decay<T>::type>::value>::type>
 	void connect(T&& f)
 	{
 		_slots.emplace_back(slot_type(std::forward<T>(f)));
@@ -114,9 +113,8 @@ public:
 					 std::end(_slots));
 	}
 
-	template <typename T,
-			  typename = typename ::std::enable_if<
-				  !::std::is_same<event, typename ::std::decay<T>::type>::value>::type>
+	template <typename T, typename = typename ::std::enable_if<
+							  !::std::is_same<event, typename ::std::decay<T>::type>::value>::type>
 	void disconnect(T&& f)
 	{
 		slot_type slot(std::forward<T>(f));

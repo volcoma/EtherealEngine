@@ -32,5 +32,4 @@ bool is_format_supported(std::uint16_t flags, texture_format format);
 texture_format get_best_format(std::uint16_t type, std::uint32_t search_flags);
 
 std::uint32_t get_default_rt_sampler_flags();
-
 }

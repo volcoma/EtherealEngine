@@ -126,8 +126,7 @@ std::string& string_append(std::string& s, size_t n, char c)
 }
 
 option_adder& option_adder::operator()(const std::string& opts, const std::string& desc,
-												 std::shared_ptr<const abstract_value> value,
-												 std::string arg_help)
+									   std::shared_ptr<const abstract_value> value, std::string arg_help)
 {
 	std::match_results<const char*> result;
 	std::regex_match(opts.c_str(), result, option_specifier);
@@ -330,8 +329,8 @@ void options_parser::parse(int& argc, char**& argv)
 	argc = nextKeep;
 }
 
-bool values::match_impl(const std::string& text, unsigned long long umax,
-						unsigned long long& result, bool& negative)
+bool values::match_impl(const std::string& text, unsigned long long umax, unsigned long long& result,
+						bool& negative)
 {
 	std::smatch match;
 	std::regex_match(text, match, integer_pattern);
@@ -378,7 +377,6 @@ bool values::match_impl(const std::string& text, unsigned long long umax,
 
 	return true;
 }
-
 
 option_adder options_parser::add_options(std::string group)
 {
@@ -502,37 +500,37 @@ void options_parser::add_option(const std::string& group, const std::string& s, 
 		value->has_implicit(), value->get_implicit_value(), std::move(arg_help), value->is_container()});
 }
 
-int options_parser::count(const std::string &o) const
+int options_parser::count(const std::string& o) const
 {
-    auto iter = m_options.find(o);
-    if(iter == m_options.end())
-    {
-        return 0;
-    }
-    
-    return iter->second->count();
+	auto iter = m_options.find(o);
+	if(iter == m_options.end())
+	{
+		return 0;
+	}
+
+	return iter->second->count();
 }
 
-const option_details &options_parser::operator[](const std::string &option) const
+const option_details& options_parser::operator[](const std::string& option) const
 {
-    auto iter = m_options.find(option);
-    
-    if(iter == m_options.end())
-    {
-        throw option_not_present_exception(option);
-    }
-    
-    return *iter->second;
+	auto iter = m_options.find(option);
+
+	if(iter == m_options.end())
+	{
+		throw option_not_present_exception(option);
+	}
+
+	return *iter->second;
 }
 
 void options_parser::add_one_option(const std::string& option, std::shared_ptr<option_details> details)
 {
-    auto in = m_options.emplace(option, details);
-    
-    if(!in.second)
-    {
-        throw option_exists_error(option);
-    }
+	auto in = m_options.emplace(option, details);
+
+	if(!in.second)
+	{
+		throw option_exists_error(option);
+	}
 }
 
 std::string options_parser::help_one_group(const std::string& g) const
@@ -659,18 +657,17 @@ std::string options_parser::help(const std::vector<std::string>& help_groups) co
 
 const std::vector<std::string> options_parser::groups() const
 {
-    std::vector<std::string> g;
-    
-    std::transform(
-                m_help.begin(), m_help.end(), std::back_inserter(g),
-                [](const std::map<std::string, help_group_details>::value_type& pair) { return pair.first; });
-    
-    return g;
+	std::vector<std::string> g;
+
+	std::transform(
+		m_help.begin(), m_help.end(), std::back_inserter(g),
+		[](const std::map<std::string, help_group_details>::value_type& pair) { return pair.first; });
+
+	return g;
 }
 
-const help_group_details &options_parser::group_help(const std::string &group) const
+const help_group_details& options_parser::group_help(const std::string& group) const
 {
-    return m_help.at(group);
+	return m_help.at(group);
 }
-
 }

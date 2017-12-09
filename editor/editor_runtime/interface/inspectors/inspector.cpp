@@ -9,7 +9,7 @@ void Tooltip(const rttr::property& prop)
 {
 	if(gui::IsItemHovered())
 	{
-		//gui::SetMouseCursor(ImGuiMouseCursor_Help);
+		// gui::SetMouseCursor(ImGuiMouseCursor_Help);
 		auto tooltip = prop.get_metadata("tooltip");
 		if(tooltip)
 		{
@@ -24,7 +24,7 @@ void Tooltip(const std::string& tooltip)
 {
 	if(gui::IsItemHovered())
 	{
-		//gui::SetMouseCursor(ImGuiMouseCursor_Help);
+		// gui::SetMouseCursor(ImGuiMouseCursor_Help);
 		gui::BeginTooltip();
 		gui::TextUnformatted(tooltip.c_str());
 		gui::EndTooltip();
@@ -37,7 +37,7 @@ property_layout::property_layout(const rttr::property& prop, bool columns /*= tr
 	if(meta_pretty_name)
 		pretty_name = meta_pretty_name.get_value<std::string>();
 
-	if (columns)
+	if(columns)
 	{
 		gui::Columns(1);
 		gui::Columns(2, nullptr, false);
@@ -56,7 +56,7 @@ property_layout::property_layout(const rttr::property& prop, bool columns /*= tr
 
 property_layout::property_layout(const std::string& name, bool columns /*= true*/)
 {
-	if (columns)
+	if(columns)
 	{
 		gui::Columns(1);
 		gui::Columns(2, nullptr, false);
@@ -73,7 +73,7 @@ property_layout::property_layout(const std::string& name, bool columns /*= true*
 
 property_layout::property_layout(const std::string& name, const std::string& tooltip, bool columns /*= true*/)
 {
-	if (columns)
+	if(columns)
 	{
 		gui::Columns(1);
 		gui::Columns(2, nullptr, false);

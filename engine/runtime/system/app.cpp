@@ -30,18 +30,13 @@ void app::setup(cmd_line::options_parser& parser)
 	gfx::set_info_logger([](const std::string& msg) { APPLOG_INFO(msg); });
 	gfx::set_warning_logger([](const std::string& msg) { APPLOG_WARNING(msg); });
 	gfx::set_error_logger([](const std::string& msg) { APPLOG_ERROR(msg); });
-    
-    
-    {
-        auto value = cmd_line::value<std::string>();
-        value->default_value("auto");
-        parser.add_option("renderer",
-                          "r", 
-                          "renderer", 
-                          "Select preferred renderer.",
-                          value,
-                          "Select preferred renderer.");
-    }
+
+	{
+		auto value = cmd_line::value<std::string>();
+		value->default_value("auto");
+		parser.add_option("renderer", "r", "renderer", "Select preferred renderer.", value,
+						  "Select preferred renderer.");
+	}
 }
 
 void app::start(cmd_line::options_parser& parser)
@@ -135,24 +130,24 @@ void app::run_one_frame()
 int app::run(int argc, char* argv[])
 {
 	core::details::initialize();
-    
-    cmd_line::options_parser parser("App");
-    
+
+	cmd_line::options_parser parser("App");
+
 	setup(parser);
 	if(_exitcode != 0)
 	{
 		core::details::dispose();
 		return _exitcode;
 	}
-    parser.help();
-    try
-    {
-        parser.parse(argc, argv);        
-    } 
-    catch (const cmd_line::option_exception& e)
-    {
-        APPLOG_ERROR(e.what());        
-    }
+	parser.help();
+	try
+	{
+		parser.parse(argc, argv);
+	}
+	catch(const cmd_line::option_exception& e)
+	{
+		APPLOG_ERROR(e.what());
+	}
 	start(parser);
 	if(_exitcode != 0)
 	{

@@ -15,11 +15,9 @@ namespace fs
 class filesystem_watcher;
 using watcher = filesystem_watcher;
 
-
 class filesystem_watcher
 {
 public:
-    
 	enum entry_status
 	{
 		created,
@@ -39,8 +37,8 @@ public:
 		uintmax_t size = 0;
 		fs::file_type type;
 	};
-    
-    using notify_callback = std::function<void(const std::vector<entry>&, bool)>;    
+
+	using notify_callback = std::function<void(const std::vector<entry>&, bool)>;
 
 	//-----------------------------------------------------------------------------
 	//  Name : watch ()
@@ -90,7 +88,8 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	~filesystem_watcher();
-    filesystem_watcher() = default;
+	filesystem_watcher() = default;
+
 protected:
 	//-----------------------------------------------------------------------------
 	//  Name : close ()
@@ -135,7 +134,6 @@ protected:
 	class watcher_impl;
 	std::map<std::string, std::unique_ptr<watcher_impl>> _watchers;
 };
-
 }
 
 #endif

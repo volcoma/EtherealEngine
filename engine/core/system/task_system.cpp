@@ -144,15 +144,14 @@ void task_system::run(std::size_t idx, std::function<bool()> condition, duration
 			const auto queue_idx = get_most_free_queue_idx(true);
 			for(std::size_t k = 0; k < steal_attempts; ++k)
 			{
-                if(queue_index != queue_idx)
-                {
-                    p = _queues[queue_idx].try_pop();
-                    if(p.first)
-                    {
-                        break;
-                    }
-                }
-				
+				if(queue_index != queue_idx)
+				{
+					p = _queues[queue_idx].try_pop();
+					if(p.first)
+					{
+						break;
+					}
+				}
 			}
 		}
 

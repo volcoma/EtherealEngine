@@ -11,8 +11,8 @@ namespace nonstd
 namespace detail
 {
 /*
-* invoke implemented as per the C++17 standard specification.
-*/
+ * invoke implemented as per the C++17 standard specification.
+ */
 template <class B, class T, class D, class... Args>
 constexpr inline auto
 invoke_(T B::*f, D&& d,
@@ -84,8 +84,8 @@ invoke_(Callable&& c,
 }
 
 /*
-* apply implemented as per the C++17 standard specification.
-*/
+ * apply implemented as per the C++17 standard specification.
+ */
 template <class F, class T, std::size_t... I>
 constexpr inline auto apply_(F&& f, T&& t, index_sequence<I...>) noexcept(
 	noexcept(invoke_(std::forward<F>(f), std::get<I>(std::forward<T>(t))...)))
@@ -222,8 +222,8 @@ struct function_traits<const volatile T&&> : public function_traits<T>
 };
 
 /*
-* This seems to be slightly better than the standard library version as of now.
-* */
+ * This seems to be slightly better than the standard library version as of now.
+ * */
 
 template <typename F>
 using fn_result_of = typename function_traits<F>::result_type;

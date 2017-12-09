@@ -37,10 +37,10 @@ inline T square(const T& t)
 }
 
 /**
-* Compute the screen bounds of a point light along one axis.
-* Based on http://www.gamasutra.com/features/20021011/lengyel_06.htm
-* and http://sourceforge.net/mailarchive/message.php?msg_id=10501105
-*/
+ * Compute the screen bounds of a point light along one axis.
+ * Based on http://www.gamasutra.com/features/20021011/lengyel_06.htm
+ * and http://sourceforge.net/mailarchive/message.php?msg_id=10501105
+ */
 inline bool compute_projected_sphere_shaft(float light_x, float light_z, float radius, const transform& proj,
 										   const vec3& axis, float axis_sign, std::int32_t& in_out_min_x,
 										   std::int32_t& in_out_max_x)

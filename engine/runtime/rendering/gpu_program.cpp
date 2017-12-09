@@ -79,18 +79,18 @@ std::shared_ptr<gfx::uniform> gpu_program::get_uniform(const std::string& _name,
 
 gfx::program::handle_type_t gpu_program::native_handle() const
 {
-    return _program->native_handle();
+	return _program->native_handle();
 }
 
-const std::vector<asset_handle<gfx::shader> > &gpu_program::get_shaders() const
+const std::vector<asset_handle<gfx::shader>>& gpu_program::get_shaders() const
 {
-    return _shaders;
+	return _shaders;
 }
 
 bool gpu_program::begin()
 {
-    bool repopulate = false;
-    for(std::size_t i = 0; i < _shaders_cached.size(); ++i)
+	bool repopulate = false;
+	for(std::size_t i = 0; i < _shaders_cached.size(); ++i)
 	{
 		auto shader_ptr = _shaders[i];
 		if(!shader_ptr)
@@ -106,7 +106,7 @@ bool gpu_program::begin()
 	if(repopulate)
 		populate();
 
-    return _program->is_valid();
+	return _program->is_valid();
 }
 
 void gpu_program::end()

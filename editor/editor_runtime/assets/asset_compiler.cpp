@@ -174,7 +174,7 @@ void compile<gfx::shader>(const fs::path& absolute_key)
 
 	{
 		std::ofstream output_file(str_output);
-        (void)output_file;
+		(void)output_file;
 	}
 
 	if(!run_compile_process("shaderc", args_array, error))
@@ -209,7 +209,7 @@ void compile<gfx::texture>(const fs::path& absolute_key)
 
 	{
 		std::ofstream output_file(str_output);
-        (void)output_file;        
+		(void)output_file;
 	}
 
 	if(!run_compile_process("texturec", args_array, error))

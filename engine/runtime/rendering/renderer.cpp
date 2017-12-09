@@ -9,10 +9,9 @@
 
 namespace runtime
 {
-renderer::renderer(cmd_line::options_parser &parser)
-    : _parser(parser)
+renderer::renderer(cmd_line::options_parser& parser)
+	: _parser(parser)
 {
-    
 }
 
 bool renderer::initialize()
@@ -158,18 +157,18 @@ bool renderer::init_backend()
 
 	gfx::set_platform_data(pd);
 
-    auto preferred_renderer = _parser["renderer"].as<std::string>();
+	auto preferred_renderer = _parser["renderer"].as<std::string>();
 	// auto detect
 	auto preferred_renderer_type = gfx::renderer_type::Count;
-    if(preferred_renderer == "opengl")
-    {
-        preferred_renderer_type = gfx::renderer_type::OpenGL;
-    }
-    else if(preferred_renderer == "directx11")
-    {
-        preferred_renderer_type = gfx::renderer_type::Direct3D11;
-    }
-    
+	if(preferred_renderer == "opengl")
+	{
+		preferred_renderer_type = gfx::renderer_type::OpenGL;
+	}
+	else if(preferred_renderer == "directx11")
+	{
+		preferred_renderer_type = gfx::renderer_type::Direct3D11;
+	}
+
 	if(!gfx::init(preferred_renderer_type))
 		return false;
 
