@@ -1,3 +1,4 @@
+add_subdirectory(common)
 add_subdirectory(cmd_line)
 add_subdirectory(config)
 add_subdirectory(console)

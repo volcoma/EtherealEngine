@@ -168,7 +168,10 @@ bool renderer::init_backend()
 	{
 		preferred_renderer_type = gfx::renderer_type::Direct3D11;
 	}
-
+    else if(preferred_renderer == "directx12")
+	{
+		preferred_renderer_type = gfx::renderer_type::Direct3D12;
+	}
 	if(!gfx::init(preferred_renderer_type))
 		return false;
 

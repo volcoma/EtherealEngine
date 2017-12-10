@@ -33,12 +33,16 @@ void show_statistics(const unsigned int fps)
 	gui::Separator();
 
 	auto stats = gfx::get_stats();
-	uint32_t num_draws = stats->numDraw;
-	uint32_t num_computes = stats->numCompute;
 	gui::AlignTextToFramePadding();
-	gui::Text("DRAW CALLS: %u", num_draws);
+	gui::Text("DRAW CALLS: %u", stats->numDraw);
 	gui::AlignTextToFramePadding();
-	gui::Text("COMPUTE CALLS: %u", num_computes);
+	gui::Text("COMPUTE CALLS: %u", stats->numCompute);
+    gui::AlignTextToFramePadding();
+	gui::Text("GPU DRIVER LATENCY: %u ms", stats->maxGpuLatency);
+	gui::AlignTextToFramePadding();
+    gui::Text("GPU MEM USED: %lld mb", stats->gpuMemoryUsed / 1024 / 1024);
+    gui::AlignTextToFramePadding();
+    gui::Text("GPU MEM TOTAL: %lld mb", stats->gpuMemoryMax / 1024 / 1024);
 	gui::AlignTextToFramePadding();
 	gui::Text("RENDER PASSES: %u", gfx::render_pass::get_pass());
 	gui::Separator();

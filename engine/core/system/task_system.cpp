@@ -1,4 +1,5 @@
 #include "task_system.h"
+#include "../common/platform.h"
 #include <limits>
 
 namespace core
@@ -209,6 +210,7 @@ task_system::task_system(std::size_t nthreads, const task_system::allocator_t& a
 	for(std::size_t th = 1; th < _threads_count; ++th)
 	{
 		_threads.emplace_back(&task_system::run, this, th, []() { return true; }, 50ms);
+        platform::set_thread_name(_threads.back(), "task_worker");
 	}
 }
 
