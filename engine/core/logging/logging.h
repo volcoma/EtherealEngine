@@ -4,7 +4,8 @@
 
 #include "../common/platform_config.h"
 
-#if $on($windows) && $on($msvc)
+#if $on($windows) 
+#if $on($msvc)
 #include "spdlog/sinks/msvc_sink.h"
 namespace spdlog
 {
@@ -14,6 +15,17 @@ using platform_sink_mt = msvc_sink_mt;
 using platform_sink_st = msvc_sink_st;
 }
 }
+#else
+#include "spdlog/sinks/wincolor_sink.h"
+namespace spdlog
+{
+namespace sinks
+{
+using platform_sink_mt = wincolor_stdout_sink_mt;
+using platform_sink_st = wincolor_stdout_sink_st;
+}
+}
+#endif
 #elif $on($linux) || $on($apple)
 #include "spdlog/sinks/stdout_sinks.h"
 namespace spdlog
