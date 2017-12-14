@@ -610,8 +610,8 @@ public:
 		auto min_el = std::min_element(begin_it, end_it, [](const auto& lhs, const auto& rhs) {
 			return lhs.pending_tasks > rhs.pending_tasks;
 		});
-		const std::size_t most_busy_idx = std::distance(std::begin(info.queue_infos), min_el);
-		return most_busy_idx;
+        const std::size_t idx = static_cast<std::size_t>(std::distance(std::begin(info.queue_infos), min_el));
+		return idx;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -632,7 +632,7 @@ public:
 		auto min_el = std::min_element(begin_it, end_it, [](const auto& lhs, const auto& rhs) {
 			return lhs.pending_tasks < rhs.pending_tasks;
 		});
-		const std::size_t idx = std::distance(std::begin(info.queue_infos), min_el);
+		const std::size_t idx = static_cast<std::size_t>(std::distance(std::begin(info.queue_infos), min_el));
 		return idx;
 	}
 	//-----------------------------------------------------------------------------

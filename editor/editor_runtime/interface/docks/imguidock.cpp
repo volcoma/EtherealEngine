@@ -315,7 +315,7 @@ void update_drag(std::uint32_t window_id)
 
 void dockspace::render_container(uint32_t& idgen, node* container, ImVec2 size, ImVec2 cursor_pos)
 {
-	const float tabbar_height = ImGui::GetItemsLineHeightWithSpacing();
+	const float tabbar_height = ImGui::GetFrameHeightWithSpacing();
 	ImVec2 calculated_size = size;
 	ImVec2 calculated_cursor_pos = cursor_pos;
 
@@ -673,7 +673,7 @@ static void get_slot_convex(ImRect parent_rect, slot dock_slot, std::vector<ImVe
 {
 	convex.clear();
 	ImVec2 size = parent_rect.Max - parent_rect.Min;
-	const float tabbar_height = ImGui::GetItemsLineHeightWithSpacing();
+	const float tabbar_height = ImGui::GetFrameHeightWithSpacing();
 	ImVec2 top_left_corner = parent_rect.Min;
 	ImVec2 bottom_right_corner = parent_rect.Max;
 	ImVec2 top_right_corner = ImVec2(parent_rect.Max.x, parent_rect.Min.y);

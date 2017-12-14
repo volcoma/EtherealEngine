@@ -33,7 +33,7 @@ void console_dock::render(const ImVec2&)
 	// If your items are of variable size you may want to implement code similar to what CalcListClipping()
 	// does. Or split your data into fixed height items to allow random-seeking into your list.
 	gui::BeginChild("ScrollingRegion",
-					ImVec2(0, -ImGui::GetStyle().ItemSpacing.y - gui::GetItemsLineHeightWithSpacing()), false,
+					ImVec2(0, -ImGui::GetStyle().ItemSpacing.y - gui::GetFrameHeightWithSpacing()), false,
 					ImGuiWindowFlags_HorizontalScrollbar);
 	if(gui::BeginPopupContextWindow())
 	{

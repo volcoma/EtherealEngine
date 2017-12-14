@@ -518,7 +518,7 @@ void app::draw_dockspace(bool is_main, render_window& window, imguidock::dockspa
 	if(is_main)
 	{
 		draw_header(window);
-		offset = gui::GetItemsLineHeightWithSpacing();
+		offset = gui::GetFrameHeightWithSpacing();
 	}
 
 	dockspace.update_and_draw(

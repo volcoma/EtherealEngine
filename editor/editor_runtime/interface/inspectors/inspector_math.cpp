@@ -92,8 +92,7 @@ bool inspector_transform::inspect(rttr::variant& var, bool read_only, const meta
 		old_quat = rotation;
 	}
 	gui::Columns(1);
-	if(gui::Button("P",
-				   ImVec2(ImGui::GetItemsLineHeightWithSpacing(), ImGui::GetItemsLineHeightWithSpacing())))
+	if(gui::Button("P", ImVec2(ImGui::GetFrameHeightWithSpacing(), ImGui::GetFrameHeightWithSpacing())))
 	{
 		data.set_position({0.0f, 0.0f, 0.0f});
 		changed = true;
@@ -112,8 +111,7 @@ bool inspector_transform::inspect(rttr::variant& var, bool read_only, const meta
 	}
 	gui::PopID();
 
-	if(gui::Button("R",
-				   ImVec2(ImGui::GetItemsLineHeightWithSpacing(), ImGui::GetItemsLineHeightWithSpacing())))
+	if(gui::Button("R", ImVec2(ImGui::GetFrameHeightWithSpacing(), ImGui::GetFrameHeightWithSpacing())))
 	{
 		data.set_rotation(math::quat());
 		euler_angles = {0.0f, 0.0f, 0.0f};
@@ -136,8 +134,7 @@ bool inspector_transform::inspect(rttr::variant& var, bool read_only, const meta
 
 	gui::PopID();
 
-	if(gui::Button("S",
-				   ImVec2(ImGui::GetItemsLineHeightWithSpacing(), ImGui::GetItemsLineHeightWithSpacing())))
+	if(gui::Button("S", ImVec2(ImGui::GetFrameHeightWithSpacing(), ImGui::GetFrameHeightWithSpacing())))
 	{
 		data.set_scale({1.0f, 1.0f, 1.0f});
 		changed = true;
