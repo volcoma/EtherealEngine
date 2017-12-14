@@ -2,6 +2,10 @@
 #include "core/math/math_includes.h"
 #include <string>
 #include <vector>
+
+namespace runtime
+{
+
 enum class anim_behaviour
 {
 	/// The value from the default node transformation is taken.
@@ -88,3 +92,4 @@ struct animation
 	/// The array is mNumChannels in size.
 	std::vector<node_animation> channels;
 };
+}

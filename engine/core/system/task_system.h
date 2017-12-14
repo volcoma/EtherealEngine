@@ -882,7 +882,7 @@ private:
 		std::pair<bool, task> pop(duration_t pop_timeout = duration_t::max());
 
 		void push(task t);
-
+        void wake_up();
 	private:
 		void sort();
 		std::deque<task> _tasks;
@@ -891,6 +891,7 @@ private:
 		std::atomic_bool _done{false};
 	};
 
+    std::atomic<std::uint32_t> _steals = {0};
 	std::vector<task_queue> _queues;
 	std::vector<std::thread> _threads;
 	typename allocator_t::template rebind<task::task_concept>::other _alloc;

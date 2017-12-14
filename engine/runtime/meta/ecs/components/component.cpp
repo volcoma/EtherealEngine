@@ -3,13 +3,14 @@
 #include "core/serialization/associative_archive.h"
 #include "core/serialization/binary_archive.h"
 
-REFLECT(runtime::component)
-{
-	rttr::registration::class_<runtime::component>("component");
-}
 
 namespace runtime
 {
+REFLECT(component)
+{
+	rttr::registration::class_<component>("component");
+}
+
 SAVE(component)
 {
 	try_save(ar, cereal::make_nvp("owner", obj._entity));

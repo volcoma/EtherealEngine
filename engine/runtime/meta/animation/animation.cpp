@@ -3,6 +3,17 @@
 #include "core/meta/math/transform.hpp"
 #include "core/serialization/binary_archive.h"
 
+namespace runtime
+{
+REFLECT(animation){
+	rttr::registration::class_<animation>("animation")
+		.property_readonly("name", &animation::name)(rttr::metadata("pretty_name", "Name"))
+		.property_readonly("duration", &animation::duration)(rttr::metadata("pretty_name", "Duration"))
+		.property_readonly("ticks_per_second",
+						   &animation::ticks_per_second)(rttr::metadata("pretty_name", "Ticks Per Second"));
+
+}
+
 SAVE(node_animation)
 {
 	try_save(ar, cereal::make_nvp("node_name", obj.node_name));
@@ -42,3 +53,4 @@ LOAD(animation)
 	try_load(ar, cereal::make_nvp("ticks_per_second", obj.channels));
 }
 LOAD_INSTANTIATE(animation, cereal::iarchive_binary_t);
+}

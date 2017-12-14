@@ -2,4 +2,7 @@
 #include "core/graphics/texture.h"
 #include "core/reflection/reflection.h"
 
-REFLECT_EXTERN(gfx::texture_info);
+namespace gfx
+{
+REFLECT_EXTERN(texture_info);
+}

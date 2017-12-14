@@ -4,8 +4,6 @@
 #include "rttr/registration_friend.h"
 #include "rttr/rttr_enable.h"
 
-template <typename T>
-extern void rttr_auto_register_reflection_function_t();
 namespace rttr
 {
 namespace detail
@@ -16,14 +14,15 @@ struct constructor_invoker;
 }
 
 #define RTTR_REGISTRATION_FRIEND_NON_INTRUSIVE(cls)                                                          \
-	friend void ::rttr_auto_register_reflection_function_t<cls>();                                           \
+	template <typename T>                                                                                    \
+	friend void rttr_auto_register_reflection_function_t();                                               \
 	RTTR_REGISTRATION_FRIEND
 
 #define EXPAND(x) x
 #define REFLECTABLE_VIRTUAL_IMPL(cls, ...)                                                                   \
 	RTTR_REGISTRATION_FRIEND_NON_INTRUSIVE(cls)                                                              \
 	RTTR_ENABLE(__VA_ARGS__)                                                                                 \
-	\
+                                                                                                             \
 public:
 
 #define REFLECTABLE(cls) RTTR_REGISTRATION_FRIEND_NON_INTRUSIVE(cls)

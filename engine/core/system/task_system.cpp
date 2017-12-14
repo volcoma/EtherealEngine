@@ -124,7 +124,12 @@ void task_system::task_queue::push(task t)
 		std::unique_lock<std::mutex> lock(_mutex);
 		_tasks.emplace_back(std::move(t));
 	}
-	_cv.notify_one();
+    _cv.notify_one();
+}
+
+void task_system::task_queue::wake_up()
+{
+    _cv.notify_all();
 }
 
 void task_system::run(std::size_t idx, std::function<bool()> condition, duration_t pop_timeout)
@@ -150,6 +155,7 @@ void task_system::run(std::size_t idx, std::function<bool()> condition, duration
 					p = _queues[queue_idx].try_pop();
 					if(p.first)
 					{
+                        _steals++;
 						break;
 					}
 				}

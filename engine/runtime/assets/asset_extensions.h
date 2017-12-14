@@ -11,7 +11,10 @@ struct shader;
 struct scene;
 struct prefab;
 class material;
-
+namespace runtime
+{
+struct animation;
+}
 namespace extensions
 {
 const std::array<std::string, 6> texture = {{".png", ".jpg", ".tga", ".dds", ".ktx", ".pvr"}};
@@ -26,7 +29,8 @@ const std::string compiled = ".asset";
 inline bool is_compiled_format(const std::string& extension)
 {
 	const bool is_compiled = (extension == extensions::compiled || extension == extensions::material ||
-							  extension == extensions::prefab || extension == extensions::scene);
+							  extension == extensions::animation || extension == extensions::prefab ||
+							  extension == extensions::scene);
 	return is_compiled;
 }
 
@@ -57,6 +61,11 @@ inline std::string get_compiled_format<::prefab>()
 
 template <>
 inline std::string get_compiled_format<::material>()
+{
+	return "";
+}
+template <>
+inline std::string get_compiled_format<runtime::animation>()
 {
 	return "";
 }

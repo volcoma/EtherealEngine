@@ -7,6 +7,7 @@
 #include "runtime/ecs/prefab.h"
 #include "runtime/rendering/material.h"
 #include "runtime/rendering/mesh.h"
+#include "runtime/animation/animation.h"
 
 bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 											 const meta_getter& get_metadata)
@@ -256,6 +257,70 @@ bool inspector_asset_handle_mesh::inspect(rttr::variant& var, bool read_only, co
 		info.primitives = data->get_face_count();
 		info.subsets = static_cast<std::uint32_t>(data->get_subset_count());
 		rttr::variant vari = info;
+		changed |= inspect_var(vari);
+	}
+	return changed;
+}
+
+bool inspector_asset_handle_animation::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
+{
+	auto data = var.get_value<asset_handle<runtime::animation>>();
+
+	auto& es = core::get_subsystem<editor::editing_system>();
+	auto& am = core::get_subsystem<runtime::asset_manager>();
+	auto& selected = es.selection_data.object;
+	if(selected && !selected.is_type<asset_handle<runtime::animation>>())
+	{
+		std::string item = !data.id().empty() ? data.id() : "none";
+		rttr::variant var_str = item;
+		if(inspect_var(var_str))
+		{
+			item = var_str.to_string();
+			if(item.empty())
+			{
+				data = asset_handle<runtime::animation>();
+			}
+			else
+			{
+				auto load_future = am.load<runtime::animation>(item);
+				if(load_future.valid())
+				{
+					data = load_future.get();
+				}
+			}
+			var = data;
+			return true;
+		}
+
+		auto& dragged = es.drag_data.object;
+		if(dragged && dragged.is_type<asset_handle<runtime::animation>>())
+		{
+			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.9f));
+			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
+			gui::PopStyleColor();
+
+			if(gui::IsItemHoveredRect())
+			{
+				gui::SetMouseCursor(ImGuiMouseCursor_Move);
+				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
+				gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
+				gui::PopStyleColor();
+				if(gui::IsMouseReleased(gui::drag_button))
+				{
+					data = dragged.get_value<asset_handle<runtime::animation>>();
+					var = data;
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	bool changed = false;
+
+	if(data)
+	{
+        rttr::variant vari = data.get();		
 		changed |= inspect_var(vari);
 	}
 	return changed;

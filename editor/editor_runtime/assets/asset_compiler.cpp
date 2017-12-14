@@ -71,7 +71,7 @@ bool run_compile_process(const std::string& process, const std::vector<std::stri
 	else
 	{
 		std::array<char, 2048> buffer;
-		process_reader.read(buffer.data(), buffer.size(), &error);
+		process_reader.read(buffer.data(), static_cast<std::int32_t>(buffer.size()), &error);
 
 		process_reader.close();
 		int32_t result = process_reader.getExitCode();
@@ -98,6 +98,11 @@ void compile<scene>(const fs::path&)
 
 template <>
 void compile<material>(const fs::path&)
+{
+}
+
+template <>
+void compile<runtime::animation>(const fs::path&)
 {
 }
 
@@ -235,7 +240,7 @@ void compile<mesh>(const fs::path& absolute_key)
 	temp /= uuids::random_uuid(str_input).to_string() + ".buildtemp";
 
 	mesh::load_data data;
-	std::vector<animation> animations;
+	std::vector<runtime::animation> animations;
 	if(!importer::load_mesh_data_from_file(str_input, data, animations))
 	{
 		APPLOG_ERROR("Failed compilation of {0}", str_input);
@@ -253,24 +258,27 @@ void compile<mesh>(const fs::path& absolute_key)
 		fs::remove(temp, err);
 
 		APPLOG_INFO("Successful compilation of {0}", str_input);
+	}
+	{
+		fs::path file = absolute_key.stem();
+		fs::path dir = absolute_key.parent_path();
+
+		for(const auto& animation : animations)
 		{
-			fs::path file = absolute_key.stem();
-			fs::path dir = absolute_key.parent_path();
-
-			for(const auto& animation : animations)
+			temp = fs::temp_directory_path(err);
+			temp.append(uuids::random_uuid(str_input).to_string() + ".buildtemp");
 			{
-				temp = fs::temp_directory_path(err);
-				temp.append(uuids::random_uuid(str_input).to_string() + ".buildtemp");
-				{
-					std::ofstream soutput(temp.string(), std::ios::out | std::ios::binary);
-					cereal::oarchive_binary_t ar(soutput);
-					try_save(ar, cereal::make_nvp("animation", animation));
-				}
-				output = (dir / file).string() + "_" + animation.name + extensions::animation;
-
-				fs::copy_file(temp, output, fs::copy_options::overwrite_if_exists, err);
-				fs::remove(temp, err);
+				std::ofstream soutput(temp.string(), std::ios::out | std::ios::binary);
+				cereal::oarchive_binary_t ar(soutput);
+				try_save(ar, cereal::make_nvp("animation", animation));
 			}
+			output = (dir / file).string() + "_" + animation.name + extensions::animation;
+
+			fs::copy_file(temp, output, fs::copy_options::overwrite_if_exists, err);
+			fs::remove(temp, err);
+            
+            APPLOG_INFO("Successful compilation of animation {0}", animation.name);
+            
 		}
 	}
 }

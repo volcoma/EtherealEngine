@@ -3,10 +3,10 @@
 #include "core/reflection/reflection.h"
 #include "core/serialization/serialization.h"
 
-REFLECT_EXTERN(runtime::component);
 
 namespace runtime
 {
+REFLECT_EXTERN(component);
 SAVE_EXTERN(component);
 LOAD_EXTERN(component);
 }

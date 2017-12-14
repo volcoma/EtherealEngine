@@ -15,6 +15,7 @@
 #include "runtime/input/input.h"
 #include "runtime/rendering/material.h"
 #include "runtime/rendering/mesh.h"
+#include "runtime/animation/animation.h"
 
 template <typename T>
 asset_handle<gfx::texture> get_asset_icon(T)
@@ -33,6 +34,13 @@ asset_handle<gfx::texture> get_asset_icon(asset_handle<prefab>)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	return es.icons["prefab"];
+}
+
+template <>
+asset_handle<gfx::texture> get_asset_icon(asset_handle<runtime::animation>)
+{
+	auto& es = core::get_subsystem<editor::editing_system>();
+	return es.icons["animation"];
 }
 
 template <>
@@ -66,12 +74,6 @@ asset_handle<gfx::texture> get_asset_icon(asset_handle<gfx::shader>)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	return es.icons["shader"];
-}
-
-asset_handle<gfx::texture>& get_icon()
-{
-	static asset_handle<gfx::texture> tex;
-	return tex;
 }
 
 template <typename T>
@@ -358,7 +360,49 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 
 						   });
 			}
-			if(file.extension == extensions::shader)
+			else if(file.extension == extensions::animation)
+			{
+				using asset_t = runtime::animation;
+				using entry_t = asset_handle<asset_t>;
+				auto entry = entry_t{};
+				auto entry_future = am.find_asset_entry<asset_t>(file.relative);
+				if(entry_future.is_ready())
+				{
+					entry = entry_future.get();
+				}
+				const auto& name = file.name;
+				const auto& relative = file.relative;
+				auto& selected = es.selection_data.object;
+				bool is_selected =
+					selected.is_type<entry_t>() ? (selected.get_value<entry_t>() == entry) : false;
+				bool is_dragging = !!es.drag_data.object;
+				list_entry(entry, name, is_selected, is_dragging, size,
+						   [&]() // on_click
+						   {
+							   es.select(entry);
+
+						   },
+						   nullptr // on_double_click
+						   ,
+						   [&](const std::string& new_name) // on_rename
+						   {
+							   const auto asset_dir = fs::path(relative).make_preferred().remove_filename();
+							   const auto new_relative =
+								   (asset_dir / new_name).generic_string() + file.extension;
+							   am.rename_asset<asset_t>(relative, new_relative);
+						   },
+						   [&]() // on_delete
+						   {
+							   am.delete_asset<asset_t>(relative);
+
+						   },
+						   [&]() // on_drag
+						   {
+							   es.drag(entry, relative);
+
+						   });
+			}
+			else if(file.extension == extensions::shader)
 			{
 				using asset_t = gfx::shader;
 				using entry_t = asset_handle<asset_t>;
@@ -400,7 +444,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 
 						   });
 			}
-			if(file.extension == extensions::prefab)
+			else if(file.extension == extensions::prefab)
 			{
 				using asset_t = prefab;
 				using entry_t = asset_handle<asset_t>;
@@ -442,7 +486,7 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 
 						   });
 			}
-			if(file.extension == extensions::scene)
+			else if(file.extension == extensions::scene)
 			{
 				using asset_t = scene;
 				using entry_t = asset_handle<asset_t>;
@@ -660,9 +704,7 @@ void assets_dock::render(const ImVec2&)
 			}
 		}
 
-		get_icon() = asset_handle<gfx::texture>();
 		list_dir(opened_dir, 88.0f * scale_icons);
-		get_icon() = asset_handle<gfx::texture>();
 		gui::EndChild();
 	}
 }

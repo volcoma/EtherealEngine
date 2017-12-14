@@ -219,7 +219,7 @@ void process_nodes(const aiScene* scene, mesh::load_data& load_data)
 	}
 }
 
-void process_animation(const aiAnimation* assimp_anim, animation& anim)
+void process_animation(const aiAnimation* assimp_anim, runtime::animation& anim)
 {
 	anim.name = assimp_anim->mName.C_Str();
 	anim.duration = assimp_anim->mDuration;
@@ -233,8 +233,8 @@ void process_animation(const aiAnimation* assimp_anim, animation& anim)
 		const aiNodeAnim* assimp_node_anim = assimp_anim->mChannels[i];
 		auto& node_anim = anim.channels[i];
 		node_anim.node_name = assimp_node_anim->mNodeName.C_Str();
-		node_anim.pre_state = static_cast<anim_behaviour>(assimp_node_anim->mPreState);
-		node_anim.post_state = static_cast<anim_behaviour>(assimp_node_anim->mPostState);
+		node_anim.pre_state = static_cast<runtime::anim_behaviour>(assimp_node_anim->mPreState);
+		node_anim.post_state = static_cast<runtime::anim_behaviour>(assimp_node_anim->mPostState);
 
 		if(assimp_node_anim->mNumPositionKeys > 0)
 			node_anim.position_keys.resize(assimp_node_anim->mNumPositionKeys);
@@ -277,7 +277,7 @@ void process_animation(const aiAnimation* assimp_anim, animation& anim)
 		}
 	}
 }
-void process_animations(const aiScene* scene, std::vector<animation>& animations)
+void process_animations(const aiScene* scene, std::vector<runtime::animation>& animations)
 {
 	if(scene->mNumAnimations > 0)
 		animations.resize(scene->mNumAnimations);
@@ -291,7 +291,7 @@ void process_animations(const aiScene* scene, std::vector<animation>& animations
 }
 
 void process_imported_scene(const aiScene* scene, mesh::load_data& load_data,
-							std::vector<animation>& animations)
+							std::vector<runtime::animation>& animations)
 {
 	load_data.vertex_format = gfx::mesh_vertex::get_layout();
 	process_meshes(scene, load_data);
@@ -300,7 +300,7 @@ void process_imported_scene(const aiScene* scene, mesh::load_data& load_data,
 }
 
 bool importer::load_mesh_data_from_file(const std::string& path, mesh::load_data& load_data,
-										std::vector<animation>& animations)
+										std::vector<runtime::animation>& animations)
 {
 	Assimp::Importer importer;
 	importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, aiComponent_CAMERAS | aiComponent_LIGHTS);

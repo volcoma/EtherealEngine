@@ -1,10 +1,9 @@
 #include "asset_reader.h"
 #include "../ecs/prefab.h"
 #include "../ecs/scene.h"
+#include "../meta/animation/animation.hpp"
 #include "../meta/rendering/material.hpp"
 #include "../meta/rendering/mesh.hpp"
-#include "../rendering/material.h"
-#include "../rendering/mesh.h"
 #include "asset_extensions.h"
 #include "core/filesystem/filesystem.h"
 #include "core/graphics/index_buffer.h"
@@ -207,11 +206,10 @@ bool load_from_file<mesh>(core::task_future<asset_handle<mesh>>& output, const s
 
 	struct wrapper_t
 	{
-		std::shared_ptr<::mesh> mesh;
+		std::shared_ptr<::mesh> mesh = std::make_shared<::mesh>();
 	};
 
 	auto wrapper = std::make_shared<wrapper_t>();
-	wrapper->mesh = std::make_shared<mesh>();
 	auto read_memory_func = [wrapper, compiled_absolute_key]() mutable {
 		mesh::load_data data;
 		{
@@ -262,6 +260,83 @@ bool load_from_file<mesh>(core::task_future<asset_handle<mesh>>& output, const s
 }
 
 template <>
+bool load_from_file<runtime::animation>(core::task_future<asset_handle<runtime::animation>>& output,
+										const std::string& key)
+{
+	asset_handle<runtime::animation> original;
+	if(output.is_ready())
+		original = output.get();
+
+	auto& ts = core::get_subsystem<core::task_system>();
+
+	auto create_resource_func_fallback = [ result = original, key ]() mutable
+	{
+		result.link->id = key;
+		return result;
+	};
+
+	if(!fs::has_known_protocol(key))
+	{
+		APPLOG_ERROR("Asset {0} has uknown protocol!", key);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
+		return true;
+	}
+
+	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
+	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<animation>();
+
+	fs::error_code err;
+	if(!fs::exists(compiled_absolute_key, err))
+	{
+		APPLOG_ERROR("Asset {0} does not exist!", key);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
+		return true;
+	}
+
+	struct wrapper_t
+	{
+		std::shared_ptr<runtime::animation> anim = std::make_shared<runtime::animation>();
+	};
+
+	auto wrapper = std::make_shared<wrapper_t>();
+	auto read_memory_func = [wrapper, compiled_absolute_key]() mutable {
+		auto& data = *wrapper->anim.get();
+		{
+			std::ifstream stream{compiled_absolute_key, std::ios::in | std::ios::binary};
+
+			if(stream.bad())
+			{
+				return false;
+			}
+
+			cereal::iarchive_binary_t ar(stream);
+
+			try_load(ar, cereal::make_nvp("animation", data));
+		}
+
+		return true;
+	};
+
+	auto create_resource_func = [ result = original, wrapper, key ](bool read_result) mutable
+	{
+		// Build the mesh
+		if(read_result && wrapper->anim)
+		{
+			result.link->id = key;
+			result.link->asset = wrapper->anim;
+			
+			wrapper.reset();
+		};
+
+		return result;
+	};
+
+	auto ready_memory_task = ts.push_on_worker_thread(read_memory_func);
+	output = ts.push_on_owner_thread(create_resource_func, ready_memory_task);
+	return true;
+}
+
+template <>
 bool load_from_file<material>(core::task_future<asset_handle<material>>& output, const std::string& key)
 {
 	asset_handle<material> original;
@@ -296,11 +371,10 @@ bool load_from_file<material>(core::task_future<asset_handle<material>>& output,
 
 	struct wrapper_t
 	{
-		std::shared_ptr<::material> material;
+		std::shared_ptr<::material> material = std::make_shared<::material>();
 	};
 
 	auto wrapper = std::make_shared<wrapper_t>();
-	wrapper->material = std::make_shared<material>();
 
 	auto read_memory_func = [wrapper, compiled_absolute_key]() mutable {
 		std::ifstream stream{compiled_absolute_key, std::ios::in | std::ios::binary};

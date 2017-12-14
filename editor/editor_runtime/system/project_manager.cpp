@@ -23,6 +23,11 @@ struct texture;
 struct shader;
 }
 
+namespace runtime
+{
+struct animation;
+}
+
 namespace editor
 {
 
@@ -227,6 +232,7 @@ void asset_directory::watch()
 		watch_assets<mesh>(relative_path, wildcard + format, true, false);
 	}
 
+    watch_assets<runtime::animation>(relative_path, wildcard + extensions::animation, true, false);
 	watch_assets<material>(relative_path, wildcard + extensions::material, true, false);
 	watch_assets<prefab>(relative_path, wildcard + extensions::prefab, true, false);
 	watch_assets<scene>(relative_path, wildcard + extensions::scene, true, false);
