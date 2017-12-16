@@ -24,27 +24,50 @@ protocols_t& get_path_protocols()
 	return protocols;
 }
 
+template <typename Container = std::string, typename CharT = char, typename Traits = std::char_traits<char>>
+auto read_stream_into_container(std::basic_istream<CharT, Traits>& in,
+								typename Container::allocator_type alloc = {})
+{
+	static_assert(
+		// Allow only strings...
+		std::is_same<Container,
+					 std::basic_string<CharT, Traits, typename Container::allocator_type>>::value ||
+			// ... and vectors of the plain, signed, and
+			// unsigned flavours of CharT.
+			std::is_same<Container, std::vector<CharT, typename Container::allocator_type>>::value ||
+			std::is_same<Container, std::vector<std::make_unsigned_t<CharT>,
+												typename Container::allocator_type>>::value ||
+			std::is_same<Container,
+						 std::vector<std::make_signed_t<CharT>, typename Container::allocator_type>>::value,
+		"only strings and vectors of ((un)signed) CharT allowed");
+
+	auto const start_pos = in.tellg();
+	if(std::streamsize(-1) == start_pos)
+		throw std::ios_base::failure{"error"};
+
+	if(!in.ignore(std::numeric_limits<std::streamsize>::max()))
+		throw std::ios_base::failure{"error"};
+
+	auto const char_count = in.gcount();
+
+	if(!in.seekg(start_pos))
+		throw std::ios_base::failure{"error"};
+
+	auto container = Container(std::move(alloc));
+	container.resize(static_cast<std::size_t>(char_count));
+
+	if(0 != container.size())
+	{
+		if(!in.read(reinterpret_cast<CharT*>(&container[0]), char_count))
+			throw std::ios_base::failure{"error"};
+	}
+
+	return container;
+}
+
 byte_array_t read_stream(std::istream& stream)
 {
-	// Open the stream
-	byte_array_t read_memory;
-
-	if(stream.good())
-	{
-		// get length of file:
-		stream.seekg(0, stream.end);
-		auto length = stream.tellg();
-		stream.seekg(0, stream.beg);
-
-		read_memory.reserve(size_t(length));
-		read_memory.insert(read_memory.end(), std::istreambuf_iterator<char>(stream),
-						   std::istreambuf_iterator<char>());
-
-		stream.clear();
-		stream.seekg(0);
-	}
-	// Done
-	return read_memory;
+	return read_stream_into_container<byte_array_t>(stream);
 }
 
 path resolve_protocol(const path& _path)

@@ -37,12 +37,12 @@ void show_statistics(const unsigned int fps)
 	gui::Text("DRAW CALLS: %u", stats->numDraw);
 	gui::AlignTextToFramePadding();
 	gui::Text("COMPUTE CALLS: %u", stats->numCompute);
-    gui::AlignTextToFramePadding();
+	gui::AlignTextToFramePadding();
 	gui::Text("GPU DRIVER LATENCY: %u ms", stats->maxGpuLatency);
 	gui::AlignTextToFramePadding();
-    gui::Text("GPU MEM USED: %lld mb", stats->gpuMemoryUsed / 1024 / 1024);
-    gui::AlignTextToFramePadding();
-    gui::Text("GPU MEM TOTAL: %lld mb", stats->gpuMemoryMax / 1024 / 1024);
+	gui::Text("GPU MEM USED: %s mb", std::to_string(stats->gpuMemoryUsed / 1024 / 1024).c_str());
+	gui::AlignTextToFramePadding();
+	gui::Text("GPU MEM TOTAL: %s mb", std::to_string(stats->gpuMemoryMax / 1024 / 1024).c_str());
 	gui::AlignTextToFramePadding();
 	gui::Text("RENDER PASSES: %u", gfx::render_pass::get_pass());
 	gui::Separator();
@@ -76,10 +76,10 @@ void draw_selected_camera(const ImVec2& size)
 			p.x += size.x - bounds.x - 20.0f;
 			p.y += size.y - bounds.y - 40.0f;
 			gui::SetNextWindowPos(p);
-			if(gui::Begin("Camera Preview", nullptr,
-						  ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoCollapse |
-							  ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
-							  ImGuiWindowFlags_AlwaysAutoResize))
+			if(gui::Begin("Camera Preview", nullptr, ImGuiWindowFlags_NoFocusOnAppearing |
+														 ImGuiWindowFlags_NoCollapse |
+														 ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+														 ImGuiWindowFlags_AlwaysAutoResize))
 			{
 				gui::Image(surface->get_attachment(0).texture, bounds);
 			}
@@ -176,7 +176,7 @@ void manipulation_gizmos()
 			//				gui::GetCurrentWindow()->DrawList->AddRect(ImVec2(rect.left, rect.top),
 			//														   ImVec2(rect.right, rect.bottom),
 			//														   gui::GetColorU32(ImVec4(1.0f, 0.0f,
-			//0.0f, 1.0f)));
+			// 0.0f, 1.0f)));
 			//			}
 		}
 	}
