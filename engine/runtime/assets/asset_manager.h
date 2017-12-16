@@ -19,7 +19,7 @@ namespace runtime
 template <typename T>
 using request_container_t = std::unordered_map<std::string, core::task_future<asset_handle<T>>>;
 
-struct base_storage
+struct basic_storage
 {
 	//-----------------------------------------------------------------------------
 	//  Name : ~base_storage (virtual )
@@ -29,7 +29,7 @@ struct base_storage
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual ~base_storage() = default;
+	virtual ~basic_storage() = default;
 
 	//-----------------------------------------------------------------------------
 	//  Name : clear (virtual )
@@ -49,12 +49,21 @@ struct base_storage
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void clear(const std::string& protocol) = 0;
+	virtual void clear(const std::string& group) = 0;
 };
 
 template <typename T>
-struct asset_storage : public base_storage
+struct asset_storage : public basic_storage
 {
+	template <typename F>
+	using callable = std::function<F>;
+	using load_from_file_t = callable<bool(core::task_future<asset_handle<T>>&, const std::string&)>;
+	using load_from_instance_t =
+		callable<bool(core::task_future<asset_handle<T>>&, const std::string&, std::shared_ptr<T>)>;
+	using save_file_t = callable<void(const std::string&, const asset_handle<T>&)>;
+	using rename_file_t = callable<void(const std::string&, const std::string&)>;
+	using delete_file_t = callable<void(const std::string&)>;
+
 	//-----------------------------------------------------------------------------
 	//  Name : ~storage ()
 	/// <summary>
@@ -73,7 +82,7 @@ struct asset_storage : public base_storage
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void clear() final
+	virtual void clear() final
 	{
 		std::lock_guard<std::recursive_mutex> lock(container_mutex);
 		for(const auto& pair : container)
@@ -91,7 +100,7 @@ struct asset_storage : public base_storage
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void clear(const std::string& protocol) final
+	virtual void clear(const std::string& group) final
 	{
 		std::lock_guard<std::recursive_mutex> lock(container_mutex);
 		auto container_copy = container;
@@ -100,7 +109,7 @@ struct asset_storage : public base_storage
 			const auto& id = pair.first;
 			const auto& task = pair.second;
 
-			if(string_utils::begins_with(id, protocol, true))
+			if(string_utils::begins_with(id, group, true))
 			{
 				task.wait();
 				container.erase(id);
@@ -109,20 +118,19 @@ struct asset_storage : public base_storage
 	}
 
 	/// key, mode
-	std::function<bool(core::task_future<asset_handle<T>>&, const std::string&)> load_from_file;
+	load_from_file_t load_from_file;
 
 	/// key, mode
-	std::function<bool(core::task_future<asset_handle<T>>&, const std::string&, std::shared_ptr<T>)>
-		load_from_instance;
+	load_from_instance_t load_from_instance;
 
 	/// key, asset
-	std::function<void(const std::string&, const asset_handle<T>&)> save_to_file;
+	save_file_t save_to_file;
 
 	/// key, new_key
-	std::function<void(const std::string&, const std::string&)> rename_asset_file;
+	rename_file_t rename_asset_file;
 
 	/// key
-	std::function<void(const std::string&)> delete_asset_file;
+	delete_file_t delete_asset_file;
 
 	/// Storage container
 	request_container_t<T> container;
@@ -154,7 +162,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void clear(const std::string& protocol);
+	void clear(const std::string& group);
 	//-----------------------------------------------------------------------------
 	//  Name : add_storage ()
 	/// <summary>
@@ -411,6 +419,6 @@ private:
 		return (static_cast<asset_storage<S>&>(*it->second.get()));
 	}
 	/// Different storages
-	std::unordered_map<std::size_t, std::unique_ptr<base_storage>> _storages;
+	std::unordered_map<std::size_t, std::unique_ptr<basic_storage>> _storages;
 };
 }

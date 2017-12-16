@@ -133,6 +133,7 @@ void process_faces(aiMesh* mesh, std::uint32_t subset_offset, mesh::load_data& l
 
 		load_data.triangle_data.push_back(triangle);
 	}
+    
 }
 
 void process_bones(aiMesh* mesh, std::uint32_t subset_offset, mesh::load_data& load_data)

@@ -236,19 +236,25 @@ void core::task_system::dispose()
 		q.set_done();
 }
 
-void task_system::run_on_owner_thread()
+void task_system::run_on_owner_thread(duration_t max_duration)
 {
-	std::pair<bool, task> p = {false, task()};
-
-	const auto queue_index = get_thread_queue_idx(0);
+    const auto queue_index = get_thread_queue_idx(0);
 
 	using namespace std::literals;
-	p = _queues[queue_index].pop(0ms);
-	if(!p.first)
-		return;
-
-	if(p.first)
-		p.second();
+    auto now = std::chrono::steady_clock::now();
+    auto end = now + max_duration;
+    
+    while(now < end)
+    {
+        auto p = _queues[queue_index].pop(0ms);
+        if(!p.first)
+            return;
+    
+        if(p.first)
+            p.second();
+        
+        now = std::chrono::steady_clock::now();
+    }
 }
 
 task_system::system_info task_system::get_info() const

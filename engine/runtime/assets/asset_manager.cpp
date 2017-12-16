@@ -21,12 +21,12 @@ void asset_manager::clear()
 	}
 }
 
-void asset_manager::clear(const std::string& protocol)
+void asset_manager::clear(const std::string& group)
 {
 	for(auto& pair : _storages)
 	{
 		auto& storage = pair.second;
-		storage->clear(protocol);
+		storage->clear(group);
 	}
 }
 }

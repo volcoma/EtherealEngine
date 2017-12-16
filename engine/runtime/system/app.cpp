@@ -98,12 +98,14 @@ void poll_events()
 
 void app::run_one_frame()
 {
+    using namespace std::literals;
+    
 	auto& sim = core::get_subsystem<core::simulation>();
 	auto& tasks = core::get_subsystem<core::task_system>();
 	auto& renderer = core::get_subsystem<runtime::renderer>();
 
 	sim.run_one_frame();
-	tasks.run_on_owner_thread();
+	tasks.run_on_owner_thread(5ms);
 
 	auto dt = sim.get_delta_time();
 

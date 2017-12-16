@@ -564,7 +564,7 @@ public:
 	/// Process owner thread tasks
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void run_on_owner_thread();
+	void run_on_owner_thread(duration_t max_duration = duration_t(0));
 
 	system_info get_info() const;
 	//-----------------------------------------------------------------------------
