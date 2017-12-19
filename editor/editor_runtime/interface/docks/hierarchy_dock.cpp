@@ -6,9 +6,9 @@
 #include "runtime/assets/asset_handle.h"
 #include "runtime/ecs/components/model_component.h"
 #include "runtime/ecs/components/transform_component.h"
-#include "runtime/ecs/prefab.h"
+#include "runtime/ecs/constructs/prefab.h"
+#include "runtime/ecs/constructs/utils.h"
 #include "runtime/ecs/systems/scene_graph.h"
-#include "runtime/ecs/utils.h"
 #include "runtime/input/input.h"
 #include "runtime/rendering/mesh.h"
 

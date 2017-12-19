@@ -3,11 +3,8 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include "core/common/basetypes.hpp"
-#include "core/common/nonstd/type_traits.hpp"
-#include "core/signals/event.hpp"
 #include "mml/window/window.hpp"
-#include <chrono>
+#include <memory>
 namespace gfx
 {
 struct frame_buffer;
@@ -19,9 +16,7 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : render_window ()
 	/// <summary>
-	///
-	///
-	///
+	/// Constructor
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	render_window();
@@ -29,9 +24,7 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : render_window ()
 	/// <summary>
-	///
-	///
-	///
+	/// Constructor
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	render_window(mml::video_mode mode, const std::string& title, std::uint32_t style = mml::style::standard);
@@ -39,9 +32,7 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : ~render_window (virtual )
 	/// <summary>
-	///
-	///
-	///
+	/// Destructor.
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	virtual ~render_window();
@@ -49,42 +40,32 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : get_surface ()
 	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	std::shared_ptr<gfx::frame_buffer> get_surface();
-
-	//-----------------------------------------------------------------------------
-	//  Name : get_surface ()
-	/// <summary>
-	///
-	///
-	///
+	/// Gets the fbo surface.
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	std::shared_ptr<gfx::frame_buffer> get_surface() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : frame_end (virtual )
+	//  Name : begin_present_pass ( )
 	/// <summary>
-	///
-	///
-	///
+	/// Begins the present pass. Fbo -> backbufffer.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual std::uint8_t begin_present_pass();
+	std::uint8_t begin_present_pass();
 
+	//-----------------------------------------------------------------------------
+	//  Name : get_id ()
+	/// <summary>
+	/// Gets the window id.
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	std::uint32_t get_id() const;
 
 protected:
 	//-----------------------------------------------------------------------------
 	//  Name : prepare_surface (virtual )
 	/// <summary>
-	///
-	///
-	///
+	/// Creates the window fbo.
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	virtual void prepare_surface();
@@ -92,12 +73,11 @@ protected:
 	//-----------------------------------------------------------------------------
 	//  Name : destroy_surface (virtual )
 	/// <summary>
-	///
-	///
-	///
+	/// Destroys the window fbo.
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	virtual void destroy_surface();
+
 	//-----------------------------------------------------------------------------
 	//  Name : on_resize (virtual )
 	/// <summary>
@@ -107,7 +87,7 @@ protected:
 	//-----------------------------------------------------------------------------
 	virtual void on_resize();
 
-	///
+	/// Window id.
 	std::uint32_t _id = 0;
 	/// Render surface for this window.
 	std::shared_ptr<gfx::frame_buffer> _surface;

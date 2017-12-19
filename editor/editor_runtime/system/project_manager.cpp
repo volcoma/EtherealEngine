@@ -6,7 +6,7 @@
 #include "core/logging/logging.h"
 #include "core/serialization/associative_archive.h"
 #include "core/system/task_system.h"
-#include "runtime/assets/asset_extensions.h"
+#include "runtime/assets/impl/asset_extensions.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/ecs/ecs.h"
 #include "runtime/system/events.h"

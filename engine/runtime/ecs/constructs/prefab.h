@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs.h"
+#include "../ecs.h"
 #include <fstream>
 #include <memory>
 

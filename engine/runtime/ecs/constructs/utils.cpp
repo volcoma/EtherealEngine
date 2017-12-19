@@ -1,6 +1,5 @@
 #include "utils.h"
-#include "../assets/asset_extensions.h"
-#include "../meta/ecs/entity.hpp"
+#include "../../meta/ecs/entity.hpp"
 #include "core/serialization/associative_archive.h"
 #include "core/serialization/binary_archive.h"
 #include "core/serialization/serialization.h"

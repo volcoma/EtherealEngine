@@ -2,8 +2,8 @@
 
 #include "../../assets/asset_handle.h"
 #include "../../assets/asset_manager.h"
-#include "../../ecs/prefab.h"
-#include "../../ecs/scene.h"
+#include "../../ecs/constructs/prefab.h"
+#include "../../ecs/constructs/scene.h"
 #include "../../rendering/material.h"
 #include "../../rendering/mesh.h"
 #include "core/graphics/texture.h"

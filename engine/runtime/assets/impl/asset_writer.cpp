@@ -1,7 +1,7 @@
 #include "asset_writer.h"
-#include "../rendering/material.h"
+#include "../../rendering/material.h"
 
-#include "../meta/rendering/material.hpp"
+#include "../../meta/rendering/material.hpp"
 #include "core/serialization/associative_archive.h"
 #include <fstream>
 namespace runtime

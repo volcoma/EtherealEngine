@@ -4,18 +4,18 @@
 
 gpu_program::gpu_program(asset_handle<gfx::shader> compute_shader)
 {
-	add_shader(compute_shader);
+	attach_shader(compute_shader);
 	populate();
 }
 
 gpu_program::gpu_program(asset_handle<gfx::shader> vertex_shader, asset_handle<gfx::shader> fragment_shader)
 {
-	add_shader(vertex_shader);
-	add_shader(fragment_shader);
+	attach_shader(vertex_shader);
+	attach_shader(fragment_shader);
 	populate();
 }
 
-void gpu_program::add_shader(asset_handle<gfx::shader> shader)
+void gpu_program::attach_shader(asset_handle<gfx::shader> shader)
 {
 	if(!shader)
 	{

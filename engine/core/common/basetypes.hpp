@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdint>
 #include <type_traits>
+#include <chrono>
 
 struct half
 {
@@ -81,32 +82,32 @@ struct range
 	using value_type = T;
 	range() = default;
 	range(T _min, T _max)
-		: Min(_min)
-		, Max(_max)
+		: min(_min)
+		, max(_max)
 	{
 	}
 
 	template <typename U, typename = typename std::enable_if<std::is_convertible<U, T>::value, void>::type>
 	range(const std::array<U, 2>& data)
-		: Min(data[0])
-		, Max(data[1])
+		: min(data[0])
+		, max(data[1])
 	{
 	}
-	T Min = 0;
-	T Max = 0;
+	T min = 0;
+	T max = 0;
 
 	inline bool contains(const T& val) const
 	{
-		return Min <= val && val <= Max;
+		return min <= val && val <= max;
 	}
 
 	inline bool operator==(const range& b) const
 	{
-		return (Min == b.Min && Max == b.Max);
+		return (min == b.Min && max == b.Max);
 	}
 	inline bool operator!=(const range& b) const
 	{
-		return (Min != b.Min || Max != b.Max);
+		return (min != b.Min || max != b.Max);
 	}
 
 }; // End Struct range<Float>
@@ -339,3 +340,5 @@ using fsize = size<float>;
 using irect = rect<std::int32_t>;
 using urect = rect<std::uint32_t>;
 using frect = rect<float>;
+
+using delta_t = std::chrono::duration<float>;

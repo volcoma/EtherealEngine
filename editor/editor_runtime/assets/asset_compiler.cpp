@@ -14,7 +14,7 @@
 #include "core/string_utils/string_utils.h"
 #include "core/uuid/uuid.hpp"
 #include "mesh_importer.h"
-#include "runtime/assets/asset_extensions.h"
+#include "runtime/assets/impl/asset_extensions.h"
 #include "runtime/meta/animation/animation.hpp"
 #include "runtime/meta/rendering/mesh.hpp"
 #include "runtime/rendering/mesh.h"

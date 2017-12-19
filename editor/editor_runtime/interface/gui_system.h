@@ -5,6 +5,8 @@
 #include "runtime/system/events.h"
 #include <map>
 #include <memory>
+
+class render_window;
 //-----------------------------------------------------------------------------
 // Main Class Declarations
 //-----------------------------------------------------------------------------

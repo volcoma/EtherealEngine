@@ -11,6 +11,13 @@ class gpu_program;
 class mesh;
 class material;
 
+//-----------------------------------------------------------------------------
+//  Name : model (Class)
+/// <summary>
+/// Structure describing a LOD group(set of meshes), LOD transitions 
+/// and their materials.
+/// </summary>
+//-----------------------------------------------------------------------------
 class model
 {
 public:

@@ -16,7 +16,7 @@ struct uniform;
 struct program : public handle_impl<program_handle>
 {
 	//-----------------------------------------------------------------------------
-	//  Name : Program ()
+	//  Name : program ()
 	/// <summary>
 	///
 	///
@@ -26,7 +26,7 @@ struct program : public handle_impl<program_handle>
 	program() = default;
 
 	//-----------------------------------------------------------------------------
-	//  Name : Program ()
+	//  Name : program ()
 	/// <summary>
 	///
 	///
@@ -36,7 +36,7 @@ struct program : public handle_impl<program_handle>
 	program(std::shared_ptr<shader> compute_shader);
 
 	//-----------------------------------------------------------------------------
-	//  Name : Program ()
+	//  Name : program ()
 	/// <summary>
 	///
 	///

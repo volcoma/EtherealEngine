@@ -19,7 +19,7 @@ LOAD(gpu_program)
 
 	for(auto shader : shaders)
 	{
-		obj.add_shader(shader);
+		obj.attach_shader(shader);
 	}
 	obj.populate();
 }

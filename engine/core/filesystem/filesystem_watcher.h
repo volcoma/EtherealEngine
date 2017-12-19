@@ -49,7 +49,7 @@ public:
 	/// or a directory.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void watch(const fs::path& path, bool recursive, bool initialList,
+	static void watch(const fs::path& path, bool recursive, bool initial_list,
 					  const notify_callback& callback);
 
 	//-----------------------------------------------------------------------------

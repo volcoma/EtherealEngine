@@ -4,7 +4,7 @@
 #include "core/graphics/texture.h"
 #include "inspectors.h"
 #include "runtime/assets/asset_manager.h"
-#include "runtime/ecs/prefab.h"
+#include "runtime/ecs/constructs/prefab.h"
 #include "runtime/rendering/material.h"
 #include "runtime/rendering/mesh.h"
 #include "runtime/animation/animation.h"

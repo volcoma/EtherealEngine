@@ -3,7 +3,7 @@
 ////////////////////////////////////////////////////////////
 #include "render_window.h"
 #include "core/graphics/render_pass.h"
-#include "core/logging/logging.h"
+
 static std::uint32_t s_next_id = 0;
 
 void render_window::on_resize()
@@ -28,11 +28,6 @@ render_window::render_window(mml::video_mode mode, const std::string& title,
 render_window::~render_window()
 {
 	destroy_surface();
-}
-
-std::shared_ptr<gfx::frame_buffer> render_window::get_surface()
-{
-	return _surface;
 }
 
 std::shared_ptr<gfx::frame_buffer> render_window::get_surface() const

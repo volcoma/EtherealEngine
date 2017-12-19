@@ -164,14 +164,14 @@ std::string replace(const std::string& str, std::string::value_type oldCharacter
 /// </summary>
 //-------------------------------------------------------------------------
 template <typename... Args>
-std::string format(const char* format, Args... args)
+std::string format(const char* format, Args&&... args)
 {
-	int length = std::snprintf(nullptr, 0, format, args...);
+	auto length = std::snprintf(nullptr, 0, format, std::forward<Args>(args)...);
 	if(length == 0)
 		return std::string();
 
 	char* buf = new char[length + 1];
-	length = std::snprintf(buf, length + 1, format, args...);
+	length = std::snprintf(buf, length + 1, format, std::forward<Args>(args)...);
 
 	std::string str(buf);
 	delete[] buf;

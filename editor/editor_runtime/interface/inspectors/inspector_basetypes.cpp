@@ -286,7 +286,7 @@ bool inspector_irange::inspect(rttr::variant& var, bool read_only, const meta_ge
 	if(max_var)
 		max = max_var.to_int32();
 
-	changed |= gui::DragIntNEx(names, &data.Min, 2, 0.05f, min, max, format.c_str());
+	changed |= gui::DragIntNEx(names, &data.min, 2, 0.05f, min, max, format.c_str());
 	if(changed)
 	{
 		var = data;
@@ -315,7 +315,7 @@ bool inspector_urange::inspect(rttr::variant& var, bool read_only, const meta_ge
 	if(max_var)
 		max = max_var.to_uint32();
 
-	changed |= gui::DragUIntNEx(names, &data.Min, 2, 0.05f, min, max, format.c_str());
+	changed |= gui::DragUIntNEx(names, &data.min, 2, 0.05f, min, max, format.c_str());
 	if(changed)
 	{
 		var = data;
@@ -344,7 +344,7 @@ bool inspector_frange::inspect(rttr::variant& var, bool read_only, const meta_ge
 	if(max_var)
 		max = max_var.to_float();
 
-	changed |= gui::DragFloatNEx(names, &data.Min, 2, 0.05f, min, max, format.c_str());
+	changed |= gui::DragFloatNEx(names, &data.min, 2, 0.05f, min, max, format.c_str());
 	if(changed)
 	{
 		var = data;
