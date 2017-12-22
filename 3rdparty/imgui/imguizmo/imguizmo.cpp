@@ -871,7 +871,8 @@ static void ComputeContext(const float* view, const float* projection, float* ma
 	gContext.mCameraEye = viewInverse.v.position;
 	gContext.mCameraRight = viewInverse.v.right;
 	gContext.mCameraUp = viewInverse.v.up;
-	gContext.mScreenFactor = 0.001f + 0.15f * GetUniform(gContext.mModel.v.position, gContext.mViewProjection);
+	gContext.mScreenFactor =
+		0.001f + 0.15f * GetUniform(gContext.mModel.v.position, gContext.mViewProjection);
 
 	ImVec2 centerSSpace = worldToPos(makeVect(0.f, 0.f), gContext.mMVP);
 	gContext.mScreenSquareCenter = centerSSpace;
@@ -952,8 +953,8 @@ static void ComputeTripodAxisAndVisibility(int axisIndex, vec_t& dirPlaneX, vec_
 		float dotCameraDirY = cameraEyeToGizmo.Dot3(dirPlaneYWorld);
 
 		// compute factor values
-		float mulAxisX = 1.0f;//(dotCameraDirX > 0.f) ? -1.f : 1.f;
-		float mulAxisY = 1.0f;//(dotCameraDirY > 0.f) ? -1.f : 1.f;
+		float mulAxisX = 1.0f; //(dotCameraDirX > 0.f) ? -1.f : 1.f;
+		float mulAxisY = 1.0f; //(dotCameraDirY > 0.f) ? -1.f : 1.f;
 		dirPlaneX *= mulAxisX;
 		dirPlaneY *= mulAxisY;
 
@@ -1035,7 +1036,7 @@ static void DrawRotationGizmo(int type)
 		if(radiusAxis > gContext.mRadiusSquareCenter)
 			gContext.mRadiusSquareCenter = radiusAxis;
 
-		drawList->AddPolyline(circlePos, halfCircleSegmentCount, colors[3 - axis], false, 2, true);
+		drawList->AddPolyline(circlePos, halfCircleSegmentCount, colors[3 - axis], false, 2);
 	}
 	drawList->AddCircle(worldToPos(gContext.mModel.v.position, gContext.mViewProjection),
 						gContext.mRadiusSquareCenter, colors[0], 64, 3.f);
@@ -1055,8 +1056,8 @@ static void DrawRotationGizmo(int type)
 			pos *= gContext.mScreenFactor;
 			circlePos[i] = worldToPos(pos + gContext.mModel.v.position, gContext.mViewProjection);
 		}
-		drawList->AddConvexPolyFilled(circlePos, halfCircleSegmentCount, 0x801080FF, true);
-		drawList->AddPolyline(circlePos, halfCircleSegmentCount, 0xFF1080FF, true, 2, true);
+		drawList->AddConvexPolyFilled(circlePos, halfCircleSegmentCount, 0x801080FF);
+		drawList->AddPolyline(circlePos, halfCircleSegmentCount, 0xFF1080FF, true, 2);
 
 		ImVec2 destinationPosOnScreen = circlePos[1];
 		char tmps[512];
@@ -1204,8 +1205,8 @@ static void DrawTranslationGizmo(int type)
 					(dirPlaneX * quadUV[j * 2] + dirPlaneY * quadUV[j * 2 + 1]) * gContext.mScreenFactor;
 				screenQuadPts[j] = worldToPos(cornerWorldPos, gContext.mMVP);
 			}
-			drawList->AddPolyline(screenQuadPts, 4, planeBorderColor[i], true, 1.0f, true);
-			drawList->AddConvexPolyFilled(screenQuadPts, 4, colors[i + 4], true);
+			drawList->AddPolyline(screenQuadPts, 4, planeBorderColor[i], true, 1.0f);
+			drawList->AddConvexPolyFilled(screenQuadPts, 4, colors[i + 4]);
 		}
 	}
 
@@ -2014,8 +2015,7 @@ void draw_cube(const float* view, const float* projection, float* matrix)
 			continue;
 
 		// draw face with lighter color
-		gContext.mDrawList->AddConvexPolyFilled(faceCoordsScreen, 4, directionColor[normalIndex] | 0x808080,
-												true);
+		gContext.mDrawList->AddConvexPolyFilled(faceCoordsScreen, 4, directionColor[normalIndex] | 0x808080);
 	}
 }
 };

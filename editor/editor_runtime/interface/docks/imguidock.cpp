@@ -763,7 +763,7 @@ slot dockspace::render_dock_slot_preview(std::uint32_t id, const ImVec2& mouse_p
 			if(!convex.empty())
 			{
 				ImGui::GetWindowDrawList()->AddPolyline(convex.data(), 4, ImGui::ColorConvertFloat4ToU32(col),
-														true, 2.0f, true);
+														true, 2.0f);
 			}
 
 			return is_point_in_convex(mouse_pos, convex);

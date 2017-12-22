@@ -30,26 +30,26 @@ static std::pair<path, std::string> visit_wild_card_path(const fs::path& path, b
 														 bool visitEmpty,
 														 const std::function<bool(const fs::path&)>& visitor)
 {
-	std::pair<fs::path, std::string> pathFilter = get_path_filter_pair(path);
-	if(!pathFilter.second.empty())
+	std::pair<fs::path, std::string> path_filter = get_path_filter_pair(path);
+	if(!path_filter.second.empty())
 	{
-		std::string full = (pathFilter.first / pathFilter.second).string();
+		std::string full = (path_filter.first / path_filter.second).string();
 		size_t wildcardPos = full.find("*");
 		std::string before = full.substr(0, wildcardPos);
 		std::string after = full.substr(wildcardPos + 1);
 		fs::directory_iterator end;
 		fs::error_code err;
-		if(visitEmpty && fs::is_empty(pathFilter.first, err))
+		if(visitEmpty && fs::is_empty(path_filter.first, err))
 		{
-			visitor(pathFilter.first);
+			visitor(path_filter.first);
 		}
-		else if(fs::exists(pathFilter.first, err))
+		else if(fs::exists(path_filter.first, err))
 		{
-			for(fs::directory_iterator it(pathFilter.first, err); it != end; ++it)
+			for(fs::directory_iterator it(path_filter.first, err); it != end; ++it)
 			{
 				if(it->status().type() == file_type::directory_file && recursive)
 				{
-					visit_wild_card_path(it->path() / pathFilter.second, recursive, visitEmpty, visitor);
+					visit_wild_card_path(it->path() / path_filter.second, recursive, visitEmpty, visitor);
 				}
 
 				std::string current = it->path().string();
@@ -66,7 +66,7 @@ static std::pair<path, std::string> visit_wild_card_path(const fs::path& path, b
 			}
 		}
 	}
-	return pathFilter;
+	return path_filter;
 }
 
 class filesystem_watcher::watcher_impl
@@ -329,17 +329,15 @@ void filesystem_watcher::start()
 		const auto poll_interval = 500ms;
 		while(_watching)
 		{
-			do
 			{
 				// iterate through each watcher and check for modification
 				std::lock_guard<std::recursive_mutex> lock(_mutex);
-				auto end = _watchers.end();
-				for(auto it = _watchers.begin(); it != end; ++it)
+				for(auto& pair : _watchers)
 				{
-					it->second->watch();
+					pair.second->watch();
 				}
 				// lock will be released before this thread goes to sleep
-			} while(false);
+			}
 			// make this thread sleep for a while
 			std::this_thread::sleep_for(poll_interval);
 		}
@@ -364,11 +362,11 @@ void filesystem_watcher::watch_impl(const fs::path& path, bool recursive, bool i
 		// try to see if there's a match for the wild card
 		if(path.string().find("*") != std::string::npos)
 		{
-			std::pair<fs::path, std::string> pathFilter =
-				visit_wild_card_path(path, recursive, true, [](const fs::path& p) { return true; });
+			std::pair<fs::path, std::string> path_filter =
+				visit_wild_card_path(path, recursive, true, [](const fs::path&) { return true; });
 
-			p = pathFilter.first;
-			filter = pathFilter.second;
+			p = path_filter.first;
+			filter = path_filter.second;
 		}
 		else
 		{

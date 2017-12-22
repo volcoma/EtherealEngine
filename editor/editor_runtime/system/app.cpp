@@ -15,15 +15,15 @@
 #include "../system/project_manager.h"
 #include "core/logging/logging.h"
 #include "editor_core/nativefd/filedialog.h"
-#include "runtime/assets/impl/asset_extensions.h"
 #include "runtime/assets/asset_manager.h"
+#include "runtime/assets/impl/asset_extensions.h"
 #include "runtime/ecs/components/camera_component.h"
 #include "runtime/ecs/components/light_component.h"
 #include "runtime/ecs/components/model_component.h"
 #include "runtime/ecs/components/reflection_probe_component.h"
 #include "runtime/ecs/components/transform_component.h"
-#include "runtime/ecs/systems/scene_graph.h"
 #include "runtime/ecs/constructs/utils.h"
+#include "runtime/ecs/systems/scene_graph.h"
 #include "runtime/input/input.h"
 #include "runtime/rendering/renderer.h"
 #include "runtime/system/events.h"
@@ -536,13 +536,35 @@ void app::draw_footer(render_window&, imguidock::dockspace& dockspace)
 		return;
 
 	auto& ts = core::get_subsystem<core::task_system>();
-	auto tasks_info = ts.get_info();
-	auto items = _console_log->get_items();
+	const auto tasks_info = ts.get_info();
+	const auto items = _console_log->get_items();
 
+    const auto total_width = gui::GetContentRegionAvailWidth();
+    gui::Columns(2, "footer");
+    gui::SetColumnWidth(0, total_width * 0.8f);
+
+	if(items.size() > 0)
+	{
+		const auto& last_item = items.back();
+		const auto& colorization = _console_log->get_level_colorization(last_item.second);
+		ImVec4 col = {colorization[0], colorization[1], colorization[2], colorization[3]};
+
+		gui::SetCursorPosY(ImGui::GetCursorPosY());
+		gui::PushStyleColor(ImGuiCol_Text, col);
+		gui::AlignTextToFramePadding();
+		if(gui::Selectable(last_item.first.c_str(), false, 0,
+						   ImVec2(0, gui::GetTextLineHeight())))
+		{
+			dockspace.activate_dock(_console_dock_name);
+		}
+		gui::PopStyleColor();
+	}
+    gui::NextColumn();
 	if(tasks_info.pending_tasks > 0)
 	{
+		gui::PushFont(gui::GetFont("icons"));
 		gui::AlignTextToFramePadding();
-		gui::Text("Tasks : %u", unsigned(tasks_info.pending_tasks));
+		gui::Text(ICON_FA_TASKS " : %u", unsigned(tasks_info.pending_tasks));
 		if(gui::IsItemHovered())
 		{
 			gui::BeginTooltip();
@@ -551,29 +573,15 @@ void app::draw_footer(render_window&, imguidock::dockspace& dockspace)
 			{
 				gui::Separator();
 				gui::AlignTextToFramePadding();
-				gui::Text("Queue %d tasks : %u", idx++, unsigned(info.pending_tasks));
+				gui::Text("QUEUE %d : %u", idx++, unsigned(info.pending_tasks));
 			}
 
 			gui::EndTooltip();
 		}
-		gui::SameLine();
+		
+		gui::PopFont();
 	}
-
-	if(items.size() > 0)
-	{
-		auto& last_item = items.back();
-		const auto& colorization = _console_log->get_level_colorization(last_item.second);
-		ImVec4 col = {colorization[0], colorization[1], colorization[2], colorization[3]};
-
-		gui::SetCursorPosY(ImGui::GetCursorPosY());
-		gui::PushStyleColor(ImGuiCol_Text, col);
-		gui::AlignTextToFramePadding();
-		if(gui::Selectable(last_item.first.c_str(), false, 0, ImVec2(0, gui::GetTextLineHeight())))
-		{
-			dockspace.activate_dock(_console_dock_name);
-		}
-		gui::PopStyleColor();
-	}
+	gui::Columns(1);
 }
 
 void app::draw_start_page(render_window& window)

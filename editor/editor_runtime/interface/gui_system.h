@@ -3,6 +3,8 @@
 #include "core/system/subsystem.h"
 #include "editor_core/gui/gui.h"
 #include "runtime/system/events.h"
+#include "embedded/icons_font_awesome.h"
+
 #include <map>
 #include <memory>
 

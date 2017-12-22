@@ -16,9 +16,9 @@
 #include <unordered_map>
 
 #include "embedded/editor_default.ttf.h"
+#include "embedded/fontawesome_webfont.ttf.h"
 #include "embedded/fs_ocornut_imgui.bin.h"
 #include "embedded/vs_ocornut_imgui.bin.h"
-
 //////////////////////////////////////////////////////////////////////////
 #include "../meta/interface/gui_system.hpp"
 #include "core/serialization/associative_archive.h"
@@ -331,9 +331,19 @@ void imgui_init()
 	s_fonts["default"] = io.Fonts->AddFontDefault(&config);
 	s_fonts["standard"] =
 		io.Fonts->AddFontFromMemoryTTF((void*)s_font_default, sizeof(s_font_default), 20, &config);
+	
+	static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
+	config.MergeMode = true;
+	config.PixelSnapH = true;
+	s_fonts["icons"] = io.Fonts->AddFontFromMemoryTTF(
+		(void*)fontawesome_webfont_ttf, sizeof(fontawesome_webfont_ttf), 20, &config, icons_ranges);
+
+    config.MergeMode = false;
+	config.PixelSnapH = false;
 	s_fonts["standard_big"] =
 		io.Fonts->AddFontFromMemoryTTF((void*)s_font_default, sizeof(s_font_default), 50, &config);
 
+	
 	io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
 
 	s_font_texture = std::make_shared<gfx::texture>(

@@ -8,12 +8,12 @@
 #include "../input/input.h"
 #include "../rendering/render_window.h"
 #include "../rendering/renderer.h"
+#include "app_setup.h"
 #include "core/logging/logging.h"
 #include "core/serialization/serialization.h"
 #include "core/system/simulation.h"
 #include "core/system/task_system.h"
 #include "events.h"
-#include "app_setup.h"
 
 namespace runtime
 {
@@ -47,7 +47,7 @@ void app::start(cmd_line::options_parser& parser)
 	core::add_subsystem<renderer>(parser);
 	core::add_subsystem<input>();
 	auto& am = core::add_subsystem<asset_manager>();
-    setup_asset_manager(am);
+	setup_asset_manager(am);
 	core::add_subsystem<entity_component_system>();
 	core::add_subsystem<scene_graph>();
 	core::add_subsystem<bone_system>();
@@ -98,8 +98,8 @@ void poll_events()
 
 void app::run_one_frame()
 {
-    using namespace std::literals;
-    
+	using namespace std::literals;
+
 	auto& sim = core::get_subsystem<core::simulation>();
 	auto& tasks = core::get_subsystem<core::task_system>();
 	auto& renderer = core::get_subsystem<runtime::renderer>();
@@ -135,7 +135,7 @@ int app::run(int argc, char* argv[])
 {
 	core::details::initialize();
 
-	cmd_line::options_parser parser("App");
+	cmd_line::options_parser parser(argv[0]);
 
 	setup(parser);
 	if(_exitcode != 0)

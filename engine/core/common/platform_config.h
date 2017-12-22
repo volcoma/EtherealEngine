@@ -1,10 +1,12 @@
 #pragma once
 
-#if !(defined(DEBUG) || defined(_DEBUG)) && !defined(NDEBUG)
+#if !defined(DEBUG) && !defined(_DEBUG)
+#ifndef NDEBUG
 #define NDEBUG
 #endif
-#if !(defined(DEBUG) || defined(_DEBUG)) && !defined(_NDEBUG)
+#ifndef _NDEBUG
 #define _NDEBUG
+#endif
 #endif
 
 #if(__cplusplus < 201103L && !defined(_MSC_VER)) || (defined(_MSC_VER) && (_MSC_VER < 1700)) ||              \

@@ -1,4 +1,6 @@
-unsigned int s_font_default_Size = 152536;
+#ifndef FONT_DEFAULT_TTF_H
+#define FONT_DEFAULT_TTF_H
+
 static const unsigned char s_font_default[] = {
 	0,   1,   0,   0,   0,   19,  1,   0,   0,   4,   0,   48,  68,  83,  73,  71,  0,   0,   0,   1,   0,
 	2,   83,  208, 0,   0,   0,   8,   71,  68,  69,  70,  34,  56,  32,  116, 0,   0,   1,   60,  0,   0,
@@ -7264,3 +7266,5 @@ static const unsigned char s_font_default[] = {
 	8,   128, 0,   1,   4,   64,  136, 99,  84,  88,  177, 3,   0,   68,  89,  89,  89,  89,  183, 60,  2,
 	40,  8,   20,  8,   3,   12,  42,  184, 1,   255, 133, 176, 4,   141, 177, 2,   0,   68,  179, 5,   100,
 	6,   0,   68,  68,  0,   0,   0,   0,   1,   0,   0,   0,   0,   0};
+
+#endif

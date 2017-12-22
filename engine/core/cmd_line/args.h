@@ -627,6 +627,8 @@ public:
 	const std::vector<std::string> groups() const;
 
 	const help_group_details& group_help(const std::string& group) const;
+	
+	const std::string& program_name() const { return m_program; }
 
 private:
 	void add_one_option(const std::string& option, std::shared_ptr<option_details> details);

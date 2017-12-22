@@ -27,7 +27,11 @@ macro(detect_platform)
 		add_definitions(-D_SCL_SECURE_NO_WARNINGS=1)
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /bigobj /W3")
 	endif()
-
+	if(MINGW)
+		if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+			add_definitions(-DDEBUG)
+		endif()
+	endif()
 endmacro()
 
 
@@ -39,8 +43,9 @@ macro(print_info)
 endmacro()
 
 macro(set_output_paths)
-	set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin) 
-	set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib) 
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin) 
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 endmacro()
 
 macro(set_project_custom_defines)
