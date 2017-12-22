@@ -11,10 +11,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 include(macros)
 include(modules/ECMEnableSanitizers)
 
-option(BUILD_SHARED_LIBS
-  "Build package with shared libraries."
-  OFF
-)
+set( BUILD_SHARED_LIBS OFF CACHE BOOL "Build package with shared libraries." FORCE)
+
 list(APPEND SANITIZERS "custom")
 #enable_sanitizers("${SANITIZERS}")
 detect_platform()
