@@ -5,6 +5,7 @@ set( ALSOFT_CONFIG OFF CACHE BOOL "Install alsoft.conf sample configuration file
 set( ALSOFT_HRTF_DEFS OFF CACHE BOOL "Install HRTF definition files" FORCE)
 set( ALSOFT_AMBDEC_PRESETS OFF CACHE BOOL "Install AmbDec preset files" FORCE)
 set( ALSOFT_INSTALL OFF CACHE BOOL "Install headers and libraries" FORCE)
+set( ALSOFT_BUILD_IMPORT_LIB OFF CACHE BOOL "Build an import .lib using dlltool (requires sed)" FORCE)
 
 if(MINGW)
 	set( ALSOFT_STATIC_LIBGCC ON CACHE BOOL "Force -static-libgcc for static GCC runtimes" FORCE)
