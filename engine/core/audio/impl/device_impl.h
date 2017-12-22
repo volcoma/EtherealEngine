@@ -1,17 +1,18 @@
 #pragma once
-#include <memory>
 #include <string>
 #include <vector>
 
+#include <AL/alc.h>
+#include <map>
+
 namespace audio
 {
-struct device_impl;
 
-class device
+class device_impl
 {
 public:
-	device(int devnum = 0);
-	~device();
+	device_impl(int devnum = 0);
+	~device_impl();
 
 	void enable();
 	void disable();
@@ -23,6 +24,13 @@ public:
 	static std::vector<std::string> enumerate();
 
 private:
-	std::unique_ptr<device_impl> _impl;
+	bool init(int devnum);
+	void quit();
+
+	ALCdevice* dev = nullptr;
+	ALCcontext* ctx = nullptr;
+
+	std::string _device_id;
+	std::string _info;
 };
 }

@@ -1,32 +1,33 @@
 #pragma once
 
-#include <AL/al.h>
-#include <cstdint>
-#include <string>
-#include <vector>
+#include "sound_data.h"
+#include <memory>
 
 namespace audio
 {
+struct sound_impl;
+
 class sound
 {
 public:
-    using native_handle_type = ALuint;
-
-	bool load(const std::string& type, const void* data, size_t size);
-	void unload();
-
-	bool ok() const;
-    std::size_t get_samples_mem_size() const;
+    sound() = default;
+    ~sound();
+    sound(sound_data&& data);
+    sound(sound&& rhs);
+    sound& operator=(sound&& rhs);
     
-    native_handle_type native_handle() const;
+    sound(const sound& rhs) = delete;
+    sound& operator=(const sound& rhs) = delete;
+
+	bool is_valid() const;
+	
+    sound_data::duration_t get_duration() const;
+    std::uint32_t get_sample_rate() const;
+    std::uint32_t get_channels() const;
     
+    const std::unique_ptr<sound_impl>& get_impl() const;
 private:
-    native_handle_type _handle = 0;
-
-	std::string _type;
-	std::vector<std::int16_t> _samples;
-	std::uint32_t _sample_rate = 0;
-	std::uint32_t _channels = 0;
-	double _seconds = 0;
+    sound_data _data;
+    std::unique_ptr<sound_impl> _impl;
 };
 }

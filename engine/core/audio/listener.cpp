@@ -1,28 +1,43 @@
 #include "listener.h"
-#include "check.h"
-#include <AL/al.h>
+#include "impl/listener_impl.h"
 
 namespace audio
 {
+listener::listener()
+{
+	_impl = std::make_unique<listener_impl>();
+	gain(1.0f);
+}
+
 void listener::gain(const float gain)
 {
-	alCheck(alListenerf(AL_GAIN, gain));
+	if(_impl)
+	{
+		_impl->gain(gain);
+	}
 }
 
 void listener::position(const float* position3)
 {
-	alCheck(alListenerfv(AL_POSITION, position3));
+	if(_impl)
+	{
+		_impl->position(position3);
+	}
 }
 
 void listener::velocity(const float* velocity3)
 {
-	alCheck(alListenerfv(AL_VELOCITY, velocity3));
+	if(_impl)
+	{
+		_impl->velocity(velocity3);
+	}
 }
 
 void listener::direction(const float* direction3)
 {
-	// orientation { norm(at), norm(up) };
-	float orientation6[] = {direction3[0], direction3[1], direction3[2], 0, 1, 0};
-	alCheck(alListenerfv(AL_ORIENTATION, orientation6));
+	if(_impl)
+	{
+		_impl->direction(direction3);
+	}
 }
 }

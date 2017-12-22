@@ -4,20 +4,24 @@
 
 namespace audio
 {
+struct source_impl;
+
 class source
 {
 public:
-	using native_handle_type = ALuint;
+    source();
+    ~source();
+    source(source&& rhs);
+    source& operator=(source&& rhs);
+    
+    source(const source& rhs) = delete;
+    source& operator=(const source& rhs) = delete;
 
-	bool create();
-	bool bind(sound::native_handle_type buffer);
 	void play(const sound& snd);
-	void unbind();
-	void purge();
 
-	void loop(const bool on);
-	void gain(const float gain);
-	void pitch(const float pitch);
+	void loop(bool on);
+	void gain(float gain);
+	void pitch(float pitch);
 	void position(const float* position3, bool relative = false);
 	void velocity(const float* velocity3);
 	void direction(const float* direction3);
@@ -30,12 +34,9 @@ public:
 	void pause();
 	bool is_playing() const;
 	bool is_binded() const;
-	bool ok() const;
-
-	native_handle_type native_handle() const;
-	sound::native_handle_type binded_handle() const;
+	bool is_valid() const;
 
 private:
-	native_handle_type _handle = 0;
+	std::unique_ptr<source_impl> _impl;
 };
 }
