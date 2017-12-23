@@ -70,7 +70,13 @@ bool load_wav_from_memory(const uint8_t* data, std::size_t data_size, sound_data
 		return false;
 	}
 
-	if(memcmp(header.wave_header, "WAVEfmt ", 8) != 0)
+	if(memcmp(header.wave_header, "WAVE", 4) != 0)
+	{
+		err = "ERROR: This file is not wav format!";
+		return false;
+	}
+
+	if(memcmp(header.fmt_header, "fmt ", 4) != 0)
 	{
 		err = "ERROR: This file is not wav format!";
 		return false;
