@@ -8,8 +8,9 @@
 
 namespace audio
 {
-
-ALenum get_format_for_channels(ALuint channels)
+namespace priv
+{
+static ALenum get_format_for_channels(std::uint32_t channels)
 {
 	ALenum format = 0;
 	switch(channels)
@@ -41,7 +42,7 @@ ALenum get_format_for_channels(ALuint channels)
 }
 
 template <typename T>
-std::size_t get_mem_size(const T& container)
+static std::size_t get_mem_size(const T& container)
 {
 	return container.size() * sizeof(typename T::value_type);
 }
@@ -50,22 +51,14 @@ sound_impl::sound_impl(const sound_data& data)
 {
 	_id = get_repository().insert_sound(this);
 
-	if(data.samples.empty())
+	if(data.data.empty())
 		return;
 
 	ALenum format = get_format_for_channels(data.channels);
 
 	alCheck(alGenBuffers(1, &_handle));
-	alCheck(alBufferData(_handle, format, data.samples.data(), ALsizei(get_mem_size(data.samples)),
+	alCheck(alBufferData(_handle, format, data.data.data(), ALsizei(get_mem_size(data.data)),
 						 ALsizei(data.sample_rate)));
-
-	//	ALint sz, bits, channels, freq;
-	//	alCheck(alGetBufferi(_handle, AL_SIZE, &sz));
-	//	alCheck(alGetBufferi(_handle, AL_BITS, &bits));
-	//	alCheck(alGetBufferi(_handle, AL_CHANNELS, &channels));
-	//	alCheck(alGetBufferi(_handle, AL_FREQUENCY, &freq));
-	//	if(alGetError() == AL_NO_ERROR)
-	//		_seconds = ALdouble((sz * 8) / (channels * bits)) / ALdouble(freq);
 }
 
 sound_impl::sound_impl(sound_impl&& rhs)
@@ -101,5 +94,6 @@ bool sound_impl::is_valid() const
 sound_impl::native_handle_type sound_impl::native_handle() const
 {
 	return _handle;
+}
 }
 }

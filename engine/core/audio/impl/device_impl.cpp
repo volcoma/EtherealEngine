@@ -7,7 +7,8 @@
 
 namespace audio
 {
-
+namespace priv
+{
 static bool has_efx(ALCdevice* dev)
 {
 	return (alcIsExtensionPresent(dev, "ALC_EXT_EFX") == AL_TRUE); // ALC_TRUE
@@ -70,8 +71,7 @@ bool device_impl::init(int devnum)
 
 	enable();
 
-	//$alDistanceModel( AL_INVERSE_DISTANCE );
-	alCheck(alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED));
+	alCheck(alDistanceModel(AL_LINEAR_DISTANCE));
 
 	_info = info();
 
@@ -111,12 +111,12 @@ bool device_impl::is_valid() const
 
 const std::string& device_impl::get_device_id() const
 {
-    return _device_id;
+	return _device_id;
 }
 
-const std::string &device_impl::get_info() const
+const std::string& device_impl::get_info() const
 {
-    return _info;
+	return _info;
 }
 
 std::vector<std::string> device_impl::enumerate()
@@ -135,5 +135,6 @@ std::vector<std::string> device_impl::enumerate()
 	}
 
 	return vs;
+}
 }
 }

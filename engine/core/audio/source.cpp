@@ -1,11 +1,12 @@
 #include "source.h"
+#include "logger.h"
 #include "impl/source_impl.h"
 
 namespace audio
 {
 source::source()
+	: _impl(std::make_unique<priv::source_impl>())
 {
-    _impl = std::make_unique<source_impl>();
 }
 
 source::~source() = default;
@@ -53,84 +54,103 @@ bool source::is_playing() const
 	return _impl && _impl->is_playing();
 }
 
-void source::loop(bool on)
+bool source::is_looping() const
 {
 	if(_impl)
 	{
-		_impl->loop(on);
+		return _impl->is_looping();
+	}
+	return false;
+}
+
+void source::set_loop(bool on)
+{
+	if(_impl)
+	{
+		_impl->set_loop(on);
 	}
 }
 
-void source::gain(float gain)
+void source::set_gain(float gain)
 {
 	if(_impl)
 	{
-		_impl->gain(gain);
+		_impl->set_gain(gain);
 	}
 }
 
 /* pitch, speed stretching */
-void source::pitch(float pitch)
+void source::set_pitch(float pitch)
 {
 	// if pitch == 0.f pitch = 0.0001f;
 	if(_impl)
 	{
-		_impl->pitch(pitch);
+		_impl->set_pitch(pitch);
 	}
 }
 
-void source::position(const float* position3, bool relative)
+void source::set_position(const float* position3)
 {
 	if(_impl)
 	{
-		_impl->position(position3, relative);
+		_impl->set_position(position3);
 	}
 }
 
-void source::velocity(const float* velocity3)
+void source::set_velocity(const float* velocity3)
 {
 	if(_impl)
 	{
-		_impl->velocity(velocity3);
+		_impl->set_velocity(velocity3);
 	}
 }
 
-void source::direction(const float* direction3)
+void source::set_direction(const float* direction3)
 {
 	if(_impl)
 	{
-		_impl->direction(direction3);
+		_impl->set_direction(direction3);
 	}
 }
 
-void source::attenuation(float roll_off, float ref_distance)
+void source::set_attenuation(float roll_off)
 {
 	if(_impl)
-    {
-        _impl->attenuation(roll_off, ref_distance);
-    }
+	{
+		_impl->set_attenuation(roll_off);
+	}
 }
 
-void source::distance(float mind, float maxd)
+void source::set_distance(float mind, float maxd)
 {
 	if(_impl)
-    {
-        _impl->distance(mind, maxd);
-    }
-    }
+	{
+		_impl->set_distance(mind, maxd);
+	}
+}
+
+void source::set_playing_offset(sound_data::duration_t offset)
+{
+	if(_impl)
+	{
+		_impl->set_playing_offset(float(offset.count()));
+	}
+}
 
 bool source::is_valid() const
 {
 	return _impl && _impl->is_valid();
 }
 
-void source::play(const sound& snd)
+void source::bind(const sound& snd)
 {
-    if(is_valid())
-    {
-        _impl->bind(snd.get_impl()->native_handle());
-        _impl->play();
-    }
+	if(is_valid())
+	{
+        if(snd.get_channels() > 1)
+        {
+            log("Sound is not mono. 3D Attenuation will not work.");
+        }
+		_impl->bind(snd._impl->native_handle());
+	}
 }
-
 }

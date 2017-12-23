@@ -7,14 +7,14 @@ namespace audio
 sound::~sound() = default;
 
 sound::sound(sound_data&& data)
-{
-	_data = std::move(data);
+	: _data(std::move(data))
+	, _impl(std::make_unique<priv::sound_impl>(_data))
 
-	_impl = std::make_unique<sound_impl>(_data);
+{
 }
 
 sound::sound(sound&& rhs)
-    : _data(std::move(rhs._data))
+	: _data(std::move(rhs._data))
 	, _impl(std::move(rhs._impl))
 {
 	rhs._data = {};
@@ -39,22 +39,17 @@ bool sound::is_valid() const
 
 sound_data::duration_t sound::get_duration() const
 {
-    return _data.duration;
+	return _data.duration;
 }
 
 uint32_t sound::get_sample_rate() const
 {
-    return _data.sample_rate;
+	return _data.sample_rate;
 }
 
 uint32_t sound::get_channels() const
 {
-    return _data.channels;
-}
-
-const std::unique_ptr<sound_impl> &sound::get_impl() const
-{
-    return _impl;
+	return _data.channels;
 }
 
 }

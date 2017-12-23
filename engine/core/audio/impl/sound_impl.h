@@ -5,7 +5,8 @@
 
 namespace audio
 {
-
+namespace priv
+{
 class sound_impl
 {
 public:
@@ -28,4 +29,5 @@ private:
 	native_handle_type _handle = 0;
 	std::size_t _id = 0;
 };
+}
 }

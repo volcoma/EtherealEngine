@@ -2,14 +2,15 @@
 
 namespace audio
 {
-
+namespace priv
+{
 class listener_impl
 {
 public:
-	void gain(const float gain);
-	void position(const float* position3);
-	void velocity(const float* velocity3);
-	void direction(const float* direction3);
-
+	void set_gain(const float gain);
+	void set_position(const float* position3);
+	void set_velocity(const float* velocity3);
+	void set_direction(const float* direction3);
 };
+}
 }

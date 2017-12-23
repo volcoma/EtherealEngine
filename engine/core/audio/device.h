@@ -5,7 +5,10 @@
 
 namespace audio
 {
-struct device_impl;
+namespace priv
+{
+class device_impl;
+}
 
 class device
 {
@@ -23,6 +26,6 @@ public:
 	static std::vector<std::string> enumerate();
 
 private:
-	std::unique_ptr<device_impl> _impl;
+	std::unique_ptr<priv::device_impl> _impl;
 };
 }

@@ -7,7 +7,8 @@
 
 namespace audio
 {
-
+namespace priv
+{
 class device_impl
 {
 public:
@@ -33,4 +34,5 @@ private:
 	std::string _device_id;
 	std::string _info;
 };
+}
 }

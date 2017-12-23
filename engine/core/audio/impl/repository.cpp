@@ -2,14 +2,15 @@
 
 namespace audio
 {
-
+namespace priv
+{
 void repository::clear()
 {
-    for(auto& source : sources)
+	for(auto& source : sources)
 	{
 		source.second->unbind();
 	}
-	
+
 	sources.clear();
 }
 
@@ -70,7 +71,7 @@ const source_impl* repository::get_source(std::size_t id)
 		return it->second;
 	}
 
-    return nullptr;
+	return nullptr;
 }
-
+}
 }
