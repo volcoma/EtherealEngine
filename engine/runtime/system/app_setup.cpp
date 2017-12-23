@@ -9,6 +9,7 @@
 #include "../rendering/material.h"
 #include "../rendering/mesh.h"
 #include "../animation/animation.h"
+#include "core/audio/sound.h"
 #include "core/graphics/shader.h"
 #include "core/graphics/texture.h"
 
@@ -37,6 +38,14 @@ void setup_asset_manager(asset_manager &manager)
         storage.load_from_instance = asset_reader::load_from_instance<mesh>;
         storage.rename_asset_file = asset_writer::rename_asset_file<mesh>;
         storage.delete_asset_file = asset_writer::delete_asset_file<mesh>;
+        
+    }
+    {
+        auto& storage = manager.add_storage<audio::sound>();
+        storage.load_from_file = asset_reader::load_from_file<audio::sound>;
+        storage.load_from_instance = asset_reader::load_from_instance<audio::sound>;
+        storage.rename_asset_file = asset_writer::rename_asset_file<audio::sound>;
+        storage.delete_asset_file = asset_writer::delete_asset_file<audio::sound>;
         
     }
     {

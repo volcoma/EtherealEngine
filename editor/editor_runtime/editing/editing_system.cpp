@@ -36,6 +36,7 @@ bool editing_system::initialize()
 	icons["loading"] = am.load<gfx::texture>("editor_data:/icons/loading.png").get();
 	icons["folder"] = am.load<gfx::texture>("editor_data:/icons/folder.png").get();
     icons["animation"] = am.load<gfx::texture>("editor_data:/icons/animation.png").get();
+    icons["sound"] = am.load<gfx::texture>("editor_data:/icons/sound.png").get();
 
 	return true;
 }

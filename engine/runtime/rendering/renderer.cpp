@@ -21,7 +21,6 @@ bool renderer::initialize()
 
 	if(!init_backend())
 	{
-		APPLOG_ERROR("Could not initialize rendering backend!");
 		return false;
 	}
 
@@ -172,17 +171,27 @@ bool renderer::init_backend()
 	{
 		preferred_renderer_type = gfx::renderer_type::Direct3D12;
 	}
+	APPLOG_SEPARATOR();
+	APPLOG_INFO("Initializing rendering backend...");
+	APPLOG_SEPARATOR();
+	
 	if(!gfx::init(preferred_renderer_type))
+	{
+		APPLOG_ERROR("Could not initialize rendering backend!");
+		APPLOG_SEPARATOR();
 		return false;
-
+    }
 	if(gfx::get_renderer_type() == gfx::renderer_type::Direct3D9)
 	{
 		APPLOG_ERROR("Does not support dx9. Minimum supported is dx11.");
+		APPLOG_SEPARATOR();
 		return false;
 	}
 	const auto sz = _init_window->get_size();
 	gfx::reset(sz[0], sz[1], BGFX_RESET_VSYNC);
 
+    APPLOG_INFO("Using {0} rendering backend.", gfx::get_renderer_name(gfx::get_renderer_type()));
+    APPLOG_SEPARATOR();
 	return true;
 }
 

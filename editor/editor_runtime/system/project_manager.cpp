@@ -23,6 +23,12 @@ struct texture;
 struct shader;
 }
 
+namespace audio
+{
+class sound;
+}
+
+
 namespace runtime
 {
 struct animation;
@@ -230,6 +236,11 @@ void asset_directory::watch()
 	for(const auto& format : extensions::mesh)
 	{
 		watch_assets<mesh>(relative_path, wildcard + format, true, false);
+	}
+	
+	for(const auto& format : extensions::sound)
+	{
+		watch_assets<audio::sound>(relative_path, wildcard + format, true, false);
 	}
 
     watch_assets<runtime::animation>(relative_path, wildcard + extensions::animation, true, false);

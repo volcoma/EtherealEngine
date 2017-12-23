@@ -11,6 +11,10 @@ namespace runtime
 {
 struct animation;
 }
+namespace audio
+{
+class sound;
+}
 class mesh;
 struct prefab;
 class material;
@@ -38,6 +42,14 @@ struct inspector_asset_handle_mesh : public inspector
 	bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata);
 };
 INSPECTOR_REFLECT(inspector_asset_handle_mesh, asset_handle<mesh>)
+
+struct inspector_asset_handle_sound : public inspector
+{
+	REFLECTABLEV(inspector_asset_handle_sound, inspector)
+
+	bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata);
+};
+INSPECTOR_REFLECT(inspector_asset_handle_sound, asset_handle<audio::sound>)
 
 struct inspector_asset_handle_animation : public inspector
 {

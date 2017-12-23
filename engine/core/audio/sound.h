@@ -27,7 +27,7 @@ public:
 	sound_data::duration_t get_duration() const;
 	std::uint32_t get_sample_rate() const;
 	std::uint32_t get_channels() const;
-
+    const sound_data& get_data() const;
 
 private:
     friend class source;

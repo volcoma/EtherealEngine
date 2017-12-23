@@ -1,5 +1,6 @@
 #include "app.h"
 #include "../assets/asset_manager.h"
+#include "../audio/audio_system.h"
 #include "../ecs/ecs.h"
 #include "../ecs/systems/bone_system.h"
 #include "../ecs/systems/camera_system.h"
@@ -32,6 +33,8 @@ void app::setup(cmd_line::options_parser& parser)
 	gfx::set_warning_logger([](const std::string& msg) { APPLOG_WARNING(msg); });
 	gfx::set_error_logger([](const std::string& msg) { APPLOG_ERROR(msg); });
 
+    audio::set_logger([](const std::string& msg) { APPLOG_INFO(msg); });
+
 	{
 		auto value = cmd_line::value<std::string>();
 		value->default_value("auto");
@@ -42,10 +45,12 @@ void app::setup(cmd_line::options_parser& parser)
 
 void app::start(cmd_line::options_parser& parser)
 {
+    APPLOG_SEPARATOR();
 	core::add_subsystem<core::simulation>();
 	core::add_subsystem<core::task_system>();
 	core::add_subsystem<renderer>(parser);
 	core::add_subsystem<input>();
+	core::add_subsystem<audio_system>();
 	auto& am = core::add_subsystem<asset_manager>();
 	setup_asset_manager(am);
 	core::add_subsystem<entity_component_system>();

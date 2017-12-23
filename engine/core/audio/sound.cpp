@@ -49,7 +49,12 @@ uint32_t sound::get_sample_rate() const
 
 uint32_t sound::get_channels() const
 {
-	return _data.channels;
+    return _data.channels;
+}
+
+const sound_data &sound::get_data() const
+{
+    return _data;   
 }
 
 }

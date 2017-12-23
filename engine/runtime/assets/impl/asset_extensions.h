@@ -8,6 +8,10 @@ namespace gfx
 {
 struct shader;
 }
+namespace audio
+{
+class sound;
+}
 struct scene;
 struct prefab;
 class material;
@@ -19,6 +23,7 @@ namespace extensions
 {
 const std::array<std::string, 7> texture = {{".png", ".jpg", ".jpeg", ".tga", ".dds", ".ktx", ".pvr"}};
 const std::array<std::string, 5> mesh = {{".obj", ".fbx", ".dae", ".blend", ".3ds"}};
+const std::array<std::string, 2> sound = {{".ogg", ".wav"}};
 const std::string shader = ".sc";
 const std::string material = ".mat";
 const std::string animation = ".anim";
@@ -69,4 +74,5 @@ inline std::string get_compiled_format<runtime::animation>()
 {
 	return "";
 }
+
 };

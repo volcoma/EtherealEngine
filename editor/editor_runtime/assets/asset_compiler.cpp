@@ -2,6 +2,8 @@
 #include "bx/error.h"
 #include "bx/process.h"
 #include "bx/string.h"
+#include "core/audio/loaders/loader.h"
+#include "core/audio/sound.h"
 #include "core/filesystem/filesystem.h"
 #include "core/graphics/graphics.h"
 #include "core/graphics/shader.h"
@@ -17,6 +19,7 @@
 #include "runtime/assets/impl/asset_extensions.h"
 #include "runtime/meta/animation/animation.hpp"
 #include "runtime/meta/rendering/mesh.hpp"
+#include "runtime/meta/audio/sound.hpp"
 #include "runtime/rendering/mesh.h"
 #include <array>
 #include <fstream>
@@ -276,10 +279,67 @@ void compile<mesh>(const fs::path& absolute_key)
 
 			fs::copy_file(temp, output, fs::copy_options::overwrite_if_exists, err);
 			fs::remove(temp, err);
-            
-            APPLOG_INFO("Successful compilation of animation {0}", animation.name);
-            
+
+			APPLOG_INFO("Successful compilation of animation {0}", animation.name);
 		}
 	}
+}
+
+template <>
+void compile<audio::sound>(const fs::path& absolute_key)
+{
+	fs::path output = absolute_key.string() + extensions::get_compiled_format<audio::sound>();
+	std::string str_input = absolute_key.string();
+
+	fs::error_code err;
+	fs::path temp = fs::temp_directory_path(err);
+	temp /= uuids::random_uuid(str_input).to_string() + ".buildtemp";
+
+	std::ifstream f(str_input, std::ios::in | std::ios::binary);
+
+	if(!f.is_open())
+	{
+		APPLOG_ERROR("Cant open file {0}", str_input);
+		return;
+	}
+
+	auto file_data = fs::read_stream(f);
+
+	auto ext = absolute_key.extension();
+	audio::sound_data data;
+
+	if(ext == ".ogg")
+	{
+		std::string load_err;
+		if(!audio::load_ogg_from_memory(file_data.data(), file_data.size(), data, load_err))
+		{
+			APPLOG_ERROR("Failed compilation of {0} with error : {1}", str_input, load_err);
+			return;
+		}
+	}
+	else if(ext == ".wav")
+	{
+		std::string load_err;
+		if(!audio::load_wav_from_memory(file_data.data(), file_data.size(), data, load_err))
+		{
+			APPLOG_ERROR("Failed compilation of {0} with error : {1}", str_input, load_err);
+			return;
+		}
+	}
+	else
+	{
+		APPLOG_ERROR("Failed compilation of {0} with error : Unsupported", str_input);
+		return;
+	}
+
+	{
+		std::ofstream soutput(temp.string(), std::ios::out | std::ios::binary);
+		cereal::oarchive_binary_t ar(soutput);
+		try_save(ar, cereal::make_nvp("sound", data));
+	}
+	fs::copy_file(temp, output, fs::copy_options::overwrite_if_exists, err);
+	fs::remove(temp, err);
+
+	APPLOG_INFO("Successful compilation of {0}", str_input);
 }
 }

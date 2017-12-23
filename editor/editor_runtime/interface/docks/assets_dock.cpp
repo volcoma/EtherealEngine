@@ -1,21 +1,22 @@
 #include "assets_dock.h"
 #include "../../editing/editing_system.h"
 #include "../../system/project_manager.h"
+#include "core/audio/sound.h"
 #include "core/filesystem/filesystem.h"
 #include "core/filesystem/filesystem_watcher.h"
 #include "core/graphics/shader.h"
 #include "core/graphics/texture.h"
 #include "core/system/task_system.h"
 #include "editor_core/nativefd/filedialog.h"
-#include "runtime/assets/impl/asset_extensions.h"
+#include "runtime/animation/animation.h"
 #include "runtime/assets/asset_manager.h"
+#include "runtime/assets/impl/asset_extensions.h"
 #include "runtime/ecs/constructs/prefab.h"
 #include "runtime/ecs/constructs/scene.h"
 #include "runtime/ecs/constructs/utils.h"
 #include "runtime/input/input.h"
 #include "runtime/rendering/material.h"
 #include "runtime/rendering/mesh.h"
-#include "runtime/animation/animation.h"
 
 template <typename T>
 asset_handle<gfx::texture> get_asset_icon(T)
@@ -74,6 +75,13 @@ asset_handle<gfx::texture> get_asset_icon(asset_handle<gfx::shader>)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	return es.icons["shader"];
+}
+
+template <>
+asset_handle<gfx::texture> get_asset_icon(asset_handle<audio::sound>)
+{
+	auto& es = core::get_subsystem<editor::editing_system>();
+	return es.icons["sound"];
 }
 
 template <typename T>
@@ -277,6 +285,53 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 				{
 
 					using asset_t = mesh;
+					using entry_t = asset_handle<asset_t>;
+					auto entry = entry_t{};
+					auto entry_future = am.find_asset_entry<asset_t>(file.relative);
+					if(entry_future.is_ready())
+					{
+						entry = entry_future.get();
+					}
+					const auto& name = file.name;
+					const auto& relative = file.relative;
+					auto& selected = es.selection_data.object;
+					bool is_selected =
+						selected.is_type<entry_t>() ? (selected.get_value<entry_t>() == entry) : false;
+					bool is_dragging = !!es.drag_data.object;
+					list_entry(entry, name, is_selected, is_dragging, size,
+							   [&]() // on_click
+							   {
+								   es.select(entry);
+
+							   },
+							   nullptr // on_double_click
+							   ,
+							   [&](const std::string& new_name) // on_rename
+							   {
+								   const auto asset_dir =
+									   fs::path(relative).make_preferred().remove_filename();
+								   const auto new_relative =
+									   (asset_dir / new_name).generic_string() + file.extension;
+								   am.rename_asset<asset_t>(relative, new_relative);
+							   },
+							   [&]() // on_delete
+							   {
+								   am.delete_asset<asset_t>(relative);
+
+							   },
+							   [&]() // on_drag
+							   {
+								   es.drag(entry, relative);
+
+							   });
+				}
+			}
+			for(const auto& ext : extensions::sound)
+			{
+				if(file.extension == ext)
+				{
+
+					using asset_t = audio::sound;
 					using entry_t = asset_handle<asset_t>;
 					auto entry = entry_t{};
 					auto entry_future = am.find_asset_entry<asset_t>(file.relative);

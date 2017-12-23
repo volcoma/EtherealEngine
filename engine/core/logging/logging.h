@@ -74,4 +74,5 @@ inline std::shared_ptr<sinks::dist_sink_mt> get_mutable_logging_container()
 #define APPLOG_ERROR(...) spdlog::get("Log")->error(__VA_ARGS__)
 #define APPLOG_WARNING(...) spdlog::get("Log")->warn(__VA_ARGS__)
 #define APPLOG_NOTICE(...) spdlog::get("Log")->notice(__VA_ARGS__)
+#define APPLOG_SEPARATOR() APPLOG_INFO("-----------------------------")
 }

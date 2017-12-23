@@ -2,9 +2,11 @@
 #include "../../ecs/constructs/prefab.h"
 #include "../../ecs/constructs/scene.h"
 #include "../../meta/animation/animation.hpp"
+#include "../../meta/audio/sound.hpp"
 #include "../../meta/rendering/material.hpp"
 #include "../../meta/rendering/mesh.hpp"
 #include "asset_extensions.h"
+#include "core/audio/sound.h"
 #include "core/filesystem/filesystem.h"
 #include "core/graphics/index_buffer.h"
 #include "core/graphics/shader.h"
@@ -260,6 +262,82 @@ bool load_from_file<mesh>(core::task_future<asset_handle<mesh>>& output, const s
 }
 
 template <>
+bool load_from_file<audio::sound>(core::task_future<asset_handle<audio::sound>>& output,
+								  const std::string& key)
+{
+	asset_handle<audio::sound> original;
+	if(output.is_ready())
+		original = output.get();
+
+	auto& ts = core::get_subsystem<core::task_system>();
+
+	auto create_resource_func_fallback = [ result = original, key ]() mutable
+	{
+		result.link->id = key;
+		return result;
+	};
+
+	if(!fs::has_known_protocol(key))
+	{
+		APPLOG_ERROR("Asset {0} has uknown protocol!", key);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
+		return true;
+	}
+
+	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
+	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<audio::sound>();
+
+	fs::error_code err;
+	if(!fs::exists(compiled_absolute_key, err))
+	{
+		APPLOG_ERROR("Asset {0} does not exist!", key);
+		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
+		return true;
+	}
+
+	struct wrapper_t
+	{
+		audio::sound_data data;
+	};
+
+	auto wrapper = std::make_shared<wrapper_t>();
+	auto read_memory_func = [wrapper, compiled_absolute_key]() mutable {
+		{
+			std::ifstream stream{compiled_absolute_key, std::ios::in | std::ios::binary};
+
+			if(stream.bad())
+			{
+				return false;
+			}
+
+			cereal::iarchive_binary_t ar(stream);
+
+			try_load(ar, cereal::make_nvp("sound", wrapper->data));
+		}
+		return true;
+	};
+
+	auto create_resource_func = [ result = original, wrapper, key ](bool read_result) mutable
+	{
+		if(read_result)
+		{
+			if(!wrapper->data.data.empty())
+			{
+				result.link->id = key;
+				result.link->asset = std::make_shared<audio::sound>(std::move(wrapper->data));
+			}
+			wrapper.reset();
+		}
+
+		return result;
+	};
+
+	auto ready_memory_task = ts.push_on_worker_thread(read_memory_func);
+	output = ts.push_on_owner_thread(create_resource_func, ready_memory_task);
+	return true;
+}
+
+template <>
 bool load_from_file<runtime::animation>(core::task_future<asset_handle<runtime::animation>>& output,
 										const std::string& key)
 {
@@ -324,7 +402,7 @@ bool load_from_file<runtime::animation>(core::task_future<asset_handle<runtime::
 		{
 			result.link->id = key;
 			result.link->asset = wrapper->anim;
-			
+
 			wrapper.reset();
 		};
 

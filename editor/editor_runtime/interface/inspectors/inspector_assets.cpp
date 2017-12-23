@@ -1,13 +1,14 @@
 #include "inspector_assets.h"
 #include "../../editing/editing_system.h"
+#include "core/audio/sound.h"
 #include "core/filesystem/filesystem.h"
 #include "core/graphics/texture.h"
 #include "inspectors.h"
+#include "runtime/animation/animation.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/ecs/constructs/prefab.h"
 #include "runtime/rendering/material.h"
 #include "runtime/rendering/mesh.h"
-#include "runtime/animation/animation.h"
 
 bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 											 const meta_getter& get_metadata)
@@ -262,7 +263,8 @@ bool inspector_asset_handle_mesh::inspect(rttr::variant& var, bool read_only, co
 	return changed;
 }
 
-bool inspector_asset_handle_animation::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
+bool inspector_asset_handle_animation::inspect(rttr::variant& var, bool read_only,
+											   const meta_getter& get_metadata)
 {
 	auto data = var.get_value<asset_handle<runtime::animation>>();
 
@@ -320,7 +322,72 @@ bool inspector_asset_handle_animation::inspect(rttr::variant& var, bool read_onl
 
 	if(data)
 	{
-        rttr::variant vari = data.get();		
+		rttr::variant vari = data.get();
+		changed |= inspect_var(vari);
+	}
+	return changed;
+}
+
+bool inspector_asset_handle_sound::inspect(rttr::variant& var, bool read_only,
+										   const meta_getter& get_metadata)
+{
+	auto data = var.get_value<asset_handle<audio::sound>>();
+
+	auto& es = core::get_subsystem<editor::editing_system>();
+	auto& am = core::get_subsystem<runtime::asset_manager>();
+	auto& selected = es.selection_data.object;
+	if(selected && !selected.is_type<asset_handle<audio::sound>>())
+	{
+		std::string item = !data.id().empty() ? data.id() : "none";
+		rttr::variant var_str = item;
+		if(inspect_var(var_str))
+		{
+			item = var_str.to_string();
+			if(item.empty())
+			{
+				data = asset_handle<audio::sound>();
+			}
+			else
+			{
+				auto load_future = am.load<audio::sound>(item);
+				if(load_future.valid())
+				{
+					data = load_future.get();
+				}
+			}
+			var = data;
+			return true;
+		}
+
+		auto& dragged = es.drag_data.object;
+		if(dragged && dragged.is_type<asset_handle<audio::sound>>())
+		{
+			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.9f));
+			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
+			gui::PopStyleColor();
+
+			if(gui::IsItemHoveredRect())
+			{
+				gui::SetMouseCursor(ImGuiMouseCursor_Move);
+				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
+				gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
+				gui::PopStyleColor();
+				if(gui::IsMouseReleased(gui::drag_button))
+				{
+					data = dragged.get_value<asset_handle<audio::sound>>();
+					var = data;
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	bool changed = false;
+
+	if(data)
+	{
+		rttr::variant vari = data.get()->get_data();
 		changed |= inspect_var(vari);
 	}
 	return changed;
