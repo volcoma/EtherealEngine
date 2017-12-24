@@ -10,7 +10,7 @@ void camera_system::frame_update(std::chrono::duration<float> dt)
 	auto& ecs = core::get_subsystem<entity_component_system>();
 
 	ecs.for_each<transform_component, camera_component>(
-		[this](entity e, transform_component& transformComponent, camera_component& cameraComponent) {
+		[](entity e, transform_component& transformComponent, camera_component& cameraComponent) {
 			cameraComponent.update(transformComponent.get_transform());
 		});
 }

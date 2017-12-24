@@ -46,18 +46,16 @@ bool source_impl::create()
 bool source_impl::bind(sound_impl::native_handle_type buffer)
 {
 	if(is_binded())
+	{   
+        if(binded_handle() == buffer)
+        {
+            return true;
+        };
 		unbind();
-
+    }
 	alCheck(alSourcei(_handle, AL_SOURCE_RELATIVE, AL_FALSE));
 
 	alCheck(alSourcei(_handle, AL_BUFFER, ALint(buffer)));
-	// alSourceQueue
-
-	alCheck(alSourcef(_handle, AL_MIN_GAIN, 0.0f));
-	alCheck(alSourcef(_handle, AL_MAX_GAIN, 1.0f));
-
-	set_gain(1.0f);
-	set_pitch(1.0f);
 
 	return true;
 }
@@ -119,9 +117,9 @@ void source_impl::set_loop(bool on)
 	alCheck(alSourcei(_handle, AL_LOOPING, on ? AL_TRUE : AL_FALSE));
 }
 
-void source_impl::set_gain(float gain)
+void source_impl::set_volume(float volume)
 {
-	alCheck(alSourcef(_handle, AL_GAIN, gain));
+	alCheck(alSourcef(_handle, AL_GAIN, volume));
 }
 
 /* pitch, speed stretching */
@@ -141,14 +139,16 @@ void source_impl::set_velocity(const float* velocity3)
 	alCheck(alSourcefv(_handle, AL_VELOCITY, velocity3));
 }
 
-void source_impl::set_direction(const float* direction3)
+void source_impl::set_orientation(const float* direction3, const float* up3)
 {
-	alCheck(alSourcefv(_handle, AL_DIRECTION, direction3));
+	//alCheck(alSourcefv(_handle, AL_DIRECTION, direction3));
+	float orientation6[] = {-direction3[0], -direction3[1], -direction3[2], up3[0], up3[1], up3[2]};
+	alCheck(alSourcefv(_handle, AL_ORIENTATION, orientation6));
 }
 
-void source_impl::set_attenuation(float roll_off)
+void source_impl::set_volume_rolloff(float rolloff)
 {
-	alCheck(alSourcef(_handle, AL_ROLLOFF_FACTOR, roll_off));
+	alCheck(alSourcef(_handle, AL_ROLLOFF_FACTOR, rolloff));
 }
 
 void source_impl::set_distance(float mind, float maxd)

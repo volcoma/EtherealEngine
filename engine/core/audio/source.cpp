@@ -71,11 +71,11 @@ void source::set_loop(bool on)
 	}
 }
 
-void source::set_gain(float gain)
+void source::set_volume(float volume)
 {
 	if(_impl)
 	{
-		_impl->set_gain(gain);
+		_impl->set_volume(volume);
 	}
 }
 
@@ -105,19 +105,19 @@ void source::set_velocity(const float* velocity3)
 	}
 }
 
-void source::set_direction(const float* direction3)
+void source::set_orientation(const float* direction3, const float* up3)
 {
 	if(_impl)
 	{
-		_impl->set_direction(direction3);
+		_impl->set_orientation(direction3, up3);
 	}
 }
 
-void source::set_attenuation(float roll_off)
+void source::set_volume_rolloff(float rolloff)
 {
 	if(_impl)
 	{
-		_impl->set_attenuation(roll_off);
+		_impl->set_volume_rolloff(rolloff);
 	}
 }
 

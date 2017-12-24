@@ -1,6 +1,7 @@
 #include "imgui_user.h"
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "../imgui/imgui_internal.h"
+#include <unordered_map>
 #include <vector>
 namespace ImGui
 {
@@ -235,27 +236,29 @@ int ImageButtonWithAspectAndLabel(ImTextureID texture, ImVec2 texture_size, ImVe
 	ImGuiWindow* window = GetCurrentWindow();
 	bool inputActive = false;
 	bool label_clicked = false;
-    const float image_padding = 0.0f;//size.x * 0.3f;
+	const float image_padding = 0.0f; // size.x * 0.3f;
 	BeginGroup();
 	{
-        //SameLine(0.0f, image_padding);        
-        
+		// SameLine(0.0f, image_padding);
+
 		if(selected)
-        {
+		{
 			ImageWithAspect(texture, texture_size, size, uv0, uv1, {0.7f, 0.7f, 0.7f, 1.0f});
-            RenderFrameEx(GetItemRectMin(), GetItemRectMax(), true, 0.0f, 2.0f);
-        }
-        else
-        {
+			RenderFrameEx(GetItemRectMin(), GetItemRectMax(), true, 0.0f, 2.0f);
+		}
+		else
+		{
 			ImageWithAspect(texture, texture_size, size, uv0, uv1);
 		}
-        //SameLine(0.0f, image_padding);
-        //NewLine();
+		// SameLine(0.0f, image_padding);
+		// NewLine();
 		auto pos = GetCursorPos();
 
 		if(!(selected && edit))
 		{
-            float wrap_pos = pos.x + size.x + image_padding * 2.0f;//CalcWrapWidthForPos(pos, pos.x + size.x + image_padding * 2.0f);
+			float wrap_pos =
+				pos.x + size.x +
+				image_padding * 2.0f; // CalcWrapWidthForPos(pos, pos.x + size.x + image_padding * 2.0f);
 			PushTextWrapPos(wrap_pos);
 			AlignTextToFramePadding();
 			TextUnformatted(label);
@@ -387,9 +390,39 @@ void LabelTextExV(const char* label, const char* fmt, va_list args)
 	const char* value_text_begin = &g.TempBuffer[0];
 	const char* value_text_end =
 		value_text_begin + ImFormatStringV(g.TempBuffer, IM_ARRAYSIZE(g.TempBuffer), fmt, args);
-	RenderTextClipped(value_bb.Min, value_bb.Max, value_text_begin, value_text_end, nullptr, ImVec2(0.0f, 0.5f));
+	RenderTextClipped(value_bb.Min, value_bb.Max, value_text_begin, value_text_end, nullptr,
+					  ImVec2(0.0f, 0.5f));
 	if(label_size.x > 0.0f)
 		RenderText(ImVec2(value_bb.Max.x + style.ItemInnerSpacing.x, value_bb.Min.y + style.FramePadding.y),
 				   label);
+}
+
+std::unordered_map<std::string, ImFont*>& GetFonts()
+{
+	static std::unordered_map<std::string, ImFont*> s_fonts;
+
+	return s_fonts;
+}
+
+ImFont* GetFont(const std::string& id)
+{
+	auto& fonts = GetFonts();
+	auto it = fonts.find(id);
+	if(it != fonts.end())
+		return it->second;
+
+	return nullptr;
+}
+
+void AddFont(const std::string& id, ImFont* font)
+{
+	auto& fonts = GetFonts();
+	fonts[id] = font;
+}
+
+void ClearFonts()
+{
+	auto& fonts = GetFonts();
+	fonts.clear();
 }
 }

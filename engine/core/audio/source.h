@@ -23,13 +23,13 @@ public:
 	void bind(const sound& snd);
 
 	void set_loop(bool on);
-	void set_gain(float gain);
+	void set_volume(float volume);
 	void set_pitch(float pitch);
 	void set_position(const float* position3);
 	void set_velocity(const float* velocity3);
-	void set_direction(const float* direction3);
+	void set_orientation(const float* direction3, const float* up3);
 
-	void set_attenuation(float roll_off);
+	void set_volume_rolloff(float rolloff);
 	void set_distance(float mind, float maxd);
 	void set_playing_offset(sound_data::duration_t offset);
 

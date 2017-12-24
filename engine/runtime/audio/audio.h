@@ -7,7 +7,7 @@
 
 namespace runtime
 {
-struct audio_system : public core::subsystem
+struct audio_device : public core::subsystem
 {
 	//-----------------------------------------------------------------------------
 	//  Name : initialize ()

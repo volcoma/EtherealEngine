@@ -1,6 +1,7 @@
 #include "editing_system.h"
 #include "core/graphics/texture.h"
 #include "runtime/assets/asset_manager.h"
+#include "runtime/ecs/components/audio_listener_component.h"
 #include "runtime/ecs/components/camera_component.h"
 #include "runtime/ecs/components/transform_component.h"
 #include "runtime/ecs/constructs/utils.h"
@@ -35,8 +36,8 @@ bool editing_system::initialize()
 	icons["shader"] = am.load<gfx::texture>("editor_data:/icons/shader.png").get();
 	icons["loading"] = am.load<gfx::texture>("editor_data:/icons/loading.png").get();
 	icons["folder"] = am.load<gfx::texture>("editor_data:/icons/folder.png").get();
-    icons["animation"] = am.load<gfx::texture>("editor_data:/icons/animation.png").get();
-    icons["sound"] = am.load<gfx::texture>("editor_data:/icons/sound.png").get();
+	icons["animation"] = am.load<gfx::texture>("editor_data:/icons/animation.png").get();
+	icons["sound"] = am.load<gfx::texture>("editor_data:/icons/sound.png").get();
 
 	return true;
 }
@@ -59,15 +60,25 @@ void editing_system::load_editor_camera()
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	runtime::entity object;
-	ecs::utils::try_load_entity_from_file(fs::resolve_protocol("app:/settings/editor_camera.cfg"), object);
-
-	if(!object.has_component<transform_component>() || !object.has_component<camera_component>())
+	if(!ecs::utils::try_load_entity_from_file(fs::resolve_protocol("app:/settings/editor_camera.cfg"),
+											  object))
 	{
 		auto& ecs = core::get_subsystem<runtime::entity_component_system>();
 		object = ecs.create();
-		object.set_name("EDITOR CAMERA");
+	}
+	object.set_name("EDITOR CAMERA");
+
+	if(!object.has_component<transform_component>())
+	{
 		object.assign<transform_component>().lock()->set_local_position({0.0f, 2.0f, -5.0f});
+	}
+	if(!object.has_component<camera_component>())
+	{
 		object.assign<camera_component>();
+	}
+	if(!object.has_component<audio_listener_component>())
+	{
+		object.assign<audio_listener_component>();
 	}
 
 	es.camera = object;

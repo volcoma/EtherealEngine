@@ -1,9 +1,12 @@
 #ifndef IMGUI_USER_H
 #define IMGUI_USER_H
 #include "../imgui/imgui.h"
-
+#include <string>
 namespace ImGui
 {
+    IMGUI_API ImFont* GetFont(const std::string& id);
+    IMGUI_API void AddFont(const std::string& id, ImFont* font);
+    IMGUI_API void ClearFonts();
 	IMGUI_API bool DragFloatNEx(const char* labels[], float* v, int components, float v_speed = 1.0f, float v_min = 0.0f, float v_max = 0.0f, const char* display_format = "%.3f", float power = 1.0f);
 	IMGUI_API bool DragIntNEx(const char* labels[], int* v, int components, float v_speed = 1.0f, int v_min = 0, int v_max = 0, const char* display_format = "%.0f");
 	IMGUI_API bool DragUIntNEx(const char* labels[], unsigned int* v, int components, float v_speed = 1.0f, unsigned int v_min = 0, unsigned int v_max = 0, const char* display_format = "%.0f");

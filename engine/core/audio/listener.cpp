@@ -6,16 +6,15 @@ namespace audio
 listener::listener()
 	: _impl(std::make_unique<priv::listener_impl>())
 {
-    set_gain(1.0f);
 }
 
 listener::~listener() = default;
     
-void listener::set_gain(const float gain)
+void listener::set_volume(float volume)
 {
 	if(_impl)
 	{
-		_impl->set_gain(gain);
+		_impl->set_volume(volume);
 	}
 }
 
@@ -35,11 +34,11 @@ void listener::set_velocity(const float* velocity3)
 	}
 }
 
-void listener::set_direction(const float* direction3)
+void listener::set_orientation(const float* direction3, const float* up3)
 {
 	if(_impl)
 	{
-		_impl->set_direction(direction3);
+		_impl->set_orientation(direction3, up3);
 	}
 }
 }

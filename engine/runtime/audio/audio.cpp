@@ -1,10 +1,10 @@
-#include "audio_system.h"
+#include "audio.h"
 #include "core/logging/logging.h"
 
 namespace runtime
 {
 
-bool audio_system::initialize()
+bool audio_device::initialize()
 {
 	// enumerate audio devices
 	auto devices = audio::device::enumerate();
@@ -32,7 +32,7 @@ bool audio_system::initialize()
 	return true;
 }
 
-void audio_system::dispose()
+void audio_device::dispose()
 {
     _device.reset();
 }

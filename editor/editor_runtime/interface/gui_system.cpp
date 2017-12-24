@@ -15,10 +15,10 @@
 #include "runtime/rendering/render_window.h"
 #include <unordered_map>
 
-#include "embedded/editor_default.ttf.h"
-#include "embedded/fontawesome_webfont.ttf.h"
-#include "embedded/fs_ocornut_imgui.bin.h"
-#include "embedded/vs_ocornut_imgui.bin.h"
+#include "editor_core/gui/embedded/editor_default.ttf.h"
+#include "editor_core/gui/embedded/fontawesome_webfont.ttf.h"
+#include "editor_core/gui/embedded/fs_ocornut_imgui.bin.h"
+#include "editor_core/gui/embedded/vs_ocornut_imgui.bin.h"
 //////////////////////////////////////////////////////////////////////////
 #include "../meta/interface/gui_system.hpp"
 #include "core/serialization/associative_archive.h"
@@ -29,12 +29,11 @@ static const gfx::embedded_shader s_embedded_shaders[] = {BGFX_EMBEDDED_SHADER(v
 // -------------------------------------------------------------------
 
 static gui_style s_gui_style;
-ImGuiContext* s_initial_context = nullptr;
+static ImGuiContext* s_initial_context = nullptr;
 
 static std::unique_ptr<gpu_program> s_program;
 static asset_handle<gfx::texture> s_font_texture;
 static std::vector<std::shared_ptr<gfx::texture>> s_textures;
-static std::unordered_map<std::string, ImFont*> s_fonts;
 
 void render_func(ImDrawData* _drawData)
 {
@@ -278,8 +277,8 @@ void imgui_frame_end()
 
 void imgui_init()
 {
-	set_initial_context(ImGui::GetCurrentContext());
-	ImGuiIO& io = ImGui::GetIO();
+	set_initial_context(gui::GetCurrentContext());
+	ImGuiIO& io = gui::GetIO();
 	io.IniFilename = nullptr;
 	io.RenderDrawListsFn = render_func;
 
@@ -328,22 +327,21 @@ void imgui_init()
 	config.FontDataOwnedByAtlas = false;
 	config.MergeMode = false;
 
-	s_fonts["default"] = io.Fonts->AddFontDefault(&config);
-	s_fonts["standard"] =
-		io.Fonts->AddFontFromMemoryTTF((void*)s_font_default, sizeof(s_font_default), 20, &config);
-	
+	gui::AddFont("default", io.Fonts->AddFontDefault(&config));
+	gui::AddFont("standard",
+			io.Fonts->AddFontFromMemoryTTF((void*)s_font_default, sizeof(s_font_default), 20, &config));
+
 	static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
 	config.MergeMode = true;
 	config.PixelSnapH = true;
-	s_fonts["icons"] = io.Fonts->AddFontFromMemoryTTF(
-		(void*)fontawesome_webfont_ttf, sizeof(fontawesome_webfont_ttf), 20, &config, icons_ranges);
+	gui::AddFont("icons", io.Fonts->AddFontFromMemoryTTF(
+		(void*)fontawesome_webfont_ttf, sizeof(fontawesome_webfont_ttf), 20, &config, icons_ranges));
 
-    config.MergeMode = false;
+	config.MergeMode = false;
 	config.PixelSnapH = false;
-	s_fonts["standard_big"] =
-		io.Fonts->AddFontFromMemoryTTF((void*)s_font_default, sizeof(s_font_default), 50, &config);
+	gui::AddFont("standard_big", 
+		io.Fonts->AddFontFromMemoryTTF((void*)s_font_default, sizeof(s_font_default), 50, &config));
 
-	
 	io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
 
 	s_font_texture = std::make_shared<gfx::texture>(
@@ -361,11 +359,11 @@ void imgui_dispose()
 	restore_initial_context();
 	s_program.reset();
 	s_font_texture.reset();
-	s_fonts.clear();
+	gui::ClearFonts();
 
-	ImGuiIO& io = ImGui::GetIO();
+	ImGuiIO& io = gui::GetIO();
 	io.Fonts->TexID = nullptr;
-	ImGui::Shutdown();
+	gui::Shutdown();
 }
 
 ImGuiContext* imgui_create_context()
@@ -454,14 +452,6 @@ void gui_system::platform_events(const std::pair<std::uint32_t, bool>& info,
 
 namespace gui
 {
-ImFont* GetFont(const std::string& id)
-{
-	auto it = s_fonts.find(id);
-	if(it != s_fonts.end())
-		return it->second;
-
-	return nullptr;
-}
 
 void Image(std::shared_ptr<gfx::texture> texture, const ImVec2& _size,
 		   const ImVec2& _uv0 /*= ImVec2(0.0f, 0.0f) */, const ImVec2& _uv1 /*= ImVec2(1.0f, 1.0f) */,

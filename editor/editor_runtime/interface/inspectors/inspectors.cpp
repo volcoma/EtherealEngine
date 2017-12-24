@@ -30,7 +30,7 @@ std::shared_ptr<inspector> get_inspector(rttr::type type)
 	return registry.type_map[type];
 }
 
-bool inspect_var(rttr::variant& var, bool read_only, const inspector::meta_getter& get_metadata)
+bool inspect_var(rttr::variant& var, bool skip_custom, bool read_only, const inspector::meta_getter& get_metadata)
 {
 	rttr::instance object = var;
 	auto type = object.get_derived_type();
@@ -39,7 +39,7 @@ bool inspect_var(rttr::variant& var, bool read_only, const inspector::meta_gette
 	bool changed = false;
 
 	auto inspector = get_inspector(type);
-	if(inspector)
+	if(!skip_custom && inspector)
 	{
 		changed |= inspector->inspect(var, read_only, get_metadata);
 	}
@@ -91,7 +91,7 @@ bool inspect_var(rttr::variant& var, bool read_only, const inspector::meta_gette
 				}
 				else
 				{
-					changed |= inspect_var(prop_var, is_readonly, get_meta);
+					changed |= inspect_var(prop_var, false, is_readonly, get_meta);
 				}
 
 				if(details && open)
@@ -135,7 +135,7 @@ bool inspect_array(rttr::variant& var, bool read_only, const inspector::meta_get
 
 		property_layout layout(element.data());
 
-		changed |= inspect_var(value, read_only, get_metadata);
+		changed |= inspect_var(value, false, read_only, get_metadata);
 
 		if(changed)
 			view.set_value(i, value);

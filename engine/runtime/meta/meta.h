@@ -4,6 +4,8 @@
 
 #include "assets/asset_handle.hpp"
 
+#include "ecs/components/audio_listener_component.hpp"
+#include "ecs/components/audio_source_component.hpp"
 #include "ecs/components/camera_component.hpp"
 #include "ecs/components/component.hpp"
 #include "ecs/components/light_component.hpp"

@@ -3,7 +3,6 @@
 #include "core/system/subsystem.h"
 #include "editor_core/gui/gui.h"
 #include "runtime/system/events.h"
-#include "embedded/icons_font_awesome.h"
 
 #include <map>
 #include <memory>
@@ -77,9 +76,7 @@ struct texture;
 namespace gui
 {
 using namespace ImGui;
-constexpr static const int drag_button = 0;
 
-ImFont* GetFont(const std::string& id);
 // Helper function for passing Texture to ImGui::Image.
 void Image(std::shared_ptr<gfx::texture> texture, const ImVec2& _size,
 		   const ImVec2& _uv0 = ImVec2(0.0f, 0.0f), const ImVec2& _uv1 = ImVec2(1.0f, 1.0f),
