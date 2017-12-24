@@ -47,11 +47,13 @@ Supported texture formats: png, tga, dds, ktx, pvr
 
 Supported mesh formats: obj, fbx, dae, 3ds
 
+Supported audio formats: ogg, wav
+
 ## SUGGESTIONS AND ISSUES
 Any suggestions and help will be appreciated.
 
 ## BUILD
-*The engine uses the CMake build system.
+The engine uses the CMake build system.
 
 ## CODEBASE
 c++14 Using the latest and greatest features of the language.
@@ -66,7 +68,8 @@ namespace nsp
 class some_class
 {
 public:
-  //-----------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
   //  Name : some_method ()
   /// <summary>
   /// This is a method comment description.
@@ -123,3 +126,5 @@ imgui - https://github.com/ocornut/imgui
 assimp - https://github.com/assimp/assimp
 
 glm - https://github.com/g-truc/glm
+
+openal-soft = https://github.com/kcat/openal-soft
