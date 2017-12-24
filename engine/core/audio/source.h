@@ -37,6 +37,7 @@ public:
 	void stop();
 	void pause();
 	bool is_playing() const;
+	bool is_paused() const;
 	bool is_looping() const;
 	bool is_valid() const;
 

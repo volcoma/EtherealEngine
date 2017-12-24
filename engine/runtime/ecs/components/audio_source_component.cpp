@@ -47,11 +47,11 @@ void audio_source_component::set_autoplay(bool on)
 {
 	_auto_play = on;
 
-    // Should this be here?
+	// Should this be here?
 	if(_auto_play)
 		play();
 	else
-        stop();
+		stop();
 }
 
 bool audio_source_component::get_autoplay() const
@@ -106,6 +106,11 @@ void audio_source_component::pause()
 bool audio_source_component::is_playing() const
 {
 	return _source.is_playing();
+}
+
+bool audio_source_component::is_paused() const
+{
+	return _source.is_paused();
 }
 
 bool audio_source_component::is_looping() const

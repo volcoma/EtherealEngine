@@ -51,7 +51,16 @@ void source::pause()
 
 bool source::is_playing() const
 {
-	return _impl && _impl->is_playing();
+    return _impl && _impl->is_playing();
+}
+
+bool source::is_paused() const
+{
+    if(_impl)
+	{
+		return _impl->is_paused();
+	}
+	return false;
 }
 
 bool source::is_looping() const

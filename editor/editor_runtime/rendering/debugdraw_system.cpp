@@ -111,7 +111,7 @@ void debugdraw_system::frame_render(std::chrono::duration<float>)
 		const auto bounds = selected_camera.get_local_bounding_box();
 		ddPush();
 		ddSetColor(0xffffffff);
-
+        ddSetWireframe(true);
 		if(selected_camera.get_projection_mode() == projection_mode::perspective)
 		{
 			ddSetTransform(nullptr);

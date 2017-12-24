@@ -102,7 +102,14 @@ bool source_impl::is_playing() const
 {
 	ALint state;
 	alCheck(alGetSourcei(_handle, AL_SOURCE_STATE, &state));
-	return (state == AL_PLAYING);
+    return (state == AL_PLAYING);
+}
+
+bool source_impl::is_paused() const
+{
+    ALint state;
+	alCheck(alGetSourcei(_handle, AL_SOURCE_STATE, &state));
+    return (state == AL_PAUSED);
 }
 
 bool source_impl::is_binded() const

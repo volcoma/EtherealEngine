@@ -46,22 +46,25 @@ public:
 	void set_range(const frange& range);
 	void set_autoplay(bool on);
 	bool get_autoplay() const;
-	
+
 	float get_volume() const;
 	float get_pitch() const;
 	float get_volume_rolloff() const;
 	const frange& get_range() const;
-	
+
 	void set_playing_offset(audio::sound_data::duration_t offset);
 
 	void play();
 	void stop();
 	void pause();
 	bool is_playing() const;
+	bool is_paused() const;
+
 	bool is_looping() const;
 
-    void set_sound(asset_handle<audio::sound> sound);
-    asset_handle<audio::sound> get_sound() const;
+	void set_sound(asset_handle<audio::sound> sound);
+	asset_handle<audio::sound> get_sound() const;
+
 private:
 	void apply_all();
 	bool is_sound_valid() const;
@@ -69,7 +72,7 @@ private:
 	// Private Member Variables.
 	//-------------------------------------------------------------------------
 
-    bool _auto_play = true;
+	bool _auto_play = true;
 	bool _loop = true;
 	float _volume = 1.0f;
 	float _pitch = 1.0f;

@@ -67,86 +67,69 @@ frustum::frustum(const bbox& AABB)
 /// Compute the new frustum details based on the matrices specified.
 /// </summary>
 //-----------------------------------------------------------------------------
-void frustum::update(const transform& View, const transform& Proj, bool _oglNDC)
+void frustum::update(const transform& view, const transform& proj, bool _oglNDC)
 {
 
 	// Build a combined view & projection matrix
-	const transform m = Proj * View;
+	const transform m = proj * view;
 
-	const float* _viewProj = m;
-	const float xw = _viewProj[3];
-	const float yw = _viewProj[7];
-	const float zw = _viewProj[11];
-	const float ww = _viewProj[15];
+	// Extract frustum planes from matrix
+	// Planes are in format: normal(xyz), offset(w)
+	planes[volume_plane::right].data.x = m[0][3] + m[0][0];
+	planes[volume_plane::right].data.y = m[1][3] + m[1][0];
+	planes[volume_plane::right].data.z = m[2][3] + m[2][0];
+	planes[volume_plane::right].data.w = m[3][3] + m[3][0];
 
-	const float xz = _viewProj[2];
-	const float yz = _viewProj[6];
-	const float zz = _viewProj[10];
-	const float wz = _viewProj[14];
+	planes[volume_plane::left].data.x = m[0][3] - m[0][0];
+	planes[volume_plane::left].data.y = m[1][3] - m[1][0];
+	planes[volume_plane::left].data.z = m[2][3] - m[2][0];
+	planes[volume_plane::left].data.w = m[3][3] - m[3][0];
 
-	const float xy = _viewProj[1];
-	const float yy = _viewProj[5];
-	const float zy = _viewProj[9];
-	const float wy = _viewProj[13];
+	planes[volume_plane::top].data.x = m[0][3] - m[0][1];
+	planes[volume_plane::top].data.y = m[1][3] - m[1][1];
+	planes[volume_plane::top].data.z = m[2][3] - m[2][1];
+	planes[volume_plane::top].data.w = m[3][3] - m[3][1];
 
-	const float xx = _viewProj[0];
-	const float yx = _viewProj[4];
-	const float zx = _viewProj[8];
-	const float wx = _viewProj[12];
+	planes[volume_plane::bottom].data.x = m[0][3] + m[0][1];
+	planes[volume_plane::bottom].data.y = m[1][3] + m[1][1];
+	planes[volume_plane::bottom].data.z = m[2][3] + m[2][1];
+	planes[volume_plane::bottom].data.w = m[3][3] + m[3][1];
 
-	planes[volume_plane::left].data.x = xw + xx;
-	planes[volume_plane::left].data.y = yw + yx;
-	planes[volume_plane::left].data.z = zw + zx;
-	planes[volume_plane::left].data.w = ww + wx;
+	planes[volume_plane::far_plane].data.x = m[0][2];
+	planes[volume_plane::far_plane].data.y = m[1][2];
+	planes[volume_plane::far_plane].data.z = m[2][2];
+	planes[volume_plane::far_plane].data.w = m[3][2];
 
-	planes[volume_plane::right].data.x = xw - xx;
-	planes[volume_plane::right].data.y = yw - yx;
-	planes[volume_plane::right].data.z = zw - zx;
-	planes[volume_plane::right].data.w = ww - wx;
+	planes[volume_plane::near_plane].data.x = m[0][3] - m[0][2];
+	planes[volume_plane::near_plane].data.y = m[1][3] - m[1][2];
+	planes[volume_plane::near_plane].data.z = m[2][3] - m[2][2];
+	planes[volume_plane::near_plane].data.w = m[3][3] - m[3][2];
 
-	planes[volume_plane::top].data.x = xw - xy;
-	planes[volume_plane::top].data.y = yw - yy;
-	planes[volume_plane::top].data.z = zw - zy;
-	planes[volume_plane::top].data.w = ww - wy;
-
-	planes[volume_plane::bottom].data.x = xw + xy;
-	planes[volume_plane::bottom].data.y = yw + yy;
-	planes[volume_plane::bottom].data.z = zw + zy;
-	planes[volume_plane::bottom].data.w = ww + wy;
-
-	planes[volume_plane::near_plane].data.x = xw + xz;
-	planes[volume_plane::near_plane].data.y = yw + yz;
-	planes[volume_plane::near_plane].data.z = zw + zz;
-	planes[volume_plane::near_plane].data.w = ww + wz;
-
-	planes[volume_plane::far_plane].data.x = xw - xz;
-	planes[volume_plane::far_plane].data.y = yw - yz;
-	planes[volume_plane::far_plane].data.z = zw - zz;
-	planes[volume_plane::far_plane].data.w = ww - wz;
-
-	if(!_oglNDC)
+	if(_oglNDC)
 	{
-		planes[volume_plane::near_plane].data.x = xz;
-		planes[volume_plane::near_plane].data.y = yz;
-		planes[volume_plane::near_plane].data.z = zz;
-		planes[volume_plane::near_plane].data.w = wz;
-	}
+		planes[volume_plane::far_plane].data.x = m[0][3] - m[0][2];
+		planes[volume_plane::far_plane].data.y = m[1][3] - m[1][2];
+		planes[volume_plane::far_plane].data.z = m[2][3] - m[2][2];
+		planes[volume_plane::far_plane].data.w = m[3][3] - m[3][2];
 
-	// Copy and normalize the planes
+		planes[volume_plane::near_plane].data.x = m[0][3] + m[0][2];
+		planes[volume_plane::near_plane].data.y = m[1][3] + m[1][2];
+		planes[volume_plane::near_plane].data.z = m[2][3] + m[2][2];
+		planes[volume_plane::near_plane].data.w = m[3][3] + m[3][2];
+	}
 	for(auto& plane : planes)
 		plane.data *= -1.0f;
-
 	// Normalize and compute additional information.
 	set_planes(planes);
 
 	// Compute the originating position of the frustum.
-	position = vec3(View[0][0], View[1][0], View[2][0]) * -View[3][0];
-	position += vec3(View[0][1], View[1][1], View[2][1]) * -View[3][1];
-	position += vec3(View[0][2], View[1][2], View[2][2]) * -View[3][2];
+	position = vec3(view[0][0], view[1][0], view[2][0]) * -view[3][0];
+	position += vec3(view[0][1], view[1][1], view[2][1]) * -view[3][1];
+	position += vec3(view[0][2], view[1][2], view[2][2]) * -view[3][2];
 }
 
 //-----------------------------------------------------------------------------
-//  Name : setPlanes ()
+//  Name : set_planes ()
 /// <summary>
 /// Compute the new frustum details based on the six planes specified.
 /// This method automatically recomputes the 8 corner points of the frustum
