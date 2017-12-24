@@ -157,7 +157,7 @@ void source::bind(const sound& snd)
 	{
         if(snd.get_channels() > 1)
         {
-            log("Sound is not mono. 3D Attenuation will not work.");
+            log_info("Sound is not mono. 3D Attenuation will not work.");
         }
 		_impl->bind(snd._impl->native_handle());
 	}

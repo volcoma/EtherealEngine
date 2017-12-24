@@ -74,14 +74,19 @@ bool run_compile_process(const std::string& process, const std::vector<std::stri
 	else
 	{
 		std::array<char, 2048> buffer;
-		process_reader.read(buffer.data(), static_cast<std::int32_t>(buffer.size()), &error);
-
+		buffer.fill(0);
+		int32_t sz = process_reader.read(buffer.data(), static_cast<std::int32_t>(buffer.size()), &error);
+    
 		process_reader.close();
 		int32_t result = process_reader.getExitCode();
 
 		if(0 != result)
 		{
 			err = std::string(error.getMessage().getPtr());
+			if(sz > 0)
+			{
+                err += " " + std::string(buffer.data());
+			}
 			return false;
 		}
 

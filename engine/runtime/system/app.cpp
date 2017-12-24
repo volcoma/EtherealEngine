@@ -34,7 +34,8 @@ void app::setup(cmd_line::options_parser& parser)
 	gfx::set_warning_logger([](const std::string& msg) { APPLOG_WARNING(msg); });
 	gfx::set_error_logger([](const std::string& msg) { APPLOG_ERROR(msg); });
 
-	audio::set_logger([](const std::string& msg) { APPLOG_INFO(msg); });
+	audio::set_info_logger([](const std::string& msg) { APPLOG_INFO(msg); });
+	audio::set_error_logger([](const std::string& msg) { APPLOG_ERROR(msg); });
 
 	{
 		auto value = cmd_line::value<std::string>();
@@ -60,7 +61,6 @@ void app::start(cmd_line::options_parser& parser)
 	core::add_subsystem<camera_system>();
 	core::add_subsystem<deferred_rendering>();
 	core::add_subsystem<audio_system>();
-
 }
 
 void app::stop()
