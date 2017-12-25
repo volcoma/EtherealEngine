@@ -137,7 +137,6 @@ std::string string_utils::replace(const std::string& str, const std::string& old
 
 	} // End if not empty
 
-	// Return self
 	return s;
 }
 
@@ -163,7 +162,6 @@ std::string string_utils::replace(const std::string& str, std::string::value_typ
 
 	} // End if not empty
 
-	// Return self
 	return s;
 }
 

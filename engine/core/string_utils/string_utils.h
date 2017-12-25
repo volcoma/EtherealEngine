@@ -149,8 +149,7 @@ std::string replace(const std::string& str, const std::string& oldSequence, cons
 //-------------------------------------------------------------------------
 //  Name : replace ()
 /// <summary>
-/// Replacing any occurances of the specified character with  another
-/// directly in-place within this std::string.
+/// Replacing any occurances of the specified character with another.
 /// </summary>
 //-------------------------------------------------------------------------
 std::string replace(const std::string& str, std::string::value_type oldCharacter,

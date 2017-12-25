@@ -343,13 +343,18 @@ void hierarchy_dock::render(const ImVec2&)
 		}
 	}
 
+	if(editor_camera.valid())
+	{
+		draw_entity(editor_camera);
+		gui::Separator();
+	}
+
 	for(auto& root : roots)
 	{
 		if(root.valid())
 		{
-			draw_entity(root);
-			if(root == editor_camera)
-				gui::Separator();
+			if(root != editor_camera)
+				draw_entity(root);
 		}
 	}
 

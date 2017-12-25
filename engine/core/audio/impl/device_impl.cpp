@@ -31,21 +31,6 @@ static std::string info()
 
 device_impl::device_impl(int devnum)
 {
-	init(devnum);
-}
-
-device_impl::~device_impl()
-{
-	quit();
-}
-
-bool device_impl::init(int devnum)
-{
-	// init
-	dev = nullptr;
-	ctx = nullptr;
-	_device_id = {};
-
 	// device name
 	auto list = enumerate();
 	if(devnum >= 0 && devnum < int(list.size()))
@@ -55,7 +40,7 @@ bool device_impl::init(int devnum)
 	dev = alcOpenDevice(_device_id.empty() ? 0 : _device_id.c_str());
 
 	if(!dev)
-		return false;
+		return;
 
 	bool has_efx_ = has_efx(dev);
 
@@ -67,28 +52,16 @@ bool device_impl::init(int devnum)
 	ctx = alcCreateContext(dev, has_efx_ ? attribs : nullptr);
 
 	if(!ctx)
-		return false;
+		return;
 
 	enable();
 
 	alCheck(alDistanceModel(AL_LINEAR_DISTANCE));
 
 	_info = info();
-
-	return true;
 }
 
-void device_impl::enable()
-{
-	alCheck(alcMakeContextCurrent(ctx));
-}
-
-void device_impl::disable()
-{
-	alCheck(alcMakeContextCurrent(nullptr));
-}
-
-void device_impl::quit()
+device_impl::~device_impl()
 {
 	if(ctx)
 	{
@@ -102,6 +75,16 @@ void device_impl::quit()
 		(alcCloseDevice(dev));
 		dev = nullptr;
 	}
+}
+
+void device_impl::enable()
+{
+	alCheck(alcMakeContextCurrent(ctx));
+}
+
+void device_impl::disable()
+{
+	alCheck(alcMakeContextCurrent(nullptr));
 }
 
 bool device_impl::is_valid() const
@@ -123,9 +106,9 @@ std::vector<std::string> device_impl::enumerate()
 {
 	std::vector<std::string> vs;
 
-	if(alcIsExtensionPresent(NULL, (const ALCchar*)"ALC_ENUMERATION_EXT") == AL_TRUE)
+	if(alcIsExtensionPresent(NULL, reinterpret_cast<const ALCchar*>("ALC_ENUMERATION_EXT")) == AL_TRUE)
 	{
-		const char* devices = (const char*)alcGetString(NULL, ALC_ALL_DEVICES_SPECIFIER);
+		const char* devices = reinterpret_cast<const char*>(alcGetString(NULL, ALC_ALL_DEVICES_SPECIFIER));
 
 		while(std::string(devices).size())
 		{

@@ -62,6 +62,8 @@ byte_array_t read_stream(std::istream& stream);
 //-----------------------------------------------------------------------------
 path resolve_protocol(const path& _path);
 
+path convert_to_protocol(const path& _path);
+
 bool has_known_protocol(const path& _path);
 //-----------------------------------------------------------------------------
 //  Name : executable_path()

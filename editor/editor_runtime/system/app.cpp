@@ -13,6 +13,7 @@
 #include "../interface/gui_system.h"
 #include "../rendering/debugdraw_system.h"
 #include "../system/project_manager.h"
+#include "core/filesystem/filesystem.h"
 #include "core/logging/logging.h"
 #include "editor_core/nativefd/filedialog.h"
 #include "runtime/assets/asset_manager.h"
@@ -22,6 +23,7 @@
 #include "runtime/ecs/components/model_component.h"
 #include "runtime/ecs/components/reflection_probe_component.h"
 #include "runtime/ecs/components/transform_component.h"
+#include "runtime/ecs/constructs/scene.h"
 #include "runtime/ecs/constructs/utils.h"
 #include "runtime/ecs/systems/scene_graph.h"
 #include "runtime/input/input.h"
@@ -155,20 +157,18 @@ auto create_new_scene()
 auto open_scene()
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
-	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
+	auto& am = core::get_subsystem<runtime::asset_manager>();
+	es.save_editor_camera();
+
 	std::string path;
 	if(native::open_file_dialog(extensions::scene.substr(1), fs::resolve_protocol("app:/data").string(),
 								path))
 	{
-		es.save_editor_camera();
-		ecs.dispose();
+		auto scene_path = fs::convert_to_protocol(path);
+		auto scene = am.load<::scene>(scene_path.string()).get();
+		scene->instantiate(::scene::mode::standard);
 		es.load_editor_camera();
-
-		std::vector<runtime::entity> out_data;
-		if(ecs::utils::load_entities_from_file(path, out_data))
-		{
-			es.scene = path;
-		}
+		es.scene = path;
 	}
 }
 
@@ -178,11 +178,12 @@ auto save_scene()
 	const auto& path = es.scene;
 	if(path != "")
 	{
-		std::vector<runtime::entity> entities = gather_scene_data();
+		auto entities = gather_scene_data();
 		ecs::utils::save_entities_to_file(path, std::move(entities));
 	}
 
 	es.save_editor_camera();
+	APPLOG_INFO("Saving scene successful.");
 }
 
 void save_scene_as()
@@ -539,9 +540,9 @@ void app::draw_footer(render_window&, imguidock::dockspace& dockspace)
 	const auto tasks_info = ts.get_info();
 	const auto items = _console_log->get_items();
 
-    const auto total_width = gui::GetContentRegionAvailWidth();
-    gui::Columns(2, "footer");
-    gui::SetColumnWidth(0, total_width * 0.8f);
+	const auto total_width = gui::GetContentRegionAvailWidth();
+	gui::Columns(2, "footer");
+	gui::SetColumnWidth(0, total_width * 0.8f);
 
 	if(items.size() > 0)
 	{
@@ -552,14 +553,13 @@ void app::draw_footer(render_window&, imguidock::dockspace& dockspace)
 		gui::SetCursorPosY(ImGui::GetCursorPosY());
 		gui::PushStyleColor(ImGuiCol_Text, col);
 		gui::AlignTextToFramePadding();
-		if(gui::Selectable(last_item.first.c_str(), false, 0,
-						   ImVec2(0, gui::GetTextLineHeight())))
+		if(gui::Selectable(last_item.first.c_str(), false, 0, ImVec2(0, gui::GetTextLineHeight())))
 		{
 			dockspace.activate_dock(_console_dock_name);
 		}
 		gui::PopStyleColor();
 	}
-    gui::NextColumn();
+	gui::NextColumn();
 	if(tasks_info.pending_tasks > 0)
 	{
 		gui::PushFont(gui::GetFont("icons"));
@@ -578,7 +578,7 @@ void app::draw_footer(render_window&, imguidock::dockspace& dockspace)
 
 			gui::EndTooltip();
 		}
-		
+
 		gui::PopFont();
 	}
 	gui::Columns(1);

@@ -568,11 +568,9 @@ void list_dir(std::weak_ptr<editor::asset_directory>& opened_dir, const float si
 							   if(!entry)
 								   return;
 
-							   auto& ecs = core::get_subsystem<runtime::entity_component_system>();
-							   ecs.dispose();
-							   es.load_editor_camera();
-							   entry->instantiate();
+							   entry->instantiate(scene::mode::standard);
 							   es.scene = fs::resolve_protocol(entry.id()).string();
+							   es.load_editor_camera();
 
 						   },
 						   [&](const std::string& new_name) // on_rename

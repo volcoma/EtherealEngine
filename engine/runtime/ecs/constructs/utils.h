@@ -9,6 +9,7 @@ namespace ecs
 {
 namespace utils
 {
+
 runtime::entity clone_entity(const runtime::entity& data);
 //-----------------------------------------------------------------------------
 //  Name : save_entity ()

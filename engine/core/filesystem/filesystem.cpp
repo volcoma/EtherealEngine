@@ -5,25 +5,6 @@
 namespace fs
 {
 
-bool add_path_protocol(const std::string& protocol, const path& dir)
-{
-	// Protocol matching is case insensitive, convert to lower case
-	auto protocol_lower = string_utils::to_lower(protocol);
-
-	auto& protocols = get_path_protocols();
-	// Add to the list
-	protocols[protocol_lower] = dir.string();
-
-	// Success!
-	return true;
-}
-
-protocols_t& get_path_protocols()
-{
-	static protocols_t protocols;
-	return protocols;
-}
-
 template <typename Container = std::string, typename CharT = char, typename Traits = std::char_traits<char>>
 auto read_stream_into_container(std::basic_istream<CharT, Traits>& in,
 								typename Container::allocator_type alloc = {})
@@ -70,6 +51,25 @@ byte_array_t read_stream(std::istream& stream)
 	return read_stream_into_container<byte_array_t>(stream);
 }
 
+bool add_path_protocol(const std::string& protocol, const path& dir)
+{
+	// Protocol matching is case insensitive, convert to lower case
+	auto protocol_lower = string_utils::to_lower(protocol);
+
+	auto& protocols = get_path_protocols();
+	// Add to the list
+	protocols[protocol_lower] = fs::path(dir).make_preferred().string();
+
+	// Success!
+	return true;
+}
+
+protocols_t& get_path_protocols()
+{
+	static protocols_t protocols;
+	return protocols;
+}
+
 path resolve_protocol(const path& _path)
 {
 	const auto string_path = _path.generic_string();
@@ -81,7 +81,7 @@ path resolve_protocol(const path& _path)
 
 	fs::path relative_path = string_path.substr(pos + 1);
 	// Matching path protocol in our list?
-	auto& protocols = get_path_protocols();
+	const auto& protocols = get_path_protocols();
 
 	auto it = protocols.find(root);
 
@@ -102,11 +102,29 @@ bool has_known_protocol(const path& _path)
 
 	const auto root = string_path.substr(0, pos);
 
-	fs::path relative_path = string_path.substr(pos + 1);
-	// Matching path protocol in our list?
-	auto& protocols = get_path_protocols();
+	const auto& protocols = get_path_protocols();
 
+	// Matching path protocol in our list?
 	return (protocols.find(root) != std::end(protocols));
+}
+
+path convert_to_protocol(const path& _path)
+{
+	const auto string_path = fs::path(_path).make_preferred().string();
+
+	const auto& protocols = get_path_protocols();
+
+	for(const auto& protocol_pair : protocols)
+	{
+		const auto& protocol = protocol_pair.first;
+		const auto& resolved_protocol = protocol_pair.second;
+
+		if(string_utils::begins_with(string_path, resolved_protocol))
+		{
+			return fs::path(string_utils::replace(string_path, resolved_protocol, protocol)).generic_path();
+		}
+	}
+	return _path;
 }
 }
 

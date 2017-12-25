@@ -25,9 +25,6 @@ public:
 	static std::vector<std::string> enumerate();
 
 private:
-	bool init(int devnum);
-	void quit();
-
 	ALCdevice* dev = nullptr;
 	ALCcontext* ctx = nullptr;
 

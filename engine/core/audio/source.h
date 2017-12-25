@@ -68,7 +68,7 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : set_position ()
 	/// <summary>
-	/// The source or listener location in three dimensional space.
+	/// The source location in three dimensional space.
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void set_position(const float* position3);
