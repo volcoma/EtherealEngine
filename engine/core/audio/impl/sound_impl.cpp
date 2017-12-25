@@ -1,7 +1,7 @@
 #include "sound_impl.h"
+#include "../logger.h"
 #include "check.h"
 #include "repository.h"
-
 #include "stb_vorbis.h"
 #include <AL/al.h>
 #include <AL/alext.h>
@@ -21,19 +21,8 @@ static ALenum get_format_for_channels(std::uint32_t channels)
 		case 2:
 			format = AL_FORMAT_STEREO16;
 			break;
-		case 4:
-			format = AL_FORMAT_QUAD16;
-			break;
-		case 6:
-			format = AL_FORMAT_51CHN16;
-			break;
-		case 7:
-			format = AL_FORMAT_61CHN16;
-			break;
-		case 8:
-			format = AL_FORMAT_71CHN16;
-			break;
 		default:
+			log_error("Unsupported channel count : " + std::to_string(channels));
 			format = 0;
 			break;
 	}

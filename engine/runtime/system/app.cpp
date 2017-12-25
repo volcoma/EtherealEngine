@@ -47,7 +47,6 @@ void app::setup(cmd_line::options_parser& parser)
 
 void app::start(cmd_line::options_parser& parser)
 {
-	APPLOG_SEPARATOR();
 	core::add_subsystem<core::simulation>();
 	core::add_subsystem<core::task_system>();
 	core::add_subsystem<renderer>(parser);
@@ -61,6 +60,8 @@ void app::start(cmd_line::options_parser& parser)
 	core::add_subsystem<camera_system>();
 	core::add_subsystem<deferred_rendering>();
 	core::add_subsystem<audio_system>();
+	
+	
 }
 
 void app::stop()

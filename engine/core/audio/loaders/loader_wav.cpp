@@ -28,24 +28,6 @@ struct wav_header
 	int32_t data_bytes;  // Number of bytes in data. Number of samples * num_channels * sample byte size
 };
 
-static std::vector<std::uint8_t> convert_to_mono(const std::vector<std::uint8_t>& stereo)
-{
-	std::vector<std::uint8_t> result;
-	result.reserve(stereo.size() / 2);
-
-	for(size_t i = 0; i < stereo.size(); i += 4)
-	{
-		int16_t left = *reinterpret_cast<const int16_t*>(&stereo[i]);
-		int16_t right = *reinterpret_cast<const int16_t*>(&stereo[i + 2]);
-		int16_t mono_sample = int16_t((int(left) + right) / 2);
-
-		uint8_t sample_part1 = uint8_t(mono_sample >> 0);
-		uint8_t sample_part2 = uint8_t(mono_sample >> 8);
-		result.push_back(sample_part1);
-		result.push_back(sample_part2);
-	}
-	return result;
-}
 
 bool load_wav_from_memory(const uint8_t* data, std::size_t data_size, sound_data& result, std::string& err)
 {
@@ -64,25 +46,25 @@ bool load_wav_from_memory(const uint8_t* data, std::size_t data_size, sound_data
 	wav_header header;
 	std::memcpy(&header, data, sizeof(wav_header));
 
-	if(memcmp(header.riff_header, "RIFF", 4) != 0)
+	if(std::memcmp(header.riff_header, "RIFF", 4) != 0)
 	{
 		err = "ERROR : Bad RIFF header.";
 		return false;
 	}
 
-	if(memcmp(header.wave_header, "WAVE", 4) != 0)
+	if(std::memcmp(header.wave_header, "WAVE", 4) != 0)
 	{
 		err = "ERROR: This file is not wav format!";
 		return false;
 	}
 
-	if(memcmp(header.fmt_header, "fmt ", 4) != 0)
+	if(std::memcmp(header.fmt_header, "fmt ", 4) != 0)
 	{
 		err = "ERROR: This file is not wav format!";
 		return false;
 	}
 
-	if(memcmp(header.data_header, "data", 4) != 0)
+	if(std::memcmp(header.data_header, "data", 4) != 0)
 	{
 		err = "ERROR: This file is not wav format!";
 		return false;
@@ -97,24 +79,11 @@ bool load_wav_from_memory(const uint8_t* data, std::size_t data_size, sound_data
 	result.sample_rate = std::uint32_t(header.sample_rate);
 	result.duration = sound_data::duration_t(
 		header.wav_size / (header.num_channels * header.sample_rate * (header.bit_depth / 8.0f)) * 1.0f);
-
-	const bool request_mono = false;
-
-	if(request_mono && header.num_channels == 2)
-	{
-		std::vector<std::uint8_t> buff;
-		buff.resize(std::size_t(header.data_bytes));
-		std::memcpy(buff.data(), data + sizeof(wav_header), buff.size());
-
-		result.data = convert_to_mono(buff);
-		result.channels = 1;
-	}
-	else
-	{
-		result.data.resize(std::size_t(header.data_bytes));
-		std::memcpy(result.data.data(), data + sizeof(wav_header), result.data.size());
-		result.channels = std::uint32_t(header.num_channels);
-	}
+    
+	result.data.resize(std::size_t(header.data_bytes));
+	result.bytes_per_sample = std::uint8_t(header.bit_depth) / 8;
+	std::memcpy(result.data.data(), data + sizeof(wav_header), result.data.size());
+	result.channels = std::uint32_t(header.num_channels);
 
 	return true;
 }
