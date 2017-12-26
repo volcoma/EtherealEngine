@@ -417,6 +417,9 @@ void app::setup(cmd_line::options_parser& parser)
 
 void app::start(cmd_line::options_parser& parser)
 {
+    auto logging_container = logging::get_mutable_logging_container();
+	_console_log = std::make_shared<console_log>();
+	logging_container->add_sink(_console_log);
 	runtime::app::start(parser);
 
 	core::add_subsystem<gui_system>();
@@ -429,7 +432,6 @@ void app::start(cmd_line::options_parser& parser)
 	auto& rend = core::get_subsystem<runtime::renderer>();
 	auto& main_window = rend.get_main_window();
 
-	_console_log = std::make_shared<console_log>();
 	_console_dock_name = "CONSOLE";
 	auto scene = std::make_unique<scene_dock>("SCENE", true, ImVec2(200.0f, 200.0f));
 	auto game = std::make_unique<game_dock>("GAME", true, ImVec2(300.0f, 200.0f));
@@ -456,8 +458,6 @@ void app::start(cmd_line::options_parser& parser)
 	docking.register_dock(std::move(assets));
 	docking.register_dock(std::move(style));
 
-	auto logging_container = logging::get_mutable_logging_container();
-	logging_container->add_sink(_console_log);
 	std::function<void()> log_version = []() { APPLOG_INFO("Version 1.0"); };
 	_console_log->register_command("version", "Returns the current version of the Editor.", {}, {},
 								   log_version);
