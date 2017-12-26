@@ -1,3 +1,11 @@
+
+if(ETH_BUILD_3RDPARTY_RELEASE)
+	message(STATUS "===============================================")
+	message(STATUS "3rd party libs will be built with optimizations")
+	message(STATUS "===============================================")
+	set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS_RELEASE})
+endif()
+
 add_subdirectory_ex(assimp)
 add_subdirectory_ex(bgfx)
 add_subdirectory_ex(rttr)

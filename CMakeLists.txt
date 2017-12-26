@@ -19,6 +19,8 @@ detect_platform()
 print_info()
 set_output_paths()
 
+option(ETH_BUILD_3RDPARTY_RELEASE "3rdparty libs will be build with optimizations" ON)
+
 add_subdirectory_ex(3rdparty)
 
 set_project_custom_defines()
