@@ -1,6 +1,6 @@
 #include "inspector_audio_source.h"
-#include "inspectors.h"
 #include "core/string_utils/string_utils.h"
+#include "inspectors.h"
 
 bool inspector_audio_source_component::inspect(rttr::variant& var, bool read_only,
 											   const meta_getter& get_metadata)
@@ -9,7 +9,7 @@ bool inspector_audio_source_component::inspect(rttr::variant& var, bool read_onl
 
 	if(data)
 	{
-        gui::PushFont(gui::GetFont("icons"));
+		gui::PushFont(gui::GetFont("icons"));
 		if(gui::Button(ICON_FA_PLAY))
 		{
 			data->play();
@@ -25,14 +25,15 @@ bool inspector_audio_source_component::inspect(rttr::variant& var, bool read_onl
 			data->stop();
 		}
 		gui::SameLine();
-        auto total_time = data->get_playing_duration();
+		auto total_time = data->get_playing_duration();
 		auto current_time = data->get_playing_offset();
-        float percent = static_cast<float>(current_time.count() / total_time.count());
-		auto label = string_utils::format("%.2f/%.2f", current_time.count(), total_time.count());
-		gui::ProgressBar(percent, ImVec2(0.0f, 0.0f), label.c_str());
+		float cur = float(current_time.count());
+		if(gui::SliderFloat("##playing_offset", &cur, 0.0f, float(total_time.count())))
+		{
+			data->set_playing_offset(audio::sound_data::duration_t(cur));
+		}
 		gui::PopFont();
-		gui::Separator();
 	}
-    
+
 	return inspect_var(var, true, read_only, get_metadata);
 }

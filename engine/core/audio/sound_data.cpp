@@ -28,7 +28,7 @@ void sound_data::convert_to_stereo()
     if(channels == 1)
     {
         data = utils::convert_to_stereo(data, bytes_per_sample);
-        channels = 1;
+        channels = 2;
     }
     else if(channels >= 2)
     {

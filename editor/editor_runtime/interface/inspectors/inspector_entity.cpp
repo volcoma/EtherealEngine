@@ -33,7 +33,7 @@ bool inspector_entity::inspect(rttr::variant& var, bool read_only, const meta_ge
 		{
 			name = meta_id.to_string();
 		}
-
+		gui::PushID(component);
 		gui::SetNextTreeNodeOpen(true, ImGuiCond_FirstUseEver);
 		if(gui::CollapsingHeader(name.c_str(), &opened))
 		{
@@ -46,7 +46,7 @@ bool inspector_entity::inspect(rttr::variant& var, bool read_only, const meta_ge
 			gui::TreePop();
 			gui::PopStyleVar();
 		}
-
+		gui::PopID();
 		if(!opened)
 		{
 			component->get_entity().remove(component_ptr.lock());
