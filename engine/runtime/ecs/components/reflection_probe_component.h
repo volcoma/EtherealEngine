@@ -7,6 +7,7 @@
 #include "core/common/basetypes.hpp"
 #include "core/graphics/render_pass.h"
 #include "core/graphics/render_view.h"
+#include <array>
 //-----------------------------------------------------------------------------
 // Forward Declarations
 //-----------------------------------------------------------------------------
@@ -96,6 +97,8 @@ public:
 	//-----------------------------------------------------------------------------
 	std::shared_ptr<gfx::frame_buffer> get_cubemap_fbo();
 
+	void update();
+
 private:
 	//-------------------------------------------------------------------------
 	// Private Member Variables.
@@ -103,5 +106,5 @@ private:
 	/// The probe object this component represents
 	reflection_probe _probe;
 	/// The render view for this component
-	gfx::render_view _render_view[6];
+	std::array<gfx::render_view, 6> _render_view;
 };

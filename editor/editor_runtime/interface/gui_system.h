@@ -23,6 +23,8 @@ struct gui_system : public core::subsystem
 	void dispose();
 	void frame_begin(std::chrono::duration<float>);
 
+    std::uint32_t get_draw_calls() const;
+
 	ImGuiContext& get_context(std::uint32_t id);
 
 	void push_context(std::uint32_t id);

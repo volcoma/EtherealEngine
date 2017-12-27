@@ -32,9 +32,15 @@ void show_statistics(const unsigned int fps)
 	gui::Text("MSPF : %.3f ms ", 1000.0 / double(fps));
 	gui::Separator();
 
+	const auto& gui_sys = core::get_subsystem<gui_system>();
+	std::uint32_t ui_draw_calls = gui_sys.get_draw_calls();
 	auto stats = gfx::get_stats();
 	gui::AlignTextToFramePadding();
-	gui::Text("DRAW CALLS: %u", stats->numDraw);
+	gui::Text("TOTAL DRAW CALLS: %u", stats->numDraw);
+	gui::AlignTextToFramePadding();
+	gui::Text("UI DRAW CALLS: %u", ui_draw_calls);
+	gui::AlignTextToFramePadding();
+	gui::Text("SCENE DRAW CALLS: %u", stats->numDraw - ui_draw_calls);
 	gui::AlignTextToFramePadding();
 	gui::Text("COMPUTE CALLS: %u", stats->numCompute);
 	gui::AlignTextToFramePadding();
@@ -76,10 +82,10 @@ void draw_selected_camera(const ImVec2& size)
 			p.x += size.x - bounds.x - 20.0f;
 			p.y += size.y - bounds.y - 40.0f;
 			gui::SetNextWindowPos(p);
-			if(gui::Begin("Camera Preview", nullptr, ImGuiWindowFlags_NoFocusOnAppearing |
-														 ImGuiWindowFlags_NoCollapse |
-														 ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
-														 ImGuiWindowFlags_AlwaysAutoResize))
+			if(gui::Begin("Camera Preview", nullptr,
+						  ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoCollapse |
+							  ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+							  ImGuiWindowFlags_AlwaysAutoResize))
 			{
 				gui::Image(surface->get_attachment(0).texture, bounds);
 			}

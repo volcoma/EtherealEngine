@@ -6,6 +6,7 @@
 #include "../ecs/systems/bone_system.h"
 #include "../ecs/systems/camera_system.h"
 #include "../ecs/systems/deferred_rendering.h"
+#include "../ecs/systems/reflection_probe_system.h"
 #include "../ecs/systems/scene_graph.h"
 #include "../input/input.h"
 #include "../rendering/render_window.h"
@@ -58,10 +59,9 @@ void app::start(cmd_line::options_parser& parser)
 	core::add_subsystem<scene_graph>();
 	core::add_subsystem<bone_system>();
 	core::add_subsystem<camera_system>();
+	core::add_subsystem<reflection_probe_system>();
 	core::add_subsystem<deferred_rendering>();
 	core::add_subsystem<audio_system>();
-	
-	
 }
 
 void app::stop()

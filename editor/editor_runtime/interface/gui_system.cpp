@@ -34,9 +34,11 @@ static ImGuiContext* s_initial_context = nullptr;
 static std::unique_ptr<gpu_program> s_program;
 static asset_handle<gfx::texture> s_font_texture;
 static std::vector<std::shared_ptr<gfx::texture>> s_textures;
+static std::uint32_t s_draw_calls = 0;
 
 void render_func(ImDrawData* _drawData)
 {
+	s_draw_calls = 0;
 	auto prog = s_program.get();
 	if(!prog)
 		return;
@@ -69,6 +71,10 @@ void render_func(ImDrawData* _drawData)
 		ImDrawIdx* indices = reinterpret_cast<ImDrawIdx*>(tib.data);
 		std::memcpy(indices, drawList->IdxBuffer.begin(), numIndices * sizeof(ImDrawIdx));
 
+		std::uint64_t state =
+			0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_MSAA |
+			BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA);
+
 		std::uint32_t offset = 0;
 		for(const ImDrawCmd *cmd = drawList->CmdBuffer.begin(), *cmdEnd = drawList->CmdBuffer.end();
 			cmd != cmdEnd; ++cmd)
@@ -79,9 +85,6 @@ void render_func(ImDrawData* _drawData)
 			}
 			else if(0 != cmd->ElemCount)
 			{
-				std::uint64_t state =
-					0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_MSAA |
-					BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA);
 				auto tex = s_font_texture.get();
 
 				if(nullptr != cmd->TextureId)
@@ -94,13 +97,14 @@ void render_func(ImDrawData* _drawData)
 				const std::uint16_t width = std::uint16_t(std::min(cmd->ClipRect.z, 65535.0f) - x);
 				const std::uint16_t height = std::uint16_t(std::min(cmd->ClipRect.w, 65535.0f) - y);
 
-				gfx::set_scissor(x, y, width, height);
 				prog->set_texture(0, "s_tex", tex);
 
+				gfx::set_scissor(x, y, width, height);
+				gfx::set_state(state);
 				gfx::set_vertex_buffer(0, &tvb, 0, numVertices);
 				gfx::set_index_buffer(&tib, offset, cmd->ElemCount);
-				gfx::set_state(state);
 				gfx::submit(gfx::render_pass::get_pass(), prog->native_handle());
+				s_draw_calls++;
 			}
 
 			offset += cmd->ElemCount;
@@ -329,18 +333,19 @@ void imgui_init()
 
 	gui::AddFont("default", io.Fonts->AddFontDefault(&config));
 	gui::AddFont("standard",
-			io.Fonts->AddFontFromMemoryTTF((void*)s_font_default, sizeof(s_font_default), 20, &config));
+				 io.Fonts->AddFontFromMemoryTTF((void*)s_font_default, sizeof(s_font_default), 20, &config));
 
 	static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
 	config.MergeMode = true;
 	config.PixelSnapH = true;
-	gui::AddFont("icons", io.Fonts->AddFontFromMemoryTTF(
-		(void*)fontawesome_webfont_ttf, sizeof(fontawesome_webfont_ttf), 20, &config, icons_ranges));
+	gui::AddFont("icons",
+				 io.Fonts->AddFontFromMemoryTTF((void*)fontawesome_webfont_ttf,
+												sizeof(fontawesome_webfont_ttf), 20, &config, icons_ranges));
 
 	config.MergeMode = false;
 	config.PixelSnapH = false;
-	gui::AddFont("standard_big", 
-		io.Fonts->AddFontFromMemoryTTF((void*)s_font_default, sizeof(s_font_default), 50, &config));
+	gui::AddFont("standard_big",
+				 io.Fonts->AddFontFromMemoryTTF((void*)s_font_default, sizeof(s_font_default), 50, &config));
 
 	io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
 
@@ -400,6 +405,11 @@ void gui_system::dispose()
 void gui_system::frame_begin(std::chrono::duration<float>)
 {
 	imgui_frame_begin();
+}
+
+uint32_t gui_system::get_draw_calls() const
+{
+	return s_draw_calls;
 }
 
 ImGuiContext& gui_system::get_context(uint32_t id)

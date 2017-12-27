@@ -48,7 +48,7 @@ REFLECT(texture_info)
 	rttr::registration::class_<texture_info>("texture_info")
 		.property_readonly("format", &texture_info::format)(rttr::metadata("pretty_name", "Format"))
 		.property_readonly("storageSize",
-						   &texture_info::storageSize)(rttr::metadata("pretty_name", "Storage Size"))
+						   &texture_info::storageSize)(rttr::metadata("pretty_name", "Storage Size(bytes)"))
 		.property_readonly("width", &texture_info::width)(rttr::metadata("pretty_name", "Width"))
 		.property_readonly("height", &texture_info::height)(rttr::metadata("pretty_name", "Height"))
 		.property_readonly("depth", &texture_info::depth)(rttr::metadata("pretty_name", "Depth"))
