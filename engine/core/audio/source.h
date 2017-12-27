@@ -117,6 +117,22 @@ public:
 	//-----------------------------------------------------------------------------
 	void set_playing_offset(sound_data::duration_t offset);
 
+    //-----------------------------------------------------------------------------
+	//  Name : get_playing_offset ()
+	/// <summary>
+	/// Gets the source buffer position, in seconds.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	sound_data::duration_t get_playing_offset() const;
+	
+	//-----------------------------------------------------------------------------
+	//  Name : get_playing_duration ()
+	/// <summary>
+	/// Gets the source buffer length, in seconds.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	sound_data::duration_t get_playing_duration() const;
+
 	//-----------------------------------------------------------------------------
 	//  Name : play ()
 	/// <summary>

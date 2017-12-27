@@ -1,3 +1,2 @@
-file(GLOB_RECURSE libsrc *.h *.cpp *.hpp *.inl *.c *.cc *.m)
-
-add_custom_target (common_lib SOURCES ${libsrc})
+add_library(common_lib INTERFACE)
+target_add_ide_support(common_lib)

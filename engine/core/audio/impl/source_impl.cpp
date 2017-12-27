@@ -46,13 +46,14 @@ bool source_impl::create()
 bool source_impl::bind(sound_impl::native_handle_type buffer)
 {
 	if(is_binded())
-	{   
-        if(binded_handle() == buffer)
-        {
-            return true;
-        };
+	{
+		if(binded_handle() == buffer)
+		{
+			return true;
+		};
 		unbind();
-    }
+	}
+
 	alCheck(alSourcei(_handle, AL_SOURCE_RELATIVE, AL_FALSE));
 
 	alCheck(alSourcei(_handle, AL_BUFFER, ALint(buffer)));
@@ -83,6 +84,33 @@ void source_impl::set_playing_offset(float seconds)
 	alCheck(alSourcef(_handle, AL_SEC_OFFSET, seconds));
 }
 
+float source_impl::get_playing_offset() const
+{
+	ALfloat seconds = 0.0f;
+	alCheck(alGetSourcef(_handle, AL_SEC_OFFSET, &seconds));
+    return static_cast<float>(seconds);
+}
+
+float source_impl::get_playing_duration() const
+{
+    auto buffer = binded_handle();
+    if(buffer == 0)
+        return 1.0f;
+        
+    ALint size_in_bytes = 0;
+	ALint channels = 0;
+	ALint bits = 0;
+    ALint frequency = 0;
+
+	alCheck(alGetBufferi(buffer, AL_SIZE, &size_in_bytes));
+	alCheck(alGetBufferi(buffer, AL_CHANNELS, &channels));
+	alCheck(alGetBufferi(buffer, AL_BITS, &bits));
+    alCheck(alGetBufferi(buffer, AL_FREQUENCY, &frequency));
+
+    auto lengthInSamples = size_in_bytes * 8 / (channels * bits);
+	return float(lengthInSamples) / float(frequency);    
+}
+
 void source_impl::play() const
 {
 	alCheck(alSourcePlay(_handle));
@@ -100,16 +128,16 @@ void source_impl::pause() const
 
 bool source_impl::is_playing() const
 {
-	ALint state;
+	ALint state = AL_INITIAL;
 	alCheck(alGetSourcei(_handle, AL_SOURCE_STATE, &state));
-    return (state == AL_PLAYING);
+	return (state == AL_PLAYING);
 }
 
 bool source_impl::is_paused() const
 {
-    ALint state;
+	ALint state;
 	alCheck(alGetSourcei(_handle, AL_SOURCE_STATE, &state));
-    return (state == AL_PAUSED);
+	return (state == AL_PAUSED);
 }
 
 bool source_impl::is_binded() const
@@ -148,7 +176,7 @@ void source_impl::set_velocity(const float* velocity3)
 
 void source_impl::set_orientation(const float* direction3, const float* up3)
 {
-	//alCheck(alSourcefv(_handle, AL_DIRECTION, direction3));
+	// alCheck(alSourcefv(_handle, AL_DIRECTION, direction3));
 	float orientation6[] = {-direction3[0], -direction3[1], -direction3[2], up3[0], up3[1], up3[2]};
 	alCheck(alSourcefv(_handle, AL_ORIENTATION, orientation6));
 }
@@ -161,12 +189,12 @@ void source_impl::set_volume_rolloff(float rolloff)
 void source_impl::set_distance(float mind, float maxd)
 {
 
-    // The distance that the source will be the loudest (if the listener is
-    // closer, it won't be any louder than if they were at this distance)
+	// The distance that the source will be the loudest (if the listener is
+	// closer, it won't be any louder than if they were at this distance)
 	alCheck(alSourcef(_handle, AL_REFERENCE_DISTANCE, mind));
-	
+
 	// The distance that the source will be the quietest (if the listener is
-    // farther, it won't be any quieter than if they were at this distance)
+	// farther, it won't be any quieter than if they were at this distance)
 	alCheck(alSourcef(_handle, AL_MAX_DISTANCE, maxd));
 }
 

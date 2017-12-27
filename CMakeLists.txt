@@ -10,6 +10,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 include(macros)
 include(modules/ECMEnableSanitizers)
+include(add_ide_support)
 
 set( BUILD_SHARED_LIBS OFF CACHE BOOL "Build package with shared libraries." FORCE)
 

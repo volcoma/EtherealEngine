@@ -143,7 +143,25 @@ void source::set_playing_offset(sound_data::duration_t offset)
 	if(_impl)
 	{
 		_impl->set_playing_offset(float(offset.count()));
+    }
+}
+
+sound_data::duration_t source::get_playing_offset() const
+{
+    if(_impl)
+	{
+		return sound_data::duration_t(_impl->get_playing_offset());
 	}
+    return sound_data::duration_t(0);
+}
+
+sound_data::duration_t source::get_playing_duration() const
+{
+    if(_impl)
+	{
+		return sound_data::duration_t(_impl->get_playing_duration());
+	}
+    return sound_data::duration_t(0);
 }
 
 bool source::is_valid() const

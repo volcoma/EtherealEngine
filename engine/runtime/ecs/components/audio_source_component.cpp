@@ -48,10 +48,10 @@ void audio_source_component::set_autoplay(bool on)
 	_auto_play = on;
 
 	// Should this be here?
-	if(_auto_play)
+	if(_auto_play && !is_playing())
+	{
 		play();
-	else
-		stop();
+	}
 }
 
 bool audio_source_component::get_autoplay() const
@@ -82,6 +82,16 @@ const frange& audio_source_component::get_range() const
 void audio_source_component::set_playing_offset(audio::sound_data::duration_t offset)
 {
 	_source.set_playing_offset(offset);
+}
+
+audio::sound_data::duration_t audio_source_component::get_playing_offset() const
+{
+	return _source.get_playing_offset();
+}
+
+audio::sound_data::duration_t audio_source_component::get_playing_duration() const
+{
+	return _source.get_playing_duration();
 }
 
 void audio_source_component::play()
@@ -121,10 +131,10 @@ bool audio_source_component::is_looping() const
 void audio_source_component::set_sound(asset_handle<audio::sound> sound)
 {
 	stop();
+
 	_sound = sound;
 
-	if(_auto_play)
-		play();
+	apply_all();
 }
 
 asset_handle<audio::sound> audio_source_component::get_sound() const

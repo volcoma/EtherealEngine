@@ -53,6 +53,8 @@ public:
 	const frange& get_range() const;
 
 	void set_playing_offset(audio::sound_data::duration_t offset);
+	audio::sound_data::duration_t get_playing_offset() const;
+	audio::sound_data::duration_t get_playing_duration() const;
 
 	void play();
 	void stop();
