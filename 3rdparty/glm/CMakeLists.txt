@@ -14,5 +14,7 @@ set(GLM_TEST_ENABLE_SIMD_AVX OFF CACHE BOOL "Enable AVX optimizations" FORCE)
 set(GLM_TEST_ENABLE_SIMD_AVX2 OFF CACHE BOOL "Enable AVX2 optimizations" FORCE)
 set(GLM_TEST_FORCE_PURE OFF CACHE BOOL "Force 'pure' instructions" FORCE)
 
+add_definitions(-DGLM_FORCE_LEFT_HANDED)
+
 add_subdirectory( glm )
 target_include_directories (glm_static PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/glm)

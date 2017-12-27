@@ -69,12 +69,13 @@ frustum::frustum(const bbox& AABB)
 //-----------------------------------------------------------------------------
 void frustum::update(const transform& view, const transform& proj, bool _oglNDC)
 {
-
+    
 	// Build a combined view & projection matrix
 	const transform m = proj * view;
 
 	// Extract frustum planes from matrix
 	// Planes are in format: normal(xyz), offset(w)
+	// Expects left handed orientation and row_major matrix layout
 	planes[volume_plane::right].data.x = m[0][3] + m[0][0];
 	planes[volume_plane::right].data.y = m[1][3] + m[1][0];
 	planes[volume_plane::right].data.z = m[2][3] + m[2][0];
@@ -95,28 +96,26 @@ void frustum::update(const transform& view, const transform& proj, bool _oglNDC)
 	planes[volume_plane::bottom].data.z = m[2][3] + m[2][1];
 	planes[volume_plane::bottom].data.w = m[3][3] + m[3][1];
 
-	planes[volume_plane::far_plane].data.x = m[0][2];
-	planes[volume_plane::far_plane].data.y = m[1][2];
-	planes[volume_plane::far_plane].data.z = m[2][2];
-	planes[volume_plane::far_plane].data.w = m[3][2];
-
-	planes[volume_plane::near_plane].data.x = m[0][3] - m[0][2];
-	planes[volume_plane::near_plane].data.y = m[1][3] - m[1][2];
-	planes[volume_plane::near_plane].data.z = m[2][3] - m[2][2];
-	planes[volume_plane::near_plane].data.w = m[3][3] - m[3][2];
+	planes[volume_plane::far_plane].data.x = m[0][3] - m[0][2];
+	planes[volume_plane::far_plane].data.y = m[1][3] - m[1][2];
+	planes[volume_plane::far_plane].data.z = m[2][3] - m[2][2];
+	planes[volume_plane::far_plane].data.w = m[3][3] - m[3][2];
 
 	if(_oglNDC)
 	{
-		planes[volume_plane::far_plane].data.x = m[0][3] - m[0][2];
-		planes[volume_plane::far_plane].data.y = m[1][3] - m[1][2];
-		planes[volume_plane::far_plane].data.z = m[2][3] - m[2][2];
-		planes[volume_plane::far_plane].data.w = m[3][3] - m[3][2];
-
 		planes[volume_plane::near_plane].data.x = m[0][3] + m[0][2];
 		planes[volume_plane::near_plane].data.y = m[1][3] + m[1][2];
 		planes[volume_plane::near_plane].data.z = m[2][3] + m[2][2];
 		planes[volume_plane::near_plane].data.w = m[3][3] + m[3][2];
 	}
+	else
+	{
+		planes[volume_plane::near_plane].data.x = m[0][2];
+		planes[volume_plane::near_plane].data.y = m[1][2];
+		planes[volume_plane::near_plane].data.z = m[2][2];
+		planes[volume_plane::near_plane].data.w = m[3][2];
+	}
+
 	for(auto& plane : planes)
 		plane.data *= -1.0f;
 	// Normalize and compute additional information.

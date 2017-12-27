@@ -1,6 +1,7 @@
 #include "picking_system.h"
 #include "core/graphics/render_pass.h"
 #include "core/graphics/texture.h"
+#include "core/logging/logging.h"
 #include "editing_system.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/ecs/components/camera_component.h"
@@ -28,51 +29,59 @@ void picking_system::frame_render(std::chrono::duration<float>)
 
 	const auto render_frame = renderer.get_render_frame();
 
-	auto& editor_camera = es.camera;
-	if(imguizmo::is_over() && es.selection_data.object)
-		return;
-
-	if(!editor_camera || !editor_camera.has_component<camera_component>())
-		return;
-
-	auto camera_comp = editor_camera.get_component<camera_component>();
-	auto camera_comp_ptr = camera_comp.lock().get();
-	auto& camera = camera_comp_ptr->get_camera();
-	auto near_clip = camera.get_near_clip();
-	auto far_clip = camera.get_far_clip();
-	const auto& mouse_pos = input.get_current_cursor_position();
-	const auto& frustum = camera.get_frustum();
-	math::vec2 cursor_pos = math::vec2{mouse_pos.x, mouse_pos.y};
-	math::vec3 pick_eye;
-	math::vec3 pick_at;
-	math::vec3 pick_up = {0.0f, 1.0f, 0.0f};
-
-	if(!camera.viewport_to_world(cursor_pos, frustum.planes[math::volume_plane::near_plane], pick_eye, true))
-		return;
-
-	if(!camera.viewport_to_world(cursor_pos, frustum.planes[math::volume_plane::far_plane], pick_at, true))
-		return;
-
 	if(input.is_mouse_button_pressed(mml::mouse::left))
 	{
+		auto& editor_camera = es.camera;
+		if(imguizmo::is_over() && es.selection_data.object)
+			return;
+
+		if(!editor_camera || !editor_camera.has_component<camera_component>())
+			return;
+
+		auto camera_comp = editor_camera.get_component<camera_component>();
+		auto camera_comp_ptr = camera_comp.lock().get();
+		const auto& current_camera = camera_comp_ptr->get_camera();
+		const auto near_clip = current_camera.get_near_clip();
+		const auto far_clip = current_camera.get_far_clip();
+		const auto& mouse_pos = input.get_current_cursor_position();
+		const auto& frustum = current_camera.get_frustum();
+		math::vec2 cursor_pos = math::vec2{mouse_pos.x, mouse_pos.y};
+		math::vec3 pick_eye;
+		math::vec3 pick_at;
+		math::vec3 pick_up = {0.0f, 1.0f, 0.0f};
+
+		if(!current_camera.viewport_to_world(cursor_pos, frustum.planes[math::volume_plane::near_plane],
+											 pick_eye, true))
+			return;
+
+		if(!current_camera.viewport_to_world(cursor_pos, frustum.planes[math::volume_plane::far_plane],
+											 pick_at, true))
+			return;
+
 		_reading = 0;
 		_start_readback = true;
-		auto pick_view = math::lookAt(pick_eye, pick_at, pick_up);
 
-		static const auto perspective_ =
-			gfx::is_homogeneous_depth() ? math::perspectiveNO<float> : math::perspectiveZO<float>;
-		auto pick_proj = perspective_(math::radians(1.0f), 1.0f, near_clip, far_clip);
+		camera pick_camera;
+		pick_camera.set_aspect_ratio(1.0f);
+		pick_camera.set_fov(1.0f);
+		pick_camera.set_near_clip(near_clip);
+		pick_camera.set_far_clip(far_clip);
+		pick_camera.look_at(pick_eye, pick_at, pick_up);
+
+		const auto& pick_view = pick_camera.get_view();
+		const auto& pick_proj = pick_camera.get_projection();
+		const auto& pick_frustum = pick_camera.get_frustum();
 
 		gfx::render_pass pass("picking_buffer_fill");
 		pass.bind(_surface.get());
 		// ID buffer clears to black, which represents clicking on nothing (background)
 		pass.clear(BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
 
-		pass.set_view_proj(math::value_ptr(pick_view), math::value_ptr(pick_proj));
+		pass.set_view_proj(pick_view, pick_proj);
 
 		ecs.for_each<transform_component, model_component>(
-			[this, &pass, &camera](runtime::entity e, transform_component& transform_comp_ref,
-								   model_component& model_comp_ref) {
+			[this, &pass, &pick_frustum](runtime::entity e, transform_component& transform_comp_ref,
+										 model_component& model_comp_ref) {
 				auto& model = model_comp_ref.get_model();
 				if(!model.is_valid())
 					return;
@@ -83,11 +92,10 @@ void picking_system::frame_render(std::chrono::duration<float>)
 				if(!mesh)
 					return;
 
-				const auto& frustum = camera.get_frustum();
 				const auto& bounds = mesh->get_bounds();
 
 				// Test the bounding box of the mesh
-				if(!math::frustum::test_obb(frustum, bounds, world_transform))
+				if(!math::frustum::test_obb(pick_frustum, bounds, world_transform))
 					return;
 
 				auto entity_index = e.id().index();
@@ -97,7 +105,6 @@ void picking_system::frame_render(std::chrono::duration<float>)
 				math::vec4 color_id = {rr / 255.0f, gg / 255.0f, bb / 255.0f, 1.0f};
 
 				const auto& bone_transforms = model_comp_ref.get_bone_transforms();
-
 				model.render(pass.id, world_transform, bone_transforms, true, true, true, 0, 0,
 							 _program.get(), [&color_id](auto& p) { p.set_uniform("u_id", &color_id); });
 			});
@@ -107,6 +114,16 @@ void picking_system::frame_render(std::chrono::duration<float>)
 	// Whatever mesh has the most pixels in the ID buffer is the one the user clicked on.
 	if(!_reading && _start_readback)
 	{
+		const auto caps = gfx::get_caps();
+		bool blit_support = 0 != (caps->supported & BGFX_CAPS_TEXTURE_BLIT);
+
+		if(blit_support == false)
+		{
+			APPLOG_WARNING("Texture blitting is not supported. Picking will not work");
+			_start_readback = false;
+			return;
+		}
+
 		gfx::render_pass pass("picking_buffer_blit");
 		// Blit and read
 		gfx::blit(pass.id, _blit_tex->native_handle(), 0, 0, _surface->get_texture()->native_handle());
@@ -124,9 +141,8 @@ void picking_system::frame_render(std::chrono::duration<float>)
 			std::uint8_t rr = *x++;
 			std::uint8_t gg = *x++;
 			std::uint8_t bb = *x++;
-			x++;
-			/*std::uint8_t aa = *x++*/;
-
+			std::uint8_t aa = *x++;
+			(void)aa;
 			if(gfx::renderer_type::Direct3D9 == gfx::get_renderer_type())
 			{
 				// Comes back as BGRA

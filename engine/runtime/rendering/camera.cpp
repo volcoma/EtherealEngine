@@ -15,10 +15,10 @@ float camera::get_ppu() const
 	return float(_viewport_size.height) / (2.0f * _ortho_size);
 }
 
-void camera::set_viewport_size(const usize& viewportSize)
+void camera::set_viewport_size(const usize& viewport_size)
 {
-	_viewport_size = viewportSize;
-	set_aspect_ratio(float(viewportSize.width) / float(viewportSize.height));
+	_viewport_size = viewport_size;
+	set_aspect_ratio(float(viewport_size.width) / float(viewport_size.height));
 }
 
 void camera::set_orthographic_size(float size)
@@ -52,14 +52,14 @@ void camera::set_projection_mode(projection_mode Mode)
 	touch();
 }
 
-void camera::set_near_clip(float fDistance)
+void camera::set_near_clip(float distance)
 {
 	// Skip if this is a no-op
-	if(math::epsilonEqual(fDistance, _near_clip, math::epsilon<float>()))
+	if(math::epsilonEqual(distance, _near_clip, math::epsilon<float>()))
 		return;
 
 	// Store value
-	_near_clip = fDistance;
+	_near_clip = distance;
 
 	touch();
 
@@ -68,14 +68,14 @@ void camera::set_near_clip(float fDistance)
 		set_far_clip(_near_clip);
 }
 
-void camera::set_far_clip(float fDistance)
+void camera::set_far_clip(float distance)
 {
 	// Skip if this is a no-op
-	if(math::epsilonEqual(fDistance, _far_clip, math::epsilon<float>()))
+	if(math::epsilonEqual(distance, _far_clip, math::epsilon<float>()))
 		return;
 
 	// Store value
-	_far_clip = fDistance;
+	_far_clip = distance;
 
 	touch();
 
@@ -88,9 +88,9 @@ math::bbox camera::get_local_bounding_box()
 {
 	if(_projection_mode == projection_mode::perspective)
 	{
-		float fFarSize = math::tan(math::radians<float>(_fov * 0.5f)) * _far_clip;
-		return math::bbox(-fFarSize * _aspect_ratio, -fFarSize, _near_clip, fFarSize * _aspect_ratio,
-						  fFarSize, _far_clip);
+		float far_size = math::tan(math::radians<float>(_fov * 0.5f)) * _far_clip;
+		return math::bbox(-far_size * _aspect_ratio, -far_size, _near_clip, far_size * _aspect_ratio,
+						  far_size, _far_clip);
 	}
 	else
 	{
@@ -102,10 +102,10 @@ math::bbox camera::get_local_bounding_box()
 	}
 }
 
-void camera::set_aspect_ratio(float fAspect, bool bLocked /* = false */)
+void camera::set_aspect_ratio(float aspect, bool bLocked /* = false */)
 {
 	// Is this a no-op?
-	if(math::epsilonEqual(fAspect, _aspect_ratio, math::epsilon<float>()))
+	if(math::epsilonEqual(aspect, _aspect_ratio, math::epsilon<float>()))
 	{
 		_aspect_locked = bLocked;
 		return;
@@ -113,7 +113,7 @@ void camera::set_aspect_ratio(float fAspect, bool bLocked /* = false */)
 	} // End if aspect is the same
 
 	// Update camera properties
-	_aspect_ratio = fAspect;
+	_aspect_ratio = aspect;
 	_aspect_locked = bLocked;
 	_aspect_dirty = true;
 	_frustum_dirty = true;
@@ -218,7 +218,7 @@ math::vec3 camera::z_unit_axis() const
 	return math::inverse(_view).z_unit_axis();
 }
 
-const math::frustum& camera::get_frustum()
+const math::frustum& camera::get_frustum() const
 {
 	// Recalculate frustum if necessary
 	if(_frustum_dirty == true && _frustum_locked == false)
@@ -258,7 +258,7 @@ const math::frustum& camera::get_frustum()
 	return _frustum;
 }
 
-const math::frustum& camera::get_clipping_volume()
+const math::frustum& camera::get_clipping_volume() const
 {
 	// Recalculate frustum if necessary
 	if(_frustum_dirty == true && _frustum_locked == false)
@@ -268,7 +268,7 @@ const math::frustum& camera::get_clipping_volume()
 	return _clipping_volume;
 }
 
-math::volume_query camera::bounds_in_frustum(const math::bbox& AABB)
+math::volume_query camera::bounds_in_frustum(const math::bbox& AABB) const
 {
 	// Recompute the frustum as necessary.
 	const math::frustum& f = get_frustum();
@@ -277,7 +277,7 @@ math::volume_query camera::bounds_in_frustum(const math::bbox& AABB)
 	return f.classify_aabb(AABB);
 }
 
-math::volume_query camera::bounds_in_frustum(const math::bbox& AABB, const math::transform& t)
+math::volume_query camera::bounds_in_frustum(const math::bbox& AABB, const math::transform& t) const
 {
 	// Recompute the frustum as necessary.
 	const math::frustum& f = get_frustum();
@@ -292,92 +292,93 @@ math::vec3 camera::world_to_viewport(const math::vec3& pos) const
 	auto view_proj = get_view_projection();
 
 	// Transform the point into clip space
-	math::vec4 vClip = view_proj.matrix() * math::vec4{pos.x, pos.y, pos.z, 1.0f};
+	math::vec4 clip = view_proj.matrix() * math::vec4{pos.x, pos.y, pos.z, 1.0f};
 
 	// Project!
-	const float recipW = 1.0f / vClip.w;
-	vClip.x *= recipW;
-	vClip.y *= recipW;
-	vClip.z *= recipW;
+	const float recip_w = 1.0f / clip.w;
+	clip.x *= recip_w;
+	clip.y *= recip_w;
+	clip.z *= recip_w;
 
 	// Transform to final screen space position
 	math::vec3 point;
-	point.x = ((vClip.x * 0.5f) + 0.5f) * (float)_viewport_size.width + _viewport_pos.x;
-	point.y = ((vClip.y * -0.5f) + 0.5f) * (float)_viewport_size.height + _viewport_pos.y;
-	point.z = vClip.z;
+	point.x = ((clip.x * 0.5f) + 0.5f) * float(_viewport_size.width) + float(_viewport_pos.x);
+	point.y = ((clip.y * -0.5f) + 0.5f) * float(_viewport_size.height) + float(_viewport_pos.y);
+	point.z = clip.z;
 
 	// Point on screen!
 	return point;
 }
 
-bool camera::viewport_to_ray(const math::vec2& point, math::vec3& vecRayStart, math::vec3& vecRayDir)
+bool camera::viewport_to_ray(const math::vec2& point, math::vec3& vec_ray_start,
+							 math::vec3& vec_ray_dir) const
 {
-	math::vec3 vCursor;
 
 	// Ensure we have an up-to-date projection and view matrix
-	math::transform mtxInvView;
-	math::transform mtxProj = get_projection();
-	math::transform mtxView = get_view();
-	mtxInvView = math::inverse(mtxView);
+	math::transform mtx_proj = get_projection();
+	math::transform mtx_view = get_view();
+	math::transform mtx_inv_view = math::inverse(mtx_view);
 
 	// Transform the pick position from view port space into camera space
-	vCursor.x = (((2.0f * (point.x - _viewport_pos.x)) / (float)_viewport_size.width) - 1) / mtxProj[0][0];
-	vCursor.y = -(((2.0f * (point.y - _viewport_pos.y)) / (float)_viewport_size.height) - 1) / mtxProj[1][1];
-	vCursor.z = 1.0f;
+	math::vec3 cursor;
+	cursor.x = (((2.0f * (point.x - _viewport_pos.x)) / float(_viewport_size.width)) - 1.0f) / mtx_proj[0][0];
+	cursor.y =
+		-(((2.0f * (point.y - _viewport_pos.y)) / float(_viewport_size.height)) - 1.0f) / mtx_proj[1][1];
+	cursor.z = 1.0f;
 
 	// Transform the camera space pick ray into 3D space
 	if(get_projection_mode() == projection_mode::orthographic)
 	{
 		// Obtain the ray from the cursor position
-		vecRayStart = math::transform::transform_coord(vCursor, mtxInvView);
-		vecRayDir = (math::vec3&)mtxInvView[2];
+		vec_ray_start = math::transform::transform_coord(cursor, mtx_inv_view);
+		vec_ray_dir = mtx_inv_view[2];
 
 	} // End If IsOrthohraphic
 	else
 	{
 		// Obtain the ray from the cursor position
-		vecRayStart = mtxInvView.get_position();
-		vecRayDir.x =
-			vCursor.x * mtxInvView[0][0] + vCursor.y * mtxInvView[1][0] + vCursor.z * mtxInvView[2][0];
-		vecRayDir.y =
-			vCursor.x * mtxInvView[0][1] + vCursor.y * mtxInvView[1][1] + vCursor.z * mtxInvView[2][1];
-		vecRayDir.z =
-			vCursor.x * mtxInvView[0][2] + vCursor.y * mtxInvView[1][2] + vCursor.z * mtxInvView[2][2];
+		vec_ray_start = mtx_inv_view.get_position();
+		vec_ray_dir.x =
+			cursor.x * mtx_inv_view[0][0] + cursor.y * mtx_inv_view[1][0] + cursor.z * mtx_inv_view[2][0];
+		vec_ray_dir.y =
+			cursor.x * mtx_inv_view[0][1] + cursor.y * mtx_inv_view[1][1] + cursor.z * mtx_inv_view[2][1];
+		vec_ray_dir.z =
+			cursor.x * mtx_inv_view[0][2] + cursor.y * mtx_inv_view[1][2] + cursor.z * mtx_inv_view[2][2];
 
 	} // End If !IsOrthohraphic
 	// Success!
 	return true;
 }
 
-bool camera::viewport_to_world(const math::vec2& point, const math::plane& Plane, math::vec3& WorldPos,
-							   bool clip)
+bool camera::viewport_to_world(const math::vec2& point, const math::plane& pl, math::vec3& world_pos,
+							   bool clip) const
 {
-	math::vec3 vPickRayDir, vPickRayOrig;
-	float fProjRayLength, fDistance;
 
 	if(clip && ((point.x < _viewport_pos.x) || (point.x > (_viewport_pos.x + _viewport_size.width)) ||
 				(point.y < _viewport_pos.y) || (point.y > (_viewport_pos.y + _viewport_size.height))))
 		return false;
 
+	math::vec3 pick_ray_dir;
+	math::vec3 pick_ray_origin;
 	// Convert the screen coordinates to a ray.
-	if(viewport_to_ray(point, vPickRayOrig, vPickRayDir) == false)
+	if(viewport_to_ray(point, pick_ray_origin, pick_ray_dir) == false)
 		return false;
 
 	// Get the length of the 'adjacent' side of the virtual triangle formed
 	// by the direction and normal.
-	fProjRayLength = math::plane::dot_normal(Plane, vPickRayDir);
-	if(math::abs<float>(fProjRayLength) < math::epsilon<float>())
+	float proj_ray_length = math::plane::dot_normal(pl, pick_ray_dir);
+	if(math::abs<float>(proj_ray_length) < math::epsilon<float>())
 		return false;
 
 	// Calculate distance to plane along its normal
-	fDistance = math::plane::dot_normal(Plane, vPickRayOrig) + Plane.data.w;
+	float distance = math::plane::dot_normal(pl, pick_ray_origin) + pl.data.w;
 
 	// If both the "direction" and origin are on the same side of the plane
 	// then we can't possibly intersect (perspective rule only)
 	if(get_projection_mode() == projection_mode::perspective)
 	{
-		int nSign1 = (fDistance > 0) ? 1 : (fDistance < 0) ? -1 : 0;
-		int nSign2 = (fProjRayLength > 0) ? 1 : (fProjRayLength < 0) ? -1 : 0;
+		int nSign1 = (distance > 0) ? 1 : (distance < 0) ? -1 : 0;
+		int nSign2 = (proj_ray_length > 0) ? 1 : (proj_ray_length < 0) ? -1 : 0;
 		if(nSign1 == nSign2)
 			return false;
 
@@ -385,26 +386,27 @@ bool camera::viewport_to_world(const math::vec2& point, const math::plane& Plane
 
 	// Calculate the actual interval (Distance along the adjacent side / length of
 	// adjacent side).
-	fDistance /= -fProjRayLength;
+	distance /= -proj_ray_length;
 
 	// Store the results
-	WorldPos = vPickRayOrig + (vPickRayDir * fDistance);
+	world_pos = pick_ray_origin + (pick_ray_dir * distance);
 
 	// Success!
 	return true;
 }
 
-bool camera::viewport_to_major_axis(const math::vec2& point, const math::vec3& Origin, math::vec3& WorldPos,
-									math::vec3& MajorAxis)
+bool camera::viewport_to_major_axis(const math::vec2& point, const math::vec3& Origin, math::vec3& world_pos,
+									math::vec3& major_axis) const
 {
-	return viewport_to_major_axis(point, Origin, z_unit_axis(), WorldPos, MajorAxis);
+	return viewport_to_major_axis(point, Origin, z_unit_axis(), world_pos, major_axis);
 }
 
 bool camera::viewport_to_major_axis(const math::vec2& point, const math::vec3& Origin,
-									const math::vec3& Normal, math::vec3& WorldPos, math::vec3& MajorAxis)
+									const math::vec3& Normal, math::vec3& world_pos,
+									math::vec3& major_axis) const
 {
 	// First select the major axis plane based on the specified normal
-	MajorAxis = math::vec3(1, 0, 0); // YZ
+	major_axis = math::vec3(1, 0, 0); // YZ
 
 	// Get absolute normal vector
 	float x = math::abs<float>(Normal.x);
@@ -414,61 +416,62 @@ bool camera::viewport_to_major_axis(const math::vec2& point, const math::vec3& O
 	// If all the components are effectively equal, select one plane
 	if(math::abs<float>(x - y) < math::epsilon<float>() && math::abs<float>(x - z) < math::epsilon<float>())
 	{
-		MajorAxis = math::vec3(0, 0, 1); // XY
+		major_axis = math::vec3(0, 0, 1); // XY
 
 	} // End if components equal
 	else
 	{
 		// Calculate which component of the normal is the major axis
-		float fNorm = x;
-		if(fNorm < y)
+		float norm = x;
+		if(norm < y)
 		{
-			fNorm = y;
-			MajorAxis = math::vec3(0, 1, 0);
+			norm = y;
+			major_axis = math::vec3(0, 1, 0);
 		} // XZ
-		if(fNorm < z)
+		if(norm < z)
 		{
-			fNorm = z;
-			MajorAxis = math::vec3(0, 0, 1);
+			norm = z;
+			major_axis = math::vec3(0, 0, 1);
 		} // XY
 
 	} // End if perform compare
 
 	// Generate the intersection plane based on this information
 	// and pass through to the standard viewportToWorld method
-	math::plane p = math::plane::from_point_normal(Origin, MajorAxis);
-	return viewport_to_world(point, p, WorldPos, false);
+	math::plane p = math::plane::from_point_normal(Origin, major_axis);
+	return viewport_to_world(point, p, world_pos, false);
 }
 
-bool camera::viewport_to_camera(const math::vec3& point, math::vec3& CameraPos)
+bool camera::viewport_to_camera(const math::vec3& point, math::vec3& camera_pos) const
 {
 	// Ensure that we have an up-to-date projection and view matrix
-	auto& mtxProj = get_projection();
+	auto& mtx_proj = get_projection();
 
 	// Transform the pick position from screen space into camera space
-	CameraPos.x = (((2.0f * (point.x - _viewport_pos.x)) / float(_viewport_size.width)) - 1) / mtxProj[0][0];
-	CameraPos.y =
-		-(((2.0f * (point.y - _viewport_pos.y)) / float(_viewport_size.height)) - 1) / mtxProj[1][1];
-	CameraPos.z = get_near_clip();
+	camera_pos.x =
+		(((2.0f * (point.x - _viewport_pos.x)) / float(_viewport_size.width)) - 1) / mtx_proj[0][0];
+	camera_pos.y =
+		-(((2.0f * (point.y - _viewport_pos.y)) / float(_viewport_size.height)) - 1) / mtx_proj[1][1];
+	camera_pos.z = get_near_clip();
 
 	// Success!
 	return true;
 }
 
-float camera::estimate_zoom_factor(const math::plane& Plane)
+float camera::estimate_zoom_factor(const math::plane& pl) const
 {
-	math::vec3 vWorld;
 
 	// Just return the actual zoom factor if this is orthographic
 	if(get_projection_mode() == projection_mode::orthographic)
 		return get_zoom_factor();
 
+	math::vec3 world;
 	// Otherwise, estimate is based on the distance from the grid plane.
-	viewport_to_world(math::vec2(float(_viewport_size.width) / 2.0f, float(_viewport_size.height) / 2.0f),
-					  Plane, vWorld, false);
+	viewport_to_world(math::vec2(float(_viewport_size.width) / 2.0f, float(_viewport_size.height) / 2.0f), pl,
+					  world, false);
 
 	// Perform full position based estimation
-	return estimate_zoom_factor(vWorld);
+	return estimate_zoom_factor(world);
 }
 
 //-----------------------------------------------------------------------------
@@ -480,61 +483,61 @@ float camera::estimate_zoom_factor(const math::plane& Plane)
 /// position.
 /// </summary>
 //-----------------------------------------------------------------------------
-float camera::estimate_zoom_factor(const math::vec3& WorldPos)
+float camera::estimate_zoom_factor(const math::vec3& world_pos) const
 {
-	return estimate_zoom_factor(WorldPos, std::numeric_limits<float>::max());
+	return estimate_zoom_factor(world_pos, std::numeric_limits<float>::max());
 }
 
-float camera::estimate_zoom_factor(const math::plane& Plane, float fMax)
+float camera::estimate_zoom_factor(const math::plane& pl, float max_val) const
 {
 	// Just return the actual zoom factor if this is orthographic
 	if(get_projection_mode() == projection_mode::orthographic)
 	{
-		float fFactor = get_zoom_factor();
-		return math::min(fMax, fFactor);
+		float factor = get_zoom_factor();
+		return math::min(max_val, factor);
 
 	} // End if orthographic
 	// Otherwise, estimate is based on the distance from the grid plane.
-	math::vec3 vWorld;
-	viewport_to_world(math::vec2(float(_viewport_size.width) / 2.0f, float(_viewport_size.height)), Plane,
-					  vWorld, false);
+	math::vec3 world;
+	viewport_to_world(math::vec2(float(_viewport_size.width) / 2.0f, float(_viewport_size.height) / 2.0f), pl,
+					  world, false);
 
 	// Perform full position based estimation
-	return estimate_zoom_factor(vWorld, fMax);
+	return estimate_zoom_factor(world, max_val);
 }
 
-float camera::estimate_zoom_factor(const math::vec3& WorldPos, float fMax)
+float camera::estimate_zoom_factor(const math::vec3& world_pos, float max_val) const
 {
 	// Just return the actual zoom factor if this is orthographic
 	if(get_projection_mode() == projection_mode::orthographic)
 	{
-		float fFactor = get_zoom_factor();
-		return math::min(fMax, fFactor);
+		float factor = get_zoom_factor();
+		return math::min(max_val, factor);
 
 	} // End if orthographic
 
 	// New Zoom factor is based on the distance to this position
 	// along the camera's look vector.
-	math::vec3 viewPos = math::transform::transform_coord(WorldPos, get_view());
-	float distance = viewPos.z / (float(_viewport_size.height) * (45.0f / get_fov()));
-	return std::min<float>(fMax, distance);
+	math::vec3 view_pos = math::transform::transform_coord(world_pos, get_view());
+	float distance = view_pos.z / (float(_viewport_size.height) * (45.0f / get_fov()));
+	return std::min<float>(max_val, distance);
 }
 
-math::vec3 camera::estimate_pick_tolerance(float WireTolerance, const math::vec3& Pos,
-										   const math::transform& ObjectTransform)
+math::vec3 camera::estimate_pick_tolerance(float wire_tolerance, const math::vec3& pos,
+										   const math::transform& object_transform) const
 {
 	// Scale tolerance based on estimated world space zoom factor.
 	math::vec3 v;
-	ObjectTransform.transform_coord(v, Pos);
-	WireTolerance *= estimate_zoom_factor(v);
+	object_transform.transform_coord(v, pos);
+	wire_tolerance *= estimate_zoom_factor(v);
 
 	// Convert into object space tolerance.
-	math::vec3 ObjectWireTolerance;
-	math::vec3 vAxisScale = ObjectTransform.get_scale();
-	ObjectWireTolerance.x = WireTolerance / vAxisScale.x;
-	ObjectWireTolerance.y = WireTolerance / vAxisScale.y;
-	ObjectWireTolerance.z = WireTolerance / vAxisScale.z;
-	return ObjectWireTolerance;
+	math::vec3 Objectwire_tolerance;
+	math::vec3 vAxisScale = object_transform.get_scale();
+	Objectwire_tolerance.x = wire_tolerance / vAxisScale.x;
+	Objectwire_tolerance.y = wire_tolerance / vAxisScale.y;
+	Objectwire_tolerance.z = wire_tolerance / vAxisScale.z;
+	return Objectwire_tolerance;
 }
 
 void camera::record_current_matrices()
@@ -543,24 +546,24 @@ void camera::record_current_matrices()
 	_last_projection = get_projection();
 }
 
-void camera::set_aa_data(const usize& viewportSize, std::uint32_t currentSubpixelIndex,
-						 std::uint32_t temporalAASamples)
+void camera::set_aa_data(const usize& viewport_size, std::uint32_t current_subpixel_index,
+						 std::uint32_t temporal_aa_samples)
 {
-	if(temporalAASamples > 1)
+	if(temporal_aa_samples > 1)
 	{
-		float SampleX = math::halton(currentSubpixelIndex, 2) - 0.5f;
-		float SampleY = math::halton(currentSubpixelIndex, 3) - 0.5f;
-		if(temporalAASamples == 2)
+		float SampleX = math::halton(current_subpixel_index, 2) - 0.5f;
+		float SampleY = math::halton(current_subpixel_index, 3) - 0.5f;
+		if(temporal_aa_samples == 2)
 		{
 
 			float SamplesX[] = {-4.0f / 16.0f, 4.0f / 16.0f};
 			float SamplesY[] = {4.0f / 16.0f, -4.0f / 16.0f};
 
-			std::uint32_t Index = currentSubpixelIndex;
+			std::uint32_t Index = current_subpixel_index;
 			SampleX = SamplesX[Index];
 			SampleY = SamplesY[Index];
 		}
-		else if(temporalAASamples == 3)
+		else if(temporal_aa_samples == 3)
 		{
 			// 3xMSAA
 			//   A..
@@ -569,11 +572,11 @@ void camera::set_aa_data(const usize& viewportSize, std::uint32_t currentSubpixe
 			// Rolling circle pattern (A,B,C).
 			float SamplesX[] = {-2.0f / 3.0f, 2.0f / 3.0f, 0.0f / 3.0f};
 			float SamplesY[] = {-2.0f / 3.0f, 0.0f / 3.0f, 2.0f / 3.0f};
-			std::uint32_t Index = currentSubpixelIndex;
+			std::uint32_t Index = current_subpixel_index;
 			SampleX = SamplesX[Index];
 			SampleY = SamplesY[Index];
 		}
-		else if(temporalAASamples == 4)
+		else if(temporal_aa_samples == 4)
 		{
 			// 4xMSAA
 			// Pattern docs:
@@ -585,31 +588,31 @@ void camera::set_aa_data(const usize& viewportSize, std::uint32_t currentSubpixe
 			// Rolling circle pattern (N,E,S,W).
 			float SamplesX[] = {-2.0f / 16.0f, 6.0f / 16.0f, 2.0f / 16.0f, -6.0f / 16.0f};
 			float SamplesY[] = {-6.0f / 16.0f, -2.0f / 16.0f, 6.0f / 16.0f, 2.0f / 16.0f};
-			std::uint32_t Index = currentSubpixelIndex;
+			std::uint32_t Index = current_subpixel_index;
 			SampleX = SamplesX[Index];
 			SampleY = SamplesY[Index];
 		}
-		else if(temporalAASamples == 8)
+		else if(temporal_aa_samples == 8)
 		{
 			// This works better than various orderings of 8xMSAA.
-			std::uint32_t Index = currentSubpixelIndex;
+			std::uint32_t Index = current_subpixel_index;
 			SampleX = math::halton(Index, 2) - 0.5f;
 			SampleY = math::halton(Index, 3) - 0.5f;
 		}
 		else
 		{
 			// More than 8 samples can improve quality.
-			std::uint32_t Index = currentSubpixelIndex;
+			std::uint32_t Index = current_subpixel_index;
 			SampleX = math::halton(Index, 2) - 0.5f;
 			SampleY = math::halton(Index, 3) - 0.5f;
 		}
 
-		_aa_data = math::vec4(float(currentSubpixelIndex), float(temporalAASamples), SampleX, SampleY);
+		_aa_data = math::vec4(float(current_subpixel_index), float(temporal_aa_samples), SampleX, SampleY);
 
-		float fWidth = static_cast<float>(viewportSize.width);
-		float fHeight = static_cast<float>(viewportSize.height);
-		_aa_data.z *= (2.0f / fWidth);
-		_aa_data.w *= (2.0f / fHeight);
+		float width = static_cast<float>(viewport_size.width);
+		float height = static_cast<float>(viewport_size.height);
+		_aa_data.z *= (2.0f / width);
+		_aa_data.w *= (2.0f / height);
 	}
 	else
 	{

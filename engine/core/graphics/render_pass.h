@@ -77,8 +77,8 @@ struct render_pass
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static std::uint8_t get_pass();
+	static gfx::view_id get_pass();
 	///
-	std::uint8_t id;
+	gfx::view_id id;
 };
 }

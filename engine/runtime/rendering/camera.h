@@ -254,7 +254,7 @@ public:
 	/// Retrieve the current camera object frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const math::frustum& get_frustum();
+	const math::frustum& get_frustum() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_clipping_volume()
@@ -264,7 +264,7 @@ public:
 	/// end up clipping geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const math::frustum& get_clipping_volume();
+	const math::frustum& get_clipping_volume() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_projection ()
@@ -281,17 +281,6 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	inline const math::transform& get_view() const
-	{
-		return _view;
-	}
-
-	//-----------------------------------------------------------------------------
-	//  Name : get_view ()
-	/// <summary>
-	/// Return the current view matrix.
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	inline math::transform& get_view()
 	{
 		return _view;
 	}
@@ -368,7 +357,7 @@ public:
 	/// Determine whether or not the AABB specified falls within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::volume_query bounds_in_frustum(const math::bbox& bounds);
+	math::volume_query bounds_in_frustum(const math::bbox& bounds) const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : bounds_in_frustum ()
@@ -376,7 +365,7 @@ public:
 	/// Determine whether or not the OOBB specified is within the frustum.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	math::volume_query bounds_in_frustum(const math::bbox& bounds, const math::transform& t);
+	math::volume_query bounds_in_frustum(const math::bbox& bounds, const math::transform& t) const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : viewport_to_ray()
@@ -385,7 +374,7 @@ public:
 	/// vector, suitable for use during picking.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool viewport_to_ray(const math::vec2& point, math::vec3& rayOriginOut, math::vec3& rayDirectionOut);
+	bool viewport_to_ray(const math::vec2& point, math::vec3& rayOriginOut, math::vec3& rayDirectionOut) const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : viewport_to_world ()
@@ -397,7 +386,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	bool viewport_to_world(const math::vec2& point, const math::plane& plane, math::vec3& positionOut,
-						   bool clip);
+						   bool clip) const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : viewport_to_major_axis ()
@@ -409,7 +398,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	bool viewport_to_major_axis(const math::vec2& point, const math::vec3& axisOrigin,
-								math::vec3& positionOut, math::vec3& majorAxisOut);
+								math::vec3& positionOut, math::vec3& majorAxisOut) const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : viewportToMajorAxis ()
@@ -422,7 +411,7 @@ public:
 	//-----------------------------------------------------------------------------
 	bool viewport_to_major_axis(const math::vec2& point, const math::vec3& axisOrigin,
 								const math::vec3& alignNormal, math::vec3& positionOut,
-								math::vec3& majorAxisOut);
+								math::vec3& majorAxisOut) const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : viewport_to_camera ()
@@ -431,7 +420,7 @@ public:
 	/// the point into a camera space position at the near plane.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool viewport_to_camera(const math::vec3& point, math::vec3& positionOut);
+	bool viewport_to_camera(const math::vec3& point, math::vec3& positionOut) const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : world_to_viewport()
@@ -450,7 +439,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float estimate_zoom_factor(const math::plane& plane);
+	float estimate_zoom_factor(const math::plane& plane) const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : estimate_zoom_factor ()
@@ -460,7 +449,7 @@ public:
 	/// "scale" as it appears in the viewport.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float estimate_zoom_factor(const math::vec3& position);
+	float estimate_zoom_factor(const math::vec3& position) const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : estimate_zoom_factor ()
@@ -470,7 +459,7 @@ public:
 	/// "scale" as it appears in the viewport.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float estimate_zoom_factor(const math::plane& plane, float maximumValue);
+	float estimate_zoom_factor(const math::plane& plane, float maximumValue) const;
 
 	//-----------------------------------------------------------------------------
 	// Name : estimate_zoom_factor ()
@@ -481,7 +470,7 @@ public:
 	/// position.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	float estimate_zoom_factor(const math::vec3& position, float maximumValue);
+	float estimate_zoom_factor(const math::vec3& position, float maximumValue) const;
 
 	//-----------------------------------------------------------------------------
 	// Name : estimate_pick_tolerance ()
@@ -491,7 +480,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	math::vec3 estimate_pick_tolerance(float pixelTolerance, const math::vec3& referencePosition,
-									   const math::transform& objectTransform);
+									   const math::transform& objectTransform) const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : look_at ()
@@ -604,10 +593,10 @@ protected:
 	/// Cached "previous" projection matrix.
 	math::transform _last_projection;
 	/// Details regarding the camera frustum.
-	math::frustum _frustum;
+	mutable math::frustum _frustum;
 	/// The near clipping volume (area of space between the camera position and
 	/// the near plane).
-	math::frustum _clipping_volume;
+	mutable math::frustum _clipping_volume;
 	/// The aspect ratio used to generate the correct horizontal degrees
 	/// (perspective only)
 	float _aspect_ratio = 1.0f;
@@ -620,7 +609,7 @@ protected:
 	/// Has the aspect ratio changed?
 	mutable bool _aspect_dirty = true;
 	/// Are the frustum planes dirty ?
-	bool _frustum_dirty = true;
+	mutable bool _frustum_dirty = true;
 	/// Should the aspect ratio be automatically updated by the render driver?
 	bool _aspect_locked = false;
 	/// Is the frustum locked?

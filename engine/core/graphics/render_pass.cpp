@@ -4,18 +4,18 @@
 #include <limits>
 namespace gfx
 {
-static std::uint8_t s_index = 0;
-static std::uint8_t s_last_index = 0;
+static gfx::view_id s_index = 0;
+static gfx::view_id s_last_index = 0;
 
-std::uint8_t generate_id()
+gfx::view_id generate_id()
 {
-	if(s_index == std::numeric_limits<decltype(s_index)>::max())
+	if(s_index == 255)
 	{
 		frame();
 		s_index = 0;
 	}
 	// find the first unset bit
-	std::uint8_t idx = s_index++;
+	gfx::view_id idx = s_index++;
 
 	s_last_index = idx;
 	return idx;
@@ -76,7 +76,7 @@ void render_pass::reset()
 	s_last_index = 0;
 }
 
-std::uint8_t render_pass::get_pass()
+gfx::view_id render_pass::get_pass()
 {
 	return s_last_index;
 }

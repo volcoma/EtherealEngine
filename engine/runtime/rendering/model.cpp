@@ -113,7 +113,7 @@ void model::set_lod_limits(const std::vector<urange>& limits)
 	_lod_limits = limits;
 }
 
-void model::render(std::uint8_t id, const math::transform& world_transform,
+void model::render(gfx::view_id id, const math::transform& world_transform,
 				   const std::vector<math::transform>& bone_transforms, bool apply_cull, bool depth_write,
 				   bool depth_test, std::uint64_t extra_states, unsigned int lod, gpu_program* user_program,
 				   std::function<void(gpu_program&)> setup_params) const
@@ -122,7 +122,7 @@ void model::render(std::uint8_t id, const math::transform& world_transform,
 	if(!mesh)
 		return;
 
-	auto render_subset = [this, &mesh](std::uint8_t id, bool skinned, std::uint32_t group_id,
+	auto render_subset = [this, &mesh](gfx::view_id id, bool skinned, std::uint32_t group_id,
 									   const float* mtx, std::uint32_t count, bool apply_cull,
 									   bool depth_write, bool depth_test, std::uint64_t extra_states,
 									   gpu_program* user_program,

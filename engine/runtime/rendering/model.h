@@ -5,6 +5,7 @@
 #include "core/math/math_includes.h"
 #include "core/reflection/registration.h"
 #include "core/serialization/serialization.h"
+#include "core/graphics/graphics.h"
 #include <vector>
 
 class gpu_program;
@@ -180,7 +181,7 @@ public:
 	/// ones.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void render(std::uint8_t id, const math::transform& world_transform,
+	void render(gfx::view_id id, const math::transform& world_transform,
 				const std::vector<math::transform>& bone_transforms, bool apply_cull, bool depth_write,
 				bool depth_test, std::uint64_t extra_states, unsigned int lod, gpu_program* user_program,
 				std::function<void(gpu_program&)> setup_params) const;

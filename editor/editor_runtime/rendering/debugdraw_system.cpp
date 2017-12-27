@@ -37,7 +37,7 @@ void debugdraw_system::frame_render(std::chrono::duration<float>)
 	gfx::render_pass pass("debug_draw_pass");
 	pass.bind(surface.get());
 	pass.set_view_proj(view, proj);
-	dd_raii dd(pass.id);
+	gfx::dd_raii dd(pass.id);
 
 	if(es.show_grid)
 	{

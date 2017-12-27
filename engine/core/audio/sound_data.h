@@ -8,22 +8,30 @@
 namespace audio
 {
 
-namespace utils
-{
-std::vector<std::uint8_t> convert_stereo_to_mono(const std::vector<std::uint8_t>& stereo);
-std::vector<std::uint8_t> convert_mono_to_stereo(const std::vector<std::uint8_t>& mono);
-}
-
 struct sound_data
 {
 	using duration_t = std::chrono::duration<double>;
 
-	double get_duration_as_double() const;
+	duration_t::rep get_duration() const;
 	
+	//-----------------------------------------------------------------------------
+	//  Name : convert_to_mono ()
+	/// <summary>
+	/// Converts internal data to mono/1 channel. Ideal for 3d positional sounds.
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	void convert_to_mono();
+	
+	//-----------------------------------------------------------------------------
+	//  Name : convert_to_stereo ()
+	/// <summary>
+	/// Converts internal data to stereo/2 channels. These will not be affected by
+	/// 3d attenuation.
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	void convert_to_stereo();
 
-	/// data buffer of pcm sound int16_t per sample stored in uint8_t buffer
+	/// data buffer of pcm sound stored in uint8_t buffer
 	std::vector<std::uint8_t> data;
     
     /// bytes per sample

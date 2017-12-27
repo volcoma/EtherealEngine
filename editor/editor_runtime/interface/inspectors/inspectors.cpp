@@ -30,7 +30,8 @@ std::shared_ptr<inspector> get_inspector(rttr::type type)
 	return registry.type_map[type];
 }
 
-bool inspect_var(rttr::variant& var, bool skip_custom, bool read_only, const inspector::meta_getter& get_metadata)
+bool inspect_var(rttr::variant& var, bool skip_custom, bool read_only,
+				 const inspector::meta_getter& get_metadata)
 {
 	rttr::instance object = var;
 	auto type = object.get_derived_type();
@@ -55,6 +56,7 @@ bool inspect_var(rttr::variant& var, bool skip_custom, bool read_only, const ins
 	{
 		for(auto& prop : properties)
 		{
+			bool prop_changed = false;
 			auto prop_var = prop.get_value(object);
 			bool is_readonly = prop.is_readonly();
 			bool is_array = prop_var.is_sequential_container();
@@ -78,30 +80,32 @@ bool inspect_var(rttr::variant& var, bool skip_custom, bool read_only, const ins
 				};
 				if(is_array)
 				{
-					changed |= inspect_array(prop_var, is_readonly, get_meta);
+					prop_changed |= inspect_array(prop_var, is_readonly, get_meta);
 				}
 				else if(is_associative_container)
 				{
-					changed |= inspect_associative_container(prop_var, is_readonly);
+					prop_changed |= inspect_associative_container(prop_var, is_readonly);
 				}
 				else if(is_enum)
 				{
 					auto enumeration = prop.get_enumeration();
-					changed |= inspect_enum(prop_var, enumeration, is_readonly);
+					prop_changed |= inspect_enum(prop_var, enumeration, is_readonly);
 				}
 				else
 				{
-					changed |= inspect_var(prop_var, false, is_readonly, get_meta);
+					prop_changed |= inspect_var(prop_var, false, is_readonly, get_meta);
 				}
 
 				if(details && open)
 					gui::TreePop();
 			}
 
-			if(changed && !is_readonly)
+			if(prop_changed && !is_readonly)
 			{
 				prop.set_value(object, prop_var);
 			}
+
+			changed |= prop_changed;
 		}
 	}
 
