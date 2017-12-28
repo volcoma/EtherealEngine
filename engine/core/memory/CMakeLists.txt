@@ -1,3 +1,2 @@
-file(GLOB_RECURSE libsrc *.h *.cpp *.hpp *.c *.cc)
-
-add_library (memory ${libsrc})
+add_library (memory INTERFACE)
+target_add_ide_support(memory)

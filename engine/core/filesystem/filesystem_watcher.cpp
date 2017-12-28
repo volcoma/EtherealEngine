@@ -80,11 +80,11 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	watcher_impl(const fs::path& path, const std::string& filter, bool recursive, bool initialList,
-				 const notify_callback& listCallback)
+	watcher_impl(const fs::path& path, const std::string& filter, bool recursive, bool initial_list,
+				 const notify_callback& list_callback)
 		: _recursive(recursive)
 		, _filter(filter)
-		, _callback(listCallback)
+		, _callback(list_callback)
 	{
 		_root = path;
 		std::vector<filesystem_watcher::entry> entries;
@@ -104,7 +104,7 @@ public:
 			poll_entry(_root, entries, created, modified);
 		}
 
-		if(initialList)
+		if(initial_list)
 		{
 			// this means that the first watch won't call the callback function
 			// so we have to manually call it here if we want that behavior
@@ -262,10 +262,10 @@ static filesystem_watcher& get_watcher()
 	return wd;
 }
 
-void filesystem_watcher::watch(const fs::path& path, bool recursive, bool initialList,
+void filesystem_watcher::watch(const fs::path& path, bool recursive, bool initial_list,
 							   const notify_callback& callback)
 {
-	watch_impl(path, recursive, initialList, callback);
+	watch_impl(path, recursive, initial_list, callback);
 }
 
 void filesystem_watcher::unwatch(const fs::path& path, bool recursive)
@@ -344,8 +344,8 @@ void filesystem_watcher::start()
 	});
 }
 
-void filesystem_watcher::watch_impl(const fs::path& path, bool recursive, bool initialList,
-									const notify_callback& listCallback)
+void filesystem_watcher::watch_impl(const fs::path& path, bool recursive, bool initial_list,
+									const notify_callback& list_callback)
 {
 	auto& wd = get_watcher();
 	// and start its thread
@@ -355,7 +355,7 @@ void filesystem_watcher::watch_impl(const fs::path& path, bool recursive, bool i
 	const std::string key = path.string();
 
 	// add a new watcher
-	if(listCallback)
+	if(list_callback)
 	{
 		std::string filter;
 		fs::path p = path;
@@ -382,7 +382,7 @@ void filesystem_watcher::watch_impl(const fs::path& path, bool recursive, bool i
 		if(wd._watchers.find(key) == wd._watchers.end())
 		{
 			wd._watchers.emplace(make_pair(
-				key, std::make_unique<watcher_impl>(p, filter, recursive, initialList, listCallback)));
+				key, std::make_unique<watcher_impl>(p, filter, recursive, initial_list, list_callback)));
 		}
 	}
 }

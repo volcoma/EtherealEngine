@@ -1,9 +1,60 @@
 #include "filesystem.h"
-#include "../common/platform_config.h"
-#include "../string_utils/string_utils.h"
-#include <array>
+
 namespace fs
 {
+
+namespace detail
+{
+bool begins_with(const std::string& str, const std::string& value)
+{
+	// Validate requirements
+	if(str.length() < value.length())
+		return false;
+	if(str.empty() == true || value.empty() == true)
+		return false;
+
+	// Do the subsets match?
+	auto s1 = str.substr(0, value.length());
+	if(s1.compare(value) == 0)
+		return true;
+
+	// No match
+	return false;
+}
+static std::string replace_seq(const std::string& str, const std::string& oldSequence,
+							   const std::string& newSequence)
+{
+	std::string s = str;
+	std::string::size_type location = 0;
+	std::string::size_type oldLength = oldSequence.length();
+	std::string::size_type newLength = newSequence.length();
+
+	// Search for all replace std::string occurances.
+	if(s.empty() == false)
+	{
+		while(std::string::npos != (location = s.find(oldSequence, location)))
+		{
+			s.replace(location, oldLength, newSequence);
+			location += newLength;
+
+			// Break out if we're done
+			if(location >= s.length())
+				break;
+
+		} // Next
+
+	} // End if not empty
+
+	return s;
+}
+
+std::string to_lower(const std::string& str)
+{
+	std::string s(str);
+	std::transform(s.begin(), s.end(), s.begin(), tolower);
+	return s;
+}
+
 
 template <typename Container = std::string, typename CharT = char, typename Traits = std::char_traits<char>>
 auto read_stream_into_container(std::basic_istream<CharT, Traits>& in,
@@ -46,15 +97,16 @@ auto read_stream_into_container(std::basic_istream<CharT, Traits>& in,
 	return container;
 }
 
+}
 byte_array_t read_stream(std::istream& stream)
 {
-	return read_stream_into_container<byte_array_t>(stream);
+	return detail::read_stream_into_container<byte_array_t>(stream);
 }
 
 bool add_path_protocol(const std::string& protocol, const path& dir)
 {
 	// Protocol matching is case insensitive, convert to lower case
-	auto protocol_lower = string_utils::to_lower(protocol);
+	auto protocol_lower = detail::to_lower(protocol);
 
 	auto& protocols = get_path_protocols();
 	// Add to the list
@@ -119,112 +171,16 @@ path convert_to_protocol(const path& _path)
 		const auto& protocol = protocol_pair.first;
 		const auto& resolved_protocol = protocol_pair.second;
 
-		if(string_utils::begins_with(string_path, resolved_protocol))
+		if(detail::begins_with(string_path, resolved_protocol))
 		{
-			return fs::path(string_utils::replace(string_path, resolved_protocol, protocol)).generic_path();
+			return replace(string_path, resolved_protocol, protocol).generic_path();
 		}
 	}
 	return _path;
 }
-}
 
-#include <stdio.h>
-#include <stdlib.h>
-
-namespace fs
+path replace(const path& _path, const path& _sequence, const path& _new_sequence)
 {
-path executable_path_fallback(const char* argv0)
-{
-	if(0 == argv0 || 0 == argv0[0])
-	{
-		return "";
-	}
-	fs::error_code err;
-	path full_path(system_complete(path(std::string(argv0)), err));
-	return full_path;
+	return path(detail::replace_seq(_path.string(), _sequence.string(), _new_sequence.string()));
 }
 }
-#if $on($windows)
-#include <Windows.h>
-namespace fs
-{
-path executable_path(const char* argv0)
-{
-	std::array<char, 1024> buf;
-	buf.fill(0);
-	DWORD ret = GetModuleFileNameA(NULL, buf.data(), DWORD(buf.size()));
-	if(ret == 0 || std::size_t(ret) == buf.size())
-	{
-		return executable_path_fallback(argv0);
-	}
-	return path(std::string(buf.data()));
-}
-void show_in_graphical_env(const path& _path)
-{
-	ShellExecuteA(NULL, NULL, _path.string().c_str(), NULL, NULL, SW_SHOWNORMAL);
-}
-}
-#elif $on($apple)
-#include <mach-o/dyld.h>
-namespace fs
-{
-path executable_path(const char* argv0)
-{
-	std::array<char, 1024> buf;
-	buf.fill(0);
-	uint32_t size = buf.size();
-	int ret = _NSGetExecutablePath(buf.data(), &size);
-	if(0 != ret)
-	{
-		return executable_path_fallback(argv0);
-	}
-	fs::error_code err;
-	path full_path(system_complete(path(std::string(buf.data())).normalize(), err));
-	return full_path;
-}
-void show_in_graphical_env(const path& _path)
-{
-}
-}
-#elif $on($linux)
-
-#include <unistd.h>
-namespace fs
-{
-path executable_path(const char* argv0)
-{
-	std::array<char, 1024> buf;
-	buf.fill(0);
-
-	ssize_t size = readlink("/proc/self/exe", buf.data(), buf.size());
-	if(size == 0 || size == sizeof(buf))
-	{
-		return executable_path_fallback(argv0);
-	}
-	std::string p(buf.data(), size);
-	fs::error_code err;
-	path full_path(system_complete(path(p).normalize(), err));
-	return full_path;
-}
-void show_in_graphical_env(const path& _path)
-{
-	static std::string cmd = "xdg-open";
-	static std::string space = " ";
-	const std::string cmd_args = "'" + _path.string() + "'";
-	const std::string whole_command = cmd + space + cmd_args;
-	system(whole_command.c_str());
-}
-}
-#else
-namespace fs
-{
-path executable_path(const char* argv0)
-{
-	return executable_path_fallback(argv0);
-}
-
-void show_in_graphical_env(const path& _path)
-{
-}
-}
-#endif

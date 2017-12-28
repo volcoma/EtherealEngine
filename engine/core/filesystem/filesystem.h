@@ -1,21 +1,14 @@
 #pragma once
 
-#include "boost/filesystem.hpp"
-#include <chrono>
+#include "detail/filesystem_includes.h"
+#include "detail/filesystem_os.h"
+
 #include <istream>
 #include <unordered_map>
 #include <vector>
+
 namespace fs
 {
-// using namespace std::experimental::filesystem;
-// using error_code = std::error_code;
-// using file_time_type = std::experimental::filesystem::file_time_type;
-// using copy_options = std::experimental::filesystem::copy_options;
-
-using namespace boost::filesystem;
-using error_code = boost::system::error_code;
-using file_time_type = std::time_t;
-using copy_options = boost::filesystem::copy_option;
 
 using protocols_t = std::unordered_map<std::string, std::string>;
 using byte_array_t = std::vector<std::uint8_t>;
@@ -34,22 +27,10 @@ bool add_path_protocol(const std::string& protocol, const path& directory);
 //-----------------------------------------------------------------------------
 //  Name : get_path_protocols ()
 /// <summary>
-///
-///
-///
+/// Returns the registered path protocols.
 /// </summary>
 //-----------------------------------------------------------------------------
 protocols_t& get_path_protocols();
-
-//-----------------------------------------------------------------------------
-//  Name : read_stream ()
-/// <summary>
-/// Load a byte_array_t with the contents of the specified file, be that file in
-/// a
-/// package or in the main file system.
-/// </summary>
-//-----------------------------------------------------------------------------
-byte_array_t read_stream(std::istream& stream);
 
 //-----------------------------------------------------------------------------
 //  Name : resolve_protocol()
@@ -62,22 +43,39 @@ byte_array_t read_stream(std::istream& stream);
 //-----------------------------------------------------------------------------
 path resolve_protocol(const path& _path);
 
+//-----------------------------------------------------------------------------
+//  Name : convert_to_protocol()
+/// <summary>
+/// Oposite of the resolve_protocol this function tries to convert to protocol
+/// path from an absolute one.
+/// </summary>
+//-----------------------------------------------------------------------------
 path convert_to_protocol(const path& _path);
 
-bool has_known_protocol(const path& _path);
 //-----------------------------------------------------------------------------
-//  Name : executable_path()
+//  Name : has_known_protocol()
 /// <summary>
-/// Retrieve the directory of the currently running application.
+/// Checks whether the path has a known protocol.
 /// </summary>
 //-----------------------------------------------------------------------------
-path executable_path(const char* argv0);
+bool has_known_protocol(const path& _path);
 
 //-----------------------------------------------------------------------------
-//  Name : show_in_graphical_env ()
+//  Name : read_stream ()
 /// <summary>
-/// Shows a path in the graphical environment e.g Explorer, Finder... etc.
+/// Load a byte_array_t with the contents of the specified file, be that file in
+/// a
+/// package or in the main file system.
 /// </summary>
 //-----------------------------------------------------------------------------
-void show_in_graphical_env(const path& _path);
+byte_array_t read_stream(std::istream& stream);
+
+//-------------------------------------------------------------------------
+//  Name : replace ()
+/// <summary>
+/// Replacing any occurences of the specified path sequence with
+/// another.
+/// </summary>
+//-------------------------------------------------------------------------
+fs::path replace(const path& _path, const path& _sequence, const path& _new_sequence);
 };
