@@ -112,14 +112,14 @@ void syncer::sync(const fs::path& reference_dir, const fs::path& synced_dir)
 			{
 				case fs::watcher::entry_status::created:
 				{
-					const auto synced_entries = get_synced_entries(entry.path, is_directory);
+					const auto synced_entries = this->get_synced_entries(entry.path, is_directory);
 
 					for(const auto& synced_entry : synced_entries)
 					{
 						ensure_directory_exists(synced_entry);
 					}
 
-					auto callback = get_on_created_callback(entry_extension);
+					auto callback = this->get_on_created_callback(entry_extension);
 					if(callback)
 					{
 						callback(entry.path, synced_entries);
@@ -128,35 +128,33 @@ void syncer::sync(const fs::path& reference_dir, const fs::path& synced_dir)
 				break;
 				case fs::watcher::entry_status::modified:
 				{
-					auto callback = get_on_modified_callback(entry_extension);
+					auto callback = this->get_on_modified_callback(entry_extension);
 					if(callback)
 					{
-						const auto synced_entries = get_synced_entries(entry.path, is_directory);
+						const auto synced_entries = this->get_synced_entries(entry.path, is_directory);
 						callback(entry.path, synced_entries);
 					}
 				}
 				break;
 				case fs::watcher::entry_status::removed:
 				{
-					const auto callback = get_on_removed_callback(entry_extension);
+					const auto callback = this->get_on_removed_callback(entry_extension);
 
 					if(callback)
 					{
-						const auto synced_entries = get_synced_entries(entry.path, is_directory);
+						const auto synced_entries = this->get_synced_entries(entry.path, is_directory);
 						callback(entry.path, synced_entries);
 					}
 				}
 				break;
 				case fs::watcher::entry_status::renamed:
 				{
-					const auto last_synced_entries = get_synced_entries(entry.last_path, is_directory);
-					const auto synced_entries = get_synced_entries(entry.path, is_directory);
-					auto callback = get_on_renamed_callback(entry_extension);
+					const auto last_synced_entries = this->get_synced_entries(entry.last_path, is_directory);
+					const auto synced_entries = this->get_synced_entries(entry.path, is_directory);
+					auto callback = this->get_on_renamed_callback(entry_extension);
 
-					if(callback)
+					if(callback && synced_entries.size() == last_synced_entries.size())
 					{
-						assert(synced_entries.size() == last_synced_entries.size());
-
 						std::vector<rename_pair_t> synced_renamed;
 						synced_renamed.reserve(synced_entries.size());
 
@@ -164,10 +162,10 @@ void syncer::sync(const fs::path& reference_dir, const fs::path& synced_dir)
 						{
 							const auto& last_synced_entry = last_synced_entries[i];
 							const auto& synced_entry = synced_entries[i];
-							rename_pair_t p = {last_synced_entry, synced_entry};
+							rename_pair_t p(last_synced_entry, synced_entry);
 							synced_renamed.emplace_back(std::move(p));
 						}
-						rename_pair_t p = {entry.last_path, entry.path};
+						rename_pair_t p(entry.last_path, entry.path);
 						callback(p, synced_renamed);
 					}
 				}
