@@ -117,7 +117,7 @@ public:
 			}
 		}
 	}
-	
+
 	//-----------------------------------------------------------------------------
 	//  Name : watch ()
 	/// <summary>
@@ -319,11 +319,10 @@ filesystem_watcher::~filesystem_watcher()
 
 void filesystem_watcher::close()
 {
-	// remove all watchers
-	unwatch_all();
-
 	// stop the thread
 	_watching = false;
+	// remove all watchers
+	unwatch_all();
 
 	if(_thread.joinable())
 		_thread.join();
@@ -404,8 +403,8 @@ std::uint64_t filesystem_watcher::watch_impl(const fs::path& path, bool recursiv
 
 		auto key = s_id++;
 		{
-            // we do it like this because if initial_list is true we don't want
-            // to call a user callback on a locked mutex
+			// we do it like this because if initial_list is true we don't want
+			// to call a user callback on a locked mutex
 			auto impl = std::make_unique<watcher_impl>(p, filter, recursive, initial_list, poll_interval,
 													   list_callback);
 			std::lock_guard<std::mutex> lock(wd._mutex);
@@ -422,14 +421,20 @@ void filesystem_watcher::unwatch_impl(std::uint64_t key)
 {
 	auto& wd = get_watcher();
 
-	std::lock_guard<std::mutex> lock(wd._mutex);
-	wd._watchers.erase(key);
+	{
+		std::lock_guard<std::mutex> lock(wd._mutex);
+		wd._watchers.erase(key);
+	}
+	wd._cv.notify_all();
 }
 
 void filesystem_watcher::unwatch_all_impl()
 {
 	auto& wd = get_watcher();
-	std::lock_guard<std::mutex> lock(wd._mutex);
-	wd._watchers.clear();
+	{
+		std::lock_guard<std::mutex> lock(wd._mutex);
+		wd._watchers.clear();
+	}
+	wd._cv.notify_all();
 }
 }
