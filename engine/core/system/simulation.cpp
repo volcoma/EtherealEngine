@@ -2,10 +2,11 @@
 #include <algorithm>
 #include <thread>
 
+#include "../common/platform.h"
+
 namespace core
 {
 using namespace std::literals;
-
 
 bool simulation::initialize()
 {
@@ -48,7 +49,7 @@ void simulation::run_one_frame(bool is_active)
 
 			if(sleep_time > duration_t(0))
 			{
-				std::this_thread::sleep_for(sleep_time);
+				platform::this_thread::sleep_for(sleep_time);
 			}
 		}
 	}

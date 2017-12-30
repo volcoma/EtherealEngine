@@ -188,7 +188,7 @@ bool renderer::init_backend()
 		return false;
 	}
 	const auto sz = _init_window->get_size();
-	gfx::reset(sz[0], sz[1], BGFX_RESET_VSYNC);
+	gfx::reset(sz[0], sz[1]);
 
     APPLOG_INFO("Using {0} rendering backend.", gfx::get_renderer_name(gfx::get_renderer_type()));
     APPLOG_SEPARATOR();
