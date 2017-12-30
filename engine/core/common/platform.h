@@ -38,7 +38,6 @@ inline void sleep_for(const std::chrono::duration<rep, period>& rtime)
 }
 }
 }
-}
 
 #endif
 
