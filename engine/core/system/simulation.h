@@ -6,6 +6,7 @@
 
 namespace core
 {
+
 //-----------------------------------------------------------------------------
 // Main Class Declarations
 //-----------------------------------------------------------------------------
@@ -17,9 +18,9 @@ namespace core
 //-----------------------------------------------------------------------------
 struct simulation : public subsystem
 {
-	using timepoint_t = std::chrono::time_point<std::chrono::high_resolution_clock>;
-	using clock_t = std::chrono::high_resolution_clock;
-	using duration_t = std::chrono::high_resolution_clock::duration;
+    using clock_t = std::chrono::high_resolution_clock;
+	using timepoint_t = clock_t::time_point;
+	using duration_t = clock_t::duration;
 
 	//-----------------------------------------------------------------------------
 	//  Name : initialize ()
@@ -47,7 +48,7 @@ struct simulation : public subsystem
 	/// Perform on frame computations with specified fps
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void run_one_frame();
+	void run_one_frame(bool is_active);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_frame ()

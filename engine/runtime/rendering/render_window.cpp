@@ -2,7 +2,6 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include "render_window.h"
-#include "core/graphics/render_pass.h"
 
 static std::uint32_t s_next_id = 0;
 
@@ -47,7 +46,7 @@ void render_window::destroy_surface()
 	}
 }
 
-std::uint8_t render_window::begin_present_pass()
+gfx::view_id render_window::begin_present_pass()
 {
 	gfx::render_pass pass("present_to_window_pass");
 	pass.bind(_surface.get());

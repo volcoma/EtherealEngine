@@ -4,6 +4,8 @@
 
 namespace core
 {
+using namespace std::literals;
+
 
 bool simulation::initialize()
 {
@@ -21,44 +23,55 @@ void simulation::dispose()
 {
 }
 
-void simulation::run_one_frame()
+void simulation::run_one_frame(bool is_active)
 {
 	// perform waiting loop if maximum fps set
 	auto max_fps = _max_fps;
-	if(max_fps > 0)
+	if(!is_active && max_fps > 0)
 		max_fps = std::min(_max_inactive_fps, max_fps);
 
+	duration_t elapsed = clock_t::now() - _last_frame_timepoint;
 	if(max_fps > 0)
 	{
-		duration_t target_duration = std::chrono::milliseconds(1000) / max_fps;
-		duration_t eplased = clock_t::now() - _last_frame_timepoint;
+		duration_t target_duration = 1000ms / max_fps;
 		for(;;)
 		{
-			eplased = clock_t::now() - _last_frame_timepoint;
-			if(eplased > target_duration)
+			elapsed = clock_t::now() - _last_frame_timepoint;
+			if(elapsed >= target_duration)
 				break;
 
-			if(target_duration - eplased > duration_t(1))
-				std::this_thread::sleep_for((target_duration - eplased) - duration_t(1));
+			if(elapsed < duration_t(0))
+			{
+				break;
+			}
+			auto sleep_time = (target_duration - elapsed);
+
+			if(sleep_time > duration_t(0))
+			{
+				std::this_thread::sleep_for(sleep_time);
+			}
 		}
 	}
 
-	duration_t eplased = clock_t::now() - _last_frame_timepoint;
+	if(elapsed < duration_t(0))
+	{
+		elapsed = duration_t(0);
+	}
 	_last_frame_timepoint = clock_t::now();
 
 	// if fps lower than minimum, clamp eplased time
 	if(_min_fps > 0)
 	{
-		duration_t target_duration = std::chrono::milliseconds(1000) / _min_fps;
-		if(eplased > target_duration)
-			eplased = target_duration;
+		duration_t target_duration = 1000ms / _min_fps;
+		if(elapsed > target_duration)
+			elapsed = target_duration;
 	}
 
 	// perform time step smoothing
 	if(_smoothing_step > 0)
 	{
 		_timestep = duration_t::zero();
-		_previous_timesteps.push_back(eplased);
+		_previous_timesteps.push_back(elapsed);
 		if(_previous_timesteps.size() > _smoothing_step)
 		{
 			auto begin = _previous_timesteps.begin();
@@ -72,7 +85,7 @@ void simulation::run_one_frame()
 	}
 	else
 	{
-		_timestep = eplased;
+		_timestep = elapsed;
 	}
 
 	++_frame;

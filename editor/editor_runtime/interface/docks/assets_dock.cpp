@@ -681,16 +681,16 @@ void assets_dock::render(const ImVec2&)
 
 			auto opened_folder_shared = opened_dir.lock();
 
-			fs::path opened_dir = opened_folder_shared->absolute_path;
+			fs::path opened = opened_folder_shared->absolute_path;
 			for(auto& path : paths)
 			{
 				fs::path p = fs::path(path).make_preferred();
 				fs::path filename = p.filename();
 
 				auto task = ts.push_on_worker_thread(
-					[opened_dir](const fs::path& path, const fs::path& filename) {
+					[opened](const fs::path& path, const fs::path& filename) {
 						fs::error_code err;
-						fs::path dir = opened_dir / filename;
+						fs::path dir = opened / filename;
 						fs::copy_file(path, dir, fs::copy_options::overwrite_if_exists, err);
 					},
 					p, filename);

@@ -5,10 +5,8 @@
 ////////////////////////////////////////////////////////////
 #include "mml/window/window.hpp"
 #include <memory>
-namespace gfx
-{
-struct frame_buffer;
-}
+#include "core/graphics/render_pass.h"
+
 
 class render_window : public mml::window
 {
@@ -51,7 +49,7 @@ public:
 	/// Begins the present pass. Fbo -> backbufffer.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::uint8_t begin_present_pass();
+	gfx::view_id begin_present_pass();
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_id ()

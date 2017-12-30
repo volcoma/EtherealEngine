@@ -103,5 +103,35 @@ private:
 	fs::path _reference_dir;
 	/// Directory to be synced with the reference one.
 	fs::path _synced_dir;
+
+	std::atomic<std::uint64_t> _watch_id = {0};
 };
+
+//////////////////////////////////////////////////////////////////////
+/// Usage:
+///
+/// //Whatever happens to original_dir you will get notified and suggested to take action for
+/// //the associated mappings in the synced_dir. For example if a .txt file was deleted from
+/// //orignal_dir you will get notified and will be listed the .txt and .meta files in the
+/// //synced_dir. It is your decision what to do with that. Maybe you want to delete them too
+/// //or take any action you think is appropriate.
+///
+/// auto on_removed = [](const auto& ref_path, const auto& synced_paths)
+/// {
+/// 	for(const auto& synced_path : synced_paths)
+/// 	{
+/// 		fs::error_code err;
+/// 		fs::remove_all(synced_path, err);
+/// 	}
+/// };
+///
+/// fs::syncer syncer;
+/// syncer.set_directory_mapping(on_dir_create, on_dir_modified, on_dir_removed, on_dir_renamed);
+/// syncer.set_mapping(".txt", {".txt", ".meta"}, on_create, on_modified, on_removed, on_renamed);
+/// syncer.sync(original_dir, synced_dir);
+///
+/// while(!should_exit)
+/// {
+///     ...
+/// }
 }

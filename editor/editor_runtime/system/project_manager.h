@@ -54,6 +54,8 @@ struct asset_directory : std::enable_shared_from_this<asset_directory>
 	std::mutex directories_mutex;
 	///
 	std::vector<std::shared_ptr<asset_directory>> directories;
+	
+	std::uint64_t watch_id = 0;
 };
 
 class project_manager : public core::subsystem

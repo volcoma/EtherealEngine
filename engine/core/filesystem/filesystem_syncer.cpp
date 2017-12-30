@@ -53,8 +53,7 @@ void syncer::set_directory_mapping(syncer::on_entry_created_t on_entry_created,
 
 void syncer::unsync()
 {
-	const fs::path watch_dir = get_watch_path();
-	fs::watcher::unwatch(watch_dir);
+	fs::watcher::unwatch(_watch_id);
 }
 
 syncer::mapping syncer::get_mapping(const std::string& ext)
@@ -176,9 +175,9 @@ void syncer::sync(const fs::path& reference_dir, const fs::path& synced_dir)
 			}
 		}
 	};
-
+    using namespace std::literals;
 	const fs::path watch_dir = get_watch_path();
-	fs::watcher::watch(watch_dir, true, true, on_change);
+	_watch_id = fs::watcher::watch(watch_dir, true, true, 500ms, on_change);
 }
 
 std::vector<fs::path> syncer::get_synced_entries(const fs::path& path, bool is_directory)
@@ -239,6 +238,7 @@ fs::path syncer::get_synced_directory(const fs::path& path)
 		return result;
 	}
 
-	return result.parent_path();
+    return result.parent_path();
 }
+
 }

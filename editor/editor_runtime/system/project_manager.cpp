@@ -6,8 +6,8 @@
 #include "core/logging/logging.h"
 #include "core/serialization/associative_archive.h"
 #include "core/system/task_system.h"
-#include "runtime/assets/impl/asset_extensions.h"
 #include "runtime/assets/asset_manager.h"
+#include "runtime/assets/impl/asset_extensions.h"
 #include "runtime/ecs/ecs.h"
 #include "runtime/system/events.h"
 #include <fstream>
@@ -28,7 +28,6 @@ namespace audio
 class sound;
 }
 
-
 namespace runtime
 {
 struct animation;
@@ -36,6 +35,7 @@ struct animation;
 
 namespace editor
 {
+using namespace std::literals;
 
 template <typename T>
 void watch_assets(const fs::path& protocol, const std::string& wildcard, bool reload_async,
@@ -48,7 +48,7 @@ void watch_assets(const fs::path& protocol, const std::string& wildcard, bool re
 	fs::path watch_dir = (dir / wildcard).make_preferred();
 
 	fs::watcher::watch(
-		watch_dir, false, true,
+		watch_dir, false, true, 500ms,
 		[&am, &ts, protocol, reload_async,
 		 force_initial_recompile](const std::vector<fs::watcher::entry>& entries, bool is_initial_list) {
 			for(const auto& entry : entries)
@@ -142,8 +142,8 @@ void watch_assets(const fs::path& protocol, const std::string& wildcard, bool re
 
 void asset_directory::watch()
 {
-	fs::watcher::watch(
-		absolute_path / fs::path("*"), false, true,
+	watch_id = fs::watcher::watch(
+		absolute_path / fs::path("*"), false, true, 500ms,
 		[this](const std::vector<fs::watcher::entry>& entries, bool is_initial_list) {
 			for(auto& entry : entries)
 			{
@@ -237,13 +237,13 @@ void asset_directory::watch()
 	{
 		watch_assets<mesh>(relative_path, wildcard + format, true, false);
 	}
-	
+
 	for(const auto& format : extensions::sound)
 	{
 		watch_assets<audio::sound>(relative_path, wildcard + format, true, false);
 	}
 
-    watch_assets<runtime::animation>(relative_path, wildcard + extensions::animation, true, false);
+	watch_assets<runtime::animation>(relative_path, wildcard + extensions::animation, true, false);
 	watch_assets<material>(relative_path, wildcard + extensions::material, true, false);
 	watch_assets<prefab>(relative_path, wildcard + extensions::prefab, true, false);
 	watch_assets<scene>(relative_path, wildcard + extensions::scene, true, false);
@@ -294,7 +294,7 @@ void asset_directory::populate(asset_directory* p, const fs::path& abs, const st
 
 void asset_directory::unwatch()
 {
-	fs::watcher::unwatch(absolute_path / fs::path("*"), true);
+	fs::watcher::unwatch(watch_id);
 }
 
 void project_manager::close_project()

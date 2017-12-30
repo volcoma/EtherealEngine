@@ -2,11 +2,13 @@
 #define FS_WATCHER_H
 
 #include <atomic>
+#include <chrono>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
+#include <condition_variable>
 
 #include "filesystem.h"
 
@@ -39,7 +41,7 @@ public:
 	};
 
 	using notify_callback = std::function<void(const std::vector<entry>&, bool)>;
-
+	using clock_t = std::chrono::steady_clock;
 	//-----------------------------------------------------------------------------
 	//  Name : watch ()
 	/// <summary>
@@ -49,8 +51,8 @@ public:
 	/// or a directory.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void watch(const fs::path& path, bool recursive, bool initial_list,
-					  const notify_callback& callback);
+	static std::uint64_t watch(const fs::path& path, bool recursive, bool initial_list,
+							   clock_t::duration poll_interval, const notify_callback& callback);
 
 	//-----------------------------------------------------------------------------
 	//  Name : unwatch ()
@@ -58,7 +60,7 @@ public:
 	/// Un-watches a previously registered file or directory
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void unwatch(const fs::path& path, bool recursive = false);
+	static void unwatch(std::uint64_t key);
 
 	//-----------------------------------------------------------------------------
 	//  Name : unwatch_all ()
@@ -119,20 +121,24 @@ protected:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static void watch_impl(const fs::path& path, bool recursive, bool initialList = true,
-						   const notify_callback& listCallback = {});
+	static std::uint64_t watch_impl(const fs::path& path, bool recursive, bool initialList ,
+									clock_t::duration poll_interval, const notify_callback& listCallback);
 
-	static void unwatch_impl(const fs::path& path, bool recursive = false);
+	static void unwatch_impl(std::uint64_t key);
+
+	static void unwatch_all_impl();
 
 	/// Mutex for the file watchers
-	std::recursive_mutex _mutex;
+	std::mutex _mutex;
 	/// Atomic bool sync
 	std::atomic<bool> _watching = {false};
+	
+	std::condition_variable _cv;
 	/// Thread that polls for changes
 	std::thread _thread;
 	/// Registered file watchers
 	class watcher_impl;
-	std::map<std::string, std::unique_ptr<watcher_impl>> _watchers;
+	std::map<std::uint64_t, std::unique_ptr<watcher_impl>> _watchers;
 };
 }
 

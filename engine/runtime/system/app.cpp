@@ -112,8 +112,8 @@ void app::run_one_frame()
 	auto& sim = core::get_subsystem<core::simulation>();
 	auto& tasks = core::get_subsystem<core::task_system>();
 	auto& renderer = core::get_subsystem<runtime::renderer>();
-
-	sim.run_one_frame();
+	const bool is_active = renderer.get_focused_window() != nullptr;
+	sim.run_one_frame(is_active);
 	tasks.run_on_owner_thread(5ms);
 
 	auto dt = sim.get_delta_time();

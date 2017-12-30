@@ -1,6 +1,8 @@
 #include "filesystem_watcher.h"
 namespace fs
 {
+using namespace std::literals;
+
 static void log_path(const fs::path&)
 {
 }
@@ -81,10 +83,11 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	watcher_impl(const fs::path& path, const std::string& filter, bool recursive, bool initial_list,
-				 const notify_callback& list_callback)
-		: _recursive(recursive)
-		, _filter(filter)
+				 clock_t::duration poll_interval, const notify_callback& list_callback)
+		: _filter(filter)
 		, _callback(list_callback)
+		, _poll_interval(poll_interval)
+		, _recursive(recursive)
 	{
 		_root = path;
 		std::vector<filesystem_watcher::entry> entries;
@@ -114,7 +117,7 @@ public:
 			}
 		}
 	}
-
+	
 	//-----------------------------------------------------------------------------
 	//  Name : watch ()
 	/// <summary>
@@ -244,7 +247,7 @@ public:
 	}
 
 protected:
-	bool _recursive = false;
+	friend class filesystem_watcher;
 	/// Path to watch
 	fs::path _root;
 	/// Filter applied
@@ -253,6 +256,12 @@ protected:
 	notify_callback _callback;
 	/// Cache watched files
 	std::map<std::string, filesystem_watcher::entry> _entries;
+	///
+	clock_t::duration _poll_interval = 500ms;
+
+	clock_t::time_point _last_poll = clock_t::now();
+	///
+	bool _recursive = false;
 };
 
 static filesystem_watcher& get_watcher()
@@ -262,20 +271,20 @@ static filesystem_watcher& get_watcher()
 	return wd;
 }
 
-void filesystem_watcher::watch(const fs::path& path, bool recursive, bool initial_list,
-							   const notify_callback& callback)
+std::uint64_t filesystem_watcher::watch(const fs::path& path, bool recursive, bool initial_list,
+										clock_t::duration poll_interval, const notify_callback& callback)
 {
-	watch_impl(path, recursive, initial_list, callback);
+	return watch_impl(path, recursive, initial_list, poll_interval, callback);
 }
 
-void filesystem_watcher::unwatch(const fs::path& path, bool recursive)
+void filesystem_watcher::unwatch(std::uint64_t key)
 {
-	unwatch_impl(path, recursive);
+	unwatch_impl(key);
 }
 
 void filesystem_watcher::unwatch_all()
 {
-	unwatch_impl(fs::path());
+	unwatch_all_impl();
 }
 
 void filesystem_watcher::touch(const fs::path& path, bool recursive, fs::file_time_type time)
@@ -326,33 +335,46 @@ void filesystem_watcher::start()
 	_thread = std::thread([this]() {
 		// keep watching for modifications every ms milliseconds
 		using namespace std::literals;
-		const auto poll_interval = 500ms;
 		while(_watching)
 		{
+			clock_t::duration sleep_time = 99999h;
+
+			// iterate through each watcher and check for modification
+			std::unique_lock<std::mutex> lock(_mutex);
+			for(auto& pair : _watchers)
 			{
-				// iterate through each watcher and check for modification
-				std::lock_guard<std::recursive_mutex> lock(_mutex);
-				for(auto& pair : _watchers)
+				auto& watcher = pair.second;
+
+				auto now = clock_t::now();
+
+				auto diff = (watcher->_last_poll + watcher->_poll_interval) - now;
+				if(diff <= clock_t::duration(0))
 				{
-					pair.second->watch();
+					watcher->watch();
+
+					watcher->_last_poll = now;
+
+					sleep_time = std::min(sleep_time, watcher->_poll_interval);
 				}
-				// lock will be released before this thread goes to sleep
+				else
+				{
+					sleep_time = std::min(sleep_time, diff);
+				}
 			}
-			// make this thread sleep for a while
-			std::this_thread::sleep_for(poll_interval);
+
+			_cv.wait_for(lock, sleep_time);
 		}
 	});
 }
 
-void filesystem_watcher::watch_impl(const fs::path& path, bool recursive, bool initial_list,
-									const notify_callback& list_callback)
+std::uint64_t filesystem_watcher::watch_impl(const fs::path& path, bool recursive, bool initial_list,
+											 clock_t::duration poll_interval,
+											 const notify_callback& list_callback)
 {
 	auto& wd = get_watcher();
 	// and start its thread
 	if(!wd._watching)
 		wd.start();
-
-	const std::string key = path.string();
 
 	// add a new watcher
 	if(list_callback)
@@ -374,59 +396,40 @@ void filesystem_watcher::watch_impl(const fs::path& path, bool recursive, bool i
 			if(!fs::exists(path, err))
 			{
 				log_path(path);
-				return;
+				return 0;
 			}
 		}
 
-		std::lock_guard<std::recursive_mutex> lock(wd._mutex);
-		if(wd._watchers.find(key) == wd._watchers.end())
+		static std::atomic<std::uint64_t> s_id = {1};
+
+		auto key = s_id++;
 		{
-			wd._watchers.emplace(make_pair(
-				key, std::make_unique<watcher_impl>(p, filter, recursive, initial_list, list_callback)));
+            // we do it like this because if initial_list is true we don't want
+            // to call a user callback on a locked mutex
+			auto impl = std::make_unique<watcher_impl>(p, filter, recursive, initial_list, poll_interval,
+													   list_callback);
+			std::lock_guard<std::mutex> lock(wd._mutex);
+			wd._watchers.emplace(key, std::move(impl));
 		}
+		wd._cv.notify_all();
+		return key;
 	}
+
+	return 0;
 }
 
-void filesystem_watcher::unwatch_impl(const fs::path& path, bool recursive)
+void filesystem_watcher::unwatch_impl(std::uint64_t key)
 {
 	auto& wd = get_watcher();
-	const std::string key = path.string();
-	const fs::path dir = path.parent_path();
 
-	// if the path is empty we unwatch all files
-	if(path.empty())
-	{
-		std::lock_guard<std::recursive_mutex> lock(wd._mutex);
-		wd._watchers.clear();
-	}
-	// or the specified file or directory
-	else
-	{
-		std::lock_guard<std::recursive_mutex> lock(wd._mutex);
+	std::lock_guard<std::mutex> lock(wd._mutex);
+	wd._watchers.erase(key);
+}
 
-		if(recursive && wd._watchers.size() > 0)
-		{
-			for(auto it = wd._watchers.begin(); it != wd._watchers.end();)
-			{
-				auto watcher_key = fs::path(it->first).parent_path();
-				if(watcher_key == dir)
-				{
-					it->second->watch();
-					it = wd._watchers.erase(it);
-				}
-				else
-					++it;
-			}
-		}
-		else
-		{
-			auto watcher = wd._watchers.find(key);
-			if(watcher != wd._watchers.end())
-			{
-				watcher->second->watch();
-				wd._watchers.erase(watcher);
-			}
-		}
-	}
+void filesystem_watcher::unwatch_all_impl()
+{
+	auto& wd = get_watcher();
+	std::lock_guard<std::mutex> lock(wd._mutex);
+	wd._watchers.clear();
 }
 }
