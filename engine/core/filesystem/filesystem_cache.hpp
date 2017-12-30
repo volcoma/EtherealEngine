@@ -51,6 +51,8 @@ public:
 		_entries = rhs._entries;
 		_should_refresh = rhs._should_refresh;
 		watch();
+		
+		return *this;
 	}
 
 	cache& operator=(cache&& rhs)
@@ -61,6 +63,8 @@ public:
 		_entries = std::move(rhs._entries);
 		_should_refresh = std::move(rhs._should_refresh);
 		watch();
+		
+		return *this;
 	}
 
 	~cache()
