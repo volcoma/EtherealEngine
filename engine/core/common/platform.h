@@ -2,44 +2,7 @@
 
 #include "platform_config.h"
 
-#include <chrono>
 #include <thread>
-
-#if $on($windows) && ($on($mingw) || $on($msvc))
-#include <winsock.h>
-namespace platform
-{
-namespace this_thread
-{
-template <typename rep, typename period>
-inline void sleep_for(const std::chrono::duration<rep, period>& rtime)
-{
-	if(rtime <= rtime.zero())
-		return;
-	auto secs = std::chrono::duration_cast<std::chrono::seconds>(rtime);
-	auto usecs = std::chrono::duration_cast<std::chrono::microseconds>(rtime - secs);
-
-	struct timeval tv;
-	tv.tv_sec = static_cast<long>(secs.count());
-	tv.tv_usec = static_cast<long>(usecs.count());
-	select(0, NULL, NULL, NULL, &tv);
-}
-}
-}
-#else
-namespace platform
-{
-namespace this_thread
-{
-template <typename rep, typename period>
-inline void sleep_for(const std::chrono::duration<rep, period>& rtime)
-{
-    std::this_thread::sleep_for(rtime);
-}
-}
-}
-
-#endif
 
 // An attempt at making a wrapper to deal with many Linuxes as well as Windows. Please edit as needed.
 #if $on($windows) && $on($msvc)
