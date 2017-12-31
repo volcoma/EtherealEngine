@@ -77,7 +77,7 @@ void simulation::run_one_frame(bool is_active)
 			_previous_timesteps.erase(begin, begin + int(_previous_timesteps.size() - _smoothing_step));
 			for(auto step : _previous_timesteps)
 				_timestep += step;
-			_timestep /= _previous_timesteps.size();
+			_timestep /= static_cast<duration_t::rep>(_previous_timesteps.size());
 		}
 		else
 			_timestep = _previous_timesteps.back();
