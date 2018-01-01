@@ -69,6 +69,8 @@ device_impl::device_impl(int devnum)
 	alCheck(alDistanceModel(AL_LINEAR_DISTANCE));
 
 	_info = info();
+
+	log_info("Using open audio device: " + _device_id);
 }
 
 device_impl::~device_impl()
