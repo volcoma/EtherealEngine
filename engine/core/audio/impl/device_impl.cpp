@@ -1,4 +1,5 @@
 #include "device_impl.h"
+#include "../logger.h"
 #include "check.h"
 #include <AL/alc.h>
 #include <AL/alext.h>
@@ -32,16 +33,23 @@ static std::string info()
 device_impl::device_impl(int devnum)
 {
 	// device name
-	auto list = enumerate();
-	if(devnum >= 0 && devnum < int(list.size()))
-		_device_id = list[std::size_t(devnum)];
+	auto devices = enumerate();
+	for(const auto& dev : devices)
+	{
+		log_info("Audio device: " + dev);
+	}
+
+	if(devnum >= 0 && devnum < int(devices.size()))
+		_device_id = devices[std::size_t(devnum)];
 
 	// select device
 	dev = alcOpenDevice(_device_id.empty() ? 0 : _device_id.c_str());
 
 	if(!dev)
+	{
+		log_error("Cant open audio device: " + _device_id);
 		return;
-
+	}
 	bool has_efx_ = has_efx(dev);
 
 	ALint attribs[4] = {0};
@@ -52,8 +60,10 @@ device_impl::device_impl(int devnum)
 	ctx = alcCreateContext(dev, has_efx_ ? attribs : nullptr);
 
 	if(!ctx)
+	{
+		log_error("Cant create audio context for device: " + _device_id);
 		return;
-
+	}
 	enable();
 
 	alCheck(alDistanceModel(AL_LINEAR_DISTANCE));

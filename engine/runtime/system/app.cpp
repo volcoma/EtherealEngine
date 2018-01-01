@@ -1,6 +1,5 @@
 #include "app.h"
 #include "../assets/asset_manager.h"
-#include "../audio/audio.h"
 #include "../ecs/ecs.h"
 #include "../ecs/systems/audio_system.h"
 #include "../ecs/systems/bone_system.h"
@@ -12,6 +11,7 @@
 #include "../rendering/render_window.h"
 #include "../rendering/renderer.h"
 #include "app_setup.h"
+#include "core/audio/library.h"
 #include "core/logging/logging.h"
 #include "core/serialization/serialization.h"
 #include "core/simulation/simulation.h"
@@ -54,7 +54,7 @@ void app::start(cmd_line::options_parser& parser)
 	core::add_subsystem<core::task_system>();
 	core::add_subsystem<renderer>(parser);
 	core::add_subsystem<input>();
-	core::add_subsystem<audio_device>();
+	core::add_subsystem<audio::device>();
 	auto& am = core::add_subsystem<asset_manager>();
 	setup_asset_manager(am);
 	core::add_subsystem<entity_component_system>();
