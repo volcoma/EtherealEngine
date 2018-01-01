@@ -1,14 +1,13 @@
 #pragma once
 
-#include "core/system/subsystem.h"
 #include <chrono>
 namespace runtime
 {
-class reflection_probe_system : public core::subsystem
+class reflection_probe_system
 {
 public:
-	bool initialize();
-	void dispose();
+	reflection_probe_system();
+	~reflection_probe_system();
 	//-----------------------------------------------------------------------------
 	//  Name : frame_update (virtual )
 	/// <summary>

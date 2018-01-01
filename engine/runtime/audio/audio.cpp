@@ -4,7 +4,7 @@
 namespace runtime
 {
 
-bool audio_device::initialize()
+audio_device::audio_device()
 {
 	// enumerate audio devices
 	auto devices = audio::device::enumerate();
@@ -18,22 +18,14 @@ bool audio_device::initialize()
 	}
 	APPLOG_SEPARATOR();
 
-	_device = std::make_unique<audio::device>();
+	_device = std::make_unique<audio::device>(0);
 
 	if(!_device->is_valid())
 	{
 		APPLOG_ERROR("Cant open audio device: {0}", _device->get_device_id());
 		APPLOG_SEPARATOR();
-		return false;
 	}
 	APPLOG_INFO("Using audio device: {0}", _device->get_device_id());
 	APPLOG_SEPARATOR();
-
-	return true;
-}
-
-void audio_device::dispose()
-{
-    _device.reset();
 }
 }

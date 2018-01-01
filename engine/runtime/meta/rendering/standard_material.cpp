@@ -1,6 +1,6 @@
 #include "standard_material.hpp"
 #include "../assets/asset_handle.hpp"
-#include "core/meta/math/vector.hpp"
+#include "../core/math/vector.hpp"
 #include "core/serialization/types/string.hpp"
 #include "core/serialization/types/unordered_map.hpp"
 #include "core/serialization/types/utility.hpp"

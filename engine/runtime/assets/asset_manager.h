@@ -3,18 +3,18 @@
 #include <functional>
 #include <unordered_map>
 
-#include "asset_storage.h"
 #include "asset_flags.h"
+#include "asset_storage.h"
 #include <cassert>
 
 namespace runtime
 {
 
-class asset_manager : public core::subsystem
+class asset_manager
 {
 public:
-	bool initialize();
-	void dispose();
+	asset_manager();
+	~asset_manager();
 	//-----------------------------------------------------------------------------
 	//  Name : clear ()
 	/// <summary>
@@ -175,9 +175,8 @@ private:
 	template <typename T, typename F>
 	core::task_future<asset_handle<T>>
 	load_asset_from_file_impl(const std::string& key, load_mode mode, load_flags flags,
-							  std::recursive_mutex& container_mutex, 
-                              typename asset_storage<T>::request_container_t& container,
-							  F&& load_func)
+							  std::recursive_mutex& container_mutex,
+							  typename asset_storage<T>::request_container_t& container, F&& load_func)
 	{
 		std::unique_lock<std::recursive_mutex> lock(container_mutex);
 		auto it = container.find(key);
@@ -223,8 +222,7 @@ private:
 	core::task_future<asset_handle<T>>&
 	create_asset_from_memory_impl(const std::string& key, const std::uint8_t* data, const std::uint32_t& size,
 								  load_mode mode, load_flags flags, std::recursive_mutex& container_mutex,
-								  typename asset_storage<T>::request_container_t& container,
-                                  F&& load_func)
+								  typename asset_storage<T>::request_container_t& container, F&& load_func)
 	{
 
 		std::lock_guard<std::recursive_mutex> lock(container_mutex);
@@ -249,9 +247,8 @@ private:
 	template <typename T, typename F>
 	core::task_future<asset_handle<T>>&
 	load_asset_from_instance_impl(const std::string& key, std::shared_ptr<T> entry,
-								  std::recursive_mutex& container_mutex, 
-                                  typename asset_storage<T>::request_container_t& container,
-								  F&& load_func)
+								  std::recursive_mutex& container_mutex,
+								  typename asset_storage<T>::request_container_t& container, F&& load_func)
 	{
 		std::lock_guard<std::recursive_mutex> lock(container_mutex);
 		auto& future = container[key];
@@ -263,9 +260,9 @@ private:
 	}
 
 	template <typename T>
-	core::task_future<asset_handle<T>> find_asset_impl(const std::string& key,
-													   std::recursive_mutex& container_mutex,
-													   typename asset_storage<T>::request_container_t& container)
+	core::task_future<asset_handle<T>>
+	find_asset_impl(const std::string& key, std::recursive_mutex& container_mutex,
+					typename asset_storage<T>::request_container_t& container)
 	{
 		std::lock_guard<std::recursive_mutex> lock(container_mutex);
 		auto it = container.find(key);

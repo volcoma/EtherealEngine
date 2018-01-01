@@ -1,8 +1,8 @@
 #include "mesh_importer.h"
-#include "editor_core/mesh_import/mesh_import.h"
 #include "core/graphics/graphics.h"
 #include "core/logging/logging.h"
 #include "core/math/math_includes.h"
+#include "editor_core/mesh_import/mesh_import.h"
 #include "runtime/rendering/mesh.h"
 #include <algorithm>
 
@@ -133,7 +133,6 @@ void process_faces(aiMesh* mesh, std::uint32_t subset_offset, mesh::load_data& l
 
 		load_data.triangle_data.push_back(triangle);
 	}
-    
 }
 
 void process_bones(aiMesh* mesh, std::uint32_t subset_offset, mesh::load_data& load_data)

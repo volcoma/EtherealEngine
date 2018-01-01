@@ -2,6 +2,7 @@
 #include "core/graphics/render_pass.h"
 #include "core/graphics/texture.h"
 #include "core/logging/logging.h"
+#include "core/system/subsystem.h"
 #include "editing_system.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/ecs/components/camera_component.h"
@@ -194,7 +195,7 @@ void picking_system::frame_render(std::chrono::duration<float>)
 	}
 }
 
-bool picking_system::initialize()
+picking_system::picking_system()
 {
 	runtime::on_frame_render.connect(this, &picking_system::frame_render);
 	// Set up ID buffer, which has a color target and depth buffer
@@ -232,11 +233,9 @@ bool picking_system::initialize()
 
 		},
 		vs_picking_id, fs_picking_id);
-
-	return true;
 }
 
-void picking_system::dispose()
+picking_system::~picking_system()
 {
 	runtime::on_frame_render.disconnect(this, &picking_system::frame_render);
 }

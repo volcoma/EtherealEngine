@@ -1,8 +1,8 @@
 #include "light_component.hpp"
 
+#include "../../core/math/vector.hpp"
 #include "../../rendering/light.hpp"
 #include "component.hpp"
-#include "core/meta/math/vector.hpp"
 
 REFLECT(light_component)
 {

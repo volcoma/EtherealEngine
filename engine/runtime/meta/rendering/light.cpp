@@ -1,5 +1,5 @@
 #include "light.hpp"
-#include "core/meta/math/vector.hpp"
+#include "../core/math/vector.hpp"
 #include "core/serialization/associative_archive.h"
 #include "core/serialization/binary_archive.h"
 

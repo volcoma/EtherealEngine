@@ -2,12 +2,11 @@
 
 namespace runtime
 {
-bool asset_manager::initialize()
+asset_manager::asset_manager()
 {
-	return true;
 }
 
-void asset_manager::dispose()
+asset_manager::~asset_manager()
 {
 	clear();
 }

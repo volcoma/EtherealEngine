@@ -1,7 +1,7 @@
 #include "audio_source_component.hpp"
 #include "../../assets/asset_handle.hpp"
+#include "../../core/common/basetypes.hpp"
 #include "component.hpp"
-#include "core/meta/common/basetypes.hpp"
 #include "core/serialization/types/vector.hpp"
 
 REFLECT(audio_source_component)

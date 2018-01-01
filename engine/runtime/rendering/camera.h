@@ -374,7 +374,8 @@ public:
 	/// vector, suitable for use during picking.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool viewport_to_ray(const math::vec2& point, math::vec3& rayOriginOut, math::vec3& rayDirectionOut) const;
+	bool viewport_to_ray(const math::vec2& point, math::vec3& rayOriginOut,
+						 math::vec3& rayDirectionOut) const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : viewport_to_world ()

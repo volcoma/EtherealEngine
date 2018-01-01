@@ -20,7 +20,6 @@ class audio_listener_component : public runtime::component_impl<audio_listener_c
 	REFLECTABLEV(audio_listener_component, component)
 
 public:
-
 	//-------------------------------------------------------------------------
 	// Public Methods
 	//-------------------------------------------------------------------------

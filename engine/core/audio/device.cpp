@@ -5,7 +5,7 @@ namespace audio
 {
 
 device::device(int devnum)
-    : _impl(std::make_unique<priv::device_impl>(devnum))
+	: _impl(std::make_unique<priv::device_impl>(devnum))
 {
 }
 

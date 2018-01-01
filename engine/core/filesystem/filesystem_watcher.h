@@ -3,12 +3,12 @@
 
 #include <atomic>
 #include <chrono>
+#include <condition_variable>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
-#include <condition_variable>
 
 #include "filesystem.h"
 
@@ -121,7 +121,7 @@ protected:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static std::uint64_t watch_impl(const fs::path& path, bool recursive, bool initialList ,
+	static std::uint64_t watch_impl(const fs::path& path, bool recursive, bool initialList,
 									clock_t::duration poll_interval, const notify_callback& listCallback);
 
 	static void unwatch_impl(std::uint64_t key);
@@ -132,7 +132,7 @@ protected:
 	std::mutex _mutex;
 	/// Atomic bool sync
 	std::atomic<bool> _watching = {false};
-	
+
 	std::condition_variable _cv;
 	/// Thread that polls for changes
 	std::thread _thread;

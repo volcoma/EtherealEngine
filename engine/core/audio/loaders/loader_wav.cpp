@@ -28,7 +28,6 @@ struct wav_header
 	int32_t data_bytes;  // Number of bytes in data. Number of samples * num_channels * sample byte size
 };
 
-
 bool load_wav_from_memory(const uint8_t* data, std::size_t data_size, sound_data& result, std::string& err)
 {
 	if(!data)
@@ -79,7 +78,7 @@ bool load_wav_from_memory(const uint8_t* data, std::size_t data_size, sound_data
 	result.sample_rate = std::uint32_t(header.sample_rate);
 	result.duration = sound_data::duration_t(
 		header.wav_size / (header.num_channels * header.sample_rate * (header.bit_depth / 8.0f)) * 1.0f);
-    
+
 	result.data.resize(std::size_t(header.data_bytes));
 	result.bytes_per_sample = std::uint8_t(header.bit_depth) / 8;
 	std::memcpy(result.data.data(), data + sizeof(wav_header), result.data.size());

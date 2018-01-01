@@ -1,7 +1,5 @@
 #include "bbox.h"
 #include <limits>
-// #include <memory.h>
-// #include <float.h>
 
 namespace math
 {

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "core/system/subsystem.h"
 #include "runtime/assets/asset_handle.h"
 #include "runtime/rendering/gpu_program.h"
+#include <chrono>
 
 namespace gfx
 {
@@ -12,10 +12,11 @@ struct texture;
 
 namespace editor
 {
-class picking_system : public core::subsystem
+class picking_system
 {
 public:
-	virtual ~picking_system() = default;
+	picking_system();
+	~picking_system();
 
 	constexpr static int tex_id_dim = 1;
 	//-----------------------------------------------------------------------------

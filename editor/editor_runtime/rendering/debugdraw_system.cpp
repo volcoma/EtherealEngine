@@ -2,6 +2,7 @@
 #include "../editing/editing_system.h"
 #include "core/graphics/debugdraw.h"
 #include "core/graphics/render_pass.h"
+#include "core/system/subsystem.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/ecs/components/camera_component.h"
 #include "runtime/ecs/components/light_component.h"
@@ -111,7 +112,7 @@ void debugdraw_system::frame_render(std::chrono::duration<float>)
 		const auto bounds = selected_camera.get_local_bounding_box();
 		ddPush();
 		ddSetColor(0xffffffff);
-        ddSetWireframe(true);
+		ddSetWireframe(true);
 		if(selected_camera.get_projection_mode() == projection_mode::perspective)
 		{
 			ddSetTransform(nullptr);
@@ -294,7 +295,7 @@ void debugdraw_system::frame_render(std::chrono::duration<float>)
 	}
 }
 
-bool debugdraw_system::initialize()
+debugdraw_system::debugdraw_system()
 {
 	runtime::on_frame_render.connect(this, &debugdraw_system::frame_render);
 
@@ -312,10 +313,9 @@ bool debugdraw_system::initialize()
 		vs_wf_wireframe, fs_wf_wireframe);
 
 	ddInit();
-	return true;
 }
 
-void debugdraw_system::dispose()
+debugdraw_system::~debugdraw_system()
 {
 	ddShutdown();
 	runtime::on_frame_render.disconnect(this, &debugdraw_system::frame_render);

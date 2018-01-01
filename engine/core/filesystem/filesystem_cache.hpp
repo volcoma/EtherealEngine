@@ -22,7 +22,7 @@ public:
 		: _path(p)
 		, _scan_frequency(scan_frequency)
 	{
-        watch();
+		watch();
 	}
 
 	cache(const cache& rhs)
@@ -31,7 +31,7 @@ public:
 		, _entries(rhs._entries)
 		, _should_refresh(rhs._should_refresh)
 	{
-        watch();
+		watch();
 	}
 
 	cache(cache&& rhs)
@@ -40,30 +40,30 @@ public:
 		, _entries(std::move(rhs._entries))
 		, _should_refresh(std::move(rhs._should_refresh))
 	{
-        watch();
+		watch();
 	}
 
 	cache& operator=(const cache& rhs)
 	{
-        unwatch();
+		unwatch();
 		_path = rhs._path;
 		_scan_frequency = rhs._scan_frequency;
 		_entries = rhs._entries;
 		_should_refresh = rhs._should_refresh;
 		watch();
-		
+
 		return *this;
 	}
 
 	cache& operator=(cache&& rhs)
 	{
-        unwatch();
+		unwatch();
 		_path = std::move(rhs._path);
 		_scan_frequency = std::move(rhs._scan_frequency);
 		_entries = std::move(rhs._entries);
 		_should_refresh = std::move(rhs._should_refresh);
 		watch();
-		
+
 		return *this;
 	}
 
@@ -134,7 +134,7 @@ private:
 
 	void watch()
 	{
-        using namespace std::literals;
+		using namespace std::literals;
 		constexpr bool is_recursive = std::is_same<iterator_t, recursive_directory_iterator>::value;
 
 		_watch_id = watcher::watch(_path / "*", is_recursive, false, _scan_frequency,
@@ -147,14 +147,14 @@ private:
 
 	///
 	fs::path _path;
-	
+
 	clock_t::duration _scan_frequency = std::chrono::milliseconds(500);
 	///
 	mutable std::vector<directory_entry> _entries;
 	///
-    mutable std::atomic_bool _should_refresh = {true};
+	mutable std::atomic_bool _should_refresh = {true};
 	///
-    mutable std::uint64_t _watch_id = 0;
+	mutable std::uint64_t _watch_id = 0;
 };
 
 using directory_cache = cache<directory_iterator>;

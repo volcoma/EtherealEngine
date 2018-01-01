@@ -2,7 +2,6 @@
 
 #include "core/common/basetypes.hpp"
 #include "core/signals/event.hpp"
-#include "core/system/subsystem.h"
 #include "input_mapping.hpp"
 #include <map>
 #include <unordered_map>
@@ -69,30 +68,11 @@ struct action_mapper
 // 	{
 // 		//do some stuff
 // 	});
-class input : public core::subsystem
+class input
 {
 public:
 	input();
-
-	//-----------------------------------------------------------------------------
-	//  Name : initialize ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	bool initialize();
-
-	//-----------------------------------------------------------------------------
-	//  Name : dispose ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void dispose();
+	~input();
 
 	void platform_events(const std::pair<std::uint32_t, bool>& info,
 						 const std::vector<mml::platform_event>& events);

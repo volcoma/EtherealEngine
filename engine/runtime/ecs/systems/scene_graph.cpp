@@ -1,6 +1,8 @@
 #include "scene_graph.h"
 #include "../../system/events.h"
 #include "../components/transform_component.h"
+#include "core/system/subsystem.h"
+
 namespace runtime
 {
 void update_transform(entity e)
@@ -49,16 +51,14 @@ void scene_graph::frame_update(std::chrono::duration<float> dt)
 	}
 }
 
-bool scene_graph::initialize()
+scene_graph::scene_graph()
 {
 	runtime::on_frame_update.connect(this, &scene_graph::frame_update);
 
 	transform_component::static_id();
-
-	return true;
 }
 
-void scene_graph::dispose()
+scene_graph::~scene_graph()
 {
 	runtime::on_frame_update.disconnect(this, &scene_graph::frame_update);
 }

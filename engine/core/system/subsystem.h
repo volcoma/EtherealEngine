@@ -3,40 +3,13 @@
 #include "../common/assert.hpp"
 #include "../common/nonstd/type_traits.hpp"
 
-#include <chrono>
+#include <algorithm>
 #include <memory>
 #include <unordered_map>
 #include <vector>
 
 namespace core
 {
-struct subsystem
-{
-	subsystem() = default;
-	subsystem(const subsystem&) = delete;
-	subsystem& operator=(const subsystem&) = delete;
-	virtual ~subsystem();
-
-	//-----------------------------------------------------------------------------
-	//  Name : initialize (virtual )
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	virtual bool initialize();
-
-	//-----------------------------------------------------------------------------
-	//  Name : dispose (virtual )
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	virtual void dispose();
-};
 
 struct subsystem_context
 {
@@ -115,7 +88,7 @@ protected:
 	///
 	std::vector<std::size_t> _orders;
 	///
-	std::unordered_map<std::size_t, std::unique_ptr<subsystem>> _subsystems;
+	std::unordered_map<std::size_t, std::shared_ptr<void>> _subsystems;
 };
 
 //
@@ -126,13 +99,10 @@ S& subsystem_context::add_subsystem(Args&&... args)
 	auto index = rtti::type_id<S>().hash_code();
 	expects(!has_subsystems<S>() && "duplicated subsystem");
 
-	// auto sys = new (std::nothrow) S(std::forward<Args>(args)...);
 	_orders.push_back(index);
 	_subsystems.emplace(std::make_pair(index, std::make_unique<S>(std::forward<Args>(args)...)));
-	auto& sys = static_cast<S&>(*_subsystems[index].get());
-	expects(sys.initialize() && "failed to initialize subsystem.");
 
-	return sys;
+	return get_subsystem<S>();
 }
 
 template <typename S>
@@ -140,7 +110,7 @@ S& subsystem_context::get_subsystem()
 {
 	expects(has_subsystems<S>() && "failed to find system");
 	const auto index = rtti::type_id<S>().hash_code();
-	return static_cast<S&>(*_subsystems[index].get());
+	return *reinterpret_cast<S*>(_subsystems[index].get());
 }
 
 template <typename S>
@@ -149,7 +119,8 @@ void subsystem_context::remove_subsystem()
 	expects(has_subsystems<S>() && "failed to find system");
 	const auto index = rtti::type_id<S>().hash_code();
 	_subsystems.erase(index);
-	_orders.erase(index);
+	_orders.erase(std::remove_if(std::begin(_orders), std::end(_orders),
+								 [index](const auto& el) { return index == el; }, std::end(_orders)));
 }
 
 template <typename S>

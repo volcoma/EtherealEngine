@@ -1,16 +1,15 @@
 #pragma once
 
-#include "core/system/subsystem.h"
 #include "imguidock.h"
 #include "runtime/system/events.h"
 #include <map>
 #include <memory>
 #include <vector>
 
-struct docking_system : public core::subsystem
+struct docking_system
 {
-	bool initialize();
-	void dispose();
+	docking_system();
+	~docking_system();
 
 	imguidock::dockspace& get_dockspace(std::uint32_t id);
 	const std::map<uint32_t, imguidock::dockspace>& get_dockspaces() const;

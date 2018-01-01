@@ -62,10 +62,10 @@ void alCheckError(const char* file, unsigned int line, const char* expression)
 
 		// Log the error
 		log_error(std::string("An internal OpenAL call failed in ") +
-			fileString.substr(fileString.find_last_of("\\/") + 1) + "(" + std::to_string(line) +
-			")."
-			"\nExpression:\n   " +
-			expression + "\nError description:\n   " + error + "\n   " + description);
+				  fileString.substr(fileString.find_last_of("\\/") + 1) + "(" + std::to_string(line) +
+				  ")."
+				  "\nExpression:\n   " +
+				  expression + "\nError description:\n   " + error + "\n   " + description);
 	}
 }
 

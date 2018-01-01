@@ -11,6 +11,8 @@
 #include "core/serialization/serialization.h"
 #include "core/serialization/types/string.hpp"
 #include "core/string_utils/string_utils.h"
+#include "core/system/subsystem.h"
+
 namespace cereal
 {
 

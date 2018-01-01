@@ -1,5 +1,6 @@
 #include "editing_system.h"
 #include "core/graphics/texture.h"
+#include "core/system/subsystem.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/ecs/components/audio_listener_component.h"
 #include "runtime/ecs/components/camera_component.h"
@@ -13,7 +14,7 @@
 namespace editor
 {
 
-bool editing_system::initialize()
+editing_system::editing_system()
 {
 	auto& am = core::get_subsystem<runtime::asset_manager>();
 
@@ -38,15 +39,6 @@ bool editing_system::initialize()
 	icons["folder"] = am.load<gfx::texture>("editor_data:/icons/folder.png").get();
 	icons["animation"] = am.load<gfx::texture>("editor_data:/icons/animation.png").get();
 	icons["sound"] = am.load<gfx::texture>("editor_data:/icons/sound.png").get();
-
-	return true;
-}
-
-void editing_system::dispose()
-{
-	drag_data = {};
-	selection_data = {};
-	icons.clear();
 }
 
 void editing_system::save_editor_camera()

@@ -9,6 +9,15 @@ input::input()
 	_current_cursor_position.x = p[0];
 	_current_cursor_position.y = p[1];
 	_last_cursor_position = _current_cursor_position;
+
+	on_platform_events.connect(this, &input::platform_events);
+	on_frame_end.connect(this, &input::reset_state);
+}
+
+input::~input()
+{
+	on_platform_events.disconnect(this, &input::platform_events);
+	on_frame_end.disconnect(this, &input::reset_state);
 }
 
 void input::reset_state(std::chrono::duration<float>)
@@ -274,20 +283,6 @@ ipoint input::get_cursor_delta_move() const
 {
 	return ipoint{get_current_cursor_position().x - get_last_cursor_position().x,
 				  get_current_cursor_position().y - get_last_cursor_position().y};
-}
-
-bool input::initialize()
-{
-	on_platform_events.connect(this, &input::platform_events);
-	on_frame_end.connect(this, &input::reset_state);
-
-	return true;
-}
-
-void input::dispose()
-{
-	on_platform_events.disconnect(this, &input::platform_events);
-	on_frame_end.disconnect(this, &input::reset_state);
 }
 
 void input::platform_events(const std::pair<std::uint32_t, bool>& info,

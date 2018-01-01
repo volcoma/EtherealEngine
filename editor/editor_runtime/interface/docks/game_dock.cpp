@@ -1,5 +1,6 @@
 #include "game_dock.h"
 #include "../../editing/editing_system.h"
+#include "core/system/subsystem.h"
 #include "runtime/ecs/components/camera_component.h"
 #include "runtime/ecs/ecs.h"
 #include "runtime/rendering/camera.h"

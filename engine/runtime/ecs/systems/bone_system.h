@@ -1,14 +1,14 @@
 #pragma once
 
-#include "../ecs.h"
+#include <chrono>
 
 namespace runtime
 {
-class bone_system : public core::subsystem
+class bone_system
 {
 public:
-	bool initialize();
-	void dispose();
+	bone_system();
+	~bone_system();
 	//-----------------------------------------------------------------------------
 	//  Name : frame_update (virtual )
 	/// <summary>

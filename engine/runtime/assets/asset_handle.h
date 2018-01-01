@@ -56,7 +56,7 @@ struct asset_handle
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    inline long use_count() const
+	inline long use_count() const
 	{
 		return link.use_count();
 	}

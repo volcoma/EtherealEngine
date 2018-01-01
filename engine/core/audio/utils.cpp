@@ -5,7 +5,7 @@ namespace audio
 namespace utils
 {
 std::vector<std::uint8_t> convert_to_mono(const std::vector<std::uint8_t>& input,
-												 std::uint8_t bytes_per_sample)
+										  std::uint8_t bytes_per_sample)
 {
 	if(input.size() % 2 != 0)
 	{
@@ -51,7 +51,7 @@ std::vector<std::uint8_t> convert_to_mono(const std::vector<std::uint8_t>& input
 }
 
 std::vector<std::uint8_t> convert_to_stereo(const std::vector<std::uint8_t>& input,
-												 std::uint8_t bytes_per_sample)
+											std::uint8_t bytes_per_sample)
 {
 	if(input.size() % 2 != 0)
 	{

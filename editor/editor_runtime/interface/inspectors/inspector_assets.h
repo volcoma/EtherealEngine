@@ -59,7 +59,6 @@ struct inspector_asset_handle_animation : public inspector
 };
 INSPECTOR_REFLECT(inspector_asset_handle_animation, asset_handle<runtime::animation>)
 
-
 struct inspector_asset_handle_prefab : public inspector
 {
 	REFLECTABLEV(inspector_asset_handle_prefab, inspector)

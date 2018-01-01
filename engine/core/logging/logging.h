@@ -4,7 +4,7 @@
 
 #include "../common/platform_config.h"
 
-#if $on($windows) 
+#if $on($windows)
 #if $on($msvc)
 #include "spdlog/sinks/msvc_sink.h"
 namespace spdlog

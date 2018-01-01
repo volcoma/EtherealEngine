@@ -8,17 +8,17 @@
 class gpu_program
 {
 public:
-    REFLECTABLE(gpu_program)
+	REFLECTABLE(gpu_program)
 	SERIALIZABLE(gpu_program)
 
-    //-----------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------
 	//  Name : gpu_program (Constructor)
 	/// <summary>
 	/// Creates a program form a compute shader asset.
 	/// </summary>
 	gpu_program(asset_handle<gfx::shader> compute_shader);
 
-    //-----------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------
 	//  Name : gpu_program (Constructor)
 	/// <summary>
 	/// Creates a program form a vertex and fragment shader assets.
@@ -26,7 +26,7 @@ public:
 	//-----------------------------------------------------------------------------
 	gpu_program(asset_handle<gfx::shader> vertex_shader, asset_handle<gfx::shader> fragment_shader);
 
-    //-----------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------
 	//  Name : begin ()
 	/// <summary>
 	/// Begins usage of the program. Checks validity of attached shaders and
@@ -34,14 +34,14 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	bool begin();
-	
+
 	//-----------------------------------------------------------------------------
 	//  Name : end ()
 	/// <summary>
 	/// Indicates end of working with a program.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void end();	
+	void end();
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_texture ()
@@ -86,7 +86,7 @@ public:
 	//-----------------------------------------------------------------------------
 	std::shared_ptr<gfx::uniform> get_uniform(const std::string& _name, bool texture = false);
 
-    //-----------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------
 	//  Name : native_handle ()
 	/// <summary>
 	/// Retrieves the native handle of the internal shader program.
@@ -94,7 +94,7 @@ public:
 	//-----------------------------------------------------------------------------
 	gfx::program::handle_type_t native_handle() const;
 
-    //-----------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------
 	//  Name : get_shaders ()
 	/// <summary>
 	/// Retrieves the shader assets that created the shader program.
@@ -105,7 +105,7 @@ public:
 private:
 	void populate();
 	void attach_shader(asset_handle<gfx::shader> shader);
-	
+
 	/// Shaders that created this program.
 	std::vector<asset_handle<gfx::shader>> _shaders;
 	/// Shaders that created this program.

@@ -13,7 +13,7 @@ struct sound_data
 	using duration_t = std::chrono::duration<double>;
 
 	duration_t::rep get_duration() const;
-	
+
 	//-----------------------------------------------------------------------------
 	//  Name : convert_to_mono ()
 	/// <summary>
@@ -21,7 +21,7 @@ struct sound_data
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void convert_to_mono();
-	
+
 	//-----------------------------------------------------------------------------
 	//  Name : convert_to_stereo ()
 	/// <summary>
@@ -33,9 +33,9 @@ struct sound_data
 
 	/// data buffer of pcm sound stored in uint8_t buffer
 	std::vector<std::uint8_t> data;
-    
-    /// bytes per sample
-    std::uint8_t bytes_per_sample = 2;
+
+	/// bytes per sample
+	std::uint8_t bytes_per_sample = 2;
 
 	/// sample rate of the sound
 	std::uint32_t sample_rate = 0;

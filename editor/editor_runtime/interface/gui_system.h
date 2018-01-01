@@ -1,6 +1,5 @@
 #pragma once
 
-#include "core/system/subsystem.h"
 #include "editor_core/gui/gui.h"
 #include "runtime/system/events.h"
 
@@ -17,13 +16,13 @@ class render_window;
 /// Class for the management of interface elements.
 /// </summary>
 //-----------------------------------------------------------------------------
-struct gui_system : public core::subsystem
+struct gui_system
 {
-	bool initialize();
-	void dispose();
+	gui_system();
+	~gui_system();
 	void frame_begin(std::chrono::duration<float>);
 
-    std::uint32_t get_draw_calls() const;
+	std::uint32_t get_draw_calls() const;
 
 	ImGuiContext& get_context(std::uint32_t id);
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../common/basetypes.hpp"
-#include "../../serialization/serialization.h"
+#include <core/common/basetypes.hpp>
+#include <core/serialization/serialization.h>
 
 namespace cereal
 {

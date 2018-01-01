@@ -1,14 +1,14 @@
 #pragma once
 
-#include "core/system/subsystem.h"
 #include <chrono>
+
 namespace runtime
 {
-class audio_system : public core::subsystem
+class audio_system
 {
 public:
-	bool initialize();
-	void dispose();
+	audio_system();
+	~audio_system();
 	//-----------------------------------------------------------------------------
 	//  Name : frame_update (virtual )
 	/// <summary>

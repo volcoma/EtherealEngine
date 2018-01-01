@@ -93,7 +93,7 @@ private:
 	std::stringstream print_buffer;
 	void print(const std::string& output)
 	{
-		print_buffer << output;// << "\n";
+		print_buffer << output; // << "\n";
 	}
 
 private:

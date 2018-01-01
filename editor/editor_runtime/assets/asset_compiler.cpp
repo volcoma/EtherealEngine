@@ -18,8 +18,8 @@
 #include "mesh_importer.h"
 #include "runtime/assets/impl/asset_extensions.h"
 #include "runtime/meta/animation/animation.hpp"
-#include "runtime/meta/rendering/mesh.hpp"
 #include "runtime/meta/audio/sound.hpp"
+#include "runtime/meta/rendering/mesh.hpp"
 #include "runtime/rendering/mesh.h"
 #include <array>
 #include <fstream>
@@ -76,7 +76,7 @@ bool run_compile_process(const std::string& process, const std::vector<std::stri
 		std::array<char, 2048> buffer;
 		buffer.fill(0);
 		int32_t sz = process_reader.read(buffer.data(), static_cast<std::int32_t>(buffer.size()), &error);
-    
+
 		process_reader.close();
 		int32_t result = process_reader.getExitCode();
 
@@ -85,7 +85,7 @@ bool run_compile_process(const std::string& process, const std::vector<std::stri
 			err = std::string(error.getMessage().getPtr());
 			if(sz > 0)
 			{
-                err += " " + std::string(buffer.data());
+				err += " " + std::string(buffer.data());
 			}
 			return false;
 		}

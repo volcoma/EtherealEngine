@@ -3,6 +3,7 @@
 #include "../components/audio_listener_component.h"
 #include "../components/audio_source_component.h"
 #include "../components/transform_component.h"
+#include "core/system/subsystem.h"
 
 namespace runtime
 {
@@ -20,14 +21,12 @@ void audio_system::frame_update(std::chrono::duration<float> dt)
 		});
 }
 
-bool audio_system::initialize()
+audio_system::audio_system()
 {
 	on_frame_update.connect(this, &audio_system::frame_update);
-
-	return true;
 }
 
-void audio_system::dispose()
+audio_system::~audio_system()
 {
 	on_frame_update.disconnect(this, &audio_system::frame_update);
 }

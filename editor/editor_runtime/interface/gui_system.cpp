@@ -8,6 +8,7 @@
 #include "core/graphics/uniform.h"
 #include "core/graphics/vertex_buffer.h"
 #include "core/logging/logging.h"
+#include "core/system/subsystem.h"
 
 #include "runtime/assets/asset_manager.h"
 #include "runtime/input/input.h"
@@ -384,17 +385,15 @@ void imgui_destroy_context(ImGuiContext*& context)
 	context = nullptr;
 }
 
-bool gui_system::initialize()
+gui_system::gui_system()
 {
 	runtime::on_platform_events.connect(this, &gui_system::platform_events);
 	runtime::on_frame_begin.connect(this, &gui_system::frame_begin);
 
 	imgui_init();
-
-	return true;
 }
 
-void gui_system::dispose()
+gui_system::~gui_system()
 {
 	runtime::on_platform_events.connect(this, &gui_system::platform_events);
 	runtime::on_frame_begin.disconnect(this, &gui_system::frame_begin);

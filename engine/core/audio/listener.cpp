@@ -9,7 +9,7 @@ listener::listener()
 }
 
 listener::~listener() = default;
-    
+
 void listener::set_volume(float volume)
 {
 	if(_impl)

@@ -4,6 +4,8 @@
 #include "../../system/events.h"
 #include "../components/model_component.h"
 #include "../components/transform_component.h"
+#include "core/system/subsystem.h"
+
 namespace runtime
 {
 
@@ -96,14 +98,12 @@ void bone_system::frame_update(std::chrono::duration<float> dt)
 	});
 }
 
-bool bone_system::initialize()
+bone_system::bone_system()
 {
 	runtime::on_frame_update.connect(this, &bone_system::frame_update);
-
-	return true;
 }
 
-void bone_system::dispose()
+bone_system::~bone_system()
 {
 	runtime::on_frame_update.disconnect(this, &bone_system::frame_update);
 }

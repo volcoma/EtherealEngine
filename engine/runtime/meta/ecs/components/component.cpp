@@ -3,7 +3,6 @@
 #include "core/serialization/associative_archive.h"
 #include "core/serialization/binary_archive.h"
 
-
 namespace runtime
 {
 REFLECT(component)

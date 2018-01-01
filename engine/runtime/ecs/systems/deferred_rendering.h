@@ -31,9 +31,11 @@ struct lod_data
 using visibility_set_models_t =
 	std::vector<std::tuple<entity, chandle<transform_component>, chandle<model_component>>>;
 
-class deferred_rendering : public core::subsystem
+class deferred_rendering
 {
 public:
+	deferred_rendering();
+	~deferred_rendering();
 	//-----------------------------------------------------------------------------
 	//  Name : gather_visible_models ()
 	/// <summary>
@@ -64,26 +66,6 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void receive(entity e);
-
-	//-----------------------------------------------------------------------------
-	//  Name : initialize ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	bool initialize() override;
-
-	//-----------------------------------------------------------------------------
-	//  Name : dispose ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void dispose() override;
 
 	//-----------------------------------------------------------------------------
 	//  Name : build_reflections ()

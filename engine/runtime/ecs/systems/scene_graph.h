@@ -5,11 +5,11 @@
 
 namespace runtime
 {
-class scene_graph : public core::subsystem
+class scene_graph
 {
 public:
-	bool initialize();
-	void dispose();
+	scene_graph();
+	~scene_graph();
 	//-----------------------------------------------------------------------------
 	//  Name : frame_update (virtual )
 	/// <summary>

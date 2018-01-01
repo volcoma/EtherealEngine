@@ -5,7 +5,7 @@
 
 #include "core/common/nonstd/type_traits.hpp"
 #include "core/string_utils/string_utils.h"
-#include "core/system/task_system.h"
+#include "core/tasks/task_system.h"
 
 #include "asset_handle.h"
 #include <cassert>
@@ -49,8 +49,8 @@ struct basic_storage
 template <typename T>
 struct asset_storage : public basic_storage
 {
-    /// aliases
-    using request_container_t = std::unordered_map<std::string, core::task_future<asset_handle<T>>>;
+	/// aliases
+	using request_container_t = std::unordered_map<std::string, core::task_future<asset_handle<T>>>;
 	template <typename F>
 	using callable = std::function<F>;
 	using load_from_file_t = callable<bool(core::task_future<asset_handle<T>>&, const std::string&)>;
@@ -60,7 +60,7 @@ struct asset_storage : public basic_storage
 	using rename_file_t = callable<void(const std::string&, const std::string&)>;
 	using delete_file_t = callable<void(const std::string&)>;
 
-    using predicate_t = callable<bool(const typename request_container_t::value_type&)>;
+	using predicate_t = callable<bool(const typename request_container_t::value_type&)>;
 	//-----------------------------------------------------------------------------
 	//  Name : ~storage ()
 	/// <summary>
@@ -71,22 +71,21 @@ struct asset_storage : public basic_storage
 	//-----------------------------------------------------------------------------
 	~asset_storage() = default;
 
-
-    void clear_with_condition(const predicate_t& predicate)
-    {
-        std::lock_guard<std::recursive_mutex> lock(container_mutex);
-        for (auto it = container.cbegin(); it != container.cend();)
-        {
-            if(predicate(*it))
-            {
-                it = container.erase(it);
-            }
-            else
-            {
-                ++it;
-            }
-        }
-    }
+	void clear_with_condition(const predicate_t& predicate)
+	{
+		std::lock_guard<std::recursive_mutex> lock(container_mutex);
+		for(auto it = container.cbegin(); it != container.cend();)
+		{
+			if(predicate(*it))
+			{
+				it = container.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+	}
 	//-----------------------------------------------------------------------------
 	//  Name : clear ()
 	/// <summary>
@@ -97,12 +96,11 @@ struct asset_storage : public basic_storage
 	//-----------------------------------------------------------------------------
 	virtual void clear() final
 	{
-        clear_with_condition([](const auto& it)
-        {
-            const auto& task = it.second;
-            task.wait();
-            return true;
-        });
+		clear_with_condition([](const auto& it) {
+			const auto& task = it.second;
+			task.wait();
+			return true;
+		});
 	}
 
 	//-----------------------------------------------------------------------------
@@ -115,18 +113,17 @@ struct asset_storage : public basic_storage
 	//-----------------------------------------------------------------------------
 	virtual void clear(const std::string& group) final
 	{
-        clear_with_condition([&group](const auto& it)
-        {
-            const auto& id = it.first;
-            const auto& task = it.second;
+		clear_with_condition([&group](const auto& it) {
+			const auto& id = it.first;
+			const auto& task = it.second;
 
-            if(string_utils::begins_with(id, group, true))
-            {
-                task.wait();
-                return true;
-            }
-            return false;
-        });
+			if(string_utils::begins_with(id, group, true))
+			{
+				task.wait();
+				return true;
+			}
+			return false;
+		});
 	}
 
 	/// key, mode
@@ -145,10 +142,9 @@ struct asset_storage : public basic_storage
 	delete_file_t delete_asset_file;
 
 	/// Storage container
-    request_container_t container;
+	request_container_t container;
 
 	/// Mutex
 	std::recursive_mutex container_mutex;
 };
-
 }

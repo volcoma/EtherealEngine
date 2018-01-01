@@ -25,11 +25,11 @@
 	extern void rttr_auto_register_reflection_function_t();                                                  \
 	template <>                                                                                              \
 	void rttr_auto_register_reflection_function_t<cls>();                                                    \
-	static const int ANONYMOUS_VARIABLE(auto_register__) = []() {                                           \
+	static const int ANONYMOUS_VARIABLE(auto_register__) = []() {                                            \
 		rttr_auto_register_reflection_function_t<cls>();                                                     \
 		return 0;                                                                                            \
 	}();                                                                                                     \
-    template <>                                                                                              \
+	template <>                                                                                              \
 	inline void rttr_auto_register_reflection_function_t<cls>()
 
 #define REFLECT_EXTERN(cls)                                                                                  \
@@ -37,7 +37,7 @@
 	extern void rttr_auto_register_reflection_function_t();                                                  \
 	template <>                                                                                              \
 	void rttr_auto_register_reflection_function_t<cls>();                                                    \
-	static const int ANONYMOUS_VARIABLE(auto_register__) = []() {                                           \
+	static const int ANONYMOUS_VARIABLE(auto_register__) = []() {                                            \
 		rttr_auto_register_reflection_function_t<cls>();                                                     \
 		return 0;                                                                                            \
 	}();

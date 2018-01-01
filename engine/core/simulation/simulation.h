@@ -1,6 +1,5 @@
 #pragma once
 
-#include "subsystem.h"
 #include <chrono>
 #include <vector>
 
@@ -16,31 +15,13 @@ namespace core
 /// Class responsible for timers.
 /// </summary>
 //-----------------------------------------------------------------------------
-struct simulation : public subsystem
+struct simulation
 {
-    using clock_t = std::chrono::high_resolution_clock;
+	using clock_t = std::chrono::high_resolution_clock;
 	using timepoint_t = clock_t::time_point;
 	using duration_t = clock_t::duration;
 
-	//-----------------------------------------------------------------------------
-	//  Name : initialize ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	bool initialize() override;
-
-	//-----------------------------------------------------------------------------
-	//  Name : dispose ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void dispose() override;
+	simulation();
 
 	//-----------------------------------------------------------------------------
 	//  Name : run_one_frame ()

@@ -417,7 +417,7 @@ void app::setup(cmd_line::options_parser& parser)
 
 void app::start(cmd_line::options_parser& parser)
 {
-    auto logging_container = logging::get_mutable_logging_container();
+	auto logging_container = logging::get_mutable_logging_container();
 	_console_log = std::make_shared<console_log>();
 	logging_container->add_sink(_console_log);
 	runtime::app::start(parser);

@@ -74,5 +74,4 @@ inline std::string get_compiled_format<runtime::animation>()
 {
 	return "";
 }
-
 };

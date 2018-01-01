@@ -16,6 +16,7 @@
 #include "core/graphics/render_view.h"
 #include "core/graphics/texture.h"
 #include "core/graphics/vertex_buffer.h"
+#include "core/system/subsystem.h"
 
 namespace runtime
 {
@@ -722,7 +723,7 @@ void deferred_rendering::receive(entity e)
 		pair.second.erase(e);
 	}
 }
-bool deferred_rendering::initialize()
+deferred_rendering::deferred_rendering()
 {
 	on_entity_destroyed.connect(this, &deferred_rendering::receive);
 	on_frame_render.connect(this, &deferred_rendering::frame_render);
@@ -789,11 +790,9 @@ bool deferred_rendering::initialize()
 
 		},
 		vs_clip_quad_ex, fs_atmospherics);
-
-	return true;
 }
 
-void deferred_rendering::dispose()
+deferred_rendering::~deferred_rendering()
 {
 	on_entity_destroyed.disconnect(this, &deferred_rendering::receive);
 	on_frame_render.disconnect(this, &deferred_rendering::frame_render);

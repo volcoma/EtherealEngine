@@ -3,10 +3,9 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
+#include "core/graphics/render_pass.h"
 #include "mml/window/window.hpp"
 #include <memory>
-#include "core/graphics/render_pass.h"
-
 
 class render_window : public mml::window
 {

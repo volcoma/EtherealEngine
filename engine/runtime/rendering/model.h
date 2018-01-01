@@ -2,10 +2,10 @@
 
 #include "../assets/asset_handle.h"
 #include "core/common/basetypes.hpp"
+#include "core/graphics/graphics.h"
 #include "core/math/math_includes.h"
 #include "core/reflection/registration.h"
 #include "core/serialization/serialization.h"
-#include "core/graphics/graphics.h"
 #include <vector>
 
 class gpu_program;
@@ -15,7 +15,7 @@ class material;
 //-----------------------------------------------------------------------------
 //  Name : model (Class)
 /// <summary>
-/// Structure describing a LOD group(set of meshes), LOD transitions 
+/// Structure describing a LOD group(set of meshes), LOD transitions
 /// and their materials.
 /// </summary>
 //-----------------------------------------------------------------------------

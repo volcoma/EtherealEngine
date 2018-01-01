@@ -16,7 +16,6 @@ void subsystem_context::dispose()
 		auto found = _subsystems.find(*iter);
 		ensures(found != _subsystems.end());
 
-		found->second->dispose();
 		found->second.reset();
 		_subsystems.erase(found);
 	}
@@ -54,18 +53,5 @@ bool initialize()
 	status() = internal_status::running;
 	return true;
 }
-}
-
-subsystem::~subsystem()
-{
-}
-
-bool subsystem::initialize()
-{
-	return true;
-}
-
-void subsystem::dispose()
-{
 }
 }

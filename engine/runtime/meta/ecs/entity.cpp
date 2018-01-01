@@ -2,6 +2,7 @@
 #include "core/serialization/associative_archive.h"
 #include "core/serialization/binary_archive.h"
 #include "core/serialization/types/vector.hpp"
+#include "core/system/subsystem.h"
 
 namespace runtime
 {

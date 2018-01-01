@@ -5,7 +5,8 @@
 #include "core/filesystem/filesystem_watcher.h"
 #include "core/logging/logging.h"
 #include "core/serialization/associative_archive.h"
-#include "core/system/task_system.h"
+#include "core/system/subsystem.h"
+#include "core/tasks/task_system.h"
 #include "runtime/assets/asset_manager.h"
 #include "runtime/assets/impl/asset_extensions.h"
 #include "runtime/ecs/ecs.h"
@@ -417,13 +418,12 @@ void project_manager::save_config()
 	try_save(ar, cereal::make_nvp("options", _options));
 }
 
-bool project_manager::initialize()
+project_manager::project_manager()
 {
 	load_config();
-	return true;
 }
 
-void project_manager::dispose()
+project_manager::~project_manager()
 {
 	save_config();
 	fs::watcher::unwatch_all();

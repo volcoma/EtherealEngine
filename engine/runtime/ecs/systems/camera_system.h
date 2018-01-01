@@ -1,14 +1,14 @@
 #pragma once
 
-#include "core/system/subsystem.h"
 #include <chrono>
+
 namespace runtime
 {
-class camera_system : public core::subsystem
+class camera_system
 {
 public:
-	bool initialize();
-	void dispose();
+	camera_system();
+	~camera_system();
 	//-----------------------------------------------------------------------------
 	//  Name : frame_update (virtual )
 	/// <summary>

@@ -3,6 +3,7 @@
 #include "../../system/project_manager.h"
 #include "core/filesystem/filesystem.h"
 #include "core/logging/logging.h"
+#include "core/system/subsystem.h"
 #include "runtime/assets/asset_handle.h"
 #include "runtime/ecs/components/model_component.h"
 #include "runtime/ecs/components/transform_component.h"

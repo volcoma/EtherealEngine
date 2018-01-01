@@ -31,7 +31,7 @@ public:
 	sound(const sound& rhs) = delete;
 	sound& operator=(const sound& rhs) = delete;
 
-    //-----------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------
 	//  Name : is_valid ()
 	/// <summary>
 	/// Checks whether a sound is valid.
@@ -39,14 +39,14 @@ public:
 	//-----------------------------------------------------------------------------
 	bool is_valid() const;
 
-    //-----------------------------------------------------------------------------
+	//-----------------------------------------------------------------------------
 	//  Name : get_duration ()
 	/// <summary>
 	/// Gets the duration of the sound in seconds.
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	sound_data::duration_t get_duration() const;
-	
+
 	//-----------------------------------------------------------------------------
 	//  Name : get_sample_rate ()
 	/// <summary>
@@ -54,7 +54,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	std::uint32_t get_sample_rate() const;
-	
+
 	//-----------------------------------------------------------------------------
 	//  Name : get_channels ()
 	/// <summary>
@@ -62,17 +62,17 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	std::uint32_t get_channels() const;
-	
+
 	//-----------------------------------------------------------------------------
 	//  Name : get_data ()
 	/// <summary>
 	/// Gets the sound data rate of the sound.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    const sound_data& get_data() const;
+	const sound_data& get_data() const;
 
 private:
-    friend class source;
+	friend class source;
 
 	sound_data _data;
 	std::unique_ptr<priv::sound_impl> _impl;

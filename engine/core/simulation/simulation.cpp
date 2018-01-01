@@ -6,20 +6,11 @@ namespace core
 {
 using namespace std::literals;
 
-bool simulation::initialize()
+simulation::simulation()
 {
-	_timestep = duration_t::zero();
-	_last_frame_timepoint = clock_t::now();
-	_launch_timepoint = clock_t::now();
 
 	if(_max_inactive_fps == 0)
 		_max_inactive_fps = std::max(_max_inactive_fps, _max_fps);
-
-	return true;
-}
-
-void simulation::dispose()
-{
 }
 
 void simulation::run_one_frame(bool is_active)

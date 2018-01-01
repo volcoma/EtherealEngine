@@ -88,27 +88,27 @@ float source_impl::get_playing_offset() const
 {
 	ALfloat seconds = 0.0f;
 	alCheck(alGetSourcef(_handle, AL_SEC_OFFSET, &seconds));
-    return static_cast<float>(seconds);
+	return static_cast<float>(seconds);
 }
 
 float source_impl::get_playing_duration() const
 {
-    auto buffer = binded_handle();
-    if(buffer == 0)
-        return 1.0f;
-        
-    ALint size_in_bytes = 0;
+	auto buffer = binded_handle();
+	if(buffer == 0)
+		return 1.0f;
+
+	ALint size_in_bytes = 0;
 	ALint channels = 0;
 	ALint bits = 0;
-    ALint frequency = 0;
+	ALint frequency = 0;
 
 	alCheck(alGetBufferi(buffer, AL_SIZE, &size_in_bytes));
 	alCheck(alGetBufferi(buffer, AL_CHANNELS, &channels));
 	alCheck(alGetBufferi(buffer, AL_BITS, &bits));
-    alCheck(alGetBufferi(buffer, AL_FREQUENCY, &frequency));
+	alCheck(alGetBufferi(buffer, AL_FREQUENCY, &frequency));
 
-    auto lengthInSamples = size_in_bytes * 8 / (channels * bits);
-	return float(lengthInSamples) / float(frequency);    
+	auto lengthInSamples = size_in_bytes * 8 / (channels * bits);
+	return float(lengthInSamples) / float(frequency);
 }
 
 void source_impl::play() const

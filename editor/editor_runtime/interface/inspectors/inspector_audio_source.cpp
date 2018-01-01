@@ -25,11 +25,11 @@ bool inspector_audio_source_component::inspect(rttr::variant& var, bool read_onl
 			data->stop();
 		}
 		gui::PopFont();
-        
+
 		gui::SameLine();
-		
+
 		property_layout layout("");
-		
+
 		auto total_time = data->get_playing_duration();
 		auto current_time = data->get_playing_offset();
 		float cur = float(current_time.count());

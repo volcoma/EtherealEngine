@@ -14,8 +14,8 @@
 #include "app_setup.h"
 #include "core/logging/logging.h"
 #include "core/serialization/serialization.h"
-#include "core/system/simulation.h"
-#include "core/system/task_system.h"
+#include "core/simulation/simulation.h"
+#include "core/tasks/task_system.h"
 #include "events.h"
 
 namespace runtime
@@ -37,6 +37,8 @@ void app::setup(cmd_line::options_parser& parser)
 
 	audio::set_info_logger([](const std::string& msg) { APPLOG_INFO(msg); });
 	audio::set_error_logger([](const std::string& msg) { APPLOG_ERROR(msg); });
+
+	ecs::set_frame_getter([]() { return core::get_subsystem<core::simulation>().get_frame(); });
 
 	{
 		auto value = cmd_line::value<std::string>();

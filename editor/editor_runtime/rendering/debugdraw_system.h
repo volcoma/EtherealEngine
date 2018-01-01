@@ -1,6 +1,5 @@
 #pragma once
 
-#include "core/system/subsystem.h"
 #include <chrono>
 #include <memory>
 
@@ -8,28 +7,11 @@ class gpu_program;
 
 namespace editor
 {
-class debugdraw_system : public core::subsystem
+class debugdraw_system
 {
 public:
-	//-----------------------------------------------------------------------------
-	//  Name : initialize ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	bool initialize();
-
-	//-----------------------------------------------------------------------------
-	//  Name : dispose ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void dispose();
+	debugdraw_system();
+	~debugdraw_system();
 
 	//-----------------------------------------------------------------------------
 	//  Name : frame_render ()

@@ -5,8 +5,6 @@
 #include "core/reflection/registration.h"
 #include "core/serialization/serialization.h"
 #include "core/signals/event.hpp"
-#include "core/system/simulation.h"
-#include "core/system/subsystem.h"
 
 #include <algorithm>
 #include <bitset>
@@ -28,6 +26,14 @@
 
 namespace runtime
 {
+
+namespace ecs
+{
+using frame_getter_t = std::function<std::uint64_t()>;
+void set_frame_getter(frame_getter_t frame_getter);
+std::uint64_t get_frame();
+}
+
 static const std::size_t MAX_COMPONENTS = 128;
 
 class component;
@@ -296,7 +302,7 @@ public:
 	//-----------------------------------------------------------------------------
 	virtual void touch()
 	{
-		_last_touched = static_cast<std::uint32_t>(core::get_subsystem<core::simulation>().get_frame()) + 1;
+		_last_touched = static_cast<std::uint32_t>(ecs::get_frame()) + 1;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -309,8 +315,7 @@ public:
 	//-----------------------------------------------------------------------------
 	virtual bool is_dirty() const
 	{
-		return _last_touched >=
-			   static_cast<std::uint32_t>(core::get_subsystem<core::simulation>().get_frame());
+		return _last_touched >= static_cast<std::uint32_t>(ecs::get_frame());
 	}
 
 	//-----------------------------------------------------------------------------
@@ -387,7 +392,7 @@ extern event<void(entity, chandle<component>)> on_component_removed;
 /**
  * Manages entity::Id creation and component assignment.
  */
-class entity_component_system : public core::subsystem
+class entity_component_system
 {
 public:
 	typedef std::bitset<MAX_COMPONENTS> component_mask_t;

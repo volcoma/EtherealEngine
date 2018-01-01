@@ -1,13 +1,11 @@
 #include "docking.h"
 
-bool docking_system::initialize()
+docking_system::docking_system()
 {
 	runtime::on_platform_events.connect(this, &docking_system::platform_events);
-
-	return true;
 }
 
-void docking_system::dispose()
+docking_system::~docking_system()
 {
 	runtime::on_platform_events.disconnect(this, &docking_system::platform_events);
 

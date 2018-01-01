@@ -1,5 +1,5 @@
 #include "camera.hpp"
-#include "core/meta/common/basetypes.hpp"
+#include "../core/common/basetypes.hpp"
 #include "core/serialization/associative_archive.h"
 #include "core/serialization/binary_archive.h"
 

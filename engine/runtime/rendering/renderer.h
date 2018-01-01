@@ -1,34 +1,16 @@
 #pragma once
 
 #include "core/cmd_line/args.h"
-#include "core/system/subsystem.h"
 #include "render_window.h"
 #include <memory>
 #include <vector>
 
 namespace runtime
 {
-struct renderer : public core::subsystem
+struct renderer
 {
 	renderer(cmd_line::options_parser& parser);
-	//-----------------------------------------------------------------------------
-	//  Name : initialize ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	bool initialize() override;
-	//-----------------------------------------------------------------------------
-	//  Name : dispose ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void dispose() override;
+	~renderer();
 
 	//-----------------------------------------------------------------------------
 	//  Name : init_backend ()
@@ -38,7 +20,7 @@ struct renderer : public core::subsystem
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool init_backend();
+	bool init_backend(cmd_line::options_parser& parser);
 
 	//-----------------------------------------------------------------------------
 	//  Name : frame_end ()
@@ -107,7 +89,5 @@ protected:
 	std::unique_ptr<mml::window> _init_window;
 	std::vector<std::unique_ptr<render_window>> _windows;
 	std::vector<std::unique_ptr<render_window>> _windows_pending_addition;
-
-	cmd_line::options_parser& _parser;
 };
 }

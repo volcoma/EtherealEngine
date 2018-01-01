@@ -3,6 +3,7 @@
 
 // user includes
 #include "core/string_utils/string_utils.h"
+#include "core/system/subsystem.h"
 #include "docking.h"
 #include "runtime/input/input.h"
 #include "runtime/rendering/renderer.h"

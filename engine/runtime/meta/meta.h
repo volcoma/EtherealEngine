@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/meta/meta.h"
+#include "core/meta.h"
 
 #include "assets/asset_handle.hpp"
 

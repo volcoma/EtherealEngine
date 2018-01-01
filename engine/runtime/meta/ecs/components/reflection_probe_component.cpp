@@ -1,7 +1,7 @@
 #include "reflection_probe_component.hpp"
+#include "../../core/math/vector.hpp"
 #include "../../rendering/reflection_probe.hpp"
 #include "component.hpp"
-#include "core/meta/math/vector.hpp"
 
 REFLECT(reflection_probe_component)
 {

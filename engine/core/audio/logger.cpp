@@ -14,7 +14,6 @@ logger_t& get_error_logger()
 	static logger_t logger;
 	return logger;
 }
-
 }
 
 void log_info(const std::string& msg)

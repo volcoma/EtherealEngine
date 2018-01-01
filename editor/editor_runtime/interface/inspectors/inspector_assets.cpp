@@ -3,6 +3,7 @@
 #include "core/audio/sound.h"
 #include "core/filesystem/filesystem.h"
 #include "core/graphics/texture.h"
+#include "core/system/subsystem.h"
 #include "inspectors.h"
 #include "runtime/animation/animation.h"
 #include "runtime/assets/asset_manager.h"

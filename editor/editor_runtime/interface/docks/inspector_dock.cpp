@@ -1,6 +1,7 @@
 #include "inspector_dock.h"
 #include "../../editing/editing_system.h"
 #include "../inspectors/inspectors.h"
+#include "core/system/subsystem.h"
 
 void inspector_dock::render(const ImVec2&)
 {

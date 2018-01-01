@@ -10,18 +10,13 @@
 namespace runtime
 {
 renderer::renderer(cmd_line::options_parser& parser)
-	: _parser(parser)
-{
-}
-
-bool renderer::initialize()
 {
 	on_platform_events.connect(this, &renderer::platform_events);
 	on_frame_end.connect(this, &renderer::frame_end);
 
-	if(!init_backend())
+	if(!init_backend(parser))
 	{
-		return false;
+		return;
 	}
 
 	mml::video_mode desktop = mml::video_mode::get_desktop_mode();
@@ -31,11 +26,9 @@ bool renderer::initialize()
 	window->request_focus();
 	register_window(std::move(window));
 	process_pending_windows();
-
-	return true;
 }
 
-void renderer::dispose()
+renderer::~renderer()
 {
 	on_platform_events.disconnect(this, &renderer::platform_events);
 	on_frame_end.disconnect(this, &renderer::frame_end);
@@ -137,7 +130,7 @@ void renderer::platform_events(const std::pair<std::uint32_t, bool>& info,
 	}
 }
 
-bool renderer::init_backend()
+bool renderer::init_backend(cmd_line::options_parser& parser)
 {
 
 	mml::video_mode desktop = mml::video_mode::get_desktop_mode();
@@ -156,7 +149,7 @@ bool renderer::init_backend()
 
 	gfx::set_platform_data(pd);
 
-	auto preferred_renderer = _parser["renderer"].as<std::string>();
+	auto preferred_renderer = parser["renderer"].as<std::string>();
 	// auto detect
 	auto preferred_renderer_type = gfx::renderer_type::Count;
 	if(preferred_renderer == "opengl")
@@ -167,20 +160,20 @@ bool renderer::init_backend()
 	{
 		preferred_renderer_type = gfx::renderer_type::Direct3D11;
 	}
-    else if(preferred_renderer == "directx12")
+	else if(preferred_renderer == "directx12")
 	{
 		preferred_renderer_type = gfx::renderer_type::Direct3D12;
 	}
 	APPLOG_SEPARATOR();
 	APPLOG_INFO("Initializing rendering backend...");
 	APPLOG_SEPARATOR();
-	
+
 	if(!gfx::init(preferred_renderer_type))
 	{
 		APPLOG_ERROR("Could not initialize rendering backend!");
 		APPLOG_SEPARATOR();
 		return false;
-    }
+	}
 	if(gfx::get_renderer_type() == gfx::renderer_type::Direct3D9)
 	{
 		APPLOG_ERROR("Does not support dx9. Minimum supported is dx11.");
@@ -190,8 +183,8 @@ bool renderer::init_backend()
 	const auto sz = _init_window->get_size();
 	gfx::reset(sz[0], sz[1]);
 
-    APPLOG_INFO("Using {0} rendering backend.", gfx::get_renderer_name(gfx::get_renderer_type()));
-    APPLOG_SEPARATOR();
+	APPLOG_INFO("Using {0} rendering backend.", gfx::get_renderer_name(gfx::get_renderer_type()));
+	APPLOG_SEPARATOR();
 	return true;
 }
 

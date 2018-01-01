@@ -1,7 +1,7 @@
 #include "transform_component.hpp"
+#include "../../core/math/transform.hpp"
+#include "../../core/math/vector.hpp"
 #include "component.hpp"
-#include "core/meta/math/transform.hpp"
-#include "core/meta/math/vector.hpp"
 #include "core/serialization/types/vector.hpp"
 
 REFLECT(transform_component)

@@ -124,12 +124,12 @@ void task_system::task_queue::push(task t)
 		std::unique_lock<std::mutex> lock(_mutex);
 		_tasks.emplace_back(std::move(t));
 	}
-    _cv.notify_one();
+	_cv.notify_one();
 }
 
 void task_system::task_queue::wake_up()
 {
-    _cv.notify_all();
+	_cv.notify_all();
 }
 
 void task_system::run(std::size_t idx, std::function<bool()> condition, duration_t pop_timeout)
@@ -155,7 +155,7 @@ void task_system::run(std::size_t idx, std::function<bool()> condition, duration
 					p = _queues[queue_idx].try_pop();
 					if(p.first)
 					{
-                        _steals++;
+						_steals++;
 						break;
 					}
 				}
@@ -216,13 +216,15 @@ task_system::task_system(std::size_t nthreads, const task_system::allocator_t& a
 	for(std::size_t th = 1; th < _threads_count; ++th)
 	{
 		_threads.emplace_back(&task_system::run, this, th, []() { return true; }, 50ms);
-        platform::set_thread_name(_threads.back(), "task_worker");
+		platform::set_thread_name(_threads.back(), "task_worker");
 	}
 }
 
 task_system::~task_system()
 {
-	dispose();
+	for(auto& q : _queues)
+		q.set_done();
+
 	for(auto& th : _threads)
 	{
 		if(th.joinable())
@@ -230,31 +232,25 @@ task_system::~task_system()
 	}
 }
 
-void core::task_system::dispose()
-{
-	for(auto& q : _queues)
-		q.set_done();
-}
-
 void task_system::run_on_owner_thread(duration_t max_duration)
 {
-    const auto queue_index = get_thread_queue_idx(0);
+	const auto queue_index = get_thread_queue_idx(0);
 
 	using namespace std::literals;
-    auto now = std::chrono::steady_clock::now();
-    auto end = now + max_duration;
-    
-    while(now < end)
-    {
-        auto p = _queues[queue_index].pop(0ms);
-        if(!p.first)
-            return;
-    
-        if(p.first)
-            p.second();
-        
-        now = std::chrono::steady_clock::now();
-    }
+	auto now = std::chrono::steady_clock::now();
+	auto end = now + max_duration;
+
+	while(now < end)
+	{
+		auto p = _queues[queue_index].pop(0ms);
+		if(!p.first)
+			return;
+
+		if(p.first)
+			p.second();
+
+		now = std::chrono::steady_clock::now();
+	}
 }
 
 task_system::system_info task_system::get_info() const

@@ -41,15 +41,15 @@ std::shared_ptr<gfx::texture> reflection_probe_component::get_cubemap()
 
 std::shared_ptr<gfx::frame_buffer> reflection_probe_component::get_cubemap_fbo()
 {
-    return _render_view[0].get_fbo("CUBEMAP", {get_cubemap()});
+	return _render_view[0].get_fbo("CUBEMAP", {get_cubemap()});
 }
 
 void reflection_probe_component::update()
 {
-    for(auto& view : _render_view)
-    {
-        view.release_unused_resources();
-    }
+	for(auto& view : _render_view)
+	{
+		view.release_unused_resources();
+	}
 }
 
 void reflection_probe_component::set_probe(const reflection_probe& probe)

@@ -69,7 +69,7 @@ frustum::frustum(const bbox& AABB)
 //-----------------------------------------------------------------------------
 void frustum::update(const transform& view, const transform& proj, bool _oglNDC)
 {
-    
+
 	// Build a combined view & projection matrix
 	const transform m = proj * view;
 

@@ -23,7 +23,7 @@ class listener
 public:
 	listener();
 	~listener();
-	
+
 	//-----------------------------------------------------------------------------
 	//  Name : set_volume ()
 	/// <summary>
@@ -61,7 +61,7 @@ public:
 	void set_orientation(const float* direction3, const float* up3);
 
 private:
-    /// pimpl idiom
+	/// pimpl idiom
 	std::unique_ptr<priv::listener_impl> _impl;
 };
 }

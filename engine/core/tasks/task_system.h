@@ -3,7 +3,6 @@
 
 #include "../common/nonstd/function_traits.hpp"
 #include "../common/nonstd/type_traits.hpp"
-#include "subsystem.h"
 #include <algorithm>
 #include <atomic>
 #include <chrono>
@@ -506,7 +505,7 @@ private:
 	std::unique_ptr<task_concept> _t;
 };
 
-class task_system : public core::subsystem
+class task_system
 {
 	using duration_t = std::chrono::steady_clock::duration;
 	template <typename T>
@@ -536,27 +535,6 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	~task_system();
-
-	//-----------------------------------------------------------------------------
-	//  Name : initialize ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	inline bool initialize() override
-	{
-		return true;
-	}
-
-	//-----------------------------------------------------------------------------
-	//  Name : dispose ()
-	/// <summary>
-	/// Notify queues on threads to finish.
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void dispose() override;
 
 	//-----------------------------------------------------------------------------
 	//  Name : run_on_owner_thread ()
@@ -610,7 +588,7 @@ public:
 		auto min_el = std::min_element(begin_it, end_it, [](const auto& lhs, const auto& rhs) {
 			return lhs.pending_tasks > rhs.pending_tasks;
 		});
-        const std::size_t idx = static_cast<std::size_t>(std::distance(std::begin(info.queue_infos), min_el));
+		const std::size_t idx = static_cast<std::size_t>(std::distance(std::begin(info.queue_infos), min_el));
 		return idx;
 	}
 
@@ -882,7 +860,8 @@ private:
 		std::pair<bool, task> pop(duration_t pop_timeout = duration_t::max());
 
 		void push(task t);
-        void wake_up();
+		void wake_up();
+
 	private:
 		void sort();
 		std::deque<task> _tasks;
@@ -891,7 +870,7 @@ private:
 		std::atomic_bool _done{false};
 	};
 
-    std::atomic<std::uint32_t> _steals = {0};
+	std::atomic<std::uint32_t> _steals = {0};
 	std::vector<task_queue> _queues;
 	std::vector<std::thread> _threads;
 	typename allocator_t::template rebind<task::task_concept>::other _alloc;

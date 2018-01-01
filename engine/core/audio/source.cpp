@@ -1,6 +1,6 @@
 #include "source.h"
-#include "logger.h"
 #include "impl/source_impl.h"
+#include "logger.h"
 
 namespace audio
 {
@@ -51,12 +51,12 @@ void source::pause()
 
 bool source::is_playing() const
 {
-    return _impl && _impl->is_playing();
+	return _impl && _impl->is_playing();
 }
 
 bool source::is_paused() const
 {
-    if(_impl)
+	if(_impl)
 	{
 		return _impl->is_paused();
 	}
@@ -143,25 +143,25 @@ void source::set_playing_offset(sound_data::duration_t offset)
 	if(_impl)
 	{
 		_impl->set_playing_offset(float(offset.count()));
-    }
+	}
 }
 
 sound_data::duration_t source::get_playing_offset() const
 {
-    if(_impl)
+	if(_impl)
 	{
 		return sound_data::duration_t(_impl->get_playing_offset());
 	}
-    return sound_data::duration_t(0);
+	return sound_data::duration_t(0);
 }
 
 sound_data::duration_t source::get_playing_duration() const
 {
-    if(_impl)
+	if(_impl)
 	{
 		return sound_data::duration_t(_impl->get_playing_duration());
 	}
-    return sound_data::duration_t(0);
+	return sound_data::duration_t(0);
 }
 
 bool source::is_valid() const
@@ -173,10 +173,10 @@ void source::bind(const sound& snd)
 {
 	if(is_valid())
 	{
-        if(snd.get_channels() > 1)
-        {
-            log_info("Sound is not mono. 3D Attenuation will not work.");
-        }
+		if(snd.get_channels() > 1)
+		{
+			log_info("Sound is not mono. 3D Attenuation will not work.");
+		}
 		_impl->bind(snd._impl->native_handle());
 	}
 }

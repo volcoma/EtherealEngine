@@ -1,17 +1,17 @@
 #include "animation.hpp"
-#include "core/meta/math/quaternion.hpp"
-#include "core/meta/math/transform.hpp"
+#include "../core/math/quaternion.hpp"
+#include "../core/math/transform.hpp"
 #include "core/serialization/binary_archive.h"
 
 namespace runtime
 {
-REFLECT(animation){
+REFLECT(animation)
+{
 	rttr::registration::class_<animation>("animation")
 		.property_readonly("name", &animation::name)(rttr::metadata("pretty_name", "Name"))
 		.property_readonly("duration", &animation::duration)(rttr::metadata("pretty_name", "Duration"))
 		.property_readonly("ticks_per_second",
 						   &animation::ticks_per_second)(rttr::metadata("pretty_name", "Ticks Per Second"));
-
 }
 
 SAVE(node_animation)

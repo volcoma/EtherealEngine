@@ -1,10 +1,8 @@
 #pragma once
 #include "../interface/docks/imguidock.h"
 #include "core/math/math_includes.h"
-#include "core/system/subsystem.h"
 #include "runtime/assets/asset_handle.h"
 #include "runtime/ecs/ecs.h"
-#include <chrono>
 
 class render_window;
 
@@ -15,7 +13,7 @@ struct texture;
 
 namespace editor
 {
-struct editing_system : core::subsystem
+struct editing_system
 {
 	struct drag_type
 	{
@@ -37,16 +35,8 @@ struct editing_system : core::subsystem
 		///
 		float scale_snap = 0.1f;
 	};
-	virtual ~editing_system() = default;
-	//-----------------------------------------------------------------------------
-	//  Name : initialize ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	bool initialize();
+	editing_system();
+	~editing_system() = default;
 
 	//-----------------------------------------------------------------------------
 	//  Name : save_editor_camera ()

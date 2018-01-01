@@ -1,5 +1,4 @@
 #include "render_pass.h"
-#include "../common/assert.hpp"
 #include <bitset>
 #include <limits>
 namespace gfx
@@ -29,7 +28,10 @@ render_pass::render_pass(const std::string& n)
 
 void render_pass::bind(const frame_buffer* fb) const
 {
-	expects(fb != nullptr);
+	if(fb == nullptr)
+	{
+		return;
+	}
 
 	const auto size = fb->get_size();
 	const auto width = size.width;

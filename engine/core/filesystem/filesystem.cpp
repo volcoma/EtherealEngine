@@ -55,7 +55,6 @@ std::string to_lower(const std::string& str)
 	return s;
 }
 
-
 template <typename Container = std::string, typename CharT = char, typename Traits = std::char_traits<char>>
 auto read_stream_into_container(std::basic_istream<CharT, Traits>& in,
 								typename Container::allocator_type alloc = {})
@@ -96,7 +95,6 @@ auto read_stream_into_container(std::basic_istream<CharT, Traits>& in,
 
 	return container;
 }
-
 }
 byte_array_t read_stream(std::istream& stream)
 {
