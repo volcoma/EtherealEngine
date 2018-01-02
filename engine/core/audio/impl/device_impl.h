@@ -25,8 +25,8 @@ public:
 	static std::vector<std::string> enumerate();
 
 private:
-	ALCdevice* dev = nullptr;
-	ALCcontext* ctx = nullptr;
+	ALCdevice* _device = nullptr;
+	ALCcontext* _context = nullptr;
 
 	std::string _device_id;
 	std::string _info;

@@ -43,23 +43,23 @@ device_impl::device_impl(int devnum)
 		_device_id = devices[std::size_t(devnum)];
 
 	// select device
-	dev = alcOpenDevice(_device_id.empty() ? 0 : _device_id.c_str());
+	_device = alcOpenDevice(_device_id.empty() ? 0 : _device_id.c_str());
 
-	if(!dev)
+	if(!_device)
 	{
 		log_error("Cant open audio device: " + _device_id);
 		return;
 	}
-	bool has_efx_ = has_efx(dev);
+	bool has_efx_ = has_efx(_device);
 
 	ALint attribs[4] = {0};
 	attribs[0] = ALC_MAX_AUXILIARY_SENDS;
 	attribs[1] = 4;
 
 	// select device
-	ctx = alcCreateContext(dev, has_efx_ ? attribs : nullptr);
+	_context = alcCreateContext(_device, has_efx_ ? attribs : nullptr);
 
-	if(!ctx)
+	if(!_context)
 	{
 		log_error("Cant create audio context for device: " + _device_id);
 		return;
@@ -70,28 +70,28 @@ device_impl::device_impl(int devnum)
 
 	_info = info();
 
-	log_info("Using open audio device: " + _device_id);
+	log_info("Using audio device: " + _device_id);
 }
 
 device_impl::~device_impl()
 {
-	if(ctx)
+	if(_context)
 	{
 		alcMakeContextCurrent(nullptr);
-		alcDestroyContext(ctx);
-		ctx = nullptr;
+		alcDestroyContext(_context);
+		_context = nullptr;
 	}
 
-	if(dev)
+	if(_device)
 	{
-		(alcCloseDevice(dev));
-		dev = nullptr;
+		alcCloseDevice(_device);
+		_device = nullptr;
 	}
 }
 
 void device_impl::enable()
 {
-	alCheck(alcMakeContextCurrent(ctx));
+	alCheck(alcMakeContextCurrent(_context));
 }
 
 void device_impl::disable()
@@ -101,7 +101,7 @@ void device_impl::disable()
 
 bool device_impl::is_valid() const
 {
-	return dev && ctx;
+	return _device && _context;
 }
 
 const std::string& device_impl::get_device_id() const
