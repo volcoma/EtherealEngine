@@ -47,9 +47,9 @@ void show_statistics(const unsigned int fps)
 	gui::AlignTextToFramePadding();
 	gui::Text("GPU DRIVER LATENCY: %u ms", stats->maxGpuLatency);
 	gui::AlignTextToFramePadding();
-	gui::Text("GPU MEM USED: %ld mb", long(stats->gpuMemoryUsed / 1024 / 1024));
+	gui::Text("GPU MEM USED: %d mb", int(stats->gpuMemoryUsed / 1024 / 1024));
 	gui::AlignTextToFramePadding();
-	gui::Text("GPU MEM TOTAL: %ld mb", long(stats->gpuMemoryMax / 1024 / 1024));
+	gui::Text("GPU MEM TOTAL: %d mb", int(stats->gpuMemoryMax / 1024 / 1024));
 	gui::AlignTextToFramePadding();
 	gui::Text("RENDER PASSES: %u", gfx::render_pass::get_pass());
 	gui::Separator();
