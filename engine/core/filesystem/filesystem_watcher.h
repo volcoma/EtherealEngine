@@ -138,7 +138,7 @@ protected:
 	std::thread _thread;
 	/// Registered file watchers
 	class watcher_impl;
-	std::map<std::uint64_t, std::unique_ptr<watcher_impl>> _watchers;
+	std::map<std::uint64_t, std::shared_ptr<watcher_impl>> _watchers;
 };
 }
 

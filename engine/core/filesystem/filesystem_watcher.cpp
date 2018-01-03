@@ -126,7 +126,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::vector<filesystem_watcher::entry> watch()
+	void watch()
 	{
 
 		std::vector<filesystem_watcher::entry> entries;
@@ -148,16 +148,11 @@ public:
 
 		process_modifications(entries, created, modified);
 
-		return entries;
-	}
-    
-    void call_callback(const std::vector<filesystem_watcher::entry>& entries, bool initial)
-    {
         if(entries.size() > 0 && _callback)
 		{
 			_callback(entries, false);
 		}
-    }
+	}
 
 	void process_modifications(std::vector<filesystem_watcher::entry>& entries,
 							   const std::vector<size_t>& created, const std::vector<size_t>&)
@@ -344,20 +339,22 @@ void filesystem_watcher::start()
 			clock_t::duration sleep_time = 99999h;
 
 			// iterate through each watcher and check for modification
-			std::unique_lock<std::mutex> lock(_mutex);
-			for(auto& pair : _watchers)
+            std::map<std::uint64_t, std::shared_ptr<watcher_impl>> watchers;
+            {
+                std::unique_lock<std::mutex> lock(_mutex);
+                watchers = _watchers;
+            }
+            
+			for(auto& pair : watchers)
 			{
-				auto& watcher = pair.second;
+				auto watcher = pair.second;
 
 				auto now = clock_t::now();
 
 				auto diff = (watcher->_last_poll + watcher->_poll_interval) - now;
 				if(diff <= clock_t::duration(0))
 				{
-					auto entries = watcher->watch();
-                    lock.unlock();
-                    watcher->call_callback(entries, false);
-                    lock.lock();
+					watcher->watch();
 					watcher->_last_poll = now;
 
 					sleep_time = std::min(sleep_time, watcher->_poll_interval);
@@ -367,7 +364,8 @@ void filesystem_watcher::start()
 					sleep_time = std::min(sleep_time, diff);
 				}
 			}
-
+            
+            std::unique_lock<std::mutex> lock(_mutex);
 			_cv.wait_for(lock, sleep_time);
 		}
 	});
@@ -412,7 +410,7 @@ std::uint64_t filesystem_watcher::watch_impl(const fs::path& path, bool recursiv
 		{
 			// we do it like this because if initial_list is true we don't want
 			// to call a user callback on a locked mutex
-			auto impl = std::make_unique<watcher_impl>(p, filter, recursive, initial_list, poll_interval,
+			auto impl = std::make_shared<watcher_impl>(p, filter, recursive, initial_list, poll_interval,
 													   list_callback);
 			std::lock_guard<std::mutex> lock(wd._mutex);
 			wd._watchers.emplace(key, std::move(impl));
