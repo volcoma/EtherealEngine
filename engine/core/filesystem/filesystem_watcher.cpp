@@ -126,7 +126,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void watch()
+	std::vector<filesystem_watcher::entry> watch()
 	{
 
 		std::vector<filesystem_watcher::entry> entries;
@@ -148,11 +148,16 @@ public:
 
 		process_modifications(entries, created, modified);
 
-		if(entries.size() > 0 && _callback)
+		return entries;
+	}
+    
+    void call_callback(const std::vector<filesystem_watcher::entry>& entries, bool initial)
+    {
+        if(entries.size() > 0 && _callback)
 		{
 			_callback(entries, false);
 		}
-	}
+    }
 
 	void process_modifications(std::vector<filesystem_watcher::entry>& entries,
 							   const std::vector<size_t>& created, const std::vector<size_t>&)
@@ -349,8 +354,10 @@ void filesystem_watcher::start()
 				auto diff = (watcher->_last_poll + watcher->_poll_interval) - now;
 				if(diff <= clock_t::duration(0))
 				{
-					watcher->watch();
-
+					auto entries = watcher->watch();
+                    lock.unlock();
+                    watcher->call_callback(entries, false);
+                    lock.lock();
 					watcher->_last_poll = now;
 
 					sleep_time = std::min(sleep_time, watcher->_poll_interval);

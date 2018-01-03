@@ -8,7 +8,7 @@
 namespace uuids
 {
 template <typename random_generator_t = ::std::mt19937>
-random_generator_t make_seeded_engine()
+inline random_generator_t make_seeded_engine()
 {
 	std::random_device r;
 	std::hash<std::thread::id> hasher;
@@ -21,7 +21,7 @@ random_generator_t make_seeded_engine()
 }
 
 template <typename random_generator_t = ::std::mt19937>
-uuid random_uuid()
+inline uuid random_uuid()
 {
 	random_uuid_generator<random_generator_t> gen(make_seeded_engine<random_generator_t>()());
 
@@ -29,7 +29,7 @@ uuid random_uuid()
 }
 
 template <typename random_generator_t = ::std::mt19937>
-uuid random_uuid(const std::string& str)
+inline uuid random_uuid(const std::string& str)
 {
 	auto hash32 = [](const char* s) -> std::uint32_t {
 		std::uint32_t hash = 0;

@@ -35,23 +35,23 @@ struct has_overloaded_addressof
 };
 
 template <typename T, typename ::std::enable_if<!has_overloaded_addressof<T>::value, bool>::type = false>
-constexpr T* static_addressof(T& ref)
+constexpr inline T* static_addressof(T& ref)
 {
 	return &ref;
 }
 
 template <typename T, typename ::std::enable_if<has_overloaded_addressof<T>::value, bool>::type = false>
-constexpr T* static_addressof(T& ref)
+constexpr inline T* static_addressof(T& ref)
 {
 	return std::addressof(ref);
 }
 
-constexpr std::size_t static_strlen(const char* str)
+constexpr inline std::size_t static_strlen(const char* str)
 {
 	return (str == nullptr || *str == 0) ? 0 : 1 + static_strlen(++str);
 }
 
-constexpr std::size_t static_wstrlen(const wchar_t* str)
+constexpr inline std::size_t static_wstrlen(const wchar_t* str)
 {
 	return (str == nullptr || *str == 0) ? 0 : 1 + static_wstrlen(++str);
 }
@@ -63,7 +63,7 @@ constexpr void static_copy(InIter1, InIter1, InIter2)
 }
 
 template <typename InIter, typename Pred>
-constexpr bool static_all_of(InIter first, InIter last, Pred pr)
+constexpr inline bool static_all_of(InIter first, InIter last, Pred pr)
 {
 	return (first != last && pr(*first)) ? static_all_of(++first, last, pr) : (first == last);
 }
@@ -71,11 +71,6 @@ constexpr bool static_all_of(InIter first, InIter last, Pred pr)
 
 struct uuid
 {
-	static const uuid namespace_url;
-	static const uuid namespace_dns;
-	static const uuid namespace_oid;
-	static const uuid namespace_x500;
-
 	using value_type = std::uint8_t;
 	using pointer = value_type*;
 	using reference = value_type&;
@@ -304,24 +299,6 @@ struct uuid
 private:
 	static constexpr std::size_t static_size = 16;
 	value_type _data[static_size];
-};
-
-///////////////////////////////////////////////////////////////////////
-
-const uuid uuid::namespace_dns{
-	0x6b, 0xa7, 0xb8, 0x10, 0x9d, 0xad, 0x11, 0xd1, 0x80, 0xb4, 0x00, 0xc0, 0x4f, 0xd4, 0x30, 0xc8,
-};
-
-const uuid uuid::namespace_url{
-	0x6b, 0xa7, 0xb8, 0x11, 0x9d, 0xad, 0x11, 0xd1, 0x80, 0xb4, 0x00, 0xc0, 0x4f, 0xd4, 0x30, 0xc8,
-};
-
-const uuid uuid::namespace_oid{
-	0x6b, 0xa7, 0xb8, 0x12, 0x9d, 0xad, 0x11, 0xd1, 0x80, 0xb4, 0x00, 0xc0, 0x4f, 0xd4, 0x30, 0xc8,
-};
-
-const uuid uuid::namespace_x500{
-	0x6b, 0xa7, 0xb8, 0x14, 0x9d, 0xad, 0x11, 0xd1, 0x80, 0xb4, 0x00, 0xc0, 0x4f, 0xd4, 0x30, 0xc8,
 };
 
 ///////////////////////////////////////////////////////////////////////

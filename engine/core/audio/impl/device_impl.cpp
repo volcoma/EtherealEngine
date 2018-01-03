@@ -34,9 +34,10 @@ device_impl::device_impl(int devnum)
 {
 	// device name
 	auto devices = enumerate();
+    log_info("Supported audio devices:");    
 	for(const auto& dev : devices)
 	{
-		log_info("Audio device: " + dev);
+		log_info(dev);
 	}
 
 	if(devnum >= 0 && devnum < int(devices.size()))

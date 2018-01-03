@@ -59,16 +59,6 @@ struct editing_system
 	void load_editor_camera();
 
 	//-----------------------------------------------------------------------------
-	//  Name : dispose ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void dispose();
-
-	//-----------------------------------------------------------------------------
 	//  Name : select ()
 	/// <summary>
 	/// Selects an object. Can be anything.
@@ -114,6 +104,8 @@ struct editing_system
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void drop();
+    
+    void close_project();
 
 	/// editor camera
 	runtime::entity camera;
