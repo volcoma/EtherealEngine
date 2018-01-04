@@ -313,7 +313,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual bool is_dirty() const
+	virtual bool is_touched() const
 	{
 		return _last_touched >= static_cast<std::uint32_t>(ecs::get_frame());
 	}

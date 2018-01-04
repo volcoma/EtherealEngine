@@ -1,10 +1,8 @@
 #include "transform.h"
-#include "math_types.h"
 
 //-----------------------------------------------------------------------------
 // Defines
 //-----------------------------------------------------------------------------
-#define MinAxisLength 1e-5f
 namespace math
 {
 //-----------------------------------------------------------------------------
@@ -54,9 +52,9 @@ transform::transform(const mat4& m)
 /// transform Class Constructor
 /// </summary>
 //-----------------------------------------------------------------------------
-transform::transform(const vec3& vTranslation)
+transform::transform(const vec3& translation)
 {
-	position() = vTranslation;
+	position() = translation;
 }
 
 //-----------------------------------------------------------------------------
@@ -65,10 +63,10 @@ transform::transform(const vec3& vTranslation)
 /// transform Class Constructor
 /// </summary>
 //-----------------------------------------------------------------------------
-transform::transform(const quat& qOrientation, const vec3& vTranslation)
+transform::transform(const quat& qOrientation, const vec3& translation)
 {
 	_matrix = glm::mat4_cast(qOrientation);
-	position() = vTranslation;
+	position() = translation;
 }
 
 //-----------------------------------------------------------------------------
@@ -174,20 +172,14 @@ mat4::col_type const& transform::operator[](mat4::length_type i) const
 //-----------------------------------------------------------------------------
 transform transform::operator*(const transform& t) const
 {
-
-	transform tOut;
-	tOut._matrix = _matrix * t._matrix;
-
-	return tOut;
+	transform result(_matrix * t._matrix);
+	return result;
 }
 
 vec4 transform::operator*(const vec4& v) const
 {
-
-	vec4 tOut;
-	tOut = _matrix * v;
-
-	return tOut;
+	vec4 result = _matrix * v;
+	return result;
 }
 
 //-----------------------------------------------------------------------------
@@ -198,9 +190,8 @@ vec4 transform::operator*(const vec4& v) const
 //-----------------------------------------------------------------------------
 transform transform::operator*(float f) const
 {
-	transform tOut(_matrix * f);
-
-	return tOut;
+	transform result(_matrix * f);
+	return result;
 }
 
 //-----------------------------------------------------------------------------
@@ -211,9 +202,8 @@ transform transform::operator*(float f) const
 //-----------------------------------------------------------------------------
 transform transform::operator+(const transform& t) const
 {
-	transform tOut;
-	tOut._matrix = _matrix + t._matrix;
-	return tOut;
+	transform result(_matrix + t._matrix);
+	return result;
 }
 
 //-----------------------------------------------------------------------------
@@ -224,9 +214,8 @@ transform transform::operator+(const transform& t) const
 //-----------------------------------------------------------------------------
 transform transform::operator-(const transform& t) const
 {
-	transform tOut;
-	tOut._matrix = _matrix - t._matrix;
-	return tOut;
+	transform result(_matrix - t._matrix);
+	return result;
 }
 
 //-----------------------------------------------------------------------------
@@ -250,7 +239,6 @@ transform& transform::operator*=(const transform& t)
 transform& transform::operator*=(float f)
 {
 	_matrix *= f;
-
 	return *this;
 }
 
@@ -297,12 +285,12 @@ vec3 transform::get_scale() const
 //-----------------------------------------------------------------------------
 vec3 transform::get_shear() const
 {
-	vec3 vScale, vShear, vTranslation;
-	quat qRotation;
-	if(decompose(vScale, vShear, qRotation, vTranslation))
-		return vShear;
+	vec3 scale, shear, translation;
+	quat rotation;
+	if(decompose(scale, shear, rotation, translation))
+		return shear;
 	else
-		return vec3(0, 0, 0);
+		return vec3(0.0f, 0.0f, 0.0f);
 }
 
 //-----------------------------------------------------------------------------
@@ -313,7 +301,7 @@ vec3 transform::get_shear() const
 //-----------------------------------------------------------------------------
 vec3& transform::position()
 {
-	return (vec3&)_matrix[3];
+	return reinterpret_cast<vec3&>(_matrix[3]);
 }
 
 //-----------------------------------------------------------------------------
@@ -324,11 +312,11 @@ vec3& transform::position()
 //-----------------------------------------------------------------------------
 const vec3& transform::get_position() const
 {
-	return (vec3&)_matrix[3];
+	return reinterpret_cast<const vec3&>(_matrix[3]);
 }
 
 //-----------------------------------------------------------------------------
-//  Name : xAxis()
+//  Name : x_axis()
 /// <summary>
 /// Retrieve the X axis orientation vector for this transform.
 /// This axis vector is not necessarily unit length and may be scaled.
@@ -336,11 +324,11 @@ const vec3& transform::get_position() const
 //-----------------------------------------------------------------------------
 const vec3& transform::x_axis() const
 {
-	return (vec3&)_matrix[0];
+	return reinterpret_cast<const vec3&>(_matrix[0]);
 }
 
 //-----------------------------------------------------------------------------
-//  Name : YXAxis()
+//  Name : y_axis()
 /// <summary>
 /// Retrieve the Y axis orientation vector for this transform.
 /// This axis vector is not necessarily unit length and may be scaled.
@@ -348,11 +336,11 @@ const vec3& transform::x_axis() const
 //-----------------------------------------------------------------------------
 const vec3& transform::y_axis() const
 {
-	return (vec3&)_matrix[1];
+	return reinterpret_cast<const vec3&>(_matrix[1]);
 }
 
 //-----------------------------------------------------------------------------
-//  Name : ZXAxis()
+//  Name : z_axis()
 /// <summary>
 /// Retrieve the Z axis orientation vector for this transform.
 /// This axis vector is not necessarily unit length and may be scaled.
@@ -360,7 +348,7 @@ const vec3& transform::y_axis() const
 //-----------------------------------------------------------------------------
 const vec3& transform::z_axis() const
 {
-	return (vec3&)_matrix[2];
+	return reinterpret_cast<const vec3&>(_matrix[2]);
 }
 
 //-----------------------------------------------------------------------------
@@ -422,12 +410,12 @@ mat4& transform::matrix()
 //-----------------------------------------------------------------------------
 quat transform::get_rotation() const
 {
-	vec3 vScale, vShear, vTranslation;
-	quat qRotation;
-	if(decompose(vScale, vShear, qRotation, vTranslation))
-		return qRotation;
+	vec3 scale, shear, translation;
+	quat rotation;
+	if(decompose(scale, shear, rotation, translation))
+		return rotation;
 	else
-		return quat(0, 0, 0, 1);
+		return quat(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 //-----------------------------------------------------------------------------
@@ -449,10 +437,10 @@ transform& transform::zero()
 /// translation.
 /// </summary>
 //-----------------------------------------------------------------------------
-bool transform::decompose(vec3& vScale, quat& qRotation, vec3& vTranslation) const
+bool transform::decompose(vec3& scale, quat& rotation, vec3& translation) const
 {
-	vec3 vShear;
-	return decompose(vScale, vShear, qRotation, vTranslation);
+	vec3 shear;
+	return decompose(scale, shear, rotation, translation);
 }
 
 //-----------------------------------------------------------------------------
@@ -461,10 +449,10 @@ bool transform::decompose(vec3& vScale, quat& qRotation, vec3& vTranslation) con
 /// Decompose a transform into its component parts: rotation and translation.
 /// </summary>
 //-----------------------------------------------------------------------------
-bool transform::decompose(quat& qRotation, vec3& vTranslation) const
+bool transform::decompose(quat& rotation, vec3& translation) const
 {
-	vec3 vScale, vShear;
-	return decompose(vScale, vShear, qRotation, vTranslation);
+	vec3 scale, shear;
+	return decompose(scale, shear, rotation, translation);
 }
 
 //-----------------------------------------------------------------------------
@@ -474,10 +462,10 @@ bool transform::decompose(quat& qRotation, vec3& vTranslation) const
 /// translation.
 /// </summary>
 //-----------------------------------------------------------------------------
-bool transform::decompose(vec3& vScale, quat& qRotation, vec3& vTranslation, const transform& t)
+bool transform::decompose(vec3& scale, quat& rotation, vec3& translation, const transform& t)
 {
-	vec3 vShear;
-	return t.decompose(vScale, vShear, qRotation, vTranslation);
+	vec3 shear;
+	return t.decompose(scale, shear, rotation, translation);
 }
 
 //-----------------------------------------------------------------------------
@@ -486,10 +474,10 @@ bool transform::decompose(vec3& vScale, quat& qRotation, vec3& vTranslation, con
 /// Decompose a transform into its component parts: rotation and translation.
 /// </summary>
 //-----------------------------------------------------------------------------
-bool transform::decompose(quat& qRotation, vec3& vTranslation, const transform& t)
+bool transform::decompose(quat& rotation, vec3& translation, const transform& t)
 {
-	vec3 vScale, vShear;
-	return t.decompose(vScale, vShear, qRotation, vTranslation);
+	vec3 scale, shear;
+	return t.decompose(scale, shear, rotation, translation);
 }
 
 //-----------------------------------------------------------------------------
@@ -499,10 +487,10 @@ bool transform::decompose(quat& qRotation, vec3& vTranslation, const transform& 
 /// rotation and translation.
 /// </summary>
 //-----------------------------------------------------------------------------
-bool transform::decompose(vec3& vScale, vec3& vShear, quat& qRotation, vec3& vTranslation) const
+bool transform::decompose(vec3& scale, vec3& shear, quat& rotation, vec3& translation) const
 {
-	vec4 vPersp;
-	glm::decompose(_matrix, vScale, qRotation, vTranslation, vShear, vPersp);
+	vec4 persp;
+	glm::decompose(_matrix, scale, rotation, translation, shear, persp);
 
 	// Success!
 	return true;
@@ -515,9 +503,9 @@ bool transform::decompose(vec3& vScale, vec3& vShear, quat& qRotation, vec3& vTr
 /// rotation and translation.
 /// </summary>
 //-----------------------------------------------------------------------------
-bool transform::decompose(vec3& vScale, vec3& vShear, quat& qRotation, vec3& vTranslation, const transform& t)
+bool transform::decompose(vec3& scale, vec3& shear, quat& rotation, vec3& translation, const transform& t)
 {
-	return t.decompose(vScale, vShear, qRotation, vTranslation);
+	return t.decompose(scale, shear, rotation, translation);
 }
 
 //-----------------------------------------------------------------------------
@@ -527,43 +515,35 @@ bool transform::decompose(vec3& vScale, vec3& vShear, quat& qRotation, vec3& vTr
 /// rotation and translation.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::compose(const vec3& vScale, const vec3& vShear, const quat& qRotation,
-							  const vec3& vTranslation)
+transform& transform::compose(const vec3& scale, const vec3& shear, const quat& rotation,
+							  const vec3& translation)
 {
-	float a1, a2;
-	mat4 mR;
 	// Convert rotation quat to matrix form.
-	mR = glm::mat4_cast(qRotation);
-
-	/*// Shear matrix definition
-	_11 = 1; _12 = 0; _13 = 0; _14 = 0;
-	_21 = XYShear; _22 = 1; _23 = 0; _24 = 0;
-	_31 = XZShear; _32 = YZShear; _33 = 1; _34 = 0;
-	_41 = 0; _42 = 0; _43 = 0; _44 = 1;*/
+	mat4 mR = glm::mat4_cast(rotation);
 
 	// (localScale * LocalShear) * rotation
 	// 1st row * 1st column
-	_matrix[0][0] = vScale.x * mR[0][0];
-	_matrix[0][1] = vScale.x * mR[0][1];
-	_matrix[0][2] = vScale.x * mR[0][2];
+	_matrix[0][0] = scale.x * mR[0][0];
+	_matrix[0][1] = scale.x * mR[0][1];
+	_matrix[0][2] = scale.x * mR[0][2];
 
 	// 2nd row * 2nd column
-	a1 = vScale.y * vShear.x;
-	_matrix[1][0] = a1 * mR[0][0] + vScale.y * mR[1][0];
-	_matrix[1][1] = a1 * mR[0][1] + vScale.y * mR[1][1];
-	_matrix[1][2] = a1 * mR[0][2] + vScale.y * mR[1][2];
+	float a1 = scale.y * shear.x;
+	_matrix[1][0] = a1 * mR[0][0] + scale.y * mR[1][0];
+	_matrix[1][1] = a1 * mR[0][1] + scale.y * mR[1][1];
+	_matrix[1][2] = a1 * mR[0][2] + scale.y * mR[1][2];
 
 	// 3rd row * 3rd column
-	a1 = vScale.z * vShear.y;
-	a2 = vScale.z * vShear.z;
-	_matrix[2][0] = a1 * mR[0][0] + a2 * mR[1][0] + vScale.z * mR[2][0];
-	_matrix[2][1] = a1 * mR[0][1] + a2 * mR[1][1] + vScale.z * mR[2][1];
-	_matrix[2][2] = a1 * mR[0][2] + a2 * mR[1][2] + vScale.z * mR[2][2];
+	a1 = scale.z * shear.y;
+	float a2 = scale.z * shear.z;
+	_matrix[2][0] = a1 * mR[0][0] + a2 * mR[1][0] + scale.z * mR[2][0];
+	_matrix[2][1] = a1 * mR[0][1] + a2 * mR[1][1] + scale.z * mR[2][1];
+	_matrix[2][2] = a1 * mR[0][2] + a2 * mR[1][2] + scale.z * mR[2][2];
 
 	// translation
-	_matrix[3][0] = vTranslation.x;
-	_matrix[3][1] = vTranslation.y;
-	_matrix[3][2] = vTranslation.z;
+	_matrix[3][0] = translation.x;
+	_matrix[3][1] = translation.y;
+	_matrix[3][2] = translation.z;
 
 	// identity fourth column.
 	_matrix[0][3] = 0.0f;
@@ -587,15 +567,15 @@ transform& transform::compose(const vec3& scale, const quat& rotation, const vec
 /// Compose a new transform from its component parts: rotation and translation.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::compose(const quat& qRotation, const vec3& vTranslation)
+transform& transform::compose(const quat& rotation, const vec3& translation)
 {
 	// Convert rotation quat to matrix form.
-	_matrix = glm::mat4_cast(qRotation);
+	_matrix = glm::mat4_cast(rotation);
 
 	// translation
-	_matrix[3][0] = vTranslation.x;
-	_matrix[3][1] = vTranslation.y;
-	_matrix[3][2] = vTranslation.z;
+	_matrix[3][0] = translation.x;
+	_matrix[3][1] = translation.y;
+	_matrix[3][2] = translation.z;
 
 	// Return reference to self in order to allow consecutive operations (i.e.
 	// a.rotate(...).scale(...))
@@ -603,20 +583,7 @@ transform& transform::compose(const quat& qRotation, const vec3& vTranslation)
 }
 
 //-----------------------------------------------------------------------------
-//  Name : invert()
-/// <summary>
-/// Invert this transform object.
-/// </summary>
-//-----------------------------------------------------------------------------
-transform& transform::invert()
-{
-	_matrix = glm::inverse(_matrix);
-
-	return *this;
-}
-
-//-----------------------------------------------------------------------------
-//  Name : transformCoord()
+//  Name : transform_coord()
 /// <summary>
 /// transforms a 3D vector by the values in this transform object, projecting
 /// the result back into w = 1.
@@ -624,14 +591,13 @@ transform& transform::invert()
 //-----------------------------------------------------------------------------
 vec3 transform::transform_coord(const vec3& v) const
 {
-	vec4 vOut;
-	vOut = _matrix * vec4{v, 1.0f};
-	vOut /= vOut.w;
-	return vOut;
+	vec4 result = _matrix * vec4{v, 1.0f};
+	result /= result.w;
+	return result;
 }
 
 //-----------------------------------------------------------------------------
-//  Name : transformCoord() (Static)
+//  Name : transform_coord() (Static)
 /// <summary>
 /// transforms a 3D vector by a given transform object, projecting the result
 /// back into w = 1.
@@ -643,7 +609,7 @@ vec3 transform::transform_coord(const vec3& v, const transform& t)
 }
 
 //-----------------------------------------------------------------------------
-//  Name : inversetransformCoord()
+//  Name : inverse_transform_coord()
 /// <summary>
 /// transforms a 3D vector by the inverse of the values in this transform
 /// object, projecting the result back into w = 1.
@@ -652,13 +618,12 @@ vec3 transform::transform_coord(const vec3& v, const transform& t)
 vec3 transform::inverse_transform_coord(const vec3& v) const
 {
 	mat4 im = glm::inverse(_matrix);
-	vec3 vOut;
-	vOut = im * vec4{v, 1.0f};
-	return vOut;
+	vec3 result = im * vec4{v, 1.0f};
+	return result;
 }
 
 //-----------------------------------------------------------------------------
-//  Name : inversetransformCoord() (Static)
+//  Name : inverse_transform_coord() (Static)
 /// <summary>
 /// transforms a 3D vector by the inverse of a given transform object,
 /// projecting the result back into w = 1.
@@ -670,7 +635,7 @@ vec3 transform::inverse_transform_coord(const vec3& v, const transform& t)
 }
 
 //-----------------------------------------------------------------------------
-//  Name : transformNormal()
+//  Name : transform_normal()
 /// <summary>
 /// transforms the 3D vector normal by the values in this transform object.
 /// </summary>
@@ -678,13 +643,12 @@ vec3 transform::inverse_transform_coord(const vec3& v, const transform& t)
 vec3 transform::transform_normal(const vec3& v) const
 {
 	mat4 im = _matrix;
-	vec3 vOut;
-	vOut = im * vec4{v, 0.0f};
-	return vOut;
+	vec3 result = im * vec4{v, 0.0f};
+	return result;
 }
 
 //-----------------------------------------------------------------------------
-//  Name : transformNormal() (Static)
+//  Name : transform_normal() (Static)
 /// <summary>
 /// transforms the 3D vector normal by the given transform object.
 /// </summary>
@@ -695,7 +659,7 @@ vec3 transform::transform_normal(const vec3& v, const transform& t)
 }
 
 //-----------------------------------------------------------------------------
-//  Name : inversetransformNormal()
+//  Name : inversetransform_normal()
 /// <summary>
 /// transforms the 3D vector normal by inverse of the values in this transform
 /// object.
@@ -704,13 +668,12 @@ vec3 transform::transform_normal(const vec3& v, const transform& t)
 vec3 transform::inverse_transform_normal(const vec3& v) const
 {
 	mat4 im = glm::inverse(_matrix);
-	vec3 vOut;
-	vOut = im * vec4{v, 0.0f};
-	return vOut;
+	vec3 result = im * vec4{v, 0.0f};
+	return result;
 }
 
 //-----------------------------------------------------------------------------
-//  Name : inversetransformNormal() (Static)
+//  Name : inversetransform_normal() (Static)
 /// <summary>
 /// transforms the 3D vector normal by the inverse of the given transform
 /// object.
@@ -729,15 +692,10 @@ vec3 transform::inverse_transform_normal(const vec3& v, const transform& t)
 //-----------------------------------------------------------------------------
 transform& transform::rotate(float x, float y, float z)
 {
-	// No - op?
-	if(!x && !y && !z)
-		return *this;
-
 	quat qx = glm::angleAxis(x, vec3{1.0f, 0.0f, 0.0f});
 	quat qy = glm::angleAxis(y, vec3{0.0f, 1.0f, 0.0f});
 	quat qz = glm::angleAxis(z, vec3{0.0f, 0.0f, 1.0f});
-	quat q = get_rotation();
-	q = qz * qy * qx * q;
+	quat q = qz * qy * qx * get_rotation();
 	set_rotation(q);
 
 	// Return reference to self in order to allow consecutive operations (i.e.
@@ -751,15 +709,10 @@ transform& transform::rotate(const vec3& v)
 
 transform& transform::rotate_local(float x, float y, float z)
 {
-	// No - op?
-	if(!x && !y && !z)
-		return *this;
-
 	quat qx = glm::angleAxis(x, x_unit_axis());
 	quat qy = glm::angleAxis(y, y_unit_axis());
 	quat qz = glm::angleAxis(z, z_unit_axis());
-	quat q = get_rotation();
-	q = qz * qy * qx * q;
+	quat q = qz * qy * qx * get_rotation();
 	set_rotation(q);
 
 	// Return reference to self in order to allow consecutive operations (i.e.
@@ -780,10 +733,6 @@ transform& transform::rotate_local(const vec3& v)
 //-----------------------------------------------------------------------------
 transform& transform::rotate_axis(float a, const vec3& v)
 {
-	// No - op?
-	if(!a)
-		return *this;
-
 	quat q = glm::angleAxis(a, v) * get_rotation();
 	set_rotation(q);
 
@@ -796,7 +745,7 @@ transform& transform::scale(const vec3& v)
 	return scale(v.x, v.y, v.z);
 }
 //-----------------------------------------------------------------------------
-//  Name : scaleLocal ()
+//  Name : scale ()
 /// <summary>
 /// Scale the transform along its own local axes.
 /// </summary>
@@ -807,27 +756,6 @@ transform& transform::scale(float x, float y, float z)
 	if(x == 1.0f && y == 1.0f && z == 1.0f)
 		return *this;
 
-	// Retrieve the current local scale (length of axes).
-	//     vec3 vCurrentLength = getScale();
-	//
-	//     // Compute the final length of the axes after
-	//     // scaling has been applied.
-	//     vec3 vFinalLength( vCurrentLength.x * glm::abs<float>(x),
-	//     vCurrentLength.y * glm::abs<float>(y),
-	//     vCurrentLength.z * glm::abs<float>(z) );
-	//
-	//     // If any fall below the minimum scale requirements, clamp the
-	//     // scaling operation.
-	//     if ( (vFinalLength.x <= MinAxisLength) && vCurrentLength.x )
-	//         x = (x < 0) ? MinAxisLength / vCurrentLength.x : MinAxisLength /
-	//         -vCurrentLength.x;
-	//     if ( vFinalLength.y <= MinAxisLength && vCurrentLength.y )
-	//         y = (y < 0) ? MinAxisLength / vCurrentLength.y : MinAxisLength /
-	//         -vCurrentLength.y;
-	//     if ( (vFinalLength.z <= MinAxisLength) && vCurrentLength.z )
-	//         z = (z < 0) ? MinAxisLength / vCurrentLength.z : MinAxisLength /
-	//         -vCurrentLength.z;
-	//
 	// Apply scale
 	_matrix = glm::scale(_matrix, vec3{x, y, z});
 
@@ -865,7 +793,7 @@ transform& transform::translate(const vec3& v)
 }
 
 //-----------------------------------------------------------------------------
-//  Name : translateLocal ()
+//  Name : translate_local ()
 /// <summary>
 /// Apply a translation to this transform along its own local axes.
 /// </summary>
@@ -882,7 +810,7 @@ transform& transform::translate_local(float x, float y, float z)
 }
 
 //-----------------------------------------------------------------------------
-//  Name : translateLocal ()
+//  Name : translate_local ()
 /// <summary>
 /// Apply a translation to this transform along its own local axes.
 /// </summary>
@@ -928,23 +856,23 @@ transform& transform::set_position(const vec3& v)
 }
 
 //-----------------------------------------------------------------------------
-//  Name : setLocalScale ()
+//  Name : set_scale ()
 /// <summary>
 /// Set the scale of the local axes defined by this transform.
 /// </summary>
 //-----------------------------------------------------------------------------
 transform& transform::set_scale(float x, float y, float z)
 {
-
+	const float min_axis_length = glm::epsilon<float>();
 	// Clamp the various scales to the minimum length.
-	x = glm::max<float>(MinAxisLength, x);
-	y = glm::max<float>(MinAxisLength, y);
-	z = glm::max<float>(MinAxisLength, z);
+	x = glm::max<float>(min_axis_length, x);
+	y = glm::max<float>(min_axis_length, y);
+	z = glm::max<float>(min_axis_length, z);
 
 	// Generate the new axis vectors;
-	(vec3&)_matrix[0] = x_unit_axis() * x;
-	(vec3&)_matrix[1] = y_unit_axis() * y;
-	(vec3&)_matrix[2] = z_unit_axis() * z;
+	reinterpret_cast<vec3&>(_matrix[0]) = x_unit_axis() * x;
+	reinterpret_cast<vec3&>(_matrix[1]) = y_unit_axis() * y;
+	reinterpret_cast<vec3&>(_matrix[2]) = z_unit_axis() * z;
 
 	// Return reference to self in order to allow multiple operations (i.e.
 	// a.rotate(...).scale(...))
@@ -952,7 +880,7 @@ transform& transform::set_scale(float x, float y, float z)
 }
 
 //-----------------------------------------------------------------------------
-//  Name : setLocalScale ()
+//  Name : set_scale ()
 /// <summary>
 /// Set the scale of the local axes defined by this transform.
 /// </summary>
@@ -963,26 +891,26 @@ transform& transform::set_scale(const vec3& v)
 }
 
 //-----------------------------------------------------------------------------
-//  Name : setLocalShear ()
+//  Name : set_shear ()
 /// <summary>
 /// Set the shear of the local axes defined by this transform.
 /// </summary>
 //-----------------------------------------------------------------------------
 transform& transform::set_shear(float xy, float xz, float yz)
 {
-	vec3 vScale, vShear, vTranslation;
-	quat qRotation;
+	vec3 scale, shear, translation;
+	quat rotation;
 
 	// Decompose the matrix into its component parts
-	decompose(vScale, vShear, qRotation, vTranslation);
+	decompose(scale, shear, rotation, translation);
 
 	// Replace the shear
-	vShear.x = xy;
-	vShear.y = xz;
-	vShear.z = yz;
+	shear.x = xy;
+	shear.y = xz;
+	shear.z = yz;
 
 	// Recompose a new matrix
-	compose(vScale, vShear, qRotation, vTranslation);
+	compose(scale, shear, rotation, translation);
 
 	// Return reference to self in order to allow multiple operations (i.e.
 	// a.rotate(...).scale(...))
@@ -990,7 +918,7 @@ transform& transform::set_shear(float xy, float xz, float yz)
 }
 
 //-----------------------------------------------------------------------------
-//  Name : setOrientation ()
+//  Name : set_rotation ()
 /// <summary>
 /// Update the transform's orientation using the quat provided. This will
 /// also have the effect of removing any shear applied to the transform, but
@@ -1002,15 +930,15 @@ transform& transform::set_rotation(const quat& q)
 	mat4 m = glm::mat4_cast(glm::normalize(q));
 
 	// Maintain relative scale.
-	vec3 vLength = get_scale();
+	vec3 length = get_scale();
 
 	// Scale to original length
-	(vec3&)m[0] *= vLength.x;
-	(vec3&)m[1] *= vLength.y;
-	(vec3&)m[2] *= vLength.z;
+	reinterpret_cast<vec3&>(m[0]) *= length.x;
+	reinterpret_cast<vec3&>(m[1]) *= length.y;
+	reinterpret_cast<vec3&>(m[2]) *= length.z;
 
 	// Duplicate position.
-	(vec3&)m[3] = get_position();
+	reinterpret_cast<vec3&>(m[3]) = get_position();
 
 	_matrix = m;
 	// Return reference to self in order to allow multiple operations (i.e.
@@ -1019,7 +947,7 @@ transform& transform::set_rotation(const quat& q)
 }
 
 //-----------------------------------------------------------------------------
-//  Name : setOrientation ()
+//  Name : set_rotation ()
 /// <summary>
 /// Update the transform's orientation using the axis vectors provided. This
 /// will also have the effect of replacing any shear applied to the transform
@@ -1029,17 +957,17 @@ transform& transform::set_rotation(const quat& q)
 transform& transform::set_rotation(const vec3& vX, const vec3& vY, const vec3& vZ)
 {
 	// Get current scale so that it can be preserved.
-	vec3 vScale = get_scale();
+	vec3 scale = get_scale();
 
 	// Set the new axis vectors (normalized)
-	(vec3&)_matrix[0] = glm::normalize(vX);
-	(vec3&)_matrix[1] = glm::normalize(vY);
-	(vec3&)_matrix[2] = glm::normalize(vZ);
+	reinterpret_cast<vec3&>(_matrix[0]) = glm::normalize(vX);
+	reinterpret_cast<vec3&>(_matrix[1]) = glm::normalize(vY);
+	reinterpret_cast<vec3&>(_matrix[2]) = glm::normalize(vZ);
 
 	// Scale back to original length
-	(vec3&)_matrix[0] *= vScale.x;
-	(vec3&)_matrix[1] *= vScale.y;
-	(vec3&)_matrix[2] *= vScale.z;
+	reinterpret_cast<vec3&>(_matrix[0]) *= scale.x;
+	reinterpret_cast<vec3&>(_matrix[1]) *= scale.y;
+	reinterpret_cast<vec3&>(_matrix[2]) *= scale.z;
 
 	// Return reference to self in order to allow multiple operations (i.e.
 	// a.rotate(...).scale(...))
@@ -1151,33 +1079,21 @@ transform transform::lerp(transform& t1, transform& t2, float dt)
 }
 
 //-----------------------------------------------------------------------------
-//  Name : translation() (Static)
-/// <summary>
-/// Generate a new translation transform.
-/// </summary>
-//-----------------------------------------------------------------------------
-// transform & transform::translation( transform & tOut, const vec3 & v )
-// {
-//     return tOut.translation( v );
-// }
-
-//-----------------------------------------------------------------------------
 //  Name : compare()
 /// <summary>
 /// Compare this transform against the provided transform in order to determine
 /// if they are equivalent (within the specified tolerance).
 /// </summary>
 //-----------------------------------------------------------------------------
-int transform::compare(const transform& t, float fTolerance) const
+int transform::compare(const transform& t, float tolerance) const
 {
-	float fDifference;
 	for(int i = 0; i < 4; ++i)
 	{
 		for(int j = 0; j < 4; ++j)
 		{
-			fDifference = _matrix[i][j] - t._matrix[i][j];
-			if(glm::abs<float>(fDifference) > fTolerance)
-				return (fDifference < 0) ? -1 : 1;
+			float diff = _matrix[i][j] - t._matrix[i][j];
+			if(glm::abs<float>(diff) > tolerance)
+				return (diff < 0) ? -1 : 1;
 		}
 	}
 
@@ -1205,8 +1121,8 @@ int transform::compare(const transform& t) const
 //-----------------------------------------------------------------------------
 bool transform::is_identity() const
 {
-	static const transform Identitytransform;
-	return (!!(_matrix == Identitytransform._matrix));
+	static const transform identity;
+	return (_matrix == identity._matrix);
 }
 
 math::transform inverse(transform const& t)

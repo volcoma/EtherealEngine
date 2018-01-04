@@ -40,7 +40,6 @@ public:
 	bool decompose(vec3& scale, vec3& shear, quat& rotation, vec3& translation) const;
 	bool decompose(vec3& scale, quat& rotation, vec3& translation) const;
 	bool decompose(quat& rotation, vec3& translation) const;
-	transform& invert();
 
 	const vec3& get_position() const;
 	vec3 get_scale() const;

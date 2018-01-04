@@ -38,27 +38,27 @@ transform_component::~transform_component()
 
 transform_component& transform_component::move(const math::vec3& amount)
 {
-	math::vec3 vNewPos = get_position();
-	vNewPos += get_x_axis() * amount.x;
-	vNewPos += get_y_axis() * amount.y;
-	vNewPos += get_z_axis() * amount.z;
+	math::vec3 new_pos = get_position();
+	new_pos += get_x_axis() * amount.x;
+	new_pos += get_y_axis() * amount.y;
+	new_pos += get_z_axis() * amount.z;
 
 	// Pass through to set_position so that any derived classes need not
 	// override the 'move' method in order to catch this position change.
-	set_position(vNewPos);
+	set_position(new_pos);
 	return *this;
 }
 
 transform_component& transform_component::move_local(const math::vec3& amount)
 {
-	math::vec3 vNewPos = get_local_position();
-	vNewPos += get_local_x_axis() * amount.x;
-	vNewPos += get_local_y_axis() * amount.y;
-	vNewPos += get_local_z_axis() * amount.z;
+	math::vec3 new_pos = get_local_position();
+	new_pos += get_local_x_axis() * amount.x;
+	new_pos += get_local_y_axis() * amount.y;
+	new_pos += get_local_z_axis() * amount.z;
 
 	// Pass through to set_position so that any derived classes need not
 	// override the 'move' method in order to catch this position change.
-	set_local_position(vNewPos);
+	set_local_position(new_pos);
 	return *this;
 }
 
@@ -153,6 +153,7 @@ math::vec3 transform_component::get_scale()
 const math::transform& transform_component::get_transform()
 {
 	// the transform should be resolved
+	resolve();
 	return _world_transform;
 }
 
@@ -164,9 +165,6 @@ const math::transform& transform_component::get_local_transform() const
 
 transform_component& transform_component::look_at(float x, float y, float z)
 {
-	// TODO("General", "These lookAt methods need to consider the pivot and the
-	// currently applied
-	// math::transform method!!!");
 	look_at(get_position(), math::vec3(x, y, z));
 	return *this;
 }
@@ -218,10 +216,6 @@ transform_component& transform_component::rotate_local(float x, float y, float z
 	if(!can_rotate())
 		return *this;
 
-	// No-op?
-	if(!x && !y && !z)
-		return *this;
-
 	_local_transform.rotate_local(math::radians(x), math::radians(y), math::radians(z));
 	set_local_transform(_local_transform);
 	return *this;
@@ -229,10 +223,6 @@ transform_component& transform_component::rotate_local(float x, float y, float z
 
 transform_component& transform_component::rotate_axis(float degrees, const math::vec3& axis)
 {
-	// No - op?
-	if(!degrees)
-		return *this;
-
 	// If rotation is disallowed, only process position change. Otherwise
 	// perform full rotation.
 	if(!can_rotate())
@@ -269,10 +259,6 @@ transform_component& transform_component::rotate_axis(float degrees, const math:
 
 transform_component& transform_component::rotate(float x, float y, float z)
 {
-	// No - op?
-	if(!x && !y && !z)
-		return *this;
-
 	// If rotation is disallowed, only process position change. Otherwise
 	// perform full rotation.
 	if(!can_rotate())
@@ -310,10 +296,6 @@ transform_component& transform_component::rotate(float x, float y, float z)
 
 transform_component& transform_component::rotate(float x, float y, float z, const math::vec3& center)
 {
-	// No - op?
-	if(!x && !y && !z)
-		return *this;
-
 	// If rotation is disallowed, only process position change. Otherwise
 	// perform full rotation.
 	if(!can_rotate())
@@ -568,6 +550,8 @@ transform_component& transform_component::set_parent(runtime::entity parent, boo
 			set_local_transform(math::transform::identity);
 	}
 
+	set_dirty(is_dirty());
+
 	// Success!
 	return *this;
 }
@@ -580,6 +564,8 @@ const runtime::entity& transform_component::get_parent() const
 void transform_component::attach_child(const runtime::entity& child)
 {
 	_children.push_back(child);
+
+	set_dirty(is_dirty());
 }
 
 void transform_component::remove_child(const runtime::entity& child)
@@ -630,6 +616,7 @@ transform_component& transform_component::set_local_transform(const math::transf
 		return *this;
 
 	touch();
+	set_dirty(true);
 
 	_local_transform = trans;
 	return *this;
@@ -655,22 +642,34 @@ void transform_component::resolve(bool force)
 		{
 			_world_transform = _local_transform;
 		}
+
+		set_dirty(false);
 	}
 }
 
 bool transform_component::is_dirty() const
 {
-	bool dirty = component::is_dirty();
-	if(!dirty && _parent.valid())
+	return _dirty;
+}
+
+void transform_component::set_dirty(bool dirty)
+{
+	_dirty = dirty;
+
+	if(_dirty == true)
 	{
-		auto parent_transform = _parent.get_component<transform_component>().lock();
-		if(parent_transform)
+		for(const auto& child : _children)
 		{
-			dirty |= parent_transform->is_dirty();
+			if(child.valid())
+			{
+				auto child_transform = child.get_component<transform_component>().lock();
+				if(child_transform)
+				{
+					child_transform->set_dirty(dirty);
+				}
+			}
 		}
 	}
-
-	return dirty;
 }
 
 const std::vector<runtime::entity>& transform_component::get_children() const

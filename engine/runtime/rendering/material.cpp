@@ -75,19 +75,31 @@ standard_material::standard_material()
 	auto vs_deferred_geom_skinned = am.load<gfx::shader>("engine_data:/shaders/vs_deferred_geom_skinned.sc");
 	auto fs_deferred_geom = am.load<gfx::shader>("engine_data:/shaders/fs_deferred_geom.sc");
 
-	ts.push_or_execute_on_owner_thread(
+	auto f = ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
 			_program = std::make_unique<gpu_program>(vs, fs);
 
 		},
 		vs_deferred_geom, fs_deferred_geom);
 
-	ts.push_or_execute_on_owner_thread(
+	auto f1 = ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
 			_program_skinned = std::make_unique<gpu_program>(vs, fs);
 
 		},
 		vs_deferred_geom_skinned, fs_deferred_geom);
+    
+    _futures.emplace_back(std::move(f));
+    _futures.emplace_back(std::move(f1));
+    
+}
+
+standard_material::~standard_material()
+{
+    for(auto& f : _futures)
+    {
+        f.wait();
+    }
 }
 
 void standard_material::submit()

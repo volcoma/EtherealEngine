@@ -190,7 +190,7 @@ visibility_set_models_t deferred_rendering::gather_visible_models(entity_compone
 				// Only dirty mesh components.
 				if(dirty_only)
 				{
-					if(transform_comp_ptr->is_dirty() || model_comp_ptr->is_dirty())
+					if(transform_comp_ptr->is_touched() || model_comp_ptr->is_touched())
 					{
 						result.push_back(std::make_tuple(entity, transform_comp_handle, model_comp_handle));
 					}
@@ -207,7 +207,7 @@ visibility_set_models_t deferred_rendering::gather_visible_models(entity_compone
 			// Only dirty mesh components.
 			if(dirty_only)
 			{
-				if(transform_comp_ptr->is_dirty() || model_comp_ptr->is_dirty())
+				if(transform_comp_ptr->is_touched() || model_comp_ptr->is_touched())
 				{
 					result.push_back(std::make_tuple(entity, transform_comp_handle, model_comp_handle));
 				}
@@ -242,12 +242,12 @@ void deferred_rendering::build_reflections_pass(entity_component_system& ecs, st
 			auto cubemap_fbo = reflection_probe_comp.get_cubemap_fbo();
 			bool should_rebuild = true;
 
-			if(!transform_comp.is_dirty() && !reflection_probe_comp.is_dirty())
+			if(!transform_comp.is_touched() && !reflection_probe_comp.is_touched())
 			{
 				// If reflections shouldn't be rebuilt - continue.
 				should_rebuild = should_rebuild_reflections(dirty_models, probe);
 			}
-
+        
 			if(!should_rebuild)
 				return;
 
@@ -291,7 +291,7 @@ void deferred_rendering::build_shadows_pass(entity_component_system& ecs, std::c
 
 			bool should_rebuild = true;
 
-			if(!transform_comp.is_dirty() && !light_comp.is_dirty())
+			if(!transform_comp.is_touched() && !light_comp.is_touched())
 			{
 				// If shadows shouldn't be rebuilt - continue.
 				should_rebuild = should_rebuild_shadows(dirty_models, light);

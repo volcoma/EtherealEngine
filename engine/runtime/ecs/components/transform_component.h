@@ -56,7 +56,7 @@ public:
 	//-----------------------------------------------------------------------------
 	void resolve(bool force = false);
 
-	//-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
 	//  Name : is_dirty (virtual )
 	/// <summary>
 	///
@@ -64,8 +64,8 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual bool is_dirty() const;
-
+	void set_dirty(bool dirty);
+    bool is_dirty() const;
 	//-----------------------------------------------------------------------------
 	//  Name : on_entity_set (virtual )
 	/// <summary>
@@ -554,4 +554,6 @@ protected:
 	math::transform _local_transform;
 	/// Cached world transformation at pivot point.
 	math::transform _world_transform;
+    
+    bool _dirty = true;
 };

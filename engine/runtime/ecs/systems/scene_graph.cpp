@@ -5,23 +5,6 @@
 
 namespace runtime
 {
-void update_transform(entity e)
-{
-	if(e.valid())
-	{
-		auto transform_comp = e.get_component<transform_component>().lock();
-		if(transform_comp)
-		{
-			transform_comp->resolve(true);
-
-			auto& children = transform_comp->get_children();
-			for(auto& child : children)
-			{
-				update_transform(child);
-			}
-		}
-	}
-}
 
 void scene_graph::frame_update(std::chrono::duration<float> dt)
 {
@@ -43,11 +26,6 @@ void scene_graph::frame_update(std::chrono::duration<float> dt)
 		{
 			_roots.push_back(entity);
 		}
-	}
-
-	for(auto& entity : _roots)
-	{
-		update_transform(entity);
 	}
 }
 
