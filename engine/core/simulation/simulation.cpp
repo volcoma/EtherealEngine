@@ -8,7 +8,6 @@ using namespace std::literals;
 
 simulation::simulation()
 {
-
 	if(_max_inactive_fps == 0)
 		_max_inactive_fps = std::max(_max_inactive_fps, _max_fps);
 }
@@ -24,6 +23,7 @@ void simulation::run_one_frame(bool is_active)
 	if(max_fps > 0)
 	{
 		duration_t target_duration = 1000ms / max_fps;
+
 		for(;;)
 		{
 			elapsed = clock_t::now() - _last_frame_timepoint;
@@ -34,10 +34,16 @@ void simulation::run_one_frame(bool is_active)
 			{
 				break;
 			}
-			duration_t sleep_time = (target_duration - elapsed) / 10;
+			duration_t sleep_time = (target_duration - elapsed);
+			auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(sleep_time);
 
-			if(sleep_time > duration_t(0))
+			if(sleep_time > std::chrono::microseconds(1000))
 			{
+				if(ms.count() > 0)
+				{
+					sleep_time /= ms.count();
+				}
+
 				std::this_thread::sleep_for(sleep_time);
 			}
 		}

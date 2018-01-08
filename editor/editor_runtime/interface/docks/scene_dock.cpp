@@ -3,6 +3,7 @@
 #include "../../system/project_manager.h"
 #include "core/graphics/render_pass.h"
 #include "core/simulation/simulation.h"
+#include "core/string_utils/string_utils.h"
 #include "core/system/subsystem.h"
 #include "runtime/assets/asset_handle.h"
 #include "runtime/ecs/components/camera_component.h"
@@ -18,6 +19,60 @@
 
 static bool show_gbuffer = false;
 
+static bool bar(float _width, float _maxWidth, float _height, const ImVec4& _color)
+{
+	const ImGuiStyle& style = gui::GetStyle();
+
+	ImVec4 hoveredColor(_color.x + _color.x * 0.1f, _color.y + _color.y * 0.1f, _color.z + _color.z * 0.1f,
+						_color.w + _color.w * 0.1f);
+
+	gui::PushStyleColor(ImGuiCol_Button, _color);
+	gui::PushStyleColor(ImGuiCol_ButtonHovered, hoveredColor);
+	gui::PushStyleColor(ImGuiCol_ButtonActive, _color);
+	gui::PushStyleVar(ImGuiStyleVar_FrameRounding, 0.0f);
+	gui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, style.ItemSpacing.y));
+
+	bool itemHovered = false;
+
+	gui::Button("", ImVec2(_width, _height));
+	itemHovered |= gui::IsItemHovered();
+
+	gui::SameLine();
+	gui::InvisibleButton("", ImVec2(_maxWidth - _width, _height));
+	itemHovered |= gui::IsItemHovered();
+
+	gui::PopStyleVar(2);
+	gui::PopStyleColor(3);
+
+	return itemHovered;
+}
+
+static void resource_bar(const char* _name, const char* _tooltip, uint32_t _num, uint32_t _max,
+						 float _maxWidth, float _height)
+{
+	bool itemHovered = false;
+
+	gui::AlignTextToFramePadding();
+	gui::Text("%s: %4d / %4d", _name, _num, _max);
+	itemHovered |= gui::IsItemHovered();
+	gui::SameLine();
+
+	const float percentage = float(_num) / float(_max);
+	static const ImVec4 color(0.5f, 0.5f, 0.5f, 1.0f);
+
+	itemHovered |= bar(std::max(1.0f, percentage * _maxWidth), _maxWidth, _height, color);
+	gui::SameLine();
+
+	gui::Text("%5.2f%%", double(percentage * 100.0f));
+
+	if(itemHovered)
+	{
+		gui::BeginTooltip();
+		gui::Text("%s %5.2f%%", _tooltip, double(percentage * 100.0f));
+		gui::EndTooltip();
+	}
+}
+
 void show_statistics(const unsigned int fps)
 {
 	ImVec2 pos = gui::GetCursorScreenPos();
@@ -26,34 +81,177 @@ void show_statistics(const unsigned int fps)
 	gui::Begin("STATISTICS", nullptr,
 			   ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
 
-	gui::AlignTextToFramePadding();
-	gui::Text("FPS  : %u", fps);
-	gui::Separator();
-	gui::AlignTextToFramePadding();
-	gui::Text("MSPF : %.3f ms ", 1000.0 / double(fps));
-	gui::Separator();
-
-	const auto& gui_sys = core::get_subsystem<gui_system>();
-	std::uint32_t ui_draw_calls = gui_sys.get_draw_calls();
 	auto stats = gfx::get_stats();
-	gui::AlignTextToFramePadding();
-	gui::Text("TOTAL DRAW CALLS: %u", stats->numDraw);
-	gui::AlignTextToFramePadding();
-	gui::Text("UI DRAW CALLS: %u", ui_draw_calls);
-	gui::AlignTextToFramePadding();
-	gui::Text("SCENE DRAW CALLS: %u", stats->numDraw - ui_draw_calls);
-	gui::AlignTextToFramePadding();
-	gui::Text("COMPUTE CALLS: %u", stats->numCompute);
-	gui::AlignTextToFramePadding();
-	gui::Text("GPU DRIVER LATENCY: %u ms", stats->maxGpuLatency);
-	gui::AlignTextToFramePadding();
-	gui::Text("GPU MEM USED: %d mb", int(stats->gpuMemoryUsed / 1024 / 1024));
-	gui::AlignTextToFramePadding();
-	gui::Text("GPU MEM TOTAL: %d mb", int(stats->gpuMemoryMax / 1024 / 1024));
-	gui::AlignTextToFramePadding();
-	gui::Text("RENDER PASSES: %u", gfx::render_pass::get_pass());
+	gui::Text("Fps  : %u", fps);
+	gui::Text("Frame time : %.3f ms ", 1000.0 / double(fps));
+
+	const double to_cpu_ms = 1000.0 / double(stats->cpuTimerFreq);
+	const double to_gpu_ms = 1000.0 / double(stats->gpuTimerFreq);
+
+	if(gui::CollapsingHeader(ICON_FA_INFO_CIRCLE " Render Info"))
+	{
+		gui::PushFont(gui::GetFont("default"));
+
+		gui::Text("Submit CPU %0.3f, GPU %0.3f", double(stats->cpuTimeEnd - stats->cpuTimeBegin) * to_cpu_ms,
+				  double(stats->gpuTimeEnd - stats->gpuTimeBegin) * to_gpu_ms);
+		gui::Text("GPU driver latency: %d", stats->maxGpuLatency);
+		if(-INT64_MAX != stats->gpuMemoryUsed)
+		{
+			char tmp0[64];
+			bx::prettify(tmp0, 64, uint64_t(stats->gpuMemoryUsed));
+			char tmp1[64];
+			bx::prettify(tmp1, 64, uint64_t(stats->gpuMemoryMax));
+			gui::Text("GPU mem: %s / %s", tmp0, tmp1);
+		}
+
+		gui::Separator();
+
+		const auto& gui_sys = core::get_subsystem<gui_system>();
+		std::uint32_t ui_draw_calls = gui_sys.get_draw_calls();
+		gui::Text("Total Draw Calls: %u", stats->numDraw);
+		gui::Text("UI Draw Calls: %u", ui_draw_calls);
+		gui::Text("Scene Draw Calls: %u", stats->numDraw - ui_draw_calls);
+		gui::Text("Render Passes: %u", gfx::render_pass::get_pass());
+
+		gui::PopFont();
+	}
+	if(gui::CollapsingHeader(ICON_FA_PUZZLE_PIECE " Resources"))
+	{
+		const auto caps = gfx::get_caps();
+
+		const float itemHeight = gui::GetTextLineHeightWithSpacing();
+		const float maxWidth = 90.0f;
+
+		gui::PushFont(gui::GetFont("default"));
+		gui::AlignTextToFramePadding();
+		gui::Text("Res: Num  / Max");
+		resource_bar("DIB", "Dynamic index buffers", stats->numDynamicIndexBuffers,
+					 caps->limits.maxDynamicIndexBuffers, maxWidth, itemHeight);
+		resource_bar("DVB", "Dynamic vertex buffers", stats->numDynamicVertexBuffers,
+					 caps->limits.maxDynamicVertexBuffers, maxWidth, itemHeight);
+		resource_bar(" FB", "Frame buffers", stats->numFrameBuffers, caps->limits.maxFrameBuffers, maxWidth,
+					 itemHeight);
+		resource_bar(" IB", "Index buffers", stats->numIndexBuffers, caps->limits.maxIndexBuffers, maxWidth,
+					 itemHeight);
+		resource_bar(" OQ", "Occlusion queries", stats->numOcclusionQueries, caps->limits.maxOcclusionQueries,
+					 maxWidth, itemHeight);
+		resource_bar("  P", "Programs", stats->numPrograms, caps->limits.maxPrograms, maxWidth, itemHeight);
+		resource_bar("  S", "Shaders", stats->numShaders, caps->limits.maxShaders, maxWidth, itemHeight);
+		resource_bar("  T", "Textures", stats->numTextures, caps->limits.maxTextures, maxWidth, itemHeight);
+		resource_bar("  U", "Uniforms", stats->numUniforms, caps->limits.maxUniforms, maxWidth, itemHeight);
+		resource_bar(" VB", "Vertex buffers", stats->numVertexBuffers, caps->limits.maxVertexBuffers,
+					 maxWidth, itemHeight);
+		resource_bar(" VD", "Vertex declarations", stats->numVertexDecls, caps->limits.maxVertexDecls,
+					 maxWidth, itemHeight);
+		gui::PopFont();
+	}
+
+	if(gui::CollapsingHeader(ICON_FA_CLOCK_O " Profiler"))
+	{
+		gui::PushFont(gui::GetFont("default"));
+
+		if(0 == stats->numViews)
+		{
+			gui::Text("Profiler is not enabled.");
+		}
+		else
+		{
+			if(gui::BeginChild("##view_profiler", ImVec2(0.0f, 0.0f)))
+			{
+
+				ImVec4 cpu_color(0.5f, 1.0f, 0.5f, 1.0f);
+				ImVec4 gpu_color(0.5f, 0.5f, 1.0f, 1.0f);
+
+				const float itemHeight = gui::GetTextLineHeightWithSpacing();
+				const float itemHeightWithSpacing = gui::GetFrameHeightWithSpacing();
+
+				const float scale = 3.0f;
+
+				if(gui::ListBoxHeader(
+					   "Encoders", ImVec2(gui::GetWindowWidth(), stats->numEncoders * itemHeightWithSpacing)))
+				{
+					ImGuiListClipper clipper(stats->numEncoders, itemHeight);
+
+					while(clipper.Step())
+					{
+						for(int32_t pos = clipper.DisplayStart; pos < clipper.DisplayEnd; ++pos)
+						{
+							const auto& encoderStats = stats->encoderStats[pos];
+
+							gui::Text("%3d", pos);
+							gui::SameLine(64.0f);
+
+							const float maxWidth = 30.0f * scale;
+							const float cpuMs =
+								float((encoderStats.cpuTimeEnd - encoderStats.cpuTimeBegin) * to_cpu_ms);
+							const float cpuWidth = math::clamp(cpuMs * scale, 1.0f, maxWidth);
+
+							if(bar(cpuWidth, maxWidth, itemHeight, cpu_color))
+							{
+								gui::BeginTooltip();
+								gui::Text("Encoder %d, CPU: %f [ms]", pos, double(cpuMs));
+								gui::EndTooltip();
+							}
+						}
+					}
+
+					gui::ListBoxFooter();
+				}
+
+				gui::Separator();
+
+				if(gui::ListBoxHeader("Views",
+									  ImVec2(gui::GetWindowWidth(), stats->numViews * itemHeightWithSpacing)))
+				{
+					ImGuiListClipper clipper(stats->numViews, itemHeight);
+
+					while(clipper.Step())
+					{
+						for(int32_t pos = clipper.DisplayStart; pos < clipper.DisplayEnd; ++pos)
+						{
+							const auto& viewStats = stats->viewStats[pos];
+
+							gui::Text("%3d %3d %s", pos, viewStats.view, viewStats.name);
+
+							const float maxWidth = 30.0f * scale;
+							const float cpuWidth = math::clamp(
+								float(viewStats.cpuTimeElapsed * to_cpu_ms) * scale, 1.0f, maxWidth);
+							const float gpuWidth = math::clamp(
+								float(viewStats.gpuTimeElapsed * to_gpu_ms) * scale, 1.0f, maxWidth);
+
+							gui::SameLine(64.0f);
+
+							if(bar(cpuWidth, maxWidth, itemHeight, cpu_color))
+							{
+								gui::BeginTooltip();
+								gui::Text("View %d \"%s\", CPU: %f [ms]", pos, viewStats.name,
+										  viewStats.cpuTimeElapsed * to_cpu_ms);
+								gui::EndTooltip();
+							}
+
+							gui::SameLine();
+							if(bar(gpuWidth, maxWidth, itemHeight, gpu_color))
+							{
+								gui::BeginTooltip();
+								gui::Text("View: %d \"%s\", GPU: %f [ms]", pos, viewStats.name,
+										  viewStats.gpuTimeElapsed * to_gpu_ms);
+								gui::EndTooltip();
+							}
+						}
+					}
+
+					gui::ListBoxFooter();
+				}
+			}
+
+			gui::EndChild();
+		}
+		gui::PopFont();
+	}
+
 	gui::Separator();
 	gui::Checkbox("SHOW G-BUFFER", &show_gbuffer);
+
 	gui::End();
 }
 
@@ -347,9 +545,9 @@ void scene_dock::render(const ImVec2&)
 
 		if(gui::IsWindowFocused())
 		{
-			ImGui::PushStyleColor(ImGuiCol_Border, gui::GetStyle().Colors[ImGuiCol_Button]);
-			ImGui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
-			ImGui::PopStyleColor();
+			gui::PushStyleColor(ImGuiCol_Border, gui::GetStyle().Colors[ImGuiCol_Button]);
+			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
+			gui::PopStyleColor();
 
 			if(input.is_key_pressed(mml::keyboard::Delete))
 			{

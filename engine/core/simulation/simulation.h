@@ -10,7 +10,7 @@ namespace core
 // Main Class Declarations
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-//  Name : Simulation (Class)
+//  Name : simulation (Class)
 /// <summary>
 /// Class responsible for timers.
 /// </summary>
@@ -109,11 +109,12 @@ protected:
 	/// minimum/maximum frames per second
 	unsigned int _min_fps = 0;
 	///
-	unsigned int _max_fps = 60;
+	unsigned int _max_fps = 200;
 	///
 	unsigned int _max_inactive_fps = 20;
 	/// previous time steps for smoothing in seconds
 	std::vector<duration_t> _previous_timesteps;
+
 	/// next frame time step in seconds
 	duration_t _timestep = duration_t::zero();
 	/// current frame
