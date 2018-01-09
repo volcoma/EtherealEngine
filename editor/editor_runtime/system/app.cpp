@@ -180,10 +180,10 @@ auto save_scene()
 	{
 		auto entities = gather_scene_data();
 		ecs::utils::save_entities_to_file(path, std::move(entities));
+		APPLOG_INFO("Saving scene successful.");
 	}
 
 	es.save_editor_camera();
-	APPLOG_INFO("Saving scene successful.");
 }
 
 void save_scene_as()
@@ -412,18 +412,21 @@ void app::setup(cmd_line::options_parser& parser)
 {
 	runtime::app::setup(parser);
 
-	runtime::on_frame_end.connect(this, &editor::app::draw_docks);
+	runtime::on_frame_update.connect(this, &editor::app::draw_docks);
 }
 
 void app::start(cmd_line::options_parser& parser)
 {
 	auto logging_container = logging::get_mutable_logging_container();
+
 	_console_log = std::make_shared<console_log>();
+
 	logging_container->add_sink(_console_log);
+
 	runtime::app::start(parser);
 
 	core::add_subsystem<gui_system>();
-	auto& docking = core::add_subsystem<docking_system>();
+	core::add_subsystem<docking_system>();
 	core::add_subsystem<editing_system>();
 	core::add_subsystem<picking_system>();
 	core::add_subsystem<debugdraw_system>();
@@ -441,6 +444,7 @@ void app::start(cmd_line::options_parser& parser)
 	auto console = std::make_unique<console_dock>("CONSOLE", true, ImVec2(200.0f, 200.0f), _console_log);
 	auto style = std::make_unique<style_dock>("STYLE", true, ImVec2(300.0f, 200.0f));
 
+	auto& docking = core::get_subsystem<docking_system>();
 	auto& dockspace = docking.get_dockspace(main_window->get_id());
 	dockspace.dock_to(scene.get(), imguidock::slot::tab, 200, true);
 	dockspace.dock_with(game.get(), scene.get(), imguidock::slot::tab, 300, false);
@@ -465,7 +469,7 @@ void app::start(cmd_line::options_parser& parser)
 
 void app::stop()
 {
-	runtime::on_frame_end.disconnect(this, &editor::app::draw_docks);
+	runtime::on_frame_update.disconnect(this, &editor::app::draw_docks);
 
 	runtime::app::stop();
 }

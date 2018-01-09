@@ -302,7 +302,7 @@ public:
 	//-----------------------------------------------------------------------------
 	virtual void touch()
 	{
-		_last_touched = static_cast<std::uint32_t>(ecs::get_frame()) + 1;
+		_last_touched = static_cast<std::uint32_t>(ecs::get_frame());
 	}
 
 	//-----------------------------------------------------------------------------

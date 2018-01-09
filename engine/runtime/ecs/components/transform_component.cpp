@@ -615,7 +615,6 @@ transform_component& transform_component::set_local_transform(const math::transf
 	if(_local_transform.compare(trans, 0.0001f) == 0)
 		return *this;
 
-	touch();
 	set_dirty(true);
 
 	_local_transform = trans;
@@ -658,6 +657,8 @@ void transform_component::set_dirty(bool dirty)
 
 	if(_dirty == true)
 	{
+		touch();
+
 		for(const auto& child : _children)
 		{
 			if(child.valid())
