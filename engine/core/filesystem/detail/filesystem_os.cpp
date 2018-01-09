@@ -51,7 +51,7 @@ path executable_path(const char* argv0)
 		return executable_path_fallback(argv0);
 	}
 	fs::error_code err;
-	path full_path(system_complete(path(std::string(buf.data())).normalize(), err));
+	path full_path(system_complete(fs::canonical(path(std::string(buf.data()))), err));
 	return full_path;
 }
 void show_in_graphical_env(const path& _path)
@@ -75,7 +75,7 @@ path executable_path(const char* argv0)
 	}
 	std::string p(buf.data(), size);
 	fs::error_code err;
-	path full_path(system_complete(path(p).normalize(), err));
+	path full_path(system_complete(fs::canonical(path(p)), err));
 	return full_path;
 }
 void show_in_graphical_env(const path& _path)

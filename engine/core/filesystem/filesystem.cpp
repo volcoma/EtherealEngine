@@ -1,4 +1,5 @@
 #include "filesystem.h"
+#include <algorithm>
 
 namespace fs
 {
@@ -171,7 +172,7 @@ path convert_to_protocol(const path& _path)
 
 		if(detail::begins_with(string_path, resolved_protocol))
 		{
-			return replace(string_path, resolved_protocol, protocol).generic_path();
+			return replace(string_path, resolved_protocol, protocol).generic_string();
 		}
 	}
 	return _path;
