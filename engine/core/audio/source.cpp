@@ -63,6 +63,15 @@ bool source::is_paused() const
 	return false;
 }
 
+bool source::is_stopped() const
+{
+	if(_impl)
+	{
+		return _impl->is_stopped();
+	}
+	return true;
+}
+
 bool source::is_looping() const
 {
 	if(_impl)

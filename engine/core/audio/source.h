@@ -160,7 +160,7 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : is_playing ()
 	/// <summary>
-	///
+    /// Checks whether a source is currently playing.
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	bool is_playing() const;
@@ -168,10 +168,18 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : is_paused ()
 	/// <summary>
-	/// Checks whether a source is currently playing.
+	/// Checks whether a source is currently paused.
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	bool is_paused() const;
+    
+    //-----------------------------------------------------------------------------
+	//  Name : is_stopped ()
+	/// <summary>
+	/// Checks whether a source is currently stopped.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	bool is_stopped() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : is_looping ()

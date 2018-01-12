@@ -8,27 +8,54 @@ namespace audio
 /// The data is stored in little-endian byte order.
 struct wav_header
 {
+	//------------------
 	// RIFF Header
-	char riff_header[4]; // Contains "RIFF"
-	int32_t wav_size; // Size of the wav portion of the file, which follows the first 8 bytes. File size - 8
-	char wave_header[4]; // Contains "WAVE"
+	//------------------
+	/// Contains "RIFF"
+	char riff_header[4] = {0};
 
+	/// Size of the wav portion of the file, which follows the first 8 bytes. File size - 8
+	std::int32_t wav_size = 0;
+
+	/// Contains "WAVE"
+	char wave_header[4] = {0};
+
+	//------------------
 	// Format Header
-	char fmt_header[4];		// Contains "fmt " (includes trailing space)
-	int32_t fmt_chunk_size; // Should be 16 for PCM
-	int16_t audio_format;   // Should be 1 for PCM. 3 for IEEE Float
-	int16_t num_channels;
-	int32_t sample_rate;
-	int32_t byte_rate;		  // Number of bytes per second. sample_rate * num_channels * Bytes Per Sample
-	int16_t sample_alignment; // num_channels * Bytes Per Sample
-	int16_t bit_depth;		  // Number of bits per sample
+	//------------------
 
-	// Data
-	char data_header[4]; // Contains "data"
-	int32_t data_bytes;  // Number of bytes in data. Number of samples * num_channels * sample byte size
+	/// Contains "fmt " (includes trailing space)
+	char fmt_header[4] = {0};
+
+	/// Should be 16 for PCM
+	std::int32_t fmt_chunk_size = 0;
+
+	/// Should be 1 for PCM. 3 for IEEE Float
+	std::int16_t audio_format = 0;
+
+	std::int16_t num_channels = 0;
+	std::int32_t sample_rate = 0;
+
+	/// Number of bytes per second. sample_rate * num_channels * bytes per sample
+	std::int32_t byte_rate = 0;
+
+	/// num_channels * bytes per sample
+	std::int16_t sample_alignment = 0;
+
+	/// Number of bits per sample
+	std::int16_t bit_depth = 0;
+
+	//------------------
+	// Data Header
+	//------------------
+	/// Contains "data"
+	char data_header[4] = {0};
+	/// Number of bytes in data. Number of samples * num_channels * sample byte size
+	std::int32_t data_bytes = 0;
 };
 
-bool load_wav_from_memory(const uint8_t* data, std::size_t data_size, sound_data& result, std::string& err)
+bool load_wav_from_memory(const std::uint8_t* data, std::size_t data_size, sound_data& result,
+						  std::string& err)
 {
 	if(!data)
 	{

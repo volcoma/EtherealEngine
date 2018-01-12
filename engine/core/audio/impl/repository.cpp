@@ -1,4 +1,5 @@
 #include "repository.h"
+#include <atomic>
 
 namespace audio
 {
@@ -6,72 +7,84 @@ namespace priv
 {
 void repository::clear()
 {
-	for(auto& source : sources)
 	{
-		source.second->unbind();
+		std::lock_guard<std::mutex> lock(sources_mutex);
+		for(auto& source : sources)
+		{
+			source.second->unbind();
+		}
+
+		sources.clear();
 	}
 
-	sources.clear();
+	{
+		std::lock_guard<std::mutex> lock(sounds_mutex);
+		sounds.clear();
+	}
 }
 
 std::size_t repository::insert_sound(const sound_impl* sound)
 {
-	static std::size_t id = 0;
+	static std::atomic<std::size_t> id = {0};
 
-	sounds.emplace(id, sound);
-
+	{
+		std::lock_guard<std::mutex> lock(sounds_mutex);
+		sounds.emplace(id, sound);
+	}
 	return id++;
 }
 
 void repository::erase_sound(std::size_t id)
 {
-	const auto& sound = get_sound(id);
+	const auto sound_handle = get_sound_handle(id);
 
-	// unbind sound from all sources that use it
-	// WARNING potentially slow
-	for(auto& source : sources)
 	{
-		if(source.second->binded_handle() == sound->native_handle())
-			source.second->unbind();
+		std::lock_guard<std::mutex> lock(sources_mutex);
+
+		// unbind sound from all sources that use it
+		// WARNING potentially slow
+		for(auto& source : sources)
+		{
+			if(source.second->binded_handle() == sound_handle)
+				source.second->unbind();
+		}
 	}
 
-	sounds.erase(id);
+	{
+		sounds.erase(id);
+		std::lock_guard<std::mutex> lock(sounds_mutex);
+	}
 }
 
-const sound_impl* repository::get_sound(std::size_t id)
+sound_impl::native_handle_type repository::get_sound_handle(std::size_t id)
 {
+	std::lock_guard<std::mutex> lock(sounds_mutex);
+
 	auto it = sounds.find(id);
 	if(it != sounds.end())
 	{
-		return it->second;
+		return it->second->native_handle();
 	}
 
-	return nullptr;
+	return 0;
 }
 
 std::size_t repository::insert_source(const source_impl* src)
 {
-	static std::size_t id = 0;
+	static std::atomic<std::size_t> id = {0};
 
-	sources.emplace(id, src);
+	{
+		std::lock_guard<std::mutex> lock(sources_mutex);
+		sources.emplace(id, src);
+	}
 
 	return id++;
 }
 
 void repository::erase_source(std::size_t id)
 {
+	std::lock_guard<std::mutex> lock(sources_mutex);
 	sources.erase(id);
-}
-
-const source_impl* repository::get_source(std::size_t id)
-{
-	auto it = sources.find(id);
-	if(it != sources.end())
-	{
-		return it->second;
-	}
-
-	return nullptr;
 }
 }
 }

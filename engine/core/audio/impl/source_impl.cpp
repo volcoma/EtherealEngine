@@ -51,7 +51,6 @@ bool source_impl::bind(sound_impl::native_handle_type buffer)
 		{
 			return true;
 		};
-		unbind();
 	}
 
 	alCheck(alSourcei(_handle, AL_SOURCE_RELATIVE, AL_FALSE));
@@ -135,9 +134,16 @@ bool source_impl::is_playing() const
 
 bool source_impl::is_paused() const
 {
-	ALint state;
+	ALint state = AL_INITIAL;
 	alCheck(alGetSourcei(_handle, AL_SOURCE_STATE, &state));
 	return (state == AL_PAUSED);
+}
+
+bool source_impl::is_stopped() const
+{
+	ALint state = AL_INITIAL;
+	alCheck(alGetSourcei(_handle, AL_SOURCE_STATE, &state));
+	return (state == AL_STOPPED);
 }
 
 bool source_impl::is_binded() const

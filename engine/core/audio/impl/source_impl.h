@@ -42,6 +42,7 @@ public:
 	void pause() const;
 	bool is_playing() const;
 	bool is_paused() const;
+	bool is_stopped() const;
 	bool is_binded() const;
 	bool is_valid() const;
 	bool is_looping() const;

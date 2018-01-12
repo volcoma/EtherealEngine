@@ -74,7 +74,10 @@ public:
 private:
 	friend class source;
 
+    /// sound info
 	sound_data _data;
+    
+    /// pimpl idiom
 	std::unique_ptr<priv::sound_impl> _impl;
 };
 }
