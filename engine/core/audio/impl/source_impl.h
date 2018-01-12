@@ -1,12 +1,16 @@
 #pragma once
 
-#include "sound_impl.h"
 #include <AL/al.h>
+#include <cstdint>
+#include <mutex>
+#include <vector>
 
 namespace audio
 {
 namespace priv
 {
+class sound_impl;
+
 class source_impl
 {
 public:
@@ -20,8 +24,8 @@ public:
 	source_impl& operator=(const source_impl& rhs) = delete;
 
 	bool create();
-	bool bind(sound_impl::native_handle_type buffer);
-	void unbind() const;
+	bool bind(sound_impl* sound);
+	void unbind();
 	void purge();
 
 	void set_loop(bool on);
@@ -48,11 +52,16 @@ public:
 	bool is_looping() const;
 
 	native_handle_type native_handle() const;
-	sound_impl::native_handle_type binded_handle() const;
 
 private:
+	void bind_sound(sound_impl* sound);
+	void unbind_sound();
+
 	native_handle_type _handle = 0;
 	std::size_t _id = 0;
+
+	mutable std::mutex _sound_mtx;
+	sound_impl* _bound_sound = nullptr;
 };
 }
 }

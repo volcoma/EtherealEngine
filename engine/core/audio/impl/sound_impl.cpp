@@ -1,10 +1,11 @@
 #include "sound_impl.h"
 #include "../logger.h"
 #include "check.h"
-#include "repository.h"
+#include "source_impl.h"
 #include "stb_vorbis.h"
 #include <AL/al.h>
 #include <AL/alext.h>
+#include <algorithm>
 
 namespace audio
 {
@@ -38,8 +39,6 @@ static std::size_t get_mem_size(const T& container)
 
 sound_impl::sound_impl(const sound_data& data)
 {
-	_id = get_repository().insert_sound(this);
-
 	if(data.data.empty())
 		return;
 
@@ -53,21 +52,20 @@ sound_impl::sound_impl(const sound_data& data)
 sound_impl::sound_impl(sound_impl&& rhs)
 	: _handle(std::move(rhs._handle))
 {
-	rhs._handle = 0;
-	_id = get_repository().insert_sound(this);
+	rhs.cleanup();
 }
 
 sound_impl& sound_impl::operator=(sound_impl&& rhs)
 {
 	_handle = std::move(rhs._handle);
-	rhs._handle = 0;
+	rhs.cleanup();
 
 	return *this;
 }
 
 sound_impl::~sound_impl()
 {
-	get_repository().erase_sound(_id);
+	unbind_from_all_sources();
 
 	if(_handle)
 	{
@@ -83,6 +81,36 @@ bool sound_impl::is_valid() const
 sound_impl::native_handle_type sound_impl::native_handle() const
 {
 	return _handle;
+}
+
+void sound_impl::bind_to_source(source_impl* source)
+{
+	_bound_to_sources.push_back(source);
+}
+
+void sound_impl::unbind_from_source(source_impl* source)
+{
+	_bound_to_sources.erase(std::remove_if(std::begin(_bound_to_sources), std::end(_bound_to_sources),
+										   [source](const auto& item) { return item == source; }),
+							std::end(_bound_to_sources));
+}
+
+void sound_impl::unbind_from_all_sources()
+{
+	for(auto& source : _bound_to_sources)
+	{
+		if(source)
+		{
+			source->unbind();
+		}
+	}
+	_bound_to_sources.clear();
+}
+
+void sound_impl::cleanup()
+{
+	_handle = 0;
+	unbind_from_all_sources();
 }
 }
 }

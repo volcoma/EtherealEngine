@@ -1,6 +1,6 @@
 #include "source_impl.h"
 #include "check.h"
-#include "repository.h"
+#include "sound_impl.h"
 
 namespace audio
 {
@@ -8,13 +8,11 @@ namespace priv
 {
 source_impl::source_impl()
 {
-	_id = get_repository().insert_source(this);
 	create();
 }
 
 source_impl::~source_impl()
 {
-	get_repository().erase_source(_id);
 	purge();
 }
 
@@ -22,7 +20,6 @@ source_impl::source_impl(source_impl&& rhs)
 	: _handle(std::move(rhs._handle))
 {
 	rhs._handle = 0;
-	_id = get_repository().insert_source(this);
 }
 
 source_impl& source_impl::operator=(source_impl&& rhs)
@@ -43,16 +40,16 @@ bool source_impl::create()
 	return _handle != 0;
 }
 
-bool source_impl::bind(sound_impl::native_handle_type buffer)
+bool source_impl::bind(sound_impl* sound)
 {
-	if(is_binded())
+	if(sound == nullptr)
 	{
-		if(binded_handle() == buffer)
-		{
-			return true;
-		};
+		return true;
 	}
 
+	bind_sound(sound);
+
+	const auto buffer = sound->native_handle();
 	alCheck(alSourcei(_handle, AL_SOURCE_RELATIVE, AL_FALSE));
 
 	alCheck(alSourcei(_handle, AL_BUFFER, ALint(buffer)));
@@ -60,10 +57,12 @@ bool source_impl::bind(sound_impl::native_handle_type buffer)
 	return true;
 }
 
-void source_impl::unbind() const
+void source_impl::unbind()
 {
 	stop();
 	alCheck(alSourcei(_handle, AL_BUFFER, 0));
+
+	unbind_sound();
 }
 
 void source_impl::purge()
@@ -92,22 +91,26 @@ float source_impl::get_playing_offset() const
 
 float source_impl::get_playing_duration() const
 {
-	auto buffer = binded_handle();
-	if(buffer == 0)
-		return 1.0f;
+	sound_impl::native_handle_type buffer = 0;
+	{
+		std::lock_guard<std::mutex> lock(_sound_mtx);
+		if(_bound_sound == nullptr)
+			return 1.0f;
+		buffer = _bound_sound->native_handle();
+	}
 
 	ALint size_in_bytes = 0;
-	ALint channels = 0;
-	ALint bits = 0;
-	ALint frequency = 0;
+	ALint channels = 1;
+	ALint bits = 1;
+	ALint frequency = 1;
 
 	alCheck(alGetBufferi(buffer, AL_SIZE, &size_in_bytes));
 	alCheck(alGetBufferi(buffer, AL_CHANNELS, &channels));
 	alCheck(alGetBufferi(buffer, AL_BITS, &bits));
 	alCheck(alGetBufferi(buffer, AL_FREQUENCY, &frequency));
 
-	auto lengthInSamples = size_in_bytes * 8 / (channels * bits);
-	return float(lengthInSamples) / float(frequency);
+	const auto length_in_samples = (size_in_bytes * 8) / (channels * bits);
+	return float(length_in_samples) / float(frequency);
 }
 
 void source_impl::play() const
@@ -221,11 +224,26 @@ source_impl::native_handle_type source_impl::native_handle() const
 	return _handle;
 }
 
-sound_impl::native_handle_type source_impl::binded_handle() const
+void source_impl::bind_sound(sound_impl* sound)
 {
-	ALint buffer = 0;
-	alCheck(alGetSourcei(_handle, AL_BUFFER, &buffer));
-	return sound_impl::native_handle_type(buffer);
+	std::lock_guard<std::mutex> lock(_sound_mtx);
+
+	if(_bound_sound == sound)
+		return;
+
+	_bound_sound = sound;
+	_bound_sound->bind_to_source(this);
+}
+
+void source_impl::unbind_sound()
+{
+	std::lock_guard<std::mutex> lock(_sound_mtx);
+
+	if(_bound_sound)
+	{
+		_bound_sound->unbind_from_source(this);
+		_bound_sound = nullptr;
+	}
 }
 }
 }

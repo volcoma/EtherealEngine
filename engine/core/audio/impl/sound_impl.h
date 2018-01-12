@@ -7,6 +7,8 @@ namespace audio
 {
 namespace priv
 {
+class source_impl;
+
 class sound_impl
 {
 public:
@@ -26,8 +28,17 @@ public:
 	native_handle_type native_handle() const;
 
 private:
+	friend class source_impl;
+
+	void bind_to_source(source_impl* source);
+	void unbind_from_source(source_impl* source);
+	void unbind_from_all_sources();
+	void cleanup();
+
 	native_handle_type _handle = 0;
 	std::size_t _id = 0;
+
+	std::vector<source_impl*> _bound_to_sources;
 };
 }
 }
