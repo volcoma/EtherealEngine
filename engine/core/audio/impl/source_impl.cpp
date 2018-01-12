@@ -46,6 +46,8 @@ bool source_impl::bind(sound_impl* sound)
 	{
 		return true;
 	}
+    
+    unbind();
 
 	bind_sound(sound);
 
