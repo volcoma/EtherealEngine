@@ -10,68 +10,120 @@ namespace audio
 {
 namespace priv
 {
-static bool has_efx(ALCdevice* dev)
+
+namespace openal
 {
-	return (alcIsExtensionPresent(dev, "ALC_EXT_EFX") == AL_TRUE); // ALC_TRUE
+static bool al_has_extension(ALCdevice* dev, const char* ext)
+{
+	return (alcIsExtensionPresent(dev, ext) == AL_TRUE); // ALC_TRUE
 }
 
-static std::string info()
+static std::vector<std::string> al_get_strings(ALCdevice* dev, ALenum e)
+{
+	std::vector<std::string> result;
+
+	const char* devices = reinterpret_cast<const char*>(alcGetString(dev, e));
+
+	while(std::string(devices).size())
+	{
+		result.push_back(devices);
+		devices += result.back().size() + 1;
+	}
+
+	return result;
+}
+
+static std::string al_version()
 {
 	std::stringstream ss;
 	if(alGetString(AL_VERSION))
-		ss << "OpenAL version: " << alGetString(AL_VERSION) << std::endl;
-	if(alGetString(AL_RENDERER))
-		ss << "OpenAL renderer: " << alGetString(AL_RENDERER) << std::endl;
-	if(alGetString(AL_VENDOR))
-		ss << "OpenAL vendor: " << alGetString(AL_VENDOR) << std::endl;
-	if(alGetString(AL_EXTENSIONS))
-		ss << "OpenAL extensions: " << alGetString(AL_EXTENSIONS) << std::endl;
+		ss << "OpenAL version: " << alGetString(AL_VERSION);
 
 	return ss.str();
+}
+
+static std::string al_vendor()
+{
+	std::stringstream ss;
+	if(alGetString(AL_VENDOR))
+		ss << "OpenAL vendor: " << alGetString(AL_VENDOR);
+
+	return ss.str();
+}
+
+static std::string al_extensions()
+{
+	std::stringstream ss;
+	if(alGetString(AL_EXTENSIONS))
+		ss << "OpenAL extensions: " << alGetString(AL_EXTENSIONS);
+
+	return ss.str();
+}
+
+static std::string alc_extensions()
+{
+	std::stringstream ss;
+	if(alcGetString(nullptr, ALC_EXTENSIONS))
+		ss << "OpenALC extensions: " << alcGetString(nullptr, ALC_EXTENSIONS);
+
+	return ss.str();
+}
 }
 
 device_impl::device_impl(int devnum)
 {
 	// device name
-	auto devices = enumerate();
-    log_info("Supported audio devices:");    
-	for(const auto& dev : devices)
+	auto playback_devices = enumerate_playback_devices();
+	log_info("Supported audio playback devices:");
+	for(const auto& dev : playback_devices)
 	{
-		log_info(dev);
+		log_info("-- " + dev);
+	}
+	auto capture_devices = enumerate_capture_devices();
+	log_info("Supported audio capture devices:");
+	for(const auto& dev : capture_devices)
+	{
+		log_info("-- " + dev);
 	}
 
-	if(devnum >= 0 && devnum < int(devices.size()))
-		_device_id = devices[std::size_t(devnum)];
+	if(devnum >= 0 && devnum < int(playback_devices.size()))
+		_device_id = playback_devices[std::size_t(devnum)];
 
 	// select device
-	_device = alcOpenDevice(_device_id.empty() ? 0 : _device_id.c_str());
+	_device = alcOpenDevice(_device_id.empty() ? nullptr : _device_id.c_str());
 
 	if(!_device)
 	{
-		log_error("Cant open audio device: " + _device_id);
+		log_error("Cant open audio playback device: " + _device_id);
 		return;
 	}
-	bool has_efx_ = has_efx(_device);
+	bool has_efx_ = openal::al_has_extension(_device, "ALC_EXT_EFX");
 
 	ALint attribs[4] = {0};
 	attribs[0] = ALC_MAX_AUXILIARY_SENDS;
 	attribs[1] = 4;
 
-	// select device
+	// create context
 	_context = alcCreateContext(_device, has_efx_ ? attribs : nullptr);
 
 	if(!_context)
 	{
-		log_error("Cant create audio context for device: " + _device_id);
+		log_error("Cant create audio context for playback device: " + _device_id);
 		return;
 	}
 	enable();
 
-	alCheck(alDistanceModel(AL_LINEAR_DISTANCE));
+	_version = openal::al_version();
+	_vendor = openal::al_vendor();
+	_extensions = openal::al_extensions();
 
-	_info = info();
+	log_info(_version);
+	log_info(_vendor);
+	// log_info(_extensions);
+	// log_info(openal::alc_extensions());
+	log_info("Using audio playback device: " + _device_id);
 
-	log_info("Using audio device: " + _device_id);
+	al_check(alDistanceModel(AL_LINEAR_DISTANCE));
 }
 
 device_impl::~device_impl()
@@ -92,12 +144,12 @@ device_impl::~device_impl()
 
 void device_impl::enable()
 {
-	alCheck(alcMakeContextCurrent(_context));
+	al_check(alcMakeContextCurrent(_context));
 }
 
 void device_impl::disable()
 {
-	alCheck(alcMakeContextCurrent(nullptr));
+	al_check(alcMakeContextCurrent(nullptr));
 }
 
 bool device_impl::is_valid() const
@@ -110,27 +162,43 @@ const std::string& device_impl::get_device_id() const
 	return _device_id;
 }
 
-const std::string& device_impl::get_info() const
+const std::string& device_impl::get_version() const
 {
-	return _info;
+	return _version;
 }
 
-std::vector<std::string> device_impl::enumerate()
+const std::string& device_impl::get_vendor() const
 {
-	std::vector<std::string> vs;
+	return _vendor;
+}
 
-	if(alcIsExtensionPresent(NULL, reinterpret_cast<const ALCchar*>("ALC_ENUMERATION_EXT")) == AL_TRUE)
+const std::string& device_impl::get_extensions() const
+{
+	return _extensions;
+}
+
+std::vector<std::string> device_impl::enumerate_capture_devices()
+{
+	bool can_enumerate = openal::al_has_extension(nullptr, "ALC_ENUMERATION_EXT");
+
+	if(can_enumerate)
 	{
-		const char* devices = reinterpret_cast<const char*>(alcGetString(NULL, ALC_ALL_DEVICES_SPECIFIER));
-
-		while(std::string(devices).size())
-		{
-			vs.push_back(devices);
-			devices += vs.back().size() + 1;
-		}
+		return openal::al_get_strings(nullptr, ALC_CAPTURE_DEVICE_SPECIFIER);
 	}
 
-	return vs;
+	return {};
+}
+
+std::vector<std::string> device_impl::enumerate_playback_devices()
+{
+	bool can_enumerate = openal::al_has_extension(nullptr, "ALC_ENUMERATION_EXT");
+
+	if(can_enumerate)
+	{
+		return openal::al_get_strings(nullptr, ALC_ALL_DEVICES_SPECIFIER);
+	}
+
+	return {};
 }
 }
 }

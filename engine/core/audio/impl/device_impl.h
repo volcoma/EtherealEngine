@@ -12,7 +12,7 @@ namespace priv
 class device_impl
 {
 public:
-	device_impl(int devnum = 0);
+	device_impl(int devnum);
 	~device_impl();
 
 	void enable();
@@ -21,15 +21,22 @@ public:
 	bool is_valid() const;
 
 	const std::string& get_device_id() const;
-	const std::string& get_info() const;
-	static std::vector<std::string> enumerate();
+	const std::string& get_version() const;
+	const std::string& get_vendor() const;
+	const std::string& get_extensions() const;
+
+	static std::vector<std::string> enumerate_playback_devices();
+	static std::vector<std::string> enumerate_capture_devices();
 
 private:
 	ALCdevice* _device = nullptr;
 	ALCcontext* _context = nullptr;
 
 	std::string _device_id;
-	std::string _info;
+
+	std::string _version;
+	std::string _vendor;
+	std::string _extensions;
 };
 }
 }

@@ -10,14 +10,14 @@ namespace audio
 namespace priv
 {
 ////////////////////////////////////////////////////////////
-void alCheckError(const char* file, unsigned int line, const char* expression)
+void al_check_error(const char* file, unsigned int line, const char* expression)
 {
 	// Get the last error
 	ALenum errorCode = alGetError();
 
 	if(errorCode != AL_NO_ERROR)
 	{
-		std::string fileString = file;
+		std::string file_string = file;
 		std::string error = "Unknown error";
 		std::string description = "No description";
 
@@ -62,7 +62,7 @@ void alCheckError(const char* file, unsigned int line, const char* expression)
 
 		// Log the error
 		log_error(std::string("An internal OpenAL call failed in ") +
-				  fileString.substr(fileString.find_last_of("\\/") + 1) + "(" + std::to_string(line) +
+				  file_string.substr(file_string.find_last_of("\\/") + 1) + "(" + std::to_string(line) +
 				  ")."
 				  "\nExpression:\n   " +
 				  expression + "\nError description:\n   " + error + "\n   " + description);

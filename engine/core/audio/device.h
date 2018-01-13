@@ -58,20 +58,44 @@ public:
 	const std::string& get_device_id() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : get_info ()
+	//  Name : get_vendor ()
 	/// <summary>
-	/// Gets additional info - version, vendor, extensions...
+	/// Gets vendor.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const std::string& get_info() const;
+	const std::string& get_vendor() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : enumerate ()
+	//  Name : get_version ()
 	/// <summary>
-	/// Enumerate all available devices on the system.
+	/// Gets get_version.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	static std::vector<std::string> enumerate();
+	const std::string& get_version() const;
+
+	//-----------------------------------------------------------------------------
+	//  Name : get_extensions ()
+	/// <summary>
+	/// Gets available extensions.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	const std::string& get_extensions() const;
+
+	//-----------------------------------------------------------------------------
+	//  Name : enumerate_playback_devices ()
+	/// <summary>
+	/// Enumerate all playback devices available on the system.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	static std::vector<std::string> enumerate_playback_devices();
+
+	//-----------------------------------------------------------------------------
+	//  Name : enumerate_capture_devices ()
+	/// <summary>
+	/// Enumerate all capture devices available on the system.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+	static std::vector<std::string> enumerate_capture_devices();
 
 private:
 	/// pimpl idiom

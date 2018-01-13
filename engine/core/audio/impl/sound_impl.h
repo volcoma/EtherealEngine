@@ -2,6 +2,7 @@
 
 #include "../sound_data.h"
 #include <AL/al.h>
+#include <mutex>
 
 namespace audio
 {
@@ -36,8 +37,8 @@ private:
 	void cleanup();
 
 	native_handle_type _handle = 0;
-	std::size_t _id = 0;
 
+	std::mutex _mutex;
 	std::vector<source_impl*> _bound_to_sources;
 };
 }

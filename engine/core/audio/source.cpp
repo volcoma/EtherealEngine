@@ -1,6 +1,5 @@
 #include "source.h"
 #include "impl/source_impl.h"
-#include "logger.h"
 
 namespace audio
 {
@@ -182,10 +181,6 @@ void source::bind(const sound& snd)
 {
 	if(is_valid())
 	{
-		if(snd.get_channels() > 1)
-		{
-			log_info("Sound is not mono. 3D Attenuation will not work.");
-		}
 		_impl->bind(snd._impl.get());
 	}
 }

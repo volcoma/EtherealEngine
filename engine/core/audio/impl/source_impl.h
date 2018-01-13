@@ -58,9 +58,8 @@ private:
 	void unbind_sound();
 
 	native_handle_type _handle = 0;
-	std::size_t _id = 0;
 
-	mutable std::mutex _sound_mtx;
+	mutable std::mutex _mutex;
 	sound_impl* _bound_sound = nullptr;
 };
 }

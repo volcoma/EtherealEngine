@@ -1,4 +1,5 @@
 #include "source_impl.h"
+#include "../logger.h"
 #include "check.h"
 #include "sound_impl.h"
 
@@ -35,7 +36,7 @@ bool source_impl::create()
 	if(_handle)
 		return true;
 
-	alCheck(alGenSources(1, &_handle));
+	al_check(alGenSources(1, &_handle));
 
 	return _handle != 0;
 }
@@ -46,15 +47,24 @@ bool source_impl::bind(sound_impl* sound)
 	{
 		return true;
 	}
-    
-    unbind();
+
+	unbind();
 
 	bind_sound(sound);
 
 	const auto buffer = sound->native_handle();
-	alCheck(alSourcei(_handle, AL_SOURCE_RELATIVE, AL_FALSE));
 
-	alCheck(alSourcei(_handle, AL_BUFFER, ALint(buffer)));
+	al_check(alSourcei(_handle, AL_SOURCE_RELATIVE, AL_FALSE));
+
+	al_check(alSourcei(_handle, AL_BUFFER, ALint(buffer)));
+
+	// optional info
+	ALint channels = 1;
+	al_check(alGetBufferi(buffer, AL_CHANNELS, &channels));
+	if(channels > 1)
+	{
+		log_info("Sound is not mono. 3D Attenuation will not work.");
+	}
 
 	return true;
 }
@@ -62,7 +72,8 @@ bool source_impl::bind(sound_impl* sound)
 void source_impl::unbind()
 {
 	stop();
-	alCheck(alSourcei(_handle, AL_BUFFER, 0));
+
+	al_check(alSourcei(_handle, AL_BUFFER, 0));
 
 	unbind_sound();
 }
@@ -74,20 +85,20 @@ void source_impl::purge()
 
 	unbind();
 
-	alCheck(alDeleteSources(1, &_handle));
+	al_check(alDeleteSources(1, &_handle));
 
 	_handle = 0;
 }
 
 void source_impl::set_playing_offset(float seconds)
 {
-	alCheck(alSourcef(_handle, AL_SEC_OFFSET, seconds));
+	al_check(alSourcef(_handle, AL_SEC_OFFSET, seconds));
 }
 
 float source_impl::get_playing_offset() const
 {
 	ALfloat seconds = 0.0f;
-	alCheck(alGetSourcef(_handle, AL_SEC_OFFSET, &seconds));
+	al_check(alGetSourcef(_handle, AL_SEC_OFFSET, &seconds));
 	return static_cast<float>(seconds);
 }
 
@@ -95,7 +106,7 @@ float source_impl::get_playing_duration() const
 {
 	sound_impl::native_handle_type buffer = 0;
 	{
-		std::lock_guard<std::mutex> lock(_sound_mtx);
+		std::lock_guard<std::mutex> lock(_mutex);
 		if(_bound_sound == nullptr)
 			return 1.0f;
 		buffer = _bound_sound->native_handle();
@@ -106,10 +117,10 @@ float source_impl::get_playing_duration() const
 	ALint bits = 1;
 	ALint frequency = 1;
 
-	alCheck(alGetBufferi(buffer, AL_SIZE, &size_in_bytes));
-	alCheck(alGetBufferi(buffer, AL_CHANNELS, &channels));
-	alCheck(alGetBufferi(buffer, AL_BITS, &bits));
-	alCheck(alGetBufferi(buffer, AL_FREQUENCY, &frequency));
+	al_check(alGetBufferi(buffer, AL_SIZE, &size_in_bytes));
+	al_check(alGetBufferi(buffer, AL_CHANNELS, &channels));
+	al_check(alGetBufferi(buffer, AL_BITS, &bits));
+	al_check(alGetBufferi(buffer, AL_FREQUENCY, &frequency));
 
 	const auto length_in_samples = (size_in_bytes * 8) / (channels * bits);
 	return float(length_in_samples) / float(frequency);
@@ -117,84 +128,83 @@ float source_impl::get_playing_duration() const
 
 void source_impl::play() const
 {
-	alCheck(alSourcePlay(_handle));
+	al_check(alSourcePlay(_handle));
 }
 
 void source_impl::stop() const
 {
-	alCheck(alSourceStop(_handle));
+	al_check(alSourceStop(_handle));
 }
 
 void source_impl::pause() const
 {
-	alCheck(alSourcePause(_handle));
+	al_check(alSourcePause(_handle));
 }
 
 bool source_impl::is_playing() const
 {
 	ALint state = AL_INITIAL;
-	alCheck(alGetSourcei(_handle, AL_SOURCE_STATE, &state));
+	al_check(alGetSourcei(_handle, AL_SOURCE_STATE, &state));
 	return (state == AL_PLAYING);
 }
 
 bool source_impl::is_paused() const
 {
 	ALint state = AL_INITIAL;
-	alCheck(alGetSourcei(_handle, AL_SOURCE_STATE, &state));
+	al_check(alGetSourcei(_handle, AL_SOURCE_STATE, &state));
 	return (state == AL_PAUSED);
 }
 
 bool source_impl::is_stopped() const
 {
 	ALint state = AL_INITIAL;
-	alCheck(alGetSourcei(_handle, AL_SOURCE_STATE, &state));
+	al_check(alGetSourcei(_handle, AL_SOURCE_STATE, &state));
 	return (state == AL_STOPPED);
 }
 
 bool source_impl::is_binded() const
 {
 	ALint buffer = 0;
-	alCheck(alGetSourcei(_handle, AL_BUFFER, &buffer));
+	al_check(alGetSourcei(_handle, AL_BUFFER, &buffer));
 	return (buffer != 0);
 }
 
 void source_impl::set_loop(bool on)
 {
-	alCheck(alSourcei(_handle, AL_LOOPING, on ? AL_TRUE : AL_FALSE));
+	al_check(alSourcei(_handle, AL_LOOPING, on ? AL_TRUE : AL_FALSE));
 }
 
 void source_impl::set_volume(float volume)
 {
-	alCheck(alSourcef(_handle, AL_GAIN, volume));
+	al_check(alSourcef(_handle, AL_GAIN, volume));
 }
 
 /* pitch, speed stretching */
 void source_impl::set_pitch(float pitch)
 {
 	// if pitch == 0.f pitch = 0.0001f;
-	alCheck(alSourcef(_handle, AL_PITCH, pitch));
+	al_check(alSourcef(_handle, AL_PITCH, pitch));
 }
 
 void source_impl::set_position(const float* position3)
 {
-	alCheck(alSourcefv(_handle, AL_POSITION, position3));
+	al_check(alSourcefv(_handle, AL_POSITION, position3));
 }
 
 void source_impl::set_velocity(const float* velocity3)
 {
-	alCheck(alSourcefv(_handle, AL_VELOCITY, velocity3));
+	al_check(alSourcefv(_handle, AL_VELOCITY, velocity3));
 }
 
 void source_impl::set_orientation(const float* direction3, const float* up3)
 {
-	// alCheck(alSourcefv(_handle, AL_DIRECTION, direction3));
 	float orientation6[] = {-direction3[0], -direction3[1], -direction3[2], up3[0], up3[1], up3[2]};
-	alCheck(alSourcefv(_handle, AL_ORIENTATION, orientation6));
+	al_check(alSourcefv(_handle, AL_ORIENTATION, orientation6));
 }
 
 void source_impl::set_volume_rolloff(float rolloff)
 {
-	alCheck(alSourcef(_handle, AL_ROLLOFF_FACTOR, rolloff));
+	al_check(alSourcef(_handle, AL_ROLLOFF_FACTOR, rolloff));
 }
 
 void source_impl::set_distance(float mind, float maxd)
@@ -202,11 +212,11 @@ void source_impl::set_distance(float mind, float maxd)
 
 	// The distance that the source will be the loudest (if the listener is
 	// closer, it won't be any louder than if they were at this distance)
-	alCheck(alSourcef(_handle, AL_REFERENCE_DISTANCE, mind));
+	al_check(alSourcef(_handle, AL_REFERENCE_DISTANCE, mind));
 
 	// The distance that the source will be the quietest (if the listener is
 	// farther, it won't be any quieter than if they were at this distance)
-	alCheck(alSourcef(_handle, AL_MAX_DISTANCE, maxd));
+	al_check(alSourcef(_handle, AL_MAX_DISTANCE, maxd));
 }
 
 bool source_impl::is_valid() const
@@ -217,7 +227,7 @@ bool source_impl::is_valid() const
 bool source_impl::is_looping() const
 {
 	ALint loop;
-	alCheck(alGetSourcei(_handle, AL_LOOPING, &loop));
+	al_check(alGetSourcei(_handle, AL_LOOPING, &loop));
 	return loop != 0;
 }
 
@@ -228,7 +238,7 @@ source_impl::native_handle_type source_impl::native_handle() const
 
 void source_impl::bind_sound(sound_impl* sound)
 {
-	std::lock_guard<std::mutex> lock(_sound_mtx);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if(_bound_sound == sound)
 		return;
@@ -239,7 +249,7 @@ void source_impl::bind_sound(sound_impl* sound)
 
 void source_impl::unbind_sound()
 {
-	std::lock_guard<std::mutex> lock(_sound_mtx);
+	std::lock_guard<std::mutex> lock(_mutex);
 
 	if(_bound_sound)
 	{

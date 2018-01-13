@@ -4,6 +4,15 @@
 namespace audio
 {
 
+namespace
+{
+static const std::string& get_empty()
+{
+	static std::string empty;
+	return empty;
+}
+}
+
 device::device(int devnum)
 	: _impl(std::make_unique<priv::device_impl>(devnum))
 {
@@ -38,23 +47,43 @@ const std::string& device::get_device_id() const
 	{
 		return _impl->get_device_id();
 	}
-	static std::string empty;
-	return empty;
-	;
+	return get_empty();
 }
 
-const std::string& device::get_info() const
+const std::string& device::get_vendor() const
 {
 	if(_impl)
 	{
-		return _impl->get_info();
+		return _impl->get_vendor();
 	}
-	static std::string empty;
-	return empty;
+	return get_empty();
 }
 
-std::vector<std::string> device::enumerate()
+const std::string& device::get_version() const
 {
-	return priv::device_impl::enumerate();
+	if(_impl)
+	{
+		return _impl->get_version();
+	}
+	return get_empty();
+}
+
+const std::string& device::get_extensions() const
+{
+	if(_impl)
+	{
+		return _impl->get_extensions();
+	}
+	return get_empty();
+}
+
+std::vector<std::string> device::enumerate_playback_devices()
+{
+	return priv::device_impl::enumerate_playback_devices();
+}
+
+std::vector<std::string> device::enumerate_capture_devices()
+{
+	return priv::device_impl::enumerate_capture_devices();
 }
 }
