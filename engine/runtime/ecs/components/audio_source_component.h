@@ -67,6 +67,7 @@ public:
 	void set_sound(asset_handle<audio::sound> sound);
 	asset_handle<audio::sound> get_sound() const;
 
+    bool has_binded_sound() const;
 private:
 	void apply_all();
 	bool is_sound_valid() const;

@@ -1,4 +1,5 @@
 #pragma once
+#include "../types.h"
 
 namespace audio
 {
@@ -8,9 +9,9 @@ class listener_impl
 {
 public:
 	void set_volume(float volume);
-	void set_position(const float* position3);
-	void set_velocity(const float* velocity3);
-	void set_orientation(const float* direction3, const float* up3);
+	void set_position(const float3& position);
+	void set_velocity(const float3& velocity);
+	void set_orientation(const float3& direction, const float3& up);
 };
 }
 }

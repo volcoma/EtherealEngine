@@ -66,7 +66,14 @@ bool source_impl::bind(sound_impl* sound)
 		log_info("Sound is not mono. 3D Attenuation will not work.");
 	}
 
-	return true;
+    return true;
+}
+
+bool source_impl::has_binded_sound() const
+{
+    ALint buffer = 0;
+    al_check(alGetSourcei(_handle, AL_BUFFER, &buffer));
+    return buffer != 0;
 }
 
 void source_impl::unbind()
@@ -104,23 +111,21 @@ float source_impl::get_playing_offset() const
 
 float source_impl::get_playing_duration() const
 {
-	sound_impl::native_handle_type buffer = 0;
-	{
-		std::lock_guard<std::mutex> lock(_mutex);
-		if(_bound_sound == nullptr)
-			return 1.0f;
-		buffer = _bound_sound->native_handle();
-	}
+    ALint buffer = 0;
+	al_check(alGetSourcei(_handle, AL_BUFFER, &buffer));
+    
+    if(buffer == 0)
+        return 0.0f;
 
 	ALint size_in_bytes = 0;
 	ALint channels = 1;
 	ALint bits = 1;
 	ALint frequency = 1;
 
-	al_check(alGetBufferi(buffer, AL_SIZE, &size_in_bytes));
-	al_check(alGetBufferi(buffer, AL_CHANNELS, &channels));
-	al_check(alGetBufferi(buffer, AL_BITS, &bits));
-	al_check(alGetBufferi(buffer, AL_FREQUENCY, &frequency));
+	al_check(alGetBufferi(ALuint(buffer), AL_SIZE, &size_in_bytes));
+	al_check(alGetBufferi(ALuint(buffer), AL_CHANNELS, &channels));
+	al_check(alGetBufferi(ALuint(buffer), AL_BITS, &bits));
+	al_check(alGetBufferi(ALuint(buffer), AL_FREQUENCY, &frequency));
 
 	const auto length_in_samples = (size_in_bytes * 8) / (channels * bits);
 	return float(length_in_samples) / float(frequency);
@@ -186,19 +191,19 @@ void source_impl::set_pitch(float pitch)
 	al_check(alSourcef(_handle, AL_PITCH, pitch));
 }
 
-void source_impl::set_position(const float* position3)
+void source_impl::set_position(const float3& position)
 {
-	al_check(alSourcefv(_handle, AL_POSITION, position3));
+	al_check(alSourcefv(_handle, AL_POSITION, position.data()));
 }
 
-void source_impl::set_velocity(const float* velocity3)
+void source_impl::set_velocity(const float3& velocity)
 {
-	al_check(alSourcefv(_handle, AL_VELOCITY, velocity3));
+	al_check(alSourcefv(_handle, AL_VELOCITY, velocity.data()));
 }
 
-void source_impl::set_orientation(const float* direction3, const float* up3)
+void source_impl::set_orientation(const float3& direction, const float3& up)
 {
-	float orientation6[] = {-direction3[0], -direction3[1], -direction3[2], up3[0], up3[1], up3[2]};
+	float orientation6[] = {-direction[0], -direction[1], -direction[2], up[0], up[1], up[2]};
 	al_check(alSourcefv(_handle, AL_ORIENTATION, orientation6));
 }
 

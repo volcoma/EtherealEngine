@@ -1,39 +1,57 @@
 #include "../logger.h"
 #include "loader.h"
+#include <algorithm>
 #include <cstring>
 namespace audio
 {
-/// Wave files have a master RIFF chunk which includes a
-/// WAVE identifier followed by sub-chunks.
-/// The data is stored in little-endian byte order.
-struct wav_header
+
+namespace detail
 {
-	//------------------
-	// RIFF Header
-	//------------------
-	/// Contains "RIFF"
-	char riff_header[4] = {0};
+template <class T>
+static void endian_swap(T* objp)
+{
+	std::uint8_t* memp = reinterpret_cast<std::uint8_t*>(objp);
+	std::reverse(memp, memp + sizeof(T));
+}
+}
+
+struct riff_header
+{
+	constexpr static const std::size_t spec_sz = 12;
+	/// Contains the letters "RIFF" in ASCII form
+	/// (0x52494646 big-endian form).
+	char header[4] = {0};
 
 	/// Size of the wav portion of the file, which follows the first 8 bytes. File size - 8
 	std::int32_t wav_size = 0;
 
-	/// Contains "WAVE"
+	/// Contains the letters "WAVE"
+	/// (0x57415645 big-endian form).
 	char wave_header[4] = {0};
+};
 
-	//------------------
-	// Format Header
-	//------------------
+struct format_header
+{
+	constexpr static const std::size_t spec_sz = 24;
+	/// Contains the letters "fmt " (includes trailing space)
+	/// (0x666d7420 big-endian form).
+	char header[4] = {0};
 
-	/// Contains "fmt " (includes trailing space)
-	char fmt_header[4] = {0};
-
-	/// Should be 16 for PCM
+	/// 16 for PCM.  This is the size of the
+	/// rest of the Subchunk which follows this number.
+	/// May be different than 16. This indicates where
+	/// the data header starts offsetted from here.
 	std::int32_t fmt_chunk_size = 0;
 
-	/// Should be 1 for PCM. 3 for IEEE Float
+	/// PCM = 1 (i.e. Linear quantization)
+	/// Values other than 1 indicate some
+	/// form of compression.
 	std::int16_t audio_format = 0;
 
+	/// Mono = 1, Stereo = 2, etc.
 	std::int16_t num_channels = 0;
+
+	/// 8000, 44100, etc.
 	std::int32_t sample_rate = 0;
 
 	/// Number of bytes per second. sample_rate * num_channels * bytes per sample
@@ -44,15 +62,70 @@ struct wav_header
 
 	/// Number of bits per sample
 	std::int16_t bit_depth = 0;
+};
+
+struct data_header
+{
+	constexpr static const std::size_t spec_sz = 8;
+	/// Contains the letters "data"
+	/// (0x64617461 big-endian form).
+	char header[4] = {0};
+
+	/// Number of bytes in data. Number of samples * num_channels * sample byte size
+	std::int32_t data_bytes = 0;
+};
+
+/// Wave files have a master RIFF chunk which includes a
+/// WAVE identifier followed by sub-chunks.
+/// All sub-headers e.g riff.header, riff.wave_header, format.header, data.header
+/// are in big-endian byte order.
+struct wav_header
+{
+	constexpr static const std::size_t spec_sz =
+		riff_header::spec_sz + format_header::spec_sz + data_header::spec_sz;
+	//------------------
+	// RIFF Header
+	//------------------
+	riff_header riff;
+
+	//------------------
+	// Format Header
+	//------------------
+	format_header format;
 
 	//------------------
 	// Data Header
 	//------------------
-	/// Contains "data"
-	char data_header[4] = {0};
-	/// Number of bytes in data. Number of samples * num_channels * sample byte size
-	std::int32_t data_bytes = 0;
+	data_header data;
 };
+
+static void convert_to_little_endian(wav_header& header)
+{
+	detail::endian_swap(header.riff.header);
+	detail::endian_swap(header.riff.wave_header);
+	detail::endian_swap(header.format.header);
+	detail::endian_swap(header.data.header);
+}
+
+static wav_header read_header(const std::uint8_t* data)
+{
+	wav_header header;
+	size_t offset = 0;
+
+	std::memcpy(&header.riff, data, riff_header::spec_sz);
+
+	offset += riff_header::spec_sz;
+
+	std::memcpy(&header.format, data + offset, format_header::spec_sz);
+
+	// data header starts after.
+	offset += sizeof(header.format.header) + sizeof(header.format.fmt_chunk_size) +
+			  size_t(header.format.fmt_chunk_size);
+
+	std::memcpy(&header.data, data + offset, data_header::spec_sz);
+
+	return header;
+}
 
 bool load_wav_from_memory(const std::uint8_t* data, std::size_t data_size, sound_data& result,
 						  std::string& err)
@@ -62,54 +135,51 @@ bool load_wav_from_memory(const std::uint8_t* data, std::size_t data_size, sound
 		err = "ERROR : No data to load from.";
 		return false;
 	}
-	if(!data_size)
+	if(!data_size || data_size <= sizeof(wav_header))
 	{
 		err = "ERROR : No data to load from.";
 		return false;
 	}
-	constexpr static const size_t WAV_BIT_DEPTH = 16;
 
-	wav_header header;
-	std::memcpy(&header, data, sizeof(wav_header));
+	wav_header header = read_header(data);
 
-	if(std::memcmp(header.riff_header, "RIFF", 4) != 0)
+	// According to the Cannonical WAVE file format
+	// all sub headers are in big-endian so we convert them to little
+	convert_to_little_endian(header);
+
+	if(std::memcmp(header.riff.header, "RIFF", 4) != 0)
 	{
 		err = "ERROR : Bad RIFF header.";
 		return false;
 	}
 
-	if(std::memcmp(header.wave_header, "WAVE", 4) != 0)
+	if(std::memcmp(header.riff.wave_header, "WAVE", 4) != 0)
 	{
 		err = "ERROR: This file is not wav format!";
 		return false;
 	}
 
-	if(std::memcmp(header.fmt_header, "fmt ", 4) != 0)
+	if(std::memcmp(header.format.header, "fmt ", 4) != 0)
 	{
 		err = "ERROR: This file is not wav format!";
 		return false;
 	}
 
-	if(std::memcmp(header.data_header, "data", 4) != 0)
+	if(std::memcmp(header.data.header, "data", 4) != 0)
 	{
 		err = "ERROR: This file is not wav format!";
 		return false;
 	}
 
-	if(header.bit_depth != WAV_BIT_DEPTH)
-	{
-		err = "ERROR: This file is not 16 bit wav format.";
-		return false;
-	}
+	result.sample_rate = std::uint32_t(header.format.sample_rate);
+	result.duration = sound_data::duration_t(sound_data::duration_t::rep(header.data.data_bytes) /
+											 sound_data::duration_t::rep(header.format.byte_rate));
 
-	result.sample_rate = std::uint32_t(header.sample_rate);
-	result.duration = sound_data::duration_t(
-		header.wav_size / (header.num_channels * header.sample_rate * (header.bit_depth / 8.0f)) * 1.0f);
+	result.data.resize(std::size_t(header.data.data_bytes));
+	result.bytes_per_sample = std::uint8_t(header.format.bit_depth) / 8;
 
-	result.data.resize(std::size_t(header.data_bytes));
-	result.bytes_per_sample = std::uint8_t(header.bit_depth) / 8;
-	std::memcpy(result.data.data(), data + sizeof(wav_header), result.data.size());
-	result.channels = std::uint32_t(header.num_channels);
+	std::memcpy(result.data.data(), data + wav_header::spec_sz, result.data.size());
+	result.channels = std::uint32_t(header.format.num_channels);
 
 	return true;
 }

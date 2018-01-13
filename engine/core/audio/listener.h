@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include "types.h"
 
 namespace audio
 {
@@ -20,7 +21,7 @@ class listener_impl;
 //-----------------------------------------------------------------------------
 class listener
 {
-public:
+public:    
 	listener();
 	~listener();
 
@@ -41,7 +42,7 @@ public:
 	/// The listener location in three dimensional space.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_position(const float* position3);
+	void set_position(const float3& position);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_velocity ()
@@ -49,7 +50,7 @@ public:
 	/// Specifies the current velocity in local space.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_velocity(const float* velocity3);
+	void set_velocity(const float3& velocity);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_orientation ()
@@ -58,7 +59,7 @@ public:
 	/// "at") and the second is the top (or "up").
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_orientation(const float* direction3, const float* up3);
+	void set_orientation(const float3& direction, const float3& up);
 
 private:
 	/// pimpl idiom

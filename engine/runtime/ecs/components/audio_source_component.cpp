@@ -3,8 +3,11 @@
 
 void audio_source_component::update(const math::transform& t)
 {
-	_source.set_position(math::value_ptr(t.get_position()));
-	_source.set_orientation(math::value_ptr(t.z_unit_axis()), math::value_ptr(t.y_unit_axis()));
+    auto pos = t.get_position();
+    auto forward = t.z_unit_axis();
+    auto up = t.y_unit_axis();
+    _source.set_position({{pos.x, pos.y, pos.z}});
+    _source.set_orientation({{forward.x, forward.y, forward.z}}, {{up.x, up.y, up.z}});
 }
 
 void audio_source_component::set_loop(bool on)
@@ -139,7 +142,12 @@ void audio_source_component::set_sound(asset_handle<audio::sound> sound)
 
 asset_handle<audio::sound> audio_source_component::get_sound() const
 {
-	return _sound;
+    return _sound;
+}
+
+bool audio_source_component::has_binded_sound() const
+{
+    return _source.has_binded_sound();
 }
 
 void audio_source_component::apply_all()

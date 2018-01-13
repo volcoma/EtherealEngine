@@ -18,27 +18,27 @@ void listener::set_volume(float volume)
 	}
 }
 
-void listener::set_position(const float* position3)
+void listener::set_position(const float3& position)
 {
 	if(_impl)
 	{
-		_impl->set_position(position3);
+		_impl->set_position(position);
 	}
 }
 
-void listener::set_velocity(const float* velocity3)
+void listener::set_velocity(const float3& velocity)
 {
 	if(_impl)
 	{
-		_impl->set_velocity(velocity3);
+		_impl->set_velocity(velocity);
 	}
 }
 
-void listener::set_orientation(const float* direction3, const float* up3)
+void listener::set_orientation(const float3& direction, const float3& up)
 {
 	if(_impl)
 	{
-		_impl->set_orientation(direction3, up3);
+		_impl->set_orientation(direction, up);
 	}
 }
 }

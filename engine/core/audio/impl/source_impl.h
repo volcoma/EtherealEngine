@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../types.h"
 #include <AL/al.h>
 #include <cstdint>
 #include <mutex>
@@ -25,15 +26,16 @@ public:
 
 	bool create();
 	bool bind(sound_impl* sound);
+    bool has_binded_sound() const;
 	void unbind();
 	void purge();
 
 	void set_loop(bool on);
 	void set_volume(float volume);
 	void set_pitch(float pitch);
-	void set_position(const float* position3);
-	void set_velocity(const float* velocity3);
-	void set_orientation(const float* direction3, const float* up3);
+	void set_position(const float3& position);
+	void set_velocity(const float3& velocity);
+	void set_orientation(const float3& direction, const float3& up);
 
 	void set_volume_rolloff(float rolloff);
 	void set_distance(float mind, float maxd);
@@ -59,7 +61,7 @@ private:
 
 	native_handle_type _handle = 0;
 
-	mutable std::mutex _mutex;
+	std::mutex _mutex;
 	sound_impl* _bound_sound = nullptr;
 };
 }

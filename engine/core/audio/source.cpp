@@ -26,7 +26,7 @@ source& source::operator=(source&& rhs)
 
 void source::play()
 {
-	if(_impl)
+	if(is_valid())
 	{
 		_impl->play();
 	}
@@ -34,7 +34,7 @@ void source::play()
 
 void source::stop()
 {
-	if(_impl)
+	if(is_valid())
 	{
 		_impl->stop();
 	}
@@ -42,7 +42,7 @@ void source::stop()
 
 void source::pause()
 {
-	if(_impl)
+	if(is_valid())
 	{
 		_impl->pause();
 	}
@@ -50,12 +50,16 @@ void source::pause()
 
 bool source::is_playing() const
 {
-	return _impl && _impl->is_playing();
+	if(is_valid())
+	{
+		return _impl->is_playing();
+	}
+	return false;
 }
 
 bool source::is_paused() const
 {
-	if(_impl)
+	if(is_valid())
 	{
 		return _impl->is_paused();
 	}
@@ -64,7 +68,7 @@ bool source::is_paused() const
 
 bool source::is_stopped() const
 {
-	if(_impl)
+	if(is_valid())
 	{
 		return _impl->is_stopped();
 	}
@@ -73,7 +77,7 @@ bool source::is_stopped() const
 
 bool source::is_looping() const
 {
-	if(_impl)
+	if(is_valid())
 	{
 		return _impl->is_looping();
 	}
@@ -82,7 +86,7 @@ bool source::is_looping() const
 
 void source::set_loop(bool on)
 {
-	if(_impl)
+	if(is_valid())
 	{
 		_impl->set_loop(on);
 	}
@@ -90,7 +94,7 @@ void source::set_loop(bool on)
 
 void source::set_volume(float volume)
 {
-	if(_impl)
+	if(is_valid())
 	{
 		_impl->set_volume(volume);
 	}
@@ -100,39 +104,39 @@ void source::set_volume(float volume)
 void source::set_pitch(float pitch)
 {
 	// if pitch == 0.f pitch = 0.0001f;
-	if(_impl)
+	if(is_valid())
 	{
 		_impl->set_pitch(pitch);
 	}
 }
 
-void source::set_position(const float* position3)
+void source::set_position(const float3& position)
 {
-	if(_impl)
+	if(is_valid())
 	{
-		_impl->set_position(position3);
+		_impl->set_position(position);
 	}
 }
 
-void source::set_velocity(const float* velocity3)
+void source::set_velocity(const float3& velocity)
 {
-	if(_impl)
+	if(is_valid())
 	{
-		_impl->set_velocity(velocity3);
+		_impl->set_velocity(velocity);
 	}
 }
 
-void source::set_orientation(const float* direction3, const float* up3)
+void source::set_orientation(const float3& direction, const float3& up)
 {
-	if(_impl)
+	if(is_valid())
 	{
-		_impl->set_orientation(direction3, up3);
+		_impl->set_orientation(direction, up);
 	}
 }
 
 void source::set_volume_rolloff(float rolloff)
 {
-	if(_impl)
+	if(is_valid())
 	{
 		_impl->set_volume_rolloff(rolloff);
 	}
@@ -140,7 +144,7 @@ void source::set_volume_rolloff(float rolloff)
 
 void source::set_distance(float mind, float maxd)
 {
-	if(_impl)
+	if(is_valid())
 	{
 		_impl->set_distance(mind, maxd);
 	}
@@ -148,7 +152,7 @@ void source::set_distance(float mind, float maxd)
 
 void source::set_playing_offset(sound_data::duration_t offset)
 {
-	if(_impl)
+	if(is_valid())
 	{
 		_impl->set_playing_offset(float(offset.count()));
 	}
@@ -156,7 +160,7 @@ void source::set_playing_offset(sound_data::duration_t offset)
 
 sound_data::duration_t source::get_playing_offset() const
 {
-	if(_impl)
+	if(is_valid())
 	{
 		return sound_data::duration_t(_impl->get_playing_offset());
 	}
@@ -165,7 +169,7 @@ sound_data::duration_t source::get_playing_offset() const
 
 sound_data::duration_t source::get_playing_duration() const
 {
-	if(_impl)
+	if(is_valid())
 	{
 		return sound_data::duration_t(_impl->get_playing_duration());
 	}
@@ -183,5 +187,15 @@ void source::bind(const sound& snd)
 	{
 		_impl->bind(snd._impl.get());
 	}
+}
+
+bool source::has_binded_sound() const
+{
+	if(is_valid())
+	{
+		return _impl->has_binded_sound();
+	}
+
+	return false;
 }
 }

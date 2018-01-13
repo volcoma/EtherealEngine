@@ -1,6 +1,7 @@
 #pragma once
 
 #include "sound.h"
+#include "types.h"
 
 namespace audio
 {
@@ -37,6 +38,14 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void bind(const sound& snd);
+    
+    //-----------------------------------------------------------------------------
+	//  Name : has_binded_sound ()
+	/// <summary>
+	/// Checks whether this source has a sound binded to it.
+	/// </summary>
+	//-----------------------------------------------------------------------------
+    bool has_binded_sound() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_loop ()
@@ -71,7 +80,7 @@ public:
 	/// The source location in three dimensional space.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_position(const float* position3);
+	void set_position(const float3& position);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_velocity ()
@@ -79,7 +88,7 @@ public:
 	/// Specifies the current velocity in local space.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_velocity(const float* velocity3);
+	void set_velocity(const float3& velocity);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_orientation ()
@@ -88,7 +97,7 @@ public:
 	/// "at") and the second is the top (or "up").
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_orientation(const float* direction3, const float* up3);
+	void set_orientation(const float3& direction, const float3& up);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_volume_rolloff ()
