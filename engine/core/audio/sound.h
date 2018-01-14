@@ -22,7 +22,7 @@ class sound_impl;
 class sound
 {
 public:
-	sound() = default;
+	sound();
 	~sound();
 	sound(sound_data&& data);
 	sound(sound&& rhs);
