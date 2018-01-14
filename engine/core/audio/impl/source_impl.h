@@ -26,7 +26,7 @@ public:
 
 	bool create();
 	bool bind(sound_impl* sound);
-    bool has_binded_sound() const;
+	bool has_binded_sound() const;
 	void unbind();
 	void purge();
 

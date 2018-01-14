@@ -247,7 +247,7 @@ void deferred_rendering::build_reflections_pass(entity_component_system& ecs, st
 				// If reflections shouldn't be rebuilt - continue.
 				should_rebuild = should_rebuild_reflections(dirty_models, probe);
 			}
-        
+
 			if(!should_rebuild)
 				return;
 
@@ -255,6 +255,7 @@ void deferred_rendering::build_reflections_pass(entity_component_system& ecs, st
 			for(std::uint32_t i = 0; i < 6; ++i)
 			{
 				auto camera = camera::get_face_camera(i, world_tranform);
+				camera.set_far_clip(reflection_probe_comp.get_probe().box_data.extents.r);
 				auto& render_view = reflection_probe_comp.get_render_view(i);
 				camera.set_viewport_size(usize(cubemap_fbo->get_size()));
 				auto& camera_lods = _lod_data[ce];

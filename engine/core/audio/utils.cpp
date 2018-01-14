@@ -7,12 +7,6 @@ namespace utils
 std::vector<std::uint8_t> convert_to_mono(const std::vector<std::uint8_t>& input,
 										  std::uint8_t bytes_per_sample)
 {
-	if(input.size() % 2 != 0)
-	{
-		log_error("Sound buffer is not complete");
-		return input;
-	}
-
 	if(bytes_per_sample > 2)
 	{
 		log_error("Sound buffer is not 8/16 bits per sample. Unsupported");
@@ -24,7 +18,7 @@ std::vector<std::uint8_t> convert_to_mono(const std::vector<std::uint8_t>& input
 
 	if(bytes_per_sample == 1)
 	{
-		for(size_t i = 0; i < input.size(); i += 2 * bytes_per_sample)
+		for(std::size_t i = 0, sz = input.size(); i < sz; i += 2 * bytes_per_sample)
 		{
 			const std::uint8_t left = input[i];
 			const std::uint8_t right = input[i + bytes_per_sample];
@@ -35,7 +29,7 @@ std::vector<std::uint8_t> convert_to_mono(const std::vector<std::uint8_t>& input
 	}
 	else if(bytes_per_sample == 2)
 	{
-		for(size_t i = 0; i < input.size(); i += 2 * bytes_per_sample)
+		for(std::size_t i = 0, sz = input.size(); i < sz; i += 2 * bytes_per_sample)
 		{
 			const std::int16_t left = *reinterpret_cast<const std::int16_t*>(&input[i]);
 			const std::int16_t right = *reinterpret_cast<const std::int16_t*>(&input[i + bytes_per_sample]);
@@ -53,12 +47,6 @@ std::vector<std::uint8_t> convert_to_mono(const std::vector<std::uint8_t>& input
 std::vector<std::uint8_t> convert_to_stereo(const std::vector<std::uint8_t>& input,
 											std::uint8_t bytes_per_sample)
 {
-	if(input.size() % 2 != 0)
-	{
-		log_error("Sound buffer is not complete");
-		return input;
-	}
-
 	if(bytes_per_sample > 2)
 	{
 		log_error("Sound buffer is not 8/16 bits per sample");
@@ -68,31 +56,18 @@ std::vector<std::uint8_t> convert_to_stereo(const std::vector<std::uint8_t>& inp
 	std::vector<std::uint8_t> output;
 	output.resize(input.size() * 2, 0);
 
-	if(bytes_per_sample == 1)
+	for(std::size_t i = 0, sz = input.size(); i < sz; i += bytes_per_sample)
 	{
-		for(size_t i = 0; i < input.size(); i += bytes_per_sample)
+		for(std::uint8_t bps = 0; bps < bytes_per_sample; ++bps)
 		{
-			const uint8_t mono_sample = input[i];
-			const size_t result_idx = i * 2;
-			output[result_idx + 0] = mono_sample;
-			output[result_idx + 1] = mono_sample;
+			const std::size_t src_idx = i + bps;
+			const std::uint8_t mono_sample = input[src_idx];
+			const std::size_t dst_idx = src_idx * 2;
+			output[dst_idx + 0] = mono_sample;
+			output[dst_idx + 1] = mono_sample;
 		}
 	}
-	else if(bytes_per_sample == 2)
-	{
-		for(size_t i = 0; i < input.size(); i += bytes_per_sample)
-		{
-			const uint8_t sample_part1 = input[i];
-			const uint8_t sample_part2 = input[i + 1];
 
-			const size_t result_idx = i * 2;
-			output[result_idx + 0] = sample_part1;
-			output[result_idx + 1] = sample_part2;
-
-			output[result_idx + 2] = sample_part1;
-			output[result_idx + 3] = sample_part2;
-		}
-	}
 	return output;
 }
 }

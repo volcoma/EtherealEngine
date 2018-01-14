@@ -38,14 +38,14 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void bind(const sound& snd);
-    
-    //-----------------------------------------------------------------------------
+
+	//-----------------------------------------------------------------------------
 	//  Name : has_binded_sound ()
 	/// <summary>
 	/// Checks whether this source has a sound binded to it.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    bool has_binded_sound() const;
+	bool has_binded_sound() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_loop ()
@@ -124,7 +124,7 @@ public:
 	/// Sets the source buffer position, in seconds.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_playing_offset(sound_data::duration_t offset);
+	void set_playing_offset(sound_info::duration_t offset);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_playing_offset ()
@@ -132,7 +132,7 @@ public:
 	/// Gets the source buffer position, in seconds.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	sound_data::duration_t get_playing_offset() const;
+	sound_info::duration_t get_playing_offset() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_playing_duration ()
@@ -140,7 +140,7 @@ public:
 	/// Gets the source buffer length, in seconds.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	sound_data::duration_t get_playing_duration() const;
+	sound_info::duration_t get_playing_duration() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : play ()
@@ -169,7 +169,7 @@ public:
 	//-----------------------------------------------------------------------------
 	//  Name : is_playing ()
 	/// <summary>
-    /// Checks whether a source is currently playing.
+	/// Checks whether a source is currently playing.
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	bool is_playing() const;
@@ -181,8 +181,8 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	bool is_paused() const;
-    
-    //-----------------------------------------------------------------------------
+
+	//-----------------------------------------------------------------------------
 	//  Name : is_stopped ()
 	/// <summary>
 	/// Checks whether a source is currently stopped.

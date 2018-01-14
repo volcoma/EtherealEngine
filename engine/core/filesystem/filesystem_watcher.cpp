@@ -148,7 +148,7 @@ public:
 
 		process_modifications(entries, created, modified);
 
-        if(entries.size() > 0 && _callback)
+		if(entries.size() > 0 && _callback)
 		{
 			_callback(entries, false);
 		}
@@ -339,12 +339,12 @@ void filesystem_watcher::start()
 			clock_t::duration sleep_time = 99999h;
 
 			// iterate through each watcher and check for modification
-            std::map<std::uint64_t, std::shared_ptr<watcher_impl>> watchers;
-            {
-                std::unique_lock<std::mutex> lock(_mutex);
-                watchers = _watchers;
-            }
-            
+			std::map<std::uint64_t, std::shared_ptr<watcher_impl>> watchers;
+			{
+				std::unique_lock<std::mutex> lock(_mutex);
+				watchers = _watchers;
+			}
+
 			for(auto& pair : watchers)
 			{
 				auto watcher = pair.second;
@@ -364,8 +364,8 @@ void filesystem_watcher::start()
 					sleep_time = std::min(sleep_time, diff);
 				}
 			}
-            
-            std::unique_lock<std::mutex> lock(_mutex);
+
+			std::unique_lock<std::mutex> lock(_mutex);
 			_cv.wait_for(lock, sleep_time);
 		}
 	});

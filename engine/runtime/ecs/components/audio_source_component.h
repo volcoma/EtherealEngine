@@ -52,9 +52,9 @@ public:
 	float get_volume_rolloff() const;
 	const frange& get_range() const;
 
-	void set_playing_offset(audio::sound_data::duration_t offset);
-	audio::sound_data::duration_t get_playing_offset() const;
-	audio::sound_data::duration_t get_playing_duration() const;
+	void set_playing_offset(audio::sound_info::duration_t offset);
+	audio::sound_info::duration_t get_playing_offset() const;
+	audio::sound_info::duration_t get_playing_duration() const;
 
 	void play();
 	void stop();
@@ -67,7 +67,8 @@ public:
 	void set_sound(asset_handle<audio::sound> sound);
 	asset_handle<audio::sound> get_sound() const;
 
-    bool has_binded_sound() const;
+	bool has_binded_sound() const;
+
 private:
 	void apply_all();
 	bool is_sound_valid() const;

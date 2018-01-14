@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sound_info.h"
 #include <chrono>
 #include <cstdint>
 #include <string>
@@ -10,10 +11,6 @@ namespace audio
 
 struct sound_data
 {
-	using duration_t = std::chrono::duration<double>;
-
-	duration_t::rep get_duration() const;
-
 	//-----------------------------------------------------------------------------
 	//  Name : convert_to_mono ()
 	/// <summary>
@@ -31,19 +28,10 @@ struct sound_data
 	//-----------------------------------------------------------------------------
 	void convert_to_stereo();
 
+	/// info about the sound
+	sound_info info;
+
 	/// data buffer of pcm sound stored in uint8_t buffer
 	std::vector<std::uint8_t> data;
-
-	/// bytes per sample
-	std::uint8_t bytes_per_sample = 2;
-
-	/// sample rate of the sound
-	std::uint32_t sample_rate = 0;
-
-	/// channel count of the sound. e.g mono/stereo
-	std::uint32_t channels = 0;
-
-	/// duration of the sound in seconds
-	duration_t duration = duration_t(0);
 };
 }

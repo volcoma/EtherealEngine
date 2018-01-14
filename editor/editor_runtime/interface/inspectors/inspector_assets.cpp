@@ -388,7 +388,7 @@ bool inspector_asset_handle_sound::inspect(rttr::variant& var, bool read_only,
 
 	if(data)
 	{
-		rttr::variant vari = data.get()->get_data();
+		rttr::variant vari = data.get()->get_info();
 		changed |= inspect_var(vari);
 	}
 	return changed;

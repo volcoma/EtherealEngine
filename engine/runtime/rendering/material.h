@@ -166,8 +166,8 @@ protected:
 	asset_handle<gfx::texture> _default_color_map;
 	/// Default normal texture
 	asset_handle<gfx::texture> _default_normal_map;
-    
-    std::vector<core::task_future<void>> _futures;
+
+	std::vector<core::task_future<void>> _futures;
 };
 
 class standard_material : public material
@@ -185,7 +185,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	standard_material();
-    ~standard_material();
+	~standard_material();
 	//-----------------------------------------------------------------------------
 	//  Name : get_base_color ()
 	/// <summary>

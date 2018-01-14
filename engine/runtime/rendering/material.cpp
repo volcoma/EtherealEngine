@@ -88,18 +88,17 @@ standard_material::standard_material()
 
 		},
 		vs_deferred_geom_skinned, fs_deferred_geom);
-    
-    _futures.emplace_back(std::move(f));
-    _futures.emplace_back(std::move(f1));
-    
+
+	_futures.emplace_back(std::move(f));
+	_futures.emplace_back(std::move(f1));
 }
 
 standard_material::~standard_material()
 {
-    for(auto& f : _futures)
-    {
-        f.wait();
-    }
+	for(auto& f : _futures)
+	{
+		f.wait();
+	}
 }
 
 void standard_material::submit()

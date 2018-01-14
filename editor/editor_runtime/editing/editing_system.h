@@ -104,8 +104,8 @@ struct editing_system
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void drop();
-    
-    void close_project();
+
+	void close_project();
 
 	/// editor camera
 	runtime::entity camera;

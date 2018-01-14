@@ -17,7 +17,7 @@ public:
 
 	sound_impl() = default;
 	~sound_impl();
-	sound_impl(const sound_data& data);
+	sound_impl(std::vector<std::uint8_t>&& buffer, const sound_info& info);
 	sound_impl(sound_impl&& rhs);
 	sound_impl& operator=(sound_impl&& rhs);
 

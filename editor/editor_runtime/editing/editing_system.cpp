@@ -96,12 +96,12 @@ void editing_system::drag(rttr::variant object, const std::string& description)
 
 void editing_system::drop()
 {
-    drag_data = {};
+	drag_data = {};
 }
 
 void editing_system::close_project()
 {
-    save_editor_camera();
+	save_editor_camera();
 	unselect();
 	scene.clear();
 }

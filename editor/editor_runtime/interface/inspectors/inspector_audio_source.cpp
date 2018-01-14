@@ -30,20 +30,20 @@ bool inspector_audio_source_component::inspect(rttr::variant& var, bool read_onl
 
 		property_layout layout("");
 
-        if(data->has_binded_sound())
-        {
-            float total_time = floorf(float(data->get_playing_duration().count()) * 100.0f) / 100.0f;
-            auto current_time = data->get_playing_offset();
-            float cur = float(current_time.count());
-            
-            if(total_time > 0.0f)
-            {
-                if(gui::SliderFloat("##playing_offset", &cur, 0.0f, total_time))
-                {
-                    data->set_playing_offset(audio::sound_data::duration_t(cur));
-                }
-            }        
-        }
+		if(data->has_binded_sound())
+		{
+			float total_time = floorf(float(data->get_playing_duration().count()) * 100.0f) / 100.0f;
+			auto current_time = data->get_playing_offset();
+			float cur = float(current_time.count());
+
+			if(total_time > 0.0f)
+			{
+				if(gui::SliderFloat("##playing_offset", &cur, 0.0f, total_time))
+				{
+					data->set_playing_offset(audio::sound_info::duration_t(cur));
+				}
+			}
+		}
 	}
 
 	return inspect_var(var, true, read_only, get_metadata);

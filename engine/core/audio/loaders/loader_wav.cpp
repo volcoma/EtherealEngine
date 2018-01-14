@@ -107,9 +107,8 @@ static void convert_to_little_endian(wav_header& header)
 	detail::endian_swap(header.data.header);
 }
 
-static wav_header read_header(const std::uint8_t* data)
+static bool read_header(wav_header& header, const std::uint8_t* data)
 {
-	wav_header header;
 	size_t offset = 0;
 
 	std::memcpy(&header.riff, data, riff_header::spec_sz);
@@ -118,13 +117,21 @@ static wav_header read_header(const std::uint8_t* data)
 
 	std::memcpy(&header.format, data + offset, format_header::spec_sz);
 
+	// here we do not use the format_header::spec_sz since some wave formats
+	// it is not
 	// data header starts after.
-	offset += sizeof(header.format.header) + sizeof(header.format.fmt_chunk_size) +
-			  size_t(header.format.fmt_chunk_size);
+	std::size_t offset_to_data = sizeof(header.format.header) + sizeof(header.format.fmt_chunk_size) +
+								 size_t(header.format.fmt_chunk_size);
+
+	if(offset_to_data < format_header::spec_sz)
+	{
+		return false;
+	}
+	offset += offset_to_data;
 
 	std::memcpy(&header.data, data + offset, data_header::spec_sz);
 
-	return header;
+	return false;
 }
 
 bool load_wav_from_memory(const std::uint8_t* data, std::size_t data_size, sound_data& result,
@@ -141,8 +148,12 @@ bool load_wav_from_memory(const std::uint8_t* data, std::size_t data_size, sound
 		return false;
 	}
 
-	wav_header header = read_header(data);
-
+	wav_header header;
+	if(read_header(header, data))
+	{
+		err = "ERROR : Incorrect wav header";
+		return false;
+	}
 	// According to the Cannonical WAVE file format
 	// all sub headers are in big-endian so we convert them to little
 	convert_to_little_endian(header);
@@ -171,15 +182,15 @@ bool load_wav_from_memory(const std::uint8_t* data, std::size_t data_size, sound
 		return false;
 	}
 
-	result.sample_rate = std::uint32_t(header.format.sample_rate);
-	result.duration = sound_data::duration_t(sound_data::duration_t::rep(header.data.data_bytes) /
-											 sound_data::duration_t::rep(header.format.byte_rate));
+	result.info.sample_rate = std::uint32_t(header.format.sample_rate);
+	result.info.duration = sound_info::duration_t(sound_info::duration_t::rep(header.data.data_bytes) /
+												  sound_info::duration_t::rep(header.format.byte_rate));
 
 	result.data.resize(std::size_t(header.data.data_bytes));
-	result.bytes_per_sample = std::uint8_t(header.format.bit_depth) / 8;
+	result.info.bytes_per_sample = std::uint8_t(header.format.bit_depth) / 8;
 
 	std::memcpy(result.data.data(), data + wav_header::spec_sz, result.data.size());
-	result.channels = std::uint32_t(header.format.num_channels);
+	result.info.channels = std::uint32_t(header.format.num_channels);
 
 	return true;
 }

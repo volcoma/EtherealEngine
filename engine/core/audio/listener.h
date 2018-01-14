@@ -1,6 +1,6 @@
 #pragma once
-#include <memory>
 #include "types.h"
+#include <memory>
 
 namespace audio
 {
@@ -21,7 +21,7 @@ class listener_impl;
 //-----------------------------------------------------------------------------
 class listener
 {
-public:    
+public:
 	listener();
 	~listener();
 

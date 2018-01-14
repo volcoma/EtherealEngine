@@ -45,7 +45,7 @@ public:
 	/// Gets the duration of the sound in seconds.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	sound_data::duration_t get_duration() const;
+	sound_info::duration_t get_duration() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_sample_rate ()
@@ -64,20 +64,20 @@ public:
 	std::uint32_t get_channels() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : get_data ()
+	//  Name : get_info ()
 	/// <summary>
-	/// Gets the sound data rate of the sound.
+	/// Gets the sound data info.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const sound_data& get_data() const;
+	const sound_info& get_info() const;
 
 private:
 	friend class source;
 
-    /// sound info
-	sound_data _data;
-    
-    /// pimpl idiom
+	/// pimpl idiom
 	std::unique_ptr<priv::sound_impl> _impl;
+
+	/// sound info
+	sound_info _info;
 };
 }

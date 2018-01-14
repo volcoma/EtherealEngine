@@ -60,24 +60,19 @@ static ALenum get_format_for_channels(std::uint32_t channels, std::uint32_t byte
 
 	return format;
 }
-
-template <typename T>
-static std::size_t get_mem_size(const T& container)
-{
-	return container.size() * sizeof(typename T::value_type);
-}
 }
 
-sound_impl::sound_impl(const sound_data& data)
+sound_impl::sound_impl(std::vector<std::uint8_t>&& buffer, const sound_info& info)
 {
-	if(data.data.empty())
+	if(buffer.empty())
 		return;
 
-	ALenum format = detail::get_format_for_channels(data.channels, data.bytes_per_sample);
+	ALenum format = detail::get_format_for_channels(info.channels, info.bytes_per_sample);
 
 	al_check(alGenBuffers(1, &_handle));
-	al_check(alBufferData(_handle, format, data.data.data(), ALsizei(detail::get_mem_size(data.data)),
-						  ALsizei(data.sample_rate)));
+	al_check(alBufferData(_handle, format, buffer.data(), ALsizei(buffer.size()), ALsizei(info.sample_rate)));
+
+	buffer.clear();
 }
 
 sound_impl::sound_impl(sound_impl&& rhs)

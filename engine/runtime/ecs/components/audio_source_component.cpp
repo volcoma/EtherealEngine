@@ -3,11 +3,11 @@
 
 void audio_source_component::update(const math::transform& t)
 {
-    auto pos = t.get_position();
-    auto forward = t.z_unit_axis();
-    auto up = t.y_unit_axis();
-    _source.set_position({{pos.x, pos.y, pos.z}});
-    _source.set_orientation({{forward.x, forward.y, forward.z}}, {{up.x, up.y, up.z}});
+	auto pos = t.get_position();
+	auto forward = t.z_unit_axis();
+	auto up = t.y_unit_axis();
+	_source.set_position({{pos.x, pos.y, pos.z}});
+	_source.set_orientation({{forward.x, forward.y, forward.z}}, {{up.x, up.y, up.z}});
 }
 
 void audio_source_component::set_loop(bool on)
@@ -82,17 +82,17 @@ const frange& audio_source_component::get_range() const
 	return _range;
 }
 
-void audio_source_component::set_playing_offset(audio::sound_data::duration_t offset)
+void audio_source_component::set_playing_offset(audio::sound_info::duration_t offset)
 {
 	_source.set_playing_offset(offset);
 }
 
-audio::sound_data::duration_t audio_source_component::get_playing_offset() const
+audio::sound_info::duration_t audio_source_component::get_playing_offset() const
 {
 	return _source.get_playing_offset();
 }
 
-audio::sound_data::duration_t audio_source_component::get_playing_duration() const
+audio::sound_info::duration_t audio_source_component::get_playing_duration() const
 {
 	return _source.get_playing_duration();
 }
@@ -142,12 +142,12 @@ void audio_source_component::set_sound(asset_handle<audio::sound> sound)
 
 asset_handle<audio::sound> audio_source_component::get_sound() const
 {
-    return _sound;
+	return _sound;
 }
 
 bool audio_source_component::has_binded_sound() const
 {
-    return _source.has_binded_sound();
+	return _source.has_binded_sound();
 }
 
 void audio_source_component::apply_all()

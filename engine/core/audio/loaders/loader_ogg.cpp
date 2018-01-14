@@ -5,7 +5,8 @@
 namespace audio
 {
 
-bool load_ogg_from_memory(const uint8_t* data, std::size_t data_size, sound_data& result, std::string& err)
+bool load_ogg_from_memory(const std::uint8_t* data, std::size_t data_size, sound_data& result,
+						  std::string& err)
 {
 	if(!data)
 	{
@@ -28,17 +29,18 @@ bool load_ogg_from_memory(const uint8_t* data, std::size_t data_size, sound_data
 		return false;
 	}
 	stb_vorbis_info info = stb_vorbis_get_info(oss);
-	result.channels = static_cast<std::uint32_t>(info.channels);
-	result.sample_rate = info.sample_rate;
-	result.bytes_per_sample = sizeof(std::int16_t);
+	result.info.channels = std::uint32_t(info.channels);
+	result.info.sample_rate = info.sample_rate;
+	result.info.bytes_per_sample = sizeof(std::int16_t);
 
 	auto stream_len_in_samples = std::size_t(stb_vorbis_stream_length_in_samples(oss));
 
-	std::size_t data_bytes = (stream_len_in_samples * std::size_t(info.channels)) * result.bytes_per_sample;
+	std::size_t data_bytes =
+		(stream_len_in_samples * std::size_t(info.channels)) * result.info.bytes_per_sample;
 
 	float seconds = stb_vorbis_stream_length_in_seconds(oss);
 
-	result.duration = sound_data::duration_t(seconds);
+	result.info.duration = sound_info::duration_t(seconds);
 	result.data.resize(data_bytes, 0);
 
 	stb_vorbis_get_samples_short_interleaved(

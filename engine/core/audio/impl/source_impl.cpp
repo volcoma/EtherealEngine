@@ -66,14 +66,14 @@ bool source_impl::bind(sound_impl* sound)
 		log_info("Sound is not mono. 3D Attenuation will not work.");
 	}
 
-    return true;
+	return true;
 }
 
 bool source_impl::has_binded_sound() const
 {
-    ALint buffer = 0;
-    al_check(alGetSourcei(_handle, AL_BUFFER, &buffer));
-    return buffer != 0;
+	ALint buffer = 0;
+	al_check(alGetSourcei(_handle, AL_BUFFER, &buffer));
+	return buffer != 0;
 }
 
 void source_impl::unbind()
@@ -111,11 +111,11 @@ float source_impl::get_playing_offset() const
 
 float source_impl::get_playing_duration() const
 {
-    ALint buffer = 0;
+	ALint buffer = 0;
 	al_check(alGetSourcei(_handle, AL_BUFFER, &buffer));
-    
-    if(buffer == 0)
-        return 0.0f;
+
+	if(buffer == 0)
+		return 0.0f;
 
 	ALint size_in_bytes = 0;
 	ALint channels = 1;

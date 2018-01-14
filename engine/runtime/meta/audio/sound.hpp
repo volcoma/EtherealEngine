@@ -4,7 +4,9 @@
 #include "core/serialization/serialization.h"
 namespace audio
 {
-REFLECT_EXTERN(sound_data);
+REFLECT_EXTERN(sound_info);
+SAVE_EXTERN(sound_info);
+LOAD_EXTERN(sound_info);
 SAVE_EXTERN(sound_data);
 LOAD_EXTERN(sound_data);
 }

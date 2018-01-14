@@ -1,11 +1,11 @@
 #pragma once
 
 #include "filesystem.h"
+#include <atomic>
 #include <mutex>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <atomic>
 
 namespace fs
 {

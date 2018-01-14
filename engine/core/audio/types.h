@@ -1,12 +1,10 @@
 #pragma once
 
-#include <cstdint>
 #include <array>
+#include <cstdint>
 
 namespace audio
 {
 
 using float3 = std::array<float, 3>;
-
-
 }
