@@ -61,6 +61,8 @@ private:
 
 	native_handle_type _handle = 0;
 
+    /// openal doesn't let us destroy sounds that are
+    /// binded, so we have to keep this bookkeeping
 	std::mutex _mutex;
 	sound_impl* _bound_sound = nullptr;
 };

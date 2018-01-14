@@ -15,7 +15,7 @@ class sound_impl
 public:
 	using native_handle_type = ALuint;
 
-	sound_impl() = default;
+	sound_impl();
 	~sound_impl();
 	sound_impl(std::vector<std::uint8_t>&& buffer, const sound_info& info);
 	sound_impl(sound_impl&& rhs);
@@ -38,6 +38,8 @@ private:
 
 	native_handle_type _handle = 0;
 
+    /// openal doesn't let us destroy sounds that are
+    /// binded, so we have to keep this bookkeeping
 	std::mutex _mutex;
 	std::vector<source_impl*> _bound_to_sources;
 };

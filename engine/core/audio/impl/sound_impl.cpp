@@ -89,6 +89,8 @@ sound_impl& sound_impl::operator=(sound_impl&& rhs)
 	return *this;
 }
 
+sound_impl::sound_impl() = default;
+
 sound_impl::~sound_impl()
 {
 	unbind_from_all_sources();
