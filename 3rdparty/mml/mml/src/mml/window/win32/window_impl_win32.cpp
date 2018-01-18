@@ -148,7 +148,7 @@ _last_size        ({mode.width, mode.height}),
 _resizing        (false),
 _surrogate       (0),
 _mouse_inside     (false),
-_fullscreen      (style & style::fullscreen),
+_fullscreen      ((style & style::fullscreen) != 0),
 _cursor_grabbed   (_fullscreen)
 {
     // Set that this process is DPI aware and can handle DPI scaling

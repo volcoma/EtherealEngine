@@ -156,7 +156,7 @@ void frustum::recompute_points()
 {
 
 	// Compute the 8 corner points
-	for(int i = 0; i < 8; ++i)
+	for(std::size_t i = 0; i < 8; ++i)
 	{
 		const plane& p0 =
 			plane::normalize((i & 1) ? planes[volume_plane::near_plane] : planes[volume_plane::far_plane]);
@@ -276,7 +276,7 @@ volume_query frustum::classify_aabb(const bbox& AABB, unsigned int& FrustumBits,
 	volume_query Result = volume_query::inside;
 	if(LastOutside >= 0 && (((FrustumBits >> LastOutside) & 0x1) == 0x0))
 	{
-		const plane& plane = planes[LastOutside];
+		const plane& plane = planes[size_t(LastOutside)];
 
 		// Calculate near / far extreme points
 		if(plane.data.x > 0.0f)
@@ -337,7 +337,7 @@ volume_query frustum::classify_aabb(const bbox& AABB, unsigned int& FrustumBits,
 
 		// If 'last outside plane' index was specified, skip if it matches the plane
 		// index
-		if(LastOutside >= 0 && LastOutside == (int)i)
+		if(LastOutside >= 0 && LastOutside == int(i))
 			continue;
 
 		// Calculate near / far extreme points
@@ -380,7 +380,7 @@ volume_query frustum::classify_aabb(const bbox& AABB, unsigned int& FrustumBits,
 		if(plane::dot_coord(plane, NearPoint) > 0.0f)
 		{
 			// Update the 'last outside' index and return.
-			LastOutside = (int)i;
+			LastOutside = int(i);
 			return volume_query::outside;
 
 		} // End if outside frustum plane
@@ -711,7 +711,7 @@ bool frustum::test_point(const vec3& vecPoint) const
 //-----------------------------------------------------------------------------
 bool frustum::test_line(const vec3& v1, const vec3& v2) const
 {
-	unsigned int nCode1 = 0, nCode2 = 0;
+	int nCode1 = 0, nCode2 = 0;
 	float fDist1, fDist2, t;
 	int nSide1, nSide2;
 	vec3 vDir, vIntersect;

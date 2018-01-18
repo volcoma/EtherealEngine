@@ -154,7 +154,7 @@ private:
 	///
 	mutable std::atomic_bool _should_refresh = {true};
 	///
-	mutable std::uint64_t _watch_id = 0;
+	std::uint64_t _watch_id = 0;
 };
 
 using directory_cache = cache<directory_iterator>;

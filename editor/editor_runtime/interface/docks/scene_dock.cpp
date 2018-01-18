@@ -73,11 +73,12 @@ static void resource_bar(const char* _name, const char* _tooltip, uint32_t _num,
 	}
 }
 
-void show_statistics(const unsigned int fps)
+void show_statistics(const ImVec2& area, const unsigned int fps)
 {
 	ImVec2 pos = gui::GetCursorScreenPos();
 	gui::SetNextWindowPos(pos);
 	gui::SetNextWindowCollapsed(true, ImGuiCond_FirstUseEver);
+    gui::SetNextWindowSizeConstraints(ImVec2(0, 0), area - gui::GetStyle().WindowPadding);
 	gui::Begin("STATISTICS", nullptr,
 			   ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
 
@@ -95,7 +96,7 @@ void show_statistics(const unsigned int fps)
 		gui::Text("Submit CPU %0.3f, GPU %0.3f", double(stats->cpuTimeEnd - stats->cpuTimeBegin) * to_cpu_ms,
 				  double(stats->gpuTimeEnd - stats->gpuTimeBegin) * to_gpu_ms);
 		gui::Text("GPU driver latency: %d", stats->maxGpuLatency);
-		if(-INT64_MAX != stats->gpuMemoryUsed)
+		if(-std::numeric_limits<std::int64_t>::max() != stats->gpuMemoryUsed)
 		{
 			char tmp0[64];
 			bx::prettify(tmp0, 64, uint64_t(stats->gpuMemoryUsed));
@@ -494,7 +495,7 @@ void handle_camera_movement()
 	}
 }
 
-void scene_dock::render(const ImVec2&)
+void scene_dock::render(const ImVec2& area)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	auto& renderer = core::get_subsystem<runtime::renderer>();
@@ -509,10 +510,9 @@ void scene_dock::render(const ImVec2&)
 
 	bool has_edit_camera = editor_camera && editor_camera.has_component<camera_component>() &&
 						   editor_camera.has_component<transform_component>();
+	show_statistics(area, sim.get_fps());
 
-	show_statistics(sim.get_fps());
-
-	if(!has_edit_camera)
+    if(!has_edit_camera)
 		return;
 
 	auto size = gui::GetContentRegionAvail();
