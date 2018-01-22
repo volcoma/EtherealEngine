@@ -213,8 +213,6 @@ void imgui_set_context(ImGuiContext* context)
 	{
 		std::memcpy(&context->Style, &last_context->Style, sizeof(ImGuiStyle));
 		std::memcpy(&context->IO.KeyMap, &last_context->IO.KeyMap, sizeof(last_context->IO.KeyMap));
-		std::memcpy(&context->MouseCursorData, &last_context->MouseCursorData,
-					sizeof(context->MouseCursorData));
 		context->IO.IniFilename = last_context->IO.IniFilename;
 		context->IO.FontAllowUserScaling = last_context->IO.FontAllowUserScaling;
 		context->IO.RenderDrawListsFn = last_context->IO.RenderDrawListsFn;

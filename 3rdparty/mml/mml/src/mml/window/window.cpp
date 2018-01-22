@@ -17,7 +17,7 @@ namespace mml
 ////////////////////////////////////////////////////////////
 window::window() :
 _impl          (NULL),
-_size          ({0, 0}),
+_size          ({{0, 0}}),
 _visible(false)
 {
 
@@ -27,7 +27,7 @@ _visible(false)
 ////////////////////////////////////////////////////////////
 window::window(video_mode mode, const std::string& title, std::uint32_t style) :
 _impl          (NULL),
-_size          ({0, 0}),
+_size          ({{0, 0}}),
 _visible(true)
 {
     create(mode, title, style);
@@ -37,7 +37,7 @@ _visible(true)
 ////////////////////////////////////////////////////////////
 window::window(window_handle handle) :
 _impl          (NULL),
-_size          ({0, 0}),
+_size          ({{0, 0}}),
 _visible(true)
 {
     create(handle);
@@ -356,7 +356,7 @@ bool window::filter_event(const platform_event& event)
         if(_size[0] != event.size.width || _size[1] != event.size.height)
         {
             // Cache the new size
-            _size = { event.size.width, event.size.height };
+            _size = { {event.size.width, event.size.height} };
     
             // Notify the derived class
             on_resize();

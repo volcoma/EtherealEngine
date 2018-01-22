@@ -21,7 +21,6 @@
 
 namespace mml
 {
-class WindowListener;
 
 namespace priv
 {

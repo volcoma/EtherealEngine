@@ -5,11 +5,12 @@
 #include "core/graphics/render_pass.h"
 #include "core/logging/logging.h"
 #include "core/string_utils/string_utils.h"
+#include <algorithm>
 #include <cstdarg>
 
 namespace runtime
 {
-renderer::renderer(cmd_line::options_parser& parser)
+renderer::renderer(cmd_line::parser& parser)
 {
 	on_platform_events.connect(this, &renderer::platform_events);
 	on_frame_end.connect(this, &renderer::frame_end);
@@ -106,11 +107,9 @@ void renderer::show_all_secondary_windows()
 
 void renderer::process_pending_windows()
 {
-	for(auto& window : _windows_pending_addition)
-	{
-		_windows.emplace_back(std::move(window));
-	}
-	_windows_pending_addition.clear();
+	std::move(std::begin(_windows_pending_addition), std::end(_windows_pending_addition),
+			  std::back_inserter(_windows));
+    _windows_pending_addition.clear();
 }
 
 void renderer::platform_events(const std::pair<std::uint32_t, bool>& info,
@@ -130,7 +129,7 @@ void renderer::platform_events(const std::pair<std::uint32_t, bool>& info,
 	}
 }
 
-bool renderer::init_backend(cmd_line::options_parser& parser)
+bool renderer::init_backend(cmd_line::parser& parser)
 {
 
 	mml::video_mode desktop = mml::video_mode::get_desktop_mode();
@@ -149,21 +148,26 @@ bool renderer::init_backend(cmd_line::options_parser& parser)
 
 	gfx::set_platform_data(pd);
 
-	auto preferred_renderer = parser["renderer"].as<std::string>();
 	// auto detect
 	auto preferred_renderer_type = gfx::renderer_type::Count;
-	if(preferred_renderer == "opengl")
+
+	std::string preferred_renderer;
+	if(parser.try_get("renderer", preferred_renderer))
 	{
-		preferred_renderer_type = gfx::renderer_type::OpenGL;
+		if(preferred_renderer == "opengl")
+		{
+			preferred_renderer_type = gfx::renderer_type::OpenGL;
+		}
+		else if(preferred_renderer == "directx11")
+		{
+			preferred_renderer_type = gfx::renderer_type::Direct3D11;
+		}
+		else if(preferred_renderer == "directx12")
+		{
+			preferred_renderer_type = gfx::renderer_type::Direct3D12;
+		}
 	}
-	else if(preferred_renderer == "directx11")
-	{
-		preferred_renderer_type = gfx::renderer_type::Direct3D11;
-	}
-	else if(preferred_renderer == "directx12")
-	{
-		preferred_renderer_type = gfx::renderer_type::Direct3D12;
-	}
+
 	if(!gfx::init(preferred_renderer_type))
 	{
 		APPLOG_ERROR("Could not initialize rendering backend!");

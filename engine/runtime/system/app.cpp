@@ -21,7 +21,7 @@
 namespace runtime
 {
 
-void app::setup(cmd_line::options_parser& parser)
+void app::setup(cmd_line::parser& parser)
 {
 	auto logging_container = logging::get_mutable_logging_container();
 	logging_container->add_sink(std::make_shared<logging::sinks::platform_sink_mt>());
@@ -40,15 +40,11 @@ void app::setup(cmd_line::options_parser& parser)
 
 	ecs::set_frame_getter([]() { return core::get_subsystem<core::simulation>().get_frame(); });
 
-	{
-		auto value = cmd_line::value<std::string>();
-		value->default_value("auto");
-		parser.add_option("renderer", "r", "renderer", "Select preferred renderer.", value,
-						  "Select preferred renderer.");
-	}
+    
+    parser.set_optional<std::string>("r", "renderer", "auto", "Select preferred renderer.");
 }
 
-void app::start(cmd_line::options_parser& parser)
+void app::start(cmd_line::parser& parser)
 {
 	core::add_subsystem<core::simulation>();
 	core::add_subsystem<core::task_system>();
@@ -146,23 +142,18 @@ int app::run(int argc, char* argv[])
 {
 	core::details::initialize();
 
-	cmd_line::options_parser parser(argv[0]);
-
+	cmd_line::parser parser(argc, argv);    
+    
 	setup(parser);
 	if(_exitcode != 0)
 	{
 		core::details::dispose();
 		return _exitcode;
 	}
-	parser.help();
-	try
-	{
-		parser.parse(argc, argv);
-	}
-	catch(const cmd_line::option_exception& e)
-	{
-		APPLOG_ERROR(e.what());
-	}
+	
+    parser.enable_help();
+    parser.run();
+
 	start(parser);
 	if(_exitcode != 0)
 	{

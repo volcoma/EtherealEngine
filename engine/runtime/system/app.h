@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/cmd_line/args.h"
+#include "core/cmd_line/parser.hpp"
 #include "core/system/subsystem.h"
 
 namespace runtime
@@ -16,14 +16,14 @@ struct app
 	/// </summary>
 	//-----------------------------------------------------------------------------
 
-	virtual void setup(cmd_line::options_parser& parser);
+	virtual void setup(cmd_line::parser& parser);
 	//-----------------------------------------------------------------------------
 	//  Name : start (virtual )
 	/// <summary>
 	///  setup after engine initialization and before running the main loop
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void start(cmd_line::options_parser& parser);
+	virtual void start(cmd_line::parser& parser);
 
 	//-----------------------------------------------------------------------------
 	//  Name : stop (virtual )

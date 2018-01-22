@@ -408,14 +408,14 @@ void app::draw_toolbar()
 
 //-----------------------------------------------------------------------------
 
-void app::setup(cmd_line::options_parser& parser)
+void app::setup(cmd_line::parser& parser)
 {
 	runtime::app::setup(parser);
 
 	runtime::on_frame_update.connect(this, &editor::app::draw_docks);
 }
 
-void app::start(cmd_line::options_parser& parser)
+void app::start(cmd_line::parser& parser)
 {
 	auto logging_container = logging::get_mutable_logging_container();
 

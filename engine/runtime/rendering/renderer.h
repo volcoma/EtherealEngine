@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/cmd_line/args.h"
+#include "core/cmd_line/parser.hpp"
 #include "render_window.h"
 #include <memory>
 #include <vector>
@@ -9,7 +9,7 @@ namespace runtime
 {
 struct renderer
 {
-	renderer(cmd_line::options_parser& parser);
+	renderer(cmd_line::parser& parser);
 	~renderer();
 
 	//-----------------------------------------------------------------------------
@@ -20,7 +20,7 @@ struct renderer
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool init_backend(cmd_line::options_parser& parser);
+	bool init_backend(cmd_line::parser& parser);
 
 	//-----------------------------------------------------------------------------
 	//  Name : frame_end ()

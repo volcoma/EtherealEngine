@@ -739,10 +739,9 @@ void submit(view_id _id, program_handle _handle, indirect_buffer_handle _indirec
 	bgfx::submit(_id, _handle, _indirectHandle, _start, _num, _depth, _preserveState);
 }
 
-void set_image(uint8_t _stage, uniform_handle _sampler, texture_handle _handle, uint8_t _mip, access _access,
-			   texture_format _format)
+void set_image(uint8_t _stage, texture_handle _handle, uint8_t _mip, access _access, texture_format _format)
 {
-	bgfx::setImage(_stage, _sampler, _handle, _mip, _access, _format);
+	bgfx::setImage(_stage, _handle, _mip, _access, _format);
 }
 
 void set_buffer(uint8_t _stage, index_buffer_handle _handle, access _access)
