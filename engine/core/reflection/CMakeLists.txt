@@ -1,5 +1,3 @@
-file(GLOB_RECURSE libsrc *.h *.cpp *.hpp *.c *.cc)
-
-add_library (reflection ${libsrc})
-
-target_link_libraries(reflection PUBLIC rttr_core_lib)
+add_library(reflection INTERFACE)
+target_link_libraries(reflection INTERFACE rttr_core_lib)
+target_add_ide_support(reflection)

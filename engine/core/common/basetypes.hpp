@@ -168,9 +168,8 @@ template <typename T>
 struct point
 {
 	using value_type = T;
-	point()
-	{
-	}
+	point() = default;
+
 	point(T _x, T _y)
 		: x(_x)
 		, y(_y)
@@ -201,9 +200,7 @@ template <typename T>
 struct rect
 {
 	using value_type = T;
-	rect()
-	{
-	}
+	rect() = default;
 	rect(T _left, T _top, T _right, T _bottom)
 		: left(_left)
 		, top(_top)
@@ -241,12 +238,34 @@ struct rect
 		return {left + width() / 2, top + height() / 2};
 	}
 
+    template <typename T1 = T>
+	inline point<T1> tl() const
+	{
+		return {left, top};
+	}
+    template <typename T1 = T>
+	inline point<T1> tr() const
+	{
+		return {right, top};
+	}
+    
+    template <typename T1 = T>
+	inline point<T1> bl() const
+	{
+		return {left, bottom};
+	}
+    template <typename T1 = T>
+	inline point<T1> br() const
+	{
+		return {right, bottom};
+	}
+    
 	inline bool contains(const point<T>& p) const
 	{
 		return (p.x >= left && p.x <= right && p.y >= top && p.y <= bottom);
 	}
 
-	static rect intersect(const rect& a, const rect& b)
+	inline static rect intersect(const rect& a, const rect& b)
 	{
 		rect c(std::max(a.left, b.left), std::max(a.top, b.top), std::min(a.right, b.right),
 			   std::min(a.bottom, b.bottom));
@@ -319,7 +338,7 @@ struct rect
 		return false;
 	}
 
-	static rect inflate(const rect& rc, T x, T y)
+	inline static rect inflate(const rect& rc, T x, T y)
 	{
 		return rect(rc.left - x, rc.top - y, rc.right + x, rc.bottom + y);
 	}

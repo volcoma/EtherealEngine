@@ -32,16 +32,25 @@ matrix:
         - COMPILERCXX='g++-5'
         - COMPILERC='gcc-5'
 
-#    - os: linux
-#      compiler: gcc
-#      addons: &gcc6
-#        apt:
-#          sources: ['ubuntu-toolchain-r-test']
-#          packages: ['g++-6', 'cmake', 'cmake-data']
-#      env:
-#        - COMPILERCXX='g++-5'
-#        - COMPILERC='gcc-5'
-   
+    - os: linux
+      compiler: gcc
+      addons: &gcc6
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['g++-6', 'cmake', 'cmake-data']
+      env:
+        - COMPILERCXX='g++-6'
+        - COMPILERC='gcc-6'
+        
+    - os: linux
+      compiler: gcc
+      addons: &gcc7
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['g++-7', 'cmake', 'cmake-data']
+      env:
+        - COMPILERCXX='g++-7'
+        - COMPILERC='gcc-7'
    
 
 before_install:

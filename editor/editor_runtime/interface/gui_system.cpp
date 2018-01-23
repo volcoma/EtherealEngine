@@ -175,8 +175,6 @@ const mml::cursor* map_cursor(ImGuiMouseCursor cursor)
 	static std::map<ImGuiMouseCursor_, mml::cursor::type> cursor_map = {
 		{ImGuiMouseCursor_Arrow, mml::cursor::arrow},
 		{ImGuiMouseCursor_Move, mml::cursor::hand},
-		//{ImGuiMouseCursor_NotAllowed, mml::cursor::not_allowed},
-		//{ImGuiMouseCursor_Help, mml::cursor::help},
 		{ImGuiMouseCursor_TextInput, mml::cursor::text},
 		{ImGuiMouseCursor_ResizeNS, mml::cursor::size_vertical},
 		{ImGuiMouseCursor_ResizeEW, mml::cursor::size_horizontal},
