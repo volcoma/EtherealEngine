@@ -53,7 +53,7 @@ matrix:
         - COMPILERC='gcc-7'
    
 allow_failures:
-    env:
+    - env:
         - COMPILERCXX='g++-7'
         - COMPILERC='gcc-7'
 
