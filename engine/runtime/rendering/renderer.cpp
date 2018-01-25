@@ -158,6 +158,10 @@ bool renderer::init_backend(cmd_line::parser& parser)
 		{
 			preferred_renderer_type = gfx::renderer_type::OpenGL;
 		}
+        else if(preferred_renderer == "vulkan")
+		{
+			preferred_renderer_type = gfx::renderer_type::Vulkan;
+		}
 		else if(preferred_renderer == "directx11")
 		{
 			preferred_renderer_type = gfx::renderer_type::Direct3D11;

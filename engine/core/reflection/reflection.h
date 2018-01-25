@@ -20,15 +20,26 @@
 #define ANONYMOUS_VARIABLE(str) CAT_(str, __LINE__)
 #endif
 
+namespace refl_detail
+{
+template <typename T>
+inline int get_reg(void (*f)())
+{
+	static const int s = [&f]() {
+		f();
+		return 0;
+	}();
+	return s;
+}
+}
+
 #define REFLECT_INLINE(cls)                                                                                  \
 	template <typename T>                                                                                    \
 	extern void rttr_auto_register_reflection_function_t();                                                  \
 	template <>                                                                                              \
 	void rttr_auto_register_reflection_function_t<cls>();                                                    \
-	static const int ANONYMOUS_VARIABLE(auto_register__) = []() {                                            \
-		rttr_auto_register_reflection_function_t<cls>();                                                     \
-		return 0;                                                                                            \
-	}();                                                                                                     \
+	static const int ANONYMOUS_VARIABLE(auto_register__) =                                                   \
+		refl_detail::get_reg<cls>(&rttr_auto_register_reflection_function_t<cls>);                           \
 	template <>                                                                                              \
 	inline void rttr_auto_register_reflection_function_t<cls>()
 
@@ -37,10 +48,8 @@
 	extern void rttr_auto_register_reflection_function_t();                                                  \
 	template <>                                                                                              \
 	void rttr_auto_register_reflection_function_t<cls>();                                                    \
-	static const int ANONYMOUS_VARIABLE(auto_register__) = []() {                                            \
-		rttr_auto_register_reflection_function_t<cls>();                                                     \
-		return 0;                                                                                            \
-	}();
+	static const int ANONYMOUS_VARIABLE(auto_register__) =                                                   \
+		refl_detail::get_reg<cls>(&rttr_auto_register_reflection_function_t<cls>);
 
 #define REFLECT(cls)                                                                                         \
 	template <>                                                                                              \

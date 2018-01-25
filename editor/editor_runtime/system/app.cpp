@@ -434,6 +434,8 @@ void app::start(cmd_line::parser& parser)
 
 	auto& rend = core::get_subsystem<runtime::renderer>();
 	auto& main_window = rend.get_main_window();
+    
+    main_window->set_title("Ethereal");
 
 	_console_dock_name = "CONSOLE";
 	auto scene = std::make_unique<scene_dock>("SCENE", true, ImVec2(200.0f, 200.0f));
