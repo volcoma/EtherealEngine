@@ -808,7 +808,7 @@ public:
 	};
 
 	template <typename... Components>
-	void for_each(typename identity<std::function<void(entity entity, Components&...)>>::type f)
+	void for_each(typename identity<std::function<void(entity e, Components&...)>>::type f)
 	{
 		return entities_with_components<Components...>().for_each(f);
 	}
@@ -957,7 +957,7 @@ private:
 		if(!component_pools_[family])
 		{
 
-			component_pools_[family].reset(new component_storage);
+			component_pools_[family].reset(new component_storage());
 			component_pools_[family]->expand(index_counter_);
 		}
 

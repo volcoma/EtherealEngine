@@ -548,7 +548,7 @@ protected:
 	//-------------------------------------------------------------------------
 	/// Parent object.
 	runtime::entity _parent;
-	/// Children object.
+	/// Children objects.
 	std::vector<runtime::entity> _children;
 	/// Local transformation relative to the parent
 	math::transform _local_transform;

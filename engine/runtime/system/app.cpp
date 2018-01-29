@@ -42,6 +42,7 @@ void app::setup(cmd_line::parser& parser)
 	ecs::set_frame_getter([]() { return core::get_subsystem<core::simulation>().get_frame(); });
 
 	parser.set_optional<std::string>("r", "renderer", "auto", "Select preferred renderer.");
+    parser.set_optional<bool>("n", "novsync", false, "Disable vsync.");  
 }
 
 void app::start(cmd_line::parser& parser)
@@ -151,14 +152,21 @@ int app::run(int argc, char* argv[])
 		return _exitcode;
 	}
 
-	parser.enable_help();
-
 	std::stringstream out, err;
 	if(!parser.run(out, err))
 	{
-		APPLOG_ERROR(out.str());
+        auto parse_error = out.str();
+        if(parse_error.empty())
+        {
+            parse_error = "Failed to parse command line.";
+        }
+		APPLOG_ERROR(parse_error);
 	}
-	APPLOG_INFO(out.str());
+    auto parse_info = out.str();
+    if(!parse_info.empty())
+    {
+        APPLOG_INFO(parse_info);
+    }
 
 	APPLOG_INFO("Initializing...");
 	start(parser);

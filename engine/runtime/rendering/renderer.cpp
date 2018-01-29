@@ -183,7 +183,14 @@ bool renderer::init_backend(cmd_line::parser& parser)
 		return false;
 	}
 	const auto sz = _init_window->get_size();
-	gfx::reset(sz[0], sz[1], BGFX_RESET_VSYNC);
+    
+    bool novsync = false;
+    parser.try_get("novsync", novsync);
+    
+    std::uint32_t flags = BGFX_RESET_VSYNC;
+    if(novsync)
+        flags = 0;
+	gfx::reset(sz[0], sz[1], flags);
 
 	APPLOG_INFO("Using {0} rendering backend.", gfx::get_renderer_name(gfx::get_renderer_type()));
 	return true;
