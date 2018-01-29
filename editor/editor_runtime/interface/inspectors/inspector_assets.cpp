@@ -30,8 +30,10 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 		auto asset_sz = data.link->asset->get_size();
 		float w = float(asset_sz.width);
 		float h = float(asset_sz.height);
-
-		gui::ImageWithAspect(data.link->asset, ImVec2(w, h), size);
+		const auto tex = data.link->asset;
+		bool is_rt = tex ? tex->is_render_target() : false;
+		bool is_orig_bl = gfx::is_origin_bottom_left();
+		gui::ImageWithAspect(tex, is_rt, is_orig_bl, ImVec2(w, h), size);
 	}
 	else
 	{

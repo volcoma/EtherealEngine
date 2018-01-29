@@ -40,30 +40,6 @@ public:
 	bool is_valid() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : get_duration ()
-	/// <summary>
-	/// Gets the duration of the sound in seconds.
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	sound_info::duration_t get_duration() const;
-
-	//-----------------------------------------------------------------------------
-	//  Name : get_sample_rate ()
-	/// <summary>
-	/// Gets the sample rate of the sound.
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	std::uint32_t get_sample_rate() const;
-
-	//-----------------------------------------------------------------------------
-	//  Name : get_channels ()
-	/// <summary>
-	/// Gets the channels count of the sound. E.g mono/stereo
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	std::uint32_t get_channels() const;
-
-	//-----------------------------------------------------------------------------
 	//  Name : get_info ()
 	/// <summary>
 	/// Gets the sound data info.

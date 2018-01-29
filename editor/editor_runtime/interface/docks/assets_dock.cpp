@@ -134,9 +134,11 @@ void list_entry(T& entry, const std::string& name, bool is_selected, bool is_dra
 	ImVec2 uv1 = {1.0f, 1.0f};
 
 	bool* edit = edit_label ? &edit_label : nullptr;
+	bool is_rt = icon.link->asset ? icon.link->asset->is_render_target() : false;
 	int action = gui::ImageButtonWithAspectAndLabel(
-		icon.link->asset, texture_size, item_size, uv0, uv1, is_selected, edit, name.c_str(), &inputBuff[0],
-		inputBuff.size(), ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll);
+		icon.link->asset, is_rt, gfx::is_origin_bottom_left(), texture_size, item_size, uv0, uv1, is_selected,
+		edit, name.c_str(), &inputBuff[0], inputBuff.size(),
+		ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll);
 
 	if(loading)
 	{

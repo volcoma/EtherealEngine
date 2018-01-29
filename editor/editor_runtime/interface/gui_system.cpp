@@ -20,6 +20,7 @@
 #include "editor_core/gui/embedded/fontawesome_webfont.ttf.h"
 #include "editor_core/gui/embedded/fs_ocornut_imgui.bin.h"
 #include "editor_core/gui/embedded/vs_ocornut_imgui.bin.h"
+#include "editor_core/gui/gui.h"
 //////////////////////////////////////////////////////////////////////////
 #include "../meta/interface/gui_system.hpp"
 #include "core/serialization/associative_archive.h"
@@ -29,12 +30,10 @@ static const gfx::embedded_shader s_embedded_shaders[] = {BGFX_EMBEDDED_SHADER(v
 														  BGFX_EMBEDDED_SHADER_END()};
 // -------------------------------------------------------------------
 
-static gui_style s_gui_style;
 static ImGuiContext* s_initial_context = nullptr;
 
 static std::unique_ptr<gpu_program> s_program;
 static asset_handle<gfx::texture> s_font_texture;
-static std::vector<std::shared_ptr<gfx::texture>> s_textures;
 static std::uint32_t s_draw_calls = 0;
 
 void render_func(ImDrawData* _drawData)
@@ -196,7 +195,7 @@ const mml::cursor* map_cursor(ImGuiMouseCursor cursor)
 
 void imgui_frame_begin()
 {
-	s_textures.clear();
+	gui::CleanupTextures();
 }
 
 void set_initial_context(ImGuiContext* context)
@@ -352,12 +351,12 @@ void imgui_init()
 
 	// Store our identifier
 	io.Fonts->SetTexID(s_font_texture.get());
-	s_gui_style.load_style();
+	get_gui_style().load_style();
 }
 
 void imgui_dispose()
 {
-	s_textures.clear();
+	gui::CleanupTextures();
 	restore_initial_context();
 	s_program.reset();
 	s_font_texture.reset();
@@ -455,81 +454,10 @@ void gui_system::platform_events(const std::pair<std::uint32_t, bool>& info,
 	pop_context();
 }
 
-namespace gui
-{
-
-void Image(std::shared_ptr<gfx::texture> texture, const ImVec2& _size,
-		   const ImVec2& _uv0 /*= ImVec2(0.0f, 0.0f) */, const ImVec2& _uv1 /*= ImVec2(1.0f, 1.0f) */,
-		   const ImVec4& _tintCol /*= ImVec4(1.0f, 1.0f, 1.0f, 1.0f) */,
-		   const ImVec4& _borderCol /*= ImVec4(0.0f, 0.0f, 0.0f, 0.0f) */)
-{
-	s_textures.push_back(texture);
-
-	ImVec2 uv0 = _uv0;
-	ImVec2 uv1 = _uv1;
-
-	if(texture && texture->is_render_target())
-	{
-		if(gfx::is_origin_bottom_left())
-		{
-			uv0 = {0.0f, 1.0f};
-			uv1 = {1.0f, 0.0f};
-		}
-	}
-
-	ImGui::Image(texture.get(), _size, uv0, uv1, _tintCol, _borderCol);
-}
-
-bool ImageButton(std::shared_ptr<gfx::texture> texture, const ImVec2& _size,
-				 const ImVec2& _uv0 /*= ImVec2(0.0f, 0.0f) */, const ImVec2& _uv1 /*= ImVec2(1.0f, 1.0f) */,
-				 int _framePadding /*= -1 */, const ImVec4& _bgCol /*= ImVec4(0.0f, 0.0f, 0.0f, 0.0f) */,
-				 const ImVec4& _tintCol /*= ImVec4(1.0f, 1.0f, 1.0f, 1.0f) */)
-{
-	s_textures.push_back(texture);
-
-	ImVec2 uv0 = _uv0;
-	ImVec2 uv1 = _uv1;
-
-	if(texture && texture->is_render_target())
-	{
-		if(gfx::is_origin_bottom_left())
-		{
-			uv0 = {0.0f, 1.0f};
-			uv1 = {1.0f, 0.0f};
-		}
-	}
-
-	return ImGui::ImageButton(texture.get(), _size, uv0, uv1, _framePadding, _bgCol, _tintCol);
-}
-
-bool ImageButtonEx(std::shared_ptr<gfx::texture> texture, const ImVec2& size, const char* tooltip,
-				   bool selected, bool enabled)
-{
-	s_textures.push_back(texture);
-	return ImGui::ImageButtonEx(texture.get(), size, tooltip, selected, enabled);
-}
-
-void ImageWithAspect(std::shared_ptr<gfx::texture> texture, const ImVec2& texture_size, const ImVec2& size,
-					 const ImVec2& uv0, const ImVec2& uv1, const ImVec4& tint_col, const ImVec4& border_col)
-{
-	s_textures.push_back(texture);
-	return ImGui::ImageWithAspect(texture.get(), texture_size, size, uv0, uv1, tint_col, border_col);
-}
-
-int ImageButtonWithAspectAndLabel(std::shared_ptr<gfx::texture> texture, const ImVec2& texture_size,
-								  const ImVec2& size, const ImVec2& uv0, const ImVec2& uv1, bool selected,
-								  bool* edit_label, const char* label, char* buf, size_t buf_size,
-								  ImGuiInputTextFlags flags /*= 0*/)
-{
-	s_textures.push_back(texture);
-	return ImGui::ImageButtonWithAspectAndLabel(texture.get(), texture_size, size, uv0, uv1, selected,
-												edit_label, label, buf, buf_size, flags);
-}
-
 gui_style& get_gui_style()
 {
+	static gui_style s_gui_style;
 	return s_gui_style;
-}
 }
 
 void gui_style::reset_style()

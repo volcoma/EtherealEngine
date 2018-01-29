@@ -78,7 +78,7 @@ void show_statistics(const ImVec2& area, const unsigned int fps)
 	ImVec2 pos = gui::GetCursorScreenPos();
 	gui::SetNextWindowPos(pos);
 	gui::SetNextWindowCollapsed(true, ImGuiCond_FirstUseEver);
-    gui::SetNextWindowSizeConstraints(ImVec2(0, 0), area - gui::GetStyle().WindowPadding);
+	gui::SetNextWindowSizeConstraints(ImVec2(0, 0), area - gui::GetStyle().WindowPadding);
 	gui::Begin("STATISTICS", nullptr,
 			   ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
 
@@ -287,7 +287,10 @@ void draw_selected_camera(const ImVec2& size)
 							  ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
 							  ImGuiWindowFlags_AlwaysAutoResize))
 			{
-				gui::Image(surface->get_attachment(0).texture, bounds);
+				auto tex = surface->get_attachment(0).texture;
+				bool is_rt = tex ? tex->is_render_target() : false;
+				bool is_orig_bl = gfx::is_origin_bottom_left();
+				gui::Image(surface->get_attachment(0).texture, is_rt, is_orig_bl, bounds);
 			}
 			gui::End();
 
@@ -512,7 +515,7 @@ void scene_dock::render(const ImVec2& area)
 						   editor_camera.has_component<transform_component>();
 	show_statistics(area, sim.get_fps());
 
-    if(!has_edit_camera)
+	if(!has_edit_camera)
 		return;
 
 	auto size = gui::GetContentRegionAvail();
@@ -531,7 +534,10 @@ void scene_dock::render(const ImVec2& area)
 		auto& render_view = camera_comp->get_render_view();
 		const auto& viewport_size = camera.get_viewport_size();
 		const auto surface = render_view.get_output_fbo(viewport_size);
-		gui::Image(surface->get_attachment(0).texture, size);
+		auto tex = surface->get_attachment(0).texture;
+		bool is_rt = tex ? tex->is_render_target() : false;
+		bool is_orig_bl = gfx::is_origin_bottom_left();
+		gui::Image(tex, is_rt, is_orig_bl, size);
 
 		if(gui::IsItemClicked(1) || gui::IsItemClicked(2))
 		{
@@ -592,8 +598,10 @@ void scene_dock::render(const ImVec2& area)
 			auto g_buffer_fbo = render_view.get_g_buffer_fbo(viewport_size).get();
 			for(std::uint32_t i = 0; i < g_buffer_fbo->get_attachment_count(); ++i)
 			{
-				const auto attachment = g_buffer_fbo->get_attachment(i).texture;
-				gui::Image(attachment, size);
+				const auto tex = g_buffer_fbo->get_attachment(i).texture;
+				bool is_rt = tex ? tex->is_render_target() : false;
+				bool is_orig_bl = gfx::is_origin_bottom_left();
+				gui::Image(tex, is_rt, is_orig_bl, size);
 
 				if(gui::IsItemClicked(1) || gui::IsItemClicked(2))
 				{

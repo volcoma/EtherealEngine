@@ -18,6 +18,9 @@ class render_window;
 //-----------------------------------------------------------------------------
 struct gui_system
 {
+    // window id, is_focused
+    using window_info = std::pair<std::uint32_t, bool>;
+    
 	gui_system();
 	~gui_system();
 	void frame_begin(std::chrono::duration<float>);
@@ -34,7 +37,7 @@ struct gui_system
 	void pop_context();
 
 private:
-	void platform_events(const std::pair<std::uint32_t, bool>& info, const std::vector<mml::platform_event>&);
+	void platform_events(const window_info& info, const std::vector<mml::platform_event>&);
 	std::map<uint32_t, ImGuiContext> _contexts;
 };
 
@@ -69,38 +72,5 @@ struct gui_style
 	hsv_setup setup;
 };
 
-namespace gfx
-{
-struct texture;
-}
-
-namespace gui
-{
-using namespace ImGui;
-
-// Helper function for passing Texture to ImGui::Image.
-void Image(std::shared_ptr<gfx::texture> texture, const ImVec2& _size,
-		   const ImVec2& _uv0 = ImVec2(0.0f, 0.0f), const ImVec2& _uv1 = ImVec2(1.0f, 1.0f),
-		   const ImVec4& _tintCol = ImVec4(1.0f, 1.0f, 1.0f, 1.0f),
-		   const ImVec4& _borderCol = ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-
-// Helper function for passing Texture to ImGui::ImageButton.
-bool ImageButton(std::shared_ptr<gfx::texture> texture, const ImVec2& _size,
-				 const ImVec2& _uv0 = ImVec2(0.0f, 0.0f), const ImVec2& _uv1 = ImVec2(1.0f, 1.0f),
-				 int _framePadding = -1, const ImVec4& _bgCol = ImVec4(0.0f, 0.0f, 0.0f, 0.0f),
-				 const ImVec4& _tintCol = ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-bool ImageButtonEx(std::shared_ptr<gfx::texture> texture, const ImVec2& size, const char* tooltip = nullptr,
-				   bool selected = false, bool enabled = true);
-
-void ImageWithAspect(std::shared_ptr<gfx::texture> texture, const ImVec2& texture_size, const ImVec2& size,
-					 const ImVec2& uv0 = ImVec2(0, 0), const ImVec2& uv1 = ImVec2(1, 1),
-					 const ImVec4& tint_col = ImVec4(1, 1, 1, 1),
-					 const ImVec4& border_col = ImVec4(0, 0, 0, 0));
-
-int ImageButtonWithAspectAndLabel(std::shared_ptr<gfx::texture> texture, const ImVec2& texture_size,
-								  const ImVec2& size, const ImVec2& uv0, const ImVec2& uv1, bool selected,
-								  bool* edit_label, const char* label, char* buf, size_t buf_size,
-								  ImGuiInputTextFlags flags = 0);
-
 gui_style& get_gui_style();
-};
+

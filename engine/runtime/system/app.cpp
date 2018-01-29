@@ -17,6 +17,7 @@
 #include "core/simulation/simulation.h"
 #include "core/tasks/task_system.h"
 #include "events.h"
+#include <sstream>
 
 namespace runtime
 {
@@ -40,8 +41,7 @@ void app::setup(cmd_line::parser& parser)
 
 	ecs::set_frame_getter([]() { return core::get_subsystem<core::simulation>().get_frame(); });
 
-    
-    parser.set_optional<std::string>("r", "renderer", "auto", "Select preferred renderer.");
+	parser.set_optional<std::string>("r", "renderer", "auto", "Select preferred renderer.");
 }
 
 void app::start(cmd_line::parser& parser)
@@ -142,18 +142,25 @@ int app::run(int argc, char* argv[])
 {
 	core::details::initialize();
 
-	cmd_line::parser parser(argc, argv);    
-    
+	cmd_line::parser parser(argc, argv);
+
 	setup(parser);
 	if(_exitcode != 0)
 	{
 		core::details::dispose();
 		return _exitcode;
 	}
-	
-    parser.enable_help();
-    parser.run();
 
+	parser.enable_help();
+
+	std::stringstream out, err;
+	if(!parser.run(out, err))
+	{
+		APPLOG_ERROR(out.str());
+	}
+	APPLOG_INFO(out.str());
+
+	APPLOG_INFO("Initializing...");
 	start(parser);
 	if(_exitcode != 0)
 	{
@@ -161,10 +168,15 @@ int app::run(int argc, char* argv[])
 		return _exitcode;
 	}
 
+	APPLOG_INFO("Starting...");
 	while(_running)
 		run_one_frame();
 
+	APPLOG_INFO("Deinitializing...");
+
 	stop();
+
+	APPLOG_INFO("Exiting...");
 
 	core::details::dispose();
 	return _exitcode;
