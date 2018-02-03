@@ -102,10 +102,10 @@ private:
 	size_type back_idx() const noexcept;
 	void increase_size() noexcept;
 
-	T* m_data;
-	size_type m_size;
-	size_type m_capacity;
-	size_type m_front_idx;
+	T* m_data = nullptr;
+	size_type m_size = 0;
+	size_type m_capacity = 0;
+	size_type m_front_idx = 0;
 	Popper m_popper;
 };
 
