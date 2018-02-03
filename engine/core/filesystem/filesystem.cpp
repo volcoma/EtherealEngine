@@ -182,4 +182,36 @@ path replace(const path& _path, const path& _sequence, const path& _new_sequence
 {
 	return path(detail::replace_seq(_path.string(), _sequence.string(), _new_sequence.string()));
 }
+
+std::vector<path> split_until(const path& _path, const path& _predicate)
+{
+	std::vector<path> result;
+
+	auto f = _path;
+
+	while(f.has_parent_path() && f.has_filename() && f != _predicate)
+	{
+		result.push_back(f);
+		f = f.parent_path();
+	}
+
+	result.push_back(_predicate);
+	std::reverse(std::begin(result), std::end(result));
+
+	return result;
+}
+
+path reduce_trailing_extensions(const path& _path)
+{
+	fs::path reduced = _path;
+	for(auto temp = reduced; temp.has_extension(); temp = reduced.stem())
+	{
+		reduced = temp;
+	}
+
+	fs::path result = _path;
+	result.remove_filename();
+	result /= reduced;
+	return result;
+}
 }

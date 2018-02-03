@@ -6,56 +6,6 @@
 
 namespace editor
 {
-struct asset_file
-{
-	asset_file(const fs::path& abs, const std::string& n, const std::string& ext, const fs::path& r);
-
-	void populate(const fs::path& abs, const std::string& n, const std::string& ext, const fs::path& r);
-
-	///
-	fs::path absolute;
-	///
-	fs::path root_path;
-	///
-	std::string relative;
-	///
-	std::string name;
-	///
-	std::string extension;
-};
-
-struct asset_directory : std::enable_shared_from_this<asset_directory>
-{
-	asset_directory(asset_directory* p, const fs::path& abs, const std::string& n, const fs::path& r);
-
-	~asset_directory();
-
-	void populate(asset_directory* p, const fs::path& abs, const std::string& n, const fs::path& r);
-
-	void watch();
-
-	void unwatch();
-	///
-	fs::path absolute_path;
-	///
-	fs::path root_path;
-	///
-	std::string relative_path;
-	///
-	std::string name;
-	///
-	std::mutex files_mutex;
-	///
-	std::vector<asset_file> files;
-	///
-	asset_directory* parent = nullptr;
-	///
-	std::mutex directories_mutex;
-	///
-	std::vector<std::shared_ptr<asset_directory>> directories;
-
-	std::uint64_t watch_id = 0;
-};
 
 class project_manager
 {
@@ -157,18 +107,6 @@ public:
 		return _options;
 	}
 
-	//-----------------------------------------------------------------------------
-	//  Name : get_root_directory ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	inline std::weak_ptr<asset_directory> get_root_directory()
-	{
-		return root_directory;
-	}
 
 private:
 	/// Project options
@@ -176,6 +114,6 @@ private:
 	/// Current project name
 	std::string _project_name;
 	///
-	std::shared_ptr<asset_directory> root_directory = nullptr;
+	std::vector<std::uint64_t> _watch_ids;
 };
 }

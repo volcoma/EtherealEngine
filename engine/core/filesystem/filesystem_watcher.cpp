@@ -29,43 +29,52 @@ static std::pair<path, std::string> get_path_filter_pair(const fs::path& path)
 }
 
 static std::pair<path, std::string> visit_wild_card_path(const fs::path& path, bool recursive,
-														 bool visitEmpty,
+														 bool visit_empty,
 														 const std::function<bool(const fs::path&)>& visitor)
 {
 	std::pair<fs::path, std::string> path_filter = get_path_filter_pair(path);
 	if(!path_filter.second.empty())
 	{
 		std::string full = (path_filter.first / path_filter.second).string();
-		size_t wildcardPos = full.find("*");
-		std::string before = full.substr(0, wildcardPos);
-		std::string after = full.substr(wildcardPos + 1);
+		size_t wildcard_pos = full.find("*");
+		std::string before = full.substr(0, wildcard_pos);
+		std::string after = full.substr(wildcard_pos + 1);
 		fs::directory_iterator end;
 		fs::error_code err;
-		if(visitEmpty && fs::is_empty(path_filter.first, err))
+		if(visit_empty && fs::is_empty(path_filter.first, err))
 		{
 			visitor(path_filter.first);
 		}
 		else if(fs::exists(path_filter.first, err))
 		{
-			for(fs::directory_iterator it(path_filter.first, err); it != end; ++it)
-			{
-				if(it->status().type() == file_type::directory_file && recursive)
-				{
-					visit_wild_card_path(it->path() / path_filter.second, recursive, visitEmpty, visitor);
-				}
-
-				std::string current = it->path().string();
-				size_t beforePos = current.find(before);
-				size_t afterPos = current.find(after);
-				if((beforePos != std::string::npos || before.empty()) &&
-				   (afterPos != std::string::npos || after.empty()))
-				{
-					if(visitor(it->path()))
-					{
-						break;
-					}
-				}
-			}
+            const auto iterate = [&](auto& it)
+            {
+                for(const auto& entry : it)
+                {
+                    std::string current = entry.path().string();
+                    size_t before_pos = current.find(before);
+                    size_t after_pos = current.find(after);
+                    if((before_pos != std::string::npos || before.empty()) &&
+                       (after_pos != std::string::npos || after.empty()))
+                    {
+                        if(visitor(entry.path()))
+                        {
+                            break;
+                        }
+                    }
+                }
+            };
+		
+            if(recursive)
+            {
+                fs::recursive_directory_iterator it(path_filter.first, err);
+                iterate(it);
+            }
+            else
+            {
+                fs::directory_iterator it(path_filter.first, err);
+                iterate(it);
+            }
 		}
 	}
 	return path_filter;

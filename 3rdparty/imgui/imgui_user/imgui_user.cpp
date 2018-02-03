@@ -234,7 +234,7 @@ int ImageButtonWithAspectAndLabel(ImTextureID texture, ImVec2 texture_size, ImVe
 	int return_value = 0;
 
 	ImGuiWindow* window = GetCurrentWindow();
-	bool inputActive = false;
+	static bool inputActive = false;
 	bool label_clicked = false;
 	const float image_padding = 0.0f; // size.x * 0.3f;
 	BeginGroup();
@@ -281,6 +281,11 @@ int ImageButtonWithAspectAndLabel(ImTextureID texture, ImVec2 texture_size, ImVe
 			SetCursorPos(pos);
 			PushItemWidth(size.x + image_padding * 2.0f);
 
+            if(!inputActive)
+            {
+            	SetKeyboardFocusHere();
+            }
+            
 			if(InputText("", &buf[0], buf_size, flags))
 			{
 				edit = false;
@@ -306,7 +311,7 @@ int ImageButtonWithAspectAndLabel(ImTextureID texture, ImVec2 texture_size, ImVe
 			id = window->GetID(label);
 
 			if(!inputActive)
-				SetActiveID(id, GetCurrentWindow());
+				SetActiveID(id, window);
 		}
 
 		if(!IsMouseDragging(0) && IsMouseReleased(0) && window->GetID(label) == id)
@@ -423,6 +428,12 @@ void AddFont(const std::string& id, ImFont* font)
 void ClearFonts()
 {
 	auto& fonts = GetFonts();
-	fonts.clear();
+    fonts.clear();
 }
+
+void PushFont(const std::string &id)
+{
+    PushFont(GetFont(id));
+}
+
 }

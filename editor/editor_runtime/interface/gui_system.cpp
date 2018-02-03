@@ -342,6 +342,12 @@ void imgui_init()
 	config.PixelSnapH = false;
 	gui::AddFont("standard_big",
 				 io.Fonts->AddFontFromMemoryTTF((void*)s_font_default, sizeof(s_font_default), 50, &config));
+    
+    config.MergeMode = true;
+	config.PixelSnapH = true;
+	gui::AddFont("icons_big",
+				 io.Fonts->AddFontFromMemoryTTF((void*)fontawesome_webfont_ttf,
+												sizeof(fontawesome_webfont_ttf), 50, &config, icons_ranges));
 
 	io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
 

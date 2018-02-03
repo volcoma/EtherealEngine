@@ -2,7 +2,7 @@
 #include "../console/console_log.h"
 #include "../editing/editing_system.h"
 #include "../editing/picking_system.h"
-#include "../interface/docks/assets_dock.h"
+#include "../interface/docks/project_dock.h"
 #include "../interface/docks/console_dock.h"
 #include "../interface/docks/docking.h"
 #include "../interface/docks/game_dock.h"
@@ -331,9 +331,9 @@ void app::draw_menubar(render_window& window)
 			{
 				create_window_with_dock<game_dock>("GAME");
 			}
-			if(gui::MenuItem("ASSETS"))
+			if(gui::MenuItem("PROJECT"))
 			{
-				create_window_with_dock<assets_dock>("ASSETS");
+				create_window_with_dock<project_dock>("PROJECT");
 			}
 			if(gui::MenuItem("STYLE"))
 			{
@@ -442,7 +442,7 @@ void app::start(cmd_line::parser& parser)
 	auto game = std::make_unique<game_dock>("GAME", true, ImVec2(300.0f, 200.0f));
 	auto hierarchy = std::make_unique<hierarchy_dock>("HIERARCHY", true, ImVec2(300.0f, 200.0f));
 	auto inspector = std::make_unique<inspector_dock>("INSPECTOR", true, ImVec2(300.0f, 200.0f));
-	auto assets = std::make_unique<assets_dock>("ASSETS", true, ImVec2(200.0f, 200.0f));
+	auto project = std::make_unique<project_dock>("PROJECT", true, ImVec2(200.0f, 200.0f));
 	auto console = std::make_unique<console_dock>("CONSOLE", true, ImVec2(200.0f, 200.0f), _console_log);
 	auto style = std::make_unique<style_dock>("STYLE", true, ImVec2(300.0f, 200.0f));
 
@@ -453,15 +453,15 @@ void app::start(cmd_line::parser& parser)
 	dockspace.dock_with(inspector.get(), scene.get(), imguidock::slot::right, 400, true);
 	dockspace.dock_with(hierarchy.get(), scene.get(), imguidock::slot::left, 300, true);
 	dockspace.dock_to(console.get(), imguidock::slot::bottom, 300, true);
-	dockspace.dock_with(assets.get(), console.get(), imguidock::slot::tab, 250, true);
-	dockspace.dock_with(style.get(), assets.get(), imguidock::slot::right, 400, true);
+	dockspace.dock_with(project.get(), console.get(), imguidock::slot::tab, 250, true);
+	dockspace.dock_with(style.get(), project.get(), imguidock::slot::right, 400, true);
 
 	docking.register_dock(std::move(scene));
 	docking.register_dock(std::move(game));
 	docking.register_dock(std::move(inspector));
 	docking.register_dock(std::move(hierarchy));
 	docking.register_dock(std::move(console));
-	docking.register_dock(std::move(assets));
+	docking.register_dock(std::move(project));
 	docking.register_dock(std::move(style));
 
 	std::function<void()> log_version = []() { APPLOG_INFO("Version 1.0"); };

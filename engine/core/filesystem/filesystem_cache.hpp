@@ -18,9 +18,12 @@ public:
 				  "T must be a valid directory iterator type");
 
 	using clock_t = std::chrono::high_resolution_clock;
+	cache() = default;
+	
 	cache(const fs::path& p, clock_t::duration scan_frequency)
-		: _path(p)
+        : _path(p)
 		, _scan_frequency(scan_frequency)
+		, _should_refresh(true)
 	{
 		watch();
 	}
@@ -29,7 +32,7 @@ public:
 		: _path(rhs.path)
 		, _scan_frequency(rhs._scan_frequency)
 		, _entries(rhs._entries)
-		, _should_refresh(rhs._should_refresh)
+		, _should_refresh(rhs._should_refresh.load())
 	{
 		watch();
 	}
@@ -38,7 +41,7 @@ public:
 		: _path(std::move(rhs._path))
 		, _scan_frequency(std::move(rhs._scan_frequency))
 		, _entries(std::move(rhs._entries))
-		, _should_refresh(std::move(rhs._should_refresh))
+		, _should_refresh(rhs._should_refresh.load())
 	{
 		watch();
 	}
@@ -49,7 +52,7 @@ public:
 		_path = rhs._path;
 		_scan_frequency = rhs._scan_frequency;
 		_entries = rhs._entries;
-		_should_refresh = rhs._should_refresh;
+		_should_refresh = rhs._should_refresh.load();
 		watch();
 
 		return *this;
@@ -61,7 +64,7 @@ public:
 		_path = std::move(rhs._path);
 		_scan_frequency = std::move(rhs._scan_frequency);
 		_entries = std::move(rhs._entries);
-		_should_refresh = std::move(rhs._should_refresh);
+		_should_refresh = rhs._should_refresh.load();
 		watch();
 
 		return *this;
@@ -112,14 +115,49 @@ public:
 		_entries.clear();
 
 		fs::error_code err;
-		for(const auto& p : iterator_t(_path, err))
+		iterator_t it(_path, err);
+		for(const auto& p : it)
 		{
 			_entries.push_back(p);
 		}
-
+        
+        std::sort(std::begin(_entries), std::end(_entries), [](const auto& lhs, const auto& rhs)
+        {
+            return fs::is_directory(lhs.status()) > fs::is_directory(rhs.status());
+        });
+        
 		_should_refresh = false;
 	}
 
+    const fs::path& get_path() const
+    {
+        return _path;
+    }
+    
+    void set_path(const fs::path& path)
+    {
+        if(_path == path)
+        {
+            return;
+        }
+        unwatch();
+        _path = path;
+        _should_refresh = true;
+        watch();
+    }
+    
+    void set_scan_frequency(clock_t::duration scan_frequency)
+    {
+        if(_scan_frequency == scan_frequency)
+        {
+            return;
+        }
+        unwatch();
+        _scan_frequency = scan_frequency;
+        _should_refresh = true;
+        watch();
+    }
+    
 private:
 	//-----------------------------------------------------------------------------
 	//  Name : should_refresh ()

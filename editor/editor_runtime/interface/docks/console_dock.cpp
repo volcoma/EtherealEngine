@@ -43,9 +43,9 @@ void console_dock::render(const ImVec2&)
 	}
 	gui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1)); // Tighten spacing
 
-	auto items = _console_log->get_items();
+	const auto items = _console_log->get_items();
 
-	for(auto& pair_msg : items)
+	for(const auto& pair_msg : items)
 	{
 		const char* item_cstr = pair_msg.first.c_str();
 		if(!filter.PassFilter(item_cstr))
