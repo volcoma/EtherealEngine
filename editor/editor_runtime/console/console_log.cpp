@@ -1,4 +1,5 @@
 #include "console_log.h"
+#include <map>
 
 void console_log::_sink_it(const logging::details::log_msg& msg)
 {
