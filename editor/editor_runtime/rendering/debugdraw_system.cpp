@@ -302,8 +302,8 @@ debugdraw_system::debugdraw_system()
 	auto& ts = core::get_subsystem<core::task_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
 
-	auto vs_wf_wireframe = am.load<gfx::shader>("editor_data:/shaders/vs_wf_wireframe.sc");
-	auto fs_wf_wireframe = am.load<gfx::shader>("editor_data:/shaders/fs_wf_wireframe.sc");
+	auto vs_wf_wireframe = am.load<gfx::shader>("editor:/data/shaders/vs_wf_wireframe.sc");
+	auto fs_wf_wireframe = am.load<gfx::shader>("editor:/data/shaders/fs_wf_wireframe.sc");
 
 	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {

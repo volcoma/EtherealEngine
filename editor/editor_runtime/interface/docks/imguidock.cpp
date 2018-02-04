@@ -936,7 +936,7 @@ void dockspace::render_tab_bar(node* container, const ImVec2&, const ImVec2& cur
 			}
 		}
 		ImGui::PopStyleColor(3);
-		bool is_hovered = ImGui::IsItemHoveredRect();
+		bool is_hovered = ImGui::IsItemHovered(ImGuiHoveredFlags_RectOnly);
 
 		if((is_hovered || is_dock_active) && dock->close_button == true)
 		{

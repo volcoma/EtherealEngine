@@ -102,11 +102,17 @@ void syncer::sync(const fs::path& reference_dir, const fs::path& synced_dir)
 		ensure_directory_exists(_synced_dir);
 	}
 
-	const auto on_change = [this](const auto& entries, bool) {
+	const auto on_change = [this](const auto& entries, bool is_initial_listing) {
 		for(const auto& entry : entries)
 		{
 			bool is_directory = (entry.type == fs::directory_file);
-			auto entry_extension = entry.path.extension().string();
+            auto entry_path = entry.path;
+            std::string entry_extension;
+            while(entry_path.has_extension())
+            {
+                entry_extension = entry_path.extension().string() + entry_extension;
+                entry_path.replace_extension();
+            }
 			switch(entry.status)
 			{
 				case fs::watcher::entry_status::created:
@@ -121,7 +127,7 @@ void syncer::sync(const fs::path& reference_dir, const fs::path& synced_dir)
 					auto callback = this->get_on_created_callback(entry_extension);
 					if(callback)
 					{
-						callback(entry.path, synced_entries);
+						callback(entry.path, synced_entries, is_initial_listing);
 					}
 				}
 				break;
@@ -131,7 +137,7 @@ void syncer::sync(const fs::path& reference_dir, const fs::path& synced_dir)
 					if(callback)
 					{
 						const auto synced_entries = this->get_synced_entries(entry.path, is_directory);
-						callback(entry.path, synced_entries);
+						callback(entry.path, synced_entries, is_initial_listing);
 					}
 				}
 				break;
@@ -191,11 +197,17 @@ std::vector<fs::path> syncer::get_synced_entries(const fs::path& path, bool is_d
 	}
 	else
 	{
-		auto ext = path.extension().string();
+        auto entry_path = path;        
+        std::string entry_extension;
+        while(entry_path.has_extension())
+        {
+            entry_extension = entry_path.extension().string() + entry_extension;
+            entry_path.replace_extension();
+        }
 
 		{
 			std::lock_guard<std::mutex> lock(_mutex);
-			auto it = _mapping.find(ext);
+			auto it = _mapping.find(entry_extension);
 			if(it != _mapping.end())
 			{
 				const auto& mapping = it->second;

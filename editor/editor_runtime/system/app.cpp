@@ -2,12 +2,12 @@
 #include "../console/console_log.h"
 #include "../editing/editing_system.h"
 #include "../editing/picking_system.h"
-#include "../interface/docks/project_dock.h"
 #include "../interface/docks/console_dock.h"
 #include "../interface/docks/docking.h"
 #include "../interface/docks/game_dock.h"
 #include "../interface/docks/hierarchy_dock.h"
 #include "../interface/docks/inspector_dock.h"
+#include "../interface/docks/project_dock.h"
 #include "../interface/docks/scene_dock.h"
 #include "../interface/docks/style_dock.h"
 #include "../interface/gui_system.h"
@@ -161,8 +161,7 @@ auto open_scene()
 	es.save_editor_camera();
 
 	std::string path;
-	if(native::open_file_dialog(extensions::scene.substr(1), fs::resolve_protocol("app:/data").string(),
-								path))
+	if(native::open_file_dialog("sgr", fs::resolve_protocol("app:/data").string(), path))
 	{
 		auto scene_path = fs::convert_to_protocol(path);
 		auto scene = am.load<::scene>(scene_path.string()).get();
@@ -191,12 +190,11 @@ void save_scene_as()
 	auto& es = core::get_subsystem<editor::editing_system>();
 
 	std::string path;
-	if(native::save_file_dialog(extensions::scene.substr(1), fs::resolve_protocol("app:/data").string(),
-								path))
+	if(native::save_file_dialog("sgr", fs::resolve_protocol("app:/data").string(), path))
 	{
 		es.scene = path;
 		if(!fs::path(path).has_extension())
-			es.scene += extensions::scene;
+			es.scene += ".sgr";
 
 		save_scene();
 	}
@@ -229,7 +227,7 @@ void app::draw_menubar(render_window& window)
 	auto& pm = core::get_subsystem<editor::project_manager>();
 	auto& rend = core::get_subsystem<runtime::renderer>();
 	auto& input = core::get_subsystem<runtime::input>();
-	const auto& current_project = pm.get_current_project();
+	const auto& current_project = pm.get_name();
 
 	if(input.is_key_down(mml::keyboard::LControl))
 	{
@@ -434,8 +432,8 @@ void app::start(cmd_line::parser& parser)
 
 	auto& rend = core::get_subsystem<runtime::renderer>();
 	auto& main_window = rend.get_main_window();
-    
-    main_window->set_title("Ethereal");
+
+	main_window->set_title("Ethereal");
 
 	_console_dock_name = "CONSOLE";
 	auto scene = std::make_unique<scene_dock>("SCENE", true, ImVec2(200.0f, 200.0f));
@@ -669,15 +667,12 @@ void app::handle_drag_and_drop()
 {
 	auto& es = core::get_subsystem<editing_system>();
 
-	if(gui::IsMouseDragging(gui::drag_button) && es.drag_data.object)
-	{
-		gui::BeginTooltip();
-		gui::TextUnformatted(es.drag_data.description.c_str());
-		gui::EndTooltip();
-
-		// if(gui::GetMouseCursor() == ImGuiMouseCursor_Arrow)
-		//	gui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);
-	}
+//	if(gui::IsMouseDragging(gui::drag_button) && es.drag_data.object && !drag_data.description.empty())
+//	{
+//		gui::BeginTooltip();
+//		gui::TextUnformatted(es.drag_data.description.c_str());
+//		gui::EndTooltip();
+//	}
 
 	if(!gui::IsAnyItemActive() && !gui::IsAnyItemHovered())
 	{

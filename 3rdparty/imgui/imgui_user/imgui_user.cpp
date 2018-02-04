@@ -268,7 +268,7 @@ int ImageButtonWithAspectAndLabel(ImTextureID texture, ImVec2 texture_size, ImVe
 		label_clicked = IsItemClicked(0);
 		if(!edit)
 		{
-			if(IsItemHovered())
+			if(IsItemHovered(ImGuiHoveredFlags_RectOnly))
 			{
 				BeginTooltip();
 				TextUnformatted(label);

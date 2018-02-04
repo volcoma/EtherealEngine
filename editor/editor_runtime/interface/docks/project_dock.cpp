@@ -13,6 +13,8 @@
 #include "runtime/assets/impl/asset_extensions.h"
 #include "runtime/ecs/constructs/prefab.h"
 #include "runtime/ecs/constructs/scene.h"
+#include "runtime/ecs/constructs/utils.h"
+#include "runtime/ecs/ecs.h"
 #include "runtime/rendering/material.h"
 #include "runtime/rendering/mesh.h"
 
@@ -21,7 +23,8 @@
 using namespace std::literals;
 
 template <typename T>
-static asset_handle<gfx::texture> get_preview(const T& entry, const std::string& type, editor::editing_system& es)
+static asset_handle<gfx::texture> get_preview(const T& entry, const std::string& type,
+											  editor::editing_system& es)
 {
 	if(entry)
 	{
@@ -30,7 +33,8 @@ static asset_handle<gfx::texture> get_preview(const T& entry, const std::string&
 	return es.icons["loading"];
 };
 
-static asset_handle<gfx::texture> get_preview(const asset_handle<gfx::texture>& entry, const std::string&, editor::editing_system& es)
+static asset_handle<gfx::texture> get_preview(const asset_handle<gfx::texture>& entry, const std::string&,
+											  editor::editing_system& es)
 {
 	if(entry)
 	{
@@ -39,15 +43,77 @@ static asset_handle<gfx::texture> get_preview(const asset_handle<gfx::texture>& 
 	return es.icons["loading"];
 };
 
-
-static asset_handle<gfx::texture> get_preview(const fs::path&, const std::string& type, editor::editing_system& es)
+static asset_handle<gfx::texture> get_preview(const fs::path&, const std::string& type,
+											  editor::editing_system& es)
 {
 	return es.icons[type];
 };
 
+static bool process_drag_drop_source(const fs::path& absolute_path)
+{
+	if(gui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+	{
+		std::string id = absolute_path.string();
+		gui::TextUnformatted(absolute_path.filename().string().c_str());
+		gui::SetDragDropPayload("asset", id.data(), id.size());
+		gui::EndDragDropSource();
+		return true;
+	}
+
+	return false;
+}
+
+static void process_drag_drop_target(const fs::path& absolute_path)
+{
+	fs::error_code err;
+	if(gui::BeginDragDropTarget())
+	{
+		if(fs::is_directory(absolute_path, err))
+		{
+			{
+				auto payload = gui::AcceptDragDropPayload("asset");
+				if(payload)
+				{
+					std::string data(reinterpret_cast<const char*>(payload->Data),
+									 std::size_t(payload->DataSize));
+					fs::path new_name = absolute_path / fs::path(data).filename();
+					if(data != new_name)
+					{
+						if(!fs::exists(new_name, err))
+						{
+                            fs::rename(data, new_name, err);
+						}
+					}
+				}
+			}
+			{
+				auto payload = gui::AcceptDragDropPayload("entity");
+				if(payload)
+				{
+					std::uint32_t entity_index = 0;
+					std::memcpy(&entity_index, payload->Data, std::size_t(payload->DataSize));
+					auto& ecs = core::get_subsystem<runtime::entity_component_system>();
+					if(ecs.valid_index(entity_index))
+					{
+						auto eid = ecs.create_id(entity_index);
+						auto dropped_entity = ecs.get(eid);
+						if(dropped_entity)
+						{
+							auto prefab_path = absolute_path /
+											   fs::path(dropped_entity.to_string() + ".pfb").make_preferred();
+							ecs::utils::save_entity_to_file(prefab_path, dropped_entity);
+						}
+					}
+				}
+			}
+		}
+		gui::EndDragDropTarget();
+	}
+}
+
 static void draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const std::string& name,
-					   bool is_selected, bool is_dragging, const float size, std::function<void()> on_click,
-					   std::function<void()> on_double_click,
+					   const fs::path& absolute_path, bool is_selected, bool is_dragging, const float size,
+					   std::function<void()> on_click, std::function<void()> on_double_click,
 					   std::function<void(const std::string&)> on_rename, std::function<void()> on_delete,
 					   std::function<void()> on_drag)
 {
@@ -116,7 +182,7 @@ static void draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const s
 		if(on_double_click)
 			on_double_click();
 	}
-	if(gui::IsItemHoveredRect())
+	if(gui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
 	{
 		if(on_double_click)
 		{
@@ -128,6 +194,11 @@ static void draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const s
 			if(on_drag)
 				on_drag();
 		}
+	}
+
+	if(!process_drag_drop_source(absolute_path))
+	{
+		process_drag_drop_target(absolute_path);
 	}
 
 	gui::PopID();
@@ -159,26 +230,7 @@ void project_dock::render(const ImVec2&)
 
 	if(gui::Button("IMPORT..."))
 	{
-		std::vector<std::string> paths;
-		if(native::open_multiple_files_dialog("obj,fbx,dae,blend,3ds,mtl,png,jpg,tga,dds,ktx,pvr,sc,io,sh",
-											  "", paths))
-		{
-			auto& ts = core::get_subsystem<core::task_system>();
-
-			for(auto& path : paths)
-			{
-				fs::path p = fs::path(path).make_preferred();
-				fs::path filename = p.filename();
-
-				auto task = ts.push_on_worker_thread(
-					[opened = _cache.get_path()](const fs::path& path, const fs::path& filename) {
-						fs::error_code err;
-						fs::path dir = opened / filename;
-						fs::copy_file(path, dir, fs::copy_options::overwrite_if_exists, err);
-					},
-					p, filename);
-			}
-		}
+		import();
 	}
 	gui::SameLine();
 	gui::PushItemWidth(80.0f);
@@ -206,6 +258,7 @@ void project_dock::render(const ImVec2&)
 			set_cache_path(dir);
 			break;
 		}
+		process_drag_drop_target(dir);
 	}
 	gui::Separator();
 
@@ -213,12 +266,10 @@ void project_dock::render(const ImVec2&)
 	auto& am = core::get_subsystem<runtime::asset_manager>();
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove |
 							 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings;
-	if(gui::BeginChild("assets_content",
-					   gui::GetContentRegionAvail(),
-					   false, flags))
+	fs::path current_path = _cache.get_path();
+	gui::BeginGroup();
+	if(gui::BeginChild("assets_content", gui::GetContentRegionAvail(), false, flags))
 	{
-		fs::path current_path = _cache.get_path();
-
 		const auto is_selected = [&](const auto& entry) {
 			using entry_t = std::decay_t<decltype(entry)>;
 			auto& selected = es.selection_data.object;
@@ -230,17 +281,39 @@ void project_dock::render(const ImVec2&)
 		for(const auto& cache_entry : _cache)
 		{
 			const auto& absolute_path = cache_entry.path();
-			const auto name = absolute_path.filename().stem().string();
+			auto filename = absolute_path.filename();
+			auto name = filename.string();
+
+			while(filename.has_extension())
+			{
+				filename = filename.stem();
+				name = filename.string();
+			}
+
 			const auto relative = fs::convert_to_protocol(absolute_path).generic_string();
 			const auto file_ext = absolute_path.extension().string();
 			bool is_dragging = !!es.drag_data.object;
 
+			const auto on_rename = [&](const std::string& new_name) {
+				fs::path new_absolute_path = absolute_path;
+				new_absolute_path.remove_filename();
+				new_absolute_path /= new_name + file_ext;
+				fs::error_code err;
+				fs::rename(absolute_path, new_absolute_path, err);
+			};
+
+			const auto on_delete = [&]() {
+				fs::error_code err;
+				fs::remove(absolute_path, err);
+			};
+
 			if(fs::is_directory(cache_entry.status()))
 			{
+
 				using entry_t = fs::path;
 				entry_t entry = absolute_path;
 				auto icon = get_preview(entry, "folder", es);
-				draw_entry(icon, false, name, is_selected(entry), is_dragging, size,
+				draw_entry(icon, false, name, absolute_path, is_selected(entry), is_dragging, size,
 						   [&]() // on_click
 						   {
 							   es.select(entry);
@@ -290,27 +363,15 @@ void project_dock::render(const ImVec2&)
 						}
 						auto icon = get_preview(entry, "icon", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, is_selected(entry), is_dragging, size,
+						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), is_dragging,
+								   size,
 								   [&]() // on_click
 								   {
 									   es.select(entry);
 
 								   },
-								   nullptr // on_double_click
-								   ,
-								   [&](const std::string& new_name) // on_rename
-								   {
-									   const auto asset_dir =
-										   fs::path(relative).make_preferred().remove_filename();
-									   const auto new_relative =
-										   (asset_dir / new_name).generic_string() + file_ext;
-									   am.rename_asset<asset_t>(relative, new_relative);
-								   },
-								   [&]() // on_delete
-								   {
-									   am.delete_asset<asset_t>(relative);
-
-								   },
+								   nullptr, // on_double_click
+								   on_rename, on_delete,
 								   [&]() // on_drag
 								   {
 									   es.drag(entry, relative);
@@ -337,27 +398,15 @@ void project_dock::render(const ImVec2&)
 						}
 						auto icon = get_preview(entry, "mesh", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, is_selected(entry), is_dragging, size,
+						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), is_dragging,
+								   size,
 								   [&]() // on_click
 								   {
 									   es.select(entry);
 
 								   },
-								   nullptr // on_double_click
-								   ,
-								   [&](const std::string& new_name) // on_rename
-								   {
-									   const auto asset_dir =
-										   fs::path(relative).make_preferred().remove_filename();
-									   const auto new_relative =
-										   (asset_dir / new_name).generic_string() + file_ext;
-									   am.rename_asset<asset_t>(relative, new_relative);
-								   },
-								   [&]() // on_delete
-								   {
-									   am.delete_asset<asset_t>(relative);
-
-								   },
+								   nullptr, // on_double_click
+								   on_rename, on_delete,
 								   [&]() // on_drag
 								   {
 									   es.drag(entry, relative);
@@ -384,27 +433,15 @@ void project_dock::render(const ImVec2&)
 						}
 						auto icon = get_preview(entry, "sound", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, is_selected(entry), is_dragging, size,
+						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), is_dragging,
+								   size,
 								   [&]() // on_click
 								   {
 									   es.select(entry);
 
 								   },
-								   nullptr // on_double_click
-								   ,
-								   [&](const std::string& new_name) // on_rename
-								   {
-									   const auto asset_dir =
-										   fs::path(relative).make_preferred().remove_filename();
-									   const auto new_relative =
-										   (asset_dir / new_name).generic_string() + file_ext;
-									   am.rename_asset<asset_t>(relative, new_relative);
-								   },
-								   [&]() // on_delete
-								   {
-									   am.delete_asset<asset_t>(relative);
-
-								   },
+								   nullptr, // on_double_click
+								   on_rename, on_delete,
 								   [&]() // on_drag
 								   {
 									   es.drag(entry, relative);
@@ -430,27 +467,15 @@ void project_dock::render(const ImVec2&)
 						}
 						auto icon = get_preview(entry, "shader", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, is_selected(entry), is_dragging, size,
+						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), is_dragging,
+								   size,
 								   [&]() // on_click
 								   {
 									   es.select(entry);
 
 								   },
-								   nullptr // on_double_click
-								   ,
-								   [&](const std::string& new_name) // on_rename
-								   {
-									   const auto asset_dir =
-										   fs::path(relative).make_preferred().remove_filename();
-									   const auto new_relative =
-										   (asset_dir / new_name).generic_string() + file_ext;
-									   am.rename_asset<asset_t>(relative, new_relative);
-								   },
-								   [&]() // on_delete
-								   {
-									   am.delete_asset<asset_t>(relative);
-
-								   },
+								   nullptr, // on_double_click
+								   on_rename, on_delete,
 								   [&]() // on_drag
 								   {
 									   es.drag(entry, relative);
@@ -476,27 +501,15 @@ void project_dock::render(const ImVec2&)
 						}
 						auto icon = get_preview(entry, "material", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, is_selected(entry), is_dragging, size,
+						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), is_dragging,
+								   size,
 								   [&]() // on_click
 								   {
 									   es.select(entry);
 
 								   },
-								   nullptr // on_double_click
-								   ,
-								   [&](const std::string& new_name) // on_rename
-								   {
-									   const auto asset_dir =
-										   fs::path(relative).make_preferred().remove_filename();
-									   const auto new_relative =
-										   (asset_dir / new_name).generic_string() + file_ext;
-									   am.rename_asset<asset_t>(relative, new_relative);
-								   },
-								   [&]() // on_delete
-								   {
-									   am.delete_asset<asset_t>(relative);
-
-								   },
+								   nullptr, // on_double_click
+								   on_rename, on_delete,
 								   [&]() // on_drag
 								   {
 									   es.drag(entry, relative);
@@ -523,27 +536,15 @@ void project_dock::render(const ImVec2&)
 						}
 						auto icon = get_preview(entry, "animation", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, is_selected(entry), is_dragging, size,
+						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), is_dragging,
+								   size,
 								   [&]() // on_click
 								   {
 									   es.select(entry);
 
 								   },
-								   nullptr // on_double_click
-								   ,
-								   [&](const std::string& new_name) // on_rename
-								   {
-									   const auto asset_dir =
-										   fs::path(relative).make_preferred().remove_filename();
-									   const auto new_relative =
-										   (asset_dir / new_name).generic_string() + file_ext;
-									   am.rename_asset<asset_t>(relative, new_relative);
-								   },
-								   [&]() // on_delete
-								   {
-									   am.delete_asset<asset_t>(relative);
-
-								   },
+								   nullptr, // on_double_click
+								   on_rename, on_delete,
 								   [&]() // on_drag
 								   {
 									   es.drag(entry, relative);
@@ -570,27 +571,15 @@ void project_dock::render(const ImVec2&)
 						}
 						auto icon = get_preview(entry, "prefab", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, is_selected(entry), is_dragging, size,
+						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), is_dragging,
+								   size,
 								   [&]() // on_click
 								   {
 									   es.select(entry);
 
 								   },
-								   nullptr // on_double_click
-								   ,
-								   [&](const std::string& new_name) // on_rename
-								   {
-									   const auto asset_dir =
-										   fs::path(relative).make_preferred().remove_filename();
-									   const auto new_relative =
-										   (asset_dir / new_name).generic_string() + file_ext;
-									   am.rename_asset<asset_t>(relative, new_relative);
-								   },
-								   [&]() // on_delete
-								   {
-									   am.delete_asset<asset_t>(relative);
-
-								   },
+								   nullptr, // on_double_click
+								   on_rename, on_delete,
 								   [&]() // on_drag
 								   {
 									   es.drag(entry, relative);
@@ -616,7 +605,8 @@ void project_dock::render(const ImVec2&)
 						}
 						auto icon = get_preview(entry, "scene", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, is_selected(entry), is_dragging, size,
+						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), is_dragging,
+								   size,
 								   [&]() // on_click
 								   {
 									   es.select(entry);
@@ -632,19 +622,7 @@ void project_dock::render(const ImVec2&)
 									   es.load_editor_camera();
 
 								   },
-								   [&](const std::string& new_name) // on_rename
-								   {
-									   const auto asset_dir =
-										   fs::path(relative).make_preferred().remove_filename();
-									   const auto new_relative =
-										   (asset_dir / new_name).generic_string() + file_ext;
-									   am.rename_asset<asset_t>(relative, new_relative);
-								   },
-								   [&]() // on_delete
-								   {
-									   am.delete_asset<asset_t>(relative);
-
-								   },
+								   on_rename, on_delete,
 								   [&]() // on_drag
 								   {
 									   es.drag(entry, relative);
@@ -661,6 +639,26 @@ void project_dock::render(const ImVec2&)
 
 		gui::EndChild();
 	}
+
+	gui::EndGroup();
+	if(gui::IsItemHovered())
+	{
+		auto& dragged = es.drag_data.object;
+		if(dragged && dragged.is_type<runtime::entity>())
+		{
+			gui::SetMouseCursor(ImGuiMouseCursor_Move);
+			if(gui::IsMouseReleased(gui::drag_button))
+			{
+				auto entity = dragged.get_value<runtime::entity>();
+				if(entity)
+					ecs::utils::save_entity_to_file(
+						current_path / fs::path(entity.to_string() + ".pfb").make_preferred(), entity);
+				es.drop();
+			}
+		}
+	}
+	process_drag_drop_target(current_path);
+
 }
 
 void project_dock::context_menu()
@@ -676,6 +674,14 @@ void project_dock::context_menu()
 		{
 			fs::show_in_graphical_env(_cache.get_path());
 		}
+        
+        gui::NewLine();
+        gui::Separator();
+        
+        if(gui::Selectable("IMPORT..."))
+        {
+            import();
+        }
 
 		gui::EndPopup();
 	}
@@ -717,7 +723,31 @@ void project_dock::set_cache_path(const fs::path& path)
 		return;
 	}
 	_cache.set_path(path);
-	_cache_path_with_protocol = fs::convert_to_protocol(path).generic();
+    _cache_path_with_protocol = fs::convert_to_protocol(path).generic();
+}
+
+void project_dock::import()
+{
+    std::vector<std::string> paths;
+    if(native::open_multiple_files_dialog("obj,fbx,dae,blend,3ds,mtl,png,jpg,tga,dds,ktx,pvr,sc,io,sh",
+                                          "", paths))
+    {
+        auto& ts = core::get_subsystem<core::task_system>();
+
+        for(auto& path : paths)
+        {
+            fs::path p = fs::path(path).make_preferred();
+            fs::path filename = p.filename();
+
+            auto task = ts.push_on_worker_thread(
+                [opened = _cache.get_path()](const fs::path& path, const fs::path& filename) {
+                    fs::error_code err;
+                    fs::path dir = opened / filename;
+                    fs::copy_file(path, dir, fs::copy_options::overwrite_if_exists, err);
+                },
+                p, filename);
+        }
+    }
 }
 
 project_dock::project_dock(const std::string& dtitle, bool close_button, const ImVec2& min_size)

@@ -1,12 +1,11 @@
 #pragma once
-#include "core/filesystem/filesystem.h"
+#include "core/filesystem/filesystem_syncer.h"
 #include "core/math/math_includes.h"
 #include <deque>
 #include <mutex>
 
 namespace editor
 {
-
 class project_manager
 {
 public:
@@ -26,7 +25,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void open_project(const fs::path& project_path);
+	bool open_project(const fs::path& project_path);
 
 	//-----------------------------------------------------------------------------
 	//  Name : close_project ()
@@ -69,14 +68,14 @@ public:
 	void load_config();
 
 	//-----------------------------------------------------------------------------
-	//  Name : get_current_project ()
+	//  Name : get_name ()
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const std::string& get_current_project() const
+	inline const std::string& get_name() const
 	{
 		return _project_name;
 	}
@@ -89,7 +88,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_current_project(const std::string& name)
+	inline void set_name(const std::string& name)
 	{
 		_project_name = name;
 	}
@@ -106,14 +105,25 @@ public:
 	{
 		return _options;
 	}
-
-
+    
 private:
+	void setup_directory(fs::syncer& syncer);
+	void setup_meta_syncer(fs::syncer& syncer, const fs::path& data_dir_protocol,
+						   const fs::path& meta_dir_protocol);
+	void setup_cache_syncer(fs::syncer& syncer, const fs::path& meta_dir_protocol,
+							const fs::path& cache_dir_protocol);
 	/// Project options
 	options _options;
 	/// Current project name
 	std::string _project_name;
-	///
-	std::vector<std::uint64_t> _watch_ids;
+    
+	fs::syncer _app_meta_syncer;
+	fs::syncer _app_cache_syncer;
+                   
+	fs::syncer _editor_meta_syncer;
+	fs::syncer _editor_cache_syncer;
+    
+    fs::syncer _engine_meta_syncer;
+	fs::syncer _engine_cache_syncer;
 };
 }

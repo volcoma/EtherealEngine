@@ -135,12 +135,6 @@ struct asset_storage : public basic_storage
 	/// key, asset
 	save_file_t save_to_file;
 
-	/// key, new_key
-	rename_file_t rename_asset_file;
-
-	/// key
-	delete_file_t delete_asset_file;
-
 	/// Storage container
 	request_container_t container;
 

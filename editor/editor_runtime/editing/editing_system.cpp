@@ -18,27 +18,27 @@ editing_system::editing_system()
 {
 	auto& am = core::get_subsystem<runtime::asset_manager>();
 
-	icons["translate"] = am.load<gfx::texture>("editor_data:/icons/translate.png").get();
-	icons["rotate"] = am.load<gfx::texture>("editor_data:/icons/rotate.png").get();
-	icons["scale"] = am.load<gfx::texture>("editor_data:/icons/scale.png").get();
-	icons["local"] = am.load<gfx::texture>("editor_data:/icons/local.png").get();
-	icons["global"] = am.load<gfx::texture>("editor_data:/icons/global.png").get();
-	icons["play"] = am.load<gfx::texture>("editor_data:/icons/play.png").get();
-	icons["pause"] = am.load<gfx::texture>("editor_data:/icons/pause.png").get();
-	icons["stop"] = am.load<gfx::texture>("editor_data:/icons/stop.png").get();
-	icons["next"] = am.load<gfx::texture>("editor_data:/icons/next.png").get();
-	icons["material"] = am.load<gfx::texture>("editor_data:/icons/material.png").get();
-	icons["mesh"] = am.load<gfx::texture>("editor_data:/icons/mesh.png").get();
-	icons["export"] = am.load<gfx::texture>("editor_data:/icons/export.png").get();
-	icons["grid"] = am.load<gfx::texture>("editor_data:/icons/grid.png").get();
-	icons["wireframe"] = am.load<gfx::texture>("editor_data:/icons/wireframe.png").get();
-	icons["prefab"] = am.load<gfx::texture>("editor_data:/icons/prefab.png").get();
-	icons["scene"] = am.load<gfx::texture>("editor_data:/icons/scene.png").get();
-	icons["shader"] = am.load<gfx::texture>("editor_data:/icons/shader.png").get();
-	icons["loading"] = am.load<gfx::texture>("editor_data:/icons/loading.png").get();
-	icons["folder"] = am.load<gfx::texture>("editor_data:/icons/folder.png").get();
-	icons["animation"] = am.load<gfx::texture>("editor_data:/icons/animation.png").get();
-	icons["sound"] = am.load<gfx::texture>("editor_data:/icons/sound.png").get();
+	icons["translate"] = am.load<gfx::texture>("editor:/data/icons/translate.png").get();
+	icons["rotate"] = am.load<gfx::texture>("editor:/data/icons/rotate.png").get();
+	icons["scale"] = am.load<gfx::texture>("editor:/data/icons/scale.png").get();
+	icons["local"] = am.load<gfx::texture>("editor:/data/icons/local.png").get();
+	icons["global"] = am.load<gfx::texture>("editor:/data/icons/global.png").get();
+	icons["play"] = am.load<gfx::texture>("editor:/data/icons/play.png").get();
+	icons["pause"] = am.load<gfx::texture>("editor:/data/icons/pause.png").get();
+	icons["stop"] = am.load<gfx::texture>("editor:/data/icons/stop.png").get();
+	icons["next"] = am.load<gfx::texture>("editor:/data/icons/next.png").get();
+	icons["material"] = am.load<gfx::texture>("editor:/data/icons/material.png").get();
+	icons["mesh"] = am.load<gfx::texture>("editor:/data/icons/mesh.png").get();
+	icons["export"] = am.load<gfx::texture>("editor:/data/icons/export.png").get();
+	icons["grid"] = am.load<gfx::texture>("editor:/data/icons/grid.png").get();
+	icons["wireframe"] = am.load<gfx::texture>("editor:/data/icons/wireframe.png").get();
+	icons["prefab"] = am.load<gfx::texture>("editor:/data/icons/prefab.png").get();
+	icons["scene"] = am.load<gfx::texture>("editor:/data/icons/scene.png").get();
+	icons["shader"] = am.load<gfx::texture>("editor:/data/icons/shader.png").get();
+	icons["loading"] = am.load<gfx::texture>("editor:/data/icons/loading.png").get();
+	icons["folder"] = am.load<gfx::texture>("editor:/data/icons/folder.png").get();
+	icons["animation"] = am.load<gfx::texture>("editor:/data/icons/animation.png").get();
+	icons["sound"] = am.load<gfx::texture>("editor:/data/icons/sound.png").get();
 }
 
 void editing_system::save_editor_camera()

@@ -613,7 +613,7 @@ void scene_dock::render(const ImVec2& area)
 		}
 	}
 
-	if(gui::IsWindowHovered())
+	if(gui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
 	{
 		if(dragged)
 		{
@@ -629,20 +629,6 @@ void scene_dock::render(const ImVec2& area)
 					projected_pos, false);
 			}
 
-			if(dragged.is_type<runtime::entity>())
-			{
-				gui::SetMouseCursor(ImGuiMouseCursor_Move);
-				if(gui::IsMouseReleased(gui::drag_button))
-				{
-					auto dragged_entity = dragged.get_value<runtime::entity>();
-					if(dragged_entity)
-					{
-						dragged_entity.get_component<transform_component>().lock()->set_parent({});
-					}
-
-					es.drop();
-				}
-			}
 			if(dragged.is_type<asset_handle<prefab>>())
 			{
 				gui::SetMouseCursor(ImGuiMouseCursor_Move);

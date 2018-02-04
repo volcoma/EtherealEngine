@@ -12,7 +12,7 @@ private:
     void context_menu();
     void context_create_menu();
     void set_cache_path(const fs::path& path);
-
+    void import();
     fs::directory_cache _cache;
     fs::path _cache_path_with_protocol;
     fs::path _root;

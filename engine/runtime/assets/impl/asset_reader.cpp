@@ -25,9 +25,10 @@ namespace runtime
 {
 namespace asset_reader
 {
+
 template <>
 bool load_from_file<gfx::texture>(core::task_future<asset_handle<gfx::texture>>& output,
-								  const std::string& key)
+								   const std::string& key)
 {
 	asset_handle<gfx::texture> original;
 	if(output.is_ready())
@@ -48,13 +49,14 @@ bool load_from_file<gfx::texture>(core::task_future<asset_handle<gfx::texture>>&
 		return true;
 	}
 
-	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
-	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<gfx::texture>();
+    auto cache_key = fs::replace(key, ":/data", ":/cache");
+	fs::path absolute_key = fs::absolute(fs::resolve_protocol(cache_key).string());
+	auto compiled_absolute_key = absolute_key.string() + ".asset";
 
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-		APPLOG_ERROR("Asset {0} does not exist!", key);
+        APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
@@ -101,7 +103,8 @@ bool load_from_file<gfx::texture>(core::task_future<asset_handle<gfx::texture>>&
 }
 
 template <>
-bool load_from_file<gfx::shader>(core::task_future<asset_handle<gfx::shader>>& output, const std::string& key)
+bool load_from_file<gfx::shader>(core::task_future<asset_handle<gfx::shader>>& output,
+								  const std::string& key)
 {
 	asset_handle<gfx::shader> original;
 	if(output.is_ready())
@@ -121,14 +124,17 @@ bool load_from_file<gfx::shader>(core::task_future<asset_handle<gfx::shader>>& o
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
-
-	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
-	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<gfx::shader>();
+    
+	auto cache_key = fs::replace(key, ":/data", ":/cache");
+    
+    fs::path absolute_key = fs::absolute(fs::resolve_protocol(cache_key).string());
+	const auto& renderer_extension = gfx::get_renderer_filename_extension();
+	auto compiled_absolute_key = absolute_key.string() + renderer_extension + ".asset";
 
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-		APPLOG_ERROR("Asset {0} does not exist!", key);
+		APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
@@ -195,13 +201,15 @@ bool load_from_file<mesh>(core::task_future<asset_handle<mesh>>& output, const s
 		return true;
 	}
 
-	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
-	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<mesh>();
+    auto cache_key = fs::replace(key, ":/data", ":/cache");
+	fs::path absolute_key = fs::absolute(fs::resolve_protocol(cache_key).string());
+
+	auto compiled_absolute_key = absolute_key.string() + ".asset";
 
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-		APPLOG_ERROR("Asset {0} does not exist!", key);
+        APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
@@ -263,7 +271,7 @@ bool load_from_file<mesh>(core::task_future<asset_handle<mesh>>& output, const s
 
 template <>
 bool load_from_file<audio::sound>(core::task_future<asset_handle<audio::sound>>& output,
-								  const std::string& key)
+								   const std::string& key)
 {
 	asset_handle<audio::sound> original;
 	if(output.is_ready())
@@ -284,13 +292,15 @@ bool load_from_file<audio::sound>(core::task_future<asset_handle<audio::sound>>&
 		return true;
 	}
 
-	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
-	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<audio::sound>();
+    auto cache_key = fs::replace(key, ":/data", ":/cache");
+	fs::path absolute_key = fs::absolute(fs::resolve_protocol(cache_key).string());
+
+	auto compiled_absolute_key = absolute_key.string() + ".asset";
 
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-		APPLOG_ERROR("Asset {0} does not exist!", key);
+        APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
@@ -339,7 +349,7 @@ bool load_from_file<audio::sound>(core::task_future<asset_handle<audio::sound>>&
 
 template <>
 bool load_from_file<runtime::animation>(core::task_future<asset_handle<runtime::animation>>& output,
-										const std::string& key)
+										 const std::string& key)
 {
 	asset_handle<runtime::animation> original;
 	if(output.is_ready())
@@ -360,13 +370,15 @@ bool load_from_file<runtime::animation>(core::task_future<asset_handle<runtime::
 		return true;
 	}
 
-	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
-	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<animation>();
+    auto cache_key = fs::replace(key, ":/data", ":/cache");
+	fs::path absolute_key = fs::absolute(fs::resolve_protocol(cache_key).string());
+
+	auto compiled_absolute_key = absolute_key.string() + ".asset";
 
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-		APPLOG_ERROR("Asset {0} does not exist!", key);
+        APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
@@ -436,13 +448,15 @@ bool load_from_file<material>(core::task_future<asset_handle<material>>& output,
 		return true;
 	}
 
-	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
-	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<material>();
+    auto cache_key = fs::replace(key, ":/data", ":/cache");
+	fs::path absolute_key = fs::absolute(fs::resolve_protocol(cache_key).string());
+
+	auto compiled_absolute_key = absolute_key.string() + ".asset";
 
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-		APPLOG_ERROR("Asset {0} does not exist!", key);
+        APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
@@ -461,7 +475,7 @@ bool load_from_file<material>(core::task_future<asset_handle<material>>& output,
 		{
 			return false;
 		}
-		cereal::iarchive_associative_t ar(stream);
+		cereal::iarchive_binary_t ar(stream);
 
 		try_load(ar, cereal::make_nvp("material", wrapper->material));
 
@@ -504,13 +518,15 @@ bool load_from_file<prefab>(core::task_future<asset_handle<prefab>>& output, con
 		return true;
 	}
 
-	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
-	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<prefab>();
+    auto cache_key = fs::replace(key, ":/data", ":/cache");
+	fs::path absolute_key = fs::absolute(fs::resolve_protocol(cache_key).string());
+
+	auto compiled_absolute_key = absolute_key.string() + ".asset";
 
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-		APPLOG_ERROR("Asset {0} does not exist!", key);
+        APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
@@ -570,13 +586,15 @@ bool load_from_file<scene>(core::task_future<asset_handle<scene>>& output, const
 		return true;
 	}
 
-	fs::path absolute_key = fs::absolute(fs::resolve_protocol(key).string());
-	auto compiled_absolute_key = absolute_key.string() + extensions::get_compiled_format<scene>();
+    auto cache_key = fs::replace(key, ":/data", ":/cache");
+	fs::path absolute_key = fs::absolute(fs::resolve_protocol(cache_key).string());
+
+	auto compiled_absolute_key = absolute_key.string() + ".asset";
 
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-		APPLOG_ERROR("Asset {0} does not exist!", key);
+        APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}

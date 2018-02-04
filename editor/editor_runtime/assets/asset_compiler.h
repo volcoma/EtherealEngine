@@ -1,8 +1,14 @@
 #pragma once
 #include "core/filesystem/filesystem.h"
 
-namespace asset_compiler
+namespace project_compiler
 {
-template <typename T>
-extern void compile(const fs::path& absolute_key);
+void compile_texture(const fs::path& absolute_meta_key, const fs::path& output);
+void compile_mesh(const fs::path& absolute_meta_key, const fs::path& output);
+void compile_animation(const fs::path& absolute_meta_key, const fs::path& output);
+void compile_sound(const fs::path& absolute_meta_key, const fs::path& output);
+void compile_shader(const fs::path& absolute_meta_key, const fs::path& output);
+void compile_material(const fs::path& absolute_meta_key, const fs::path& output);
+void compile_scene(const fs::path& absolute_meta_key, const fs::path& output);
+void compile_prefab(const fs::path& absolute_meta_key, const fs::path& output);
 };

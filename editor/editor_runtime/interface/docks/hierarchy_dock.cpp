@@ -82,7 +82,7 @@ context_action check_context_menu(runtime::entity entity)
 
 void check_drag(runtime::entity entity)
 {
-	if(!gui::IsWindowHovered())
+	if(!gui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
 		return;
 
 	auto& es = core::get_subsystem<editor::editing_system>();
@@ -93,7 +93,40 @@ void check_drag(runtime::entity entity)
 
 	if(entity)
 	{
-		if(gui::IsItemHoveredRect())
+//		if(entity != editor_camera)
+//		{
+//			if(gui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+//			{
+//				auto entity_index = entity.id().index();
+//				gui::TextUnformatted(entity.get_name().c_str());
+//				gui::SetDragDropPayload("entity", &entity_index, sizeof(entity_index));
+//				gui::EndDragDropSource();
+//			}
+//			else if(gui::BeginDragDropTarget())
+//			{
+//				auto payload = gui::AcceptDragDropPayload("entity");
+//				if(payload)
+//				{
+//					std::uint32_t entity_index = 0;
+//					std::memcpy(&entity_index, payload->Data, std::size_t(payload->DataSize));
+//					if(ecs.valid_index(entity_index))
+//					{
+//						auto eid = ecs.create_id(entity_index);
+//						auto dropped_entity = ecs.get(eid);
+//						if(dropped_entity)
+//						{
+//							auto trans_comp = dropped_entity.get_component<transform_component>().lock();
+//							if(trans_comp)
+//							{
+//								trans_comp->set_parent(entity);
+//							}
+//						}
+//					}
+//				}
+//				gui::EndDragDropTarget();
+//			}
+//		}
+		if(gui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
 		{
 
 			if(gui::IsMouseClicked(gui::drag_button) && entity != editor_camera)
@@ -165,7 +198,7 @@ void check_drag(runtime::entity entity)
 	}
 }
 
-void draw_entity(runtime::entity entity)
+void hierarchy_dock::draw_entity(runtime::entity entity)
 {
 	if(!entity)
 		return;
@@ -177,7 +210,6 @@ void draw_entity(runtime::entity entity)
 	auto& es = core::get_subsystem<editor::editing_system>();
 	auto& input = core::get_subsystem<runtime::input>();
 	auto& selected = es.selection_data.object;
-	static bool edit_label = false;
 	bool is_selected = false;
 	if(selected && selected.is_type<runtime::entity>())
 	{
@@ -210,6 +242,10 @@ void draw_entity(runtime::entity entity)
 	gui::AlignTextToFramePadding();
 	bool opened = gui::TreeNodeEx(name.c_str(), flags);
 
+	if(!edit_label)
+	{
+		check_drag(entity);
+	}
 	if(edit_label && is_selected)
 	{
 		std::array<char, 64> input_buff;
@@ -240,7 +276,6 @@ void draw_entity(runtime::entity entity)
 	}
 
 	ImGuiWindow* window = gui::GetCurrentWindow();
-	static ImGuiID id;
 
 	if(gui::IsItemHovered() && !gui::IsMouseDragging(0))
 	{
@@ -270,7 +305,6 @@ void draw_entity(runtime::entity entity)
 		{
 			edit_label = true;
 		}
-		check_drag(entity);
 	}
 
 	if(opened)
@@ -359,9 +393,8 @@ void hierarchy_dock::render(const ImVec2&)
 		}
 	}
 
-	if(gui::IsWindowHovered() && !gui::IsAnyItemHovered())
+	if(gui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem) && !gui::IsAnyItemHovered())
 	{
-
 		if(dragged)
 		{
 			if(dragged.is_type<runtime::entity>())

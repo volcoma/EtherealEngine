@@ -529,7 +529,7 @@ void gui_style::set_style_colors(const hsv_setup& _setup)
 
 void gui_style::load_style()
 {
-	const fs::path absoluteKey = fs::resolve_protocol("editor_data:/config/style.cfg");
+	const fs::path absoluteKey = fs::resolve_protocol("editor:/config/style.cfg");
 	fs::error_code err;
 	if(!fs::exists(absoluteKey, err))
 	{
@@ -546,7 +546,7 @@ void gui_style::load_style()
 
 void gui_style::save_style()
 {
-	const fs::path absoluteKey = fs::resolve_protocol("editor_data:/config/style.cfg");
+	const fs::path absoluteKey = fs::resolve_protocol("editor:/config/style.cfg");
 	std::ofstream output(absoluteKey.string());
 	cereal::oarchive_associative_t ar(output);
 

@@ -1,4 +1,5 @@
 #include "asset_compiler.h"
+#include "../assets/mesh_importer.h"
 #include "bx/error.h"
 #include "bx/process.h"
 #include "bx/string.h"
@@ -9,34 +10,34 @@
 #include "core/graphics/shader.h"
 #include "core/graphics/texture.h"
 #include "core/logging/logging.h"
+#include "core/serialization/associative_archive.h"
 #include "core/serialization/binary_archive.h"
 #include "core/serialization/serialization.h"
+#include "core/serialization/types/map.hpp"
 #include "core/serialization/types/unordered_map.hpp"
 #include "core/serialization/types/vector.hpp"
 #include "core/string_utils/string_utils.h"
 #include "core/uuid/uuid.hpp"
-#include "mesh_importer.h"
 #include "runtime/assets/impl/asset_extensions.h"
+#include "runtime/ecs/constructs/prefab.h"
+#include "runtime/ecs/constructs/scene.h"
 #include "runtime/meta/animation/animation.hpp"
 #include "runtime/meta/audio/sound.hpp"
+#include "runtime/meta/rendering/material.hpp"
 #include "runtime/meta/rendering/mesh.hpp"
-#include "runtime/rendering/mesh.h"
+
 #include <array>
 #include <fstream>
 
-class material;
-struct prefab;
-struct scene;
-
-namespace asset_compiler
+namespace project_compiler
 {
-std::string escape_str(const std::string& str)
+static std::string escape_str(const std::string& str)
 {
 	return "\"" + str + "\"";
 }
 
-bool run_compile_process(const std::string& process, const std::vector<std::string>& args_array,
-						 std::string& err)
+static bool run_compile_process(const std::string& process, const std::vector<std::string>& args_array,
+								std::string& err)
 {
 
 	std::string args;
@@ -94,35 +95,16 @@ bool run_compile_process(const std::string& process, const std::vector<std::stri
 	}
 }
 
-template <>
-void compile<prefab>(const fs::path&)
+void compile_shader(const fs::path& absolute_meta_key, const fs::path& output)
 {
-}
-
-template <>
-void compile<scene>(const fs::path&)
-{
-}
-
-template <>
-void compile<material>(const fs::path&)
-{
-}
-
-template <>
-void compile<runtime::animation>(const fs::path&)
-{
-}
-
-template <>
-void compile<gfx::shader>(const fs::path& absolute_key)
-{
-	fs::path output = absolute_key.string() + extensions::get_compiled_format<gfx::shader>();
+    fs::error_code err;
+    fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
+    absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
+    absolute_key.replace_extension();
 	std::string str_input = absolute_key.string();
 	std::string file = absolute_key.stem().string();
 	fs::path dir = absolute_key.parent_path();
 
-	fs::error_code err;
 	fs::path temp = fs::temp_directory_path(err);
 	temp /= uuids::random_uuid(str_input).to_string() + ".buildtemp";
 
@@ -202,13 +184,14 @@ void compile<gfx::shader>(const fs::path& absolute_key)
 	fs::remove(temp, err);
 }
 
-template <>
-void compile<gfx::texture>(const fs::path& absolute_key)
+void compile_texture(const fs::path& absolute_meta_key, const fs::path& output)
 {
-	fs::path output = absolute_key.string() + extensions::get_compiled_format<gfx::texture>();
+    fs::error_code err;
+    fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
+    absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
+    absolute_key.replace_extension();
 	std::string str_input = absolute_key.string();
 
-	fs::error_code err;
 	fs::path temp = fs::temp_directory_path(err);
 	temp /= uuids::random_uuid(str_input).to_string() + ".buildtemp";
 
@@ -237,13 +220,14 @@ void compile<gfx::texture>(const fs::path& absolute_key)
 	fs::remove(temp, err);
 }
 
-template <>
-void compile<mesh>(const fs::path& absolute_key)
+void compile_mesh(const fs::path& absolute_meta_key, const fs::path& output)
 {
-	fs::path output = absolute_key.string() + extensions::get_compiled_format<mesh>();
+    fs::error_code err;
+    fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
+    absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
+    absolute_key.replace_extension();
 	std::string str_input = absolute_key.string();
 
-	fs::error_code err;
 	fs::path temp = fs::temp_directory_path(err);
 	temp /= uuids::random_uuid(str_input).to_string() + ".buildtemp";
 
@@ -267,36 +251,43 @@ void compile<mesh>(const fs::path& absolute_key)
 
 		APPLOG_INFO("Successful compilation of {0}", str_input);
 	}
-	{
-		fs::path file = absolute_key.stem();
-		fs::path dir = absolute_key.parent_path();
+	//	{
+	//		fs::path file = absolute_key.stem();
+	//		fs::path dir = absolute_key.parent_path();
 
-		for(const auto& animation : animations)
-		{
-			temp = fs::temp_directory_path(err);
-			temp.append(uuids::random_uuid(str_input).to_string() + ".buildtemp");
-			{
-				std::ofstream soutput(temp.string(), std::ios::out | std::ios::binary);
-				cereal::oarchive_binary_t ar(soutput);
-				try_save(ar, cereal::make_nvp("animation", animation));
-			}
-			output = (dir / file).string() + "_" + animation.name + extensions::animation;
+	//		for(const auto& animation : animations)
+	//		{
+	//			temp = fs::temp_directory_path(err);
+	//			temp.append(uuids::random_uuid(str_input).to_string() + ".buildtemp");
+	//			{
+	//				std::ofstream soutput(temp.string(), std::ios::out | std::ios::binary);
+	//				cereal::oarchive_binary_t ar(soutput);
+	//				try_save(ar, cereal::make_nvp("animation", animation));
+	//			}
+	//			output = (dir / file).string() + "_" + animation.name + extensions::animation;
 
-			fs::copy_file(temp, output, fs::copy_options::overwrite_if_exists, err);
-			fs::remove(temp, err);
+	//			fs::copy_file(temp, output, fs::copy_options::overwrite_if_exists, err);
+	//			fs::remove(temp, err);
 
-			APPLOG_INFO("Successful compilation of animation {0}", animation.name);
-		}
-	}
+	//			APPLOG_INFO("Successful compilation of animation {0}", animation.name);
+	//		}
+	//	}
 }
 
-template <>
-void compile<audio::sound>(const fs::path& absolute_key)
+
+void compile_animation(const fs::path &absolute_meta_key, const fs::path &output)
 {
-	fs::path output = absolute_key.string() + extensions::get_compiled_format<audio::sound>();
+}
+
+void compile_sound(const fs::path& absolute_meta_key, const fs::path& output)
+{
+    fs::error_code err;
+    fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
+    absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
+    absolute_key.replace_extension();
+    
 	std::string str_input = absolute_key.string();
 
-	fs::error_code err;
 	fs::path temp = fs::temp_directory_path(err);
 	temp /= uuids::random_uuid(str_input).to_string() + ".buildtemp";
 
@@ -347,4 +338,58 @@ void compile<audio::sound>(const fs::path& absolute_key)
 
 	APPLOG_INFO("Successful compilation of {0}", str_input);
 }
+
+void compile_material(const fs::path& absolute_meta_key, const fs::path& output)
+{
+    fs::error_code err;
+    fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
+    absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
+    absolute_key.replace_extension();
+    std::string str_input = absolute_key.string();
+    
+	std::shared_ptr<::material> material;
+	{
+		std::ifstream stream(absolute_key.string());
+		if(stream.good())
+		{
+			cereal::iarchive_associative_t ar(stream);
+
+			try_load(ar, cereal::make_nvp("material", material));
+		}
+	}
+
+	if(material)
+	{
+		std::ofstream stream(output.string(), std::ios::binary);
+		if(stream.good())
+		{
+			cereal::oarchive_binary_t ar(stream);
+
+			try_save(ar, cereal::make_nvp("material", material));
+            
+            APPLOG_INFO("Successful compilation of {0}", str_input);
+            
+		}
+	}
+}
+
+void compile_scene(const fs::path& absolute_meta_key, const fs::path& output)
+{
+    fs::error_code err;
+    fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
+    absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
+    absolute_key.replace_extension();
+	fs::copy_file(absolute_key, output, fs::copy_options::overwrite_if_exists, err);
+}
+
+void compile_prefab(const fs::path& absolute_meta_key, const fs::path& output)
+{
+    fs::error_code err;
+    fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
+    absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
+    absolute_key.replace_extension();
+    fs::copy_file(absolute_key, output, fs::copy_options::overwrite_if_exists, err);
+}
+
+
 }

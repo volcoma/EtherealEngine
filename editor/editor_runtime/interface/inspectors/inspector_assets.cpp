@@ -48,7 +48,7 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 			return false;
 	}
 	gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
-	bool hoveredFrame = gui::IsItemHoveredRect();
+	bool hoveredFrame = gui::IsItemHovered(ImGuiHoveredFlags_RectOnly);
 	auto bbMinFrame = gui::GetItemRectMin();
 	auto bbMaxFrame = gui::GetItemRectMax();
 
@@ -97,7 +97,7 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
 			gui::PopStyleColor();
 
-			if(hoveredFrame || gui::IsItemHoveredRect())
+			if(hoveredFrame || gui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
 			{
 				gui::SetMouseCursor(ImGuiMouseCursor_Move);
 				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
@@ -163,7 +163,7 @@ bool inspector_asset_handle_material::inspect(rttr::variant& var, bool read_only
 			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
 			gui::PopStyleColor();
 
-			if(gui::IsItemHoveredRect())
+			if(gui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
 			{
 				gui::SetMouseCursor(ImGuiMouseCursor_Move);
 				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
@@ -235,7 +235,7 @@ bool inspector_asset_handle_mesh::inspect(rttr::variant& var, bool read_only, co
 			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
 			gui::PopStyleColor();
 
-			if(gui::IsItemHoveredRect())
+			if(gui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
 			{
 				gui::SetMouseCursor(ImGuiMouseCursor_Move);
 				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
@@ -304,7 +304,7 @@ bool inspector_asset_handle_animation::inspect(rttr::variant& var, bool read_onl
 			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
 			gui::PopStyleColor();
 
-			if(gui::IsItemHoveredRect())
+			if(gui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
 			{
 				gui::SetMouseCursor(ImGuiMouseCursor_Move);
 				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
@@ -369,7 +369,7 @@ bool inspector_asset_handle_sound::inspect(rttr::variant& var, bool read_only,
 			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
 			gui::PopStyleColor();
 
-			if(gui::IsItemHoveredRect())
+			if(gui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
 			{
 				gui::SetMouseCursor(ImGuiMouseCursor_Move);
 				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
@@ -434,7 +434,7 @@ bool inspector_asset_handle_prefab::inspect(rttr::variant& var, bool read_only,
 			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
 			gui::PopStyleColor();
 
-			if(gui::IsItemHoveredRect())
+			if(gui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
 			{
 				gui::SetMouseCursor(ImGuiMouseCursor_Move);
 				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));

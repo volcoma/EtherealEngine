@@ -22,21 +22,21 @@ bool begins_with(const std::string& str, const std::string& value)
 	// No match
 	return false;
 }
-static std::string replace_seq(const std::string& str, const std::string& oldSequence,
-							   const std::string& newSequence)
+static std::string replace_seq(const std::string& str, const std::string& old_sequence,
+							   const std::string& new_sequence)
 {
 	std::string s = str;
 	std::string::size_type location = 0;
-	std::string::size_type oldLength = oldSequence.length();
-	std::string::size_type newLength = newSequence.length();
+	std::string::size_type old_length = old_sequence.length();
+	std::string::size_type new_length = new_sequence.length();
 
 	// Search for all replace std::string occurances.
 	if(s.empty() == false)
 	{
-		while(std::string::npos != (location = s.find(oldSequence, location)))
+		while(std::string::npos != (location = s.find(old_sequence, location)))
 		{
-			s.replace(location, oldLength, newSequence);
-			location += newLength;
+			s.replace(location, old_length, new_sequence);
+			location += new_length;
 
 			// Break out if we're done
 			if(location >= s.length())

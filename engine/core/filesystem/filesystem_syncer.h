@@ -14,8 +14,8 @@ class syncer
 public:
 	using rename_pair_t = std::pair<fs::path, fs::path>;
 
-	using on_entry_created_t = std::function<void(const fs::path&, const std::vector<fs::path>&)>;
-	using on_entry_modified_t = std::function<void(const fs::path&, const std::vector<fs::path>&)>;
+	using on_entry_created_t = std::function<void(const fs::path&, const std::vector<fs::path>&, bool)>;
+	using on_entry_modified_t = std::function<void(const fs::path&, const std::vector<fs::path>&, bool)>;
 	using on_entry_removed_t = std::function<void(const fs::path&, const std::vector<fs::path>&)>;
 	using on_entry_renamed_t = std::function<void(const rename_pair_t&, const std::vector<rename_pair_t>&)>;
 

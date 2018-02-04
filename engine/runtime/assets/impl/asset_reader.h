@@ -8,6 +8,7 @@ namespace runtime
 {
 namespace asset_reader
 {
+
 template <typename T>
 extern bool load_from_file(core::task_future<asset_handle<T>>& output, const std::string& key);
 

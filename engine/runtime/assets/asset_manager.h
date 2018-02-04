@@ -96,8 +96,6 @@ public:
 	void rename_asset(const std::string& key, const std::string& new_key)
 	{
 		auto& storage = get_storage<T>();
-		if(storage.rename_asset_file)
-			storage.rename_asset_file(key, new_key);
 
 		std::lock_guard<std::recursive_mutex> lock(storage.container_mutex);
 		auto it = storage.container.find(key);
@@ -128,23 +126,6 @@ public:
 
 			storage.container.erase(it);
 		}
-	}
-	//-----------------------------------------------------------------------------
-	//  Name : delete_asset ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	template <typename T>
-	void delete_asset(const std::string& key)
-	{
-		auto& storage = get_storage<T>();
-		if(storage.delete_asset_file)
-			storage.delete_asset_file(key);
-
-		clear_asset<T>(key);
 	}
 
 	//-----------------------------------------------------------------------------

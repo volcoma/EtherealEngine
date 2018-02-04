@@ -22,58 +22,42 @@ void setup_asset_manager(asset_manager& manager)
 		auto& storage = manager.add_storage<gfx::shader>();
 		storage.load_from_file = asset_reader::load_from_file<gfx::shader>;
 		storage.load_from_instance = asset_reader::load_from_instance<gfx::shader>;
-		storage.rename_asset_file = asset_writer::rename_asset_file<gfx::shader>;
-		storage.delete_asset_file = asset_writer::delete_asset_file<gfx::shader>;
 	}
 	{
 		auto& storage = manager.add_storage<gfx::texture>();
 		storage.load_from_file = asset_reader::load_from_file<gfx::texture>;
 		storage.load_from_instance = asset_reader::load_from_instance<gfx::texture>;
-		storage.rename_asset_file = asset_writer::rename_asset_file<gfx::texture>;
-		storage.delete_asset_file = asset_writer::delete_asset_file<gfx::texture>;
 	}
 	{
 		auto& storage = manager.add_storage<mesh>();
 		storage.load_from_file = asset_reader::load_from_file<mesh>;
 		storage.load_from_instance = asset_reader::load_from_instance<mesh>;
-		storage.rename_asset_file = asset_writer::rename_asset_file<mesh>;
-		storage.delete_asset_file = asset_writer::delete_asset_file<mesh>;
 	}
 	{
 		auto& storage = manager.add_storage<audio::sound>();
 		storage.load_from_file = asset_reader::load_from_file<audio::sound>;
 		storage.load_from_instance = asset_reader::load_from_instance<audio::sound>;
-		storage.rename_asset_file = asset_writer::rename_asset_file<audio::sound>;
-		storage.delete_asset_file = asset_writer::delete_asset_file<audio::sound>;
 	}
 	{
 		auto& storage = manager.add_storage<material>();
 		storage.load_from_file = asset_reader::load_from_file<material>;
 		storage.load_from_instance = asset_reader::load_from_instance<material>;
 		storage.save_to_file = asset_writer::save_to_file<material>;
-		storage.rename_asset_file = asset_writer::rename_asset_file<material>;
-		storage.delete_asset_file = asset_writer::delete_asset_file<material>;
 	}
 	{
 		auto& storage = manager.add_storage<animation>();
 		storage.load_from_file = asset_reader::load_from_file<animation>;
 		storage.load_from_instance = asset_reader::load_from_instance<animation>;
-		storage.rename_asset_file = asset_writer::rename_asset_file<animation>;
-		storage.delete_asset_file = asset_writer::delete_asset_file<animation>;
 	}
 	{
 		auto& storage = manager.add_storage<prefab>();
 		storage.load_from_file = asset_reader::load_from_file<prefab>;
 		storage.load_from_instance = asset_reader::load_from_instance<prefab>;
-		storage.rename_asset_file = asset_writer::rename_asset_file<prefab>;
-		storage.delete_asset_file = asset_writer::delete_asset_file<prefab>;
 	}
 	{
 		auto& storage = manager.add_storage<scene>();
 		storage.load_from_file = asset_reader::load_from_file<scene>;
 		storage.load_from_instance = asset_reader::load_from_instance<scene>;
-		storage.rename_asset_file = asset_writer::rename_asset_file<scene>;
-		storage.delete_asset_file = asset_writer::delete_asset_file<scene>;
 	}
 
 	{

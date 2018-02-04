@@ -10,10 +10,10 @@
 material::material()
 {
 	auto& am = core::get_subsystem<runtime::asset_manager>();
-	auto default_color = am.load<gfx::texture>("engine_data:/textures/default_color.dds");
+	auto default_color = am.load<gfx::texture>("engine:/data/textures/default_color.dds");
 	_default_color_map = default_color.get();
 
-	auto default_normal = am.load<gfx::texture>("engine_data:/textures/default_normal.dds");
+	auto default_normal = am.load<gfx::texture>("engine:/data/textures/default_normal.dds");
 	_default_normal_map = default_normal.get();
 }
 
@@ -71,9 +71,9 @@ standard_material::standard_material()
 {
 	auto& ts = core::get_subsystem<core::task_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
-	auto vs_deferred_geom = am.load<gfx::shader>("engine_data:/shaders/vs_deferred_geom.sc");
-	auto vs_deferred_geom_skinned = am.load<gfx::shader>("engine_data:/shaders/vs_deferred_geom_skinned.sc");
-	auto fs_deferred_geom = am.load<gfx::shader>("engine_data:/shaders/fs_deferred_geom.sc");
+	auto vs_deferred_geom = am.load<gfx::shader>("engine:/data/shaders/vs_deferred_geom.sc");
+	auto vs_deferred_geom_skinned = am.load<gfx::shader>("engine:/data/shaders/vs_deferred_geom_skinned.sc");
+	auto fs_deferred_geom = am.load<gfx::shader>("engine:/data/shaders/fs_deferred_geom.sc");
 
 	auto f = ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {

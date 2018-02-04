@@ -731,18 +731,18 @@ deferred_rendering::deferred_rendering()
 
 	auto& ts = core::get_subsystem<core::task_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
-	auto vs_clip_quad = am.load<gfx::shader>("engine_data:/shaders/vs_clip_quad.sc");
-	auto fs_deferred_point_light = am.load<gfx::shader>("engine_data:/shaders/fs_deferred_point_light.sc");
-	auto fs_deferred_spot_light = am.load<gfx::shader>("engine_data:/shaders/fs_deferred_spot_light.sc");
+	auto vs_clip_quad = am.load<gfx::shader>("engine:/data/shaders/vs_clip_quad.sc");
+	auto fs_deferred_point_light = am.load<gfx::shader>("engine:/data/shaders/fs_deferred_point_light.sc");
+	auto fs_deferred_spot_light = am.load<gfx::shader>("engine:/data/shaders/fs_deferred_spot_light.sc");
 	auto fs_deferred_directional_light =
-		am.load<gfx::shader>("engine_data:/shaders/fs_deferred_directional_light.sc");
-	auto fs_gamma_correction = am.load<gfx::shader>("engine_data:/shaders/fs_gamma_correction.sc");
-	auto vs_clip_quad_ex = am.load<gfx::shader>("engine_data:/shaders/vs_clip_quad_ex.sc");
+		am.load<gfx::shader>("engine:/data/shaders/fs_deferred_directional_light.sc");
+	auto fs_gamma_correction = am.load<gfx::shader>("engine:/data/shaders/fs_gamma_correction.sc");
+	auto vs_clip_quad_ex = am.load<gfx::shader>("engine:/data/shaders/vs_clip_quad_ex.sc");
 	auto fs_sphere_reflection_probe =
-		am.load<gfx::shader>("engine_data:/shaders/fs_sphere_reflection_probe.sc");
-	auto fs_box_reflection_probe = am.load<gfx::shader>("engine_data:/shaders/fs_box_reflection_probe.sc");
-	auto fs_atmospherics = am.load<gfx::shader>("engine_data:/shaders/fs_atmospherics.sc");
-	_ibl_brdf_lut = am.load<gfx::texture>("engine_data:/textures/ibl_brdf_lut.png").get();
+		am.load<gfx::shader>("engine:/data/shaders/fs_sphere_reflection_probe.sc");
+	auto fs_box_reflection_probe = am.load<gfx::shader>("engine:/data/shaders/fs_box_reflection_probe.sc");
+	auto fs_atmospherics = am.load<gfx::shader>("engine:/data/shaders/fs_atmospherics.sc");
+	_ibl_brdf_lut = am.load<gfx::texture>("engine:/data/textures/ibl_brdf_lut.png").get();
 
 	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {

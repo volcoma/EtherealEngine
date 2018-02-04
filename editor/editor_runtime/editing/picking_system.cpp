@@ -224,8 +224,8 @@ picking_system::picking_system()
 	auto& ts = core::get_subsystem<core::task_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
 
-	auto vs_picking_id = am.load<gfx::shader>("editor_data:/shaders/vs_picking_id.sc");
-	auto fs_picking_id = am.load<gfx::shader>("editor_data:/shaders/fs_picking_id.sc");
+	auto vs_picking_id = am.load<gfx::shader>("editor:/data/shaders/vs_picking_id.sc");
+	auto fs_picking_id = am.load<gfx::shader>("editor:/data/shaders/fs_picking_id.sc");
 
 	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
