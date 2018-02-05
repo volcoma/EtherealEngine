@@ -27,10 +27,10 @@ matrix:
       addons: &gcc5
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-5', 'cmake', 'cmake-data']
+          packages: ['g++-5.3', 'cmake', 'cmake-data']
       env:
-        - COMPILERCXX='g++-5'
-        - COMPILERC='gcc-5'
+        - COMPILERCXX='g++-5.3'
+        - COMPILERC='gcc-5.3'
 
     - os: linux
       compiler: gcc
