@@ -12,39 +12,19 @@ matrix:
     # 1/ Linux Clang Builds
     - os: linux
       compiler: clang
-      addons:
+      addons: &clang38
         apt:
-          sources: ['ubuntu-toolchain-r-test' 'llvm-toolchain-trusty-3.8']
-          packages: ['libstdc++-5-dev', 'clang-3.8', 'cmake', 'cmake-data']
-      env:
+          sources: ['llvm-toolchain-trusty-3.8', 'ubuntu-toolchain-r-test']
+          packages: ['clang-3.8', 'cmake', 'cmake-data']
+      env: 
         - COMPILERCXX='clang++-3.8'
         - COMPILERC='clang-3.8'
-        
-    #- os: linux
-    #  compiler: clang
-    #  addons:
-    #    apt:
-    #      sources: ['ubuntu-toolchain-r-test' 'llvm-toolchain-trusty-3.9']
-    #      packages: ['libstdc++-6-dev', 'clang-3.9', 'cmake', 'cmake-data']
-    #  env:
-    #    - COMPILERCXX='clang++-3.9'
-    #    - COMPILERC='clang-3.9'
-    #    
-    #- os: linux
-    #  compiler: clang
-    #  addons:
-    #    apt:
-    #      sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-4.0']
-    #      packages: ['libstdc++-6-dev', 'clang-4.0', 'cmake', 'cmake-data']
-    #  env:
-    #    - COMPILERCXX='clang++-4.0'
-    #    - COMPILERC='clang-4.0'
     
     
     # 2/ Linux GCC Builds
     - os: linux
       compiler: gcc
-      addons:
+      addons: &gcc5
         apt:
           sources: ['ubuntu-toolchain-r-test']
           packages: ['g++-5', 'cmake', 'cmake-data']
@@ -54,25 +34,31 @@ matrix:
 
     - os: linux
       compiler: gcc
-      addons:
+      addons: &gcc6
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-6', 'cmake', 'cmake-data']]
+          packages: ['g++-6', 'cmake', 'cmake-data']
       env:
         - COMPILERCXX='g++-6'
         - COMPILERC='gcc-6'
         
     - os: linux
       compiler: gcc
-      addons:
+      addons: &gcc7
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-7', 'cmake', 'cmake-data']]
+          packages: ['g++-7', 'cmake', 'cmake-data']
       env:
+        - COMPILERCXX='g++-7'
+        - COMPILERC='gcc-7'
+   
+  allow_failures:
+    - env:
         - COMPILERCXX='g++-7'
         - COMPILERC='gcc-7'
 
 before_install:
+  - sudo apt-get update -qq
   - sudo apt-get install -y libglew-dev
   - sudo apt-get install libgtk-3-dev
   - sudo apt-get install libudev-dev
