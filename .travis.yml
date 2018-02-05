@@ -8,6 +8,7 @@ env:
 
 matrix:
   include:
+  
     # Linux / GCC
     - os: linux
       compiler: gcc
@@ -79,103 +80,29 @@ matrix:
       env:
         - COMPILERCXX='clang++-5.0'
         - COMPILERC='clang-5.0'
-    # 1/ Linux Clang Builds
-    #- os: linux
-    #  compiler: clang
-    #  addons: &clang38
-    #    apt:
-    #      sources: ['llvm-toolchain-trusty-3.8', 'ubuntu-toolchain-r-test']
-    #      packages: ['clang-3.8', 'cmake', 'cmake-data']
-    #  env: 
-    #    - COMPILERCXX='clang++-3.8'
-    #    - COMPILERC='clang-3.8'
-    #
-    #
-    ## 2/ Linux GCC Builds
-    #- os: linux
-    #  compiler: gcc
-    #  addons: &gcc5
-    #    apt:
-    #      sources: ['ubuntu-toolchain-r-test']
-    #      packages: ['g++-5.3', 'cmake', 'cmake-data']
-    #  env:
-    #    - COMPILERCXX='g++-5.3'
-    #    - COMPILERC='gcc-5.3'
-    #
-    #- os: linux
-    #  compiler: gcc
-    #  addons: &gcc6
-    #    apt:
-    #      sources: ['ubuntu-toolchain-r-test']
-    #      packages: ['g++-6', 'cmake', 'cmake-data']
-    #  env:
-    #    - COMPILERCXX='g++-6'
-    #    - COMPILERC='gcc-6'
-    #    
-    #- os: linux
-    #  compiler: gcc
-    #  addons: &gcc7
-    #    apt:
-    #      sources: ['ubuntu-toolchain-r-test']
-    #      packages: ['g++-7', 'cmake', 'cmake-data']
-    #  env:
-    #    - COMPILERCXX='g++-7'
-    #    - COMPILERC='gcc-7'
-   
-  #allow_failures:
-  #  - env:
-  #      - COMPILERCXX='g++-7'
-  #      - COMPILERC='gcc-7'
 
 before_install:
   - sudo apt-get install -y libglew-dev
   - sudo apt-get install libgtk-3-dev
   - sudo apt-get install libudev-dev
-  
+  - export CIT_ROOT=`pwd`
+  - cd $CIT_ROOT
+
 install:
-  - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
-  - mkdir ${DEPS_DIR} && cd ${DEPS_DIR}
+  - DEPS_DIR="${TRAVIS_BUILD_DIR}/3rd_party"
+  - cd ${DEPS_DIR}
+  #######################################################################################
+  # Install a recent CMake (unless already installed on OS X)
+  #######################################################################################
   - |
     if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-      CMAKE_URL="http://www.cmake.org/files/v3.3/cmake-3.3.2-Linux-x86_64.tar.gz"
+      CMAKE_URL="http://www.cmake.org/files/v3.10/cmake-3.10.2-Linux-x86_64.tar.gz"
       mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
       export PATH=${DEPS_DIR}/cmake/bin:${PATH}
-    elif [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-      which cmake || brew install cmake
+    else
+      brew upgrade cmake || brew install cmake ninja || brew link --overwrite cmake
     fi
-  - cd ${TRAVIS_BUILD_DIR}
-
-#  ############################################################################
-#  # Install libc++ and libc++abi (on Linux only; Xcode uses libc++ by default)
-#  ############################################################################
-#  - |
-#    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-#      if   [[ "${COMPILERCXX}" == "clang++-3.5" ]]; then LLVM_VERSION="3.5.2"
-#      elif [[ "${COMPILERCXX}" == "clang++-3.6" ]]; then LLVM_VERSION="3.6.2";
-#      elif [[ "${COMPILERCXX}" == "clang++-3.7" ]]; then LLVM_VERSION="3.7.0";
-#      elif [[ "${COMPILERCXX}" == "clang++-3.8" ]]; then LLVM_VERSION="3.8.0";
-#      elif [[ "${COMPILERCXX}" == "clang++-3.9" ]]; then LLVM_VERSION="3.9.0";
-#      elif [[ "${COMPILERCXX}" == "clang++-4.0" ]]; then LLVM_VERSION="4.0.0"; fi
-#      if [[ "${LLVM_VERSION}" != "" ]]; then
-#        LLVM_URL="http://llvm.org/releases/${LLVM_VERSION}/llvm-${LLVM_VERSION}.src.tar.xz"
-#        LIBCXX_URL="http://llvm.org/releases/${LLVM_VERSION}/libcxx-${LLVM_VERSION}.src.tar.xz"
-#        LIBCXXABI_URL="http://llvm.org/releases/${LLVM_VERSION}/libcxxabi-${LLVM_VERSION}.src.tar.xz"
-#        TAR_FLAGS="-xJ"
-#        
-#        mkdir -p llvm llvm/build llvm/projects/libcxx llvm/projects/libcxxabi
-#        travis_retry wget --quiet -O - ${LLVM_URL} | tar --strip-components=1 ${TAR_FLAGS} -C llvm
-#        travis_retry wget --quiet -O - ${LIBCXX_URL} | tar --strip-components=1 ${TAR_FLAGS} -C llvm/projects/libcxx
-#        travis_retry wget --quiet -O - ${LIBCXXABI_URL} | tar --strip-components=1 ${TAR_FLAGS} -C llvm/projects/libcxxabi
-#        (cd llvm/build && cmake .. -DCMAKE_INSTALL_PREFIX=${DEPS_DIR}/llvm/install -DCMAKE_CXX_COMPILER=clang++)
-#        (cd llvm/build/projects/libcxx && make install -j2)
-#        (cd llvm/build/projects/libcxxabi && make install -j2)
-#        
-#        export CXXFLAGS="-isystem ${DEPS_DIR}/llvm/install/include/c++/v1"
-#        export LDFLAGS="-L ${DEPS_DIR}/llvm/install/lib -l c++ -l c++abi"
-#        export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${DEPS_DIR}/llvm/install/lib"
-#        export PATH="llvm/clang/bin:${PATH}"
-#      fi
-#    fi
+  - cmake --version
 
 
 script:
