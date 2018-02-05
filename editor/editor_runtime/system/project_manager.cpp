@@ -251,12 +251,12 @@ void project_manager::setup_meta_syncer(fs::syncer& syncer, const fs::path& data
 
 static std::vector<fs::path> remove_meta_tag(const std::vector<fs::path>& synced_paths)
 {
-	static const std::string meta = ".meta";
+	static const std::string meta_ext = ".meta";
 	std::decay_t<decltype(synced_paths)> reduced;
 	reduced.reserve(synced_paths.size());
 	for(const auto& synced_path : synced_paths)
 	{
-		reduced.emplace_back(fs::replace(synced_path, meta, ""));
+		reduced.emplace_back(fs::replace(synced_path, meta_ext, ""));
 	}
 	return reduced;
 }
