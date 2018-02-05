@@ -19,7 +19,36 @@ matrix:
       env: 
         - COMPILERCXX='clang++-3.8'
         - COMPILERC='clang-3.8'
+
+    - os: linux
+      compiler: clang
+      addons: &clang39
+        apt:
+          sources: ['llvm-toolchain-trusty-3.9', 'ubuntu-toolchain-r-test']
+          packages: ['clang-3.9', 'cmake', 'cmake-data']
+      env: 
+        - COMPILERCXX='clang++-3.9'
+        - COMPILERC='clang-3.9'
+
+    - os: linux
+      compiler: clang
+      addons: &clang40
+        apt:
+          sources: ['llvm-toolchain-trusty-4.0', 'ubuntu-toolchain-r-test']
+          packages: ['clang-4.0', 'cmake', 'cmake-data']
+      env: 
+        - COMPILERCXX='clang++-4.0'
+        - COMPILERC='clang-4.0'
     
+    - os: linux
+      compiler: clang
+      addons: &clang50
+        apt:
+          sources: ['llvm-toolchain-trusty-5.0', 'ubuntu-toolchain-r-test']
+          packages: ['clang-5.0', 'cmake', 'cmake-data']
+      env: 
+        - COMPILERCXX='clang++-5.0'
+        - COMPILERC='clang-5.0'
     
     # 2/ Linux GCC Builds
     - os: linux
