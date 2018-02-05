@@ -222,14 +222,17 @@ void hierarchy_dock::draw_entity(runtime::entity entity)
 	if(is_selected)
 		flags |= ImGuiTreeNodeFlags_Selected;
 
-	if(is_selected && !gui::IsAnyItemActive())
+    if(gui::IsWindowFocused())
 	{
-		if(input.is_key_pressed(mml::keyboard::F2))
-		{
-			edit_label = true;
-		}
-	}
-
+        if(is_selected && !gui::IsAnyItemActive())
+        {
+            if(input.is_key_pressed(mml::keyboard::F2))
+            {
+                edit_label = true;
+                gui::SetKeyboardFocusHere();
+            }
+        }
+    }
 	auto transformComponent = entity.get_component<transform_component>().lock();
 	bool no_children = true;
 	if(transformComponent)
