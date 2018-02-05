@@ -28,13 +28,11 @@ struct property_layout
 
 REFLECT_EXTERN(inspector);
 
-#define INSPECTED_TYPE "inspected_type"
-
 #define INSPECTOR_REFLECT(inspector_type, inspected_type)                                                    \
 	REFLECT_INLINE(inspector_type)                                                                           \
 	{                                                                                                        \
 		rttr::registration::class_<inspector_type>(#inspector_type)(                                         \
-			rttr::metadata(INSPECTED_TYPE, rttr::type::get<inspected_type>()))                               \
+			rttr::metadata("inspected_type", rttr::type::get<inspected_type>()))                               \
 			.constructor<>()(rttr::policy::ctor::as_std_shared_ptr);                                         \
 	}
 

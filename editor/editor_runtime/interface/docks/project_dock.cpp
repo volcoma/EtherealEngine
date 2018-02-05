@@ -81,7 +81,7 @@ static void process_drag_drop_target(const fs::path& absolute_path)
 					{
 						if(!fs::exists(new_name, err))
 						{
-                            fs::rename(data, new_name, err);
+							fs::rename(data, new_name, err);
 						}
 					}
 				}
@@ -658,7 +658,6 @@ void project_dock::render(const ImVec2&)
 		}
 	}
 	process_drag_drop_target(current_path);
-
 }
 
 void project_dock::context_menu()
@@ -674,14 +673,13 @@ void project_dock::context_menu()
 		{
 			fs::show_in_graphical_env(_cache.get_path());
 		}
-        
-        gui::NewLine();
-        gui::Separator();
-        
-        if(gui::Selectable("IMPORT..."))
-        {
-            import();
-        }
+
+		gui::Separator();
+
+		if(gui::Selectable("IMPORT..."))
+		{
+			import();
+		}
 
 		gui::EndPopup();
 	}
@@ -723,31 +721,33 @@ void project_dock::set_cache_path(const fs::path& path)
 		return;
 	}
 	_cache.set_path(path);
-    _cache_path_with_protocol = fs::convert_to_protocol(path).generic();
+	_cache_path_with_protocol = fs::convert_to_protocol(path).generic();
 }
 
 void project_dock::import()
 {
-    std::vector<std::string> paths;
-    if(native::open_multiple_files_dialog("obj,fbx,dae,blend,3ds,mtl,png,jpg,tga,dds,ktx,pvr,sc,io,sh",
-                                          "", paths))
-    {
-        auto& ts = core::get_subsystem<core::task_system>();
+	std::vector<std::string> paths;
+	if(native::open_multiple_files_dialog(
+		   "png,jpg,jpeg,tga,dds,ktx,pvr,obj,fbx,dae,blend,3ds,ogg,wav,sc,mat,pfb,sgr",
+		   //                "*",
+		   "", paths))
+	{
+		auto& ts = core::get_subsystem<core::task_system>();
 
-        for(auto& path : paths)
-        {
-            fs::path p = fs::path(path).make_preferred();
-            fs::path filename = p.filename();
+		for(auto& path : paths)
+		{
+			fs::path p = fs::path(path).make_preferred();
+			fs::path filename = p.filename();
 
-            auto task = ts.push_on_worker_thread(
-                [opened = _cache.get_path()](const fs::path& path, const fs::path& filename) {
-                    fs::error_code err;
-                    fs::path dir = opened / filename;
-                    fs::copy_file(path, dir, fs::copy_options::overwrite_if_exists, err);
-                },
-                p, filename);
-        }
-    }
+			auto task = ts.push_on_worker_thread(
+				[opened = _cache.get_path()](const fs::path& path, const fs::path& filename) {
+					fs::error_code err;
+					fs::path dir = opened / filename;
+					fs::copy_file(path, dir, fs::copy_options::overwrite_if_exists, err);
+				},
+				p, filename);
+		}
+	}
 }
 
 project_dock::project_dock(const std::string& dtitle, bool close_button, const ImVec2& min_size)

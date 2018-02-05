@@ -9,7 +9,7 @@ struct inspector_registry
 		auto inspector_types = rttr::type::get<inspector>().get_derived_classes();
 		for(auto& inspector_type : inspector_types)
 		{
-			auto inspected_type_var = inspector_type.get_metadata(INSPECTED_TYPE);
+			auto inspected_type_var = inspector_type.get_metadata("inspected_type");
 			if(inspected_type_var)
 			{
 				auto inspected_type = inspected_type_var.get_value<rttr::type>();
