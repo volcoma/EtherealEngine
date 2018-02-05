@@ -251,12 +251,11 @@ void project_manager::setup_meta_syncer(fs::syncer& syncer, const fs::path& data
 
 static std::vector<fs::path> remove_meta_tag(const std::vector<fs::path>& synced_paths)
 {
-	static const std::string meta_ext = ".meta";
 	std::decay_t<decltype(synced_paths)> reduced;
 	reduced.reserve(synced_paths.size());
 	for(const auto& synced_path : synced_paths)
 	{
-		reduced.emplace_back(fs::replace(synced_path, meta_ext, ""));
+		reduced.emplace_back(fs::replace(synced_path, ".meta", ""));
 	}
 	return reduced;
 }
@@ -268,12 +267,11 @@ void project_manager::setup_cache_syncer(fs::syncer& syncer, const fs::path& met
 
 	setup_directory(syncer);
 	static const std::string wildcard = "*";
-	static const std::string meta = ".meta";
 
 	auto on_removed = [](const auto& ref_path, const auto& synced_paths) {
 		for(const auto& synced_path : synced_paths)
 		{
-			auto synced_asset = fs::replace(synced_path, meta, "");
+			auto synced_asset = fs::replace(synced_path, ".meta", "");
 			fs::error_code err;
 			fs::remove_all(synced_asset, err);
 		}
@@ -282,8 +280,8 @@ void project_manager::setup_cache_syncer(fs::syncer& syncer, const fs::path& met
 	auto on_renamed = [](const auto& ref_path, const auto& synced_paths) {
 		for(const auto& synced_path : synced_paths)
 		{
-			auto synced_old_asset = fs::replace(synced_path.first, meta, "");
-			auto synced_new_asset = fs::replace(synced_path.second, meta, "");
+			auto synced_old_asset = fs::replace(synced_path.first, ".meta", "");
+			auto synced_new_asset = fs::replace(synced_path.second, ".meta", "");
 			fs::error_code err;
 			fs::rename(synced_old_asset, synced_new_asset, err);
 		}
@@ -307,7 +305,7 @@ void project_manager::setup_cache_syncer(fs::syncer& syncer, const fs::path& met
 
 	for(const auto& type : ex::get_suported_texture_formats())
 	{
-		syncer.set_mapping(type + meta, {".asset"}, on_image_modified, on_image_modified, on_removed,
+		syncer.set_mapping(type + ".meta", {".asset"}, on_image_modified, on_image_modified, on_removed,
 						   on_renamed);
 		watch_assets<gfx::texture>(cache_dir_protocol, wildcard + type, true);
 	}
@@ -327,7 +325,7 @@ void project_manager::setup_cache_syncer(fs::syncer& syncer, const fs::path& met
 	};
 	for(const auto& type : ex::get_suported_mesh_formats())
 	{
-		syncer.set_mapping(type + meta, {".asset"}, on_mesh_modified, on_mesh_modified, on_removed,
+		syncer.set_mapping(type + ".meta", {".asset"}, on_mesh_modified, on_mesh_modified, on_removed,
 						   on_renamed);
 		watch_assets<mesh>(cache_dir_protocol, wildcard + type, true);
 	}
@@ -347,7 +345,7 @@ void project_manager::setup_cache_syncer(fs::syncer& syncer, const fs::path& met
 	};
 	for(const auto& type : ex::get_suported_sound_formats())
 	{
-		syncer.set_mapping(type + meta, {".asset"}, on_sound_modified, on_sound_modified, on_removed,
+		syncer.set_mapping(type + ".meta", {".asset"}, on_sound_modified, on_sound_modified, on_removed,
 						   on_renamed);
 
 		watch_assets<audio::sound>(cache_dir_protocol, wildcard + type, true);
@@ -382,7 +380,7 @@ void project_manager::setup_cache_syncer(fs::syncer& syncer, const fs::path& met
 
 	for(const auto& type : ex::get_suported_shader_formats())
 	{
-		syncer.set_mapping(type + meta, {".dx11.asset", ".dx12.asset", ".gl.asset"}, on_shader_modified,
+		syncer.set_mapping(type + ".meta", {".dx11.asset", ".dx12.asset", ".gl.asset"}, on_shader_modified,
 						   on_shader_modified, on_removed, on_renamed);
 
 		watch_assets<gfx::shader>(cache_dir_protocol, wildcard + type, true);
@@ -405,7 +403,7 @@ void project_manager::setup_cache_syncer(fs::syncer& syncer, const fs::path& met
 
 	for(const auto& type : ex::get_suported_material_formats())
 	{
-		syncer.set_mapping(type + meta, {".asset"}, on_material_modified, on_material_modified, on_removed,
+		syncer.set_mapping(type + ".meta", {".asset"}, on_material_modified, on_material_modified, on_removed,
 						   on_renamed);
 
 		watch_assets<material>(cache_dir_protocol, wildcard + type, true);
@@ -425,7 +423,7 @@ void project_manager::setup_cache_syncer(fs::syncer& syncer, const fs::path& met
 	};
 	for(const auto& type : ex::get_suported_animation_formats())
 	{
-		syncer.set_mapping(type + meta, {".asset"}, on_anim_modified, on_anim_modified, on_removed,
+		syncer.set_mapping(type + ".meta", {".asset"}, on_anim_modified, on_anim_modified, on_removed,
 						   on_renamed);
 
 		watch_assets<runtime::animation>(cache_dir_protocol, wildcard + type, true);
@@ -447,7 +445,7 @@ void project_manager::setup_cache_syncer(fs::syncer& syncer, const fs::path& met
 
 	for(const auto& type : ex::get_suported_prefab_formats())
 	{
-		syncer.set_mapping(type + meta, {".asset"}, on_prefab_modified, on_prefab_modified, on_removed,
+		syncer.set_mapping(type + ".meta", {".asset"}, on_prefab_modified, on_prefab_modified, on_removed,
 						   on_renamed);
 
 		watch_assets<prefab>(cache_dir_protocol, wildcard + type, true);
@@ -468,7 +466,7 @@ void project_manager::setup_cache_syncer(fs::syncer& syncer, const fs::path& met
 	};
 	for(const auto& type : ex::get_suported_scene_formats())
 	{
-		syncer.set_mapping(type + meta, {".asset"}, on_scene_modified, on_scene_modified, on_removed,
+		syncer.set_mapping(type + ".meta", {".asset"}, on_scene_modified, on_scene_modified, on_removed,
 						   on_renamed);
 
 		watch_assets<scene>(cache_dir_protocol, wildcard + type, true);
