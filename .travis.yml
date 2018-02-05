@@ -81,7 +81,11 @@ matrix:
         - COMPILERCXX='g++-7'
         - COMPILERC='gcc-7'
 
-
+  allow_failures:
+    - env:
+        - COMPILERCXX='g++-5'
+        - COMPILERC='gcc-5'
+        
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y libglew-dev
