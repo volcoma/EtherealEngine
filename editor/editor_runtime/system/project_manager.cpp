@@ -313,23 +313,23 @@ void project_manager::setup_cache_syncer(fs::syncer& syncer, const fs::path& met
 	auto& ts = core::get_subsystem<core::task_system>();
 	auto on_removed = [&ts](const auto& /*ref_path*/, const auto& synced_paths) {
 
-		ts.push_on_worker_thread(
-			[](const auto& synced_paths) {
+//		ts.push_on_worker_thread(
+//			[](const auto& synced_paths) {
 				for(const auto& synced_path : synced_paths)
 				{
 					auto synced_asset = fs::replace(synced_path, ".meta", "");
 					fs::error_code err;
 					fs::remove_all(synced_asset, err);
 				}
-			},
-			synced_paths);
+//			},
+//			synced_paths);
 
 	};
 
 	auto on_renamed = [&ts](const auto& /*ref_path*/, const auto& synced_paths) {
 
-		ts.push_on_worker_thread(
-			[](const auto& synced_paths) {
+//		ts.push_on_worker_thread(
+//			[](const auto& synced_paths) {
 				for(const auto& synced_path : synced_paths)
 				{
 					auto synced_old_asset = fs::replace(synced_path.first, ".meta", "");
@@ -337,8 +337,8 @@ void project_manager::setup_cache_syncer(fs::syncer& syncer, const fs::path& met
 					fs::error_code err;
 					fs::rename(synced_old_asset, synced_new_asset, err);
 				}
-			},
-			synced_paths);
+//			},
+//			synced_paths);
 
 	};
 
