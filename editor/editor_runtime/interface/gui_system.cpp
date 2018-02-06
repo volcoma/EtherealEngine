@@ -24,19 +24,17 @@
 //////////////////////////////////////////////////////////////////////////
 #include "../meta/interface/gui_system.hpp"
 #include "core/serialization/associative_archive.h"
-
+namespace
+{
 static const gfx::embedded_shader s_embedded_shaders[] = {BGFX_EMBEDDED_SHADER(vs_ocornut_imgui),
 														  BGFX_EMBEDDED_SHADER(fs_ocornut_imgui),
 														  BGFX_EMBEDDED_SHADER_END()};
 // -------------------------------------------------------------------
-
-static ImGuiContext* s_initial_context = nullptr;
-
 static std::unique_ptr<gpu_program> s_program;
 static asset_handle<gfx::texture> s_font_texture;
 static std::uint32_t s_draw_calls = 0;
 
-void render_func(ImDrawData* _drawData)
+static void render_func(ImDrawData* _drawData)
 {
 	s_draw_calls = 0;
 	auto prog = s_program.get();
@@ -113,7 +111,7 @@ void render_func(ImDrawData* _drawData)
 	prog->end();
 }
 
-void imgui_handle_event(const mml::platform_event& event)
+static void imgui_handle_event(const mml::platform_event& event)
 {
 	auto& io = gui::GetIO();
 	if(event.type == mml::platform_event::lost_focus)
@@ -169,7 +167,7 @@ void imgui_handle_event(const mml::platform_event& event)
 	}
 }
 
-const mml::cursor* map_cursor(ImGuiMouseCursor cursor)
+static const mml::cursor* map_cursor(ImGuiMouseCursor cursor)
 {
 	static std::map<ImGuiMouseCursor_, mml::cursor::type> cursor_map = {
 		{ImGuiMouseCursor_Arrow, mml::cursor::arrow},
@@ -193,17 +191,12 @@ const mml::cursor* map_cursor(ImGuiMouseCursor cursor)
 	return cursors[id].get();
 }
 
-void imgui_frame_begin()
+static void imgui_frame_begin()
 {
 	gui::CleanupTextures();
 }
 
-void set_initial_context(ImGuiContext* context)
-{
-	s_initial_context = context;
-}
-
-void imgui_set_context(ImGuiContext* context)
+static void imgui_set_context(ImGuiContext* context)
 {
 	ImGuiContext* last_context = gui::GetCurrentContext();
 	if(last_context != nullptr && last_context != context)
@@ -211,6 +204,7 @@ void imgui_set_context(ImGuiContext* context)
 		std::memcpy(&context->Style, &last_context->Style, sizeof(ImGuiStyle));
 		std::memcpy(&context->IO.KeyMap, &last_context->IO.KeyMap, sizeof(last_context->IO.KeyMap));
 		context->IO.IniFilename = last_context->IO.IniFilename;
+		context->IO.NavFlags = last_context->IO.NavFlags;
 		context->IO.FontAllowUserScaling = last_context->IO.FontAllowUserScaling;
 		context->IO.RenderDrawListsFn = last_context->IO.RenderDrawListsFn;
 		context->Initialized = last_context->Initialized;
@@ -218,18 +212,7 @@ void imgui_set_context(ImGuiContext* context)
 	gui::SetCurrentContext(context);
 }
 
-void restore_initial_context()
-{
-	if(s_initial_context)
-		imgui_set_context(s_initial_context);
-}
-
-void imgui_restore_context()
-{
-	restore_initial_context();
-}
-
-void imgui_frame_update(render_window& window, std::chrono::duration<float> dt)
+static void imgui_frame_update(render_window& window, std::chrono::duration<float> dt)
 {
 	auto& io = gui::GetIO();
 	auto view_size = window.get_surface()->get_size();
@@ -269,19 +252,24 @@ void imgui_frame_update(render_window& window, std::chrono::duration<float> dt)
 	gui::Begin("###workspace", 0, flags);
 }
 
-void imgui_frame_end()
+static void imgui_frame_end()
 {
 	gui::End();
 	gui::Render();
 }
 
-void imgui_init()
+static ImGuiContext* imgui_create_context(ImFontAtlas& atlas)
 {
-	set_initial_context(gui::GetCurrentContext());
-	ImGuiIO& io = gui::GetIO();
-	io.IniFilename = nullptr;
-	io.RenderDrawListsFn = render_func;
+	return gui::CreateContext(&atlas);
+}
 
+static void imgui_destroy_context(ImGuiContext* context = nullptr)
+{
+	gui::DestroyContext(context);
+}
+
+static void imgui_init()
+{
 	auto& ts = core::get_subsystem<core::task_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
 
@@ -300,16 +288,24 @@ void imgui_init()
 		},
 		vs_ocornut_imgui, fs_ocornut_imgui);
 
+	ImGuiIO& io = gui::GetIO();
+	io.NavFlags |= ImGuiNavFlags_EnableKeyboard;
+	io.IniFilename = nullptr;
+	io.RenderDrawListsFn = render_func;
 	// init keyboard mapping
 	io.KeyMap[ImGuiKey_Tab] = mml::keyboard::Tab;
 	io.KeyMap[ImGuiKey_LeftArrow] = mml::keyboard::Left;
 	io.KeyMap[ImGuiKey_RightArrow] = mml::keyboard::Right;
 	io.KeyMap[ImGuiKey_UpArrow] = mml::keyboard::Up;
 	io.KeyMap[ImGuiKey_DownArrow] = mml::keyboard::Down;
+	io.KeyMap[ImGuiKey_PageUp] = mml::keyboard::PageUp;
+	io.KeyMap[ImGuiKey_PageDown] = mml::keyboard::PageDown;
 	io.KeyMap[ImGuiKey_Home] = mml::keyboard::Home;
 	io.KeyMap[ImGuiKey_End] = mml::keyboard::End;
+	io.KeyMap[ImGuiKey_Insert] = mml::keyboard::Insert;
 	io.KeyMap[ImGuiKey_Delete] = mml::keyboard::Delete;
 	io.KeyMap[ImGuiKey_Backspace] = mml::keyboard::BackSpace;
+	io.KeyMap[ImGuiKey_Space] = mml::keyboard::Space;
 	io.KeyMap[ImGuiKey_Enter] = mml::keyboard::Return;
 	io.KeyMap[ImGuiKey_Escape] = mml::keyboard::Escape;
 	io.KeyMap[ImGuiKey_A] = mml::keyboard::A;
@@ -342,8 +338,8 @@ void imgui_init()
 	config.PixelSnapH = false;
 	gui::AddFont("standard_big",
 				 io.Fonts->AddFontFromMemoryTTF((void*)s_font_default, sizeof(s_font_default), 50, &config));
-    
-    config.MergeMode = true;
+
+	config.MergeMode = true;
 	config.PixelSnapH = true;
 	gui::AddFont("icons_big",
 				 io.Fonts->AddFontFromMemoryTTF((void*)fontawesome_webfont_ttf,
@@ -360,37 +356,20 @@ void imgui_init()
 	get_gui_style().load_style();
 }
 
-void imgui_dispose()
+static void imgui_dispose()
 {
+	gui::ClearFonts();
 	gui::CleanupTextures();
-	restore_initial_context();
 	s_program.reset();
 	s_font_texture.reset();
-	gui::ClearFonts();
-
-	ImGuiIO& io = gui::GetIO();
-	io.Fonts->TexID = nullptr;
-	gui::Shutdown();
 }
-
-ImGuiContext* imgui_create_context()
-{
-	return gui::CreateContext();
 }
-
-void imgui_destroy_context(ImGuiContext*& context)
-{
-	if(context)
-		gui::DestroyContext(context);
-
-	context = nullptr;
-}
-
 gui_system::gui_system()
 {
 	runtime::on_platform_events.connect(this, &gui_system::platform_events);
 	runtime::on_frame_begin.connect(this, &gui_system::frame_begin);
 
+	_initial_context = imgui_create_context(_atlas);
 	imgui_init();
 }
 
@@ -400,6 +379,7 @@ gui_system::~gui_system()
 	runtime::on_frame_begin.disconnect(this, &gui_system::frame_begin);
 
 	imgui_dispose();
+	imgui_destroy_context(_initial_context);
 }
 
 void gui_system::frame_begin(std::chrono::duration<float>)
@@ -412,16 +392,23 @@ uint32_t gui_system::get_draw_calls() const
 	return s_draw_calls;
 }
 
-ImGuiContext& gui_system::get_context(uint32_t id)
+ImGuiContext* gui_system::get_context(uint32_t id)
 {
-	return _contexts[id];
+	auto it = _contexts.find(id);
+	if(it != _contexts.end())
+	{
+		return it->second;
+	}
+
+	auto ins = _contexts.emplace(id, imgui_create_context(_atlas));
+	return ins.first->second;
 }
 
 void gui_system::push_context(uint32_t id)
 {
-	auto& context = get_context(id);
+	auto context = get_context(id);
 
-	imgui_set_context(&context);
+	imgui_set_context(context);
 }
 
 void gui_system::draw_begin(render_window& window, std::chrono::duration<float> dt)
@@ -436,7 +423,7 @@ void gui_system::draw_end()
 
 void gui_system::pop_context()
 {
-	imgui_restore_context();
+	imgui_set_context(_initial_context);
 }
 
 void gui_system::platform_events(const std::pair<std::uint32_t, bool>& info,
@@ -449,6 +436,11 @@ void gui_system::platform_events(const std::pair<std::uint32_t, bool>& info,
 		if(e.type == mml::platform_event::closed)
 		{
 			pop_context();
+			auto context = _contexts[window_id];
+			if(context)
+			{
+				imgui_destroy_context(context);
+			}
 			_contexts.erase(window_id);
 			return;
 		}

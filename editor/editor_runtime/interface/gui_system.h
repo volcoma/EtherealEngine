@@ -23,22 +23,24 @@ struct gui_system
     
 	gui_system();
 	~gui_system();
+    
 	void frame_begin(std::chrono::duration<float>);
 
 	std::uint32_t get_draw_calls() const;
-
-	ImGuiContext& get_context(std::uint32_t id);
+	ImGuiContext* get_context(std::uint32_t id);
 
 	void push_context(std::uint32_t id);
 	void draw_begin(render_window& window, std::chrono::duration<float> dt);
 
 	void draw_end();
-
 	void pop_context();
 
 private:
 	void platform_events(const window_info& info, const std::vector<mml::platform_event>&);
-	std::map<uint32_t, ImGuiContext> _contexts;
+	std::map<uint32_t, ImGuiContext*> _contexts;
+    
+    ImFontAtlas _atlas;
+    ImGuiContext* _initial_context = nullptr;
 };
 
 struct gui_style

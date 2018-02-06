@@ -76,7 +76,7 @@ struct dock
 	bool draging = false;
 
 	ImVec2 last_size;
-	ImVec2 min_size;
+    ImVec2 min_size = {100.0f, 100.0f};
 
 	std::string title;
 	std::function<void(const ImVec2&)> draw_function;

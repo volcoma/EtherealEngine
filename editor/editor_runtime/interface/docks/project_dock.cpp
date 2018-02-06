@@ -54,8 +54,9 @@ static bool process_drag_drop_source(asset_handle<gfx::texture> preview, const f
 	if(gui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
 	{
 		const auto filename = absolute_path.filename();
-		std::string extension = filename.has_extension() ? filename.extension().string() : "folder";
-		std::string id = absolute_path.string();
+		const std::string extension = filename.has_extension() ? filename.extension().string() : "folder";
+		const std::string id = absolute_path.string();
+		const std::string strfilename = filename.string();
 		auto tex = preview;
 		bool is_rt = tex ? tex->is_render_target() : false;
 		bool is_orig_bl = gfx::is_origin_bottom_left();
@@ -66,8 +67,13 @@ static bool process_drag_drop_source(asset_handle<gfx::texture> preview, const f
 		ImVec2 uv0 = {0.0f, 0.0f};
 		ImVec2 uv1 = {1.0f, 1.0f};
 		gui::BeginGroup();
+
+		auto w = gui::CalcTextSize(strfilename.c_str()).x;
+
+		gui::SameLine(0.0f, (w - item_size.x) / 2.0f);
 		gui::ImageWithAspect(tex.get_asset(), is_rt, is_orig_bl, texture_size, item_size, uv0, uv1);
-		gui::TextUnformatted(filename.string().c_str());
+
+		gui::TextUnformatted(strfilename.c_str());
 
 		gui::EndGroup();
 		gui::SetDragDropPayload(extension.c_str(), id.data(), id.size());
@@ -612,9 +618,8 @@ void project_dock::render(const ImVec2&)
 		set_cache_path(current_path);
 
 		context_menu();
-
-		gui::EndChild();
 	}
+	gui::EndChild();
 
 	gui::EndGroup();
 

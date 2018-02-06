@@ -411,8 +411,8 @@ void hierarchy_dock::render(const ImVec2&)
 					draw_entity(root);
 			}
 		}
-		gui::EndChild();
 	}
+	gui::EndChild();
 
 	gui::EndGroup();
 
