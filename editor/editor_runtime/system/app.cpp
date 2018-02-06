@@ -17,7 +17,6 @@
 #include "core/logging/logging.h"
 #include "editor_core/nativefd/filedialog.h"
 #include "runtime/assets/asset_manager.h"
-#include "runtime/assets/impl/asset_extensions.h"
 #include "runtime/ecs/components/camera_component.h"
 #include "runtime/ecs/components/light_component.h"
 #include "runtime/ecs/components/model_component.h"
@@ -667,24 +666,13 @@ void app::handle_drag_and_drop()
 {
 	auto& es = core::get_subsystem<editing_system>();
 
-//	if(gui::IsMouseDragging(gui::drag_button) && es.drag_data.object && !drag_data.description.empty())
-//	{
-//		gui::BeginTooltip();
-//		gui::TextUnformatted(es.drag_data.description.c_str());
-//		gui::EndTooltip();
-//	}
-
 	if(!gui::IsAnyItemActive() && !gui::IsAnyItemHovered())
 	{
 		if(gui::IsMouseDoubleClicked(0) && !imguizmo::is_over())
 		{
 			es.unselect();
-			es.drop();
 		}
 	}
-	if(gui::IsMouseReleased(gui::drag_button))
-	{
-		es.drop();
-	}
+
 }
 }

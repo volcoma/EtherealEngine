@@ -1,4 +1,5 @@
 #include "inspector_assets.h"
+#include "../../assets/asset_extensions.h"
 #include "../../editing/editing_system.h"
 #include "core/audio/sound.h"
 #include "core/filesystem/filesystem.h"
@@ -10,6 +11,38 @@
 #include "runtime/ecs/constructs/prefab.h"
 #include "runtime/rendering/material.h"
 #include "runtime/rendering/mesh.h"
+
+template <typename asset_t>
+static bool process_drag_drop_target(asset_handle<asset_t>& entry)
+{
+	auto& am = core::get_subsystem<runtime::asset_manager>();
+
+	if(gui::BeginDragDropTarget())
+	{
+		for(const auto& type : ex::get_suported_formats<asset_t>())
+		{
+			auto payload = gui::AcceptDragDropPayload(type.c_str());
+			if(payload)
+			{
+				std::string absolute_path(reinterpret_cast<const char*>(payload->Data),
+										  std::size_t(payload->DataSize));
+
+				std::string key = fs::convert_to_protocol(fs::path(absolute_path)).string();
+				auto entry_future = am.find_asset_entry<asset_t>(key);
+				if(entry_future.is_ready())
+				{
+					entry = entry_future.get();
+				}
+
+				if(entry)
+					return true;
+			}
+		}
+		gui::EndDragDropTarget();
+	}
+	return false;
+	;
+}
 
 bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 											 const meta_getter& get_metadata)
@@ -47,13 +80,18 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 		if(!gui::ItemAdd(bb, 0))
 			return false;
 	}
+
 	gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
-	bool hoveredFrame = gui::IsItemHovered(ImGuiHoveredFlags_RectOnly);
-	auto bbMinFrame = gui::GetItemRectMin();
-	auto bbMaxFrame = gui::GetItemRectMax();
 
 	if(selected && !selected.is_type<asset_handle<gfx::texture>>())
 	{
+
+		if(process_drag_drop_target(data))
+		{
+			var = data;
+			changed = true;
+		}
+
 		gui::SameLine();
 		if(gui::Button("REMOVE"))
 		{
@@ -81,38 +119,13 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 			var = data;
 			changed = true;
 		}
-		if((!gui::IsItemActive() && gui::IsItemHovered()) || hoveredFrame)
+
+		if(process_drag_drop_target(data))
 		{
-			// gui::SetMouseCursor(ImGuiMouseCursor_Help);
-			gui::BeginTooltip();
-			gui::TextUnformatted("YOU CAN DRAG AND DROP HERE");
-			gui::EndTooltip();
+			var = data;
+			changed = true;
 		}
 
-		auto& dragged = es.drag_data.object;
-		if(dragged && dragged.is_type<asset_handle<gfx::texture>>())
-		{
-			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.9f));
-			gui::RenderFrameEx(bbMinFrame, bbMaxFrame, true, 0.0f, 1.0f);
-			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
-			gui::PopStyleColor();
-
-			if(hoveredFrame || gui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
-			{
-				gui::SetMouseCursor(ImGuiMouseCursor_Move);
-				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
-				gui::RenderFrameEx(bbMinFrame, bbMaxFrame, true, 0.0f, 2.0f);
-				gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
-				gui::PopStyleColor();
-
-				if(gui::IsMouseReleased(gui::drag_button))
-				{
-					data = dragged.get_value<asset_handle<gfx::texture>>();
-					var = data;
-					changed = true;
-				}
-			}
-		}
 		return changed;
 	}
 
@@ -156,27 +169,12 @@ bool inspector_asset_handle_material::inspect(rttr::variant& var, bool read_only
 			return true;
 		}
 
-		auto& dragged = es.drag_data.object;
-		if(dragged && dragged.is_type<asset_handle<material>>())
+		if(process_drag_drop_target(data))
 		{
-			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.9f));
-			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
-			gui::PopStyleColor();
-
-			if(gui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
-			{
-				gui::SetMouseCursor(ImGuiMouseCursor_Move);
-				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
-				gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
-				gui::PopStyleColor();
-				if(gui::IsMouseReleased(gui::drag_button))
-				{
-					data = dragged.get_value<asset_handle<material>>();
-					var = data;
-					return true;
-				}
-			}
+			var = data;
+			return true;
 		}
+
 		return false;
 	}
 
@@ -227,27 +225,10 @@ bool inspector_asset_handle_mesh::inspect(rttr::variant& var, bool read_only, co
 			var = data;
 			return true;
 		}
-
-		auto& dragged = es.drag_data.object;
-		if(dragged && dragged.is_type<asset_handle<mesh>>())
+		if(process_drag_drop_target(data))
 		{
-			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.9f));
-			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
-			gui::PopStyleColor();
-
-			if(gui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
-			{
-				gui::SetMouseCursor(ImGuiMouseCursor_Move);
-				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
-				gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
-				gui::PopStyleColor();
-				if(gui::IsMouseReleased(gui::drag_button))
-				{
-					data = dragged.get_value<asset_handle<mesh>>();
-					var = data;
-					return true;
-				}
-			}
+			var = data;
+			return true;
 		}
 		return false;
 	}
@@ -296,27 +277,10 @@ bool inspector_asset_handle_animation::inspect(rttr::variant& var, bool read_onl
 			var = data;
 			return true;
 		}
-
-		auto& dragged = es.drag_data.object;
-		if(dragged && dragged.is_type<asset_handle<runtime::animation>>())
+		if(process_drag_drop_target(data))
 		{
-			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.9f));
-			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
-			gui::PopStyleColor();
-
-			if(gui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
-			{
-				gui::SetMouseCursor(ImGuiMouseCursor_Move);
-				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
-				gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
-				gui::PopStyleColor();
-				if(gui::IsMouseReleased(gui::drag_button))
-				{
-					data = dragged.get_value<asset_handle<runtime::animation>>();
-					var = data;
-					return true;
-				}
-			}
+			var = data;
+			return true;
 		}
 		return false;
 	}
@@ -362,26 +326,10 @@ bool inspector_asset_handle_sound::inspect(rttr::variant& var, bool read_only,
 			return true;
 		}
 
-		auto& dragged = es.drag_data.object;
-		if(dragged && dragged.is_type<asset_handle<audio::sound>>())
+		if(process_drag_drop_target(data))
 		{
-			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.9f));
-			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
-			gui::PopStyleColor();
-
-			if(gui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
-			{
-				gui::SetMouseCursor(ImGuiMouseCursor_Move);
-				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
-				gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
-				gui::PopStyleColor();
-				if(gui::IsMouseReleased(gui::drag_button))
-				{
-					data = dragged.get_value<asset_handle<audio::sound>>();
-					var = data;
-					return true;
-				}
-			}
+			var = data;
+			return true;
 		}
 		return false;
 	}
@@ -427,26 +375,10 @@ bool inspector_asset_handle_prefab::inspect(rttr::variant& var, bool read_only,
 			return true;
 		}
 
-		auto& dragged = es.drag_data.object;
-		if(dragged && dragged.is_type<asset_handle<prefab>>())
+		if(process_drag_drop_target(data))
 		{
-			gui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.5f, 0.0f, 0.9f));
-			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
-			gui::PopStyleColor();
-
-			if(gui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
-			{
-				gui::SetMouseCursor(ImGuiMouseCursor_Move);
-				gui::PushStyleColor(ImGuiCol_Border, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
-				gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
-				gui::PopStyleColor();
-				if(gui::IsMouseReleased(gui::drag_button))
-				{
-					data = dragged.get_value<asset_handle<prefab>>();
-					var = data;
-					return true;
-				}
-			}
+			var = data;
+			return true;
 		}
 		return false;
 	}

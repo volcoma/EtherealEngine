@@ -319,6 +319,9 @@ bool importer::load_mesh_data_from_file(const std::string& path, mesh::load_data
 		return false;
 	}
 	process_imported_scene(scene, load_data, animations);
+    
+    double factor = 1.0;
+    scene->mMetaData->Get("UnitScaleFactor", factor);
 
 	return true;
 }

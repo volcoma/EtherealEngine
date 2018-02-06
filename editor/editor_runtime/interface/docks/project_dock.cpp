@@ -1,4 +1,5 @@
 #include "project_dock.h"
+#include "../../assets/asset_extensions.h"
 #include "../../editing/editing_system.h"
 #include "core/audio/sound.h"
 #include "core/common/nonstd/function_traits.hpp"
@@ -10,7 +11,6 @@
 #include "editor_core/nativefd/filedialog.h"
 #include "runtime/animation/animation.h"
 #include "runtime/assets/asset_manager.h"
-#include "runtime/assets/impl/asset_extensions.h"
 #include "runtime/ecs/constructs/prefab.h"
 #include "runtime/ecs/constructs/scene.h"
 #include "runtime/ecs/constructs/utils.h"
@@ -53,9 +53,11 @@ static bool process_drag_drop_source(const fs::path& absolute_path)
 {
 	if(gui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
 	{
+		const auto filename = absolute_path.filename();
+		std::string extension = filename.has_extension() ? filename.extension().string() : "folder";
 		std::string id = absolute_path.string();
-		gui::TextUnformatted(absolute_path.filename().string().c_str());
-		gui::SetDragDropPayload("asset", id.data(), id.size());
+		gui::TextUnformatted(filename.string().c_str());
+		gui::SetDragDropPayload(extension.c_str(), id.data(), id.size());
 		gui::EndDragDropSource();
 		return true;
 	}
@@ -65,13 +67,15 @@ static bool process_drag_drop_source(const fs::path& absolute_path)
 
 static void process_drag_drop_target(const fs::path& absolute_path)
 {
-	fs::error_code err;
 	if(gui::BeginDragDropTarget())
 	{
+		fs::error_code err;
 		if(fs::is_directory(absolute_path, err))
 		{
-			{
-				auto payload = gui::AcceptDragDropPayload("asset");
+			static const std::vector<std::vector<std::string>> types = ex::get_all_formats();
+
+			const auto process_drop = [&absolute_path](const std::string& type) {
+				auto payload = gui::AcceptDragDropPayload(type.c_str());
 				if(payload)
 				{
 					std::string data(reinterpret_cast<const char*>(payload->Data),
@@ -79,12 +83,29 @@ static void process_drag_drop_target(const fs::path& absolute_path)
 					fs::path new_name = absolute_path / fs::path(data).filename();
 					if(data != new_name)
 					{
+						fs::error_code err;
+
 						if(!fs::exists(new_name, err))
 						{
 							fs::rename(data, new_name, err);
 						}
 					}
 				}
+				return payload;
+			};
+
+			for(const auto& asset_set : types)
+			{
+				for(const auto& type : asset_set)
+				{
+					if(process_drop(type))
+					{
+						break;
+					}
+				}
+			}
+			{
+				process_drop("folder");
 			}
 			{
 				auto payload = gui::AcceptDragDropPayload("entity");
@@ -112,10 +133,9 @@ static void process_drag_drop_target(const fs::path& absolute_path)
 }
 
 static void draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const std::string& name,
-					   const fs::path& absolute_path, bool is_selected, bool is_dragging, const float size,
+					   const fs::path& absolute_path, bool is_selected, const float size,
 					   std::function<void()> on_click, std::function<void()> on_double_click,
-					   std::function<void(const std::string&)> on_rename, std::function<void()> on_delete,
-					   std::function<void()> on_drag)
+					   std::function<void(const std::string&)> on_rename, std::function<void()> on_delete)
 {
 	bool edit_label = false;
 	if(is_selected && !gui::IsAnyItemActive())
@@ -187,12 +207,6 @@ static void draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const s
 		if(on_double_click)
 		{
 			gui::SetMouseCursor(ImGuiMouseCursor_Move);
-		}
-
-		if(gui::IsMouseClicked(gui::drag_button) && !is_dragging)
-		{
-			if(on_drag)
-				on_drag();
 		}
 	}
 
@@ -292,7 +306,6 @@ void project_dock::render(const ImVec2&)
 
 			const auto relative = fs::convert_to_protocol(absolute_path).generic_string();
 			const auto file_ext = absolute_path.extension().string();
-			bool is_dragging = !!es.drag_data.object;
 
 			const auto on_rename = [&](const std::string& new_name) {
 				fs::path new_absolute_path = absolute_path;
@@ -313,7 +326,7 @@ void project_dock::render(const ImVec2&)
 				using entry_t = fs::path;
 				entry_t entry = absolute_path;
 				auto icon = get_preview(entry, "folder", es);
-				draw_entry(icon, false, name, absolute_path, is_selected(entry), is_dragging, size,
+				draw_entry(icon, false, name, absolute_path, is_selected(entry), size,
 						   [&]() // on_click
 						   {
 							   es.select(entry);
@@ -337,15 +350,13 @@ void project_dock::render(const ImVec2&)
 							   fs::error_code err;
 							   fs::remove_all(absolute_path, err);
 
-						   },
-						   nullptr // on_drag
-				);
+						   });
 			}
 			else
 			{
 
 				bool processed = false;
-				for(const auto& ext : ex::get_suported_texture_formats())
+				for(const auto& ext : ex::get_suported_formats<gfx::texture>())
 				{
 					if(processed)
 						break;
@@ -361,26 +372,20 @@ void project_dock::render(const ImVec2&)
 						{
 							entry = entry_future.get();
 						}
-						auto icon = get_preview(entry, "icon", es);
+						auto icon = get_preview(entry, "texture", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), is_dragging,
-								   size,
+						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
 								   [&]() // on_click
 								   {
 									   es.select(entry);
 
 								   },
 								   nullptr, // on_double_click
-								   on_rename, on_delete,
-								   [&]() // on_drag
-								   {
-									   es.drag(entry, relative);
-
-								   });
+								   on_rename, on_delete);
 					}
 				}
 
-				for(const auto& ext : ex::get_suported_mesh_formats())
+				for(const auto& ext : ex::get_suported_formats<mesh>())
 				{
 					if(processed)
 						break;
@@ -398,24 +403,18 @@ void project_dock::render(const ImVec2&)
 						}
 						auto icon = get_preview(entry, "mesh", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), is_dragging,
-								   size,
+						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
 								   [&]() // on_click
 								   {
 									   es.select(entry);
 
 								   },
 								   nullptr, // on_double_click
-								   on_rename, on_delete,
-								   [&]() // on_drag
-								   {
-									   es.drag(entry, relative);
-
-								   });
+								   on_rename, on_delete);
 					}
 				}
 
-				for(const auto& ext : ex::get_suported_sound_formats())
+				for(const auto& ext : ex::get_suported_formats<audio::sound>())
 				{
 					if(processed)
 						break;
@@ -433,23 +432,17 @@ void project_dock::render(const ImVec2&)
 						}
 						auto icon = get_preview(entry, "sound", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), is_dragging,
-								   size,
+						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
 								   [&]() // on_click
 								   {
 									   es.select(entry);
 
 								   },
 								   nullptr, // on_double_click
-								   on_rename, on_delete,
-								   [&]() // on_drag
-								   {
-									   es.drag(entry, relative);
-
-								   });
+								   on_rename, on_delete);
 					}
 				}
-				for(const auto& ext : ex::get_suported_shader_formats())
+				for(const auto& ext : ex::get_suported_formats<gfx::shader>())
 				{
 					if(processed)
 						break;
@@ -467,23 +460,17 @@ void project_dock::render(const ImVec2&)
 						}
 						auto icon = get_preview(entry, "shader", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), is_dragging,
-								   size,
+						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
 								   [&]() // on_click
 								   {
 									   es.select(entry);
 
 								   },
 								   nullptr, // on_double_click
-								   on_rename, on_delete,
-								   [&]() // on_drag
-								   {
-									   es.drag(entry, relative);
-
-								   });
+								   on_rename, on_delete);
 					}
 				}
-				for(const auto& ext : ex::get_suported_material_formats())
+				for(const auto& ext : ex::get_suported_formats<material>())
 				{
 					if(processed)
 						break;
@@ -501,24 +488,18 @@ void project_dock::render(const ImVec2&)
 						}
 						auto icon = get_preview(entry, "material", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), is_dragging,
-								   size,
+						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
 								   [&]() // on_click
 								   {
 									   es.select(entry);
 
 								   },
 								   nullptr, // on_double_click
-								   on_rename, on_delete,
-								   [&]() // on_drag
-								   {
-									   es.drag(entry, relative);
-
-								   });
+								   on_rename, on_delete);
 					}
 				}
 
-				for(const auto& ext : ex::get_suported_animation_formats())
+				for(const auto& ext : ex::get_suported_formats<runtime::animation>())
 				{
 					if(processed)
 						break;
@@ -536,24 +517,18 @@ void project_dock::render(const ImVec2&)
 						}
 						auto icon = get_preview(entry, "animation", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), is_dragging,
-								   size,
+						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
 								   [&]() // on_click
 								   {
 									   es.select(entry);
 
 								   },
 								   nullptr, // on_double_click
-								   on_rename, on_delete,
-								   [&]() // on_drag
-								   {
-									   es.drag(entry, relative);
-
-								   });
+								   on_rename, on_delete);
 					}
 				}
 
-				for(const auto& ext : ex::get_suported_prefab_formats())
+				for(const auto& ext : ex::get_suported_formats<prefab>())
 				{
 					if(processed)
 						break;
@@ -571,23 +546,17 @@ void project_dock::render(const ImVec2&)
 						}
 						auto icon = get_preview(entry, "prefab", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), is_dragging,
-								   size,
+						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
 								   [&]() // on_click
 								   {
 									   es.select(entry);
 
 								   },
 								   nullptr, // on_double_click
-								   on_rename, on_delete,
-								   [&]() // on_drag
-								   {
-									   es.drag(entry, relative);
-
-								   });
+								   on_rename, on_delete);
 					}
 				}
-				for(const auto& ext : ex::get_suported_scene_formats())
+				for(const auto& ext : ex::get_suported_formats<scene>())
 				{
 					if(processed)
 						break;
@@ -605,8 +574,7 @@ void project_dock::render(const ImVec2&)
 						}
 						auto icon = get_preview(entry, "scene", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), is_dragging,
-								   size,
+						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
 								   [&]() // on_click
 								   {
 									   es.select(entry);
@@ -622,12 +590,7 @@ void project_dock::render(const ImVec2&)
 									   es.load_editor_camera();
 
 								   },
-								   on_rename, on_delete,
-								   [&]() // on_drag
-								   {
-									   es.drag(entry, relative);
-
-								   });
+								   on_rename, on_delete);
 					}
 				}
 			}
@@ -641,22 +604,7 @@ void project_dock::render(const ImVec2&)
 	}
 
 	gui::EndGroup();
-	if(gui::IsItemHovered())
-	{
-		auto& dragged = es.drag_data.object;
-		if(dragged && dragged.is_type<runtime::entity>())
-		{
-			gui::SetMouseCursor(ImGuiMouseCursor_Move);
-			if(gui::IsMouseReleased(gui::drag_button))
-			{
-				auto entity = dragged.get_value<runtime::entity>();
-				if(entity)
-					ecs::utils::save_entity_to_file(
-						current_path / fs::path(entity.to_string() + ".pfb").make_preferred(), entity);
-				es.drop();
-			}
-		}
-	}
+
 	process_drag_drop_target(current_path);
 }
 
@@ -727,10 +675,7 @@ void project_dock::set_cache_path(const fs::path& path)
 void project_dock::import()
 {
 	std::vector<std::string> paths;
-	if(native::open_multiple_files_dialog(
-		   "png,jpg,jpeg,tga,dds,ktx,pvr,obj,fbx,dae,blend,3ds,ogg,wav,sc,mat,pfb,sgr",
-		   //                "*",
-		   "", paths))
+	if(native::open_multiple_files_dialog("", "", paths))
 	{
 		auto& ts = core::get_subsystem<core::task_system>();
 

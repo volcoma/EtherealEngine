@@ -1,10 +1,12 @@
 #include "hierarchy_dock.h"
+#include "../../assets/asset_extensions.h"
 #include "../../editing/editing_system.h"
 #include "../../system/project_manager.h"
 #include "core/filesystem/filesystem.h"
 #include "core/logging/logging.h"
 #include "core/system/subsystem.h"
 #include "runtime/assets/asset_handle.h"
+#include "runtime/assets/asset_manager.h"
 #include "runtime/ecs/components/model_component.h"
 #include "runtime/ecs/components/transform_component.h"
 #include "runtime/ecs/constructs/prefab.h"
@@ -22,7 +24,7 @@ enum class context_action
 };
 }
 
-context_action check_context_menu(runtime::entity entity)
+static context_action check_context_menu(runtime::entity entity)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
@@ -80,120 +82,130 @@ context_action check_context_menu(runtime::entity entity)
 	return action;
 }
 
-void check_drag(runtime::entity entity)
+static bool process_drag_drop_source(runtime::entity entity)
 {
-	if(!gui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
-		return;
-
-	auto& es = core::get_subsystem<editor::editing_system>();
-	auto& editor_camera = es.camera;
-	auto& dragged = es.drag_data.object;
-
-	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
-
-	if(entity)
+	if(entity && gui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
 	{
-//		if(entity != editor_camera)
-//		{
-//			if(gui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
-//			{
-//				auto entity_index = entity.id().index();
-//				gui::TextUnformatted(entity.get_name().c_str());
-//				gui::SetDragDropPayload("entity", &entity_index, sizeof(entity_index));
-//				gui::EndDragDropSource();
-//			}
-//			else if(gui::BeginDragDropTarget())
-//			{
-//				auto payload = gui::AcceptDragDropPayload("entity");
-//				if(payload)
-//				{
-//					std::uint32_t entity_index = 0;
-//					std::memcpy(&entity_index, payload->Data, std::size_t(payload->DataSize));
-//					if(ecs.valid_index(entity_index))
-//					{
-//						auto eid = ecs.create_id(entity_index);
-//						auto dropped_entity = ecs.get(eid);
-//						if(dropped_entity)
-//						{
-//							auto trans_comp = dropped_entity.get_component<transform_component>().lock();
-//							if(trans_comp)
-//							{
-//								trans_comp->set_parent(entity);
-//							}
-//						}
-//					}
-//				}
-//				gui::EndDragDropTarget();
-//			}
-//		}
-		if(gui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
+		auto entity_index = entity.id().index();
+		gui::TextUnformatted(entity.get_name().c_str());
+		gui::SetDragDropPayload("entity", &entity_index, sizeof(entity_index));
+		gui::EndDragDropSource();
+		return true;
+	}
+
+	return false;
+}
+
+static void process_drag_drop_target(runtime::entity entity)
+{
+	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
+	auto& am = core::get_subsystem<runtime::asset_manager>();
+	auto& es = core::get_subsystem<editor::editing_system>();
+
+	if(gui::BeginDragDropTarget())
+	{
 		{
-
-			if(gui::IsMouseClicked(gui::drag_button) && entity != editor_camera)
+			auto payload = gui::AcceptDragDropPayload("entity");
+			if(payload)
 			{
-				es.drag(entity, entity.to_string());
-			}
-
-			if(dragged && entity != editor_camera)
-			{
-				if(dragged.is_type<runtime::entity>())
+				std::uint32_t entity_index = 0;
+				std::memcpy(&entity_index, payload->Data, std::size_t(payload->DataSize));
+				if(ecs.valid_index(entity_index))
 				{
-					auto dragged_entity = dragged.get_value<runtime::entity>();
-					if(dragged_entity && dragged_entity != entity)
+					auto eid = ecs.create_id(entity_index);
+					auto dropped_entity = ecs.get(eid);
+					if(dropped_entity)
 					{
-						gui::SetMouseCursor(ImGuiMouseCursor_Move);
-						if(gui::IsMouseReleased(gui::drag_button))
-						{
-							auto trans_comp = dragged_entity.get_component<transform_component>().lock();
-							if(trans_comp)
-							{
-								trans_comp->set_parent(entity);
-							}
-							es.drop();
-						}
-					}
-				}
-
-				if(dragged.is_type<asset_handle<prefab>>())
-				{
-					gui::SetMouseCursor(ImGuiMouseCursor_Move);
-					if(gui::IsMouseReleased(gui::drag_button))
-					{
-						auto pfab = dragged.get_value<asset_handle<prefab>>();
-						auto object = pfab->instantiate();
-						auto trans_comp = object.get_component<transform_component>().lock();
+						auto trans_comp = dropped_entity.get_component<transform_component>().lock();
 						if(trans_comp)
 						{
 							trans_comp->set_parent(entity);
 						}
-						es.drop();
-						es.select(object);
-					}
-				}
-				if(dragged.is_type<asset_handle<mesh>>())
-				{
-					gui::SetMouseCursor(ImGuiMouseCursor_Move);
-					if(gui::IsMouseReleased(gui::drag_button))
-					{
-						auto hmesh = dragged.get_value<asset_handle<mesh>>();
-						model mdl;
-						mdl.set_lod(hmesh, 0);
-
-						auto object = ecs.create();
-						// Add component and configure it.
-						object.assign<transform_component>().lock()->set_parent(entity);
-						// Add component and configure it.
-						object.assign<model_component>()
-							.lock()
-							->set_casts_shadow(true)
-							.set_casts_reflection(false)
-							.set_model(mdl);
-
-						es.drop();
-						es.select(object);
 					}
 				}
 			}
+		}
+
+		for(const auto& type : ex::get_suported_formats<prefab>())
+		{
+			auto payload = gui::AcceptDragDropPayload(type.c_str());
+			if(payload)
+			{
+				std::string absolute_path(reinterpret_cast<const char*>(payload->Data),
+										  std::size_t(payload->DataSize));
+
+				std::string key = fs::convert_to_protocol(fs::path(absolute_path)).string();
+				using asset_t = prefab;
+				using entry_t = asset_handle<asset_t>;
+				auto entry = entry_t{};
+				auto entry_future = am.find_asset_entry<asset_t>(key);
+				if(entry_future.is_ready())
+				{
+					entry = entry_future.get();
+				}
+				if(entry)
+				{
+					auto object = entry->instantiate();
+					auto trans_comp = object.get_component<transform_component>().lock();
+					if(trans_comp)
+					{
+						trans_comp->set_parent(entity);
+					}
+					es.select(object);
+				}
+			}
+		}
+		for(const auto& type : ex::get_suported_formats<mesh>())
+		{
+			auto payload = gui::AcceptDragDropPayload(type.c_str());
+			if(payload)
+			{
+				std::string absolute_path(reinterpret_cast<const char*>(payload->Data),
+										  std::size_t(payload->DataSize));
+
+				std::string key = fs::convert_to_protocol(fs::path(absolute_path)).string();
+				using asset_t = mesh;
+				using entry_t = asset_handle<asset_t>;
+				auto entry = entry_t{};
+				auto entry_future = am.find_asset_entry<asset_t>(key);
+				if(entry_future.is_ready())
+				{
+					entry = entry_future.get();
+				}
+				if(entry)
+				{
+					model mdl;
+					mdl.set_lod(entry, 0);
+
+					auto object = ecs.create();
+					// Add component and configure it.
+					object.assign<transform_component>().lock()->set_parent(entity);
+					// Add component and configure it.
+					object.assign<model_component>()
+						.lock()
+						->set_casts_shadow(true)
+						.set_casts_reflection(false)
+						.set_model(mdl);
+
+					es.select(object);
+				}
+			}
+		}
+
+		gui::EndDragDropTarget();
+	}
+}
+
+static void check_drag(runtime::entity entity)
+{
+	auto& es = core::get_subsystem<editor::editing_system>();
+	auto& editor_camera = es.camera;
+
+	if(entity != editor_camera)
+	{
+		if(!process_drag_drop_source(entity))
+		{
+			process_drag_drop_target(entity);
 		}
 	}
 }
@@ -222,17 +234,17 @@ void hierarchy_dock::draw_entity(runtime::entity entity)
 	if(is_selected)
 		flags |= ImGuiTreeNodeFlags_Selected;
 
-    if(gui::IsWindowFocused())
+	if(gui::IsWindowFocused())
 	{
-        if(is_selected && !gui::IsAnyItemActive())
-        {
-            if(input.is_key_pressed(mml::keyboard::F2))
-            {
-                edit_label = true;
-                gui::SetKeyboardFocusHere();
-            }
-        }
-    }
+		if(is_selected && !gui::IsAnyItemActive())
+		{
+			if(input.is_key_pressed(mml::keyboard::F2))
+			{
+				edit_label = true;
+				gui::SetKeyboardFocusHere();
+			}
+		}
+	}
 	auto transformComponent = entity.get_component<transform_component>().lock();
 	bool no_children = true;
 	if(transformComponent)
@@ -243,8 +255,8 @@ void hierarchy_dock::draw_entity(runtime::entity entity)
 
 	auto pos = gui::GetCursorScreenPos();
 	gui::AlignTextToFramePadding();
-	bool opened = gui::TreeNodeEx(name.c_str(), flags);
 
+	bool opened = gui::TreeNodeEx(name.c_str(), flags);
 	if(!edit_label)
 	{
 		check_drag(entity);
@@ -332,128 +344,79 @@ void hierarchy_dock::draw_entity(runtime::entity entity)
 void hierarchy_dock::render(const ImVec2&)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
-	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
 	auto& sg = core::get_subsystem<runtime::scene_graph>();
 	auto& input = core::get_subsystem<runtime::input>();
 
 	auto& roots = sg.get_roots();
 	auto& editor_camera = es.camera;
 	auto& selected = es.selection_data.object;
-	auto& dragged = es.drag_data.object;
 
-	check_context_menu(runtime::entity());
-
-	if(gui::IsWindowFocused())
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove |
+							 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings;
+	gui::BeginGroup();
+	if(gui::BeginChild("hierarchy_content", gui::GetContentRegionAvail(), false, flags))
 	{
-		if(input.is_key_pressed(mml::keyboard::Delete))
-		{
-			if(selected && selected.is_type<runtime::entity>())
-			{
-				auto sel = selected.get_value<runtime::entity>();
-				if(sel && sel != editor_camera)
-				{
-					sel.destroy();
-					es.unselect();
-				}
-			}
-		}
 
-		if(input.is_key_pressed(mml::keyboard::D))
+		check_context_menu(runtime::entity());
+
+		if(gui::IsWindowFocused())
 		{
-			if(input.is_key_down(mml::keyboard::LControl))
+			if(input.is_key_pressed(mml::keyboard::Delete))
 			{
 				if(selected && selected.is_type<runtime::entity>())
 				{
 					auto sel = selected.get_value<runtime::entity>();
 					if(sel && sel != editor_camera)
 					{
-						auto clone = ecs::utils::clone_entity(sel);
-						auto clone_trans_comp = clone.get_component<transform_component>().lock();
-						auto sel_trans_comp = sel.get_component<transform_component>().lock();
-						if(clone_trans_comp && sel_trans_comp)
-						{
-							clone_trans_comp->set_parent(sel_trans_comp->get_parent(), false, true);
-						}
-						es.select(clone);
+						sel.destroy();
+						es.unselect();
 					}
 				}
 			}
-		}
-	}
 
-	if(editor_camera.valid())
-	{
-		draw_entity(editor_camera);
-		gui::Separator();
-	}
-
-	for(auto& root : roots)
-	{
-		if(root.valid())
-		{
-			if(root != editor_camera)
-				draw_entity(root);
-		}
-	}
-
-	if(gui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem) && !gui::IsAnyItemHovered())
-	{
-		if(dragged)
-		{
-			if(dragged.is_type<runtime::entity>())
+			if(input.is_key_pressed(mml::keyboard::D))
 			{
-				gui::SetMouseCursor(ImGuiMouseCursor_Move);
-				if(gui::IsMouseReleased(gui::drag_button))
+				if(input.is_key_down(mml::keyboard::LControl))
 				{
-					auto dragged_entity = dragged.get_value<runtime::entity>();
-					if(dragged_entity)
+					if(selected && selected.is_type<runtime::entity>())
 					{
-						auto dragged_trans_comp = dragged_entity.get_component<transform_component>().lock();
-						if(dragged_trans_comp)
+						auto sel = selected.get_value<runtime::entity>();
+						if(sel && sel != editor_camera)
 						{
-							dragged_trans_comp->set_parent({});
+							auto clone = ecs::utils::clone_entity(sel);
+							auto clone_trans_comp = clone.get_component<transform_component>().lock();
+							auto sel_trans_comp = sel.get_component<transform_component>().lock();
+							if(clone_trans_comp && sel_trans_comp)
+							{
+								clone_trans_comp->set_parent(sel_trans_comp->get_parent(), false, true);
+							}
+							es.select(clone);
 						}
 					}
-
-					es.drop();
-				}
-			}
-			if(dragged.is_type<asset_handle<prefab>>())
-			{
-				gui::SetMouseCursor(ImGuiMouseCursor_Move);
-				if(gui::IsMouseReleased(gui::drag_button))
-				{
-					auto pfab = dragged.get_value<asset_handle<prefab>>();
-					auto object = pfab->instantiate();
-					es.drop();
-					es.select(object);
-				}
-			}
-			if(dragged.is_type<asset_handle<mesh>>())
-			{
-				gui::SetMouseCursor(ImGuiMouseCursor_Move);
-				if(gui::IsMouseReleased(gui::drag_button))
-				{
-					auto hmesh = dragged.get_value<asset_handle<mesh>>();
-					model mdl;
-					mdl.set_lod(hmesh, 0);
-
-					auto object = ecs.create();
-					// Add component and configure it.
-					object.assign<transform_component>();
-					// Add component and configure it.
-					object.assign<model_component>()
-						.lock()
-						->set_casts_shadow(true)
-						.set_casts_reflection(false)
-						.set_model(mdl);
-
-					es.drop();
-					es.select(object);
 				}
 			}
 		}
+
+		if(editor_camera.valid())
+		{
+			draw_entity(editor_camera);
+			gui::Separator();
+		}
+
+		for(auto& root : roots)
+		{
+			if(root.valid())
+			{
+				if(root != editor_camera)
+					draw_entity(root);
+			}
+		}
+		gui::EndChild();
 	}
+
+	gui::EndGroup();
+
+	process_drag_drop_target({});
 }
 
 hierarchy_dock::hierarchy_dock(const std::string& dtitle, bool close_button, const ImVec2& min_size)

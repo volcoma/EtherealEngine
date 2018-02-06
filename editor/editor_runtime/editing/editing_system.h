@@ -15,12 +15,6 @@ namespace editor
 {
 struct editing_system
 {
-	struct drag_type
-	{
-		rttr::variant object;
-		std::string description;
-	};
-
 	struct selection
 	{
 		rttr::variant object;
@@ -89,22 +83,6 @@ struct editing_system
 		}
 	}
 
-	//-----------------------------------------------------------------------------
-	//  Name : drag ()
-	/// <summary>
-	/// Starts dragging an object. Can be anything.
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void drag(rttr::variant object, const std::string& description = "");
-
-	//-----------------------------------------------------------------------------
-	//  Name : drop ()
-	/// <summary>
-	/// Clears the drag data.
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void drop();
-
 	void close_project();
 
 	/// editor camera
@@ -119,8 +97,6 @@ struct editing_system
 	imguizmo::operation operation = imguizmo::translate;
 	/// current manipulation gizmo space.
 	imguizmo::mode mode = imguizmo::local;
-	/// drag data containing dragged object
-	drag_type drag_data;
 	/// selection data containing selected object
 	selection selection_data;
 	/// snap data containging various snap options

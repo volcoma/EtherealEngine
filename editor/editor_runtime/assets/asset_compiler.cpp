@@ -1,5 +1,6 @@
 #include "asset_compiler.h"
 #include "../assets/mesh_importer.h"
+#include "asset_extensions.h"
 #include "bx/error.h"
 #include "bx/process.h"
 #include "bx/string.h"
@@ -18,7 +19,6 @@
 #include "core/serialization/types/vector.hpp"
 #include "core/string_utils/string_utils.h"
 #include "core/uuid/uuid.hpp"
-#include "runtime/assets/impl/asset_extensions.h"
 #include "runtime/ecs/constructs/prefab.h"
 #include "runtime/ecs/constructs/scene.h"
 #include "runtime/meta/animation/animation.hpp"
@@ -97,10 +97,10 @@ static bool run_compile_process(const std::string& process, const std::vector<st
 
 void compile_shader(const fs::path& absolute_meta_key, const fs::path& output)
 {
-    fs::error_code err;
-    fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
-    absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
-    absolute_key.replace_extension();
+	fs::error_code err;
+	fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
+	absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
+	absolute_key.replace_extension();
 	std::string str_input = absolute_key.string();
 	std::string file = absolute_key.stem().string();
 	fs::path dir = absolute_key.parent_path();
@@ -186,10 +186,10 @@ void compile_shader(const fs::path& absolute_meta_key, const fs::path& output)
 
 void compile_texture(const fs::path& absolute_meta_key, const fs::path& output)
 {
-    fs::error_code err;
-    fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
-    absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
-    absolute_key.replace_extension();
+	fs::error_code err;
+	fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
+	absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
+	absolute_key.replace_extension();
 	std::string str_input = absolute_key.string();
 
 	fs::path temp = fs::temp_directory_path(err);
@@ -222,10 +222,10 @@ void compile_texture(const fs::path& absolute_meta_key, const fs::path& output)
 
 void compile_mesh(const fs::path& absolute_meta_key, const fs::path& output)
 {
-    fs::error_code err;
-    fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
-    absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
-    absolute_key.replace_extension();
+	fs::error_code err;
+	fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
+	absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
+	absolute_key.replace_extension();
 	std::string str_input = absolute_key.string();
 
 	fs::path temp = fs::temp_directory_path(err);
@@ -274,18 +274,17 @@ void compile_mesh(const fs::path& absolute_meta_key, const fs::path& output)
 	//	}
 }
 
-
-void compile_animation(const fs::path &absolute_meta_key, const fs::path &output)
+void compile_animation(const fs::path& absolute_meta_key, const fs::path& output)
 {
 }
 
 void compile_sound(const fs::path& absolute_meta_key, const fs::path& output)
 {
-    fs::error_code err;
-    fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
-    absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
-    absolute_key.replace_extension();
-    
+	fs::error_code err;
+	fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
+	absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
+	absolute_key.replace_extension();
+
 	std::string str_input = absolute_key.string();
 
 	fs::path temp = fs::temp_directory_path(err);
@@ -341,12 +340,12 @@ void compile_sound(const fs::path& absolute_meta_key, const fs::path& output)
 
 void compile_material(const fs::path& absolute_meta_key, const fs::path& output)
 {
-    fs::error_code err;
-    fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
-    absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
-    absolute_key.replace_extension();
-    std::string str_input = absolute_key.string();
-    
+	fs::error_code err;
+	fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
+	absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
+	absolute_key.replace_extension();
+	std::string str_input = absolute_key.string();
+
 	std::shared_ptr<::material> material;
 	{
 		std::ifstream stream(absolute_key.string());
@@ -366,30 +365,27 @@ void compile_material(const fs::path& absolute_meta_key, const fs::path& output)
 			cereal::oarchive_binary_t ar(stream);
 
 			try_save(ar, cereal::make_nvp("material", material));
-            
-            APPLOG_INFO("Successful compilation of {0}", str_input);
-            
+
+			APPLOG_INFO("Successful compilation of {0}", str_input);
 		}
 	}
 }
 
 void compile_scene(const fs::path& absolute_meta_key, const fs::path& output)
 {
-    fs::error_code err;
-    fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
-    absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
-    absolute_key.replace_extension();
+	fs::error_code err;
+	fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
+	absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
+	absolute_key.replace_extension();
 	fs::copy_file(absolute_key, output, fs::copy_options::overwrite_if_exists, err);
 }
 
 void compile_prefab(const fs::path& absolute_meta_key, const fs::path& output)
 {
-    fs::error_code err;
-    fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
-    absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
-    absolute_key.replace_extension();
-    fs::copy_file(absolute_key, output, fs::copy_options::overwrite_if_exists, err);
+	fs::error_code err;
+	fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
+	absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
+	absolute_key.replace_extension();
+	fs::copy_file(absolute_key, output, fs::copy_options::overwrite_if_exists, err);
 }
-
-
 }

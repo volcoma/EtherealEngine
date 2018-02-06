@@ -10,7 +10,6 @@
 namespace gui
 {
 using namespace ImGui;
-constexpr static const int drag_button = 0;
 
 void CleanupTextures();
 

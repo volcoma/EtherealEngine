@@ -88,17 +88,6 @@ void editing_system::unselect()
 	imguizmo::enable(true);
 }
 
-void editing_system::drag(rttr::variant object, const std::string& description)
-{
-	drag_data.object = object;
-	drag_data.description = description;
-}
-
-void editing_system::drop()
-{
-	drag_data = {};
-}
-
 void editing_system::close_project()
 {
 	save_editor_camera();

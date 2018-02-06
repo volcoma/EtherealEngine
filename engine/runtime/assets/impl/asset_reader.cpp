@@ -5,7 +5,6 @@
 #include "../../meta/audio/sound.hpp"
 #include "../../meta/rendering/material.hpp"
 #include "../../meta/rendering/mesh.hpp"
-#include "asset_extensions.h"
 #include "core/audio/sound.h"
 #include "core/filesystem/filesystem.h"
 #include "core/graphics/index_buffer.h"

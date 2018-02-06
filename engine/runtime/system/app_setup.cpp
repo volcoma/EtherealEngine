@@ -1,6 +1,5 @@
 #include "app_setup.h"
 #include "../assets/asset_manager.h"
-#include "../assets/impl/asset_extensions.h"
 #include "../assets/impl/asset_reader.h"
 #include "../assets/impl/asset_writer.h"
 
