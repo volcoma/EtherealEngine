@@ -49,14 +49,27 @@ static asset_handle<gfx::texture> get_preview(const fs::path&, const std::string
 	return es.icons[type];
 };
 
-static bool process_drag_drop_source(const fs::path& absolute_path)
+static bool process_drag_drop_source(asset_handle<gfx::texture> preview, const fs::path& absolute_path)
 {
 	if(gui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
 	{
 		const auto filename = absolute_path.filename();
 		std::string extension = filename.has_extension() ? filename.extension().string() : "folder";
 		std::string id = absolute_path.string();
+		auto tex = preview;
+		bool is_rt = tex ? tex->is_render_target() : false;
+		bool is_orig_bl = gfx::is_origin_bottom_left();
+		ImVec2 item_size = {32, 32};
+		ImVec2 texture_size = item_size;
+		if(tex)
+			texture_size = {float(tex->info.width), float(tex->info.height)};
+		ImVec2 uv0 = {0.0f, 0.0f};
+		ImVec2 uv1 = {1.0f, 1.0f};
+		gui::BeginGroup();
+		gui::ImageWithAspect(tex.get_asset(), is_rt, is_orig_bl, texture_size, item_size, uv0, uv1);
 		gui::TextUnformatted(filename.string().c_str());
+
+		gui::EndGroup();
 		gui::SetDragDropPayload(extension.c_str(), id.data(), id.size());
 		gui::EndDragDropSource();
 		return true;
@@ -210,7 +223,7 @@ static void draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const s
 		}
 	}
 
-	if(!process_drag_drop_source(absolute_path))
+	if(!process_drag_drop_source(icon, absolute_path))
 	{
 		process_drag_drop_target(absolute_path);
 	}

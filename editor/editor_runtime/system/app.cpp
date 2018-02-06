@@ -568,7 +568,8 @@ void app::draw_footer(render_window&, imguidock::dockspace& dockspace)
 		gui::PushFont(gui::GetFont("icons"));
 		gui::AlignTextToFramePadding();
 		gui::Text(ICON_FA_TASKS " : %u", unsigned(tasks_info.pending_tasks));
-		if(gui::IsItemHovered())
+		auto& g = *gui::GetCurrentContext();
+		if(!g.DragDropActive && gui::IsItemHovered())
 		{
 			gui::BeginTooltip();
 			int idx = 0;
@@ -673,6 +674,5 @@ void app::handle_drag_and_drop()
 			es.unselect();
 		}
 	}
-
 }
 }

@@ -268,7 +268,8 @@ int ImageButtonWithAspectAndLabel(ImTextureID texture, ImVec2 texture_size, ImVe
 		label_clicked = IsItemClicked(0);
 		if(!edit)
 		{
-			if(IsItemHovered(ImGuiHoveredFlags_RectOnly))
+			auto& g = *GetCurrentContext();
+			if(!g.DragDropActive && IsItemHovered())
 			{
 				BeginTooltip();
 				TextUnformatted(label);
@@ -281,11 +282,11 @@ int ImageButtonWithAspectAndLabel(ImTextureID texture, ImVec2 texture_size, ImVe
 			SetCursorPos(pos);
 			PushItemWidth(size.x + image_padding * 2.0f);
 
-            if(!inputActive)
-            {
-            	SetKeyboardFocusHere();
-            }
-            
+			if(!inputActive)
+			{
+				SetKeyboardFocusHere();
+			}
+
 			if(InputText("", &buf[0], buf_size, flags))
 			{
 				edit = false;
@@ -428,12 +429,11 @@ void AddFont(const std::string& id, ImFont* font)
 void ClearFonts()
 {
 	auto& fonts = GetFonts();
-    fonts.clear();
+	fonts.clear();
 }
 
-void PushFont(const std::string &id)
+void PushFont(const std::string& id)
 {
-    PushFont(GetFont(id));
+	PushFont(GetFont(id));
 }
-
 }

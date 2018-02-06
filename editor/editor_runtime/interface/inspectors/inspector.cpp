@@ -7,7 +7,8 @@ REFLECT(inspector)
 
 void Tooltip(const rttr::property& prop)
 {
-	if(gui::IsItemHovered())
+	auto& g = *gui::GetCurrentContext();
+	if(!g.DragDropActive && gui::IsItemHovered())
 	{
 		// gui::SetMouseCursor(ImGuiMouseCursor_Help);
 		auto tooltip = prop.get_metadata("tooltip");
@@ -22,7 +23,8 @@ void Tooltip(const rttr::property& prop)
 
 void Tooltip(const std::string& tooltip)
 {
-	if(gui::IsItemHovered())
+	auto& g = *gui::GetCurrentContext();
+	if(!g.DragDropActive && gui::IsItemHovered())
 	{
 		// gui::SetMouseCursor(ImGuiMouseCursor_Help);
 		gui::BeginTooltip();
