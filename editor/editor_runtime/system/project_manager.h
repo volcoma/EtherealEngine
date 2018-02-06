@@ -105,25 +105,23 @@ public:
 	{
 		return _options;
 	}
-    
+
 private:
 	void setup_directory(fs::syncer& syncer);
-	void setup_meta_syncer(fs::syncer& syncer, const fs::path& data_dir_protocol,
-						   const fs::path& meta_dir_protocol);
-	void setup_cache_syncer(fs::syncer& syncer, const fs::path& meta_dir_protocol,
-							const fs::path& cache_dir_protocol);
+	void setup_meta_syncer(fs::syncer& syncer, const fs::path& data_dir, const fs::path& meta_dir);
+	void setup_cache_syncer(fs::syncer& syncer, const fs::path& meta_dir, const fs::path& cache_dir);
 	/// Project options
 	options _options;
 	/// Current project name
 	std::string _project_name;
-    
+
 	fs::syncer _app_meta_syncer;
 	fs::syncer _app_cache_syncer;
-                   
+
 	fs::syncer _editor_meta_syncer;
 	fs::syncer _editor_cache_syncer;
-    
-    fs::syncer _engine_meta_syncer;
+
+	fs::syncer _engine_meta_syncer;
 	fs::syncer _engine_cache_syncer;
 };
 }

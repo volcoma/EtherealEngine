@@ -1,6 +1,7 @@
 #include "asset_compiler.h"
-#include "../assets/mesh_importer.h"
 #include "asset_extensions.h"
+#include "mesh_importer.h"
+
 #include "bx/error.h"
 #include "bx/process.h"
 #include "bx/string.h"
@@ -29,7 +30,7 @@
 #include <array>
 #include <fstream>
 
-namespace project_compiler
+namespace asset_compiler
 {
 static std::string escape_str(const std::string& str)
 {
@@ -95,7 +96,8 @@ static bool run_compile_process(const std::string& process, const std::vector<st
 	}
 }
 
-void compile_shader(const fs::path& absolute_meta_key, const fs::path& output)
+template <>
+void compile<gfx::shader>(const fs::path& absolute_meta_key, const fs::path& output)
 {
 	fs::error_code err;
 	fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
@@ -184,7 +186,8 @@ void compile_shader(const fs::path& absolute_meta_key, const fs::path& output)
 	fs::remove(temp, err);
 }
 
-void compile_texture(const fs::path& absolute_meta_key, const fs::path& output)
+template <>
+void compile<gfx::texture>(const fs::path& absolute_meta_key, const fs::path& output)
 {
 	fs::error_code err;
 	fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
@@ -220,7 +223,8 @@ void compile_texture(const fs::path& absolute_meta_key, const fs::path& output)
 	fs::remove(temp, err);
 }
 
-void compile_mesh(const fs::path& absolute_meta_key, const fs::path& output)
+template <>
+void compile<mesh>(const fs::path& absolute_meta_key, const fs::path& output)
 {
 	fs::error_code err;
 	fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
@@ -274,11 +278,13 @@ void compile_mesh(const fs::path& absolute_meta_key, const fs::path& output)
 	//	}
 }
 
-void compile_animation(const fs::path& absolute_meta_key, const fs::path& output)
+template <>
+void compile<runtime::animation>(const fs::path& absolute_meta_key, const fs::path& output)
 {
 }
 
-void compile_sound(const fs::path& absolute_meta_key, const fs::path& output)
+template <>
+void compile<audio::sound>(const fs::path& absolute_meta_key, const fs::path& output)
 {
 	fs::error_code err;
 	fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
@@ -338,7 +344,8 @@ void compile_sound(const fs::path& absolute_meta_key, const fs::path& output)
 	APPLOG_INFO("Successful compilation of {0}", str_input);
 }
 
-void compile_material(const fs::path& absolute_meta_key, const fs::path& output)
+template <>
+void compile<material>(const fs::path& absolute_meta_key, const fs::path& output)
 {
 	fs::error_code err;
 	fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
@@ -371,21 +378,25 @@ void compile_material(const fs::path& absolute_meta_key, const fs::path& output)
 	}
 }
 
-void compile_scene(const fs::path& absolute_meta_key, const fs::path& output)
+template <>
+void compile<prefab>(const fs::path& absolute_meta_key, const fs::path& output)
 {
 	fs::error_code err;
 	fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
 	absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
 	absolute_key.replace_extension();
 	fs::copy_file(absolute_key, output, fs::copy_options::overwrite_if_exists, err);
+	APPLOG_INFO("Successful compilation of {0}", absolute_key.string());
 }
 
-void compile_prefab(const fs::path& absolute_meta_key, const fs::path& output)
+template <>
+void compile<scene>(const fs::path& absolute_meta_key, const fs::path& output)
 {
 	fs::error_code err;
 	fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
 	absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
 	absolute_key.replace_extension();
 	fs::copy_file(absolute_key, output, fs::copy_options::overwrite_if_exists, err);
+	APPLOG_INFO("Successful compilation of {0}", absolute_key.string());
 }
 }

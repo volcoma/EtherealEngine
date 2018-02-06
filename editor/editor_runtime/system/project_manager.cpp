@@ -18,8 +18,19 @@ namespace editor
 {
 using namespace std::literals;
 
+static std::vector<fs::path> remove_meta_tag(const std::vector<fs::path>& synced_paths)
+{
+	std::decay_t<decltype(synced_paths)> reduced;
+	reduced.reserve(synced_paths.size());
+	for(const auto& synced_path : synced_paths)
+	{
+		reduced.emplace_back(fs::replace(synced_path, ".meta", ""));
+	}
+	return reduced;
+}
+
 template <typename T>
-std::uint64_t watch_assets(const fs::path& dir, const std::string& wildcard, bool reload_async)
+static std::uint64_t watch_assets(const fs::path& dir, const std::string& wildcard, bool reload_async)
 {
 	auto& am = core::get_subsystem<runtime::asset_manager>();
 	auto& ts = core::get_subsystem<core::task_system>();
@@ -63,6 +74,77 @@ std::uint64_t watch_assets(const fs::path& dir, const std::string& wildcard, boo
 			}
 
 		});
+}
+
+template <typename T>
+static void add_to_syncer(fs::syncer& syncer, const fs::path& dir, fs::syncer::on_entry_removed_t on_removed,
+						  fs::syncer::on_entry_renamed_t on_renamed)
+{
+	auto& ts = core::get_subsystem<core::task_system>();
+	auto on_modified = [&ts](const auto& ref_path, const auto& synced_paths, bool is_initial_listing) {
+
+		auto task = ts.push_on_worker_thread(
+			[ ref_path, synced_paths = remove_meta_tag(synced_paths), is_initial_listing ]() {
+
+				fs::path output = synced_paths.front();
+				fs::error_code err;
+				if(is_initial_listing && fs::exists(output, err))
+				{
+					return;
+				}
+				asset_compiler::compile<T>(ref_path, output);
+			});
+
+	};
+
+	for(const auto& type : ex::get_suported_formats<T>())
+	{
+		syncer.set_mapping(type + ".meta", {".asset"}, on_modified, on_modified, on_removed, on_renamed);
+		watch_assets<T>(dir, "*" + type, true);
+	}
+}
+
+template <>
+void add_to_syncer<gfx::shader>(fs::syncer& syncer, const fs::path& dir,
+								fs::syncer::on_entry_removed_t on_removed,
+								fs::syncer::on_entry_renamed_t on_renamed)
+{
+	auto& ts = core::get_subsystem<core::task_system>();
+
+	auto on_modified = [&ts](const auto& ref_path, const auto& synced_paths, bool is_initial_listing) {
+		auto task = ts.push_on_worker_thread(
+			[ ref_path, synced_paths = remove_meta_tag(synced_paths), is_initial_listing ]() {
+				const auto& renderer_extension = gfx::get_renderer_filename_extension();
+				auto it = std::find_if(std::begin(synced_paths), std::end(synced_paths),
+									   [&renderer_extension](const auto& key) {
+										   return key.stem().extension() == renderer_extension;
+									   });
+
+				if(it == std::end(synced_paths))
+				{
+					return;
+				}
+
+				fs::path output = *it;
+
+				fs::error_code err;
+				if(is_initial_listing && fs::exists(output, err))
+				{
+					return;
+				}
+
+				asset_compiler::compile<gfx::shader>(ref_path, output);
+			});
+
+	};
+
+	for(const auto& type : ex::get_suported_formats<gfx::shader>())
+	{
+		syncer.set_mapping(type + ".meta", {".dx11.asset", ".dx12.asset", ".gl.asset"}, on_modified,
+						   on_modified, on_removed, on_renamed);
+
+		watch_assets<gfx::shader>(dir, "*" + type, true);
+	}
 }
 
 void project_manager::close_project()
@@ -150,12 +232,11 @@ void project_manager::load_config()
 
 void project_manager::setup_directory(fs::syncer& syncer)
 {
-	const auto on_dir_modified = [](const auto& ref_path, const auto& synced_paths, bool is_initial_listing) {
-		for(const auto& synced_path : synced_paths)
-		{
-		}
+	const auto on_dir_modified = [](const auto& /*ref_path*/, const auto& /*synced_paths*/,
+									bool /*is_initial_listing*/) {
+
 	};
-	const auto on_dir_removed = [](const auto& ref_path, const auto& synced_paths) {
+	const auto on_dir_removed = [](const auto& /*ref_path*/, const auto& synced_paths) {
 		for(const auto& synced_path : synced_paths)
 		{
 			fs::error_code err;
@@ -163,7 +244,7 @@ void project_manager::setup_directory(fs::syncer& syncer)
 		}
 	};
 
-	const auto on_dir_renamed = [](const auto& ref_path, const auto& synced_paths) {
+	const auto on_dir_renamed = [](const auto& /*ref_path*/, const auto& synced_paths) {
 		for(const auto& synced_path : synced_paths)
 		{
 			fs::error_code err;
@@ -173,13 +254,12 @@ void project_manager::setup_directory(fs::syncer& syncer)
 	syncer.set_directory_mapping(on_dir_modified, on_dir_modified, on_dir_removed, on_dir_renamed);
 }
 
-void project_manager::setup_meta_syncer(fs::syncer& syncer, const fs::path& data_dir_protocol,
-										const fs::path& meta_dir_protocol)
+void project_manager::setup_meta_syncer(fs::syncer& syncer, const fs::path& data_dir,
+										const fs::path& meta_dir)
 {
-
 	setup_directory(syncer);
 
-	const auto on_file_removed = [](const auto& ref_path, const auto& synced_paths) {
+	const auto on_file_removed = [](const auto& /*ref_path*/, const auto& synced_paths) {
 		for(const auto& synced_path : synced_paths)
 		{
 			fs::error_code err;
@@ -187,7 +267,7 @@ void project_manager::setup_meta_syncer(fs::syncer& syncer, const fs::path& data
 		}
 	};
 
-	const auto on_file_renamed = [](const auto& ref_path, const auto& synced_paths) {
+	const auto on_file_renamed = [](const auto& /*ref_path*/, const auto& synced_paths) {
 		for(const auto& synced_path : synced_paths)
 		{
 			fs::error_code err;
@@ -195,7 +275,7 @@ void project_manager::setup_meta_syncer(fs::syncer& syncer, const fs::path& data
 		}
 	};
 
-	const auto on_file_modified = [](const auto& ref_path, const auto& synced_paths,
+	const auto on_file_modified = [](const auto& /*ref_path*/, const auto& synced_paths,
 									 bool is_initial_listing) {
 
 		for(const auto& synced_path : synced_paths)
@@ -221,232 +301,57 @@ void project_manager::setup_meta_syncer(fs::syncer& syncer, const fs::path& data
 		}
 	}
 
-	syncer.sync(data_dir_protocol, meta_dir_protocol);
+	syncer.sync(data_dir, meta_dir);
 }
 
-static std::vector<fs::path> remove_meta_tag(const std::vector<fs::path>& synced_paths)
+void project_manager::setup_cache_syncer(fs::syncer& syncer, const fs::path& meta_dir,
+										 const fs::path& cache_dir)
 {
-	std::decay_t<decltype(synced_paths)> reduced;
-	reduced.reserve(synced_paths.size());
-	for(const auto& synced_path : synced_paths)
-	{
-		reduced.emplace_back(fs::replace(synced_path, ".meta", ""));
-	}
-	return reduced;
-}
-
-void project_manager::setup_cache_syncer(fs::syncer& syncer, const fs::path& meta_dir_protocol,
-										 const fs::path& cache_dir_protocol)
-{
-	auto& ts = core::get_subsystem<core::task_system>();
 
 	setup_directory(syncer);
-	static const std::string wildcard = "*";
 
-	auto on_removed = [](const auto& ref_path, const auto& synced_paths) {
-		for(const auto& synced_path : synced_paths)
-		{
-			auto synced_asset = fs::replace(synced_path, ".meta", "");
-			fs::error_code err;
-			fs::remove_all(synced_asset, err);
-		}
-	};
+	auto& ts = core::get_subsystem<core::task_system>();
+	auto on_removed = [&ts](const auto& /*ref_path*/, const auto& synced_paths) {
 
-	auto on_renamed = [](const auto& ref_path, const auto& synced_paths) {
-		for(const auto& synced_path : synced_paths)
-		{
-			auto synced_old_asset = fs::replace(synced_path.first, ".meta", "");
-			auto synced_new_asset = fs::replace(synced_path.second, ".meta", "");
-			fs::error_code err;
-			fs::rename(synced_old_asset, synced_new_asset, err);
-		}
-	};
-
-	auto on_image_modified = [&ts](const auto& ref_path, const auto& synced_paths, bool is_initial_listing) {
-
-		auto task = ts.push_on_worker_thread(
-			[ ref_path, synced_paths = remove_meta_tag(synced_paths), is_initial_listing ]() {
-
-				fs::path output = synced_paths.front();
-				fs::error_code err;
-				if(is_initial_listing && fs::exists(output, err))
+		ts.push_on_worker_thread(
+			[](const auto& synced_paths) {
+				for(const auto& synced_path : synced_paths)
 				{
-					return;
+					auto synced_asset = fs::replace(synced_path, ".meta", "");
+					fs::error_code err;
+					fs::remove_all(synced_asset, err);
 				}
-				project_compiler::compile_texture(ref_path, output);
-			});
+			},
+			synced_paths);
 
 	};
 
-	for(const auto& type : ex::get_suported_formats<gfx::texture>())
-	{
-		syncer.set_mapping(type + ".meta", {".asset"}, on_image_modified, on_image_modified, on_removed,
-						   on_renamed);
-		watch_assets<gfx::texture>(cache_dir_protocol, wildcard + type, true);
-	}
+	auto on_renamed = [&ts](const auto& /*ref_path*/, const auto& synced_paths) {
 
-	auto on_mesh_modified = [&ts](const auto& ref_path, const auto& synced_paths, bool is_initial_listing) {
-		auto task = ts.push_on_worker_thread(
-			[ ref_path, synced_paths = remove_meta_tag(synced_paths), is_initial_listing ]() {
-				fs::path output = synced_paths.front();
-				fs::error_code err;
-				if(is_initial_listing && fs::exists(output, err))
+		ts.push_on_worker_thread(
+			[](const auto& synced_paths) {
+				for(const auto& synced_path : synced_paths)
 				{
-					return;
+					auto synced_old_asset = fs::replace(synced_path.first, ".meta", "");
+					auto synced_new_asset = fs::replace(synced_path.second, ".meta", "");
+					fs::error_code err;
+					fs::rename(synced_old_asset, synced_new_asset, err);
 				}
-				project_compiler::compile_mesh(ref_path, output);
-			});
-
-	};
-	for(const auto& type : ex::get_suported_formats<mesh>())
-	{
-		syncer.set_mapping(type + ".meta", {".asset"}, on_mesh_modified, on_mesh_modified, on_removed,
-						   on_renamed);
-		watch_assets<mesh>(cache_dir_protocol, wildcard + type, true);
-	}
-
-	auto on_sound_modified = [&ts](const auto& ref_path, const auto& synced_paths, bool is_initial_listing) {
-		auto task = ts.push_on_worker_thread(
-			[ ref_path, synced_paths = remove_meta_tag(synced_paths), is_initial_listing ]() {
-				fs::path output = synced_paths.front();
-				fs::error_code err;
-				if(is_initial_listing && fs::exists(output, err))
-				{
-					return;
-				}
-				project_compiler::compile_sound(ref_path, output);
-			});
-
-	};
-	for(const auto& type : ex::get_suported_formats<audio::sound>())
-	{
-		syncer.set_mapping(type + ".meta", {".asset"}, on_sound_modified, on_sound_modified, on_removed,
-						   on_renamed);
-
-		watch_assets<audio::sound>(cache_dir_protocol, wildcard + type, true);
-	}
-
-	auto on_shader_modified = [&ts](const auto& ref_path, const auto& synced_paths, bool is_initial_listing) {
-		auto task = ts.push_on_worker_thread(
-			[ ref_path, synced_paths = remove_meta_tag(synced_paths), is_initial_listing ]() {
-				const auto& renderer_extension = gfx::get_renderer_filename_extension();
-				auto it = std::find_if(std::begin(synced_paths), std::end(synced_paths),
-									   [&renderer_extension](const auto& key) {
-										   return key.stem().extension() == renderer_extension;
-									   });
-
-				if(it == std::end(synced_paths))
-				{
-					return;
-				}
-
-				fs::path output = *it;
-
-				fs::error_code err;
-				if(is_initial_listing && fs::exists(output, err))
-				{
-					return;
-				}
-
-				project_compiler::compile_shader(ref_path, output);
-			});
+			},
+			synced_paths);
 
 	};
 
-	for(const auto& type : ex::get_suported_formats<gfx::shader>())
-	{
-		syncer.set_mapping(type + ".meta", {".dx11.asset", ".dx12.asset", ".gl.asset"}, on_shader_modified,
-						   on_shader_modified, on_removed, on_renamed);
+	add_to_syncer<gfx::texture>(syncer, cache_dir, on_removed, on_renamed);
+	add_to_syncer<gfx::shader>(syncer, cache_dir, on_removed, on_renamed);
+	add_to_syncer<mesh>(syncer, cache_dir, on_removed, on_renamed);
+	add_to_syncer<audio::sound>(syncer, cache_dir, on_removed, on_renamed);
+	add_to_syncer<material>(syncer, cache_dir, on_removed, on_renamed);
+	add_to_syncer<runtime::animation>(syncer, cache_dir, on_removed, on_renamed);
+	add_to_syncer<prefab>(syncer, cache_dir, on_removed, on_renamed);
+	add_to_syncer<scene>(syncer, cache_dir, on_removed, on_renamed);
 
-		watch_assets<gfx::shader>(cache_dir_protocol, wildcard + type, true);
-	}
-
-	auto on_material_modified = [&ts](const auto& ref_path, const auto& synced_paths,
-									  bool is_initial_listing) {
-		auto task = ts.push_on_worker_thread(
-			[ ref_path, synced_paths = remove_meta_tag(synced_paths), is_initial_listing ]() {
-				fs::path output = synced_paths.front();
-				fs::error_code err;
-				if(is_initial_listing && fs::exists(output, err))
-				{
-					return;
-				}
-				project_compiler::compile_material(ref_path, output);
-			});
-
-	};
-
-	for(const auto& type : ex::get_suported_formats<material>())
-	{
-		syncer.set_mapping(type + ".meta", {".asset"}, on_material_modified, on_material_modified, on_removed,
-						   on_renamed);
-
-		watch_assets<material>(cache_dir_protocol, wildcard + type, true);
-	}
-
-	auto on_anim_modified = [&ts](const auto& ref_path, const auto& synced_paths, bool is_initial_listing) {
-		auto task = ts.push_on_worker_thread(
-			[ ref_path, synced_paths = remove_meta_tag(synced_paths), is_initial_listing ]() {
-				fs::path output = synced_paths.front();
-				fs::error_code err;
-				if(is_initial_listing && fs::exists(output, err))
-				{
-					return;
-				}
-				project_compiler::compile_animation(ref_path, output);
-			});
-	};
-	for(const auto& type : ex::get_suported_formats<runtime::animation>())
-	{
-		syncer.set_mapping(type + ".meta", {".asset"}, on_anim_modified, on_anim_modified, on_removed,
-						   on_renamed);
-
-		watch_assets<runtime::animation>(cache_dir_protocol, wildcard + type, true);
-	}
-
-	auto on_prefab_modified = [&ts](const auto& ref_path, const auto& synced_paths, bool is_initial_listing) {
-		auto task = ts.push_on_worker_thread(
-			[ ref_path, synced_paths = remove_meta_tag(synced_paths), is_initial_listing ]() {
-				fs::path output = synced_paths.front();
-				fs::error_code err;
-				if(is_initial_listing && fs::exists(output, err))
-				{
-					return;
-				}
-				project_compiler::compile_prefab(ref_path, output);
-			});
-
-	};
-
-	for(const auto& type : ex::get_suported_formats<prefab>())
-	{
-		syncer.set_mapping(type + ".meta", {".asset"}, on_prefab_modified, on_prefab_modified, on_removed,
-						   on_renamed);
-
-		watch_assets<prefab>(cache_dir_protocol, wildcard + type, true);
-	}
-
-	auto on_scene_modified = [&ts](const auto& ref_path, const auto& synced_paths, bool is_initial_listing) {
-		auto task = ts.push_on_worker_thread(
-			[ ref_path, synced_paths = remove_meta_tag(synced_paths), is_initial_listing ]() {
-				fs::path output = synced_paths.front();
-				fs::error_code err;
-				if(is_initial_listing && fs::exists(output, err))
-				{
-					return;
-				}
-				project_compiler::compile_scene(ref_path, output);
-			});
-
-	};
-	for(const auto& type : ex::get_suported_formats<scene>())
-	{
-		syncer.set_mapping(type + ".meta", {".asset"}, on_scene_modified, on_scene_modified, on_removed,
-						   on_renamed);
-
-		watch_assets<scene>(cache_dir_protocol, wildcard + type, true);
-	}
-	syncer.sync(meta_dir_protocol, cache_dir_protocol);
+	syncer.sync(meta_dir, cache_dir);
 }
 
 void project_manager::save_config()
