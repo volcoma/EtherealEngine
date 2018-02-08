@@ -1,7 +1,3 @@
-#.rst:
-# ECMEnableSanitizers
-# -------------------
-#
 # Enable compiler sanitizer flags.
 #
 # The following sanitizers are supported:
@@ -24,15 +20,10 @@
 #
 # Simply add::
 #
-#    include(ECMEnableSanitizers)
+#    include(sanitizers_support)
 #
-# to your ``CMakeLists.txt``. Note that this module is included in
-# KDECompilerSettings, so projects using that module do not need to also
-# include this one.
-#
-# The sanitizers are not enabled by default. Instead, you must set
-# ``ECM_ENABLE_SANITIZERS`` (either in your ``CMakeLists.txt`` or on the
-# command line) to a semicolon-separated list of sanitizers you wish to enable.
+# The sanitizers are not enabled by default. Instead, you must call
+# ``enable_sanitizers`` in your ``CMakeLists.txt`` with a list of sanitizers.
 # The options are:
 #
 # - address
@@ -50,15 +41,6 @@
 #
 #   To reduce the overhead induced by the instrumentation of the sanitizers, it
 #   is advised to enable compiler optimizations (``-O1`` or higher).
-#
-# Example
-# =======
-#
-# This is an example of usage::
-#
-#   mkdir build
-#   cd build
-#   cmake -DECM_ENABLE_SANITIZERS='address;leak;undefined' ..
 #
 # .. note::
 #
@@ -152,9 +134,9 @@ macro (enable_sanitizer_flags sanitize_option)
     endif ()
 endmacro ()
 
-macro(enable_sanitizers ECM_ENABLE_SANITIZERS)
-	# for each element of the ECM_ENABLE_SANITIZERS list
-	foreach ( CUR_SANITIZER ${ECM_ENABLE_SANITIZERS} )
+macro(enable_sanitizers SANITIZERS_LIST)
+	# for each element of the SANITIZERS_LIST list
+	foreach ( CUR_SANITIZER ${SANITIZERS_LIST} )
 		message(STATUS "---------CONSIDERING SANITIZER = ${CUR_SANITIZER}")
 		# lowercase filter
 		string(TOLOWER ${CUR_SANITIZER} CUR_SANITIZER)
