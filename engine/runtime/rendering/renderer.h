@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/cmd_line/parser.hpp"
+#include "core/common/basetypes.hpp"
 #include "render_window.h"
 #include <memory>
 #include <vector>
@@ -30,7 +31,7 @@ struct renderer
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void frame_end(std::chrono::duration<float>);
+	void frame_end(delta_t);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_render_frame ()

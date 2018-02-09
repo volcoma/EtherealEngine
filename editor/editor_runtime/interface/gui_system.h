@@ -24,13 +24,13 @@ struct gui_system
 	gui_system();
 	~gui_system();
     
-	void frame_begin(std::chrono::duration<float>);
+	void frame_begin(delta_t);
 
 	std::uint32_t get_draw_calls() const;
 	ImGuiContext* get_context(std::uint32_t id);
 
 	void push_context(std::uint32_t id);
-	void draw_begin(render_window& window, std::chrono::duration<float> dt);
+	void draw_begin(render_window& window, delta_t dt);
 
 	void draw_end();
 	void pop_context();

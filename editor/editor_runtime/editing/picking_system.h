@@ -1,8 +1,8 @@
 #pragma once
 
+#include "core/common/basetypes.hpp"
 #include "runtime/assets/asset_handle.h"
 #include "runtime/rendering/gpu_program.h"
-#include <chrono>
 
 namespace gfx
 {
@@ -27,7 +27,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void frame_render(std::chrono::duration<float> dt);
+	void frame_render(delta_t dt);
 
 private:
 	/// surface used to render into

@@ -88,6 +88,10 @@ static void process_drag_drop_target(const fs::path& absolute_path)
 {
 	if(gui::BeginDragDropTarget())
 	{
+		if(gui::IsDragDropPayloadBeingAccepted())
+		{
+			gui::SetMouseCursor(ImGuiMouseCursor_Move);
+		}
 		fs::error_code err;
 		if(fs::is_directory(absolute_path, err))
 		{

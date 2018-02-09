@@ -7,7 +7,7 @@
 
 namespace runtime
 {
-void audio_system::frame_update(std::chrono::duration<float> dt)
+void audio_system::frame_update(delta_t dt)
 {
 	auto& ecs = core::get_subsystem<entity_component_system>();
 

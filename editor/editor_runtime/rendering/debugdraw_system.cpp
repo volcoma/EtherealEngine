@@ -17,7 +17,7 @@
 
 namespace editor
 {
-void debugdraw_system::frame_render(std::chrono::duration<float>)
+void debugdraw_system::frame_render(delta_t)
 {
 	auto& es = core::get_subsystem<editing_system>();
 	auto& editor_camera = es.camera;

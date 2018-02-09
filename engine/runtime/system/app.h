@@ -2,6 +2,7 @@
 
 #include "core/cmd_line/parser.hpp"
 #include "core/system/subsystem.h"
+#include "core/common/basetypes.hpp"
 
 namespace runtime
 {

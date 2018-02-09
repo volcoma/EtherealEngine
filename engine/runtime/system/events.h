@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/common/basetypes.hpp"
 #include "core/signals/event.hpp"
 #include <chrono>
 #include <cstdint>
@@ -8,10 +9,10 @@
 namespace runtime
 {
 /// engine loop events
-extern event<void(std::chrono::duration<float>)> on_frame_begin;
-extern event<void(std::chrono::duration<float>)> on_frame_update;
-extern event<void(std::chrono::duration<float>)> on_frame_render;
-extern event<void(std::chrono::duration<float>)> on_frame_end;
+extern event<void(delta_t)> on_frame_begin;
+extern event<void(delta_t)> on_frame_update;
+extern event<void(delta_t)> on_frame_render;
+extern event<void(delta_t)> on_frame_end;
 
 /// platform events
 

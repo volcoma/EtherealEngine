@@ -28,7 +28,7 @@ void app::setup(cmd_line::parser& parser)
 	logging_container->add_sink(std::make_shared<logging::sinks::platform_sink_mt>());
 	logging_container->add_sink(std::make_shared<logging::sinks::daily_file_sink_mt>("Log", 23, 59));
 
-	auto logger = logging::create(APPLOG, logging_container);
+	logging::create(APPLOG, logging_container);
 
 	serialization::set_warning_logger([](const std::string& msg) { APPLOG_WARNING(msg); });
 
@@ -42,7 +42,7 @@ void app::setup(cmd_line::parser& parser)
 	ecs::set_frame_getter([]() { return core::get_subsystem<core::simulation>().get_frame(); });
 
 	parser.set_optional<std::string>("r", "renderer", "auto", "Select preferred renderer.");
-    parser.set_optional<bool>("n", "novsync", false, "Disable vsync.");  
+	parser.set_optional<bool>("n", "novsync", false, "Disable vsync.");
 }
 
 void app::start(cmd_line::parser& parser)
@@ -52,8 +52,8 @@ void app::start(cmd_line::parser& parser)
 	core::add_subsystem<renderer>(parser);
 	core::add_subsystem<input>();
 	core::add_subsystem<audio::device>();
-	auto& am = core::add_subsystem<asset_manager>();
-	setup_asset_manager(am);
+	core::add_subsystem<asset_manager>();
+	setup_asset_manager();
 	core::add_subsystem<entity_component_system>();
 	core::add_subsystem<scene_graph>();
 	core::add_subsystem<bone_system>();
@@ -155,18 +155,18 @@ int app::run(int argc, char* argv[])
 	std::stringstream out, err;
 	if(!parser.run(out, err))
 	{
-        auto parse_error = out.str();
-        if(parse_error.empty())
-        {
-            parse_error = "Failed to parse command line.";
-        }
+		auto parse_error = out.str();
+		if(parse_error.empty())
+		{
+			parse_error = "Failed to parse command line.";
+		}
 		APPLOG_ERROR(parse_error);
 	}
-    auto parse_info = out.str();
-    if(!parse_info.empty())
-    {
-        APPLOG_INFO(parse_info);
-    }
+	auto parse_info = out.str();
+	if(!parse_info.empty())
+	{
+		APPLOG_INFO(parse_info);
+	}
 
 	APPLOG_INFO("Initializing...");
 	start(parser);

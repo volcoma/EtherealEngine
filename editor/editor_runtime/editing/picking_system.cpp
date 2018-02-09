@@ -21,7 +21,7 @@ namespace editor
 {
 constexpr int picking_system::tex_id_dim;
 
-void picking_system::frame_render(std::chrono::duration<float>)
+void picking_system::frame_render(delta_t dt)
 {
 	auto& es = core::get_subsystem<editing_system>();
 	auto& input = core::get_subsystem<runtime::input>();

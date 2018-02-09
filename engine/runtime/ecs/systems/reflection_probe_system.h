@@ -1,6 +1,7 @@
 #pragma once
 
-#include <chrono>
+#include "core/common/basetypes.hpp"
+
 namespace runtime
 {
 class reflection_probe_system
@@ -16,6 +17,6 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void frame_update(std::chrono::duration<float> dt);
+	void frame_update(delta_t dt);
 };
 }

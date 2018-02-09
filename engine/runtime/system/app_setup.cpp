@@ -15,8 +15,9 @@
 namespace runtime
 {
 
-void setup_asset_manager(asset_manager& manager)
+void setup_asset_manager()
 {
+    auto& manager = core::get_subsystem<asset_manager>();
 	{
 		auto& storage = manager.add_storage<gfx::shader>();
 		storage.load_from_file = asset_reader::load_from_file<gfx::shader>;

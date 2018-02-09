@@ -4,6 +4,7 @@
 #include "../components/model_component.h"
 #include "../components/transform_component.h"
 #include "../ecs.h"
+#include "core/common/basetypes.hpp"
 
 #include <chrono>
 #include <memory>
@@ -55,7 +56,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void frame_render(std::chrono::duration<float> dt);
+	void frame_render(delta_t dt);
 
 	//-----------------------------------------------------------------------------
 	//  Name : receive ()
@@ -75,7 +76,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void build_reflections_pass(entity_component_system& ecs, std::chrono::duration<float> dt);
+	void build_reflections_pass(entity_component_system& ecs, delta_t dt);
 
 	//-----------------------------------------------------------------------------
 	//  Name : build_shadows ()
@@ -85,7 +86,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void build_shadows_pass(entity_component_system& ecs, std::chrono::duration<float> dt);
+	void build_shadows_pass(entity_component_system& ecs, delta_t dt);
 
 	//-----------------------------------------------------------------------------
 	//  Name : camera_pass ()
@@ -95,7 +96,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void camera_pass(entity_component_system& ecs, std::chrono::duration<float> dt);
+	void camera_pass(entity_component_system& ecs, delta_t dt);
 
 	//-----------------------------------------------------------------------------
 	//  Name : scene_pass ()
@@ -108,7 +109,7 @@ public:
 	std::shared_ptr<gfx::frame_buffer> deferred_render_full(camera& camera, gfx::render_view& render_view,
 															entity_component_system& ecs,
 															std::unordered_map<entity, lod_data>& camera_lods,
-															std::chrono::duration<float> dt);
+															delta_t dt);
 
 	//-----------------------------------------------------------------------------
 	//  Name : g_buffer_pass ()
@@ -122,7 +123,7 @@ public:
 													 gfx::render_view& render_view,
 													 visibility_set_models_t& visibility_set,
 													 std::unordered_map<entity, lod_data>& camera_lods,
-													 std::chrono::duration<float> dt);
+													 delta_t dt);
 
 	//-----------------------------------------------------------------------------
 	//  Name : lighting_pass ()
@@ -132,9 +133,10 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	std::shared_ptr<gfx::frame_buffer>
-	lighting_pass(std::shared_ptr<gfx::frame_buffer> input, camera& camera, gfx::render_view& render_view,
-				  entity_component_system& ecs, std::chrono::duration<float> dt, bool bind_indirect_specular);
+	std::shared_ptr<gfx::frame_buffer> lighting_pass(std::shared_ptr<gfx::frame_buffer> input, camera& camera,
+													 gfx::render_view& render_view,
+													 entity_component_system& ecs, delta_t dt,
+													 bool bind_indirect_specular);
 
 	//-----------------------------------------------------------------------------
 	//  Name : reflection_probe ()
@@ -146,8 +148,7 @@ public:
 	//-----------------------------------------------------------------------------
 	std::shared_ptr<gfx::frame_buffer> reflection_probe_pass(std::shared_ptr<gfx::frame_buffer> input,
 															 camera& camera, gfx::render_view& render_view,
-															 entity_component_system& ecs,
-															 std::chrono::duration<float> dt);
+															 entity_component_system& ecs, delta_t dt);
 
 	//-----------------------------------------------------------------------------
 	//  Name : atmospherics_pass ()
@@ -159,8 +160,7 @@ public:
 	//-----------------------------------------------------------------------------
 	std::shared_ptr<gfx::frame_buffer> atmospherics_pass(std::shared_ptr<gfx::frame_buffer> input,
 														 camera& camera, gfx::render_view& render_view,
-														 entity_component_system& ecs,
-														 std::chrono::duration<float> dt);
+														 entity_component_system& ecs, delta_t dt);
 
 	//-----------------------------------------------------------------------------
 	//  Name : tonemapping_pass ()

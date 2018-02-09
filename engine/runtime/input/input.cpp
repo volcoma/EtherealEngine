@@ -20,7 +20,7 @@ input::~input()
 	on_frame_end.disconnect(this, &input::reset_state);
 }
 
-void input::reset_state(std::chrono::duration<float>)
+void input::reset_state(delta_t)
 {
 	key_reset();
 

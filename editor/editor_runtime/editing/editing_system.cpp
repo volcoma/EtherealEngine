@@ -43,14 +43,12 @@ editing_system::editing_system()
 
 void editing_system::save_editor_camera()
 {
-	auto& es = core::get_subsystem<editor::editing_system>();
-	if(es.camera)
-		ecs::utils::save_entity_to_file(fs::resolve_protocol("app:/settings/editor_camera.cfg"), es.camera);
+	if(camera)
+		ecs::utils::save_entity_to_file(fs::resolve_protocol("app:/settings/editor_camera.cfg"), camera);
 }
 
 void editing_system::load_editor_camera()
 {
-	auto& es = core::get_subsystem<editor::editing_system>();
 	runtime::entity object;
 	if(!ecs::utils::try_load_entity_from_file(fs::resolve_protocol("app:/settings/editor_camera.cfg"),
 											  object))
@@ -62,7 +60,8 @@ void editing_system::load_editor_camera()
 
 	if(!object.has_component<transform_component>())
 	{
-		object.assign<transform_component>().lock()->set_local_position({0.0f, 2.0f, -5.0f});
+		auto transform_comp = object.assign<transform_component>().lock();
+        transform_comp->set_local_position({0.0f, 2.0f, -5.0f});
 	}
 	if(!object.has_component<camera_component>())
 	{
@@ -73,7 +72,7 @@ void editing_system::load_editor_camera()
 		object.assign<audio_listener_component>();
 	}
 
-	es.camera = object;
+	camera = object;
 }
 
 void editing_system::select(rttr::variant object)

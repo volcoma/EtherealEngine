@@ -212,7 +212,7 @@ static void imgui_set_context(ImGuiContext* context)
 	gui::SetCurrentContext(context);
 }
 
-static void imgui_frame_update(render_window& window, std::chrono::duration<float> dt)
+static void imgui_frame_update(render_window& window, delta_t dt)
 {
 	auto& io = gui::GetIO();
 	auto view_size = window.get_surface()->get_size();
@@ -382,7 +382,7 @@ gui_system::~gui_system()
 	imgui_destroy_context(_initial_context);
 }
 
-void gui_system::frame_begin(std::chrono::duration<float>)
+void gui_system::frame_begin(delta_t)
 {
 	imgui_frame_begin();
 }
@@ -411,7 +411,7 @@ void gui_system::push_context(uint32_t id)
 	imgui_set_context(context);
 }
 
-void gui_system::draw_begin(render_window& window, std::chrono::duration<float> dt)
+void gui_system::draw_begin(render_window& window, delta_t dt)
 {
 	imgui_frame_update(window, dt);
 }

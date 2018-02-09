@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../ecs.h"
+#include "core/common/basetypes.hpp"
 #include <vector>
 
 namespace runtime
@@ -18,7 +19,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void frame_update(std::chrono::duration<float> dt);
+	void frame_update(delta_t dt);
 
 	//-----------------------------------------------------------------------------
 	//  Name : getRoots ()

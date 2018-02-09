@@ -30,7 +30,26 @@
 #include "runtime/system/events.h"
 namespace editor
 {
+namespace
+{
+template <typename T>
+void create_window_with_dock(const std::string& dock_name)
+{
+	auto& rend = core::get_subsystem<runtime::renderer>();
+	auto& docking = core::get_subsystem<docking_system>();
+	mml::video_mode desktop = mml::video_mode::get_desktop_mode();
+	desktop.width = 1280;
+	desktop.height = 720;
+	auto window = std::make_unique<render_window>(desktop, "App", mml::style::standard);
+	window->request_focus();
 
+	auto dock = std::make_unique<T>(dock_name, true, ImVec2(200.0f, 200.0f));
+
+	auto& dockspace = docking.get_dockspace(window->get_id());
+	dockspace.dock_to(dock.get(), imguidock::slot::tab, 200, true);
+	rend.register_window(std::move(window));
+	docking.register_dock(std::move(dock));
+}
 std::vector<runtime::entity> gather_scene_data()
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
@@ -200,24 +219,6 @@ void save_scene_as()
 
 	es.save_editor_camera();
 }
-
-template <typename T>
-void create_window_with_dock(const std::string& dock_name)
-{
-	auto& rend = core::get_subsystem<runtime::renderer>();
-	auto& docking = core::get_subsystem<docking_system>();
-	mml::video_mode desktop = mml::video_mode::get_desktop_mode();
-	desktop.width = 1280;
-	desktop.height = 720;
-	auto window = std::make_unique<render_window>(desktop, "App", mml::style::standard);
-	window->request_focus();
-
-	auto dock = std::make_unique<T>(dock_name, true, ImVec2(200.0f, 200.0f));
-
-	auto& dockspace = docking.get_dockspace(window->get_id());
-	dockspace.dock_to(dock.get(), imguidock::slot::tab, 200, true);
-	rend.register_window(std::move(window));
-	docking.register_dock(std::move(dock));
 }
 
 void app::draw_menubar(render_window& window)
@@ -414,10 +415,9 @@ void app::setup(cmd_line::parser& parser)
 
 void app::start(cmd_line::parser& parser)
 {
-	auto logging_container = logging::get_mutable_logging_container();
-
 	_console_log = std::make_shared<console_log>();
 
+	auto logging_container = logging::get_mutable_logging_container();
 	logging_container->add_sink(_console_log);
 
 	runtime::app::start(parser);
@@ -429,10 +429,16 @@ void app::start(cmd_line::parser& parser)
 	core::add_subsystem<debugdraw_system>();
 	core::add_subsystem<project_manager>();
 
+	create_docks();
+	register_console_commands();
+}
+
+void app::create_docks()
+{
 	auto& rend = core::get_subsystem<runtime::renderer>();
 	auto& main_window = rend.get_main_window();
 
-	main_window->set_title("Ethereal");
+	main_window->set_title("ETHEREAL");
 
 	_console_dock_name = "CONSOLE";
 	auto scene = std::make_unique<scene_dock>("SCENE", true, ImVec2(200.0f, 200.0f));
@@ -460,7 +466,10 @@ void app::start(cmd_line::parser& parser)
 	docking.register_dock(std::move(console));
 	docking.register_dock(std::move(project));
 	docking.register_dock(std::move(style));
+}
 
+void app::register_console_commands()
+{
 	std::function<void()> log_version = []() { APPLOG_INFO("Version 1.0"); };
 	_console_log->register_command("version", "Returns the current version of the Editor.", {}, {},
 								   log_version);
@@ -473,7 +482,7 @@ void app::stop()
 	runtime::app::stop();
 }
 
-void app::draw_docks(std::chrono::duration<float> dt)
+void app::draw_docks(delta_t dt)
 {
 	auto& gui = core::get_subsystem<gui_system>();
 	auto& docking = core::get_subsystem<docking_system>();

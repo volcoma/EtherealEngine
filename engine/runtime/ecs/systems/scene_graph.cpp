@@ -6,7 +6,7 @@
 namespace runtime
 {
 
-void scene_graph::frame_update(std::chrono::duration<float> dt)
+void scene_graph::frame_update(delta_t dt)
 {
 	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
 	_roots.clear();

@@ -508,7 +508,10 @@ static void process_drag_drop_target(std::shared_ptr<camera_component> camera_co
 
 	if(gui::BeginDragDropTarget())
 	{
-
+		if(gui::IsDragDropPayloadBeingAccepted())
+		{
+			gui::SetMouseCursor(ImGuiMouseCursor_Move);
+		}
 		for(const auto& type : ex::get_suported_formats<prefab>())
 		{
 			auto payload = gui::AcceptDragDropPayload(type.c_str());
