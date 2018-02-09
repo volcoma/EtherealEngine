@@ -132,7 +132,7 @@ void task_system::task_queue::wake_up()
 	_cv.notify_all();
 }
 
-void task_system::run(std::size_t idx, std::function<bool()> condition, duration_t pop_timeout)
+void task_system::run(std::size_t idx, const std::function<bool()>& condition, duration_t pop_timeout)
 {
 	while(condition())
 	{

@@ -7,7 +7,7 @@ namespace fs
 {
 static path executable_path_fallback(const char* argv0)
 {
-	if(0 == argv0 || 0 == argv0[0])
+	if(nullptr == argv0 || 0 == argv0[0])
 	{
 		return "";
 	}

@@ -79,7 +79,7 @@ std::vector<std::string> console::tokenize_line(const std::string& line)
 	bool escapingQuotes = false;
 	// TODO: and with auto?
 	// TODO: we might want to use getwc() to correctly read unicode characters
-	for(const unsigned char& c : line)
+	for(const auto& c : line)
 	{
 		// ignore control characters
 		// 		if (std::iscntrl(c) != 0)
@@ -167,7 +167,7 @@ void console::help_command(const std::string& term)
 	else if(term == "commands")
 	{
 		// TODO: implement the filter
-		for(const auto command : list_of_commands())
+		for(const auto& command : list_of_commands())
 		{
 			print(command);
 			if(!commands[command]->description.empty())

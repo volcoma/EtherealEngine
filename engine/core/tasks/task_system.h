@@ -826,7 +826,8 @@ private:
 	/// Main loop of our worker threads
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void run(std::size_t idx, std::function<bool()> condition, duration_t pop_timeout = duration_t::max());
+	void run(std::size_t idx, const std::function<bool()>& condition,
+			 duration_t pop_timeout = duration_t::max());
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_thread_queue_idx ()

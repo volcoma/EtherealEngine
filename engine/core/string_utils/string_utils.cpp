@@ -171,11 +171,10 @@ std::string string_utils::format(const char* format, va_list args)
 	if(length == 0)
 		return std::string();
 
-	char* buf = new char[static_cast<size_t>(length) + 1];
-	std::vsnprintf(buf, static_cast<size_t>(length) + 1, format, args);
+    std::vector<char> buf(static_cast<size_t>(length) + 1);
+	std::vsnprintf(buf.data(), static_cast<size_t>(length) + 1, format, args);
 
-	std::string str(buf);
-	delete[] buf;
+	std::string str(buf.data());
 	return str;
 }
 
@@ -183,14 +182,14 @@ std::string string_utils::word_wrap(const std::string& value, std::string::size_
 									const std::string& linePadding /*= ""*/)
 {
 	std::string wrapString, currentLine;
-	std::string::size_type lastSpace = std::string::size_type(-1), lineLength = std::string::size_type(0);
+	auto lastSpace = std::string::size_type(-1);
+    auto lineLength = std::string::size_type(0);
 
 	// TODO: Add support for tab character to wrapping method.
 
 	// Loop through each character in the std::string
-	for(std::string::size_type i = 0, length = value.length(); i < length; ++i)
+	for(auto character : value)
 	{
-		char character = value[i];
 		switch(character)
 		{
 			case '\r':
@@ -253,7 +252,8 @@ std::string string_utils::word_wrap(const std::string& value, std::string::size_
 						// Break onto a new-line where the space was found
 						if(lastSpace > 0)
 							wrapString += currentLine.substr(0, lastSpace) + "\n";
-						currentLine = linePadding + currentLine.substr(lastSpace + 1);
+						currentLine = linePadding;
+                        currentLine.append(currentLine.substr(lastSpace + 1));
 						lineLength = currentLine.length();
 						lastSpace = std::string::size_type(-1);
 
@@ -335,9 +335,8 @@ bool string_utils::parse_command_line(const std::string& strCommandLine,
 	// Parse one character at a time
 	bool bInQuotes = false;
 	bool bConstructingArgument = false;
-	for(size_t i = 0; i < strCommandLine.size(); ++i)
+	for(auto c : strCommandLine)
 	{
-		char c = strCommandLine.at(i);
 		if(bInQuotes)
 		{
 			if(c == '\"')

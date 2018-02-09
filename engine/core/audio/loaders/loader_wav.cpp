@@ -10,7 +10,7 @@ namespace detail
 template <class T>
 static void endian_swap(T* objp)
 {
-	std::uint8_t* memp = reinterpret_cast<std::uint8_t*>(objp);
+	auto memp = reinterpret_cast<std::uint8_t*>(objp);
 	std::reverse(memp, memp + sizeof(T));
 }
 }

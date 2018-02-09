@@ -873,9 +873,8 @@ bool frustum::test_frustum(const frustum& f) const
 //-----------------------------------------------------------------------------
 frustum& frustum::mul(const transform& t)
 {
-	transform mtxIT, mtx = t;
-	mtxIT = inverse(mtx);
-	mtxIT = transpose(mtxIT);
+    const transform& mtx = t;
+	transform mtxIT = transpose(inverse(mtx));
 
 	// transform planes
 	for(auto& plane : planes)

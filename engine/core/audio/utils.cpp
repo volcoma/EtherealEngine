@@ -22,7 +22,7 @@ std::vector<std::uint8_t> convert_to_mono(const std::vector<std::uint8_t>& input
 		{
 			const std::uint8_t left = input[i];
 			const std::uint8_t right = input[i + bytes_per_sample];
-			const std::uint8_t mono_sample = std::uint8_t((int(left) + right) / 2);
+			const auto mono_sample = std::uint8_t((int(left) + right) / 2);
 
 			output.push_back(mono_sample);
 		}
@@ -33,10 +33,10 @@ std::vector<std::uint8_t> convert_to_mono(const std::vector<std::uint8_t>& input
 		{
 			const std::int16_t left = *reinterpret_cast<const std::int16_t*>(&input[i]);
 			const std::int16_t right = *reinterpret_cast<const std::int16_t*>(&input[i + bytes_per_sample]);
-			const std::int16_t mono_sample = std::int16_t((int(left) + right) / 2);
+			const auto mono_sample = std::int16_t((int(left) + right) / 2);
 
-			const std::uint8_t sample_part1 = std::uint8_t(mono_sample >> 0);
-			const std::uint8_t sample_part2 = std::uint8_t(mono_sample >> 8);
+			const auto sample_part1 = std::uint8_t(mono_sample >> 0);
+			const auto sample_part2 = std::uint8_t(mono_sample >> 8);
 			output.push_back(sample_part1);
 			output.push_back(sample_part2);
 		}
