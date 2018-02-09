@@ -344,20 +344,48 @@ struct rect
 	}
 };
 
-using irange = range<std::int32_t>;
-using urange = range<std::uint32_t>;
-using frange = range<float>;
+using irange8_t = range<std::int8_t>;
+using irange16_t = range<std::int16_t>;
+using irange32_t = range<std::int32_t>;
+using irange64_t = range<std::int64_t>;
+using urange8_t = range<std::uint8_t>;
+using urange16_t = range<std::uint16_t>;
+using urange32_t = range<std::uint32_t>;
+using urange64_t = range<std::uint64_t>;
+using frange_t = range<float>;
+using drange_t = range<double>;
 
-using ipoint = point<std::int32_t>;
-using upoint = point<std::uint32_t>;
-using fpoint = point<float>;
+using isize8_t = size<std::int8_t>;
+using isize16_t = size<std::int16_t>;
+using isize32_t = size<std::int32_t>;
+using isize64_t = size<std::int64_t>;
+using usize8_t = size<std::uint8_t>;
+using usize16_t = size<std::uint16_t>;
+using usize32_t = size<std::uint32_t>;
+using usize64_t = size<std::uint64_t>;
+using fsize_t = size<float>;
+using dsize_t = size<double>;
 
-using isize = size<std::int32_t>;
-using usize = size<std::uint32_t>;
-using fsize = size<float>;
+using ipoint8_t = point<std::int8_t>;
+using ipoint16_t = point<std::int16_t>;
+using ipoint32_t = point<std::int32_t>;
+using ipoint64_t = point<std::int64_t>;
+using upoint8_t = point<std::uint8_t>;
+using upoint16_t = point<std::uint16_t>;
+using upoint32_t = point<std::uint32_t>;
+using upoint64_t = point<std::uint64_t>;
+using fpoint_t = point<float>;
+using dpoint_t = point<double>;
 
-using irect = rect<std::int32_t>;
-using urect = rect<std::uint32_t>;
-using frect = rect<float>;
+using irect8_t = rect<std::int8_t>;
+using irect16_t = rect<std::int16_t>;
+using irect32_t = rect<std::int32_t>;
+using irect64_t = rect<std::int64_t>;
+using urect8_t = rect<std::uint8_t>;
+using urect16_t = rect<std::uint16_t>;
+using urect32_t = rect<std::uint32_t>;
+using urect64_t = rect<std::uint64_t>;
+using frect_t = rect<float>;
+using drect_t = rect<double>;
 
 using delta_t = std::chrono::duration<float>;

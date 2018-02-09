@@ -83,7 +83,7 @@ struct texture : public handle_impl<texture_handle>
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	usize get_size() const;
+	usize32_t get_size() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : is_render_target ()

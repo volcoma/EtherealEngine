@@ -180,7 +180,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_viewport_size(const usize& size);
+	void set_viewport_size(const usize32_t& size);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_viewport_size ()
@@ -190,7 +190,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const usize& get_viewport_size() const;
+	const usize32_t& get_viewport_size() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_ortho_size ()

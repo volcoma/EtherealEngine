@@ -43,14 +43,14 @@ public:
 	void set_pitch(float pitch);
 
 	void set_volume_rolloff(float rolloff);
-	void set_range(const frange& range);
+	void set_range(const frange_t& range);
 	void set_autoplay(bool on);
 	bool get_autoplay() const;
 
 	float get_volume() const;
 	float get_pitch() const;
 	float get_volume_rolloff() const;
-	const frange& get_range() const;
+	const frange_t& get_range() const;
 
 	void set_playing_offset(audio::sound_info::duration_t offset);
 	audio::sound_info::duration_t get_playing_offset() const;
@@ -81,7 +81,7 @@ private:
 	float _volume = 1.0f;
 	float _pitch = 1.0f;
 	float _volume_rolloff = 1.0f;
-	frange _range = {1.0f, 20.0f};
+	frange_t _range = {1.0f, 20.0f};
 	audio::source _source;
 	asset_handle<audio::sound> _sound;
 };

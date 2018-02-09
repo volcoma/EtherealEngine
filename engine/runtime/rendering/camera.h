@@ -155,7 +155,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_viewport_size(const usize& viewportSize);
+	void set_viewport_size(const usize32_t& viewportSize);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_viewport_pos ()
@@ -165,7 +165,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_viewport_pos(const upoint& viewportPos)
+	inline void set_viewport_pos(const upoint32_t& viewportPos)
 	{
 		_viewport_pos = viewportPos;
 	}
@@ -178,7 +178,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	const usize& get_viewport_size() const
+	const usize32_t& get_viewport_size() const
 	{
 		return _viewport_size;
 	}
@@ -191,7 +191,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const upoint& get_viewport_pos() const
+	inline const upoint32_t& get_viewport_pos() const
 	{
 		return _viewport_pos;
 	}
@@ -335,7 +335,7 @@ public:
 	/// Sets the current jitter value for temporal anti-aliasing
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_aa_data(const usize& viewportSize, std::uint32_t currentSubpixelIndex,
+	void set_aa_data(const usize32_t& viewportSize, std::uint32_t currentSubpixelIndex,
 					 std::uint32_t temporalAASamples);
 
 	//-----------------------------------------------------------------------------
@@ -582,9 +582,9 @@ protected:
 	/// camera's half-size when in orthographic mode.
 	float _ortho_size = 5;
 	/// Viewport position
-	upoint _viewport_pos = {0, 0};
+	upoint32_t _viewport_pos = {0, 0};
 	/// Viewport size
-	usize _viewport_size = {0, 0};
+	usize32_t _viewport_size = {0, 0};
 	/// Cached view matrix
 	math::transform _view;
 	/// Cached projection matrix.

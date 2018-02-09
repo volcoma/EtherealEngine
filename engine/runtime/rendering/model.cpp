@@ -109,7 +109,7 @@ asset_handle<material> model::get_material_for_group(const size_t& group) const
 	return _materials[group];
 }
 
-void model::set_lod_limits(const std::vector<urange>& limits)
+void model::set_lod_limits(const std::vector<urange32_t>& limits)
 {
 	_lod_limits = limits;
 }
@@ -221,7 +221,7 @@ void model::recalulate_lod_limits()
 		if(_mesh_lods.size() - 1 != i)
 			lower_limit = upper_limit * (0.5f - ((i)*0.1f));
 
-		_lod_limits.emplace_back(urange(urange::value_type(lower_limit), urange::value_type(upper_limit)));
+		_lod_limits.emplace_back(urange32_t(urange32_t::value_type(lower_limit), urange32_t::value_type(upper_limit)));
 		upper_limit = lower_limit;
 	}
 }

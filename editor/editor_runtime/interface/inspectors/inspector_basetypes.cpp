@@ -1,8 +1,9 @@
 #include "inspector_basetypes.h"
 
-bool inspector_irect::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
+
+bool inspector_irect32_t::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
-	auto data = var.get_value<irect>();
+	auto data = var.get_value<irect32_t>();
 	bool changed = false;
 	const char* namesLT[] = {"L", "T"};
 	const char* namesRB[] = {"R", "B"};
@@ -31,9 +32,9 @@ bool inspector_irect::inspect(rttr::variant& var, bool read_only, const meta_get
 	return false;
 }
 
-bool inspector_urect::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
+bool inspector_urect32_t::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
-	auto data = var.get_value<urect>();
+	auto data = var.get_value<urect32_t>();
 	bool changed = false;
 	const char* namesLT[] = {"L", "T"};
 	const char* namesRB[] = {"R", "B"};
@@ -62,9 +63,9 @@ bool inspector_urect::inspect(rttr::variant& var, bool read_only, const meta_get
 	return false;
 }
 
-bool inspector_frect::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
+bool inspector_frect_t::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
-	auto data = var.get_value<frect>();
+	auto data = var.get_value<frect_t>();
 	bool changed = false;
 	const char* namesLT[] = {"L", "T"};
 	const char* namesRB[] = {"R", "B"};
@@ -93,9 +94,9 @@ bool inspector_frect::inspect(rttr::variant& var, bool read_only, const meta_get
 	return false;
 }
 
-bool inspector_ipoint::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
+bool inspector_ipoint32_t::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
-	auto data = var.get_value<ipoint>();
+	auto data = var.get_value<ipoint32_t>();
 	bool changed = false;
 	const char* names[] = {"X", "Y"};
 
@@ -122,9 +123,9 @@ bool inspector_ipoint::inspect(rttr::variant& var, bool read_only, const meta_ge
 	return false;
 }
 
-bool inspector_upoint::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
+bool inspector_upoint32_t::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
-	auto data = var.get_value<upoint>();
+	auto data = var.get_value<upoint32_t>();
 	bool changed = false;
 	const char* names[] = {"X", "Y"};
 
@@ -151,9 +152,9 @@ bool inspector_upoint::inspect(rttr::variant& var, bool read_only, const meta_ge
 	return false;
 }
 
-bool inspector_fpoint::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
+bool inspector_fpoint_t::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
-	auto data = var.get_value<fpoint>();
+	auto data = var.get_value<fpoint_t>();
 	bool changed = false;
 	const char* names[] = {"X", "Y"};
 
@@ -180,9 +181,9 @@ bool inspector_fpoint::inspect(rttr::variant& var, bool read_only, const meta_ge
 	return false;
 }
 
-bool inspector_isize::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
+bool inspector_isize32_t::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
-	auto data = var.get_value<isize>();
+	auto data = var.get_value<isize32_t>();
 	bool changed = false;
 	const char* names[] = {"W", "H"};
 
@@ -209,9 +210,9 @@ bool inspector_isize::inspect(rttr::variant& var, bool read_only, const meta_get
 	return false;
 }
 
-bool inspector_usize::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
+bool inspector_usize32_t::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
-	auto data = var.get_value<usize>();
+	auto data = var.get_value<usize32_t>();
 	bool changed = false;
 	const char* names[] = {"W", "H"};
 
@@ -238,9 +239,9 @@ bool inspector_usize::inspect(rttr::variant& var, bool read_only, const meta_get
 	return false;
 }
 
-bool inspector_fsize::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
+bool inspector_fsize_t::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
-	auto data = var.get_value<fsize>();
+	auto data = var.get_value<fsize_t>();
 	bool changed = false;
 	const char* names[] = {"W", "H"};
 
@@ -266,9 +267,9 @@ bool inspector_fsize::inspect(rttr::variant& var, bool read_only, const meta_get
 	return false;
 }
 
-bool inspector_irange::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
+bool inspector_irange32_t::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
-	auto data = var.get_value<irange>();
+	auto data = var.get_value<irange32_t>();
 	bool changed = false;
 	const char* names[] = {"Min", "Max"};
 
@@ -295,9 +296,9 @@ bool inspector_irange::inspect(rttr::variant& var, bool read_only, const meta_ge
 	return false;
 }
 
-bool inspector_urange::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
+bool inspector_urange32_t::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
-	auto data = var.get_value<urange>();
+	auto data = var.get_value<urange32_t>();
 	bool changed = false;
 	const char* names[] = {"Min", "Max"};
 
@@ -324,9 +325,9 @@ bool inspector_urange::inspect(rttr::variant& var, bool read_only, const meta_ge
 	return false;
 }
 
-bool inspector_frange::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
+bool inspector_frange_t::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
-	auto data = var.get_value<frange>();
+	auto data = var.get_value<frange_t>();
 	bool changed = false;
 	const char* names[] = {"Min", "Max"};
 

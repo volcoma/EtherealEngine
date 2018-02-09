@@ -4483,7 +4483,7 @@ const std::unique_ptr<mesh::armature_node>& mesh::get_armature() const
 	return _root;
 }
 
-irect mesh::calculate_screen_rect(const math::transform& world, const camera& cam) const
+irect32_t mesh::calculate_screen_rect(const math::transform& world, const camera& cam) const
 {
 
 	auto bounds = math::bbox::mul(get_bounds(), world);
@@ -4507,8 +4507,8 @@ irect mesh::calculate_screen_rect(const math::transform& world, const camera& ca
 		min = math::min(min, v);
 		max = math::max(max, v);
 	}
-	return irect(irect::value_type(min.x), irect::value_type(min.y), irect::value_type(max.x),
-				 irect::value_type(max.y));
+	return irect32_t(irect32_t::value_type(min.x), irect32_t::value_type(min.y), irect32_t::value_type(max.x),
+					 irect32_t::value_type(max.y));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

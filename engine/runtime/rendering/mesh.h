@@ -767,7 +767,7 @@ public:
 	const bone_palette_array_t& get_bone_palettes() const;
 
 	const std::unique_ptr<armature_node>& get_armature() const;
-	irect calculate_screen_rect(const math::transform& world, const camera& cam) const;
+	irect32_t calculate_screen_rect(const math::transform& world, const camera& cam) const;
 	//-----------------------------------------------------------------------------
 	//  Name : get_subset ()
 	/// <summary>

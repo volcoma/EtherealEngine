@@ -21,7 +21,7 @@
 namespace runtime
 {
 
-bool update_lod_data(lod_data& data, const std::vector<urange>& lod_limits, std::size_t total_lods,
+bool update_lod_data(lod_data& data, const std::vector<urange32_t>& lod_limits, std::size_t total_lods,
 					 float transition_time, float dt, asset_handle<mesh> mesh, const math::transform& world,
 					 const camera& cam)
 {
@@ -32,7 +32,7 @@ bool update_lod_data(lod_data& data, const std::vector<urange>& lod_limits, std:
 		return true;
 
 	const auto& viewport = cam.get_viewport_size();
-	irect rect = mesh->calculate_screen_rect(world, cam);
+	irect32_t rect = mesh->calculate_screen_rect(world, cam);
 
 	float percent = math::clamp((float(rect.height()) / float(viewport.height)) * 100.0f, 0.0f, 100.0f);
 
@@ -40,7 +40,7 @@ bool update_lod_data(lod_data& data, const std::vector<urange>& lod_limits, std:
 	for(size_t i = 0; i < lod_limits.size(); ++i)
 	{
 		const auto& range = lod_limits[i];
-		if(range.contains(urange::value_type(percent)))
+		if(range.contains(urange32_t::value_type(percent)))
 		{
 			lod = i;
 		}
@@ -257,7 +257,7 @@ void deferred_rendering::build_reflections_pass(entity_component_system& ecs, st
 				auto camera = camera::get_face_camera(i, world_tranform);
 				camera.set_far_clip(reflection_probe_comp.get_probe().box_data.extents.r);
 				auto& render_view = reflection_probe_comp.get_render_view(i);
-				camera.set_viewport_size(usize(cubemap_fbo->get_size()));
+				camera.set_viewport_size(usize32_t(cubemap_fbo->get_size()));
 				auto& camera_lods = _lod_data[ce];
 				visibility_set_models_t visibility_set;
 
@@ -453,7 +453,8 @@ deferred_rendering::lighting_pass(std::shared_ptr<gfx::frame_buffer> input, came
 			const auto& light_position = world_transform.get_position();
 			const auto& light_direction = world_transform.z_unit_axis();
 
-			irect rect(0, 0, irect::value_type(buffer_size.width), irect::value_type(buffer_size.height));
+			irect32_t rect(0, 0, irect32_t::value_type(buffer_size.width),
+						   irect32_t::value_type(buffer_size.height));
 			if(light_comp_ref.compute_projected_sphere_rect(rect, light_position, light_direction, view,
 															proj) == 0)
 				return;
@@ -554,7 +555,8 @@ deferred_rendering::reflection_probe_pass(std::shared_ptr<gfx::frame_buffer> inp
 			const auto& world_transform = transform_comp_ref.get_transform();
 			const auto& probe_position = world_transform.get_position();
 
-			irect rect(0, 0, buffer_size.width, buffer_size.height);
+			irect32_t rect(0, 0, irect32_t::value_type(buffer_size.width),
+						   irect32_t::value_type(buffer_size.height));
 			if(probe_comp_ref.compute_projected_sphere_rect(rect, probe_position, view, proj) == 0)
 				return;
 
@@ -671,7 +673,8 @@ deferred_rendering::atmospherics_pass(std::shared_ptr<gfx::frame_buffer> input, 
 		_atmospherics_program->begin();
 		_atmospherics_program->set_uniform("u_light_direction", &light_direction);
 
-		irect rect(0, 0, output_size.width, output_size.height);
+		irect32_t rect(0, 0, irect32_t::value_type(output_size.width),
+					   irect32_t::value_type(output_size.height));
 		gfx::set_scissor(rect.left, rect.top, rect.width(), rect.height());
 		auto topology = gfx::clip_quad(1.0f);
 		gfx::set_state(topology | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE |
@@ -704,7 +707,8 @@ deferred_rendering::tonemapping_pass(std::shared_ptr<gfx::frame_buffer> input, c
 	{
 		_gamma_correction_program->begin();
 		_gamma_correction_program->set_texture(0, "s_input", input->get_texture().get());
-		irect rect(0, 0, output_size.width, output_size.height);
+		irect32_t rect(0, 0, irect32_t::value_type(output_size.width),
+					   irect32_t::value_type(output_size.height));
 		gfx::set_scissor(rect.left, rect.top, rect.width(), rect.height());
 		auto topology = gfx::clip_quad(1.0f);
 		gfx::set_state(topology | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);

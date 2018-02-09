@@ -138,25 +138,25 @@ std::shared_ptr<frame_buffer> render_view::get_fbo(const std::string& id,
 	return tex;
 }
 
-std::shared_ptr<texture> render_view::get_depth_stencil_buffer(const usize& viewport_size)
+std::shared_ptr<texture> render_view::get_depth_stencil_buffer(const usize32_t& viewport_size)
 {
 	static auto format =
 		get_best_format(BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER,
 						format_search_flags::requires_depth | format_search_flags::requires_stencil);
 	return get_texture("DEPTH", viewport_size.width, viewport_size.height, false, 1, format);
 }
-std::shared_ptr<texture> render_view::get_output_buffer(const usize& viewport_size)
+std::shared_ptr<texture> render_view::get_output_buffer(const usize32_t& viewport_size)
 {
 	static auto format =
 		get_best_format(BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER,
 						format_search_flags::four_channels | format_search_flags::requires_alpha);
 	return get_texture("OUTPUT", viewport_size.width, viewport_size.height, false, 1, format);
 }
-std::shared_ptr<frame_buffer> render_view::get_output_fbo(const usize& viewport_size)
+std::shared_ptr<frame_buffer> render_view::get_output_fbo(const usize32_t& viewport_size)
 {
 	return get_fbo("OUTPUT", {get_output_buffer(viewport_size), get_depth_stencil_buffer(viewport_size)});
 }
-std::shared_ptr<frame_buffer> render_view::get_g_buffer_fbo(const usize& viewport_size)
+std::shared_ptr<frame_buffer> render_view::get_g_buffer_fbo(const usize32_t& viewport_size)
 {
 	static auto format =
 		get_best_format(BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER,

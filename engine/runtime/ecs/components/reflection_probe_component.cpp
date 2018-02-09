@@ -1,6 +1,6 @@
 #include "reflection_probe_component.h"
 
-int reflection_probe_component::compute_projected_sphere_rect(irect& rect, const math::vec3& position,
+int reflection_probe_component::compute_projected_sphere_rect(irect32_t& rect, const math::vec3& position,
 															  const math::transform& view,
 															  const math::transform& proj)
 {

@@ -30,12 +30,12 @@ void camera_component::set_hdr(bool hdr)
 	_hdr = hdr;
 }
 
-void camera_component::set_viewport_size(const usize& size)
+void camera_component::set_viewport_size(const usize32_t& size)
 {
 	_camera.set_viewport_size(size);
 }
 
-const usize& camera_component::get_viewport_size() const
+const usize32_t& camera_component::get_viewport_size() const
 {
 	return _camera.get_viewport_size();
 }

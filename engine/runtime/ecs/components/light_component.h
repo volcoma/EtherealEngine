@@ -61,7 +61,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	int compute_projected_sphere_rect(irect& rect, const math::vec3& light_position,
+	int compute_projected_sphere_rect(irect32_t& rect, const math::vec3& light_position,
 									  const math::vec3& light_direction, const math::transform& view,
 									  const math::transform& proj);
 

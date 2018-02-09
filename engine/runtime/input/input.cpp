@@ -188,7 +188,7 @@ bool input::mouse_event(const mml::platform_event& event)
 	else if(event.type == mml::platform_event::mouse_moved)
 	{
 		_last_cursor_position = _current_cursor_position;
-		ipoint mouse;
+		ipoint32_t mouse;
 		mouse.x = event.mouse_move.x;
 		mouse.y = event.mouse_move.y;
 		_current_cursor_position = mouse;
@@ -279,10 +279,10 @@ bool input::joystick_event(const mml::platform_event& event)
 	return false;
 }
 
-ipoint input::get_cursor_delta_move() const
+ipoint32_t input::get_cursor_delta_move() const
 {
-	return ipoint{get_current_cursor_position().x - get_last_cursor_position().x,
-				  get_current_cursor_position().y - get_last_cursor_position().y};
+	return ipoint32_t{get_current_cursor_position().x - get_last_cursor_position().x,
+					  get_current_cursor_position().y - get_last_cursor_position().y};
 }
 
 void input::platform_events(const std::pair<std::uint32_t, bool>& info,

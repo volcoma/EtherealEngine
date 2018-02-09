@@ -223,7 +223,7 @@ static void imgui_frame_update(render_window& window, delta_t dt)
 	// Setup time step
 	io.DeltaTime = dt.count();
 
-	irect relative_rect;
+	irect32_t relative_rect;
 	relative_rect.left = 0;
 	relative_rect.top = 0;
 	relative_rect.right = static_cast<std::int32_t>(window_size[0]);

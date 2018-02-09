@@ -161,7 +161,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const ipoint& get_current_cursor_position() const
+	inline const ipoint32_t& get_current_cursor_position() const
 	{
 		return _current_cursor_position;
 	}
@@ -174,7 +174,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const ipoint& get_last_cursor_position() const
+	inline const ipoint32_t& get_last_cursor_position() const
 	{
 		return _last_cursor_position;
 	}
@@ -187,7 +187,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	ipoint get_cursor_delta_move() const;
+	ipoint32_t get_cursor_delta_move() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : is_mouse_button_pressed ()
@@ -385,9 +385,9 @@ private:
 	///
 	float _mouse_scroll_delta = 0.0f;
 	///
-	ipoint _current_cursor_position;
+	ipoint32_t _current_cursor_position;
 	///
-	ipoint _last_cursor_position;
+	ipoint32_t _last_cursor_position;
 	///
 	std::map<unsigned int, bool> _mouse_buttons_pressed;
 	///

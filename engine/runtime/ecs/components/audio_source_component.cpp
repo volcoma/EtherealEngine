@@ -37,7 +37,7 @@ void audio_source_component::set_volume_rolloff(float rolloff)
 	_source.set_volume_rolloff(rolloff);
 }
 
-void audio_source_component::set_range(const frange& range)
+void audio_source_component::set_range(const frange_t& range)
 {
 	math::clamp(range.min, 0.0f, range.max);
 	math::clamp(range.max, range.min, std::numeric_limits<float>::max());
@@ -77,7 +77,7 @@ float audio_source_component::get_volume_rolloff() const
 	return _volume_rolloff;
 }
 
-const frange& audio_source_component::get_range() const
+const frange_t& audio_source_component::get_range() const
 {
 	return _range;
 }

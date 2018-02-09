@@ -68,11 +68,11 @@ texture::texture(backbuffer_ratio _ratio, bool _hasMips, std::uint16_t _numLayer
 	ratio = _ratio;
 }
 
-usize texture::get_size() const
+usize32_t texture::get_size() const
 {
 	if(ratio == backbuffer_ratio::Count)
 	{
-		usize size = {static_cast<std::uint32_t>(info.width), static_cast<std::uint32_t>(info.height)};
+		usize32_t size = {static_cast<std::uint32_t>(info.width), static_cast<std::uint32_t>(info.height)};
 		return size;
 
 	} // End if Absolute
@@ -81,7 +81,7 @@ usize texture::get_size() const
 		std::uint16_t width;
 		std::uint16_t height;
 		get_size_from_ratio(ratio, width, height);
-		usize size = {static_cast<std::uint32_t>(width), static_cast<std::uint32_t>(height)};
+		usize32_t size = {static_cast<std::uint32_t>(width), static_cast<std::uint32_t>(height)};
 		return size;
 
 	} // End if Relative

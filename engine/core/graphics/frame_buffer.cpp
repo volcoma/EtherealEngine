@@ -50,7 +50,7 @@ void frame_buffer::populate(const std::vector<fbo_attachment>& textures)
 	std::vector<attachment> buffer;
 	buffer.reserve(textures.size());
 
-	usize size = {0, 0};
+	usize32_t size = {0, 0};
 	auto ratio = backbuffer_ratio::Count;
 	for(auto& tex : textures)
 	{
@@ -78,7 +78,7 @@ void frame_buffer::populate(const std::vector<fbo_attachment>& textures)
 	}
 }
 
-usize frame_buffer::get_size() const
+usize32_t frame_buffer::get_size() const
 {
 	if(_bbratio == backbuffer_ratio::Count)
 	{
@@ -90,7 +90,7 @@ usize frame_buffer::get_size() const
 		std::uint16_t width;
 		std::uint16_t height;
 		gfx::get_size_from_ratio(_bbratio, width, height);
-		usize size = {static_cast<std::uint32_t>(width), static_cast<std::uint32_t>(height)};
+		usize32_t size = {static_cast<std::uint32_t>(width), static_cast<std::uint32_t>(height)};
 		return size;
 
 	} // End if Relative

@@ -15,7 +15,7 @@ float camera::get_ppu() const
 	return float(_viewport_size.height) / (2.0f * _ortho_size);
 }
 
-void camera::set_viewport_size(const usize& viewport_size)
+void camera::set_viewport_size(const usize32_t& viewport_size)
 {
 	_viewport_size = viewport_size;
 	set_aspect_ratio(float(viewport_size.width) / float(viewport_size.height));
@@ -164,7 +164,7 @@ const math::transform& camera::get_projection() const
 		{
 			// Generate the updated orthographic projection matrix
 			float zoom = get_zoom_factor();
-			const frect rect = {-float(_viewport_size.width) / 2.0f, float(_viewport_size.height) / 2.0f,
+			const frect_t rect = {-float(_viewport_size.width) / 2.0f, float(_viewport_size.height) / 2.0f,
 								float(_viewport_size.width) / 2.0f, -float(_viewport_size.height) / 2.0f};
 			static const auto ortho_ =
 				gfx::is_homogeneous_depth() ? math::orthoNO<float> : math::orthoZO<float>;
@@ -546,7 +546,7 @@ void camera::record_current_matrices()
 	_last_projection = get_projection();
 }
 
-void camera::set_aa_data(const usize& viewport_size, std::uint32_t current_subpixel_index,
+void camera::set_aa_data(const usize32_t& viewport_size, std::uint32_t current_subpixel_index,
 						 std::uint32_t temporal_aa_samples)
 {
 	if(temporal_aa_samples > 1)

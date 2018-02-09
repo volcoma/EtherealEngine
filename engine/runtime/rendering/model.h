@@ -167,11 +167,11 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline const std::vector<urange>& get_lod_limits() const
+	inline const std::vector<urange32_t>& get_lod_limits() const
 	{
 		return _lod_limits;
 	}
-	void set_lod_limits(const std::vector<urange>& limits);
+	void set_lod_limits(const std::vector<urange32_t>& limits);
 
 	//-----------------------------------------------------------------------------
 	//  Name : render ()
@@ -195,7 +195,7 @@ private:
 	/// Collection of all lods for this model.
 	std::vector<asset_handle<mesh>> _mesh_lods;
 	///
-	std::vector<urange> _lod_limits;
+	std::vector<urange32_t> _lod_limits;
 	/// Duration for a transition between two lods.
 	float _transition_time = 0.75f;
 };

@@ -3,86 +3,88 @@
 #include "core/common/basetypes.hpp"
 #include "inspector.h"
 
-struct inspector_irect : public inspector
+struct inspector_irect32_t : public inspector
 {
-	REFLECTABLEV(inspector_irect, inspector)
+	REFLECTABLEV(inspector_irect32_t, inspector)
 	bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata);
 };
-INSPECTOR_REFLECT(inspector_irect, irect)
+INSPECTOR_REFLECT(inspector_irect32_t, irect32_t)
 
-struct inspector_urect : public inspector
+struct inspector_urect32_t : public inspector
 {
-	REFLECTABLEV(inspector_urect, inspector)
+	REFLECTABLEV(inspector_urect32_t, inspector)
 	bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata);
 };
-INSPECTOR_REFLECT(inspector_urect, urect)
+INSPECTOR_REFLECT(inspector_urect32_t, urect32_t)
 
-struct inspector_frect : public inspector
+struct inspector_frect_t : public inspector
 {
-	REFLECTABLEV(inspector_frect, inspector)
+	REFLECTABLEV(inspector_frect_t, inspector)
 	bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata);
 };
-INSPECTOR_REFLECT(inspector_frect, frect)
+INSPECTOR_REFLECT(inspector_frect_t, frect_t)
 
-struct inspector_ipoint : public inspector
+struct inspector_ipoint32_t : public inspector
 {
-	REFLECTABLEV(inspector_ipoint, inspector)
+	REFLECTABLEV(inspector_ipoint32_t, inspector)
 	bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata);
 };
-INSPECTOR_REFLECT(inspector_ipoint, ipoint)
+INSPECTOR_REFLECT(inspector_ipoint32_t, ipoint32_t)
 
-struct inspector_upoint : public inspector
+struct inspector_upoint32_t : public inspector
 {
-	REFLECTABLEV(inspector_upoint, inspector)
+	REFLECTABLEV(inspector_upoint32_t, inspector)
 	bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata);
 };
-INSPECTOR_REFLECT(inspector_upoint, upoint)
+INSPECTOR_REFLECT(inspector_upoint32_t, upoint32_t)
 
-struct inspector_fpoint : public inspector
+struct inspector_fpoint_t : public inspector
 {
-	REFLECTABLEV(inspector_fpoint, inspector)
+	REFLECTABLEV(inspector_fpoint_t, inspector)
 	bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata);
 };
-INSPECTOR_REFLECT(inspector_fpoint, fpoint)
+INSPECTOR_REFLECT(inspector_fpoint_t, fpoint_t)
 
-struct inspector_isize : public inspector
+struct inspector_isize32_t : public inspector
 {
-	REFLECTABLEV(inspector_isize, inspector)
+	REFLECTABLEV(inspector_isize32_t, inspector)
 	bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata);
 };
-INSPECTOR_REFLECT(inspector_isize, isize)
+INSPECTOR_REFLECT(inspector_isize32_t, isize32_t)
 
-struct inspector_usize : public inspector
+struct inspector_usize32_t : public inspector
 {
-	REFLECTABLEV(inspector_usize, inspector)
+	REFLECTABLEV(inspector_usize32_t, inspector)
 	bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata);
 };
-INSPECTOR_REFLECT(inspector_usize, usize)
+INSPECTOR_REFLECT(inspector_usize32_t, usize32_t)
 
-struct inspector_fsize : public inspector
+struct inspector_fsize_t : public inspector
 {
-	REFLECTABLEV(inspector_fsize, inspector)
+	REFLECTABLEV(inspector_fsize_t, inspector)
 	bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata);
 };
-INSPECTOR_REFLECT(inspector_fsize, fsize)
+INSPECTOR_REFLECT(inspector_fsize_t, fsize_t)
 
-struct inspector_irange : public inspector
+struct inspector_irange32_t : public inspector
 {
-	REFLECTABLEV(inspector_irange, inspector)
+	REFLECTABLEV(inspector_irange32_t, inspector)
 	bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata);
 };
-INSPECTOR_REFLECT(inspector_irange, irange)
+INSPECTOR_REFLECT(inspector_irange32_t, irange32_t)
 
-struct inspector_urange : public inspector
+struct inspector_urange32_t : public inspector
 {
-	REFLECTABLEV(inspector_urange, inspector)
+	REFLECTABLEV(inspector_urange32_t, inspector)
 	bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata);
 };
-INSPECTOR_REFLECT(inspector_urange, urange)
+INSPECTOR_REFLECT(inspector_urange32_t, urange32_t)
 
-struct inspector_frange : public inspector
+struct inspector_frange_t : public inspector
 {
-	REFLECTABLEV(inspector_frange, inspector)
+	REFLECTABLEV(inspector_frange_t, inspector)
 	bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata);
 };
-INSPECTOR_REFLECT(inspector_frange, frange)
+INSPECTOR_REFLECT(inspector_frange_t, frange_t)
+
+

@@ -26,8 +26,10 @@ struct property_layout
 	~property_layout();
 };
 
-REFLECT_EXTERN(inspector);
-
+REFLECT_INLINE(inspector)
+{
+	rttr::registration::class_<inspector>("inspector");
+}
 #define INSPECTOR_REFLECT(inspector_type, inspected_type)                                                    \
 	REFLECT_INLINE(inspector_type)                                                                           \
 	{                                                                                                        \
@@ -39,7 +41,7 @@ REFLECT_EXTERN(inspector);
 #define DECLARE_INSPECTOR(inspector_type, inspected_type)                                                    \
 	struct inspector_type : public inspector                                                                 \
 	{                                                                                                        \
-		REFLECTABLE(inspector_type, inspector)                                                               \
+		REFLECTABLEV(inspector_type, inspector)                                                               \
 		bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata);                   \
 	};                                                                                                       \
 	INSPECTOR_REFLECT(inspector_type, inspected_type)

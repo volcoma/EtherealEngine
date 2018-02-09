@@ -1,10 +1,5 @@
 #include "inspector.h"
 
-REFLECT(inspector)
-{
-	rttr::registration::class_<inspector>("inspector");
-}
-
 void Tooltip(const rttr::property& prop)
 {
 	auto& g = *gui::GetCurrentContext();
