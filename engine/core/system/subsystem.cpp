@@ -21,7 +21,7 @@ void subsystem_context::dispose()
 	}
 
 	_orders.clear();
-	ensures(_subsystems.size() == 0);
+	ensures(_subsystems.empty());
 }
 
 namespace details
@@ -48,7 +48,9 @@ subsystem_context& context()
 bool initialize()
 {
 	if(!context().initialize())
+	{
 		return false;
+	}
 
 	status() = internal_status::running;
 	return true;

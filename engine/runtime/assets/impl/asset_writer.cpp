@@ -1,6 +1,5 @@
 #include "asset_writer.h"
 
-#include "../../meta/audio/sound.hpp"
 #include "../../meta/rendering/material.hpp"
 
 #include "core/serialization/associative_archive.h"

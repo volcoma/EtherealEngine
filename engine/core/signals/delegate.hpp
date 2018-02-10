@@ -177,7 +177,7 @@ class delegate<R(A...)>
 		}
 
 		template <typename Func>
-		static bool not_empty_function(const Func&)
+		static bool not_empty_function(const Func& /*unused*/)
 		{
 			return true;
 		}
@@ -194,26 +194,26 @@ class delegate<R(A...)>
 
 		// Clone a function object that is not location-invariant or
 		// that cannot fit into an any_data structure.
-		static void clone_impl(any_data&, const any_data&, std::false_type)
+		static void clone_impl(any_data& /*unused*/, const any_data& /*unused*/, std::false_type /*unused*/)
 		{
 			assert(false && "TRYING TO COPY A NON-COPYABLE FUNCTOR/FUNCTION");
 		}
 
-		static void clone_impl(any_data& dest, const any_data& source, std::true_type)
+		static void clone_impl(any_data& dest, const any_data& source, std::true_type /*unused*/)
 		{
 			clone_impl_local(dest, source, local_storage());
 		}
 
 		// Clone a location-invariant function object that fits within
 		// an any_data structure.
-		static void clone_impl_local(any_data& dest, const any_data& source, std::true_type)
+		static void clone_impl_local(any_data& dest, const any_data& source, std::true_type /*unused*/)
 		{
 			new(dest.access()) F(source.template access<F>());
 		}
 
 		// Clone a function object that is not location-invariant or
 		// that cannot fit into an any_data structure.
-		static void clone_impl_local(any_data& dest, const any_data& source, std::false_type)
+		static void clone_impl_local(any_data& dest, const any_data& source, std::false_type /*unused*/)
 		{
 			dest.template access<F*>() = new F(*source.template access<F*>());
 		}
@@ -232,7 +232,7 @@ class delegate<R(A...)>
 			return obj_ptr1 == obj_ptr2 && func_ptr1 == func_ptr2;
 		}
 
-		static bool compare_impl_function(const any_data& data1, const any_data& data2, std::true_type)
+		static bool compare_impl_function(const any_data& data1, const any_data& data2, std::true_type /*unused*/)
 		{
 			const F* ptr1 = get_pointer_typed(data1);
 			const F* ptr2 = get_pointer_typed(data2);
@@ -240,7 +240,7 @@ class delegate<R(A...)>
 			return *ptr1 == *ptr2;
 		}
 
-		static bool compare_impl_function(const any_data& data1, const any_data& data2, std::false_type)
+		static bool compare_impl_function(const any_data& data1, const any_data& data2, std::false_type /*unused*/)
 		{
 			const F* ptr1 = get_pointer_typed(data1);
 			const F* ptr2 = get_pointer_typed(data2);
@@ -248,35 +248,35 @@ class delegate<R(A...)>
 			return ptr1 == ptr2;
 		}
 
-		static bool compare_impl(const any_data& data1, const any_data& data2, std::true_type)
+		static bool compare_impl(const any_data& data1, const any_data& data2, std::true_type /*unused*/)
 		{
 			return compare_impl_pair(data1, data2);
 		}
 
-		static bool compare_impl(const any_data& data1, const any_data& data2, std::false_type)
+		static bool compare_impl(const any_data& data1, const any_data& data2, std::false_type /*unused*/)
 		{
 			return compare_impl_function(data1, data2, is_function_pointer());
 		}
 
 		// Destroying a location-invariant object may still require
 		// destruction.
-		static void destroy_impl(any_data& victim, std::true_type)
+		static void destroy_impl(any_data& victim, std::true_type /*unused*/)
 		{
 			victim.template access<F>().~F();
 		}
 
 		// Destroying an object located on the heap.
-		static void destroy_impl(any_data& victim, std::false_type)
+		static void destroy_impl(any_data& victim, std::false_type /*unused*/)
 		{
 			delete victim.template access<F*>();
 		}
 
-		static void init_impl(any_data& _F, F&& f, std::true_type)
+		static void init_impl(any_data& _F, F&& f, std::true_type /*unused*/)
 		{
 			new(_F.access()) F(std::forward<F>(f));
 		}
 
-		static void init_impl(any_data& _F, F&& f, std::false_type)
+		static void init_impl(any_data& _F, F&& f, std::false_type /*unused*/)
 		{
 			_F.template access<F*>() = new F(std::forward<F>(f));
 		}
@@ -315,8 +315,9 @@ public:
 
 	~delegate()
 	{
-		if(manager_)
+		if(manager_) {
 			manager_->destroy_type_(functor_);
+}
 	}
 
 	delegate(delegate const& rhs)

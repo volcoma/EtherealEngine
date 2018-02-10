@@ -106,13 +106,13 @@ void syncer::sync(const fs::path& reference_dir, const fs::path& synced_dir)
 		for(const auto& entry : entries)
 		{
 			bool is_directory = (entry.type == fs::directory_file);
-            auto entry_path = entry.path;
-            std::string entry_extension;
-            while(entry_path.has_extension())
-            {
-                entry_extension = entry_path.extension().string() + entry_extension;
-                entry_path.replace_extension();
-            }
+			auto entry_path = entry.path;
+			std::string entry_extension;
+			while(entry_path.has_extension())
+			{
+				entry_extension = entry_path.extension().string() + entry_extension;
+				entry_path.replace_extension();
+			}
 			switch(entry.status)
 			{
 				case fs::watcher::entry_status::created:
@@ -197,13 +197,14 @@ std::vector<fs::path> syncer::get_synced_entries(const fs::path& path, bool is_d
 	}
 	else
 	{
-        auto entry_path = path;        
-        std::string entry_extension;
-        while(entry_path.has_extension())
-        {
-            entry_extension = entry_path.extension().string() + entry_extension;
-            entry_path.replace_extension();
-        }
+		auto entry_path = path;
+		std::string entry_extension;
+		while(entry_path.has_extension())
+		{
+            auto ext = entry_path.extension().string() + entry_extension;
+			entry_extension = ext;
+			entry_path.replace_extension();
+		}
 
 		{
 			std::lock_guard<std::mutex> lock(_mutex);

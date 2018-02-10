@@ -46,8 +46,10 @@ std::string console::process_input(const std::string& line)
 	print_buffer.str(std::string()); // clear()
 	std::vector<std::string> tokens = tokenize_line(line);
 
-	if(tokens.size() == 0)
+	if(tokens.empty())
+	{
 		return "";
+	}
 
 	std::string identifier = tokens.at(0);
 
@@ -81,17 +83,7 @@ std::vector<std::string> console::tokenize_line(const std::string& line)
 	// TODO: we might want to use getwc() to correctly read unicode characters
 	for(const auto& c : line)
 	{
-		// ignore control characters
-		// 		if (std::iscntrl(c) != 0)
-		// 		{
-		// 			// TODO: BOM might not be recognized on non-Windows
-		// platforms.
-		// We
-		// might want to
-		// 			// check for it.
-		// 			continue;
-		// 		}
-		/*else */ if(c == ' ' && !insideQuotes)
+		if(c == ' ' && !insideQuotes)
 		{
 			// keep spaces inside of quoted text
 			if(currWord.empty())
@@ -99,12 +91,10 @@ std::vector<std::string> console::tokenize_line(const std::string& line)
 				// ignore leading spaces
 				continue;
 			}
-			else
-			{
-				// finish off word
-				out.push_back(currWord);
-				currWord.clear();
-			}
+
+			// finish off word
+			out.push_back(currWord);
+			currWord.clear();
 		}
 		else if(!escapingQuotes && c == '\\')
 		{
@@ -140,14 +130,16 @@ std::vector<std::string> console::tokenize_line(const std::string& line)
 	}
 	// add the last word
 	if(!currWord.empty())
+	{
 		out.push_back(currWord);
+	}
 	return out;
 }
 
 void console::register_help_command()
 {
 	register_command("help", "Prints information about using the console or a given command.", {"term"}, {""},
-					 (std::function<void(std::string)>)([this](std::string term) { help_command(term); }));
+					 std::function<void(std::string)>([this](std::string term) { help_command(term); }));
 }
 
 /**
@@ -171,7 +163,9 @@ void console::help_command(const std::string& term)
 		{
 			print(command);
 			if(!commands[command]->description.empty())
+			{
 				print("    " + commands[command]->description);
+			}
 		}
 	}
 	else
@@ -180,7 +174,9 @@ void console::help_command(const std::string& term)
 		{
 			print(commands[term]->get_usage());
 			if(!commands[term]->description.empty())
+			{
 				print("    " + commands[term]->description);
+			}
 		}
 		else
 		{
@@ -198,7 +194,7 @@ std::vector<std::string> console::list_of_commands(const std::string& filter)
 	std::vector<std::string> list{};
 	for(auto value : commands)
 	{
-		if(filter == "" || value.first.compare(0, filter.length(), filter) == 0)
+		if(filter.empty() || value.first.compare(0, filter.length(), filter) == 0)
 		{
 			list.push_back(value.first);
 		}

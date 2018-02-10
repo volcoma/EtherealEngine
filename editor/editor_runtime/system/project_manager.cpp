@@ -313,32 +313,24 @@ void project_manager::setup_cache_syncer(fs::syncer& syncer, const fs::path& met
 	auto& ts = core::get_subsystem<core::task_system>();
 	auto on_removed = [&ts](const auto& /*ref_path*/, const auto& synced_paths) {
 
-//		ts.push_on_worker_thread(
-//			[](const auto& synced_paths) {
-				for(const auto& synced_path : synced_paths)
-				{
-					auto synced_asset = fs::replace(synced_path, ".meta", "");
-					fs::error_code err;
-					fs::remove_all(synced_asset, err);
-				}
-//			},
-//			synced_paths);
+		for(const auto& synced_path : synced_paths)
+		{
+			auto synced_asset = fs::replace(synced_path, ".meta", "");
+			fs::error_code err;
+			fs::remove_all(synced_asset, err);
+		}
 
 	};
 
 	auto on_renamed = [&ts](const auto& /*ref_path*/, const auto& synced_paths) {
 
-//		ts.push_on_worker_thread(
-//			[](const auto& synced_paths) {
-				for(const auto& synced_path : synced_paths)
-				{
-					auto synced_old_asset = fs::replace(synced_path.first, ".meta", "");
-					auto synced_new_asset = fs::replace(synced_path.second, ".meta", "");
-					fs::error_code err;
-					fs::rename(synced_old_asset, synced_new_asset, err);
-				}
-//			},
-//			synced_paths);
+		for(const auto& synced_path : synced_paths)
+		{
+			auto synced_old_asset = fs::replace(synced_path.first, ".meta", "");
+			auto synced_new_asset = fs::replace(synced_path.second, ".meta", "");
+			fs::error_code err;
+			fs::rename(synced_old_asset, synced_new_asset, err);
+		}
 
 	};
 
@@ -366,7 +358,7 @@ void project_manager::save_config()
 
 	fs::error_code err;
 	fs::create_directory(fs::resolve_protocol("editor:/config"), err);
-	const std::string project_config_file = fs::resolve_protocol("editor:/config/project.cfg").string();
+	const auto project_config_file = fs::resolve_protocol("editor:/config/project.cfg").string();
 	std::ofstream output(project_config_file);
 	cereal::oarchive_associative_t ar(output);
 

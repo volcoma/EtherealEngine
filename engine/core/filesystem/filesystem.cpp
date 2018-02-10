@@ -10,17 +10,18 @@ bool begins_with(const std::string& str, const std::string& value)
 {
 	// Validate requirements
 	if(str.length() < value.length())
+	{
 		return false;
-	if(str.empty() == true || value.empty() == true)
+	}
+	if(str.empty() || value.empty())
+	{
 		return false;
+	}
 
 	// Do the subsets match?
 	auto s1 = str.substr(0, value.length());
-	if(s1.compare(value) == 0)
-		return true;
 
-	// No match
-	return false;
+	return s1.compare(value) == 0;
 }
 static std::string replace_seq(const std::string& str, const std::string& old_sequence,
 							   const std::string& new_sequence)
@@ -31,7 +32,7 @@ static std::string replace_seq(const std::string& str, const std::string& old_se
 	std::string::size_type new_length = new_sequence.length();
 
 	// Search for all replace std::string occurances.
-	if(s.empty() == false)
+	if(!s.empty())
 	{
 		while(std::string::npos != (location = s.find(old_sequence, location)))
 		{
@@ -40,7 +41,9 @@ static std::string replace_seq(const std::string& str, const std::string& old_se
 
 			// Break out if we're done
 			if(location >= s.length())
+			{
 				break;
+			}
 
 		} // Next
 
@@ -75,23 +78,30 @@ auto read_stream_into_container(std::basic_istream<CharT, Traits>& in,
 
 	auto const start_pos = in.tellg();
 	if(std::streamsize(-1) == start_pos)
+	{
 		throw std::ios_base::failure{"error"};
+	};
 
 	if(!in.ignore(std::numeric_limits<std::streamsize>::max()))
+	{
 		throw std::ios_base::failure{"error"};
-
+	};
 	auto const char_count = in.gcount();
 
 	if(!in.seekg(start_pos))
+	{
 		throw std::ios_base::failure{"error"};
+	};
 
 	auto container = Container(std::move(alloc));
 	container.resize(static_cast<std::size_t>(char_count));
 
-	if(0 != container.size())
+	if(!container.empty())
 	{
 		if(!in.read(reinterpret_cast<CharT*>(&container[0]), char_count))
+		{
 			throw std::ios_base::failure{"error"};
+		};
 	}
 
 	return container;
@@ -126,7 +136,9 @@ path resolve_protocol(const path& _path)
 	const auto string_path = _path.generic_string();
 	auto pos = string_path.find(':', 0) + 1;
 	if(pos == std::string::npos)
+	{
 		return path{};
+	};
 
 	const auto root = string_path.substr(0, pos);
 
@@ -137,7 +149,9 @@ path resolve_protocol(const path& _path)
 	auto it = protocols.find(root);
 
 	if(it == std::end(protocols))
+	{
 		return path{};
+	};
 
 	const auto resolved = it->second;
 	auto result = resolved / relative_path.make_preferred();
@@ -149,7 +163,9 @@ bool has_known_protocol(const path& _path)
 	const auto string_path = _path.generic_string();
 	auto pos = string_path.find(':', 0) + 1;
 	if(pos == std::string::npos)
+	{
 		return false;
+	}
 
 	const auto root = string_path.substr(0, pos);
 

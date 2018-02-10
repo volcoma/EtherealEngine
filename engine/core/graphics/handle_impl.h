@@ -20,7 +20,9 @@ public:
 	void dispose()
 	{
 		if(is_valid())
+		{
 			bgfx::destroy(handle);
+		}
 
 		handle = invalid_handle();
 	}

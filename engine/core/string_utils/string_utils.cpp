@@ -5,9 +5,10 @@
 int string_utils::compare(const std::string& s1, const std::string& s2, bool ignoreCase)
 {
 	if(!ignoreCase)
+	{
 		return s1.compare(s2);
-	else
-		return StrICmp()(s1, s2);
+	}
+	return StrICmp()(s1, s2);
 }
 
 std::string string_utils::trim(const std::string& str)
@@ -16,26 +17,38 @@ std::string string_utils::trim(const std::string& str)
 	std::string::size_type pos;
 
 	// Early out
-	if(s.empty() == true)
+	if(s.empty())
+	{
 		return s;
+	}
 
 	// Trim Left
 	pos = s.find_first_not_of(" \t");
 	if(pos != std::string::npos)
+	{
 		s.erase(0, pos);
+	}
 	else
+	{
 		s.clear();
+	}
 
 	// Early out
-	if(s.empty() == true)
+	if(s.empty())
+	{
 		return s;
+	}
 
 	// Trim right
 	pos = s.find_last_not_of(" \t");
 	if(pos != std::string::npos)
+	{
 		s.erase(pos + 1);
+	}
 	else
+	{
 		s.clear();
+	}
 
 	return s;
 }
@@ -47,14 +60,16 @@ std::vector<std::string> string_utils::split(const std::string& text, char sep, 
 	while((end = text.find(sep, start)) != std::string::npos)
 	{
 		std::string temp = text.substr(start, end - start);
-		if(temp != "")
+		if(!temp.empty())
+		{
 			tokens.push_back(temp);
+		}
 		start = end + 1;
 	}
 	std::string temp = text.substr(start);
 	if(skipEmpty)
 	{
-		if(temp != "")
+		if(!temp.empty())
 		{
 			tokens.push_back(temp);
 		}
@@ -85,32 +100,32 @@ bool string_utils::begins_with(const std::string& str, const std::string& value,
 {
 	// Validate requirements
 	if(str.length() < value.length())
+	{
 		return false;
-	if(str.empty() == true || value.empty() == true)
+	}
+	if(str.empty() || value.empty())
+	{
 		return false;
+	}
 
 	// Do the subsets match?
-	if(compare(std::string(str.substr(0, value.length())), value, ignoreCase) == 0)
-		return true;
-
-	// No match
-	return false;
+	return (compare(std::string(str.substr(0, value.length())), value, ignoreCase) == 0);
 }
 
 bool string_utils::ends_with(const std::string& str, const std::string& value, bool ignoreCase /*= false*/)
 {
 	// Validate requirements
 	if(str.size() < value.size())
+	{
 		return false;
-	if(str.empty() == true || value.empty() == true)
+	}
+	if(str.empty() || value.empty())
+	{
 		return false;
+	}
 
 	// Do the subsets match?
-	if(compare(std::string(str.substr(str.length() - value.length())), value, ignoreCase) == 0)
-		return true;
-
-	// No match
-	return false;
+	return (compare(std::string(str.substr(str.length() - value.length())), value, ignoreCase) == 0);
 }
 
 std::string string_utils::replace(const std::string& str, const std::string& oldSequence,
@@ -122,7 +137,7 @@ std::string string_utils::replace(const std::string& str, const std::string& old
 	std::string::size_type newLength = newSequence.length();
 
 	// Search for all replace std::string occurances.
-	if(s.empty() == false)
+	if(!s.empty())
 	{
 		while(std::string::npos != (location = s.find(oldSequence, location)))
 		{
@@ -131,7 +146,9 @@ std::string string_utils::replace(const std::string& str, const std::string& old
 
 			// Break out if we're done
 			if(location >= s.length())
+			{
 				break;
+			}
 
 		} // Next
 
@@ -147,7 +164,7 @@ std::string string_utils::replace(const std::string& str, std::string::value_typ
 	std::string::size_type location = 0;
 
 	// Search for all replace std::string occurances.
-	if(s.empty() == false)
+	if(!s.empty())
 	{
 		while(std::string::npos != (location = s.find(oldCharacter, location)))
 		{
@@ -156,7 +173,9 @@ std::string string_utils::replace(const std::string& str, std::string::value_typ
 
 			// Break out if we're done
 			if(location >= s.length())
+			{
 				break;
+			}
 
 		} // Next
 
@@ -169,9 +188,11 @@ std::string string_utils::format(const char* format, va_list args)
 {
 	int length = std::vsnprintf(nullptr, 0, format, args);
 	if(length == 0)
+	{
 		return std::string();
+	}
 
-    std::vector<char> buf(static_cast<size_t>(length) + 1);
+	std::vector<char> buf(static_cast<size_t>(length) + 1);
 	std::vsnprintf(buf.data(), static_cast<size_t>(length) + 1, format, args);
 
 	std::string str(buf.data());
@@ -183,7 +204,7 @@ std::string string_utils::word_wrap(const std::string& value, std::string::size_
 {
 	std::string wrapString, currentLine;
 	auto lastSpace = std::string::size_type(-1);
-    auto lineLength = std::string::size_type(0);
+	auto lineLength = std::string::size_type(0);
 
 	// TODO: Add support for tab character to wrapping method.
 
@@ -210,7 +231,7 @@ std::string string_utils::word_wrap(const std::string& value, std::string::size_
 				else
 				{
 					// Add padding if we haven'value2 already
-					if(wrapString.empty() == false && lineLength == 0)
+					if(!wrapString.empty() && lineLength == 0)
 					{
 						currentLine = linePadding;
 						lineLength = currentLine.length();
@@ -251,9 +272,11 @@ std::string string_utils::word_wrap(const std::string& value, std::string::size_
 					{
 						// Break onto a new-line where the space was found
 						if(lastSpace > 0)
+						{
 							wrapString += currentLine.substr(0, lastSpace) + "\n";
+						}
 						currentLine = linePadding;
-                        currentLine.append(currentLine.substr(lastSpace + 1));
+						currentLine.append(currentLine.substr(lastSpace + 1));
 						lineLength = currentLine.length();
 						lastSpace = std::string::size_type(-1);
 
@@ -262,7 +285,7 @@ std::string string_utils::word_wrap(const std::string& value, std::string::size_
 				} // End if exceeding line length
 
 				// Add padding if we haven'value2 already
-				if(wrapString.empty() == false && lineLength == 0)
+				if(!wrapString.empty() && lineLength == 0)
 				{
 					currentLine = linePadding;
 					lineLength = currentLine.length();
@@ -319,9 +342,11 @@ std::string string_utils::random_string(std::string::size_type length)
 
 std::string string_utils::command_line_args(int _argc, char* _argv[])
 {
-	std::string cmdLine = "";
+	std::string cmdLine;
 	for(int i = 1; i < _argc - 1; ++i)
+	{
 		cmdLine.append(_argv[i]).append(" ");
+	}
 	cmdLine.append(_argv[_argc - 1]);
 	return cmdLine;
 }
@@ -364,7 +389,9 @@ bool string_utils::parse_command_line(const std::string& strCommandLine,
 					// If we haven't started constructing an argument yet
 					// create space for one.
 					if(!bConstructingArgument)
+					{
 						ArgumentsOut.resize(ArgumentsOut.size() + 1);
+					}
 					bConstructingArgument = true;
 					break;
 
@@ -380,7 +407,9 @@ bool string_utils::parse_command_line(const std::string& strCommandLine,
 					// If we haven't started constructing an argument yet
 					// create space for one.
 					if(!bConstructingArgument)
+					{
 						ArgumentsOut.resize(ArgumentsOut.size() + 1);
+					}
 					bConstructingArgument = true;
 
 					// Append character to current argument.

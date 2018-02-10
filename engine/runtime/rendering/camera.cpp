@@ -5,7 +5,9 @@
 float camera::get_zoom_factor() const
 {
 	if(_viewport_size.height == 0)
+	{
 		return 0.0f;
+	}
 
 	return _ortho_size / (float(_viewport_size.height) / 2.0f);
 }
@@ -32,7 +34,9 @@ void camera::set_fov(float fFOVY)
 {
 	// Skip if no-op
 	if(math::epsilonEqual(fFOVY, _fov, math::epsilon<float>()))
+	{
 		return;
+	}
 
 	// Update projection matrix and view frustum
 	_fov = fFOVY;
@@ -40,14 +44,16 @@ void camera::set_fov(float fFOVY)
 	touch();
 }
 
-void camera::set_projection_mode(projection_mode Mode)
+void camera::set_projection_mode(projection_mode mode)
 {
 	// Bail if this is a no op.
-	if(Mode == _projection_mode)
+	if(mode == _projection_mode)
+	{
 		return;
+	}
 
 	// Alter the projection mode.
-	_projection_mode = Mode;
+	_projection_mode = mode;
 
 	touch();
 }
@@ -56,7 +62,9 @@ void camera::set_near_clip(float distance)
 {
 	// Skip if this is a no-op
 	if(math::epsilonEqual(distance, _near_clip, math::epsilon<float>()))
+	{
 		return;
+	}
 
 	// Store value
 	_near_clip = distance;
@@ -65,14 +73,18 @@ void camera::set_near_clip(float distance)
 
 	// Make sure near clip is less than the far clip
 	if(_near_clip > _far_clip)
+	{
 		set_far_clip(_near_clip);
+	}
 }
 
 void camera::set_far_clip(float distance)
 {
 	// Skip if this is a no-op
 	if(math::epsilonEqual(distance, _far_clip, math::epsilon<float>()))
+	{
 		return;
+	}
 
 	// Store value
 	_far_clip = distance;
@@ -81,7 +93,9 @@ void camera::set_far_clip(float distance)
 
 	// Make sure near clip is less than the far clip
 	if(_near_clip > _far_clip)
+	{
 		set_near_clip(_far_clip);
+	}
 }
 
 math::bbox camera::get_local_bounding_box()
@@ -92,14 +106,12 @@ math::bbox camera::get_local_bounding_box()
 		return math::bbox(-far_size * _aspect_ratio, -far_size, _near_clip, far_size * _aspect_ratio,
 						  far_size, _far_clip);
 	}
-	else
-	{
-		float spread = _far_clip - _near_clip;
-		math::vec3 center = {0.0f, 0.0f, (_far_clip + _near_clip) * 0.5f};
-		float orthographicSize = get_ortho_size();
-		math::vec3 size = {orthographicSize * 2.0f * _aspect_ratio, orthographicSize * 2.0f, spread};
-		return math::bbox(center - (size / 2.0f), center + (size / 2.0f));
-	}
+
+	float spread = _far_clip - _near_clip;
+	math::vec3 center = {0.0f, 0.0f, (_far_clip + _near_clip) * 0.5f};
+	float orthographicSize = get_ortho_size();
+	math::vec3 size = {orthographicSize * 2.0f * _aspect_ratio, orthographicSize * 2.0f, spread};
+	return math::bbox(center - (size / 2.0f), center + (size / 2.0f));
 }
 
 void camera::set_aspect_ratio(float aspect, bool bLocked /* = false */)
@@ -165,7 +177,7 @@ const math::transform& camera::get_projection() const
 			// Generate the updated orthographic projection matrix
 			float zoom = get_zoom_factor();
 			const frect_t rect = {-float(_viewport_size.width) / 2.0f, float(_viewport_size.height) / 2.0f,
-								float(_viewport_size.width) / 2.0f, -float(_viewport_size.height) / 2.0f};
+								  float(_viewport_size.width) / 2.0f, -float(_viewport_size.height) / 2.0f};
 			static const auto ortho_ =
 				gfx::is_homogeneous_depth() ? math::orthoNO<float> : math::orthoZO<float>;
 
@@ -221,7 +233,7 @@ math::vec3 camera::z_unit_axis() const
 const math::frustum& camera::get_frustum() const
 {
 	// Recalculate frustum if necessary
-	if(_frustum_dirty == true && _frustum_locked == false)
+	if(_frustum_dirty && !_frustum_locked)
 	{
 		_frustum.update(get_view(), get_projection(), gfx::is_homogeneous_depth());
 		_frustum_dirty = false;
@@ -261,8 +273,10 @@ const math::frustum& camera::get_frustum() const
 const math::frustum& camera::get_clipping_volume() const
 {
 	// Recalculate frustum if necessary
-	if(_frustum_dirty == true && _frustum_locked == false)
+	if(_frustum_dirty && !_frustum_locked)
+	{
 		get_frustum();
+	}
 
 	// Return the clipping volume
 	return _clipping_volume;
@@ -356,19 +370,25 @@ bool camera::viewport_to_world(const math::vec2& point, const math::plane& pl, m
 
 	if(clip && ((point.x < _viewport_pos.x) || (point.x > (_viewport_pos.x + _viewport_size.width)) ||
 				(point.y < _viewport_pos.y) || (point.y > (_viewport_pos.y + _viewport_size.height))))
+	{
 		return false;
+	}
 
 	math::vec3 pick_ray_dir;
 	math::vec3 pick_ray_origin;
 	// Convert the screen coordinates to a ray.
-	if(viewport_to_ray(point, pick_ray_origin, pick_ray_dir) == false)
+	if(!viewport_to_ray(point, pick_ray_origin, pick_ray_dir))
+	{
 		return false;
+	}
 
 	// Get the length of the 'adjacent' side of the virtual triangle formed
 	// by the direction and normal.
 	float proj_ray_length = math::plane::dot_normal(pl, pick_ray_dir);
 	if(math::abs<float>(proj_ray_length) < math::epsilon<float>())
+	{
 		return false;
+	}
 
 	// Calculate distance to plane along its normal
 	float distance = math::plane::dot_normal(pl, pick_ray_origin) + pl.data.w;
@@ -380,7 +400,9 @@ bool camera::viewport_to_world(const math::vec2& point, const math::plane& pl, m
 		int nSign1 = (distance > 0) ? 1 : (distance < 0) ? -1 : 0;
 		int nSign2 = (proj_ray_length > 0) ? 1 : (proj_ray_length < 0) ? -1 : 0;
 		if(nSign1 == nSign2)
+		{
 			return false;
+		}
 
 	} // End if perspective
 
@@ -463,7 +485,9 @@ float camera::estimate_zoom_factor(const math::plane& pl) const
 
 	// Just return the actual zoom factor if this is orthographic
 	if(get_projection_mode() == projection_mode::orthographic)
+	{
 		return get_zoom_factor();
+	}
 
 	math::vec3 world;
 	// Otherwise, estimate is based on the distance from the grid plane.

@@ -3,7 +3,7 @@ namespace fs
 {
 using namespace std::literals;
 
-static void log_path(const fs::path&)
+static void log_path(const fs::path& /*unused*/)
 {
 }
 static std::pair<path, std::string> get_path_filter_pair(const fs::path& path)
@@ -11,7 +11,7 @@ static std::pair<path, std::string> get_path_filter_pair(const fs::path& path)
 	// extract wild card and parent path
 	std::string key = path.string();
 	fs::path p = path;
-	size_t wildCardPos = key.find("*");
+	size_t wildCardPos = key.find('*');
 	std::string filter;
 	if(wildCardPos != std::string::npos)
 	{
@@ -36,7 +36,7 @@ static std::pair<path, std::string> visit_wild_card_path(const fs::path& path, b
 	if(!path_filter.second.empty())
 	{
 		std::string full = (path_filter.first / path_filter.second).string();
-		size_t wildcard_pos = full.find("*");
+		size_t wildcard_pos = full.find('*');
 		std::string before = full.substr(0, wildcard_pos);
 		std::string after = full.substr(wildcard_pos + 1);
 		fs::directory_iterator end;
@@ -47,34 +47,33 @@ static std::pair<path, std::string> visit_wild_card_path(const fs::path& path, b
 		}
 		else if(fs::exists(path_filter.first, err))
 		{
-            const auto iterate = [&](auto& it)
-            {
-                for(const auto& entry : it)
-                {
-                    std::string current = entry.path().string();
-                    size_t before_pos = current.find(before);
-                    size_t after_pos = current.find(after);
-                    if((before_pos != std::string::npos || before.empty()) &&
-                       (after_pos != std::string::npos || after.empty()))
-                    {
-                        if(visitor(entry.path()))
-                        {
-                            break;
-                        }
-                    }
-                }
-            };
-		
-            if(recursive)
-            {
-                fs::recursive_directory_iterator it(path_filter.first, err);
-                iterate(it);
-            }
-            else
-            {
-                fs::directory_iterator it(path_filter.first, err);
-                iterate(it);
-            }
+			const auto iterate = [&](auto& it) {
+				for(const auto& entry : it)
+				{
+					std::string current = entry.path().string();
+					size_t before_pos = current.find(before);
+					size_t after_pos = current.find(after);
+					if((before_pos != std::string::npos || before.empty()) &&
+					   (after_pos != std::string::npos || after.empty()))
+					{
+						if(visitor(entry.path()))
+						{
+							break;
+						}
+					}
+				}
+			};
+
+			if(recursive)
+			{
+				fs::recursive_directory_iterator it(path_filter.first, err);
+				iterate(it);
+			}
+			else
+			{
+				fs::directory_iterator it(path_filter.first, err);
+				iterate(it);
+			}
 		}
 	}
 	return path_filter;
@@ -120,7 +119,7 @@ public:
 		{
 			// this means that the first watch won't call the callback function
 			// so we have to manually call it here if we want that behavior
-			if(entries.size() > 0 && _callback)
+			if(!entries.empty() && _callback)
 			{
 				_callback(entries, true);
 			}
@@ -157,14 +156,14 @@ public:
 
 		process_modifications(entries, created, modified);
 
-		if(entries.size() > 0 && _callback)
+		if(!entries.empty() && _callback)
 		{
 			_callback(entries, false);
 		}
 	}
 
 	void process_modifications(std::vector<filesystem_watcher::entry>& entries,
-							   const std::vector<size_t>& created, const std::vector<size_t>&)
+							   const std::vector<size_t>& created, const std::vector<size_t>& /*unused*/)
 	{
 		auto it = std::begin(_entries);
 		while(it != std::end(_entries))
@@ -306,7 +305,7 @@ void filesystem_watcher::touch(const fs::path& path, bool recursive, fs::file_ti
 		return;
 	}
 	// if not, visit each path if there's a wild card
-	if(path.string().find("*") != std::string::npos)
+	if(path.string().find('*') != std::string::npos)
 	{
 		visit_wild_card_path(path, recursive, true, [time](const fs::path& p) {
 			fs::error_code err;
@@ -334,7 +333,9 @@ void filesystem_watcher::close()
 	unwatch_all();
 
 	if(_thread.joinable())
+	{
 		_thread.join();
+	}
 }
 
 void filesystem_watcher::start()
@@ -387,7 +388,9 @@ std::uint64_t filesystem_watcher::watch_impl(const fs::path& path, bool recursiv
 	auto& wd = get_watcher();
 	// and start its thread
 	if(!wd._watching)
+	{
 		wd.start();
+	}
 
 	// add a new watcher
 	if(list_callback)
@@ -395,7 +398,7 @@ std::uint64_t filesystem_watcher::watch_impl(const fs::path& path, bool recursiv
 		std::string filter;
 		fs::path p = path;
 		// try to see if there's a match for the wild card
-		if(path.string().find("*") != std::string::npos)
+		if(path.string().find('*') != std::string::npos)
 		{
 			std::pair<fs::path, std::string> path_filter =
 				visit_wild_card_path(path, recursive, true, [](const fs::path&) { return true; });

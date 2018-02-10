@@ -66,11 +66,11 @@ parser::Token parser::lex_token(std::string& value)
 		case ' ':
 		case '\t':
 		case '\v':
-			value.push_back(c);
+			value.push_back(std::string::value_type(c));
 			return lex_whitespace(value);
 		case '\n':
 		case '\r':
-			value.push_back(c);
+			value.push_back(std::string::value_type(c));
 			return lex_newline(value);
 		case '0':
 		case '1':
@@ -84,7 +84,7 @@ parser::Token parser::lex_token(std::string& value)
 		case '9':
 		case '-':
 		case '+':
-			value.push_back(c);
+			value.push_back(std::string::value_type(c));
 			return lex_number(value);
 		case 'a':
 		case 'b':
@@ -139,7 +139,7 @@ parser::Token parser::lex_token(std::string& value)
 		case 'Y':
 		case 'Z':
 		case '_':
-			value.push_back(c);
+			value.push_back(std::string::value_type(c));
 			return lex_identifier(value);
 		case '"':
 			return lex_string(value);
@@ -157,7 +157,7 @@ parser::Token parser::lex_token(std::string& value)
 		case EOF:
 			return FILE_END;
 		default:
-			value.push_back(c);
+			value.push_back(std::string::value_type(c));
 			error("Unexpected " + value + ".");
 			return ERROR;
 	}
@@ -173,7 +173,7 @@ parser::Token parser::lex_whitespace(std::string& value)
 			case ' ':
 			case '\t':
 			case '\v':
-				value.push_back(c);
+				value.push_back(std::string::value_type(c));
 				break;
 			default:
 				in->unget();
@@ -227,7 +227,7 @@ parser::Token parser::lex_number(std::string& value)
 			case '8':
 			case '9':
 			case '.':
-				value.push_back(c);
+				value.push_back(std::string::value_type(c));
 				break;
 			default:
 				in->unget();
@@ -308,7 +308,7 @@ parser::Token parser::lex_identifier(std::string& value)
 			case 'Z':
 			case '_':
 			case '-':
-				value.push_back(c);
+				value.push_back(std::string::value_type(c));
 				break;
 			default:
 				in->unget();
@@ -372,7 +372,7 @@ parser::Token parser::lex_string(std::string& value)
 				}
 				break;
 			default:
-				value.push_back(c);
+				value.push_back(std::string::value_type(c));
 				break;
 		}
 		c = in->get();
@@ -391,7 +391,7 @@ parser::Token parser::lex_comment(std::string& value)
 			case EOF:
 				return COMMENT;
 			default:
-				value.push_back(c);
+				value.push_back(std::string::value_type(c));
 				break;
 		}
 		c = in->get();

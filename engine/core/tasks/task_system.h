@@ -247,7 +247,7 @@ public:
 
 	template <class Allocator, class F, class... Args>
 	friend std::pair<task, task_future<typename std::result_of<F(Args...)>::type>>
-	make_ready_task(std::allocator_arg_t, Allocator const& alloc, F&& f, Args&&... args)
+	make_ready_task(std::allocator_arg_t /*unused*/, Allocator const& alloc, F&& f, Args&&... args)
 	{
 		using pair_type = std::pair<task, task_future<typename std::result_of<F(Args...)>::type>>;
 		using model_type = ready_task_model<typename std::result_of<F(Args...)>::type(Args...)>;
@@ -274,7 +274,7 @@ public:
 
 	template <class Allocator, class F, class... Args>
 	friend std::pair<task, task_future<typename std::result_of<F(decay_if_future<Args>...)>::type>>
-	make_awaitable_task(std::allocator_arg_t, Allocator const& alloc, F&& f, Args&&... args)
+	make_awaitable_task(std::allocator_arg_t /*unused*/, Allocator const& alloc, F&& f, Args&&... args)
 	{
 		using pair_type =
 			std::pair<task, task_future<typename std::result_of<F(decay_if_future<Args>...)>::type>>;
@@ -290,34 +290,39 @@ public:
 	void operator()()
 	{
 		if(_t)
+		{
 			_t->invoke_();
+		}
 	}
 
 	bool ready() const
 	{
 		if(_t)
+		{
 			return _t->ready_();
-		else
-			return false;
+		}
+
+		return false;
 	}
 
 private:
 	template <class F, class... Args>
-	task(ready_task_tag, F&& f, Args&&... args)
+	task(ready_task_tag /*unused*/, F&& f, Args&&... args)
 		: _t(new ready_task_model<typename std::result_of<F(Args...)>::type(Args...)>(
 			  std::forward<F>(f), std::forward<Args>(args)...))
 	{
 	}
 
 	template <class Allocator, class F, class... Args>
-	task(ready_task_tag, std::allocator_arg_t, Allocator const& alloc, F&& f, Args&&... args)
+	task(ready_task_tag /*unused*/, std::allocator_arg_t /*unused*/, Allocator const& alloc, F&& f,
+		 Args&&... args)
 		: _t(new ready_task_model<typename std::result_of<F(Args...)>::type(Args...)>(
 			  std::allocator_arg_t(), alloc, std::forward<F>(f), std::forward<Args>(args)...))
 	{
 	}
 
 	template <class F, class... Args>
-	task(awaitable_task_tag, F&& f, Args&&... args)
+	task(awaitable_task_tag /*unused*/, F&& f, Args&&... args)
 		: _t(new awaitable_task_model<
 			  typename std::result_of<F(decay_if_future<Args>...)>::type(decay_if_future<Args>...), Args...>(
 			  std::forward<F>(f), std::forward<Args>(args)...))
@@ -325,7 +330,8 @@ private:
 	}
 
 	template <class Allocator, class F, class... Args>
-	task(awaitable_task_tag, std::allocator_arg_t, Allocator const& alloc, F&& f, Args&&... args)
+	task(awaitable_task_tag /*unused*/, std::allocator_arg_t /*unused*/, Allocator const& alloc, F&& f,
+		 Args&&... args)
 		: _t(new awaitable_task_model<
 			  typename std::result_of<F(decay_if_future<Args>...)>::type(decay_if_future<Args>...), Args...>(
 			  std::allocator_arg_t(), alloc, std::forward<F>(f), std::forward<Args>(args)...))
@@ -363,7 +369,8 @@ private:
 		}
 
 		template <class Allocator, class F>
-		explicit ready_task_model(std::allocator_arg_t, Allocator const& alloc, F&& f, Args&&... args)
+		explicit ready_task_model(std::allocator_arg_t /*unused*/, Allocator const& alloc, F&& f,
+								  Args&&... args)
 			: _f(std::allocator_arg_t(), alloc, std::forward<F>(f))
 			, _args(std::forward<Args>(args)...)
 		{
@@ -412,7 +419,8 @@ private:
 		}
 
 		template <class Allocator, class F, class... Args>
-		explicit awaitable_task_model(std::allocator_arg_t, Allocator const& alloc, F&& f, Args&&... args)
+		explicit awaitable_task_model(std::allocator_arg_t /*unused*/, Allocator const& alloc, F&& f,
+									  Args&&... args)
 			: _f(std::allocator_arg_t(), alloc, std::forward<F>(f))
 			, _args(std::forward<Args>(args)...)
 		{
@@ -461,13 +469,13 @@ private:
 		}
 
 		template <std::size_t... I>
-		inline void do_invoke_(std::index_sequence<I...>)
+		inline void do_invoke_(std::index_sequence<I...> /*unused*/)
 		{
 			nonstd::invoke(_f, call_get(std::get<I>(std::move(_args)))...);
 		}
 
 		template <class T>
-		static inline bool call_ready(const T&) noexcept
+		static inline bool call_ready(const T& /*unused*/) noexcept
 		{
 			return true;
 		}
@@ -493,7 +501,7 @@ private:
 		}
 
 		template <std::size_t... I>
-		inline bool do_ready_(std::index_sequence<I...>) const noexcept
+		inline bool do_ready_(std::index_sequence<I...> /*unused*/) const noexcept
 		{
 			return nonstd::check_all_true(call_ready(std::get<I>(_args))...);
 		}
@@ -580,7 +588,9 @@ public:
 	std::size_t get_most_busy_queue_idx(bool skip_owner) const
 	{
 		if(_threads_count == 1)
+		{
 			return get_owner_thread_idx();
+		}
 
 		auto info = get_info();
 		auto begin_it = skip_owner ? std::begin(info.queue_infos) + 1 : std::begin(info.queue_infos);
@@ -602,7 +612,9 @@ public:
 	std::size_t get_most_free_queue_idx(bool skip_owner) const
 	{
 		if(_threads_count == 1)
+		{
 			return get_owner_thread_idx();
+		}
 
 		auto info = get_info();
 		auto begin_it = skip_owner ? std::begin(info.queue_infos) + 1 : std::begin(info.queue_infos);
@@ -621,7 +633,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	template <class F, class... Args>
-	auto push_on_thread(const std::size_t idx, F&& f, Args&&... args)
+	decltype(auto) push_on_thread(const std::size_t idx, F&& f, Args&&... args)
 	{
 		using is_ready_task = nonstd::all_true<!is_future<Args>::value...>;
 		return push_impl(is_ready_task(), idx, false, std::forward<F>(f), std::forward<Args>(args)...);
@@ -635,7 +647,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	template <class F, class... Args>
-	auto push_on_worker_thread(F&& f, Args&&... args)
+	decltype(auto) push_on_worker_thread(F&& f, Args&&... args)
 	{
 		const std::size_t idx = get_any_worker_thread_idx();
 		return push_on_thread(idx, std::forward<F>(f), std::forward<Args>(args)...);
@@ -652,7 +664,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	template <class F, class... Args>
-	auto push_on_owner_thread(F&& f, Args&&... args)
+	decltype(auto) push_on_owner_thread(F&& f, Args&&... args)
 	{
 		const std::size_t idx = get_owner_thread_idx();
 		return push_on_thread(idx, std::forward<F>(f), std::forward<Args>(args)...);
@@ -668,7 +680,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	template <class F, class... Args>
-	auto push_or_execute_on_thread(const std::size_t idx, F&& f, Args&&... args)
+	decltype(auto) push_or_execute_on_thread(const std::size_t idx, F&& f, Args&&... args)
 	{
 		using is_ready_task = nonstd::all_true<!is_future<Args>::value...>;
 		return push_impl(is_ready_task(), idx, true, std::forward<F>(f), std::forward<Args>(args)...);
@@ -684,7 +696,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	template <class F, class... Args>
-	auto push_or_execute_on_worker_thread(F&& f, Args&&... args)
+	decltype(auto) push_or_execute_on_worker_thread(F&& f, Args&&... args)
 	{
 		const std::size_t idx = get_any_worker_thread_idx();
 		return push_or_execute_on_thread(idx, std::forward<F>(f), std::forward<Args>(args)...);
@@ -702,7 +714,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	template <class F, class... Args>
-	auto push_or_execute_on_owner_thread(F&& f, Args&&... args)
+	decltype(auto) push_or_execute_on_owner_thread(F&& f, Args&&... args)
 	{
 		const std::size_t idx = get_owner_thread_idx();
 		return push_or_execute_on_thread(idx, std::forward<F>(f), std::forward<Args>(args)...);
@@ -721,7 +733,8 @@ private:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	template <class F, class... Args>
-	auto push_impl(std::true_type, std::size_t idx, bool execute_if_ready, F&& f, Args&&... args)
+	decltype(auto) push_impl(std::true_type /*unused*/, std::size_t idx, bool execute_if_ready, F&& f,
+							 Args&&... args)
 	{
 		return push_task(
 			make_ready_task(std::allocator_arg_t{}, _alloc, std::forward<F>(f), std::forward<Args>(args)...),
@@ -738,7 +751,8 @@ private:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	template <class F, class... Args>
-	auto push_impl(std::false_type, std::size_t idx, bool execute_if_ready, F&& f, Args&&... args)
+	decltype(auto) push_impl(std::false_type /*unused*/, std::size_t idx, bool execute_if_ready, F&& f,
+							 Args&&... args)
 	{
 		return push_task(make_awaitable_task(std::allocator_arg_t{}, _alloc, std::forward<F>(f),
 											 std::forward<Args>(args)...),
@@ -773,11 +787,9 @@ private:
 
 			return std::move(t.second);
 		}
-		else
-		{
-			_queues[queue_index].push(std::move(t.first));
-			return std::move(t.second);
-		}
+
+		_queues[queue_index].push(std::move(t.first));
+		return std::move(t.second);
 	}
 
 	//-----------------------------------------------------------------------------
@@ -811,7 +823,9 @@ private:
 		}
 
 		if(queue_index == invalid_index)
+		{
 			return false;
+		}
 
 		const auto condition = [&t]() { return !t.is_ready(); };
 
@@ -849,7 +863,7 @@ private:
 	{
 
 	public:
-		task_queue();
+		task_queue() = default;
 		task_queue(task_queue const&) = delete;
 		task_queue(task_queue&& other) noexcept;
 
@@ -884,7 +898,9 @@ template <typename T>
 void task_future<T>::wait() const
 {
 	if(!future.valid())
+	{
 		return;
+	}
 
 	if(!is_ready())
 	{

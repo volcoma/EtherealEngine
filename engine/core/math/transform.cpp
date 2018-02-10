@@ -94,7 +94,7 @@ transform& transform::operator=(const mat4& m)
 //-----------------------------------------------------------------------------
 bool transform::operator==(const transform& t) const
 {
-	return ((_matrix == t._matrix) != 0);
+	return _matrix == t._matrix;
 }
 
 //-----------------------------------------------------------------------------
@@ -105,7 +105,7 @@ bool transform::operator==(const transform& t) const
 //-----------------------------------------------------------------------------
 bool transform::operator!=(const transform& t) const
 {
-	return ((_matrix != t._matrix) != 0);
+	return _matrix != t._matrix;
 }
 
 //-----------------------------------------------------------------------------
@@ -288,9 +288,10 @@ vec3 transform::get_shear() const
 	vec3 scale, shear, translation;
 	quat rotation;
 	if(decompose(scale, shear, rotation, translation))
+	{
 		return shear;
-	else
-		return vec3(0.0f, 0.0f, 0.0f);
+	}
+	return vec3(0.0f, 0.0f, 0.0f);
 }
 
 //-----------------------------------------------------------------------------
@@ -413,9 +414,10 @@ quat transform::get_rotation() const
 	vec3 scale, shear, translation;
 	quat rotation;
 	if(decompose(scale, shear, rotation, translation))
+	{
 		return rotation;
-	else
-		return quat(0.0f, 0.0f, 0.0f, 1.0f);
+	}
+	return quat(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 //-----------------------------------------------------------------------------
@@ -754,7 +756,9 @@ transform& transform::scale(float x, float y, float z)
 {
 	// No - op?
 	if(x == 1.0f && y == 1.0f && z == 1.0f)
+	{
 		return *this;
+	}
 
 	// Apply scale
 	_matrix = glm::scale(_matrix, vec3{x, y, z});
@@ -1093,7 +1097,9 @@ int transform::compare(const transform& t, float tolerance) const
 		{
 			float diff = _matrix[i][j] - t._matrix[i][j];
 			if(glm::abs<float>(diff) > tolerance)
+			{
 				return (diff < 0) ? -1 : 1;
+			}
 		}
 	}
 
@@ -1110,7 +1116,7 @@ int transform::compare(const transform& t, float tolerance) const
 //-----------------------------------------------------------------------------
 int transform::compare(const transform& t) const
 {
-	return _matrix == t._matrix;
+	return static_cast<int>(_matrix == t._matrix);
 }
 
 //-----------------------------------------------------------------------------

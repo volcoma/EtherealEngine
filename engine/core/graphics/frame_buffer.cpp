@@ -85,15 +85,13 @@ usize32_t frame_buffer::get_size() const
 		return _cached_size;
 
 	} // End if Absolute
-	else
-	{
-		std::uint16_t width;
-		std::uint16_t height;
-		gfx::get_size_from_ratio(_bbratio, width, height);
-		usize32_t size = {static_cast<std::uint32_t>(width), static_cast<std::uint32_t>(height)};
-		return size;
 
-	} // End if Relative
+	std::uint16_t width;
+	std::uint16_t height;
+	gfx::get_size_from_ratio(_bbratio, width, height);
+	usize32_t size = {static_cast<std::uint32_t>(width), static_cast<std::uint32_t>(height)};
+	return size;
+	// End if Relative
 }
 
 const fbo_attachment& frame_buffer::get_attachment(std::uint32_t index) const

@@ -141,7 +141,9 @@ public:
 	{
 		auto& storage = get_storage<T>();
 		if(storage.save_to_file)
+		{
 			storage.save_to_file(asset.id(), asset);
+		}
 	}
 
 private:
@@ -167,7 +169,9 @@ private:
 			if(flags == load_flags::reload && future.is_ready())
 			{
 				if(load_func)
+				{
 					load_func(future, key);
+				}
 			}
 			auto future_copy = future;
 
@@ -180,15 +184,15 @@ private:
 
 			return future_copy;
 		}
-		else
-		{
-			auto& future = container[key];
-			// Dispatch the loading
-			if(load_func)
-				load_func(future, key);
 
-			return future;
+		auto& future = container[key];
+		// Dispatch the loading
+		if(load_func)
+		{
+			load_func(future, key);
 		}
+
+		return future;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -202,7 +206,8 @@ private:
 	template <typename T, typename F>
 	core::task_future<asset_handle<T>>&
 	create_asset_from_memory_impl(const std::string& key, const std::uint8_t* data, const std::uint32_t& size,
-								  load_mode mode, load_flags flags, std::recursive_mutex& container_mutex,
+								  load_mode /*mode*/, load_flags /*flags*/,
+								  std::recursive_mutex& container_mutex,
 								  typename asset_storage<T>::request_container_t& container, F&& load_func)
 	{
 
@@ -214,15 +219,15 @@ private:
 			auto& future = it->second;
 			return future;
 		}
-		else
-		{
-			auto& future = container[key];
-			// Dispatch the loading
-			if(load_func)
-				load_func(future, key, data, size);
 
-			return future;
+		auto& future = container[key];
+		// Dispatch the loading
+		if(load_func)
+		{
+			load_func(future, key, data, size);
 		}
+
+		return future;
 	}
 
 	template <typename T, typename F>
@@ -235,7 +240,9 @@ private:
 		auto& future = container[key];
 		// Dispatch the loading
 		if(load_func)
+		{
 			load_func(future, key, entry);
+		}
 
 		return future;
 	}
@@ -251,10 +258,8 @@ private:
 		{
 			return it->second;
 		}
-		else
-		{
-			return {};
-		}
+
+		return {};
 	}
 
 	//-----------------------------------------------------------------------------

@@ -50,7 +50,7 @@ bool isalnum(const std::string& name)
 {
 	for(char c : name)
 	{
-		if(std::isalnum(c) == false)
+		if(std::isalnum(c) == 0)
 		{
 			return false;
 		}
@@ -67,18 +67,20 @@ const std::string& config::get_value(const std::string& section, const std::stri
 									 const std::string& defaultValue)
 {
 	if(!has_value(section, name))
+	{
 		return defaultValue;
+	}
 
 	return get(section, name);
 }
 
 void config::set(const std::string& section, const std::string& name, const std::string& value)
 {
-	if(isalnum(section) == false)
+	if(!isalnum(section))
 	{
 		throw std::invalid_argument("Section is not an identifier.");
 	}
-	if(isalnum(name) == false)
+	if(!isalnum(name))
 	{
 		throw std::invalid_argument("Name is not an identifier.");
 	}

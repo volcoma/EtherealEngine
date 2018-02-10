@@ -75,7 +75,9 @@ bool bbox::is_populated() const
 				   std::numeric_limits<float>::max()) ||
 	   max != vec3(-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max(),
 				   -std::numeric_limits<float>::max()))
+	{
 		return true;
+	}
 
 	// Still at reset state.
 	return false;
@@ -249,13 +251,17 @@ bbox& bbox::from_points(const char* point_buffer, unsigned int point_count, unsi
 {
 	// Reset the box if requested
 	if(reset_bounds)
+	{
 		reset();
+	}
 
 	// Loop through all the points supplied and grow the box.
-	if(point_buffer && point_count)
+	if((point_buffer != nullptr) && (point_count != 0u))
 	{
 		for(unsigned int v = 0; v < point_count; ++v, point_buffer += point_stride)
-			add_point(*(vec3*)point_buffer);
+		{
+			add_point(*reinterpret_cast<const vec3*>(point_buffer));
+		}
 
 	} // End if has data
 	return *this;
@@ -325,21 +331,35 @@ bool bbox::intersect(const bbox& bounds, bool& contained) const
 
 	// Does the point fall outside any of the AABB planes?
 	if(bounds.min.x < min.x || bounds.min.x > max.x)
+	{
 		contained = false;
+	}
 	else if(bounds.min.y < min.y || bounds.min.y > max.y)
+	{
 		contained = false;
+	}
 	else if(bounds.min.z < min.z || bounds.min.z > max.z)
+	{
 		contained = false;
+	}
 	else if(bounds.max.x < min.x || bounds.max.x > max.x)
+	{
 		contained = false;
+	}
 	else if(bounds.max.y < min.y || bounds.max.y > max.y)
+	{
 		contained = false;
+	}
 	else if(bounds.max.z < min.z || bounds.max.z > max.z)
+	{
 		contained = false;
+	}
 
 	// Return immediately if it's fully contained
-	if(contained == true)
+	if(contained)
+	{
 		return true;
+	}
 
 	// Perform full intersection test
 	return (min.x <= bounds.max.x) && (min.y <= bounds.max.y) && (min.z <= bounds.max.z) &&
@@ -365,7 +385,9 @@ bool bbox::intersect(const bbox& bounds, bbox& intersection) const
 	// Test for intersection
 	if(intersection.min.x > intersection.max.x || intersection.min.y > intersection.max.y ||
 	   intersection.min.z > intersection.max.z)
+	{
 		return false;
+	}
 
 	// Intersecting!
 	return true;
@@ -403,7 +425,7 @@ bool bbox::intersect(const vec3& origin, const vec3& velocity, float& t,
 
 	// If ray origin is inside bounding box, just return true (treat AABB as a
 	// solid box)
-	if(contains_point(origin) == true)
+	if(contains_point(origin))
 	{
 		t = 0.0f;
 		return true;
@@ -428,13 +450,21 @@ bool bbox::intersect(const vec3& origin, const vec3& velocity, float& t,
 
 		// Compare and validate
 		if(t1 > tMin)
+		{
 			tMin = t1;
+		}
 		if(t2 < tMax)
+		{
 			tMax = t2;
+		}
 		if(tMin > tMax)
+		{
 			return false;
+		}
 		if(tMax < 0)
+		{
 			return false;
+		}
 
 	} // End if
 	else
@@ -465,13 +495,21 @@ bool bbox::intersect(const vec3& origin, const vec3& velocity, float& t,
 
 		// Compare and validate
 		if(t1 > tMin)
+		{
 			tMin = t1;
+		}
 		if(t2 < tMax)
+		{
 			tMax = t2;
+		}
 		if(tMin > tMax)
+		{
 			return false;
+		}
 		if(tMax < 0)
+		{
 			return false;
+		}
 
 	} // End if
 	else
@@ -480,7 +518,9 @@ bool bbox::intersect(const vec3& origin, const vec3& velocity, float& t,
 		// slab
 		// if ( origin.y < (min.y - origin.y) || origin.y > (max.y - origin.y) )
 		if(origin.y < min.y || origin.y > max.y)
+		{
 			return false;
+		}
 
 	} // End else
 
@@ -502,13 +542,21 @@ bool bbox::intersect(const vec3& origin, const vec3& velocity, float& t,
 
 		// Compare and validate
 		if(t1 > tMin)
+		{
 			tMin = t1;
+		}
 		if(t2 < tMax)
+		{
 			tMax = t2;
+		}
 		if(tMin > tMax)
+		{
 			return false;
+		}
 		if(tMax < 0)
+		{
 			return false;
+		}
 
 	} // End if
 	else
@@ -517,19 +565,27 @@ bool bbox::intersect(const vec3& origin, const vec3& velocity, float& t,
 		// slab
 		// if ( origin.z < (min.z - origin.z) || origin.z > (max.z - origin.z) )
 		if(origin.z < min.z || origin.z > max.z)
+		{
 			return false;
+		}
 
 	} // End else
 
 	// Pick the correct t value
 	if(tMin > 0)
+	{
 		t = tMin;
+	}
 	else
+	{
 		t = tMax;
+	}
 
 	// Outside our valid range? if yes, return no collide
-	if(t < 0.0f || (restrict_range == true && t > 1.0f))
+	if(t < 0.0f || (restrict_range && t > 1.0f))
+	{
 		return false;
+	}
 
 	// We intersected!
 	return true;
@@ -547,7 +603,9 @@ bool bbox::intersect(const vec3& v_tri0, const vec3& v_tri1, const vec3& v_tri2,
 	// between the supplied triangle bounding box and the source box.
 	if(tri_bounds.min.x > max.x || tri_bounds.max.x < min.x || tri_bounds.min.y > max.y ||
 	   tri_bounds.max.y < min.y || tri_bounds.min.z > max.z || tri_bounds.max.z < min.z)
+	{
 		return false;
+	}
 
 	// Move everything such that the box center is located at <0,0,0>
 	// and the entire test becomes relative to it.
@@ -602,11 +660,15 @@ bool bbox::intersect(const vec3& v_tri0, const vec3& v_tri1, const vec3& v_tri2,
 	// If near extreme point is outside, then the AABB is totally outside the
 	// plane
 	if(glm::dot(vNormal, vNearPoint - vCenter) + fPlaneDistance > 0.0f)
+	{
 		return false;
+	}
 
 	// If far extreme point is inside, then the AABB is not intersecting the plane
 	if(glm::dot(vNormal, vFarPoint - vCenter) + fPlaneDistance < 0.0f)
+	{
 		return false;
+	}
 
 	// AXISTEST macro required variables
 	vec3 vAbsEdge;
@@ -689,7 +751,9 @@ bool bbox::intersect(const vec3& v_tri0, const vec3& v_tri1, const vec3& v_tri2)
 	// between the supplied triangle bounding box and the source box.
 	if(tri_bounds.min.x > max.x || tri_bounds.max.x < min.x || tri_bounds.min.y > max.y ||
 	   tri_bounds.max.y < min.y || tri_bounds.min.z > max.z || tri_bounds.max.z < min.z)
+	{
 		return false;
+	}
 
 	// Move everything such that the box center is located at <0,0,0>
 	// and the entire test becomes relative to it.
@@ -744,11 +808,15 @@ bool bbox::intersect(const vec3& v_tri0, const vec3& v_tri1, const vec3& v_tri2)
 	// If near extreme point is outside, then the AABB is totally outside the
 	// plane
 	if(glm::dot(vNormal, vNearPoint - vCenter) + fPlaneDistance > 0.0f)
+	{
 		return false;
+	}
 
 	// If far extreme point is inside, then the AABB is not intersecting the plane
 	if(glm::dot(vNormal, vFarPoint - vCenter) + fPlaneDistance < 0.0f)
+	{
 		return false;
+	}
 
 	// AXISTEST macro required variables
 	vec3 vAbsEdge;
@@ -824,11 +892,17 @@ bool bbox::intersect(const vec3& v_tri0, const vec3& v_tri1, const vec3& v_tri2)
 bool bbox::contains_point(const vec3& point, float tolerance) const
 {
 	if(point.x < min.x - tolerance || point.x > max.x + tolerance)
+	{
 		return false;
+	}
 	if(point.y < min.y - tolerance || point.y > max.y + tolerance)
+	{
 		return false;
+	}
 	if(point.z < min.z - tolerance || point.z > max.z + tolerance)
+	{
 		return false;
+	}
 	return true;
 }
 
@@ -841,11 +915,17 @@ bool bbox::contains_point(const vec3& point, float tolerance) const
 bool bbox::contains_point(const vec3& point) const
 {
 	if(point.x < min.x || point.x > max.x)
+	{
 		return false;
+	}
 	if(point.y < min.y || point.y > max.y)
+	{
 		return false;
+	}
 	if(point.z < min.z || point.z > max.z)
+	{
 		return false;
+	}
 	return true;
 }
 
@@ -859,11 +939,17 @@ bool bbox::contains_point(const vec3& point) const
 bool bbox::contains_point(const vec3& point, const vec3& tolerance) const
 {
 	if(point.x < min.x - tolerance.x || point.x > max.x + tolerance.x)
+	{
 		return false;
+	}
 	if(point.y < min.y - tolerance.y || point.y > max.y + tolerance.y)
+	{
 		return false;
+	}
 	if(point.z < min.z - tolerance.z || point.z > max.z + tolerance.z)
+	{
 		return false;
+	}
 	return true;
 }
 
@@ -880,27 +966,45 @@ vec3 bbox::closest_point(const vec3& test_point) const
 
 	// Test X extent
 	if(test_point.x < min.x)
+	{
 		Closest.x = min.x;
+	}
 	else if(test_point.x > max.x)
+	{
 		Closest.x = max.x;
+	}
 	else
+	{
 		Closest.x = test_point.x;
+	}
 
 	// Test Y extent
 	if(test_point.y < min.y)
+	{
 		Closest.y = min.y;
+	}
 	else if(test_point.y > max.y)
+	{
 		Closest.y = max.y;
+	}
 	else
+	{
 		Closest.y = test_point.y;
+	}
 
 	// Test Z extent
 	if(test_point.z < min.z)
+	{
 		Closest.z = min.z;
+	}
 	else if(test_point.z > max.z)
+	{
 		Closest.z = max.z;
+	}
 	else
+	{
 		Closest.z = test_point.z;
+	}
 
 	// Return the closest test_point
 	return Closest;

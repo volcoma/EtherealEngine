@@ -169,7 +169,8 @@ void console::register_command(const std::string& name, const std::string& descr
  * bindCallback, base case
  */
 inline std::function<void()> console::bind_callback(std::function<void()> callback,
-													const std::vector<std::string>&, int)
+													const std::vector<std::string>& /*unused*/,
+													int /*unused*/)
 {
 	return callback;
 }
@@ -241,10 +242,8 @@ struct console::NameArguments<>
 		{
 			return "]";
 		}
-		else
-		{
-			return "";
-		}
+
+		return "";
 	}
 };
 

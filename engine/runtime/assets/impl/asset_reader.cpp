@@ -27,11 +27,13 @@ namespace asset_reader
 
 template <>
 bool load_from_file<gfx::texture>(core::task_future<asset_handle<gfx::texture>>& output,
-								   const std::string& key)
+								  const std::string& key)
 {
 	asset_handle<gfx::texture> original;
 	if(output.is_ready())
+	{
 		original = output.get();
+	}
 
 	auto& ts = core::get_subsystem<core::task_system>();
 
@@ -48,14 +50,14 @@ bool load_from_file<gfx::texture>(core::task_future<asset_handle<gfx::texture>>&
 		return true;
 	}
 
-    auto cache_key = fs::replace(key, ":/data", ":/cache");
+	auto cache_key = fs::replace(key, ":/data", ":/cache");
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(cache_key).string());
 	auto compiled_absolute_key = absolute_key.string() + ".asset";
 
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-        APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
+		APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
@@ -63,8 +65,9 @@ bool load_from_file<gfx::texture>(core::task_future<asset_handle<gfx::texture>>&
 	auto read_memory = std::make_shared<fs::byte_array_t>();
 	auto read_memory_func = [read_memory, compiled_absolute_key]() {
 		if(!read_memory)
+		{
 			return false;
-
+		}
 		auto stream = std::ifstream{compiled_absolute_key, std::ios::in | std::ios::binary};
 		*read_memory = fs::read_stream(stream);
 
@@ -73,12 +76,20 @@ bool load_from_file<gfx::texture>(core::task_future<asset_handle<gfx::texture>>&
 
 	auto create_resource_func = [ result = original, read_memory, key ](bool read_result) mutable
 	{
+		if(!read_result)
+		{
+			return result;
+		}
 		// if someone destroyed our memory
 		if(!read_memory)
+		{
 			return result;
+		}
 		// if nothing was read
 		if(read_memory->empty())
+		{
 			return result;
+		}
 
 		const gfx::memory_view* mem =
 			gfx::copy(read_memory->data(), static_cast<std::uint32_t>(read_memory->size()));
@@ -102,12 +113,13 @@ bool load_from_file<gfx::texture>(core::task_future<asset_handle<gfx::texture>>&
 }
 
 template <>
-bool load_from_file<gfx::shader>(core::task_future<asset_handle<gfx::shader>>& output,
-								  const std::string& key)
+bool load_from_file<gfx::shader>(core::task_future<asset_handle<gfx::shader>>& output, const std::string& key)
 {
 	asset_handle<gfx::shader> original;
 	if(output.is_ready())
+	{
 		original = output.get();
+	}
 
 	auto& ts = core::get_subsystem<core::task_system>();
 
@@ -123,10 +135,10 @@ bool load_from_file<gfx::shader>(core::task_future<asset_handle<gfx::shader>>& o
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
-    
+
 	auto cache_key = fs::replace(key, ":/data", ":/cache");
-    
-    fs::path absolute_key = fs::absolute(fs::resolve_protocol(cache_key).string());
+
+	fs::path absolute_key = fs::absolute(fs::resolve_protocol(cache_key).string());
 	const auto& renderer_extension = gfx::get_renderer_filename_extension();
 	auto compiled_absolute_key = absolute_key.string() + renderer_extension + ".asset";
 
@@ -142,8 +154,9 @@ bool load_from_file<gfx::shader>(core::task_future<asset_handle<gfx::shader>>& o
 
 	auto read_memory_func = [read_memory, compiled_absolute_key]() {
 		if(!read_memory)
+		{
 			return false;
-
+		}
 		auto stream = std::ifstream{compiled_absolute_key, std::ios::in | std::ios::binary};
 		*read_memory = fs::read_stream(stream);
 
@@ -152,12 +165,20 @@ bool load_from_file<gfx::shader>(core::task_future<asset_handle<gfx::shader>>& o
 
 	auto create_resource_func = [ result = original, read_memory, key ](bool read_result) mutable
 	{
+		if(!read_result)
+		{
+			return result;
+		}
 		// if someone destroyed our memory
 		if(!read_memory)
+		{
 			return result;
+		}
 		// if nothing was read
 		if(read_memory->empty())
+		{
 			return result;
+		}
 
 		const gfx::memory_view* mem =
 			gfx::copy(read_memory->data(), static_cast<std::uint32_t>(read_memory->size()));
@@ -183,7 +204,9 @@ bool load_from_file<mesh>(core::task_future<asset_handle<mesh>>& output, const s
 {
 	asset_handle<mesh> original;
 	if(output.is_ready())
+	{
 		original = output.get();
+	}
 
 	auto& ts = core::get_subsystem<core::task_system>();
 
@@ -200,7 +223,7 @@ bool load_from_file<mesh>(core::task_future<asset_handle<mesh>>& output, const s
 		return true;
 	}
 
-    auto cache_key = fs::replace(key, ":/data", ":/cache");
+	auto cache_key = fs::replace(key, ":/data", ":/cache");
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(cache_key).string());
 
 	auto compiled_absolute_key = absolute_key.string() + ".asset";
@@ -208,7 +231,7 @@ bool load_from_file<mesh>(core::task_future<asset_handle<mesh>>& output, const s
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-        APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
+		APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
@@ -270,11 +293,13 @@ bool load_from_file<mesh>(core::task_future<asset_handle<mesh>>& output, const s
 
 template <>
 bool load_from_file<audio::sound>(core::task_future<asset_handle<audio::sound>>& output,
-								   const std::string& key)
+								  const std::string& key)
 {
 	asset_handle<audio::sound> original;
 	if(output.is_ready())
+	{
 		original = output.get();
+	}
 
 	auto& ts = core::get_subsystem<core::task_system>();
 
@@ -291,7 +316,7 @@ bool load_from_file<audio::sound>(core::task_future<asset_handle<audio::sound>>&
 		return true;
 	}
 
-    auto cache_key = fs::replace(key, ":/data", ":/cache");
+	auto cache_key = fs::replace(key, ":/data", ":/cache");
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(cache_key).string());
 
 	auto compiled_absolute_key = absolute_key.string() + ".asset";
@@ -299,7 +324,7 @@ bool load_from_file<audio::sound>(core::task_future<asset_handle<audio::sound>>&
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-        APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
+		APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
@@ -348,11 +373,13 @@ bool load_from_file<audio::sound>(core::task_future<asset_handle<audio::sound>>&
 
 template <>
 bool load_from_file<runtime::animation>(core::task_future<asset_handle<runtime::animation>>& output,
-										 const std::string& key)
+										const std::string& key)
 {
 	asset_handle<runtime::animation> original;
 	if(output.is_ready())
+	{
 		original = output.get();
+	}
 
 	auto& ts = core::get_subsystem<core::task_system>();
 
@@ -369,7 +396,7 @@ bool load_from_file<runtime::animation>(core::task_future<asset_handle<runtime::
 		return true;
 	}
 
-    auto cache_key = fs::replace(key, ":/data", ":/cache");
+	auto cache_key = fs::replace(key, ":/data", ":/cache");
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(cache_key).string());
 
 	auto compiled_absolute_key = absolute_key.string() + ".asset";
@@ -377,7 +404,7 @@ bool load_from_file<runtime::animation>(core::task_future<asset_handle<runtime::
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-        APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
+		APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
@@ -389,7 +416,7 @@ bool load_from_file<runtime::animation>(core::task_future<asset_handle<runtime::
 
 	auto wrapper = std::make_shared<wrapper_t>();
 	auto read_memory_func = [wrapper, compiled_absolute_key]() mutable {
-		auto& data = *wrapper->anim.get();
+		auto& data = *wrapper->anim;
 		{
 			std::ifstream stream{compiled_absolute_key, std::ios::in | std::ios::binary};
 
@@ -430,7 +457,9 @@ bool load_from_file<material>(core::task_future<asset_handle<material>>& output,
 {
 	asset_handle<material> original;
 	if(output.is_ready())
+	{
 		original = output.get();
+	}
 
 	auto& ts = core::get_subsystem<core::task_system>();
 
@@ -447,7 +476,7 @@ bool load_from_file<material>(core::task_future<asset_handle<material>>& output,
 		return true;
 	}
 
-    auto cache_key = fs::replace(key, ":/data", ":/cache");
+	auto cache_key = fs::replace(key, ":/data", ":/cache");
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(cache_key).string());
 
 	auto compiled_absolute_key = absolute_key.string() + ".asset";
@@ -455,7 +484,7 @@ bool load_from_file<material>(core::task_future<asset_handle<material>>& output,
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-        APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
+		APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
@@ -483,9 +512,12 @@ bool load_from_file<material>(core::task_future<asset_handle<material>>& output,
 
 	auto create_resource_func = [ result = original, wrapper, key ](bool read_result) mutable
 	{
-		result.link->id = key;
-		result.link->asset = wrapper->material;
-		wrapper.reset();
+		if(read_result)
+		{
+			result.link->id = key;
+			result.link->asset = wrapper->material;
+			wrapper.reset();
+		}
 
 		return result;
 	};
@@ -500,7 +532,9 @@ bool load_from_file<prefab>(core::task_future<asset_handle<prefab>>& output, con
 {
 	asset_handle<prefab> original;
 	if(output.is_ready())
+	{
 		original = output.get();
+	}
 
 	auto& ts = core::get_subsystem<core::task_system>();
 
@@ -517,7 +551,7 @@ bool load_from_file<prefab>(core::task_future<asset_handle<prefab>>& output, con
 		return true;
 	}
 
-    auto cache_key = fs::replace(key, ":/data", ":/cache");
+	auto cache_key = fs::replace(key, ":/data", ":/cache");
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(cache_key).string());
 
 	auto compiled_absolute_key = absolute_key.string() + ".asset";
@@ -525,7 +559,7 @@ bool load_from_file<prefab>(core::task_future<asset_handle<prefab>>& output, con
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-        APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
+		APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
@@ -534,7 +568,9 @@ bool load_from_file<prefab>(core::task_future<asset_handle<prefab>>& output, con
 
 	auto read_memory_func = [read_memory, compiled_absolute_key]() {
 		if(!read_memory)
+		{
 			return false;
+		}
 
 		auto stream =
 			std::fstream{compiled_absolute_key, std::fstream::in | std::fstream::out | std::ios::binary};
@@ -568,7 +604,9 @@ bool load_from_file<scene>(core::task_future<asset_handle<scene>>& output, const
 {
 	asset_handle<scene> original;
 	if(output.is_ready())
+	{
 		original = output.get();
+	}
 
 	auto& ts = core::get_subsystem<core::task_system>();
 
@@ -585,7 +623,7 @@ bool load_from_file<scene>(core::task_future<asset_handle<scene>>& output, const
 		return true;
 	}
 
-    auto cache_key = fs::replace(key, ":/data", ":/cache");
+	auto cache_key = fs::replace(key, ":/data", ":/cache");
 	fs::path absolute_key = fs::absolute(fs::resolve_protocol(cache_key).string());
 
 	auto compiled_absolute_key = absolute_key.string() + ".asset";
@@ -593,7 +631,7 @@ bool load_from_file<scene>(core::task_future<asset_handle<scene>>& output, const
 	fs::error_code err;
 	if(!fs::exists(compiled_absolute_key, err))
 	{
-        APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
+		APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
 		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
 		return true;
 	}
@@ -602,7 +640,9 @@ bool load_from_file<scene>(core::task_future<asset_handle<scene>>& output, const
 
 	auto read_memory_func = [read_memory, compiled_absolute_key]() {
 		if(!read_memory)
+		{
 			return false;
+		}
 
 		auto stream =
 			std::fstream{compiled_absolute_key, std::fstream::in | std::fstream::out | std::ios::binary};

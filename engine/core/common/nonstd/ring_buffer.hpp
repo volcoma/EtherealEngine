@@ -29,8 +29,7 @@ struct policy_std_vector
 
 	static buffer_t create_with_size(size_type n)
 	{
-		buffer_t buf(n);
-		return buf;
+		return buffer_t(n);
 	}
 };
 

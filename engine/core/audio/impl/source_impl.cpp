@@ -33,8 +33,10 @@ source_impl& source_impl::operator=(source_impl&& rhs)
 
 bool source_impl::create()
 {
-	if(_handle)
+	if(_handle != 0u)
+	{
 		return true;
+	}
 
 	al_check(alGenSources(1, &_handle));
 
@@ -87,8 +89,10 @@ void source_impl::unbind()
 
 void source_impl::purge()
 {
-	if(!_handle)
+	if(_handle == 0u)
+	{
 		return;
+	}
 
 	unbind();
 
@@ -115,7 +119,9 @@ float source_impl::get_playing_duration() const
 	al_check(alGetSourcei(_handle, AL_BUFFER, &buffer));
 
 	if(buffer == 0)
+	{
 		return 0.0f;
+	}
 
 	ALint size_in_bytes = 0;
 	ALint channels = 1;
@@ -246,7 +252,9 @@ void source_impl::bind_sound(sound_impl* sound)
 	std::lock_guard<std::mutex> lock(_mutex);
 
 	if(_bound_sound == sound)
+	{
 		return;
+	}
 
 	_bound_sound = sound;
 	_bound_sound->bind_to_source(this);
@@ -256,7 +264,7 @@ void source_impl::unbind_sound()
 {
 	std::lock_guard<std::mutex> lock(_mutex);
 
-	if(_bound_sound)
+	if(_bound_sound != nullptr)
 	{
 		_bound_sound->unbind_from_source(this);
 		_bound_sound = nullptr;

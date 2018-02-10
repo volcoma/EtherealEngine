@@ -65,7 +65,9 @@ static ALenum get_format_for_channels(std::uint32_t channels, std::uint32_t byte
 sound_impl::sound_impl(std::vector<std::uint8_t>&& buffer, const sound_info& info)
 {
 	if(buffer.empty())
+	{
 		return;
+	}
 
 	ALenum format = detail::get_format_for_channels(info.channels, info.bytes_per_sample);
 
@@ -95,7 +97,7 @@ sound_impl::~sound_impl()
 {
 	unbind_from_all_sources();
 
-	if(_handle)
+	if(_handle != 0u)
 	{
 		al_check(alDeleteBuffers(1, &_handle));
 	}
@@ -130,7 +132,7 @@ void sound_impl::unbind_from_all_sources()
 	std::lock_guard<std::mutex> lock(_mutex);
 	for(auto& source : _bound_to_sources)
 	{
-		if(source)
+		if(source != nullptr)
 		{
 			source->unbind();
 		}

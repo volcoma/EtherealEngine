@@ -23,7 +23,9 @@ void set_error_logger(std::function<void(const std::string& log_msg)> logger)
 void log(const std::string& category, const std::string& log_msg)
 {
 	if(s_loggers[category])
+	{
 		s_loggers[category](log_msg);
+	}
 }
 
 struct gfx_callback : public bgfx::CallbackI
@@ -97,7 +99,9 @@ void set_platform_data(const platform_data& _data)
 void shutdown()
 {
 	if(s_initted)
+	{
 		bgfx::shutdown();
+	}
 }
 
 bool init(renderer_type _type, std::uint16_t _vendorId, std::uint16_t _deviceId)
@@ -1006,5 +1010,12 @@ float get_half_texel()
 	const renderer_type renderer = bgfx::getRendererType();
 	float half_texel = renderer_type::Direct3D9 == renderer ? 0.5f : 0.0f;
 	return half_texel;
+}
+
+bool is_supported(uint64_t flag)
+{
+	const auto caps = gfx::get_caps();
+	bool supported = 0 != (caps->supported & flag);
+	return supported;
 }
 }

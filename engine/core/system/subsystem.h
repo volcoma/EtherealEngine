@@ -10,6 +10,72 @@
 
 namespace core
 {
+// retrieve the registered system instance, existence should be guaranteed
+template <typename S>
+S& get_subsystem();
+
+// spawn a new subsystem with type S and construct arguments
+template <typename S, typename... Args>
+S& add_subsystem(Args&&... args);
+
+// release and unregistered a subsystem from our context
+template <typename S>
+void remove_subsystem();
+
+// check if we have specified subsystems
+template <typename... Args>
+bool has_subsystems();
+
+struct subsystem_context;
+namespace details
+{
+enum class internal_status : uint8_t
+{
+	idle,
+	running,
+	disposed
+};
+
+//-----------------------------------------------------------------------------
+//  Name : initialize ()
+/// <summary>
+///
+///
+///
+/// </summary>
+//-----------------------------------------------------------------------------
+bool initialize();
+
+//-----------------------------------------------------------------------------
+//  Name : status ()
+/// <summary>
+///
+///
+///
+/// </summary>
+//-----------------------------------------------------------------------------
+internal_status& status();
+
+//-----------------------------------------------------------------------------
+//  Name : dispose ()
+/// <summary>
+///
+///
+///
+/// </summary>
+//-----------------------------------------------------------------------------
+void dispose();
+
+//-----------------------------------------------------------------------------
+//  Name : context ()
+/// <summary>
+///
+///
+///
+/// </summary>
+//-----------------------------------------------------------------------------
+subsystem_context& context();
+}
 
 struct subsystem_context
 {
@@ -40,7 +106,7 @@ struct subsystem_context
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	template <typename S, typename... Args>
-	S& add_subsystem(Args&&...);
+	S& add_subsystem(Args&&... args);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_subsystem ()
@@ -136,73 +202,6 @@ bool subsystem_context::has_subsystems() const
 	return has_subsystems<S1>() && has_subsystems<S2, Args...>();
 }
 
-// retrieve the registered system instance, existence should be guaranteed
-template <typename S>
-S& get_subsystem();
-
-// spawn a new subsystem with type S and construct arguments
-template <typename S, typename... Args>
-S& add_subsystem(Args&&... args);
-
-// release and unregistered a subsystem from our context
-template <typename S>
-void remove_subsystem();
-
-// check if we have specified subsystems
-template <typename... Args>
-bool has_subsystems();
-
-struct subsystem_context;
-namespace details
-{
-enum class internal_status : uint8_t
-{
-	idle,
-	running,
-	disposed
-};
-
-//-----------------------------------------------------------------------------
-//  Name : initialize ()
-/// <summary>
-///
-///
-///
-/// </summary>
-//-----------------------------------------------------------------------------
-bool initialize();
-
-//-----------------------------------------------------------------------------
-//  Name : status ()
-/// <summary>
-///
-///
-///
-/// </summary>
-//-----------------------------------------------------------------------------
-internal_status& status();
-
-//-----------------------------------------------------------------------------
-//  Name : dispose ()
-/// <summary>
-///
-///
-///
-/// </summary>
-//-----------------------------------------------------------------------------
-void dispose();
-
-//-----------------------------------------------------------------------------
-//  Name : context ()
-/// <summary>
-///
-///
-///
-/// </summary>
-//-----------------------------------------------------------------------------
-subsystem_context& context();
-}
-
 template <typename S>
 S& get_subsystem()
 {
@@ -221,7 +220,9 @@ template <typename S>
 void remove_subsystem()
 {
 	if(details::status() == details::internal_status::running)
+	{
 		details::context().remove_subsystem<S>();
+	}
 }
 
 template <typename... Args>

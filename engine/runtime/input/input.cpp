@@ -20,7 +20,7 @@ input::~input()
 	on_frame_end.disconnect(this, &input::reset_state);
 }
 
-void input::reset_state(delta_t)
+void input::reset_state(delta_t /*unused*/)
 {
 	key_reset();
 
@@ -34,13 +34,19 @@ void input::handle_event(const mml::platform_event& event)
 	_action_mapper.handle_event(event);
 
 	if(key_event(event))
+	{
 		return;
+	}
 
 	if(mouse_event(event))
+	{
 		return;
+	}
 
 	if(joystick_event(event))
+	{
 		return;
+	}
 }
 
 bool input::is_key_pressed(mml::keyboard::key key)
@@ -122,7 +128,9 @@ void input::key_reset()
 	for(auto& it : _keys_released)
 	{
 		if(it.second)
+		{
 			it.second = false;
+		}
 	}
 }
 
@@ -134,7 +142,7 @@ bool input::key_event(const mml::platform_event& event)
 		_keys_released[event.key.code] = false;
 		return true;
 	}
-	else if(event.type == mml::platform_event::key_released)
+	if(event.type == mml::platform_event::key_released)
 	{
 		_keys_pressed[event.key.code] = false;
 		_keys_down[event.key.code] = false;
@@ -160,7 +168,9 @@ void input::mouse_reset()
 	for(auto& it : _mouse_buttons_released)
 	{
 		if(it.second)
+		{
 			it.second = false;
+		}
 	}
 
 	if(mouse_wheel_scrolled)
@@ -178,14 +188,14 @@ bool input::mouse_event(const mml::platform_event& event)
 		_mouse_buttons_released[event.mouse_button.button] = false;
 		return true;
 	}
-	else if(event.type == mml::platform_event::mouse_button_released)
+	if(event.type == mml::platform_event::mouse_button_released)
 	{
 		_mouse_buttons_pressed[event.mouse_button.button] = false;
 		_mouse_buttons_down[event.mouse_button.button] = false;
 		_mouse_buttons_released[event.mouse_button.button] = true;
 		return true;
 	}
-	else if(event.type == mml::platform_event::mouse_moved)
+	if(event.type == mml::platform_event::mouse_moved)
 	{
 		_last_cursor_position = _current_cursor_position;
 		ipoint32_t mouse;
@@ -195,7 +205,7 @@ bool input::mouse_event(const mml::platform_event& event)
 		_mouse_move_event = true;
 		return true;
 	}
-	else if(event.type == mml::platform_event::mouse_wheel_scrolled)
+	if(event.type == mml::platform_event::mouse_wheel_scrolled)
 	{
 		mouse_wheel_scrolled = true;
 		_mouse_scroll_delta = static_cast<float>(event.mouse_wheel_scroll.delta);
@@ -218,7 +228,9 @@ void input::joystick_reset()
 	for(auto& it : _joystick_buttons_released)
 	{
 		if(it.second)
+		{
 			it.second = false;
+		}
 	}
 
 	for(auto& it : _joysticks_connected)
@@ -233,7 +245,9 @@ void input::joystick_reset()
 	for(auto& it : _joysticks_disconnected)
 	{
 		if(it.second)
+		{
 			it.second = false;
+		}
 	}
 }
 
@@ -246,14 +260,14 @@ bool input::joystick_event(const mml::platform_event& event)
 		_joysticks_disconnected[event.joystick_connect.joystick_id] = false;
 		return true;
 	}
-	else if(event.type == mml::platform_event::joystick_disconnected)
+	if(event.type == mml::platform_event::joystick_disconnected)
 	{
 		_joysticks_connected[event.joystick_connect.joystick_id] = false;
 		_joysticks_active[event.joystick_connect.joystick_id] = false;
 		_joysticks_disconnected[event.joystick_connect.joystick_id] = true;
 		return true;
 	}
-	else if(event.type == mml::platform_event::joystick_button_pressed)
+	if(event.type == mml::platform_event::joystick_button_pressed)
 	{
 		std::pair<unsigned int, unsigned int> k(event.joystick_button.joystick_id,
 												event.joystick_button.button);
@@ -261,7 +275,7 @@ bool input::joystick_event(const mml::platform_event& event)
 		_joystick_buttons_released[k] = false;
 		return true;
 	}
-	else if(event.type == mml::platform_event::joystick_button_released)
+	if(event.type == mml::platform_event::joystick_button_released)
 	{
 		std::pair<unsigned int, unsigned int> k(event.joystick_button.joystick_id,
 												event.joystick_button.button);
@@ -270,7 +284,7 @@ bool input::joystick_event(const mml::platform_event& event)
 		_joystick_buttons_released[k] = true;
 		return true;
 	}
-	else if(event.type == mml::platform_event::joystick_moved)
+	if(event.type == mml::platform_event::joystick_moved)
 	{
 		std::pair<unsigned int, unsigned int> k(event.joystick_move.joystick_id, event.joystick_move.axis);
 		_joystick_axis_positions[k] = event.joystick_move.position;

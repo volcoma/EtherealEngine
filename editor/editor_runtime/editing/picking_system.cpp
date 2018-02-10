@@ -115,8 +115,7 @@ void picking_system::frame_render(delta_t dt)
 	// Whatever mesh has the most pixels in the ID buffer is the one the user clicked on.
 	if(!_reading && _start_readback)
 	{
-		const auto caps = gfx::get_caps();
-		bool blit_support = 0 != (caps->supported & BGFX_CAPS_TEXTURE_BLIT);
+		bool blit_support = gfx::is_supported(BGFX_CAPS_TEXTURE_BLIT);
 
 		if(blit_support == false)
 		{
@@ -180,9 +179,9 @@ void picking_system::frame_render(delta_t dt)
 					if(ecs.valid_index(id_key))
 					{
 						auto eid = ecs.create_id(id_key);
-						auto pickedEntity = ecs.get(eid);
-						if(pickedEntity)
-							es.select(pickedEntity);
+						auto picked_entity = ecs.get(eid);
+						if(picked_entity)
+							es.select(picked_entity);
 					}
 					break;
 				}

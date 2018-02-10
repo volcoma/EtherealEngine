@@ -21,7 +21,7 @@ public:
 	// Constructors & Destructors
 	//---------------------------------------------------------------------
 	StrICmp(const char* lpszLang)
-		: mLocale(lpszLang)
+		: locale_(lpszLang)
 	{
 	}
 
@@ -39,7 +39,7 @@ public:
 		// Constructors & Destructors
 		//-----------------------------------------------------------------
 		CharLessI(std::locale& Locale)
-			: mLocale(Locale)
+			: locale_(Locale)
 		{
 		}
 
@@ -49,7 +49,7 @@ public:
 		template <typename T>
 		bool operator()(T c1, T c2)
 		{
-			return std::tolower(c1, mLocale) < std::tolower(c2, mLocale);
+			return std::tolower(c1, locale_) < std::tolower(c2, locale_);
 
 		} // End Operator
 
@@ -57,7 +57,7 @@ public:
 		//-----------------------------------------------------------------
 		// Private Member Variables
 		//-----------------------------------------------------------------
-		std::locale& mLocale;
+		std::locale& locale_;
 	};
 
 	//---------------------------------------------------------------------
@@ -65,10 +65,14 @@ public:
 	//---------------------------------------------------------------------
 	int operator()(const std::string& s1, const std::string& s2)
 	{
-		if(std::lexicographical_compare(s1.begin(), s1.end(), s2.begin(), s2.end(), CharLessI(mLocale)))
+		if(std::lexicographical_compare(s1.begin(), s1.end(), s2.begin(), s2.end(), CharLessI(locale_)))
+		{
 			return -1;
-		if(std::lexicographical_compare(s2.begin(), s2.end(), s1.begin(), s1.end(), CharLessI(mLocale)))
+		}
+		if(std::lexicographical_compare(s2.begin(), s2.end(), s1.begin(), s1.end(), CharLessI(locale_)))
+		{
 			return 1;
+		}
 		return 0;
 
 	} // End Operator
@@ -77,7 +81,7 @@ private:
 	//---------------------------------------------------------------------
 	// Private Member Variables
 	//---------------------------------------------------------------------
-	std::locale mLocale;
+	std::locale locale_;
 };
 //-------------------------------------------------------------------------
 //  Name : compare ()
@@ -167,7 +171,9 @@ std::string format(const char* format, Args&&... args)
 {
 	auto length = std::snprintf(nullptr, 0, format, std::forward<Args>(args)...);
 	if(length == 0)
+	{
 		return std::string();
+	}
 
 	char* buf = new char[length + 1];
 	length = std::snprintf(buf, length + 1, format, std::forward<Args>(args)...);

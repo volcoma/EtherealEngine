@@ -6,7 +6,7 @@
 
 namespace gfx
 {
-program::program(std::shared_ptr<shader> compute_shader)
+program::program(const std::shared_ptr<shader>& compute_shader)
 {
 	if(compute_shader)
 	{
@@ -19,7 +19,7 @@ program::program(std::shared_ptr<shader> compute_shader)
 	}
 }
 
-program::program(std::shared_ptr<shader> vertex_shader, std::shared_ptr<shader> fragment_shader)
+program::program(const std::shared_ptr<shader>& vertex_shader, const std::shared_ptr<shader>& fragment_shader)
 {
 	if(vertex_shader && fragment_shader)
 	{
@@ -41,8 +41,10 @@ void program::set_texture(std::uint8_t _stage, const std::string& _sampler, gfx:
 						  uint8_t _attachment /*= 0 */,
 						  std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
-	if(!frameBuffer)
+	if(frameBuffer == nullptr)
+	{
 		return;
+	}
 
 	gfx::set_texture(_stage, get_uniform(_sampler, true)->native_handle(),
 					 frameBuffer->get_texture(_attachment)->native_handle(), _flags);
@@ -51,8 +53,10 @@ void program::set_texture(std::uint8_t _stage, const std::string& _sampler, gfx:
 void program::set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::texture* _texture,
 						  std::uint32_t _flags /*= std::numeric_limits<std::uint32_t>::max()*/)
 {
-	if(!_texture)
+	if(_texture == nullptr)
+	{
 		return;
+	}
 
 	gfx::set_texture(_stage, get_uniform(_sampler, true)->native_handle(), _texture->native_handle(), _flags);
 }
@@ -62,7 +66,9 @@ void program::set_uniform(const std::string& _name, const void* _value, uint16_t
 	auto uniform = get_uniform(_name);
 
 	if(uniform)
+	{
 		gfx::set_uniform(uniform->native_handle(), _value, _num);
+	}
 }
 
 std::shared_ptr<gfx::uniform> program::get_uniform(const std::string& _name, bool texture)

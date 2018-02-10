@@ -33,7 +33,7 @@ struct program : public handle_impl<program_handle>
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	program(std::shared_ptr<shader> compute_shader);
+	program(const std::shared_ptr<shader>& compute_shader);
 
 	//-----------------------------------------------------------------------------
 	//  Name : program ()
@@ -43,7 +43,7 @@ struct program : public handle_impl<program_handle>
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	program(std::shared_ptr<shader> vertex_shader, std::shared_ptr<shader> fragment_shader);
+	program(const std::shared_ptr<shader>& vertex_shader, const std::shared_ptr<shader>& fragment_shader);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_texture ()

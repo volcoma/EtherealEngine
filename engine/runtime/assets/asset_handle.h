@@ -86,7 +86,9 @@ struct asset_handle
 	{
 		// Own the specified handle's data pointer
 		if(data != link->asset)
+		{
 			link->asset = data;
+		}
 
 		return *this;
 	}

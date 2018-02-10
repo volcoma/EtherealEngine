@@ -16,13 +16,17 @@ bool operator==(const fbo_key& key1, const fbo_key& key2)
 {
 	bool result = key1.id == key2.id && key1.textures.size() == key2.textures.size();
 	if(!result)
+	{
 		return false;
+	}
 
 	std::size_t tex_count = key1.textures.size();
 	for(std::size_t i = 0; i < tex_count; ++i)
 	{
 		if(key1.textures[i] != key2.textures[i])
+		{
 			return false;
+		}
 	}
 
 	// Identical

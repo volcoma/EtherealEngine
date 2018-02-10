@@ -15,11 +15,6 @@ void task_system::task_queue::sort()
 	}
 }
 
-task_system::task_queue::task_queue()
-	: _tasks{}
-{
-}
-
 task_system::task_queue::task_queue(task_system::task_queue&& other) noexcept
 	: _tasks(std::move(other)._tasks)
 	, _done(other._done.load())
@@ -51,7 +46,7 @@ std::pair<bool, task> task_system::task_queue::try_pop()
 	{
 		return std::make_pair(false, task{});
 	}
-	else if(_tasks.front().ready())
+	if(_tasks.front().ready())
 	{
 		auto t = std::move(_tasks.front());
 		_tasks.pop_front();
@@ -67,7 +62,9 @@ bool task_system::task_queue::try_push(task& t)
 	{
 		std::unique_lock<std::mutex> lock(_mutex, std::try_to_lock);
 		if(!lock)
+		{
 			return false;
+		}
 
 		_tasks.emplace_back(std::move(t));
 	}
@@ -94,7 +91,9 @@ std::pair<bool, task> task_system::task_queue::pop(duration_t pop_timeout)
 	}
 
 	if(_tasks.empty())
+	{
 		return std::make_pair(false, task{});
+	}
 
 	if(_tasks.front().ready())
 	{
@@ -102,10 +101,8 @@ std::pair<bool, task> task_system::task_queue::pop(duration_t pop_timeout)
 		_tasks.pop_front();
 		return std::make_pair(true, std::move(t));
 	}
-	else
-	{
-		sort();
-	}
+
+	sort();
 
 	// try after sort
 	if(_tasks.front().ready())
@@ -140,7 +137,9 @@ void task_system::run(std::size_t idx, const std::function<bool()>& condition, d
 		bool is_done = _queues[queue_index].is_done();
 		bool is_empty = _queues[queue_index].get_pending_tasks() == 0;
 		if(is_done && is_empty)
+		{
 			return;
+		}
 
 		std::pair<bool, task> p = {false, task()};
 
@@ -163,10 +162,14 @@ void task_system::run(std::size_t idx, const std::function<bool()>& condition, d
 		}
 
 		if(!p.first)
+		{
 			p = _queues[queue_index].pop(pop_timeout);
+		}
 
 		if(p.first)
+		{
 			p.second();
+		}
 	}
 }
 
@@ -174,12 +177,16 @@ std::size_t task_system::get_thread_queue_idx(std::size_t idx, std::size_t seed)
 {
 	// if owner thread then just return
 	if(idx == get_owner_thread_idx())
+	{
 		return get_owner_thread_idx();
+	}
 
 	auto queue_index = ((idx + seed) % _threads_count);
 
 	if(queue_index == get_owner_thread_idx())
+	{
 		queue_index++;
+	}
 
 	return queue_index;
 }
@@ -223,12 +230,16 @@ task_system::task_system(std::size_t nthreads, const task_system::allocator_t& a
 task_system::~task_system()
 {
 	for(auto& q : _queues)
+	{
 		q.set_done();
+	}
 
 	for(auto& th : _threads)
 	{
 		if(th.joinable())
+		{
 			th.join();
+		}
 	}
 }
 
@@ -244,10 +255,14 @@ void task_system::run_on_owner_thread(duration_t max_duration)
 	{
 		auto p = _queues[queue_index].pop(0ms);
 		if(!p.first)
+		{
 			return;
+		}
 
 		if(p.first)
+		{
 			p.second();
+		}
 
 		now = std::chrono::steady_clock::now();
 	}

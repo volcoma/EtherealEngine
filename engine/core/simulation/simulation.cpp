@@ -9,7 +9,9 @@ using namespace std::literals;
 simulation::simulation()
 {
 	if(_max_inactive_fps == 0)
+	{
 		_max_inactive_fps = std::max(_max_inactive_fps, _max_fps);
+	}
 }
 
 void simulation::run_one_frame(bool is_active)
@@ -17,7 +19,9 @@ void simulation::run_one_frame(bool is_active)
 	// perform waiting loop if maximum fps set
 	auto max_fps = _max_fps;
 	if(!is_active && max_fps > 0)
+	{
 		max_fps = std::min(_max_inactive_fps, max_fps);
+	}
 
 	duration_t elapsed = clock_t::now() - _last_frame_timepoint;
 	if(max_fps > 0)
@@ -28,7 +32,9 @@ void simulation::run_one_frame(bool is_active)
 		{
 			elapsed = clock_t::now() - _last_frame_timepoint;
 			if(elapsed >= target_duration)
+			{
 				break;
+			}
 
 			if(elapsed < duration_t(0))
 			{
@@ -60,7 +66,9 @@ void simulation::run_one_frame(bool is_active)
 	{
 		duration_t target_duration = 1000ms / _min_fps;
 		if(elapsed > target_duration)
+		{
 			elapsed = target_duration;
+		}
 	}
 
 	// perform time step smoothing
@@ -73,11 +81,15 @@ void simulation::run_one_frame(bool is_active)
 			auto begin = _previous_timesteps.begin();
 			_previous_timesteps.erase(begin, begin + int(_previous_timesteps.size() - _smoothing_step));
 			for(auto step : _previous_timesteps)
+			{
 				_timestep += step;
+			}
 			_timestep /= static_cast<duration_t::rep>(_previous_timesteps.size());
 		}
 		else
+		{
 			_timestep = _previous_timesteps.back();
+		}
 	}
 	else
 	{

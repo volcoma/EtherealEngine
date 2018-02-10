@@ -72,8 +72,8 @@ private:
 		explicit cmd_base(const std::string& name, const std::string& alternative,
 						  const std::string& description, bool required, bool dominant, bool is_variadic)
 			: name(name)
-			, command(name.size() > 0 ? "-" + name : "")
-			, alternative(alternative.size() > 0 ? "--" + alternative : "")
+			, command(!name.empty() ? "-" + name : "")
+			, alternative(!alternative.empty() ? "--" + alternative : "")
 			, description(description)
 			, required(required)
 			, handled(false)
@@ -170,7 +170,7 @@ private:
 		{
 		}
 
-		virtual bool parse(std::ostream&, std::ostream&)
+		virtual bool parse(std::ostream& /*output*/, std::ostream& /*error*/)
 		{
 			try
 			{
@@ -191,82 +191,100 @@ private:
 		T value;
 	};
 
-	static int parse(const std::vector<std::string>& elements, const int&, int numberBase = 0)
+	static int parse(const std::vector<std::string>& elements, const int& /*unused*/, int numberBase = 0)
 	{
 		if(elements.size() != 1)
+		{
 			throw std::bad_cast();
+		}
 
-		return std::stoi(elements[0], 0, numberBase);
+		return std::stoi(elements[0], nullptr, numberBase);
 	}
 
 	static bool parse(const std::vector<std::string>& elements, const bool& defval)
 	{
-		if(elements.size() != 0)
+		if(!elements.empty())
+		{
 			throw std::runtime_error("A boolean command line parameter cannot have any arguments.");
+		}
 
 		return !defval;
 	}
 
-	static double parse(const std::vector<std::string>& elements, const double&)
+	static double parse(const std::vector<std::string>& elements, const double& /*unused*/)
 	{
 		if(elements.size() != 1)
+		{
 			throw std::bad_cast();
+		}
 
 		return std::stod(elements[0]);
 	}
 
-	static float parse(const std::vector<std::string>& elements, const float&)
+	static float parse(const std::vector<std::string>& elements, const float& /*unused*/)
 	{
 		if(elements.size() != 1)
+		{
 			throw std::bad_cast();
+		}
 
 		return std::stof(elements[0]);
 	}
 
-	static long double parse(const std::vector<std::string>& elements, const long double&)
+	static long double parse(const std::vector<std::string>& elements, const long double& /*unused*/)
 	{
 		if(elements.size() != 1)
+		{
 			throw std::bad_cast();
+		}
 
 		return std::stold(elements[0]);
 	}
 
-	static unsigned int parse(const std::vector<std::string>& elements, const unsigned int&,
+	static unsigned int parse(const std::vector<std::string>& elements, const unsigned int& /*unused*/,
 							  int numberBase = 0)
 	{
 		if(elements.size() != 1)
+		{
 			throw std::bad_cast();
+		}
 
-		return static_cast<unsigned int>(std::stoul(elements[0], 0, numberBase));
+		return static_cast<unsigned int>(std::stoul(elements[0], nullptr, numberBase));
 	}
 
-	static unsigned long parse(const std::vector<std::string>& elements, const unsigned long&,
+	static unsigned long parse(const std::vector<std::string>& elements, const unsigned long& /*unused*/,
 							   int numberBase = 0)
 	{
 		if(elements.size() != 1)
+		{
 			throw std::bad_cast();
+		}
 
-		return std::stoul(elements[0], 0, numberBase);
+		return std::stoul(elements[0], nullptr, numberBase);
 	}
 
-	static long parse(const std::vector<std::string>& elements, const long&)
+	static long parse(const std::vector<std::string>& elements, const long& /*unused*/)
 	{
 		if(elements.size() != 1)
+		{
 			throw std::bad_cast();
+		}
 
 		return std::stol(elements[0]);
 	}
 
-	static std::string parse(const std::vector<std::string>& elements, const std::string&)
+	static std::string parse(const std::vector<std::string>& elements, const std::string& /*unused*/)
 	{
 		if(elements.size() != 1)
+		{
 			throw std::bad_cast();
+		}
 
 		return elements[0];
 	}
 
 	template <class T>
-	static std::vector<T> parse(const std::vector<std::string>& elements, const std::vector<T>&)
+	static std::vector<T> parse(const std::vector<std::string>& elements, const std::vector<T>& /*unused*/)
 	{
 		const T defval = T();
 		std::vector<T> values{};
@@ -424,7 +442,7 @@ public:
 
 	inline void run_and_exit_if_error()
 	{
-		if(run() == false)
+		if(!run())
 		{
 			exit(1);
 		}
@@ -442,13 +460,13 @@ public:
 
 	bool run(std::ostream& output, std::ostream& error)
 	{
-		if(_arguments.size() > 0)
+		if(!_arguments.empty())
 		{
 			auto current = find_default();
 
 			for(const auto& arg : _arguments)
 			{
-				auto isarg = arg.size() > 0 && arg[0] == '-';
+				auto isarg = !arg.empty() && arg[0] == '-';
 				auto associated = isarg ? find(arg) : nullptr;
 
 				if(associated != nullptr)
@@ -547,12 +565,12 @@ public:
 	{
 		try
 		{
-            result = get<T>(name);
-            return true;
+			result = get<T>(name);
+			return true;
 		}
 		catch(const std::exception&)
 		{
-            return false;
+			return false;
 		}
 	}
 
@@ -609,7 +627,7 @@ protected:
 		for(auto& command_pair : _commands)
 		{
 			auto& command = command_pair.second;
-			if(command->name == "")
+			if(command->name.empty())
 			{
 				return command.get();
 			}
@@ -629,14 +647,14 @@ protected:
 
 			ss << "  " << command->command << "\t" << command->alternative;
 
-			if(command->required == true)
+			if(command->required)
 			{
 				ss << "\t(required)";
 			}
 
 			ss << "\n   " << command->description;
 
-			if(command->required == false)
+			if(!command->required)
 			{
 				ss << "\n   "
 				   << "This parameter is optional. The default value is '" + command->print_value() << "'.";

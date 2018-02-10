@@ -117,7 +117,9 @@ void frustum::update(const transform& view, const transform& proj, bool _oglNDC)
 	}
 
 	for(auto& plane : planes)
+	{
 		plane.data *= -1.0f;
+	}
 	// Normalize and compute additional information.
 	set_planes(planes);
 
@@ -140,7 +142,9 @@ void frustum::set_planes(const std::array<plane, 6>& new_planes)
 	planes = new_planes;
 	// Copy and normalize the planes
 	for(auto& plane : planes)
+	{
 		plane = plane::normalize(plane);
+	}
 
 	// Recompute the frustum corner points.
 	recompute_points();
@@ -158,12 +162,12 @@ void frustum::recompute_points()
 	// Compute the 8 corner points
 	for(std::size_t i = 0; i < 8; ++i)
 	{
-		const plane& p0 =
-			plane::normalize((i & 1) ? planes[volume_plane::near_plane] : planes[volume_plane::far_plane]);
+		const plane& p0 = plane::normalize((i & 1) != 0u ? planes[volume_plane::near_plane]
+														 : planes[volume_plane::far_plane]);
 		const plane& p1 =
-			plane::normalize((i & 2) ? planes[volume_plane::top] : planes[volume_plane::bottom]);
+			plane::normalize((i & 2) != 0u ? planes[volume_plane::top] : planes[volume_plane::bottom]);
 		const plane& p2 =
-			plane::normalize((i & 4) ? planes[volume_plane::left] : planes[volume_plane::right]);
+			plane::normalize((i & 4) != 0u ? planes[volume_plane::left] : planes[volume_plane::right]);
 
 		// Compute the point at which the three planes intersect
 		float cosTheta, secTheta;
@@ -237,12 +241,16 @@ volume_query frustum::classify_aabb(const bbox& AABB) const
 		// If near extreme point is outside, then the AABB is totally outside the
 		// frustum
 		if(plane::dot_coord(plane, NearPoint) > 0.0f)
+		{
 			return volume_query::outside;
+		}
 
 		// If far extreme point is outside, then the AABB is intersecting the
 		// frustum
 		if(plane::dot_coord(plane, FarPoint) > 0.0f)
+		{
 			Result = volume_query::intersect;
+		}
 
 	} // Next plane
 	return Result;
@@ -315,15 +323,21 @@ volume_query frustum::classify_aabb(const bbox& AABB, unsigned int& FrustumBits,
 		// If near extreme point is outside, then the AABB is totally outside the
 		// frustum
 		if(plane::dot_coord(plane, NearPoint) > 0.0f)
+		{
 			return volume_query::outside;
+		}
 
 		// If far extreme point is outside, then the AABB is intersecting the
 		// frustum
 		if(plane::dot_coord(plane, FarPoint) > 0.0f)
+		{
 			Result = volume_query::intersect;
+		}
 		else
+		{
 			FrustumBits |= (0x1 << LastOutside); // We were totally inside this
-												 // frustum plane, update our bit set
+		}
+		// frustum plane, update our bit set
 
 	} // End if last outside plane specified
 
@@ -333,12 +347,16 @@ volume_query frustum::classify_aabb(const bbox& AABB, unsigned int& FrustumBits,
 		// Check the bit in the uchar passed to see if it should be tested (if it's
 		// 1, it's already passed)
 		if(((FrustumBits >> i) & 0x1) == 0x1)
+		{
 			continue;
+		}
 
 		// If 'last outside plane' index was specified, skip if it matches the plane
 		// index
 		if(LastOutside >= 0 && LastOutside == int(i))
+		{
 			continue;
+		}
 
 		// Calculate near / far extreme points
 		const plane& plane = planes[i];
@@ -388,10 +406,14 @@ volume_query frustum::classify_aabb(const bbox& AABB, unsigned int& FrustumBits,
 		// If far extreme point is outside, then the AABB is intersecting the
 		// frustum
 		if(plane::dot_coord(plane, FarPoint) > 0.0f)
+		{
 			Result = volume_query::intersect;
+		}
 		else
+		{
 			FrustumBits |= (0x1 << i); // We were totally inside this frustum plane,
-									   // update our bit set
+		}
+		// update our bit set
 
 	} // Next plane
 
@@ -430,24 +452,38 @@ bool frustum::test_aabb(const bbox& AABB) const
 	{
 		// Calculate near / far extreme points
 		if(plane.data.x > 0.0f)
+		{
 			NearPoint.x = AABB.min.x;
+		}
 		else
+		{
 			NearPoint.x = AABB.max.x;
+		}
 
 		if(plane.data.y > 0.0f)
+		{
 			NearPoint.y = AABB.min.y;
+		}
 		else
+		{
 			NearPoint.y = AABB.max.y;
+		}
 
 		if(plane.data.z > 0.0f)
+		{
 			NearPoint.z = AABB.min.z;
+		}
 		else
+		{
 			NearPoint.z = AABB.max.z;
+		}
 
 		// If near extreme point is outside, then the AABB is totally outside the
 		// frustum
 		if(plane::dot_coord(plane, NearPoint) > 0.0f)
+		{
 			return false;
+		}
 
 	} // Next plane
 
@@ -500,8 +536,10 @@ bool frustum::test_extruded_aabb(const bbox_extruded& Box) const
 	//  Build an imaginary sphere around the origin, representing the volume of
 	//  max attenuation -- if this doesn't intersect the view frustum, then
 	//  this caster can be trivially rejected.
-	if(test_sphere(Box.projection_point, Box.projection_range) == false)
+	if(!test_sphere(Box.projection_point, Box.projection_range))
+	{
 		return false;
+	}
 
 	// Test frustum edges against extruded box.
 
@@ -532,7 +570,7 @@ bool frustum::test_extruded_aabb(const bbox_extruded& Box) const
 
 	// Test extruded box edges against frustum
 	bIntersect2 = false;
-	for(i = 0; (i < Box.edge_count) && (bIntersect1 == false && bIntersect2 == false); ++i)
+	for(i = 0; (i < Box.edge_count) && (!bIntersect1 && !bIntersect2); ++i)
 	{
 		vec3 vRay, vPoint1, vPoint2;
 
@@ -571,11 +609,15 @@ volume_query frustum::classify_sphere(const vec3& vecCenter, float fRadius) cons
 
 		// Sphere entirely in front of plane
 		if(fDot >= fRadius)
+		{
 			return volume_query::outside;
+		}
 
 		// Sphere spans plane
 		if(fDot >= -fRadius)
+		{
 			Result = volume_query::intersect;
+		}
 
 	} // Next plane
 
@@ -598,7 +640,9 @@ bool frustum::test_sphere(const vec3& vecCenter, float fRadius) const
 
 		// Sphere entirely in front of plane
 		if(fDot >= fRadius)
+		{
 			return false;
+		}
 
 	} // Next plane
 
@@ -629,20 +673,19 @@ bool frustum::swept_sphere_intersect_plane(float& t0, float& t1, const plane& pl
 			return true;
 
 		} // End if infinity
-		else
-			return false;
+
+		return false;
 
 	} // End if runs parallel to plane
-	else
-	{
-		// Compute the two possible intersections
-		float tmp0 = (fRadius - b_dot_n) / d_dot_n;
-		float tmp1 = (-fRadius - b_dot_n) / d_dot_n;
-		t0 = glm::min<float>(tmp0, tmp1);
-		t1 = glm::max<float>(tmp0, tmp1);
-		return true;
 
-	} // End if intersection
+	// Compute the two possible intersections
+	float tmp0 = (fRadius - b_dot_n) / d_dot_n;
+	float tmp1 = (-fRadius - b_dot_n) / d_dot_n;
+	t0 = glm::min<float>(tmp0, tmp1);
+	t1 = glm::max<float>(tmp0, tmp1);
+	return true;
+
+	// End if intersection
 }
 
 //-----------------------------------------------------------------------------
@@ -664,13 +707,17 @@ bool frustum::test_swept_sphere(const vec3& vecCenter, float fRadius, const vec3
 	for(const auto& plane : planes)
 	{
 		// Intersects frustum plane?
-		if(swept_sphere_intersect_plane(t0, t1, plane, vecCenter, fRadius, vecSweepDirection) == true)
+		if(swept_sphere_intersect_plane(t0, t1, plane, vecCenter, fRadius, vecSweepDirection))
 		{
 			// TODO: Possibly needs to be < 0?
 			if(t0 >= 0.0f)
+			{
 				pDisplacements[nCount++] = t0;
+			}
 			if(t1 >= 0.0f)
+			{
 				pDisplacements[nCount++] = t1;
+			}
 
 		} // End if intersects
 
@@ -683,8 +730,10 @@ bool frustum::test_swept_sphere(const vec3& vecCenter, float fRadius, const vec3
 	{
 		vDisplacedCenter = vecCenter + (vecSweepDirection * pDisplacements[i]);
 		fDisplacedRadius = fRadius * 1.1f; // Tolerance.
-		if(test_sphere(vDisplacedCenter, fDisplacedRadius) == true)
+		if(test_sphere(vDisplacedCenter, fDisplacedRadius))
+		{
 			return true;
+		}
 
 	} // Next Intersection
 
@@ -734,10 +783,12 @@ bool frustum::test_line(const vec3& v1, const vec3& v2) const
 		// If the line is completely in front of any plane
 		// then it cannot possibly be intersecting.
 		if(nSide1 == 1 && nSide2 == 1)
+		{
 			return false;
+		}
 
 		// The line is potentially spanning?
-		if(nSide1 ^ nSide2)
+		if((nSide1 ^ nSide2) != 0)
 		{
 			// Compute the point at which the line intersects this plane.
 			vDir = v2 - v1;
@@ -748,7 +799,9 @@ bool frustum::test_line(const vec3& v1, const vec3& v2) const
 			{
 				vIntersect = v1 + (vDir * t);
 				if(test_sphere(vIntersect, 0.01f))
+				{
 					return true;
+				}
 
 			} // End if spanning
 
@@ -776,19 +829,27 @@ volume_query frustum::classify_plane(const plane& plane) const
 	{
 		float fDot = plane::dot_coord(plane, points[i]);
 		if(fDot > 0.0f)
+		{
 			nInFrontCount++;
+		}
 		else if(fDot < 0.0f)
+		{
 			nBehindCount++;
+		}
 
 	} // Next plane
 
 	// frustum entirely in front of plane
 	if(nInFrontCount == 8)
+	{
 		return volume_query::outside;
+	}
 
 	// frustum entire behind plane
 	if(nBehindCount == 8)
+	{
 		return volume_query::inside;
+	}
 
 	// Return intersection (spanning the plane)
 	return volume_query::intersect;
@@ -832,7 +893,9 @@ bool frustum::test_frustum(const frustum& f) const
 
 	// Early out
 	if(bIntersect1)
+	{
 		return true;
+	}
 
 	// B -> A
 	bool bIntersect2;
@@ -873,16 +936,20 @@ bool frustum::test_frustum(const frustum& f) const
 //-----------------------------------------------------------------------------
 frustum& frustum::mul(const transform& t)
 {
-    const transform& mtx = t;
+	const transform& mtx = t;
 	transform mtxIT = transpose(inverse(mtx));
 
 	// transform planes
 	for(auto& plane : planes)
+	{
 		plane = plane::normalize(plane::mul(plane, mtxIT));
+	}
 
 	// transform points
 	for(auto& point : points)
+	{
 		point = transform::transform_coord(point, mtx);
+	}
 
 	// transform originating position.
 	position = transform::transform_coord(position, mtx);
@@ -916,11 +983,13 @@ bool frustum::operator==(const frustum& frustum) const
 	{
 		const plane& p1 = planes[i];
 		const plane& p2 = frustum.planes[i];
-		if((glm::abs<float>(p1.data.x - p2.data.x) <= glm::epsilon<float>() &&
-			glm::abs<float>(p1.data.y - p2.data.y) <= glm::epsilon<float>() &&
-			glm::abs<float>(p1.data.z - p2.data.z) <= glm::epsilon<float>() &&
-			glm::abs<float>(p1.data.w - p2.data.w) <= glm::epsilon<float>()) == false)
+		if(!(glm::abs<float>(p1.data.x - p2.data.x) <= glm::epsilon<float>() &&
+			 glm::abs<float>(p1.data.y - p2.data.y) <= glm::epsilon<float>() &&
+			 glm::abs<float>(p1.data.z - p2.data.z) <= glm::epsilon<float>() &&
+			 glm::abs<float>(p1.data.w - p2.data.w) <= glm::epsilon<float>()))
+		{
 			return false;
+		}
 
 	} // Next plane
 

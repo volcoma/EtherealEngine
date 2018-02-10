@@ -26,7 +26,7 @@ struct has_overloaded_addressof
 	}
 
 	template <typename U, ::std::size_t N = sizeof(::std::declval<U&>().operator&())>
-	static constexpr bool has_overload(bool)
+	static constexpr bool has_overload(bool /*unused*/)
 	{
 		return true;
 	}
@@ -57,7 +57,7 @@ constexpr inline std::size_t static_wstrlen(const wchar_t* str)
 }
 
 template <typename InIter1, typename InIter2>
-constexpr void static_copy(InIter1, InIter1, InIter2)
+constexpr void static_copy(InIter1 /*unused*/, InIter1 /*unused*/, InIter2 /*unused*/)
 {
 	// return (first1 != last1) ?
 }
@@ -120,7 +120,7 @@ struct uuid
 	{
 	}
 
-	constexpr uuid(char const*, size_type)
+	constexpr uuid(char const* /*unused*/, size_type /*unused*/)
 		: uuid()
 	{
 		// std::isxdigit(ch)..
@@ -284,12 +284,13 @@ struct uuid
 
 		if(ok)
 		{
-			std::size_t i = 0;
-			for(; i != u.size(); ++i)
+			for(std::size_t i = 0; i != u.size(); ++i)
 			{
 				os << ::std::hex << ::std::setfill('0') << ::std::setw(2) << static_cast<int>(u[i]);
 				if(i == 3 || i == 5 || i == 7 || i == 9)
+				{
 					os << os.widen('-');
+				}
 			}
 		}
 

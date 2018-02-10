@@ -357,7 +357,7 @@ void hierarchy_dock::render(const ImVec2&)
 
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove |
 							 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings;
-	gui::BeginGroup();
+	//gui::BeginGroup();
 	if(gui::BeginChild("hierarchy_content", gui::GetContentRegionAvail(), false, flags))
 	{
 
@@ -418,7 +418,7 @@ void hierarchy_dock::render(const ImVec2&)
 	}
 	gui::EndChild();
 
-	gui::EndGroup();
+	//gui::EndGroup();
 
 	process_drag_drop_target({});
 }

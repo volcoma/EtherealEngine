@@ -110,7 +110,6 @@ renderer_type get_renderer_type();
 
 /**/
 const caps* get_caps();
-
 /**/
 const hmd* get_hmd();
 
@@ -519,5 +518,8 @@ std::uint64_t screen_quad(float dest_width, float dest_height, float depth = 0.0
 std::uint64_t clip_quad(float depth = 0.0f, float width = 1.0f, float height = 1.0f);
 
 void get_size_from_ratio(backbuffer_ratio _ratio, std::uint16_t& _width, std::uint16_t& _height);
+
 const std::string& get_renderer_filename_extension();
+bool is_supported(uint64_t flag);
+
 }

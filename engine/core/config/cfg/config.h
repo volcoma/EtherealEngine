@@ -27,7 +27,9 @@ public:
 	T get_value(const std::string& section, const std::string& name, const T& defaultValue)
 	{
 		if(!has_value(section, name))
+		{
 			return defaultValue;
+		}
 
 		const auto& value = get(section, name);
 
