@@ -1,5 +1,5 @@
-#ifndef _NONSTD_TYPE_TRAITS_
-#define _NONSTD_TYPE_TRAITS_
+#ifndef NONSTD_TYPE_TRAITS
+#define NONSTD_TYPE_TRAITS
 
 #include <cstddef>
 #include <future>
@@ -29,13 +29,13 @@ struct decay_reference_wrapper<std::reference_wrapper<T>>
 	using type = T;
 };
 
-static inline bool check_all_true()
+inline bool check_all_true()
 {
 	return true;
 }
 
 template <typename... BoolArgs>
-static bool check_all_true(bool arg1, BoolArgs... args)
+inline bool check_all_true(bool arg1, BoolArgs... args)
 {
 	return arg1 & check_all_true(args...);
 }

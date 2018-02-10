@@ -1,9 +1,14 @@
 #include "core/filesystem/filesystem.h"
 #include "meta/meta.h"
 #include "system/app.h"
+#include "core/common/nonstd/variant.hpp"
+#include "core/common/nonstd/optional.hpp"
 
 int main(int argc, char* argv[])
-{
+{    
+    nonstd::variant<int, bool> v;
+    nonstd::optional<int> o;
+  
 	fs::path engine_path = fs::system_complete(ENGINE_DIRECTORY);
 	fs::path shader_include_path = fs::system_complete(SHADER_INCLUDE_DIRECTORY);
 
