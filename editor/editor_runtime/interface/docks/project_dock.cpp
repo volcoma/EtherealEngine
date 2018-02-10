@@ -304,7 +304,6 @@ void project_dock::render(const ImVec2&)
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove |
 							 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings;
 	fs::path current_path = _cache.get_path();
-	gui::BeginGroup();
 	if(gui::BeginChild("assets_content", gui::GetContentRegionAvail(), false, flags))
 	{
 		const auto is_selected = [&](const auto& entry) {
@@ -624,8 +623,6 @@ void project_dock::render(const ImVec2&)
 		context_menu();
 	}
 	gui::EndChild();
-
-	gui::EndGroup();
 
 	process_drag_drop_target(current_path);
 }
