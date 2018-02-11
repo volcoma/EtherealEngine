@@ -17,14 +17,14 @@ static path executable_path_fallback(const char* argv0)
 }
 }
 #if $on($windows)
-#include <windows.h>
+#include <Windows.h>
 namespace fs
 {
 path executable_path(const char* argv0)
 {
 	std::array<char, 1024> buf;
 	buf.fill(0);
-	DWORD ret = GetModuleFileNameA(NULL, buf.data(), DWORD(buf.size()));
+	DWORD ret = GetModuleFileNameA(nullptr, buf.data(), DWORD(buf.size()));
 	if(ret == 0 || std::size_t(ret) == buf.size())
 	{
 		return executable_path_fallback(argv0);
@@ -33,7 +33,7 @@ path executable_path(const char* argv0)
 }
 void show_in_graphical_env(const path& _path)
 {
-	ShellExecuteA(NULL, NULL, _path.string().c_str(), NULL, NULL, SW_SHOWNORMAL);
+	ShellExecuteA(nullptr, nullptr, _path.string().c_str(), nullptr, nullptr, SW_SHOWNORMAL);
 }
 }
 #elif $on($apple)

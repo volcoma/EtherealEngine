@@ -701,9 +701,9 @@ void set_vertex_buffer(uint8_t _stream, const transient_vertex_buffer* _tvb, uin
 	bgfx::setVertexBuffer(_stream, _tvb, _startVertex, _numVertices);
 }
 
-void set_instance_data_buffer(const instance_data_buffer* _idb, uint32_t _num)
+void set_instance_data_buffer(const instance_data_buffer* _idb, uint32_t _start, uint32_t _num)
 {
-	bgfx::setInstanceDataBuffer(_idb, _num);
+	bgfx::setInstanceDataBuffer(_idb, _start, _num);
 }
 
 void set_instance_data_buffer(vertex_buffer_handle _handle, uint32_t _startVertex, uint32_t _num)

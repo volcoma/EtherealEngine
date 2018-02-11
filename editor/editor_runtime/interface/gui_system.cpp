@@ -26,20 +26,22 @@
 #include "core/serialization/associative_archive.h"
 namespace
 {
-static const gfx::embedded_shader s_embedded_shaders[] = {BGFX_EMBEDDED_SHADER(vs_ocornut_imgui),
-														  BGFX_EMBEDDED_SHADER(fs_ocornut_imgui),
-														  BGFX_EMBEDDED_SHADER_END()};
+const gfx::embedded_shader s_embedded_shaders[] = {BGFX_EMBEDDED_SHADER(vs_ocornut_imgui),
+												   BGFX_EMBEDDED_SHADER(fs_ocornut_imgui),
+												   BGFX_EMBEDDED_SHADER_END()};
 // -------------------------------------------------------------------
-static std::unique_ptr<gpu_program> s_program;
-static asset_handle<gfx::texture> s_font_texture;
-static std::uint32_t s_draw_calls = 0;
+std::unique_ptr<gpu_program> s_program;
+asset_handle<gfx::texture> s_font_texture;
+std::uint32_t s_draw_calls = 0;
 
-static void render_func(ImDrawData* _drawData)
+void render_func(ImDrawData* _drawData)
 {
 	s_draw_calls = 0;
 	auto prog = s_program.get();
-	if(!prog)
+	if(prog == nullptr)
+	{
 		return;
+	}
 	prog->begin();
 	// Render command lists
 	for(int32_t ii = 0, num = _drawData->CmdListsCount; ii < num; ++ii)
@@ -77,7 +79,7 @@ static void render_func(ImDrawData* _drawData)
 		for(const ImDrawCmd *cmd = drawList->CmdBuffer.begin(), *cmdEnd = drawList->CmdBuffer.end();
 			cmd != cmdEnd; ++cmd)
 		{
-			if(cmd->UserCallback)
+			if(cmd->UserCallback != nullptr)
 			{
 				cmd->UserCallback(drawList, cmd);
 			}
@@ -111,7 +113,7 @@ static void render_func(ImDrawData* _drawData)
 	prog->end();
 }
 
-static void imgui_handle_event(const mml::platform_event& event)
+void imgui_handle_event(const mml::platform_event& event)
 {
 	auto& io = gui::GetIO();
 	if(event.type == mml::platform_event::lost_focus)
@@ -163,11 +165,13 @@ static void imgui_handle_event(const mml::platform_event& event)
 	if(event.type == mml::platform_event::text_entered)
 	{
 		if(event.text.unicode > 0 && event.text.unicode < 0x10000)
+		{
 			io.AddInputCharacter(static_cast<ImWchar>(event.text.unicode));
+		}
 	}
 }
 
-static const mml::cursor* map_cursor(ImGuiMouseCursor cursor)
+const mml::cursor* map_cursor(ImGuiMouseCursor cursor)
 {
 	static std::map<ImGuiMouseCursor_, mml::cursor::type> cursor_map = {
 		{ImGuiMouseCursor_Arrow, mml::cursor::arrow},
@@ -191,12 +195,12 @@ static const mml::cursor* map_cursor(ImGuiMouseCursor cursor)
 	return cursors[id].get();
 }
 
-static void imgui_frame_begin()
+void imgui_frame_begin()
 {
 	gui::CleanupTextures();
 }
 
-static void imgui_set_context(ImGuiContext* context)
+void imgui_set_context(ImGuiContext* context)
 {
 	ImGuiContext* last_context = gui::GetCurrentContext();
 	if(last_context != nullptr && last_context != context)
@@ -212,7 +216,7 @@ static void imgui_set_context(ImGuiContext* context)
 	gui::SetCurrentContext(context);
 }
 
-static void imgui_frame_update(render_window& window, delta_t dt)
+void imgui_frame_update(render_window& window, delta_t dt)
 {
 	auto& io = gui::GetIO();
 	auto view_size = window.get_surface()->get_size();
@@ -234,8 +238,10 @@ static void imgui_frame_update(render_window& window, delta_t dt)
 	{
 		static auto last_cursor_type = gui::GetMouseCursor();
 		auto cursor = map_cursor(gui::GetMouseCursor());
-		if(cursor && last_cursor_type != gui::GetMouseCursor())
+		if((cursor != nullptr) && last_cursor_type != gui::GetMouseCursor())
+		{
 			window.set_mouse_cursor(*cursor);
+		}
 
 		last_cursor_type = gui::GetMouseCursor();
 	}
@@ -249,26 +255,26 @@ static void imgui_frame_update(render_window& window, delta_t dt)
 							 ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse |
 							 ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing;
 
-	gui::Begin("###workspace", 0, flags);
+	gui::Begin("###workspace", nullptr, flags);
 }
 
-static void imgui_frame_end()
+void imgui_frame_end()
 {
 	gui::End();
 	gui::Render();
 }
 
-static ImGuiContext* imgui_create_context(ImFontAtlas& atlas)
+ImGuiContext* imgui_create_context(ImFontAtlas& atlas)
 {
 	return gui::CreateContext(&atlas);
 }
 
-static void imgui_destroy_context(ImGuiContext* context = nullptr)
+void imgui_destroy_context(ImGuiContext* context = nullptr)
 {
 	gui::DestroyContext(context);
 }
 
-static void imgui_init()
+void imgui_init()
 {
 	auto& ts = core::get_subsystem<core::task_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
@@ -356,7 +362,7 @@ static void imgui_init()
 	get_gui_style().load_style();
 }
 
-static void imgui_dispose()
+void imgui_dispose()
 {
 	gui::ClearFonts();
 	gui::CleanupTextures();
@@ -364,6 +370,7 @@ static void imgui_dispose()
 	s_font_texture.reset();
 }
 }
+
 gui_system::gui_system()
 {
 	runtime::on_platform_events.connect(this, &gui_system::platform_events);
@@ -382,7 +389,7 @@ gui_system::~gui_system()
 	imgui_destroy_context(_initial_context);
 }
 
-void gui_system::frame_begin(delta_t)
+void gui_system::frame_begin(delta_t /*unused*/)
 {
 	imgui_frame_begin();
 }
@@ -437,17 +444,15 @@ void gui_system::platform_events(const std::pair<std::uint32_t, bool>& info,
 		{
 			pop_context();
 			auto context = _contexts[window_id];
-			if(context)
+			if(context != nullptr)
 			{
 				imgui_destroy_context(context);
 			}
 			_contexts.erase(window_id);
 			return;
 		}
-		else
-		{
-			imgui_handle_event(e);
-		}
+
+		imgui_handle_event(e);
 	}
 	pop_context();
 }
