@@ -5,6 +5,10 @@
 [![Join the chat at https://gitter.im/EtherealEngine/Lobby](https://badges.gitter.im/EtherealEngine/Lobby.svg)](https://gitter.im/EtherealEngine/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/volcoma/EtherealEngine.svg?branch=master)](https://travis-ci.org/volcoma/EtherealEngine)
 [![Build status](https://ci.appveyor.com/api/projects/status/18pxyag4wok2fscl?svg=true)](https://ci.appveyor.com/project/volcoma/etherealengine)
+![license](https://img.shields.io/github/license/volcoma/EtherealEngine.svg)
+![language](https://img.shields.io/badge/language-c++-blue.svg) ![c++](https://img.shields.io/badge/std-c++14-blue.svg)
+![msvc2015+](https://img.shields.io/badge/MSVC-2015+-ff69b4.svg) ![mingw-5.3+](https://img.shields.io/badge/MINGW-5.3+-ff69b4.svg) 
+![gcc-5.0+](https://img.shields.io/badge/GCC-5.0+-ff69b4.svg) ![clang-3.8+](https://img.shields.io/badge/CLANG-3.8+-ff69b4.svg)
 [![](https://codescene.io/projects/1800/status.svg) Get more details at **codescene.io**.](https://codescene.io/projects/1800/jobs/latest-successful/results)
 
 ## INFO
@@ -31,14 +35,14 @@ cmake ..
 ```
 
 ## PLATFORMS
-It is written in a cross-platform manner using c++14.
+It is written in a cross-platform manner using ![c++](https://img.shields.io/badge/std-c++14-blue.svg).
 
-Compilers      | Windows | Linux
+![msvc2015+](https://img.shields.io/badge/compilers--ff69b4.svg)      | ![windows](https://img.shields.io/badge/platform-windows-blue.svg) | ![linux](https://img.shields.io/badge/platform-linux-blue.svg)
 ---------------| --------|--------
-MSVC(2015 +)   | yes     |
-MinGW(5.3 +)   | yes     |
-GCC(5.0 +)     |         | yes
-clang(3.8 +)   |         | yes
+![msvc2015+](https://img.shields.io/badge/MSVC-2015+-ff69b4.svg)   | ![yes](https://img.shields.io/badge/status-yes-green.svg)     |
+![mingw-5.3+](https://img.shields.io/badge/MINGW-5.3+-ff69b4.svg)    | ![yes](https://img.shields.io/badge/status-yes-green.svg)     |
+![gcc-5.0+](https://img.shields.io/badge/GCC-5.0+-ff69b4.svg)    |         | ![yes](https://img.shields.io/badge/status-yes-green.svg)
+![clang-3.8+](https://img.shields.io/badge/CLANG-3.8+-ff69b4.svg)   |         | ![yes](https://img.shields.io/badge/status-yes-green.svg)
 
 ## ASSETS
 Some high quality assets: https://github.com/volcoma/Library
@@ -56,7 +60,7 @@ Any suggestions and help will be appreciated.
 The engine uses the CMake build system.
 
 ## CODEBASE
-c++14 Using the latest and greatest features of the language.
+![c++](https://img.shields.io/badge/std-c++14-blue.svg) Using the latest and greatest features of the language.
 
 ## CODE STYLE
 ```c++
