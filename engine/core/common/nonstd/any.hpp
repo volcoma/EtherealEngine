@@ -1,7 +1,7 @@
-#ifndef LINB_ANY_HPP
-#define LINB_ANY_HPP
+#ifndef STX_ANY_HPP_INCLUDED
+#define STX_ANY_HPP_INCLUDED
 
-#include "type_traits.hpp"
+#include "type_index.hpp"
 #include <stdexcept>
 #include <type_traits>
 #include <typeinfo>
@@ -270,7 +270,7 @@ private: // Storage and Virtual Method Table
 	template <typename T>
 	struct requires_allocation
 		: std::integral_constant<bool,
-								 !(std::is_nothrow_move_constructible<T>::value // N4562 §6.3/3
+								 !(std::is_nothrow_move_constructible<T>::value // N4562 6.3/3
 																				// [any.class]
 								   && sizeof(T) <= sizeof(storage_union::stack) &&
 								   std::alignment_of<T>::value <=

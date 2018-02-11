@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/common/assert.hpp"
-#include "core/common/nonstd/type_traits.hpp"
+#include "core/common/nonstd/type_index.hpp"
 #include "core/reflection/registration.h"
 #include "core/serialization/serialization.h"
 #include "core/signals/event.hpp"

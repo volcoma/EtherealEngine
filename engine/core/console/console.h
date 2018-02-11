@@ -3,7 +3,7 @@
 
 #include <cassert>
 
-#include "../common/nonstd/type_traits.hpp"
+#include "../common/nonstd/type_index.hpp"
 #include <functional>
 #include <memory>
 #include <set>

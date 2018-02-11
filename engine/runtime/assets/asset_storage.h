@@ -3,7 +3,7 @@
 #include <functional>
 #include <unordered_map>
 
-#include "core/common/nonstd/type_traits.hpp"
+#include "core/common/nonstd/type_index.hpp"
 #include "core/string_utils/string_utils.h"
 #include "core/tasks/task_system.h"
 
