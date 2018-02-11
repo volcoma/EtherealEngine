@@ -5,7 +5,7 @@
 [![Join the chat at https://gitter.im/EtherealEngine/Lobby](https://badges.gitter.im/EtherealEngine/Lobby.svg)](https://gitter.im/EtherealEngine/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/volcoma/EtherealEngine.svg?branch=master)](https://travis-ci.org/volcoma/EtherealEngine)
 [![Build status](https://ci.appveyor.com/api/projects/status/18pxyag4wok2fscl?svg=true)](https://ci.appveyor.com/project/volcoma/etherealengine)
-![license](https://img.shields.io/github/license/volcoma/EtherealEngine.svg)
+[![license](https://img.shields.io/github/license/volcoma/EtherealEngine.svg)](LICENSE.txt)
 ![language](https://img.shields.io/badge/language-c++-blue.svg) ![c++](https://img.shields.io/badge/std-c++14-blue.svg)
 ![msvc2015+](https://img.shields.io/badge/MSVC-2015+-ff69b4.svg) ![mingw-5.3+](https://img.shields.io/badge/MINGW-5.3+-ff69b4.svg) 
 ![gcc-5.0+](https://img.shields.io/badge/GCC-5.0+-ff69b4.svg) ![clang-3.8+](https://img.shields.io/badge/CLANG-3.8+-ff69b4.svg)
@@ -104,10 +104,6 @@ inline void some_class::some_templated_method()
 // If the class is fully templated it is acceptable to put this inside the class
 }
 ```
-
-## LICENSE
-[LINK](LICENSE.txt)
-
 ## PREVIEW
 ![screenshot1](https://user-images.githubusercontent.com/1499411/29488399-e4c76a18-8512-11e7-8090-7453fea8d33f.png)
 
