@@ -5,6 +5,7 @@
 #include "embedded/icons_font_awesome.h"
 #include "imgui/imgui_internal.h"
 #include "imgui_user/imgui_user.h"
+#include "imgui_user/imgui_tabs.h"
 #include "imguizmo/imguizmo.h"
 #include <memory>
 namespace gui

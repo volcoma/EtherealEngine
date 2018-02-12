@@ -39,7 +39,9 @@ static bool process_drag_drop_target(asset_handle<asset_t>& entry)
 				}
 
 				if(entry)
+				{
 					return true;
+				}
 			}
 		}
 		gui::EndDragDropTarget();
@@ -57,38 +59,50 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 	auto& selected = es.selection_data.object;
 	bool is_selected = selected && selected.is_type<asset_handle<gfx::texture>>();
 	bool changed = false;
+
 	float available = math::min(64.0f, gui::GetContentRegionAvailWidth() / 1.5f);
+
 	if(is_selected)
+	{
 		available = gui::GetContentRegionAvailWidth();
-
-	ImVec2 size = {available, available};
-	if(data)
-	{
-		auto asset_sz = data.link->asset->get_size();
-		float w = float(asset_sz.width);
-		float h = float(asset_sz.height);
-		const auto tex = data.link->asset;
-		bool is_rt = tex ? tex->is_render_target() : false;
-		bool is_orig_bl = gfx::is_origin_bottom_left();
-		gui::ImageWithAspect(tex, is_rt, is_orig_bl, ImVec2(w, h), size);
-	}
-	else
-	{
-
-		ImGuiWindow* window = gui::GetCurrentWindow();
-		if(window->SkipItems)
-			return false;
-		ImRect bb(window->DC.CursorPos,
-				  ImVec2(window->DC.CursorPos.x + size.x, window->DC.CursorPos.y + size.y));
-		gui::ItemSize(bb);
-		if(!gui::ItemAdd(bb, 0))
-			return false;
 	}
 
-	gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
+	auto draw_image = [&]() {
+		ImVec2 size = {available, available};
+		if(data)
+		{
+			auto asset_sz = data.link->asset->get_size();
+			float w = float(asset_sz.width);
+			float h = float(asset_sz.height);
+			const auto tex = data.link->asset;
+			bool is_rt = tex ? tex->is_render_target() : false;
+			bool is_orig_bl = gfx::is_origin_bottom_left();
+			gui::ImageWithAspect(tex, is_rt, is_orig_bl, ImVec2(w, h), size);
+		}
+		else
+		{
+
+			ImGuiWindow* window = gui::GetCurrentWindow();
+			if(window->SkipItems)
+				return false;
+			ImRect bb(window->DC.CursorPos,
+					  ImVec2(window->DC.CursorPos.x + size.x, window->DC.CursorPos.y + size.y));
+			gui::ItemSize(bb);
+			if(!gui::ItemAdd(bb, 0))
+				return false;
+
+			gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 1.0f);
+		}
+		return true;
+	};
 
 	if(selected && !selected.is_type<asset_handle<gfx::texture>>())
 	{
+
+		if(!draw_image())
+		{
+			return false;
+		}
 
 		if(process_drag_drop_target(data))
 		{
@@ -133,12 +147,28 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 		return changed;
 	}
 
-	if(data)
+	gui::BeginTabBar("asset_handle_texture", ImGuiTabBarFlags_SizingPolicyEqual | ImGuiTabBarFlags_NoReorder |
+												 ImGuiTabBarFlags_NoCloseWithMiddleMouseButton);
+
+	if(gui::TabItem("Info"))
 	{
-		auto info = data.get()->info;
-		rttr::variant vari = info;
-		changed |= inspect_var(vari);
+		if(!draw_image())
+		{
+			return false;
+		}
+		if(data)
+		{
+			auto info = data.get()->info;
+			rttr::variant vari = info;
+			changed |= inspect_var(vari);
+		}
 	}
+	if(gui::TabItem("Import"))
+	{
+		gui::TextUnformatted("Import options");
+	}
+	gui::EndTabBar();
+
 	return changed;
 }
 
@@ -239,15 +269,27 @@ bool inspector_asset_handle_mesh::inspect(rttr::variant& var, bool read_only, co
 
 	bool changed = false;
 
-	if(data)
+	gui::BeginTabBar("asset_handle_mesh", ImGuiTabBarFlags_SizingPolicyEqual | ImGuiTabBarFlags_NoReorder |
+											  ImGuiTabBarFlags_NoCloseWithMiddleMouseButton);
+
+	if(gui::TabItem("Info"))
 	{
-		mesh::info info;
-		info.vertices = data->get_vertex_count();
-		info.primitives = data->get_face_count();
-		info.subsets = static_cast<std::uint32_t>(data->get_subset_count());
-		rttr::variant vari = info;
-		changed |= inspect_var(vari);
+		if(data)
+		{
+			mesh::info info;
+			info.vertices = data->get_vertex_count();
+			info.primitives = data->get_face_count();
+			info.subsets = static_cast<std::uint32_t>(data->get_subset_count());
+			rttr::variant vari = info;
+			changed |= inspect_var(vari);
+		}
 	}
+	if(gui::TabItem("Import"))
+	{
+		gui::TextUnformatted("Import options");
+	}
+	gui::EndTabBar();
+
 	return changed;
 }
 
@@ -296,6 +338,7 @@ bool inspector_asset_handle_animation::inspect(rttr::variant& var, bool read_onl
 		rttr::variant vari = data.get();
 		changed |= inspect_var(vari);
 	}
+
 	return changed;
 }
 
@@ -340,11 +383,23 @@ bool inspector_asset_handle_sound::inspect(rttr::variant& var, bool read_only,
 
 	bool changed = false;
 
-	if(data)
+	gui::BeginTabBar("asset_handle_sound", ImGuiTabBarFlags_SizingPolicyEqual | ImGuiTabBarFlags_NoReorder |
+											   ImGuiTabBarFlags_NoCloseWithMiddleMouseButton);
+
+	if(gui::TabItem("Info"))
 	{
-		rttr::variant vari = data.get()->get_info();
-		changed |= inspect_var(vari);
+		if(data)
+		{
+			rttr::variant vari = data.get()->get_info();
+			changed |= inspect_var(vari);
+		}
 	}
+	if(gui::TabItem("Import"))
+	{
+		gui::TextUnformatted("Import options");
+	}
+	gui::EndTabBar();
+
 	return changed;
 }
 
