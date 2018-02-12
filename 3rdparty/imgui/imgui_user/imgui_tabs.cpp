@@ -7,7 +7,7 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #define IMGUI_DEFINE_PLACEMENT_NEW
 #include "../imgui/imgui_internal.h"
-
+#include <cstdint>
 #define TAB_SMOOTH_DRAG 0   // This work nicely but has overlapping issues (maybe render dragged tab separately, at end)
 
 // Basic keyed storage, slow/amortized insertion, O(Log N) queries over a dense/hot buffer
@@ -708,7 +708,7 @@ bool    ImGui::TabItem(const char* label, bool* p_open, ImGuiTabItemFlags flags)
             //  'hovered' will be true when hovering the Tab but NOT when hovering the close button
             //  'g.HoveredId==id' will be true when hovering the Tab including when hovering the close button
             //  'g.ActiveId==close_button_id' will be true when we are holding on the close button, in which case both hovered booleans are false
-            const ImGuiID close_button_id = window->GetID((void*)(intptr_t)(id + 1));
+            const ImGuiID close_button_id = window->GetID((void*)(std::intptr_t)(id + 1));
             const bool hovered_unblocked = IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup);
             const bool hovered_regular = g.HoveredId == id || g.HoveredId == close_button_id;
             if (hovered_regular || g.ActiveId == close_button_id)
@@ -1049,7 +1049,7 @@ void ImGui::ShowTabsDebug()
             ImGui::PushID(tab);
             if (ImGui::Button("<")) TabBarQueueChangeTabOrder(tab_bar, tab, -1); ImGui::SameLine(0, 2);
             if (ImGui::Button(">")) TabBarQueueChangeTabOrder(tab_bar, tab, +1); ImGui::SameLine();
-            if (ImGui::TreeNode((void*)(intptr_t)tab_n, "%02d%c Tab 0x%08X '%s'", tab_n, (tab->Id == tab_bar->CurrSelectedTabId) ? '*' : ' ', tab->Id, tab->DebugName))
+            if (ImGui::TreeNode((void*)(std::intptr_t)tab_n, "%02d%c Tab 0x%08X '%s'", tab_n, (tab->Id == tab_bar->CurrSelectedTabId) ? '*' : ' ', tab->Id, tab->DebugName))
             {
                 ImGui::Text("GlobalIndex = %d", tab->GlobalIndex);
                 ImGui::TreePop();
