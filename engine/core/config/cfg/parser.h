@@ -20,7 +20,7 @@ public:
 	 * @param file the file that is parsed, for error purposes
 	 * @param line the initial line
 	 **/
-	void parse(std::istream& in, const std::string& file = "", unsigned int line = 1);
+	void parse(std::istream& in_, const std::string& file_ = "", unsigned int line_ = 1);
 
 private:
 	enum Token
@@ -39,18 +39,15 @@ private:
 		ERROR // this should never be returned
 	};
 
-	config& conf;
-	std::istream* in;
-	std::string file;
-	unsigned int line;
-
-	Token next_token;
-	std::string next_value;
-
-	std::string section;
+	config& conf_;
+	std::istream* in_;
+	std::string file_;
+	unsigned int line_;
+	Token next_token_;
+	std::string next_value_;
+	std::string section_;
 
 	Token get_next_token(std::string& value);
-
 	Token lex_token(std::string& value);
 	Token lex_whitespace(std::string& value);
 	Token lex_newline(std::string& value);
@@ -60,11 +57,8 @@ private:
 	Token lex_comment(std::string& value);
 
 	void parse_section();
-
 	void parse_section_header();
-
 	void parse_value_pair();
-
 	void error(const std::string& msg);
 
 	parser(const parser&) = delete;

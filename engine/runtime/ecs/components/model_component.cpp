@@ -3,56 +3,56 @@
 
 model_component& model_component::set_casts_shadow(bool cast_shadow)
 {
-	if(_casts_shadow == cast_shadow)
+	if(casts_shadow_ == cast_shadow)
 		return *this;
 
 	touch();
 
-	_casts_shadow = cast_shadow;
+	casts_shadow_ = cast_shadow;
 
 	return *this;
 }
 
 model_component& model_component::set_static(bool is_static)
 {
-	if(_static == is_static)
+	if(static_ == is_static)
 		return *this;
 
 	touch();
 
-	_static = is_static;
+	static_ = is_static;
 	return *this;
 }
 
 model_component& model_component::set_casts_reflection(bool casts_reflection)
 {
-	if(_casts_reflection == casts_reflection)
+	if(casts_reflection_ == casts_reflection)
 		return *this;
 
 	touch();
 
-	_casts_reflection = casts_reflection;
+	casts_reflection_ = casts_reflection;
 	return *this;
 }
 
 bool model_component::casts_shadow() const
 {
-	return _casts_shadow;
+	return casts_shadow_;
 }
 
 bool model_component::is_static() const
 {
-	return _static;
+	return static_;
 }
 
 const model& model_component::get_model() const
 {
-	return _model;
+	return model_;
 }
 
 model_component& model_component::set_model(const model& model)
 {
-	_model = model;
+	model_ = model;
 
 	touch();
 
@@ -61,7 +61,7 @@ model_component& model_component::set_model(const model& model)
 
 model_component& model_component::set_bone_transforms(const std::vector<math::transform>& bone_transforms)
 {
-	_bone_transforms = bone_transforms;
+	bone_transforms_ = bone_transforms;
 
 	touch();
 
@@ -70,12 +70,12 @@ model_component& model_component::set_bone_transforms(const std::vector<math::tr
 
 const std::vector<math::transform>& model_component::get_bone_transforms() const
 {
-	return _bone_transforms;
+	return bone_transforms_;
 }
 
 model_component& model_component::set_bone_entities(const std::vector<runtime::entity>& bone_entities)
 {
-	_bone_entities = bone_entities;
+	bone_entities_ = bone_entities;
 
 	touch();
 
@@ -84,10 +84,10 @@ model_component& model_component::set_bone_entities(const std::vector<runtime::e
 
 const std::vector<runtime::entity>& model_component::get_bone_entities() const
 {
-	return _bone_entities;
+	return bone_entities_;
 }
 
 bool model_component::casts_reflection() const
 {
-	return _casts_reflection;
+	return casts_reflection_;
 }

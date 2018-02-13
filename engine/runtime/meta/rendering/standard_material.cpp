@@ -52,13 +52,13 @@ REFLECT(standard_material)
 SAVE(standard_material)
 {
 	try_save(ar, cereal::make_nvp("base_type", cereal::base_class<material>(&obj)));
-	try_save(ar, cereal::make_nvp("base_color", obj._base_color));
-	try_save(ar, cereal::make_nvp("subsurface_color", obj._subsurface_color));
-	try_save(ar, cereal::make_nvp("emissive_color", obj._emissive_color));
-	try_save(ar, cereal::make_nvp("surface_data", obj._surface_data));
-	try_save(ar, cereal::make_nvp("tiling", obj._tiling));
-	try_save(ar, cereal::make_nvp("dither_threshold", obj._dither_threshold));
-	try_save(ar, cereal::make_nvp("maps", obj._maps));
+	try_save(ar, cereal::make_nvp("base_color", obj.base_color_));
+	try_save(ar, cereal::make_nvp("subsurface_color", obj.subsurface_color_));
+	try_save(ar, cereal::make_nvp("emissive_color", obj.emissive_color_));
+	try_save(ar, cereal::make_nvp("surface_data", obj.surface_data_));
+	try_save(ar, cereal::make_nvp("tiling", obj.tiling_));
+	try_save(ar, cereal::make_nvp("dither_threshold", obj.dither_threshold_));
+	try_save(ar, cereal::make_nvp("maps", obj.maps_));
 }
 SAVE_INSTANTIATE(standard_material, cereal::oarchive_associative_t);
 SAVE_INSTANTIATE(standard_material, cereal::oarchive_binary_t);
@@ -66,13 +66,13 @@ SAVE_INSTANTIATE(standard_material, cereal::oarchive_binary_t);
 LOAD(standard_material)
 {
 	try_load(ar, cereal::make_nvp("base_type", cereal::base_class<material>(&obj)));
-	try_load(ar, cereal::make_nvp("base_color", obj._base_color));
-	try_load(ar, cereal::make_nvp("subsurface_color", obj._subsurface_color));
-	try_load(ar, cereal::make_nvp("emissive_color", obj._emissive_color));
-	try_load(ar, cereal::make_nvp("surface_data", obj._surface_data));
-	try_load(ar, cereal::make_nvp("tiling", obj._tiling));
-	try_load(ar, cereal::make_nvp("dither_threshold", obj._dither_threshold));
-	try_load(ar, cereal::make_nvp("maps", obj._maps));
+	try_load(ar, cereal::make_nvp("base_color", obj.base_color_));
+	try_load(ar, cereal::make_nvp("subsurface_color", obj.subsurface_color_));
+	try_load(ar, cereal::make_nvp("emissive_color", obj.emissive_color_));
+	try_load(ar, cereal::make_nvp("surface_data", obj.surface_data_));
+	try_load(ar, cereal::make_nvp("tiling", obj.tiling_));
+	try_load(ar, cereal::make_nvp("dither_threshold", obj.dither_threshold_));
+	try_load(ar, cereal::make_nvp("maps", obj.maps_));
 }
 LOAD_INSTANTIATE(standard_material, cereal::iarchive_associative_t);
 LOAD_INSTANTIATE(standard_material, cereal::iarchive_binary_t);

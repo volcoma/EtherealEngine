@@ -29,14 +29,14 @@ public:
 	static std::vector<std::string> enumerate_capture_devices();
 
 private:
-	ALCdevice* _device = nullptr;
-	ALCcontext* _context = nullptr;
+	ALCdevice* device_ = nullptr;
+	ALCcontext* context_ = nullptr;
 
-	std::string _device_id;
+	std::string device_id_;
 
-	std::string _version;
-	std::string _vendor;
-	std::string _extensions;
+	std::string version_;
+	std::string vendor_;
+	std::string extensions_;
 };
 }
 }

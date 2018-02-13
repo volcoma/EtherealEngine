@@ -33,13 +33,13 @@ REFLECT(audio_source_component)
 SAVE(audio_source_component)
 {
 	try_save(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::component>(&obj)));
-	try_save(ar, cereal::make_nvp("auto_play", obj._auto_play));
-	try_save(ar, cereal::make_nvp("loop", obj._loop));
-	try_save(ar, cereal::make_nvp("volume", obj._volume));
-	try_save(ar, cereal::make_nvp("pitch", obj._pitch));
-	try_save(ar, cereal::make_nvp("volume_rolloff", obj._volume_rolloff));
-	try_save(ar, cereal::make_nvp("range", obj._range));
-	try_save(ar, cereal::make_nvp("sound", obj._sound));
+	try_save(ar, cereal::make_nvp("auto_play", obj.auto_play_));
+	try_save(ar, cereal::make_nvp("loop", obj.loop_));
+	try_save(ar, cereal::make_nvp("volume", obj.volume_));
+	try_save(ar, cereal::make_nvp("pitch", obj.pitch_));
+	try_save(ar, cereal::make_nvp("volume_rolloff", obj.volume_rolloff_));
+	try_save(ar, cereal::make_nvp("range", obj.range_));
+	try_save(ar, cereal::make_nvp("sound", obj.sound_));
 }
 SAVE_INSTANTIATE(audio_source_component, cereal::oarchive_associative_t);
 SAVE_INSTANTIATE(audio_source_component, cereal::oarchive_binary_t);
@@ -47,13 +47,13 @@ SAVE_INSTANTIATE(audio_source_component, cereal::oarchive_binary_t);
 LOAD(audio_source_component)
 {
 	try_load(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::component>(&obj)));
-	try_load(ar, cereal::make_nvp("auto_play", obj._auto_play));
-	try_load(ar, cereal::make_nvp("loop", obj._loop));
-	try_load(ar, cereal::make_nvp("volume", obj._volume));
-	try_load(ar, cereal::make_nvp("pitch", obj._pitch));
-	try_load(ar, cereal::make_nvp("volume_rolloff", obj._volume_rolloff));
-	try_load(ar, cereal::make_nvp("range", obj._range));
-	try_load(ar, cereal::make_nvp("sound", obj._sound));
+	try_load(ar, cereal::make_nvp("auto_play", obj.auto_play_));
+	try_load(ar, cereal::make_nvp("loop", obj.loop_));
+	try_load(ar, cereal::make_nvp("volume", obj.volume_));
+	try_load(ar, cereal::make_nvp("pitch", obj.pitch_));
+	try_load(ar, cereal::make_nvp("volume_rolloff", obj.volume_rolloff_));
+	try_load(ar, cereal::make_nvp("range", obj.range_));
+	try_load(ar, cereal::make_nvp("sound", obj.sound_));
 
 	obj.apply_all();
 }

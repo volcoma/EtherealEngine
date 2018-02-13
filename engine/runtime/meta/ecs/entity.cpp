@@ -38,7 +38,7 @@ SAVE_INSTANTIATE(entity, cereal::oarchive_binary_t);
 
 LOAD(entity)
 {
-	std::uint64_t id;
+	std::uint64_t id = 0;
 	std::string name;
 	std::vector<chandle<component>> components;
 
@@ -62,7 +62,7 @@ LOAD(entity)
 			try_load(ar, cereal::make_nvp("components", components));
 
 			obj.set_name(name);
-			for(auto component : components)
+			for(const auto& component : components)
 			{
 				auto component_shared = component.lock();
 				if(component_shared)

@@ -77,7 +77,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline const std::string& get_name() const
 	{
-		return _project_name;
+		return project_name_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -90,7 +90,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline void set_name(const std::string& name)
 	{
-		_project_name = name;
+		project_name_ = name;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -103,7 +103,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline options& get_options()
 	{
-		return _options;
+		return options_;
 	}
 
 private:
@@ -111,17 +111,17 @@ private:
 	void setup_meta_syncer(fs::syncer& syncer, const fs::path& data_dir, const fs::path& meta_dir);
 	void setup_cache_syncer(fs::syncer& syncer, const fs::path& meta_dir, const fs::path& cache_dir);
 	/// Project options
-	options _options;
+	options options_;
 	/// Current project name
-	std::string _project_name;
+	std::string project_name_;
 
-	fs::syncer _app_meta_syncer;
-	fs::syncer _app_cache_syncer;
+	fs::syncer app_meta_syncer_;
+	fs::syncer app_cache_syncer_;
 
-	fs::syncer _editor_meta_syncer;
-	fs::syncer _editor_cache_syncer;
+	fs::syncer editor_meta_syncer_;
+	fs::syncer editor_cache_syncer_;
 
-	fs::syncer _engine_meta_syncer;
-	fs::syncer _engine_cache_syncer;
+	fs::syncer engine_meta_syncer_;
+	fs::syncer engine_cache_syncer_;
 };
 }

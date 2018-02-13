@@ -99,6 +99,6 @@ public:
 
 private:
 	/// pimpl idiom
-	std::unique_ptr<priv::device_impl> _impl;
+	std::unique_ptr<priv::device_impl> impl_;
 };
 }

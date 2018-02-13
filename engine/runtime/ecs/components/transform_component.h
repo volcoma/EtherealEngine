@@ -547,13 +547,13 @@ protected:
 	// Protected Member Variables
 	//-------------------------------------------------------------------------
 	/// Parent object.
-	runtime::entity _parent;
+	runtime::entity parent_;
 	/// Children objects.
-	std::vector<runtime::entity> _children;
+	std::vector<runtime::entity> children_;
 	/// Local transformation relative to the parent
-	math::transform _local_transform;
+	math::transform local_transform_;
 	/// Cached world transformation at pivot point.
-	math::transform _world_transform;
-
-	bool _dirty = true;
+	math::transform world_transform_;
+    /// Should recalc world transform.
+	bool dirty_ = true;
 };

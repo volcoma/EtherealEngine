@@ -34,7 +34,8 @@ void set_frame_getter(frame_getter_t frame_getter);
 std::uint64_t get_frame();
 }
 
-static const std::size_t MAX_COMPONENTS = 128;
+template <typename C>
+using chandle = std::weak_ptr<C>;
 
 class component;
 class component_storage
@@ -73,16 +74,13 @@ public:
 		return std::static_pointer_cast<T>(data[index]);
 	}
 
-	std::weak_ptr<component> set(unsigned int index, std::shared_ptr<component> component);
+	std::weak_ptr<component> set(unsigned int index, const std::shared_ptr<component>& component);
 
 private:
 	std::vector<std::shared_ptr<component>> data;
 };
 
 class entity_component_system;
-
-template <typename C>
-using chandle = std::weak_ptr<C>;
 
 /** A convenience handle around an entity::Id.
  *
@@ -141,7 +139,6 @@ public:
 		}
 
 	private:
-		friend class entity_component_system;
 
 		std::uint64_t id_;
 	};
@@ -182,7 +179,7 @@ public:
 	{
 		return other.id_ < id_;
 	}
-	void set_name(std::string name);
+	void set_name(const std::string& name);
 	const std::string& get_name() const;
 	/**
 	 * Is this entity handle valid?
@@ -213,12 +210,12 @@ public:
 	template <typename C, typename... Args>
 	chandle<C> assign(Args&&... args);
 
-	chandle<component> assign(std::shared_ptr<component> component);
+	chandle<component> assign(const std::shared_ptr<component>& component);
 
 	template <typename C>
 	void remove();
 
-	void remove(std::shared_ptr<component> component);
+	void remove(const std::shared_ptr<component>& component);
 
 	template <typename C>
 	chandle<C> get_component() const;
@@ -233,7 +230,7 @@ public:
 	template <typename C>
 	bool has_component() const;
 
-	bool has_component(std::shared_ptr<component> component) const;
+	bool has_component(const std::shared_ptr<component>& component) const;
 
 	template <typename A, typename... Args>
 	void unpack(chandle<A>& a, chandle<Args>&... args);
@@ -242,7 +239,6 @@ public:
 	 * Destroy and invalidate this entity.
 	 */
 	void destroy();
-	std::bitset<MAX_COMPONENTS> component_mask() const;
 
 private:
 	entity::id_t id_ = INVALID;
@@ -277,7 +273,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	component(const component&)
+	component(const component& /*unused*/)
 	{
 		touch();
 	}
@@ -300,9 +296,9 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void touch()
+	void touch()
 	{
-		_last_touched = static_cast<std::uint32_t>(ecs::get_frame());
+		last_touched_ = static_cast<std::uint32_t>(ecs::get_frame());
 	}
 
 	//-----------------------------------------------------------------------------
@@ -313,9 +309,9 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual bool is_touched() const
+	bool is_touched() const
 	{
-		return _last_touched >= static_cast<std::uint32_t>(ecs::get_frame());
+		return last_touched_ >= static_cast<std::uint32_t>(ecs::get_frame());
 	}
 
 	//-----------------------------------------------------------------------------
@@ -340,7 +336,7 @@ public:
 	//-----------------------------------------------------------------------------
 	entity get_entity()
 	{
-		return _entity;
+		return entity_;
 	}
 
 protected:
@@ -354,9 +350,9 @@ protected:
 	//-----------------------------------------------------------------------------
 	virtual rtti::type_index_sequential_t::index_t runtime_id() const = 0;
 	/// Was the component touched.
-	std::uint32_t _last_touched = 0;
+	std::uint32_t last_touched_ = 0;
 	/// Owning entity
-	entity _entity;
+	entity entity_;
 };
 
 template <typename T>
@@ -392,14 +388,14 @@ extern event<void(entity, chandle<component>)> on_component_removed;
 /**
  * Manages entity::Id creation and component assignment.
  */
+static const std::size_t MAX_COMPONENTS = 128;
 class entity_component_system
 {
 public:
 	typedef std::bitset<MAX_COMPONENTS> component_mask_t;
 
-	explicit entity_component_system();
+	explicit entity_component_system() = default;
 	virtual ~entity_component_system();
-
 	/// An iterator over a view of the entities in an entity_component_system.
 	/// If All is true it will iterate over all valid entities and will ignore the
 	/// entity mask.
@@ -507,7 +503,7 @@ public:
 				view_iterator<iterator_type, All>::next();
 			}
 
-			void next_entity(entity&)
+			void next_entity(entity& /*unused*/)
 			{
 			}
 		};
@@ -560,7 +556,9 @@ public:
 		void for_each(typename identity<std::function<void(entity entity, Components&...)>>::type f)
 		{
 			for(auto it : *this)
+			{
 				f(it, *(it.template get_component<Components>().lock().get())...);
+			}
 		}
 
 	private:
@@ -577,7 +575,7 @@ public:
 	};
 
 	template <typename... Components>
-	using View = typed_view<false, Components...>;
+	using view = typed_view<false, Components...>;
 
 	template <typename... Components>
 	class unpacking_view
@@ -725,7 +723,7 @@ public:
 			assign(id, std::make_shared<C>(std::forward<Args>(args)...)).lock());
 	}
 
-	chandle<component> assign(entity::id_t id, std::shared_ptr<component> comp);
+	chandle<component> assign(entity::id_t id, const std::shared_ptr<component>& comp);
 
 	/**
 	 * Remove a component from an entity::Id
@@ -737,8 +735,8 @@ public:
 	{
 		remove(id, rtti::type_index_sequential_t::id<component, C>());
 	}
-	void remove(entity::id_t id, std::shared_ptr<component> component);
-	void remove(entity::id_t id, const rtti::type_index_sequential_t::index_t family);
+	void remove(entity::id_t id, const std::shared_ptr<component>& component);
+	void remove(entity::id_t id, rtti::type_index_sequential_t::index_t family);
 
 	/**
 	 * Check if an entity has a component.
@@ -749,7 +747,7 @@ public:
 		return has_component(id, rtti::type_index_sequential_t::id<component, C>());
 	}
 
-	bool has_component(entity::id_t id, std::shared_ptr<component> component) const;
+	bool has_component(entity::id_t id, const std::shared_ptr<component>& component) const;
 
 	bool has_component(entity::id_t id, rtti::type_index_sequential_t::index_t family) const;
 	/**
@@ -766,10 +764,14 @@ public:
 		// We don't bother checking the component mask, as we return a nullptr
 		// anyway.
 		if(family >= component_pools_.size())
+		{
 			return chandle<C>();
+		}
 		auto& pool = component_pools_[family];
 		if(!pool || !entity_component_mask_[id.index()][family])
+		{
 			return chandle<C>();
+		}
 		return chandle<C>(pool->template get<C>(id.index()));
 	}
 
@@ -795,10 +797,10 @@ public:
 	 * @endcode
 	 */
 	template <typename... Components>
-	View<Components...> entities_with_components()
+	view<Components...> entities_with_components()
 	{
 		auto mask = component_mask<Components...>();
-		return View<Components...>(this, mask);
+		return view<Components...>(this, mask);
 	}
 
 	template <typename T>
@@ -877,7 +879,7 @@ public:
 	 */
 	void dispose();
 
-	void set_entity_name(entity::id_t id, std::string name);
+	void set_entity_name(entity::id_t id, const std::string& name);
 	const std::string& get_entity_name(entity::id_t id);
 
 private:
@@ -916,13 +918,13 @@ private:
 	}
 
 	template <typename C>
-	component_mask_t component_mask(const chandle<C>&)
+	component_mask_t component_mask(const chandle<C>& /*unused*/)
 	{
 		return component_mask<C>();
 	}
 
 	template <typename C1, typename... Components>
-	component_mask_t component_mask(const chandle<C1>&, const chandle<Components>&...)
+	component_mask_t component_mask(const chandle<C1>& /*unused*/, const chandle<Components>&... /*unused*/)
 	{
 		return component_mask<C1, Components...>();
 	}
@@ -936,7 +938,9 @@ private:
 			for(auto& pool : component_pools_)
 			{
 				if(pool)
+				{
 					pool->expand(index + 1);
+				}
 			}
 		}
 	}
@@ -954,14 +958,15 @@ private:
 		{
 			component_pools_.resize(family + 1);
 		}
-		if(!component_pools_[family])
-		{
 
-			component_pools_[family].reset(new component_storage());
-			component_pools_[family]->expand(index_counter_);
+		auto& pool = component_pools_[family];
+		if(!pool)
+		{
+			pool.reset(new component_storage());
+			pool->expand(index_counter_);
 		}
 
-		return *component_pools_[family].get();
+		return *pool;
 	}
 
 	std::uint32_t index_counter_ = 0;
@@ -988,7 +993,7 @@ chandle<C> entity::assign(Args&&... args)
 	return manager_->assign<C>(id_, std::forward<Args>(args)...);
 }
 
-inline chandle<component> entity::assign(std::shared_ptr<component> component)
+inline chandle<component> entity::assign(const std::shared_ptr<component>& component)
 {
 	expects(valid());
 	return manager_->assign(id_, component);
@@ -1001,7 +1006,7 @@ void entity::remove()
 	manager_->remove<C>(id_);
 }
 
-inline void entity::remove(std::shared_ptr<component> component)
+inline void entity::remove(const std::shared_ptr<component>& component)
 {
 	expects(valid() && has_component(component));
 	manager_->remove(id_, component);
@@ -1037,14 +1042,18 @@ template <typename C>
 bool entity::has_component() const
 {
 	if(!valid())
+	{
 		return false;
+	}
 	return manager_->has_component<C>(id_);
 }
 
-inline bool entity::has_component(std::shared_ptr<component> component) const
+inline bool entity::has_component(const std::shared_ptr<component>& component) const
 {
 	if(!valid())
+	{
 		return false;
+	}
 	return manager_->has_component(id_, component);
 }
 
@@ -1057,7 +1066,7 @@ void entity::unpack(chandle<A>& a, chandle<Args>&... args)
 
 inline bool entity::valid() const
 {
-	return manager_ && manager_->valid(id_);
+	return (manager_ != nullptr) && manager_->valid(id_);
 }
 
 inline std::ostream& operator<<(std::ostream& out, const entity::id_t& id)
@@ -1075,7 +1084,7 @@ inline std::ostream& operator<<(std::ostream& out, const entity& entity)
 inline std::string entity::to_string() const
 {
 	auto name = get_name();
-	if(name == "")
+	if(name.empty())
 	{
 		std::ostringstream str;
 		str << *this;

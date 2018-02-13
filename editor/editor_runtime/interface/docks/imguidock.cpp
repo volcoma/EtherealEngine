@@ -505,24 +505,24 @@ void dockspace::update_and_draw(ImVec2 dockspaceSize)
 	ImVec2 backup_pos = ImGui::GetCursorPos();
 
 	render_container(idgen, &root, dockspaceSize, backup_pos);
-	if(_current_dock_to)
+	if(current_dock_to_)
 	{
-		if(_current_dock_action == eUndock)
+		if(current_dock_action_ == eUndock)
 		{
-			if(undock(_current_dock_to))
+			if(undock(current_dock_to_))
 			{
-				_current_dock_to->container = nullptr;
-				_current_dock_to->draging = true;
+				current_dock_to_->container = nullptr;
+				current_dock_to_->draging = true;
 
 				auto& renderer = core::get_subsystem<runtime::renderer>();
 				auto& docking = core::get_subsystem<docking_system>();
 				auto window = std::make_unique<render_window>(
-					mml::video_mode(static_cast<unsigned int>(_current_dock_to->last_size.x),
-									static_cast<unsigned int>(_current_dock_to->last_size.y)),
+					mml::video_mode(static_cast<unsigned int>(current_dock_to_->last_size.x),
+									static_cast<unsigned int>(current_dock_to_->last_size.y)),
 					"Window", mml::style::standard);
 
 				auto& dockspace = docking.get_dockspace(window->get_id());
-				dockspace.dock_to(_current_dock_to, slot::tab, 0, true);
+				dockspace.dock_to(current_dock_to_, slot::tab, 0, true);
 				auto pos = mml::mouse::get_position();
 				pos[0] -= 40;
 				pos[1] -= 30 + int32_t(ImGui::GetTextLineHeightWithSpacing());
@@ -532,25 +532,25 @@ void dockspace::update_and_draw(ImVec2 dockspaceSize)
 				renderer.register_window(std::move(window));
 			}
 		}
-		else if(_current_dock_action == eDrag)
+		else if(current_dock_action_ == eDrag)
 		{
-			if(!_current_dock_to->draging)
+			if(!current_dock_to_->draging)
 			{
 			}
-			_current_dock_to->draging = true;
+			current_dock_to_->draging = true;
 		}
-		else if(_current_dock_action == eClose)
+		else if(current_dock_action_ == eClose)
 		{
-			if(_current_dock_to->on_close_func)
+			if(current_dock_to_->on_close_func)
 			{
-				if(_current_dock_to->on_close_func())
-					undock(_current_dock_to);
+				if(current_dock_to_->on_close_func())
+					undock(current_dock_to_);
 			}
 			else
-				undock(_current_dock_to);
+				undock(current_dock_to_);
 		}
-		_current_dock_to = nullptr;
-		_current_dock_action = eNull;
+		current_dock_to_ = nullptr;
+		current_dock_action_ = eNull;
 	}
 	update_drag(owner_id);
 }
@@ -928,8 +928,8 @@ void dockspace::render_tab_bar(node* container, const ImVec2& sz, const ImVec2& 
 			{
 				if(ImGui::IsMouseDragging(0, 4.0f))
 				{
-					_current_dock_action = eDrag;
-					_current_dock_to = dock;
+					current_dock_action_ = eDrag;
+					current_dock_to_ = dock;
 				}
 			}
 			else
@@ -938,8 +938,8 @@ void dockspace::render_tab_bar(node* container, const ImVec2& sz, const ImVec2& 
 				{
 					if(dock->undockable == false)
 					{
-						_current_dock_action = eUndock;
-						_current_dock_to = dock;
+						current_dock_action_ = eUndock;
+						current_dock_to_ = dock;
 					}
 				}
 			}
@@ -966,8 +966,8 @@ void dockspace::render_tab_bar(node* container, const ImVec2& sz, const ImVec2& 
 			ImGui::PushID(dockTitle.c_str());
 			if(ImGui::Button("X", ImVec2(0, tabbar_height)))
 			{
-				_current_dock_action = eClose;
-				_current_dock_to = dock;
+				current_dock_action_ = eClose;
+				current_dock_to_ = dock;
 			}
 			ImGui::PopID();
 			ImGui::PopStyleColor();

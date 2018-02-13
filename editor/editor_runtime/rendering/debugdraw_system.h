@@ -25,6 +25,6 @@ public:
 
 private:
 	///
-	std::unique_ptr<gpu_program> _program;
+	std::unique_ptr<gpu_program> program_;
 };
 }

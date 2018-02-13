@@ -4,10 +4,10 @@
 void console_log::_sink_it(const logging::details::log_msg& msg)
 {
 	{
-		std::lock_guard<std::recursive_mutex> lock(_entries_mutex);
-		_entries.push_back({msg.formatted.c_str(), msg.level});
+		std::lock_guard<std::recursive_mutex> lock(entries_mutex_);
+		entries_.push_back({msg.formatted.c_str(), msg.level});
 	}
-	_has_new_entries = true;
+	has_new_entries_ = true;
 }
 
 void console_log::_flush()
@@ -18,8 +18,8 @@ console_log::entries_t console_log::get_items()
 {
 	entries_t items_copy;
 	{
-		std::lock_guard<std::recursive_mutex> lock(_entries_mutex);
-		items_copy = _entries;
+		std::lock_guard<std::recursive_mutex> lock(entries_mutex_);
+		items_copy = entries_;
 	}
 	return items_copy;
 }
@@ -27,10 +27,10 @@ console_log::entries_t console_log::get_items()
 void console_log::clear_log()
 {
 	{
-		std::lock_guard<std::recursive_mutex> lock(_entries_mutex);
-		_entries.clear();
+		std::lock_guard<std::recursive_mutex> lock(entries_mutex_);
+		entries_.clear();
 	}
-	_has_new_entries = false;
+	has_new_entries_ = false;
 }
 
 const std::array<float, 4>& console_log::get_level_colorization(logging::level::level_enum level)

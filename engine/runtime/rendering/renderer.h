@@ -43,7 +43,7 @@ struct renderer
 	//-----------------------------------------------------------------------------
 	inline std::uint32_t get_render_frame() const
 	{
-		return _render_frame;
+		return render_frame_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -84,11 +84,11 @@ struct renderer
 						 const std::vector<mml::platform_event>& events);
 
 protected:
-	std::uint32_t _render_frame = 0;
+	std::uint32_t render_frame_ = 0;
 
 	/// engine windows
-	std::unique_ptr<mml::window> _init_window;
-	std::vector<std::unique_ptr<render_window>> _windows;
-	std::vector<std::unique_ptr<render_window>> _windows_pending_addition;
+	std::unique_ptr<mml::window> init_window_;
+	std::vector<std::unique_ptr<render_window>> windows_;
+	std::vector<std::unique_ptr<render_window>> windows_pending_addition_;
 };
 }

@@ -208,6 +208,6 @@ public:
 
 private:
 	/// pimpl idiom
-	std::unique_ptr<priv::source_impl> _impl;
+	std::unique_ptr<priv::source_impl> impl_;
 };
 }

@@ -63,6 +63,6 @@ public:
 
 private:
 	/// pimpl idiom
-	std::unique_ptr<priv::listener_impl> _impl;
+	std::unique_ptr<priv::listener_impl> impl_;
 };
 }

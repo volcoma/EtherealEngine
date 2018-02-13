@@ -59,12 +59,13 @@ private:
 	void bind_sound(sound_impl* sound);
 	void unbind_sound();
 
-	native_handle_type _handle = 0;
+	native_handle_type handle_ = 0;
 
     /// openal doesn't let us destroy sounds that are
     /// binded, so we have to keep this bookkeeping
-	std::mutex _mutex;
-	sound_impl* _bound_sound = nullptr;
+	std::mutex mutex_;  
+    /// non owning
+	sound_impl* bound_sound_ = nullptr;
 };
 }
 }

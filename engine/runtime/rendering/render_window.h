@@ -85,7 +85,7 @@ protected:
 	virtual void on_resize();
 
 	/// Window id.
-	std::uint32_t _id = 0;
+	std::uint32_t id_ = 0;
 	/// Render surface for this window.
-	std::shared_ptr<gfx::frame_buffer> _surface;
+	std::shared_ptr<gfx::frame_buffer> surface_;
 };

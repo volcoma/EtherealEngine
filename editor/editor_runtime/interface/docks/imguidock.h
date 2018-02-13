@@ -116,8 +116,8 @@ protected:
 		eNull
 	};
 
-	dock* _current_dock_to = nullptr;
-	dock_action _current_dock_action = eNull;
+	dock* current_dock_to_ = nullptr;
+	dock_action current_dock_action_ = eNull;
 
 public:
 	std::uint32_t owner_id = INVALID_WINDOW;

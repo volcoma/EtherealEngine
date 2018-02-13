@@ -268,7 +268,7 @@ void app::draw_menubar(render_window& window)
 			}
 			if(gui::MenuItem("SHOW START PAGE", "CTRL+P"))
 			{
-				_show_start_page = true;
+				show_start_page_ = true;
 				rend.hide_all_secondary_windows();
 				pm.close_project();
 				window.restore();
@@ -415,10 +415,10 @@ void app::setup(cmd_line::parser& parser)
 
 void app::start(cmd_line::parser& parser)
 {
-	_console_log = std::make_shared<console_log>();
+	console_log_ = std::make_shared<console_log>();
 
 	auto logging_container = logging::get_mutable_logging_container();
-	logging_container->add_sink(_console_log);
+	logging_container->add_sink(console_log_);
 
 	runtime::app::start(parser);
 
@@ -440,13 +440,13 @@ void app::create_docks()
 
 	main_window->set_title("ETHEREAL");
 
-	_console_dock_name = "CONSOLE";
+	console_dock_name_ = "CONSOLE";
 	auto scene = std::make_unique<scene_dock>("SCENE", true, ImVec2(200.0f, 200.0f));
 	auto game = std::make_unique<game_dock>("GAME", true, ImVec2(300.0f, 200.0f));
 	auto hierarchy = std::make_unique<hierarchy_dock>("HIERARCHY", true, ImVec2(300.0f, 200.0f));
 	auto inspector = std::make_unique<inspector_dock>("INSPECTOR", true, ImVec2(300.0f, 200.0f));
 	auto project = std::make_unique<project_dock>("PROJECT", true, ImVec2(200.0f, 200.0f));
-	auto console = std::make_unique<console_dock>("CONSOLE", true, ImVec2(200.0f, 200.0f), _console_log);
+	auto console = std::make_unique<console_dock>("CONSOLE", true, ImVec2(200.0f, 200.0f), console_log_);
 	auto style = std::make_unique<style_dock>("STYLE", true, ImVec2(300.0f, 200.0f));
 
 	auto& docking = core::get_subsystem<docking_system>();
@@ -471,7 +471,7 @@ void app::create_docks()
 void app::register_console_commands()
 {
 	std::function<void()> log_version = []() { APPLOG_INFO("Version 1.0"); };
-	_console_log->register_command("version", "Returns the current version of the Editor.", {}, {},
+	console_log_->register_command("version", "Returns the current version of the Editor.", {}, {},
 								   log_version);
 }
 
@@ -501,7 +501,7 @@ void app::draw_docks(delta_t dt)
 
 		gui::PushFont(gui::GetFont("standard"));
 
-		if(_show_start_page)
+		if(show_start_page_)
 		{
 			draw_start_page(*window);
 		}
@@ -545,12 +545,12 @@ void app::draw_dockspace(bool is_main, render_window& window, imguidock::dockspa
 
 void app::draw_footer(render_window&, imguidock::dockspace& dockspace)
 {
-	if(!_console_log)
+	if(!console_log_)
 		return;
 
 	auto& ts = core::get_subsystem<core::task_system>();
 	const auto tasks_info = ts.get_info();
-	const auto items = _console_log->get_items();
+	const auto items = console_log_->get_items();
 
 	const auto total_width = gui::GetContentRegionAvailWidth();
 	gui::Columns(2, "footer");
@@ -559,7 +559,7 @@ void app::draw_footer(render_window&, imguidock::dockspace& dockspace)
 	if(items.size() > 0)
 	{
 		const auto& last_item = items.back();
-		const auto& colorization = _console_log->get_level_colorization(last_item.second);
+		const auto& colorization = console_log_->get_level_colorization(last_item.second);
 		ImVec4 col = {colorization[0], colorization[1], colorization[2], colorization[3]};
 
 		gui::SetCursorPosY(ImGui::GetCursorPosY());
@@ -567,7 +567,7 @@ void app::draw_footer(render_window&, imguidock::dockspace& dockspace)
 		gui::AlignTextToFramePadding();
 		if(gui::Selectable(last_item.first.c_str(), false, 0, ImVec2(0, gui::GetTextLineHeight())))
 		{
-			dockspace.activate_dock(_console_dock_name);
+			dockspace.activate_dock(console_dock_name_);
 		}
 		gui::PopStyleColor();
 	}
@@ -607,7 +607,7 @@ void app::draw_start_page(render_window& window)
 		pm.create_project(path);
 		window.maximize();
 		rend.show_all_secondary_windows();
-		_show_start_page = false;
+		show_start_page_ = false;
 	};
 	auto on_open_project = [&](const std::string& p) {
 		auto& rend = core::get_subsystem<runtime::renderer>();
@@ -615,7 +615,7 @@ void app::draw_start_page(render_window& window)
 		pm.open_project(path);
 		window.maximize();
 		rend.show_all_secondary_windows();
-		_show_start_page = false;
+		show_start_page_ = false;
 	};
 
 	gui::PushFont(gui::GetFont("standard_big"));

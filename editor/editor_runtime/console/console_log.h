@@ -64,7 +64,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline bool has_new_entries() const
 	{
-		return _has_new_entries;
+		return has_new_entries_;
 	}
 
 	const std::array<float, 4>& get_level_colorization(logging::level::level_enum level);
@@ -78,13 +78,13 @@ public:
 	//-----------------------------------------------------------------------------
 	inline void set_has_new_entries(bool val)
 	{
-		_has_new_entries = val;
+		has_new_entries_ = val;
 	}
 
 private:
-	std::recursive_mutex _entries_mutex;
+	std::recursive_mutex entries_mutex_;
 	///
-	entries_t _entries;
+	entries_t entries_;
 	///
-	std::atomic<bool> _has_new_entries = {false};
+	std::atomic<bool> has_new_entries_ = {false};
 };

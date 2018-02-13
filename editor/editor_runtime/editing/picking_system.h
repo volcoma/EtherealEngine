@@ -31,16 +31,16 @@ public:
 
 private:
 	/// surface used to render into
-	std::shared_ptr<gfx::frame_buffer> _surface;
+	std::shared_ptr<gfx::frame_buffer> surface_;
 	///
-	std::shared_ptr<gfx::texture> _blit_tex;
+	std::shared_ptr<gfx::texture> blit_tex_;
 	/// picking program
-	std::unique_ptr<gpu_program> _program;
+	std::unique_ptr<gpu_program> program_;
 	/// Read blit into this
-	std::uint8_t _blit_data[tex_id_dim * tex_id_dim * 4];
+	std::uint8_t blit_data_[tex_id_dim * tex_id_dim * 4];
 	/// Indicates if is reading and when it will be ready
-	std::uint32_t _reading = 0;
+	std::uint32_t reading_ = 0;
 	///
-	bool _start_readback = false;
+	bool start_readback_ = false;
 };
 }

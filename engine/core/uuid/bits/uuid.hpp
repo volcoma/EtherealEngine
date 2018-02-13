@@ -107,7 +107,7 @@ struct uuid
 	///////////////////////////////////////////////////////////////////////
 
 	constexpr uuid()
-		: _data{0}
+		: data_{0}
 	{
 	}
 
@@ -140,7 +140,7 @@ struct uuid
 	template <typename InIter>
 	uuid(InIter first, InIter last)
 	{
-		::std::copy(first, last, _data);
+		::std::copy(first, last, data_);
 	}
 
 	uuid& operator=(uuid&&) = default;
@@ -151,7 +151,7 @@ struct uuid
 
 	constexpr const_reference operator[](size_type idx) const noexcept
 	{
-		return _data[idx];
+		return data_[idx];
 	}
 
 	///////////////////////////////////////////////////////////////////////
@@ -175,13 +175,13 @@ struct uuid
 	constexpr variant_type variant() const noexcept
 	{
 		return (
-			(_data[8] >> 5) == 0x07
+			(data_[8] >> 5) == 0x07
 				? variant_future
-				: ((_data[8] >> 5) == 0x06
+				: ((data_[8] >> 5) == 0x06
 					   ? variant_microsoft
-					   : ((_data[8] >> 6) == 0x02
+					   : ((data_[8] >> 6) == 0x02
 							  ? variant_rfc4122
-							  : ((_data[8] >> 7) == 0x00 ? variant_ncs : variant_unknown)))); // not sure if
+							  : ((data_[8] >> 7) == 0x00 ? variant_ncs : variant_unknown)))); // not sure if
 		// variant_unknown
 		// possible... here
 		// just cuz..
@@ -202,8 +202,8 @@ struct uuid
 				continue;
 			}
 
-			result[i++] = hex_digits[(_data[k] & 0xf0u) >> 4];
-			result[i++] = hex_digits[(_data[k] & 0x0fu)];
+			result[i++] = hex_digits[(data_[k] & 0xf0u) >> 4];
+			result[i++] = hex_digits[(data_[k] & 0x0fu)];
 			++k;
 		}
 
@@ -214,22 +214,22 @@ struct uuid
 
 	constexpr const_iterator begin() const noexcept
 	{
-		return detail::static_addressof(_data[0]);
+		return detail::static_addressof(data_[0]);
 	}
 
 	constexpr const_iterator end() const noexcept
 	{
-		return detail::static_addressof(_data[static_size - 1]);
+		return detail::static_addressof(data_[static_size - 1]);
 	}
 
 	constexpr const_iterator cbegin() const noexcept
 	{
-		return detail::static_addressof(_data[0]);
+		return detail::static_addressof(data_[0]);
 	}
 
 	constexpr const_iterator cend() const noexcept
 	{
-		return detail::static_addressof(_data[static_size - 1]);
+		return detail::static_addressof(data_[static_size - 1]);
 	}
 
 	const_reverse_iterator rbegin() const noexcept
@@ -299,7 +299,7 @@ struct uuid
 
 private:
 	static constexpr std::size_t static_size = 16;
-	value_type _data[static_size];
+	value_type data_[static_size];
 };
 
 ///////////////////////////////////////////////////////////////////////

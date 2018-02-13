@@ -10,31 +10,31 @@ model::model()
 {
 	auto& am = core::get_subsystem<runtime::asset_manager>();
 	auto standard = am.load<material>("embedded:/standard");
-	_default_material = standard.get();
+	default_material_ = standard.get();
 }
 
 bool model::is_valid() const
 {
-	return !_mesh_lods.empty();
+	return !mesh_lods_.empty();
 }
 
 asset_handle<mesh> model::get_lod(std::uint32_t lod) const
 {
-	if(_mesh_lods.size() > lod)
+	if(mesh_lods_.size() > lod)
 	{
-		auto lodMesh = _mesh_lods[lod];
+		auto lodMesh = mesh_lods_[lod];
 		if(lodMesh)
 			return lodMesh;
 
-		for(unsigned int i = lod; i < _mesh_lods.size(); ++i)
+		for(unsigned int i = lod; i < mesh_lods_.size(); ++i)
 		{
-			auto lodMesh = _mesh_lods[i];
+			auto lodMesh = mesh_lods_[i];
 			if(lodMesh)
 				return lodMesh;
 		}
 		for(unsigned int i = lod; i > 0; --i)
 		{
-			auto lodMesh = _mesh_lods[i];
+			auto lodMesh = mesh_lods_[i];
 			if(lodMesh)
 				return lodMesh;
 		}
@@ -44,74 +44,74 @@ asset_handle<mesh> model::get_lod(std::uint32_t lod) const
 
 void model::set_lod(asset_handle<mesh> mesh, std::uint32_t lod)
 {
-	if(lod >= _mesh_lods.size())
+	if(lod >= mesh_lods_.size())
 	{
-		_mesh_lods.resize(lod + 1);
+		mesh_lods_.resize(lod + 1);
 		recalulate_lod_limits();
 	}
-	_mesh_lods[lod] = mesh;
+	mesh_lods_[lod] = mesh;
 
-	if(_materials.size() != mesh->get_subset_count())
+	if(materials_.size() != mesh->get_subset_count())
 	{
-		_materials.resize(mesh->get_subset_count(), _default_material);
+		materials_.resize(mesh->get_subset_count(), default_material_);
 	}
 }
 
 void model::set_material(asset_handle<material> material, std::uint32_t index)
 {
-	if(index >= _mesh_lods.size())
-		_mesh_lods.resize(index + 1);
+	if(index >= mesh_lods_.size())
+		mesh_lods_.resize(index + 1);
 
-	_materials[index] = material;
+	materials_[index] = material;
 }
 
 const std::vector<asset_handle<mesh>>& model::get_lods() const
 {
-	return _mesh_lods;
+	return mesh_lods_;
 }
 
 void model::set_lods(const std::vector<asset_handle<mesh>>& lods)
 {
 	auto sz1 = lods.size();
-	auto sz2 = _mesh_lods.size();
+	auto sz2 = mesh_lods_.size();
 
-	_mesh_lods = lods;
+	mesh_lods_ = lods;
 
 	if(sz1 != sz2)
 		recalulate_lod_limits();
 
-	if(_mesh_lods.size() > 0)
+	if(mesh_lods_.size() > 0)
 	{
-		auto& mesh = _mesh_lods[0];
+		auto& mesh = mesh_lods_[0];
 		if(mesh)
 		{
-			if(_materials.size() != mesh->get_subset_count())
-				_materials.resize(mesh->get_subset_count(), _default_material);
+			if(materials_.size() != mesh->get_subset_count())
+				materials_.resize(mesh->get_subset_count(), default_material_);
 		}
 	}
 }
 
 const std::vector<asset_handle<material>>& model::get_materials() const
 {
-	return _materials;
+	return materials_;
 }
 
 void model::set_materials(const std::vector<asset_handle<material>>& materials)
 {
-	_materials = materials;
+	materials_ = materials;
 }
 
 asset_handle<material> model::get_material_for_group(const size_t& group) const
 {
-	if(_materials.size() <= group)
+	if(materials_.size() <= group)
 		return asset_handle<material>();
 
-	return _materials[group];
+	return materials_[group];
 }
 
 void model::set_lod_limits(const std::vector<urange32_t>& limits)
 {
-	_lod_limits = limits;
+	lod_limits_ = limits;
 }
 
 void model::render(gfx::view_id id, const math::transform& world_transform,
@@ -211,17 +211,17 @@ void model::render(gfx::view_id id, const math::transform& world_transform,
 void model::recalulate_lod_limits()
 {
 	float upper_limit = 100.0f;
-	_lod_limits.clear();
-	_lod_limits.reserve(_mesh_lods.size());
+	lod_limits_.clear();
+	lod_limits_.reserve(mesh_lods_.size());
 
-	for(size_t i = 0; i < _mesh_lods.size(); ++i)
+	for(size_t i = 0; i < mesh_lods_.size(); ++i)
 	{
 		float lower_limit = 0.0f;
 
-		if(_mesh_lods.size() - 1 != i)
+		if(mesh_lods_.size() - 1 != i)
 			lower_limit = upper_limit * (0.5f - ((i)*0.1f));
 
-		_lod_limits.emplace_back(urange32_t(urange32_t::value_type(lower_limit), urange32_t::value_type(upper_limit)));
+		lod_limits_.emplace_back(urange32_t(urange32_t::value_type(lower_limit), urange32_t::value_type(upper_limit)));
 		upper_limit = lower_limit;
 	}
 }

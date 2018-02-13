@@ -14,7 +14,7 @@ static const std::string& get_empty()
 }
 
 device::device(int devnum)
-	: _impl(std::make_unique<priv::device_impl>(devnum))
+	: impl_(std::make_unique<priv::device_impl>(devnum))
 {
 }
 
@@ -22,57 +22,57 @@ device::~device() = default;
 
 void device::enable()
 {
-	if(_impl)
+	if(impl_)
 	{
-		_impl->enable();
+		impl_->enable();
 	}
 }
 
 void device::disable()
 {
-	if(_impl)
+	if(impl_)
 	{
-		_impl->disable();
+		impl_->disable();
 	}
 }
 
 bool device::is_valid() const
 {
-	return _impl && _impl->is_valid();
+	return impl_ && impl_->is_valid();
 }
 
 const std::string& device::get_device_id() const
 {
-	if(_impl)
+	if(impl_)
 	{
-		return _impl->get_device_id();
+		return impl_->get_device_id();
 	}
 	return get_empty();
 }
 
 const std::string& device::get_vendor() const
 {
-	if(_impl)
+	if(impl_)
 	{
-		return _impl->get_vendor();
+		return impl_->get_vendor();
 	}
 	return get_empty();
 }
 
 const std::string& device::get_version() const
 {
-	if(_impl)
+	if(impl_)
 	{
-		return _impl->get_version();
+		return impl_->get_version();
 	}
 	return get_empty();
 }
 
 const std::string& device::get_extensions() const
 {
-	if(_impl)
+	if(impl_)
 	{
-		return _impl->get_extensions();
+		return impl_->get_extensions();
 	}
 	return get_empty();
 }

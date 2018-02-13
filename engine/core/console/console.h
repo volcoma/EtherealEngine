@@ -65,8 +65,8 @@ private:
 		command& operator=(const command&) = delete;
 	};
 
-	std::unordered_map<std::string, std::shared_ptr<command>> commands;
-	std::set<std::string> names;
+	std::unordered_map<std::string, std::shared_ptr<command>> commands_;
+	std::set<std::string> names_;
 	void register_help_command();
 	void help_command(const std::string& term);
 
@@ -109,8 +109,8 @@ void console::register_command(const std::string& name, const std::string& descr
 	const std::size_t argCount = sizeof...(Args);
 	assert(argumentNames.size() <= argCount);
 	assert(defaultArguments.size() <= argCount);
-	assert(commands.find(name) == commands.end());
-	assert(names.find(name) == names.end());
+	assert(commands_.find(name) == commands_.end());
+	assert(names_.find(name) == names_.end());
 
 	auto cmd = std::make_shared<command>(name, description, static_cast<unsigned int>(argCount),
 										 argumentNames, defaultArguments);
@@ -161,8 +161,8 @@ void console::register_command(const std::string& name, const std::string& descr
 										   static_cast<unsigned int>(requiredArguments));
 	};
 
-	commands[name] = cmd;
-	names.insert(name);
+	commands_[name] = cmd;
+	names_.insert(name);
 }
 
 /**

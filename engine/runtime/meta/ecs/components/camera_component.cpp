@@ -34,8 +34,8 @@ REFLECT(camera_component)
 SAVE(camera_component)
 {
 	try_save(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::component>(&obj)));
-	try_save(ar, cereal::make_nvp("camera", obj._camera));
-	try_save(ar, cereal::make_nvp("hdr", obj._hdr));
+	try_save(ar, cereal::make_nvp("camera", obj.camera_));
+	try_save(ar, cereal::make_nvp("hdr", obj.hdr_));
 }
 SAVE_INSTANTIATE(camera_component, cereal::oarchive_associative_t);
 SAVE_INSTANTIATE(camera_component, cereal::oarchive_binary_t);
@@ -43,8 +43,8 @@ SAVE_INSTANTIATE(camera_component, cereal::oarchive_binary_t);
 LOAD(camera_component)
 {
 	try_load(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::component>(&obj)));
-	try_load(ar, cereal::make_nvp("camera", obj._camera));
-	try_load(ar, cereal::make_nvp("hdr", obj._hdr));
+	try_load(ar, cereal::make_nvp("camera", obj.camera_));
+	try_load(ar, cereal::make_nvp("hdr", obj.hdr_));
 }
 LOAD_INSTANTIATE(camera_component, cereal::iarchive_associative_t);
 LOAD_INSTANTIATE(camera_component, cereal::iarchive_binary_t);

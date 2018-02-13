@@ -115,14 +115,14 @@ private:
 	// Private Member Variables.
 	//-------------------------------------------------------------------------
 	///
-	bool _static = true;
+	bool static_ = true;
 	///
-	bool _casts_shadow = true;
+	bool casts_shadow_ = true;
 	///
-	bool _casts_reflection = true;
+	bool casts_reflection_ = true;
 	///
-	model _model;
+	model model_;
 	///
-	std::vector<runtime::entity> _bone_entities;
-	std::vector<math::transform> _bone_transforms;
+	std::vector<runtime::entity> bone_entities_;
+	std::vector<math::transform> bone_transforms_;
 };

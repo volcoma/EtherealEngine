@@ -12,14 +12,14 @@ REFLECT(component)
 
 SAVE(component)
 {
-	try_save(ar, cereal::make_nvp("owner", obj._entity));
+	try_save(ar, cereal::make_nvp("owner", obj.entity_));
 }
 SAVE_INSTANTIATE(component, cereal::oarchive_associative_t);
 SAVE_INSTANTIATE(component, cereal::oarchive_binary_t);
 
 LOAD(component)
 {
-	try_load(ar, cereal::make_nvp("owner", obj._entity));
+	try_load(ar, cereal::make_nvp("owner", obj.entity_));
 
 	obj.touch();
 }

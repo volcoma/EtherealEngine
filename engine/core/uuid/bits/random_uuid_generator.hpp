@@ -18,20 +18,20 @@ class random_uuid_generator
 
 	typename engine_type::result_type gen()
 	{
-		return _distribution(_generator);
+		return distribution_(generator_);
 	}
 
 public:
 	explicit random_uuid_generator(result_type seed = engine_type::default_seed)
-		: _generator(seed)
-		, _distribution(std::numeric_limits<result_type>::min(), std::numeric_limits<result_type>::max())
+		: generator_(seed)
+		, distribution_(std::numeric_limits<result_type>::min(), std::numeric_limits<result_type>::max())
 	{
 	}
 
 	template <typename SeedSequence>
 	explicit random_uuid_generator(SeedSequence& q)
-		: _generator(q)
-		, _distribution(std::numeric_limits<result_type>::min(), std::numeric_limits<result_type>::max())
+		: generator_(q)
+		, distribution_(std::numeric_limits<result_type>::min(), std::numeric_limits<result_type>::max())
 	{
 	}
 
@@ -64,8 +64,8 @@ public:
 	}
 
 private:
-	engine_type _generator;
-	distribution_type _distribution;
+	engine_type generator_;
+	distribution_type distribution_;
 };
 }
 

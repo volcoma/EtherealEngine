@@ -126,7 +126,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline camera& get_camera()
 	{
-		return _camera;
+		return camera_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -139,7 +139,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline const camera& get_camera() const
 	{
-		return _camera;
+		return camera_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -232,7 +232,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline gfx::render_view& get_render_view()
 	{
-		return _render_view;
+		return render_view_;
 	}
 
 private:
@@ -240,9 +240,9 @@ private:
 	// Private Member Variables.
 	//-------------------------------------------------------------------------
 	/// The camera object this component represents
-	camera _camera;
+	camera camera_;
 	/// The render view for this component
-	gfx::render_view _render_view;
+	gfx::render_view render_view_;
 	/// Is the camera HDR?
-	bool _hdr = true;
+	bool hdr_ = true;
 };

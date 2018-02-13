@@ -107,9 +107,9 @@ private:
 	void attach_shader(asset_handle<gfx::shader> shader);
 
 	/// Shaders that created this program.
-	std::vector<asset_handle<gfx::shader>> _shaders;
+	std::vector<asset_handle<gfx::shader>> shaders_;
 	/// Shaders that created this program.
-	std::vector<std::uint16_t> _shaders_cached;
+	std::vector<std::uint16_t> shaders_cached_;
 	/// program
-	std::unique_ptr<gfx::program> _program;
+	std::unique_ptr<gfx::program> program_;
 };

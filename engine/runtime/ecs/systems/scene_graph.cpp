@@ -9,7 +9,7 @@ namespace runtime
 void scene_graph::frame_update(delta_t dt)
 {
 	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
-	_roots.clear();
+	roots_.clear();
 	auto all_entities = ecs.all_entities();
 	for(const auto entity : all_entities)
 	{
@@ -19,12 +19,12 @@ void scene_graph::frame_update(delta_t dt)
 			auto parent = transform_comp->get_parent();
 			if(parent.valid() == false)
 			{
-				_roots.push_back(entity);
+				roots_.push_back(entity);
 			}
 		}
 		else
 		{
-			_roots.push_back(entity);
+			roots_.push_back(entity);
 		}
 	}
 }

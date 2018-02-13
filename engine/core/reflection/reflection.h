@@ -49,7 +49,7 @@ inline int get_reg(void (*f)())
 	template <>                                                                                              \
 	void rttr_auto_register_reflection_function_t<cls>();                                                    \
 	static const int ANONYMOUS_VARIABLE(auto_register__) =                                                   \
-		refl_detail::get_reg<cls>(&rttr_auto_register_reflection_function_t<cls>);
+		refl_detail::get_reg<cls>(&rttr_auto_register_reflection_function_t<cls>)
 
 #define REFLECT(cls)                                                                                         \
 	template <>                                                                                              \

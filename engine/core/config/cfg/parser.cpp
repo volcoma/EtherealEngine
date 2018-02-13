@@ -8,10 +8,10 @@ namespace cfg
 {
 
 parser::parser(config& c)
-	: conf(c)
-	, in(nullptr)
-	, line(0)
-	, next_token(NO_TOKEN)
+	: conf_(c)
+	, in_(nullptr)
+	, line_(0)
+	, next_token_(NO_TOKEN)
 {
 }
 
@@ -21,17 +21,17 @@ parser::~parser()
 
 void parser::parse(std::istream& i, const std::string& f, unsigned int l)
 {
-	in = &i;
-	file = f;
-	line = l;
+	in_ = &i;
+	file_ = f;
+	line_ = l;
 
 	// prep the look ahead
 	std::string dummy;
 	get_next_token(dummy);
 
-	while(next_token != FILE_END)
+	while(next_token_ != FILE_END)
 	{
-		if(next_token == NEWLINE)
+		if(next_token_ == NEWLINE)
 		{
 			// skip empty lines
 			get_next_token(dummy);
@@ -45,13 +45,13 @@ void parser::parse(std::istream& i, const std::string& f, unsigned int l)
 
 parser::Token parser::get_next_token(std::string& value)
 {
-	Token token = next_token;
-	value = next_value;
+	Token token = next_token_;
+	value = next_value_;
 
-	next_token = lex_token(next_value);
-	while(next_token == WHITESPACE || next_token == COMMENT)
+	next_token_ = lex_token(next_value_);
+	while(next_token_ == WHITESPACE || next_token_ == COMMENT)
 	{
-		next_token = lex_token(next_value);
+		next_token_ = lex_token(next_value_);
 	}
 
 	return token;
@@ -60,7 +60,7 @@ parser::Token parser::get_next_token(std::string& value)
 parser::Token parser::lex_token(std::string& value)
 {
 	value.clear();
-	int c = in->get();
+	int c = in_->get();
 	switch(c)
 	{
 		case ' ':
@@ -165,7 +165,7 @@ parser::Token parser::lex_token(std::string& value)
 
 parser::Token parser::lex_whitespace(std::string& value)
 {
-	int c = in->get();
+	int c = in_->get();
 	while(true)
 	{
 		switch(c)
@@ -176,17 +176,17 @@ parser::Token parser::lex_whitespace(std::string& value)
 				value.push_back(std::string::value_type(c));
 				break;
 			default:
-				in->unget();
+				in_->unget();
 				return WHITESPACE;
 		}
-		c = in->get();
+		c = in_->get();
 	}
 }
 
 parser::Token parser::lex_newline(std::string& value)
 {
-	int c = in->get();
-	line++;
+	int c = in_->get();
+	line_++;
 	switch(c)
 	{
 		case '\n':
@@ -199,18 +199,18 @@ parser::Token parser::lex_newline(std::string& value)
 			else
 			{
 				// treat \n \n as two newline, obviously
-				in->unget();
+				in_->unget();
 			}
 			return NEWLINE;
 		default:
-			in->unget();
+			in_->unget();
 			return NEWLINE;
 	}
 }
 
 parser::Token parser::lex_number(std::string& value)
 {
-	int c = in->get();
+	int c = in_->get();
 	while(true)
 	{
 		// NOTE: not validating the actual format
@@ -230,16 +230,16 @@ parser::Token parser::lex_number(std::string& value)
 				value.push_back(std::string::value_type(c));
 				break;
 			default:
-				in->unget();
+				in_->unget();
 				return NUMBER;
 		}
-		c = in->get();
+		c = in_->get();
 	}
 }
 
 parser::Token parser::lex_identifier(std::string& value)
 {
-	int c = in->get();
+	int c = in_->get();
 	while(true)
 	{
 		switch(c)
@@ -311,16 +311,16 @@ parser::Token parser::lex_identifier(std::string& value)
 				value.push_back(std::string::value_type(c));
 				break;
 			default:
-				in->unget();
+				in_->unget();
 				return IDENTIFIER;
 		}
-		c = in->get();
+		c = in_->get();
 	}
 }
 
 parser::Token parser::lex_string(std::string& value)
 {
-	int c = in->get();
+	int c = in_->get();
 	while(true)
 	{
 		switch(c)
@@ -333,7 +333,7 @@ parser::Token parser::lex_string(std::string& value)
 				error("Unexpected newline in string.");
 				return ERROR;
 			case '\\':
-				c = in->get();
+				c = in_->get();
 				switch(c)
 				{
 					case '\'':
@@ -375,13 +375,13 @@ parser::Token parser::lex_string(std::string& value)
 				value.push_back(std::string::value_type(c));
 				break;
 		}
-		c = in->get();
+		c = in_->get();
 	}
 }
 
 parser::Token parser::lex_comment(std::string& value)
 {
-	int c = in->get();
+	int c = in_->get();
 	while(true)
 	{
 		switch(c)
@@ -394,7 +394,7 @@ parser::Token parser::lex_comment(std::string& value)
 				value.push_back(std::string::value_type(c));
 				break;
 		}
-		c = in->get();
+		c = in_->get();
 	}
 }
 
@@ -402,7 +402,7 @@ void parser::parse_section()
 {
 	parse_section_header();
 
-	while(next_token == IDENTIFIER || next_token == NEWLINE)
+	while(next_token_ == IDENTIFIER || next_token_ == NEWLINE)
 	{
 		parse_value_pair();
 	}
@@ -423,7 +423,7 @@ void parser::parse_section_header()
 	{
 		error("Expected identifier.");
 	}
-	section = value;
+	section_ = value;
 
 	t = get_next_token(value);
 	if(t != CLOSE_BRACE)
@@ -467,7 +467,7 @@ void parser::parse_value_pair()
 		error("Expected identifier or string.");
 	}
 
-	conf.set_value(section, name, value);
+	conf_.set_value(section_, name, value);
 
 	t = get_next_token(value);
 	if(t != NEWLINE && t != FILE_END)
@@ -479,11 +479,11 @@ void parser::parse_value_pair()
 void parser::error(const std::string& msg)
 {
 	std::stringstream buff;
-	if(!file.empty())
+	if(!file_.empty())
 	{
-		buff << file;
+		buff << file_;
 	}
-	buff << "(" << line << "): " << msg;
+	buff << "(" << line_ << "): " << msg;
 
 	throw std::runtime_error(buff.str());
 }

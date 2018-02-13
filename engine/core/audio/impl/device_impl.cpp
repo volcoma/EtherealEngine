@@ -97,65 +97,65 @@ device_impl::device_impl(int devnum)
 
 	if(devnum >= 0 && devnum < int(playback_devices.size()))
 	{
-		_device_id = playback_devices[std::size_t(devnum)];
+		device_id_ = playback_devices[std::size_t(devnum)];
 	}
 
 	// select device
-	_device = alcOpenDevice(_device_id.empty() ? nullptr : _device_id.c_str());
+	device_ = alcOpenDevice(device_id_.empty() ? nullptr : device_id_.c_str());
 
-	if(_device == nullptr)
+	if(device_ == nullptr)
 	{
-		log_error("Cant open audio playback device: " + _device_id);
+		log_error("Cant open audio playback device: " + device_id_);
 		return;
 	}
-	bool has_efx_ = openal::al_has_extension(_device, "ALC_EXT_EFX");
+	bool has_efx_ = openal::al_has_extension(device_, "ALC_EXT_EFX");
 
 	ALint attribs[4] = {0};
 	attribs[0] = ALC_MAX_AUXILIARY_SENDS;
 	attribs[1] = 4;
 
 	// create context
-	_context = alcCreateContext(_device, has_efx_ ? attribs : nullptr);
+	context_ = alcCreateContext(device_, has_efx_ ? attribs : nullptr);
 
-	if(_context == nullptr)
+	if(context_ == nullptr)
 	{
-		log_error("Cant create audio context for playback device: " + _device_id);
+		log_error("Cant create audio context for playback device: " + device_id_);
 		return;
 	}
 	enable();
 
-	_version = openal::al_version();
-	_vendor = openal::al_vendor();
-	_extensions = openal::al_extensions();
+	version_ = openal::al_version();
+	vendor_ = openal::al_vendor();
+	extensions_ = openal::al_extensions();
 
-	log_info(_version);
-	log_info(_vendor);
+	log_info(version_);
+	log_info(vendor_);
 	// log_info(_extensions);
 	// log_info(openal::alc_extensions());
-	log_info("Using audio playback device: " + _device_id);
+	log_info("Using audio playback device: " + device_id_);
 
 	al_check(alDistanceModel(AL_LINEAR_DISTANCE));
 }
 
 device_impl::~device_impl()
 {
-	if(_context != nullptr)
+	if(context_ != nullptr)
 	{
 		alcMakeContextCurrent(nullptr);
-		alcDestroyContext(_context);
-		_context = nullptr;
+		alcDestroyContext(context_);
+		context_ = nullptr;
 	}
 
-	if(_device != nullptr)
+	if(device_ != nullptr)
 	{
-		alcCloseDevice(_device);
-		_device = nullptr;
+		alcCloseDevice(device_);
+		device_ = nullptr;
 	}
 }
 
 void device_impl::enable()
 {
-	al_check(alcMakeContextCurrent(_context));
+	al_check(alcMakeContextCurrent(context_));
 }
 
 void device_impl::disable()
@@ -165,27 +165,27 @@ void device_impl::disable()
 
 bool device_impl::is_valid() const
 {
-	return (_device != nullptr) && (_context != nullptr);
+	return (device_ != nullptr) && (context_ != nullptr);
 }
 
 const std::string& device_impl::get_device_id() const
 {
-	return _device_id;
+	return device_id_;
 }
 
 const std::string& device_impl::get_version() const
 {
-	return _version;
+	return version_;
 }
 
 const std::string& device_impl::get_vendor() const
 {
-	return _vendor;
+	return vendor_;
 }
 
 const std::string& device_impl::get_extensions() const
 {
-	return _extensions;
+	return extensions_;
 }
 
 std::vector<std::string> device_impl::enumerate_capture_devices()

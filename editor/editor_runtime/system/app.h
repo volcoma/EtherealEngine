@@ -35,10 +35,10 @@ private:
 	void draw_toolbar();
 	void handle_drag_and_drop();
 
-	bool _show_start_page = true;
+	bool show_start_page_ = true;
 	///
-	std::shared_ptr<console_log> _console_log;
+	std::shared_ptr<console_log> console_log_;
 	///
-	std::string _console_dock_name;
+	std::string console_dock_name_;
 };
 }

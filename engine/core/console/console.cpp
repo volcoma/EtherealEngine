@@ -11,7 +11,7 @@ console::console()
 
 console::~console()
 {
-	commands.clear();
+	commands_.clear();
 }
 
 /**
@@ -19,11 +19,11 @@ console::~console()
  */
 void console::register_alias(const std::string& alias, const std::string& command)
 {
-	assert(commands.find(command) != commands.end());
-	assert(commands.find(alias) == commands.end());
-	assert(names.find(alias) == names.end()); // TODO: rename names?
-	commands[alias] = commands[command];
-	names.insert(alias);
+	assert(commands_.find(command) != commands_.end());
+	assert(commands_.find(alias) == commands_.end());
+	assert(names_.find(alias) == names_.end()); // TODO: rename names?
+	commands_[alias] = commands_[command];
+	names_.insert(alias);
 }
 
 /**
@@ -54,8 +54,8 @@ std::string console::process_input(const std::string& line)
 	std::string identifier = tokens.at(0);
 
 	tokens.erase(tokens.begin());
-	auto it = commands.find(identifier);
-	if(it != commands.end())
+	auto it = commands_.find(identifier);
+	if(it != commands_.end())
 	{
 		it->second->call(tokens);
 	}
@@ -162,20 +162,20 @@ void console::help_command(const std::string& term)
 		for(const auto& command : list_of_commands())
 		{
 			print(command);
-			if(!commands[command]->description.empty())
+			if(!commands_[command]->description.empty())
 			{
-				print("    " + commands[command]->description);
+				print("    " + commands_[command]->description);
 			}
 		}
 	}
 	else
 	{
-		if(commands.find(term) != commands.end())
+		if(commands_.find(term) != commands_.end())
 		{
-			print(commands[term]->get_usage());
-			if(!commands[term]->description.empty())
+			print(commands_[term]->get_usage());
+			if(!commands_[term]->description.empty())
 			{
-				print("    " + commands[term]->description);
+				print("    " + commands_[term]->description);
 			}
 		}
 		else
@@ -192,7 +192,7 @@ void console::help_command(const std::string& term)
 std::vector<std::string> console::list_of_commands(const std::string& filter)
 {
 	std::vector<std::string> list{};
-	for(auto value : commands)
+	for(auto value : commands_)
 	{
 		if(filter.empty() || value.first.compare(0, filter.length(), filter) == 0)
 		{

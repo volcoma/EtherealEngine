@@ -69,7 +69,7 @@ struct app
 
 protected:
 	/// exit code of the application
-	int _exitcode = 0;
-	bool _running = true;
+	int exitcode_ = 0;
+	bool running_ = true;
 };
 }

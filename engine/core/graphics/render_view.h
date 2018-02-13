@@ -45,7 +45,7 @@ public:
 	void release_unused_resources();
 
 private:
-	std::unordered_map<texture_key, std::pair<std::shared_ptr<texture>, bool>> _textures;
-	std::unordered_map<fbo_key, std::pair<std::shared_ptr<frame_buffer>, bool>> _fbos;
+	std::unordered_map<texture_key, std::pair<std::shared_ptr<texture>, bool>> textures_;
+	std::unordered_map<fbo_key, std::pair<std::shared_ptr<frame_buffer>, bool>> fbos_;
 };
 }

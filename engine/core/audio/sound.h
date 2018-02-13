@@ -51,9 +51,9 @@ private:
 	friend class source;
 
 	/// pimpl idiom
-	std::unique_ptr<priv::sound_impl> _impl;
+	std::unique_ptr<priv::sound_impl> impl_;
 
 	/// sound info
-	sound_info _info;
+	sound_info info_;
 };
 }

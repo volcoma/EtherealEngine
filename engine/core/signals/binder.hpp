@@ -261,7 +261,7 @@ public:
 		info_t info;
 		info.priority = priority;
 		info.function = make_wrapper(std::forward<F>(f));
-		auto& container = _list[id];
+		auto& container = list_[id];
 		container.emplace_back(std::move(info));
 		sort(container);
 	}
@@ -275,7 +275,7 @@ public:
 		info_t info;
 		info.priority = priority;
 		info.function = make_wrapper(object_ptr, std::forward<F>(f));
-		auto& container = _list[id];
+		auto& container = list_[id];
 		container.emplace_back(std::move(info));
 		sort(container);
 	}
@@ -290,7 +290,7 @@ public:
 		info.priority = priority;
 		info.sentinel = sentinel;
 		info.function = make_wrapper(std::forward<F>(f));
-		auto& container = _list[id];
+		auto& container = list_[id];
 		container.emplace_back(std::move(info));
 		sort(container);
 	}
@@ -307,7 +307,7 @@ public:
 		info.sentinel = sentinel;
 		info.function = make_wrapper(object_ptr, std::forward<F>(f));
 
-		auto& container = _list[id];
+		auto& container = list_[id];
 		container.emplace_back(std::move(info));
 		sort(container);
 	}
@@ -318,7 +318,7 @@ public:
 		static_assert(std::is_same<void, typename nonstd::function_traits<F>::result_type>::value,
 					  "signals cannot have a return type different from void");
 
-		auto& container = _list[id];
+		auto& container = list_[id];
 
 		using arg_index_sequence = nonstd::make_index_sequence<nonstd::function_traits<F>::arity>;
 		auto slot =
@@ -336,7 +336,7 @@ public:
 	template <typename... Args>
 	void emit(const id_t& id, Args&&... args)
 	{
-		auto& container = _list[id];
+		auto& container = list_[id];
 
 		auto any_args = fill_args(std::forward<Args>(args)...);
 		// Iterate this way to allow modification
@@ -360,7 +360,7 @@ public:
 
 	void clear()
 	{
-		_list.clear();
+		list_.clear();
 	}
 
 private:
@@ -382,7 +382,7 @@ private:
 	}
 
 	/// signal / slots
-	std::unordered_map<id_t, std::vector<info_t>> _list;
+	std::unordered_map<id_t, std::vector<info_t>> list_;
 };
 
 template <typename id_t = std::string, typename sentinel_t = std::weak_ptr<void>>
@@ -402,7 +402,7 @@ public:
 	{
 		info_t info;
 		info.function = make_wrapper(std::forward<F>(f));
-		_list[id] = std::move(info);
+		list_[id] = std::move(info);
 	}
 
 	template <typename C, typename F>
@@ -410,7 +410,7 @@ public:
 	{
 		info_t info;
 		info.function = make_wrapper(object_ptr, std::forward<F>(f));
-		_list[id] = std::move(info);
+		list_[id] = std::move(info);
 	}
 
 	template <typename F>
@@ -419,7 +419,7 @@ public:
 		info_t info;
 		info.sentinel = sentinel;
 		info.function = make_wrapper(std::forward<F>(f));
-		_list[id] = std::move(info);
+		list_[id] = std::move(info);
 	}
 
 	template <typename C, typename F>
@@ -428,12 +428,12 @@ public:
 		info_t info;
 		info.sentinel = sentinel;
 		info.function = make_wrapper(object_ptr, std::forward<F>(f));
-		_list[id] = std::move(info);
+		list_[id] = std::move(info);
 	}
 
 	void unbind(const id_t& id)
 	{
-		_list.erase(id);
+		list_.erase(id);
 	}
 
 	template <typename R, typename... Args,
@@ -441,8 +441,8 @@ public:
 	R invoke(const id_t& id, Args&&... args)
 	{
 		static_assert(!std::is_reference<R>::value, "unsupported return by reference (use return by value)");
-		auto it = _list.find(id);
-		assert((it != _list.end()) && "invoking a function without being binded to "
+		auto it = list_.find(id);
+		assert((it != list_.end()) && "invoking a function without being binded to "
 									  "any and expecting a result");
 		const auto& info = it->second;
 
@@ -450,7 +450,7 @@ public:
 		R res{};
 		if(info.sentinel.has_value() && info.sentinel.value().expired())
 		{
-			_list.erase(it);
+			list_.erase(it);
 			assert(false && "invoking a function without being binded to any and "
 							"expecting a result");
 			return res;
@@ -470,15 +470,15 @@ public:
 	R invoke(const id_t& id, Args&&... args)
 	{
 		static_assert(!std::is_reference<R>::value, "unsupported return by reference (use return by value)");
-		auto it = _list.find(id);
-		assert((it != _list.end()) && "invoking a function without being binded to "
+		auto it = list_.find(id);
+		assert((it != list_.end()) && "invoking a function without being binded to "
 									  "any");
 		const auto& info = it->second;
 
 		// check if subscriber expired
 		if(info.sentinel.has_value() && info.sentinel.value().expired())
 		{
-			_list.erase(it);
+			list_.erase(it);
 			assert(false && "invoking a function without being binded to any and "
 							"expecting a result");
 			return;
@@ -492,12 +492,12 @@ public:
 
 	void clear()
 	{
-		_list.clear();
+		list_.clear();
 	}
 
 private:
 	/// signal / slots
-	std::unordered_map<id_t, info_t> _list;
+	std::unordered_map<id_t, info_t> list_;
 };
 
 template <typename id_t = std::string, typename sentinel_t = std::weak_ptr<void>>

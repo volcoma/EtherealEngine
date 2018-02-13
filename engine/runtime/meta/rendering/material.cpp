@@ -15,14 +15,14 @@ REFLECT(material)
 
 SAVE(material)
 {
-	try_save(ar, cereal::make_nvp("cull_type", obj._cull_type));
+	try_save(ar, cereal::make_nvp("cull_type", obj.cull_type_));
 }
 SAVE_INSTANTIATE(material, cereal::oarchive_associative_t);
 SAVE_INSTANTIATE(material, cereal::oarchive_binary_t);
 
 LOAD(material)
 {
-	try_load(ar, cereal::make_nvp("cull_type", obj._cull_type));
+	try_load(ar, cereal::make_nvp("cull_type", obj.cull_type_));
 }
 LOAD_INSTANTIATE(material, cereal::iarchive_associative_t);
 LOAD_INSTANTIATE(material, cereal::iarchive_binary_t);

@@ -244,7 +244,7 @@ void hierarchy_dock::draw_entity(runtime::entity entity)
 		{
 			if(input.is_key_pressed(mml::keyboard::F2))
 			{
-				edit_label = true;
+				edit_label_ = true;
 				gui::SetKeyboardFocusHere();
 			}
 		}
@@ -261,11 +261,11 @@ void hierarchy_dock::draw_entity(runtime::entity entity)
 	gui::AlignTextToFramePadding();
 
 	bool opened = gui::TreeNodeEx(name.c_str(), flags);
-	if(!edit_label)
+	if(!edit_label_)
 	{
 		check_drag(entity);
 	}
-	if(edit_label && is_selected)
+	if(edit_label_ && is_selected)
 	{
 		std::array<char, 64> input_buff;
 		input_buff.fill(0);
@@ -281,14 +281,14 @@ void hierarchy_dock::draw_entity(runtime::entity entity)
 						  ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
 		{
 			entity.set_name(input_buff.data());
-			edit_label = false;
+			edit_label_ = false;
 		}
 
 		gui::PopItemWidth();
 
 		if(!gui::IsItemActive() && (gui::IsMouseClicked(0) || gui::IsMouseDragging()))
 		{
-			edit_label = false;
+			edit_label_ = false;
 		}
 		gui::PopID();
 		gui::PopID();
@@ -300,29 +300,29 @@ void hierarchy_dock::draw_entity(runtime::entity entity)
 	{
 		if(gui::IsMouseClicked(0))
 		{
-			id = window->GetID(transformComponent.get());
+			id_ = window->GetID(transformComponent.get());
 		}
 
-		if(gui::IsMouseReleased(0) && window->GetID(transformComponent.get()) == id)
+		if(gui::IsMouseReleased(0) && window->GetID(transformComponent.get()) == id_)
 		{
 			if(!is_selected)
-				edit_label = false;
+				edit_label_ = false;
 
 			es.select(entity);
 		}
 
 		if(gui::IsMouseDoubleClicked(0))
 		{
-			edit_label = is_selected;
+			edit_label_ = is_selected;
 		}
 	}
 
-	if(!edit_label)
+	if(!edit_label_)
 	{
 		auto action = check_context_menu(entity);
 		if(action == context_action::rename)
 		{
-			edit_label = true;
+			edit_label_ = true;
 		}
 	}
 

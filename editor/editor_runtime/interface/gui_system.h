@@ -18,12 +18,12 @@ class render_window;
 //-----------------------------------------------------------------------------
 struct gui_system
 {
-    // window id, is_focused
-    using window_info = std::pair<std::uint32_t, bool>;
-    
+	// window id, is_focused
+	using window_info = std::pair<std::uint32_t, bool>;
+
 	gui_system();
 	~gui_system();
-    
+
 	void frame_begin(delta_t);
 
 	std::uint32_t get_draw_calls() const;
@@ -37,10 +37,10 @@ struct gui_system
 
 private:
 	void platform_events(const window_info& info, const std::vector<mml::platform_event>&);
-	std::map<uint32_t, ImGuiContext*> _contexts;
-    
-    ImFontAtlas _atlas;
-    ImGuiContext* _initial_context = nullptr;
+
+	std::map<uint32_t, ImGuiContext*> contexts_;
+	ImFontAtlas atlas_;
+	ImGuiContext* initial_context_ = nullptr;
 };
 
 struct gui_style
@@ -75,4 +75,3 @@ struct gui_style
 };
 
 gui_style& get_gui_style();
-

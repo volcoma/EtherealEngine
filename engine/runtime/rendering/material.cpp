@@ -11,10 +11,10 @@ material::material()
 {
 	auto& am = core::get_subsystem<runtime::asset_manager>();
 	auto default_color = am.load<gfx::texture>("engine:/data/textures/default_color.dds");
-	_default_color_map = default_color.get();
+	default_color_map_ = default_color.get();
 
 	auto default_normal = am.load<gfx::texture>("engine:/data/textures/default_normal.dds");
-	_default_normal_map = default_normal.get();
+	default_normal_map_ = default_normal.get();
 }
 
 material::~material()
@@ -41,7 +41,7 @@ void material::set_uniform(const std::string& _name, const void* _value, std::ui
 
 gpu_program* material::get_program() const
 {
-	return skinned ? _program_skinned.get() : _program.get();
+	return skinned ? program_skinned_.get() : program_.get();
 }
 
 std::uint64_t material::get_render_states(bool apply_cull, bool depth_write, bool depth_test) const
@@ -77,25 +77,25 @@ standard_material::standard_material()
 
 	auto f = ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
-			_program = std::make_unique<gpu_program>(vs, fs);
+			program_ = std::make_unique<gpu_program>(vs, fs);
 
 		},
 		vs_deferred_geom, fs_deferred_geom);
 
 	auto f1 = ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
-			_program_skinned = std::make_unique<gpu_program>(vs, fs);
+			program_skinned_ = std::make_unique<gpu_program>(vs, fs);
 
 		},
 		vs_deferred_geom_skinned, fs_deferred_geom);
 
-	_futures.emplace_back(std::move(f));
-	_futures.emplace_back(std::move(f1));
+	futures_.emplace_back(std::move(f));
+	futures_.emplace_back(std::move(f1));
 }
 
 standard_material::~standard_material()
 {
-	for(auto& f : _futures)
+	for(auto& f : futures_)
 	{
 		f.wait();
 	}
@@ -106,24 +106,24 @@ void standard_material::submit()
 	if(!is_valid())
 		return;
 
-	get_program()->set_uniform("u_base_color", &_base_color);
-	get_program()->set_uniform("u_subsurface_color", &_subsurface_color);
-	get_program()->set_uniform("u_emissive_color", &_emissive_color);
-	get_program()->set_uniform("u_surface_data", &_surface_data);
-	get_program()->set_uniform("u_tiling", &_tiling);
-	get_program()->set_uniform("u_dither_threshold", &_dither_threshold);
+	get_program()->set_uniform("u_base_color", &base_color_);
+	get_program()->set_uniform("u_subsurface_color", &subsurface_color_);
+	get_program()->set_uniform("u_emissive_color", &emissive_color_);
+	get_program()->set_uniform("u_surface_data", &surface_data_);
+	get_program()->set_uniform("u_tiling", &tiling_);
+	get_program()->set_uniform("u_dither_threshold", &dither_threshold_);
 
-	const auto& color_map = _maps["color"];
-	const auto& normal_map = _maps["normal"];
-	const auto& roughness_map = _maps["roughness"];
-	const auto& metalness_map = _maps["metalness"];
-	const auto& ao_map = _maps["ao"];
+	const auto& color_map = maps_["color"];
+	const auto& normal_map = maps_["normal"];
+	const auto& roughness_map = maps_["roughness"];
+	const auto& metalness_map = maps_["metalness"];
+	const auto& ao_map = maps_["ao"];
 
-	auto albedo = color_map ? color_map : _default_color_map;
-	auto normal = normal_map ? normal_map : _default_normal_map;
-	auto roughness = roughness_map ? roughness_map : _default_color_map;
-	auto metalness = metalness_map ? metalness_map : _default_color_map;
-	auto ao = ao_map ? ao_map : _default_color_map;
+	auto albedo = color_map ? color_map : default_color_map_;
+	auto normal = normal_map ? normal_map : default_normal_map_;
+	auto roughness = roughness_map ? roughness_map : default_color_map_;
+	auto metalness = metalness_map ? metalness_map : default_color_map_;
+	auto ao = ao_map ? ao_map : default_color_map_;
 
 	get_program()->set_texture(0, "s_tex_color", albedo.get());
 	get_program()->set_texture(1, "s_tex_normal", normal.get());

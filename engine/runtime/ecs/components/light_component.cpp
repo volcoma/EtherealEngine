@@ -4,18 +4,18 @@ int light_component::compute_projected_sphere_rect(irect32_t& rect, const math::
 												   const math::vec3& light_direction,
 												   const math::transform& view, const math::transform& proj)
 {
-	if(_light.type == light_type::point)
+	if(light_.type == light_type::point)
 	{
 		return math::compute_projected_sphere_rect(rect.left, rect.right, rect.top, rect.bottom,
-												   light_position, _light.point_data.range, view, proj);
+												   light_position, light_.point_data.range, view, proj);
 	}
-	else if(_light.type == light_type::spot)
+	else if(light_.type == light_type::spot)
 	{
-		float range = _light.spot_data.get_range();
+		float range = light_.spot_data.get_range();
 		float clamped_inner_cone_angle =
-			math::radians(math::clamp(_light.spot_data.get_inner_angle(), 0.0f, 89.0f));
+			math::radians(math::clamp(light_.spot_data.get_inner_angle(), 0.0f, 89.0f));
 		float clamped_outer_cone_angle =
-			math::clamp(math::radians(_light.spot_data.get_outer_angle()), clamped_inner_cone_angle + 0.001f,
+			math::clamp(math::radians(light_.spot_data.get_outer_angle()), clamped_inner_cone_angle + 0.001f,
 						math::radians(89.0f) + 0.001f);
 		float cos_outer_cone = math::cos(clamped_outer_cone_angle);
 		// Use the law of cosines to find the distance to the furthest edge of the

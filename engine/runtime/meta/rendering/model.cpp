@@ -28,10 +28,10 @@ REFLECT(model)
 
 SAVE(model)
 {
-	try_save(ar, cereal::make_nvp("lods", obj._mesh_lods));
-	try_save(ar, cereal::make_nvp("materials", obj._materials));
-	try_save(ar, cereal::make_nvp("transition_time", obj._transition_time));
-	try_save(ar, cereal::make_nvp("lod_limits", obj._lod_limits));
+	try_save(ar, cereal::make_nvp("lods", obj.mesh_lods_));
+	try_save(ar, cereal::make_nvp("materials", obj.materials_));
+	try_save(ar, cereal::make_nvp("transition_time", obj.transition_time_));
+	try_save(ar, cereal::make_nvp("lod_limits", obj.lod_limits_));
 }
 SAVE_INSTANTIATE(model, cereal::oarchive_associative_t);
 SAVE_INSTANTIATE(model, cereal::oarchive_binary_t);
@@ -39,10 +39,10 @@ SAVE_INSTANTIATE(model, cereal::oarchive_binary_t);
 LOAD(model)
 {
 
-	try_load(ar, cereal::make_nvp("lods", obj._mesh_lods));
-	try_load(ar, cereal::make_nvp("materials", obj._materials));
-	try_load(ar, cereal::make_nvp("transition_time", obj._transition_time));
-	try_load(ar, cereal::make_nvp("lod_limits", obj._lod_limits));
+	try_load(ar, cereal::make_nvp("lods", obj.mesh_lods_));
+	try_load(ar, cereal::make_nvp("materials", obj.materials_));
+	try_load(ar, cereal::make_nvp("transition_time", obj.transition_time_));
+	try_load(ar, cereal::make_nvp("lod_limits", obj.lod_limits_));
 }
 LOAD_INSTANTIATE(model, cereal::iarchive_associative_t);
 LOAD_INSTANTIATE(model, cereal::iarchive_binary_t);

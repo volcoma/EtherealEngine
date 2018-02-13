@@ -17,10 +17,14 @@ public:
 		std::uint32_t mantissa = (data & 0x7FFFFF);
 
 		// Handle cases
-		if(exponent == 255) // NaN or inf
+		if(exponent == 255)
+		{ // NaN or inf
 			exponent = 31;
-		else if(exponent < 102) // (127-15)-10
+		}
+		else if(exponent < 102)
+		{ // (127-15)-10
 			exponent = mantissa = 0;
+		}
 		else if(exponent >= 143) // 127+(31-15)
 		{
 			exponent = 31;
@@ -33,7 +37,9 @@ public:
 			exponent = 0;
 		}
 		else
+		{
 			exponent -= 112;
+		}
 
 		// Store
 		_data = (std::uint16_t)((signBit << 15) | (exponent << 10) | (mantissa >> 13));
@@ -60,11 +66,17 @@ public:
 
 		// Handle cases
 		if(exponent == 31)
+		{
 			exponent = 255;
+		}
 		else if(exponent == 0)
+		{
 			exponent = 0;
+		}
 		else
+		{
 			exponent += 112;
+		}
 
 		// Convert
 		const std::uint32_t data = (signBit << 31) | (exponent << 23) | (mantissa << 13);
@@ -144,16 +156,21 @@ struct size
 	inline bool operator<(const size& b) const
 	{
 		if(width != b.width)
+		{
 			return (width < b.width);
-		else
-			return (height < b.height);
+		}
+		return (height < b.height);
 	}
 	inline bool operator>(const size& b) const
 	{
 		if(width < b.width)
+		{
 			return false;
+		}
 		if(width > b.width)
+		{
 			return true;
+		}
 		return (height > b.height);
 	}
 
@@ -238,28 +255,28 @@ struct rect
 		return {left + width() / 2, top + height() / 2};
 	}
 
-    template <typename T1 = T>
+	template <typename T1 = T>
 	inline point<T1> tl() const
 	{
 		return {left, top};
 	}
-    template <typename T1 = T>
+	template <typename T1 = T>
 	inline point<T1> tr() const
 	{
 		return {right, top};
 	}
-    
-    template <typename T1 = T>
+
+	template <typename T1 = T>
 	inline point<T1> bl() const
 	{
 		return {left, bottom};
 	}
-    template <typename T1 = T>
+	template <typename T1 = T>
 	inline point<T1> br() const
 	{
 		return {right, bottom};
 	}
-    
+
 	inline bool contains(const point<T>& p) const
 	{
 		return (p.x >= left && p.x <= right && p.y >= top && p.y <= bottom);
@@ -275,10 +292,8 @@ struct rect
 		{
 			return rect();
 		}
-		else
-		{
-			return c;
-		}
+
+		return c;
 	}
 
 	inline bool operator==(const rect& b) const
@@ -309,32 +324,48 @@ struct rect
 	{
 		T r = left - b.left;
 		if(r)
+		{
 			return (r < 0);
+		}
 		r = top - b.top;
 		if(r)
+		{
 			return (r < 0);
+		}
 		r = right - b.right;
 		if(r)
+		{
 			return (r < 0);
+		}
 		r = bottom - b.bottom;
 		if(r)
+		{
 			return (r < 0);
+		}
 		return false;
 	}
 	inline bool operator>(const rect& b) const
 	{
 		T r = left - b.left;
 		if(r)
+		{
 			return (r > 0);
+		}
 		r = top - b.top;
 		if(r)
+		{
 			return (r > 0);
+		}
 		r = right - b.right;
 		if(r)
+		{
 			return (r > 0);
+		}
 		r = bottom - b.bottom;
 		if(r)
+		{
 			return (r > 0);
+		}
 		return false;
 	}
 

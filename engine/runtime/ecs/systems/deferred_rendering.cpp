@@ -258,7 +258,7 @@ void deferred_rendering::build_reflections_pass(entity_component_system& ecs, st
 				camera.set_far_clip(reflection_probe_comp.get_probe().box_data.extents.r);
 				auto& render_view = reflection_probe_comp.get_render_view(i);
 				camera.set_viewport_size(usize32_t(cubemap_fbo->get_size()));
-				auto& camera_lods = _lod_data[ce];
+				auto& camera_lods = lod_data_[ce];
 				visibility_set_models_t visibility_set;
 
 				if(probe.method != reflect_method::environment)
@@ -307,7 +307,7 @@ void deferred_rendering::build_shadows_pass(entity_component_system& ecs, std::c
 void deferred_rendering::camera_pass(entity_component_system& ecs, std::chrono::duration<float> dt)
 {
 	ecs.for_each<camera_component>([this, &ecs, dt](entity ce, camera_component& camera_comp) {
-		auto& camera_lods = _lod_data[ce];
+		auto& camera_lods = lod_data_[ce];
 		auto& camera = camera_comp.get_camera();
 		auto& render_view = camera_comp.get_render_view();
 
@@ -460,25 +460,25 @@ deferred_rendering::lighting_pass(std::shared_ptr<gfx::frame_buffer> input, came
 				return;
 
 			gpu_program* program = nullptr;
-			if(light.type == light_type::directional && _directional_light_program)
+			if(light.type == light_type::directional && directional_light_program_)
 			{
 				// Draw light.
-				program = _directional_light_program.get();
+				program = directional_light_program_.get();
 				program->begin();
 				program->set_uniform("u_light_direction", &light_direction);
 			}
-			if(light.type == light_type::point && _point_light_program)
+			if(light.type == light_type::point && point_light_program_)
 			{
 				float light_data[4] = {light.point_data.range, light.point_data.exponent_falloff, 0.0f, 0.0f};
 
 				// Draw light.
-				program = _point_light_program.get();
+				program = point_light_program_.get();
 				program->begin();
 				program->set_uniform("u_light_position", &light_position);
 				program->set_uniform("u_light_data", light_data);
 			}
 
-			if(light.type == light_type::spot && _spot_light_program)
+			if(light.type == light_type::spot && spot_light_program_)
 			{
 				float light_data[4] = {light.spot_data.get_range(),
 									   math::cos(math::radians(light.spot_data.get_inner_angle() * 0.5f)),
@@ -486,7 +486,7 @@ deferred_rendering::lighting_pass(std::shared_ptr<gfx::frame_buffer> input, came
 									   0.0f};
 
 				// Draw light.
-				program = _spot_light_program.get();
+				program = spot_light_program_.get();
 				program->begin();
 				program->set_uniform("u_light_position", &light_position);
 				program->set_uniform("u_light_direction", &light_direction);
@@ -506,7 +506,7 @@ deferred_rendering::lighting_pass(std::shared_ptr<gfx::frame_buffer> input, came
 				program->set_texture(3, "s_tex3", g_buffer_fbo->get_texture(3).get());
 				program->set_texture(4, "s_tex4", g_buffer_fbo->get_texture(4).get());
 				program->set_texture(5, "s_tex5", refl_buffer);
-				program->set_texture(6, "s_tex6", _ibl_brdf_lut.get());
+				program->set_texture(6, "s_tex6", ibl_brdf_lut_.get());
 
 				gfx::set_scissor(rect.left, rect.top, rect.width(), rect.height());
 				auto topology = gfx::clip_quad(1.0f);
@@ -564,14 +564,14 @@ deferred_rendering::reflection_probe_pass(std::shared_ptr<gfx::frame_buffer> inp
 
 			gpu_program* program = nullptr;
 			float influence_radius = 0.0f;
-			if(probe.type == probe_type::sphere && _sphere_ref_probe_program)
+			if(probe.type == probe_type::sphere && sphere_ref_probe_program_)
 			{
-				program = _sphere_ref_probe_program.get();
+				program = sphere_ref_probe_program_.get();
 				program->begin();
 				influence_radius = probe.sphere_data.range;
 			}
 
-			if(probe.type == probe_type::box && _box_ref_probe_program)
+			if(probe.type == probe_type::box && box_ref_probe_program_)
 			{
 				math::transform t;
 				t.set_scale(probe.box_data.extents);
@@ -580,7 +580,7 @@ deferred_rendering::reflection_probe_pass(std::shared_ptr<gfx::frame_buffer> inp
 				float data2[4] = {probe.box_data.extents.x, probe.box_data.extents.y,
 								  probe.box_data.extents.z, probe.box_data.transition_distance};
 
-				program = _box_ref_probe_program.get();
+				program = box_ref_probe_program_.get();
 				program->begin();
 				program->set_uniform("u_inv_world", &u_inv_world);
 				program->set_uniform("u_data2", data2);
@@ -650,7 +650,7 @@ deferred_rendering::atmospherics_pass(std::shared_ptr<gfx::frame_buffer> input, 
 	pass.bind(surface);
 	pass.set_view_proj(view, proj);
 
-	if(surface && _atmospherics_program)
+	if(surface && atmospherics_program_)
 	{
 		bool found_sun = false;
 		auto light_direction = math::normalize(math::vec3(0.2f, -0.8f, 1.0f));
@@ -670,8 +670,8 @@ deferred_rendering::atmospherics_pass(std::shared_ptr<gfx::frame_buffer> input, 
 				}
 			});
 
-		_atmospherics_program->begin();
-		_atmospherics_program->set_uniform("u_light_direction", &light_direction);
+		atmospherics_program_->begin();
+		atmospherics_program_->set_uniform("u_light_direction", &light_direction);
 
 		irect32_t rect(0, 0, irect32_t::value_type(output_size.width),
 					   irect32_t::value_type(output_size.height));
@@ -679,9 +679,9 @@ deferred_rendering::atmospherics_pass(std::shared_ptr<gfx::frame_buffer> input, 
 		auto topology = gfx::clip_quad(1.0f);
 		gfx::set_state(topology | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE |
 					   BGFX_STATE_DEPTH_TEST_LEQUAL | BGFX_STATE_BLEND_ADD);
-		gfx::submit(pass.id, _atmospherics_program->native_handle());
+		gfx::submit(pass.id, atmospherics_program_->native_handle());
 		gfx::set_state(BGFX_STATE_DEFAULT);
-		_atmospherics_program->end();
+		atmospherics_program_->end();
 	}
 
 	return input;
@@ -703,18 +703,18 @@ deferred_rendering::tonemapping_pass(std::shared_ptr<gfx::frame_buffer> input, c
 	pass.bind(surface.get());
 	pass.set_view_proj(view, proj);
 
-	if(surface && _gamma_correction_program)
+	if(surface && gamma_correction_program_)
 	{
-		_gamma_correction_program->begin();
-		_gamma_correction_program->set_texture(0, "s_input", input->get_texture().get());
+		gamma_correction_program_->begin();
+		gamma_correction_program_->set_texture(0, "s_input", input->get_texture().get());
 		irect32_t rect(0, 0, irect32_t::value_type(output_size.width),
 					   irect32_t::value_type(output_size.height));
 		gfx::set_scissor(rect.left, rect.top, rect.width(), rect.height());
 		auto topology = gfx::clip_quad(1.0f);
 		gfx::set_state(topology | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
-		gfx::submit(pass.id, _gamma_correction_program->native_handle());
+		gfx::submit(pass.id, gamma_correction_program_->native_handle());
 		gfx::set_state(BGFX_STATE_DEFAULT);
-		_gamma_correction_program->end();
+		gamma_correction_program_->end();
 	}
 
 	return surface;
@@ -722,8 +722,8 @@ deferred_rendering::tonemapping_pass(std::shared_ptr<gfx::frame_buffer> input, c
 
 void deferred_rendering::receive(entity e)
 {
-	_lod_data.erase(e);
-	for(auto& pair : _lod_data)
+	lod_data_.erase(e);
+	for(auto& pair : lod_data_)
 	{
 		pair.second.erase(e);
 	}
@@ -746,52 +746,52 @@ deferred_rendering::deferred_rendering()
 		am.load<gfx::shader>("engine:/data/shaders/fs_sphere_reflection_probe.sc");
 	auto fs_box_reflection_probe = am.load<gfx::shader>("engine:/data/shaders/fs_box_reflection_probe.sc");
 	auto fs_atmospherics = am.load<gfx::shader>("engine:/data/shaders/fs_atmospherics.sc");
-	_ibl_brdf_lut = am.load<gfx::texture>("engine:/data/textures/ibl_brdf_lut.png").get();
+	ibl_brdf_lut_ = am.load<gfx::texture>("engine:/data/textures/ibl_brdf_lut.png").get();
 
 	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
-			_point_light_program = std::make_unique<gpu_program>(vs, fs);
+			point_light_program_ = std::make_unique<gpu_program>(vs, fs);
 		},
 		vs_clip_quad, fs_deferred_point_light);
 
 	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
-			_spot_light_program = std::make_unique<gpu_program>(vs, fs);
+			spot_light_program_ = std::make_unique<gpu_program>(vs, fs);
 
 		},
 		vs_clip_quad, fs_deferred_spot_light);
 
 	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
-			_directional_light_program = std::make_unique<gpu_program>(vs, fs);
+			directional_light_program_ = std::make_unique<gpu_program>(vs, fs);
 
 		},
 		vs_clip_quad, fs_deferred_directional_light);
 
 	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
-			_gamma_correction_program = std::make_unique<gpu_program>(vs, fs);
+			gamma_correction_program_ = std::make_unique<gpu_program>(vs, fs);
 
 		},
 		vs_clip_quad, fs_gamma_correction);
 
 	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
-			_sphere_ref_probe_program = std::make_unique<gpu_program>(vs, fs);
+			sphere_ref_probe_program_ = std::make_unique<gpu_program>(vs, fs);
 
 		},
 		vs_clip_quad_ex, fs_sphere_reflection_probe);
 
 	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
-			_box_ref_probe_program = std::make_unique<gpu_program>(vs, fs);
+			box_ref_probe_program_ = std::make_unique<gpu_program>(vs, fs);
 
 		},
 		vs_clip_quad_ex, fs_box_reflection_probe);
 
 	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
-			_atmospherics_program = std::make_unique<gpu_program>(vs, fs);
+			atmospherics_program_ = std::make_unique<gpu_program>(vs, fs);
 
 		},
 		vs_clip_quad_ex, fs_atmospherics);

@@ -4,7 +4,7 @@
 namespace audio
 {
 listener::listener()
-	: _impl(std::make_unique<priv::listener_impl>())
+	: impl_(std::make_unique<priv::listener_impl>())
 {
 }
 
@@ -12,33 +12,33 @@ listener::~listener() = default;
 
 void listener::set_volume(float volume)
 {
-	if(_impl)
+	if(impl_)
 	{
-		_impl->set_volume(volume);
+		impl_->set_volume(volume);
 	}
 }
 
 void listener::set_position(const float3& position)
 {
-	if(_impl)
+	if(impl_)
 	{
-		_impl->set_position(position);
+		impl_->set_position(position);
 	}
 }
 
 void listener::set_velocity(const float3& velocity)
 {
-	if(_impl)
+	if(impl_)
 	{
-		_impl->set_velocity(velocity);
+		impl_->set_velocity(velocity);
 	}
 }
 
 void listener::set_orientation(const float3& direction, const float3& up)
 {
-	if(_impl)
+	if(impl_)
 	{
-		_impl->set_orientation(direction, up);
+		impl_->set_orientation(direction, up);
 	}
 }
 }

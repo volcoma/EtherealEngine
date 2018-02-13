@@ -41,7 +41,7 @@ struct simulation
 	//-----------------------------------------------------------------------------
 	inline const std::uint64_t& get_frame() const
 	{
-		return _frame;
+		return frame_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -107,23 +107,22 @@ struct simulation
 
 protected:
 	/// minimum/maximum frames per second
-	unsigned int _min_fps = 0;
+	unsigned int min_fps_ = 0;
 	///
-	unsigned int _max_fps = 200;
+	unsigned int max_fps_ = 200;
 	///
-	unsigned int _max_inactive_fps = 20;
+	unsigned int max_inactive_fps_ = 20;
 	/// previous time steps for smoothing in seconds
-	std::vector<duration_t> _previous_timesteps;
-
+	std::vector<duration_t> previous_timesteps_;
 	/// next frame time step in seconds
-	duration_t _timestep = duration_t::zero();
+	duration_t timestep_ = duration_t::zero();
 	/// current frame
-	std::uint64_t _frame = 0;
+	std::uint64_t frame_ = 0;
 	/// how many frames to average for the smoothed time step
-	unsigned int _smoothing_step = 11;
+	unsigned int smoothing_step_ = 11;
 	/// frame update timer
-	timepoint_t _last_frame_timepoint = clock_t::now();
+	timepoint_t last_frame_timepoint_ = clock_t::now();
 	/// time point when we launched
-	timepoint_t _launch_timepoint = clock_t::now();
+	timepoint_t launch_timepoint_ = clock_t::now();
 };
 }

@@ -80,7 +80,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline projection_mode get_projection_mode() const
 	{
-		return _projection_mode;
+		return projection_mode_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -91,7 +91,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline float get_fov() const
 	{
-		return _fov;
+		return fov_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -102,7 +102,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline float get_near_clip() const
 	{
-		return _near_clip;
+		return near_clip_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -113,7 +113,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline float get_far_clip() const
 	{
-		return _far_clip;
+		return far_clip_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -124,7 +124,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline float get_ortho_size() const
 	{
-		return _ortho_size;
+		return ortho_size_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -167,7 +167,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline void set_viewport_pos(const upoint32_t& viewportPos)
 	{
-		_viewport_pos = viewportPos;
+		viewport_pos_ = viewportPos;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -180,7 +180,7 @@ public:
 	//-----------------------------------------------------------------------------
 	const usize32_t& get_viewport_size() const
 	{
-		return _viewport_size;
+		return viewport_size_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -193,7 +193,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline const upoint32_t& get_viewport_pos() const
 	{
-		return _viewport_pos;
+		return viewport_pos_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -213,7 +213,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline float get_aspect_ratio() const
 	{
-		return _aspect_ratio;
+		return aspect_ratio_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -234,7 +234,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline bool is_frustum_locked() const
 	{
-		return _frustum_locked;
+		return frustum_locked_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -245,7 +245,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline void lock_frustum(bool locked)
 	{
-		_frustum_locked = locked;
+		frustum_locked_ = locked;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -282,7 +282,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline const math::transform& get_view() const
 	{
-		return _view;
+		return view_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -305,7 +305,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline const math::transform& get_last_view() const
 	{
-		return _last_view;
+		return last_view_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -317,7 +317,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline const math::transform& get_last_projection() const
 	{
-		return _last_projection;
+		return last_projection_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -348,7 +348,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline const math::vec4& get_aa_data() const
 	{
-		return _aa_data;
+		return aa_data_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -572,47 +572,47 @@ protected:
 	// Protected Variables
 	//-------------------------------------------------------------------------
 	/// The type of projection currently selected for this camera.
-	projection_mode _projection_mode = projection_mode::perspective;
+	projection_mode projection_mode_ = projection_mode::perspective;
 	/// Vertical degrees angle (perspective only).
-	float _fov = 60.0f;
+	float fov_ = 60.0f;
 	/// Near clip plane Distance
-	float _near_clip = 0.1f;
+	float near_clip_ = 0.1f;
 	/// Far clip plane Distance
-	float _far_clip = 1000.0f;
+	float far_clip_ = 1000.0f;
 	/// camera's half-size when in orthographic mode.
-	float _ortho_size = 5;
+	float ortho_size_ = 5;
 	/// Viewport position
-	upoint32_t _viewport_pos = {0, 0};
+	upoint32_t viewport_pos_ = {0, 0};
 	/// Viewport size
-	usize32_t _viewport_size = {0, 0};
+	usize32_t viewport_size_ = {0, 0};
 	/// Cached view matrix
-	math::transform _view;
+	math::transform view_;
 	/// Cached projection matrix.
-	mutable math::transform _projection;
+	mutable math::transform projection_;
 	/// Cached "previous" view matrix.
-	math::transform _last_view;
+	math::transform last_view_;
 	/// Cached "previous" projection matrix.
-	math::transform _last_projection;
+	math::transform last_projection_;
 	/// Details regarding the camera frustum.
-	mutable math::frustum _frustum;
+	mutable math::frustum frustum_;
 	/// The near clipping volume (area of space between the camera position and
 	/// the near plane).
-	mutable math::frustum _clipping_volume;
+	mutable math::frustum clipping_volume_;
 	/// The aspect ratio used to generate the correct horizontal degrees
 	/// (perspective only)
-	float _aspect_ratio = 1.0f;
+	float aspect_ratio_ = 1.0f;
 	/// Anti-aliasing data.
-	math::vec4 _aa_data = {0.0f, 0.0f, 0.0f, 0.0f};
+	math::vec4 aa_data_ = {0.0f, 0.0f, 0.0f, 0.0f};
 	/// View matrix dirty ?
-	bool _view_dirty = true;
+	bool view_dirty_ = true;
 	/// Projection matrix dirty ?
-	mutable bool _projection_dirty = true;
+	mutable bool projection_dirty_ = true;
 	/// Has the aspect ratio changed?
-	mutable bool _aspect_dirty = true;
+	mutable bool aspect_dirty_ = true;
 	/// Are the frustum planes dirty ?
-	mutable bool _frustum_dirty = true;
+	mutable bool frustum_dirty_ = true;
 	/// Should the aspect ratio be automatically updated by the render driver?
-	bool _aspect_locked = false;
+	bool aspect_locked_ = false;
 	/// Is the frustum locked?
-	bool _frustum_locked = false;
+	bool frustum_locked_ = false;
 };

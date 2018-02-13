@@ -23,8 +23,8 @@ REFLECT(transform_component)
 SAVE(transform_component)
 {
 	try_save(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::component>(&obj)));
-	try_save(ar, cereal::make_nvp("local_transform", obj._local_transform));
-	try_save(ar, cereal::make_nvp("children", obj._children));
+	try_save(ar, cereal::make_nvp("local_transform", obj.local_transform_));
+	try_save(ar, cereal::make_nvp("children", obj.children_));
 }
 SAVE_INSTANTIATE(transform_component, cereal::oarchive_associative_t);
 SAVE_INSTANTIATE(transform_component, cereal::oarchive_binary_t);
@@ -32,17 +32,17 @@ SAVE_INSTANTIATE(transform_component, cereal::oarchive_binary_t);
 LOAD(transform_component)
 {
 	try_load(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::component>(&obj)));
-	try_load(ar, cereal::make_nvp("local_transform", obj._local_transform));
-	try_load(ar, cereal::make_nvp("children", obj._children));
+	try_load(ar, cereal::make_nvp("local_transform", obj.local_transform_));
+	try_load(ar, cereal::make_nvp("children", obj.children_));
 
-	for(auto child : obj._children)
+	for(auto child : obj.children_)
 	{
 		if(child.valid())
 		{
 			auto child_transform = child.get_component<transform_component>().lock();
 			if(child_transform)
 			{
-				child_transform->_parent = obj.get_entity();
+				child_transform->parent_ = obj.get_entity();
 			}
 		}
 	}

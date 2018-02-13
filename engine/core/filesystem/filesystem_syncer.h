@@ -97,15 +97,15 @@ private:
 	fs::path get_watch_path();
 
 	/// Mutex for locking the data of this class.
-	std::mutex _mutex;
+	std::mutex mutex_;
 	/// Mappings of all remapped extensions.
-	mapping_t _mapping;
+	mapping_t mapping_;
 	/// Reference directory to be watched.
-	fs::path _reference_dir;
+	fs::path reference_dir_;
 	/// Directory to be synced with the reference one.
-	fs::path _synced_dir;
+	fs::path synced_dir_;
 
-	std::atomic<std::uint64_t> _watch_id = {0};
+	std::atomic<std::uint64_t> watch_id_ = {0};
 };
 
 //////////////////////////////////////////////////////////////////////

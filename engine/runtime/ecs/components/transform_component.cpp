@@ -4,14 +4,14 @@
 
 void transform_component::on_entity_set()
 {
-	for(auto& child : _children)
+	for(auto& child : children_)
 	{
 		if(child.valid())
 		{
 			auto child_transform = child.get_component<transform_component>().lock();
 			if(child_transform)
 			{
-				child_transform->_parent = get_entity();
+				child_transform->parent_ = get_entity();
 			}
 		}
 	}
@@ -19,15 +19,15 @@ void transform_component::on_entity_set()
 
 transform_component::~transform_component()
 {
-	if(_parent.valid())
+	if(parent_.valid())
 	{
-		auto parent_transform = _parent.get_component<transform_component>().lock();
+		auto parent_transform = parent_.get_component<transform_component>().lock();
 		if(parent_transform)
 		{
 			parent_transform->remove_child(get_entity());
 		}
 	}
-	for(auto& child : _children)
+	for(auto& child : children_)
 	{
 		if(child.valid())
 		{
@@ -65,8 +65,8 @@ transform_component& transform_component::move_local(const math::vec3& amount)
 transform_component& transform_component::set_local_position(const math::vec3& position)
 {
 	// Set new cell relative position
-	_local_transform.set_position(position);
-	set_local_transform(_local_transform);
+	local_transform_.set_position(position);
+	set_local_transform(local_transform_);
 	return *this;
 }
 
@@ -76,9 +76,9 @@ transform_component& transform_component::set_position(const math::vec3& positio
 	math::transform m = get_transform();
 	m.set_position(position);
 
-	if(_parent.valid())
+	if(parent_.valid())
 	{
-		auto parent_transform = _parent.get_component<transform_component>().lock();
+		auto parent_transform = parent_.get_component<transform_component>().lock();
 		if(parent_transform)
 		{
 			math::transform inv_parent_transform = math::inverse(parent_transform->get_transform());
@@ -92,32 +92,32 @@ transform_component& transform_component::set_position(const math::vec3& positio
 
 math::vec3 transform_component::get_local_scale()
 {
-	return _local_transform.get_scale();
+	return local_transform_.get_scale();
 }
 
 const math::vec3& transform_component::get_local_position()
 {
-	return _local_transform.get_position();
+	return local_transform_.get_position();
 }
 
 math::quat transform_component::get_local_rotation()
 {
-	return _local_transform.get_rotation();
+	return local_transform_.get_rotation();
 }
 
 math::vec3 transform_component::get_local_x_axis()
 {
-	return _local_transform.x_unit_axis();
+	return local_transform_.x_unit_axis();
 }
 
 math::vec3 transform_component::get_local_y_axis()
 {
-	return _local_transform.y_unit_axis();
+	return local_transform_.y_unit_axis();
 }
 
 math::vec3 transform_component::get_local_z_axis()
 {
-	return _local_transform.z_unit_axis();
+	return local_transform_.z_unit_axis();
 }
 
 const math::vec3& transform_component::get_position()
@@ -154,13 +154,13 @@ const math::transform& transform_component::get_transform()
 {
 	// the transform should be resolved
 	resolve();
-	return _world_transform;
+	return world_transform_;
 }
 
 const math::transform& transform_component::get_local_transform() const
 {
 	// Return reference to our internal matrix
-	return _local_transform;
+	return local_transform_;
 }
 
 transform_component& transform_component::look_at(float x, float y, float z)
@@ -216,8 +216,8 @@ transform_component& transform_component::rotate_local(float x, float y, float z
 	if(!can_rotate())
 		return *this;
 
-	_local_transform.rotate_local(math::radians(x), math::radians(y), math::radians(z));
-	set_local_transform(_local_transform);
+	local_transform_.rotate_local(math::radians(x), math::radians(y), math::radians(z));
+	set_local_transform(local_transform_);
 	return *this;
 }
 
@@ -241,9 +241,9 @@ transform_component& transform_component::rotate_axis(float degrees, const math:
 		math::transform m = get_transform();
 		m.rotate_axis(math::radians(degrees), axis);
 
-		if(_parent.valid())
+		if(parent_.valid())
 		{
-			auto parent_transform = _parent.get_component<transform_component>().lock();
+			auto parent_transform = parent_.get_component<transform_component>().lock();
 			if(parent_transform)
 			{
 				math::transform inv_parent_transform = math::inverse(parent_transform->get_transform());
@@ -278,9 +278,9 @@ transform_component& transform_component::rotate(float x, float y, float z)
 		math::transform m = get_transform();
 		m.rotate(math::radians(x), math::radians(y), math::radians(z));
 
-		if(_parent.valid())
+		if(parent_.valid())
 		{
-			auto parent_transform = _parent.get_component<transform_component>().lock();
+			auto parent_transform = parent_.get_component<transform_component>().lock();
 			if(parent_transform)
 			{
 				math::transform inv_parent_transform = math::inverse(parent_transform->get_transform());
@@ -316,9 +316,9 @@ transform_component& transform_component::rotate(float x, float y, float z, cons
 		math::transform m = get_transform();
 		m.rotate(math::radians(x), math::radians(y), math::radians(z));
 
-		if(_parent.valid())
+		if(parent_.valid())
 		{
-			auto parent_transform = _parent.get_component<transform_component>().lock();
+			auto parent_transform = parent_.get_component<transform_component>().lock();
 			if(parent_transform)
 			{
 				math::transform inv_parent_transform = math::inverse(parent_transform->get_transform());
@@ -344,9 +344,9 @@ transform_component& transform_component::set_scale(const math::vec3& s)
 	math::transform m = get_transform();
 	m.set_scale(s);
 
-	if(_parent.valid())
+	if(parent_.valid())
 	{
-		auto parent_transform = _parent.get_component<transform_component>().lock();
+		auto parent_transform = parent_.get_component<transform_component>().lock();
 		if(parent_transform)
 		{
 			math::transform inv_parent_transform = math::inverse(parent_transform->get_transform());
@@ -363,8 +363,8 @@ transform_component& transform_component::set_local_scale(const math::vec3& scal
 	// Do nothing if scaling is disallowed.
 	if(!can_scale())
 		return *this;
-	_local_transform.set_scale(scale);
-	set_local_transform(_local_transform);
+	local_transform_.set_scale(scale);
+	set_local_transform(local_transform_);
 	return *this;
 }
 
@@ -378,9 +378,9 @@ transform_component& transform_component::set_rotation(const math::quat& rotatio
 	math::transform m = get_transform();
 	m.set_rotation(rotation);
 
-	if(_parent.valid())
+	if(parent_.valid())
 	{
-		auto parent_transform = _parent.get_component<transform_component>().lock();
+		auto parent_transform = parent_.get_component<transform_component>().lock();
 		if(parent_transform)
 		{
 			math::transform inv_parent_transform = math::inverse(parent_transform->get_transform());
@@ -399,8 +399,8 @@ transform_component& transform_component::set_local_rotation(const math::quat& r
 		return *this;
 
 	// Set orientation of new math::transform
-	_local_transform.set_rotation(rotation);
-	set_local_transform(_local_transform);
+	local_transform_.set_rotation(rotation);
+	set_local_transform(local_transform_);
 
 	return *this;
 }
@@ -519,20 +519,20 @@ transform_component& transform_component::set_parent(runtime::entity parent, boo
 		resolve(true);
 		cached_world_transform = get_transform();
 	}
-	if(_parent.valid())
+	if(parent_.valid())
 	{
-		auto parent_transform = _parent.get_component<transform_component>().lock();
+		auto parent_transform = parent_.get_component<transform_component>().lock();
 		if(parent_transform)
 		{
 			parent_transform->remove_child(get_entity());
 		}
 	}
 
-	_parent = parent;
+	parent_ = parent;
 
-	if(_parent.valid())
+	if(parent_.valid())
 	{
-		auto parent_transform = _parent.get_component<transform_component>().lock();
+		auto parent_transform = parent_.get_component<transform_component>().lock();
 		if(parent_transform)
 		{
 			parent_transform->attach_child(get_entity());
@@ -558,33 +558,33 @@ transform_component& transform_component::set_parent(runtime::entity parent, boo
 
 const runtime::entity& transform_component::get_parent() const
 {
-	return _parent;
+	return parent_;
 }
 
 void transform_component::attach_child(const runtime::entity& child)
 {
-	_children.push_back(child);
+	children_.push_back(child);
 
 	set_dirty(is_dirty());
 }
 
 void transform_component::remove_child(const runtime::entity& child)
 {
-	_children.erase(std::remove_if(std::begin(_children), std::end(_children),
+	children_.erase(std::remove_if(std::begin(children_), std::end(children_),
 								   [&child](const auto& other) { return child == other; }),
-					std::end(_children));
+					std::end(children_));
 }
 
 void transform_component::cleanup_dead_children()
 {
-	_children.erase(std::remove_if(std::begin(_children), std::end(_children),
+	children_.erase(std::remove_if(std::begin(children_), std::end(children_),
 								   [](const auto& other) { return other.valid() == false; }),
-					std::end(_children));
+					std::end(children_));
 }
 
 transform_component& transform_component::set_transform(const math::transform& tr)
 {
-	if(_world_transform.compare(tr, 0.0001f) == 0)
+	if(world_transform_.compare(tr, 0.0001f) == 0)
 		return *this;
 
 	math::vec3 position, scaling;
@@ -596,9 +596,9 @@ transform_component& transform_component::set_transform(const math::transform& t
 	m.set_rotation(orientation);
 	m.set_position(position);
 
-	if(_parent.valid())
+	if(parent_.valid())
 	{
-		auto parent_transform = _parent.get_component<transform_component>().lock();
+		auto parent_transform = parent_.get_component<transform_component>().lock();
 		if(parent_transform)
 		{
 			math::transform inv_parent_transform = math::inverse(parent_transform->get_transform());
@@ -612,12 +612,12 @@ transform_component& transform_component::set_transform(const math::transform& t
 
 transform_component& transform_component::set_local_transform(const math::transform& trans)
 {
-	if(_local_transform.compare(trans, 0.0001f) == 0)
+	if(local_transform_.compare(trans, 0.0001f) == 0)
 		return *this;
 
 	set_dirty(true);
 
-	_local_transform = trans;
+	local_transform_ = trans;
 	return *this;
 }
 
@@ -625,21 +625,21 @@ void transform_component::resolve(bool force)
 {
 	if(force || is_dirty())
 	{
-		if(_parent.valid())
+		if(parent_.valid())
 		{
-			auto parent_transform = _parent.get_component<transform_component>().lock();
+			auto parent_transform = parent_.get_component<transform_component>().lock();
 			if(parent_transform)
 			{
-				_world_transform = parent_transform->get_transform() * _local_transform;
+				world_transform_ = parent_transform->get_transform() * local_transform_;
 			}
 			else
 			{
-				_world_transform = _local_transform;
+				world_transform_ = local_transform_;
 			}
 		}
 		else
 		{
-			_world_transform = _local_transform;
+			world_transform_ = local_transform_;
 		}
 
 		set_dirty(false);
@@ -648,18 +648,18 @@ void transform_component::resolve(bool force)
 
 bool transform_component::is_dirty() const
 {
-	return _dirty;
+	return dirty_;
 }
 
 void transform_component::set_dirty(bool dirty)
 {
-	_dirty = dirty;
+	dirty_ = dirty;
 
-	if(_dirty == true)
+	if(dirty_ == true)
 	{
 		touch();
 
-		for(const auto& child : _children)
+		for(const auto& child : children_)
 		{
 			if(child.valid())
 			{
@@ -675,5 +675,5 @@ void transform_component::set_dirty(bool dirty)
 
 const std::vector<runtime::entity>& transform_component::get_children() const
 {
-	return _children;
+	return children_;
 }

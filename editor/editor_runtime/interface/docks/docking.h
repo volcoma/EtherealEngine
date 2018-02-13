@@ -19,6 +19,6 @@ private:
 	void platform_events(const std::pair<std::uint32_t, bool>& info,
 						 const std::vector<mml::platform_event>& events);
 
-	std::map<uint32_t, imguidock::dockspace> _dockspaces;
-	std::vector<std::unique_ptr<imguidock::dock>> _docks;
+	std::map<uint32_t, imguidock::dockspace> dockspaces_;
+	std::vector<std::unique_ptr<imguidock::dock>> docks_;
 };

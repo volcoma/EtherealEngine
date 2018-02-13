@@ -3,7 +3,7 @@
 
 console_dock::console_dock(const std::string& dtitle, bool close_button, const ImVec2& min_size,
 						   std::shared_ptr<console_log> log)
-	: _console_log(log)
+	: console_log_(log)
 
 {
 	initialize(dtitle, close_button, min_size, std::bind(&console_dock::render, this, std::placeholders::_1));
@@ -11,7 +11,7 @@ console_dock::console_dock(const std::string& dtitle, bool close_button, const I
 
 void console_dock::render(const ImVec2&)
 {
-	if(!_console_log)
+	if(!console_log_)
 		return;
 
 	gui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
@@ -22,7 +22,7 @@ void console_dock::render(const ImVec2&)
 	gui::SameLine();
 	if(gui::SmallButton("CLEAR"))
 	{
-		_console_log->clear_log();
+		console_log_->clear_log();
 	}
 	gui::Separator();
 
@@ -38,28 +38,28 @@ void console_dock::render(const ImVec2&)
 	if(gui::BeginPopupContextWindow())
 	{
 		if(gui::Selectable("Clear"))
-			_console_log->clear_log();
+			console_log_->clear_log();
 		gui::EndPopup();
 	}
 	gui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1)); // Tighten spacing
 
-	const auto items = _console_log->get_items();
+	const auto items = console_log_->get_items();
 
 	for(const auto& pair_msg : items)
 	{
 		const char* item_cstr = pair_msg.first.c_str();
 		if(!filter.PassFilter(item_cstr))
 			continue;
-		const auto& colorization = _console_log->get_level_colorization(pair_msg.second);
+		const auto& colorization = console_log_->get_level_colorization(pair_msg.second);
 		ImVec4 col = {colorization[0], colorization[1], colorization[2], colorization[3]};
 		gui::PushStyleColor(ImGuiCol_Text, col);
 		gui::TextWrapped("%s", item_cstr);
 		gui::PopStyleColor();
 	}
-	if(_console_log->has_new_entries())
+	if(console_log_->has_new_entries())
 		gui::SetScrollHere();
 
-	_console_log->set_has_new_entries(false);
+	console_log_->set_has_new_entries(false);
 
 	gui::PopStyleVar();
 	gui::EndChild();
@@ -75,7 +75,7 @@ void console_dock::render(const ImVec2&)
 	{
 		// copy from c_str to remove trailing zeros
 		std::string command = input_buff.data();
-		std::string error_msg = _console_log->process_input(command);
+		std::string error_msg = console_log_->process_input(command);
 		if(error_msg != "")
 		{
 			APPLOG_WARNING(error_msg.c_str());

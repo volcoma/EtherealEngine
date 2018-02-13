@@ -38,8 +38,8 @@ const std::int32_t MaxVertexCacheSize = 32;
 };
 
 mesh::mesh()
-	: _hardware_vb(std::make_shared<gfx::vertex_buffer>())
-	, _hardware_ib(std::make_shared<gfx::index_buffer>())
+	: hardware_vb_(std::make_shared<gfx::vertex_buffer>())
+	, hardware_ib_(std::make_shared<gfx::index_buffer>())
 {
 }
 
@@ -51,63 +51,63 @@ mesh::~mesh()
 void mesh::dispose()
 {
 	// Iterate through the different subsets in the mesh and clean up
-	for(auto subset : _mesh_subsets)
+	for(auto subset : mesh_subsets_)
 	{
 		// Just perform a standard 'disconnect' in the
 		// regular unload case.
 		checked_delete(subset);
 	}
 
-	_mesh_subsets.clear();
-	_subset_lookup.clear();
-	_data_groups.clear();
+	mesh_subsets_.clear();
+	subset_lookup_.clear();
+	data_groups_.clear();
 
 	// Release bone palettes and skin data (if any)
-	_bone_palettes.clear();
-	_skin_bind_data.clear();
+	bone_palettes_.clear();
+	skin_bind_data_.clear();
 
 	// Clean up preparation data.
-	if(_preparation_data.owns_source == true)
-		checked_array_delete(_preparation_data.vertex_source);
-	_preparation_data.vertex_source = nullptr;
-	_preparation_data.source_format = {};
-	_preparation_data.owns_source = false;
-	_preparation_data.vertex_data.clear();
-	_preparation_data.vertex_flags.clear();
-	_preparation_data.vertex_records.clear();
-	_preparation_data.triangle_data.clear();
+	if(preparation_data_.owns_source == true)
+		checked_array_delete(preparation_data_.vertex_source);
+	preparation_data_.vertex_source = nullptr;
+	preparation_data_.source_format = {};
+	preparation_data_.owns_source = false;
+	preparation_data_.vertex_data.clear();
+	preparation_data_.vertex_flags.clear();
+	preparation_data_.vertex_records.clear();
+	preparation_data_.triangle_data.clear();
 
 	// Release mesh data memory
-	checked_array_delete(_system_vb);
-	checked_array_delete(_system_ib);
+	checked_array_delete(system_vb_);
+	checked_array_delete(system_ib_);
 
-	_triangle_data.clear();
+	triangle_data_.clear();
 
 	// Release resources
-	_hardware_vb.reset();
-	_hardware_ib.reset();
+	hardware_vb_.reset();
+	hardware_ib_.reset();
 
 	// Clear variables
-	_preparation_data.vertex_source = nullptr;
-	_preparation_data.owns_source = false;
-	_preparation_data.source_format = {};
-	_preparation_data.triangle_count = 0;
-	_preparation_data.vertex_count = 0;
-	_preparation_data.compute_normals = false;
-	_preparation_data.compute_binormals = false;
-	_preparation_data.compute_tangents = false;
-	_prepare_status = mesh_status::not_prepared;
-	_face_count = 0;
-	_vertex_count = 0;
-	_system_vb = nullptr;
-	_vertex_format = {};
-	_system_ib = nullptr;
-	_force_tangent_generation = false;
-	_force_normal_generation = false;
-	_force_barycentric_generation = true;
+	preparation_data_.vertex_source = nullptr;
+	preparation_data_.owns_source = false;
+	preparation_data_.source_format = {};
+	preparation_data_.triangle_count = 0;
+	preparation_data_.vertex_count = 0;
+	preparation_data_.compute_normals = false;
+	preparation_data_.compute_binormals = false;
+	preparation_data_.compute_tangents = false;
+	prepare_status_ = mesh_status::not_prepared;
+	face_count_ = 0;
+	vertex_count_ = 0;
+	system_vb_ = nullptr;
+	vertex_format_ = {};
+	system_ib_ = nullptr;
+	force_tangent_generation_ = false;
+	force_normal_generation_ = false;
+	force_barycentric_generation_ = true;
 
 	// Reset structures
-	_bbox.reset();
+	bbox_.reset();
 }
 
 bool mesh::bind_skin(const skin_bind_data& bind_data)
@@ -122,27 +122,27 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 	std::uint32_t palette_size = gfx::get_max_blend_transforms();
 
 	// Destroy any previous palette entries.
-	_bone_palettes.clear();
+	bone_palettes_.clear();
 
-	_skin_bind_data.clear();
-	_skin_bind_data = bind_data;
+	skin_bind_data_.clear();
+	skin_bind_data_ = bind_data;
 
 	// If the mesh has already been prepared, roll it back.
-	if(_prepare_status == mesh_status::prepared)
-		prepare_mesh(_vertex_format);
+	if(prepare_status_ == mesh_status::prepared)
+		prepare_mesh(vertex_format_);
 
 	face_influences used_bones;
 	// Build a list of all bone indices and associated weights for each vertex.
-	_skin_bind_data.build_vertex_table(_preparation_data.vertex_count, _preparation_data.vertex_records,
+	skin_bind_data_.build_vertex_table(preparation_data_.vertex_count, preparation_data_.vertex_records,
 									   vertex_table);
 
 	// Vertex based influences are no longer required. Clear them to save space.
-	_skin_bind_data.clear_vertex_influences();
+	skin_bind_data_.clear_vertex_influences();
 
 	// Now build a list of unique bone combinations that influences each face in
 	// the mesh
-	triangle_array_t& tri_data = _preparation_data.triangle_data;
-	for(std::uint32_t i = 0; i < _preparation_data.triangle_count; ++i)
+	triangle_array_t& tri_data = preparation_data_.triangle_data;
+	for(std::uint32_t i = 0; i < preparation_data_.triangle_count; ++i)
 	{
 		// Clear out any previous bone references and set up for new run.
 		used_bones.bones.clear();
@@ -195,7 +195,7 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 	// as many bones as possible. To do so, we must continuously search for
 	// face influence combinations that will fit into any existing palettes.
 
-	const auto materials_count = _mesh_subsets.size();
+	const auto materials_count = mesh_subsets_.size();
 	for(auto data_group_id = 0u; data_group_id < materials_count; ++data_group_id)
 	{
 
@@ -237,10 +237,10 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 				} // End if largest
 
 				// Test against each palette
-				for(size_t i = 0; i < _bone_palettes.size(); ++i)
+				for(size_t i = 0; i < bone_palettes_.size(); ++i)
 				{
 					std::int32_t common_bones, additional_bones, remaining_space;
-					auto& palette = _bone_palettes[i];
+					auto& palette = bone_palettes_[i];
 
 					if(data_group_id != palette.get_data_group())
 						continue;
@@ -288,7 +288,7 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 
 				// At least one good combination was found that can be added to an
 				// existing palette.
-				auto& palette = _bone_palettes[static_cast<std::size_t>(palette_id)];
+				auto& palette = bone_palettes_[static_cast<std::size_t>(palette_id)];
 				palette.assign_bones(influences_ptr->bones, *face_list_ptr);
 
 				// We should now remove the selected combination.
@@ -310,7 +310,7 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 				bone_palette new_palette(palette_size);
 				new_palette.set_data_group(data_group);
 				new_palette.assign_bones(influences_ptr->bones, *face_list_ptr);
-				_bone_palettes.push_back(new_palette);
+				bone_palettes_.push_back(new_palette);
 
 				// We should now remove the selected combination.
 				bone_combinations.erase(it_largest_combination);
@@ -323,9 +323,9 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 	}
 	// Bone palettes are now fully constructed. mesh vertices must now be split as
 	// necessary in cases where they are shared by faces in alternate palettes.
-	for(size_t i = 0; i < _bone_palettes.size(); ++i)
+	for(size_t i = 0; i < bone_palettes_.size(); ++i)
 	{
-		auto& palette = _bone_palettes[i];
+		auto& palette = bone_palettes_[i];
 		std::vector<std::uint32_t>& faces = palette.get_influenced_faces();
 		for(size_t j = 0, total = faces.size(); j < total; ++j)
 		{
@@ -378,8 +378,8 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 
 	// Vertex format must be adjusted to include blend weights and indices
 	// (if they don't already exist).
-	gfx::vertex_layout new_format(_vertex_format);
-	gfx::vertex_layout original_format = _vertex_format;
+	gfx::vertex_layout new_format(vertex_format_);
+	gfx::vertex_layout original_format = vertex_format_;
 	bool has_weights = new_format.has(gfx::attribute::Weight);
 	bool has_indices = new_format.has(gfx::attribute::Indices);
 	if(!has_weights || !has_indices)
@@ -392,41 +392,41 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 
 		new_format.end();
 		// Add to format database.
-		_vertex_format = new_format;
+		vertex_format_ = new_format;
 		// Vertex format was updated.
 
 	} // End if needs new format
 
 	// Get access to final data offset information.
-	std::uint16_t vertex_stride = _vertex_format.getStride();
+	std::uint16_t vertex_stride = vertex_format_.getStride();
 
 	// Now we need to update the vertex data as required. It's possible
 	// that the buffer also needs to grow if / when vertices were split.
 	// First convert original data into the new format and also ensure
 	// that it is large enough to contain our entire final data set.
-	std::uint32_t original_vertex_count = static_cast<std::uint32_t>(_preparation_data.vertex_count);
-	if(_vertex_format.m_hash != original_format.m_hash)
+	std::uint32_t original_vertex_count = static_cast<std::uint32_t>(preparation_data_.vertex_count);
+	if(vertex_format_.m_hash != original_format.m_hash)
 	{
 		// Format has changed, run conversion.
-		byte_array_t original_buffer(_preparation_data.vertex_data);
-		_preparation_data.vertex_data.clear();
-		_preparation_data.vertex_data.resize(vertex_table.size() * vertex_stride);
-		_preparation_data.vertex_flags.resize(vertex_table.size());
+		byte_array_t original_buffer(preparation_data_.vertex_data);
+		preparation_data_.vertex_data.clear();
+		preparation_data_.vertex_data.resize(vertex_table.size() * vertex_stride);
+		preparation_data_.vertex_flags.resize(vertex_table.size());
 
-		gfx::vertex_convert(_vertex_format, &_preparation_data.vertex_data[0], original_format,
+		gfx::vertex_convert(vertex_format_, &preparation_data_.vertex_data[0], original_format,
 							&original_buffer[0], original_vertex_count);
 
 	} // End if convert
 	else
 	{
 		// No conversion required, just add space for the new vertices.
-		_preparation_data.vertex_data.resize(vertex_table.size() * vertex_stride);
-		_preparation_data.vertex_flags.resize(vertex_table.size());
+		preparation_data_.vertex_data.resize(vertex_table.size() * vertex_stride);
+		preparation_data_.vertex_flags.resize(vertex_table.size());
 
 	} // End if !convert
 
 	// Populate with newly constructed information.
-	std::uint8_t* src_vertices_ptr = &_preparation_data.vertex_data[0];
+	std::uint8_t* src_vertices_ptr = &preparation_data_.vertex_data[0];
 	for(size_t i = 0; i < vertex_table.size(); ++i)
 	{
 		auto& data = vertex_table[i];
@@ -435,7 +435,7 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 		if(data.palette < 0)
 			continue;
 
-		const auto& palette = _bone_palettes[static_cast<std::size_t>(data.palette)];
+		const auto& palette = bone_palettes_[static_cast<std::size_t>(data.palette)];
 
 		// If this is a new vertex, duplicate data from original vertex (it will
 		// have
@@ -449,7 +449,7 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 				   src_vertices_ptr + (data.original_vertex * vertex_stride), vertex_stride);
 
 			// Also duplicate additional vertex data.
-			_preparation_data.vertex_flags[i] = _preparation_data.vertex_flags[data.original_vertex];
+			preparation_data_.vertex_flags[i] = preparation_data_.vertex_flags[data.original_vertex];
 
 		} // End if new vertex
 
@@ -469,16 +469,16 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 
 		} // Next Influence
 
-		gfx::vertex_pack(math::value_ptr(blend_weights), false, gfx::attribute::Weight, _vertex_format,
+		gfx::vertex_pack(math::value_ptr(blend_weights), false, gfx::attribute::Weight, vertex_format_,
 						 src_vertices_ptr, std::uint32_t(i));
 
-		gfx::vertex_pack(math::value_ptr(blend_indices), false, gfx::attribute::Indices, _vertex_format,
+		gfx::vertex_pack(math::value_ptr(blend_indices), false, gfx::attribute::Indices, vertex_format_,
 						 src_vertices_ptr, std::uint32_t(i));
 
 	} // Next Vertex
 
 	// Update vertex count to match final size.
-	_preparation_data.vertex_count = static_cast<std::uint32_t>(vertex_table.size());
+	preparation_data_.vertex_count = static_cast<std::uint32_t>(vertex_table.size());
 
 	vertex_table.clear();
 
@@ -488,75 +488,75 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 
 bool mesh::bind_armature(std::unique_ptr<armature_node>& root)
 {
-	_root = std::move(root);
+	root_ = std::move(root);
 	return true;
 }
 
 void mesh::set_subset_count(uint32_t count)
 {
 	if(count > 0)
-		_mesh_subsets.resize(count);
+		mesh_subsets_.resize(count);
 }
 
 bool mesh::prepare_mesh(const gfx::vertex_layout& format)
 {
 	// If we are already in the process of preparing, this is a no-op.
-	if(_prepare_status == mesh_status::preparing)
+	if(prepare_status_ == mesh_status::preparing)
 		return false;
 
 	// Should we roll back an earlier call to 'endPrepare' ?
-	if(_prepare_status == mesh_status::prepared)
+	if(prepare_status_ == mesh_status::prepared)
 	{
 		// Reset required values.
-		_preparation_data.triangle_count = 0;
-		_preparation_data.triangle_data.clear();
-		_preparation_data.vertex_count = 0;
-		_preparation_data.vertex_data.clear();
-		_preparation_data.vertex_flags.clear();
-		_preparation_data.vertex_records.clear();
-		_preparation_data.compute_normals = false;
-		_preparation_data.compute_binormals = false;
-		_preparation_data.compute_tangents = false;
+		preparation_data_.triangle_count = 0;
+		preparation_data_.triangle_data.clear();
+		preparation_data_.vertex_count = 0;
+		preparation_data_.vertex_data.clear();
+		preparation_data_.vertex_flags.clear();
+		preparation_data_.vertex_records.clear();
+		preparation_data_.compute_normals = false;
+		preparation_data_.compute_binormals = false;
+		preparation_data_.compute_tangents = false;
 
 		// We can release the prior prepared triangle data early as this information
 		// will be reconstructed from the existing mesh subset table.
-		_triangle_data.clear();
+		triangle_data_.clear();
 
 		// Release prior hardware buffers if they were constructed.
-		_hardware_vb.reset();
-		_hardware_ib.reset();
+		hardware_vb_.reset();
+		hardware_ib_.reset();
 
 		// Set the size of the preparation buffer so that we can add
 		// the existing buffer data to it.
 		auto new_stride = format.getStride();
-		_preparation_data.vertex_data.resize(_vertex_count * new_stride);
-		_preparation_data.vertex_count = _vertex_count;
+		preparation_data_.vertex_data.resize(vertex_count_ * new_stride);
+		preparation_data_.vertex_count = vertex_count_;
 
 		// Create enough space in our triangle data array for
 		// the number of faces that existed in the prior final buffer.
-		_preparation_data.triangle_data.resize(_face_count);
+		preparation_data_.triangle_data.resize(face_count_);
 
 		// Copy all of the vertex data back into the preparation
 		// structures, converting if necessary.
-		if(format.m_hash == _vertex_format.m_hash)
-			memcpy(&_preparation_data.vertex_data[0], _system_vb, _preparation_data.vertex_data.size());
+		if(format.m_hash == vertex_format_.m_hash)
+			memcpy(&preparation_data_.vertex_data[0], system_vb_, preparation_data_.vertex_data.size());
 		else
-			gfx::vertex_convert(format, &_preparation_data.vertex_data[0], _vertex_format, _system_vb,
-								_vertex_count);
+			gfx::vertex_convert(format, &preparation_data_.vertex_data[0], vertex_format_, system_vb_,
+								vertex_count_);
 
 		// Clear out the vertex buffer
-		checked_array_delete(_system_vb);
-		_vertex_count = 0;
+		checked_array_delete(system_vb_);
+		vertex_count_ = 0;
 
 		// Iterate through each subset and extract triangle data.
-		for(auto subset : _mesh_subsets)
+		for(auto subset : mesh_subsets_)
 		{
 			// Iterate through each face in the subset
-			std::uint32_t* current_index_ptr = &_system_ib[(subset->face_start * 3)];
+			std::uint32_t* current_index_ptr = &system_ib_[(subset->face_start * 3)];
 			for(std::uint32_t i = 0; i < subset->face_count; ++i, current_index_ptr += 3)
 			{
 				// Generate winding data
-				triangle& tri = _preparation_data.triangle_data[_preparation_data.triangle_count++];
+				triangle& tri = preparation_data_.triangle_data[preparation_data_.triangle_count++];
 				tri.data_group_id = subset->data_group_id;
 				memcpy(tri.indices, current_index_ptr, 3 * sizeof(std::uint32_t));
 
@@ -565,13 +565,13 @@ bool mesh::prepare_mesh(const gfx::vertex_layout& format)
 		} // Next subset
 
 		// Release additional memory
-		checked_array_delete(_system_ib);
-		_face_count = 0;
+		checked_array_delete(system_ib_);
+		face_count_ = 0;
 
 		// Determine which components the original vertex data actually contained.
-		bool source_has_normals = _vertex_format.has(gfx::attribute::Normal);
-		bool source_has_binormal = _vertex_format.has(gfx::attribute::Bitangent);
-		bool source_has_tangent = _vertex_format.has(gfx::attribute::Tangent);
+		bool source_has_normals = vertex_format_.has(gfx::attribute::Normal);
+		bool source_has_binormal = vertex_format_.has(gfx::attribute::Bitangent);
+		bool source_has_tangent = vertex_format_.has(gfx::attribute::Tangent);
 
 		// The 'preparation_data::vertexFlags' array contains a record of the above
 		// for each vertex
@@ -587,30 +587,30 @@ bool mesh::prepare_mesh(const gfx::vertex_layout& format)
 			vertex_flags |= preparation_data::source_contains_tangent;
 
 		// Record the information.
-		_preparation_data.vertex_flags.resize(_preparation_data.vertex_count);
-		for(std::uint32_t i = 0; i < _preparation_data.vertex_count; ++i)
-			_preparation_data.vertex_flags[i] = vertex_flags;
+		preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
+		for(std::uint32_t i = 0; i < preparation_data_.vertex_count; ++i)
+			preparation_data_.vertex_flags[i] = vertex_flags;
 
 		// If skin binding data was available (i.e. this is a skinned mesh), reverse
 		// engineer
 		// the existing data into a newly populated skin binding structure.
-		if(_skin_bind_data.has_bones())
+		if(skin_bind_data_.has_bones())
 		{
 			// Clear out any previous influence data.
-			_skin_bind_data.clear_vertex_influences();
+			skin_bind_data_.clear_vertex_influences();
 
 			// First, retrieve the offsets to the weight and bone palette index data
 			// stored in each vertex in the mesh.
 
 			//::uint16_t vertex_stride = _vertex_format.getStride();
-			std::uint8_t* vertex_data_ptr = &_preparation_data.vertex_data[0];
+			std::uint8_t* vertex_data_ptr = &preparation_data_.vertex_data[0];
 
 			// Search through each bone palette to get influence data.
-			skin_bind_data::bone_influence_array_t& bones = _skin_bind_data.get_bones();
-			for(const auto& palette : _bone_palettes)
+			skin_bind_data::bone_influence_array_t& bones = skin_bind_data_.get_bones();
+			for(const auto& palette : bone_palettes_)
 			{
 				// Find the subset associated with this bone palette.
-				subset* subset_ptr = _subset_lookup[mesh_subset_key(palette.get_data_group())];
+				subset* subset_ptr = subset_lookup_[mesh_subset_key(palette.get_data_group())];
 
 				// Process faces in this subset to retrieve referenced vertex data.
 				std::int32_t max_blend_index = palette.get_maximum_blend_index();
@@ -619,14 +619,14 @@ bool mesh::prepare_mesh(const gfx::vertex_layout& format)
 					face < (subset_ptr->face_start + static_cast<std::int32_t>(subset_ptr->face_count));
 					++face)
 				{
-					triangle& tri = _preparation_data.triangle_data[static_cast<std::size_t>(face)];
+					triangle& tri = preparation_data_.triangle_data[static_cast<std::size_t>(face)];
 					for(size_t i = 0; i < 3; ++i)
 					{
 						float weights[4];
-						gfx::vertex_unpack(weights, gfx::attribute::Weight, _vertex_format, vertex_data_ptr,
+						gfx::vertex_unpack(weights, gfx::attribute::Weight, vertex_format_, vertex_data_ptr,
 										   tri.indices[i]);
 						float indices[4];
-						gfx::vertex_unpack(indices, gfx::attribute::Indices, _vertex_format, vertex_data_ptr,
+						gfx::vertex_unpack(indices, gfx::attribute::Indices, vertex_format_, vertex_data_ptr,
 										   tri.indices[i]);
 
 						float* weights_ptr = weights;
@@ -658,19 +658,19 @@ bool mesh::prepare_mesh(const gfx::vertex_layout& format)
 		} // End if is skin
 
 		// Clean up heap allocated subset structures
-		for(auto subset : _mesh_subsets)
+		for(auto subset : mesh_subsets_)
 		{
 			checked_delete(subset);
 		}
 		// Reset prepared data arrays and variables.
-		_data_groups.clear();
-		_mesh_subsets.clear();
-		_subset_lookup.clear();
-		_hardware_mesh = false;
-		_optimize_mesh = false;
+		data_groups_.clear();
+		mesh_subsets_.clear();
+		subset_lookup_.clear();
+		hardware_mesh_ = false;
+		optimize_mesh_ = false;
 
 	} // End if roll back an earlier prepare
-	else if((_prepare_status != mesh_status::preparing))
+	else if((prepare_status_ != mesh_status::preparing))
 	{
 		// Clear out anything which is currently loaded in the mesh.
 		dispose();
@@ -678,8 +678,8 @@ bool mesh::prepare_mesh(const gfx::vertex_layout& format)
 	} // End if not rolling back or no need to roll back
 
 	// We are in the process of preparing the mesh
-	_prepare_status = mesh_status::preparing;
-	_vertex_format = format;
+	prepare_status_ = mesh_status::preparing;
+	vertex_format_ = format;
 
 	return true;
 }
@@ -692,19 +692,19 @@ bool mesh::prepare_mesh(const gfx::vertex_layout& format, void* vertices_ptr, st
 	dispose();
 
 	// We are in the process of preparing the mesh
-	_prepare_status = mesh_status::preparing;
-	_vertex_format = format;
+	prepare_status_ = mesh_status::preparing;
+	vertex_format_ = format;
 
 	// Populate preparation structures.
-	_preparation_data.triangle_count = static_cast<std::uint32_t>(faces.size());
-	_preparation_data.triangle_data = faces;
-	_preparation_data.vertex_count = vertex_count;
+	preparation_data_.triangle_count = static_cast<std::uint32_t>(faces.size());
+	preparation_data_.triangle_data = faces;
+	preparation_data_.vertex_count = vertex_count;
 
 	// Copy vertex data.
-	_preparation_data.vertex_data.resize(vertex_count * format.getStride());
-	_preparation_data.vertex_flags.resize(vertex_count);
-	memset(&_preparation_data.vertex_flags[0], 0, vertex_count);
-	memcpy(&_preparation_data.vertex_data[0], vertices_ptr, vertex_count * format.getStride());
+	preparation_data_.vertex_data.resize(vertex_count * format.getStride());
+	preparation_data_.vertex_flags.resize(vertex_count);
+	memset(&preparation_data_.vertex_flags[0], 0, vertex_count);
+	memcpy(&preparation_data_.vertex_data[0], vertices_ptr, vertex_count * format.getStride());
 
 	// Generate the bounding box data for the new geometry.
 	std::int32_t position_offset = format.getOffset(gfx::attribute::Position);
@@ -713,7 +713,7 @@ bool mesh::prepare_mesh(const gfx::vertex_layout& format, void* vertices_ptr, st
 	{
 		std::uint8_t* src_ptr = reinterpret_cast<std::uint8_t*>(vertices_ptr) + position_offset;
 		for(std::uint32_t i = 0; i < vertex_count; ++i, src_ptr += stride)
-			_bbox.add_point(*(reinterpret_cast<math::vec3*>(src_ptr)));
+			bbox_.add_point(*(reinterpret_cast<math::vec3*>(src_ptr)));
 
 	} // End if has position
 
@@ -725,7 +725,7 @@ bool mesh::set_vertex_source(void* source_ptr, std::uint32_t vertex_count,
 							 const gfx::vertex_layout& source_format)
 {
 	// We can only do this if we are in the process of preparing the mesh
-	if(_prepare_status != mesh_status::preparing)
+	if(prepare_status_ != mesh_status::preparing)
 	{
 		APPLOG_ERROR("Attempting to set a mesh vertex source without first calling "
 					 "'prepareMesh' is not allowed.\n");
@@ -734,12 +734,12 @@ bool mesh::set_vertex_source(void* source_ptr, std::uint32_t vertex_count,
 	} // End if not preparing
 
 	// Clear any existing source information.
-	if(_preparation_data.owns_source == true)
-		checked_array_delete(_preparation_data.vertex_source);
-	_preparation_data.vertex_source = nullptr;
-	_preparation_data.source_format = {};
-	_preparation_data.owns_source = false;
-	_preparation_data.vertex_records.clear();
+	if(preparation_data_.owns_source == true)
+		checked_array_delete(preparation_data_.vertex_source);
+	preparation_data_.vertex_source = nullptr;
+	preparation_data_.source_format = {};
+	preparation_data_.owns_source = false;
+	preparation_data_.vertex_records.clear();
 
 	// If specifying nullptr (i.e. to clear) then we're done.
 	if(source_ptr == nullptr)
@@ -752,38 +752,38 @@ bool mesh::set_vertex_source(void* source_ptr, std::uint32_t vertex_count,
 	// If source format matches the format we're using to prepare
 	// then just store the pointer for this vertex source. Otherwise
 	// we need to allocate a temporary buffer and convert the data.
-	_preparation_data.source_format = source_format;
-	if(source_format.m_hash == _vertex_format.m_hash)
+	preparation_data_.source_format = source_format;
+	if(source_format.m_hash == vertex_format_.m_hash)
 	{
-		_preparation_data.vertex_source = reinterpret_cast<std::uint8_t*>(source_ptr);
+		preparation_data_.vertex_source = reinterpret_cast<std::uint8_t*>(source_ptr);
 
 	} // End if matching
 	else
 	{
-		_preparation_data.vertex_source = new std::uint8_t[vertex_count * _vertex_format.getStride()];
-		_preparation_data.owns_source = true;
-		gfx::vertex_convert(_vertex_format, _preparation_data.vertex_source, source_format,
+		preparation_data_.vertex_source = new std::uint8_t[vertex_count * vertex_format_.getStride()];
+		preparation_data_.owns_source = true;
+		gfx::vertex_convert(vertex_format_, preparation_data_.vertex_source, source_format,
 							reinterpret_cast<std::uint8_t*>(source_ptr), vertex_count);
 	} // End if !matching
 
 	// Allocate the vertex records for the new vertex buffer
-	_preparation_data.vertex_records.clear();
-	_preparation_data.vertex_records.resize(vertex_count);
+	preparation_data_.vertex_records.clear();
+	preparation_data_.vertex_records.resize(vertex_count);
 
 	// Fill with 0xFFFFFFFF initially to indicate that no vertex
 	// originally in this location has yet been inserted into the
 	// final vertex list.
-	memset(&_preparation_data.vertex_records[0], 0xFF, vertex_count * sizeof(std::uint32_t));
+	memset(&preparation_data_.vertex_records[0], 0xFF, vertex_count * sizeof(std::uint32_t));
 
 	// Some data needs computing? These variables are essentially 'toggles'
 	// that are set largely so that we can early out if it was NEVER necessary
 	// to generate these components (i.e. not one single vertex needed it).
-	if(!source_format.has(gfx::attribute::Normal) && _vertex_format.has(gfx::attribute::Normal))
-		_preparation_data.compute_normals = true;
-	if(!source_format.has(gfx::attribute::Bitangent) && _vertex_format.has(gfx::attribute::Bitangent))
-		_preparation_data.compute_binormals = true;
-	if(!source_format.has(gfx::attribute::Tangent) && _vertex_format.has(gfx::attribute::Tangent))
-		_preparation_data.compute_tangents = true;
+	if(!source_format.has(gfx::attribute::Normal) && vertex_format_.has(gfx::attribute::Normal))
+		preparation_data_.compute_normals = true;
+	if(!source_format.has(gfx::attribute::Bitangent) && vertex_format_.has(gfx::attribute::Bitangent))
+		preparation_data_.compute_binormals = true;
+	if(!source_format.has(gfx::attribute::Tangent) && vertex_format_.has(gfx::attribute::Tangent))
+		preparation_data_.compute_tangents = true;
 
 	// Success!
 	return true;
@@ -794,7 +794,7 @@ bool mesh::add_primitives(const triangle_array_t& triangles)
 	std::uint32_t orig_index, index;
 
 	// We can only do this if we are in the process of preparing the mesh
-	if(_prepare_status != mesh_status::preparing)
+	if(prepare_status_ != mesh_status::preparing)
 	{
 		APPLOG_ERROR("Attempting to add primitives to a mesh without first calling "
 					 "'prepareMesh' is not allowed.\n");
@@ -803,16 +803,16 @@ bool mesh::add_primitives(const triangle_array_t& triangles)
 	} // End if not preparing
 
 	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = _vertex_format.has(gfx::attribute::Position);
-	bool has_normal = _vertex_format.has(gfx::attribute::Normal);
-	std::uint16_t vertex_stride = _vertex_format.getStride();
+	bool has_position = vertex_format_.has(gfx::attribute::Position);
+	bool has_normal = vertex_format_.has(gfx::attribute::Normal);
+	std::uint16_t vertex_stride = vertex_format_.getStride();
 
 	// During the construction process we test to see if any specified
 	// vertex normal contains invalid data. If the original source vertex
 	// data did not contain a normal, we can optimize and skip this step.
-	bool source_has_normals = _preparation_data.source_format.has(gfx::attribute::Normal);
-	bool source_has_binormal = _preparation_data.source_format.has(gfx::attribute::Bitangent);
-	bool source_has_tangent = _preparation_data.source_format.has(gfx::attribute::Tangent);
+	bool source_has_normals = preparation_data_.source_format.has(gfx::attribute::Normal);
+	bool source_has_binormal = preparation_data_.source_format.has(gfx::attribute::Bitangent);
+	bool source_has_tangent = preparation_data_.source_format.has(gfx::attribute::Tangent);
 
 	// In addition, we also record which of the required components each
 	// vertex actually contained based on the following information.
@@ -825,7 +825,7 @@ bool mesh::add_primitives(const triangle_array_t& triangles)
 		vertex_flags |= preparation_data::source_contains_tangent;
 
 	// Loop through the specified faces and process them.
-	std::uint8_t* src_vertices_ptr = _preparation_data.vertex_source;
+	std::uint8_t* src_vertices_ptr = preparation_data_.vertex_source;
 	for(const auto& src_tri : triangles)
 	{
 		// Retrieve vertex positions (if there are any) so that we can perform
@@ -834,15 +834,15 @@ bool mesh::add_primitives(const triangle_array_t& triangles)
 		{
 			math::vec3 v1;
 			float vf1[4];
-			gfx::vertex_unpack(vf1, gfx::attribute::Position, _vertex_format, src_vertices_ptr,
+			gfx::vertex_unpack(vf1, gfx::attribute::Position, vertex_format_, src_vertices_ptr,
 							   src_tri.indices[0]);
 			math::vec3 v2;
 			float vf2[4];
-			gfx::vertex_unpack(vf2, gfx::attribute::Position, _vertex_format, src_vertices_ptr,
+			gfx::vertex_unpack(vf2, gfx::attribute::Position, vertex_format_, src_vertices_ptr,
 							   src_tri.indices[1]);
 			math::vec3 v3;
 			float vf3[4];
-			gfx::vertex_unpack(vf3, gfx::attribute::Position, _vertex_format, src_vertices_ptr,
+			gfx::vertex_unpack(vf3, gfx::attribute::Position, vertex_format_, src_vertices_ptr,
 							   src_tri.indices[2]);
 			memcpy(&v1[0], vf1, 3 * sizeof(float));
 			memcpy(&v2[0], vf2, 3 * sizeof(float));
@@ -856,9 +856,9 @@ bool mesh::add_primitives(const triangle_array_t& triangles)
 		} // End if has position.
 
 		// Prepare a triangle structure ready for population
-		_preparation_data.triangle_count++;
-		_preparation_data.triangle_data.resize(_preparation_data.triangle_count);
-		triangle& triangle_data = _preparation_data.triangle_data[_preparation_data.triangle_count - 1];
+		preparation_data_.triangle_count++;
+		preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
+		triangle& triangle_data = preparation_data_.triangle_data[preparation_data_.triangle_count - 1];
 
 		// Set triangle's subset information.
 		triangle_data.data_group_id = src_tri.data_group_id;
@@ -870,36 +870,36 @@ bool mesh::add_primitives(const triangle_array_t& triangles)
 			orig_index = src_tri.indices[j];
 
 			// Retrieve the vertex record for the original vertex
-			index = _preparation_data.vertex_records[orig_index];
+			index = preparation_data_.vertex_records[orig_index];
 
 			// Have we inserted this vertex into the vertex buffer previously?
 			if(index == 0xFFFFFFFF)
 			{
 				// Vertex does not yet exist in the vertex buffer we are preparing
 				// so copy the vertex in and record the index mapping for this vertex.
-				index = _preparation_data.vertex_count++;
-				_preparation_data.vertex_records[orig_index] = index;
+				index = preparation_data_.vertex_count++;
+				preparation_data_.vertex_records[orig_index] = index;
 
 				// Resize the output vertex buffer ready to hold this new data.
-				std::size_t nInitialSize = _preparation_data.vertex_data.size();
-				_preparation_data.vertex_data.resize(nInitialSize + vertex_stride);
+				std::size_t nInitialSize = preparation_data_.vertex_data.size();
+				preparation_data_.vertex_data.resize(nInitialSize + vertex_stride);
 
 				// Copy the data in.
 				std::uint8_t* src_ptr = src_vertices_ptr + (orig_index * vertex_stride);
-				std::uint8_t* dst_ptr = &_preparation_data.vertex_data[nInitialSize];
+				std::uint8_t* dst_ptr = &preparation_data_.vertex_data[nInitialSize];
 				memcpy(dst_ptr, src_ptr, vertex_stride);
 
 				// Also record other pertenant details about this vertex.
-				_preparation_data.vertex_flags.push_back(vertex_flags);
+				preparation_data_.vertex_flags.push_back(vertex_flags);
 
 				// Clear any invalid normals (completely messes up HDR if ANY NaNs make
 				// it this far)
 				if(has_normal && source_has_normals == true)
 				{
 					float fnorm[4];
-					gfx::vertex_unpack(fnorm, gfx::attribute::Normal, _vertex_format, dst_ptr);
+					gfx::vertex_unpack(fnorm, gfx::attribute::Normal, vertex_format_, dst_ptr);
 					if(std::isnan(fnorm[0]) || std::isnan(fnorm[1]) || std::isnan(fnorm[2]))
-						gfx::vertex_pack(fnorm, true, gfx::attribute::Normal, _vertex_format, dst_ptr);
+						gfx::vertex_pack(fnorm, true, gfx::attribute::Normal, vertex_format_, dst_ptr);
 
 				} // End if have normal
 
@@ -907,8 +907,8 @@ bool mesh::add_primitives(const triangle_array_t& triangles)
 				if(has_position)
 				{
 					float fpos[4];
-					gfx::vertex_unpack(fpos, gfx::attribute::Position, _vertex_format, dst_ptr);
-					_bbox.add_point(math::vec3(fpos[0], fpos[1], fpos[2]));
+					gfx::vertex_unpack(fpos, gfx::attribute::Position, vertex_format_, dst_ptr);
+					bbox_.add_point(math::vec3(fpos[0], fpos[1], fpos[2]));
 				}
 
 			} // End if vertex not recorded in this buffer yet
@@ -935,32 +935,32 @@ bool mesh::create_cylinder(const gfx::vertex_layout& format, float radius, float
 	dispose();
 
 	// We are in the process of preparing.
-	_prepare_status = mesh_status::preparing;
-	_vertex_format = format;
+	prepare_status_ = mesh_status::preparing;
+	vertex_format_ = format;
 
 	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = _vertex_format.has(gfx::attribute::Position);
-	bool has_texcoord = _vertex_format.has(gfx::attribute::TexCoord0);
-	bool has_normal = _vertex_format.has(gfx::attribute::Normal);
-	std::uint16_t vertex_stride = _vertex_format.getStride();
+	bool has_position = vertex_format_.has(gfx::attribute::Position);
+	bool has_texcoord = vertex_format_.has(gfx::attribute::TexCoord0);
+	bool has_normal = vertex_format_.has(gfx::attribute::Normal);
+	std::uint16_t vertex_stride = vertex_format_.getStride();
 
 	// Compute the number of faces and vertices that will be required for this box
-	_preparation_data.triangle_count = (slices * stacks) * 2;
-	_preparation_data.vertex_count = (slices + 1) * (stacks + 1);
+	preparation_data_.triangle_count = (slices * stacks) * 2;
+	preparation_data_.vertex_count = (slices + 1) * (stacks + 1);
 
 	// Add vertices and faces for caps
-	std::uint32_t caps_start = _preparation_data.vertex_count;
-	_preparation_data.vertex_count += slices * 2;
-	_preparation_data.triangle_count += (slices - 2) * 2;
+	std::uint32_t caps_start = preparation_data_.vertex_count;
+	preparation_data_.vertex_count += slices * 2;
+	preparation_data_.triangle_count += (slices - 2) * 2;
 
 	// Allocate enough space for the new vertex and triangle data
-	_preparation_data.vertex_data.resize(_preparation_data.vertex_count * vertex_stride);
-	_preparation_data.vertex_flags.resize(_preparation_data.vertex_count);
-	_preparation_data.triangle_data.resize(_preparation_data.triangle_count);
+	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
+	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
+	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
 
 	// For each stack
-	std::uint8_t* current_vertex_ptr = &_preparation_data.vertex_data[0];
-	std::uint8_t* current_flags_ptr = &_preparation_data.vertex_flags[0];
+	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
+	std::uint8_t* current_flags_ptr = &preparation_data_.vertex_flags[0];
 	for(std::uint32_t stack = 0; stack <= stacks; ++stack)
 	{
 		// Generate a ring of vertices which describe the top edges of that stack's
@@ -1014,7 +1014,7 @@ bool mesh::create_cylinder(const gfx::vertex_layout& format, float radius, float
 
 			// Grow the object space bounding box for this mesh
 			// by including the computed position.
-			_bbox.add_point(current_pos);
+			bbox_.add_point(current_pos);
 
 			// Move on to next vertex
 			current_vertex_ptr += vertex_stride;
@@ -1061,7 +1061,7 @@ bool mesh::create_cylinder(const gfx::vertex_layout& format, float radius, float
 
 		// Grow the object space bounding box for this mesh
 		// by including the computed position.
-		_bbox.add_point(current_pos);
+		bbox_.add_point(current_pos);
 
 		// Move on to next vertex
 		current_vertex_ptr += vertex_stride;
@@ -1106,7 +1106,7 @@ bool mesh::create_cylinder(const gfx::vertex_layout& format, float radius, float
 
 		// Grow the object space bounding box for this mesh
 		// by including the computed position.
-		_bbox.add_point(current_pos);
+		bbox_.add_point(current_pos);
 
 		// Move on to next vertex
 		current_vertex_ptr += vertex_stride;
@@ -1114,7 +1114,7 @@ bool mesh::create_cylinder(const gfx::vertex_layout& format, float radius, float
 	} // Next Slice
 
 	// Now compute the indices. For each stack (except the top and bottom)
-	triangle* current_triangle_ptr = &_preparation_data.triangle_data[0];
+	triangle* current_triangle_ptr = &preparation_data_.triangle_data[0];
 	for(std::uint32_t stack = 0; stack < stacks; ++stack)
 	{
 		// Generate two triangles for the quad on each slice
@@ -1200,8 +1200,8 @@ bool mesh::create_cylinder(const gfx::vertex_layout& format, float radius, float
 	} // Next Slice
 
 	// We need to generate binormals / tangents?
-	_preparation_data.compute_binormals = _vertex_format.has(gfx::attribute::Bitangent);
-	_preparation_data.compute_tangents = _vertex_format.has(gfx::attribute::Tangent);
+	preparation_data_.compute_binormals = vertex_format_.has(gfx::attribute::Bitangent);
+	preparation_data_.compute_tangents = vertex_format_.has(gfx::attribute::Tangent);
 
 	// Finish up
 	return end_prepare(hardware_copy, false, false);
@@ -1218,14 +1218,14 @@ bool mesh::create_capsule(const gfx::vertex_layout& format, float radius, float 
 	dispose();
 
 	// We are in the process of preparing.
-	_prepare_status = mesh_status::preparing;
-	_vertex_format = format;
+	prepare_status_ = mesh_status::preparing;
+	vertex_format_ = format;
 
 	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = _vertex_format.has(gfx::attribute::Position);
-	bool has_texcoord = _vertex_format.has(gfx::attribute::TexCoord0);
-	bool has_normal = _vertex_format.has(gfx::attribute::Normal);
-	std::uint16_t vertex_stride = _vertex_format.getStride();
+	bool has_position = vertex_format_.has(gfx::attribute::Position);
+	bool has_texcoord = vertex_format_.has(gfx::attribute::TexCoord0);
+	bool has_normal = vertex_format_.has(gfx::attribute::Normal);
+	std::uint16_t vertex_stride = vertex_format_.getStride();
 
 	// Compute the number of 'stacks' required for the hemisphere caps.
 	// This must be the closest multiple of 2 to ensure a valid center division.
@@ -1249,31 +1249,31 @@ bool mesh::create_capsule(const gfx::vertex_layout& format, float radius, float 
 
 	// Add vertices for the first hemisphere. The cap shares a common row of
 	// vertices with the capsule sides.
-	_preparation_data.triangle_count = (slices * (sphere_stacks / 2)) * 2;
-	_preparation_data.vertex_count = (slices + 1) * ((sphere_stacks / 2) + 1);
+	preparation_data_.triangle_count = (slices * (sphere_stacks / 2)) * 2;
+	preparation_data_.vertex_count = (slices + 1) * ((sphere_stacks / 2) + 1);
 
 	// Cylinder geometry starts at the last row of the first hemisphere.
-	std::uint32_t cylinder_start = _preparation_data.vertex_count - (slices + 1);
+	std::uint32_t cylinder_start = preparation_data_.vertex_count - (slices + 1);
 
 	// Compute the number of faces and vertices that will be required by the
 	// cylinder shape that exists between the two hemispheres.
 	std::uint32_t cylinder_verts = (slices + 1) * (stacks - 1);
-	_preparation_data.triangle_count += (slices * stacks) * 2;
-	_preparation_data.vertex_count += cylinder_verts;
+	preparation_data_.triangle_count += (slices * stacks) * 2;
+	preparation_data_.vertex_count += cylinder_verts;
 
 	// Add vertices for the bottom hemisphere. The cap shares a common row of
 	// vertices with the capsule sides.
-	_preparation_data.triangle_count += (slices * (sphere_stacks / 2)) * 2;
-	_preparation_data.vertex_count += (slices + 1) * ((sphere_stacks / 2) + 1);
+	preparation_data_.triangle_count += (slices * (sphere_stacks / 2)) * 2;
+	preparation_data_.vertex_count += (slices + 1) * ((sphere_stacks / 2) + 1);
 
 	// Allocate enough space for the new vertex and triangle data
-	_preparation_data.vertex_data.resize(_preparation_data.vertex_count * vertex_stride);
-	_preparation_data.vertex_flags.resize(_preparation_data.vertex_count);
-	_preparation_data.triangle_data.resize(_preparation_data.triangle_count);
+	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
+	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
+	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
 
 	// First add the top hemisphere
-	std::uint8_t* current_vertex_ptr = &_preparation_data.vertex_data[0];
-	std::uint8_t* current_flags_ptr = &_preparation_data.vertex_flags[0];
+	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
+	std::uint8_t* current_flags_ptr = &preparation_data_.vertex_flags[0];
 	std::int32_t vertices_added = 0;
 	for(std::uint32_t stack = 0; stack <= sphere_stacks / 2; ++stack)
 	{
@@ -1327,7 +1327,7 @@ bool mesh::create_capsule(const gfx::vertex_layout& format, float radius, float 
 
 			// Grow the object space bounding box for this mesh
 			// by including the computed position.
-			_bbox.add_point(current_pos);
+			bbox_.add_point(current_pos);
 
 			// Move on to next vertex
 			current_vertex_ptr += vertex_stride;
@@ -1394,7 +1394,7 @@ bool mesh::create_capsule(const gfx::vertex_layout& format, float radius, float 
 
 			// Grow the object space bounding box for this mesh
 			// by including the computed position.
-			_bbox.add_point(current_pos);
+			bbox_.add_point(current_pos);
 
 			// Move on to next vertex
 			current_vertex_ptr += vertex_stride;
@@ -1457,7 +1457,7 @@ bool mesh::create_capsule(const gfx::vertex_layout& format, float radius, float 
 
 			// Grow the object space bounding box for this mesh
 			// by including the computed position.
-			_bbox.add_point(current_pos);
+			bbox_.add_point(current_pos);
 
 			// Move on to next vertex
 			current_vertex_ptr += vertex_stride;
@@ -1469,7 +1469,7 @@ bool mesh::create_capsule(const gfx::vertex_layout& format, float radius, float 
 
 	// Now generate indices for the top hemisphere first.
 	std::int32_t triangles_added = 0;
-	triangle* current_triangle_ptr = &_preparation_data.triangle_data[0];
+	triangle* current_triangle_ptr = &preparation_data_.triangle_data[0];
 	for(std::uint32_t stack = 0; stack < sphere_stacks / 2; ++stack)
 	{
 		// Generate two triangles for the quad on each slice
@@ -1619,8 +1619,8 @@ bool mesh::create_capsule(const gfx::vertex_layout& format, float radius, float 
 	} // Next Stack
 
 	// We need to generate binormals / tangents?
-	_preparation_data.compute_binormals = _vertex_format.has(gfx::attribute::Bitangent);
-	_preparation_data.compute_tangents = _vertex_format.has(gfx::attribute::Tangent);
+	preparation_data_.compute_binormals = vertex_format_.has(gfx::attribute::Bitangent);
+	preparation_data_.compute_tangents = vertex_format_.has(gfx::attribute::Tangent);
 
 	// Finish up
 	return end_prepare(hardware_copy, false, false);
@@ -1640,28 +1640,28 @@ bool mesh::create_sphere(const gfx::vertex_layout& format, float radius, std::ui
 		radius = -radius;
 
 	// We are in the process of preparing.
-	_prepare_status = mesh_status::preparing;
-	_vertex_format = format;
+	prepare_status_ = mesh_status::preparing;
+	vertex_format_ = format;
 
 	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = _vertex_format.has(gfx::attribute::Position);
-	bool has_texcoord = _vertex_format.has(gfx::attribute::TexCoord0);
-	bool has_normal = _vertex_format.has(gfx::attribute::Normal);
-	std::uint16_t vertex_stride = _vertex_format.getStride();
+	bool has_position = vertex_format_.has(gfx::attribute::Position);
+	bool has_texcoord = vertex_format_.has(gfx::attribute::TexCoord0);
+	bool has_normal = vertex_format_.has(gfx::attribute::Normal);
+	std::uint16_t vertex_stride = vertex_format_.getStride();
 
 	// Compute the number of faces and vertices that will be required for this
 	// sphere
-	_preparation_data.triangle_count = (slices * stacks) * 2;
-	_preparation_data.vertex_count = (slices + 1) * (stacks + 1);
+	preparation_data_.triangle_count = (slices * stacks) * 2;
+	preparation_data_.vertex_count = (slices + 1) * (stacks + 1);
 
 	// Allocate enough space for the new vertex and triangle data
-	_preparation_data.vertex_data.resize(_preparation_data.vertex_count * vertex_stride);
-	_preparation_data.vertex_flags.resize(_preparation_data.vertex_count);
-	_preparation_data.triangle_data.resize(_preparation_data.triangle_count);
+	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
+	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
+	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
 
 	// For each stack
-	std::uint8_t* current_vertex_ptr = &_preparation_data.vertex_data[0];
-	std::uint8_t* current_flags_ptr = &_preparation_data.vertex_flags[0];
+	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
+	std::uint8_t* current_flags_ptr = &preparation_data_.vertex_flags[0];
 	for(std::uint32_t stack = 0; stack <= stacks; ++stack)
 	{
 		// Generate a ring of vertices which describe the top edges of that stack's
@@ -1704,7 +1704,7 @@ bool mesh::create_sphere(const gfx::vertex_layout& format, float radius, std::ui
 
 			// Grow the object space bounding box for this mesh
 			// by including the computed position.
-			_bbox.add_point(vec_position);
+			bbox_.add_point(vec_position);
 
 			// Move on to next vertex
 			current_vertex_ptr += vertex_stride;
@@ -1714,7 +1714,7 @@ bool mesh::create_sphere(const gfx::vertex_layout& format, float radius, std::ui
 	} // Next Stack
 
 	// Now generate indices. Process each stack (except the top and bottom)
-	triangle* current_triangle_ptr = &_preparation_data.triangle_data[0];
+	triangle* current_triangle_ptr = &preparation_data_.triangle_data[0];
 	for(std::uint32_t stack = 0; stack < stacks; ++stack)
 	{
 		// Generate two triangles for the quad on each slice
@@ -1737,8 +1737,8 @@ bool mesh::create_sphere(const gfx::vertex_layout& format, float radius, std::ui
 	} // Next Stack
 
 	// We need to generate binormals / tangents?
-	_preparation_data.compute_binormals = _vertex_format.has(gfx::attribute::Bitangent);
-	_preparation_data.compute_tangents = _vertex_format.has(gfx::attribute::Tangent);
+	preparation_data_.compute_binormals = vertex_format_.has(gfx::attribute::Bitangent);
+	preparation_data_.compute_tangents = vertex_format_.has(gfx::attribute::Tangent);
 
 	// Finish up
 	return end_prepare(hardware_copy, false, false);
@@ -1755,32 +1755,32 @@ bool mesh::create_torus(const gfx::vertex_layout& format, float outer_radius, fl
 	dispose();
 
 	// We are in the process of preparing.
-	_prepare_status = mesh_status::preparing;
-	_vertex_format = format;
+	prepare_status_ = mesh_status::preparing;
+	vertex_format_ = format;
 
 	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = _vertex_format.has(gfx::attribute::Position);
-	bool has_texcoord = _vertex_format.has(gfx::attribute::TexCoord0);
-	bool has_normal = _vertex_format.has(gfx::attribute::Normal);
-	std::uint16_t vertex_stride = _vertex_format.getStride();
+	bool has_position = vertex_format_.has(gfx::attribute::Position);
+	bool has_texcoord = vertex_format_.has(gfx::attribute::TexCoord0);
+	bool has_normal = vertex_format_.has(gfx::attribute::Normal);
+	std::uint16_t vertex_stride = vertex_format_.getStride();
 
 	// Compute the number of faces and vertices that will be required for this
 	// torus
-	_preparation_data.triangle_count = (bands * sides) * 2;
-	_preparation_data.vertex_count = (bands + 1) * (sides + 1);
+	preparation_data_.triangle_count = (bands * sides) * 2;
+	preparation_data_.vertex_count = (bands + 1) * (sides + 1);
 
 	// Allocate enough space for the new vertex and triangle data
-	_preparation_data.vertex_data.resize(_preparation_data.vertex_count * vertex_stride);
-	_preparation_data.vertex_flags.resize(_preparation_data.vertex_count);
-	_preparation_data.triangle_data.resize(_preparation_data.triangle_count);
+	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
+	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
+	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
 
 	// The radius of a circle running through the core of the torus interior
 	float fCoreRadius = (inner_radius + outer_radius) / 2.0f;
 	float fBandRadius = (outer_radius - inner_radius) / 2.0f;
 
 	// Generate vertex data. For each band (around the outside)
-	std::uint8_t* current_vertex_ptr = &_preparation_data.vertex_data[0];
-	std::uint8_t* current_flags_ptr = &_preparation_data.vertex_flags[0];
+	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
+	std::uint8_t* current_flags_ptr = &preparation_data_.vertex_flags[0];
 	for(std::uint32_t nBand = 0; nBand <= bands; ++nBand)
 	{
 		// Precompute any re-usable values
@@ -1833,7 +1833,7 @@ bool mesh::create_torus(const gfx::vertex_layout& format, float outer_radius, fl
 
 			// Grow the object space bounding box for this mesh
 			// by including the computed position.
-			_bbox.add_point(position);
+			bbox_.add_point(position);
 
 			// Move on to next vertex
 			current_vertex_ptr += vertex_stride;
@@ -1843,7 +1843,7 @@ bool mesh::create_torus(const gfx::vertex_layout& format, float outer_radius, fl
 	} // Next Stack
 
 	// Now generate indices. For each band.
-	triangle* current_triangle_ptr = &_preparation_data.triangle_data[0];
+	triangle* current_triangle_ptr = &preparation_data_.triangle_data[0];
 	for(std::uint32_t nBand = 0; nBand < bands; ++nBand)
 	{
 		// Generate two triangles for the quad on each side
@@ -1885,8 +1885,8 @@ bool mesh::create_torus(const gfx::vertex_layout& format, float outer_radius, fl
 	} // Next Band
 
 	// We need to generate binormals / tangents?
-	_preparation_data.compute_binormals = _vertex_format.has(gfx::attribute::Bitangent);
-	_preparation_data.compute_tangents = _vertex_format.has(gfx::attribute::Tangent);
+	preparation_data_.compute_binormals = vertex_format_.has(gfx::attribute::Bitangent);
+	preparation_data_.compute_tangents = vertex_format_.has(gfx::attribute::Tangent);
 
 	// Finish up
 	return end_prepare(hardware_copy, false, false);
@@ -1898,17 +1898,17 @@ bool mesh::create_teapot(const gfx::vertex_layout& format, bool hardware_copy /*
 	dispose();
 
 	// We are in the process of preparing.
-	_prepare_status = mesh_status::preparing;
-	_vertex_format = format;
+	prepare_status_ = mesh_status::preparing;
+	vertex_format_ = format;
 
 	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = _vertex_format.has(gfx::attribute::Position);
-	bool has_texcoord0 = _vertex_format.has(gfx::attribute::TexCoord0);
-	bool has_texcoord1 = _vertex_format.has(gfx::attribute::TexCoord1);
-	bool has_normals = _vertex_format.has(gfx::attribute::Normal);
-	bool has_tangents = _vertex_format.has(gfx::attribute::Tangent);
-	bool has_bitangents = _vertex_format.has(gfx::attribute::Bitangent);
-	std::uint16_t vertex_stride = _vertex_format.getStride();
+	bool has_position = vertex_format_.has(gfx::attribute::Position);
+	bool has_texcoord0 = vertex_format_.has(gfx::attribute::TexCoord0);
+	bool has_texcoord1 = vertex_format_.has(gfx::attribute::TexCoord1);
+	bool has_normals = vertex_format_.has(gfx::attribute::Normal);
+	bool has_tangents = vertex_format_.has(gfx::attribute::Tangent);
+	bool has_bitangents = vertex_format_.has(gfx::attribute::Bitangent);
+	std::uint16_t vertex_stride = vertex_format_.getStride();
 
 	RMC_DEFINE_DATA
 	triangle_mesh_tools::create_teapot(vertices, indices);
@@ -1918,15 +1918,15 @@ bool mesh::create_teapot(const gfx::vertex_layout& format, bool hardware_copy /*
 	triangle_mesh_tools::fill_dummy_ttt(vertices, normals, tangents, texcoords0, texcoords1);
 	triangle_mesh_tools::generate_tangents(tangents, bitangents, vertices, normals, texcoords0, indices);
 	// Compute the number of faces and vertices that will be required for this box
-	_preparation_data.triangle_count = std::uint32_t(indices.size()) / 3;
-	_preparation_data.vertex_count = std::uint32_t(vertices.size());
+	preparation_data_.triangle_count = std::uint32_t(indices.size()) / 3;
+	preparation_data_.vertex_count = std::uint32_t(vertices.size());
 
 	// Allocate enough space for the new vertex and triangle data
-	_preparation_data.vertex_data.resize(_preparation_data.vertex_count * vertex_stride);
-	_preparation_data.vertex_flags.resize(_preparation_data.vertex_count);
-	_preparation_data.triangle_data.resize(_preparation_data.triangle_count);
+	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
+	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
+	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
 
-	std::uint8_t* current_vertex_ptr = &_preparation_data.vertex_data[0];
+	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
 	for(std::size_t i = 0; i < vertices.size(); ++i)
 	{
 		// Store vertex components
@@ -1949,12 +1949,12 @@ bool mesh::create_teapot(const gfx::vertex_layout& format, bool hardware_copy /*
 			gfx::vertex_pack(&bitangents[i][0], true, gfx::attribute::Bitangent, format, current_vertex_ptr,
 							 std::uint32_t(i));
 
-		_bbox.add_point(vertices[i]);
+		bbox_.add_point(vertices[i]);
 	}
 
 	for(std::size_t i = 0; i < indices.size(); i += 3)
 	{
-		triangle& tri = _preparation_data.triangle_data[i / 3];
+		triangle& tri = preparation_data_.triangle_data[i / 3];
 		tri.indices[0] = indices[i + 0];
 		tri.indices[1] = indices[i + 1];
 		tri.indices[2] = indices[i + 2];
@@ -1974,17 +1974,17 @@ bool mesh::create_tetrahedron(const gfx::vertex_layout& format, bool hardware_co
 	dispose();
 
 	// We are in the process of preparing.
-	_prepare_status = mesh_status::preparing;
-	_vertex_format = format;
+	prepare_status_ = mesh_status::preparing;
+	vertex_format_ = format;
 
 	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = _vertex_format.has(gfx::attribute::Position);
-	bool has_texcoord0 = _vertex_format.has(gfx::attribute::TexCoord0);
-	bool has_texcoord1 = _vertex_format.has(gfx::attribute::TexCoord1);
-	bool has_normals = _vertex_format.has(gfx::attribute::Normal);
-	bool has_tangents = _vertex_format.has(gfx::attribute::Tangent);
-	bool has_bitangents = _vertex_format.has(gfx::attribute::Bitangent);
-	std::uint16_t vertex_stride = _vertex_format.getStride();
+	bool has_position = vertex_format_.has(gfx::attribute::Position);
+	bool has_texcoord0 = vertex_format_.has(gfx::attribute::TexCoord0);
+	bool has_texcoord1 = vertex_format_.has(gfx::attribute::TexCoord1);
+	bool has_normals = vertex_format_.has(gfx::attribute::Normal);
+	bool has_tangents = vertex_format_.has(gfx::attribute::Tangent);
+	bool has_bitangents = vertex_format_.has(gfx::attribute::Bitangent);
+	std::uint16_t vertex_stride = vertex_format_.getStride();
 
 	RMC_DEFINE_DATA
 	triangle_mesh_tools::create_tetrahedron(vertices, indices, false);
@@ -1994,15 +1994,15 @@ bool mesh::create_tetrahedron(const gfx::vertex_layout& format, bool hardware_co
 	triangle_mesh_tools::fill_dummy_ttt(vertices, normals, tangents, texcoords0, texcoords1);
 	triangle_mesh_tools::generate_tangents(tangents, bitangents, vertices, normals, texcoords0, indices);
 	// Compute the number of faces and vertices that will be required for this box
-	_preparation_data.triangle_count = std::uint32_t(indices.size()) / 3;
-	_preparation_data.vertex_count = std::uint32_t(vertices.size());
+	preparation_data_.triangle_count = std::uint32_t(indices.size()) / 3;
+	preparation_data_.vertex_count = std::uint32_t(vertices.size());
 
 	// Allocate enough space for the new vertex and triangle data
-	_preparation_data.vertex_data.resize(_preparation_data.vertex_count * vertex_stride);
-	_preparation_data.vertex_flags.resize(_preparation_data.vertex_count);
-	_preparation_data.triangle_data.resize(_preparation_data.triangle_count);
+	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
+	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
+	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
 
-	std::uint8_t* current_vertex_ptr = &_preparation_data.vertex_data[0];
+	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
 	for(std::size_t i = 0; i < vertices.size(); ++i)
 	{
 		// Store vertex components
@@ -2025,12 +2025,12 @@ bool mesh::create_tetrahedron(const gfx::vertex_layout& format, bool hardware_co
 			gfx::vertex_pack(&bitangents[i][0], true, gfx::attribute::Bitangent, format, current_vertex_ptr,
 							 std::uint32_t(i));
 
-		_bbox.add_point(vertices[i]);
+		bbox_.add_point(vertices[i]);
 	}
 
 	for(std::size_t i = 0; i < indices.size(); i += 3)
 	{
-		triangle& tri = _preparation_data.triangle_data[i / 3];
+		triangle& tri = preparation_data_.triangle_data[i / 3];
 		tri.indices[0] = indices[i + 0];
 		tri.indices[1] = indices[i + 1];
 		tri.indices[2] = indices[i + 2];
@@ -2050,17 +2050,17 @@ bool mesh::create_octahedron(const gfx::vertex_layout& format, bool hardware_cop
 	dispose();
 
 	// We are in the process of preparing.
-	_prepare_status = mesh_status::preparing;
-	_vertex_format = format;
+	prepare_status_ = mesh_status::preparing;
+	vertex_format_ = format;
 
 	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = _vertex_format.has(gfx::attribute::Position);
-	bool has_texcoord0 = _vertex_format.has(gfx::attribute::TexCoord0);
-	bool has_texcoord1 = _vertex_format.has(gfx::attribute::TexCoord1);
-	bool has_normals = _vertex_format.has(gfx::attribute::Normal);
-	bool has_tangents = _vertex_format.has(gfx::attribute::Tangent);
-	bool has_bitangents = _vertex_format.has(gfx::attribute::Bitangent);
-	std::uint16_t vertex_stride = _vertex_format.getStride();
+	bool has_position = vertex_format_.has(gfx::attribute::Position);
+	bool has_texcoord0 = vertex_format_.has(gfx::attribute::TexCoord0);
+	bool has_texcoord1 = vertex_format_.has(gfx::attribute::TexCoord1);
+	bool has_normals = vertex_format_.has(gfx::attribute::Normal);
+	bool has_tangents = vertex_format_.has(gfx::attribute::Tangent);
+	bool has_bitangents = vertex_format_.has(gfx::attribute::Bitangent);
+	std::uint16_t vertex_stride = vertex_format_.getStride();
 
 	RMC_DEFINE_DATA
 	triangle_mesh_tools::create_octahedron(vertices, indices, false);
@@ -2070,15 +2070,15 @@ bool mesh::create_octahedron(const gfx::vertex_layout& format, bool hardware_cop
 	triangle_mesh_tools::fill_dummy_ttt(vertices, normals, tangents, texcoords0, texcoords1);
 	triangle_mesh_tools::generate_tangents(tangents, bitangents, vertices, normals, texcoords0, indices);
 	// Compute the number of faces and vertices that will be required for this box
-	_preparation_data.triangle_count = std::uint32_t(indices.size()) / 3;
-	_preparation_data.vertex_count = std::uint32_t(vertices.size());
+	preparation_data_.triangle_count = std::uint32_t(indices.size()) / 3;
+	preparation_data_.vertex_count = std::uint32_t(vertices.size());
 
 	// Allocate enough space for the new vertex and triangle data
-	_preparation_data.vertex_data.resize(_preparation_data.vertex_count * vertex_stride);
-	_preparation_data.vertex_flags.resize(_preparation_data.vertex_count);
-	_preparation_data.triangle_data.resize(_preparation_data.triangle_count);
+	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
+	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
+	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
 
-	std::uint8_t* current_vertex_ptr = &_preparation_data.vertex_data[0];
+	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
 	for(std::size_t i = 0; i < vertices.size(); ++i)
 	{
 		// Store vertex components
@@ -2101,12 +2101,12 @@ bool mesh::create_octahedron(const gfx::vertex_layout& format, bool hardware_cop
 			gfx::vertex_pack(&bitangents[i][0], true, gfx::attribute::Bitangent, format, current_vertex_ptr,
 							 std::uint32_t(i));
 
-		_bbox.add_point(vertices[i]);
+		bbox_.add_point(vertices[i]);
 	}
 
 	for(std::size_t i = 0; i < indices.size(); i += 3)
 	{
-		triangle& tri = _preparation_data.triangle_data[i / 3];
+		triangle& tri = preparation_data_.triangle_data[i / 3];
 		tri.indices[0] = indices[i + 0];
 		tri.indices[1] = indices[i + 1];
 		tri.indices[2] = indices[i + 2];
@@ -2126,17 +2126,17 @@ bool mesh::create_icosahedron(const gfx::vertex_layout& format, bool hardware_co
 	dispose();
 
 	// We are in the process of preparing.
-	_prepare_status = mesh_status::preparing;
-	_vertex_format = format;
+	prepare_status_ = mesh_status::preparing;
+	vertex_format_ = format;
 
 	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = _vertex_format.has(gfx::attribute::Position);
-	bool has_texcoord0 = _vertex_format.has(gfx::attribute::TexCoord0);
-	bool has_texcoord1 = _vertex_format.has(gfx::attribute::TexCoord1);
-	bool has_normals = _vertex_format.has(gfx::attribute::Normal);
-	bool has_tangents = _vertex_format.has(gfx::attribute::Tangent);
-	bool has_bitangents = _vertex_format.has(gfx::attribute::Bitangent);
-	std::uint16_t vertex_stride = _vertex_format.getStride();
+	bool has_position = vertex_format_.has(gfx::attribute::Position);
+	bool has_texcoord0 = vertex_format_.has(gfx::attribute::TexCoord0);
+	bool has_texcoord1 = vertex_format_.has(gfx::attribute::TexCoord1);
+	bool has_normals = vertex_format_.has(gfx::attribute::Normal);
+	bool has_tangents = vertex_format_.has(gfx::attribute::Tangent);
+	bool has_bitangents = vertex_format_.has(gfx::attribute::Bitangent);
+	std::uint16_t vertex_stride = vertex_format_.getStride();
 
 	RMC_DEFINE_DATA
 	triangle_mesh_tools::create_icosahedron(vertices, indices, false);
@@ -2146,15 +2146,15 @@ bool mesh::create_icosahedron(const gfx::vertex_layout& format, bool hardware_co
 	triangle_mesh_tools::fill_dummy_ttt(vertices, normals, tangents, texcoords0, texcoords1);
 	triangle_mesh_tools::generate_tangents(tangents, bitangents, vertices, normals, texcoords0, indices);
 	// Compute the number of faces and vertices that will be required for this box
-	_preparation_data.triangle_count = std::uint32_t(indices.size()) / 3;
-	_preparation_data.vertex_count = std::uint32_t(vertices.size());
+	preparation_data_.triangle_count = std::uint32_t(indices.size()) / 3;
+	preparation_data_.vertex_count = std::uint32_t(vertices.size());
 
 	// Allocate enough space for the new vertex and triangle data
-	_preparation_data.vertex_data.resize(_preparation_data.vertex_count * vertex_stride);
-	_preparation_data.vertex_flags.resize(_preparation_data.vertex_count);
-	_preparation_data.triangle_data.resize(_preparation_data.triangle_count);
+	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
+	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
+	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
 
-	std::uint8_t* current_vertex_ptr = &_preparation_data.vertex_data[0];
+	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
 	for(std::size_t i = 0; i < vertices.size(); ++i)
 	{
 		// Store vertex components
@@ -2177,12 +2177,12 @@ bool mesh::create_icosahedron(const gfx::vertex_layout& format, bool hardware_co
 			gfx::vertex_pack(&bitangents[i][0], true, gfx::attribute::Bitangent, format, current_vertex_ptr,
 							 std::uint32_t(i));
 
-		_bbox.add_point(vertices[i]);
+		bbox_.add_point(vertices[i]);
 	}
 
 	for(std::size_t i = 0; i < indices.size(); i += 3)
 	{
-		triangle& tri = _preparation_data.triangle_data[i / 3];
+		triangle& tri = preparation_data_.triangle_data[i / 3];
 		tri.indices[0] = indices[i + 0];
 		tri.indices[1] = indices[i + 1];
 		tri.indices[2] = indices[i + 2];
@@ -2202,17 +2202,17 @@ bool mesh::create_dodecahedron(const gfx::vertex_layout& format, bool hardware_c
 	dispose();
 
 	// We are in the process of preparing.
-	_prepare_status = mesh_status::preparing;
-	_vertex_format = format;
+	prepare_status_ = mesh_status::preparing;
+	vertex_format_ = format;
 
 	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = _vertex_format.has(gfx::attribute::Position);
-	bool has_texcoord0 = _vertex_format.has(gfx::attribute::TexCoord0);
-	bool has_texcoord1 = _vertex_format.has(gfx::attribute::TexCoord1);
-	bool has_normals = _vertex_format.has(gfx::attribute::Normal);
-	bool has_tangents = _vertex_format.has(gfx::attribute::Tangent);
-	bool has_bitangents = _vertex_format.has(gfx::attribute::Bitangent);
-	std::uint16_t vertex_stride = _vertex_format.getStride();
+	bool has_position = vertex_format_.has(gfx::attribute::Position);
+	bool has_texcoord0 = vertex_format_.has(gfx::attribute::TexCoord0);
+	bool has_texcoord1 = vertex_format_.has(gfx::attribute::TexCoord1);
+	bool has_normals = vertex_format_.has(gfx::attribute::Normal);
+	bool has_tangents = vertex_format_.has(gfx::attribute::Tangent);
+	bool has_bitangents = vertex_format_.has(gfx::attribute::Bitangent);
+	std::uint16_t vertex_stride = vertex_format_.getStride();
 
 	RMC_DEFINE_DATA
 	triangle_mesh_tools::create_dodecahedron(vertices, indices, false);
@@ -2222,15 +2222,15 @@ bool mesh::create_dodecahedron(const gfx::vertex_layout& format, bool hardware_c
 	triangle_mesh_tools::fill_dummy_ttt(vertices, normals, tangents, texcoords0, texcoords1);
 	triangle_mesh_tools::generate_tangents(tangents, bitangents, vertices, normals, texcoords0, indices);
 	// Compute the number of faces and vertices that will be required for this box
-	_preparation_data.triangle_count = std::uint32_t(indices.size()) / 3;
-	_preparation_data.vertex_count = std::uint32_t(vertices.size());
+	preparation_data_.triangle_count = std::uint32_t(indices.size()) / 3;
+	preparation_data_.vertex_count = std::uint32_t(vertices.size());
 
 	// Allocate enough space for the new vertex and triangle data
-	_preparation_data.vertex_data.resize(_preparation_data.vertex_count * vertex_stride);
-	_preparation_data.vertex_flags.resize(_preparation_data.vertex_count);
-	_preparation_data.triangle_data.resize(_preparation_data.triangle_count);
+	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
+	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
+	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
 
-	std::uint8_t* current_vertex_ptr = &_preparation_data.vertex_data[0];
+	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
 	for(std::size_t i = 0; i < vertices.size(); ++i)
 	{
 		// Store vertex components
@@ -2253,12 +2253,12 @@ bool mesh::create_dodecahedron(const gfx::vertex_layout& format, bool hardware_c
 			gfx::vertex_pack(&bitangents[i][0], true, gfx::attribute::Bitangent, format, current_vertex_ptr,
 							 std::uint32_t(i));
 
-		_bbox.add_point(vertices[i]);
+		bbox_.add_point(vertices[i]);
 	}
 
 	for(std::size_t i = 0; i < indices.size(); i += 3)
 	{
-		triangle& tri = _preparation_data.triangle_data[i / 3];
+		triangle& tri = preparation_data_.triangle_data[i / 3];
 		tri.indices[0] = indices[i + 0];
 		tri.indices[1] = indices[i + 1];
 		tri.indices[2] = indices[i + 2];
@@ -2279,17 +2279,17 @@ bool mesh::create_icosphere(const gfx::vertex_layout& format, int tesselation_le
 	dispose();
 
 	// We are in the process of preparing.
-	_prepare_status = mesh_status::preparing;
-	_vertex_format = format;
+	prepare_status_ = mesh_status::preparing;
+	vertex_format_ = format;
 
 	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = _vertex_format.has(gfx::attribute::Position);
-	bool has_texcoord0 = _vertex_format.has(gfx::attribute::TexCoord0);
-	bool has_texcoord1 = _vertex_format.has(gfx::attribute::TexCoord1);
-	bool has_normals = _vertex_format.has(gfx::attribute::Normal);
-	bool has_tangents = _vertex_format.has(gfx::attribute::Tangent);
-	bool has_bitangents = _vertex_format.has(gfx::attribute::Bitangent);
-	std::uint16_t vertex_stride = _vertex_format.getStride();
+	bool has_position = vertex_format_.has(gfx::attribute::Position);
+	bool has_texcoord0 = vertex_format_.has(gfx::attribute::TexCoord0);
+	bool has_texcoord1 = vertex_format_.has(gfx::attribute::TexCoord1);
+	bool has_normals = vertex_format_.has(gfx::attribute::Normal);
+	bool has_tangents = vertex_format_.has(gfx::attribute::Tangent);
+	bool has_bitangents = vertex_format_.has(gfx::attribute::Bitangent);
+	std::uint16_t vertex_stride = vertex_format_.getStride();
 
 	RMC_DEFINE_DATA
 	triangle_mesh_tools::create_icosphere(vertices, indices, tesselation_level, false);
@@ -2299,15 +2299,15 @@ bool mesh::create_icosphere(const gfx::vertex_layout& format, int tesselation_le
 	triangle_mesh_tools::fill_dummy_ttt(vertices, normals, tangents, texcoords0, texcoords1);
 	triangle_mesh_tools::generate_tangents(tangents, bitangents, vertices, normals, texcoords0, indices);
 	// Compute the number of faces and vertices that will be required for this box
-	_preparation_data.triangle_count = std::uint32_t(indices.size()) / 3;
-	_preparation_data.vertex_count = std::uint32_t(vertices.size());
+	preparation_data_.triangle_count = std::uint32_t(indices.size()) / 3;
+	preparation_data_.vertex_count = std::uint32_t(vertices.size());
 
 	// Allocate enough space for the new vertex and triangle data
-	_preparation_data.vertex_data.resize(_preparation_data.vertex_count * vertex_stride);
-	_preparation_data.vertex_flags.resize(_preparation_data.vertex_count);
-	_preparation_data.triangle_data.resize(_preparation_data.triangle_count);
+	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
+	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
+	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
 
-	std::uint8_t* current_vertex_ptr = &_preparation_data.vertex_data[0];
+	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
 	for(std::size_t i = 0; i < vertices.size(); ++i)
 	{
 		// Store vertex components
@@ -2330,12 +2330,12 @@ bool mesh::create_icosphere(const gfx::vertex_layout& format, int tesselation_le
 			gfx::vertex_pack(&bitangents[i].x, true, gfx::attribute::Bitangent, format, current_vertex_ptr,
 							 std::uint32_t(i));
 
-		_bbox.add_point(vertices[i]);
+		bbox_.add_point(vertices[i]);
 	}
 
 	for(std::size_t i = 0; i < indices.size(); i += 3)
 	{
-		triangle& tri = _preparation_data.triangle_data[i / 3];
+		triangle& tri = preparation_data_.triangle_data[i / 3];
 		tri.indices[0] = indices[i + 0];
 		tri.indices[1] = indices[i + 1];
 		tri.indices[2] = indices[i + 2];
@@ -2360,36 +2360,36 @@ bool mesh::create_cone(const gfx::vertex_layout& format, float radius, float rad
 	dispose();
 
 	// We are in the process of preparing.
-	_prepare_status = mesh_status::preparing;
-	_vertex_format = format;
+	prepare_status_ = mesh_status::preparing;
+	vertex_format_ = format;
 
 	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = _vertex_format.has(gfx::attribute::Position);
-	bool has_texcoord = _vertex_format.has(gfx::attribute::TexCoord0);
-	bool has_normal = _vertex_format.has(gfx::attribute::Normal);
-	std::uint16_t vertex_stride = _vertex_format.getStride();
+	bool has_position = vertex_format_.has(gfx::attribute::Position);
+	bool has_texcoord = vertex_format_.has(gfx::attribute::TexCoord0);
+	bool has_normal = vertex_format_.has(gfx::attribute::Normal);
+	std::uint16_t vertex_stride = vertex_format_.getStride();
 
 	// Compute the number of faces and vertices that will be required for this
 	// cone
-	_preparation_data.triangle_count = (slices * stacks) * 2;
-	_preparation_data.vertex_count = (slices + 1) * (stacks + 1);
+	preparation_data_.triangle_count = (slices * stacks) * 2;
+	preparation_data_.vertex_count = (slices + 1) * (stacks + 1);
 
 	// Add vertices and faces for caps
 	if(radius_tip < 0.001f)
 		radius_tip = 0.0f;
 	std::uint32_t num_caps = (radius_tip > 0.0f) ? 2 : 1;
-	std::uint32_t caps_start = _preparation_data.vertex_count;
-	_preparation_data.vertex_count += slices * num_caps;
-	_preparation_data.triangle_count += (slices - 2) * num_caps;
+	std::uint32_t caps_start = preparation_data_.vertex_count;
+	preparation_data_.vertex_count += slices * num_caps;
+	preparation_data_.triangle_count += (slices - 2) * num_caps;
 
 	// Allocate enough space for the new vertex and triangle data
-	_preparation_data.vertex_data.resize(_preparation_data.vertex_count * vertex_stride);
-	_preparation_data.vertex_flags.resize(_preparation_data.vertex_count);
-	_preparation_data.triangle_data.resize(_preparation_data.triangle_count);
+	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
+	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
+	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
 
 	// Generate vertex data. For each stack
-	std::uint8_t* current_vertex_ptr = &_preparation_data.vertex_data[0];
-	std::uint8_t* current_flags_ptr = &_preparation_data.vertex_flags[0];
+	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
+	std::uint8_t* current_flags_ptr = &preparation_data_.vertex_flags[0];
 	for(std::uint32_t stack = 0; stack <= stacks; ++stack)
 	{
 		// Generate a ring of vertices which describe the top edges of that stack's
@@ -2438,7 +2438,7 @@ bool mesh::create_cone(const gfx::vertex_layout& format, float radius, float rad
 
 			// Grow the object space bounding box for this mesh
 			// by including the computed position.
-			_bbox.add_point(vec_position);
+			bbox_.add_point(vec_position);
 
 			// Move on to next vertex
 			current_vertex_ptr += vertex_stride;
@@ -2484,7 +2484,7 @@ bool mesh::create_cone(const gfx::vertex_layout& format, float radius, float rad
 
 		// Grow the object space bounding box for this mesh
 		// by including the computed position.
-		_bbox.add_point(vec_position);
+		bbox_.add_point(vec_position);
 
 		// Move on to next vertex
 		current_vertex_ptr += vertex_stride;
@@ -2532,7 +2532,7 @@ bool mesh::create_cone(const gfx::vertex_layout& format, float radius, float rad
 
 			// Grow the object space bounding box for this mesh
 			// by including the computed position.
-			_bbox.add_point(vec_position);
+			bbox_.add_point(vec_position);
 
 			// Move on to next vertex
 			current_vertex_ptr += vertex_stride;
@@ -2542,7 +2542,7 @@ bool mesh::create_cone(const gfx::vertex_layout& format, float radius, float rad
 	} // End if add end cap
 
 	// Now generate indices. Process each stack (except the top and bottom)
-	triangle* current_triangle_ptr = &_preparation_data.triangle_data[0];
+	triangle* current_triangle_ptr = &preparation_data_.triangle_data[0];
 	for(std::uint32_t stack = 0; stack < stacks; ++stack)
 	{
 		// Generate two triangles for the quad on each slice
@@ -2636,8 +2636,8 @@ bool mesh::create_cone(const gfx::vertex_layout& format, float radius, float rad
 	} // Next Slice
 
 	// We need to generate binormals / tangents?
-	_preparation_data.compute_binormals = _vertex_format.has(gfx::attribute::Bitangent);
-	_preparation_data.compute_tangents = _vertex_format.has(gfx::attribute::Tangent);
+	preparation_data_.compute_binormals = vertex_format_.has(gfx::attribute::Bitangent);
+	preparation_data_.compute_tangents = vertex_format_.has(gfx::attribute::Tangent);
 
 	// Finish up
 	return end_prepare(hardware_copy, false, false);
@@ -2667,35 +2667,35 @@ bool mesh::create_cube(const gfx::vertex_layout& format, float width, float heig
 	dispose();
 
 	// We are in the process of preparing.
-	_prepare_status = mesh_status::preparing;
-	_vertex_format = format;
+	prepare_status_ = mesh_status::preparing;
+	vertex_format_ = format;
 
 	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = _vertex_format.has(gfx::attribute::Position);
-	bool has_texcoord = _vertex_format.has(gfx::attribute::TexCoord0);
-	bool has_normal = _vertex_format.has(gfx::attribute::Normal);
-	std::uint16_t vertex_stride = _vertex_format.getStride();
+	bool has_position = vertex_format_.has(gfx::attribute::Position);
+	bool has_texcoord = vertex_format_.has(gfx::attribute::TexCoord0);
+	bool has_normal = vertex_format_.has(gfx::attribute::Normal);
+	std::uint16_t vertex_stride = vertex_format_.getStride();
 
 	// Compute the number of faces and vertices that will be required for this box
-	_preparation_data.triangle_count = (4 * (width_segments * depth_segments)) +
+	preparation_data_.triangle_count = (4 * (width_segments * depth_segments)) +
 									   (4 * (width_segments * height_segments)) +
 									   (4 * (height_segments * depth_segments));
-	_preparation_data.vertex_count = (2 * ((width_segments + 1) * (depth_segments + 1))) +
+	preparation_data_.vertex_count = (2 * ((width_segments + 1) * (depth_segments + 1))) +
 									 (2 * ((width_segments + 1) * (height_segments + 1))) +
 									 (2 * ((height_segments + 1) * (depth_segments + 1)));
 
 	// Allocate enough space for the new vertex and triangle data
-	_preparation_data.vertex_data.resize(_preparation_data.vertex_count * vertex_stride);
-	_preparation_data.vertex_flags.resize(_preparation_data.vertex_count);
-	_preparation_data.triangle_data.resize(_preparation_data.triangle_count);
+	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
+	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
+	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
 
 	// Ensure width and depth are absolute (prevent inverting on those axes)
 	width = math::abs(width);
 	depth = math::abs(depth);
 
 	// Generate faces
-	std::uint8_t* current_vertex_ptr = &_preparation_data.vertex_data[0];
-	std::uint8_t* current_flags_ptr = &_preparation_data.vertex_flags[0];
+	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
+	std::uint8_t* current_flags_ptr = &preparation_data_.vertex_flags[0];
 	float half_width = width / 2, half_depth = depth / 2;
 	for(std::uint32_t i = 0; i < 6; ++i)
 	{
@@ -2792,7 +2792,7 @@ bool mesh::create_cube(const gfx::vertex_layout& format, float width, float heig
 
 				// Grow the object space bounding box for this mesh
 				// by including the computed position.
-				_bbox.add_point(output_pos);
+				bbox_.add_point(output_pos);
 
 				// Move to next vertex position
 				current_pos += delta_pos_x;
@@ -2813,7 +2813,7 @@ bool mesh::create_cube(const gfx::vertex_layout& format, float width, float heig
 
 	// Now generate indices. For each box face.
 	counter = 0;
-	triangle* current_triangle_ptr = &_preparation_data.triangle_data[0];
+	triangle* current_triangle_ptr = &preparation_data_.triangle_data[0];
 	for(std::uint32_t i = 0; i < 6; ++i)
 	{
 		switch(i)
@@ -2885,8 +2885,8 @@ bool mesh::create_cube(const gfx::vertex_layout& format, float width, float heig
 	} // Next Face
 
 	// We need to generate binormals / tangents?
-	_preparation_data.compute_binormals = _vertex_format.has(gfx::attribute::Bitangent);
-	_preparation_data.compute_tangents = _vertex_format.has(gfx::attribute::Tangent);
+	preparation_data_.compute_binormals = vertex_format_.has(gfx::attribute::Bitangent);
+	preparation_data_.compute_tangents = vertex_format_.has(gfx::attribute::Tangent);
 	// Finish up
 	return end_prepare(hardware_copy, false, false);
 }
@@ -2895,7 +2895,7 @@ bool mesh::end_prepare(bool hardware_copy /* = true */, bool weld /* = true */, 
 					   bool build_buffers /*= true*/)
 {
 	// Were we previously preparing?
-	if(_prepare_status != mesh_status::preparing)
+	if(prepare_status_ != mesh_status::preparing)
 	{
 		APPLOG_ERROR("Attempting to call 'end_prepare' on a mesh without first "
 					 "calling 'prepareMesh' is not "
@@ -2905,21 +2905,21 @@ bool mesh::end_prepare(bool hardware_copy /* = true */, bool weld /* = true */, 
 	} // End if previously preparing
 
 	// Scan the preparation data for degenerate triangles.
-	std::uint16_t position_offset = _vertex_format.getOffset(gfx::attribute::Position);
+	std::uint16_t position_offset = vertex_format_.getOffset(gfx::attribute::Position);
 	// std::uint16_t vertex_stride = _vertex_format.getStride();
-	std::uint8_t* src_vertices_ptr = &_preparation_data.vertex_data[0] + position_offset;
-	for(std::uint32_t i = 0; i < _preparation_data.triangle_count; ++i)
+	std::uint8_t* src_vertices_ptr = &preparation_data_.vertex_data[0] + position_offset;
+	for(std::uint32_t i = 0; i < preparation_data_.triangle_count; ++i)
 	{
-		triangle& tri = _preparation_data.triangle_data[i];
+		triangle& tri = preparation_data_.triangle_data[i];
 		math::vec3 v1;
 		float vf1[4];
-		gfx::vertex_unpack(vf1, gfx::attribute::Position, _vertex_format, src_vertices_ptr, tri.indices[0]);
+		gfx::vertex_unpack(vf1, gfx::attribute::Position, vertex_format_, src_vertices_ptr, tri.indices[0]);
 		math::vec3 v2;
 		float vf2[4];
-		gfx::vertex_unpack(vf2, gfx::attribute::Position, _vertex_format, src_vertices_ptr, tri.indices[1]);
+		gfx::vertex_unpack(vf2, gfx::attribute::Position, vertex_format_, src_vertices_ptr, tri.indices[1]);
 		math::vec3 v3;
 		float vf3[4];
-		gfx::vertex_unpack(vf3, gfx::attribute::Position, _vertex_format, src_vertices_ptr, tri.indices[2]);
+		gfx::vertex_unpack(vf3, gfx::attribute::Position, vertex_format_, src_vertices_ptr, tri.indices[2]);
 		memcpy(&v1[0], vf1, 3 * sizeof(float));
 		memcpy(&v2[0], vf2, 3 * sizeof(float));
 		memcpy(&v3[0], vf3, 3 * sizeof(float));
@@ -2937,39 +2937,39 @@ bool mesh::end_prepare(bool hardware_copy /* = true */, bool weld /* = true */, 
 		return false;
 
 	// Allocate the system memory vertex buffer ready for population.
-	_vertex_count = _preparation_data.vertex_count;
-	_system_vb = new std::uint8_t[_vertex_count * _vertex_format.getStride()];
+	vertex_count_ = preparation_data_.vertex_count;
+	system_vb_ = new std::uint8_t[vertex_count_ * vertex_format_.getStride()];
 
 	// Copy vertex data into the new buffer and dispose of the temporary data.
-	memcpy(_system_vb, &_preparation_data.vertex_data[0], _vertex_count * _vertex_format.getStride());
-	_preparation_data.vertex_data.clear();
-	_preparation_data.vertex_flags.clear();
-	_preparation_data.vertex_count = 0;
+	memcpy(system_vb_, &preparation_data_.vertex_data[0], vertex_count_ * vertex_format_.getStride());
+	preparation_data_.vertex_data.clear();
+	preparation_data_.vertex_flags.clear();
+	preparation_data_.vertex_count = 0;
 
 	// Allocate the memory for our system memory index buffer
-	_face_count = _preparation_data.triangle_count;
-	_system_ib = new std::uint32_t[_face_count * 3];
+	face_count_ = preparation_data_.triangle_count;
+	system_ib_ = new std::uint32_t[face_count_ * 3];
 
 	// math::transform triangle indices, material and data group information
 	// to the final triangle data arrays. We keep the latter two handy so
 	// that we know precisely which subset each triangle belongs to.
-	_triangle_data.resize(_face_count);
-	std::uint32_t* dst_indices_ptr = _system_ib;
-	for(std::uint32_t i = 0; i < _face_count; ++i)
+	triangle_data_.resize(face_count_);
+	std::uint32_t* dst_indices_ptr = system_ib_;
+	for(std::uint32_t i = 0; i < face_count_; ++i)
 	{
 		// Copy indices.
-		const triangle& tri_in = _preparation_data.triangle_data[i];
+		const triangle& tri_in = preparation_data_.triangle_data[i];
 		*dst_indices_ptr++ = tri_in.indices[0];
 		*dst_indices_ptr++ = tri_in.indices[1];
 		*dst_indices_ptr++ = tri_in.indices[2];
 
 		// Copy triangle subset information.
-		mesh_subset_key& tri_out = _triangle_data[i];
+		mesh_subset_key& tri_out = triangle_data_[i];
 		tri_out.data_group_id = tri_in.data_group_id;
 
 	} // Next triangle
-	_preparation_data.triangle_count = 0;
-	_preparation_data.triangle_data.clear();
+	preparation_data_.triangle_count = 0;
+	preparation_data_.triangle_data.clear();
 
 	// Index data has been updated and potentially needs to be serialized.
 	if(build_buffers)
@@ -2983,9 +2983,9 @@ bool mesh::end_prepare(bool hardware_copy /* = true */, bool weld /* = true */, 
 		return false;
 
 	// The mesh is now prepared
-	_prepare_status = mesh_status::prepared;
-	_hardware_mesh = hardware_copy;
-	_optimize_mesh = optimize;
+	prepare_status_ = mesh_status::prepared;
+	hardware_mesh_ = hardware_copy;
+	optimize_mesh_ = optimize;
 
 	// Success!
 	return true;
@@ -2997,10 +2997,10 @@ void mesh::build_vb(bool hardware_copy)
 	if(hardware_copy)
 	{
 		// Calculate the required size of the vertex buffer
-		std::uint32_t buffer_size = _vertex_count * _vertex_format.getStride();
+		std::uint32_t buffer_size = vertex_count_ * vertex_format_.getStride();
 
-		const gfx::memory_view* mem = gfx::copy(_system_vb, static_cast<std::uint32_t>(buffer_size));
-		_hardware_vb = std::make_shared<gfx::vertex_buffer>(mem, _vertex_format);
+		const gfx::memory_view* mem = gfx::copy(system_vb_, static_cast<std::uint32_t>(buffer_size));
+		hardware_vb_ = std::make_shared<gfx::vertex_buffer>(mem, vertex_format_);
 
 	} // End if video memory vertex buffer required
 }
@@ -3011,18 +3011,18 @@ void mesh::build_ib(bool hardware_copy)
 	if(hardware_copy)
 	{
 		// Calculate the required size of the index buffer
-		std::uint32_t buffer_size = _face_count * 3 * sizeof(std::uint32_t);
+		std::uint32_t buffer_size = face_count_ * 3 * sizeof(std::uint32_t);
 
 		// Allocate hardware buffer if required (i.e. it does not already exist).
-		if(!_hardware_ib)
+		if(!hardware_ib_)
 		{
-			const gfx::memory_view* mem = gfx::copy(_system_ib, static_cast<std::uint32_t>(buffer_size));
-			_hardware_ib = std::make_shared<gfx::index_buffer>(mem, BGFX_BUFFER_INDEX32);
+			const gfx::memory_view* mem = gfx::copy(system_ib_, static_cast<std::uint32_t>(buffer_size));
+			hardware_ib_ = std::make_shared<gfx::index_buffer>(mem, BGFX_BUFFER_INDEX32);
 		} // End if not allocated
-		else if(_hardware_ib && !_hardware_ib->is_valid())
+		else if(hardware_ib_ && !hardware_ib_->is_valid())
 		{
-			const gfx::memory_view* mem = gfx::copy(_system_ib, static_cast<std::uint32_t>(buffer_size));
-			_hardware_ib = std::make_shared<gfx::index_buffer>(mem, BGFX_BUFFER_INDEX32);
+			const gfx::memory_view* mem = gfx::copy(system_ib_, static_cast<std::uint32_t>(buffer_size));
+			hardware_ib_ = std::make_shared<gfx::index_buffer>(mem, BGFX_BUFFER_INDEX32);
 		}
 
 	} // End if hardware buffer required
@@ -3037,14 +3037,14 @@ bool mesh::sort_mesh_data(bool optimize, bool hardware_copy, bool build_buffer)
 	// Clear out any old data EXCEPT the old subset index
 	// We'll need this in order to understand how to update
 	// the material reference counting later on.
-	_data_groups.clear();
-	_subset_lookup.clear();
+	data_groups_.clear();
+	subset_lookup_.clear();
 
 	// Our first job is to collate all the various subsets and also
 	// to determine how many triangles should exist in each.
-	for(std::uint32_t i = 0; i < _face_count; ++i)
+	for(std::uint32_t i = 0; i < face_count_; ++i)
 	{
-		const mesh_subset_key& subset_key = _triangle_data[i];
+		const mesh_subset_key& subset_key = triangle_data_[i];
 
 		// Already contains this material / data group combination?
 		it_subset_size = subset_sizes.find(subset_key);
@@ -3092,29 +3092,29 @@ bool mesh::sort_mesh_data(bool optimize, bool hardware_copy, bool build_buffer)
 		// Add to list for fast linear access, and lookup table
 		// for sorted search.
 		new_subsets.push_back(sub);
-		_subset_lookup[key] = sub;
+		subset_lookup_[key] = sub;
 
 		// Add to data group lookup table
-		it_data_group = _data_groups.find(sub->data_group_id);
-		if(it_data_group == _data_groups.end())
-			_data_groups[sub->data_group_id].push_back(sub);
+		it_data_group = data_groups_.find(sub->data_group_id);
+		if(it_data_group == data_groups_.end())
+			data_groups_[sub->data_group_id].push_back(sub);
 		else
 			it_data_group->second.push_back(sub);
 
 	} // Next subset
 
 	// Allocate space for new sorted index buffer and face re-map information
-	std::uint32_t* src_indices_ptr = _system_ib;
-	auto dst_indices_ptr = new std::uint32_t[_face_count * 3];
-	auto face_remap_ptr = new std::uint32_t[_face_count];
+	std::uint32_t* src_indices_ptr = system_ib_;
+	auto dst_indices_ptr = new std::uint32_t[face_count_ * 3];
+	auto face_remap_ptr = new std::uint32_t[face_count_];
 
 	// Start building new indices
 	std::uint32_t index = 0;
 	std::uint32_t index_start = 0;
-	for(std::uint32_t i = 0; i < _face_count; ++i)
+	for(std::uint32_t i = 0; i < face_count_; ++i)
 	{
 		// Find a matching subset for this triangle
-		subset* sub = _subset_lookup[_triangle_data[i]];
+		subset* sub = subset_lookup_[triangle_data_[i]];
 
 		// Copy index data over to new buffer, taking care to record the correct
 		// vertex values as required. We'll temporarily use VertexStart and
@@ -3170,13 +3170,13 @@ bool mesh::sort_mesh_data(bool optimize, bool hardware_copy, bool build_buffer)
 	// (render control batching system requires that we cache this information in
 	// a
 	// specific format).
-	for(it_data_group = _data_groups.begin(); it_data_group != _data_groups.end(); ++it_data_group)
+	for(it_data_group = data_groups_.begin(); it_data_group != data_groups_.end(); ++it_data_group)
 		std::sort(it_data_group->second.begin(), it_data_group->second.end(), sort_predicate);
 
 	// Optimize the faces as we transfer to the final destination index buffer
 	// if requested. Otherwise, just copy them over directly.
 	src_indices_ptr = dst_indices_ptr;
-	dst_indices_ptr = _system_ib;
+	dst_indices_ptr = system_ib_;
 	counter = 0;
 	for(auto subset : new_subsets)
 	{
@@ -3216,7 +3216,7 @@ bool mesh::sort_mesh_data(bool optimize, bool hardware_copy, bool build_buffer)
 		auto fstart = static_cast<std::uint32_t>(subset->face_start);
 		for(std::uint32_t j = fstart; j < (fstart + subset->face_count); ++j)
 		{
-			_triangle_data[j].data_group_id = subset->data_group_id;
+			triangle_data_[j].data_group_id = subset->data_group_id;
 
 		} // Next triangle
 
@@ -3234,12 +3234,12 @@ bool mesh::sort_mesh_data(bool optimize, bool hardware_copy, bool build_buffer)
 	// serialized.
 
 	// Destroy old subset data.
-	for(auto subset : _mesh_subsets)
+	for(auto subset : mesh_subsets_)
 		checked_delete(subset);
-	_mesh_subsets.clear();
+	mesh_subsets_.clear();
 
 	// Use the new subset data.
-	_mesh_subsets = new_subsets;
+	mesh_subsets_ = new_subsets;
 
 	// Success!
 	return true;
@@ -3523,7 +3523,7 @@ void mesh::build_optimized_index_buffer(const subset* subset, std::uint32_t* src
 
 void mesh::bind_render_buffers()
 {
-	for(size_t i = 0; i < _mesh_subsets.size(); ++i)
+	for(size_t i = 0; i < mesh_subsets_.size(); ++i)
 	{
 		bind_render_buffers_for_subset(std::uint32_t(i));
 	}
@@ -3532,8 +3532,8 @@ void mesh::bind_render_buffers()
 void mesh::bind_render_buffers_for_subset(std::uint32_t data_group_id)
 {
 	// Attempt to find a matching subset.
-	auto it = _subset_lookup.find(mesh_subset_key(data_group_id));
-	if(it == _subset_lookup.end())
+	auto it = subset_lookup_.find(mesh_subset_key(data_group_id));
+	if(it == subset_lookup_.end())
 		return;
 
 	// Process and draw all subsets of the mesh that use the specified material.
@@ -3577,21 +3577,21 @@ void mesh::bind_mesh_data(std::uint32_t face_start, std::uint32_t face_count, st
 	std::uint32_t index_start = face_start * 3;
 	std::uint32_t index_count = face_count * 3;
 	// Hardware or software rendering?
-	if(_hardware_mesh)
+	if(hardware_mesh_)
 	{
 		// Render using hardware streams
-		gfx::set_vertex_buffer(0, _hardware_vb->native_handle(), 0, vertex_count);
-		gfx::set_index_buffer(_hardware_ib->native_handle(), index_start, index_count);
+		gfx::set_vertex_buffer(0, hardware_vb_->native_handle(), 0, vertex_count);
+		gfx::set_index_buffer(hardware_ib_->native_handle(), index_start, index_count);
 
 	} // End if has hardware copy
 	else
 	{
 
-		if(vertex_count == gfx::get_avail_transient_vertex_buffer(vertex_count, _vertex_format))
+		if(vertex_count == gfx::get_avail_transient_vertex_buffer(vertex_count, vertex_format_))
 		{
 			gfx::transient_vertex_buffer vb;
-			gfx::alloc_transient_vertex_buffer(&vb, vertex_count, _vertex_format);
-			memcpy(vb.data, _system_vb, vb.size);
+			gfx::alloc_transient_vertex_buffer(&vb, vertex_count, vertex_format_);
+			memcpy(vb.data, system_vb_, vb.size);
 			gfx::set_vertex_buffer(0, &vb, 0, vertex_count);
 		}
 
@@ -3599,7 +3599,7 @@ void mesh::bind_mesh_data(std::uint32_t face_start, std::uint32_t face_count, st
 		{
 			gfx::transient_index_buffer ib;
 			gfx::alloc_transient_index_buffer(&ib, index_count);
-			memcpy(ib.data, _system_ib, ib.size);
+			memcpy(ib.data, system_ib_, ib.size);
 			gfx::set_index_buffer(&ib, index_start, index_count);
 		}
 
@@ -3609,25 +3609,25 @@ void mesh::bind_mesh_data(std::uint32_t face_start, std::uint32_t face_count, st
 bool mesh::generate_vertex_components(bool weld)
 {
 	// Vertex normals were requested (and at least some were not yet provided?)
-	if(_force_normal_generation || _preparation_data.compute_normals)
+	if(force_normal_generation_ || preparation_data_.compute_normals)
 	{
 		// Generate the adjacency information for vertex normal computation
 		std::vector<std::uint32_t> adjacency;
 		if(!generate_adjacency(adjacency))
 		{
 			APPLOG_ERROR("Failed to generate adjacency buffer mesh containing {0} faces.\n",
-						 _preparation_data.triangle_count);
+						 preparation_data_.triangle_count);
 			return false;
 
 		} // End if failed to generate
-		if(_force_barycentric_generation || _preparation_data.compute_barycentric)
+		if(force_barycentric_generation_ || preparation_data_.compute_barycentric)
 		{
 			// Generate any vertex barycentric coords that have not been provided
 			if(!generate_vertex_barycentrics(&adjacency.front()))
 			{
 				APPLOG_ERROR("Failed to generate vertex barycentric coords for mesh "
 							 "containing {0} faces.\n",
-							 _preparation_data.triangle_count);
+							 preparation_data_.triangle_count);
 				return false;
 
 			} // End if failed to generate
@@ -3638,7 +3638,7 @@ bool mesh::generate_vertex_components(bool weld)
 		if(!generate_vertex_normals(&adjacency.front()))
 		{
 			APPLOG_ERROR("Failed to generate vertex normals for mesh containing {0} faces.\n",
-						 _preparation_data.triangle_count);
+						 preparation_data_.triangle_count);
 			return false;
 
 		} // End if failed to generate
@@ -3651,7 +3651,7 @@ bool mesh::generate_vertex_components(bool weld)
 		if(!weld_vertices())
 		{
 			APPLOG_ERROR("Failed to weld vertices for mesh containing {0} faces.\n",
-						 _preparation_data.triangle_count);
+						 preparation_data_.triangle_count);
 			return false;
 
 		} // End if failed to weld
@@ -3660,17 +3660,17 @@ bool mesh::generate_vertex_components(bool weld)
 
 	// Binormals and / or tangents were requested (and at least some where not yet
 	// provided?)
-	if(_force_tangent_generation || _preparation_data.compute_binormals || _preparation_data.compute_tangents)
+	if(force_tangent_generation_ || preparation_data_.compute_binormals || preparation_data_.compute_tangents)
 	{
 		// Requires normals
-		if(_vertex_format.has(gfx::attribute::Normal))
+		if(vertex_format_.has(gfx::attribute::Normal))
 		{
 			// Generate any vertex tangents that have not been provided
 			if(!generate_vertex_tangents())
 			{
 				APPLOG_ERROR("Failed to generate vertex tangents for mesh containing "
 							 "{0} faces.\n",
-							 _preparation_data.triangle_count);
+							 preparation_data_.triangle_count);
 				return false;
 
 			} // End if failed to generate
@@ -3691,32 +3691,32 @@ bool mesh::generate_vertex_normals(std::uint32_t* adjacency_ptr,
 	std::uint32_t i, j, k, index;
 
 	// Get access to useful data offset information.
-	std::uint16_t position_offset = _vertex_format.getOffset(gfx::attribute::Position);
-	bool has_normals = _vertex_format.has(gfx::attribute::Normal);
-	std::uint16_t vertex_stride = _vertex_format.getStride();
+	std::uint16_t position_offset = vertex_format_.getOffset(gfx::attribute::Position);
+	bool has_normals = vertex_format_.has(gfx::attribute::Normal);
+	std::uint16_t vertex_stride = vertex_format_.getStride();
 
 	// Final format requests vertex normals?
 	if(!has_normals)
 		return true;
 
 	// Size the remap array accordingly and populate it with the default mapping.
-	std::uint32_t original_vertex_count = _preparation_data.vertex_count;
+	std::uint32_t original_vertex_count = preparation_data_.vertex_count;
 	if(remap_array_ptr)
 	{
-		remap_array_ptr->resize(_preparation_data.vertex_count);
-		for(i = 0; i < _preparation_data.vertex_count; ++i)
+		remap_array_ptr->resize(preparation_data_.vertex_count);
+		for(i = 0; i < preparation_data_.vertex_count; ++i)
 			(*remap_array_ptr)[i] = i;
 
 	} // End if supplied
 
 	// Pre-compute surface normals for each triangle
-	std::uint8_t* src_vertices_ptr = &_preparation_data.vertex_data[0];
-	auto* normals_ptr = new math::vec3[_preparation_data.triangle_count];
-	memset(normals_ptr, 0, _preparation_data.triangle_count * sizeof(math::vec3));
-	for(i = 0; i < _preparation_data.triangle_count; ++i)
+	std::uint8_t* src_vertices_ptr = &preparation_data_.vertex_data[0];
+	auto* normals_ptr = new math::vec3[preparation_data_.triangle_count];
+	memset(normals_ptr, 0, preparation_data_.triangle_count * sizeof(math::vec3));
+	for(i = 0; i < preparation_data_.triangle_count; ++i)
 	{
 		// Retrieve positions of each referenced vertex.
-		const triangle& tri = _preparation_data.triangle_data[i];
+		const triangle& tri = preparation_data_.triangle_data[i];
 		const auto* v1 = reinterpret_cast<const math::vec3*>(
 			src_vertices_ptr + (tri.indices[0] * vertex_stride) + position_offset);
 		const auto* v2 = reinterpret_cast<const math::vec3*>(
@@ -3736,9 +3736,9 @@ bool mesh::generate_vertex_normals(std::uint32_t* adjacency_ptr,
 	} // Next Face
 
 	// Now compute the actual VERTEX normals using face adjacency information
-	for(i = 0; i < _preparation_data.triangle_count; ++i)
+	for(i = 0; i < preparation_data_.triangle_count; ++i)
 	{
-		triangle& tri = _preparation_data.triangle_data[i];
+		triangle& tri = preparation_data_.triangle_data[i];
 		if(tri.flags & triangle_flags::degenerate)
 			continue;
 
@@ -3749,8 +3749,8 @@ bool mesh::generate_vertex_normals(std::uint32_t* adjacency_ptr,
 			index = tri.indices[j];
 
 			// Skip this vertex if normal information was already provided.
-			if(!_force_normal_generation &&
-			   (_preparation_data.vertex_flags[index] & preparation_data::source_contains_normal))
+			if(!force_normal_generation_ &&
+			   (preparation_data_.vertex_flags[index] & preparation_data::source_contains_normal))
 				continue;
 
 			// To generate vertex normals using the adjacency information we first
@@ -3875,14 +3875,14 @@ bool mesh::generate_vertex_normals(std::uint32_t* adjacency_ptr,
 			// we need
 			// to split the vertex into two.
 			float fn[4];
-			gfx::vertex_unpack(fn, gfx::attribute::Normal, _vertex_format, src_vertices_ptr, index);
+			gfx::vertex_unpack(fn, gfx::attribute::Normal, vertex_format_, src_vertices_ptr, index);
 			math::vec3 ref_normal;
 			ref_normal[0] = fn[0];
 			ref_normal[1] = fn[1];
 			ref_normal[2] = fn[2];
 			if(ref_normal.x == 0.0f && ref_normal.y == 0.0f && ref_normal.z == 0.0f)
 			{
-				gfx::vertex_pack(math::value_ptr(vec_normal), true, gfx::attribute::Normal, _vertex_format,
+				gfx::vertex_pack(math::value_ptr(vec_normal), true, gfx::attribute::Normal, vertex_format_,
 								 src_vertices_ptr, index);
 			} // End if no normal stored here yet
 			else
@@ -3893,7 +3893,7 @@ bool mesh::generate_vertex_normals(std::uint32_t* adjacency_ptr,
 				   math::abs(ref_normal.z - vec_normal.z) >= 1e-3f)
 				{
 					// Make room for new vertex data.
-					_preparation_data.vertex_data.resize(_preparation_data.vertex_data.size() +
+					preparation_data_.vertex_data.resize(preparation_data_.vertex_data.size() +
 														 vertex_stride);
 
 					// Ensure that we update the 'src_vertices_ptr' pointer (used
@@ -3901,24 +3901,24 @@ bool mesh::generate_vertex_normals(std::uint32_t* adjacency_ptr,
 					// loop). The internal buffer wrapped by the resized vertex data
 					// vector
 					// may have been re-allocated.
-					src_vertices_ptr = &_preparation_data.vertex_data[0];
+					src_vertices_ptr = &preparation_data_.vertex_data[0];
 
 					// Duplicate the vertex at the end of the buffer
-					memcpy(src_vertices_ptr + (_preparation_data.vertex_count * vertex_stride),
+					memcpy(src_vertices_ptr + (preparation_data_.vertex_count * vertex_stride),
 						   src_vertices_ptr + (index * vertex_stride), vertex_stride);
 
 					// Duplicate any other remaining information.
-					_preparation_data.vertex_flags.push_back(_preparation_data.vertex_flags[index]);
+					preparation_data_.vertex_flags.push_back(preparation_data_.vertex_flags[index]);
 
 					// Record the split
 					if(remap_array_ptr)
-						(*remap_array_ptr)[index] = _preparation_data.vertex_count;
+						(*remap_array_ptr)[index] = preparation_data_.vertex_count;
 
 					// Store the new normal and finally record the fact that we have
 					// added a new vertex.
-					index = _preparation_data.vertex_count++;
+					index = preparation_data_.vertex_count++;
 					gfx::vertex_pack(math::value_ptr(vec_normal), true, gfx::attribute::Normal,
-									 _vertex_format, src_vertices_ptr, index);
+									 vertex_format_, src_vertices_ptr, index);
 
 					// Update the index
 					tri.indices[j] = index;
@@ -3936,7 +3936,7 @@ bool mesh::generate_vertex_normals(std::uint32_t* adjacency_ptr,
 
 	// If no new vertices were introduced, then it is not necessary
 	// for the caller to remap anything.
-	if(remap_array_ptr && original_vertex_count == _preparation_data.vertex_count)
+	if(remap_array_ptr && original_vertex_count == preparation_data_.vertex_count)
 		remap_array_ptr->clear();
 
 	// Success!
@@ -3956,33 +3956,33 @@ bool mesh::generate_vertex_tangents()
 	math::vec3 P, Q, T, B, cross_vec, normal_vec;
 
 	// Get access to useful data offset information.
-	std::uint16_t vertex_stride = _vertex_format.getStride();
+	std::uint16_t vertex_stride = vertex_format_.getStride();
 
-	bool has_normals = _vertex_format.has(gfx::attribute::Normal);
+	bool has_normals = vertex_format_.has(gfx::attribute::Normal);
 	// This will fail if we don't already have normals however.
 	if(!has_normals)
 		return false;
 
 	// Final format requests tangents?
-	bool requires_tangents = _vertex_format.has(gfx::attribute::Tangent);
-	bool requires_bitangents = _vertex_format.has(gfx::attribute::Bitangent);
-	if(!_force_tangent_generation && !requires_bitangents && !requires_tangents)
+	bool requires_tangents = vertex_format_.has(gfx::attribute::Tangent);
+	bool requires_bitangents = vertex_format_.has(gfx::attribute::Bitangent);
+	if(!force_tangent_generation_ && !requires_bitangents && !requires_tangents)
 		return true;
 
 	// Allocate storage space for the tangent and bitangent vectors
 	// that we will effectively need to average for shared vertices.
-	num_faces = _preparation_data.triangle_count;
-	num_verts = _preparation_data.vertex_count;
+	num_faces = preparation_data_.triangle_count;
+	num_verts = preparation_data_.vertex_count;
 	tangents = new math::vec3[num_verts];
 	bitangents = new math::vec3[num_verts];
 	memset(tangents, 0, sizeof(math::vec3) * num_verts);
 	memset(bitangents, 0, sizeof(math::vec3) * num_verts);
 
 	// Iterate through each triangle in the mesh
-	std::uint8_t* src_vertices_ptr = &_preparation_data.vertex_data[0];
+	std::uint8_t* src_vertices_ptr = &preparation_data_.vertex_data[0];
 	for(i = 0; i < num_faces; ++i)
 	{
-		triangle& tri = _preparation_data.triangle_data[i];
+		triangle& tri = preparation_data_.triangle_data[i];
 
 		// Compute the three indices for the triangle
 		i1 = tri.indices[0];
@@ -3993,13 +3993,13 @@ bool mesh::generate_vertex_tangents()
 		// triangle.
 		math::vec3 E;
 		float fE[4];
-		gfx::vertex_unpack(fE, gfx::attribute::Position, _vertex_format, src_vertices_ptr, i1);
+		gfx::vertex_unpack(fE, gfx::attribute::Position, vertex_format_, src_vertices_ptr, i1);
 		math::vec3 F;
 		float fF[4];
-		gfx::vertex_unpack(fF, gfx::attribute::Position, _vertex_format, src_vertices_ptr, i2);
+		gfx::vertex_unpack(fF, gfx::attribute::Position, vertex_format_, src_vertices_ptr, i2);
 		math::vec3 G;
 		float fG[4];
-		gfx::vertex_unpack(fG, gfx::attribute::Position, _vertex_format, src_vertices_ptr, i3);
+		gfx::vertex_unpack(fG, gfx::attribute::Position, vertex_format_, src_vertices_ptr, i3);
 		memcpy(&E[0], fE, 3 * sizeof(float));
 		memcpy(&F[0], fF, 3 * sizeof(float));
 		memcpy(&G[0], fG, 3 * sizeof(float));
@@ -4009,13 +4009,13 @@ bool mesh::generate_vertex_tangents()
 		// TODO: Allow customization of which tex coordinates to generate from.
 		math::vec2 Et;
 		float fEt[4];
-		gfx::vertex_unpack(&fEt[0], gfx::attribute::TexCoord0, _vertex_format, src_vertices_ptr, i1);
+		gfx::vertex_unpack(&fEt[0], gfx::attribute::TexCoord0, vertex_format_, src_vertices_ptr, i1);
 		math::vec2 Ft;
 		float fFt[4];
-		gfx::vertex_unpack(&fFt[0], gfx::attribute::TexCoord0, _vertex_format, src_vertices_ptr, i2);
+		gfx::vertex_unpack(&fFt[0], gfx::attribute::TexCoord0, vertex_format_, src_vertices_ptr, i2);
 		math::vec2 Gt;
 		float fGt[4];
-		gfx::vertex_unpack(&fGt[0], gfx::attribute::TexCoord0, _vertex_format, src_vertices_ptr, i3);
+		gfx::vertex_unpack(&fGt[0], gfx::attribute::TexCoord0, vertex_format_, src_vertices_ptr, i3);
 		memcpy(&Et[0], fEt, 2 * sizeof(float));
 		memcpy(&Ft[0], fFt, 2 * sizeof(float));
 		memcpy(&Gt[0], fGt, 2 * sizeof(float));
@@ -4070,16 +4070,16 @@ bool mesh::generate_vertex_tangents()
 		// Skip if the original imported data already provided a bitangent /
 		// tangent.
 		bool has_bitangent =
-			((_preparation_data.vertex_flags[i] & preparation_data::source_contains_binormal) != 0);
+			((preparation_data_.vertex_flags[i] & preparation_data::source_contains_binormal) != 0);
 		bool has_tangent =
-			((_preparation_data.vertex_flags[i] & preparation_data::source_contains_tangent) != 0);
-		if(!_force_tangent_generation && has_bitangent && has_tangent)
+			((preparation_data_.vertex_flags[i] & preparation_data::source_contains_tangent) != 0);
+		if(!force_tangent_generation_ && has_bitangent && has_tangent)
 			continue;
 
 		// Retrieve the normal vector from the vertex and the computed
 		// tangent vector.
 		float normal[4];
-		gfx::vertex_unpack(normal, gfx::attribute::Normal, _vertex_format, src_vertices_ptr);
+		gfx::vertex_unpack(normal, gfx::attribute::Normal, vertex_format_, src_vertices_ptr);
 		memcpy(&normal_vec[0], normal, 3 * sizeof(float));
 
 		T = tangents[i];
@@ -4089,12 +4089,12 @@ bool mesh::generate_vertex_tangents()
 		T = math::normalize(T);
 
 		// Store tangent if required
-		if(_force_tangent_generation || (!has_tangent && requires_tangents))
-			gfx::vertex_pack(&math::vec4(T, 1.0f)[0], true, gfx::attribute::Tangent, _vertex_format,
+		if(force_tangent_generation_ || (!has_tangent && requires_tangents))
+			gfx::vertex_pack(&math::vec4(T, 1.0f)[0], true, gfx::attribute::Tangent, vertex_format_,
 							 src_vertices_ptr);
 
 		// Compute and store bitangent if required
-		if(_force_tangent_generation || (!has_bitangent && requires_bitangents))
+		if(force_tangent_generation_ || (!has_bitangent && requires_bitangents))
 		{
 			// Calculate the new orthogonal bitangent
 			B = math::cross(normal_vec, T);
@@ -4112,7 +4112,7 @@ bool mesh::generate_vertex_tangents()
 			} // End if coordinates inverted
 
 			// Store.
-			gfx::vertex_pack(&math::vec4(B, 1.0f)[0], true, gfx::attribute::Bitangent, _vertex_format,
+			gfx::vertex_pack(&math::vec4(B, 1.0f)[0], true, gfx::attribute::Bitangent, vertex_format_,
 							 src_vertices_ptr);
 
 		} // End if requires bitangent
@@ -4133,24 +4133,24 @@ bool mesh::generate_adjacency(std::vector<std::uint32_t>& adjacency)
 	std::map<adjacent_edge_key, std::uint32_t>::iterator it_edge;
 
 	// What is the status of the mesh?
-	if(_prepare_status != mesh_status::prepared)
+	if(prepare_status_ != mesh_status::prepared)
 	{
 		// Validate requirements
-		if(_preparation_data.triangle_count == 0)
+		if(preparation_data_.triangle_count == 0)
 			return false;
 
 		// Retrieve useful data offset information.
-		std::uint16_t position_offset = _vertex_format.getOffset(gfx::attribute::Position);
-		std::uint16_t vertex_stride = _vertex_format.getStride();
+		std::uint16_t position_offset = vertex_format_.getOffset(gfx::attribute::Position);
+		std::uint16_t vertex_stride = vertex_format_.getStride();
 
 		// Insert all edges into the edge tree
-		std::uint8_t* src_vertices_ptr = &_preparation_data.vertex_data[0] + position_offset;
-		for(std::uint32_t i = 0; i < _preparation_data.triangle_count; ++i)
+		std::uint8_t* src_vertices_ptr = &preparation_data_.vertex_data[0] + position_offset;
+		for(std::uint32_t i = 0; i < preparation_data_.triangle_count; ++i)
 		{
 			adjacent_edge_key edge;
 
 			// Degenerate triangles cannot participate.
-			const triangle& tri = _preparation_data.triangle_data[i];
+			const triangle& tri = preparation_data_.triangle_data[i];
 			if(tri.flags & triangle_flags::degenerate)
 				continue;
 
@@ -4180,15 +4180,15 @@ bool mesh::generate_adjacency(std::vector<std::uint32_t>& adjacency)
 		} // Next Face
 
 		// Size the output array.
-		adjacency.resize(_preparation_data.triangle_count * 3, 0xFFFFFFFF);
+		adjacency.resize(preparation_data_.triangle_count * 3, 0xFFFFFFFF);
 
 		// Now, find any adjacent edges for each triangle edge
-		for(std::uint32_t i = 0; i < _preparation_data.triangle_count; ++i)
+		for(std::uint32_t i = 0; i < preparation_data_.triangle_count; ++i)
 		{
 			adjacent_edge_key edge;
 
 			// Degenerate triangles cannot participate.
-			const triangle& tri = _preparation_data.triangle_data[i];
+			const triangle& tri = preparation_data_.triangle_data[i];
 			if(tri.flags & triangle_flags::degenerate)
 				continue;
 
@@ -4238,17 +4238,17 @@ bool mesh::generate_adjacency(std::vector<std::uint32_t>& adjacency)
 	else
 	{
 		// Validate requirements
-		if(_face_count == 0)
+		if(face_count_ == 0)
 			return false;
 
 		// Retrieve useful data offset information.
-		std::uint16_t position_offset = _vertex_format.getOffset(gfx::attribute::Position);
-		std::uint16_t vertex_stride = _vertex_format.getStride();
+		std::uint16_t position_offset = vertex_format_.getOffset(gfx::attribute::Position);
+		std::uint16_t vertex_stride = vertex_format_.getStride();
 
 		// Insert all edges into the edge tree
-		std::uint8_t* src_vertices_ptr = _system_vb + position_offset;
-		std::uint32_t* src_indices_ptr = _system_ib;
-		for(std::uint32_t i = 0; i < _face_count; ++i, src_indices_ptr += 3)
+		std::uint8_t* src_vertices_ptr = system_vb_ + position_offset;
+		std::uint32_t* src_indices_ptr = system_ib_;
+		for(std::uint32_t i = 0; i < face_count_; ++i, src_indices_ptr += 3)
 		{
 			adjacent_edge_key edge;
 
@@ -4278,11 +4278,11 @@ bool mesh::generate_adjacency(std::vector<std::uint32_t>& adjacency)
 		} // Next Face
 
 		// Size the output array.
-		adjacency.resize(_face_count * 3, 0xFFFFFFFF);
+		adjacency.resize(face_count_ * 3, 0xFFFFFFFF);
 
 		// Now, find any adjacent edges for each triangle edge
-		src_indices_ptr = _system_ib;
-		for(std::uint32_t i = 0; i < _face_count; ++i, src_indices_ptr += 3)
+		src_indices_ptr = system_ib_;
+		for(std::uint32_t i = 0; i < face_count_; ++i, src_indices_ptr += 3)
 		{
 			adjacent_edge_key edge;
 
@@ -4344,18 +4344,18 @@ bool mesh::weld_vertices(float tolerance, std::vector<std::uint32_t>* vertex_rem
 
 	// Allocate enough space to build the remap array for the existing vertices
 	if(vertex_remap_ptr)
-		vertex_remap_ptr->resize(_preparation_data.vertex_count);
-	auto collapse_map = new std::uint32_t[_preparation_data.vertex_count];
+		vertex_remap_ptr->resize(preparation_data_.vertex_count);
+	auto collapse_map = new std::uint32_t[preparation_data_.vertex_count];
 
 	// Retrieve useful data offset information.
-	std::uint16_t vertex_stride = _vertex_format.getStride();
+	std::uint16_t vertex_stride = vertex_format_.getStride();
 
 	// For each vertex to be welded.
-	for(std::uint32_t i = 0; i < _preparation_data.vertex_count; ++i)
+	for(std::uint32_t i = 0; i < preparation_data_.vertex_count; ++i)
 	{
 		// Build a new key structure for inserting
-		key.vertex = (&_preparation_data.vertex_data[0]) + (i * vertex_stride);
-		key.format = _vertex_format;
+		key.vertex = (&preparation_data_.vertex_data[0]) + (i * vertex_stride);
+		key.format = vertex_format_;
 		key.tolerance = tolerance;
 
 		// Does a vertex with matching details already exist in the tree.
@@ -4371,7 +4371,7 @@ bool mesh::weld_vertices(float tolerance, std::vector<std::uint32_t>* vertex_rem
 			// Store the vertex in the new buffer
 			new_vertex_data.resize((new_vertex_count + 1) * vertex_stride);
 			memcpy(&new_vertex_data[new_vertex_count * vertex_stride], key.vertex, vertex_stride);
-			new_vertex_flags.push_back(_preparation_data.vertex_flags[i]);
+			new_vertex_flags.push_back(preparation_data_.vertex_flags[i]);
 			new_vertex_count++;
 
 		} // End if no matching vertex
@@ -4388,7 +4388,7 @@ bool mesh::weld_vertices(float tolerance, std::vector<std::uint32_t>* vertex_rem
 	} // Next Vertex
 
 	// If nothing was welded, just bail
-	if(_preparation_data.vertex_count == new_vertex_count)
+	if(preparation_data_.vertex_count == new_vertex_count)
 	{
 		checked_array_delete(collapse_map);
 
@@ -4399,18 +4399,18 @@ bool mesh::weld_vertices(float tolerance, std::vector<std::uint32_t>* vertex_rem
 	} // End if nothing to do
 
 	// Otherwise, replace the old preparation vertices and remap
-	_preparation_data.vertex_data.clear();
-	_preparation_data.vertex_data.resize(new_vertex_data.size());
-	memcpy(&_preparation_data.vertex_data[0], &new_vertex_data[0], new_vertex_data.size());
-	_preparation_data.vertex_flags.clear();
-	_preparation_data.vertex_flags.resize(new_vertex_flags.size());
-	memcpy(&_preparation_data.vertex_flags[0], &new_vertex_flags[0], new_vertex_flags.size());
-	_preparation_data.vertex_count = new_vertex_count;
+	preparation_data_.vertex_data.clear();
+	preparation_data_.vertex_data.resize(new_vertex_data.size());
+	memcpy(&preparation_data_.vertex_data[0], &new_vertex_data[0], new_vertex_data.size());
+	preparation_data_.vertex_flags.clear();
+	preparation_data_.vertex_flags.resize(new_vertex_flags.size());
+	memcpy(&preparation_data_.vertex_flags[0], &new_vertex_flags[0], new_vertex_flags.size());
+	preparation_data_.vertex_count = new_vertex_count;
 
 	// Now remap all the triangle indices
-	for(std::uint32_t i = 0; i < _preparation_data.triangle_count; ++i)
+	for(std::uint32_t i = 0; i < preparation_data_.triangle_count; ++i)
 	{
-		triangle& tri = _preparation_data.triangle_data[i];
+		triangle& tri = preparation_data_.triangle_data[i];
 		tri.indices[0] = collapse_map[tri.indices[0]];
 		tri.indices[1] = collapse_map[tri.indices[1]];
 		tri.indices[2] = collapse_map[tri.indices[2]];
@@ -4426,60 +4426,60 @@ bool mesh::weld_vertices(float tolerance, std::vector<std::uint32_t>* vertex_rem
 
 std::uint32_t mesh::get_face_count() const
 {
-	if(_prepare_status == mesh_status::prepared)
-		return _face_count;
-	else if(_prepare_status == mesh_status::preparing)
-		return static_cast<std::uint32_t>(_preparation_data.triangle_data.size());
+	if(prepare_status_ == mesh_status::prepared)
+		return face_count_;
+	else if(prepare_status_ == mesh_status::preparing)
+		return static_cast<std::uint32_t>(preparation_data_.triangle_data.size());
 	else
 		return 0;
 }
 
 std::uint32_t mesh::get_vertex_count() const
 {
-	if(_prepare_status == mesh_status::prepared)
-		return _vertex_count;
-	else if(_prepare_status == mesh_status::preparing)
-		return _preparation_data.vertex_count;
+	if(prepare_status_ == mesh_status::prepared)
+		return vertex_count_;
+	else if(prepare_status_ == mesh_status::preparing)
+		return preparation_data_.vertex_count;
 	else
 		return 0;
 }
 
 std::uint8_t* mesh::get_system_vb()
 {
-	return _system_vb;
+	return system_vb_;
 }
 
 std::uint32_t* mesh::get_system_ib()
 {
-	return _system_ib;
+	return system_ib_;
 }
 
 const gfx::vertex_layout& mesh::get_vertex_format() const
 {
-	return _vertex_format;
+	return vertex_format_;
 }
 
 const mesh::subset* mesh::get_subset(std::uint32_t data_group_id /* = 0 */) const
 {
-	auto it = _subset_lookup.find(mesh_subset_key(data_group_id));
-	if(it == _subset_lookup.end())
+	auto it = subset_lookup_.find(mesh_subset_key(data_group_id));
+	if(it == subset_lookup_.end())
 		return nullptr;
 	return it->second;
 }
 
 const skin_bind_data& mesh::get_skin_bind_data() const
 {
-	return _skin_bind_data;
+	return skin_bind_data_;
 }
 
 const mesh::bone_palette_array_t& mesh::get_bone_palettes() const
 {
-	return _bone_palettes;
+	return bone_palettes_;
 }
 
 const std::unique_ptr<mesh::armature_node>& mesh::get_armature() const
 {
-	return _root;
+	return root_;
 }
 
 irect32_t mesh::calculate_screen_rect(const math::transform& world, const camera& cam) const
@@ -4515,16 +4515,16 @@ irect32_t mesh::calculate_screen_rect(const math::transform& world, const camera
 ///////////////////////////////////////////////////////////////////////////////
 void skin_bind_data::add_bone(const bone_influence& bone)
 {
-	_bones.push_back(bone);
+	bones_.push_back(bone);
 }
 
 void skin_bind_data::remove_empty_bones()
 {
-	for(size_t i = 0; i < _bones.size();)
+	for(size_t i = 0; i < bones_.size();)
 	{
-		if(_bones[i].influences.empty())
+		if(bones_[i].influences.empty())
 		{
-			_bones.erase(_bones.begin() + static_cast<int>(i));
+			bones_.erase(bones_.begin() + static_cast<int>(i));
 
 		} // End if empty
 		else
@@ -4535,22 +4535,22 @@ void skin_bind_data::remove_empty_bones()
 
 void skin_bind_data::clear_vertex_influences()
 {
-	for(size_t i = 0; i < _bones.size(); ++i)
-		_bones[i].influences.clear();
+	for(size_t i = 0; i < bones_.size(); ++i)
+		bones_[i].influences.clear();
 }
 
 void skin_bind_data::clear()
 {
-	_bones.clear();
+	bones_.clear();
 }
 
 void skin_bind_data::remap_vertices(const std::vector<std::uint32_t>& remap)
 {
 	// Iterate through all bone information and remap vertex indices.
-	for(size_t i = 0; i < _bones.size(); ++i)
+	for(size_t i = 0; i < bones_.size(); ++i)
 	{
 		vertex_influence_array_t new_influences;
-		vertex_influence_array_t& influences = _bones[i].influences;
+		vertex_influence_array_t& influences = bones_[i].influences;
 		new_influences.reserve(influences.size());
 		for(size_t j = 0; j < influences.size(); ++j)
 		{
@@ -4569,7 +4569,7 @@ void skin_bind_data::remap_vertices(const std::vector<std::uint32_t>& remap)
 			} // End if !removed
 
 		} // Next source influence
-		_bones[i].influences = new_influences;
+		bones_[i].influences = new_influences;
 
 	} // Next bone
 }
@@ -4592,9 +4592,9 @@ void skin_bind_data::build_vertex_table(std::uint32_t vertex_count,
 	} // Next Vertex
 
 	// Iterate through all bone information and populate the above array.
-	for(size_t i = 0; i < _bones.size(); ++i)
+	for(size_t i = 0; i < bones_.size(); ++i)
 	{
-		vertex_influence_array_t& influences = _bones[i].influences;
+		vertex_influence_array_t& influences = bones_[i].influences;
 		for(size_t j = 0; j < influences.size(); ++j)
 		{
 
@@ -4624,12 +4624,12 @@ void skin_bind_data::build_vertex_table(std::uint32_t vertex_count,
 
 const std::vector<skin_bind_data::bone_influence>& skin_bind_data::get_bones() const
 {
-	return _bones;
+	return bones_;
 }
 
 std::vector<skin_bind_data::bone_influence>& skin_bind_data::get_bones()
 {
-	return _bones;
+	return bones_;
 }
 
 bool skin_bind_data::has_bones() const
@@ -4639,9 +4639,9 @@ bool skin_bind_data::has_bones() const
 
 const skin_bind_data::bone_influence* skin_bind_data::find_bone_by_id(const std::string& name) const
 {
-	auto it = std::find_if(std::begin(_bones), std::end(_bones),
+	auto it = std::find_if(std::begin(bones_), std::end(bones_),
 						   [name](const auto& bone) { return name == bone.bone_id; });
-	if(it != std::end(_bones))
+	if(it != std::end(bones_))
 	{
 		return &(*it);
 	}
@@ -4659,9 +4659,9 @@ const skin_bind_data::bone_influence* skin_bind_data::find_bone_by_id(const std:
 /// </summary>
 //-----------------------------------------------------------------------------
 bone_palette::bone_palette(std::uint32_t palette_size)
-	: _data_group_id(0)
-	, _maximum_size(palette_size)
-	, _maximum_blend_index(-1)
+	: data_group_id_(0)
+	, maximum_size_(palette_size)
+	, maximum_blend_index_(-1)
 {
 }
 
@@ -4672,12 +4672,12 @@ bone_palette::bone_palette(std::uint32_t palette_size)
 /// </summary>
 //-----------------------------------------------------------------------------
 bone_palette::bone_palette(const bone_palette& rhs)
-	: _bones_lut(rhs._bones_lut)
-	, _bones(rhs._bones)
-	, _faces(rhs._faces)
-	, _data_group_id(rhs._data_group_id)
-	, _maximum_size(rhs._maximum_size)
-	, _maximum_blend_index(rhs._maximum_blend_index)
+	: bones_lut_(rhs.bones_lut_)
+	, bones_(rhs.bones_)
+	, faces_(rhs.faces_)
+	, data_group_id_(rhs.data_group_id_)
+	, maximum_size_(rhs.maximum_size_)
+	, maximum_blend_index_(rhs.maximum_blend_index_)
 {
 }
 
@@ -4706,9 +4706,9 @@ bone_palette::get_skinning_matrices(const std::vector<math::transform>& node_tra
 	transforms.resize(max_blend_transforms);
 
 	// Compute transformation matrix for each bone in the palette
-	for(size_t i = 0; i < _bones.size(); ++i)
+	for(size_t i = 0; i < bones_.size(); ++i)
 	{
-		auto bone = _bones[i];
+		auto bone = bones_[i];
 		const auto& bone_transform = node_transforms[bone];
 		const auto& bone_data = bind_list[bone];
 		auto& transform = transforms[i];
@@ -4731,18 +4731,18 @@ void bone_palette::assign_bones(bone_index_map_t& bones, std::vector<std::uint32
 	// palette.
 	for(it_bone = bones.begin(); it_bone != bones.end(); ++it_bone)
 	{
-		it_bone2 = _bones_lut.find(it_bone->first);
-		if(it_bone2 == _bones_lut.end())
+		it_bone2 = bones_lut_.find(it_bone->first);
+		if(it_bone2 == bones_lut_.end())
 		{
-			_bones_lut[it_bone->first] = static_cast<std::uint32_t>(_bones.size());
-			_bones.push_back(it_bone->first);
+			bones_lut_[it_bone->first] = static_cast<std::uint32_t>(bones_.size());
+			bones_.push_back(it_bone->first);
 
 		} // End if not already added
 
 	} // Next Bone
 
 	// Merge the new face list with ours.
-	_faces.insert(_faces.end(), faces.begin(), faces.end());
+	faces_.insert(faces_.end(), faces.begin(), faces.end());
 }
 
 void bone_palette::assign_bones(const std::vector<std::uint32_t>& bones)
@@ -4750,18 +4750,18 @@ void bone_palette::assign_bones(const std::vector<std::uint32_t>& bones)
 	bone_index_map_t::iterator it_bone;
 
 	// Clear out prior data.
-	_bones.clear();
-	_bones_lut.clear();
+	bones_.clear();
+	bones_lut_.clear();
 
 	// Iterate through newly specified input bones and add any unique ones to the
 	// palette.
 	for(size_t i = 0; i < bones.size(); ++i)
 	{
-		it_bone = _bones_lut.find(bones[i]);
-		if(it_bone == _bones_lut.end())
+		it_bone = bones_lut_.find(bones[i]);
+		if(it_bone == bones_lut_.end())
 		{
-			_bones_lut[bones[i]] = static_cast<std::uint32_t>(_bones.size());
-			_bones.push_back(bones[i]);
+			bones_lut_[bones[i]] = static_cast<std::uint32_t>(bones_.size());
+			bones_.push_back(bones[i]);
 
 		} // End if not already added
 
@@ -4772,12 +4772,12 @@ void bone_palette::compute_palette_fit(bone_index_map_t& input, std::int32_t& cu
 									   std::int32_t& common_bones, std::int32_t& additional_bones)
 {
 	// Reset values
-	current_space = static_cast<std::int32_t>(_maximum_size - static_cast<std::uint32_t>(_bones.size()));
+	current_space = static_cast<std::int32_t>(maximum_size_ - static_cast<std::uint32_t>(bones_.size()));
 	common_bones = 0;
 	additional_bones = 0;
 
 	// Early out if possible
-	if(_bones.size() == 0)
+	if(bones_.size() == 0)
 	{
 		additional_bones = static_cast<std::int32_t>(input.size());
 		return;
@@ -4794,8 +4794,8 @@ void bone_palette::compute_palette_fit(bone_index_map_t& input, std::int32_t& cu
 	bone_index_map_t::iterator it_bone, it_bone2;
 	for(it_bone = input.begin(); it_bone != input.end(); ++it_bone)
 	{
-		it_bone2 = _bones_lut.find(it_bone->first);
-		if(it_bone2 != _bones_lut.end())
+		it_bone2 = bones_lut_.find(it_bone->first);
+		if(it_bone2 != bones_lut_.end())
 			common_bones++;
 		else
 			additional_bones++;
@@ -4805,50 +4805,50 @@ void bone_palette::compute_palette_fit(bone_index_map_t& input, std::int32_t& cu
 
 std::uint32_t bone_palette::translate_bone_to_palette(std::uint32_t bone_index) const
 {
-	auto it_bone = _bones_lut.find(bone_index);
-	if(it_bone == _bones_lut.end())
+	auto it_bone = bones_lut_.find(bone_index);
+	if(it_bone == bones_lut_.end())
 		return 0xFFFFFFFF;
 	return it_bone->second;
 }
 
 std::uint32_t bone_palette::get_data_group() const
 {
-	return _data_group_id;
+	return data_group_id_;
 }
 
 void bone_palette::set_data_group(std::uint32_t group)
 {
-	_data_group_id = group;
+	data_group_id_ = group;
 }
 
 std::int32_t bone_palette::get_maximum_blend_index() const
 {
-	return _maximum_blend_index;
+	return maximum_blend_index_;
 }
 
 void bone_palette::set_maximum_blend_index(int nIndex)
 {
-	_maximum_blend_index = nIndex;
+	maximum_blend_index_ = nIndex;
 }
 
 std::uint32_t bone_palette::get_maximum_size() const
 {
-	return _maximum_size;
+	return maximum_size_;
 }
 
 std::vector<std::uint32_t>& bone_palette::get_influenced_faces()
 {
-	return _faces;
+	return faces_;
 }
 
 void bone_palette::clear_influenced_faces()
 {
-	_faces.clear();
+	faces_.clear();
 }
 
 const std::vector<std::uint32_t>& bone_palette::get_bones() const
 {
-	return _bones;
+	return bones_;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

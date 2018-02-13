@@ -259,10 +259,10 @@ void project_dock::render(const ImVec2&)
 	const auto root_path = fs::resolve_protocol("app:/data");
 
 	fs::error_code err;
-	if(_root != root_path || !fs::exists(_cache.get_path(), err))
+	if(root_ != root_path || !fs::exists(cache_.get_path(), err))
 	{
-		_root = root_path;
-		_cache.set_path(_root);
+		root_ = root_path;
+		cache_.set_path(root_);
 	}
 
 	if(gui::Button("IMPORT..."))
@@ -271,8 +271,8 @@ void project_dock::render(const ImVec2&)
 	}
 	gui::SameLine();
 	gui::PushItemWidth(80.0f);
-	gui::SliderFloat("", &_scale, 0.5f, 1.0f);
-	const float size = 88.0f * _scale;
+	gui::SliderFloat("", &scale_, 0.5f, 1.0f);
+	const float size = 88.0f * scale_;
 	if(gui::IsItemHovered())
 	{
 		gui::BeginTooltip();
@@ -281,7 +281,7 @@ void project_dock::render(const ImVec2&)
 	}
 	gui::PopItemWidth();
 
-	const auto hierarchy = fs::split_until(_cache.get_path(), root_path);
+	const auto hierarchy = fs::split_until(cache_.get_path(), root_path);
 
 	for(const auto& dir : hierarchy)
 	{
@@ -303,7 +303,7 @@ void project_dock::render(const ImVec2&)
 	auto& am = core::get_subsystem<runtime::asset_manager>();
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove |
 							 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoSavedSettings;
-	fs::path current_path = _cache.get_path();
+	fs::path current_path = cache_.get_path();
 	if(gui::BeginChild("assets_content", gui::GetContentRegionAvail(), false, flags))
 	{
 		const auto is_selected = [&](const auto& entry) {
@@ -314,7 +314,7 @@ void project_dock::render(const ImVec2&)
 			return is_selected;
 		};
 
-		for(const auto& cache_entry : _cache)
+		for(const auto& cache_entry : cache_)
 		{
 			const auto& absolute_path = cache_entry.path();
 			auto filename = absolute_path.filename();
@@ -638,7 +638,7 @@ void project_dock::context_menu()
 
 		if(gui::Selectable("OPEN IN ENVIRONMENT"))
 		{
-			fs::show_in_graphical_env(_cache.get_path());
+			fs::show_in_graphical_env(cache_.get_path());
 		}
 
 		gui::Separator();
@@ -658,7 +658,7 @@ void project_dock::context_create_menu()
 	{
 		if(gui::MenuItem("FOLDER"))
 		{
-			const auto available = get_new_file(_cache.get_path(), "New Folder");
+			const auto available = get_new_file(cache_.get_path(), "New Folder");
 			fs::error_code err;
 			fs::create_directory(available, err);
 		}
@@ -667,7 +667,7 @@ void project_dock::context_create_menu()
 
 		if(gui::MenuItem("MATERIAL"))
 		{
-			const auto available = get_new_file(_cache.get_path(), "New Material", ".mat");
+			const auto available = get_new_file(cache_.get_path(), "New Material", ".mat");
 			const auto key = fs::convert_to_protocol(available).generic_string();
 
 			auto& am = core::get_subsystem<runtime::asset_manager>();
@@ -683,12 +683,12 @@ void project_dock::context_create_menu()
 
 void project_dock::set_cache_path(const fs::path& path)
 {
-	if(_cache.get_path() == path)
+	if(cache_.get_path() == path)
 	{
 		return;
 	}
-	_cache.set_path(path);
-	_cache_path_with_protocol = fs::convert_to_protocol(path).generic();
+	cache_.set_path(path);
+	cache_path_with_protocol_ = fs::convert_to_protocol(path).generic();
 }
 
 void project_dock::import()
@@ -704,7 +704,7 @@ void project_dock::import()
 			fs::path filename = p.filename();
 
 			auto task = ts.push_on_worker_thread(
-				[opened = _cache.get_path()](const fs::path& path, const fs::path& filename) {
+				[opened = cache_.get_path()](const fs::path& path, const fs::path& filename) {
 					fs::error_code err;
 					fs::path dir = opened / filename;
 					fs::copy_file(path, dir, fs::copy_options::overwrite_if_exists, err);

@@ -43,7 +43,7 @@ public:
 	template <typename S, typename... Args>
 	asset_storage<S>& add_storage(Args&&... args)
 	{
-		auto operation = _storages.emplace(rtti::type_id<asset_storage<S>>().hash_code(),
+		auto operation = storages_.emplace(rtti::type_id<asset_storage<S>>().hash_code(),
 										   std::make_unique<asset_storage<S>>(std::forward<Args>(args)...));
 
 		return static_cast<asset_storage<S>&>(*operation.first->second);
@@ -271,11 +271,11 @@ private:
 	template <typename S>
 	asset_storage<S>& get_storage()
 	{
-		auto it = _storages.find(rtti::type_id<asset_storage<S>>().hash_code());
-		assert(it != _storages.end());
+		auto it = storages_.find(rtti::type_id<asset_storage<S>>().hash_code());
+		assert(it != storages_.end());
 		return (static_cast<asset_storage<S>&>(*it->second.get()));
 	}
 	/// Different storages
-	std::unordered_map<std::size_t, std::unique_ptr<basic_storage>> _storages;
+	std::unordered_map<std::size_t, std::unique_ptr<basic_storage>> storages_;
 };
 }

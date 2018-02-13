@@ -146,10 +146,10 @@ int app::run(int argc, char* argv[])
 	cmd_line::parser parser(argc, argv);
 
 	setup(parser);
-	if(_exitcode != 0)
+	if(exitcode_ != 0)
 	{
 		core::details::dispose();
-		return _exitcode;
+		return exitcode_;
 	}
 
 	std::stringstream out, err;
@@ -170,14 +170,14 @@ int app::run(int argc, char* argv[])
 
 	APPLOG_INFO("Initializing...");
 	start(parser);
-	if(_exitcode != 0)
+	if(exitcode_ != 0)
 	{
 		core::details::dispose();
-		return _exitcode;
+		return exitcode_;
 	}
 
 	APPLOG_INFO("Starting...");
-	while(_running)
+	while(running_)
 		run_one_frame();
 
 	APPLOG_INFO("Deinitializing...");
@@ -187,7 +187,7 @@ int app::run(int argc, char* argv[])
 	APPLOG_INFO("Exiting...");
 
 	core::details::dispose();
-	return _exitcode;
+	return exitcode_;
 }
 
 void app::quit_with_error(const std::string& message)
@@ -198,7 +198,7 @@ void app::quit_with_error(const std::string& message)
 
 void app::quit(int exitcode)
 {
-	_running = false;
-	_exitcode = exitcode;
+	running_ = false;
+	exitcode_ = exitcode;
 }
 }

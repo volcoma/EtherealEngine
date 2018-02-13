@@ -23,11 +23,11 @@ REFLECT(model_component)
 SAVE(model_component)
 {
 	try_save(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::component>(&obj)));
-	try_save(ar, cereal::make_nvp("static", obj._static));
-	try_save(ar, cereal::make_nvp("casts_shadow", obj._casts_shadow));
-	try_save(ar, cereal::make_nvp("casts_reflection", obj._casts_reflection));
-	try_save(ar, cereal::make_nvp("model", obj._model));
-	try_save(ar, cereal::make_nvp("bone_entities", obj._bone_entities));
+	try_save(ar, cereal::make_nvp("static", obj.static_));
+	try_save(ar, cereal::make_nvp("casts_shadow", obj.casts_shadow_));
+	try_save(ar, cereal::make_nvp("casts_reflection", obj.casts_reflection_));
+	try_save(ar, cereal::make_nvp("model", obj.model_));
+	try_save(ar, cereal::make_nvp("bone_entities", obj.bone_entities_));
 }
 SAVE_INSTANTIATE(model_component, cereal::oarchive_associative_t);
 SAVE_INSTANTIATE(model_component, cereal::oarchive_binary_t);
@@ -35,11 +35,11 @@ SAVE_INSTANTIATE(model_component, cereal::oarchive_binary_t);
 LOAD(model_component)
 {
 	try_load(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::component>(&obj)));
-	try_load(ar, cereal::make_nvp("static", obj._static));
-	try_load(ar, cereal::make_nvp("casts_shadow", obj._casts_shadow));
-	try_load(ar, cereal::make_nvp("casts_reflection", obj._casts_reflection));
-	try_load(ar, cereal::make_nvp("model", obj._model));
-	try_load(ar, cereal::make_nvp("bone_entities", obj._bone_entities));
+	try_load(ar, cereal::make_nvp("static", obj.static_));
+	try_load(ar, cereal::make_nvp("casts_shadow", obj.casts_shadow_));
+	try_load(ar, cereal::make_nvp("casts_reflection", obj.casts_reflection_));
+	try_load(ar, cereal::make_nvp("model", obj.model_));
+	try_load(ar, cereal::make_nvp("bone_entities", obj.bone_entities_));
 }
 LOAD_INSTANTIATE(model_component, cereal::iarchive_associative_t);
 LOAD_INSTANTIATE(model_component, cereal::iarchive_binary_t);

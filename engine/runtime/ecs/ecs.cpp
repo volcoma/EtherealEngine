@@ -63,7 +63,7 @@ void component_storage::destroy(std::size_t n)
 	element.reset();
 }
 
-std::weak_ptr<component> component_storage::set(unsigned int index, std::shared_ptr<component> component)
+std::weak_ptr<component> component_storage::set(unsigned int index, const std::shared_ptr<component>& component)
 {
 	data[index] = component;
 	return component;
@@ -72,7 +72,7 @@ std::weak_ptr<component> component_storage::set(unsigned int index, std::shared_
 /////////////////////////////////////////////////////////////////////////////
 const entity::id_t entity::INVALID;
 
-void entity::set_name(std::string name)
+void entity::set_name(const std::string& name)
 {
 	expects(valid());
 	manager_->set_entity_name(id_, name);
@@ -95,15 +95,6 @@ void entity::destroy()
 	expects(valid());
 	manager_->destroy(id_);
 	invalidate();
-}
-
-std::bitset<MAX_COMPONENTS> entity::component_mask() const
-{
-	return manager_->component_mask(id_);
-}
-
-entity_component_system::entity_component_system()
-{
 }
 
 entity_component_system::~entity_component_system()
@@ -151,7 +142,7 @@ entity entity_component_system::create()
 	return entity;
 }
 
-void entity_component_system::set_entity_name(entity::id_t id, std::string name)
+void entity_component_system::set_entity_name(entity::id_t id, const std::string& name)
 {
 	entity_names_[id.id()] = name;
 }
@@ -175,12 +166,12 @@ void entity_component_system::dispose()
 	index_counter_ = 0;
 }
 
-void entity_component_system::remove(entity::id_t id, std::shared_ptr<component> component)
+void entity_component_system::remove(entity::id_t id, const std::shared_ptr<component>& component)
 {
 	remove(id, component->runtime_id());
 }
 
-void entity_component_system::remove(entity::id_t id, const rtti::type_index_sequential_t::index_t family)
+void entity_component_system::remove(entity::id_t id, rtti::type_index_sequential_t::index_t family)
 {
 	assert_valid(id);
 	const std::uint32_t index = id.index();
@@ -196,7 +187,7 @@ void entity_component_system::remove(entity::id_t id, const rtti::type_index_seq
 	pool->destroy(index);
 }
 
-bool entity_component_system::has_component(entity::id_t id, std::shared_ptr<component> component) const
+bool entity_component_system::has_component(entity::id_t id, const std::shared_ptr<component>& component) const
 {
 	return has_component(id, component->runtime_id());
 }
@@ -207,11 +198,11 @@ bool entity_component_system::has_component(entity::id_t id,
 	assert_valid(id);
 	// We don't bother checking the component mask, as we return a nullptr anyway.
 	if(family >= component_pools_.size())
+	{
 		return false;
+	}
 	auto& pool = component_pools_[family];
-	if(!pool || !entity_component_mask_[id.index()][family])
-		return false;
-	return true;
+	return !(!pool || !entity_component_mask_[id.index()][family]);
 }
 
 std::vector<chandle<component>> entity_component_system::all_components(entity::id_t id) const
@@ -224,7 +215,9 @@ std::vector<chandle<component>> entity_component_system::all_components(entity::
 		{
 			auto& pool = component_pools_[i];
 			if(pool)
+			{
 				components.push_back(chandle<component>(pool->get(id.index())));
+			}
 		}
 	}
 	return components;
@@ -240,13 +233,15 @@ std::vector<std::shared_ptr<component>> entity_component_system::all_components_
 		{
 			auto& pool = component_pools_[i];
 			if(pool)
+			{
 				components.push_back(pool->get(id.index()));
+			}
 		}
 	}
 	return components;
 }
 
-chandle<component> entity_component_system::assign(entity::id_t id, std::shared_ptr<component> comp)
+chandle<component> entity_component_system::assign(entity::id_t id, const std::shared_ptr<component>& comp)
 {
 	assert_valid(id);
 	const auto family = comp->runtime_id();
@@ -260,7 +255,7 @@ chandle<component> entity_component_system::assign(entity::id_t id, std::shared_
 	entity_component_mask_[id.index()].set(family);
 
 	// Create and return handle.
-	comp->_entity = get(id);
+	comp->entity_ = get(id);
 	comp->on_entity_set();
 	chandle<component> handle(ptr);
 	on_component_added(get(id), handle);
@@ -281,7 +276,7 @@ void entity_component_system::destroy(entity::id_t id)
 			if(pool)
 			{
 				auto handle = pool->get(index);
-				handle->_entity.remove(handle);
+				handle->entity_.remove(handle);
 			}
 		}
 	}

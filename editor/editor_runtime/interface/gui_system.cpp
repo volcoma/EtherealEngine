@@ -376,7 +376,7 @@ gui_system::gui_system()
 	runtime::on_platform_events.connect(this, &gui_system::platform_events);
 	runtime::on_frame_begin.connect(this, &gui_system::frame_begin);
 
-	_initial_context = imgui_create_context(_atlas);
+	initial_context_ = imgui_create_context(atlas_);
 	imgui_init();
 }
 
@@ -386,7 +386,7 @@ gui_system::~gui_system()
 	runtime::on_frame_begin.disconnect(this, &gui_system::frame_begin);
 
 	imgui_dispose();
-	imgui_destroy_context(_initial_context);
+	imgui_destroy_context(initial_context_);
 }
 
 void gui_system::frame_begin(delta_t /*unused*/)
@@ -401,13 +401,13 @@ uint32_t gui_system::get_draw_calls() const
 
 ImGuiContext* gui_system::get_context(uint32_t id)
 {
-	auto it = _contexts.find(id);
-	if(it != _contexts.end())
+	auto it = contexts_.find(id);
+	if(it != contexts_.end())
 	{
 		return it->second;
 	}
 
-	auto ins = _contexts.emplace(id, imgui_create_context(_atlas));
+	auto ins = contexts_.emplace(id, imgui_create_context(atlas_));
 	return ins.first->second;
 }
 
@@ -430,7 +430,7 @@ void gui_system::draw_end()
 
 void gui_system::pop_context()
 {
-	imgui_set_context(_initial_context);
+	imgui_set_context(initial_context_);
 }
 
 void gui_system::platform_events(const std::pair<std::uint32_t, bool>& info,
@@ -443,12 +443,12 @@ void gui_system::platform_events(const std::pair<std::uint32_t, bool>& info,
 		if(e.type == mml::platform_event::closed)
 		{
 			pop_context();
-			auto context = _contexts[window_id];
+			auto context = contexts_[window_id];
 			if(context != nullptr)
 			{
 				imgui_destroy_context(context);
 			}
-			_contexts.erase(window_id);
+			contexts_.erase(window_id);
 			return;
 		}
 

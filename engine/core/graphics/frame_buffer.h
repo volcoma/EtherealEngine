@@ -133,10 +133,10 @@ struct frame_buffer : public handle_impl<frame_buffer_handle>
 	std::size_t get_attachment_count() const;
 
 	/// Back buffer ratio if any.
-	backbuffer_ratio _bbratio = backbuffer_ratio::Equal;
+	backbuffer_ratio bbratio_ = backbuffer_ratio::Equal;
 	/// Size of the surface. If {0,0} then it is controlled by backbuffer ratio
-	usize32_t _cached_size = {0, 0};
+	usize32_t cached_size_ = {0, 0};
 	/// Texture attachments to the frame buffer
-	std::vector<fbo_attachment> _textures;
+	std::vector<fbo_attachment> textures_;
 };
 }

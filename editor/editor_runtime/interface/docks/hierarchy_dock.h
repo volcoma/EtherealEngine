@@ -10,7 +10,7 @@ struct hierarchy_dock : public imguidock::dock
 	void render(const ImVec2& area);
     
     void draw_entity(runtime::entity entity);
-    
-    bool edit_label = false;
-    ImGuiID id = 0;    
+private:    
+    bool edit_label_ = false;
+    ImGuiID id_ = 0;    
 };

@@ -174,22 +174,22 @@ public:
 														camera& camera, gfx::render_view& render_view);
 
 private:
-	std::unordered_map<entity, std::unordered_map<entity, lod_data>> _lod_data;
+	std::unordered_map<entity, std::unordered_map<entity, lod_data>> lod_data_;
 	/// Program that is responsible for rendering.
-	std::unique_ptr<gpu_program> _directional_light_program;
+	std::unique_ptr<gpu_program> directional_light_program_;
 	/// Program that is responsible for rendering.
-	std::unique_ptr<gpu_program> _point_light_program;
+	std::unique_ptr<gpu_program> point_light_program_;
 	/// Program that is responsible for rendering.
-	std::unique_ptr<gpu_program> _spot_light_program;
+	std::unique_ptr<gpu_program> spot_light_program_;
 	/// Program that is responsible for rendering.
-	std::unique_ptr<gpu_program> _box_ref_probe_program;
+	std::unique_ptr<gpu_program> box_ref_probe_program_;
 	/// Program that is responsible for rendering.
-	std::unique_ptr<gpu_program> _sphere_ref_probe_program;
+	std::unique_ptr<gpu_program> sphere_ref_probe_program_;
 	/// Program that is responsible for rendering.
-	std::unique_ptr<gpu_program> _gamma_correction_program;
+	std::unique_ptr<gpu_program> gamma_correction_program_;
 	/// Program that is responsible for rendering.
-	std::unique_ptr<gpu_program> _atmospherics_program;
-
-	asset_handle<gfx::texture> _ibl_brdf_lut;
+	std::unique_ptr<gpu_program> atmospherics_program_;
+    ///
+	asset_handle<gfx::texture> ibl_brdf_lut_;
 };
 }

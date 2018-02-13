@@ -79,18 +79,18 @@ static std::pair<path, std::string> visit_wild_card_path(const fs::path& path, b
 	return path_filter;
 }
 
-class filesystem_watcher::watcher_impl
+class filesystem_watcher::impl
 {
 public:
 	//-----------------------------------------------------------------------------
-	//  Name : watcher_impl ()
+	//  Name : impl ()
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	watcher_impl(const fs::path& path, const std::string& filter, bool recursive, bool initial_list,
+	impl(const fs::path& path, const std::string& filter, bool recursive, bool initial_list,
 				 clock_t::duration poll_interval, const notify_callback& list_callback)
 		: _filter(filter)
 		, _callback(list_callback)
@@ -328,31 +328,31 @@ filesystem_watcher::~filesystem_watcher()
 void filesystem_watcher::close()
 {
 	// stop the thread
-	_watching = false;
+	watching_ = false;
 	// remove all watchers
 	unwatch_all();
 
-	if(_thread.joinable())
+	if(thread_.joinable())
 	{
-		_thread.join();
+		thread_.join();
 	}
 }
 
 void filesystem_watcher::start()
 {
-	_watching = true;
-	_thread = std::thread([this]() {
+	watching_ = true;
+	thread_ = std::thread([this]() {
 		// keep watching for modifications every ms milliseconds
 		using namespace std::literals;
-		while(_watching)
+		while(watching_)
 		{
 			clock_t::duration sleep_time = 99999h;
 
 			// iterate through each watcher and check for modification
-			std::map<std::uint64_t, std::shared_ptr<watcher_impl>> watchers;
+			std::map<std::uint64_t, std::shared_ptr<impl>> watchers;
 			{
-				std::unique_lock<std::mutex> lock(_mutex);
-				watchers = _watchers;
+				std::unique_lock<std::mutex> lock(mutex_);
+				watchers = watchers_;
 			}
 
 			for(auto& pair : watchers)
@@ -375,8 +375,8 @@ void filesystem_watcher::start()
 				}
 			}
 
-			std::unique_lock<std::mutex> lock(_mutex);
-			_cv.wait_for(lock, sleep_time);
+			std::unique_lock<std::mutex> lock(mutex_);
+			cv_.wait_for(lock, sleep_time);
 		}
 	});
 }
@@ -387,7 +387,7 @@ std::uint64_t filesystem_watcher::watch_impl(const fs::path& path, bool recursiv
 {
 	auto& wd = get_watcher();
 	// and start its thread
-	if(!wd._watching)
+	if(!wd.watching_)
 	{
 		wd.start();
 	}
@@ -422,12 +422,12 @@ std::uint64_t filesystem_watcher::watch_impl(const fs::path& path, bool recursiv
 		{
 			// we do it like this because if initial_list is true we don't want
 			// to call a user callback on a locked mutex
-			auto impl = std::make_shared<watcher_impl>(p, filter, recursive, initial_list, poll_interval,
+			auto imp = std::make_shared<impl>(p, filter, recursive, initial_list, poll_interval,
 													   list_callback);
-			std::lock_guard<std::mutex> lock(wd._mutex);
-			wd._watchers.emplace(key, std::move(impl));
+			std::lock_guard<std::mutex> lock(wd.mutex_);
+			wd.watchers_.emplace(key, std::move(imp));
 		}
-		wd._cv.notify_all();
+		wd.cv_.notify_all();
 		return key;
 	}
 
@@ -439,19 +439,19 @@ void filesystem_watcher::unwatch_impl(std::uint64_t key)
 	auto& wd = get_watcher();
 
 	{
-		std::lock_guard<std::mutex> lock(wd._mutex);
-		wd._watchers.erase(key);
+		std::lock_guard<std::mutex> lock(wd.mutex_);
+		wd.watchers_.erase(key);
 	}
-	wd._cv.notify_all();
+	wd.cv_.notify_all();
 }
 
 void filesystem_watcher::unwatch_all_impl()
 {
 	auto& wd = get_watcher();
 	{
-		std::lock_guard<std::mutex> lock(wd._mutex);
-		wd._watchers.clear();
+		std::lock_guard<std::mutex> lock(wd.mutex_);
+		wd.watchers_.clear();
 	}
-	wd._cv.notify_all();
+	wd.cv_.notify_all();
 }
 }

@@ -37,7 +37,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline const light& get_light() const
 	{
-		return _light;
+		return light_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -48,9 +48,9 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	inline void set_light(const light& light)
+	inline void set_light(const light& l)
 	{
-		_light = light;
+		light_ = l;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -70,5 +70,5 @@ private:
 	// Private Member Variables.
 	//-------------------------------------------------------------------------
 	/// The light object this component represents
-	light _light;
+	light light_;
 };

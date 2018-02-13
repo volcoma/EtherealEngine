@@ -307,7 +307,7 @@ debugdraw_system::debugdraw_system()
 
 	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
-			_program = std::make_unique<gpu_program>(vs, fs);
+			program_ = std::make_unique<gpu_program>(vs, fs);
 
 		},
 		vs_wf_wireframe, fs_wf_wireframe);

@@ -36,12 +36,11 @@ private:
 	void unbind_from_all_sources();
 	void cleanup();
 
-	native_handle_type _handle = 0;
-
+	native_handle_type handle_ = 0;
     /// openal doesn't let us destroy sounds that are
     /// binded, so we have to keep this bookkeeping
-	std::mutex _mutex;
-	std::vector<source_impl*> _bound_to_sources;
+	std::mutex mutex_;
+	std::vector<source_impl*> bound_to_sources_;
 };
 }
 }

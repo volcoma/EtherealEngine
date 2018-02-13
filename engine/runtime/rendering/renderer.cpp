@@ -33,8 +33,8 @@ renderer::~renderer()
 {
 	on_platform_events.disconnect(this, &renderer::platform_events);
 	on_frame_end.disconnect(this, &renderer::frame_end);
-	_windows.clear();
-	_windows_pending_addition.clear();
+	windows_.clear();
+	windows_pending_addition_.clear();
 	gfx::shutdown();
 }
 
@@ -56,35 +56,35 @@ render_window* renderer::get_focused_window() const
 
 void renderer::register_window(std::unique_ptr<render_window> window)
 {
-	_windows_pending_addition.emplace_back(std::move(window));
+	windows_pending_addition_.emplace_back(std::move(window));
 }
 
 const std::vector<std::unique_ptr<render_window>>& renderer::get_windows() const
 {
-	return _windows;
+	return windows_;
 }
 
 const std::unique_ptr<render_window>& renderer::get_window(uint32_t id) const
 {
-	auto it = std::find_if(std::begin(_windows), std::end(_windows),
+	auto it = std::find_if(std::begin(windows_), std::end(windows_),
 						   [id](const auto& window) { return window->get_id() == id; });
 
-	ensures(it != std::end(_windows));
+	ensures(it != std::end(windows_));
 
 	return *it;
 }
 
 const std::unique_ptr<render_window>& renderer::get_main_window() const
 {
-	expects(_windows.size() > 0);
+	expects(windows_.size() > 0);
 
-	return _windows.front();
+	return windows_.front();
 }
 
 void renderer::hide_all_secondary_windows()
 {
 	std::size_t i = 0;
-	for(auto& window : _windows)
+	for(auto& window : windows_)
 	{
 		if(i++ != 0)
 		{
@@ -96,7 +96,7 @@ void renderer::hide_all_secondary_windows()
 void renderer::show_all_secondary_windows()
 {
 	std::size_t i = 0;
-	for(auto& window : _windows)
+	for(auto& window : windows_)
 	{
 		if(i++ != 0)
 		{
@@ -107,9 +107,9 @@ void renderer::show_all_secondary_windows()
 
 void renderer::process_pending_windows()
 {
-	std::move(std::begin(_windows_pending_addition), std::end(_windows_pending_addition),
-			  std::back_inserter(_windows));
-	_windows_pending_addition.clear();
+	std::move(std::begin(windows_pending_addition_), std::end(windows_pending_addition_),
+			  std::back_inserter(windows_));
+	windows_pending_addition_.clear();
 }
 
 void renderer::platform_events(const std::pair<std::uint32_t, bool>& info,
@@ -119,11 +119,11 @@ void renderer::platform_events(const std::pair<std::uint32_t, bool>& info,
 	{
 		if(e.type == mml::platform_event::closed)
 		{
-			_windows.erase(std::remove_if(std::begin(_windows), std::end(_windows),
+			windows_.erase(std::remove_if(std::begin(windows_), std::end(windows_),
 										  [window_id = info.first](const auto& window) {
 											  return window->get_id() == window_id;
 										  }),
-						   std::end(_windows));
+						   std::end(windows_));
 			return;
 		}
 	}
@@ -135,11 +135,11 @@ bool renderer::init_backend(cmd_line::parser& parser)
 	mml::video_mode desktop = mml::video_mode::get_desktop_mode();
 	desktop.width = 100;
 	desktop.height = 100;
-	_init_window = std::make_unique<mml::window>(desktop, "App", mml::style::none);
-	_init_window->set_visible(false);
+	init_window_ = std::make_unique<mml::window>(desktop, "App", mml::style::none);
+	init_window_->set_visible(false);
 	gfx::platform_data pd{
-		reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(_init_window->get_system_handle_specific())),
-		reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(_init_window->get_system_handle())),
+		reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(init_window_->get_system_handle_specific())),
+		reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(init_window_->get_system_handle())),
 		nullptr,
 		nullptr,
 		nullptr,
@@ -182,7 +182,7 @@ bool renderer::init_backend(cmd_line::parser& parser)
 		APPLOG_ERROR("Does not support dx9. Minimum supported is dx11.");
 		return false;
 	}
-	const auto sz = _init_window->get_size();
+	const auto sz = init_window_->get_size();
 
 	bool novsync = false;
 	parser.try_get("novsync", novsync);
@@ -202,7 +202,7 @@ void renderer::frame_end(delta_t)
 	pass.bind();
 	pass.clear();
 
-	_render_frame = gfx::frame();
+	render_frame_ = gfx::frame();
 
 	gfx::render_pass::reset();
 }

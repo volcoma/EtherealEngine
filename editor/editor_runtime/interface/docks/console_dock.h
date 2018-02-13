@@ -12,5 +12,5 @@ struct console_dock : public imguidock::dock
 	void render(const ImVec2& area);
 
 private:
-	std::shared_ptr<console_log> _console_log;
+	std::shared_ptr<console_log> console_log_;
 };

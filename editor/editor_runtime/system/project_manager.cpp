@@ -155,8 +155,8 @@ void project_manager::close_project()
 	es.close_project();
 	ecs.dispose();
 	am.clear("app:/data");
-	_app_meta_syncer.unsync();
-	_app_cache_syncer.unsync();
+	app_meta_syncer_.unsync();
+	app_cache_syncer_.unsync();
 }
 
 bool project_manager::open_project(const fs::path& project_path)
@@ -176,8 +176,8 @@ bool project_manager::open_project(const fs::path& project_path)
 
 	save_config();
 
-	setup_meta_syncer(_app_meta_syncer, fs::resolve_protocol("app:/data"), fs::resolve_protocol("app:/meta"));
-	setup_cache_syncer(_app_cache_syncer, fs::resolve_protocol("app:/meta"),
+	setup_meta_syncer(app_meta_syncer_, fs::resolve_protocol("app:/data"), fs::resolve_protocol("app:/meta"));
+	setup_cache_syncer(app_cache_syncer_, fs::resolve_protocol("app:/meta"),
 					   fs::resolve_protocol("app:/cache"));
 
 	auto& es = core::get_subsystem<editing_system>();
@@ -210,9 +210,9 @@ void project_manager::load_config()
 		std::ifstream output(project_config_file.string());
 		cereal::iarchive_associative_t ar(output);
 
-		try_load(ar, cereal::make_nvp("options", _options));
+		try_load(ar, cereal::make_nvp("options", options_));
 
-		auto& items = _options.recent_project_paths;
+		auto& items = options_.recent_project_paths;
 		auto iter = std::begin(items);
 		while(iter != items.end())
 		{
@@ -348,7 +348,7 @@ void project_manager::setup_cache_syncer(fs::syncer& syncer, const fs::path& met
 
 void project_manager::save_config()
 {
-	auto& rp = _options.recent_project_paths;
+	auto& rp = options_.recent_project_paths;
 	auto project_path = fs::resolve_protocol("app:/");
 	if(project_path != "" &&
 	   std::find(std::begin(rp), std::end(rp), project_path.generic_string()) == std::end(rp))
@@ -362,19 +362,19 @@ void project_manager::save_config()
 	std::ofstream output(project_config_file);
 	cereal::oarchive_associative_t ar(output);
 
-	try_save(ar, cereal::make_nvp("options", _options));
+	try_save(ar, cereal::make_nvp("options", options_));
 }
 
 project_manager::project_manager()
 {
 	load_config();
-	setup_meta_syncer(_engine_meta_syncer, fs::resolve_protocol("engine:/data"),
+	setup_meta_syncer(engine_meta_syncer_, fs::resolve_protocol("engine:/data"),
 					  fs::resolve_protocol("engine:/meta"));
-	setup_cache_syncer(_engine_cache_syncer, fs::resolve_protocol("engine:/meta"),
+	setup_cache_syncer(engine_cache_syncer_, fs::resolve_protocol("engine:/meta"),
 					   fs::resolve_protocol("engine:/cache"));
-	setup_meta_syncer(_editor_meta_syncer, fs::resolve_protocol("editor:/data"),
+	setup_meta_syncer(editor_meta_syncer_, fs::resolve_protocol("editor:/data"),
 					  fs::resolve_protocol("editor:/meta"));
-	setup_cache_syncer(_editor_cache_syncer, fs::resolve_protocol("editor:/meta"),
+	setup_cache_syncer(editor_cache_syncer_, fs::resolve_protocol("editor:/meta"),
 					   fs::resolve_protocol("editor:/cache"));
 }
 

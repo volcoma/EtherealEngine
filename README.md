@@ -95,7 +95,7 @@ public:
   
 private:
   /// this is a member comment
-  int _some_private_member = 0;
+  int some_private_member_ = 0;
 }
 
 template<typename T>

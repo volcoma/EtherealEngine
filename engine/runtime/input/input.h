@@ -87,7 +87,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline action_mapper& get_mappings()
 	{
-		return _action_mapper;
+		return action_mapper_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -150,7 +150,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline bool mouse_moved() const
 	{
-		return _mouse_move_event;
+		return mouse_move_event_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -163,7 +163,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline const ipoint32_t& get_current_cursor_position() const
 	{
-		return _current_cursor_position;
+		return current_cursor_position_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -176,7 +176,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline const ipoint32_t& get_last_cursor_position() const
 	{
-		return _last_cursor_position;
+		return last_cursor_position_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -229,7 +229,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline bool is_mouse_wheel_scrolled() const
 	{
-		return mouse_wheel_scrolled;
+		return mouse_wheel_scrolled_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -242,7 +242,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline float get_mouse_wheel_scroll_delta_move() const
 	{
-		return _mouse_scroll_delta;
+		return mouse_scroll_delta_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -377,42 +377,42 @@ private:
 	bool joystick_event(const mml::platform_event& event);
 
 	///
-	action_mapper _action_mapper;
+	action_mapper action_mapper_;
 	///
-	bool _mouse_move_event = false;
+	bool mouse_move_event_ = false;
 	///
-	bool mouse_wheel_scrolled = false;
+	bool mouse_wheel_scrolled_ = false;
 	///
-	float _mouse_scroll_delta = 0.0f;
+	float mouse_scroll_delta_ = 0.0f;
 	///
-	ipoint32_t _current_cursor_position;
+	ipoint32_t current_cursor_position_;
 	///
-	ipoint32_t _last_cursor_position;
+	ipoint32_t last_cursor_position_;
 	///
-	std::map<unsigned int, bool> _mouse_buttons_pressed;
+	std::map<unsigned int, bool> mouse_buttons_pressed_;
 	///
-	std::map<unsigned int, bool> _mouse_buttons_down;
+	std::map<unsigned int, bool> mouse_buttons_down_;
 	///
-	std::map<unsigned int, bool> _mouse_buttons_released;
+	std::map<unsigned int, bool> mouse_buttons_released_;
 	///
-	std::map<mml::keyboard::key, bool> _keys_pressed;
+	std::map<mml::keyboard::key, bool> keys_pressed_;
 	///
-	std::map<mml::keyboard::key, bool> _keys_down;
+	std::map<mml::keyboard::key, bool> keys_down_;
 	///
-	std::map<mml::keyboard::key, bool> _keys_released;
+	std::map<mml::keyboard::key, bool> keys_released_;
 	///
-	std::map<unsigned int, bool> _joysticks_connected;
+	std::map<unsigned int, bool> joysticks_connected_;
 	///
-	std::map<unsigned int, bool> _joysticks_active;
+	std::map<unsigned int, bool> joysticks_active_;
 	///
-	std::map<unsigned int, bool> _joysticks_disconnected;
+	std::map<unsigned int, bool> joysticks_disconnected_;
 	///
-	std::map<std::pair<unsigned int, unsigned int>, bool> _joystick_buttons_pressed;
+	std::map<std::pair<unsigned int, unsigned int>, bool> joystick_buttons_pressed_;
 	///
-	std::map<std::pair<unsigned int, unsigned int>, bool> _joystick_buttons_down;
+	std::map<std::pair<unsigned int, unsigned int>, bool> joystick_buttons_down_;
 	///
-	std::map<std::pair<unsigned int, unsigned int>, bool> _joystick_buttons_released;
+	std::map<std::pair<unsigned int, unsigned int>, bool> joystick_buttons_released_;
 	///
-	std::map<std::pair<unsigned int, unsigned int>, float> _joystick_axis_positions;
+	std::map<std::pair<unsigned int, unsigned int>, float> joystick_axis_positions_;
 };
 }

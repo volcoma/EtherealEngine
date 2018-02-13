@@ -14,7 +14,7 @@ REFLECT(light_component)
 SAVE(light_component)
 {
 	try_save(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::component>(&obj)));
-	try_save(ar, cereal::make_nvp("light", obj._light));
+	try_save(ar, cereal::make_nvp("light", obj.light_));
 }
 SAVE_INSTANTIATE(light_component, cereal::oarchive_associative_t);
 SAVE_INSTANTIATE(light_component, cereal::oarchive_binary_t);
@@ -22,7 +22,7 @@ SAVE_INSTANTIATE(light_component, cereal::oarchive_binary_t);
 LOAD(light_component)
 {
 	try_load(ar, cereal::make_nvp("base_type", cereal::base_class<runtime::component>(&obj)));
-	try_load(ar, cereal::make_nvp("light", obj._light));
+	try_load(ar, cereal::make_nvp("light", obj.light_));
 }
 LOAD_INSTANTIATE(light_component, cereal::iarchive_associative_t);
 LOAD_INSTANTIATE(light_component, cereal::iarchive_binary_t);

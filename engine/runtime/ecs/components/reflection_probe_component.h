@@ -40,7 +40,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline const reflection_probe& get_probe() const
 	{
-		return _probe;
+		return probe_;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -74,7 +74,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline gfx::render_view& get_render_view(size_t idx)
 	{
-		return _render_view[idx];
+		return render_view_[idx];
 	}
 
 	//-----------------------------------------------------------------------------
@@ -104,7 +104,7 @@ private:
 	// Private Member Variables.
 	//-------------------------------------------------------------------------
 	/// The probe object this component represents
-	reflection_probe _probe;
+	reflection_probe probe_;
 	/// The render view for this component
-	std::array<gfx::render_view, 6> _render_view;
+	std::array<gfx::render_view, 6> render_view_;
 };

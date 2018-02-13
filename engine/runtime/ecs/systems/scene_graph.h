@@ -31,11 +31,11 @@ public:
 	//-----------------------------------------------------------------------------
 	const std::vector<entity>& get_roots() const
 	{
-		return _roots;
+		return roots_;
 	}
 
 private:
 	/// scene roots
-	std::vector<entity> _roots;
+	std::vector<entity> roots_;
 };
 }

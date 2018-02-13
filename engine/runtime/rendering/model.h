@@ -145,7 +145,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline float get_lod_transition_time() const
 	{
-		return _transition_time;
+		return transition_time_;
 	}
 	//-----------------------------------------------------------------------------
 	//  Name : set_lod_transition_time ()
@@ -157,7 +157,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline void set_lod_transition_time(float time)
 	{
-		_transition_time = time;
+		transition_time_ = time;
 	}
 	//-----------------------------------------------------------------------------
 	//  Name : get_lod_limits ()
@@ -169,7 +169,7 @@ public:
 	//-----------------------------------------------------------------------------
 	inline const std::vector<urange32_t>& get_lod_limits() const
 	{
-		return _lod_limits;
+		return lod_limits_;
 	}
 	void set_lod_limits(const std::vector<urange32_t>& limits);
 
@@ -189,13 +189,13 @@ public:
 private:
 	void recalulate_lod_limits();
 	/// Collection of all materials for this model.
-	std::vector<asset_handle<material>> _materials;
+	std::vector<asset_handle<material>> materials_;
 	/// Default material
-	asset_handle<material> _default_material;
+	asset_handle<material> default_material_;
 	/// Collection of all lods for this model.
-	std::vector<asset_handle<mesh>> _mesh_lods;
+	std::vector<asset_handle<mesh>> mesh_lods_;
 	///
-	std::vector<urange32_t> _lod_limits;
+	std::vector<urange32_t> lod_limits_;
 	/// Duration for a transition between two lods.
-	float _transition_time = 0.75f;
+	float transition_time_ = 0.75f;
 };

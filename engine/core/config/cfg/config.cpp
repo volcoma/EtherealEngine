@@ -20,8 +20,8 @@ config::~config()
 
 bool config::has_value(const std::string& section, const std::string& name) const
 {
-	auto si = values.find(section);
-	if(si != values.end())
+	auto si = values_.find(section);
+	if(si != values_.end())
 	{
 		auto vi = si->second.find(name);
 		if(vi != si->second.end())
@@ -34,8 +34,8 @@ bool config::has_value(const std::string& section, const std::string& name) cons
 
 const std::string& config::get(const std::string& section, const std::string& name) const
 {
-	auto si = values.find(section);
-	if(si != values.end())
+	auto si = values_.find(section);
+	if(si != values_.end())
 	{
 		auto vi = si->second.find(name);
 		if(vi != si->second.end())
@@ -85,7 +85,7 @@ void config::set(const std::string& section, const std::string& name, const std:
 		throw std::invalid_argument("Name is not an identifier.");
 	}
 
-	values[section][name] = value;
+	values_[section][name] = value;
 }
 
 std::string escape(const std::string& value)
@@ -153,7 +153,7 @@ void config::save(const std::string& file)
 		throw std::runtime_error("Failed to open " + file + " for writing.");
 	}
 
-	for(auto& section : values)
+	for(auto& section : values_)
 	{
 		out << "[" << section.first << "]" << std::endl;
 		for(auto& value : section.second)

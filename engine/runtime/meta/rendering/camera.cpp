@@ -13,37 +13,37 @@ REFLECT(camera)
 
 SAVE(camera)
 {
-	try_save(ar, cereal::make_nvp("projection_mode", obj._projection_mode));
-	try_save(ar, cereal::make_nvp("field_of_view", obj._fov));
-	try_save(ar, cereal::make_nvp("near_clip", obj._near_clip));
-	try_save(ar, cereal::make_nvp("far_clip", obj._far_clip));
-	try_save(ar, cereal::make_nvp("viewport_position", obj._viewport_pos));
-	try_save(ar, cereal::make_nvp("viewport_size", obj._viewport_size));
-	try_save(ar, cereal::make_nvp("orthographic_size", obj._ortho_size));
-	try_save(ar, cereal::make_nvp("aspect_ratio", obj._aspect_ratio));
-	try_save(ar, cereal::make_nvp("aspect_locked", obj._aspect_locked));
-	try_save(ar, cereal::make_nvp("frustum_locked", obj._frustum_locked));
+	try_save(ar, cereal::make_nvp("projection_mode", obj.projection_mode_));
+	try_save(ar, cereal::make_nvp("field_of_view", obj.fov_));
+	try_save(ar, cereal::make_nvp("near_clip", obj.near_clip_));
+	try_save(ar, cereal::make_nvp("far_clip", obj.far_clip_));
+	try_save(ar, cereal::make_nvp("viewport_position", obj.viewport_pos_));
+	try_save(ar, cereal::make_nvp("viewport_size", obj.viewport_size_));
+	try_save(ar, cereal::make_nvp("orthographic_size", obj.ortho_size_));
+	try_save(ar, cereal::make_nvp("aspect_ratio", obj.aspect_ratio_));
+	try_save(ar, cereal::make_nvp("aspect_locked", obj.aspect_locked_));
+	try_save(ar, cereal::make_nvp("frustum_locked", obj.frustum_locked_));
 }
 SAVE_INSTANTIATE(camera, cereal::oarchive_associative_t);
 SAVE_INSTANTIATE(camera, cereal::oarchive_binary_t);
 
 LOAD(camera)
 {
-	try_load(ar, cereal::make_nvp("projection_mode", obj._projection_mode));
-	try_load(ar, cereal::make_nvp("field_of_view", obj._fov));
-	try_load(ar, cereal::make_nvp("near_clip", obj._near_clip));
-	try_load(ar, cereal::make_nvp("far_clip", obj._far_clip));
-	try_load(ar, cereal::make_nvp("viewport_position", obj._viewport_pos));
-	try_load(ar, cereal::make_nvp("viewport_size", obj._viewport_size));
-	try_load(ar, cereal::make_nvp("orthographic_size", obj._ortho_size));
-	try_load(ar, cereal::make_nvp("aspect_ratio", obj._aspect_ratio));
-	try_load(ar, cereal::make_nvp("aspect_locked", obj._aspect_locked));
-	try_load(ar, cereal::make_nvp("frustum_locked", obj._frustum_locked));
+    try_load(ar, cereal::make_nvp("projection_mode", obj.projection_mode_));
+	try_load(ar, cereal::make_nvp("field_of_view", obj.fov_));
+	try_load(ar, cereal::make_nvp("near_clip", obj.near_clip_));
+	try_load(ar, cereal::make_nvp("far_clip", obj.far_clip_));
+	try_load(ar, cereal::make_nvp("viewport_position", obj.viewport_pos_));
+	try_load(ar, cereal::make_nvp("viewport_size", obj.viewport_size_));
+	try_load(ar, cereal::make_nvp("orthographic_size", obj.ortho_size_));
+	try_load(ar, cereal::make_nvp("aspect_ratio", obj.aspect_ratio_));
+	try_load(ar, cereal::make_nvp("aspect_locked", obj.aspect_locked_));
+	try_load(ar, cereal::make_nvp("frustum_locked", obj.frustum_locked_));
 
-	obj._view_dirty = true;
-	obj._projection_dirty = true;
-	obj._aspect_dirty = true;
-	obj._frustum_dirty = true;
+	obj.view_dirty_ = true;
+	obj.projection_dirty_ = true;
+	obj.aspect_dirty_ = true;
+	obj.frustum_dirty_ = true;
 }
 LOAD_INSTANTIATE(camera, cereal::iarchive_associative_t);
 LOAD_INSTANTIATE(camera, cereal::iarchive_binary_t);

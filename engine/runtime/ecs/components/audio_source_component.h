@@ -76,12 +76,12 @@ private:
 	// Private Member Variables.
 	//-------------------------------------------------------------------------
 
-	bool _auto_play = true;
-	bool _loop = true;
-	float _volume = 1.0f;
-	float _pitch = 1.0f;
-	float _volume_rolloff = 1.0f;
-	frange_t _range = {1.0f, 20.0f};
-	audio::source _source;
-	asset_handle<audio::sound> _sound;
+	bool auto_play_ = true;
+	bool loop_ = true;
+	float volume_ = 1.0f;
+	float pitch_ = 1.0f;
+	float volume_rolloff_ = 1.0f;
+	frange_t range_ = {1.0f, 20.0f};
+	audio::source source_;
+	asset_handle<audio::sound> sound_;
 };
