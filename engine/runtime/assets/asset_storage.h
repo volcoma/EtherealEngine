@@ -56,7 +56,7 @@ struct asset_storage : public basic_storage
 	using load_from_file_t = callable<bool(core::task_future<asset_handle<T>>&, const std::string&)>;
 	using load_from_instance_t =
 		callable<bool(core::task_future<asset_handle<T>>&, const std::string&, std::shared_ptr<T>)>;
-	
+
 	using predicate_t = callable<bool(const typename request_container_t::value_type&)>;
 	//-----------------------------------------------------------------------------
 	//  Name : ~storage ()
