@@ -42,7 +42,6 @@ void setup_asset_manager()
 		auto& storage = manager.add_storage<material>();
 		storage.load_from_file = asset_reader::load_from_file<material>;
 		storage.load_from_instance = asset_reader::load_from_instance<material>;
-		storage.save_to_file = asset_writer::save_to_file<material>;
 	}
 	{
 		auto& storage = manager.add_storage<animation>();

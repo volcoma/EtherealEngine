@@ -67,7 +67,7 @@ void mesh::dispose()
 	skin_bind_data_.clear();
 
 	// Clean up preparation data.
-	if(preparation_data_.owns_source == true)
+	if(preparation_data_.owns_source)
 		checked_array_delete(preparation_data_.vertex_source);
 	preparation_data_.vertex_source = nullptr;
 	preparation_data_.source_format = {};
@@ -201,7 +201,7 @@ bool mesh::bind_skin(const skin_bind_data& bind_data)
 
 		// Keep searching until we have consumed all unique face influence
 		// combinations.
-		for(; bone_combinations.empty() == false;)
+		for(; !bone_combinations.empty();)
 		{
 			bone_combination_map_t::iterator it_combination;
 			auto it_best_combination = bone_combinations.end();
@@ -734,7 +734,7 @@ bool mesh::set_vertex_source(void* source_ptr, std::uint32_t vertex_count,
 	} // End if not preparing
 
 	// Clear any existing source information.
-	if(preparation_data_.owns_source == true)
+	if(preparation_data_.owns_source)
 		checked_array_delete(preparation_data_.vertex_source);
 	preparation_data_.vertex_source = nullptr;
 	preparation_data_.source_format = {};
@@ -817,11 +817,11 @@ bool mesh::add_primitives(const triangle_array_t& triangles)
 	// In addition, we also record which of the required components each
 	// vertex actually contained based on the following information.
 	std::uint8_t vertex_flags = 0;
-	if(source_has_normals == true)
+	if(source_has_normals)
 		vertex_flags |= preparation_data::source_contains_normal;
-	if(source_has_binormal == true)
+	if(source_has_binormal)
 		vertex_flags |= preparation_data::source_contains_binormal;
-	if(source_has_tangent == true)
+	if(source_has_tangent)
 		vertex_flags |= preparation_data::source_contains_tangent;
 
 	// Loop through the specified faces and process them.
@@ -894,7 +894,7 @@ bool mesh::add_primitives(const triangle_array_t& triangles)
 
 				// Clear any invalid normals (completely messes up HDR if ANY NaNs make
 				// it this far)
-				if(has_normal && source_has_normals == true)
+				if(has_normal && source_has_normals)
 				{
 					float fnorm[4];
 					gfx::vertex_unpack(fnorm, gfx::attribute::Normal, vertex_format_, dst_ptr);
@@ -2758,7 +2758,7 @@ bool mesh::create_cube(const gfx::vertex_layout& format, float width, float heig
 		} // End Face Switch
 
 		// Should we invert the vertex normal
-		if(inverted == true)
+		if(inverted)
 			normal_vec = -normal_vec;
 
 		// Add faces
@@ -2844,7 +2844,7 @@ bool mesh::create_cube(const gfx::vertex_layout& format, float width, float heig
 			{
 				// If height was negative (i.e. faces are inverted)
 				// we need to flip the order of the indices
-				if((inverted == false && height < 0) || (inverted == true && height > 0))
+				if((!inverted && height < 0) || (inverted && height > 0))
 				{
 					current_triangle_ptr->data_group_id = 0;
 					current_triangle_ptr->indices[0] = x + 1 + ((y + 1) * x_count) + counter;
@@ -2933,7 +2933,7 @@ bool mesh::end_prepare(bool hardware_copy /* = true */, bool weld /* = true */, 
 	// Process the vertex data in order to generate any additional components that
 	// may be necessary
 	// (i.e. Normal, Binormal and Tangent)
-	if(generate_vertex_components(weld) == false)
+	if(!generate_vertex_components(weld))
 		return false;
 
 	// Allocate the system memory vertex buffer ready for population.
@@ -3019,10 +3019,14 @@ void mesh::build_ib(bool hardware_copy)
 			const gfx::memory_view* mem = gfx::copy(system_ib_, static_cast<std::uint32_t>(buffer_size));
 			hardware_ib_ = std::make_shared<gfx::index_buffer>(mem, BGFX_BUFFER_INDEX32);
 		} // End if not allocated
-		else if(hardware_ib_ && !hardware_ib_->is_valid())
+		else
 		{
-			const gfx::memory_view* mem = gfx::copy(system_ib_, static_cast<std::uint32_t>(buffer_size));
-			hardware_ib_ = std::make_shared<gfx::index_buffer>(mem, BGFX_BUFFER_INDEX32);
+			auto ib = std::static_pointer_cast<gfx::index_buffer>(hardware_ib_);
+			if(!ib->is_valid())
+			{
+				const gfx::memory_view* mem = gfx::copy(system_ib_, static_cast<std::uint32_t>(buffer_size));
+				hardware_ib_ = std::make_shared<gfx::index_buffer>(mem, BGFX_BUFFER_INDEX32);
+			}
 		}
 
 	} // End if hardware buffer required
@@ -3183,7 +3187,7 @@ bool mesh::sort_mesh_data(bool optimize, bool hardware_copy, bool build_buffer)
 		// Note: Remember that at this stage, the subset's 'vertex_count' member
 		// still describes
 		// a 'max' vertex (not a count)... We're correcting this later.
-		if(optimize == true)
+		if(optimize)
 			build_optimized_index_buffer(subset, src_indices_ptr + (subset->face_start * 3), dst_indices_ptr,
 										 static_cast<std::uint32_t>(subset->vertex_start),
 										 static_cast<std::uint32_t>(subset->vertex_count));
@@ -3366,7 +3370,7 @@ void mesh::build_optimized_index_buffer(const subset* subset, std::uint32_t* src
 			// Iterate through the entire list of un-added faces
 			for(std::uint32_t j = 0; j < subset->face_count; ++j)
 			{
-				if(triangle_info_ptr[j].added == false)
+				if(!triangle_info_ptr[j].added)
 				{
 					score = triangle_info_ptr[j].triangle_score;
 
@@ -3580,8 +3584,11 @@ void mesh::bind_mesh_data(std::uint32_t face_start, std::uint32_t face_count, st
 	if(hardware_mesh_)
 	{
 		// Render using hardware streams
-		gfx::set_vertex_buffer(0, hardware_vb_->native_handle(), 0, vertex_count);
-		gfx::set_index_buffer(hardware_ib_->native_handle(), index_start, index_count);
+		auto vb = std::static_pointer_cast<gfx::vertex_buffer>(hardware_vb_);
+		auto ib = std::static_pointer_cast<gfx::index_buffer>(hardware_ib_);
+
+		gfx::set_vertex_buffer(0, vb->native_handle(), 0, vertex_count);
+		gfx::set_index_buffer(ib->native_handle(), index_start, index_count);
 
 	} // End if has hardware copy
 	else

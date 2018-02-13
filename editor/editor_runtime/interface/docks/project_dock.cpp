@@ -11,13 +11,13 @@
 #include "editor_core/nativefd/filedialog.h"
 #include "runtime/animation/animation.h"
 #include "runtime/assets/asset_manager.h"
+#include "runtime/assets/impl/asset_writer.h"
 #include "runtime/ecs/constructs/prefab.h"
 #include "runtime/ecs/constructs/scene.h"
 #include "runtime/ecs/constructs/utils.h"
 #include "runtime/ecs/ecs.h"
 #include "runtime/rendering/material.h"
 #include "runtime/rendering/mesh.h"
-
 #include <chrono>
 
 using namespace std::literals;
@@ -674,7 +674,7 @@ void project_dock::context_create_menu()
 			auto new_mat_future =
 				am.load_asset_from_instance<material>(key, std::make_shared<standard_material>());
 			auto asset = new_mat_future.get();
-			am.save(asset);
+			runtime::asset_writer::save_to_file(asset.id(), asset);
 		}
 
 		gui::EndMenu();

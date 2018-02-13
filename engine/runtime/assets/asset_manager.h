@@ -128,24 +128,6 @@ public:
 		}
 	}
 
-	//-----------------------------------------------------------------------------
-	//  Name : save ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	template <typename T>
-	void save(const asset_handle<T>& asset)
-	{
-		auto& storage = get_storage<T>();
-		if(storage.save_to_file)
-		{
-			storage.save_to_file(asset.id(), asset);
-		}
-	}
-
 private:
 	//-----------------------------------------------------------------------------
 	//  Name : load_asset_from_file_impl ()
@@ -170,6 +152,9 @@ private:
 			{
 				if(load_func)
 				{
+                    //calling the function on a locked mutex is ok
+                    //since we dont expect this to actually
+                    //do much except add tasks to the executor
 					load_func(future, key);
 				}
 			}
@@ -189,6 +174,9 @@ private:
 		// Dispatch the loading
 		if(load_func)
 		{
+            //calling the function on a locked mutex is ok
+            //since we dont expect this to actually
+            //do much except add tasks to the executor
 			load_func(future, key);
 		}
 
@@ -224,6 +212,9 @@ private:
 		// Dispatch the loading
 		if(load_func)
 		{
+            //calling the function on a locked mutex is ok
+            //since we dont expect this to actually
+            //do much except add tasks to the executor
 			load_func(future, key, data, size);
 		}
 
@@ -241,6 +232,10 @@ private:
 		// Dispatch the loading
 		if(load_func)
 		{
+            //loading on a locked mutex is ok
+            //since we dont expect this to actually
+            //do much except add tasks to the
+            //executor
 			load_func(future, key, entry);
 		}
 

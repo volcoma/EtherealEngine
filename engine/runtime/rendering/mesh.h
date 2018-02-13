@@ -10,12 +10,6 @@
 #include <memory>
 #include <vector>
 
-namespace gfx
-{
-struct vertex_buffer;
-struct index_buffer;
-}
-
 class camera;
 namespace triangle_flags
 {
@@ -1087,10 +1081,10 @@ protected:
 	subset_key_array_t triangle_data_;
 	/// After constructing the mesh, this will contain the actual hardware vertex
 	/// buffer resource
-	std::shared_ptr<gfx::vertex_buffer> hardware_vb_;
+	std::shared_ptr<void> hardware_vb_;
 	/// After constructing the mesh, this will contain the actual hardware index
 	/// buffer resource
-	std::shared_ptr<gfx::index_buffer> hardware_ib_;
+	std::shared_ptr<void> hardware_ib_;
 
 	// mesh data look up tables
 	/// The actual list of subsets maintained by this mesh.
@@ -1129,38 +1123,3 @@ protected:
 	/// List of each of armature nodes
 	std::unique_ptr<armature_node> root_ = nullptr;
 };
-
-////-----------------------------------------------------------------------------
-//// Global Operators
-////-----------------------------------------------------------------------------
-////-----------------------------------------------------------------------------
-////  Name : operator < () (adjacent_edge_key&, adjacent_edge_key&)
-///// <summary>
-///// Perform less than comparison on the adjacent_edge_key structure.
-///// </summary>
-////-----------------------------------------------------------------------------
-//bool operator<(const mesh::adjacent_edge_key& key1, const mesh::adjacent_edge_key& key2);
-
-////-----------------------------------------------------------------------------
-////  Name : operator < () (mesh_subset_key&, mesh_subset_key&)
-///// <summary>
-///// Perform less than comparison on the mesh_subset_key structure.
-///// </summary>
-////-----------------------------------------------------------------------------
-//bool operator<(const mesh::mesh_subset_key& key1, const mesh::mesh_subset_key& key2);
-
-////-----------------------------------------------------------------------------
-////  Name : operator < () (weld_key&, weld_key&)
-///// <summary>
-///// Perform less than comparison on the weld_key structure.
-///// </summary>
-////-----------------------------------------------------------------------------
-//bool operator<(const mesh::weld_key& key1, const mesh::weld_key& key2);
-
-////-----------------------------------------------------------------------------
-////  Name : operator < () (bone_combination_key&, bone_combination_key&)
-///// <summary>
-///// Perform less than comparison on the bone_combination_key structure.
-///// </summary>
-////-----------------------------------------------------------------------------
-//bool operator<(const mesh::bone_combination_key& key1, const mesh::bone_combination_key& key2);

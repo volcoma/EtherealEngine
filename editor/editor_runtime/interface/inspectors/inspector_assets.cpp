@@ -11,6 +11,7 @@
 #include "runtime/ecs/constructs/prefab.h"
 #include "runtime/rendering/material.h"
 #include "runtime/rendering/mesh.h"
+#include "runtime/assets/impl/asset_writer.h"
 
 template <typename asset_t>
 static bool process_drag_drop_target(asset_handle<asset_t>& entry)
@@ -214,7 +215,7 @@ bool inspector_asset_handle_material::inspect(rttr::variant& var, bool read_only
 
 	if(gui::Button("SAVE CHANGES##top", ImVec2(-1, 0)))
 	{
-		am.save(data);
+        runtime::asset_writer::save_to_file(data.id(), data);
 	}
 	gui::Separator();
 	bool changed = false;
@@ -225,7 +226,7 @@ bool inspector_asset_handle_material::inspect(rttr::variant& var, bool read_only
 	gui::Separator();
 	if(gui::Button("SAVE CHANGES##bottom", ImVec2(-1, 0)))
 	{
-		am.save(data);
+        runtime::asset_writer::save_to_file(data.id(), data);
 	}
 	return changed;
 }

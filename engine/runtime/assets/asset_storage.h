@@ -56,10 +56,7 @@ struct asset_storage : public basic_storage
 	using load_from_file_t = callable<bool(core::task_future<asset_handle<T>>&, const std::string&)>;
 	using load_from_instance_t =
 		callable<bool(core::task_future<asset_handle<T>>&, const std::string&, std::shared_ptr<T>)>;
-	using save_file_t = callable<void(const std::string&, const asset_handle<T>&)>;
-	using rename_file_t = callable<void(const std::string&, const std::string&)>;
-	using delete_file_t = callable<void(const std::string&)>;
-
+	
 	using predicate_t = callable<bool(const typename request_container_t::value_type&)>;
 	//-----------------------------------------------------------------------------
 	//  Name : ~storage ()
@@ -131,9 +128,6 @@ struct asset_storage : public basic_storage
 
 	/// key, mode
 	load_from_instance_t load_from_instance;
-
-	/// key, asset
-	save_file_t save_to_file;
 
 	/// Storage container
 	request_container_t container;
