@@ -39,22 +39,21 @@ struct node_animation
 	std::string node_name;
 
 	/// The position keys of this animation channel. Positions are
-	/// specified as 3D vector. The array is mNumPositionKeys in size.
+	/// specified as 3D vector.
 	///
 	/// If there are position keys, there will also be at least one
 	/// scaling and one rotation key.
 	std::vector<key<math::vec3>> position_keys;
 
 	/// The rotation keys of this animation channel. Rotations are
-	/// given as quaternions,  which are 4D vectors. The array is
-	/// mNumRotationKeys in size.
+	/// given as quaternions,  which are 4D vectors.
 	///
 	/// If there are rotation keys, there will also be at least one
 	/// scaling and one position key.
 	std::vector<key<math::quat>> rotation_keys;
 
 	/// The scaling keys of this animation channel. Scalings are
-	/// specified as 3D vector. The array is mNumScalingKeys in size.
+	/// specified as 3D vector.
 	///
 	/// If there are scaling keys, there will also be at least one
 	/// position and one rotation key.
@@ -63,14 +62,14 @@ struct node_animation
 	/// Defines how the animation behaves before the first
 	/// key is encountered.
 	///
-	/// The default value is aiAnimBehaviour_DEFAULT (the original
+	/// The default value is anim_behaviour::DEFAULT (the original
 	/// transformation matrix of the affected node is used).
 	anim_behaviour pre_state = anim_behaviour::DEFAULT;
 
 	/// Defines how the animation behaves after the last
 	/// key was processed.
 	///
-	/// The default value is aiAnimBehaviour_DEFAULT (the original
+	/// The default value is anim_behaviour::DEFAULT (the original
 	/// transformation matrix of the affected node is taken).
 	anim_behaviour post_state = anim_behaviour::DEFAULT;
 };
@@ -89,7 +88,6 @@ struct animation
 	double ticks_per_second = 0.0;
 
 	/// The node animation channels. Each channel affects a single node.
-	/// The array is mNumChannels in size.
 	std::vector<node_animation> channels;
 };
 }

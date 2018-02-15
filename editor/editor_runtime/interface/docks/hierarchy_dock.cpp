@@ -141,6 +141,7 @@ static context_action check_context_menu(runtime::entity entity)
 			{
 				auto object = ecs.create();
 				object.assign<transform_component>();
+				es.select(object);
 			}
 
 			if(gui::BeginMenu("3D Objects"))
@@ -177,6 +178,7 @@ static context_action check_context_menu(runtime::entity entity)
 								model_comp->set_casts_shadow(true);
 								model_comp->set_casts_reflection(false);
 								model_comp->set_model(model);
+								es.select(object);
 							}
 						}
 						gui::EndMenu();
@@ -213,6 +215,7 @@ static context_action check_context_menu(runtime::entity entity)
 
 							auto light_comp = object.assign<light_component>().lock();
 							light_comp->set_light(light_data);
+							es.select(object);
 						}
 					}
 					gui::EndMenu();
@@ -239,6 +242,7 @@ static context_action check_context_menu(runtime::entity entity)
 							probe.type = type;
 							auto reflection_comp = object.assign<reflection_probe_component>().lock();
 							reflection_comp->set_probe(probe);
+							es.select(object);
 						}
 					}
 					gui::EndMenu();
@@ -254,6 +258,7 @@ static context_action check_context_menu(runtime::entity entity)
 					object.set_name("audio source");
 					object.assign<transform_component>();
 					object.assign<audio_source_component>();
+					es.select(object);
 				}
 				gui::EndMenu();
 			}
@@ -266,6 +271,7 @@ static context_action check_context_menu(runtime::entity entity)
 				transf_comp->set_local_position({0.0f, 2.0f, -5.0f});
 
 				object.assign<camera_component>();
+				es.select(object);
 			}
 			gui::EndPopup();
 		}
