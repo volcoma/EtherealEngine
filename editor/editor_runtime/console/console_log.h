@@ -1,17 +1,17 @@
 #pragma once
 
+#include "core/common/nonstd/ring_buffer.hpp"
+#include "core/console/console.h"
 #include "core/logging/logging.h"
 #include <array>
 #include <atomic>
-#include "core/console/console.h"
-#include "core/common/nonstd/ring_buffer.hpp"
 #include <string>
 
 class console_log : public logging::sinks::base_sink<std::mutex>, public console
 {
 public:
-    template<typename T>
-    using ring_buffer = nonstd::stack_ringbuffer<T, 150>;
+	template <typename T>
+	using ring_buffer = nonstd::stack_ringbuffer<T, 150>;
 	using entries_t = ring_buffer<std::pair<std::string, logging::level::level_enum>>;
 
 	//-----------------------------------------------------------------------------

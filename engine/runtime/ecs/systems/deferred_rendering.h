@@ -189,7 +189,7 @@ private:
 	std::unique_ptr<gpu_program> gamma_correction_program_;
 	/// Program that is responsible for rendering.
 	std::unique_ptr<gpu_program> atmospherics_program_;
-    ///
+	///
 	asset_handle<gfx::texture> ibl_brdf_lut_;
 };
 }

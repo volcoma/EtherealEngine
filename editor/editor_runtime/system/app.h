@@ -24,8 +24,8 @@ public:
 	virtual void stop();
 
 private:
-    void create_docks();
-    void register_console_commands();
+	void create_docks();
+	void register_console_commands();
 	void draw_docks(delta_t dt);
 	void draw_header(render_window& window);
 	void draw_dockspace(bool is_main, render_window& window, imguidock::dockspace& dockspace);

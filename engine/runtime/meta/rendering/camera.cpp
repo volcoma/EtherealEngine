@@ -29,7 +29,7 @@ SAVE_INSTANTIATE(camera, cereal::oarchive_binary_t);
 
 LOAD(camera)
 {
-    try_load(ar, cereal::make_nvp("projection_mode", obj.projection_mode_));
+	try_load(ar, cereal::make_nvp("projection_mode", obj.projection_mode_));
 	try_load(ar, cereal::make_nvp("field_of_view", obj.fov_));
 	try_load(ar, cereal::make_nvp("near_clip", obj.near_clip_));
 	try_load(ar, cereal::make_nvp("far_clip", obj.far_clip_));

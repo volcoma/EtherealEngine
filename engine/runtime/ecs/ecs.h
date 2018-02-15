@@ -139,7 +139,6 @@ public:
 		}
 
 	private:
-
 		std::uint64_t id_;
 	};
 

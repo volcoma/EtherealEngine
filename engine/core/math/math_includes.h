@@ -164,21 +164,21 @@ inline std::uint32_t power_of_n_round_down(std::uint32_t val, std::uint32_t n)
 
 struct color
 {
-    static color white()
-    {
-        static color c(1.0f, 1.0f, 1.0f, 1.0f);
-        return c;
-    }
-    static color red()
-    {
-        static color c(1.0f, 0.0f, 0.0f, 1.0f);
-        return c;
-    }
-    static color purple()
-    {
-        static color c(1.0f, 0.0f, 1.0f, 1.0f);
-        return c;
-    }
+	static color white()
+	{
+		static color c(1.0f, 1.0f, 1.0f, 1.0f);
+		return c;
+	}
+	static color red()
+	{
+		static color c(1.0f, 0.0f, 0.0f, 1.0f);
+		return c;
+	}
+	static color purple()
+	{
+		static color c(1.0f, 0.0f, 1.0f, 1.0f);
+		return c;
+	}
 	vec4 value;
 
 	color()

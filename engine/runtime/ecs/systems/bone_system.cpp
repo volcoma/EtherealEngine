@@ -19,9 +19,9 @@ void process_node(const std::unique_ptr<mesh::armature_node>& node, const skin_b
 	auto entity_node = ecs.create();
 	entity_node.set_name(node->name);
 
-    auto transf_comp = entity_node.assign<transform_component>().lock();
-    transf_comp->set_parent(parent);
-    transf_comp->set_local_transform(node->local_transform);
+	auto transf_comp = entity_node.assign<transform_component>().lock();
+	transf_comp->set_parent(parent);
+	transf_comp->set_local_transform(node->local_transform);
 
 	auto bone = bind_data.find_bone_by_id(node->name);
 	if(bone)

@@ -61,8 +61,8 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	int compute_projected_sphere_rect(irect32_t& rect, const math::vec3& position, const math::transform& view,
-									  const math::transform& proj);
+	int compute_projected_sphere_rect(irect32_t& rect, const math::vec3& position,
+									  const math::transform& view, const math::transform& proj);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_render_view ()

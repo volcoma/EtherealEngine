@@ -1,6 +1,5 @@
 #include "inspector_basetypes.h"
 
-
 bool inspector_irect32_t::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<irect32_t>();

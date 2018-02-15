@@ -201,7 +201,7 @@ std::vector<fs::path> syncer::get_synced_entries(const fs::path& path, bool is_d
 		std::string entry_extension;
 		while(entry_path.has_extension())
 		{
-            auto ext = entry_path.extension().string() + entry_extension;
+			auto ext = entry_path.extension().string() + entry_extension;
 			entry_extension = ext;
 			entry_path.replace_extension();
 		}

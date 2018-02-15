@@ -44,7 +44,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void set_fov(float fovDegrees);
+	void set_fov(float fovDegrees);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_near_clip ()
@@ -54,7 +54,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void set_near_clip(float distance);
+	void set_near_clip(float distance);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_far_clip ()
@@ -64,7 +64,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void set_far_clip(float distance);
+	void set_far_clip(float distance);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_projection_mode ()
@@ -74,7 +74,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void set_projection_mode(projection_mode mode);
+	void set_projection_mode(projection_mode mode);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_fov ()
@@ -233,7 +233,7 @@ public:
 	inline gfx::render_view& get_render_view()
 	{
 		return render_view_;
-    }
+	}
 
 private:
 	//-------------------------------------------------------------------------

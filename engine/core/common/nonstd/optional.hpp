@@ -43,7 +43,8 @@ namespace STX_NAMESPACE_NAME
 using std::experimental::bad_optional_access;
 #ifndef STX_HAVE_IN_PLACE_T
 using std::experimental::in_place;
-using std::experimental::in_place_t;;
+using std::experimental::in_place_t;
+;
 #define STX_IN_PLACE_T 1
 #endif
 using std::experimental::make_optional;
@@ -768,8 +769,8 @@ public:
 		assert(initialized());
 		return contained_val();
 	}
-     
-    constexpr bool has_value() const noexcept
+
+	constexpr bool has_value() const noexcept
 	{
 		return initialized();
 	}

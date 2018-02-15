@@ -19,9 +19,9 @@ public:
 
 	using clock_t = std::chrono::high_resolution_clock;
 	cache() = default;
-	
+
 	cache(const fs::path& p, clock_t::duration scan_frequency)
-        : path_(p)
+		: path_(p)
 		, scan_frequency_(scan_frequency)
 		, should_refresh_(true)
 	{
@@ -120,44 +120,43 @@ public:
 		{
 			entries_.push_back(p);
 		}
-        
-        std::sort(std::begin(entries_), std::end(entries_), [](const auto& lhs, const auto& rhs)
-        {
-            return fs::is_directory(lhs.status()) > fs::is_directory(rhs.status());
-        });
-        
+
+		std::sort(std::begin(entries_), std::end(entries_), [](const auto& lhs, const auto& rhs) {
+			return fs::is_directory(lhs.status()) > fs::is_directory(rhs.status());
+		});
+
 		should_refresh_ = false;
 	}
 
-    const fs::path& get_path() const
-    {
-        return path_;
-    }
-    
-    void set_path(const fs::path& path)
-    {
-        if(path_ == path)
-        {
-            return;
-        }
-        unwatch();
-        path_ = path;
-        should_refresh_ = true;
-        watch();
-    }
-    
-    void set_scan_frequency(clock_t::duration scan_frequency)
-    {
-        if(scan_frequency_ == scan_frequency)
-        {
-            return;
-        }
-        unwatch();
-        scan_frequency_ = scan_frequency;
-        should_refresh_ = true;
-        watch();
-    }
-    
+	const fs::path& get_path() const
+	{
+		return path_;
+	}
+
+	void set_path(const fs::path& path)
+	{
+		if(path_ == path)
+		{
+			return;
+		}
+		unwatch();
+		path_ = path;
+		should_refresh_ = true;
+		watch();
+	}
+
+	void set_scan_frequency(clock_t::duration scan_frequency)
+	{
+		if(scan_frequency_ == scan_frequency)
+		{
+			return;
+		}
+		unwatch();
+		scan_frequency_ = scan_frequency;
+		should_refresh_ = true;
+		watch();
+	}
+
 private:
 	//-----------------------------------------------------------------------------
 	//  Name : should_refresh ()

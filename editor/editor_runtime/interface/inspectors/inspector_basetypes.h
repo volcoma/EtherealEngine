@@ -86,5 +86,3 @@ struct inspector_frange_t : public inspector
 	bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata);
 };
 INSPECTOR_REFLECT(inspector_frange_t, frange_t)
-
-

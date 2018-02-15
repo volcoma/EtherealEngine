@@ -85,7 +85,7 @@ void show_in_graphical_env(const path& _path)
 	const std::string cmd_args = "'" + _path.string() + "'";
 	const std::string whole_command = cmd + space + cmd_args;
 	auto result = std::system(whole_command.c_str());
-    (void)result;
+	(void)result;
 }
 }
 #else

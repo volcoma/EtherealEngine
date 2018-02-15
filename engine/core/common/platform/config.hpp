@@ -29,10 +29,11 @@
 #define $is $on															 // usage: #if $is($debug)
 #define $has(...) $clang(__has_feature(__VA_ARGS__)) $celse(__VA_ARGS__) // usage: #if $has(cxx_exceptions)
 
-#define ETH_ON(v) (0 v(+1))												 // usage: #if $on($msvc)
-#define ETH_IS ETH_ON															 // usage: #if $is($debug)
-#define ETH_HAS(...) ETH_COMPILER_CLANG(__has_feature(__VA_ARGS__)) ETH_COMPILER_CELSE(__VA_ARGS__) // usage: #if $has(cxx_exceptions)
-
+#define ETH_ON(v) (0 v(+1)) // usage: #if $on($msvc)
+#define ETH_IS ETH_ON		// usage: #if $is($debug)
+#define ETH_HAS(...)                                                                                         \
+	ETH_COMPILER_CLANG(__has_feature(__VA_ARGS__))                                                           \
+	ETH_COMPILER_CELSE(__VA_ARGS__) // usage: #if $has(cxx_exceptions)
 
 #if defined(_WIN32)
 #define $windows $yes

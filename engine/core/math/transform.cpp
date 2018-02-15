@@ -516,8 +516,7 @@ bool transform::decompose(vec3& scale, vec3& shear, quat& rotation, vec3& transl
 /// rotation and translation.
 /// </summary>
 //-----------------------------------------------------------------------------
-void transform::compose(const vec3& scale, const vec3& shear, const quat& rotation,
-							  const vec3& translation)
+void transform::compose(const vec3& scale, const vec3& shear, const quat& rotation, const vec3& translation)
 {
 	// Convert rotation quat to matrix form.
 	mat4 mR = glm::mat4_cast(rotation);
@@ -573,7 +572,6 @@ void transform::compose(const quat& rotation, const vec3& translation)
 	matrix_[3][0] = translation.x;
 	matrix_[3][1] = translation.y;
 	matrix_[3][2] = translation.z;
-
 }
 
 //-----------------------------------------------------------------------------
@@ -724,7 +722,7 @@ void transform::rotate_axis(float a, const vec3& v)
 }
 void transform::scale(const vec3& v)
 {
-    // No - op?
+	// No - op?
 	if(v.x == 1.0f && v.y == 1.0f && v.z == 1.0f)
 	{
 		return;
@@ -732,7 +730,6 @@ void transform::scale(const vec3& v)
 
 	// Apply scale
 	matrix_ = glm::scale(matrix_, v);
-	
 }
 //-----------------------------------------------------------------------------
 //  Name : scale ()
@@ -742,7 +739,7 @@ void transform::scale(const vec3& v)
 //-----------------------------------------------------------------------------
 void transform::scale(float x, float y, float z)
 {
-    scale(vec3(x, y, z));
+	scale(vec3(x, y, z));
 }
 
 //-----------------------------------------------------------------------------
@@ -921,7 +918,6 @@ void transform::set_rotation(const vec3& vX, const vec3& vY, const vec3& vZ)
 	reinterpret_cast<vec3&>(matrix_[0]) *= scale.x;
 	reinterpret_cast<vec3&>(matrix_[1]) *= scale.y;
 	reinterpret_cast<vec3&>(matrix_[2]) *= scale.z;
-
 }
 
 //-----------------------------------------------------------------------------

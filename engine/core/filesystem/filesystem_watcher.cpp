@@ -91,7 +91,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	impl(const fs::path& path, const std::string& filter, bool recursive, bool initial_list,
-				 clock_t::duration poll_interval, const notify_callback& list_callback)
+		 clock_t::duration poll_interval, const notify_callback& list_callback)
 		: _filter(filter)
 		, _callback(list_callback)
 		, _poll_interval(poll_interval)
@@ -422,8 +422,8 @@ std::uint64_t filesystem_watcher::watch_impl(const fs::path& path, bool recursiv
 		{
 			// we do it like this because if initial_list is true we don't want
 			// to call a user callback on a locked mutex
-			auto imp = std::make_shared<impl>(p, filter, recursive, initial_list, poll_interval,
-													   list_callback);
+			auto imp =
+				std::make_shared<impl>(p, filter, recursive, initial_list, poll_interval, list_callback);
 			std::lock_guard<std::mutex> lock(wd.mutex_);
 			wd.watchers_.emplace(key, std::move(imp));
 		}

@@ -222,7 +222,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void look_at(float x, float y, float z);
+	void look_at(float x, float y, float z);
 
 	//-----------------------------------------------------------------------------
 	//  Name : look_at (virtual )
@@ -232,7 +232,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void look_at(const math::vec3& point);
+	void look_at(const math::vec3& point);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_position()
@@ -242,7 +242,7 @@ public:
 	/// for initialization purposes.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void set_position(const math::vec3& position);
+	void set_position(const math::vec3& position);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_local_position()
@@ -252,7 +252,7 @@ public:
 	/// for initialization purposes.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void set_local_position(const math::vec3& position);
+	void set_local_position(const math::vec3& position);
 
 	//-----------------------------------------------------------------------------
 	//  Name : move()
@@ -260,7 +260,7 @@ public:
 	/// Move the current position of the node by the specified amount.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void move(const math::vec3& amount);
+	void move(const math::vec3& amount);
 
 	//-----------------------------------------------------------------------------
 	//  Name : move_local()
@@ -269,228 +269,227 @@ public:
 	/// its own local axes.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void move_local(const math::vec3& amount);
+	void move_local(const math::vec3& amount);
 
 	//-----------------------------------------------------------------------------
-    //  Name : rotate ( )
+	//  Name : rotate ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void rotate(float x, float y, float z);
+	void rotate(float x, float y, float z);
 
 	//-----------------------------------------------------------------------------
-    //  Name : rotate ( )
+	//  Name : rotate ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void rotate(float x, float y, float z, const math::vec3& center);
+	void rotate(float x, float y, float z, const math::vec3& center);
 
 	//-----------------------------------------------------------------------------
-    //  Name : rotate_local ( )
+	//  Name : rotate_local ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void rotate_local(float x, float y, float z);
+	void rotate_local(float x, float y, float z);
 
 	//-----------------------------------------------------------------------------
-    //  Name : rotate_axis ( )
+	//  Name : rotate_axis ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void rotate_axis(float degrees, const math::vec3& axis);
+	void rotate_axis(float degrees, const math::vec3& axis);
 
 	//-----------------------------------------------------------------------------
-    //  Name : set_scale ( )
+	//  Name : set_scale ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void set_scale(const math::vec3& s);
+	void set_scale(const math::vec3& s);
 
 	//-----------------------------------------------------------------------------
-    //  Name : set_local_scale ( )
+	//  Name : set_local_scale ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void set_local_scale(const math::vec3& scale);
+	void set_local_scale(const math::vec3& scale);
 
 	//-----------------------------------------------------------------------------
-    //  Name : set_rotation ( )
+	//  Name : set_rotation ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void set_rotation(const math::quat& rotation);
+	void set_rotation(const math::quat& rotation);
 
 	//-----------------------------------------------------------------------------
-    //  Name : set_local_rotation ( )
+	//  Name : set_local_rotation ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void set_local_rotation(const math::quat& rotation);
+	void set_local_rotation(const math::quat& rotation);
 
 	//-----------------------------------------------------------------------------
-    //  Name : reset_rotation ( )
+	//  Name : reset_rotation ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void reset_rotation();
+	void reset_rotation();
 
 	//-----------------------------------------------------------------------------
-    //  Name : reset_scale ( )
+	//  Name : reset_scale ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void reset_scale();
+	void reset_scale();
 
 	//-----------------------------------------------------------------------------
-    //  Name : reset_local_rotation ( )
+	//  Name : reset_local_rotation ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void reset_local_rotation();
+	void reset_local_rotation();
 
 	//-----------------------------------------------------------------------------
-    //  Name : reset_local_scale ( )
+	//  Name : reset_local_scale ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void reset_local_scale();
+	void reset_local_scale();
 
 	//-----------------------------------------------------------------------------
-    //  Name : reset_pivot ( )
+	//  Name : reset_pivot ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void reset_pivot();
+	void reset_pivot();
 
 	//-----------------------------------------------------------------------------
-    //  Name : set_local_transform ( )
+	//  Name : set_local_transform ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void set_local_transform(const math::transform& trans);
+	void set_local_transform(const math::transform& trans);
 
 	//-----------------------------------------------------------------------------
-    //  Name : set_transform ( )
+	//  Name : set_transform ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void set_transform(const math::transform& trans);
+	void set_transform(const math::transform& trans);
 
 	//-----------------------------------------------------------------------------
-    //  Name : look_at ( )
+	//  Name : look_at ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void look_at(const math::vec3& eye, const math::vec3& at);
+	void look_at(const math::vec3& eye, const math::vec3& at);
 
 	//-----------------------------------------------------------------------------
-    //  Name : look_at ( )
+	//  Name : look_at ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void look_at(const math::vec3& eye, const math::vec3& at, const math::vec3& up);
+	void look_at(const math::vec3& eye, const math::vec3& at, const math::vec3& up);
 
 	//-----------------------------------------------------------------------------
-    //  Name : can_adjust_pivot ( )
+	//  Name : can_adjust_pivot ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    bool can_adjust_pivot() const;
+	bool can_adjust_pivot() const;
 
 	//-----------------------------------------------------------------------------
-    //  Name : can_scale ( )
+	//  Name : can_scale ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    bool can_scale() const;
+	bool can_scale() const;
 
 	//-----------------------------------------------------------------------------
-    //  Name : can_rotate ( )
+	//  Name : can_rotate ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    bool can_rotate() const;
+	bool can_rotate() const;
 
 	//-----------------------------------------------------------------------------
-    //  Name : set_parent ( )
+	//  Name : set_parent ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void set_parent(runtime::entity parent, bool world_position_stays,
-											bool local_position_stays);
+	void set_parent(runtime::entity parent, bool world_position_stays, bool local_position_stays);
 
 	//-----------------------------------------------------------------------------
-    //  Name : set_parent ( )
+	//  Name : set_parent ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-    void set_parent(runtime::entity parent);
+	void set_parent(runtime::entity parent);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_parent ()
@@ -554,6 +553,6 @@ protected:
 	math::transform local_transform_;
 	/// Cached world transformation at pivot point.
 	math::transform world_transform_;
-    /// Should recalc world transform.
+	/// Should recalc world transform.
 	bool dirty_ = true;
 };

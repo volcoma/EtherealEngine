@@ -63,7 +63,8 @@ void component_storage::destroy(std::size_t n)
 	element.reset();
 }
 
-std::weak_ptr<component> component_storage::set(unsigned int index, const std::shared_ptr<component>& component)
+std::weak_ptr<component> component_storage::set(unsigned int index,
+												const std::shared_ptr<component>& component)
 {
 	data[index] = component;
 	return component;
@@ -187,7 +188,8 @@ void entity_component_system::remove(entity::id_t id, rtti::type_index_sequentia
 	pool->destroy(index);
 }
 
-bool entity_component_system::has_component(entity::id_t id, const std::shared_ptr<component>& component) const
+bool entity_component_system::has_component(entity::id_t id,
+											const std::shared_ptr<component>& component) const
 {
 	return has_component(id, component->runtime_id());
 }

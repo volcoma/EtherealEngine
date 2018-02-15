@@ -221,7 +221,8 @@ void model::recalulate_lod_limits()
 		if(mesh_lods_.size() - 1 != i)
 			lower_limit = upper_limit * (0.5f - ((i)*0.1f));
 
-		lod_limits_.emplace_back(urange32_t(urange32_t::value_type(lower_limit), urange32_t::value_type(upper_limit)));
+		lod_limits_.emplace_back(
+			urange32_t(urange32_t::value_type(lower_limit), urange32_t::value_type(upper_limit)));
 		upper_limit = lower_limit;
 	}
 }

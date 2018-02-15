@@ -232,7 +232,8 @@ class delegate<R(A...)>
 			return obj_ptr1 == obj_ptr2 && func_ptr1 == func_ptr2;
 		}
 
-		static bool compare_impl_function(const any_data& data1, const any_data& data2, std::true_type /*unused*/)
+		static bool compare_impl_function(const any_data& data1, const any_data& data2,
+										  std::true_type /*unused*/)
 		{
 			const F* ptr1 = get_pointer_typed(data1);
 			const F* ptr2 = get_pointer_typed(data2);
@@ -240,7 +241,8 @@ class delegate<R(A...)>
 			return *ptr1 == *ptr2;
 		}
 
-		static bool compare_impl_function(const any_data& data1, const any_data& data2, std::false_type /*unused*/)
+		static bool compare_impl_function(const any_data& data1, const any_data& data2,
+										  std::false_type /*unused*/)
 		{
 			const F* ptr1 = get_pointer_typed(data1);
 			const F* ptr2 = get_pointer_typed(data2);
@@ -315,9 +317,10 @@ public:
 
 	~delegate()
 	{
-		if(manager_) {
+		if(manager_)
+		{
 			manager_->destroy_type_(functor_);
-}
+		}
 	}
 
 	delegate(delegate const& rhs)

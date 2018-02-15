@@ -521,5 +521,4 @@ void get_size_from_ratio(backbuffer_ratio _ratio, std::uint16_t& _width, std::ui
 
 const std::string& get_renderer_filename_extension();
 bool is_supported(uint64_t flag);
-
 }

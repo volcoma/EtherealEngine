@@ -152,9 +152,9 @@ private:
 			{
 				if(load_func)
 				{
-                    //calling the function on a locked mutex is ok
-                    //since we dont expect this to actually
-                    //do much except add tasks to the executor
+					// calling the function on a locked mutex is ok
+					// since we dont expect this to actually
+					// do much except add tasks to the executor
 					load_func(future, key);
 				}
 			}
@@ -174,9 +174,9 @@ private:
 		// Dispatch the loading
 		if(load_func)
 		{
-            //calling the function on a locked mutex is ok
-            //since we dont expect this to actually
-            //do much except add tasks to the executor
+			// calling the function on a locked mutex is ok
+			// since we dont expect this to actually
+			// do much except add tasks to the executor
 			load_func(future, key);
 		}
 
@@ -212,9 +212,9 @@ private:
 		// Dispatch the loading
 		if(load_func)
 		{
-            //calling the function on a locked mutex is ok
-            //since we dont expect this to actually
-            //do much except add tasks to the executor
+			// calling the function on a locked mutex is ok
+			// since we dont expect this to actually
+			// do much except add tasks to the executor
 			load_func(future, key, data, size);
 		}
 
@@ -232,10 +232,10 @@ private:
 		// Dispatch the loading
 		if(load_func)
 		{
-            //loading on a locked mutex is ok
-            //since we dont expect this to actually
-            //do much except add tasks to the
-            //executor
+			// loading on a locked mutex is ok
+			// since we dont expect this to actually
+			// do much except add tasks to the
+			// executor
 			load_func(future, key, entry);
 		}
 

@@ -52,7 +52,7 @@ void camera_component::set_ortho_size(float size)
 
 float camera_component::get_ppu() const
 {
-    return camera_.get_ppu();
+	return camera_.get_ppu();
 }
 
 void camera_component::set_fov(float fovDegrees)

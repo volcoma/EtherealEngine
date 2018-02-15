@@ -591,10 +591,10 @@ static void process_drag_drop_target(std::shared_ptr<camera_component> camera_co
 						}
 					}
 					// Add component and configure it.
-                    auto model_comp = object.assign<model_component>().lock();
-                    model_comp->set_casts_shadow(true);
-                    model_comp->set_casts_reflection(false);
-                    model_comp->set_model(mdl);
+					auto model_comp = object.assign<model_component>().lock();
+					model_comp->set_casts_shadow(true);
+					model_comp->set_casts_reflection(false);
+					model_comp->set_model(mdl);
 
 					es.select(object);
 				}

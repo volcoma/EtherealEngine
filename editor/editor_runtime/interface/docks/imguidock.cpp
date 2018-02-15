@@ -862,7 +862,8 @@ bool dockspace::get_min_size(node* container, ImVec2& min)
 	return false;
 }
 
-void dockspace::render_tab_bar(node* container, const ImVec2& sz, const ImVec2& cursor_pos, float tabbar_height)
+void dockspace::render_tab_bar(node* container, const ImVec2& sz, const ImVec2& cursor_pos,
+							   float tabbar_height)
 {
 	ImGui::SetCursorPos(cursor_pos);
 
@@ -871,7 +872,7 @@ void dockspace::render_tab_bar(node* container, const ImVec2& sz, const ImVec2& 
 
 	for(auto dock : container->docks)
 	{
-        
+
 		std::string dockTitle = dock->title;
 
 		ImVec4 button_color =
@@ -906,14 +907,13 @@ void dockspace::render_tab_bar(node* container, const ImVec2& sz, const ImVec2& 
 			ImGui::CalcItemSize(ImVec2(0, tabbar_height), close_label_size.x + style.FramePadding.x * 2.0f,
 								close_label_size.y + style.FramePadding.y * 2.0f);
 
-        float tab_width = title_sz.x + close_sz.x * 1.5f;
-        if(ImGui::GetCursorPosX() > cursor_pos.x + sz.x)
-        {
-            ImGui::PopStyleColor(3);            
-            break;
-        }
-        
-        
+		float tab_width = title_sz.x + close_sz.x * 1.5f;
+		if(ImGui::GetCursorPosX() > cursor_pos.x + sz.x)
+		{
+			ImGui::PopStyleColor(3);
+			break;
+		}
+
 		if(ImGui::Button(dockTitle.c_str(), ImVec2(tab_width, tabbar_height)))
 		{
 			container->active_dock = dock;
@@ -984,7 +984,7 @@ void dock::initialize(const std::string& dtitle, bool close_btn, const ImVec2& m
 	static int i = 0;
 	title = dtitle + "###" + std::to_string(i++);
 	close_button = close_btn;
-    min_size = ImVec2(std::max(min_size.x, min_sz.x), std::max(min_size.y, min_sz.y));
+	min_size = ImVec2(std::max(min_size.x, min_sz.x), std::max(min_size.y, min_sz.y));
 	draw_function = ddrawFunction;
 }
 }

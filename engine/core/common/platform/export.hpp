@@ -72,12 +72,11 @@
 
 #endif
 
-
 ////////////////////////////////////////////////////////////
 // Define portable import / export macros
 ////////////////////////////////////////////////////////////
 #if defined(ETH_API_EXPORTS)
-    #define ETH_API ETH_API_EXPORT
+#define ETH_API ETH_API_EXPORT
 #else
-    #define ETH_API ETH_API_IMPORT
+#define ETH_API ETH_API_IMPORT
 #endif

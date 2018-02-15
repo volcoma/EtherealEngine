@@ -4,9 +4,9 @@
 void model_component::set_casts_shadow(bool cast_shadow)
 {
 	if(casts_shadow_ == cast_shadow)
-    {
-        return;
-    }
+	{
+		return;
+	}
 
 	touch();
 
@@ -16,9 +16,9 @@ void model_component::set_casts_shadow(bool cast_shadow)
 void model_component::set_static(bool is_static)
 {
 	if(static_ == is_static)
-    {
-        return;
-    }
+	{
+		return;
+	}
 
 	touch();
 
@@ -28,9 +28,9 @@ void model_component::set_static(bool is_static)
 void model_component::set_casts_reflection(bool casts_reflection)
 {
 	if(casts_reflection_ == casts_reflection)
-    {
-        return;
-    }
+	{
+		return;
+	}
 
 	touch();
 

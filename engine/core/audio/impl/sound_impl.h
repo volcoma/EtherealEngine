@@ -37,8 +37,8 @@ private:
 	void cleanup();
 
 	native_handle_type handle_ = 0;
-    /// openal doesn't let us destroy sounds that are
-    /// binded, so we have to keep this bookkeeping
+	/// openal doesn't let us destroy sounds that are
+	/// binded, so we have to keep this bookkeeping
 	std::mutex mutex_;
 	std::vector<source_impl*> bound_to_sources_;
 };

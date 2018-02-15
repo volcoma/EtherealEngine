@@ -61,7 +61,7 @@ void editing_system::load_editor_camera()
 	if(!object.has_component<transform_component>())
 	{
 		auto transform_comp = object.assign<transform_component>().lock();
-        transform_comp->set_local_position({0.0f, 2.0f, -5.0f});
+		transform_comp->set_local_position({0.0f, 2.0f, -5.0f});
 	}
 	if(!object.has_component<camera_component>())
 	{
