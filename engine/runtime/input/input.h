@@ -119,6 +119,8 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	bool is_key_pressed(mml::keyboard::key key);
+    bool is_key_pressed(mml::keyboard::key key, mml::keyboard::key modifier);
+    bool are_keys_pressed(const std::vector<mml::keyboard::key>& keys);
 
 	//-----------------------------------------------------------------------------
 	//  Name : is_key_down ()

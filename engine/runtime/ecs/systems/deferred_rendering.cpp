@@ -510,7 +510,7 @@ deferred_rendering::lighting_pass(std::shared_ptr<gfx::frame_buffer> input, came
 
 				gfx::set_scissor(rect.left, rect.top, rect.width(), rect.height());
 				auto topology = gfx::clip_quad(1.0f);
-				gfx::set_state(topology | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE |
+				gfx::set_state(topology | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A |
 							   BGFX_STATE_BLEND_ADD);
 				gfx::submit(pass.id, program->native_handle());
 				gfx::set_state(BGFX_STATE_DEFAULT);
@@ -611,7 +611,7 @@ deferred_rendering::reflection_probe_pass(std::shared_ptr<gfx::frame_buffer> inp
 				program->set_texture(5, "s_tex_cube", cubemap.get());
 				gfx::set_scissor(rect.left, rect.top, rect.width(), rect.height());
 				auto topology = gfx::clip_quad(1.0f);
-				gfx::set_state(topology | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE |
+				gfx::set_state(topology | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A |
 							   BGFX_STATE_BLEND_ALPHA);
 				gfx::submit(pass.id, program->native_handle());
 				gfx::set_state(BGFX_STATE_DEFAULT);
@@ -650,16 +650,18 @@ deferred_rendering::atmospherics_pass(std::shared_ptr<gfx::frame_buffer> input, 
 	pass.bind(surface);
 	pass.set_view_proj(view, proj);
 
-	if(surface && atmospherics_program_)
+	if((surface != nullptr) && atmospherics_program_)
 	{
 		bool found_sun = false;
 		auto light_direction = math::normalize(math::vec3(0.2f, -0.8f, 1.0f));
 		ecs.for_each<transform_component, light_component>(
-			[this, &light_direction, &found_sun](entity e, transform_component& transform_comp_ref,
+			[&light_direction, &found_sun](entity e, transform_component& transform_comp_ref,
 												 light_component& light_comp_ref) {
 				if(found_sun)
+                {
 					return;
-
+                }
+                
 				const auto& light = light_comp_ref.get_light();
 
 				if(light.type == light_type::directional)
@@ -677,7 +679,7 @@ deferred_rendering::atmospherics_pass(std::shared_ptr<gfx::frame_buffer> input, 
 					   irect32_t::value_type(output_size.height));
 		gfx::set_scissor(rect.left, rect.top, rect.width(), rect.height());
 		auto topology = gfx::clip_quad(1.0f);
-		gfx::set_state(topology | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE |
+		gfx::set_state(topology | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A |
 					   BGFX_STATE_DEPTH_TEST_LEQUAL | BGFX_STATE_BLEND_ADD);
 		gfx::submit(pass.id, atmospherics_program_->native_handle());
 		gfx::set_state(BGFX_STATE_DEFAULT);
@@ -711,7 +713,7 @@ deferred_rendering::tonemapping_pass(std::shared_ptr<gfx::frame_buffer> input, c
 					   irect32_t::value_type(output_size.height));
 		gfx::set_scissor(rect.left, rect.top, rect.width(), rect.height());
 		auto topology = gfx::clip_quad(1.0f);
-		gfx::set_state(topology | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE);
+		gfx::set_state(topology | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A);
 		gfx::submit(pass.id, gamma_correction_program_->native_handle());
 		gfx::set_state(BGFX_STATE_DEFAULT);
 		gamma_correction_program_->end();

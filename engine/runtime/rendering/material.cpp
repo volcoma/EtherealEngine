@@ -47,10 +47,10 @@ gpu_program* material::get_program() const
 std::uint64_t material::get_render_states(bool apply_cull, bool depth_write, bool depth_test) const
 {
 	// Set render states.
-	std::uint64_t states = 0 | BGFX_STATE_RGB_WRITE | BGFX_STATE_ALPHA_WRITE | BGFX_STATE_MSAA;
+	std::uint64_t states = 0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_MSAA;
 
 	if(depth_write)
-		states |= BGFX_STATE_DEPTH_WRITE;
+		states |= BGFX_STATE_WRITE_Z;
 
 	if(depth_test)
 		states |= BGFX_STATE_DEPTH_TEST_LESS;

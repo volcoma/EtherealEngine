@@ -20,7 +20,7 @@
 #include "runtime/rendering/mesh.h"
 namespace
 {
-static math::bbox calc_bounds(runtime::entity entity)
+math::bbox calc_bounds(runtime::entity entity)
 {
 	const math::vec3 one = {1.0f, 1.0f, 1.0f};
 	math::bbox bounds = math::bbox(-one, one);
@@ -49,7 +49,7 @@ static math::bbox calc_bounds(runtime::entity entity)
 	return bounds;
 };
 
-static void focus_entity_on_bounds(runtime::entity entity, const math::bbox& bounds)
+void focus_entity_on_bounds(runtime::entity entity, const math::bbox& bounds)
 {
 	auto trans_comp = entity.get_component<transform_component>().lock();
 	auto camera_comp = entity.get_component<camera_component>().lock();
@@ -245,16 +245,6 @@ static context_action check_context_menu(runtime::entity entity)
 				gui::EndMenu();
 			}
 
-			if(gui::MenuItem("Camera"))
-			{
-				auto object = ecs.create();
-				object.set_name("camera");
-				auto transf_comp = object.assign<transform_component>().lock();
-				transf_comp->set_local_position({0.0f, 2.0f, -5.0f});
-
-				object.assign<camera_component>();
-			}
-
 			if(gui::BeginMenu("Audio"))
 			{
 				if(gui::MenuItem("Source"))
@@ -265,6 +255,16 @@ static context_action check_context_menu(runtime::entity entity)
 					object.assign<audio_source_component>();
 				}
 				gui::EndMenu();
+			}
+
+			if(gui::MenuItem("Camera"))
+			{
+				auto object = ecs.create();
+				object.set_name("camera");
+				auto transf_comp = object.assign<transform_component>().lock();
+				transf_comp->set_local_position({0.0f, 2.0f, -5.0f});
+
+				object.assign<camera_component>();
 			}
 			gui::EndPopup();
 		}
@@ -300,7 +300,7 @@ static void process_drag_drop_target(runtime::entity entity)
 		}
 		{
 			auto payload = gui::AcceptDragDropPayload("entity");
-			if(payload)
+			if(payload != nullptr)
 			{
 				std::uint32_t entity_index = 0;
 				std::memcpy(&entity_index, payload->Data, std::size_t(payload->DataSize));
@@ -323,7 +323,7 @@ static void process_drag_drop_target(runtime::entity entity)
 		for(const auto& type : ex::get_suported_formats<prefab>())
 		{
 			auto payload = gui::AcceptDragDropPayload(type.c_str());
-			if(payload)
+			if(payload != nullptr)
 			{
 				std::string absolute_path(reinterpret_cast<const char*>(payload->Data),
 										  std::size_t(payload->DataSize));
@@ -352,7 +352,7 @@ static void process_drag_drop_target(runtime::entity entity)
 		for(const auto& type : ex::get_suported_formats<mesh>())
 		{
 			auto payload = gui::AcceptDragDropPayload(type.c_str());
-			if(payload)
+			if(payload != nullptr)
 			{
 				std::string absolute_path(reinterpret_cast<const char*>(payload->Data),
 										  std::size_t(payload->DataSize));
@@ -406,7 +406,9 @@ static void check_drag(runtime::entity entity)
 void hierarchy_dock::draw_entity(runtime::entity entity)
 {
 	if(!entity)
+	{
 		return;
+	}
 
 	gui::PushID(static_cast<int>(entity.id().index()));
 	gui::PushID(static_cast<int>(entity.id().version()));
@@ -425,7 +427,9 @@ void hierarchy_dock::draw_entity(runtime::entity entity)
 	ImGuiTreeNodeFlags flags = 0 | ImGuiTreeNodeFlags_AllowOverlapMode | ImGuiTreeNodeFlags_OpenOnArrow;
 
 	if(is_selected)
+	{
 		flags |= ImGuiTreeNodeFlags_Selected;
+	}
 
 	if(gui::IsWindowFocused())
 	{
@@ -438,13 +442,17 @@ void hierarchy_dock::draw_entity(runtime::entity entity)
 			}
 		}
 	}
-	auto transformComponent = entity.get_component<transform_component>().lock();
+	auto trans_comp = entity.get_component<transform_component>().lock();
 	bool no_children = true;
-	if(transformComponent)
-		no_children = transformComponent->get_children().empty();
+	if(trans_comp)
+	{
+		no_children = trans_comp->get_children().empty();
+	}
 
 	if(no_children)
+	{
 		flags |= ImGuiTreeNodeFlags_Leaf;
+	}
 
 	auto pos = gui::GetCursorScreenPos();
 	gui::AlignTextToFramePadding();
@@ -489,14 +497,15 @@ void hierarchy_dock::draw_entity(runtime::entity entity)
 	{
 		if(gui::IsMouseClicked(0))
 		{
-			id_ = window->GetID(transformComponent.get());
+			id_ = window->GetID(trans_comp.get());
 		}
 
-		if(gui::IsMouseReleased(0) && window->GetID(transformComponent.get()) == id_)
+		if(gui::IsMouseReleased(0) && window->GetID(trans_comp.get()) == id_)
 		{
 			if(!is_selected)
+			{
 				edit_label_ = false;
-
+			}
 			es.select(entity);
 		}
 
@@ -519,11 +528,13 @@ void hierarchy_dock::draw_entity(runtime::entity entity)
 	{
 		if(!no_children)
 		{
-			const auto& children = entity.get_component<transform_component>().lock()->get_children();
+			const auto& children = trans_comp->get_children();
 			for(auto& child : children)
 			{
 				if(child.valid())
+				{
 					draw_entity(child);
+				}
 			}
 		}
 
@@ -534,7 +545,7 @@ void hierarchy_dock::draw_entity(runtime::entity entity)
 	gui::PopID();
 }
 
-void hierarchy_dock::render(const ImVec2&)
+void hierarchy_dock::render(const ImVec2& /*unused*/)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
 	auto& sg = core::get_subsystem<runtime::scene_graph>();
@@ -567,44 +578,37 @@ void hierarchy_dock::render(const ImVec2&)
 				}
 			}
 
-			if(input.is_key_pressed(mml::keyboard::D))
+			if(input.is_key_pressed(mml::keyboard::D, mml::keyboard::LControl))
 			{
-				if(input.is_key_down(mml::keyboard::LControl))
+				if(selected && selected.is_type<runtime::entity>())
 				{
-					if(selected && selected.is_type<runtime::entity>())
+					auto sel = selected.get_value<runtime::entity>();
+					if(sel && sel != editor_camera)
 					{
-						auto sel = selected.get_value<runtime::entity>();
-						if(sel && sel != editor_camera)
+						auto clone = ecs::utils::clone_entity(sel);
+						auto clone_trans_comp = clone.get_component<transform_component>().lock();
+						auto sel_trans_comp = sel.get_component<transform_component>().lock();
+						if(clone_trans_comp && sel_trans_comp)
 						{
-							auto clone = ecs::utils::clone_entity(sel);
-							auto clone_trans_comp = clone.get_component<transform_component>().lock();
-							auto sel_trans_comp = sel.get_component<transform_component>().lock();
-							if(clone_trans_comp && sel_trans_comp)
-							{
-								clone_trans_comp->set_parent(sel_trans_comp->get_parent(), false, true);
-							}
-							es.select(clone);
+							clone_trans_comp->set_parent(sel_trans_comp->get_parent(), false, true);
 						}
+						es.select(clone);
 					}
 				}
 			}
-
-			if(input.is_key_pressed(mml::keyboard::F))
+		}
+		if(input.is_key_pressed(mml::keyboard::F, mml::keyboard::LShift))
+		{
+			if(selected && selected.is_type<runtime::entity>())
 			{
-				if(input.is_key_down(mml::keyboard::LShift))
+				auto sel = selected.get_value<runtime::entity>();
+				if(sel && sel != editor_camera)
 				{
-					if(selected && selected.is_type<runtime::entity>())
+					if(editor_camera.has_component<transform_component>() &&
+					   editor_camera.has_component<camera_component>())
 					{
-						auto sel = selected.get_value<runtime::entity>();
-						if(sel && sel != editor_camera)
-						{
-							if(editor_camera.has_component<transform_component>() &&
-							   editor_camera.has_component<camera_component>())
-							{
-								auto bounds = calc_bounds(sel);
-								focus_entity_on_bounds(editor_camera, bounds);
-							}
-						}
+						auto bounds = calc_bounds(sel);
+						focus_entity_on_bounds(editor_camera, bounds);
 					}
 				}
 			}
@@ -621,7 +625,9 @@ void hierarchy_dock::render(const ImVec2&)
 			if(root.valid())
 			{
 				if(root != editor_camera)
+				{
 					draw_entity(root);
+				}
 			}
 		}
 	}
