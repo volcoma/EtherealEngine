@@ -313,7 +313,7 @@ bool importer::load_mesh_data_from_file(const std::string& path, mesh::load_data
 				  aiProcess_SortByPType | aiProcess_FindDegenerates | aiProcess_FindInvalidData |
 				  aiProcess_FindInstances | aiProcess_ValidateDataStructure | aiProcess_OptimizeMeshes);
 
-	if(!scene)
+	if(scene == nullptr)
 	{
 		APPLOG_ERROR(importer.GetErrorString());
 		return false;
@@ -321,7 +321,10 @@ bool importer::load_mesh_data_from_file(const std::string& path, mesh::load_data
 	process_imported_scene(scene, load_data, animations);
 
 	double factor = 1.0;
-	scene->mMetaData->Get("UnitScaleFactor", factor);
+    if(scene->mMetaData)
+    {
+        scene->mMetaData->Get("UnitScaleFactor", factor);
+    }
 
 	return true;
 }

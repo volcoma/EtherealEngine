@@ -307,11 +307,9 @@ void project_manager::setup_meta_syncer(fs::syncer& syncer, const fs::path& data
 void project_manager::setup_cache_syncer(fs::syncer& syncer, const fs::path& meta_dir,
 										 const fs::path& cache_dir)
 {
-
 	setup_directory(syncer);
 
-	auto& ts = core::get_subsystem<core::task_system>();
-	auto on_removed = [&ts](const auto& /*ref_path*/, const auto& synced_paths) {
+	auto on_removed = [](const auto& /*ref_path*/, const auto& synced_paths) {
 
 		for(const auto& synced_path : synced_paths)
 		{
@@ -322,7 +320,7 @@ void project_manager::setup_cache_syncer(fs::syncer& syncer, const fs::path& met
 
 	};
 
-	auto on_renamed = [&ts](const auto& /*ref_path*/, const auto& synced_paths) {
+	auto on_renamed = [](const auto& /*ref_path*/, const auto& synced_paths) {
 
 		for(const auto& synced_path : synced_paths)
 		{
