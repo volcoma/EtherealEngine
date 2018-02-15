@@ -7,6 +7,7 @@
 #include "core/system/subsystem.h"
 #include "runtime/assets/asset_handle.h"
 #include "runtime/assets/asset_manager.h"
+#include "runtime/ecs/components/camera_component.h"
 #include "runtime/ecs/components/model_component.h"
 #include "runtime/ecs/components/transform_component.h"
 #include "runtime/ecs/constructs/prefab.h"
@@ -61,6 +62,65 @@ static context_action check_context_menu(runtime::entity entity)
 			if(gui::MenuItem("DELETE", "DEL"))
 			{
 				entity.destroy();
+			}
+
+			if(gui::MenuItem("FOCUS"))
+			{
+				const auto calc_bounds = [](runtime::entity entity) {
+                    const math::vec3 one = {1.0f, 1.0f, 1.0f};
+                    math::bbox bounds = math::bbox(-one, one);
+					auto ent_trans_comp = entity.get_component<transform_component>().lock();
+					if(ent_trans_comp)
+					{
+						auto target_pos = ent_trans_comp->get_position();
+						bounds = math::bbox(target_pos - one, target_pos + one);
+
+						auto ent_model_comp = entity.get_component<model_component>().lock();
+						if(ent_model_comp)
+						{
+							const auto& model = ent_model_comp->get_model();
+							if(model.is_valid())
+							{
+								const auto current_mesh = model.get_lod(0);
+								if(current_mesh)
+								{
+									bounds = current_mesh->get_bounds();
+								}
+							}
+						}
+						const auto& world = ent_trans_comp->get_transform();
+						bounds = math::bbox::mul(bounds, world);
+					}
+					return bounds;
+				};
+
+				if(editor_camera.has_component<transform_component>() &&
+				   editor_camera.has_component<camera_component>())
+				{
+					auto camera_trans_comp = editor_camera.get_component<transform_component>().lock();
+					auto camera_comp = editor_camera.get_component<camera_component>().lock();
+					const auto& cam = camera_comp->get_camera();
+					auto bounds = calc_bounds(entity);
+
+					math::vec3 cen = bounds.get_center();
+					math::vec3 size = bounds.get_dimensions();
+
+					float aspect = cam.get_aspect_ratio();
+					float fov = cam.get_fov();
+					// Get the radius of a sphere circumscribing the bounds
+					float radius = math::length(size) / 2.0f;
+					// Get the horizontal FOV, since it may be the limiting of the two FOVs to properly
+					// encapsulate the objects
+					float horizontalFOV =
+						math::degrees(2.0f * math::atan(math::tan(math::radians(fov) / 2.0f) * aspect));
+					// Use the smaller FOV as it limits what would get cut off by the frustum
+					float mfov = math::min(fov, horizontalFOV);
+					float dist = radius / (math::sin(math::radians(mfov) / 2.0f));
+
+					camera_comp->set_ortho_size(radius);
+					camera_trans_comp->set_position(cen - dist * camera_trans_comp->get_z_axis());
+					camera_trans_comp->look_at(cen);
+				}
 			}
 
 			gui::EndPopup();

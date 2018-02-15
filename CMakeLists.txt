@@ -15,6 +15,12 @@ include(modules/add_ide_support)
 
 set( BUILD_SHARED_LIBS OFF CACHE BOOL "Build package with shared libraries." FORCE)
 
+# define SFML_STATIC if the build type is not set to 'shared'
+if(NOT BUILD_SHARED_LIBS)
+    add_definitions(-DETH_STATIC)
+	add_definitions(-DETH_API_EXPORTS)
+endif()
+
 #enable_sanitizers("custom")
 
 detect_platform()

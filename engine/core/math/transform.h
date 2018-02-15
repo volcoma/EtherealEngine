@@ -55,37 +55,37 @@ public:
 	mat4& matrix();
 
 	// transformation Operations
-	transform& rotate_axis(float a, const vec3& v);
-	transform& rotate(float x, float y, float z);
-	transform& rotate(const vec3& v);
-	transform& rotate_local(float x, float y, float z);
-	transform& rotate_local(const vec3& v);
-	transform& scale(const vec3& v);
-	transform& scale(float x, float y, float z);
-	transform& translate(float x, float y, float z);
-	transform& translate(const vec3& v);
-	transform& translate_local(float x, float y, float z);
-	transform& translate_local(const vec3& v);
-	transform& set_position(float x, float y, float z);
-	transform& set_position(const vec3& v);
-	transform& set_scale(float x, float y, float z);
-	transform& set_scale(const vec3& v);
-	transform& set_shear(float xy, float xz, float yz);
-	transform& set_rotation(const vec3& x, const vec3& y, const vec3& z);
-	transform& set_rotation(const quat& q);
+	void rotate_axis(float a, const vec3& v);
+	void rotate(float x, float y, float z);
+	void rotate(const vec3& v);
+	void rotate_local(float x, float y, float z);
+	void rotate_local(const vec3& v);
+	void scale(const vec3& v);
+	void scale(float x, float y, float z);
+	void translate(float x, float y, float z);
+	void translate(const vec3& v);
+	void translate_local(float x, float y, float z);
+	void translate_local(const vec3& v);
+	void set_position(float x, float y, float z);
+	void set_position(const vec3& v);
+	void set_scale(float x, float y, float z);
+	void set_scale(const vec3& v);
+	void set_shear(float xy, float xz, float yz);
+	void set_rotation(const vec3& x, const vec3& y, const vec3& z);
+	void set_rotation(const quat& q);
 
 	// Full Re-Populate
-	transform& zero();
-	transform& compose(const vec3& scale, const vec3& shear, const quat& rotation, const vec3& translation);
-	transform& compose(const vec3& scale, const quat& rotation, const vec3& translation);
-	transform& compose(const quat& rotation, const vec3& translation);
-	transform& scaling(float x, float y, float z);
-	transform& rotation(float x, float y, float z);
-	transform& rotation_axis(float angle, const vec3& axis);
-	transform& translation(float x, float y, float z);
-	transform& translation(const vec3& v);
-	transform& look_at(const vec3& eye, const vec3& at);
-	transform& look_at(const vec3& eye, const vec3& at, const vec3& upAlign);
+	void zero();
+	void compose(const vec3& scale, const vec3& shear, const quat& rotation, const vec3& translation);
+	void compose(const vec3& scale, const quat& rotation, const vec3& translation);
+	void compose(const quat& rotation, const vec3& translation);
+	void scaling(float x, float y, float z);
+	void rotation(float x, float y, float z);
+	void rotation_axis(float angle, const vec3& axis);
+	void translation(float x, float y, float z);
+	void translation(const vec3& v);
+	void look_at(const vec3& eye, const vec3& at);
+	void look_at(const vec3& eye, const vec3& at, const vec3& upAlign);
 
 	// Comparisons
 	int compare(const transform& t) const;

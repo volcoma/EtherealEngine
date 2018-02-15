@@ -1,5 +1,5 @@
 #include "task_system.h"
-#include "../common/platform.h"
+#include "../common/platform/thread.hpp"
 #include <limits>
 
 namespace core

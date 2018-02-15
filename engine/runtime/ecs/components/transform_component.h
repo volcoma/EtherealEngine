@@ -422,26 +422,6 @@ public:
 	virtual transform_component& set_transform(const math::transform& trans);
 
 	//-----------------------------------------------------------------------------
-	//  Name : look_at (virtual )
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	virtual transform_component& look_at(const math::vec3& eye, const math::vec3& at);
-
-	//-----------------------------------------------------------------------------
-	//  Name : look_at (virtual )
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	virtual transform_component& look_at(const math::vec3& eye, const math::vec3& at, const math::vec3& up);
-
-	//-----------------------------------------------------------------------------
 	//  Name : can_adjust_pivot (virtual )
 	/// <summary>
 	///

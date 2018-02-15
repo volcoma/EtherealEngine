@@ -1,4 +1,5 @@
 #pragma once
+#include <limits>
 
 #if !defined(DEBUG) && !defined(_DEBUG)
 #ifndef NDEBUG
@@ -9,54 +10,52 @@
 #endif
 #endif
 
-#if(__cplusplus < 201103L && !defined(_MSC_VER)) || (defined(_MSC_VER) && (_MSC_VER < 1700)) ||              \
-	(defined(__GLIBCXX__) && __GLIBCXX__ < 20130322L)
-#define $cpp11 $no
-#define $cpp03 $yes
-#else
-#define $cpp11 $yes
-#define $cpp03 $no
-#endif
-
-// Thread Local Storage
-#if defined(__MINGW32__) || defined(__SUNPRO_C) || defined(__xlc__) || defined(__GNUC__) ||                  \
-	defined(__clang__) || defined(__GNUC__) // __INTEL_COMPILER on linux
-//   MingW, Solaris Studio C/C++, IBM XL C/C++,[3] GNU C,[4] Clang[5] and Intel
-//   C++ Compiler (Linux systems)
-#define $tls(x) __thread x
-#else
-//   Visual C++,[7] Intel C/C++ (Windows systems),[8] C++Builder, and Digital
-//   Mars C++
-#define $tls(x) __declspec(thread) x
-#endif
-
 // OS utils. Here is where the fun starts... good luck
-
 #define $quote(...) #__VA_ARGS__
 #define $comment(...) $no
 #define $uncomment(...) $yes
 
+#define ETH_QUOTE(...) #__VA_ARGS__
+#define ETH_COMMENT(...) ETH_NO
+#define ETH_UNCOMMENT(...) ETH_YES
+
 #define $yes(...) __VA_ARGS__
 #define $no(...)
+
+#define ETH_YES(...) __VA_ARGS__
+#define ETH_NO(...)
 
 #define $on(v) (0 v(+1))												 // usage: #if $on($msvc)
 #define $is $on															 // usage: #if $is($debug)
 #define $has(...) $clang(__has_feature(__VA_ARGS__)) $celse(__VA_ARGS__) // usage: #if $has(cxx_exceptions)
 
+#define ETH_ON(v) (0 v(+1))												 // usage: #if $on($msvc)
+#define ETH_IS ETH_ON															 // usage: #if $is($debug)
+#define ETH_HAS(...) ETH_COMPILER_CLANG(__has_feature(__VA_ARGS__)) ETH_COMPILER_CELSE(__VA_ARGS__) // usage: #if $has(cxx_exceptions)
+
+
 #if defined(_WIN32)
 #define $windows $yes
 #define $welse $no
+#define ETH_PLATFORM_WINDOWS ETH_YES
+#define ETH_PLATFOMR_WELSE ETH_NO
 #else
 #define $windows $no
 #define $welse $yes
+#define ETH_PLATFORM_WINDOWS ETH_NO
+#define ETH_PLATFOMR_WELSE ETH_YES
 #endif
 
 #ifdef __APPLE__
 #define $apple $yes
 #define $aelse $no
+#define ETH_APPLE ETH_YES
+#define ETH_AELSE ETH_NO
 #else
 #define $apple $no
 #define $aelse $yes
+#define ETH_PLATFORM_APPLE ETH_NO
+#define ETH_PLATFORM_AELSE ETH_YES
 #endif
 
 #ifdef __linux__

@@ -2,7 +2,7 @@
 
 #include "spdlog/spdlog.h"
 
-#include "../common/platform_config.h"
+#include "../common/platform/config.hpp"
 
 #if $on($windows)
 #if $on($msvc)

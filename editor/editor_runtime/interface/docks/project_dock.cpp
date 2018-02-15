@@ -63,7 +63,9 @@ static bool process_drag_drop_source(asset_handle<gfx::texture> preview, const f
 		ImVec2 item_size = {32, 32};
 		ImVec2 texture_size = item_size;
 		if(tex)
+		{
 			texture_size = {float(tex->info.width), float(tex->info.height)};
+		}
 		ImVec2 uv0 = {0.0f, 0.0f};
 		ImVec2 uv1 = {1.0f, 1.0f};
 		gui::BeginGroup();
@@ -99,7 +101,7 @@ static void process_drag_drop_target(const fs::path& absolute_path)
 
 			const auto process_drop = [&absolute_path](const std::string& type) {
 				auto payload = gui::AcceptDragDropPayload(type.c_str());
-				if(payload)
+				if(payload != nullptr)
 				{
 					std::string data(reinterpret_cast<const char*>(payload->Data),
 									 std::size_t(payload->DataSize));
@@ -121,7 +123,7 @@ static void process_drag_drop_target(const fs::path& absolute_path)
 			{
 				for(const auto& type : asset_set)
 				{
-					if(process_drop(type))
+					if(process_drop(type) != nullptr)
 					{
 						break;
 					}
@@ -132,7 +134,7 @@ static void process_drag_drop_target(const fs::path& absolute_path)
 			}
 			{
 				auto payload = gui::AcceptDragDropPayload("entity");
-				if(payload)
+				if(payload != nullptr)
 				{
 					std::uint32_t entity_index = 0;
 					std::memcpy(&entity_index, payload->Data, std::size_t(payload->DataSize));
@@ -157,8 +159,9 @@ static void process_drag_drop_target(const fs::path& absolute_path)
 
 static void draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const std::string& name,
 					   const fs::path& absolute_path, bool is_selected, const float size,
-					   std::function<void()> on_click, std::function<void()> on_double_click,
-					   std::function<void(const std::string&)> on_rename, std::function<void()> on_delete)
+					   const std::function<void()>& on_click, const std::function<void()>& on_double_click,
+					   const std::function<void(const std::string&)>& on_rename,
+					   const std::function<void()>& on_delete)
 {
 	bool edit_label = false;
 	if(is_selected && !gui::IsAnyItemActive())
@@ -172,15 +175,18 @@ static void draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const s
 		if(gui::IsKeyPressed(mml::keyboard::Delete))
 		{
 			if(on_delete)
+			{
 				on_delete();
+			}
 		}
 	}
 
 	gui::PushID(name.c_str());
 
 	if(gui::GetContentRegionAvailWidth() < size)
+	{
 		gui::NewLine();
-
+	}
 	std::array<char, 64> input_buff;
 	input_buff.fill(0);
 	std::memcpy(input_buff.data(), name.c_str(), std::min(name.size(), input_buff.size()));
@@ -188,7 +194,9 @@ static void draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const s
 	ImVec2 item_size = {size, size};
 	ImVec2 texture_size = item_size;
 	if(icon)
+	{
 		texture_size = {float(icon->info.width), float(icon->info.height)};
+	}
 	ImVec2 uv0 = {0.0f, 0.0f};
 	ImVec2 uv1 = {1.0f, 1.0f};
 
@@ -209,7 +217,9 @@ static void draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const s
 	if(action == 1)
 	{
 		if(on_click)
+		{
 			on_click();
+		}
 	}
 	else if(action == 2)
 	{
@@ -217,13 +227,17 @@ static void draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const s
 		if(new_name != name && new_name != "")
 		{
 			if(on_rename)
+			{
 				on_rename(new_name);
+			}
 		}
 	}
 	else if(action == 3)
 	{
 		if(on_double_click)
+		{
 			on_double_click();
+		}
 	}
 	if(gui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
 	{
@@ -381,7 +395,9 @@ void project_dock::render(const ImVec2&)
 				for(const auto& ext : ex::get_suported_formats<gfx::texture>())
 				{
 					if(processed)
+					{
 						break;
+					}
 
 					if(file_ext == ext)
 					{
@@ -410,7 +426,9 @@ void project_dock::render(const ImVec2&)
 				for(const auto& ext : ex::get_suported_formats<mesh>())
 				{
 					if(processed)
+					{
 						break;
+					}
 
 					if(file_ext == ext)
 					{
@@ -439,7 +457,9 @@ void project_dock::render(const ImVec2&)
 				for(const auto& ext : ex::get_suported_formats<audio::sound>())
 				{
 					if(processed)
+					{
 						break;
+					}
 
 					if(file_ext == ext)
 					{
@@ -467,7 +487,9 @@ void project_dock::render(const ImVec2&)
 				for(const auto& ext : ex::get_suported_formats<gfx::shader>())
 				{
 					if(processed)
+					{
 						break;
+					}
 
 					if(file_ext == ext)
 					{
@@ -495,7 +517,9 @@ void project_dock::render(const ImVec2&)
 				for(const auto& ext : ex::get_suported_formats<material>())
 				{
 					if(processed)
+					{
 						break;
+					}
 
 					if(file_ext == ext)
 					{
@@ -524,7 +548,9 @@ void project_dock::render(const ImVec2&)
 				for(const auto& ext : ex::get_suported_formats<runtime::animation>())
 				{
 					if(processed)
+					{
 						break;
+					}
 
 					if(file_ext == ext)
 					{
@@ -553,7 +579,9 @@ void project_dock::render(const ImVec2&)
 				for(const auto& ext : ex::get_suported_formats<prefab>())
 				{
 					if(processed)
+					{
 						break;
+					}
 
 					if(file_ext == ext)
 					{
@@ -581,7 +609,9 @@ void project_dock::render(const ImVec2&)
 				for(const auto& ext : ex::get_suported_formats<scene>())
 				{
 					if(processed)
+					{
 						break;
+					}
 
 					if(file_ext == ext)
 					{
@@ -605,7 +635,9 @@ void project_dock::render(const ImVec2&)
 								   [&]() // on_double_click
 								   {
 									   if(!entry)
+									   {
 										   return;
+									   }
 
 									   entry->instantiate(scene::mode::standard);
 									   es.scene = fs::resolve_protocol(entry.id()).string();

@@ -426,10 +426,9 @@ quat transform::get_rotation() const
 /// Reset the transform back to a completely empty state.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::zero()
+void transform::zero()
 {
 	memset(&matrix_, 0, sizeof(mat4));
-	return *this;
 }
 
 //-----------------------------------------------------------------------------
@@ -517,7 +516,7 @@ bool transform::decompose(vec3& scale, vec3& shear, quat& rotation, vec3& transl
 /// rotation and translation.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::compose(const vec3& scale, const vec3& shear, const quat& rotation,
+void transform::compose(const vec3& scale, const vec3& shear, const quat& rotation,
 							  const vec3& translation)
 {
 	// Convert rotation quat to matrix form.
@@ -552,15 +551,11 @@ transform& transform::compose(const vec3& scale, const vec3& shear, const quat& 
 	matrix_[1][3] = 0.0f;
 	matrix_[2][3] = 0.0f;
 	matrix_[3][3] = 1.0f;
-
-	// Return reference to self in order to allow consecutive operations (i.e.
-	// a.rotate(...).scale(...))
-	return *this;
 }
 
-transform& transform::compose(const vec3& scale, const quat& rotation, const vec3& translation)
+void transform::compose(const vec3& scale, const quat& rotation, const vec3& translation)
 {
-	return compose(scale, vec3{0.0f, 0.0f, 0.0f}, rotation, translation);
+	compose(scale, vec3{0.0f, 0.0f, 0.0f}, rotation, translation);
 }
 
 //-----------------------------------------------------------------------------
@@ -569,7 +564,7 @@ transform& transform::compose(const vec3& scale, const quat& rotation, const vec
 /// Compose a new transform from its component parts: rotation and translation.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::compose(const quat& rotation, const vec3& translation)
+void transform::compose(const quat& rotation, const vec3& translation)
 {
 	// Convert rotation quat to matrix form.
 	matrix_ = glm::mat4_cast(rotation);
@@ -579,9 +574,6 @@ transform& transform::compose(const quat& rotation, const vec3& translation)
 	matrix_[3][1] = translation.y;
 	matrix_[3][2] = translation.z;
 
-	// Return reference to self in order to allow consecutive operations (i.e.
-	// a.rotate(...).scale(...))
-	return *this;
 }
 
 //-----------------------------------------------------------------------------
@@ -692,39 +684,31 @@ vec3 transform::inverse_transform_normal(const vec3& v, const transform& t)
 /// rotate the transform around its own local axes.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::rotate(float x, float y, float z)
+void transform::rotate(float x, float y, float z)
 {
 	quat qx = glm::angleAxis(x, vec3{1.0f, 0.0f, 0.0f});
 	quat qy = glm::angleAxis(y, vec3{0.0f, 1.0f, 0.0f});
 	quat qz = glm::angleAxis(z, vec3{0.0f, 0.0f, 1.0f});
 	quat q = qz * qy * qx * get_rotation();
 	set_rotation(q);
-
-	// Return reference to self in order to allow consecutive operations (i.e.
-	// a.rotate(...).scale(...))
-	return *this;
 }
-transform& transform::rotate(const vec3& v)
+void transform::rotate(const vec3& v)
 {
-	return rotate(v.x, v.y, v.z);
+	rotate(v.x, v.y, v.z);
 }
 
-transform& transform::rotate_local(float x, float y, float z)
+void transform::rotate_local(float x, float y, float z)
 {
 	quat qx = glm::angleAxis(x, x_unit_axis());
 	quat qy = glm::angleAxis(y, y_unit_axis());
 	quat qz = glm::angleAxis(z, z_unit_axis());
 	quat q = qz * qy * qx * get_rotation();
 	set_rotation(q);
-
-	// Return reference to self in order to allow consecutive operations (i.e.
-	// a.rotate(...).scale(...))
-	return *this;
 }
 
-transform& transform::rotate_local(const vec3& v)
+void transform::rotate_local(const vec3& v)
 {
-	return rotate_local(v.x, v.y, v.z);
+	rotate_local(v.x, v.y, v.z);
 }
 //-----------------------------------------------------------------------------
 //  Name : rotateAxis ()
@@ -733,18 +717,22 @@ transform& transform::rotate_local(const vec3& v)
 /// relative axis.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::rotate_axis(float a, const vec3& v)
+void transform::rotate_axis(float a, const vec3& v)
 {
 	quat q = glm::angleAxis(a, v) * get_rotation();
 	set_rotation(q);
-
-	// Return reference to self in order to allow multiple operations (i.e.
-	// a.rotate(...).scale(...))
-	return *this;
 }
-transform& transform::scale(const vec3& v)
+void transform::scale(const vec3& v)
 {
-	return scale(v.x, v.y, v.z);
+    // No - op?
+	if(v.x == 1.0f && v.y == 1.0f && v.z == 1.0f)
+	{
+		return;
+	}
+
+	// Apply scale
+	matrix_ = glm::scale(matrix_, v);
+	
 }
 //-----------------------------------------------------------------------------
 //  Name : scale ()
@@ -752,20 +740,9 @@ transform& transform::scale(const vec3& v)
 /// Scale the transform along its own local axes.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::scale(float x, float y, float z)
+void transform::scale(float x, float y, float z)
 {
-	// No - op?
-	if(x == 1.0f && y == 1.0f && z == 1.0f)
-	{
-		return *this;
-	}
-
-	// Apply scale
-	matrix_ = glm::scale(matrix_, vec3{x, y, z});
-
-	// Return reference to self in order to allow multiple operations (i.e.
-	// a.rotate(...).scale(...))
-	return *this;
+    scale(vec3(x, y, z));
 }
 
 //-----------------------------------------------------------------------------
@@ -774,11 +751,11 @@ transform& transform::scale(float x, float y, float z)
 /// Apply a translation to this transform in its parent space.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::translate(float x, float y, float z)
+void transform::translate(float x, float y, float z)
 {
 	// Return reference to self in order to allow multiple operations (i.e.
 	// a.rotate(...).scale(...))
-	return translate(vec3{x, y, z});
+	translate(vec3{x, y, z});
 }
 
 //-----------------------------------------------------------------------------
@@ -787,13 +764,9 @@ transform& transform::translate(float x, float y, float z)
 /// Apply a translation to this transform in its parent space.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::translate(const vec3& v)
+void transform::translate(const vec3& v)
 {
 	position() += v;
-
-	// Return reference to self in order to allow multiple operations (i.e.
-	// a.rotate(...).scale(...))
-	return *this;
 }
 
 //-----------------------------------------------------------------------------
@@ -802,15 +775,11 @@ transform& transform::translate(const vec3& v)
 /// Apply a translation to this transform along its own local axes.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::translate_local(float x, float y, float z)
+void transform::translate_local(float x, float y, float z)
 {
 	position() += x_unit_axis() * x;
 	position() += y_unit_axis() * y;
 	position() += z_unit_axis() * z;
-
-	// Return reference to self in order to allow multiple operations (i.e.
-	// a.rotate(...).scale(...))
-	return *this;
 }
 
 //-----------------------------------------------------------------------------
@@ -819,15 +788,11 @@ transform& transform::translate_local(float x, float y, float z)
 /// Apply a translation to this transform along its own local axes.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::translate_local(const vec3& v)
+void transform::translate_local(const vec3& v)
 {
 	position() += x_unit_axis() * v.x;
 	position() += y_unit_axis() * v.y;
 	position() += z_unit_axis() * v.z;
-
-	// Return reference to self in order to allow multiple operations (i.e.
-	// a.rotate(...).scale(...))
-	return *this;
 }
 
 //-----------------------------------------------------------------------------
@@ -836,12 +801,11 @@ transform& transform::translate_local(const vec3& v)
 /// Set the position of the origin of this transform with respect its parent.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::set_position(float x, float y, float z)
+void transform::set_position(float x, float y, float z)
 {
 	// Return reference to self in order to allow multiple operations (i.e.
 	// a.rotate(...).scale(...))
-	return set_position(vec3{x, y, z});
-	;
+	set_position(vec3{x, y, z});
 }
 
 //-----------------------------------------------------------------------------
@@ -850,13 +814,9 @@ transform& transform::set_position(float x, float y, float z)
 /// Set the position of the origin of this transform with respect its parent.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::set_position(const vec3& v)
+void transform::set_position(const vec3& v)
 {
 	position() = v;
-
-	// Return reference to self in order to allow multiple operations (i.e.
-	// a.rotate(...).scale(...))
-	return *this;
 }
 
 //-----------------------------------------------------------------------------
@@ -865,7 +825,7 @@ transform& transform::set_position(const vec3& v)
 /// Set the scale of the local axes defined by this transform.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::set_scale(float x, float y, float z)
+void transform::set_scale(float x, float y, float z)
 {
 	const float min_axis_length = glm::epsilon<float>();
 	// Clamp the various scales to the minimum length.
@@ -877,10 +837,6 @@ transform& transform::set_scale(float x, float y, float z)
 	reinterpret_cast<vec3&>(matrix_[0]) = x_unit_axis() * x;
 	reinterpret_cast<vec3&>(matrix_[1]) = y_unit_axis() * y;
 	reinterpret_cast<vec3&>(matrix_[2]) = z_unit_axis() * z;
-
-	// Return reference to self in order to allow multiple operations (i.e.
-	// a.rotate(...).scale(...))
-	return *this;
 }
 
 //-----------------------------------------------------------------------------
@@ -889,9 +845,9 @@ transform& transform::set_scale(float x, float y, float z)
 /// Set the scale of the local axes defined by this transform.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::set_scale(const vec3& v)
+void transform::set_scale(const vec3& v)
 {
-	return set_scale(v.x, v.y, v.z);
+	set_scale(v.x, v.y, v.z);
 }
 
 //-----------------------------------------------------------------------------
@@ -900,7 +856,7 @@ transform& transform::set_scale(const vec3& v)
 /// Set the shear of the local axes defined by this transform.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::set_shear(float xy, float xz, float yz)
+void transform::set_shear(float xy, float xz, float yz)
 {
 	vec3 scale, shear, translation;
 	quat rotation;
@@ -915,10 +871,6 @@ transform& transform::set_shear(float xy, float xz, float yz)
 
 	// Recompose a new matrix
 	compose(scale, shear, rotation, translation);
-
-	// Return reference to self in order to allow multiple operations (i.e.
-	// a.rotate(...).scale(...))
-	return *this;
 }
 
 //-----------------------------------------------------------------------------
@@ -929,7 +881,7 @@ transform& transform::set_shear(float xy, float xz, float yz)
 /// local axis scales will be maintained.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::set_rotation(const quat& q)
+void transform::set_rotation(const quat& q)
 {
 	mat4 m = glm::mat4_cast(glm::normalize(q));
 
@@ -945,9 +897,6 @@ transform& transform::set_rotation(const quat& q)
 	reinterpret_cast<vec3&>(m[3]) = get_position();
 
 	matrix_ = m;
-	// Return reference to self in order to allow multiple operations (i.e.
-	// a.rotate(...).scale(...))
-	return *this;
 }
 
 //-----------------------------------------------------------------------------
@@ -958,7 +907,7 @@ transform& transform::set_rotation(const quat& q)
 /// with that of the axes supplied, but local axis scales will be maintained.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::set_rotation(const vec3& vX, const vec3& vY, const vec3& vZ)
+void transform::set_rotation(const vec3& vX, const vec3& vY, const vec3& vZ)
 {
 	// Get current scale so that it can be preserved.
 	vec3 scale = get_scale();
@@ -973,37 +922,28 @@ transform& transform::set_rotation(const vec3& vX, const vec3& vY, const vec3& v
 	reinterpret_cast<vec3&>(matrix_[1]) *= scale.y;
 	reinterpret_cast<vec3&>(matrix_[2]) *= scale.z;
 
-	// Return reference to self in order to allow multiple operations (i.e.
-	// a.rotate(...).scale(...))
-	return *this;
 }
 
 //-----------------------------------------------------------------------------
-//  Name : lookAt()
+//  Name : look_at()
 /// <summary>
 /// Generate a transform oriented toward the specified point.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::look_at(const vec3& vEye, const vec3& vAt)
+void transform::look_at(const vec3& vEye, const vec3& vAt)
 {
-	// Return reference to self in order to allow multiple operations (i.e.
-	// a.rotate(...).scale(...))
-	return look_at(vEye, vAt, vec3{0.0f, 1.0f, 0.0f});
+	look_at(vEye, vAt, vec3{0.0f, 1.0f, 0.0f});
 }
 
 //-----------------------------------------------------------------------------
-//  Name : lookAt()
+//  Name : look_at()
 /// <summary>
 /// Generate a transform oriented toward the specified point.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::look_at(const vec3& vEye, const vec3& vAt, const vec3& vUpAlign)
+void transform::look_at(const vec3& vEye, const vec3& vAt, const vec3& vUpAlign)
 {
 	matrix_ = glm::lookAt(vEye, vAt, vUpAlign);
-
-	// Return reference to self in order to allow multiple operations (i.e.
-	// a.rotate(...).scale(...))
-	return *this;
 }
 
 //-----------------------------------------------------------------------------
@@ -1012,10 +952,9 @@ transform& transform::look_at(const vec3& vEye, const vec3& vAt, const vec3& vUp
 /// Generate a new scaling transform, replacing the existing transformation.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::scaling(float x, float y, float z)
+void transform::scaling(float x, float y, float z)
 {
 	matrix_ = glm::scale(vec3{x, y, z});
-	return *this;
 }
 
 //-----------------------------------------------------------------------------
@@ -1024,7 +963,7 @@ transform& transform::scaling(float x, float y, float z)
 /// Generate a new rotation transform, replacing the existing transformation.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::rotation(float x, float y, float z)
+void transform::rotation(float x, float y, float z)
 {
 	quat qx, qy, qz;
 	qx = glm::angleAxis(x, vec3{1.0f, 0.0f, 0.0f});
@@ -1032,7 +971,6 @@ transform& transform::rotation(float x, float y, float z)
 	qz = glm::angleAxis(z, vec3{0.0f, 0.0f, 1.0f});
 	quat q = qx * qy * qz;
 	matrix_ = glm::mat4_cast(q);
-	return *this;
 }
 
 //-----------------------------------------------------------------------------
@@ -1042,11 +980,10 @@ transform& transform::rotation(float x, float y, float z)
 /// transformation.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::rotation_axis(float a, const vec3& v)
+void transform::rotation_axis(float a, const vec3& v)
 {
 	quat q = glm::angleAxis(a, v);
 	matrix_ = glm::mat4_cast(q);
-	return *this;
 }
 
 //-----------------------------------------------------------------------------
@@ -1055,10 +992,9 @@ transform& transform::rotation_axis(float a, const vec3& v)
 /// Generate a new translation transform, replacing the existing transformation.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::translation(float x, float y, float z)
+void transform::translation(float x, float y, float z)
 {
 	matrix_ = glm::translate(vec3{x, y, z});
-	return *this;
 }
 
 //-----------------------------------------------------------------------------
@@ -1067,10 +1003,9 @@ transform& transform::translation(float x, float y, float z)
 /// Generate a new translation transform, replacing the existing transformation.
 /// </summary>
 //-----------------------------------------------------------------------------
-transform& transform::translation(const vec3& v)
+void transform::translation(const vec3& v)
 {
 	matrix_ = glm::translate(v);
-	return *this;
 }
 
 transform transform::lerp(transform& t1, transform& t2, float dt)

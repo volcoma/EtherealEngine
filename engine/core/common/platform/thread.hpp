@@ -1,6 +1,6 @@
 #pragma once
 
-#include "platform_config.h"
+#include "config.hpp"
 
 #include <thread>
 

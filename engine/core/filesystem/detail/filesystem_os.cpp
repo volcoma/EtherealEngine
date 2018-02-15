@@ -1,5 +1,5 @@
 #include "filesystem_os.h"
-#include "../../common/platform_config.h"
+#include "../../common/platform/config.hpp"
 #include <array>
 #include <cstdlib>
 

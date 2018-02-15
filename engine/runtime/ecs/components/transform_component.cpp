@@ -165,49 +165,18 @@ const math::transform& transform_component::get_local_transform() const
 
 transform_component& transform_component::look_at(float x, float y, float z)
 {
-	look_at(get_position(), math::vec3(x, y, z));
+	look_at(math::vec3(x, y, z));
 	return *this;
 }
 
 transform_component& transform_component::look_at(const math::vec3& point)
 {
-	look_at(get_position(), point);
-	return *this;
-}
-
-transform_component& transform_component::look_at(const math::vec3& eye, const math::vec3& at)
-{
-	math::transform m;
-	m.look_at(eye, at);
-
-	// Update the component position / orientation through the common base method.
-	math::vec3 translation;
-	math::quat orientation;
-
-	if(m.decompose(orientation, translation))
-	{
-		set_rotation(orientation);
-		set_position(translation);
-	}
-	return *this;
-}
-
-transform_component& transform_component::look_at(const math::vec3& eye, const math::vec3& at,
-												  const math::vec3& up)
-{
-	math::transform m;
-	m.look_at(eye, at, up);
-
-	// Update the component position / orientation through the common base method.
-	math::vec3 translation;
-	math::quat orientation;
-
-	if(m.decompose(orientation, translation))
-	{
-		set_rotation(orientation);
-		set_position(translation);
-	}
-	return *this;
+    math::vec3 eye = get_position();
+    math::transform m;
+	m.look_at(eye, point);
+    m = math::inverse(m);
+    set_rotation(m.get_rotation());    
+    return *this;
 }
 
 transform_component& transform_component::rotate_local(float x, float y, float z)
