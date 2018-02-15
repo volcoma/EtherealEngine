@@ -74,41 +74,46 @@ void default_scene()
 	{
 		auto object = ecs.create();
 		object.set_name("main camera");
-		object.assign<transform_component>().lock()->set_local_position({0.0f, 2.0f, -5.0f});
+        auto transf_comp = object.assign<transform_component>().lock();
+        transf_comp->set_local_position({0.0f, 2.0f, -5.0f});
 		object.assign<camera_component>();
 	}
 	{
 		auto object = ecs.create();
 		object.set_name("light");
-		object.assign<transform_component>()
-			.lock()
-			->set_local_position({1.0f, 6.0f, -3.0f})
-			.rotate_local(50.0f, -30.0f, 0.0f);
+        auto transf_comp = object.assign<transform_component>().lock();
+        transf_comp->set_local_position({1.0f, 6.0f, -3.0f});
+        transf_comp->rotate_local(50.0f, -30.0f, 0.0f);
 
 		light light_data;
 		light_data.color = math::color(255, 244, 214, 255);
-		object.assign<light_component>().lock()->set_light(light_data);
+        auto light_comp = object.assign<light_component>().lock();
+        light_comp->set_light(light_data);
 	}
 	{
 		auto object = ecs.create();
-		object.set_name("global probe");
-		object.assign<transform_component>().lock()->set_local_position({0.0f, 0.1f, 0.0f});
+        object.set_name("global probe");
+        auto transf_comp = object.assign<transform_component>().lock();
+        transf_comp->set_local_position({0.0f, 0.1f, 0.0f});
 
 		reflection_probe probe;
 		probe.method = reflect_method::environment;
 		probe.type = probe_type::sphere;
 		probe.sphere_data.range = 1000.0f;
-		object.assign<reflection_probe_component>().lock()->set_probe(probe);
+        auto reflect_comp = object.assign<reflection_probe_component>().lock();
+        reflect_comp->set_probe(probe);
 	}
 	{
 		auto object = ecs.create();
 		object.set_name("local probe");
-		object.assign<transform_component>().lock()->set_local_position({0.0f, 0.1f, 0.0f});
+        auto transf_comp = object.assign<transform_component>().lock();
+        transf_comp->set_local_position({0.0f, 0.1f, 0.0f});
 
 		reflection_probe probe;
 		probe.method = reflect_method::static_only;
 		probe.type = probe_type::box;
-		object.assign<reflection_probe_component>().lock()->set_probe(probe);
+        auto reflect_comp = object.assign<reflection_probe_component>().lock();
+        reflect_comp->set_probe(probe);
 	}
 	{
 		auto object = ecs.create();
@@ -120,27 +125,33 @@ void default_scene()
 		model.set_lod(asset_future.get(), 0);
 
 		// Add component and configure it.
-		object.assign<model_component>().lock()->set_casts_shadow(true).set_casts_reflection(true).set_model(
-			model);
+        auto model_comp = object.assign<model_component>().lock();
+        model_comp->set_casts_shadow(true);
+        model_comp->set_casts_reflection(true);
+        model_comp->set_model(model);
 	}
 	{
 		auto object = ecs.create();
 		object.set_name("object");
-		object.assign<transform_component>().lock()->set_local_position({-2.0f, 0.5f, 0.0f});
+        auto transf_comp = object.assign<transform_component>().lock();
+        transf_comp->set_local_position({-2.0f, 0.5f, 0.0f});
 
 		auto asset_future = am.load<mesh>("embedded:/sphere");
 		model model;
 		model.set_lod(asset_future.get(), 0);
 
 		// Add component and configure it.
-		object.assign<model_component>().lock()->set_casts_shadow(true).set_casts_reflection(false).set_model(
-			model);
+        auto model_comp = object.assign<model_component>().lock();
+        model_comp->set_casts_shadow(true);
+        model_comp->set_casts_reflection(false);
+        model_comp->set_model(model);
 	}
 
 	{
 		auto object = ecs.create();
 		object.set_name("object_with_lods");
-		object.assign<transform_component>().lock()->set_local_position({2.0f, 1.0f, 0.0f});
+        auto transf_comp = object.assign<transform_component>().lock();
+        transf_comp->set_local_position({2.0f, 1.0f, 0.0f});
 
 		model model;
 		{
@@ -156,8 +167,10 @@ void default_scene()
 			model.set_lod(asset_future.get(), 2);
 		}
 		// Add component and configure it.
-		object.assign<model_component>().lock()->set_casts_shadow(true).set_casts_reflection(false).set_model(
-			model);
+        auto model_comp = object.assign<model_component>().lock();
+        model_comp->set_casts_shadow(true);
+        model_comp->set_casts_reflection(false);
+        model_comp->set_model(model);
 	}
 }
 

@@ -33,7 +33,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	model_component& set_casts_shadow(bool cast_shadow);
+    void set_casts_shadow(bool cast_shadow);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_casts_reflection ()
@@ -43,7 +43,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	model_component& set_casts_reflection(bool casts_reflection);
+    void set_casts_reflection(bool casts_reflection);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_static ()
@@ -53,7 +53,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	model_component& set_static(bool is_static);
+    void set_static(bool is_static);
 
 	//-----------------------------------------------------------------------------
 	//  Name : casts_shadow ()
@@ -103,11 +103,11 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	model_component& set_model(const model& model);
+    void set_model(const model& model);
 
-	model_component& set_bone_entities(const std::vector<runtime::entity>& bone_entities);
+    void set_bone_entities(const std::vector<runtime::entity>& bone_entities);
 	const std::vector<runtime::entity>& get_bone_entities() const;
-	model_component& set_bone_transforms(const std::vector<math::transform>& bone_transforms);
+    void set_bone_transforms(const std::vector<math::transform>& bone_transforms);
 	const std::vector<math::transform>& get_bone_transforms() const;
 
 private:

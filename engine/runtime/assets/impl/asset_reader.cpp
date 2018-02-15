@@ -5,6 +5,7 @@
 #include "../../meta/audio/sound.hpp"
 #include "../../meta/rendering/material.hpp"
 #include "../../meta/rendering/mesh.hpp"
+#include "../asset_manager.h"
 #include "core/audio/sound.h"
 #include "core/filesystem/filesystem.h"
 #include "core/graphics/index_buffer.h"
@@ -462,6 +463,7 @@ bool load_from_file<material>(core::task_future<asset_handle<material>>& output,
 	}
 
 	auto& ts = core::get_subsystem<core::task_system>();
+    auto& am = core::get_subsystem<asset_manager>();
 
 	auto create_resource_func_fallback = [ result = original, key ]() mutable
 	{
@@ -472,7 +474,8 @@ bool load_from_file<material>(core::task_future<asset_handle<material>>& output,
 	if(!fs::has_known_protocol(key))
 	{
 		APPLOG_ERROR("Asset {0} has uknown protocol!", key);
-		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
+        output = am.load<material>("embedded:/fallback");
+
 		return true;
 	}
 
@@ -485,7 +488,7 @@ bool load_from_file<material>(core::task_future<asset_handle<material>>& output,
 	if(!fs::exists(compiled_absolute_key, err))
 	{
 		APPLOG_ERROR("Asset with key {0} and absolute_path {1} does not exist!", key, compiled_absolute_key);
-		output = ts.push_or_execute_on_worker_thread(create_resource_func_fallback);
+        output = am.load<material>("embedded:/fallback");
 		return true;
 	}
 

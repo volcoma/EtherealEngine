@@ -222,7 +222,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	transform_component& look_at(float x, float y, float z);
+    void look_at(float x, float y, float z);
 
 	//-----------------------------------------------------------------------------
 	//  Name : look_at (virtual )
@@ -232,7 +232,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	transform_component& look_at(const math::vec3& point);
+    void look_at(const math::vec3& point);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_position()
@@ -242,7 +242,7 @@ public:
 	/// for initialization purposes.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& set_position(const math::vec3& position);
+    void set_position(const math::vec3& position);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_local_position()
@@ -252,7 +252,7 @@ public:
 	/// for initialization purposes.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& set_local_position(const math::vec3& position);
+    void set_local_position(const math::vec3& position);
 
 	//-----------------------------------------------------------------------------
 	//  Name : move()
@@ -260,7 +260,7 @@ public:
 	/// Move the current position of the node by the specified amount.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& move(const math::vec3& amount);
+    void move(const math::vec3& amount);
 
 	//-----------------------------------------------------------------------------
 	//  Name : move_local()
@@ -269,208 +269,228 @@ public:
 	/// its own local axes.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& move_local(const math::vec3& amount);
+    void move_local(const math::vec3& amount);
 
 	//-----------------------------------------------------------------------------
-	//  Name : rotate (virtual )
+    //  Name : rotate ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& rotate(float x, float y, float z);
+    void rotate(float x, float y, float z);
 
 	//-----------------------------------------------------------------------------
-	//  Name : rotate (virtual )
+    //  Name : rotate ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& rotate(float x, float y, float z, const math::vec3& center);
+    void rotate(float x, float y, float z, const math::vec3& center);
 
 	//-----------------------------------------------------------------------------
-	//  Name : rotate_local (virtual )
+    //  Name : rotate_local ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& rotate_local(float x, float y, float z);
+    void rotate_local(float x, float y, float z);
 
 	//-----------------------------------------------------------------------------
-	//  Name : rotate_axis (virtual )
+    //  Name : rotate_axis ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& rotate_axis(float degrees, const math::vec3& axis);
+    void rotate_axis(float degrees, const math::vec3& axis);
 
 	//-----------------------------------------------------------------------------
-	//  Name : set_scale (virtual )
+    //  Name : set_scale ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& set_scale(const math::vec3& s);
+    void set_scale(const math::vec3& s);
 
 	//-----------------------------------------------------------------------------
-	//  Name : set_local_scale (virtual )
+    //  Name : set_local_scale ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& set_local_scale(const math::vec3& scale);
+    void set_local_scale(const math::vec3& scale);
 
 	//-----------------------------------------------------------------------------
-	//  Name : set_rotation (virtual )
+    //  Name : set_rotation ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& set_rotation(const math::quat& rotation);
+    void set_rotation(const math::quat& rotation);
 
 	//-----------------------------------------------------------------------------
-	//  Name : set_local_rotation (virtual )
+    //  Name : set_local_rotation ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& set_local_rotation(const math::quat& rotation);
+    void set_local_rotation(const math::quat& rotation);
 
 	//-----------------------------------------------------------------------------
-	//  Name : reset_rotation (virtual )
+    //  Name : reset_rotation ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& reset_rotation();
+    void reset_rotation();
 
 	//-----------------------------------------------------------------------------
-	//  Name : reset_scale (virtual )
+    //  Name : reset_scale ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& reset_scale();
+    void reset_scale();
 
 	//-----------------------------------------------------------------------------
-	//  Name : reset_local_rotation (virtual )
+    //  Name : reset_local_rotation ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& reset_local_rotation();
+    void reset_local_rotation();
 
 	//-----------------------------------------------------------------------------
-	//  Name : reset_local_scale (virtual )
+    //  Name : reset_local_scale ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& reset_local_scale();
+    void reset_local_scale();
 
 	//-----------------------------------------------------------------------------
-	//  Name : reset_pivot (virtual )
+    //  Name : reset_pivot ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& reset_pivot();
+    void reset_pivot();
 
 	//-----------------------------------------------------------------------------
-	//  Name : set_local_transform (virtual )
+    //  Name : set_local_transform ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& set_local_transform(const math::transform& trans);
+    void set_local_transform(const math::transform& trans);
 
 	//-----------------------------------------------------------------------------
-	//  Name : set_transform (virtual )
+    //  Name : set_transform ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& set_transform(const math::transform& trans);
+    void set_transform(const math::transform& trans);
 
 	//-----------------------------------------------------------------------------
-	//  Name : can_adjust_pivot (virtual )
+    //  Name : look_at ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual bool can_adjust_pivot() const;
+    void look_at(const math::vec3& eye, const math::vec3& at);
 
 	//-----------------------------------------------------------------------------
-	//  Name : can_scale (virtual )
+    //  Name : look_at ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual bool can_scale() const;
+    void look_at(const math::vec3& eye, const math::vec3& at, const math::vec3& up);
 
 	//-----------------------------------------------------------------------------
-	//  Name : can_rotate (virtual )
+    //  Name : can_adjust_pivot ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual bool can_rotate() const;
+    bool can_adjust_pivot() const;
 
 	//-----------------------------------------------------------------------------
-	//  Name : set_parent (virtual )
+    //  Name : can_scale ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& set_parent(runtime::entity parent, bool world_position_stays,
+    bool can_scale() const;
+
+	//-----------------------------------------------------------------------------
+    //  Name : can_rotate ( )
+	/// <summary>
+	///
+	///
+	///
+	/// </summary>
+	//-----------------------------------------------------------------------------
+    bool can_rotate() const;
+
+	//-----------------------------------------------------------------------------
+    //  Name : set_parent ( )
+	/// <summary>
+	///
+	///
+	///
+	/// </summary>
+	//-----------------------------------------------------------------------------
+    void set_parent(runtime::entity parent, bool world_position_stays,
 											bool local_position_stays);
 
 	//-----------------------------------------------------------------------------
-	//  Name : set_parent (virtual )
+    //  Name : set_parent ( )
 	/// <summary>
 	///
 	///
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual transform_component& set_parent(runtime::entity parent);
+    void set_parent(runtime::entity parent);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_parent ()

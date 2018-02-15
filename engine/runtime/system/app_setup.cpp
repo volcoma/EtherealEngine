@@ -149,8 +149,16 @@ void setup_asset_manager()
 
 	{
 		const auto id = "embedded:/standard";
-		std::shared_ptr<material> instance = std::make_shared<standard_material>();
-		manager.load_asset_from_instance(id, instance);
+        auto instance = std::make_shared<standard_material>();
+        manager.load_asset_from_instance<material>(id, instance);
 	}
+
+    {
+        const auto id = "embedded:/fallback";
+        auto instance = std::make_shared<standard_material>();
+        instance->set_emissive_color(math::color::purple());
+        instance->set_roughness(1.0f);
+        manager.load_asset_from_instance<material>(id, instance);
+    }
 }
 }

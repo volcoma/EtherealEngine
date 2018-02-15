@@ -52,34 +52,27 @@ void camera_component::set_ortho_size(float size)
 
 float camera_component::get_ppu() const
 {
-	return camera_.get_ppu();
+    return camera_.get_ppu();
 }
 
-camera_component& camera_component::set_fov(float fovDegrees)
+void camera_component::set_fov(float fovDegrees)
 {
 	camera_.set_fov(fovDegrees);
-
-	return *this;
 }
 
-camera_component& camera_component::set_near_clip(float distance)
+void camera_component::set_near_clip(float distance)
 {
 	camera_.set_near_clip(distance);
-
-	return *this;
 }
-camera_component& camera_component::set_far_clip(float distance)
+
+void camera_component::set_far_clip(float distance)
 {
 	camera_.set_far_clip(distance);
-
-	return *this;
 }
 
-camera_component& camera_component::set_projection_mode(projection_mode mode)
+void camera_component::set_projection_mode(projection_mode mode)
 {
 	camera_.set_projection_mode(mode);
-
-	return *this;
 }
 
 float camera_component::get_fov() const

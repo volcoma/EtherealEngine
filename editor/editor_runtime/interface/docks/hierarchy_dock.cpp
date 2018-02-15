@@ -15,16 +15,73 @@
 #include "runtime/ecs/systems/scene_graph.h"
 #include "runtime/input/input.h"
 #include "runtime/rendering/mesh.h"
-
+#include "runtime/ecs/components/light_component.h"
+#include "runtime/ecs/components/reflection_probe_component.h"
+#include "runtime/ecs/components/camera_component.h"
+#include "runtime/ecs/components/audio_source_component.h"
 namespace
 {
+static math::bbox calc_bounds(runtime::entity entity)
+{
+    const math::vec3 one = {1.0f, 1.0f, 1.0f};
+    math::bbox bounds = math::bbox(-one, one);
+    auto ent_trans_comp = entity.get_component<transform_component>().lock();
+    if(ent_trans_comp)
+    {
+        auto target_pos = ent_trans_comp->get_position();
+        bounds = math::bbox(target_pos - one, target_pos + one);
+
+        auto ent_model_comp = entity.get_component<model_component>().lock();
+        if(ent_model_comp)
+        {
+            const auto& model = ent_model_comp->get_model();
+            if(model.is_valid())
+            {
+                const auto current_mesh = model.get_lod(0);
+                if(current_mesh)
+                {
+                    bounds = current_mesh->get_bounds();
+                }
+            }
+        }
+        const auto& world = ent_trans_comp->get_transform();
+        bounds = math::bbox::mul(bounds, world);
+    }
+    return bounds;
+};
+
+static void focus_entity_on_bounds(runtime::entity entity, const math::bbox& bounds)
+{
+    auto trans_comp = entity.get_component<transform_component>().lock();
+    auto camera_comp = entity.get_component<camera_component>().lock();
+    const auto& cam = camera_comp->get_camera();
+
+    math::vec3 cen = bounds.get_center();
+    math::vec3 size = bounds.get_dimensions();
+
+    float aspect = cam.get_aspect_ratio();
+    float fov = cam.get_fov();
+    // Get the radius of a sphere circumscribing the bounds
+    float radius = math::length(size) / 2.0f;
+    // Get the horizontal FOV, since it may be the limiting of the two FOVs to properly
+    // encapsulate the objects
+    float horizontalFOV =
+        math::degrees(2.0f * math::atan(math::tan(math::radians(fov) / 2.0f) * aspect));
+    // Use the smaller FOV as it limits what would get cut off by the frustum
+    float mfov = math::min(fov, horizontalFOV);
+    float dist = radius / (math::sin(math::radians(mfov) / 2.0f));
+
+    camera_comp->set_ortho_size(radius);
+    trans_comp->set_position(cen - dist * trans_comp->get_z_axis());
+    trans_comp->look_at(cen);
+}
+
 enum class context_action
 {
 	none,
 	rename,
 };
 }
-
 static context_action check_context_menu(runtime::entity entity)
 {
 	auto& es = core::get_subsystem<editor::editing_system>();
@@ -59,67 +116,19 @@ static context_action check_context_menu(runtime::entity entity)
 
 				es.select(object);
 			}
+
 			if(gui::MenuItem("DELETE", "DEL"))
 			{
 				entity.destroy();
 			}
 
-			if(gui::MenuItem("FOCUS"))
+            if(gui::MenuItem("FOCUS", "SHIFT + F"))
 			{
-				const auto calc_bounds = [](runtime::entity entity) {
-                    const math::vec3 one = {1.0f, 1.0f, 1.0f};
-                    math::bbox bounds = math::bbox(-one, one);
-					auto ent_trans_comp = entity.get_component<transform_component>().lock();
-					if(ent_trans_comp)
-					{
-						auto target_pos = ent_trans_comp->get_position();
-						bounds = math::bbox(target_pos - one, target_pos + one);
-
-						auto ent_model_comp = entity.get_component<model_component>().lock();
-						if(ent_model_comp)
-						{
-							const auto& model = ent_model_comp->get_model();
-							if(model.is_valid())
-							{
-								const auto current_mesh = model.get_lod(0);
-								if(current_mesh)
-								{
-									bounds = current_mesh->get_bounds();
-								}
-							}
-						}
-						const auto& world = ent_trans_comp->get_transform();
-						bounds = math::bbox::mul(bounds, world);
-					}
-					return bounds;
-				};
-
 				if(editor_camera.has_component<transform_component>() &&
 				   editor_camera.has_component<camera_component>())
 				{
-					auto camera_trans_comp = editor_camera.get_component<transform_component>().lock();
-					auto camera_comp = editor_camera.get_component<camera_component>().lock();
-					const auto& cam = camera_comp->get_camera();
 					auto bounds = calc_bounds(entity);
-
-					math::vec3 cen = bounds.get_center();
-					math::vec3 size = bounds.get_dimensions();
-
-					float aspect = cam.get_aspect_ratio();
-					float fov = cam.get_fov();
-					// Get the radius of a sphere circumscribing the bounds
-					float radius = math::length(size) / 2.0f;
-					// Get the horizontal FOV, since it may be the limiting of the two FOVs to properly
-					// encapsulate the objects
-					float horizontalFOV =
-						math::degrees(2.0f * math::atan(math::tan(math::radians(fov) / 2.0f) * aspect));
-					// Use the smaller FOV as it limits what would get cut off by the frustum
-					float mfov = math::min(fov, horizontalFOV);
-					float dist = radius / (math::sin(math::radians(mfov) / 2.0f));
-
-					camera_comp->set_ortho_size(radius);
-					camera_trans_comp->set_position(cen - dist * camera_trans_comp->get_z_axis());
-					camera_trans_comp->look_at(cen);
+                    focus_entity_on_bounds(editor_camera, bounds);
 				}
 			}
 
@@ -130,13 +139,142 @@ static context_action check_context_menu(runtime::entity entity)
 	{
 		if(gui::BeginPopupContextWindow())
 		{
-			if(gui::MenuItem("CREATE EMPTY"))
-			{
-				auto object = ecs.create();
-				object.assign<transform_component>();
-			}
+            if(gui::MenuItem("Create empty"))
+            {
+                auto object = ecs.create();
+                object.assign<transform_component>();
+            }
 
-			gui::EndPopup();
+            if( gui::BeginMenu("3D Objects"))
+            {
+                static const std::map<std::string, std::vector<std::string>> menu_objects =
+                {
+                    {"Basic", {"cube", "plane", "cylinder", "capsule", "cone", "torus"}},
+                    {"Polygons", {"tetrahedron", "octahedron", "icosahedron", "dodecahedron"}},
+                    {"Spheres", {"icosphere0", "icosphere1", "icosphere2", "icosphere3", "icosphere4", "icosphere5"}}
+                };
+
+                auto& am = core::get_subsystem<runtime::asset_manager>();
+                for(const auto& p : menu_objects)
+                {
+                    const auto& name = p.first;
+                    const auto& objects_name = p.second;
+
+                    if( gui::BeginMenu(name.c_str()) )
+                    {
+                        for(const auto& name : objects_name)
+                        {
+                            if( gui::MenuItem(name.c_str()) )
+                            {
+                                const auto id = "embedded:/" + name;
+                                auto asset_future = am.load<mesh>(id);
+                                model model;
+                                model.set_lod(asset_future.get(), 0);
+
+                                auto object = ecs.create();
+                                object.set_name(name);
+                                object.assign<transform_component>();
+
+                                auto model_comp = object.assign<model_component>().lock();
+                                model_comp->set_casts_shadow(true);
+                                model_comp->set_casts_reflection(false);
+                                model_comp->set_model(model);
+                            }
+                        }
+                        gui::EndMenu();
+                    }
+                }
+                gui::EndMenu();
+            }
+
+            if( gui::BeginMenu("Lighting"))
+            {
+                if( gui::BeginMenu("Light"))
+                {
+                    static const std::vector<std::pair<std::string, light_type>> light_objects =
+                    {
+                        {"directional", light_type::directional},
+                        {"spot", light_type::spot},
+                        {"point", light_type::point}
+                    };
+
+                    for(const auto& p : light_objects)
+                    {
+                        const auto& name = p.first;
+                        const auto& type = p.second;
+                        if( gui::MenuItem(name.c_str()) )
+                        {
+                            auto object = ecs.create();
+                            object.set_name(name + " light");
+
+                            auto transf_comp = object.assign<transform_component>().lock();
+                            transf_comp->set_local_position({1.0f, 6.0f, -3.0f});
+                            transf_comp->rotate_local(50.0f, -30.0f, 0.0f);
+
+                            light light_data;
+                            light_data.color = math::color(255, 244, 214, 255);
+                            light_data.type = type;
+
+                            auto light_comp = object.assign<light_component>().lock();
+                            light_comp->set_light(light_data);
+                        }
+                    }
+                    gui::EndMenu();
+                }
+
+                if( gui::BeginMenu("Reflection probes"))
+                {
+                    static const std::vector<std::pair<std::string, probe_type>> reflection_probes =
+                    {
+                        {"sphere", probe_type::sphere},
+                        {"box", probe_type::box}
+                    };
+                    for(const auto& p : reflection_probes)
+                    {
+                        const auto& name = p.first + " probe";
+                        const auto& type = p.second;
+
+                        if( gui::MenuItem(name.c_str()) )
+                        {
+                            auto object = ecs.create();
+                            object.set_name(name);
+                            auto transf_comp = object.assign<transform_component>().lock();
+                            transf_comp->set_local_position({0.0f, 0.1f, 0.0f});
+
+                            reflection_probe probe;
+                            probe.method = reflect_method::static_only;
+                            probe.type = type;
+                            auto reflection_comp = object.assign<reflection_probe_component>().lock();
+                            reflection_comp->set_probe(probe);
+                        }
+                    }
+                    gui::EndMenu();
+                }
+                gui::EndMenu();
+            }
+
+            if(gui::MenuItem("Camera"))
+            {
+                auto object = ecs.create();
+                object.set_name("camera");
+                auto transf_comp = object.assign<transform_component>().lock();
+                transf_comp->set_local_position({0.0f, 2.0f, -5.0f});
+
+                object.assign<camera_component>();
+            }
+
+            if( gui::BeginMenu("Audio") )
+            {
+                if(gui::MenuItem("Source"))
+                {
+                    auto object = ecs.create();
+                    object.set_name("audio source");
+                    object.assign<transform_component>();
+                    object.assign<audio_source_component>();
+                }
+                gui::EndMenu();
+            }
+            gui::EndPopup();
 		}
 	}
 	return action;
@@ -147,7 +285,7 @@ static bool process_drag_drop_source(runtime::entity entity)
 	if(entity && gui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
 	{
 		auto entity_index = entity.id().index();
-		gui::TextUnformatted(entity.get_name().c_str());
+        gui::TextUnformatted(entity.to_string().c_str());
 		gui::SetDragDropPayload("entity", &entity_index, sizeof(entity_index));
 		gui::EndDragDropSource();
 		return true;
@@ -245,11 +383,10 @@ static void process_drag_drop_target(runtime::entity entity)
 					// Add component and configure it.
 					object.assign<transform_component>().lock()->set_parent(entity);
 					// Add component and configure it.
-					object.assign<model_component>()
-						.lock()
-						->set_casts_shadow(true)
-						.set_casts_reflection(false)
-						.set_model(mdl);
+                    auto model_comp = object.assign<model_component>().lock();
+                    model_comp->set_casts_shadow(true);
+                    model_comp->set_casts_reflection(false);
+                    model_comp->set_model(mdl);
 
 					es.select(object);
 				}
@@ -402,7 +539,7 @@ void hierarchy_dock::draw_entity(runtime::entity entity)
 	}
 
 	gui::PopID();
-	gui::PopID();
+    gui::PopID();
 }
 
 void hierarchy_dock::render(const ImVec2&)
@@ -457,8 +594,28 @@ void hierarchy_dock::render(const ImVec2&)
 							es.select(clone);
 						}
 					}
-				}
+                }
 			}
+
+            if(input.is_key_pressed(mml::keyboard::F))
+            {
+                if(input.is_key_down(mml::keyboard::LShift))
+                {
+                    if(selected && selected.is_type<runtime::entity>())
+                    {
+                        auto sel = selected.get_value<runtime::entity>();
+                        if(sel && sel != editor_camera)
+                        {
+                            if(editor_camera.has_component<transform_component>() &&
+                               editor_camera.has_component<camera_component>())
+                            {
+                                auto bounds = calc_bounds(sel);
+                                focus_entity_on_bounds(editor_camera, bounds);
+                            }
+                        }
+                    }
+                }
+            }
 		}
 
 		if(editor_camera.valid())

@@ -36,7 +36,7 @@ transform_component::~transform_component()
 	}
 }
 
-transform_component& transform_component::move(const math::vec3& amount)
+void transform_component::move(const math::vec3& amount)
 {
 	math::vec3 new_pos = get_position();
 	new_pos += get_x_axis() * amount.x;
@@ -46,10 +46,9 @@ transform_component& transform_component::move(const math::vec3& amount)
 	// Pass through to set_position so that any derived classes need not
 	// override the 'move' method in order to catch this position change.
 	set_position(new_pos);
-	return *this;
 }
 
-transform_component& transform_component::move_local(const math::vec3& amount)
+void transform_component::move_local(const math::vec3& amount)
 {
 	math::vec3 new_pos = get_local_position();
 	new_pos += get_local_x_axis() * amount.x;
@@ -59,18 +58,16 @@ transform_component& transform_component::move_local(const math::vec3& amount)
 	// Pass through to set_position so that any derived classes need not
 	// override the 'move' method in order to catch this position change.
 	set_local_position(new_pos);
-	return *this;
 }
 
-transform_component& transform_component::set_local_position(const math::vec3& position)
+void transform_component::set_local_position(const math::vec3& position)
 {
 	// Set new cell relative position
 	local_transform_.set_position(position);
 	set_local_transform(local_transform_);
-	return *this;
 }
 
-transform_component& transform_component::set_position(const math::vec3& position)
+void transform_component::set_position(const math::vec3& position)
 {
 	// Rotate a copy of the current math::transform.
 	math::transform m = get_transform();
@@ -87,7 +84,6 @@ transform_component& transform_component::set_position(const math::vec3& positio
 	}
 
 	set_local_transform(m);
-	return *this;
 }
 
 math::vec3 transform_component::get_local_scale()
@@ -163,34 +159,33 @@ const math::transform& transform_component::get_local_transform() const
 	return local_transform_;
 }
 
-transform_component& transform_component::look_at(float x, float y, float z)
+void transform_component::look_at(float x, float y, float z)
 {
 	look_at(math::vec3(x, y, z));
-	return *this;
 }
 
-transform_component& transform_component::look_at(const math::vec3& point)
+void transform_component::look_at(const math::vec3& point)
 {
     math::vec3 eye = get_position();
     math::transform m;
 	m.look_at(eye, point);
     m = math::inverse(m);
     set_rotation(m.get_rotation());    
-    return *this;
 }
 
-transform_component& transform_component::rotate_local(float x, float y, float z)
+void transform_component::rotate_local(float x, float y, float z)
 {
 	// Do nothing if rotation is disallowed.
 	if(!can_rotate())
-		return *this;
+	{
+		return;
+	}
 
 	local_transform_.rotate_local(math::radians(x), math::radians(y), math::radians(z));
 	set_local_transform(local_transform_);
-	return *this;
 }
 
-transform_component& transform_component::rotate_axis(float degrees, const math::vec3& axis)
+void transform_component::rotate_axis(float degrees, const math::vec3& axis)
 {
 	// If rotation is disallowed, only process position change. Otherwise
 	// perform full rotation.
@@ -223,10 +218,9 @@ transform_component& transform_component::rotate_axis(float degrees, const math:
 		set_local_transform(m);
 
 	} // End if canRotate()
-	return *this;
 }
 
-transform_component& transform_component::rotate(float x, float y, float z)
+void transform_component::rotate(float x, float y, float z)
 {
 	// If rotation is disallowed, only process position change. Otherwise
 	// perform full rotation.
@@ -260,10 +254,9 @@ transform_component& transform_component::rotate(float x, float y, float z)
 		set_local_transform(m);
 
 	} // End if canRotate()
-	return *this;
 }
 
-transform_component& transform_component::rotate(float x, float y, float z, const math::vec3& center)
+void transform_component::rotate(float x, float y, float z, const math::vec3& center)
 {
 	// If rotation is disallowed, only process position change. Otherwise
 	// perform full rotation.
@@ -298,15 +291,16 @@ transform_component& transform_component::rotate(float x, float y, float z, cons
 		set_local_transform(m);
 
 	} // End if canRotate()
-	return *this;
 }
 
-transform_component& transform_component::set_scale(const math::vec3& s)
+void transform_component::set_scale(const math::vec3& s)
 {
 	// If scaling is disallowed, only process position change. Otherwise
 	// perform full scale.
 	if(!can_scale())
-		return *this;
+    {
+        return;
+    }
 
 	// Scale a copy of the cell math::transform
 	// Set orientation of new math::transform
@@ -324,24 +318,26 @@ transform_component& transform_component::set_scale(const math::vec3& s)
 	}
 
 	set_local_transform(m);
-	return *this;
 }
 
-transform_component& transform_component::set_local_scale(const math::vec3& scale)
+void transform_component::set_local_scale(const math::vec3& scale)
 {
 	// Do nothing if scaling is disallowed.
 	if(!can_scale())
-		return *this;
+    {
+        return;
+    }
 	local_transform_.set_scale(scale);
 	set_local_transform(local_transform_);
-	return *this;
 }
 
-transform_component& transform_component::set_rotation(const math::quat& rotation)
+void transform_component::set_rotation(const math::quat& rotation)
 {
 	// Do nothing if rotation is disallowed.
 	if(!can_rotate())
-		return *this;
+    {
+        return;
+    }
 
 	// Set orientation of new math::transform
 	math::transform m = get_transform();
@@ -358,70 +354,71 @@ transform_component& transform_component::set_rotation(const math::quat& rotatio
 	}
 
 	set_local_transform(m);
-	return *this;
 }
 
-transform_component& transform_component::set_local_rotation(const math::quat& rotation)
+void transform_component::set_local_rotation(const math::quat& rotation)
 {
 	// Do nothing if rotation is disallowed.
 	if(!can_rotate())
-		return *this;
+    {
+        return;
+    }
 
 	// Set orientation of new math::transform
 	local_transform_.set_rotation(rotation);
 	set_local_transform(local_transform_);
-
-	return *this;
 }
 
-transform_component& transform_component::reset_rotation()
+void transform_component::reset_rotation()
 {
 	// Do nothing if rotation is disallowed.
 	if(!can_rotate())
-		return *this;
+    {
+        return;
+    }
 	set_rotation(math::quat{});
-	return *this;
 }
 
-transform_component& transform_component::reset_scale()
+void transform_component::reset_scale()
 {
 	// Do nothing if scaling is disallowed.
 	if(!can_scale())
-		return *this;
+    {
+        return;
+    }
 
 	set_scale(math::vec3{1.0f, 1.0f, 1.0f});
-	return *this;
 }
 
-transform_component& transform_component::reset_local_rotation()
+void transform_component::reset_local_rotation()
 {
 	// Do nothing if rotation is disallowed.
 	if(!can_rotate())
-		return *this;
+    {
+        return;
+    }
 
 	set_local_rotation(math::quat{});
-
-	return *this;
 }
 
-transform_component& transform_component::reset_local_scale()
+void transform_component::reset_local_scale()
 {
 	// Do nothing if scaling is disallowed.
 	if(!can_scale())
-		return *this;
+    {
+        return;
+    }
 
 	set_local_scale(math::vec3{1.0f, 1.0f, 1.0f});
-
-	return *this;
 }
 
-transform_component& transform_component::reset_pivot()
+void transform_component::reset_pivot()
 {
-	// Do nothing if pivot adjustment is disallowed.
-	if(!can_adjust_pivot())
-		return *this;
-
-	return *this;
+    // Do nothing if pivot adjustment is disallowed.
+//	if(!can_adjust_pivot())
+//    {
+//        return;
+//    }
 }
 
 bool transform_component::can_scale() const
@@ -442,11 +439,9 @@ bool transform_component::can_adjust_pivot() const
 	return true;
 }
 
-transform_component& transform_component::set_parent(runtime::entity parent)
+void transform_component::set_parent(runtime::entity parent)
 {
 	set_parent(parent, true, false);
-
-	return *this;
 }
 
 bool check_parent(const runtime::entity& e, const runtime::entity& parent)
@@ -473,12 +468,14 @@ bool check_parent(const runtime::entity& e, const runtime::entity& parent)
 	return true;
 }
 
-transform_component& transform_component::set_parent(runtime::entity parent, bool world_position_stays,
+void transform_component::set_parent(runtime::entity parent, bool world_position_stays,
 													 bool local_position_stays)
 {
 	// Skip if this is a no-op.
 	if(check_parent(get_entity(), parent) == false)
-		return *this;
+    {
+        return;
+    }
 
 	// Before we do anything, make sure that all pending math::transform
 	// operations are resolved (including those applied to our parent).
@@ -520,9 +517,6 @@ transform_component& transform_component::set_parent(runtime::entity parent, boo
 	}
 
 	set_dirty(is_dirty());
-
-	// Success!
-	return *this;
 }
 
 const runtime::entity& transform_component::get_parent() const
@@ -551,10 +545,12 @@ void transform_component::cleanup_dead_children()
 					std::end(children_));
 }
 
-transform_component& transform_component::set_transform(const math::transform& tr)
+void transform_component::set_transform(const math::transform& tr)
 {
 	if(world_transform_.compare(tr, 0.0001f) == 0)
-		return *this;
+    {
+        return;
+    }
 
 	math::vec3 position, scaling;
 	math::quat orientation;
@@ -576,18 +572,18 @@ transform_component& transform_component::set_transform(const math::transform& t
 	}
 
 	set_local_transform(m);
-	return *this;
 }
 
-transform_component& transform_component::set_local_transform(const math::transform& trans)
+void transform_component::set_local_transform(const math::transform& trans)
 {
 	if(local_transform_.compare(trans, 0.0001f) == 0)
-		return *this;
+    {
+        return;
+    }
 
 	set_dirty(true);
 
 	local_transform_ = trans;
-	return *this;
 }
 
 void transform_component::resolve(bool force)
