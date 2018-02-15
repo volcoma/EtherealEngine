@@ -157,6 +157,7 @@ void project_manager::close_project()
 	am.clear("app:/data");
 	app_meta_syncer_.unsync();
 	app_cache_syncer_.unsync();
+	load_config();
 }
 
 bool project_manager::open_project(const fs::path& project_path)

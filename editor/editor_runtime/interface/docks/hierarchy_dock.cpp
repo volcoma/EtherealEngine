@@ -146,10 +146,10 @@ static context_action check_context_menu(runtime::entity entity)
 			if(gui::BeginMenu("3D Objects"))
 			{
 				static const std::map<std::string, std::vector<std::string>> menu_objects = {
-					{"Basic", {"cube", "plane", "cylinder", "capsule", "cone", "torus"}},
-					{"Polygons", {"tetrahedron", "octahedron", "icosahedron", "dodecahedron"}},
+					{"Basic", {"Sphere", "Cube", "Plane", "Cylinder", "Capsule", "Cone", "Torus", "Teapot"}},
+					{"Polygons", {"Tetrahedron", "Octahedron", "Icosahedron", "Dodecahedron"}},
 					{"Spheres",
-					 {"icosphere0", "icosphere1", "icosphere2", "icosphere3", "icosphere4", "icosphere5"}}};
+					 {"Icosphere0", "Icosphere1", "Icosphere2", "Icosphere3", "Icosphere4", "Icosphere5"}}};
 
 				auto& am = core::get_subsystem<runtime::asset_manager>();
 				for(const auto& p : menu_objects)
@@ -163,14 +163,15 @@ static context_action check_context_menu(runtime::entity entity)
 						{
 							if(gui::MenuItem(name.c_str()))
 							{
-								const auto id = "embedded:/" + name;
+								const auto id = "embedded:/" + string_utils::to_lower(name);
 								auto asset_future = am.load<mesh>(id);
 								model model;
 								model.set_lod(asset_future.get(), 0);
 
 								auto object = ecs.create();
 								object.set_name(name);
-								object.assign<transform_component>();
+								auto transf_comp = object.assign<transform_component>().lock();
+								transf_comp->set_local_position({0.0f, 0.5f, 0.0f});
 
 								auto model_comp = object.assign<model_component>().lock();
 								model_comp->set_casts_shadow(true);
@@ -189,9 +190,9 @@ static context_action check_context_menu(runtime::entity entity)
 				if(gui::BeginMenu("Light"))
 				{
 					static const std::vector<std::pair<std::string, light_type>> light_objects = {
-						{"directional", light_type::directional},
-						{"spot", light_type::spot},
-						{"point", light_type::point}};
+						{"Directional", light_type::directional},
+						{"Spot", light_type::spot},
+						{"Point", light_type::point}};
 
 					for(const auto& p : light_objects)
 					{
@@ -200,10 +201,10 @@ static context_action check_context_menu(runtime::entity entity)
 						if(gui::MenuItem(name.c_str()))
 						{
 							auto object = ecs.create();
-							object.set_name(name + " light");
+							object.set_name(name + " Light");
 
 							auto transf_comp = object.assign<transform_component>().lock();
-							transf_comp->set_local_position({1.0f, 6.0f, -3.0f});
+							transf_comp->set_local_position({0.0f, 1.0f, 0.0f});
 							transf_comp->rotate_local(50.0f, -30.0f, 0.0f);
 
 							light light_data;
@@ -220,7 +221,7 @@ static context_action check_context_menu(runtime::entity entity)
 				if(gui::BeginMenu("Reflection probes"))
 				{
 					static const std::vector<std::pair<std::string, probe_type>> reflection_probes = {
-						{"sphere", probe_type::sphere}, {"box", probe_type::box}};
+						{"Sphere", probe_type::sphere}, {"Box", probe_type::box}};
 					for(const auto& p : reflection_probes)
 					{
 						const auto& name = p.first + " probe";
