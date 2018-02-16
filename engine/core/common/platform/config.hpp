@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <limits>
 
 #if !defined(DEBUG) && !defined(_DEBUG)
@@ -11,136 +12,121 @@
 #endif
 
 // OS utils. Here is where the fun starts... good luck
-#define $quote(...) #__VA_ARGS__
-#define $comment(...) $no
-#define $uncomment(...) $yes
 
 #define ETH_QUOTE(...) #__VA_ARGS__
 #define ETH_COMMENT(...) ETH_NO
 #define ETH_UNCOMMENT(...) ETH_YES
 
-#define $yes(...) __VA_ARGS__
-#define $no(...)
-
 #define ETH_YES(...) __VA_ARGS__
 #define ETH_NO(...)
 
-#define $on(v) (0 v(+1))												 // usage: #if $on($msvc)
-#define $is $on															 // usage: #if $is($debug)
-#define $has(...) $clang(__has_feature(__VA_ARGS__)) $celse(__VA_ARGS__) // usage: #if $has(cxx_exceptions)
-
-#define ETH_ON(v) (0 v(+1)) // usage: #if $on($msvc)
-#define ETH_IS ETH_ON		// usage: #if $is($debug)
+#define ETH_ON(v) (0 v(+1)) // usage: #if ETH_ON(ETH_COMPILER_MSVC)
+#define ETH_IS ETH_ON		// usage: #if ETH_ON(ETH_DEBUG)
 #define ETH_HAS(...)                                                                                         \
 	ETH_COMPILER_CLANG(__has_feature(__VA_ARGS__))                                                           \
-	ETH_COMPILER_CELSE(__VA_ARGS__) // usage: #if $has(cxx_exceptions)
+	ETH_COMPILER_CELSE(__VA_ARGS__) // usage: #if ETH_HAS(cxx_exceptions)
 
 #if defined(_WIN32)
-#define $windows $yes
-#define $welse $no
 #define ETH_PLATFORM_WINDOWS ETH_YES
 #define ETH_PLATFOMR_WELSE ETH_NO
 #else
-#define $windows $no
-#define $welse $yes
 #define ETH_PLATFORM_WINDOWS ETH_NO
 #define ETH_PLATFOMR_WELSE ETH_YES
 #endif
 
 #ifdef __APPLE__
-#define $apple $yes
-#define $aelse $no
-#define ETH_APPLE ETH_YES
-#define ETH_AELSE ETH_NO
+#define ETH_PLATFORM_APPLE ETH_YES
+#define ETH_PLATFORM_AELSE ETH_NO
 #else
-#define $apple $no
-#define $aelse $yes
 #define ETH_PLATFORM_APPLE ETH_NO
 #define ETH_PLATFORM_AELSE ETH_YES
 #endif
 
 #ifdef __linux__
-#define $linux $yes
-#define $lelse $no
+#define ETH_PLATFORM_LINUX ETH_YES
+#define ETH_PLATFORM_LELSE ETH_NO
 #else
-#define $linux $no
-#define $lelse $yes
+#define ETH_PLATFORM_LINUX ETH_NO
+#define ETH_PLATFORM_LELSE ETH_YES
 #endif
 
 #ifdef __ANDROID__
-#define $android $yes
-#define $aelse $no
+#define ETH_PLATFORM_ANDROID ETH_YES
+#define ETH_PLATFORM_AELSE ETH_NO
 #else
-#define $android $no
-#define $aelse $yes
+#define ETH_PLATFORM_ANDROID ETH_NO
+#define ETH_PLATFORM_AELSE ETH_YES
 #endif
 
 // Compiler utils
-
-#if ULONG_MAX == 4294967295
-#define $bits64 $yes
-#define $bits32 $no
+#if INTPTR_MAX == INT64_MAX
+#define ETH_ARCH_64 ETH_YES
+#define ETH_ARCH_32 ETH_NO
 #else
-#define $bits64 $no
-#define $bits32 $yes
+#define ETH_ARCH_64 ETH_NO
+#define ETH_ARCH_32 ETH_YES
 #endif
 
 #if defined(NDEBUG) || defined(_NDEBUG) || defined(RELEASE)
-#define $release $yes
-#define $debug $no
+#define ETH_DEBUG ETH_YES
+#define ETH_RELEASE ETH_NO
 #else
-#define $release $no
-#define $debug $yes
+#define ETH_DEBUG ETH_NO
+#define ETH_RELEASE ETH_YES
 #endif
 
 #if defined(NDEVEL) || defined(_NDEVEL) || defined(PUBLIC)
-#define $public $yes
-#define $devel $no
+#define ETH_PUBLIC ETH_YES
+#define ETH_DEVELOP ETH_NO
 #else
-#define $public $no
-#define $devel $yes
+#define ETH_PUBLIC ETH_NO
+#define ETH_DEVELOP ETH_YES
 #endif
 
 #if defined(__GNUC__) || defined(__MINGW32__)
-#define $gnuc $yes
-#define $gelse $no
+#define ETH_COMPILER_GNUC ETH_YES
+#define ETH_COMPILER_GELSE ETH_NO
 #else
-#define $gnuc $no
-#define $gelse $yes
+#define ETH_COMPILER_GNUC ETH_NO
+#define ETH_COMPILER_GELSE ETH_YES
 #endif
 
 #if defined(__MINGW32__)
-#define $mingw $yes
+#define ETH_COMPILER_MINGW ETH_YES
+#define ETH_COMPILER_MIELSE ETH_NO
 #else
-#define $mingw $no
+#define ETH_COMPILER_MINGW ETH_NO
+#define ETH_COMPILER_MIELSE ETH_YES
 #endif
 
 #ifdef _MSC_VER
-#define $msvc $yes
-#define $melse $no
+#define ETH_COMPILER_MSVC ETH_YES
+#define ETH_COMPILER_MELSE ETH_NO
 #else
-#define $msvc $no
-#define $melse $yes
+#define ETH_COMPILER_MSVC ETH_NO
+#define ETH_COMPILER_MELSE ETH_YES
 #endif
 
 #ifdef __clang__
-#define $clang $yes
-#define $celse $no
+#define ETH_COMPILER_CLANG ETH_YES
+#define ETH_COMPILER_CELSE ETH_NO
 #else
-#define $clang $no
-#define $celse $yes
+#define ETH_COMPILER_CLANG ETH_NO
+#define ETH_COMPILER_CELSE ETH_YES
 #endif
 
-#if $on($msvc) || $on($gnuc) || $on($clang)
-#define $undefined_compiler $no
+#if ETH_ON(ETH_COMPILER_MSVC) || ETH_ON(ETH_COMPILER_GNUC) || ETH_ON(ETH_COMPILER_CLANG) ||                  \
+	ETH_ON(ETH_COMPILER_MINGW)
+#define ETH_UNDEFINED_COMPILER ETH_NO
 #else
-#define $undefined_compiler $yes
+#define ETH_UNDEFINED_COMPILER ETH_YES
 #endif
 
-#if $on($windows) || $on($linux) || $on($apple) || $on($android)
-#define $undefined_os $no
+#if ETH_ON(ETH_PLATFORM_WINDOWS) || ETH_ON(ETH_PLATFORM_LINUX) || ETH_ON(ETH_PLATFORM_APPLE) ||              \
+	ETH_ON(ETH_PLATFORM_ANDROID)
+#define ETH_UNDEFINED_OS ETH_NO
 #else
-#define $undefined_os $yes
+#define ETH_UNDEFINED_OS ETH_YES
 #endif
 
 template <bool>

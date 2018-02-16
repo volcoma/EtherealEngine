@@ -4,8 +4,8 @@
 
 #include "../common/platform/config.hpp"
 
-#if $on($windows)
-#if $on($msvc)
+#if ETH_ON(ETH_PLATFORM_WINDOWS)
+#if ETH_ON(ETH_COMPILER_MSVC)
 #include "spdlog/sinks/msvc_sink.h"
 namespace spdlog
 {
@@ -26,7 +26,7 @@ using platform_sink_st = wincolor_stdout_sink_st;
 }
 }
 #endif
-#elif $on($linux) || $on($apple)
+#elif ETH_ON(ETH_PLATFORM_LINUX) || ETH_ON(ETH_PLATFORM_APPLE)
 #include "spdlog/sinks/stdout_sinks.h"
 namespace spdlog
 {
@@ -36,7 +36,7 @@ using platform_sink_mt = stdout_sink_mt;
 using platform_sink_st = stdout_sink_st;
 }
 }
-#elif $on($android)
+#elif ETH_ON(ETH_PLATFORM_ANDROID)
 #include "spdlog/sinks/android_sink.h"
 namespace spdlog
 {

@@ -63,7 +63,7 @@ static bool run_compile_process(const std::string& process, const std::vector<st
 
 	auto executable_dir = fs::resolve_protocol("binary:/");
 	auto process_full = executable_dir / process;
-#if($on($windows))
+#if ETH_ON(ETH_PLATFORM_WINDOWS)
 	process_reader.open((process_full.string() + " " + args).c_str(), "", &error);
 #else
 	process_reader.open(process_full.string().c_str(), args.c_str(), &error);
@@ -161,10 +161,8 @@ void compile<gfx::shader>(const fs::path& absolute_meta_key, const fs::path& out
 		str_type = "unknown";
 
 	const std::vector<std::string> args_array = {
-		"-f",		  str_input.c_str(),	"-o",			str_output.c_str(),
-		"-i",		  str_include.c_str(),  "--varyingdef", str_varying.c_str(),
-		"--platform", str_platform.c_str(), "-p",			str_profile.c_str(),
-		"--type",	 str_type.c_str(),		"-O",			"3",
+		"-f",		  str_input,	"-o", str_output,  "-i",	 str_include, "--varyingdef", str_varying,
+		"--platform", str_platform, "-p", str_profile, "--type", str_type,	"-O",			  "3",
 	};
 
 	std::string error;
@@ -201,7 +199,7 @@ void compile<gfx::texture>(const fs::path& absolute_meta_key, const fs::path& ou
 	std::string str_output = temp.string();
 
 	const std::vector<std::string> args_array = {
-		"-f", str_input.c_str(), "-o", str_output.c_str(), "--as", "ktx", "-m", "-t", "BGRA8",
+		"-f", str_input, "-o", str_output, "--as", "ktx", "-m", "-t", "BGRA8",
 	};
 
 	std::string error;
@@ -243,7 +241,7 @@ void compile<mesh>(const fs::path& absolute_meta_key, const fs::path& output)
 		return;
 	}
 
-	if(data.vertex_data.empty() == false)
+	if(!data.vertex_data.empty())
 	{
 		{
 			std::ofstream soutput(temp.string(), std::ios::out | std::ios::binary);
@@ -255,32 +253,64 @@ void compile<mesh>(const fs::path& absolute_meta_key, const fs::path& output)
 
 		APPLOG_INFO("Successful compilation of {0}", str_input);
 	}
-	//	{
-	//		fs::path file = absolute_key.stem();
-	//		fs::path dir = absolute_key.parent_path();
+	{
+		fs::path file = absolute_key.stem();
+		fs::path dir = absolute_key.parent_path();
 
-	//		for(const auto& animation : animations)
-	//		{
-	//			temp = fs::temp_directory_path(err);
-	//			temp.append(uuids::random_uuid(str_input).to_string() + ".buildtemp");
-	//			{
-	//				std::ofstream soutput(temp.string(), std::ios::out | std::ios::binary);
-	//				cereal::oarchive_binary_t ar(soutput);
-	//				try_save(ar, cereal::make_nvp("animation", animation));
-	//			}
-	//			output = (dir / file).string() + "_" + animation.name + extensions::animation;
+		for(const auto& animation : animations)
+		{
+			temp = fs::temp_directory_path(err);
+			temp.append(uuids::random_uuid(str_input).to_string() + ".buildtemp");
+			{
+				std::ofstream soutput(temp.string(), std::ios::out | std::ios::binary);
+				cereal::oarchive_associative_t ar(soutput);
+				try_save(ar, cereal::make_nvp("animation", animation));
+			}
+			fs::path anim_output = (dir / file).string() + "_" + animation.name + ".anim";
 
-	//			fs::copy_file(temp, output, fs::copy_options::overwrite_if_exists, err);
-	//			fs::remove(temp, err);
+			fs::copy_file(temp, anim_output, fs::copy_options::overwrite_if_exists, err);
+			fs::remove(temp, err);
 
-	//			APPLOG_INFO("Successful compilation of animation {0}", animation.name);
-	//		}
-	//	}
+			APPLOG_INFO("Successful compilation of animation {0}", animation.name);
+		}
+	}
 }
 
 template <>
 void compile<runtime::animation>(const fs::path& absolute_meta_key, const fs::path& output)
 {
+	fs::error_code err;
+	fs::path absolute_key = fs::convert_to_protocol(absolute_meta_key);
+	absolute_key = fs::resolve_protocol(fs::replace(absolute_key, ":/meta", ":/data"));
+	absolute_key.replace_extension();
+	std::string str_input = absolute_key.string();
+
+	bool has_loaded = false;
+	runtime::animation anim;
+	{
+		std::ifstream stream(absolute_key.string());
+		if(stream.good())
+		{
+			cereal::iarchive_associative_t ar(stream);
+
+			try_load(ar, cereal::make_nvp("animation", anim));
+
+			has_loaded = true;
+		}
+	}
+
+	if(has_loaded)
+	{
+		std::ofstream stream(output.string(), std::ios::binary);
+		if(stream.good())
+		{
+			cereal::oarchive_binary_t ar(stream);
+
+			try_save(ar, cereal::make_nvp("animation", anim));
+
+			APPLOG_INFO("Successful compilation of {0}", str_input);
+		}
+	}
 }
 
 template <>

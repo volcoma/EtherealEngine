@@ -2,6 +2,7 @@
 #include "../core/math/quaternion.hpp"
 #include "../core/math/transform.hpp"
 #include "core/serialization/binary_archive.h"
+#include "core/serialization/associative_archive.h"
 
 namespace runtime
 {
@@ -23,6 +24,7 @@ SAVE(node_animation)
 	try_save(ar, cereal::make_nvp("pre_state", obj.pre_state));
 	try_save(ar, cereal::make_nvp("post_state", obj.post_state));
 }
+SAVE_INSTANTIATE(node_animation, cereal::oarchive_associative_t);
 SAVE_INSTANTIATE(node_animation, cereal::oarchive_binary_t);
 
 LOAD(node_animation)
@@ -34,6 +36,7 @@ LOAD(node_animation)
 	try_load(ar, cereal::make_nvp("pre_state", obj.pre_state));
 	try_load(ar, cereal::make_nvp("post_state", obj.post_state));
 }
+LOAD_INSTANTIATE(node_animation, cereal::iarchive_associative_t);
 LOAD_INSTANTIATE(node_animation, cereal::iarchive_binary_t);
 
 SAVE(animation)
@@ -43,6 +46,7 @@ SAVE(animation)
 	try_save(ar, cereal::make_nvp("ticks_per_second", obj.ticks_per_second));
 	try_save(ar, cereal::make_nvp("ticks_per_second", obj.channels));
 }
+SAVE_INSTANTIATE(animation, cereal::oarchive_associative_t);
 SAVE_INSTANTIATE(animation, cereal::oarchive_binary_t);
 
 LOAD(animation)
@@ -52,5 +56,6 @@ LOAD(animation)
 	try_load(ar, cereal::make_nvp("ticks_per_second", obj.ticks_per_second));
 	try_load(ar, cereal::make_nvp("ticks_per_second", obj.channels));
 }
+LOAD_INSTANTIATE(animation, cereal::iarchive_associative_t);
 LOAD_INSTANTIATE(animation, cereal::iarchive_binary_t);
 }

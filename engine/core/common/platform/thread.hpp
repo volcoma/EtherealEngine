@@ -5,7 +5,7 @@
 #include <thread>
 
 // An attempt at making a wrapper to deal with many Linuxes as well as Windows. Please edit as needed.
-#if $on($windows) && $on($msvc)
+#if ETH_ON(ETH_PLATFORM_WINDOWS) && ETH_ON(ETH_COMPILER_MSVC)
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 

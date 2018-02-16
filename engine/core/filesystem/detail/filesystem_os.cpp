@@ -16,7 +16,7 @@ static path executable_path_fallback(const char* argv0)
 	return full_path;
 }
 }
-#if $on($windows)
+#if ETH_ON(ETH_PLATFORM_WINDOWS)
 #include <Windows.h>
 namespace fs
 {
@@ -36,7 +36,7 @@ void show_in_graphical_env(const path& _path)
 	ShellExecuteA(nullptr, nullptr, _path.string().c_str(), nullptr, nullptr, SW_SHOWNORMAL);
 }
 }
-#elif $on($apple)
+#elif ETH_ON(ETH_PLATFORM_APPLE)
 #include <mach-o/dyld.h>
 namespace fs
 {
@@ -58,7 +58,7 @@ void show_in_graphical_env(const path& _path)
 {
 }
 }
-#elif $on($linux)
+#elif ETH_ON(ETH_PLATFORM_LINUX)
 
 #include <unistd.h>
 namespace fs

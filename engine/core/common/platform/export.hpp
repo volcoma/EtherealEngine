@@ -7,13 +7,13 @@
 ////////////////////////////////////////////////////////////
 #if !defined(ETH_STATIC)
 
-#if $on($windows)
+#if ETH_ON(ETH_PLATFORM_WINDOWS)
 // Windows compilers need specific (and different) keywords for export and import
 #define ETH_API_EXPORT __declspec(dllexport)
 #define ETH_API_IMPORT __declspec(dllimport)
 
 // For Visual C++ compilers, we also need to turn off this annoying C4251 warning
-#if $on($msvc)
+#if ETH_ON(ETH_COMPILER_MSVC)
 #pragma warning(disable : 4251)
 #endif
 
@@ -50,14 +50,14 @@
 // User explicitly requests to disable deprecation warnings
 #define ETH_DEPRECATED
 
-#elif $on($msvc)
+#elif ETH_ON(ETH_COMPILER_MSVC)
 
 // Microsoft C++ compiler
 // Note: On newer MSVC versions, using deprecated functions causes a compiler error. In order to
 // trigger a warning instead of an error, the compiler flag /sdl- (instead of /sdl) must be specified.
 #define ETH_DEPRECATED __declspec(deprecated)
 
-#elif $on($gnuc) || $on($clang)
+#elif ETH_ON(ETH_COMPILER_GNUC) || ETH_ON(ETH_COMPILER_CLANG)
 
 // g++ and clang
 #define ETH_DEPRECATED __attribute__((deprecated))
