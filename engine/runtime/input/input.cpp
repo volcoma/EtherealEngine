@@ -51,12 +51,12 @@ void input::handle_event(const mml::platform_event& event)
 
 bool input::is_key_pressed(mml::keyboard::key key)
 {
-    return keys_pressed_[key];
+	return keys_pressed_[key];
 }
 
 bool input::is_key_pressed(mml::keyboard::key key, mml::keyboard::key modifier)
 {
-    return is_key_pressed(key) && is_key_down(modifier);
+	return is_key_pressed(key) && is_key_down(modifier);
 }
 
 bool input::is_key_down(mml::keyboard::key key)

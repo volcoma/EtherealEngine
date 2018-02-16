@@ -76,7 +76,7 @@ const std::unique_ptr<render_window>& renderer::get_window(uint32_t id) const
 
 const std::unique_ptr<render_window>& renderer::get_main_window() const
 {
-	expects(windows_.size() > 0);
+	expects(!windows_.empty());
 
 	return windows_.front();
 }
@@ -189,14 +189,21 @@ bool renderer::init_backend(cmd_line::parser& parser)
 
 	std::uint32_t flags = BGFX_RESET_VSYNC;
 	if(novsync)
+	{
 		flags = 0;
+	}
 	gfx::reset(sz[0], sz[1], flags);
 
 	APPLOG_INFO("Using {0} rendering backend.", gfx::get_renderer_name(gfx::get_renderer_type()));
+
+	if(gfx::get_renderer_type() == gfx::renderer_type::Direct3D12)
+	{
+		APPLOG_WARNING("Directx 12 support is experimental and unstable.");
+	}
 	return true;
 }
 
-void renderer::frame_end(delta_t)
+void renderer::frame_end(delta_t /*unused*/)
 {
 	gfx::render_pass pass("init_bb_update");
 	pass.bind();

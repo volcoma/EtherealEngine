@@ -22,8 +22,13 @@ static bool process_drag_drop_target(asset_handle<asset_t>& entry)
 	{
 		if(gui::IsDragDropPayloadBeingAccepted())
 		{
-			gui::SetMouseCursor(ImGuiMouseCursor_Move);
+			gui::SetMouseCursor(ImGuiMouseCursor_Hand);
 		}
+		else
+		{
+			gui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);
+		}
+
 		for(const auto& type : ex::get_suported_formats<asset_t>())
 		{
 			auto payload = gui::AcceptDragDropPayload(type.c_str());

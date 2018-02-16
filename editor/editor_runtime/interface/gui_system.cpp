@@ -34,54 +34,54 @@ std::unique_ptr<gpu_program> s_program;
 asset_handle<gfx::texture> s_font_texture;
 std::uint32_t s_draw_calls = 0;
 
-void render_func(ImDrawData* _drawData)
+void render_func(ImDrawData* _draw_data)
 {
-	s_draw_calls = 0;
-	auto prog = s_program.get();
-	if(prog == nullptr)
+	if(_draw_data == nullptr || s_program == nullptr)
 	{
 		return;
 	}
-	prog->begin();
+	s_draw_calls = 0;
+	auto program = s_program.get();
+	program->begin();
 	// Render command lists
-	for(int32_t ii = 0, num = _drawData->CmdListsCount; ii < num; ++ii)
+	for(int32_t ii = 0, num = _draw_data->CmdListsCount; ii < num; ++ii)
 	{
 		gfx::transient_vertex_buffer tvb;
 		gfx::transient_index_buffer tib;
 
-		const ImDrawList* drawList = _drawData->CmdLists[ii];
-		std::uint32_t numVertices = static_cast<std::uint32_t>(drawList->VtxBuffer.size());
-		std::uint32_t numIndices = static_cast<std::uint32_t>(drawList->IdxBuffer.size());
+		const ImDrawList* draw_list = _draw_data->CmdLists[ii];
+		std::uint32_t num_vertices = static_cast<std::uint32_t>(draw_list->VtxBuffer.size());
+		std::uint32_t num_indices = static_cast<std::uint32_t>(draw_list->IdxBuffer.size());
 
 		const auto& layout = gfx::pos_texcoord0_color0_vertex::get_layout();
 
-		if(!(gfx::get_avail_transient_vertex_buffer(numVertices, layout) == numVertices) ||
-		   !(gfx::get_avail_transient_index_buffer(numIndices) == numIndices))
+		if(!(gfx::get_avail_transient_vertex_buffer(num_vertices, layout) == num_vertices) ||
+		   !(gfx::get_avail_transient_index_buffer(num_indices) == num_indices))
 		{
 			// not enough space in transient buffer just quit drawing the rest...
 			break;
 		}
 
-		gfx::alloc_transient_vertex_buffer(&tvb, numVertices, layout);
-		gfx::alloc_transient_index_buffer(&tib, numIndices);
+		gfx::alloc_transient_vertex_buffer(&tvb, num_vertices, layout);
+		gfx::alloc_transient_index_buffer(&tib, num_indices);
 
 		ImDrawVert* verts = reinterpret_cast<ImDrawVert*>(tvb.data);
-		std::memcpy(verts, drawList->VtxBuffer.begin(), numVertices * sizeof(ImDrawVert));
+		std::memcpy(verts, draw_list->VtxBuffer.begin(), num_vertices * sizeof(ImDrawVert));
 
 		ImDrawIdx* indices = reinterpret_cast<ImDrawIdx*>(tib.data);
-		std::memcpy(indices, drawList->IdxBuffer.begin(), numIndices * sizeof(ImDrawIdx));
+		std::memcpy(indices, draw_list->IdxBuffer.begin(), num_indices * sizeof(ImDrawIdx));
 
 		std::uint64_t state =
 			0 | BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_MSAA |
 			BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA);
 
 		std::uint32_t offset = 0;
-		for(const ImDrawCmd *cmd = drawList->CmdBuffer.begin(), *cmdEnd = drawList->CmdBuffer.end();
+		for(const ImDrawCmd *cmd = draw_list->CmdBuffer.begin(), *cmdEnd = draw_list->CmdBuffer.end();
 			cmd != cmdEnd; ++cmd)
 		{
 			if(cmd->UserCallback != nullptr)
 			{
-				cmd->UserCallback(drawList, cmd);
+				cmd->UserCallback(draw_list, cmd);
 			}
 			else if(0 != cmd->ElemCount)
 			{
@@ -97,20 +97,20 @@ void render_func(ImDrawData* _drawData)
 				const std::uint16_t width = std::uint16_t(std::min(cmd->ClipRect.z, 65535.0f) - x);
 				const std::uint16_t height = std::uint16_t(std::min(cmd->ClipRect.w, 65535.0f) - y);
 
-				prog->set_texture(0, "s_tex", tex);
+				program->set_texture(0, "s_tex", tex);
 
 				gfx::set_scissor(x, y, width, height);
 				gfx::set_state(state);
-				gfx::set_vertex_buffer(0, &tvb, 0, numVertices);
+				gfx::set_vertex_buffer(0, &tvb, 0, num_vertices);
 				gfx::set_index_buffer(&tib, offset, cmd->ElemCount);
-				gfx::submit(gfx::render_pass::get_pass(), prog->native_handle());
+				gfx::submit(gfx::render_pass::get_pass(), program->native_handle());
 				s_draw_calls++;
 			}
 
 			offset += cmd->ElemCount;
 		}
 	}
-	prog->end();
+	program->end();
 }
 
 void imgui_handle_event(const mml::platform_event& event)
@@ -173,15 +173,25 @@ void imgui_handle_event(const mml::platform_event& event)
 
 const mml::cursor* map_cursor(ImGuiMouseCursor cursor)
 {
-	static std::map<ImGuiMouseCursor_, mml::cursor::type> cursor_map = {
+	static std::map<ImGuiMouseCursor, mml::cursor::type> cursor_map = {
+		{ImGuiMouseCursor_None, mml::cursor::not_allowed},
 		{ImGuiMouseCursor_Arrow, mml::cursor::arrow},
-		{ImGuiMouseCursor_Move, mml::cursor::hand},
+		{ImGuiMouseCursor_ResizeAll, mml::cursor::size_all},
 		{ImGuiMouseCursor_TextInput, mml::cursor::text},
 		{ImGuiMouseCursor_ResizeNS, mml::cursor::size_vertical},
 		{ImGuiMouseCursor_ResizeEW, mml::cursor::size_horizontal},
 		{ImGuiMouseCursor_ResizeNESW, mml::cursor::size_bottom_left_top_right},
-		{ImGuiMouseCursor_ResizeNWSE, mml::cursor::size_top_left_bottom_right}};
-	auto id = cursor_map[static_cast<ImGuiMouseCursor_>(cursor)];
+		{ImGuiMouseCursor_ResizeNWSE, mml::cursor::size_top_left_bottom_right},
+
+		{ImGuiMouseCursor_Hand, mml::cursor::hand},
+		{ImGuiMouseCursor_NotAllowed, mml::cursor::not_allowed},
+		{ImGuiMouseCursor_Help, mml::cursor::help},
+		{ImGuiMouseCursor_Wait, mml::cursor::wait},
+		{ImGuiMouseCursor_ArrowWait, mml::cursor::arrow_wait},
+		{ImGuiMouseCursor_Cross, mml::cursor::cross},
+
+	};
+	auto id = cursor_map[cursor];
 	static std::map<mml::cursor::type, std::unique_ptr<mml::cursor>> cursors;
 	if(cursors.find(id) == cursors.end())
 	{
@@ -210,7 +220,6 @@ void imgui_set_context(ImGuiContext* context)
 		context->IO.IniFilename = last_context->IO.IniFilename;
 		context->IO.NavFlags = last_context->IO.NavFlags;
 		context->IO.FontAllowUserScaling = last_context->IO.FontAllowUserScaling;
-		context->IO.RenderDrawListsFn = last_context->IO.RenderDrawListsFn;
 		context->Initialized = last_context->Initialized;
 	}
 	gui::SetCurrentContext(context);
@@ -262,6 +271,7 @@ void imgui_frame_end()
 {
 	gui::End();
 	gui::Render();
+	render_func(gui::GetDrawData());
 }
 
 ImGuiContext* imgui_create_context(ImFontAtlas& atlas)
@@ -297,7 +307,6 @@ void imgui_init()
 	ImGuiIO& io = gui::GetIO();
 	io.NavFlags |= ImGuiNavFlags_EnableKeyboard;
 	io.IniFilename = nullptr;
-	io.RenderDrawListsFn = render_func;
 	// init keyboard mapping
 	io.KeyMap[ImGuiKey_Tab] = mml::keyboard::Tab;
 	io.KeyMap[ImGuiKey_LeftArrow] = mml::keyboard::Left;
@@ -331,25 +340,27 @@ void imgui_init()
 
 	gui::AddFont("default", io.Fonts->AddFontDefault(&config));
 	gui::AddFont("standard",
-				 io.Fonts->AddFontFromMemoryTTF((void*)s_font_default, sizeof(s_font_default), 20, &config));
+				 io.Fonts->AddFontFromMemoryTTF(reinterpret_cast<void*>(std::intptr_t(s_font_default)),
+												sizeof(s_font_default), 20, &config));
 
 	static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
 	config.MergeMode = true;
 	config.PixelSnapH = true;
-	gui::AddFont("icons",
-				 io.Fonts->AddFontFromMemoryTTF((void*)fontawesome_webfont_ttf,
-												sizeof(fontawesome_webfont_ttf), 20, &config, icons_ranges));
+	gui::AddFont("icons", io.Fonts->AddFontFromMemoryTTF(
+							  reinterpret_cast<void*>(std::intptr_t(fontawesome_webfont_ttf)),
+							  sizeof(fontawesome_webfont_ttf), 20, &config, icons_ranges));
 
 	config.MergeMode = false;
 	config.PixelSnapH = false;
 	gui::AddFont("standard_big",
-				 io.Fonts->AddFontFromMemoryTTF((void*)s_font_default, sizeof(s_font_default), 50, &config));
+				 io.Fonts->AddFontFromMemoryTTF(reinterpret_cast<void*>(std::intptr_t(s_font_default)),
+												sizeof(s_font_default), 50, &config));
 
 	config.MergeMode = true;
 	config.PixelSnapH = true;
-	gui::AddFont("icons_big",
-				 io.Fonts->AddFontFromMemoryTTF((void*)fontawesome_webfont_ttf,
-												sizeof(fontawesome_webfont_ttf), 50, &config, icons_ranges));
+	gui::AddFont("icons_big", io.Fonts->AddFontFromMemoryTTF(
+								  reinterpret_cast<void*>(std::intptr_t(fontawesome_webfont_ttf)),
+								  sizeof(fontawesome_webfont_ttf), 50, &config, icons_ranges));
 
 	io.Fonts->GetTexDataAsRGBA32(&data, &width, &height);
 

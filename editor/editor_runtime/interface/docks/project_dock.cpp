@@ -49,15 +49,15 @@ static asset_handle<gfx::texture> get_preview(const fs::path&, const std::string
 	return es.icons[type];
 };
 
-static bool process_drag_drop_source(asset_handle<gfx::texture> preview, const fs::path& absolute_path)
+static bool process_drag_drop_source(const asset_handle<gfx::texture>& preview, const fs::path& absolute_path)
 {
 	if(gui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
-	{
+	{        
 		const auto filename = absolute_path.filename();
 		const std::string extension = filename.has_extension() ? filename.extension().string() : "folder";
 		const std::string id = absolute_path.string();
 		const std::string strfilename = filename.string();
-		auto tex = preview;
+		const auto& tex = preview;
 		bool is_rt = tex ? tex->is_render_target() : false;
 		bool is_orig_bl = gfx::is_origin_bottom_left();
 		ImVec2 item_size = {32, 32};
@@ -92,8 +92,13 @@ static void process_drag_drop_target(const fs::path& absolute_path)
 	{
 		if(gui::IsDragDropPayloadBeingAccepted())
 		{
-			gui::SetMouseCursor(ImGuiMouseCursor_Move);
+			gui::SetMouseCursor(ImGuiMouseCursor_Hand);
 		}
+		else
+		{
+			gui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);
+		}
+
 		fs::error_code err;
 		if(fs::is_directory(absolute_path, err))
 		{
@@ -224,7 +229,7 @@ static void draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const s
 	else if(action == 2)
 	{
 		std::string new_name = std::string(input_buff.data());
-		if(new_name != name && new_name != "")
+		if(new_name != name && !new_name.empty())
 		{
 			if(on_rename)
 			{
@@ -243,7 +248,7 @@ static void draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const s
 	{
 		if(on_double_click)
 		{
-			gui::SetMouseCursor(ImGuiMouseCursor_Move);
+			gui::SetMouseCursor(ImGuiMouseCursor_Hand);
 		}
 	}
 
@@ -268,7 +273,7 @@ fs::path get_new_file(const fs::path& path, const std::string& name, const std::
 	return path / (string_utils::format("%s (%d)", name.c_str(), i) + ext);
 }
 
-void project_dock::render(const ImVec2&)
+void project_dock::render(const ImVec2& /*unused*/)
 {
 	const auto root_path = fs::resolve_protocol("app:/data");
 

@@ -119,7 +119,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	bool is_key_pressed(mml::keyboard::key key);
-    bool is_key_pressed(mml::keyboard::key key, mml::keyboard::key modifier);
+	bool is_key_pressed(mml::keyboard::key key, mml::keyboard::key modifier);
 	//-----------------------------------------------------------------------------
 	//  Name : is_key_down ()
 	/// <summary>

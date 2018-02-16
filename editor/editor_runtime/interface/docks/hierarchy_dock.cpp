@@ -303,8 +303,13 @@ static void process_drag_drop_target(runtime::entity entity)
 	{
 		if(gui::IsDragDropPayloadBeingAccepted())
 		{
-			gui::SetMouseCursor(ImGuiMouseCursor_Move);
+			gui::SetMouseCursor(ImGuiMouseCursor_Hand);
 		}
+		else
+		{
+			gui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);
+		}
+
 		{
 			auto payload = gui::AcceptDragDropPayload("entity");
 			if(payload != nullptr)

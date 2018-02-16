@@ -19,8 +19,6 @@
 #include "runtime/rendering/render_window.h"
 #include "runtime/rendering/renderer.h"
 
-static bool show_gbuffer = false;
-
 static bool bar(float _width, float _maxWidth, float _height, const ImVec4& _color)
 {
 	const ImGuiStyle& style = gui::GetStyle();
@@ -75,13 +73,13 @@ static void resource_bar(const char* _name, const char* _tooltip, uint32_t _num,
 	}
 }
 
-void show_statistics(const ImVec2& area, const unsigned int fps)
+void scene_dock::show_statistics(const ImVec2& area, unsigned int fps, bool& show_gbuffer)
 {
 	ImVec2 pos = gui::GetCursorScreenPos();
 	gui::SetNextWindowPos(pos);
 	gui::SetNextWindowCollapsed(true, ImGuiCond_FirstUseEver);
 	gui::SetNextWindowSizeConstraints(ImVec2(0, 0), area - gui::GetStyle().WindowPadding);
-	gui::Begin("STATISTICS", nullptr,
+	gui::Begin(("STATISTICS###" + title).c_str(), nullptr,
 			   ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
 
 	auto stats = gfx::get_stats();
@@ -358,11 +356,17 @@ void manipulation_gizmos()
 			if(input.is_key_down(mml::keyboard::LControl))
 			{
 				if(operation == imguizmo::operation::translate)
+				{
 					snap = &es.snap_data.translation_snap[0];
+				}
 				else if(operation == imguizmo::operation::rotate)
+				{
 					snap = &es.snap_data.rotation_degree_snap;
+				}
 				else if(operation == imguizmo::operation::scale)
+				{
 					snap = &es.snap_data.scale_snap;
+				}
 			}
 			const auto& camera = camera_comp->get_camera();
 			imguizmo::manipulate(camera.get_view(), camera.get_projection(), operation, mode, transform,
@@ -396,8 +400,9 @@ void manipulation_gizmos()
 void handle_camera_movement()
 {
 	if(!gui::IsWindowFocused())
+	{
 		return;
-
+	}
 	auto& es = core::get_subsystem<editor::editing_system>();
 	auto& input = core::get_subsystem<runtime::input>();
 	auto& sim = core::get_subsystem<core::simulation>();
@@ -510,12 +515,17 @@ static void process_drag_drop_target(std::shared_ptr<camera_component> camera_co
 	{
 		if(gui::IsDragDropPayloadBeingAccepted())
 		{
-			gui::SetMouseCursor(ImGuiMouseCursor_Move);
+			gui::SetMouseCursor(ImGuiMouseCursor_Hand);
 		}
+		else
+		{
+			gui::SetMouseCursor(ImGuiMouseCursor_NotAllowed);
+		}
+
 		for(const auto& type : ex::get_suported_formats<prefab>())
 		{
 			auto payload = gui::AcceptDragDropPayload(type.c_str());
-			if(payload)
+			if(payload != nullptr)
 			{
 				std::string absolute_path(reinterpret_cast<const char*>(payload->Data),
 										  std::size_t(payload->DataSize));
@@ -554,7 +564,7 @@ static void process_drag_drop_target(std::shared_ptr<camera_component> camera_co
 		for(const auto& type : ex::get_suported_formats<mesh>())
 		{
 			auto payload = gui::AcceptDragDropPayload(type.c_str());
-			if(payload)
+			if(payload != nullptr)
 			{
 				std::string absolute_path(reinterpret_cast<const char*>(payload->Data),
 										  std::size_t(payload->DataSize));
@@ -618,10 +628,13 @@ void scene_dock::render(const ImVec2& area)
 
 	bool has_edit_camera = editor_camera && editor_camera.has_component<camera_component>() &&
 						   editor_camera.has_component<transform_component>();
-	show_statistics(area, sim.get_fps());
+
+	show_statistics(area, sim.get_fps(), show_gbuffer);
 
 	if(!has_edit_camera)
+	{
 		return;
+	}
 
 	auto size = gui::GetContentRegionAvail();
 	auto pos = gui::GetCursorScreenPos();
@@ -647,8 +660,10 @@ void scene_dock::render(const ImVec2& area)
 		if(gui::IsItemClicked(1) || gui::IsItemClicked(2))
 		{
 			gui::SetWindowFocus();
-			if(window)
+			if(window != nullptr)
+			{
 				window->set_mouse_cursor_visible(false);
+			}
 		}
 
 		manipulation_gizmos();
@@ -694,8 +709,10 @@ void scene_dock::render(const ImVec2& area)
 
 		if(gui::IsMouseReleased(1) || gui::IsMouseReleased(2))
 		{
-			if(window)
+			if(window != nullptr)
+			{
 				window->set_mouse_cursor_visible(true);
+			}
 		}
 
 		if(show_gbuffer)
@@ -711,8 +728,10 @@ void scene_dock::render(const ImVec2& area)
 				if(gui::IsItemClicked(1) || gui::IsItemClicked(2))
 				{
 					gui::SetWindowFocus();
-					if(window)
+					if(window != nullptr)
+					{
 						window->set_mouse_cursor_visible(false);
+					}
 				}
 			}
 		}
