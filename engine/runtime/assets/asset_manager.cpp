@@ -8,7 +8,6 @@ asset_manager::asset_manager()
 
 asset_manager::~asset_manager()
 {
-	clear();
 }
 
 void asset_manager::clear()

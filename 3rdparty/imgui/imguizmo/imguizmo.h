@@ -40,6 +40,6 @@ enum mode
 };
 
 void manipulate(const float* view, const float* projection, operation op, mode mod, float* matrix,
-				float* deltaMatrix = 0, float* snap = 0, float* localBounds = nullptr,
+				float* deltaMatrix = nullptr, float* snap = nullptr, float* localBounds = nullptr,
 				float* boundsSnap = nullptr);
 };

@@ -95,7 +95,7 @@ struct asset_storage : public basic_storage
 	{
 		clear_with_condition([](const auto& it) {
 			const auto& task = it.second;
-			task.wait();
+			task.cancel();
 			return true;
 		});
 	}
@@ -116,7 +116,7 @@ struct asset_storage : public basic_storage
 
 			if(string_utils::begins_with(id, group, true))
 			{
-				task.wait();
+				task.cancel();
 				return true;
 			}
 			return false;

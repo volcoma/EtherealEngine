@@ -919,11 +919,36 @@ static void ComputeColors(ImU32* colors, int type, operation op)
 }
 
 static void ComputeTripodAxisAndVisibility(int axisIndex, vec_t& dirPlaneX, vec_t& dirPlaneY,
-										   bool& belowAxisLimit, bool& belowPlaneLimit)
+										   bool& belowAxisLimit, bool& belowPlaneLimit,
+										   vec_t* planNormal = NULL, bool checkNormal = true)
 {
-	const int planNormal = (axisIndex + 2) % 3;
+	const vec_t direction[3] = {gContext.mModel.v.right, gContext.mModel.v.up, gContext.mModel.v.dir};
+
+	// check both orthoganal axis for best planNormalIndex
+	int axisNormalIndex = 2;
+	int planNormalIndex = (axisIndex + 2) % 3;
+	if(planNormal)
+	{
+		if(checkNormal)
+		{
+			int planNormalIndexAlt = (axisIndex + 1) % 3;
+			vec_t planNormalIndexChosen = direction[planNormalIndex];
+			vec_t planNormalIndexChosenAlt = direction[planNormalIndexAlt];
+			float dotplanNormalIndex = fabsf(Dot(gContext.mCameraDir, planNormalIndexChosen));
+			float dotplanNormalIndexAlt = fabsf(Dot(gContext.mCameraDir, planNormalIndexChosenAlt));
+			if(dotplanNormalIndex < dotplanNormalIndexAlt)
+			{
+				planNormalIndex = planNormalIndexAlt;
+				axisNormalIndex = 1;
+			}
+		}
+
+		*planNormal = direction[planNormalIndex];
+	}
+	const int planYIndex = (axisIndex + (3 - axisNormalIndex)) % 3;
+
 	dirPlaneX = directionUnary[axisIndex];
-	dirPlaneY = directionUnary[(axisIndex + 1) % 3];
+	dirPlaneY = directionUnary[planYIndex];
 
 	if(gContext.mbUsing)
 	{
@@ -932,12 +957,12 @@ static void ComputeTripodAxisAndVisibility(int axisIndex, vec_t& dirPlaneX, vec_
 		belowPlaneLimit = gContext.mBelowPlaneLimit[axisIndex];
 
 		dirPlaneX *= gContext.mAxisFactor[axisIndex];
-		dirPlaneY *= gContext.mAxisFactor[(axisIndex + 1) % 3];
+		dirPlaneY *= gContext.mAxisFactor[planYIndex];
 	}
 	else
 	{
 		vec_t dirPlaneNormalWorld;
-		dirPlaneNormalWorld.TransformVector(directionUnary[planNormal], gContext.mModel);
+		dirPlaneNormalWorld.TransformVector(directionUnary[planNormalIndex], gContext.mModel);
 		dirPlaneNormalWorld.Normalize();
 
 		vec_t dirPlaneXWorld(dirPlaneX);
@@ -963,7 +988,7 @@ static void ComputeTripodAxisAndVisibility(int axisIndex, vec_t& dirPlaneX, vec_
 
 		// and store values
 		gContext.mAxisFactor[axisIndex] = mulAxisX;
-		gContext.mAxisFactor[(axisIndex + 1) % 3] = mulAxisY;
+		gContext.mAxisFactor[planYIndex] = mulAxisY;
 		gContext.mBelowAxisLimit[axisIndex] = belowAxisLimit;
 		gContext.mBelowPlaneLimit[axisIndex] = belowPlaneLimit;
 	}
@@ -998,6 +1023,10 @@ static float ComputeAngleOnPlan()
 	perpendicularVector.Normalize();
 	float acosAngle = Clamp(Dot(localPos, gContext.mRotationVectorSource), -0.9999f, 0.9999f);
 	float angle = acosf(acosAngle);
+    if(angle * RAD2DEG < 1.0f)
+    {
+        angle = 0;
+    }
 	angle *= (Dot(localPos, perpendicularVector) < 0.f) ? 1.f : -1.f;
 	return angle;
 }
@@ -1490,20 +1519,17 @@ static int GetScaleType()
 	   io.MousePos.y >= gContext.mScreenSquareMin.y && io.MousePos.y <= gContext.mScreenSquareMax.y)
 		type = SCALE_XYZ;
 
-	const vec_t direction[3] = {gContext.mModel.v.right, gContext.mModel.v.up, gContext.mModel.v.dir};
 	// compute
 	for(unsigned int i = 0; i < 3 && type == NONE; i++)
 	{
-		vec_t dirPlaneX, dirPlaneY;
+		vec_t dirPlaneX, dirPlaneY, planNormal;
 		bool belowAxisLimit, belowPlaneLimit;
-		ComputeTripodAxisAndVisibility(i, dirPlaneX, dirPlaneY, belowAxisLimit, belowPlaneLimit);
+		ComputeTripodAxisAndVisibility(i, dirPlaneX, dirPlaneY, belowAxisLimit, belowPlaneLimit, &planNormal);
 		dirPlaneX.TransformVector(gContext.mModel);
 		dirPlaneY.TransformVector(gContext.mModel);
 
-		const int planNormal = (i + 2) % 3;
-
 		const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayVector,
-											BuildPlan(gContext.mModel.v.position, direction[planNormal]));
+											BuildPlan(gContext.mModel.v.position, planNormal));
 		vec_t posOnPlan = gContext.mRayOrigin + gContext.mRayVector * len;
 
 		const float dx =
@@ -1558,21 +1584,18 @@ static int GetMoveType(vec_t* gizmoHitProportion)
 	   io.MousePos.y >= gContext.mScreenSquareMin.y && io.MousePos.y <= gContext.mScreenSquareMax.y)
 		type = MOVE_SCREEN;
 
-	const vec_t direction[3] = {gContext.mModel.v.right, gContext.mModel.v.up, gContext.mModel.v.dir};
-
 	// compute
 	for(unsigned int i = 0; i < 3 && type == NONE; i++)
 	{
-		vec_t dirPlaneX, dirPlaneY;
+		vec_t dirPlaneX, dirPlaneY, planNormal;
 		bool belowAxisLimit, belowPlaneLimit;
-		ComputeTripodAxisAndVisibility(i, dirPlaneX, dirPlaneY, belowAxisLimit, belowPlaneLimit);
+		// single axis check has two potential planes, do separately from plane check
+		ComputeTripodAxisAndVisibility(i, dirPlaneX, dirPlaneY, belowAxisLimit, belowPlaneLimit, &planNormal);
 		dirPlaneX.TransformVector(gContext.mModel);
 		dirPlaneY.TransformVector(gContext.mModel);
 
-		const int planNormal = (i + 2) % 3;
-
 		const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayVector,
-											BuildPlan(gContext.mModel.v.position, direction[planNormal]));
+											BuildPlan(gContext.mModel.v.position, planNormal));
 		vec_t posOnPlan = gContext.mRayOrigin + gContext.mRayVector * len;
 
 		const float dx =
@@ -1582,8 +1605,32 @@ static int GetMoveType(vec_t* gizmoHitProportion)
 		if(belowAxisLimit && dy > -0.1f && dy < 0.1f && dx > 0.1f && dx < 1.f)
 			type = MOVE_X + i;
 
-		if(belowPlaneLimit && dx >= quadUV[0] && dx <= quadUV[4] && dy >= quadUV[1] && dy <= quadUV[3])
+		// perform plane check without planNormal query
+
+		ComputeTripodAxisAndVisibility(i, dirPlaneX, dirPlaneY, belowAxisLimit, belowPlaneLimit, &planNormal,
+									   false);
+
+		dirPlaneX.TransformVector(gContext.mModel);
+
+		dirPlaneY.TransformVector(gContext.mModel);
+
+		const float lenPlane = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayVector,
+												 BuildPlan(gContext.mModel.v.position, planNormal));
+
+		vec_t posOnPlanPlane = gContext.mRayOrigin + gContext.mRayVector * lenPlane;
+
+		const float dxPlane =
+			dirPlaneX.Dot3((posOnPlanPlane - gContext.mModel.v.position) * (1.f / gContext.mScreenFactor));
+
+		const float dyPlane =
+			dirPlaneY.Dot3((posOnPlanPlane - gContext.mModel.v.position) * (1.f / gContext.mScreenFactor));
+
+		if(belowPlaneLimit && dxPlane >= quadUV[0] && dxPlane <= quadUV[4] && dyPlane >= quadUV[1] &&
+		   dyPlane <= quadUV[3])
+		{
+			// if(belowPlaneLimit && dx >= quadUV[0] && dx <= quadUV[4] && dy >= quadUV[1] && dy <= quadUV[3])
 			type = MOVE_XY + i;
+		}
 
 		if(gizmoHitProportion)
 			*gizmoHitProportion = makeVect(dx, dy, 0.f);
@@ -1666,8 +1713,25 @@ static void HandleTranslation(float* matrix, float* deltaMatrix, int& type, floa
 											gContext.mModel.v.right, gContext.mModel.v.dir,
 											gContext.mModel.v.right, gContext.mModel.v.up,
 											-gContext.mCameraDir};
+			const vec_t movePlanNormalAlt[] = {gContext.mModel.v.dir, gContext.mModel.v.right,
+											   gContext.mModel.v.up};
+
+			unsigned int planNormalIndex = type - MOVE_X;
+			vec_t movePlanNormalChosen = movePlanNormal[planNormalIndex];
+			if(planNormalIndex < 3)
+			{
+				// single axis move, select best axis
+				vec_t movePlanNormalChosenAlt = movePlanNormalAlt[planNormalIndex];
+				float dotPlanNormal = fabsf(Dot(gContext.mCameraDir, movePlanNormalChosen));
+				float dotPlanNormalAlt = fabsf(Dot(gContext.mCameraDir, movePlanNormalChosenAlt));
+				if(dotPlanNormal < dotPlanNormalAlt)
+				{
+					movePlanNormalChosen = movePlanNormalChosenAlt;
+				}
+			}
+
 			// pickup plan
-			gContext.mTranslationPlan = BuildPlan(gContext.mModel.v.position, movePlanNormal[type - MOVE_X]);
+			gContext.mTranslationPlan = BuildPlan(gContext.mModel.v.position, movePlanNormalChosen );
 			const float len =
 				IntersectRayPlane(gContext.mRayOrigin, gContext.mRayVector, gContext.mTranslationPlan);
 			gContext.mTranslationPlanOrigin = gContext.mRayOrigin + gContext.mRayVector * len;
@@ -1732,12 +1796,12 @@ static void HandleScale(float* matrix, float* deltaMatrix, int& type, float* sna
 			vec_t baseVector = gContext.mTranslationPlanOrigin - gContext.mModel.v.position;
 			float ratio = Dot(axisValue, baseVector + delta) / Dot(axisValue, baseVector);
 
-			gContext.mScale[axisIndex] = max(ratio, 0.001f);
+			gContext.mScale[axisIndex] = max(ratio, 0.01f);
 		}
 		else
 		{
 			float scaleDelta = (io.MousePos.x - gContext.mSaveMousePosx) * 0.01f;
-			gContext.mScale.Set(max(1.f + scaleDelta, 0.001f));
+			gContext.mScale.Set(max(1.f + scaleDelta, 0.01f));
 		}
 
 		// snap
@@ -1749,7 +1813,7 @@ static void HandleScale(float* matrix, float* deltaMatrix, int& type, float* sna
 
 		// no 0 allowed
 		for(int i = 0; i < 3; i++)
-			gContext.mScale[i] = max(gContext.mScale[i], 0.001f);
+			gContext.mScale[i] = max(gContext.mScale[i], 0.01f);
 
 		// compute matrix & delta
 		matrix_t deltaMatrixScale;

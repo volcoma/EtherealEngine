@@ -7,6 +7,12 @@ namespace core
 
 task::task_concept::~task_concept() noexcept = default;
 
+task::task_concept::task_concept() noexcept
+{
+	static std::atomic<std::uint64_t> id = {1};
+	id_ = id++;
+}
+
 void task_system::task_queue::sort()
 {
 	if(tasks_.size() > 1)
@@ -25,6 +31,12 @@ std::size_t task_system::task_queue::get_pending_tasks() const
 {
 	std::lock_guard<std::mutex> lock(mutex_);
 	return tasks_.size();
+}
+
+void task_system::task_queue::clear()
+{
+	std::unique_lock<std::mutex> lock(mutex_);
+	tasks_.clear();
 }
 
 void task_system::task_queue::set_done()
@@ -129,6 +141,27 @@ void task_system::task_queue::wake_up()
 	cv_.notify_all();
 }
 
+bool task_system::task_queue::cancel(uint64_t id)
+{
+	bool res = false;
+	{
+		std::unique_lock<std::mutex> lock(mutex_);
+		tasks_.erase(std::remove_if(std::begin(tasks_), std::end(tasks_),
+									[id, &res](const auto& task) {
+										auto cmp = task.get_id() == id;
+										if(cmp)
+										{
+											res = true;
+										}
+										return cmp;
+									}),
+					 std::end(tasks_));
+	}
+	cv_.notify_one();
+
+	return res;
+}
+
 void task_system::run(std::size_t idx, const std::function<bool()>& condition, duration_t pop_timeout)
 {
 	while(condition())
@@ -199,14 +232,15 @@ std::thread::id task_system::get_thread_id(std::size_t index)
 	return thread_id;
 }
 
-task_system::task_system()
-	: task_system(std::thread::hardware_concurrency())
+task_system::task_system(bool wait_on_destruct)
+	: task_system(wait_on_destruct, std::thread::hardware_concurrency())
 {
 }
 
-task_system::task_system(std::size_t nthreads, const task_system::allocator_t& alloc)
+task_system::task_system(bool wait_on_destruct, std::size_t nthreads, const task_system::allocator_t& alloc)
 	: alloc_(alloc)
 	, threads_count_{nthreads}
+	, wait_on_destruct_(wait_on_destruct)
 {
 	queues_.reserve(threads_count_);
 	queues_.emplace_back();
@@ -230,6 +264,10 @@ task_system::~task_system()
 {
 	for(auto& q : queues_)
 	{
+		if(!wait_on_destruct_)
+		{
+            q.clear();
+		}
 		q.set_done();
 	}
 

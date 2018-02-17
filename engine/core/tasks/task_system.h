@@ -53,6 +53,8 @@ public:
 	//-----------------------------------------------------------------------------
 	void wait() const;
 
+	void cancel() const;
+
 	template <class Rep, class Per>
 	std::future_status wait_for(const std::chrono::duration<Rep, Per>& rel_time) const
 	{ // wait for duration
@@ -65,29 +67,38 @@ public:
 		return future_.wait_until(abs_time);
 	}
 
-	static task_future<T> from_shared_future(const std::shared_future<T>& fut)
+	static task_future<T> from_shared_future(const std::shared_future<T>& fut, std::uint64_t id = 0)
 	{
 		task_future<T> res;
 		res.future_ = fut;
+		res.id_ = id;
 		return res;
 	}
-	static task_future<T> from_shared_future(std::shared_future<T>&& fut)
+	static task_future<T> from_shared_future(std::shared_future<T>&& fut, std::uint64_t id = 0)
 	{
 		task_future<T> res;
 		res.future_ = std::move(fut);
+		res.id_ = id;
 		return res;
 	}
-	static task_future<T> from_future(std::future<T>&& fut)
+	static task_future<T> from_future(std::future<T>&& fut, std::uint64_t id = 0)
 	{
 		task_future<T> res;
 		res.future_ = fut.share();
+		res.id_ = id;
 		return res;
+	}
+
+	std::uint64_t get_id() const
+	{
+		return id_;
 	}
 
 private:
 	friend class task_system;
 	std::shared_future<T> future_;
 	task_system* executor_ = nullptr;
+	std::uint64_t id_ = 0;
 };
 
 template <class>
@@ -304,6 +315,15 @@ public:
 
 		return false;
 	}
+	std::uint64_t get_id() const
+	{
+		if(t_)
+		{
+			return t_->id_;
+		}
+
+		return 0;
+	}
 
 private:
 	template <class F, class... Args>
@@ -340,9 +360,11 @@ private:
 
 	struct task_concept
 	{
+		task_concept() noexcept;
 		virtual ~task_concept() noexcept;
 		virtual void invoke_() = 0;
 		virtual bool ready_() const noexcept = 0;
+		std::uint64_t id_ = 0;
 	};
 
 	template <class>
@@ -378,7 +400,7 @@ private:
 
 		task_future<R> get_future()
 		{
-			return task_future<R>::from_shared_future(f_.get_future().share());
+			return task_future<R>::from_shared_future(f_.get_future().share(), id_);
 		}
 
 		void invoke_() override
@@ -428,13 +450,20 @@ private:
 
 		task_future<R> get_future()
 		{
-			return task_future<R>::from_shared_future(f_.get_future().share());
+			return task_future<R>::from_shared_future(f_.get_future().share(), id_);
 		}
 
 		void invoke_() override
 		{
 			constexpr const std::size_t arity = sizeof...(FutArgs);
-			do_invoke_(std::make_index_sequence<arity>());
+			try
+			{
+				do_invoke_(std::make_index_sequence<arity>());
+			}
+			catch(const std::future_error& e)
+			{
+				(void)e;
+			}
 		}
 
 		bool ready_() const noexcept override
@@ -445,25 +474,25 @@ private:
 
 	private:
 		template <class T>
-		static inline decltype(auto) call_get(T&& t) noexcept
+		static inline decltype(auto) call_get(T&& t)
 		{
 			return std::forward<T>(t);
 		}
 
 		template <class T>
-		static inline decltype(auto) call_get(task_future<T>&& t) noexcept
+		static inline decltype(auto) call_get(task_future<T>&& t)
 		{
 			return t.get();
 		}
 
 		template <class T>
-		static inline decltype(auto) call_get(std::future<T>&& t) noexcept
+		static inline decltype(auto) call_get(std::future<T>&& t)
 		{
 			return t.get();
 		}
 
 		template <class T>
-		static inline decltype(auto) call_get(std::shared_future<T>&& t) noexcept
+		static inline decltype(auto) call_get(std::shared_future<T>&& t)
 		{
 			return t.get();
 		}
@@ -532,9 +561,9 @@ public:
 
 	using allocator_t = std::allocator<task>;
 
-	task_system();
+	task_system(bool wait_on_destruct);
 
-	task_system(std::size_t nthreads, allocator_t const& alloc = {});
+	task_system(bool wait_on_destruct, std::size_t nthreads, allocator_t const& alloc = {});
 
 	//-----------------------------------------------------------------------------
 	//  Name : ~task_system ()
@@ -792,6 +821,23 @@ private:
 		return std::move(t.second);
 	}
 
+	bool cancel(std::uint64_t id)
+	{
+		bool cancelled = false;
+		for(std::size_t i = 0; i < threads_count_; ++i)
+		{
+			auto queue_index = get_thread_queue_idx(i, 0);
+
+			auto& queue = queues_[queue_index];
+			if(queue.cancel(id))
+			{
+				cancelled = true;
+				break;
+			}
+		}
+
+		return cancelled;
+	}
 	//-----------------------------------------------------------------------------
 	//  Name : processing_wait ()
 	/// <summary>
@@ -877,6 +923,9 @@ private:
 		void push(task t);
 		void wake_up();
 
+		bool cancel(std::uint64_t id);
+		void clear();
+
 	private:
 		void sort();
 		std::deque<task> tasks_;
@@ -889,6 +938,7 @@ private:
 	std::vector<std::thread> threads_;
 	typename allocator_t::template rebind<task::task_concept>::other alloc_;
 	std::size_t threads_count_;
+	bool wait_on_destruct_ = false;
 	//
 	const std::thread::id owner_thread_id_ = std::this_thread::get_id();
 };
@@ -913,6 +963,25 @@ void task_future<T>::wait() const
 		else
 		{
 			future_.wait();
+		}
+	}
+}
+
+template <typename T>
+void task_future<T>::cancel() const
+{
+	if(!future_.valid())
+	{
+		return;
+	}
+
+	if(executor_)
+	{
+		bool cancelled = executor_->cancel(id_);
+
+		if(!cancelled)
+		{
+			wait();
 		}
 	}
 }
