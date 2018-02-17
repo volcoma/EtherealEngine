@@ -52,7 +52,7 @@ static asset_handle<gfx::texture> get_preview(const fs::path&, const std::string
 static bool process_drag_drop_source(const asset_handle<gfx::texture>& preview, const fs::path& absolute_path)
 {
 	if(gui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
-	{        
+	{
 		const auto filename = absolute_path.filename();
 		const std::string extension = filename.has_extension() ? filename.extension().string() : "folder";
 		const std::string id = absolute_path.string();

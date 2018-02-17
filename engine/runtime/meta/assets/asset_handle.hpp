@@ -46,7 +46,7 @@ inline void LOAD_FUNCTION_NAME(Archive& ar, asset_handle<T>& obj)
 	else
 	{
 		auto& am = core::get_subsystem<runtime::asset_manager>();
-		auto asset_future = am.load<T>(obj.link->id, runtime::load_mode::sync);
+		auto asset_future = am.load<T>(obj.link->id);
 		obj = asset_future.get();
 	}
 }

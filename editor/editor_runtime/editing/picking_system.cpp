@@ -224,8 +224,9 @@ picking_system::picking_system()
 	auto& am = core::get_subsystem<runtime::asset_manager>();
 
 	auto vs_picking_id = am.load<gfx::shader>("editor:/data/shaders/vs_picking_id.sc");
+	vs_picking_id.wait();
 	auto fs_picking_id = am.load<gfx::shader>("editor:/data/shaders/fs_picking_id.sc");
-
+	fs_picking_id.wait();
 	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
 			program_ = std::make_unique<gpu_program>(vs, fs);

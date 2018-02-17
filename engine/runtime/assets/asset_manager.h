@@ -50,11 +50,10 @@ public:
 	}
 
 	template <typename T>
-	core::task_future<asset_handle<T>> load(const std::string& key, load_mode mode = load_mode::sync,
-											load_flags flags = load_flags::standard)
+	core::task_future<asset_handle<T>> load(const std::string& key, load_flags flags = load_flags::standard)
 	{
 		auto& storage = get_storage<T>();
-		return load_asset_from_file_impl<T>(key, mode, flags, storage.container_mutex, storage.container,
+		return load_asset_from_file_impl<T>(key, flags, storage.container_mutex, storage.container,
 											storage.load_from_file);
 	}
 
@@ -69,10 +68,10 @@ public:
 	template <typename T>
 	core::task_future<asset_handle<T>>
 	create_asset_from_memory(const std::string& key, const std::uint8_t* data, const std::uint32_t& size,
-							 load_mode mode = load_mode::sync, load_flags flags = load_flags::standard)
+							 load_flags flags = load_flags::standard)
 	{
 		auto& storage = get_storage<T>();
-		return create_asset_from_memory_impl<T>(key, data, size, mode, flags, storage.container_mutex,
+		return create_asset_from_memory_impl<T>(key, data, size, flags, storage.container_mutex,
 												storage.container, storage.load_from_memory);
 	}
 
@@ -139,8 +138,7 @@ private:
 	//-----------------------------------------------------------------------------
 	template <typename T, typename F>
 	core::task_future<asset_handle<T>>
-	load_asset_from_file_impl(const std::string& key, load_mode mode, load_flags flags,
-							  std::recursive_mutex& container_mutex,
+	load_asset_from_file_impl(const std::string& key, load_flags flags, std::recursive_mutex& container_mutex,
 							  typename asset_storage<T>::request_container_t& container, F&& load_func)
 	{
 		std::unique_lock<std::recursive_mutex> lock(container_mutex);
@@ -161,11 +159,6 @@ private:
 			auto future_copy = future;
 
 			lock.unlock();
-
-			if(mode == load_mode::sync)
-			{
-				future_copy.wait();
-			}
 
 			return future_copy;
 		}
@@ -194,8 +187,7 @@ private:
 	template <typename T, typename F>
 	core::task_future<asset_handle<T>>&
 	create_asset_from_memory_impl(const std::string& key, const std::uint8_t* data, const std::uint32_t& size,
-								  load_mode /*mode*/, load_flags /*flags*/,
-								  std::recursive_mutex& container_mutex,
+								  load_flags /*flags*/, std::recursive_mutex& container_mutex,
 								  typename asset_storage<T>::request_container_t& container, F&& load_func)
 	{
 

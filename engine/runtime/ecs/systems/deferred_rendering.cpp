@@ -736,18 +736,26 @@ deferred_rendering::deferred_rendering()
 	auto& ts = core::get_subsystem<core::task_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
 	auto vs_clip_quad = am.load<gfx::shader>("engine:/data/shaders/vs_clip_quad.sc");
+	vs_clip_quad.wait();
 	auto fs_deferred_point_light = am.load<gfx::shader>("engine:/data/shaders/fs_deferred_point_light.sc");
+	fs_deferred_point_light.wait();
 	auto fs_deferred_spot_light = am.load<gfx::shader>("engine:/data/shaders/fs_deferred_spot_light.sc");
+	fs_deferred_spot_light.wait();
 	auto fs_deferred_directional_light =
 		am.load<gfx::shader>("engine:/data/shaders/fs_deferred_directional_light.sc");
+	fs_deferred_directional_light.wait();
 	auto fs_gamma_correction = am.load<gfx::shader>("engine:/data/shaders/fs_gamma_correction.sc");
+	fs_gamma_correction.wait();
 	auto vs_clip_quad_ex = am.load<gfx::shader>("engine:/data/shaders/vs_clip_quad_ex.sc");
+	vs_clip_quad_ex.wait();
 	auto fs_sphere_reflection_probe =
 		am.load<gfx::shader>("engine:/data/shaders/fs_sphere_reflection_probe.sc");
+	fs_sphere_reflection_probe.wait();
 	auto fs_box_reflection_probe = am.load<gfx::shader>("engine:/data/shaders/fs_box_reflection_probe.sc");
+	fs_box_reflection_probe.wait();
 	auto fs_atmospherics = am.load<gfx::shader>("engine:/data/shaders/fs_atmospherics.sc");
+	fs_atmospherics.wait();
 	ibl_brdf_lut_ = am.load<gfx::texture>("engine:/data/textures/ibl_brdf_lut.png").get();
-
 	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
 			point_light_program_ = std::make_unique<gpu_program>(vs, fs);

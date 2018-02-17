@@ -49,8 +49,7 @@ static std::uint64_t watch_assets(const fs::path& dir, const std::string& wildca
 				{
 					if(entry.status == fs::watcher::entry_status::removed)
 					{
-						auto task =
-							ts.push_on_owner_thread([reload_async, key, &am]() { am.clear_asset<T>(key); });
+						auto task = ts.push_on_owner_thread([key, &am]() { am.clear_asset<T>(key); });
 					}
 					else if(entry.status == fs::watcher::entry_status::renamed)
 					{
@@ -58,17 +57,15 @@ static std::uint64_t watch_assets(const fs::path& dir, const std::string& wildca
 						auto old_data_key = fs::convert_to_protocol(old_p);
 						auto old_key = fs::replace(old_data_key.generic(), ":/cache", ":/data").string();
 						auto task = ts.push_on_owner_thread(
-							[reload_async, old_key, key, &am]() { am.rename_asset<T>(old_key, key); });
+							[old_key, key, &am]() { am.rename_asset<T>(old_key, key); });
 					}
 					else
 					{
 						using namespace runtime;
-						load_mode mode = reload_async ? load_mode::async : load_mode::sync;
 						load_flags flags = is_initial_list ? load_flags::standard : load_flags::reload;
 
 						// created or modified
-						auto task = ts.push_on_worker_thread(
-							[mode, flags, key, &am]() { am.load<T>(key, mode, flags); });
+						auto task = ts.push_on_worker_thread([flags, key, &am]() { am.load<T>(key, flags); });
 					}
 				}
 			}

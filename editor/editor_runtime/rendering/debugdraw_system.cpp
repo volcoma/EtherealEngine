@@ -304,7 +304,8 @@ debugdraw_system::debugdraw_system()
 
 	auto vs_wf_wireframe = am.load<gfx::shader>("editor:/data/shaders/vs_wf_wireframe.sc");
 	auto fs_wf_wireframe = am.load<gfx::shader>("editor:/data/shaders/fs_wf_wireframe.sc");
-
+	vs_wf_wireframe.wait();
+	fs_wf_wireframe.wait();
 	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
 			program_ = std::make_unique<gpu_program>(vs, fs);

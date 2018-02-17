@@ -246,7 +246,7 @@ struct rect
 	template <typename T1 = T>
 	inline size<T1> size() const
 	{
-		return size<T1>(right - left, bottom - top);
+		return size<T1>(right - left /*+ 1*/, bottom - top /*+ 1*/);
 	}
 
 	template <typename T1 = T>
