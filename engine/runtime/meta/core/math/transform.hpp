@@ -77,12 +77,22 @@ inline void SERIALIZE_FUNCTION_NAME(Archive& ar, math::tmat4x4<T, P>& obj)
 	try_serialize(ar, cereal::make_nvp("col_3", obj[3]));
 }
 
-template <typename Archive>
-inline void SERIALIZE_FUNCTION_NAME(Archive& ar, math::transform& obj)
+// template <typename Archive>
+// inline void SERIALIZE_FUNCTION_NAME(Archive& ar, math::transform& obj)
+//{
+//	try_serialize(ar, cereal::make_nvp("col_0", obj[0]));
+//	try_serialize(ar, cereal::make_nvp("col_1", obj[1]));
+//	try_serialize(ar, cereal::make_nvp("col_2", obj[2]));
+//	try_serialize(ar, cereal::make_nvp("col_3", obj[3]));
+//}
+template <typename Archive, typename T, math::qualifier P>
+inline void SERIALIZE_FUNCTION_NAME(Archive& ar, math::transform_t<T, P>& obj)
 {
-	try_serialize(ar, cereal::make_nvp("col_0", obj[0]));
-	try_serialize(ar, cereal::make_nvp("col_1", obj[1]));
-	try_serialize(ar, cereal::make_nvp("col_2", obj[2]));
-	try_serialize(ar, cereal::make_nvp("col_3", obj[3]));
+	typename math::transform_t<T, P>::mat4_t m = obj;
+	try_serialize(ar, cereal::make_nvp("col_0", m[0]));
+	try_serialize(ar, cereal::make_nvp("col_1", m[1]));
+	try_serialize(ar, cereal::make_nvp("col_2", m[2]));
+	try_serialize(ar, cereal::make_nvp("col_3", m[3]));
+	obj = m;
 }
 }

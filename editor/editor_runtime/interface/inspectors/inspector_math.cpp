@@ -63,7 +63,7 @@ bool inspector_quaternion::inspect(rttr::variant& var, bool read_only, const met
 		math::quat qy = math::angleAxis(delta.y, math::vec3{0.0f, 1.0f, 0.0f});
 		math::quat qz = math::angleAxis(delta.z, math::vec3{0.0f, 0.0f, 1.0f});
 		data = qz * qy * qx * data;
-		;
+
 		var = data;
 		return true;
 	}
@@ -82,8 +82,8 @@ bool inspector_transform::inspect(rttr::variant& var, bool read_only, const meta
 
 	const bool is_global = true;
 
-	static math::quat old_quat;
-	static math::vec3 euler_angles;
+	static math::quat old_quat(1.0f, 0.0f, 0.0f, 0.0f);
+	static math::vec3 euler_angles(0.0f, 0.0f, 0.0f);
 	bool changed = false;
 	bool equal = math::epsilonEqual(math::abs(math::dot(old_quat, rotation)), 1.0f, math::epsilon<float>());
 	if(!equal && (!gui::IsMouseDragging() || imguizmo::is_using()))
@@ -99,21 +99,25 @@ bool inspector_transform::inspect(rttr::variant& var, bool read_only, const meta
 	}
 	gui::SameLine();
 	gui::PushID("Position");
-	auto prevPos = position;
+	auto last_pos = position;
 	if(gui::DragFloatNEx(names, &position[0], 3, 0.05f))
 	{
-		auto delta = position - prevPos;
+		auto delta = position - last_pos;
 		if(is_global)
+		{
 			data.translate(delta);
+		}
 		else
+		{
 			data.translate_local(delta);
+		}
 		changed = true;
 	}
 	gui::PopID();
 
 	if(gui::Button("R", ImVec2(ImGui::GetFrameHeightWithSpacing(), ImGui::GetFrameHeightWithSpacing())))
 	{
-		data.set_rotation(math::quat());
+		data.set_rotation(math::quat(1.0f, 0.0f, 0.0f, 0.0f));
 		euler_angles = {0.0f, 0.0f, 0.0f};
 		changed = true;
 	}
@@ -124,10 +128,13 @@ bool inspector_transform::inspect(rttr::variant& var, bool read_only, const meta
 	if(gui::DragFloatNEx(names, &degrees[0], 3, 0.05f))
 	{
 		if(is_global)
+		{
 			data.rotate(math::radians(degrees - euler_angles));
+		}
 		else
+		{
 			data.rotate_local(math::radians(degrees - euler_angles));
-
+		}
 		euler_angles = degrees;
 		changed = true;
 	}

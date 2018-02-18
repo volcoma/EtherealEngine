@@ -150,10 +150,11 @@ const math::transform& camera::get_projection() const
 			static const auto perspective_ =
 				gfx::is_homogeneous_depth() ? math::perspectiveNO<float> : math::perspectiveZO<float>;
 
-			projection_ = perspective_(fov_radians, aspect_ratio_, near_clip_, far_clip_);
+			math::mat4 projection = perspective_(fov_radians, aspect_ratio_, near_clip_, far_clip_);
 
-			projection_[2][0] += aa_data_.z;
-			projection_[2][1] += aa_data_.w;
+			projection[2][0] += aa_data_.z;
+			projection[2][1] += aa_data_.w;
+			projection_ = projection;
 			// Matrix has been updated
 			projection_dirty_ = false;
 			aspect_dirty_ = false;
@@ -162,8 +163,9 @@ const math::transform& camera::get_projection() const
 		else if(aspect_dirty_)
 		{
 			// Just alter the aspect ratio
-			projection_[0][0] = projection_[1][1] / aspect_ratio_;
-
+			math::mat4 projection = projection_;
+			projection[0][0] = projection[1][1] / aspect_ratio_;
+			projection_ = projection;
 			// Matrix has been updated
 			aspect_dirty_ = false;
 
@@ -181,10 +183,11 @@ const math::transform& camera::get_projection() const
 			static const auto ortho_ =
 				gfx::is_homogeneous_depth() ? math::orthoNO<float> : math::orthoZO<float>;
 
-			projection_ = ortho_(rect.left * zoom, rect.right * zoom, rect.bottom * zoom, rect.top * zoom,
-								 get_near_clip(), get_far_clip());
-			projection_[2][0] += aa_data_.z;
-			projection_[2][1] += aa_data_.w;
+			math::mat4 projection = ortho_(rect.left * zoom, rect.right * zoom, rect.bottom * zoom,
+										   rect.top * zoom, get_near_clip(), get_far_clip());
+			projection[2][0] += aa_data_.z;
+			projection[2][1] += aa_data_.w;
+			projection_ = projection;
 			// Matrix has been updated
 			projection_dirty_ = false;
 			aspect_dirty_ = false;
@@ -199,14 +202,12 @@ const math::transform& camera::get_projection() const
 
 void camera::look_at(const math::vec3& vEye, const math::vec3& vAt)
 {
-	view_.look_at(vEye, vAt);
-
-	touch();
+	look_at(vEye, vAt, math::vec3(0.0f, 1.0f, 0.0f));
 }
 
 void camera::look_at(const math::vec3& vEye, const math::vec3& vAt, const math::vec3& vUp)
 {
-	view_.look_at(vEye, vAt, vUp);
+	view_ = math::lookAt(vEye, vAt, vUp);
 
 	touch();
 }
@@ -306,7 +307,7 @@ math::vec3 camera::world_to_viewport(const math::vec3& pos) const
 	auto view_proj = get_view_projection();
 
 	// Transform the point into clip space
-	math::vec4 clip = view_proj.matrix() * math::vec4{pos.x, pos.y, pos.z, 1.0f};
+	math::vec4 clip = view_proj * math::vec4{pos.x, pos.y, pos.z, 1.0f};
 
 	// Project!
 	const float recip_w = 1.0f / clip.w;
@@ -551,8 +552,7 @@ math::vec3 camera::estimate_pick_tolerance(float wire_tolerance, const math::vec
 										   const math::transform& object_transform) const
 {
 	// Scale tolerance based on estimated world space zoom factor.
-	math::vec3 v;
-	object_transform.transform_coord(v, pos);
+	math::vec3 v = object_transform.transform_coord(pos);
 	wire_tolerance *= estimate_zoom_factor(v);
 
 	// Convert into object space tolerance.
@@ -671,53 +671,41 @@ camera camera::get_face_camera(uint32_t face, const math::transform& transform)
 	math::vec3 Zero(0, 0, 0);
 	math::transform t;
 	// Generate the correct view matrix for the frustum
-	if(!gfx::is_origin_bottom_left())
+
+	switch(face)
 	{
-		switch(face)
-		{
-			case 0:
-				t.set_rotation(-Z, +Y, +X);
-				break;
-			case 1:
-				t.set_rotation(+Z, +Y, -X);
-				break;
-			case 2:
+		case 0: // right
+			t.set_rotation(-Z, +Y, +X);
+			break;
+		case 1: // left
+			t.set_rotation(+Z, +Y, -X);
+			break;
+		case 2: // up
+			if(!gfx::is_origin_bottom_left())
+			{
 				t.set_rotation(+X, -Z, +Y);
-				break;
-			case 3:
+			}
+			else
+			{
 				t.set_rotation(+X, +Z, -Y);
-				break;
-			case 4:
-				t.set_rotation(+X, +Y, +Z);
-				break;
-			case 5:
-				t.set_rotation(-X, +Y, -Z);
-				break;
-		}
-	}
-	else
-	{
-		switch(face)
-		{
-			case 0:
-				t.set_rotation(-Z, +Y, +X);
-				break;
-			case 1:
-				t.set_rotation(+Z, +Y, -X);
-				break;
-			case 3:
+			}
+			break;
+		case 3: // down
+			if(!gfx::is_origin_bottom_left())
+			{
+				t.set_rotation(+X, +Z, -Y);
+			}
+			else
+			{
 				t.set_rotation(+X, -Z, +Y);
-				break;
-			case 2:
-				t.set_rotation(+X, +Z, -Y);
-				break;
-			case 4:
-				t.set_rotation(+X, +Y, +Z);
-				break;
-			case 5:
-				t.set_rotation(-X, +Y, -Z);
-				break;
-		}
+			}
+			break;
+		case 4: // front
+			t.set_rotation(+X, +Y, +Z);
+			break;
+		case 5: // back
+			t.set_rotation(-X, +Y, -Z);
+			break;
 	}
 
 	t = transform * t;

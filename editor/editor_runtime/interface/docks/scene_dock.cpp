@@ -351,7 +351,6 @@ void manipulation_gizmos()
 			transform_comp->resolve(true);
 			auto transform = transform_comp->get_transform();
 			math::transform delta;
-			math::transform inputTransform = transform;
 			float* snap = nullptr;
 			if(input.is_key_down(mml::keyboard::LControl))
 			{
@@ -369,10 +368,11 @@ void manipulation_gizmos()
 				}
 			}
 			const auto& camera = camera_comp->get_camera();
-			imguizmo::manipulate(camera.get_view(), camera.get_projection(), operation, mode, transform,
-								 nullptr, snap);
+			math::mat4 output = transform;
+			imguizmo::manipulate(camera.get_view(), camera.get_projection(), operation, mode,
+								 math::value_ptr(output), nullptr, snap);
 
-			transform_comp->set_transform(transform);
+			transform_comp->set_transform(output);
 
 			//			if(sel.has_component<model_component>())
 			//			{
@@ -492,13 +492,16 @@ void handle_camera_movement()
 		float x = static_cast<float>(delta_move.x);
 		float y = static_cast<float>(delta_move.y);
 
-		// Make each pixel correspond to a quarter of a degree.
-		float dx = x * rotation_speed;
-		float dy = y * rotation_speed;
-
 		transform->resolve(true);
-		transform->rotate(0.0f, dx, 0.0f);
-		transform->rotate_local(dy, 0.0f, 0.0f);
+		// if(x != 0.0f|| y != 0.0f)
+		{
+			// Make each pixel correspond to a quarter of a degree.
+			float dx = x * rotation_speed;
+			float dy = y * rotation_speed;
+
+			transform->rotate(0.0f, dx, 0.0f);
+			transform->rotate_local(dy, 0.0f, 0.0f);
+		}
 
 		float delta_wheel = input.get_mouse_wheel_scroll_delta_move();
 		transform->move_local({0.0f, 0.0f, 14.0f * movement_speed * delta_wheel * dt});

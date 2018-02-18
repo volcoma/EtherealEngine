@@ -266,7 +266,7 @@ task_system::~task_system()
 	{
 		if(!wait_on_destruct_)
 		{
-            q.clear();
+			q.clear();
 		}
 		q.set_done();
 	}

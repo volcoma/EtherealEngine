@@ -47,13 +47,13 @@ void app::setup(cmd_line::parser& parser)
 
 void app::start(cmd_line::parser& parser)
 {
-    //this order is important
+	// this order is important
 	core::add_subsystem<core::simulation>();
 	core::add_subsystem<renderer>(parser);
 	core::add_subsystem<input>();
 	core::add_subsystem<audio::device>();
 	core::add_subsystem<asset_manager>();
-    core::add_subsystem<core::task_system>(false);
+	core::add_subsystem<core::task_system>(false);
 	setup_asset_manager();
 	core::add_subsystem<entity_component_system>();
 	core::add_subsystem<scene_graph>();

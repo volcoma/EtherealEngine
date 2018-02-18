@@ -167,141 +167,81 @@ void transform_component::look_at(float x, float y, float z)
 void transform_component::look_at(const math::vec3& point)
 {
 	math::vec3 eye = get_position();
-	math::transform m;
-	m.look_at(eye, point);
+	math::transform m = math::lookAt(eye, point, math::vec3{0.0f, 1.0f, 0.0f});
 	m = math::inverse(m);
 	set_rotation(m.get_rotation());
 }
 
 void transform_component::rotate_local(float x, float y, float z)
 {
-	// Do nothing if rotation is disallowed.
-	if(!can_rotate())
-	{
-		return;
-	}
-
 	local_transform_.rotate_local(math::radians(x), math::radians(y), math::radians(z));
 	set_local_transform(local_transform_);
 }
 
 void transform_component::rotate_axis(float degrees, const math::vec3& axis)
 {
-	// If rotation is disallowed, only process position change. Otherwise
-	// perform full rotation.
-	if(!can_rotate())
-	{
-		// Scale the position, but do not allow axes to scale.
-		math::vec3 vPos = get_position();
-		math::transform t;
-		t.rotate_axis(math::radians(degrees), axis);
-		t.transform_coord(vPos, vPos);
-		set_position(vPos);
 
-	} // End if !canRotate()
-	else
-	{
-		// Rotate a copy of the current math::transform.
-		math::transform m = get_transform();
-		m.rotate_axis(math::radians(degrees), axis);
+	// Rotate a copy of the current math::transform.
+	math::transform m = get_transform();
+	m.rotate_axis(math::radians(degrees), axis);
 
-		if(parent_.valid())
+	if(parent_.valid())
+	{
+		auto parent_transform = parent_.get_component<transform_component>().lock();
+		if(parent_transform)
 		{
-			auto parent_transform = parent_.get_component<transform_component>().lock();
-			if(parent_transform)
-			{
-				math::transform inv_parent_transform = math::inverse(parent_transform->get_transform());
-				m = inv_parent_transform * m;
-			}
+			math::transform inv_parent_transform = math::inverse(parent_transform->get_transform());
+			m = inv_parent_transform * m;
 		}
+	}
 
-		set_local_transform(m);
-
-	} // End if canRotate()
+	set_local_transform(m);
 }
 
 void transform_component::rotate(float x, float y, float z)
 {
-	// If rotation is disallowed, only process position change. Otherwise
-	// perform full rotation.
-	if(!can_rotate())
-	{
-		// Scale the position, but do not allow axes to scale.
-		math::transform t;
-		math::vec3 position = get_position();
-		t.rotate(math::radians(x), math::radians(y), math::radians(z));
-		t.transform_coord(position, position);
-		set_position(position);
 
-	} // End if !canRotate()
-	else
-	{
-		// Scale a copy of the cell math::transform
-		// Set orientation of new math::transform
-		math::transform m = get_transform();
-		m.rotate(math::radians(x), math::radians(y), math::radians(z));
+	// Scale a copy of the cell math::transform
+	// Set orientation of new math::transform
+	math::transform m = get_transform();
+	m.rotate(math::radians(x), math::radians(y), math::radians(z));
 
-		if(parent_.valid())
+	if(parent_.valid())
+	{
+		auto parent_transform = parent_.get_component<transform_component>().lock();
+		if(parent_transform)
 		{
-			auto parent_transform = parent_.get_component<transform_component>().lock();
-			if(parent_transform)
-			{
-				math::transform inv_parent_transform = math::inverse(parent_transform->get_transform());
-				m = inv_parent_transform * m;
-			}
+			math::transform inv_parent_transform = math::inverse(parent_transform->get_transform());
+			m = inv_parent_transform * m;
 		}
+	}
 
-		set_local_transform(m);
-
-	} // End if canRotate()
+	set_local_transform(m);
 }
 
 void transform_component::rotate(float x, float y, float z, const math::vec3& center)
 {
-	// If rotation is disallowed, only process position change. Otherwise
-	// perform full rotation.
-	if(!can_rotate())
+
+	// Scale a copy of the cell math::transform
+	// Set orientation of new math::transform
+	math::transform m = get_transform();
+	m.rotate(math::radians(x), math::radians(y), math::radians(z));
+
+	if(parent_.valid())
 	{
-		// Scale the position, but do not allow axes to scale.
-		math::transform t;
-		math::vec3 position = get_position() - center;
-		t.rotate(math::radians(x), math::radians(y), math::radians(z));
-		t.transform_coord(position, position);
-		set_position(position + center);
-
-	} // End if !canRotate()
-	else
-	{
-
-		// Scale a copy of the cell math::transform
-		// Set orientation of new math::transform
-		math::transform m = get_transform();
-		m.rotate(math::radians(x), math::radians(y), math::radians(z));
-
-		if(parent_.valid())
+		auto parent_transform = parent_.get_component<transform_component>().lock();
+		if(parent_transform)
 		{
-			auto parent_transform = parent_.get_component<transform_component>().lock();
-			if(parent_transform)
-			{
-				math::transform inv_parent_transform = math::inverse(parent_transform->get_transform());
-				m = inv_parent_transform * m;
-			}
+			math::transform inv_parent_transform = math::inverse(parent_transform->get_transform());
+			m = inv_parent_transform * m;
 		}
+	}
 
-		set_local_transform(m);
-
-	} // End if canRotate()
+	set_local_transform(m);
 }
 
 void transform_component::set_scale(const math::vec3& s)
 {
-	// If scaling is disallowed, only process position change. Otherwise
-	// perform full scale.
-	if(!can_scale())
-	{
-		return;
-	}
-
 	// Scale a copy of the cell math::transform
 	// Set orientation of new math::transform
 	math::transform m = get_transform();
@@ -323,22 +263,12 @@ void transform_component::set_scale(const math::vec3& s)
 void transform_component::set_local_scale(const math::vec3& scale)
 {
 	// Do nothing if scaling is disallowed.
-	if(!can_scale())
-	{
-		return;
-	}
 	local_transform_.set_scale(scale);
 	set_local_transform(local_transform_);
 }
 
 void transform_component::set_rotation(const math::quat& rotation)
 {
-	// Do nothing if rotation is disallowed.
-	if(!can_rotate())
-	{
-		return;
-	}
-
 	// Set orientation of new math::transform
 	math::transform m = get_transform();
 	m.set_rotation(rotation);
@@ -358,12 +288,6 @@ void transform_component::set_rotation(const math::quat& rotation)
 
 void transform_component::set_local_rotation(const math::quat& rotation)
 {
-	// Do nothing if rotation is disallowed.
-	if(!can_rotate())
-	{
-		return;
-	}
-
 	// Set orientation of new math::transform
 	local_transform_.set_rotation(rotation);
 	set_local_transform(local_transform_);
@@ -371,54 +295,26 @@ void transform_component::set_local_rotation(const math::quat& rotation)
 
 void transform_component::reset_rotation()
 {
-	// Do nothing if rotation is disallowed.
-	if(!can_rotate())
-	{
-		return;
-	}
 	set_rotation(math::quat{});
 }
 
 void transform_component::reset_scale()
 {
-	// Do nothing if scaling is disallowed.
-	if(!can_scale())
-	{
-		return;
-	}
-
 	set_scale(math::vec3{1.0f, 1.0f, 1.0f});
 }
 
 void transform_component::reset_local_rotation()
 {
-	// Do nothing if rotation is disallowed.
-	if(!can_rotate())
-	{
-		return;
-	}
-
 	set_local_rotation(math::quat{});
 }
 
 void transform_component::reset_local_scale()
 {
-	// Do nothing if scaling is disallowed.
-	if(!can_scale())
-	{
-		return;
-	}
-
 	set_local_scale(math::vec3{1.0f, 1.0f, 1.0f});
 }
 
 void transform_component::reset_pivot()
 {
-	// Do nothing if pivot adjustment is disallowed.
-	//	if(!can_adjust_pivot())
-	//    {
-	//        return;
-	//    }
 }
 
 bool transform_component::can_scale() const
@@ -513,7 +409,7 @@ void transform_component::set_parent(runtime::entity parent, bool world_position
 	else
 	{
 		if(!local_position_stays)
-			set_local_transform(math::transform::identity);
+			set_local_transform(math::transform::identity());
 	}
 
 	set_dirty(is_dirty());
@@ -552,9 +448,10 @@ void transform_component::set_transform(const math::transform& tr)
 		return;
 	}
 
-	math::vec3 position, scaling;
-	math::quat orientation;
-	tr.decompose(scaling, orientation, position);
+	math::vec3 position = tr.get_position();
+	math::vec3 scaling = tr.get_scale();
+	math::quat orientation = tr.get_rotation();
+	// tr.decompose(scaling, orientation, position);
 
 	math::transform m = get_transform();
 	m.set_scale(scaling);

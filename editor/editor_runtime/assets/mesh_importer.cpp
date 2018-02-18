@@ -8,7 +8,7 @@
 
 math::transform process_matrix(const aiMatrix4x4& assimp_matrix)
 {
-	math::transform matrix;
+	math::mat4 matrix;
 
 	matrix[0][0] = assimp_matrix.a1;
 	matrix[1][0] = assimp_matrix.a2;
