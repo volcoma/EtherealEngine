@@ -234,14 +234,14 @@ inline void transform_t<T, Q>::set_rotation(const typename transform_t::vec3_t& 
 
 	update_matrix();
 	// Set the new axis vectors (normalized)
-	reinterpret_cast<vec3&>(matrix_[0]) = glm::normalize(x);
-	reinterpret_cast<vec3&>(matrix_[1]) = glm::normalize(y);
-	reinterpret_cast<vec3&>(matrix_[2]) = glm::normalize(z);
+	reinterpret_cast<vec3_t&>(matrix_[0]) = glm::normalize(x);
+	reinterpret_cast<vec3_t&>(matrix_[1]) = glm::normalize(y);
+	reinterpret_cast<vec3_t&>(matrix_[2]) = glm::normalize(z);
 
 	// Scale back to original length
-	reinterpret_cast<vec3&>(matrix_[0]) *= scale.x;
-	reinterpret_cast<vec3&>(matrix_[1]) *= scale.y;
-	reinterpret_cast<vec3&>(matrix_[2]) *= scale.z;
+	reinterpret_cast<vec3_t&>(matrix_[0]) *= scale.x;
+	reinterpret_cast<vec3_t&>(matrix_[1]) *= scale.y;
+	reinterpret_cast<vec3_t&>(matrix_[2]) *= scale.z;
 
 	update_components();
 }
@@ -419,7 +419,7 @@ inline typename transform_t<T, Q>::vec3_t
 transform_t<T, Q>::transform_coord(const typename transform_t::vec3_t& v, const transform_t& t)
 {
 	const mat4_t& m = t.get_matrix();
-	vec4 result = m * vec4{v, 1.0f};
+	vec4_t result = m * vec4_t{v, 1.0f};
 	result /= result.w;
 	return result;
 }
@@ -429,8 +429,8 @@ inline typename transform_t<T, Q>::vec3_t
 transform_t<T, Q>::inverse_transform_coord(const typename transform_t::vec3_t& v, const transform_t& t)
 {
 	const mat4_t& m = t.get_matrix();
-	mat4 im = glm::inverse(m);
-	vec3 result = im * vec4{v, 1.0f};
+	mat4_t im = glm::inverse(m);
+	vec3_t result = im * vec4_t{v, 1.0f};
 	return result;
 }
 
@@ -439,7 +439,7 @@ inline typename transform_t<T, Q>::vec3_t
 transform_t<T, Q>::transform_normal(const typename transform_t::vec3_t& v, const transform_t& t)
 {
 	const mat4_t& m = t.get_matrix();
-	vec4 result = m * vec4{v, 0.0f};
+	vec4_t result = m * vec4_t{v, 0.0f};
 	result /= result.w;
 	return result;
 }
@@ -449,8 +449,8 @@ inline typename transform_t<T, Q>::vec3_t
 transform_t<T, Q>::inverse_transform_normal(const typename transform_t::vec3_t& v, const transform_t& t)
 {
 	const mat4_t& m = t.get_matrix();
-	mat4 im = glm::inverse(m);
-	vec3 result = im * vec4{v, 0.0f};
+	mat4_t im = glm::inverse(m);
+	vec3_t result = im * vec4_t{v, 0.0f};
 	return result;
 }
 
