@@ -239,8 +239,8 @@ int ImageButtonWithAspectAndLabel(ImTextureID texture, ImVec2 texture_size, ImVe
 	const float image_padding = 0.0f; // size.x * 0.3f;
 	BeginGroup();
 	{
-		// SameLine(0.0f, image_padding);
-
+//		Dummy(ImVec2(image_padding, 0.0f));
+//        SameLine();
 		if(selected)
 		{
 			ImageWithAspect(texture, texture_size, size, uv0, uv1, {0.7f, 0.7f, 0.7f, 1.0f});
@@ -250,8 +250,9 @@ int ImageButtonWithAspectAndLabel(ImTextureID texture, ImVec2 texture_size, ImVe
 		{
 			ImageWithAspect(texture, texture_size, size, uv0, uv1);
 		}
-		// SameLine(0.0f, image_padding);
-		// NewLine();
+//        SameLine();
+//        Dummy(ImVec2(image_padding, 0.0f));
+		
 		auto pos = GetCursorPos();
 
 		if(!(selected && edit))
@@ -262,6 +263,7 @@ int ImageButtonWithAspectAndLabel(ImTextureID texture, ImVec2 texture_size, ImVe
 			PushTextWrapPos(wrap_pos);
 			AlignTextToFramePadding();
 			TextUnformatted(label);
+
 			PopTextWrapPos();
 		}
 

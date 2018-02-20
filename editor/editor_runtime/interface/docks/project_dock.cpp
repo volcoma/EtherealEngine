@@ -212,6 +212,7 @@ static void draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const s
 		edit, name.c_str(), input_buff.data(), input_buff.size(),
 		ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll);
 
+
 	if(is_loading)
 	{
 		gui::PopID();
@@ -687,6 +688,7 @@ void project_dock::context_menu()
 
 		gui::EndPopup();
 	}
+
 }
 
 void project_dock::context_create_menu()
