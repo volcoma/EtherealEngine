@@ -113,7 +113,7 @@ void picking_system::frame_render(delta_t dt)
 
 	// If the user previously clicked, and we're done reading data from GPU, look at ID buffer on CPU
 	// Whatever mesh has the most pixels in the ID buffer is the one the user clicked on.
-	if(!reading_ && start_readback_)
+	if((reading_ == 0u) && start_readback_)
 	{
 		bool blit_support = gfx::is_supported(BGFX_CAPS_TEXTURE_BLIT);
 
@@ -169,7 +169,7 @@ void picking_system::frame_render(delta_t dt)
 		}
 
 		std::uint32_t id_key = 0;
-		if(max_amount)
+		if(max_amount != 0u)
 		{
 			for(auto& pair : ids)
 			{

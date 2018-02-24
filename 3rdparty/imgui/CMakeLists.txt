@@ -1,4 +1,6 @@
 set(libsrc 
+imgui/imgui_internal.h
+imgui/imconfig.h
 imgui/imgui.cpp
 imgui/imgui.h
 imgui/imgui_draw.cpp

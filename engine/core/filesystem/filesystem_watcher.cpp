@@ -92,17 +92,17 @@ public:
 	//-----------------------------------------------------------------------------
 	impl(const fs::path& path, const std::string& filter, bool recursive, bool initial_list,
 		 clock_t::duration poll_interval, const notify_callback& list_callback)
-		: _filter(filter)
-		, _callback(list_callback)
-		, _poll_interval(poll_interval)
-		, _recursive(recursive)
+		: filter_(filter)
+		, callback_(list_callback)
+		, poll_interval_(poll_interval)
+		, recursive_(recursive)
 	{
-		_root = path;
+		root_ = path;
 		std::vector<filesystem_watcher::entry> entries;
 		std::vector<size_t> created;
 		std::vector<size_t> modified;
 		// make sure we store all initial write time
-		if(!_filter.empty())
+		if(!filter_.empty())
 		{
 			visit_wild_card_path(path / filter, recursive, false,
 								 [this, &entries, &created, &modified](const fs::path& p) {
@@ -112,16 +112,16 @@ public:
 		}
 		else
 		{
-			poll_entry(_root, entries, created, modified);
+			poll_entry(root_, entries, created, modified);
 		}
 
 		if(initial_list)
 		{
 			// this means that the first watch won't call the callback function
 			// so we have to manually call it here if we want that behavior
-			if(!entries.empty() && _callback)
+			if(!entries.empty() && callback_)
 			{
-				_callback(entries, true);
+				callback_(entries, true);
 			}
 		}
 	}
@@ -141,9 +141,9 @@ public:
 		std::vector<size_t> created;
 		std::vector<size_t> modified;
 		// otherwise we check the whole parent directory
-		if(!_filter.empty())
+		if(!filter_.empty())
 		{
-			visit_wild_card_path(_root / _filter, _recursive, false,
+			visit_wild_card_path(root_ / filter_, recursive_, false,
 								 [this, &entries, &created, &modified](const fs::path& p) {
 									 poll_entry(p, entries, created, modified);
 									 return false;
@@ -151,22 +151,24 @@ public:
 		}
 		else
 		{
-			poll_entry(_root, entries, created, modified);
+			poll_entry(root_, entries, created, modified);
 		}
 
 		process_modifications(entries, created, modified);
 
-		if(!entries.empty() && _callback)
+		if(!entries.empty() && callback_)
 		{
-			_callback(entries, false);
+			callback_(entries, false);
 		}
 	}
 
 	void process_modifications(std::vector<filesystem_watcher::entry>& entries,
 							   const std::vector<size_t>& created, const std::vector<size_t>& /*unused*/)
 	{
-		auto it = std::begin(_entries);
-		while(it != std::end(_entries))
+        using namespace std::literals;
+        
+		auto it = std::begin(entries_);
+		while(it != std::end(entries_))
 		{
 			auto& fi = it->second;
 			fs::error_code err;
@@ -176,12 +178,20 @@ public:
 				for(auto idx : created)
 				{
 					auto& e = entries[idx];
-					if(e.last_mod_time == fi.last_mod_time && e.size == fi.size)
+					if(e.size == fi.size)
 					{
-						e.status = filesystem_watcher::entry_status::renamed;
-						e.last_path = fi.path;
-						was_removed = false;
-						break;
+                        using sys_clock = std::chrono::system_clock;
+                        std::chrono::microseconds tolerance = 1000us;
+                        auto diff = sys_clock::from_time_t(e.last_mod_time - fi.last_mod_time);
+                        auto d = std::chrono::time_point_cast<std::chrono::microseconds>(diff);             
+                        if(e.last_mod_time == fi.last_mod_time)
+						{
+
+							e.status = filesystem_watcher::entry_status::renamed;
+							e.last_path = fi.path;
+							was_removed = false;
+							break;
+						}
 					}
 				}
 
@@ -191,7 +201,7 @@ public:
 					entries.push_back(fi);
 				}
 
-				it = _entries.erase(it);
+				it = entries_.erase(it);
 			}
 			else
 			{
@@ -218,8 +228,8 @@ public:
 		fs::file_status status = fs::status(path, err);
 		// add a new modification time to the map
 		std::string key = path.string();
-		auto it = _entries.find(key);
-		if(it != _entries.end())
+		auto it = entries_.find(key);
+		if(it != entries_.end())
 		{
 			auto& fi = it->second;
 
@@ -241,7 +251,7 @@ public:
 		else
 		{
 			// or compare with an older one
-			auto& fi = _entries[key];
+			auto& fi = entries_[key];
 			fi.path = path;
 			fi.last_path = path;
 			fi.last_mod_time = time;
@@ -257,19 +267,19 @@ public:
 protected:
 	friend class filesystem_watcher;
 	/// Path to watch
-	fs::path _root;
+	fs::path root_;
 	/// Filter applied
-	std::string _filter;
+	std::string filter_;
 	/// Callback for list of modifications
-	notify_callback _callback;
+	notify_callback callback_;
 	/// Cache watched files
-	std::map<std::string, filesystem_watcher::entry> _entries;
+	std::map<std::string, filesystem_watcher::entry> entries_;
 	///
-	clock_t::duration _poll_interval = 500ms;
+	clock_t::duration poll_interval_ = 500ms;
 
-	clock_t::time_point _last_poll = clock_t::now();
+	clock_t::time_point last_poll_ = clock_t::now();
 	///
-	bool _recursive = false;
+	bool recursive_ = false;
 };
 
 static filesystem_watcher& get_watcher()
@@ -361,13 +371,13 @@ void filesystem_watcher::start()
 
 				auto now = clock_t::now();
 
-				auto diff = (watcher->_last_poll + watcher->_poll_interval) - now;
+				auto diff = (watcher->last_poll_ + watcher->poll_interval_) - now;
 				if(diff <= clock_t::duration(0))
 				{
 					watcher->watch();
-					watcher->_last_poll = now;
+					watcher->last_poll_ = now;
 
-					sleep_time = std::min(sleep_time, watcher->_poll_interval);
+					sleep_time = std::min(sleep_time, watcher->poll_interval_);
 				}
 				else
 				{

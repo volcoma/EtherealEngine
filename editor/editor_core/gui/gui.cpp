@@ -99,4 +99,25 @@ void CleanupTextures()
 {
 	s_textures.clear();
 }
+
+bool ImageButtonWithAspectAndTextDOWN(std::shared_ptr<void> texture, bool is_rt, bool is_origin_bl,
+									  const std::string& name, const ImVec2& texture_size,
+									  const ImVec2& image_size, const ImVec2& _uv0, const ImVec2& _uv1,
+									  int frame_padding, const ImVec4& bg_col, const ImVec4& tint_col)
+{
+	s_textures.push_back(texture);
+	ImVec2 uv0 = _uv0;
+	ImVec2 uv1 = _uv1;
+	if(texture && is_rt)
+	{
+		if(is_origin_bl)
+		{
+			uv0 = {0.0f, 1.0f};
+			uv1 = {1.0f, 0.0f};
+		}
+	}
+
+	return ImGui::ImageButtonWithAspectAndTextDOWN(texture.get(), name, texture_size, image_size, uv0, uv1,
+												   frame_padding, bg_col, tint_col);
+}
 }

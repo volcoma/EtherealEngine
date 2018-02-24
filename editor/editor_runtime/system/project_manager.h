@@ -109,7 +109,8 @@ public:
 private:
 	void setup_directory(fs::syncer& syncer);
 	void setup_meta_syncer(fs::syncer& syncer, const fs::path& data_dir, const fs::path& meta_dir);
-	void setup_cache_syncer(fs::syncer& syncer, const fs::path& meta_dir, const fs::path& cache_dir);
+	void setup_cache_syncer(std::vector<uint64_t>& watchers, fs::syncer& syncer, const fs::path& meta_dir,
+							const fs::path& cache_dir);
 	/// Project options
 	options options_;
 	/// Current project name
@@ -117,11 +118,14 @@ private:
 
 	fs::syncer app_meta_syncer_;
 	fs::syncer app_cache_syncer_;
+	std::vector<std::uint64_t> app_watchers_;
 
 	fs::syncer editor_meta_syncer_;
 	fs::syncer editor_cache_syncer_;
+	std::vector<std::uint64_t> editor_watchers_;
 
 	fs::syncer engine_meta_syncer_;
 	fs::syncer engine_cache_syncer_;
+	std::vector<std::uint64_t> engine_watchers_;
 };
 }

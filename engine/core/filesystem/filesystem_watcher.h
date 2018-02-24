@@ -36,7 +36,7 @@ public:
 		fs::path last_path;
 		entry_status status = unmodified;
 		fs::file_time_type last_mod_time;
-		uintmax_t size = 0;
+		std::uintmax_t size = 0;
 		fs::file_type type;
 	};
 

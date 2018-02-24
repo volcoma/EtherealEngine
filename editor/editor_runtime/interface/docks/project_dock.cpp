@@ -162,39 +162,44 @@ static void process_drag_drop_target(const fs::path& absolute_path)
 	}
 }
 
-static void draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const std::string& name,
+static bool draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const std::string& name,
 					   const fs::path& absolute_path, bool is_selected, const float size,
 					   const std::function<void()>& on_click, const std::function<void()>& on_double_click,
 					   const std::function<void(const std::string&)>& on_rename,
 					   const std::function<void()>& on_delete)
 {
-	bool edit_label = false;
-	if(is_selected && !gui::IsAnyItemActive())
+	enum class entry_action
 	{
+		none,
+		clicked,
+		double_clicked,
+		renamed,
+		deleted,
+	};
 
+	bool is_popup_opened = false;
+	entry_action action = entry_action::none;
+
+	bool open_rename_menu = false;
+
+	gui::PushID(name.c_str());
+	if(is_selected && !gui::IsAnyItemActive() && gui::IsWindowFocused())
+	{
 		if(gui::IsKeyPressed(mml::keyboard::F2))
 		{
-			edit_label = true;
+			open_rename_menu = true;
 		}
 
 		if(gui::IsKeyPressed(mml::keyboard::Delete))
 		{
-			if(on_delete)
-			{
-				on_delete();
-			}
+			action = entry_action::deleted;
 		}
 	}
-
-	gui::PushID(name.c_str());
 
 	if(gui::GetContentRegionAvailWidth() < size)
 	{
 		gui::NewLine();
 	}
-	std::array<char, 64> input_buff;
-	input_buff.fill(0);
-	std::memcpy(input_buff.data(), name.c_str(), std::min(name.size(), input_buff.size()));
 
 	ImVec2 item_size = {size, size};
 	ImVec2 texture_size = item_size;
@@ -205,52 +210,144 @@ static void draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const s
 	ImVec2 uv0 = {0.0f, 0.0f};
 	ImVec2 uv1 = {1.0f, 1.0f};
 
-	bool* edit = edit_label ? &edit_label : nullptr;
+	auto col = gui::GetStyle().Colors[ImGuiCol_WindowBg];
+	gui::PushStyleColor(ImGuiCol_Button, ImVec4(col.x, col.y, col.z, 0.44f));
+	gui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(col.x, col.y, col.z, 0.86f));
+	gui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(col.x, col.y, col.z, 1.0f));
+
 	bool is_rt = icon.link->asset ? icon.link->asset->is_render_target() : false;
-	int action = gui::ImageButtonWithAspectAndLabel(
-		icon.link->asset, is_rt, gfx::is_origin_bottom_left(), texture_size, item_size, uv0, uv1, is_selected,
-		edit, name.c_str(), input_buff.data(), input_buff.size(),
-		ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll);
-
-
-	if(is_loading)
+	const int padding = 6;
+	auto pos = gui::GetCursorScreenPos();
+	pos.y += item_size.y + padding * 2.0f;
+	if(gui::ImageButtonWithAspectAndTextDOWN(icon.get_asset(), is_rt, gfx::is_origin_bottom_left(), name,
+											 texture_size, item_size, uv0, uv1, padding))
 	{
-		gui::PopID();
-		gui::SameLine();
-		return;
+		action = entry_action::clicked;
 	}
 
-	if(action == 1)
-	{
-		if(on_click)
-		{
-			on_click();
-		}
-	}
-	else if(action == 2)
-	{
-		std::string new_name = std::string(input_buff.data());
-		if(new_name != name && !new_name.empty())
-		{
-			if(on_rename)
-			{
-				on_rename(new_name);
-			}
-		}
-	}
-	else if(action == 3)
-	{
-		if(on_double_click)
-		{
-			on_double_click();
-		}
-	}
-	if(gui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
+	gui::PopStyleColor(3);
+
+	if(gui::IsItemHovered())
 	{
 		if(on_double_click)
 		{
 			gui::SetMouseCursor(ImGuiMouseCursor_Hand);
 		}
+		if(gui::IsMouseDoubleClicked(0))
+		{
+			action = entry_action::double_clicked;
+		}
+
+		auto& g = *gui::GetCurrentContext();
+		if(!g.DragDropActive)
+		{
+			gui::BeginTooltip();
+			gui::TextUnformatted(name.c_str());
+			gui::EndTooltip();
+		}
+	}
+
+	if(is_selected && gui::GetNavInputAmount(ImGuiNavInput_Input, ImGuiInputReadMode_Pressed) > 0.0f)
+	{
+		action = entry_action::double_clicked;
+	}
+
+	std::array<char, 64> input_buff;
+	input_buff.fill(0);
+	auto name_sz = std::min(name.size(), input_buff.size() - 1);
+	std::memcpy(input_buff.data(), name.c_str(), name_sz);
+
+	if(gui::BeginPopupContextItem("ENTRY_CONTEXT_MENU"))
+	{
+		is_popup_opened = true;
+
+		if(gui::MenuItem("RENAME", "F2"))
+		{
+			open_rename_menu = true;
+			gui::CloseCurrentPopup();
+		}
+		if(gui::MenuItem("REMOVE", "Delete"))
+		{
+			action = entry_action::deleted;
+			gui::CloseCurrentPopup();
+		}
+		gui::EndPopup();
+	}
+
+	if(open_rename_menu)
+	{
+		gui::OpenPopup("ENTRY_RENAME_MENU");
+		gui::SetNextWindowPos(pos);
+	}
+
+	if(gui::BeginPopup("ENTRY_RENAME_MENU"))
+	{
+		is_popup_opened = true;
+		if(open_rename_menu)
+		{
+			gui::SetKeyboardFocusHere();
+		}
+		gui::PushItemWidth(150.0f);
+		if(gui::InputText("##NAME", input_buff.data(), input_buff.size(),
+						  ImGuiInputTextFlags_EnterReturnsTrue))
+		{
+			action = entry_action::renamed;
+			gui::CloseCurrentPopup();
+		}
+		gui::PopItemWidth();
+		gui::EndPopup();
+	}
+	if(is_selected)
+	{
+		gui::RenderFrameEx(gui::GetItemRectMin(), gui::GetItemRectMax(), true, 0.0f, 2.0f);
+	}
+
+	if(is_loading)
+	{
+		action = entry_action::none;
+	}
+
+	switch(action)
+	{
+		case entry_action::clicked:
+		{
+			if(on_click)
+			{
+				on_click();
+			}
+		}
+		break;
+		case entry_action::double_clicked:
+		{
+			if(on_double_click)
+			{
+				on_double_click();
+			}
+		}
+		break;
+		case entry_action::renamed:
+		{
+			std::string new_name = std::string(input_buff.data());
+			if(new_name != name && !new_name.empty())
+			{
+				if(on_rename)
+				{
+					on_rename(new_name);
+				}
+			}
+		}
+		break;
+		case entry_action::deleted:
+		{
+			if(on_delete)
+			{
+				on_delete();
+			}
+		}
+		break;
+
+		default:
+			break;
 	}
 
 	if(!process_drag_drop_source(icon, absolute_path))
@@ -260,6 +357,7 @@ static void draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const s
 
 	gui::PopID();
 	gui::SameLine();
+	return is_popup_opened;
 }
 
 fs::path get_new_file(const fs::path& path, const std::string& name, const std::string& ext = "")
@@ -291,8 +389,8 @@ void project_dock::render(const ImVec2& /*unused*/)
 	}
 	gui::SameLine();
 	gui::PushItemWidth(80.0f);
-	gui::SliderFloat("", &scale_, 0.5f, 1.0f);
-	const float size = 88.0f * scale_;
+	gui::SliderFloat("", &scale_, 0.3f, 1.0f);
+	const float size = 128.0f * scale_;
 	if(gui::IsItemHovered())
 	{
 		gui::BeginTooltip();
@@ -303,6 +401,7 @@ void project_dock::render(const ImVec2& /*unused*/)
 
 	const auto hierarchy = fs::split_until(cache_.get_path(), root_path);
 
+	int i = 0;
 	for(const auto& dir : hierarchy)
 	{
 		gui::SameLine();
@@ -310,13 +409,18 @@ void project_dock::render(const ImVec2& /*unused*/)
 		gui::TextUnformatted("/");
 		gui::SameLine();
 
-		if(gui::Button(dir.filename().string().c_str()))
+		gui::PushID(i++);
+		bool clicked = gui::Button(dir.filename().string().c_str());
+		gui::PopID();
+
+		if(clicked)
 		{
 			set_cache_path(dir);
 			break;
 		}
 		process_drag_drop_target(dir);
 	}
+
 	gui::Separator();
 
 	auto& es = core::get_subsystem<editor::editing_system>();
@@ -334,6 +438,7 @@ void project_dock::render(const ImVec2& /*unused*/)
 			return is_selected;
 		};
 
+		bool is_popup_opened = false;
 		for(const auto& cache_entry : cache_)
 		{
 			const auto& absolute_path = cache_entry.path();
@@ -360,6 +465,8 @@ void project_dock::render(const ImVec2& /*unused*/)
 			const auto on_delete = [&]() {
 				fs::error_code err;
 				fs::remove(absolute_path, err);
+                
+                es.unselect();
 			};
 
 			if(fs::is_directory(cache_entry.status()))
@@ -368,31 +475,31 @@ void project_dock::render(const ImVec2& /*unused*/)
 				using entry_t = fs::path;
 				entry_t entry = absolute_path;
 				auto icon = get_preview(entry, "folder", es);
-				draw_entry(icon, false, name, absolute_path, is_selected(entry), size,
-						   [&]() // on_click
-						   {
-							   es.select(entry);
+				is_popup_opened |= draw_entry(icon, false, name, absolute_path, is_selected(entry), size,
+											  [&]() // on_click
+											  {
+												  es.select(entry);
 
-						   },
-						   [&]() // on_double_click
-						   {
-							   current_path = entry;
-							   es.try_unselect<fs::path>();
-						   },
-						   [&](const std::string& new_name) // on_rename
-						   {
-							   fs::path new_absolute_path = absolute_path;
-							   new_absolute_path.remove_filename();
-							   new_absolute_path /= new_name;
-							   fs::error_code err;
-							   fs::rename(absolute_path, new_absolute_path, err);
-						   },
-						   [&]() // on_delete
-						   {
-							   fs::error_code err;
-							   fs::remove_all(absolute_path, err);
+											  },
+											  [&]() // on_double_click
+											  {
+												  current_path = entry;
+												  es.try_unselect<fs::path>();
+											  },
+											  [&](const std::string& new_name) // on_rename
+											  {
+												  fs::path new_absolute_path = absolute_path;
+												  new_absolute_path.remove_filename();
+												  new_absolute_path /= new_name;
+												  fs::error_code err;
+												  fs::rename(absolute_path, new_absolute_path, err);
+											  },
+											  [&]() // on_delete
+											  {
+												  fs::error_code err;
+												  fs::remove_all(absolute_path, err);
 
-						   });
+											  });
 			}
 			else
 			{
@@ -418,14 +525,15 @@ void project_dock::render(const ImVec2& /*unused*/)
 						}
 						auto icon = get_preview(entry, "texture", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
-								   [&]() // on_click
-								   {
-									   es.select(entry);
+						is_popup_opened |=
+							draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
+									   [&]() // on_click
+									   {
+										   es.select(entry);
 
-								   },
-								   nullptr, // on_double_click
-								   on_rename, on_delete);
+									   },
+									   nullptr, // on_double_click
+									   on_rename, on_delete);
 					}
 				}
 
@@ -449,14 +557,15 @@ void project_dock::render(const ImVec2& /*unused*/)
 						}
 						auto icon = get_preview(entry, "mesh", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
-								   [&]() // on_click
-								   {
-									   es.select(entry);
+						is_popup_opened |=
+							draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
+									   [&]() // on_click
+									   {
+										   es.select(entry);
 
-								   },
-								   nullptr, // on_double_click
-								   on_rename, on_delete);
+									   },
+									   nullptr, // on_double_click
+									   on_rename, on_delete);
 					}
 				}
 
@@ -480,14 +589,15 @@ void project_dock::render(const ImVec2& /*unused*/)
 						}
 						auto icon = get_preview(entry, "sound", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
-								   [&]() // on_click
-								   {
-									   es.select(entry);
+						is_popup_opened |=
+							draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
+									   [&]() // on_click
+									   {
+										   es.select(entry);
 
-								   },
-								   nullptr, // on_double_click
-								   on_rename, on_delete);
+									   },
+									   nullptr, // on_double_click
+									   on_rename, on_delete);
 					}
 				}
 				for(const auto& ext : ex::get_suported_formats<gfx::shader>())
@@ -510,14 +620,15 @@ void project_dock::render(const ImVec2& /*unused*/)
 						}
 						auto icon = get_preview(entry, "shader", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
-								   [&]() // on_click
-								   {
-									   es.select(entry);
+						is_popup_opened |=
+							draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
+									   [&]() // on_click
+									   {
+										   es.select(entry);
 
-								   },
-								   nullptr, // on_double_click
-								   on_rename, on_delete);
+									   },
+									   nullptr, // on_double_click
+									   on_rename, on_delete);
 					}
 				}
 				for(const auto& ext : ex::get_suported_formats<material>())
@@ -540,14 +651,15 @@ void project_dock::render(const ImVec2& /*unused*/)
 						}
 						auto icon = get_preview(entry, "material", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
-								   [&]() // on_click
-								   {
-									   es.select(entry);
+						is_popup_opened |=
+							draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
+									   [&]() // on_click
+									   {
+										   es.select(entry);
 
-								   },
-								   nullptr, // on_double_click
-								   on_rename, on_delete);
+									   },
+									   nullptr, // on_double_click
+									   on_rename, on_delete);
 					}
 				}
 
@@ -571,14 +683,15 @@ void project_dock::render(const ImVec2& /*unused*/)
 						}
 						auto icon = get_preview(entry, "animation", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
-								   [&]() // on_click
-								   {
-									   es.select(entry);
+						is_popup_opened |=
+							draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
+									   [&]() // on_click
+									   {
+										   es.select(entry);
 
-								   },
-								   nullptr, // on_double_click
-								   on_rename, on_delete);
+									   },
+									   nullptr, // on_double_click
+									   on_rename, on_delete);
 					}
 				}
 
@@ -602,14 +715,15 @@ void project_dock::render(const ImVec2& /*unused*/)
 						}
 						auto icon = get_preview(entry, "prefab", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
-								   [&]() // on_click
-								   {
-									   es.select(entry);
+						is_popup_opened |=
+							draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
+									   [&]() // on_click
+									   {
+										   es.select(entry);
 
-								   },
-								   nullptr, // on_double_click
-								   on_rename, on_delete);
+									   },
+									   nullptr, // on_double_click
+									   on_rename, on_delete);
 					}
 				}
 				for(const auto& ext : ex::get_suported_formats<scene>())
@@ -632,33 +746,36 @@ void project_dock::render(const ImVec2& /*unused*/)
 						}
 						auto icon = get_preview(entry, "scene", es);
 						bool is_loading = !entry;
-						draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
-								   [&]() // on_click
-								   {
-									   es.select(entry);
-
-								   },
-								   [&]() // on_double_click
-								   {
-									   if(!entry)
+						is_popup_opened |=
+							draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
+									   [&]() // on_click
 									   {
-										   return;
-									   }
+										   es.select(entry);
 
-									   entry->instantiate(scene::mode::standard);
-									   es.scene = fs::resolve_protocol(entry.id()).string();
-									   es.load_editor_camera();
+									   },
+									   [&]() // on_double_click
+									   {
+										   if(!entry)
+										   {
+											   return;
+										   }
 
-								   },
-								   on_rename, on_delete);
+										   entry->instantiate(scene::mode::standard);
+										   es.scene = fs::resolve_protocol(entry.id()).string();
+										   es.load_editor_camera();
+
+									   },
+									   on_rename, on_delete);
 					}
 				}
 			}
 		}
 
+		if(!is_popup_opened)
+		{
+			context_menu();
+		}
 		set_cache_path(current_path);
-
-		context_menu();
 	}
 	gui::EndChild();
 
@@ -688,7 +805,6 @@ void project_dock::context_menu()
 
 		gui::EndPopup();
 	}
-
 }
 
 void project_dock::context_create_menu()

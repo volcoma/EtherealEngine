@@ -4535,7 +4535,9 @@ void skin_bind_data::remove_empty_bones()
 
 		} // End if empty
 		else
+		{
 			++i;
+		}
 
 	} // Next Bone
 }
@@ -4543,7 +4545,9 @@ void skin_bind_data::remove_empty_bones()
 void skin_bind_data::clear_vertex_influences()
 {
 	for(size_t i = 0; i < bones_.size(); ++i)
+	{
 		bones_[i].influences.clear();
+	}
 }
 
 void skin_bind_data::clear()
@@ -4570,8 +4574,10 @@ void skin_bind_data::remap_vertices(const std::vector<std::uint32_t>& remap)
 				// If the vertex was split into two, we want to retain an
 				// influence to the original index too.
 				if(new_index >= remap.size())
+				{
 					new_influences.push_back(
 						vertex_influence(influences[j].vertex_index, influences[j].weight));
+				}
 
 			} // End if !removed
 

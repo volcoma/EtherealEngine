@@ -3,8 +3,153 @@
 #include "../imgui/imgui_internal.h"
 #include <unordered_map>
 #include <vector>
+#include <array>
 namespace ImGui
 {
+
+bool ImageButtonWithAspectAndTextDOWN(ImTextureID texId, const std::string& name, const ImVec2& texture_size, const ImVec2& imageSize,
+									   const ImVec2& uv0, const ImVec2& uv1, int frame_padding,
+									   const ImVec4& bg_col, const ImVec4& tint_col)
+{
+	ImGuiWindow* window = GetCurrentWindow();
+	if(window->SkipItems)
+		return false;
+
+	ImVec2 size = imageSize;
+	if(size.x <= 0 && size.y <= 0)
+	{
+		size.x = size.y = ImGui::GetTextLineHeightWithSpacing();
+	}
+	else
+	{
+		if(size.x <= 0)
+			size.x = size.y;
+		else if(size.y <= 0)
+			size.y = size.x;
+		size *= window->FontWindowScale * ImGui::GetIO().FontGlobalScale;
+	}
+
+	ImGuiContext& g = *GImGui;
+	const ImGuiStyle& style = g.Style;
+
+    
+    ImVec2 size_name = ImGui::CalcTextSize(name.c_str(), nullptr, true);
+
+	std::array<char, 64> input_buff;
+	input_buff.fill(0);
+	auto name_sz = std::min(name.size(), input_buff.size() - 1);
+	std::memcpy(input_buff.data(), name.c_str(), name_sz);
+
+	if(size_name.x > imageSize.x)
+	{
+		for(auto ds = name_sz; ds > 4; ds--)
+		{
+			auto str = std::string(input_buff.data());
+			size_name = ImGui::CalcTextSize(str.c_str(), nullptr, true);
+			if(size_name.x < imageSize.x)
+			{
+				input_buff[ds - 3] = '.';
+				input_buff[ds - 2] = '.';
+				input_buff[ds - 1] = '.';
+				input_buff[ds] = '\0';
+				break;
+			}
+
+			input_buff[ds - 1] = 0;
+		}
+	}
+    
+    std::string label_str(input_buff.data());
+    const char* label = label_str.c_str();
+    
+	const ImGuiID id = window->GetID(label);
+	const ImVec2 textSize = ImGui::CalcTextSize(label, NULL, true);
+	const bool hasText = textSize.x > 0;
+
+	const float innerSpacing =
+		hasText ? ((frame_padding >= 0) ? (float)frame_padding : (style.ItemInnerSpacing.x)) : 0.f;
+	const ImVec2 padding =
+		(frame_padding >= 0) ? ImVec2((float)frame_padding, (float)frame_padding) : style.FramePadding;
+	bool istextBig = false;
+	if(textSize.x > imageSize.x)
+	{
+		istextBig = true;
+	}
+	const ImVec2 totalSizeWithoutPadding(size.x, size.y > textSize.y ? size.y : textSize.y);
+
+	ImRect bb(window->DC.CursorPos, window->DC.CursorPos + totalSizeWithoutPadding + padding * 2);
+	ImVec2 start(0, 0);
+	start = window->DC.CursorPos + padding;
+	if(size.y < textSize.y)
+	{
+		start.y += (textSize.y - size.y) * .5f;
+	}
+	ImVec2 reajustMIN(0, 0);
+	ImVec2 reajustMAX = size;
+	if(bb.Max.y - textSize.y < start.y + reajustMAX.y)
+	{
+		reajustMIN.x += textSize.y / 2;
+		reajustMAX.x -= textSize.y / 2;
+		reajustMAX.y -= textSize.y;
+	}
+	ImRect image_bb(start + reajustMIN, start + reajustMAX);
+	start = window->DC.CursorPos + padding;
+	start.y += (size.y - textSize.y) + 2;
+	if(istextBig == false)
+	{
+		start.x += (size.x - textSize.x) * .5f;
+	}
+
+	ItemSize(bb);
+	if(!ItemAdd(bb, id))
+		return false;
+
+	bool hovered = false, held = false;
+	bool pressed = ButtonBehavior(bb, id, &hovered, &held);
+
+	// Render
+	const ImU32 col = GetColorU32((hovered && held) ? ImGuiCol_ButtonActive
+													: hovered ? ImGuiCol_ButtonHovered : ImGuiCol_Button);
+	RenderFrame(bb.Min, bb.Max, col, true,
+				ImClamp((float)ImMin(padding.x, padding.y), 0.0f, style.FrameRounding));
+	if(bg_col.w > 0.0f)
+		window->DrawList->AddRectFilled(image_bb.Min, image_bb.Max, GetColorU32(bg_col));
+
+	float w = texture_size.x;
+	float h = texture_size.y;
+	ImVec2 imgSz = ImVec2(image_bb.GetWidth(), image_bb.GetHeight());
+	float max_size = ImMax(imgSz.x, imgSz.y);
+	float aspect = w / h;
+	if(w > h)
+	{
+		float m = ImMin(max_size, w);
+
+		imgSz.x = m;
+		imgSz.y = m / aspect;
+	}
+	else if(h > w)
+	{
+		float m = ImMin(max_size, h);
+
+		imgSz.x = m * aspect;
+		imgSz.y = m;
+	}
+
+	if(imgSz.x > imgSz.y)
+		image_bb.Min.y += (max_size - imgSz.y) * 0.5f;
+	if(imgSz.x < imgSz.y)
+		image_bb.Min.x += (max_size - imgSz.x) * 0.5f;
+
+    image_bb.Max = image_bb.Min + imgSz;
+	window->DrawList->AddImage(texId, image_bb.Min, image_bb.Max, uv0, uv1, GetColorU32(tint_col));
+
+	if(textSize.x > 0)
+	{
+		ImGui::RenderText(start, label);
+	}
+	return pressed;
+}
+
 void RenderFrameEx(ImVec2 p_min, ImVec2 p_max, bool border, float rounding, float thickness)
 {
 	ImGuiWindow* window = GetCurrentWindow();
@@ -239,8 +384,8 @@ int ImageButtonWithAspectAndLabel(ImTextureID texture, ImVec2 texture_size, ImVe
 	const float image_padding = 0.0f; // size.x * 0.3f;
 	BeginGroup();
 	{
-//		Dummy(ImVec2(image_padding, 0.0f));
-//        SameLine();
+		//		Dummy(ImVec2(image_padding, 0.0f));
+		//        SameLine();
 		if(selected)
 		{
 			ImageWithAspect(texture, texture_size, size, uv0, uv1, {0.7f, 0.7f, 0.7f, 1.0f});
@@ -250,9 +395,9 @@ int ImageButtonWithAspectAndLabel(ImTextureID texture, ImVec2 texture_size, ImVe
 		{
 			ImageWithAspect(texture, texture_size, size, uv0, uv1);
 		}
-//        SameLine();
-//        Dummy(ImVec2(image_padding, 0.0f));
-		
+		//        SameLine();
+		//        Dummy(ImVec2(image_padding, 0.0f));
+
 		auto pos = GetCursorPos();
 
 		if(!(selected && edit))

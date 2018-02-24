@@ -29,6 +29,15 @@ static std::vector<fs::path> remove_meta_tag(const std::vector<fs::path>& synced
 	return reduced;
 }
 
+static void unwatch(std::vector<uint64_t>& watchers)
+{
+	for(const auto& id : watchers)
+	{
+		fs::watcher::unwatch(id);
+	}
+	watchers.clear();
+};
+
 template <typename T>
 static std::uint64_t watch_assets(const fs::path& dir, const std::string& wildcard, bool reload_async)
 {
@@ -74,7 +83,8 @@ static std::uint64_t watch_assets(const fs::path& dir, const std::string& wildca
 }
 
 template <typename T>
-static void add_to_syncer(fs::syncer& syncer, const fs::path& dir, fs::syncer::on_entry_removed_t on_removed,
+static void add_to_syncer(std::vector<uint64_t>& watchers, fs::syncer& syncer, const fs::path& dir,
+						  fs::syncer::on_entry_removed_t on_removed,
 						  fs::syncer::on_entry_renamed_t on_renamed)
 {
 	auto& ts = core::get_subsystem<core::task_system>();
@@ -97,12 +107,13 @@ static void add_to_syncer(fs::syncer& syncer, const fs::path& dir, fs::syncer::o
 	for(const auto& type : ex::get_suported_formats<T>())
 	{
 		syncer.set_mapping(type + ".meta", {".asset"}, on_modified, on_modified, on_removed, on_renamed);
-		watch_assets<T>(dir, "*" + type, true);
+		const auto watch_id = watch_assets<T>(dir, "*" + type, true);
+		watchers.push_back(watch_id);
 	}
 }
 
 template <>
-void add_to_syncer<gfx::shader>(fs::syncer& syncer, const fs::path& dir,
+void add_to_syncer<gfx::shader>(std::vector<uint64_t>& watchers, fs::syncer& syncer, const fs::path& dir,
 								fs::syncer::on_entry_removed_t on_removed,
 								fs::syncer::on_entry_renamed_t on_renamed)
 {
@@ -140,7 +151,8 @@ void add_to_syncer<gfx::shader>(fs::syncer& syncer, const fs::path& dir,
 		syncer.set_mapping(type + ".meta", {".dx11.asset", ".dx12.asset", ".gl.asset"}, on_modified,
 						   on_modified, on_removed, on_renamed);
 
-		watch_assets<gfx::shader>(dir, "*" + type, true);
+		const auto watch_id = watch_assets<gfx::shader>(dir, "*" + type, true);
+		watchers.push_back(watch_id);
 	}
 }
 
@@ -152,6 +164,7 @@ void project_manager::close_project()
 	es.close_project();
 	ecs.dispose();
 	am.clear("app:/data");
+	unwatch(app_watchers_);
 	app_meta_syncer_.unsync();
 	app_cache_syncer_.unsync();
 	load_config();
@@ -175,7 +188,7 @@ bool project_manager::open_project(const fs::path& project_path)
 	save_config();
 
 	setup_meta_syncer(app_meta_syncer_, fs::resolve_protocol("app:/data"), fs::resolve_protocol("app:/meta"));
-	setup_cache_syncer(app_cache_syncer_, fs::resolve_protocol("app:/meta"),
+	setup_cache_syncer(app_watchers_, app_cache_syncer_, fs::resolve_protocol("app:/meta"),
 					   fs::resolve_protocol("app:/cache"));
 
 	auto& es = core::get_subsystem<editing_system>();
@@ -302,8 +315,8 @@ void project_manager::setup_meta_syncer(fs::syncer& syncer, const fs::path& data
 	syncer.sync(data_dir, meta_dir);
 }
 
-void project_manager::setup_cache_syncer(fs::syncer& syncer, const fs::path& meta_dir,
-										 const fs::path& cache_dir)
+void project_manager::setup_cache_syncer(std::vector<uint64_t>& watchers, fs::syncer& syncer,
+										 const fs::path& meta_dir, const fs::path& cache_dir)
 {
 	setup_directory(syncer);
 
@@ -330,14 +343,14 @@ void project_manager::setup_cache_syncer(fs::syncer& syncer, const fs::path& met
 
 	};
 
-	add_to_syncer<gfx::texture>(syncer, cache_dir, on_removed, on_renamed);
-	add_to_syncer<gfx::shader>(syncer, cache_dir, on_removed, on_renamed);
-	add_to_syncer<mesh>(syncer, cache_dir, on_removed, on_renamed);
-	add_to_syncer<audio::sound>(syncer, cache_dir, on_removed, on_renamed);
-	add_to_syncer<material>(syncer, cache_dir, on_removed, on_renamed);
-	add_to_syncer<runtime::animation>(syncer, cache_dir, on_removed, on_renamed);
-	add_to_syncer<prefab>(syncer, cache_dir, on_removed, on_renamed);
-	add_to_syncer<scene>(syncer, cache_dir, on_removed, on_renamed);
+	add_to_syncer<gfx::texture>(watchers, syncer, cache_dir, on_removed, on_renamed);
+	add_to_syncer<gfx::shader>(watchers, syncer, cache_dir, on_removed, on_renamed);
+	add_to_syncer<mesh>(watchers, syncer, cache_dir, on_removed, on_renamed);
+	add_to_syncer<audio::sound>(watchers, syncer, cache_dir, on_removed, on_renamed);
+	add_to_syncer<material>(watchers, syncer, cache_dir, on_removed, on_renamed);
+	add_to_syncer<runtime::animation>(watchers, syncer, cache_dir, on_removed, on_renamed);
+	add_to_syncer<prefab>(watchers, syncer, cache_dir, on_removed, on_renamed);
+	add_to_syncer<scene>(watchers, syncer, cache_dir, on_removed, on_renamed);
 
 	syncer.sync(meta_dir, cache_dir);
 }
@@ -366,16 +379,31 @@ project_manager::project_manager()
 	load_config();
 	setup_meta_syncer(engine_meta_syncer_, fs::resolve_protocol("engine:/data"),
 					  fs::resolve_protocol("engine:/meta"));
-	setup_cache_syncer(engine_cache_syncer_, fs::resolve_protocol("engine:/meta"),
+	setup_cache_syncer(engine_watchers_, engine_cache_syncer_, fs::resolve_protocol("engine:/meta"),
 					   fs::resolve_protocol("engine:/cache"));
 	setup_meta_syncer(editor_meta_syncer_, fs::resolve_protocol("editor:/data"),
 					  fs::resolve_protocol("editor:/meta"));
-	setup_cache_syncer(editor_cache_syncer_, fs::resolve_protocol("editor:/meta"),
+	setup_cache_syncer(editor_watchers_, editor_cache_syncer_, fs::resolve_protocol("editor:/meta"),
 					   fs::resolve_protocol("editor:/cache"));
 }
 
 project_manager::~project_manager()
 {
 	save_config();
+
+	unwatch(app_watchers_);
+
+	app_meta_syncer_.unsync();
+	app_cache_syncer_.unsync();
+
+	unwatch(editor_watchers_);
+
+	editor_meta_syncer_.unsync();
+	editor_cache_syncer_.unsync();
+
+	unwatch(engine_watchers_);
+
+	engine_meta_syncer_.unsync();
+	engine_cache_syncer_.unsync();
 }
 }

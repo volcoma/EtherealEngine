@@ -10,7 +10,7 @@ style_dock::style_dock(const std::string& dtitle, bool close_button, const ImVec
 	style.set_style_colors(setup);
 }
 
-void style_dock::render(const ImVec2&)
+void style_dock::render(const ImVec2& /*unused*/)
 {
 	auto& style = get_gui_style();
 	auto& setup = style.setup;
@@ -35,19 +35,27 @@ void style_dock::render(const ImVec2&)
 
 	gui::ColorConvertHSVtoRGB(col_main_hue, col_main_sat, col_main_val, rgb.x, rgb.y, rgb.z);
 	if(gui::ColorEdit3("MAIN", &rgb.x, ImGuiColorEditFlags_HSV))
+	{
 		gui::ColorConvertRGBtoHSV(rgb.x, rgb.y, rgb.z, col_main_hue, col_main_sat, col_main_val);
+	}
 
 	gui::ColorConvertHSVtoRGB(col_area_hue, col_area_sat, col_area_val, rgb.x, rgb.y, rgb.z);
 	if(gui::ColorEdit3("AREA", &rgb.x, ImGuiColorEditFlags_HSV))
+	{
 		gui::ColorConvertRGBtoHSV(rgb.x, rgb.y, rgb.z, col_area_hue, col_area_sat, col_area_val);
+	}
 
 	gui::ColorConvertHSVtoRGB(col_back_hue, col_back_sat, col_back_val, rgb.x, rgb.y, rgb.z);
 	if(gui::ColorEdit3("BACK", &rgb.x, ImGuiColorEditFlags_HSV))
+	{
 		gui::ColorConvertRGBtoHSV(rgb.x, rgb.y, rgb.z, col_back_hue, col_back_sat, col_back_val);
+	}
 
 	gui::ColorConvertHSVtoRGB(col_text_hue, col_text_sat, col_text_val, rgb.x, rgb.y, rgb.z);
 	if(gui::ColorEdit3("TEXT", &rgb.x, ImGuiColorEditFlags_HSV))
+	{
 		gui::ColorConvertRGBtoHSV(rgb.x, rgb.y, rgb.z, col_text_hue, col_text_sat, col_text_val);
+	}
 
 	gui::SliderFloat("ROUNDING", &frameRounding, 0.0f, 10.0f);
 
