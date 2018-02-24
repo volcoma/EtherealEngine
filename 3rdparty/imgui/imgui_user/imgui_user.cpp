@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <vector>
 #include <array>
+#include <cstring>
 namespace ImGui
 {
 
