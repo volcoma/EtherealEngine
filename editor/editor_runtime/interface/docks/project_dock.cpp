@@ -266,7 +266,8 @@ static bool draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const s
 			open_rename_menu = true;
 			gui::CloseCurrentPopup();
 		}
-		if(gui::MenuItem("REMOVE", "Delete"))
+        
+		if(gui::MenuItem("DELETE", "DEL"))
 		{
 			action = entry_action::deleted;
 			gui::CloseCurrentPopup();

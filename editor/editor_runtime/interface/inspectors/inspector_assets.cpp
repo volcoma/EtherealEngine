@@ -117,7 +117,7 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 		}
 
 		gui::SameLine();
-		if(gui::Button("REMOVE"))
+		if(gui::Button("CLEAR"))
 		{
 			data = asset_handle<gfx::texture>();
 			var = data;

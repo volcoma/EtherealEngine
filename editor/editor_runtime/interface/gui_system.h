@@ -53,7 +53,7 @@ struct gui_style
 
 		float col_area_hue = 0.0f / 255.0f;
 		float col_area_sat = 0.0f / 255.0f;
-		float col_area_val = 80.0f / 255.0f;
+		float col_area_val = 60.0f / 255.0f;
 
 		float col_back_hue = 0.0f / 255.0f;
 		float col_back_sat = 0.0f / 255.0f;

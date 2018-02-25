@@ -101,7 +101,7 @@ static context_action check_context_menu(runtime::entity entity)
 				action = context_action::rename;
 			}
 
-			if(gui::MenuItem("CLONE", "CTRL + D"))
+			if(gui::MenuItem("DUPLICATE", "CTRL + D"))
 			{
 				auto object = ecs::utils::clone_entity(entity);
 
@@ -137,20 +137,20 @@ static context_action check_context_menu(runtime::entity entity)
 	{
 		if(gui::BeginPopupContextWindow())
 		{
-			if(gui::MenuItem("Create empty"))
+			if(gui::MenuItem("CREATE EMPTY"))
 			{
 				auto object = ecs.create();
 				object.assign<transform_component>();
 				es.select(object);
 			}
 
-			if(gui::BeginMenu("3D Objects"))
+			if(gui::BeginMenu("3D OBJECTS"))
 			{
 				static const std::map<std::string, std::vector<std::string>> menu_objects = {
-					{"Basic", {"Sphere", "Cube", "Plane", "Cylinder", "Capsule", "Cone", "Torus", "Teapot"}},
-					{"Polygons", {"Tetrahedron", "Octahedron", "Icosahedron", "Dodecahedron"}},
-					{"Spheres",
-					 {"Icosphere0", "Icosphere1", "Icosphere2", "Icosphere3", "Icosphere4", "Icosphere5"}}};
+					{"BASIC", {"SPHERE", "CUBE", "PLANE", "CYLINDER", "CAPSULE", "CONE", "TORUS", "TEAPOT"}},
+					{"POLYGONS", {"TETRAHEDRON", "OCTAHEDRON", "ICOSAHEDRON", "DODECAHEDRON"}},
+					{"ICOSPHERES",
+					 {"ICOSPHERE0", "ICOSPHERE1", "ICOSPHERE2", "ICOSPHERE3", "ICOSPHERE4", "ICOSPHERE5"}}};
 
 				auto& am = core::get_subsystem<runtime::asset_manager>();
 				for(const auto& p : menu_objects)
@@ -187,14 +187,14 @@ static context_action check_context_menu(runtime::entity entity)
 				gui::EndMenu();
 			}
 
-			if(gui::BeginMenu("Lighting"))
+			if(gui::BeginMenu("LIGHTING"))
 			{
-				if(gui::BeginMenu("Light"))
+				if(gui::BeginMenu("LIGHT"))
 				{
 					static const std::vector<std::pair<std::string, light_type>> light_objects = {
-						{"Directional", light_type::directional},
-						{"Spot", light_type::spot},
-						{"Point", light_type::point}};
+						{"DIRECTIONAL", light_type::directional},
+						{"SPOT", light_type::spot},
+						{"POINT", light_type::point}};
 
 					for(const auto& p : light_objects)
 					{
@@ -203,7 +203,7 @@ static context_action check_context_menu(runtime::entity entity)
 						if(gui::MenuItem(name.c_str()))
 						{
 							auto object = ecs.create();
-							object.set_name(name + " Light");
+							object.set_name(name + " LIGHT");
 
 							auto transf_comp = object.assign<transform_component>().lock();
 							transf_comp->set_local_position({0.0f, 1.0f, 0.0f});
@@ -221,13 +221,13 @@ static context_action check_context_menu(runtime::entity entity)
 					gui::EndMenu();
 				}
 
-				if(gui::BeginMenu("Reflection probes"))
+				if(gui::BeginMenu("REFLECTION PROBES"))
 				{
 					static const std::vector<std::pair<std::string, probe_type>> reflection_probes = {
-						{"Sphere", probe_type::sphere}, {"Box", probe_type::box}};
+						{"SPHERE", probe_type::sphere}, {"BOX", probe_type::box}};
 					for(const auto& p : reflection_probes)
 					{
-						const auto& name = p.first + " probe";
+						const auto& name = p.first + " PROBE";
 						const auto& type = p.second;
 
 						if(gui::MenuItem(name.c_str()))
@@ -250,12 +250,12 @@ static context_action check_context_menu(runtime::entity entity)
 				gui::EndMenu();
 			}
 
-			if(gui::BeginMenu("Audio"))
+			if(gui::BeginMenu("AUDIO"))
 			{
-				if(gui::MenuItem("Source"))
+				if(gui::MenuItem("SOURCE"))
 				{
 					auto object = ecs.create();
-					object.set_name("audio source");
+					object.set_name("AUDIO SOURCE");
 					object.assign<transform_component>();
 					object.assign<audio_source_component>();
 					es.select(object);
@@ -263,10 +263,10 @@ static context_action check_context_menu(runtime::entity entity)
 				gui::EndMenu();
 			}
 
-			if(gui::MenuItem("Camera"))
+			if(gui::MenuItem("CAMERA"))
 			{
 				auto object = ecs.create();
-				object.set_name("camera");
+				object.set_name("CAMERA");
 				auto transf_comp = object.assign<transform_component>().lock();
 				transf_comp->set_local_position({0.0f, 2.0f, -5.0f});
 
@@ -533,6 +533,7 @@ void hierarchy_dock::draw_entity(runtime::entity entity)
 		if(action == context_action::rename)
 		{
 			edit_label_ = true;
+            es.select(entity);
 		}
 	}
 
