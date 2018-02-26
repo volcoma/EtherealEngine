@@ -142,8 +142,8 @@ private:
 	//-------------------------------------------------------------------------
 	// Protected Variables
 	//-------------------------------------------------------------------------
-	//this should be always first.
-    mutable mat4_t matrix_ = mat4_t(1);
+	// this should be always first.
+	mutable mat4_t matrix_ = mat4_t(1);
 
 	vec3_t position_ = vec3_t(0, 0, 0);
 	quat_t rotation_ = quat_t(1, 0, 0, 0);
@@ -250,19 +250,19 @@ inline void transform_t<T, Q>::set_rotation(const typename transform_t::vec3_t& 
 template <typename T, qualifier Q>
 inline typename transform_t<T, Q>::vec3_t transform_t<T, Q>::x_axis() const
 {
-	return get_rotation() * vec3_t(1, 0, 0);
+	return get_matrix()[0];
 }
 
 template <typename T, qualifier Q>
 inline typename transform_t<T, Q>::vec3_t transform_t<T, Q>::y_axis() const
 {
-	return get_rotation() * vec3_t(0, 1, 0);
+	return get_matrix()[1];
 }
 
 template <typename T, qualifier Q>
 inline typename transform_t<T, Q>::vec3_t transform_t<T, Q>::z_axis() const
 {
-	return get_rotation() * vec3_t(0, 0, 1);
+	return get_matrix()[2];
 }
 
 template <typename T, qualifier Q>
