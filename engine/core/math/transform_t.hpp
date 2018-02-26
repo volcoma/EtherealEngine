@@ -142,7 +142,8 @@ private:
 	//-------------------------------------------------------------------------
 	// Protected Variables
 	//-------------------------------------------------------------------------
-	mutable mat4_t matrix_ = mat4_t(1);
+	//this should be always first.
+    mutable mat4_t matrix_ = mat4_t(1);
 
 	vec3_t position_ = vec3_t(0, 0, 0);
 	quat_t rotation_ = quat_t(1, 0, 0, 0);

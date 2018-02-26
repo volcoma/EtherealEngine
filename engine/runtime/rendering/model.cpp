@@ -140,7 +140,7 @@ void model::render(gfx::view_id id, const math::transform& world_transform,
 	}
 
 	auto render_subset = [this, &mesh](gfx::view_id id, bool skinned, std::uint32_t group_id,
-									   const float* mtx, std::uint32_t count, bool apply_cull,
+									   const std::vector<math::transform>& matrices, bool apply_cull,
 									   bool depth_write, bool depth_test, std::uint64_t extra_states,
 									   gpu_program* user_program,
 									   std::function<void(gpu_program&)> setup_params) {
@@ -179,9 +179,16 @@ void model::render(gfx::view_id id, const math::transform& world_transform,
 				extra_states |= mat->get_render_states(apply_cull, depth_write, depth_test);
 			}
 
-			if(mtx != nullptr)
+			if(!matrices.empty())
 			{
-				gfx::set_transform(mtx, static_cast<std::uint16_t>(count));
+				using mat_type = math::transform::mat4_t;
+				std::vector<mat_type> mats;
+				mats.reserve(matrices.size());
+				for(const auto& m : matrices)
+				{
+					mats.emplace_back(m.get_matrix());
+				}
+				gfx::set_transform(mats.data(), static_cast<std::uint16_t>(mats.size()));
 			}
 
 			gfx::set_state(extra_states);
@@ -212,8 +219,7 @@ void model::render(gfx::view_id id, const math::transform& world_transform,
 			// auto max_blend_index = palette.get_maximum_blend_index();
 
 			auto data_group = palette.get_data_group();
-			render_subset(id, true, data_group, reinterpret_cast<float*>(&skinning_matrices[0]),
-						  std::uint32_t(skinning_matrices.size()), apply_cull, depth_write, depth_test,
+			render_subset(id, true, data_group, skinning_matrices, apply_cull, depth_write, depth_test,
 						  extra_states, user_program, setup_params);
 
 		} // Next Palette
@@ -222,7 +228,7 @@ void model::render(gfx::view_id id, const math::transform& world_transform,
 	{
 		for(std::size_t i = 0; i < mesh->get_subset_count(); ++i)
 		{
-			render_subset(id, false, std::uint32_t(i), world_transform, 1, apply_cull, depth_write,
+			render_subset(id, false, std::uint32_t(i), {world_transform}, apply_cull, depth_write,
 						  depth_test, extra_states, user_program, setup_params);
 		}
 	}

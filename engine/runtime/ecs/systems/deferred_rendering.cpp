@@ -575,13 +575,13 @@ deferred_rendering::reflection_probe_pass(std::shared_ptr<gfx::frame_buffer> inp
 				math::transform t;
 				t.set_scale(probe.box_data.extents);
 				t = world_transform * t;
-				auto u_inv_world = math::inverse(t);
+				auto u_inv_world = math::inverse(t).get_matrix();
 				float data2[4] = {probe.box_data.extents.x, probe.box_data.extents.y,
 								  probe.box_data.extents.z, probe.box_data.transition_distance};
 
 				program = box_ref_probe_program_.get();
 				program->begin();
-				program->set_uniform("u_inv_world", &u_inv_world);
+				program->set_uniform("u_inv_world", math::value_ptr(u_inv_world));
 				program->set_uniform("u_data2", data2);
 
 				influence_radius = math::length(t.get_scale() + probe.box_data.transition_distance);
