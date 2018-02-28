@@ -497,7 +497,7 @@ bool BeginToolbar(const char* str_id, ImVec2 screen_pos, ImVec2 size)
 							 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar |
 							 ImGuiWindowFlags_NoSavedSettings;
 	ImGui::SetNextWindowSize(size);
-	bool ret = ImGui::Begin(str_id, nullptr, size, -1, flags);
+	bool ret = ImGui::Begin(str_id, nullptr, flags);
 	ImGui::PopStyleVar(3);
 
 	return ret;

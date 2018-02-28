@@ -803,8 +803,8 @@ void set_draw_list()
 void BeginFrame()
 {
 	ImGuiIO& io = ImGui::GetIO();
-
-	ImGui::Begin("gizmo", NULL, io.DisplaySize, 0,
+    ImGui::SetNextWindowSize(io.DisplaySize, ImGuiCond_FirstUseEver);
+	ImGui::Begin("gizmo", nullptr,
 				 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar |
 					 ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoSavedSettings |
 					 ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus);

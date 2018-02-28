@@ -504,3 +504,35 @@ bool inspector_string::inspect(rttr::variant& var, bool read_only, const meta_ge
 
 	return false;
 }
+
+bool inspector_duration_sec_float::inspect(rttr::variant &var, bool read_only, const inspector::meta_getter &get_metadata)
+{
+    auto data = var.get_value<std::chrono::duration<float>>();    
+    inspector_float inspector;
+    auto count = data.count();
+    rttr::variant v = count;
+    bool changed = inspector.inspect(v, read_only, get_metadata);
+    if(changed)
+    {
+        count = v.get_value<float>();
+        var = std::chrono::duration<float>(count);
+    }
+    
+    return changed;
+}
+
+bool inspector_duration_sec_double::inspect(rttr::variant &var, bool read_only, const inspector::meta_getter &get_metadata)
+{
+    auto data = var.get_value<std::chrono::duration<double>>();    
+    inspector_double inspector;
+    auto count = data.count();
+    rttr::variant v = count;
+    bool changed = inspector.inspect(v, read_only, get_metadata);
+    if(changed)
+    {
+        count = v.get_value<double>();
+        var = std::chrono::duration<double>(count);
+    }
+    
+    return changed;
+}

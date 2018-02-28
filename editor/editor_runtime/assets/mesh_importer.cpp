@@ -234,8 +234,15 @@ void process_nodes(const aiScene* scene, mesh::load_data& load_data)
 void process_animation(const aiAnimation* assimp_anim, runtime::animation& anim)
 {
 	anim.name = assimp_anim->mName.C_Str();
-	anim.duration = assimp_anim->mDuration;
-	anim.ticks_per_second = assimp_anim->mTicksPerSecond;
+    auto ticks_per_second = assimp_anim->mTicksPerSecond;
+    if(ticks_per_second < 0.001)
+    {
+        ticks_per_second = 25.0;
+    }
+    
+    auto ticks = assimp_anim->mDuration;
+     
+	anim.duration = decltype(anim.duration)(ticks * ticks_per_second);
 
 	if(assimp_anim->mNumChannels > 0)
 	{
@@ -247,8 +254,6 @@ void process_animation(const aiAnimation* assimp_anim, runtime::animation& anim)
 		const aiNodeAnim* assimp_node_anim = assimp_anim->mChannels[i];
 		auto& node_anim = anim.channels[i];
 		node_anim.node_name = assimp_node_anim->mNodeName.C_Str();
-		node_anim.pre_state = static_cast<runtime::anim_behaviour>(assimp_node_anim->mPreState);
-		node_anim.post_state = static_cast<runtime::anim_behaviour>(assimp_node_anim->mPostState);
 
 		if(assimp_node_anim->mNumPositionKeys > 0)
 		{
@@ -259,7 +264,7 @@ void process_animation(const aiAnimation* assimp_anim, runtime::animation& anim)
 		{
 			const auto& anim_key = assimp_node_anim->mPositionKeys[idx];
 			auto& key = node_anim.position_keys[idx];
-			key.time = anim_key.mTime;
+			key.time = decltype(key.time)(anim_key.mTime);
 			key.value.x = anim_key.mValue.x;
 			key.value.y = anim_key.mValue.y;
 			key.value.z = anim_key.mValue.z;
@@ -274,7 +279,7 @@ void process_animation(const aiAnimation* assimp_anim, runtime::animation& anim)
 		{
 			const auto& anim_key = assimp_node_anim->mRotationKeys[idx];
 			auto& key = node_anim.rotation_keys[idx];
-			key.time = anim_key.mTime;
+			key.time = decltype(key.time)(anim_key.mTime);
 			key.value.x = anim_key.mValue.x;
 			key.value.y = anim_key.mValue.y;
 			key.value.z = anim_key.mValue.z;
@@ -289,11 +294,11 @@ void process_animation(const aiAnimation* assimp_anim, runtime::animation& anim)
 		for(size_t idx = 0; idx < assimp_node_anim->mNumScalingKeys; ++idx)
 		{
 			const auto& anim_key = assimp_node_anim->mScalingKeys[idx];
-			auto& pos_key = node_anim.scaling_keys[idx];
-			pos_key.time = anim_key.mTime;
-			pos_key.value.x = anim_key.mValue.x;
-			pos_key.value.y = anim_key.mValue.y;
-			pos_key.value.z = anim_key.mValue.z;
+			auto& key = node_anim.scaling_keys[idx];
+			key.time = decltype(key.time)(anim_key.mTime);
+			key.value.x = anim_key.mValue.x;
+			key.value.y = anim_key.mValue.y;
+			key.value.z = anim_key.mValue.z;
 		}
 	}
 }

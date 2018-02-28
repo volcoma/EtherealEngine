@@ -1,6 +1,8 @@
 #pragma once
 
 #include "inspector.h"
+#include <string>
+#include <chrono>
 
 struct inspector_bool : public inspector
 {
@@ -84,3 +86,17 @@ struct inspector_string : public inspector
 	bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata);
 };
 INSPECTOR_REFLECT(inspector_string, std::string)
+
+struct inspector_duration_sec_float : public inspector
+{
+	REFLECTABLEV(inspector_duration_sec_float, inspector)
+	bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata);
+};
+INSPECTOR_REFLECT(inspector_duration_sec_float, std::chrono::duration<float>)
+
+struct inspector_duration_sec_double : public inspector
+{
+	REFLECTABLEV(inspector_duration_sec_double, inspector)
+	bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata);
+};
+INSPECTOR_REFLECT(inspector_duration_sec_double, std::chrono::duration<double>)

@@ -35,44 +35,6 @@
 #endif
 
 ////////////////////////////////////////////////////////////
-// Cross-platform warning for deprecated functions and classes
-//
-// Usage:
-// class ETH_DEPRECATED MyClass
-// {
-//     ETH_DEPRECATED void memberFunc();
-// };
-//
-// ETH_DEPRECATED void globalFunc();
-////////////////////////////////////////////////////////////
-#if defined(ETH_NO_DEPRECATED_WARNINGS)
-
-// User explicitly requests to disable deprecation warnings
-#define ETH_DEPRECATED
-
-#elif ETH_ON(ETH_COMPILER_MSVC)
-
-// Microsoft C++ compiler
-// Note: On newer MSVC versions, using deprecated functions causes a compiler error. In order to
-// trigger a warning instead of an error, the compiler flag /sdl- (instead of /sdl) must be specified.
-#define ETH_DEPRECATED __declspec(deprecated)
-
-#elif ETH_ON(ETH_COMPILER_GNUC) || ETH_ON(ETH_COMPILER_CLANG)
-
-// g++ and clang
-#define ETH_DEPRECATED __attribute__((deprecated))
-
-#else
-
-// Other compilers are not supported, leave class or function as-is.
-// With a bit of luck, the #pragma directive works, otherwise users get a warning (no error!) for unrecognized
-// #pragma.
-#pragma message("ETH_DEPRECATED is not supported for your compiler.")
-#define ETH_DEPRECATED
-
-#endif
-
-////////////////////////////////////////////////////////////
 // Define portable import / export macros
 ////////////////////////////////////////////////////////////
 #if defined(ETH_API_EXPORTS)

@@ -40,7 +40,7 @@ bool load_ogg_from_memory(const std::uint8_t* data, std::size_t data_size, sound
 
 	float seconds = stb_vorbis_stream_length_in_seconds(oss);
 
-	result.info.duration = sound_info::duration_t(seconds);
+	result.info.duration = sound_info::seconds_t(seconds);
 	result.data.resize(data_bytes, 0);
 
 	stb_vorbis_get_samples_short_interleaved(

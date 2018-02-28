@@ -14,7 +14,7 @@ REFLECT(sound_info)
 			rttr::metadata("pretty_name", "Sample rate"), rttr::metadata("tooltip", "Sample rate."))
 		.property_readonly("channels", &sound_info::channels)(rttr::metadata("pretty_name", "Channels"),
 															  rttr::metadata("tooltip", "Mono or Stereo."))
-		.property_readonly("duration", &sound_info::get_duration)(
+		.property_readonly("duration", &sound_info::duration)(
 			rttr::metadata("pretty_name", "Duration"), rttr::metadata("tooltip", "Duration in seconds."));
 }
 

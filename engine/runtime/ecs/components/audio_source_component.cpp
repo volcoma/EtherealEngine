@@ -82,17 +82,17 @@ const frange_t& audio_source_component::get_range() const
 	return range_;
 }
 
-void audio_source_component::set_playing_offset(audio::sound_info::duration_t offset)
+void audio_source_component::set_playing_offset(audio::sound_info::seconds_t offset)
 {
 	source_.set_playing_offset(offset);
 }
 
-audio::sound_info::duration_t audio_source_component::get_playing_offset() const
+audio::sound_info::seconds_t audio_source_component::get_playing_offset() const
 {
 	return source_.get_playing_offset();
 }
 
-audio::sound_info::duration_t audio_source_component::get_playing_duration() const
+audio::sound_info::seconds_t audio_source_component::get_playing_duration() const
 {
 	return source_.get_playing_duration();
 }

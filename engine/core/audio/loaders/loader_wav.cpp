@@ -183,8 +183,8 @@ bool load_wav_from_memory(const std::uint8_t* data, std::size_t data_size, sound
 	}
 
 	result.info.sample_rate = std::uint32_t(header.format.sample_rate);
-	result.info.duration = sound_info::duration_t(sound_info::duration_t::rep(header.data.data_bytes) /
-												  sound_info::duration_t::rep(header.format.byte_rate));
+	result.info.duration = sound_info::seconds_t(sound_info::seconds_t::rep(header.data.data_bytes) /
+												 sound_info::seconds_t::rep(header.format.byte_rate));
 
 	result.data.resize(std::size_t(header.data.data_bytes));
 	result.info.bytes_per_sample = std::uint8_t(header.format.bit_depth) / 8;
