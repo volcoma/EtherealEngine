@@ -868,7 +868,7 @@ void dockspace::render_tab_bar(node* container, const ImVec2& sz, const ImVec2& 
 	ImGui::SetCursorPos(cursor_pos);
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(14.0f, 3.0f));
-	ImVec4 childBg = ImGui::GetStyle().Colors[ImGuiCol_ChildWindowBg];
+	ImVec4 childBg = ImGui::GetStyle().Colors[ImGuiCol_ChildBg];
 
 	for(auto dock : container->docks)
 	{

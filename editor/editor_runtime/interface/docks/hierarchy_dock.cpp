@@ -436,7 +436,7 @@ void hierarchy_dock::draw_entity(runtime::entity entity)
 	}
 
 	std::string name = entity.to_string();
-	ImGuiTreeNodeFlags flags = 0 | ImGuiTreeNodeFlags_AllowOverlapMode | ImGuiTreeNodeFlags_OpenOnArrow;
+	ImGuiTreeNodeFlags flags = 0 | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_OpenOnArrow;
 
 	if(is_selected)
 	{

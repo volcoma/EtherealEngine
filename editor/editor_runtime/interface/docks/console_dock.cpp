@@ -81,8 +81,8 @@ void console_dock::render(const ImVec2&)
 			APPLOG_WARNING(error_msg.c_str());
 		}
 		// Demonstrate keeping auto focus on the input box
-		if(gui::IsItemHovered() ||
-		   (gui::IsRootWindowOrAnyChildFocused() && !gui::IsAnyItemActive() && !gui::IsMouseClicked(0)))
+		if(gui::IsItemHovered() || (gui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
+									!gui::IsAnyItemActive() && !gui::IsMouseClicked(0)))
 			gui::SetKeyboardFocusHere(-1); // Auto focus previous widget
 	}
 

@@ -20,5 +20,8 @@ _CRT_SECURE_NO_WARNINGS
 _CRT_SECURE_NO_DEPRECATE)
 endif()
 
+set(imgui_flags ${imgui_flags}
+IMGUI_DISABLE_OBSOLETE_FUNCTIONS)
+
 target_compile_definitions(imgui PUBLIC ${imgui_flags})
 target_include_directories (imgui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
