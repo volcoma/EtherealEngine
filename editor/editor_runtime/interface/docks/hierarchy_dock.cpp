@@ -533,7 +533,7 @@ void hierarchy_dock::draw_entity(runtime::entity entity)
 		if(action == context_action::rename)
 		{
 			edit_label_ = true;
-            es.select(entity);
+			es.select(entity);
 		}
 	}
 

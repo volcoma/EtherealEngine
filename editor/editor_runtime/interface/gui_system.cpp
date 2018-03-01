@@ -218,7 +218,7 @@ void imgui_set_context(ImGuiContext* context)
 		std::memcpy(&context->Style, &last_context->Style, sizeof(ImGuiStyle));
 		std::memcpy(&context->IO.KeyMap, &last_context->IO.KeyMap, sizeof(last_context->IO.KeyMap));
 		context->IO.IniFilename = last_context->IO.IniFilename;
-		context->IO.NavFlags = last_context->IO.NavFlags;
+		context->IO.ConfigFlags = last_context->IO.ConfigFlags;
 		context->IO.FontAllowUserScaling = last_context->IO.FontAllowUserScaling;
 		context->Initialized = last_context->Initialized;
 	}
@@ -305,7 +305,7 @@ void imgui_init()
 		vs_ocornut_imgui, fs_ocornut_imgui);
 
 	ImGuiIO& io = gui::GetIO();
-	io.NavFlags |= ImGuiNavFlags_EnableKeyboard;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	io.IniFilename = nullptr;
 	// init keyboard mapping
 	io.KeyMap[ImGuiKey_Tab] = mml::keyboard::Tab;

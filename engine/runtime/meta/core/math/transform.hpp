@@ -2,8 +2,8 @@
 
 #include "core/math/math_includes.h"
 #include "core/serialization/serialization.h"
-#include "vector.hpp"
 #include "quaternion.hpp"
+#include "vector.hpp"
 
 namespace cereal
 {
@@ -81,16 +81,16 @@ inline void SERIALIZE_FUNCTION_NAME(Archive& ar, math::tmat4x4<T, P>& obj)
 template <typename Archive, typename T, math::qualifier P>
 inline void SERIALIZE_FUNCTION_NAME(Archive& ar, math::transform_t<T, P>& obj)
 {
-    auto pos = obj.get_position();
-    auto rot = obj.get_rotation();
-    auto scale = obj.get_scale();
-    
-    try_serialize(ar, cereal::make_nvp("position", pos));
-    try_serialize(ar, cereal::make_nvp("rotation", rot));
-    try_serialize(ar, cereal::make_nvp("scale", scale));
-    
-    obj.set_position(pos);
-    obj.set_rotation(rot);
-    obj.set_scale(scale);
+	auto pos = obj.get_position();
+	auto rot = obj.get_rotation();
+	auto scale = obj.get_scale();
+
+	try_serialize(ar, cereal::make_nvp("position", pos));
+	try_serialize(ar, cereal::make_nvp("rotation", rot));
+	try_serialize(ar, cereal::make_nvp("scale", scale));
+
+	obj.set_position(pos);
+	obj.set_rotation(rot);
+	obj.set_scale(scale);
 }
 }

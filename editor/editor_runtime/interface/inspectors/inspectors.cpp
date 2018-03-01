@@ -122,23 +122,22 @@ bool inspect_array(rttr::variant& var, bool read_only, const inspector::meta_get
 	if(view.is_dynamic())
 	{
 		property_layout layout("Size");
-        
-        if(!read_only)
-        {
-            if(gui::InputInt("", &int_size))
-            {
-                if(int_size < 0)
-                    int_size = 0;
-                size = static_cast<std::size_t>(int_size);
-                changed |= view.set_size(size);
-            }
-        }
-        else
-        {
-            gui::AlignTextToFramePadding();
-            gui::TextUnformatted(std::to_string(int_size).c_str());
-        }
-		
+
+		if(!read_only)
+		{
+			if(gui::InputInt("", &int_size))
+			{
+				if(int_size < 0)
+					int_size = 0;
+				size = static_cast<std::size_t>(int_size);
+				changed |= view.set_size(size);
+			}
+		}
+		else
+		{
+			gui::AlignTextToFramePadding();
+			gui::TextUnformatted(std::to_string(int_size).c_str());
+		}
 	}
 
 	for(std::size_t i = 0; i < size; ++i)

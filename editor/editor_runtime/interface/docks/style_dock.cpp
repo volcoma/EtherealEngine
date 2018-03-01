@@ -1,5 +1,4 @@
 #include "style_dock.h"
-#include "../gui_system.h"
 
 style_dock::style_dock(const std::string& dtitle, bool close_button, const ImVec2& min_size)
 {

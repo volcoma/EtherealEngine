@@ -3,6 +3,8 @@
 #include "editor_core/gui/gui.h"
 #include "runtime/system/events.h"
 
+#include "core/graphics/texture.h"
+#include "runtime/assets/asset_handle.h"
 #include <map>
 #include <memory>
 
@@ -42,6 +44,24 @@ private:
 	ImFontAtlas atlas_;
 	ImGuiContext* initial_context_ = nullptr;
 };
+
+namespace gui
+{
+inline texture_info get_info(const std::shared_ptr<gfx::texture>& texture)
+{
+	gui::texture_info info;
+	info.texture = texture;
+	bool is_rt = texture ? texture->is_render_target() : false;
+	info.is_rt = is_rt;
+	info.is_origin_bl = gfx::is_origin_bottom_left();
+	return info;
+}
+
+inline texture_info get_info(const asset_handle<gfx::texture>& asset)
+{
+	return get_info(asset.get_asset());
+}
+}
 
 struct gui_style
 {

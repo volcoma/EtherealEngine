@@ -25,9 +25,7 @@ void game_dock::render(const ImVec2&)
 			const auto& viewport_size = camera.get_viewport_size();
 			const auto surface = render_view.get_output_fbo(viewport_size);
 			auto tex = surface->get_attachment(0).texture;
-			bool is_rt = tex ? tex->is_render_target() : false;
-			bool is_orig_bl = gfx::is_origin_bottom_left();
-			gui::Image(tex, is_rt, is_orig_bl, size);
+			gui::Image(gui::get_info(tex), size);
 		}
 
 	});

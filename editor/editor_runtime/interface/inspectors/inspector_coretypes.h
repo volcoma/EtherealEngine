@@ -1,8 +1,8 @@
 #pragma once
 
 #include "inspector.h"
-#include <string>
 #include <chrono>
+#include <string>
 
 struct inspector_bool : public inspector
 {

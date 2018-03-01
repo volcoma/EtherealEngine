@@ -228,8 +228,8 @@ void model::render(gfx::view_id id, const math::transform& world_transform,
 	{
 		for(std::size_t i = 0; i < mesh->get_subset_count(); ++i)
 		{
-			render_subset(id, false, std::uint32_t(i), {world_transform}, apply_cull, depth_write,
-						  depth_test, extra_states, user_program, setup_params);
+			render_subset(id, false, std::uint32_t(i), {world_transform}, apply_cull, depth_write, depth_test,
+						  extra_states, user_program, setup_params);
 		}
 	}
 }

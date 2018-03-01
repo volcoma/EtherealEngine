@@ -234,14 +234,14 @@ void process_nodes(const aiScene* scene, mesh::load_data& load_data)
 void process_animation(const aiAnimation* assimp_anim, runtime::animation& anim)
 {
 	anim.name = assimp_anim->mName.C_Str();
-    auto ticks_per_second = assimp_anim->mTicksPerSecond;
-    if(ticks_per_second < 0.001)
-    {
-        ticks_per_second = 25.0;
-    }
-    
-    auto ticks = assimp_anim->mDuration;
-     
+	auto ticks_per_second = assimp_anim->mTicksPerSecond;
+	if(ticks_per_second < 0.001)
+	{
+		ticks_per_second = 25.0;
+	}
+
+	auto ticks = assimp_anim->mDuration;
+
 	anim.duration = decltype(anim.duration)(ticks * ticks_per_second);
 
 	if(assimp_anim->mNumChannels > 0)
@@ -347,11 +347,11 @@ bool importer::load_mesh_data_from_file(const std::string& path, mesh::load_data
 	}
 	process_imported_scene(scene, load_data, animations);
 
-//	double factor = 1.0;
-//	if(scene->mMetaData != nullptr)
-//	{
-//		scene->mMetaData->Get("UnitScaleFactor", factor);
-//	}
+	//	double factor = 1.0;
+	//	if(scene->mMetaData != nullptr)
+	//	{
+	//		scene->mMetaData->Get("UnitScaleFactor", factor);
+	//	}
 
 	return true;
 }

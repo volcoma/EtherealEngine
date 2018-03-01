@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../gui_system.h"
 #include "imguidock.h"
 
 class console_log;

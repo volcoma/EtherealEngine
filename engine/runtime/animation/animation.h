@@ -49,13 +49,13 @@ struct animation
 	/// name is usually empty.
 	std::string name;
 
-    /// Duration of the animation in seconds
-    node_animation::seconds_t duration = node_animation::seconds_t(0);
+	/// Duration of the animation in seconds
+	node_animation::seconds_t duration = node_animation::seconds_t(0);
 
 	/// The node animation channels. Each channel affects a single node.
 	std::vector<node_animation> channels;
 };
 
-//elapsed_time = math::modf(elapsed_time + dt , anim.duration);
+// elapsed_time = math::modf(elapsed_time + dt , anim.duration);
 
 } // namespace runtime

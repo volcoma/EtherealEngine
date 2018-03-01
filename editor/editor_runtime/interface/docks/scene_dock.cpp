@@ -288,9 +288,7 @@ void draw_selected_camera(const ImVec2& size)
 							  ImGuiWindowFlags_AlwaysAutoResize))
 			{
 				auto tex = surface->get_attachment(0).texture;
-				bool is_rt = tex ? tex->is_render_target() : false;
-				bool is_orig_bl = gfx::is_origin_bottom_left();
-				gui::Image(tex, is_rt, is_orig_bl, bounds);
+				gui::Image(gui::get_info(tex), bounds);
 			}
 			gui::End();
 
@@ -656,9 +654,7 @@ void scene_dock::render(const ImVec2& area)
 		const auto& viewport_size = camera.get_viewport_size();
 		const auto surface = render_view.get_output_fbo(viewport_size);
 		auto tex = surface->get_attachment(0).texture;
-		bool is_rt = tex ? tex->is_render_target() : false;
-		bool is_orig_bl = gfx::is_origin_bottom_left();
-		gui::Image(tex, is_rt, is_orig_bl, size);
+		gui::Image(gui::get_info(tex), size);
 
 		if(gui::IsItemClicked(1) || gui::IsItemClicked(2))
 		{
@@ -724,9 +720,7 @@ void scene_dock::render(const ImVec2& area)
 			for(std::uint32_t i = 0; i < g_buffer_fbo->get_attachment_count(); ++i)
 			{
 				const auto tex = g_buffer_fbo->get_attachment(i).texture;
-				bool is_rt = tex ? tex->is_render_target() : false;
-				bool is_orig_bl = gfx::is_origin_bottom_left();
-				gui::Image(tex, is_rt, is_orig_bl, size);
+				gui::Image(gui::get_info(tex), size);
 
 				if(gui::IsItemClicked(1) || gui::IsItemClicked(2))
 				{

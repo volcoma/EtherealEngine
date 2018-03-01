@@ -10,7 +10,6 @@ REFLECT(node_animation)
 {
 	rttr::registration::class_<node_animation>("node_animation")
 		.property_readonly("node_name", &node_animation::node_name)(rttr::metadata("pretty_name", "Name"));
-	
 }
 
 REFLECT(animation)
@@ -18,8 +17,7 @@ REFLECT(animation)
 	rttr::registration::class_<animation>("animation")
 		.property_readonly("name", &animation::name)(rttr::metadata("pretty_name", "Name"))
 		.property_readonly("duration", &animation::duration)(rttr::metadata("pretty_name", "Duration"))
-        .property_readonly("channels", &animation::channels)(rttr::metadata("pretty_name", "Channels"));
-	
+		.property_readonly("channels", &animation::channels)(rttr::metadata("pretty_name", "Channels"));
 }
 
 SAVE(node_animation)

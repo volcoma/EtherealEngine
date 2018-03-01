@@ -58,8 +58,6 @@ static bool process_drag_drop_source(const asset_handle<gfx::texture>& preview, 
 		const std::string id = absolute_path.string();
 		const std::string strfilename = filename.string();
 		const auto& tex = preview;
-		bool is_rt = tex ? tex->is_render_target() : false;
-		bool is_orig_bl = gfx::is_origin_bottom_left();
 		ImVec2 item_size = {32, 32};
 		ImVec2 texture_size = item_size;
 		if(tex)
@@ -73,7 +71,7 @@ static bool process_drag_drop_source(const asset_handle<gfx::texture>& preview, 
 		auto w = gui::CalcTextSize(strfilename.c_str()).x;
 
 		gui::SameLine(0.0f, (w - item_size.x) / 2.0f);
-		gui::ImageWithAspect(tex.get_asset(), is_rt, is_orig_bl, texture_size, item_size, uv0, uv1);
+		gui::ImageWithAspect(gui::get_info(tex), texture_size, item_size, uv0, uv1);
 
 		gui::TextUnformatted(strfilename.c_str());
 
@@ -215,12 +213,11 @@ static bool draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const s
 	gui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(col.x, col.y, col.z, 0.86f));
 	gui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(col.x, col.y, col.z, 1.0f));
 
-	bool is_rt = icon.link->asset ? icon.link->asset->is_render_target() : false;
 	const int padding = 6;
 	auto pos = gui::GetCursorScreenPos();
 	pos.y += item_size.y + padding * 2.0f;
-	if(gui::ImageButtonWithAspectAndTextDOWN(icon.get_asset(), is_rt, gfx::is_origin_bottom_left(), name,
-											 texture_size, item_size, uv0, uv1, padding))
+	if(gui::ImageButtonWithAspectAndTextDOWN(gui::get_info(icon), name, texture_size, item_size, uv0, uv1,
+											 padding))
 	{
 		action = entry_action::clicked;
 	}
@@ -266,7 +263,7 @@ static bool draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const s
 			open_rename_menu = true;
 			gui::CloseCurrentPopup();
 		}
-        
+
 		if(gui::MenuItem("DELETE", "DEL"))
 		{
 			action = entry_action::deleted;
@@ -466,8 +463,8 @@ void project_dock::render(const ImVec2& /*unused*/)
 			const auto on_delete = [&]() {
 				fs::error_code err;
 				fs::remove(absolute_path, err);
-                
-                es.unselect();
+
+				es.unselect();
 			};
 
 			if(fs::is_directory(cache_entry.status()))
