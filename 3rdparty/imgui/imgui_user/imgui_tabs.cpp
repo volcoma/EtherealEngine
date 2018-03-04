@@ -137,7 +137,7 @@ static bool ArrowButton(ImGuiID id, ImGuiDir dir, ImVec2 padding, ImGuiButtonFla
     const ImU32 col = ImGui::GetColorU32((hovered && held) ? ImGuiCol_ButtonActive : hovered ? ImGuiCol_ButtonHovered : ImGuiCol_Button);
     ImGui::RenderNavHighlight(bb, id);
     ImGui::RenderFrame(bb.Min, bb.Max, col, true, style.FrameRounding);
-    ImGui::RenderTriangle(bb.Min + padding, dir, 1.0f);
+    ImGui::RenderArrow(bb.Min + padding, dir, 1.0f);
 
     return pressed;
 }

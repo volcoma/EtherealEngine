@@ -44,13 +44,14 @@ struct node_animation
 
 struct animation
 {
+    using seconds_t = node_animation::seconds_t;
 	/// The name of the animation. If the modeling package this data was
 	/// exported from does support only a single animation channel, this
 	/// name is usually empty.
 	std::string name;
 
 	/// Duration of the animation in seconds
-	node_animation::seconds_t duration = node_animation::seconds_t(0);
+	seconds_t duration = seconds_t(0);
 
 	/// The node animation channels. Each channel affects a single node.
 	std::vector<node_animation> channels;

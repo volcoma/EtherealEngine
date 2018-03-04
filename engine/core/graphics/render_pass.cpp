@@ -3,26 +3,29 @@
 #include <limits>
 namespace gfx
 {
-static gfx::view_id s_index = 0;
-static gfx::view_id s_last_index = 0;
 
+static gfx::view_id& get_counter()
+{
+    static gfx::view_id s_index = 0;
+    return s_index;    
+}
 gfx::view_id generate_id()
 {
-	if(s_index == 255)
+    auto& counter = get_counter();
+	if(counter == MAX_RENDER_PASSES)
 	{
 		frame();
-		s_index = 0;
+		counter = 0;
 	}
-	// find the first unset bit
-	gfx::view_id idx = s_index++;
+	gfx::view_id idx = counter++;
 
-	s_last_index = idx;
 	return idx;
 }
 
 render_pass::render_pass(const std::string& n)
 {
 	id = generate_id();
+    reset_view(id);
 	set_view_name(id, n.c_str());
 }
 
@@ -70,16 +73,17 @@ void render_pass::set_view_proj(const float* v, const float* p)
 
 void render_pass::reset()
 {
-	for(std::uint8_t i = 0; i < s_index; ++i)
-	{
-		reset_view(i);
-	}
-	s_index = 0;
-	s_last_index = 0;
+    get_counter() = 0;
 }
 
 gfx::view_id render_pass::get_pass()
 {
-	return s_last_index;
+    auto counter = get_counter();
+    if(counter == 0)
+    {
+        return MAX_RENDER_PASSES;
+    }
+    return counter - 1;
 }
+
 }

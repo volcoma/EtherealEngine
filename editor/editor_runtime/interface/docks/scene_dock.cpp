@@ -111,8 +111,7 @@ void scene_dock::show_statistics(const ImVec2& area, unsigned int fps, bool& sho
 		std::uint32_t ui_draw_calls = gui_sys.get_draw_calls();
 		gui::Text("Total Draw Calls: %u", stats->numDraw);
 		gui::Text("UI Draw Calls: %u", ui_draw_calls);
-		gui::Text("Scene Draw Calls: %u", stats->numDraw - ui_draw_calls);
-		gui::Text("Render Passes: %u", gfx::render_pass::get_pass());
+		gui::Text("Scene Draw Calls: %u", math::abs<std::uint32_t>(stats->numDraw - ui_draw_calls));
 
 		gui::PopFont();
 	}

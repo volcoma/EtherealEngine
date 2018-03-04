@@ -39,6 +39,11 @@ if( MSVC )
 	target_compile_definitions( bgfx PRIVATE "_CRT_SECURE_NO_WARNINGS" )
 endif()
 
+SET(MAX_VIEWS 1024 CACHE INT "MAX_VIEWS" FORCE)
+target_compile_definitions(bgfx PRIVATE "BGFX_CONFIG_MAX_VIEWS=${MAX_VIEWS}")
+target_compile_definitions(bgfx PRIVATE "BGFX_CONFIG_MAX_VIEW_NAME=${MAX_VIEWS}")
+target_compile_definitions(bgfx PRIVATE "BGFX_CONFIG_MAX_FRAME_BUFFERS=2048")
+
 # Includes
 target_include_directories( bgfx PRIVATE ${BGFX_DIR}/3rdparty ${BGFX_DIR}/3rdparty/dxsdk/include ${BGFX_DIR}/3rdparty/khronos )
 target_include_directories( bgfx PUBLIC ${BGFX_DIR}/include )
