@@ -31,6 +31,7 @@ inline int get_reg(void (*f)())
 	}();
 	return s;
 }
+
 }
 
 #define REFLECT_INLINE(cls)                                                                                  \

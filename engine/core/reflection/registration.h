@@ -13,7 +13,6 @@
 #define REFLECTABLE_VIRTUAL_IMPL(cls, ...)                                                                   \
 	RTTR_REGISTRATION_FRIEND_NON_INTRUSIVE(cls)                                                              \
 	RTTR_ENABLE(__VA_ARGS__)                                                                                 \
-	\
 public:
 
 #define REFLECTABLE(cls) RTTR_REGISTRATION_FRIEND_NON_INTRUSIVE(cls)
