@@ -69,7 +69,22 @@ void gpu_program::set_texture(uint8_t _stage, const std::string& _sampler, gfx::
 
 void gpu_program::set_uniform(const std::string& _name, const void* _value, uint16_t _num)
 {
-	program_->set_uniform(_name, _value, _num);
+    program_->set_uniform(_name, _value, _num);
+}
+
+void gpu_program::set_uniform(const std::string &_name, const math::vec4 &_value, uint16_t _num)
+{
+    set_uniform(_name, math::value_ptr(_value), _num);
+}
+
+void gpu_program::set_uniform(const std::string &_name, const glm::vec3 &_value, uint16_t _num)
+{
+    set_uniform(_name, math::vec4(_value, 0.0f), _num);
+}
+
+void gpu_program::set_uniform(const std::string &_name, const glm::vec2 &_value, uint16_t _num)
+{
+    set_uniform(_name, math::vec4(_value, 0.0f, 0.0f), _num);
 }
 
 std::shared_ptr<gfx::uniform> gpu_program::get_uniform(const std::string& _name, bool texture)

@@ -1003,8 +1003,11 @@ bool mesh::create_cylinder(const gfx::vertex_layout& format, float radius, float
 				gfx::vertex_pack(&current_pos[0], false, gfx::attribute::Position, format,
 								 current_vertex_ptr);
 			if(has_normal)
-				gfx::vertex_pack(&normal_vec[0], true, gfx::attribute::Normal, format, current_vertex_ptr);
-			if(has_texcoord)
+            {
+                math::vec4 norm(normal_vec, 0.0f);
+				gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format, current_vertex_ptr);
+			}
+            if(has_texcoord)
 				gfx::vertex_pack(&current_tex[0], true, gfx::attribute::TexCoord0, format,
 								 current_vertex_ptr);
 
@@ -1051,8 +1054,11 @@ bool mesh::create_cylinder(const gfx::vertex_layout& format, float radius, float
 		if(has_position)
 			gfx::vertex_pack(&current_pos[0], false, gfx::attribute::Position, format, current_vertex_ptr);
 		if(has_normal)
-			gfx::vertex_pack(&normal_vec[0], true, gfx::attribute::Normal, format, current_vertex_ptr);
-		if(has_texcoord)
+        {
+            math::vec4 norm(normal_vec, 0.0f);
+			gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format, current_vertex_ptr);
+		}
+        if(has_texcoord)
 			gfx::vertex_pack(&current_tex[0], true, gfx::attribute::TexCoord0, format, current_vertex_ptr);
 
 		// Set flags for this vertex (we want to generate tangents
@@ -1096,8 +1102,11 @@ bool mesh::create_cylinder(const gfx::vertex_layout& format, float radius, float
 		if(has_position)
 			gfx::vertex_pack(&current_pos[0], false, gfx::attribute::Position, format, current_vertex_ptr);
 		if(has_normal)
-			gfx::vertex_pack(&normal_vec[0], true, gfx::attribute::Normal, format, current_vertex_ptr);
-		if(has_texcoord)
+        {
+            math::vec4 norm(normal_vec, 0.0f);
+			gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format, current_vertex_ptr);
+		}
+        if(has_texcoord)
 			gfx::vertex_pack(&current_tex[0], true, gfx::attribute::TexCoord0, format, current_vertex_ptr);
 
 		// Set flags for this vertex (we want to generate tangents
@@ -1316,8 +1325,11 @@ bool mesh::create_capsule(const gfx::vertex_layout& format, float radius, float 
 				gfx::vertex_pack(&current_pos[0], false, gfx::attribute::Position, format,
 								 current_vertex_ptr);
 			if(has_normal)
-				gfx::vertex_pack(&normal_vec[0], true, gfx::attribute::Normal, format, current_vertex_ptr);
-			if(has_texcoord)
+            {
+                math::vec4 norm(normal_vec, 0.0f);
+                gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format, current_vertex_ptr);
+			}
+            if(has_texcoord)
 				gfx::vertex_pack(&current_tex[0], true, gfx::attribute::TexCoord0, format,
 								 current_vertex_ptr);
 
@@ -1383,7 +1395,10 @@ bool mesh::create_capsule(const gfx::vertex_layout& format, float radius, float 
 				gfx::vertex_pack(&current_pos[0], false, gfx::attribute::Position, format,
 								 current_vertex_ptr);
 			if(has_normal)
-				gfx::vertex_pack(&normal_vec[0], true, gfx::attribute::Normal, format, current_vertex_ptr);
+            {
+                math::vec4 norm(normal_vec, 0.0f);
+                gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format, current_vertex_ptr);
+            }
 			if(has_texcoord)
 				gfx::vertex_pack(&current_tex[0], true, gfx::attribute::TexCoord0, format,
 								 current_vertex_ptr);
@@ -1446,7 +1461,10 @@ bool mesh::create_capsule(const gfx::vertex_layout& format, float radius, float 
 				gfx::vertex_pack(&current_pos[0], false, gfx::attribute::Position, format,
 								 current_vertex_ptr);
 			if(has_normal)
-				gfx::vertex_pack(&normal_vec[0], true, gfx::attribute::Normal, format, current_vertex_ptr);
+            {
+                math::vec4 norm(normal_vec, 0.0f);
+                gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format, current_vertex_ptr);
+            }
 			if(has_texcoord)
 				gfx::vertex_pack(&current_tex[0], true, gfx::attribute::TexCoord0, format,
 								 current_vertex_ptr);
@@ -1692,7 +1710,10 @@ bool mesh::create_sphere(const gfx::vertex_layout& format, float radius, std::ui
 				gfx::vertex_pack(&vec_position[0], false, gfx::attribute::Position, format,
 								 current_vertex_ptr);
 			if(has_normal)
-				gfx::vertex_pack(&vec_normal[0], true, gfx::attribute::Normal, format, current_vertex_ptr);
+            {
+                math::vec4 norm(vec_normal, 0.0f);
+                gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format, current_vertex_ptr);
+            }
 			if(has_texcoord)
 				gfx::vertex_pack(&math::vec2((1 / static_cast<float>(slices)) * static_cast<float>(slice),
 											 (1 / static_cast<float>(stacks)) * static_cast<float>(stack))[0],
@@ -1823,7 +1844,10 @@ bool mesh::create_torus(const gfx::vertex_layout& format, float outer_radius, fl
 			if(has_position)
 				gfx::vertex_pack(&position[0], false, gfx::attribute::Position, format, current_vertex_ptr);
 			if(has_normal)
-				gfx::vertex_pack(&normal_vec[0], true, gfx::attribute::Normal, format, current_vertex_ptr);
+            {
+                math::vec4 norm(normal_vec, 0.0f);
+                gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format, current_vertex_ptr);
+            }
 			if(has_texcoord)
 				gfx::vertex_pack(&texcoord[0], true, gfx::attribute::TexCoord0, format, current_vertex_ptr);
 
@@ -2423,15 +2447,21 @@ bool mesh::create_cone(const gfx::vertex_layout& format, float radius, float rad
 
 			// Store vertex components
 			if(has_position)
+            {
 				gfx::vertex_pack(&vec_position[0], false, gfx::attribute::Position, format,
 								 current_vertex_ptr);
+            }
 			if(has_normal)
-				gfx::vertex_pack(&vec_normal[0], true, gfx::attribute::Normal, format, current_vertex_ptr);
-			if(has_texcoord)
+            {
+                math::vec4 norm(vec_normal, 0.0f);
+				gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format, current_vertex_ptr);
+			}
+            if(has_texcoord)
+            {
 				gfx::vertex_pack(&math::vec2((1 / static_cast<float>(slices)) * static_cast<float>(slice),
 											 (1 / static_cast<float>(stacks)) * static_cast<float>(stack))[0],
 								 true, gfx::attribute::TexCoord0, format, current_vertex_ptr);
-
+            }
 			// Set flags for this vertex (we want to generate tangents
 			// and binormals if we need them).
 			*current_flags_ptr++ = preparation_data::source_contains_normal;
@@ -2474,8 +2504,11 @@ bool mesh::create_cone(const gfx::vertex_layout& format, float radius, float rad
 		if(has_position)
 			gfx::vertex_pack(&vec_position[0], false, gfx::attribute::Position, format, current_vertex_ptr);
 		if(has_normal)
-			gfx::vertex_pack(&vec_normal[0], true, gfx::attribute::Normal, format, current_vertex_ptr);
-		if(has_texcoord)
+        {
+            math::vec4 norm(vec_normal, 0.0f);
+            gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format, current_vertex_ptr);
+		}
+        if(has_texcoord)
 			gfx::vertex_pack(&vec_tex_coords[0], true, gfx::attribute::TexCoord0, format, current_vertex_ptr);
 
 		// Set flags for this vertex (we want to generate tangents
@@ -2521,8 +2554,11 @@ bool mesh::create_cone(const gfx::vertex_layout& format, float radius, float rad
 				gfx::vertex_pack(&vec_position[0], false, gfx::attribute::Position, format,
 								 current_vertex_ptr);
 			if(has_normal)
-				gfx::vertex_pack(&vec_normal[0], true, gfx::attribute::Normal, format, current_vertex_ptr);
-			if(has_texcoord)
+            {
+                math::vec4 norm(vec_normal, 0.0f);
+				gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format, current_vertex_ptr);
+			}
+            if(has_texcoord)
 				gfx::vertex_pack(&vec_tex_coords[0], true, gfx::attribute::TexCoord0, format,
 								 current_vertex_ptr);
 
@@ -2780,8 +2816,11 @@ bool mesh::create_cube(const gfx::vertex_layout& format, float width, float heig
 					gfx::vertex_pack(&output_pos[0], false, gfx::attribute::Position, format,
 									 current_vertex_ptr);
 				if(has_normal)
-					gfx::vertex_pack(&normal_vec[0], true, gfx::attribute::Normal, format,
+                {
+                    math::vec4 norm(normal_vec, 0.0f);
+                    gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format,
 									 current_vertex_ptr);
+                }
 				if(has_texcoord)
 					gfx::vertex_pack(&math::vec2(current_tex.x * tex_u_scale, current_tex.y * tex_v_scale)[0],
 									 true, gfx::attribute::TexCoord0, format, current_vertex_ptr);
@@ -3889,7 +3928,7 @@ bool mesh::generate_vertex_normals(std::uint32_t* adjacency_ptr,
 			ref_normal[2] = fn[2];
 			if(ref_normal.x == 0.0f && ref_normal.y == 0.0f && ref_normal.z == 0.0f)
 			{
-				gfx::vertex_pack(math::value_ptr(vec_normal), true, gfx::attribute::Normal, vertex_format_,
+				gfx::vertex_pack(fn, true, gfx::attribute::Normal, vertex_format_,
 								 src_vertices_ptr, index);
 			} // End if no normal stored here yet
 			else
@@ -3924,7 +3963,8 @@ bool mesh::generate_vertex_normals(std::uint32_t* adjacency_ptr,
 					// Store the new normal and finally record the fact that we have
 					// added a new vertex.
 					index = preparation_data_.vertex_count++;
-					gfx::vertex_pack(math::value_ptr(vec_normal), true, gfx::attribute::Normal,
+                    math::vec4 norm(vec_normal, 0.0f);
+					gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal,
 									 vertex_format_, src_vertices_ptr, index);
 
 					// Update the index

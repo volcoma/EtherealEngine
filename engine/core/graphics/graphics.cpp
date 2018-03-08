@@ -113,13 +113,13 @@ bool init(renderer_type _type, std::uint16_t _vendorId, std::uint16_t _deviceId)
 	return s_initted;
 }
 
-void vertex_pack(const float _input[], bool _inputNormalized, attribute _attr, const vertex_layout& _decl,
+void vertex_pack(const float _input[4], bool _inputNormalized, attribute _attr, const vertex_layout& _decl,
 				 void* _data, uint32_t _index)
 {
 	bgfx::vertexPack(_input, _inputNormalized, _attr, _decl, _data, _index);
 }
 
-void vertex_unpack(float _output[], attribute _attr, const vertex_layout& _decl, const void* _data,
+void vertex_unpack(float _output[4], attribute _attr, const vertex_layout& _decl, const void* _data,
 				   uint32_t _index)
 {
 	bgfx::vertexUnpack(_output, _attr, _decl, _data, _index);

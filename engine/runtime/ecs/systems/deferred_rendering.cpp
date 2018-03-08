@@ -397,16 +397,16 @@ deferred_rendering::g_buffer_pass(std::shared_ptr<gfx::frame_buffer> input, came
 		model.render(pass.id, world_transform, bone_transforms, true, true, true, 0, current_lod_index,
 					 nullptr, [&camera, &clip_planes, &params](auto& p) {
 						 auto camera_pos = camera.get_position();
-						 p.set_uniform("u_camera_wpos", &camera_pos);
-						 p.set_uniform("u_camera_clip_planes", &clip_planes);
-						 p.set_uniform("u_lod_params", &params);
+						 p.set_uniform("u_camera_wpos", camera_pos);
+						 p.set_uniform("u_camera_clip_planes", clip_planes);
+						 p.set_uniform("u_lod_params", params);
 					 });
 
 		if(current_time != 0.0f)
 		{
 			model.render(pass.id, world_transform, bone_transforms, true, true, true, 0, target_lod_index,
 						 nullptr, [&camera, &clip_planes, &params_inv](auto& p) {
-							 p.set_uniform("u_lod_params", &params_inv);
+							 p.set_uniform("u_lod_params", params_inv);
 						 });
 		}
 	}
@@ -465,7 +465,7 @@ deferred_rendering::lighting_pass(std::shared_ptr<gfx::frame_buffer> input, came
 				// Draw light.
 				program = directional_light_program_.get();
 				program->begin();
-				program->set_uniform("u_light_direction", &light_direction);
+				program->set_uniform("u_light_direction", light_direction);
 			}
 			if(light.type == light_type::point && point_light_program_)
 			{
@@ -474,7 +474,7 @@ deferred_rendering::lighting_pass(std::shared_ptr<gfx::frame_buffer> input, came
 				// Draw light.
 				program = point_light_program_.get();
 				program->begin();
-				program->set_uniform("u_light_position", &light_position);
+				program->set_uniform("u_light_position", light_position);
 				program->set_uniform("u_light_data", light_data);
 			}
 
@@ -488,8 +488,8 @@ deferred_rendering::lighting_pass(std::shared_ptr<gfx::frame_buffer> input, came
 				// Draw light.
 				program = spot_light_program_.get();
 				program->begin();
-				program->set_uniform("u_light_position", &light_position);
-				program->set_uniform("u_light_direction", &light_direction);
+				program->set_uniform("u_light_position", light_position);
+				program->set_uniform("u_light_direction", light_direction);
 				program->set_uniform("u_light_data", light_data);
 			}
 
@@ -499,7 +499,7 @@ deferred_rendering::lighting_pass(std::shared_ptr<gfx::frame_buffer> input, came
 												  light.color.value.b, light.intensity};
 				auto camera_pos = camera.get_position();
 				program->set_uniform("u_light_color_intensity", light_color_intensity);
-				program->set_uniform("u_camera_position", &camera_pos);
+				program->set_uniform("u_camera_position", camera_pos);
 				program->set_texture(0, "s_tex0", g_buffer_fbo->get_texture(0).get());
 				program->set_texture(1, "s_tex1", g_buffer_fbo->get_texture(1).get());
 				program->set_texture(2, "s_tex2", g_buffer_fbo->get_texture(2).get());
@@ -671,7 +671,7 @@ deferred_rendering::atmospherics_pass(std::shared_ptr<gfx::frame_buffer> input, 
 			});
 
 		atmospherics_program_->begin();
-		atmospherics_program_->set_uniform("u_light_direction", &light_direction);
+		atmospherics_program_->set_uniform("u_light_direction", light_direction);
 
 		irect32_t rect(0, 0, irect32_t::value_type(output_size.width),
 					   irect32_t::value_type(output_size.height));
