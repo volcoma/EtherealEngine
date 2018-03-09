@@ -266,11 +266,12 @@ void deferred_rendering::build_reflections_pass(entity_component_system& ecs, st
 
 				std::shared_ptr<gfx::frame_buffer> output = nullptr;
 				output = g_buffer_pass(output, camera, render_view, visibility_set, camera_lods, dt);
-				output = lighting_pass(output, camera, render_view, ecs, dt, false);
+				output = lighting_pass(output, camera, render_view, ecs, dt);
 				output = atmospherics_pass(output, camera, render_view, ecs, dt);
 				output = tonemapping_pass(output, camera, render_view);
 
 				gfx::render_pass pass("cubemap_fill");
+				pass.bind();
 				gfx::blit(pass.id, cubemap_fbo->get_texture()->native_handle(), 0, 0, 0, std::uint16_t(i),
 						  output->get_texture()->native_handle());
 			}
@@ -312,7 +313,6 @@ void deferred_rendering::camera_pass(entity_component_system& ecs, std::chrono::
 		auto& render_view = camera_comp.get_render_view();
 
 		auto output = deferred_render_full(camera, render_view, ecs, camera_lods, dt);
-
 	});
 }
 
@@ -328,7 +328,7 @@ std::shared_ptr<gfx::frame_buffer> deferred_rendering::deferred_render_full(
 
 	output = reflection_probe_pass(output, camera, render_view, ecs, dt);
 
-	output = lighting_pass(output, camera, render_view, ecs, dt, true);
+	output = lighting_pass(output, camera, render_view, ecs, dt);
 
 	output = atmospherics_pass(output, camera, render_view, ecs, dt);
 
@@ -404,20 +404,20 @@ deferred_rendering::g_buffer_pass(std::shared_ptr<gfx::frame_buffer> input, came
 
 		if(current_time != 0.0f)
 		{
-			model.render(pass.id, world_transform, bone_transforms, true, true, true, 0, target_lod_index,
-						 nullptr, [&camera, &clip_planes, &params_inv](auto& p) {
-							 p.set_uniform("u_lod_params", params_inv);
-						 });
+			model.render(
+				pass.id, world_transform, bone_transforms, true, true, true, 0, target_lod_index, nullptr,
+				[&camera, &clip_planes, &params_inv](auto& p) { p.set_uniform("u_lod_params", params_inv); });
 		}
 	}
 
 	return g_buffer_fbo;
 }
 
-std::shared_ptr<gfx::frame_buffer>
-deferred_rendering::lighting_pass(std::shared_ptr<gfx::frame_buffer> input, camera& camera,
-								  gfx::render_view& render_view, entity_component_system& ecs,
-								  std::chrono::duration<float> dt, bool bind_indirect_specular)
+std::shared_ptr<gfx::frame_buffer> deferred_rendering::lighting_pass(std::shared_ptr<gfx::frame_buffer> input,
+																	 camera& camera,
+																	 gfx::render_view& render_view,
+																	 entity_component_system& ecs,
+																	 std::chrono::duration<float> dt)
 {
 	const auto& view = camera.get_view();
 	const auto& proj = camera.get_projection();
@@ -446,7 +446,7 @@ deferred_rendering::lighting_pass(std::shared_ptr<gfx::frame_buffer> input, came
 			.get();
 
 	ecs.for_each<transform_component, light_component>(
-		[this, bind_indirect_specular, &camera, &pass, &buffer_size, &view, &proj, g_buffer_fbo,
+		[this, &camera, &pass, &buffer_size, &view, &proj, g_buffer_fbo,
 		 refl_buffer](entity e, transform_component& transform_comp_ref, light_component& light_comp_ref) {
 			const auto& light = light_comp_ref.get_light();
 			const auto& world_transform = transform_comp_ref.get_transform();
@@ -639,8 +639,7 @@ deferred_rendering::atmospherics_pass(std::shared_ptr<gfx::frame_buffer> input, 
 
 	auto light_buffer = render_view.get_texture("LBUFFER", viewport_size.width, viewport_size.height, false,
 												1, light_buffer_format, gfx::get_default_rt_sampler_flags());
-	input =
-		render_view.get_fbo("LBUFFER", {light_buffer, render_view.get_depth_stencil_buffer(viewport_size)});
+	input = render_view.get_fbo("LBUFFER", {light_buffer, render_view.get_depth_buffer(viewport_size)});
 
 	const auto surface = input.get();
 	const auto output_size = surface->get_size();

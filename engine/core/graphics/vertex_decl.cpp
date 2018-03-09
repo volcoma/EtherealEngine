@@ -14,10 +14,11 @@ void mesh_vertex::init(vertex_layout& decl)
 {
 	decl.begin()
 		.add(attribute::Position, 3, attribute_type::Float)
-		.add(attribute::Color1, 4, attribute_type::Uint8, true)
-		.add(attribute::Normal, 4, attribute_type::Uint8, true, true)
-		.add(attribute::Tangent, 4, attribute_type::Uint8, true, true)
-		.add(attribute::Bitangent, 4, attribute_type::Uint8, true, true)
+		// this is for barycentric coords eventually
+		//.add(attribute::Color1, 4, attribute_type::Uint8, true)
+		.add(attribute::Normal, 3, attribute_type::Uint8, true, true)
+		.add(attribute::Tangent, 3, attribute_type::Uint8, true, true)
+		.add(attribute::Bitangent, 3, attribute_type::Uint8, true, true)
 		.add(attribute::TexCoord0, 2, attribute_type::Float)
 		.end();
 }

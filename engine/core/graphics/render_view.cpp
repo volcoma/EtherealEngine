@@ -143,6 +143,13 @@ std::shared_ptr<texture> render_view::get_depth_stencil_buffer(const usize32_t& 
 	static auto format =
 		get_best_format(BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER,
 						format_search_flags::requires_depth | format_search_flags::requires_stencil);
+	return get_texture("DEPTH_STENCIL", viewport_size.width, viewport_size.height, false, 1, format);
+}
+
+std::shared_ptr<texture> render_view::get_depth_buffer(const usize32_t& viewport_size)
+{
+	static auto format =
+		get_best_format(BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER, format_search_flags::requires_depth);
 	return get_texture("DEPTH", viewport_size.width, viewport_size.height, false, 1, format);
 }
 std::shared_ptr<texture> render_view::get_output_buffer(const usize32_t& viewport_size)
@@ -154,7 +161,7 @@ std::shared_ptr<texture> render_view::get_output_buffer(const usize32_t& viewpor
 }
 std::shared_ptr<frame_buffer> render_view::get_output_fbo(const usize32_t& viewport_size)
 {
-	return get_fbo("OUTPUT", {get_output_buffer(viewport_size), get_depth_stencil_buffer(viewport_size)});
+	return get_fbo("OUTPUT", {get_output_buffer(viewport_size), get_depth_buffer(viewport_size)});
 }
 std::shared_ptr<frame_buffer> render_view::get_g_buffer_fbo(const usize32_t& viewport_size)
 {
@@ -165,7 +172,7 @@ std::shared_ptr<frame_buffer> render_view::get_g_buffer_fbo(const usize32_t& vie
 		get_best_format(BGFX_CAPS_FORMAT_TEXTURE_FRAMEBUFFER, format_search_flags::four_channels |
 																  format_search_flags::requires_alpha |
 																  format_search_flags::half_precision_float);
-	auto depth_buffer = get_depth_stencil_buffer(viewport_size);
+	auto depth_buffer = get_depth_buffer(viewport_size);
 	auto buffer0 = get_texture("GBUFFER0", viewport_size.width, viewport_size.height, false, 1, format);
 	auto buffer1 =
 		get_texture("GBUFFER1", viewport_size.width, viewport_size.height, false, 1, normal_format);

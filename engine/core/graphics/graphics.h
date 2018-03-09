@@ -459,7 +459,8 @@ void submit(view_id _id, program_handle _handle, indirect_buffer_handle _indirec
 			uint16_t _num = 1, int32_t _depth = 0, bool _preserveState = false);
 
 /**/
-void set_image(uint8_t _stage, texture_handle _handle, uint8_t _mip, access _access, texture_format _format);
+void set_image(uint8_t _stage, texture_handle _handle, uint8_t _mip, access _access,
+			   texture_format _format = texture_format::Count);
 
 /**/
 void set_buffer(uint8_t _stage, index_buffer_handle _handle, access _access);

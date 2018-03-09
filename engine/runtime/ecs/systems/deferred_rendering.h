@@ -135,8 +135,7 @@ public:
 	//-----------------------------------------------------------------------------
 	std::shared_ptr<gfx::frame_buffer> lighting_pass(std::shared_ptr<gfx::frame_buffer> input, camera& camera,
 													 gfx::render_view& render_view,
-													 entity_component_system& ecs, delta_t dt,
-													 bool bind_indirect_specular);
+													 entity_component_system& ecs, delta_t dt);
 
 	//-----------------------------------------------------------------------------
 	//  Name : reflection_probe ()

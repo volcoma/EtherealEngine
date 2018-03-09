@@ -6,13 +6,13 @@ namespace gfx
 
 static gfx::view_id& get_counter()
 {
-    static gfx::view_id s_index = 0;
-    return s_index;    
+	static gfx::view_id id = 0;
+	return id;
 }
 gfx::view_id generate_id()
 {
-    auto& counter = get_counter();
-	if(counter == MAX_RENDER_PASSES)
+	auto& counter = get_counter();
+	if(counter == MAX_RENDER_PASSES - 1)
 	{
 		frame();
 		counter = 0;
@@ -25,7 +25,7 @@ gfx::view_id generate_id()
 render_pass::render_pass(const std::string& n)
 {
 	id = generate_id();
-    reset_view(id);
+	reset_view(id);
 	set_view_name(id, n.c_str());
 }
 
@@ -47,11 +47,6 @@ void render_pass::bind(const frame_buffer* fb) const
 
 void render_pass::bind() const
 {
-	std::uint16_t width = 0;
-	std::uint16_t height = 0;
-	get_size_from_ratio(backbuffer_ratio::Equal, width, height);
-	set_view_rect(id, std::uint16_t(0), std::uint16_t(0), std::uint16_t(width), std::uint16_t(height));
-	set_view_scissor(id, std::uint16_t(0), std::uint16_t(0), std::uint16_t(width), std::uint16_t(height));
 	touch(id);
 }
 
@@ -73,17 +68,16 @@ void render_pass::set_view_proj(const float* v, const float* p)
 
 void render_pass::reset()
 {
-    get_counter() = 0;
+	get_counter() = 0;
 }
 
 gfx::view_id render_pass::get_pass()
 {
-    auto counter = get_counter();
-    if(counter == 0)
-    {
-        return MAX_RENDER_PASSES;
-    }
-    return counter - 1;
+	auto counter = get_counter();
+	if(counter == 0)
+	{
+		counter = MAX_RENDER_PASSES;
+	}
+	return counter - 1;
 }
-
 }

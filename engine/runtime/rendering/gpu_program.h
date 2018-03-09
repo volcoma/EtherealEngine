@@ -2,9 +2,9 @@
 
 #include "../assets/asset_handle.h"
 #include "core/graphics/program.h"
+#include "core/math/math_includes.h"
 #include "core/reflection/registration.h"
 #include "core/serialization/serialization.h"
-#include "core/math/math_includes.h"
 
 class gpu_program
 {
@@ -76,10 +76,10 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void set_uniform(const std::string& _name, const void* _value, std::uint16_t _num = 1);
-    void set_uniform(const std::string& _name, const math::vec4& _value, std::uint16_t _num = 1);
-    void set_uniform(const std::string& _name, const math::vec3& _value, std::uint16_t _num = 1);
-    void set_uniform(const std::string& _name, const math::vec2& _value, std::uint16_t _num = 1);
-    
+	void set_uniform(const std::string& _name, const math::vec4& _value, std::uint16_t _num = 1);
+	void set_uniform(const std::string& _name, const math::vec3& _value, std::uint16_t _num = 1);
+	void set_uniform(const std::string& _name, const math::vec2& _value, std::uint16_t _num = 1);
+
 	//-----------------------------------------------------------------------------
 	//  Name : get_uniform ()
 	/// <summary>

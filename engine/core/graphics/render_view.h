@@ -38,6 +38,7 @@ public:
 										  const std::vector<std::shared_ptr<texture>>& bind_textures);
 
 	std::shared_ptr<texture> get_depth_stencil_buffer(const usize32_t& viewport_size);
+	std::shared_ptr<texture> get_depth_buffer(const usize32_t& viewport_size);
 	std::shared_ptr<texture> get_output_buffer(const usize32_t& viewport_size);
 	std::shared_ptr<frame_buffer> get_output_fbo(const usize32_t& viewport_size);
 	std::shared_ptr<frame_buffer> get_g_buffer_fbo(const usize32_t& viewport_size);

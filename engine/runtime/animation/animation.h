@@ -44,7 +44,7 @@ struct node_animation
 
 struct animation
 {
-    using seconds_t = node_animation::seconds_t;
+	using seconds_t = node_animation::seconds_t;
 	/// The name of the animation. If the modeling package this data was
 	/// exported from does support only a single animation channel, this
 	/// name is usually empty.
