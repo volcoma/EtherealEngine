@@ -15,7 +15,6 @@ include(modules/add_ide_support)
 
 set( BUILD_SHARED_LIBS OFF CACHE BOOL "Build package with shared libraries." FORCE)
 
-# define SFML_STATIC if the build type is not set to 'shared'
 if(NOT BUILD_SHARED_LIBS)
     add_definitions(-DETH_STATIC)
 	add_definitions(-DETH_API_EXPORTS)
@@ -28,9 +27,8 @@ print_info()
 set_output_paths()
 
 add_subdirectory_ex(3rdparty)
-
 set_project_custom_defines()
-#set_clang_tidy_args("-checks=-*,bugprone-*,performance-*,modernize-*,-modernize-use-equals-default")
 
+#set_clang_tidy_args("-checks=-*,clang-analyzer-*,bugprone-*,performance-*,modernize-*,-modernize-use-equals-default")
 add_subdirectory_ex(engine)
 add_subdirectory_ex(editor)

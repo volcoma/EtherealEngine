@@ -29,7 +29,7 @@ bool open_multiple_files_dialog(const std::string& filterList, const std::string
 		for(size_t i = 0; i < selected_count; ++i)
 		{
 			nfdchar_t* path = NFD_PathSet_GetPath(&out, i);
-			outPaths.push_back(path);
+			outPaths.emplace_back(path);
 		}
 		NFD_PathSet_Free(&out);
 		return true;

@@ -17,7 +17,7 @@ LOAD(gpu_program)
 
 	try_load(ar, cereal::make_nvp("shaders", shaders));
 
-	for(auto shader : shaders)
+	for(const auto& shader : shaders)
 	{
 		obj.attach_shader(shader);
 	}

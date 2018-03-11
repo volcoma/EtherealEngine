@@ -30,63 +30,63 @@ void log(const std::string& category, const std::string& log_msg)
 
 struct gfx_callback : public bgfx::CallbackI
 {
-	virtual ~gfx_callback()
+	~gfx_callback() final
 	{
 	}
 
-	virtual void traceVargs(const char* /*_filePath*/, std::uint16_t /*_line*/, const char* /*_format*/,
+	void traceVargs(const char* /*_filePath*/, std::uint16_t /*_line*/, const char* /*_format*/,
 							va_list /*_argList*/) final
 	{
 	}
 
-	virtual void profilerBegin(const char* /*_name*/, std::uint32_t /*_abgr*/, const char* /*_filePath*/,
+	void profilerBegin(const char* /*_name*/, std::uint32_t /*_abgr*/, const char* /*_filePath*/,
 							   std::uint16_t /*_line*/) final
 	{
 	}
 
-	virtual void profilerBeginLiteral(const char* /*_name*/, std::uint32_t /*_abgr*/,
+	void profilerBeginLiteral(const char* /*_name*/, std::uint32_t /*_abgr*/,
 									  const char* /*_filePath*/, std::uint16_t /*_line*/) final
 	{
 	}
 
-	virtual void profilerEnd() final
+	void profilerEnd() final
 	{
 	}
-	virtual void fatal(bgfx::Fatal::Enum /*_code*/, const char* _str) final
+	void fatal(bgfx::Fatal::Enum /*_code*/, const char* _str) final
 	{
 		log("error", _str);
 	}
 
-	virtual std::uint32_t cacheReadSize(std::uint64_t /*_id*/) final
+	std::uint32_t cacheReadSize(std::uint64_t /*_id*/) final
 	{
 		return 0;
 	}
 
-	virtual bool cacheRead(std::uint64_t /*_id*/, void* /*_data*/, std::uint32_t /*_size*/) final
+	bool cacheRead(std::uint64_t /*_id*/, void* /*_data*/, std::uint32_t /*_size*/) final
 	{
 		return false;
 	}
 
-	virtual void cacheWrite(std::uint64_t /*_id*/, const void* /*_data*/, std::uint32_t /*_size*/) final
+	void cacheWrite(std::uint64_t /*_id*/, const void* /*_data*/, std::uint32_t /*_size*/) final
 	{
 	}
 
-	virtual void screenShot(const char* /*_filePath*/, std::uint32_t /*_width*/, std::uint32_t /*_height*/,
+	void screenShot(const char* /*_filePath*/, std::uint32_t /*_width*/, std::uint32_t /*_height*/,
 							std::uint32_t /*_pitch*/, const void* /*_data*/, std::uint32_t /*_size*/,
 							bool /*_yflip*/) final
 	{
 	}
 
-	virtual void captureBegin(std::uint32_t /*_width*/, std::uint32_t /*_height*/, std::uint32_t /*_pitch*/,
+	void captureBegin(std::uint32_t /*_width*/, std::uint32_t /*_height*/, std::uint32_t /*_pitch*/,
 							  texture_format /*_format*/, bool /*_yflip*/) final
 	{
 	}
 
-	virtual void captureEnd() final
+	void captureEnd() final
 	{
 	}
 
-	virtual void captureFrame(const void* /*_data*/, std::uint32_t /*_size*/) final
+	void captureFrame(const void* /*_data*/, std::uint32_t /*_size*/) final
 	{
 	}
 };

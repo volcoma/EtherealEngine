@@ -10,6 +10,5 @@ set(GLM_TEST_ENABLE_LANG_EXTENSIONS OFF CACHE BOOL "Enable language extensions" 
 set(GLM_TEST_FORCE_PURE OFF CACHE BOOL "Force 'pure' instructions" FORCE)
 
 add_definitions(-DGLM_FORCE_LEFT_HANDED)
-add_definitions(-DGLM_FORCE_MESSAGES)
 add_subdirectory( glm )
 target_include_directories (glm_static PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/glm)

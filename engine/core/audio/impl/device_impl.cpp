@@ -22,11 +22,11 @@ static std::vector<std::string> al_get_strings(ALCdevice* dev, ALenum e)
 {
 	std::vector<std::string> result;
 
-	const char* devices = reinterpret_cast<const char*>(alcGetString(dev, e));
+	auto devices = reinterpret_cast<const char*>(alcGetString(dev, e));
 
 	while(!std::string(devices).empty())
 	{
-		result.push_back(devices);
+		result.emplace_back(devices);
 		devices += result.back().size() + 1;
 	}
 

@@ -266,7 +266,7 @@ chandle<component> entity_component_system::assign(entity::id_t id, const std::s
 
 void entity_component_system::destroy(entity::id_t id)
 {
-	entity_names_[id.id()] = "";
+	entity_names_[id.id()].clear();
 	assert_valid(id);
 	std::uint32_t index = id.index();
 	auto mask = entity_component_mask_[index];
@@ -297,7 +297,8 @@ entity entity_component_system::get(entity::id_t id)
 
 entity::id_t entity_component_system::create_id(uint32_t index) const
 {
-	return entity::id_t(index, entity_version_[index]);
+	auto id = entity::id_t(index, entity_version_[index]);
+	return id;
 }
 
 component::~component()

@@ -135,7 +135,7 @@ void audio_source_component::set_sound(asset_handle<audio::sound> sound)
 {
 	stop();
 
-	sound_ = sound;
+	sound_ = std::move(sound);
 
 	apply_all();
 }

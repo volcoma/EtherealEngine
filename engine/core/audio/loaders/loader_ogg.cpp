@@ -24,7 +24,7 @@ bool load_ogg_from_memory(const std::uint8_t* data, std::size_t data_size, sound
 
 	if(!oss)
 	{
-		STBVorbisError decoded_err = STBVorbisError(vorb_err);
+		auto decoded_err = STBVorbisError(vorb_err);
 		err = "ERROR : Vorbis error code : " + std::to_string(decoded_err);
 		return false;
 	}

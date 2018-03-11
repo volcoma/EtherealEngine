@@ -1,7 +1,7 @@
 macro(add_subdirectory_ex arg)
-	message(STATUS "---------Configure ${arg}")
+	message(STATUS "---------${arg} scanning---------")
 	add_subdirectory(${arg})
-	message(STATUS "---------Done ${arg}")
+	message(STATUS "---------${arg} finished---------")
 endmacro()
 
 macro(detect_platform)
