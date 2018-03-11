@@ -51,6 +51,7 @@ gfx::view_id render_window::begin_present_pass()
 	gfx::render_pass pass("present_to_window_pass");
 	pass.bind(surface_.get());
 	pass.clear();
+
 	return pass.id;
 }
 

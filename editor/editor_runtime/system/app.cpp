@@ -512,7 +512,7 @@ void app::draw_docks(delta_t dt)
 		gui.push_context(id);
 		gui.draw_begin(*window, dt);
 
-		gui::PushFont(gui::GetFont("standard"));
+		gui::PushFont("standard");
 
 		if(show_start_page_)
 		{
@@ -587,7 +587,7 @@ void app::draw_footer(render_window&, imguidock::dockspace& dockspace)
 	gui::NextColumn();
 	if(tasks_info.pending_tasks > 0)
 	{
-		gui::PushFont(gui::GetFont("icons"));
+		gui::PushFont("icons");
 		gui::AlignTextToFramePadding();
 		gui::Text(ICON_FA_TASKS " Queued tasks : (%u)", unsigned(tasks_info.pending_tasks));
 		auto& g = *gui::GetCurrentContext();
@@ -631,7 +631,7 @@ void app::draw_start_page(render_window& window)
 		show_start_page_ = false;
 	};
 
-	gui::PushFont(gui::GetFont("standard_big"));
+	gui::PushFont("standard_big");
 	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove |
 							 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_HorizontalScrollbar |
 							 ImGuiWindowFlags_NoSavedSettings;

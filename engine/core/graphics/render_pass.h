@@ -26,8 +26,8 @@ struct render_pass
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void bind(const frame_buffer* fb) const;
-	void bind() const;
+	void bind(const frame_buffer* fb = nullptr) const;
+	void touch() const;
 	//-----------------------------------------------------------------------------
 	//  Name : clear ()
 	/// <summary>

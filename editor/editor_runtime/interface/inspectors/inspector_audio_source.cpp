@@ -9,7 +9,7 @@ bool inspector_audio_source_component::inspect(rttr::variant& var, bool read_onl
 
 	if(data)
 	{
-		gui::PushFont(gui::GetFont("icons"));
+		gui::PushFont("icons");
 		if(gui::Button(ICON_FA_PLAY))
 		{
 			data->play();

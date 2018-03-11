@@ -271,14 +271,14 @@ void deferred_rendering::build_reflections_pass(entity_component_system& ecs, st
 				output = tonemapping_pass(output, camera, render_view);
 
 				gfx::render_pass pass("cubemap_fill");
-				pass.bind();
+				pass.touch();
 				gfx::blit(pass.id, cubemap_fbo->get_texture()->native_handle(), 0, 0, 0, std::uint16_t(i),
 						  output->get_texture()->native_handle());
 			}
 
 			gfx::render_pass pass("cubemap_generate_mips");
 			pass.bind(cubemap_fbo.get());
-
+			pass.touch();
 		});
 }
 
@@ -347,11 +347,10 @@ deferred_rendering::g_buffer_pass(std::shared_ptr<gfx::frame_buffer> input, came
 	const auto& proj = camera.get_projection();
 	const auto& viewport_size = camera.get_viewport_size();
 	auto g_buffer_fbo = render_view.get_g_buffer_fbo(viewport_size);
-
 	gfx::render_pass pass("g_buffer_fill");
-	pass.bind(g_buffer_fbo.get());
 	pass.clear();
 	pass.set_view_proj(view, proj);
+	pass.bind(g_buffer_fbo.get());
 
 	for(auto& element : visibility_set)
 	{
@@ -437,9 +436,8 @@ std::shared_ptr<gfx::frame_buffer> deferred_rendering::lighting_pass(std::shared
 
 	gfx::render_pass pass("light_buffer_fill");
 	pass.bind(l_buffer_fbo.get());
-	pass.clear(BGFX_CLEAR_COLOR, 0, 0.0f, 0);
 	pass.set_view_proj(view, proj);
-
+	pass.clear(BGFX_CLEAR_COLOR, 0, 0.0f, 0);
 	auto refl_buffer =
 		render_view
 			.get_texture("RBUFFER", viewport_size.width, viewport_size.height, false, 1, light_buffer_format)
@@ -544,9 +542,8 @@ deferred_rendering::reflection_probe_pass(std::shared_ptr<gfx::frame_buffer> inp
 
 	gfx::render_pass pass("refl_buffer_fill");
 	pass.bind(r_buffer_fbo.get());
-	pass.clear(BGFX_CLEAR_COLOR, 0, 0.0f, 0);
 	pass.set_view_proj(view, proj);
-
+	pass.clear(BGFX_CLEAR_COLOR, 0, 0.0f, 0);
 	ecs.for_each<transform_component, reflection_probe_component>(
 		[this, &camera, &pass, &buffer_size, &view, &proj, g_buffer_fbo](
 			entity e, transform_component& transform_comp_ref, reflection_probe_component& probe_comp_ref) {
@@ -644,8 +641,8 @@ deferred_rendering::atmospherics_pass(std::shared_ptr<gfx::frame_buffer> input, 
 	const auto surface = input.get();
 	const auto output_size = surface->get_size();
 	gfx::render_pass pass("atmospherics_fill");
-	pass.bind(surface);
 	pass.set_view_proj(view, proj);
+	pass.bind(surface);
 
 	if((surface != nullptr) && atmospherics_program_)
 	{
@@ -699,8 +696,8 @@ deferred_rendering::tonemapping_pass(std::shared_ptr<gfx::frame_buffer> input, c
 	const auto& view = camera.get_view();
 	const auto& proj = camera.get_projection();
 	gfx::render_pass pass("output_buffer_fill");
-	pass.bind(surface.get());
 	pass.set_view_proj(view, proj);
+	pass.bind(surface.get());
 
 	if(surface && gamma_correction_program_)
 	{

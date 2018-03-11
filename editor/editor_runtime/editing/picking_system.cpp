@@ -74,11 +74,10 @@ void picking_system::frame_render(delta_t dt)
 		const auto& pick_frustum = pick_camera.get_frustum();
 
 		gfx::render_pass pass("picking_buffer_fill");
-		pass.bind(surface_.get());
 		// ID buffer clears to black, which represents clicking on nothing (background)
 		pass.clear(BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
-
 		pass.set_view_proj(pick_view, pick_proj);
+		pass.bind(surface_.get());
 
 		ecs.for_each<transform_component, model_component>(
 			[this, &pass, &pick_frustum](runtime::entity e, transform_component& transform_comp_ref,
@@ -125,6 +124,7 @@ void picking_system::frame_render(delta_t dt)
 		}
 
 		gfx::render_pass pass("picking_buffer_blit");
+		pass.touch();
 		// Blit and read
 		gfx::blit(pass.id, blit_tex_->native_handle(), 0, 0, surface_->get_texture()->native_handle());
 		reading_ = gfx::read_texture(blit_tex_->native_handle(), blit_data_);
