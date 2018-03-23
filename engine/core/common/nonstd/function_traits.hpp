@@ -93,6 +93,14 @@ constexpr inline auto apply_(F&& f, T&& t, index_sequence<I...>) noexcept(
 {
 	return invoke_(std::forward<F>(f), std::get<I>(std::forward<T>(t))...);
 }
+
+
+template <typename Tuple, typename F, std::size_t... Indices>
+void for_each_impl(Tuple&& tuple, F&& f, std::index_sequence<Indices...>)
+{
+	using swallow = int[];
+	(void)swallow{1, (f(std::get<Indices>(std::forward<Tuple>(tuple))), void(), int{})...};
+}
 } // namespace detail
 
 template <class F, class... Args>
@@ -114,6 +122,15 @@ constexpr inline auto apply(F&& f, T&& t) noexcept(
 	return detail::apply_(std::forward<F>(f), std::forward<T>(t),
 						  make_index_sequence<std::tuple_size<typename std::decay<T>::type>::value>{});
 }
+
+
+template <typename Tuple, typename F>
+void for_each(Tuple&& tuple, F&& f)
+{
+	constexpr const std::size_t N = std::tuple_size<std::remove_reference_t<Tuple>>::value;
+	detail::for_each_impl(std::forward<Tuple>(tuple), std::forward<F>(f), std::make_index_sequence<N>{});
+}
+
 
 template <class T>
 struct unwrap_refwrapper
@@ -140,7 +157,7 @@ struct function_traits<R(Args...)>
 {
 	using result_type = R;
 	using return_type = result_type;
-	typedef result_type function_type(Args...);
+	using function_type = result_type (Args...);
 	constexpr static const std::size_t arity = sizeof...(Args);
 
 	using arg_types = std::tuple<Args...>;
@@ -155,25 +172,25 @@ struct function_traits<R (*)(Args...)> : public function_traits<R(Args...)>
 template <typename C, typename R, typename... Args>
 struct function_traits<R (C::*)(Args...)> : public function_traits<R(Args...)>
 {
-	typedef C& owner_type;
+	using owner_type = C &;
 };
 
 template <typename C, typename R, typename... Args>
 struct function_traits<R (C::*)(Args...) const> : public function_traits<R(Args...)>
 {
-	typedef const C& owner_type;
+	using owner_type = const C &;
 };
 
 template <typename C, typename R, typename... Args>
 struct function_traits<R (C::*)(Args...) volatile> : public function_traits<R(Args...)>
 {
-	typedef volatile C& owner_type;
+	using owner_type = volatile C &;
 };
 
 template <typename C, typename R, typename... Args>
 struct function_traits<R (C::*)(Args...) const volatile> : public function_traits<R(Args...)>
 {
-	typedef const volatile C& owner_type;
+	using owner_type = const volatile C &;
 };
 
 template <typename Functor>

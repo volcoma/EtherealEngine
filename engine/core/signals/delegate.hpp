@@ -2,7 +2,7 @@
 #define DELEGATE_HPP
 #pragma once
 
-#include <assert.h>
+#include <cassert>
 #include <cstring>
 #include <memory>
 
@@ -433,7 +433,7 @@ public:
 	}
 
 	template <R (*const function_ptr)(A...)>
-	static delegate from(void) noexcept
+	static delegate from() noexcept
 	{
 		return {nullptr, function_stub<function_ptr>};
 	}

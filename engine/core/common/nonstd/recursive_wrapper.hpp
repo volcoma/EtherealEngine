@@ -1,5 +1,5 @@
-#ifndef _UTIL_RECURSIVE_WRAPPER_HPP
-#define _UTIL_RECURSIVE_WRAPPER_HPP
+#ifndef UTIL_RECURSIVE_WRAPPER_HPP
+#define UTIL_RECURSIVE_WRAPPER_HPP
 
 #include <cassert>
 #include <utility>
