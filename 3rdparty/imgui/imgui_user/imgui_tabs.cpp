@@ -714,9 +714,9 @@ bool    ImGui::TabItem(const char* label, bool* p_open, ImGuiTabItemFlags flags)
             if (hovered_regular || g.ActiveId == close_button_id)
             {
                 close_button_visible = true;
-                ImVec4 close_col = GetStyleColorVec4(ImGuiCol_CloseButton); // FIXME: Tab style
+                ImVec4 close_col = GetStyleColorVec4(ImGuiCol_Button); // FIXME: Tab style
                 close_col.w *= 0.70f;
-                PushStyleColor(ImGuiCol_CloseButton, close_col);
+                PushStyleColor(ImGuiCol_Button, close_col);
                 ImGuiItemHoveredDataBackup last_item_backup;
                 last_item_backup.Backup();
                 if (CloseButton(close_button_id, ImVec2(bb.Max.x - style.FramePadding.x - close_button_sz, bb.Min.y + style.FramePadding.y + close_button_sz), close_button_sz))
