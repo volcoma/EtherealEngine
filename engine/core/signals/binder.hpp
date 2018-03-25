@@ -11,9 +11,9 @@
 #include <vector>
 
 #include "../common/nonstd/any.hpp"
-#include "../common/nonstd/function_traits.hpp"
 #include "../common/nonstd/optional.hpp"
 #include "../common/nonstd/type_traits.hpp"
+#include "../common/nonstd/utility.hpp"
 #include "delegate.hpp"
 
 // Create vector of any from variadic pack
@@ -145,14 +145,14 @@ template <typename F, typename IndexSequence>
 class function_wrapper;
 
 template <typename F, size_t... ArgCount>
-class function_wrapper<F, nonstd::index_sequence<ArgCount...>> : public base_function_wrapper
+class function_wrapper<F, std::index_sequence<ArgCount...>> : public base_function_wrapper
 {
 	constexpr static const bool result_is_void = std::is_same<typename nonstd::fn_result_of<F>, void>::value;
 
 	using is_void = std::integral_constant<bool, result_is_void>;
 
 	template <std::size_t... Arg_Idx>
-	nonstd::any invoke_variadic_impl(nonstd::index_sequence<Arg_Idx...> /*seq*/,
+	nonstd::any invoke_variadic_impl(std::index_sequence<Arg_Idx...> /*seq*/,
 									 const std::vector<nonstd::any>& arg_list) const
 	{
 		return invoke(is_void(),
@@ -205,7 +205,7 @@ public:
 
 	virtual nonstd::any invoke(const std::vector<nonstd::any>& params) const
 	{
-		return invoke_variadic_impl(nonstd::make_index_sequence<nonstd::function_traits<F>::arity>(), params);
+		return invoke_variadic_impl(std::make_index_sequence<nonstd::function_traits<F>::arity>(), params);
 	}
 
 	virtual bool owns(const nonstd::any& any_delegate) const
@@ -225,7 +225,7 @@ private:
 template <typename F>
 std::unique_ptr<base_function_wrapper> make_wrapper(F&& f)
 {
-	using arg_index_sequence = nonstd::make_index_sequence<nonstd::function_traits<F>::arity>;
+	using arg_index_sequence = std::make_index_sequence<nonstd::function_traits<F>::arity>;
 	using wrapper = function_wrapper<F, arg_index_sequence>;
 	return std::make_unique<wrapper>(std::forward<F>(f));
 }
@@ -233,7 +233,7 @@ std::unique_ptr<base_function_wrapper> make_wrapper(F&& f)
 template <typename C, typename F>
 std::unique_ptr<base_function_wrapper> make_wrapper(C* const object_ptr, F&& f)
 {
-	using arg_index_sequence = nonstd::make_index_sequence<nonstd::function_traits<F>::arity>;
+	using arg_index_sequence = std::make_index_sequence<nonstd::function_traits<F>::arity>;
 	using wrapper = function_wrapper<F, arg_index_sequence>;
 	return std::make_unique<wrapper>(object_ptr, std::forward<F>(f));
 }
@@ -320,7 +320,7 @@ public:
 
 		auto& container = list_[id];
 
-		using arg_index_sequence = nonstd::make_index_sequence<nonstd::function_traits<F>::arity>;
+		using arg_index_sequence = std::make_index_sequence<nonstd::function_traits<F>::arity>;
 		auto slot =
 			typename function_wrapper<F, arg_index_sequence>::delegate_t(object_ptr, std::forward<F>(f));
 		auto it = std::find_if(std::begin(container), std::end(container),

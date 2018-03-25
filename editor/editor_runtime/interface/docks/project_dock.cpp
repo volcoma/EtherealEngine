@@ -2,7 +2,6 @@
 #include "../../assets/asset_extensions.h"
 #include "../../editing/editing_system.h"
 #include "core/audio/sound.h"
-#include "core/common/nonstd/function_traits.hpp"
 #include "core/graphics/shader.h"
 #include "core/graphics/texture.h"
 #include "core/string_utils/string_utils.h"

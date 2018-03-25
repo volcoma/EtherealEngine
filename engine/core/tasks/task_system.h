@@ -1,8 +1,7 @@
 #ifndef TASK_SYSTEM_H
 #define TASK_SYSTEM_H
 
-#include "../common/nonstd/function_traits.hpp"
-#include "../common/nonstd/type_traits.hpp"
+#include "future_traits.hpp"
 #include <algorithm>
 #include <atomic>
 #include <chrono>
@@ -15,8 +14,10 @@
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <type_traits>
 #include <utility>
 #include <vector>
+
 namespace core
 {
 class task_system;
@@ -57,13 +58,15 @@ public:
 
 	template <class Rep, class Per>
 	std::future_status wait_for(const std::chrono::duration<Rep, Per>& rel_time) const
-	{ // wait for duration
+	{
+		// wait for duration
 		return future_.wait_for(rel_time);
 	}
 
 	template <class Clock, class Dur>
 	std::future_status wait_until(const std::chrono::time_point<Clock, Dur>& abs_time) const
-	{ // wait until time point
+	{
+		// wait until time point
 		return future_.wait_until(abs_time);
 	}
 
@@ -94,95 +97,16 @@ public:
 		return id_;
 	}
 
+	template <typename F>
+	decltype(auto) then_on_worker(F&& f);
+	template <typename F>
+	decltype(auto) then_on_owner(F&& f);
+
 private:
 	friend class task_system;
 	std::shared_future<T> future_;
 	task_system* executor_ = nullptr;
 	std::uint64_t id_ = 0;
-};
-
-template <class>
-struct is_future : std::false_type
-{
-};
-
-template <class T>
-struct is_future<std::future<T>> : std::true_type
-{
-};
-
-template <class T>
-struct is_future<std::shared_future<T>> : std::true_type
-{
-};
-template <class T>
-struct is_future<std::shared_future<T>&> : std::true_type
-{
-};
-template <class T>
-struct is_future<const std::shared_future<T>&> : std::true_type
-{
-};
-
-template <class T>
-struct is_future<task_future<T>> : std::true_type
-{
-};
-template <class T>
-struct is_future<task_future<T>&> : std::true_type
-{
-};
-template <class T>
-struct is_future<const task_future<T>&> : std::true_type
-{
-};
-
-template <class T>
-struct decay_future
-{
-	using type = T;
-};
-
-template <class T>
-struct decay_future<std::future<T>>
-{
-	using type = T;
-};
-
-template <class T>
-struct decay_future<std::shared_future<T>>
-{
-	using type = T;
-};
-
-template <class T>
-struct decay_future<std::shared_future<T>&>
-{
-	using type = T;
-};
-
-template <class T>
-struct decay_future<const std::shared_future<T>&>
-{
-	using type = T;
-};
-
-template <class T>
-struct decay_future<task_future<T>>
-{
-	using type = T;
-};
-
-template <class T>
-struct decay_future<task_future<T>&>
-{
-	using type = T;
-};
-
-template <class T>
-struct decay_future<const task_future<T>&>
-{
-	using type = T;
 };
 
 /*
@@ -209,12 +133,25 @@ struct decay_future<const task_future<T>&>
  * the newly constructed task and a std::future object to the
  * return value.
  */
+
+template <typename T>
+using is_future = async::detail::is_future<T>;
+
 class task
 {
-	template <class T>
-	using decay_if_future = typename std::conditional<is_future<typename std::decay<T>::type>::value,
-													  typename decay_future<T>::type, T>::type;
 
+	template <typename T>
+	using decay_future = async::detail::decay_future<T>;
+
+	template <typename T>
+	using decay_future_t = typename async::detail::decay_future<T>::type;
+
+	template <class T>
+	using decay_if_future_t = typename std::conditional<is_future<T>::value, decay_future_t<T>, T>::type;
+  
+    template<typename F, typename ...Args>
+    using invoke_result_t = typename nonstd::function_traits<F>::result_type;    
+    
 	struct ready_task_tag
 	{
 	};
@@ -244,24 +181,13 @@ public:
 
 	friend class task_system;
 
-	template <class F, class... Args>
-	friend std::pair<task, task_future<typename std::result_of<F(Args...)>::type>>
-	make_ready_task(F&& f, Args&&... args)
-	{
-		using pair_type = std::pair<task, task_future<typename std::result_of<F(Args...)>::type>>;
-		using model_type = ready_task_model<typename std::result_of<F(Args...)>::type(Args...)>;
-
-		task t(ready_task_tag(), std::forward<F>(f), std::forward<Args>(args)...);
-		auto fut = static_cast<model_type&>(*t.t_).get_future();
-		return pair_type(std::move(t), std::move(fut));
-	}
-
 	template <class Allocator, class F, class... Args>
-	friend std::pair<task, task_future<typename std::result_of<F(Args...)>::type>>
+	friend std::pair<task, task_future<invoke_result_t<F, Args...>>>
 	make_ready_task(std::allocator_arg_t /*unused*/, Allocator const& alloc, F&& f, Args&&... args)
 	{
-		using pair_type = std::pair<task, task_future<typename std::result_of<F(Args...)>::type>>;
-		using model_type = ready_task_model<typename std::result_of<F(Args...)>::type(Args...)>;
+		using invoke_res = invoke_result_t<F, Args...>;
+		using pair_type = std::pair<task, task_future<invoke_res>>;
+		using model_type = ready_task_model<invoke_res(Args...)>;
 
 		task t(ready_task_tag(), std::allocator_arg_t(), alloc, std::forward<F>(f),
 			   std::forward<Args>(args)...);
@@ -269,28 +195,13 @@ public:
 		return pair_type(std::move(t), std::move(fut));
 	}
 
-	template <class F, class... Args>
-	friend std::pair<task, task_future<typename std::result_of<F(decay_if_future<Args>...)>::type>>
-	make_awaitable_task(F&& f, Args&&... args)
-	{
-		using pair_type =
-			std::pair<task, task_future<typename std::result_of<F(decay_if_future<Args>...)>::type>>;
-		using model_type = awaitable_task_model<
-			typename std::result_of<F(decay_if_future<Args>...)>::type(decay_if_future<Args>...), Args...>;
-
-		task t(awaitable_task_tag(), std::forward<F>(f), std::forward<Args>(args)...);
-		auto fut = static_cast<model_type&>(*t.t_).get_future();
-		return pair_type(std::move(t), std::move(fut));
-	}
-
 	template <class Allocator, class F, class... Args>
-	friend std::pair<task, task_future<typename std::result_of<F(decay_if_future<Args>...)>::type>>
+	friend std::pair<task, task_future<invoke_result_t<F, Args...>>>
 	make_awaitable_task(std::allocator_arg_t /*unused*/, Allocator const& alloc, F&& f, Args&&... args)
 	{
-		using pair_type =
-			std::pair<task, task_future<typename std::result_of<F(decay_if_future<Args>...)>::type>>;
-		using model_type = awaitable_task_model<
-			typename std::result_of<F(decay_if_future<Args>...)>::type(decay_if_future<Args>...), Args...>;
+		using invoke_res = invoke_result_t<F, Args...>;
+		using pair_type = std::pair<task, task_future<invoke_res>>;
+		using model_type = awaitable_task_model<invoke_res(decay_if_future_t<Args>...), Args...>;
 
 		task t(awaitable_task_tag(), std::allocator_arg_t(), alloc, std::forward<F>(f),
 			   std::forward<Args>(args)...);
@@ -328,23 +239,22 @@ public:
 private:
 	template <class F, class... Args>
 	task(ready_task_tag /*unused*/, F&& f, Args&&... args)
-		: t_(new ready_task_model<typename std::result_of<F(Args...)>::type(Args...)>(
-			  std::forward<F>(f), std::forward<Args>(args)...))
+		: t_(new ready_task_model<invoke_result_t<F, Args...>(Args...)>(std::forward<F>(f),
+																	std::forward<Args>(args)...))
 	{
 	}
 
 	template <class Allocator, class F, class... Args>
 	task(ready_task_tag /*unused*/, std::allocator_arg_t /*unused*/, Allocator const& alloc, F&& f,
 		 Args&&... args)
-		: t_(new ready_task_model<typename std::result_of<F(Args...)>::type(Args...)>(
+		: t_(new ready_task_model<invoke_result_t<F, Args...>(Args...)>(
 			  std::allocator_arg_t(), alloc, std::forward<F>(f), std::forward<Args>(args)...))
 	{
 	}
 
 	template <class F, class... Args>
 	task(awaitable_task_tag /*unused*/, F&& f, Args&&... args)
-		: t_(new awaitable_task_model<
-			  typename std::result_of<F(decay_if_future<Args>...)>::type(decay_if_future<Args>...), Args...>(
+		: t_(new awaitable_task_model<invoke_result_t<F, Args...>(decay_if_future_t<Args>...), Args...>(
 			  std::forward<F>(f), std::forward<Args>(args)...))
 	{
 	}
@@ -352,8 +262,7 @@ private:
 	template <class Allocator, class F, class... Args>
 	task(awaitable_task_tag /*unused*/, std::allocator_arg_t /*unused*/, Allocator const& alloc, F&& f,
 		 Args&&... args)
-		: t_(new awaitable_task_model<
-			  typename std::result_of<F(decay_if_future<Args>...)>::type(decay_if_future<Args>...), Args...>(
+		: t_(new awaitable_task_model<invoke_result_t<F, Args...>(decay_if_future_t<Args>...), Args...>(
 			  std::allocator_arg_t(), alloc, std::forward<F>(f), std::forward<Args>(args)...))
 	{
 	}
@@ -473,25 +382,25 @@ private:
 		}
 
 	private:
-		template <class T>
+		template <typename T>
 		static inline decltype(auto) call_get(T&& t)
 		{
 			return std::forward<T>(t);
 		}
 
-		template <class T>
+		template <typename T>
 		static inline decltype(auto) call_get(task_future<T>&& t)
 		{
 			return t.get();
 		}
 
-		template <class T>
+		template <typename T>
 		static inline decltype(auto) call_get(std::future<T>&& t)
 		{
 			return t.get();
 		}
 
-		template <class T>
+		template <typename T>
 		static inline decltype(auto) call_get(std::shared_future<T>&& t)
 		{
 			return t.get();
@@ -500,29 +409,36 @@ private:
 		template <std::size_t... I>
 		inline void do_invoke_(std::index_sequence<I...> /*unused*/)
 		{
-			nonstd::invoke(f_, call_get(std::get<I>(std::move(args_)))...);
+			try
+			{
+				nonstd::invoke(f_, call_get(std::get<I>(std::move(args_)))...);
+			}
+			catch(const std::future_error& e)
+			{
+				(void)e;
+			}
 		}
 
-		template <class T>
+		template <typename T>
 		static inline bool call_ready(const T& /*unused*/) noexcept
 		{
 			return true;
 		}
 
-		template <class T>
+		template <typename T>
 		static inline bool call_ready(const task_future<T>& t) noexcept
 		{
 			return t.is_ready();
 		}
 
-		template <class T>
+		template <typename T>
 		static inline bool call_ready(const std::future<T>& t) noexcept
 		{
 			using namespace std::chrono_literals;
 			return t.valid() && t.wait_for(0s) == std::future_status::ready;
 		}
 
-		template <class T>
+		template <typename T>
 		static inline bool call_ready(const std::shared_future<T>& t) noexcept
 		{
 			using namespace std::chrono_literals;
@@ -664,7 +580,7 @@ public:
 	template <class F, class... Args>
 	decltype(auto) push_on_thread(const std::size_t idx, F&& f, Args&&... args)
 	{
-		using is_ready_task = nonstd::all_true<!is_future<Args>::value...>;
+		using is_ready_task = nonstd::conjunction<nonstd::negation<is_future<Args>>...>;
 		return push_impl(is_ready_task(), idx, false, std::forward<F>(f), std::forward<Args>(args)...);
 	}
 
@@ -711,7 +627,7 @@ public:
 	template <class F, class... Args>
 	decltype(auto) push_or_execute_on_thread(const std::size_t idx, F&& f, Args&&... args)
 	{
-		using is_ready_task = nonstd::all_true<!is_future<Args>::value...>;
+		using is_ready_task = nonstd::conjunction<nonstd::negation<is_future<Args>>...>;
 		return push_impl(is_ready_task(), idx, true, std::forward<F>(f), std::forward<Args>(args)...);
 	}
 
@@ -802,7 +718,7 @@ private:
 	/// contrasted with ready tasks that are assumed to be immediately invokable.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	template <class T>
+	template <typename T>
 	auto push_task(T&& t, std::size_t idx, bool execute_if_ready) ->
 		typename std::remove_reference<decltype(t.second)>::type
 	{
@@ -936,15 +852,27 @@ private:
 
 	std::vector<task_queue> queues_;
 	std::vector<std::thread> threads_;
-	typename allocator_t::template rebind<task::task_concept>::other alloc_;
 	std::size_t threads_count_;
-	bool wait_on_destruct_ = false;
 	//
 	const std::thread::id owner_thread_id_ = std::this_thread::get_id();
+	typename allocator_t::template rebind<task::task_concept>::other alloc_;
+	bool wait_on_destruct_ = false;
 };
 
 template <typename T>
-void task_future<T>::wait() const
+template <typename F>
+inline decltype(auto) task_future<T>::then_on_worker(F&& f)
+{
+	return executor_->push_or_execute_on_worker_thread(std::forward<F>(f), *this);
+}
+template <typename T>
+template <typename F>
+inline decltype(auto) task_future<T>::then_on_owner(F&& f)
+{
+	return executor_->push_or_execute_on_owner_thread(std::forward<F>(f), *this);
+}
+template <typename T>
+inline void task_future<T>::wait() const
 {
 	if(!future_.valid())
 	{
@@ -968,7 +896,7 @@ void task_future<T>::wait() const
 }
 
 template <typename T>
-void task_future<T>::cancel() const
+inline void task_future<T>::cancel() const
 {
 	if(!future_.valid())
 	{
