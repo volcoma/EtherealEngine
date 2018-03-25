@@ -237,9 +237,8 @@ task_system::task_system(bool wait_on_destruct)
 {
 }
 
-task_system::task_system(bool wait_on_destruct, std::size_t nthreads, const task_system::allocator_t& alloc)
-	: alloc_(alloc)
-	, threads_count_{nthreads}
+task_system::task_system(bool wait_on_destruct, std::size_t nthreads)
+	: threads_count_{nthreads}
 	, wait_on_destruct_(wait_on_destruct)
 {
 	queues_.reserve(threads_count_);

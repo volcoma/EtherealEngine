@@ -110,10 +110,8 @@ private:
 };
 
 /*
- * awaitable_task; a type-erased, allocator-aware std::packaged_task that
- * also contains its own arguments. The underlying packaged_task and the
- * stored argument tuple can be heap allocated or allocated with a provided
- * allocator.
+ * awaitable_task; a type-erased, std::packaged_task that
+ * also contains its own arguments.
  *
  * There are two forms of tasks: ready tasks and awaitable tasks.
  *
@@ -139,19 +137,15 @@ using is_future = async::detail::is_future<T>;
 
 class task
 {
-
 	template <typename T>
-	using decay_future = async::detail::decay_future<T>;
-
-	template <typename T>
-	using decay_future_t = typename async::detail::decay_future<T>::type;
+	using decay_future_t = async::detail::decay_future_t<T>;
 
 	template <class T>
 	using decay_if_future_t = typename std::conditional<is_future<T>::value, decay_future_t<T>, T>::type;
-  
-    template<typename F, typename ...Args>
-    using invoke_result_t = typename nonstd::function_traits<F>::result_type;    
-    
+
+	template <typename F, typename... Args>
+	using invoke_result_t = typename nonstd::function_traits<F>::result_type;
+
 	struct ready_task_tag
 	{
 	};
@@ -179,32 +173,26 @@ public:
 		return static_cast<bool>(t_);
 	}
 
-	friend class task_system;
-
-	template <class Allocator, class F, class... Args>
-	friend std::pair<task, task_future<invoke_result_t<F, Args...>>>
-	make_ready_task(std::allocator_arg_t /*unused*/, Allocator const& alloc, F&& f, Args&&... args)
+	template <class F, class... Args>
+	static decltype(auto) make_ready_task(F&& f, Args&&... args)
 	{
 		using invoke_res = invoke_result_t<F, Args...>;
 		using pair_type = std::pair<task, task_future<invoke_res>>;
 		using model_type = ready_task_model<invoke_res(Args...)>;
 
-		task t(ready_task_tag(), std::allocator_arg_t(), alloc, std::forward<F>(f),
-			   std::forward<Args>(args)...);
+		task t(ready_task_tag(), std::forward<F>(f), std::forward<Args>(args)...);
 		auto fut = static_cast<model_type&>(*t.t_).get_future();
 		return pair_type(std::move(t), std::move(fut));
 	}
 
-	template <class Allocator, class F, class... Args>
-	friend std::pair<task, task_future<invoke_result_t<F, Args...>>>
-	make_awaitable_task(std::allocator_arg_t /*unused*/, Allocator const& alloc, F&& f, Args&&... args)
+	template <class F, class... Args>
+	static decltype(auto) make_awaitable_task(F&& f, Args&&... args)
 	{
 		using invoke_res = invoke_result_t<F, Args...>;
 		using pair_type = std::pair<task, task_future<invoke_res>>;
 		using model_type = awaitable_task_model<invoke_res(decay_if_future_t<Args>...), Args...>;
 
-		task t(awaitable_task_tag(), std::allocator_arg_t(), alloc, std::forward<F>(f),
-			   std::forward<Args>(args)...);
+		task t(awaitable_task_tag(), std::forward<F>(f), std::forward<Args>(args)...);
 		auto fut = static_cast<model_type&>(*t.t_).get_future();
 		return pair_type(std::move(t), std::move(fut));
 	}
@@ -238,32 +226,16 @@ public:
 
 private:
 	template <class F, class... Args>
-	task(ready_task_tag /*unused*/, F&& f, Args&&... args)
+	task(ready_task_tag /*unused*/, F&& f, Args&&... args) noexcept
 		: t_(new ready_task_model<invoke_result_t<F, Args...>(Args...)>(std::forward<F>(f),
-																	std::forward<Args>(args)...))
-	{
-	}
-
-	template <class Allocator, class F, class... Args>
-	task(ready_task_tag /*unused*/, std::allocator_arg_t /*unused*/, Allocator const& alloc, F&& f,
-		 Args&&... args)
-		: t_(new ready_task_model<invoke_result_t<F, Args...>(Args...)>(
-			  std::allocator_arg_t(), alloc, std::forward<F>(f), std::forward<Args>(args)...))
+																		std::forward<Args>(args)...))
 	{
 	}
 
 	template <class F, class... Args>
-	task(awaitable_task_tag /*unused*/, F&& f, Args&&... args)
+	task(awaitable_task_tag /*unused*/, F&& f, Args&&... args) noexcept
 		: t_(new awaitable_task_model<invoke_result_t<F, Args...>(decay_if_future_t<Args>...), Args...>(
 			  std::forward<F>(f), std::forward<Args>(args)...))
-	{
-	}
-
-	template <class Allocator, class F, class... Args>
-	task(awaitable_task_tag /*unused*/, std::allocator_arg_t /*unused*/, Allocator const& alloc, F&& f,
-		 Args&&... args)
-		: t_(new awaitable_task_model<invoke_result_t<F, Args...>(decay_if_future_t<Args>...), Args...>(
-			  std::allocator_arg_t(), alloc, std::forward<F>(f), std::forward<Args>(args)...))
 	{
 	}
 
@@ -293,16 +265,8 @@ private:
 	struct ready_task_model<R(Args...)> : task_concept
 	{
 		template <class F>
-		explicit ready_task_model(F&& f, Args&&... args)
+		explicit ready_task_model(F&& f, Args&&... args) noexcept
 			: f_(std::forward<F>(f))
-			, args_(std::forward<Args>(args)...)
-		{
-		}
-
-		template <class Allocator, class F>
-		explicit ready_task_model(std::allocator_arg_t /*unused*/, Allocator const& alloc, F&& f,
-								  Args&&... args)
-			: f_(std::allocator_arg_t(), alloc, std::forward<F>(f))
 			, args_(std::forward<Args>(args)...)
 		{
 		}
@@ -343,16 +307,8 @@ private:
 	struct awaitable_task_model<R(CallArgs...), FutArgs...> : task_concept
 	{
 		template <class F, class... Args>
-		explicit awaitable_task_model(F&& f, Args&&... args)
+		explicit awaitable_task_model(F&& f, Args&&... args) noexcept
 			: f_(std::forward<F>(f))
-			, args_(std::forward<Args>(args)...)
-		{
-		}
-
-		template <class Allocator, class F, class... Args>
-		explicit awaitable_task_model(std::allocator_arg_t /*unused*/, Allocator const& alloc, F&& f,
-									  Args&&... args)
-			: f_(std::allocator_arg_t(), alloc, std::forward<F>(f))
 			, args_(std::forward<Args>(args)...)
 		{
 		}
@@ -475,11 +431,9 @@ public:
 		std::vector<queue_info> queue_infos;
 	};
 
-	using allocator_t = std::allocator<task>;
-
 	task_system(bool wait_on_destruct);
 
-	task_system(bool wait_on_destruct, std::size_t nthreads, allocator_t const& alloc = {});
+	task_system(bool wait_on_destruct, std::size_t nthreads);
 
 	//-----------------------------------------------------------------------------
 	//  Name : ~task_system ()
@@ -681,9 +635,8 @@ private:
 	decltype(auto) push_impl(std::true_type /*unused*/, std::size_t idx, bool execute_if_ready, F&& f,
 							 Args&&... args)
 	{
-		return push_task(
-			make_ready_task(std::allocator_arg_t{}, alloc_, std::forward<F>(f), std::forward<Args>(args)...),
-			idx, execute_if_ready);
+		return push_task(task::make_ready_task(std::forward<F>(f), std::forward<Args>(args)...), idx,
+						 execute_if_ready);
 	}
 
 	//-----------------------------------------------------------------------------
@@ -699,9 +652,8 @@ private:
 	decltype(auto) push_impl(std::false_type /*unused*/, std::size_t idx, bool execute_if_ready, F&& f,
 							 Args&&... args)
 	{
-		return push_task(make_awaitable_task(std::allocator_arg_t{}, alloc_, std::forward<F>(f),
-											 std::forward<Args>(args)...),
-						 idx, execute_if_ready);
+		return push_task(task::make_awaitable_task(std::forward<F>(f), std::forward<Args>(args)...), idx,
+						 execute_if_ready);
 	}
 
 	//-----------------------------------------------------------------------------
@@ -855,7 +807,6 @@ private:
 	std::size_t threads_count_;
 	//
 	const std::thread::id owner_thread_id_ = std::this_thread::get_id();
-	typename allocator_t::template rebind<task::task_concept>::other alloc_;
 	bool wait_on_destruct_ = false;
 };
 
