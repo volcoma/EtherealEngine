@@ -6,7 +6,7 @@
 #include <future>
 namespace core
 {
-template<typename T>
+template <typename T>
 class task_future;
 namespace async
 {
@@ -20,14 +20,13 @@ using has_wait = decltype(std::declval<T>().wait());
 template <typename T>
 using has_valid = decltype(std::declval<T>().valid());
 template <typename T>
-using has_wait_for = decltype(std::declval<T>().wait_for(std::chrono::milliseconds(0)));
+using has_wait_for = decltype(std::declval<T>().wait_for(std::declval<std::chrono::milliseconds>()));
 template <typename T>
-using has_wait_until = decltype(std::declval<T>().wait_until(std::chrono::system_clock::time_point()));
-
+using has_wait_until =
+	decltype(std::declval<T>().wait_until(std::declval<std::chrono::system_clock::time_point>()));
 
 namespace v2
 {
-
 
 template <typename T>
 using is_future_impl =
@@ -47,18 +46,18 @@ struct decay_future
 template <template <typename> class X, typename T>
 struct decay_future<X<T>>
 {
-    using type = T;
+	using type = T;
 };
 template <template <typename> class X, typename T>
 struct decay_future<X<T>&>
 {
-    using type = T;
+	using type = T;
 };
 
 template <template <typename> class X, typename T>
 struct decay_future<const X<T>&>
 {
-    using type = T;
+	using type = T;
 };
 }
 
@@ -75,8 +74,6 @@ using decay_future = impl::decay_future<T>;
 
 template <typename T>
 using decay_future_t = typename decay_future<T>::type;
-
 }
 }
 }
-

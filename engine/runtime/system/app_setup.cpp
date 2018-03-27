@@ -62,49 +62,48 @@ void setup_asset_manager()
 	{
 		const auto id = "embedded:/sphere";
 		auto instance = std::make_shared<mesh>();
-		instance->create_sphere(gfx::mesh_vertex::get_layout(), 0.5f, 20, 20, false,
-								mesh_create_origin::center);
+		instance->create_sphere(gfx::mesh_vertex::get_layout(), 0.5f, 20, 20, mesh_create_origin::center);
 		manager.load_asset_from_instance(id, instance);
 	}
 	{
 		const auto id = "embedded:/cube";
 		auto instance = std::make_shared<mesh>();
-		instance->create_cube(gfx::mesh_vertex::get_layout(), 1.0f, 1.0f, 1.0f, 1, 1, 1, false,
+		instance->create_cube(gfx::mesh_vertex::get_layout(), 1.0f, 1.0f, 1.0f, 1, 1, 1,
 							  mesh_create_origin::center);
 		manager.load_asset_from_instance(id, instance);
 	}
 	{
 		const auto id = "embedded:/plane";
 		auto instance = std::make_shared<mesh>();
-		instance->create_cube(gfx::mesh_vertex::get_layout(), 10.0f, 0.01f, 10.0f, 1, 1, 1, false,
-							  mesh_create_origin::center);
+		instance->create_plane(gfx::mesh_vertex::get_layout(), 10.0f, 10.0f, 1, 1,
+							   mesh_create_origin::center);
 		manager.load_asset_from_instance(id, instance);
 	}
 	{
 		const auto id = "embedded:/cylinder";
 		auto instance = std::make_shared<mesh>();
-		instance->create_cylinder(gfx::mesh_vertex::get_layout(), 0.5f, 2.0f, 20, 20, false,
+		instance->create_cylinder(gfx::mesh_vertex::get_layout(), 0.5f, 2.0f, 20, 20,
 								  mesh_create_origin::center);
 		manager.load_asset_from_instance(id, instance);
 	}
 	{
 		const auto id = "embedded:/capsule";
 		auto instance = std::make_shared<mesh>();
-		instance->create_capsule(gfx::mesh_vertex::get_layout(), 0.5f, 2.0f, 20, 20, false,
+		instance->create_capsule(gfx::mesh_vertex::get_layout(), 0.5f, 2.0f, 20, 20,
 								 mesh_create_origin::center);
 		manager.load_asset_from_instance(id, instance);
 	}
 	{
 		const auto id = "embedded:/cone";
 		auto instance = std::make_shared<mesh>();
-		instance->create_cone(gfx::mesh_vertex::get_layout(), 0.5f, 0.0f, 2, 20, 20, false,
+		instance->create_cone(gfx::mesh_vertex::get_layout(), 0.5f, 0.0f, 2, 20, 20,
 							  mesh_create_origin::bottom);
 		manager.load_asset_from_instance(id, instance);
 	}
 	{
 		const auto id = "embedded:/torus";
 		auto instance = std::make_shared<mesh>();
-		instance->create_torus(gfx::mesh_vertex::get_layout(), 1.0f, 0.5f, 20, 20, false,
+		instance->create_torus(gfx::mesh_vertex::get_layout(), 1.0f, 0.5f, 20, 20,
 							   mesh_create_origin::center);
 		manager.load_asset_from_instance(id, instance);
 	}
@@ -112,18 +111,6 @@ void setup_asset_manager()
 		const auto id = "embedded:/teapot";
 		auto instance = std::make_shared<mesh>();
 		instance->create_teapot(gfx::mesh_vertex::get_layout());
-		manager.load_asset_from_instance(id, instance);
-	}
-	{
-		const auto id = "embedded:/tetrahedron";
-		auto msh = std::make_shared<mesh>();
-		msh->create_tetrahedron(gfx::mesh_vertex::get_layout());
-		manager.load_asset_from_instance(id, msh);
-	}
-	{
-		const auto id = "embedded:/octahedron";
-		auto instance = std::make_shared<mesh>();
-		instance->create_octahedron(gfx::mesh_vertex::get_layout());
 		manager.load_asset_from_instance(id, instance);
 	}
 	{
@@ -139,7 +126,7 @@ void setup_asset_manager()
 		manager.load_asset_from_instance(id, instance);
 	}
 
-	for(int i = 0; i < 6; ++i)
+	for(int i = 0; i < 20; ++i)
 	{
 		const auto id = std::string("embedded:/icosphere") + std::to_string(i);
 		auto instance = std::make_shared<mesh>();

@@ -35,17 +35,17 @@ struct gfx_callback : public bgfx::CallbackI
 	}
 
 	void traceVargs(const char* /*_filePath*/, std::uint16_t /*_line*/, const char* /*_format*/,
-							va_list /*_argList*/) final
+					va_list /*_argList*/) final
 	{
 	}
 
 	void profilerBegin(const char* /*_name*/, std::uint32_t /*_abgr*/, const char* /*_filePath*/,
-							   std::uint16_t /*_line*/) final
+					   std::uint16_t /*_line*/) final
 	{
 	}
 
-	void profilerBeginLiteral(const char* /*_name*/, std::uint32_t /*_abgr*/,
-									  const char* /*_filePath*/, std::uint16_t /*_line*/) final
+	void profilerBeginLiteral(const char* /*_name*/, std::uint32_t /*_abgr*/, const char* /*_filePath*/,
+							  std::uint16_t /*_line*/) final
 	{
 	}
 
@@ -72,13 +72,13 @@ struct gfx_callback : public bgfx::CallbackI
 	}
 
 	void screenShot(const char* /*_filePath*/, std::uint32_t /*_width*/, std::uint32_t /*_height*/,
-							std::uint32_t /*_pitch*/, const void* /*_data*/, std::uint32_t /*_size*/,
-							bool /*_yflip*/) final
+					std::uint32_t /*_pitch*/, const void* /*_data*/, std::uint32_t /*_size*/,
+					bool /*_yflip*/) final
 	{
 	}
 
 	void captureBegin(std::uint32_t /*_width*/, std::uint32_t /*_height*/, std::uint32_t /*_pitch*/,
-							  texture_format /*_format*/, bool /*_yflip*/) final
+					  texture_format /*_format*/, bool /*_yflip*/) final
 	{
 	}
 

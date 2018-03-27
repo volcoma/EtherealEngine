@@ -3,8 +3,7 @@
 
 namespace nonstd
 {
-///BOOL CONSTANT
+/// BOOL CONSTANT
 template <bool B>
 using bool_constant = std::integral_constant<bool, B>;
-
 }

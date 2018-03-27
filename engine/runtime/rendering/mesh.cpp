@@ -4,26 +4,10 @@
 #include "core/graphics/vertex_buffer.h"
 #include "core/logging/logging.h"
 #include "core/memory/checked_delete.h"
-#include "mesh_tools.h"
+#include "generator/generator.hpp"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
-
-#define RMC_DEFINE_DATA                                                                                      \
-	std::vector<math::vec3> vertices;                                                                        \
-	std::vector<math::vec4> normals;                                                                         \
-	std::vector<math::vec4> tangents;                                                                        \
-	std::vector<math::vec4> bitangents;                                                                      \
-	std::vector<math::vec2> texcoords0;                                                                      \
-	std::vector<math::vec2> texcoords1;                                                                      \
-	std::vector<std::uint32_t> indices;
-
-#define RMC_RESIZE_NTTT                                                                                      \
-	normals.resize(vertices.size());                                                                         \
-	tangents.resize(vertices.size());                                                                        \
-	bitangents.resize(vertices.size());                                                                      \
-	texcoords0.resize(vertices.size());                                                                      \
-	texcoords1.resize(vertices.size());
 //-----------------------------------------------------------------------------
 // Local Module Level Namespaces.
 //-----------------------------------------------------------------------------
@@ -924,13 +908,71 @@ bool mesh::add_primitives(const triangle_array_t& triangles)
 	return true;
 }
 
-bool mesh::create_cylinder(const gfx::vertex_layout& format, float radius, float height, std::uint32_t stacks,
-						   std::uint32_t slices, bool inverted, mesh_create_origin origin,
-						   bool hardware_copy /* = true */)
+static void create_mesh(const gfx::vertex_layout& format, const generator::any_mesh& mesh,
+						mesh::preparation_data& data, math::bbox& bbox)
 {
-	math::vec3 current_pos, normal_vec;
-	math::vec2 current_tex;
 
+	// Determine the correct offset to any relevant elements in the vertex
+	bool has_position = format.has(gfx::attribute::Position);
+	bool has_texcoord0 = format.has(gfx::attribute::TexCoord0);
+	bool has_normals = format.has(gfx::attribute::Normal);
+	bool has_tangents = format.has(gfx::attribute::Tangent);
+	bool has_bitangents = format.has(gfx::attribute::Bitangent);
+	std::uint16_t vertex_stride = format.getStride();
+
+	auto triangle_count = generator::count(mesh.triangles());
+	auto vertex_count = generator::count(mesh.vertices());
+	data.triangle_count = std::uint32_t(triangle_count);
+	data.vertex_count = std::uint32_t(vertex_count);
+
+	// Allocate enough space for the new vertex and triangle data
+	data.vertex_data.resize(data.vertex_count * vertex_stride);
+	data.vertex_flags.resize(data.vertex_count);
+	data.triangle_data.resize(data.triangle_count);
+
+	std::uint8_t* current_vertex_ptr = &data.vertex_data[0];
+	size_t i = 0;
+	for(const auto& v : mesh.vertices())
+	{
+
+		math::vec3 position = v.position;
+		math::vec4 normal = math::vec4(v.normal, 0.0f);
+		math::vec2 texcoords0 = v.tex_coord;
+		// Store vertex components
+		if(has_position)
+			gfx::vertex_pack(&position.x, false, gfx::attribute::Position, format, current_vertex_ptr,
+							 std::uint32_t(i));
+		if(has_normals)
+			gfx::vertex_pack(&normal.x, true, gfx::attribute::Normal, format, current_vertex_ptr,
+							 std::uint32_t(i));
+		if(has_texcoord0)
+			gfx::vertex_pack(&texcoords0.x, true, gfx::attribute::TexCoord0, format, current_vertex_ptr,
+							 std::uint32_t(i));
+
+		bbox.add_point(position);
+		i++;
+	}
+
+	size_t tri_idx = 0;
+	for(const auto& triangle : mesh.triangles())
+	{
+		const auto& indices = triangle.vertices;
+		auto& tri = data.triangle_data[tri_idx];
+		tri.indices[0] = std::uint32_t(indices[0]);
+		tri.indices[1] = std::uint32_t(indices[1]);
+		tri.indices[2] = std::uint32_t(indices[2]);
+
+		tri_idx++;
+	}
+
+	// We need to generate binormals / tangents?
+	data.compute_binormals = has_bitangents;
+	data.compute_tangents = has_tangents;
+}
+
+bool mesh::create_cylinder(const gfx::vertex_layout& format, float radius, float height, std::uint32_t stacks,
+						   std::uint32_t slices, mesh_create_origin origin, bool hardware_copy /* = true */)
+{
 	// Clear out old data.
 	dispose();
 
@@ -938,292 +980,19 @@ bool mesh::create_cylinder(const gfx::vertex_layout& format, float radius, float
 	prepare_status_ = mesh_status::preparing;
 	vertex_format_ = format;
 
-	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = vertex_format_.has(gfx::attribute::Position);
-	bool has_texcoord = vertex_format_.has(gfx::attribute::TexCoord0);
-	bool has_normal = vertex_format_.has(gfx::attribute::Normal);
-	std::uint16_t vertex_stride = vertex_format_.getStride();
+	using namespace generator;
+	capped_cylinder_mesh_t cylinder(radius, height * 0.5, slices, stacks);
+	math::quat rot(math::vec3(math::radians(-90.0f), 0.f, 0.0f));
+	auto mesh = rotate_mesh(cylinder, rot);
 
-	// Compute the number of faces and vertices that will be required for this box
-	preparation_data_.triangle_count = (slices * stacks) * 2;
-	preparation_data_.vertex_count = (slices + 1) * (stacks + 1);
-
-	// Add vertices and faces for caps
-	std::uint32_t caps_start = preparation_data_.vertex_count;
-	preparation_data_.vertex_count += slices * 2;
-	preparation_data_.triangle_count += (slices - 2) * 2;
-
-	// Allocate enough space for the new vertex and triangle data
-	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
-	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
-	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
-
-	// For each stack
-	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
-	std::uint8_t* current_flags_ptr = &preparation_data_.vertex_flags[0];
-	for(std::uint32_t stack = 0; stack <= stacks; ++stack)
-	{
-		// Generate a ring of vertices which describe the top edges of that stack's
-		// geometry
-		// The last vertex is a duplicate of the first to ensure we have correct
-		// texturing
-		for(std::uint32_t slice = 0; slice <= slices; ++slice)
-		{
-			// Precompute any reusable values
-			float a = (math::two_pi<float>() / static_cast<float>(slices)) * static_cast<float>(slice);
-
-			// Compuse vertex normal at this location around the cylinder.
-			normal_vec.x = math::sin(a);
-			normal_vec.y = 0;
-			normal_vec.z = math::cos(a);
-
-			// Position is simply a scaled version of the normal
-			// with the correctly computed height.
-			current_pos.x = normal_vec.x * radius;
-			current_pos.y = static_cast<float>(stack) * (height / static_cast<float>(stacks));
-			current_pos.z = normal_vec.z * radius;
-
-			// Compute the texture coordinate.
-			current_tex.x = (1.0f / static_cast<float>(slices)) * static_cast<float>(slice);
-			current_tex.y = (1.0f / static_cast<float>(stacks)) * static_cast<float>(stack);
-
-			// Position in center or at base/tip?
-			if(origin == mesh_create_origin::center)
-				current_pos.y -= height * 0.5f;
-			else if(origin == mesh_create_origin::top)
-				current_pos.y -= height;
-
-			// Should we invert the vertex normal
-			if(inverted)
-				normal_vec = -normal_vec;
-
-			// Store!
-			// Store vertex components
-			if(has_position)
-				gfx::vertex_pack(&current_pos[0], false, gfx::attribute::Position, format,
-								 current_vertex_ptr);
-			if(has_normal)
-			{
-				math::vec4 norm(normal_vec, 0.0f);
-				gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format,
-								 current_vertex_ptr);
-			}
-			if(has_texcoord)
-				gfx::vertex_pack(&current_tex[0], true, gfx::attribute::TexCoord0, format,
-								 current_vertex_ptr);
-
-			// Set flags for this vertex (we want to generate tangents
-			// and binormals if we need them).
-			*current_flags_ptr++ = preparation_data::source_contains_normal;
-
-			// Grow the object space bounding box for this mesh
-			// by including the computed position.
-			bbox_.add_point(current_pos);
-
-			// Move on to next vertex
-			current_vertex_ptr += vertex_stride;
-
-		} // Next Slice
-
-	} // Next Stack
-
-	// Now cmpute the vertices for the base cylinder cap geometry.
-	for(std::uint32_t slice = 0; slice < slices; ++slice)
-	{
-		// Precompute any reusable values
-		float a = (math::two_pi<float>() / static_cast<float>(slices)) * static_cast<float>(slice);
-
-		// Compute the vertex components.
-		current_pos = math::vec3(math::sin(a), 0, math::cos(a));
-		normal_vec = (height >= 0) ? math::vec3(0, -1, 0) : math::vec3(0, 1, 0);
-		current_tex.x = (current_pos.x * 0.5f) + 0.5f;
-		current_tex.y = (current_pos.z * 0.5f) + 0.5f;
-		current_pos.x *= radius;
-		current_pos.z *= radius;
-
-		// Position in center or at base/tip?
-		if(origin == mesh_create_origin::center)
-			current_pos.y -= height * 0.5f;
-		else if(origin == mesh_create_origin::top)
-			current_pos.y -= height;
-
-		// Should we invert the vertex normal
-		if(inverted)
-			normal_vec = -normal_vec;
-
-		// Store!
-		if(has_position)
-			gfx::vertex_pack(&current_pos[0], false, gfx::attribute::Position, format, current_vertex_ptr);
-		if(has_normal)
-		{
-			math::vec4 norm(normal_vec, 0.0f);
-			gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format, current_vertex_ptr);
-		}
-		if(has_texcoord)
-			gfx::vertex_pack(&current_tex[0], true, gfx::attribute::TexCoord0, format, current_vertex_ptr);
-
-		// Set flags for this vertex (we want to generate tangents
-		// and binormals if we need them).
-		*current_flags_ptr++ = preparation_data::source_contains_normal;
-
-		// Grow the object space bounding box for this mesh
-		// by including the computed position.
-		bbox_.add_point(current_pos);
-
-		// Move on to next vertex
-		current_vertex_ptr += vertex_stride;
-
-	} // Next Slice
-
-	// And the vertices for the end cylinder cap geometry.
-	for(std::uint32_t slice = 0; slice < slices; ++slice)
-	{
-		// Precompute any reusable values
-		float a = (math::two_pi<float>() / static_cast<float>(slices)) * static_cast<float>(slice);
-
-		// Compute the vertex components.
-		current_pos = math::vec3(math::sin(a), height, math::cos(a));
-		normal_vec = (height >= 0) ? math::vec3(0, 1, 0) : math::vec3(0, -1, 0);
-		current_tex.x = (current_pos.x * -0.5f) + 0.5f;
-		current_tex.y = (current_pos.z * -0.5f) + 0.5f;
-		current_pos.x *= radius;
-		current_pos.z *= radius;
-
-		// Position in center or at base/tip?
-		if(origin == mesh_create_origin::center)
-			current_pos.y -= height * 0.5f;
-		else if(origin == mesh_create_origin::top)
-			current_pos.y -= height;
-
-		// Should we invert the vertex normal
-		if(inverted)
-			normal_vec = -normal_vec;
-
-		// Store!
-		if(has_position)
-			gfx::vertex_pack(&current_pos[0], false, gfx::attribute::Position, format, current_vertex_ptr);
-		if(has_normal)
-		{
-			math::vec4 norm(normal_vec, 0.0f);
-			gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format, current_vertex_ptr);
-		}
-		if(has_texcoord)
-			gfx::vertex_pack(&current_tex[0], true, gfx::attribute::TexCoord0, format, current_vertex_ptr);
-
-		// Set flags for this vertex (we want to generate tangents
-		// and binormals if we need them).
-		*current_flags_ptr++ = preparation_data::source_contains_normal;
-
-		// Grow the object space bounding box for this mesh
-		// by including the computed position.
-		bbox_.add_point(current_pos);
-
-		// Move on to next vertex
-		current_vertex_ptr += vertex_stride;
-
-	} // Next Slice
-
-	// Now compute the indices. For each stack (except the top and bottom)
-	triangle* current_triangle_ptr = &preparation_data_.triangle_data[0];
-	for(std::uint32_t stack = 0; stack < stacks; ++stack)
-	{
-		// Generate two triangles for the quad on each slice
-		for(std::uint32_t slice = 0; slice < slices; ++slice)
-		{
-			// If height was negative (i.e. faces are inverted)
-			// we need to flip the order of the indices
-			if(((!inverted) && height < 0) || (inverted && height > 0))
-			{
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = (stack * (slices + 1)) + slice;
-				current_triangle_ptr->indices[1] = ((stack + 1) * (slices + 1)) + slice;
-				current_triangle_ptr->indices[2] = (stack * (slices + 1)) + slice + 1;
-				current_triangle_ptr++;
-
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = ((stack + 1) * (slices + 1)) + slice;
-				current_triangle_ptr->indices[1] = ((stack + 1) * (slices + 1)) + slice + 1;
-				current_triangle_ptr->indices[2] = (stack * (slices + 1)) + slice + 1;
-				current_triangle_ptr++;
-
-			} // End if inverted
-			else
-			{
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = (stack * (slices + 1)) + slice + 1;
-				current_triangle_ptr->indices[1] = ((stack + 1) * (slices + 1)) + slice;
-				current_triangle_ptr->indices[2] = (stack * (slices + 1)) + slice;
-				current_triangle_ptr++;
-
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = (stack * (slices + 1)) + slice + 1;
-				current_triangle_ptr->indices[1] = ((stack + 1) * (slices + 1)) + slice + 1;
-				current_triangle_ptr->indices[2] = ((stack + 1) * (slices + 1)) + slice;
-				current_triangle_ptr++;
-
-			} // End if not inverted
-
-		} // Next Slice
-
-	} // Next Stack
-
-	// Add cylinder cap geometry
-	for(std::uint32_t slice = 0; slice < slices - 2; ++slice)
-	{
-		// If height was negative (i.e. faces are inverted)
-		// we need to flip the order of the indices
-		if(((!inverted) && height < 0) || (inverted && height > 0))
-		{
-			// Base Cap
-			current_triangle_ptr->data_group_id = 0;
-			current_triangle_ptr->indices[0] = caps_start;
-			current_triangle_ptr->indices[1] = caps_start + slice + 1;
-			current_triangle_ptr->indices[2] = caps_start + slice + 2;
-			current_triangle_ptr++;
-
-			// End Cap
-			current_triangle_ptr->data_group_id = 0;
-			current_triangle_ptr->indices[0] = caps_start + slices + slice + 2;
-			current_triangle_ptr->indices[1] = caps_start + slices + slice + 1;
-			current_triangle_ptr->indices[2] = caps_start + slices;
-			current_triangle_ptr++;
-
-		} // End if inverted
-		else
-		{
-			// Base Cap
-			current_triangle_ptr->data_group_id = 0;
-			current_triangle_ptr->indices[0] = caps_start + slice + 2;
-			current_triangle_ptr->indices[1] = caps_start + slice + 1;
-			current_triangle_ptr->indices[2] = caps_start;
-			current_triangle_ptr++;
-
-			// End Cap
-			current_triangle_ptr->data_group_id = 0;
-			current_triangle_ptr->indices[0] = caps_start + slices;
-			current_triangle_ptr->indices[1] = caps_start + slices + slice + 1;
-			current_triangle_ptr->indices[2] = caps_start + slices + slice + 2;
-			current_triangle_ptr++;
-
-		} // End if not inverted
-
-	} // Next Slice
-
-	// We need to generate binormals / tangents?
-	preparation_data_.compute_binormals = vertex_format_.has(gfx::attribute::Bitangent);
-	preparation_data_.compute_tangents = vertex_format_.has(gfx::attribute::Tangent);
-
+	create_mesh(vertex_format_, mesh, preparation_data_, bbox_);
 	// Finish up
 	return end_prepare(hardware_copy, false, false);
 }
 
 bool mesh::create_capsule(const gfx::vertex_layout& format, float radius, float height, std::uint32_t stacks,
-						  std::uint32_t slices, bool inverted, mesh_create_origin origin,
-						  bool hardware_copy /* = true */)
+						  std::uint32_t slices, mesh_create_origin origin, bool hardware_copy /* = true */)
 {
-	math::vec3 current_pos, normal_vec;
-	math::vec2 current_tex;
-
 	// Clear out old data.
 	dispose();
 
@@ -1231,552 +1000,40 @@ bool mesh::create_capsule(const gfx::vertex_layout& format, float radius, float 
 	prepare_status_ = mesh_status::preparing;
 	vertex_format_ = format;
 
-	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = vertex_format_.has(gfx::attribute::Position);
-	bool has_texcoord = vertex_format_.has(gfx::attribute::TexCoord0);
-	bool has_normal = vertex_format_.has(gfx::attribute::Normal);
-	std::uint16_t vertex_stride = vertex_format_.getStride();
-
-	// Compute the number of 'stacks' required for the hemisphere caps.
-	// This must be the closest multiple of 2 to ensure a valid center division.
-	std::uint32_t sphere_stacks = ((slices / 2) + 1) & 0xFFFFFFFE;
-	if(sphere_stacks < 2)
-		sphere_stacks = 2;
-
-	// Height must be at least equal to radius * 2 (to account for the
-	// hemispheres)
-	bool bNegateY = (height < 0);
-	radius = math::abs(radius);
-	height = math::abs(height);
-	height = std::max<float>(radius * 2.0f, height);
-	float fCylinderHeight = height - (radius * 2.0f);
-	if(bNegateY)
-	{
-		height = -height;
-		fCylinderHeight = -fCylinderHeight;
-
-	} // End if negated.
-
-	// Add vertices for the first hemisphere. The cap shares a common row of
-	// vertices with the capsule sides.
-	preparation_data_.triangle_count = (slices * (sphere_stacks / 2)) * 2;
-	preparation_data_.vertex_count = (slices + 1) * ((sphere_stacks / 2) + 1);
-
-	// Cylinder geometry starts at the last row of the first hemisphere.
-	std::uint32_t cylinder_start = preparation_data_.vertex_count - (slices + 1);
-
-	// Compute the number of faces and vertices that will be required by the
-	// cylinder shape that exists between the two hemispheres.
-	std::uint32_t cylinder_verts = (slices + 1) * (stacks - 1);
-	preparation_data_.triangle_count += (slices * stacks) * 2;
-	preparation_data_.vertex_count += cylinder_verts;
-
-	// Add vertices for the bottom hemisphere. The cap shares a common row of
-	// vertices with the capsule sides.
-	preparation_data_.triangle_count += (slices * (sphere_stacks / 2)) * 2;
-	preparation_data_.vertex_count += (slices + 1) * ((sphere_stacks / 2) + 1);
-
-	// Allocate enough space for the new vertex and triangle data
-	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
-	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
-	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
-
-	// First add the top hemisphere
-	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
-	std::uint8_t* current_flags_ptr = &preparation_data_.vertex_flags[0];
-	std::int32_t vertices_added = 0;
-	for(std::uint32_t stack = 0; stack <= sphere_stacks / 2; ++stack)
-	{
-		// Generate a ring of vertices which describe the top edges of that stack's
-		// geometry
-		// The last vertex is a duplicate of the first to ensure we have correct
-		// texturing
-		for(std::uint32_t slice = 0; slice <= slices; ++slice)
-		{
-			// Precompute any reusable values
-			float a = (math::pi<float>() / static_cast<float>(sphere_stacks)) * static_cast<float>(stack);
-			float b = (math::two_pi<float>() / static_cast<float>(slices)) * static_cast<float>(slice);
-			float xz = math::sin(a);
-
-			// Compute the normal & position of the vertex
-			normal_vec.x = xz * math::sin(b);
-			normal_vec.y = math::cos((bNegateY) ? math::pi<float>() - a : a);
-			normal_vec.z = xz * math::cos(b);
-			current_pos = normal_vec * radius;
-
-			// Offset so that it sits at the top of the central cylinder
-			current_pos.y += fCylinderHeight * 0.5f;
-
-			// Compute the texture coordinate.
-			current_tex.x = (1.0f / static_cast<float>(slices)) * static_cast<float>(slice);
-			current_tex.y = (current_pos.y + (height * 0.5f)) / height;
-
-			// Invert normal if required
-			if(inverted)
-				normal_vec = -normal_vec;
-
-			// Position in center or at base/tip?
-			if(origin == mesh_create_origin::bottom)
-				current_pos.y += height * 0.5f;
-			else if(origin == mesh_create_origin::top)
-				current_pos.y -= height * 0.5f;
-
-			// Store vertex components
-			if(has_position)
-				gfx::vertex_pack(&current_pos[0], false, gfx::attribute::Position, format,
-								 current_vertex_ptr);
-			if(has_normal)
-			{
-				math::vec4 norm(normal_vec, 0.0f);
-				gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format,
-								 current_vertex_ptr);
-			}
-			if(has_texcoord)
-				gfx::vertex_pack(&current_tex[0], true, gfx::attribute::TexCoord0, format,
-								 current_vertex_ptr);
-
-			// Set flags for this vertex (we want to generate tangents
-			// and binormals if we need them).
-			*current_flags_ptr++ = preparation_data::source_contains_normal;
-
-			// Grow the object space bounding box for this mesh
-			// by including the computed position.
-			bbox_.add_point(current_pos);
-
-			// Move on to next vertex
-			current_vertex_ptr += vertex_stride;
-			vertices_added++;
-
-		} // Next Slice
-
-	} // Next Stack
-
-	// Create cylinder side vertices. We don't generate
-	// vertices for the top/bottom row -- these were added by the
-	// hemispheres.
-	for(std::uint32_t stack = 1; stack < stacks; ++stack)
-	{
-		// Generate a ring of vertices which describe the top edges of that stack's
-		// geometry
-		// The last vertex is a duplicate of the first to ensure we have correct
-		// texturing
-		for(std::uint32_t slice = 0; slice <= slices; ++slice)
-		{
-			// Precompute any reusable values
-			float a = (math::two_pi<float>() / static_cast<float>(slices)) * static_cast<float>(slice);
-
-			// Compuse vertex normal at this location around the cylinder.
-			normal_vec.x = math::sin(a);
-			normal_vec.y = 0;
-			normal_vec.z = math::cos(a);
-
-			// Position is simply a scaled version of the normal
-			// with the correctly computed height.
-			current_pos.x = normal_vec.x * radius;
-			current_pos.y = (fCylinderHeight -
-							 (static_cast<float>(stack) * (fCylinderHeight / static_cast<float>(stacks))));
-			current_pos.y -= (fCylinderHeight * 0.5f);
-			current_pos.z = normal_vec.z * radius;
-
-			// Compute the texture coordinate.
-			current_tex.x = (1.0f / static_cast<float>(slices)) * static_cast<float>(slice);
-			current_tex.y = (current_pos.y + (height * 0.5f)) / height;
-
-			// Position in center or at base/tip?
-			if(origin == mesh_create_origin::bottom)
-				current_pos.y += height * 0.5f;
-			else if(origin == mesh_create_origin::top)
-				current_pos.y -= height * 0.5f;
-
-			// Should we invert the vertex normal
-			if(inverted)
-				normal_vec = -normal_vec;
-
-			// Store!
-			if(has_position)
-				gfx::vertex_pack(&current_pos[0], false, gfx::attribute::Position, format,
-								 current_vertex_ptr);
-			if(has_normal)
-			{
-				math::vec4 norm(normal_vec, 0.0f);
-				gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format,
-								 current_vertex_ptr);
-			}
-			if(has_texcoord)
-				gfx::vertex_pack(&current_tex[0], true, gfx::attribute::TexCoord0, format,
-								 current_vertex_ptr);
-
-			// Set flags for this vertex (we want to generate tangents
-			// and binormals if we need them).
-			*current_flags_ptr++ = preparation_data::source_contains_normal;
-
-			// Grow the object space bounding box for this mesh
-			// by including the computed position.
-			bbox_.add_point(current_pos);
-
-			// Move on to next vertex
-			current_vertex_ptr += vertex_stride;
-			vertices_added++;
-
-		} // Next Slice
-
-	} // Next Stack
-
-	// Now the bottom hemisphere
-	for(std::uint32_t stack = sphere_stacks / 2; stack <= sphere_stacks; ++stack)
-	{
-		// Generate a ring of vertices which describe the top edges of that stack's
-		// geometry
-		// The last vertex is a duplicate of the first to ensure we have correct
-		// texturing
-		for(std::uint32_t slice = 0; slice <= slices; ++slice)
-		{
-			// Precompute any reusable values
-			float a = (math::pi<float>() / static_cast<float>(sphere_stacks)) * static_cast<float>(stack);
-			float b = (math::two_pi<float>() / static_cast<float>(slices)) * static_cast<float>(slice);
-			float xz = math::sin(a);
-
-			// Compute the normal & position of the vertex
-			normal_vec.x = xz * math::sin(b);
-			normal_vec.y = math::cos((bNegateY) ? math::pi<float>() - a : a);
-			normal_vec.z = xz * math::cos(b);
-			current_pos = normal_vec * radius;
-
-			// Offset so that it sits at the bottom of the central cylinder
-			current_pos.y -= fCylinderHeight * 0.5f;
-
-			// Compute the texture coordinate.
-			current_tex.x = (1.0f / static_cast<float>(slices)) * static_cast<float>(slice);
-			current_tex.y = (current_pos.y + (height * 0.5f)) / height;
-
-			// Invert normal if required
-			if(inverted)
-				normal_vec = -normal_vec;
-
-			// Position in center or at base/tip?
-			if(origin == mesh_create_origin::bottom)
-				current_pos.y += height * 0.5f;
-			else if(origin == mesh_create_origin::top)
-				current_pos.y -= height * 0.5f;
-
-			// Store vertex components
-			if(has_position)
-				gfx::vertex_pack(&current_pos[0], false, gfx::attribute::Position, format,
-								 current_vertex_ptr);
-			if(has_normal)
-			{
-				math::vec4 norm(normal_vec, 0.0f);
-				gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format,
-								 current_vertex_ptr);
-			}
-			if(has_texcoord)
-				gfx::vertex_pack(&current_tex[0], true, gfx::attribute::TexCoord0, format,
-								 current_vertex_ptr);
-
-			// Set flags for this vertex (we want to generate tangents
-			// and binormals if we need them).
-			*current_flags_ptr++ = preparation_data::source_contains_normal;
-
-			// Grow the object space bounding box for this mesh
-			// by including the computed position.
-			bbox_.add_point(current_pos);
-
-			// Move on to next vertex
-			current_vertex_ptr += vertex_stride;
-			vertices_added++;
-
-		} // Next Slice
-
-	} // Next Stack
-
-	// Now generate indices for the top hemisphere first.
-	std::int32_t triangles_added = 0;
-	triangle* current_triangle_ptr = &preparation_data_.triangle_data[0];
-	for(std::uint32_t stack = 0; stack < sphere_stacks / 2; ++stack)
-	{
-		// Generate two triangles for the quad on each slice
-		for(std::uint32_t slice = 0; slice < slices; ++slice)
-		{
-			// If height was negative (i.e. faces are inverted)
-			// we need to flip the order of the indices
-			if(((!inverted) && height < 0) || (inverted && height > 0))
-			{
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = (stack * (slices + 1)) + slice + 1;
-				current_triangle_ptr->indices[1] = ((stack + 1) * (slices + 1)) + slice;
-				current_triangle_ptr->indices[2] = (stack * (slices + 1)) + slice;
-				current_triangle_ptr++;
-
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = (stack * (slices + 1)) + slice + 1;
-				current_triangle_ptr->indices[1] = ((stack + 1) * (slices + 1)) + slice + 1;
-				current_triangle_ptr->indices[2] = ((stack + 1) * (slices + 1)) + slice;
-				current_triangle_ptr++;
-
-				triangles_added += 2;
-
-			} // End if inverted
-			else
-			{
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = (stack * (slices + 1)) + slice;
-				current_triangle_ptr->indices[1] = ((stack + 1) * (slices + 1)) + slice;
-				current_triangle_ptr->indices[2] = (stack * (slices + 1)) + slice + 1;
-				current_triangle_ptr++;
-
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = ((stack + 1) * (slices + 1)) + slice;
-				current_triangle_ptr->indices[1] = ((stack + 1) * (slices + 1)) + slice + 1;
-				current_triangle_ptr->indices[2] = (stack * (slices + 1)) + slice + 1;
-				current_triangle_ptr++;
-
-				triangles_added += 2;
-
-			} // End if !inverted
-
-		} // Next Slice
-
-	} // Next Stack
-
-	// Cylinder stacks.
-	for(std::uint32_t stack = 0; stack < stacks; ++stack)
-	{
-		// Generate two triangles for the quad on each slice
-		for(std::uint32_t slice = 0; slice < slices; ++slice)
-		{
-			// If height was negative (i.e. faces are inverted)
-			// we need to flip the order of the indices
-			if(((!inverted) && height < 0) || (inverted && height > 0))
-			{
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = cylinder_start + ((stack * (slices + 1)) + slice + 1);
-				current_triangle_ptr->indices[1] = cylinder_start + (((stack + 1) * (slices + 1)) + slice);
-				current_triangle_ptr->indices[2] = cylinder_start + ((stack * (slices + 1)) + slice);
-				current_triangle_ptr++;
-
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = cylinder_start + ((stack * (slices + 1)) + slice + 1);
-				current_triangle_ptr->indices[1] =
-					cylinder_start + (((stack + 1) * (slices + 1)) + slice + 1);
-				current_triangle_ptr->indices[2] = cylinder_start + (((stack + 1) * (slices + 1)) + slice);
-				current_triangle_ptr++;
-
-				triangles_added += 2;
-
-			} // End if inverted
-			else
-			{
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = cylinder_start + ((stack * (slices + 1)) + slice);
-				current_triangle_ptr->indices[1] = cylinder_start + (((stack + 1) * (slices + 1)) + slice);
-				current_triangle_ptr->indices[2] = cylinder_start + ((stack * (slices + 1)) + slice + 1);
-				current_triangle_ptr++;
-
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = cylinder_start + (((stack + 1) * (slices + 1)) + slice);
-				current_triangle_ptr->indices[1] =
-					cylinder_start + (((stack + 1) * (slices + 1)) + slice + 1);
-				current_triangle_ptr->indices[2] = cylinder_start + ((stack * (slices + 1)) + slice + 1);
-				current_triangle_ptr++;
-
-				triangles_added += 2;
-
-			} // End if not inverted
-
-		} // Next Slice
-
-	} // Next Stack
-
-	// Finally, the indices for the bottom hemisphere.
-	for(std::uint32_t stack = sphere_stacks / 2; stack < sphere_stacks; ++stack)
-	{
-		// Generate two triangles for the quad on each slice
-		for(std::uint32_t slice = 0; slice < slices; ++slice)
-		{
-			// If height was negative (i.e. faces are inverted)
-			// we need to flip the order of the indices
-			if(((!inverted) && height < 0) || (inverted && height > 0))
-			{
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] =
-					cylinder_verts + (((stack + 1) * (slices + 1)) + slice + 1);
-				current_triangle_ptr->indices[1] = cylinder_verts + (((stack + 2) * (slices + 1)) + slice);
-				current_triangle_ptr->indices[2] = cylinder_verts + (((stack + 1) * (slices + 1)) + slice);
-				current_triangle_ptr++;
-
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] =
-					cylinder_verts + (((stack + 1) * (slices + 1)) + slice + 1);
-				current_triangle_ptr->indices[1] =
-					cylinder_verts + (((stack + 2) * (slices + 1)) + slice + 1);
-				current_triangle_ptr->indices[2] = cylinder_verts + (((stack + 2) * (slices + 1)) + slice);
-				current_triangle_ptr++;
-
-				triangles_added += 2;
-
-			} // End if inverted
-			else
-			{
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = cylinder_verts + (((stack + 1) * (slices + 1)) + slice);
-				current_triangle_ptr->indices[1] = cylinder_verts + (((stack + 2) * (slices + 1)) + slice);
-				current_triangle_ptr->indices[2] =
-					cylinder_verts + (((stack + 1) * (slices + 1)) + slice + 1);
-				current_triangle_ptr++;
-
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = cylinder_verts + (((stack + 2) * (slices + 1)) + slice);
-				current_triangle_ptr->indices[1] =
-					cylinder_verts + (((stack + 2) * (slices + 1)) + slice + 1);
-				current_triangle_ptr->indices[2] =
-					cylinder_verts + (((stack + 1) * (slices + 1)) + slice + 1);
-				current_triangle_ptr++;
-
-				triangles_added += 2;
-
-			} // End if !inverted
-
-		} // Next Slice
-
-	} // Next Stack
-
-	// We need to generate binormals / tangents?
-	preparation_data_.compute_binormals = vertex_format_.has(gfx::attribute::Bitangent);
-	preparation_data_.compute_tangents = vertex_format_.has(gfx::attribute::Tangent);
-
+	using namespace generator;
+	capsule_mesh_t capsule(radius, height * 0.5, slices, stacks);
+	math::quat rot(math::vec3(math::radians(-90.0f), 0.f, 0.0f));
+	auto mesh = rotate_mesh(capsule, rot);
+
+	create_mesh(vertex_format_, mesh, preparation_data_, bbox_);
 	// Finish up
 	return end_prepare(hardware_copy, false, false);
 }
 
 bool mesh::create_sphere(const gfx::vertex_layout& format, float radius, std::uint32_t stacks,
-						 std::uint32_t slices, bool inverted, mesh_create_origin origin,
-						 bool hardware_copy /* = true */)
+						 std::uint32_t slices, mesh_create_origin origin, bool hardware_copy /* = true */)
 {
-	math::vec3 vec_position, vec_normal;
-
 	// Clear out old data.
 	dispose();
-
-	// Inverting?
-	if(inverted)
-		radius = -radius;
 
 	// We are in the process of preparing.
 	prepare_status_ = mesh_status::preparing;
 	vertex_format_ = format;
 
-	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = vertex_format_.has(gfx::attribute::Position);
-	bool has_texcoord = vertex_format_.has(gfx::attribute::TexCoord0);
-	bool has_normal = vertex_format_.has(gfx::attribute::Normal);
-	std::uint16_t vertex_stride = vertex_format_.getStride();
+	using namespace generator;
+	sphere_mesh_t sphere(radius, slices, stacks);
+	math::quat rot(math::vec3(math::radians(-90.0f), 0.f, 0.0f));
+	auto mesh = rotate_mesh(sphere, rot);
 
-	// Compute the number of faces and vertices that will be required for this
-	// sphere
-	preparation_data_.triangle_count = (slices * stacks) * 2;
-	preparation_data_.vertex_count = (slices + 1) * (stacks + 1);
-
-	// Allocate enough space for the new vertex and triangle data
-	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
-	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
-	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
-
-	// For each stack
-	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
-	std::uint8_t* current_flags_ptr = &preparation_data_.vertex_flags[0];
-	for(std::uint32_t stack = 0; stack <= stacks; ++stack)
-	{
-		// Generate a ring of vertices which describe the top edges of that stack's
-		// geometry
-		// The last vertex is a duplicate of the first to ensure we have correct
-		// texturing
-		for(std::uint32_t slice = 0; slice <= slices; ++slice)
-		{
-			// Precompute any reusable values
-			float a = (math::pi<float>() / static_cast<float>(stacks)) * static_cast<float>(stack);
-			float b = (math::two_pi<float>() / static_cast<float>(slices)) * static_cast<float>(slice);
-			float xz = math::sin(a);
-
-			// Compute the normal & position of the vertex
-			vec_normal.x = xz * math::sin(b);
-			vec_normal.y = math::cos(a);
-			vec_normal.z = xz * math::cos(b);
-			vec_position = vec_normal * radius;
-
-			// Position in center or at base/tip?
-			if(origin == mesh_create_origin::bottom)
-				vec_position.y += math::abs(radius);
-			else if(origin == mesh_create_origin::top)
-				vec_position.y -= math::abs(radius);
-
-			// Store vertex components
-			if(has_position)
-				gfx::vertex_pack(&vec_position[0], false, gfx::attribute::Position, format,
-								 current_vertex_ptr);
-			if(has_normal)
-			{
-				math::vec4 norm(vec_normal, 0.0f);
-				gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format,
-								 current_vertex_ptr);
-			}
-			if(has_texcoord)
-				gfx::vertex_pack(&math::vec2((1 / static_cast<float>(slices)) * static_cast<float>(slice),
-											 (1 / static_cast<float>(stacks)) * static_cast<float>(stack))[0],
-								 true, gfx::attribute::TexCoord0, format, current_vertex_ptr);
-
-			// Set flags for this vertex (we want to generate tangents
-			// and binormals if we need them).
-			*current_flags_ptr++ = preparation_data::source_contains_normal;
-
-			// Grow the object space bounding box for this mesh
-			// by including the computed position.
-			bbox_.add_point(vec_position);
-
-			// Move on to next vertex
-			current_vertex_ptr += vertex_stride;
-
-		} // Next Slice
-
-	} // Next Stack
-
-	// Now generate indices. Process each stack (except the top and bottom)
-	triangle* current_triangle_ptr = &preparation_data_.triangle_data[0];
-	for(std::uint32_t stack = 0; stack < stacks; ++stack)
-	{
-		// Generate two triangles for the quad on each slice
-		for(std::uint32_t slice = 0; slice < slices; ++slice)
-		{
-			current_triangle_ptr->data_group_id = 0;
-			current_triangle_ptr->indices[0] = (stack * (slices + 1)) + slice;
-			current_triangle_ptr->indices[1] = ((stack + 1) * (slices + 1)) + slice;
-			current_triangle_ptr->indices[2] = (stack * (slices + 1)) + slice + 1;
-			current_triangle_ptr++;
-
-			current_triangle_ptr->data_group_id = 0;
-			current_triangle_ptr->indices[0] = ((stack + 1) * (slices + 1)) + slice;
-			current_triangle_ptr->indices[1] = ((stack + 1) * (slices + 1)) + slice + 1;
-			current_triangle_ptr->indices[2] = (stack * (slices + 1)) + slice + 1;
-			current_triangle_ptr++;
-
-		} // Next Slice
-
-	} // Next Stack
-
-	// We need to generate binormals / tangents?
-	preparation_data_.compute_binormals = vertex_format_.has(gfx::attribute::Bitangent);
-	preparation_data_.compute_tangents = vertex_format_.has(gfx::attribute::Tangent);
-
+	create_mesh(vertex_format_, mesh, preparation_data_, bbox_);
 	// Finish up
 	return end_prepare(hardware_copy, false, false);
 }
 
 bool mesh::create_torus(const gfx::vertex_layout& format, float outer_radius, float inner_radius,
-						std::uint32_t bands, std::uint32_t sides, bool inverted, mesh_create_origin origin,
+						std::uint32_t bands, std::uint32_t sides, mesh_create_origin origin,
 						bool hardware_copy /* = true */)
 {
-	math::vec3 position, normal_vec, vCenter;
-	math::vec2 texcoord;
-
 	// Clear out old data.
 	dispose();
 
@@ -1784,140 +1041,12 @@ bool mesh::create_torus(const gfx::vertex_layout& format, float outer_radius, fl
 	prepare_status_ = mesh_status::preparing;
 	vertex_format_ = format;
 
-	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = vertex_format_.has(gfx::attribute::Position);
-	bool has_texcoord = vertex_format_.has(gfx::attribute::TexCoord0);
-	bool has_normal = vertex_format_.has(gfx::attribute::Normal);
-	std::uint16_t vertex_stride = vertex_format_.getStride();
+	using namespace generator;
+	torus_mesh_t torus(inner_radius, outer_radius, sides, bands);
+	math::quat rot(math::vec3(math::radians(-90.0f), 0.f, 0.0f));
+	auto mesh = rotate_mesh(torus, rot);
 
-	// Compute the number of faces and vertices that will be required for this
-	// torus
-	preparation_data_.triangle_count = (bands * sides) * 2;
-	preparation_data_.vertex_count = (bands + 1) * (sides + 1);
-
-	// Allocate enough space for the new vertex and triangle data
-	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
-	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
-	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
-
-	// The radius of a circle running through the core of the torus interior
-	float fCoreRadius = (inner_radius + outer_radius) / 2.0f;
-	float fBandRadius = (outer_radius - inner_radius) / 2.0f;
-
-	// Generate vertex data. For each band (around the outside)
-	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
-	std::uint8_t* current_flags_ptr = &preparation_data_.vertex_flags[0];
-	for(std::uint32_t nBand = 0; nBand <= bands; ++nBand)
-	{
-		// Precompute any re-usable values
-		float a = (math::two_pi<float>() / static_cast<float>(bands)) * nBand;
-		float sinBand = math::sin(a);
-		float cosBand = math::cos(a);
-
-		// Compute the center point for this band (imagine drawing a circle through
-		// the torus interior.)
-		vCenter = math::vec3(sinBand * fCoreRadius, 0, cosBand * fCoreRadius);
-
-		// Position in center or at base/tip?
-		if(origin == mesh_create_origin::bottom)
-			vCenter.y += math::abs(fBandRadius);
-		else if(origin == mesh_create_origin::top)
-			vCenter.y -= math::abs(fBandRadius);
-
-		// Generate a ring of vertices that wrap around this core point.
-		// The last vertex is a duplicate of the first to ensure we have correct
-		// texturing
-		for(std::uint32_t nSide = 0; nSide <= sides; ++nSide)
-		{
-			// Precompute any re-usable values
-			float b = (math::two_pi<float>() / static_cast<float>(sides)) * nSide;
-			float c = math::sin(b) * fBandRadius;
-
-			// Compute the vertex components
-			position.x = vCenter.x + (c * sinBand);
-			position.y = vCenter.y + (math::cos(b) * fBandRadius);
-			position.z = vCenter.z + (c * cosBand);
-			normal_vec = math::normalize(position - vCenter);
-			texcoord = math::vec2((1.0f / static_cast<float>(bands)) * static_cast<float>(nBand),
-								  (1.0f / static_cast<float>(sides)) * static_cast<float>(nSide));
-
-			// Inverting?
-			if(inverted)
-				normal_vec = -normal_vec;
-
-			// Store!
-			if(has_position)
-				gfx::vertex_pack(&position[0], false, gfx::attribute::Position, format, current_vertex_ptr);
-			if(has_normal)
-			{
-				math::vec4 norm(normal_vec, 0.0f);
-				gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format,
-								 current_vertex_ptr);
-			}
-			if(has_texcoord)
-				gfx::vertex_pack(&texcoord[0], true, gfx::attribute::TexCoord0, format, current_vertex_ptr);
-
-			// Set flags for this vertex (we want to generate tangents
-			// and binormals if we need them).
-			*current_flags_ptr++ = preparation_data::source_contains_normal;
-
-			// Grow the object space bounding box for this mesh
-			// by including the computed position.
-			bbox_.add_point(position);
-
-			// Move on to next vertex
-			current_vertex_ptr += vertex_stride;
-
-		} // Next Slice
-
-	} // Next Stack
-
-	// Now generate indices. For each band.
-	triangle* current_triangle_ptr = &preparation_data_.triangle_data[0];
-	for(std::uint32_t nBand = 0; nBand < bands; ++nBand)
-	{
-		// Generate two triangles for the quad on each side
-		for(std::uint32_t nSide = 0; nSide < sides; ++nSide)
-		{
-			if(!inverted)
-			{
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = (nBand * (sides + 1)) + nSide + 1;
-				current_triangle_ptr->indices[1] = ((nBand + 1) * (sides + 1)) + nSide;
-				current_triangle_ptr->indices[2] = (nBand * (sides + 1)) + nSide;
-				current_triangle_ptr++;
-
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = (nBand * (sides + 1)) + nSide + 1;
-				current_triangle_ptr->indices[1] = ((nBand + 1) * (sides + 1)) + nSide + 1;
-				current_triangle_ptr->indices[2] = ((nBand + 1) * (sides + 1)) + nSide;
-				current_triangle_ptr++;
-
-			} // End if !inverted
-			else
-			{
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = (nBand * (sides + 1)) + nSide;
-				current_triangle_ptr->indices[1] = ((nBand + 1) * (sides + 1)) + nSide;
-				current_triangle_ptr->indices[2] = (nBand * (sides + 1)) + nSide + 1;
-				current_triangle_ptr++;
-
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = ((nBand + 1) * (sides + 1)) + nSide;
-				current_triangle_ptr->indices[1] = ((nBand + 1) * (sides + 1)) + nSide + 1;
-				current_triangle_ptr->indices[2] = (nBand * (sides + 1)) + nSide + 1;
-				current_triangle_ptr++;
-
-			} // End if inverted
-
-		} // Next Side
-
-	} // Next Band
-
-	// We need to generate binormals / tangents?
-	preparation_data_.compute_binormals = vertex_format_.has(gfx::attribute::Bitangent);
-	preparation_data_.compute_tangents = vertex_format_.has(gfx::attribute::Tangent);
-
+	create_mesh(vertex_format_, mesh, preparation_data_, bbox_);
 	// Finish up
 	return end_prepare(hardware_copy, false, false);
 }
@@ -1931,221 +1060,12 @@ bool mesh::create_teapot(const gfx::vertex_layout& format, bool hardware_copy /*
 	prepare_status_ = mesh_status::preparing;
 	vertex_format_ = format;
 
-	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = vertex_format_.has(gfx::attribute::Position);
-	bool has_texcoord0 = vertex_format_.has(gfx::attribute::TexCoord0);
-	bool has_texcoord1 = vertex_format_.has(gfx::attribute::TexCoord1);
-	bool has_normals = vertex_format_.has(gfx::attribute::Normal);
-	bool has_tangents = vertex_format_.has(gfx::attribute::Tangent);
-	bool has_bitangents = vertex_format_.has(gfx::attribute::Bitangent);
-	std::uint16_t vertex_stride = vertex_format_.getStride();
+	using namespace generator;
+	teapot_mesh_t teapot;
+	math::quat rot(math::vec3(math::radians(-90.0f), 0.f, 0.0f));
+	auto mesh = rotate_mesh(teapot, rot);
 
-	RMC_DEFINE_DATA
-	triangle_mesh_tools::create_teapot(vertices, indices);
-	RMC_RESIZE_NTTT
-
-	triangle_mesh_tools::generate_normals(normals, vertices, indices, false);
-	triangle_mesh_tools::fill_dummy_ttt(vertices, normals, tangents, texcoords0, texcoords1);
-	triangle_mesh_tools::generate_tangents(tangents, bitangents, vertices, normals, texcoords0, indices);
-	// Compute the number of faces and vertices that will be required for this box
-	preparation_data_.triangle_count = std::uint32_t(indices.size()) / 3;
-	preparation_data_.vertex_count = std::uint32_t(vertices.size());
-
-	// Allocate enough space for the new vertex and triangle data
-	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
-	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
-	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
-
-	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
-	for(std::size_t i = 0; i < vertices.size(); ++i)
-	{
-		// Store vertex components
-		if(has_position)
-			gfx::vertex_pack(&vertices[i][0], false, gfx::attribute::Position, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_normals)
-			gfx::vertex_pack(&normals[i][0], true, gfx::attribute::Normal, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_texcoord0)
-			gfx::vertex_pack(&texcoords0[i][0], true, gfx::attribute::TexCoord0, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_texcoord1)
-			gfx::vertex_pack(&texcoords1[i][0], true, gfx::attribute::TexCoord1, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_tangents)
-			gfx::vertex_pack(&tangents[i][0], true, gfx::attribute::Tangent, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_bitangents)
-			gfx::vertex_pack(&bitangents[i][0], true, gfx::attribute::Bitangent, format, current_vertex_ptr,
-							 std::uint32_t(i));
-
-		bbox_.add_point(vertices[i]);
-	}
-
-	for(std::size_t i = 0; i < indices.size(); i += 3)
-	{
-		triangle& tri = preparation_data_.triangle_data[i / 3];
-		tri.indices[0] = indices[i + 0];
-		tri.indices[1] = indices[i + 1];
-		tri.indices[2] = indices[i + 2];
-	}
-
-	// We need to generate binormals / tangents?
-	// 	_preparation_data.compute_binormals = has_bitangents;
-	// 	_preparation_data.compute_tangents = has_tangents;
-	// 	_preparation_data.compute_tangents = has_normals;
-	// Finish up
-	return end_prepare(hardware_copy, false, false);
-}
-
-bool mesh::create_tetrahedron(const gfx::vertex_layout& format, bool hardware_copy /*= true*/)
-{
-	// Clear out old data.
-	dispose();
-
-	// We are in the process of preparing.
-	prepare_status_ = mesh_status::preparing;
-	vertex_format_ = format;
-
-	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = vertex_format_.has(gfx::attribute::Position);
-	bool has_texcoord0 = vertex_format_.has(gfx::attribute::TexCoord0);
-	bool has_texcoord1 = vertex_format_.has(gfx::attribute::TexCoord1);
-	bool has_normals = vertex_format_.has(gfx::attribute::Normal);
-	bool has_tangents = vertex_format_.has(gfx::attribute::Tangent);
-	bool has_bitangents = vertex_format_.has(gfx::attribute::Bitangent);
-	std::uint16_t vertex_stride = vertex_format_.getStride();
-
-	RMC_DEFINE_DATA
-	triangle_mesh_tools::create_tetrahedron(vertices, indices, false);
-	RMC_RESIZE_NTTT
-
-	triangle_mesh_tools::generate_normals(normals, vertices, indices, false);
-	triangle_mesh_tools::fill_dummy_ttt(vertices, normals, tangents, texcoords0, texcoords1);
-	triangle_mesh_tools::generate_tangents(tangents, bitangents, vertices, normals, texcoords0, indices);
-	// Compute the number of faces and vertices that will be required for this box
-	preparation_data_.triangle_count = std::uint32_t(indices.size()) / 3;
-	preparation_data_.vertex_count = std::uint32_t(vertices.size());
-
-	// Allocate enough space for the new vertex and triangle data
-	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
-	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
-	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
-
-	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
-	for(std::size_t i = 0; i < vertices.size(); ++i)
-	{
-		// Store vertex components
-		if(has_position)
-			gfx::vertex_pack(&vertices[i][0], false, gfx::attribute::Position, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_normals)
-			gfx::vertex_pack(&normals[i][0], true, gfx::attribute::Normal, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_texcoord0)
-			gfx::vertex_pack(&texcoords0[i][0], true, gfx::attribute::TexCoord0, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_texcoord1)
-			gfx::vertex_pack(&texcoords1[i][0], true, gfx::attribute::TexCoord1, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_tangents)
-			gfx::vertex_pack(&tangents[i][0], true, gfx::attribute::Tangent, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_bitangents)
-			gfx::vertex_pack(&bitangents[i][0], true, gfx::attribute::Bitangent, format, current_vertex_ptr,
-							 std::uint32_t(i));
-
-		bbox_.add_point(vertices[i]);
-	}
-
-	for(std::size_t i = 0; i < indices.size(); i += 3)
-	{
-		triangle& tri = preparation_data_.triangle_data[i / 3];
-		tri.indices[0] = indices[i + 0];
-		tri.indices[1] = indices[i + 1];
-		tri.indices[2] = indices[i + 2];
-	}
-
-	// We need to generate binormals / tangents?
-	// 	_preparation_data.compute_binormals = has_bitangents;
-	// 	_preparation_data.compute_tangents = has_tangents;
-	// 	_preparation_data.compute_tangents = has_normals;
-	// Finish up
-	return end_prepare(hardware_copy, false, false);
-}
-
-bool mesh::create_octahedron(const gfx::vertex_layout& format, bool hardware_copy /*= true*/)
-{
-	// Clear out old data.
-	dispose();
-
-	// We are in the process of preparing.
-	prepare_status_ = mesh_status::preparing;
-	vertex_format_ = format;
-
-	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = vertex_format_.has(gfx::attribute::Position);
-	bool has_texcoord0 = vertex_format_.has(gfx::attribute::TexCoord0);
-	bool has_texcoord1 = vertex_format_.has(gfx::attribute::TexCoord1);
-	bool has_normals = vertex_format_.has(gfx::attribute::Normal);
-	bool has_tangents = vertex_format_.has(gfx::attribute::Tangent);
-	bool has_bitangents = vertex_format_.has(gfx::attribute::Bitangent);
-	std::uint16_t vertex_stride = vertex_format_.getStride();
-
-	RMC_DEFINE_DATA
-	triangle_mesh_tools::create_octahedron(vertices, indices, false);
-	RMC_RESIZE_NTTT
-
-	triangle_mesh_tools::generate_normals(normals, vertices, indices, false);
-	triangle_mesh_tools::fill_dummy_ttt(vertices, normals, tangents, texcoords0, texcoords1);
-	triangle_mesh_tools::generate_tangents(tangents, bitangents, vertices, normals, texcoords0, indices);
-	// Compute the number of faces and vertices that will be required for this box
-	preparation_data_.triangle_count = std::uint32_t(indices.size()) / 3;
-	preparation_data_.vertex_count = std::uint32_t(vertices.size());
-
-	// Allocate enough space for the new vertex and triangle data
-	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
-	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
-	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
-
-	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
-	for(std::size_t i = 0; i < vertices.size(); ++i)
-	{
-		// Store vertex components
-		if(has_position)
-			gfx::vertex_pack(&vertices[i][0], false, gfx::attribute::Position, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_normals)
-			gfx::vertex_pack(&normals[i][0], true, gfx::attribute::Normal, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_texcoord0)
-			gfx::vertex_pack(&texcoords0[i][0], true, gfx::attribute::TexCoord0, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_texcoord1)
-			gfx::vertex_pack(&texcoords1[i][0], true, gfx::attribute::TexCoord1, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_tangents)
-			gfx::vertex_pack(&tangents[i][0], true, gfx::attribute::Tangent, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_bitangents)
-			gfx::vertex_pack(&bitangents[i][0], true, gfx::attribute::Bitangent, format, current_vertex_ptr,
-							 std::uint32_t(i));
-
-		bbox_.add_point(vertices[i]);
-	}
-
-	for(std::size_t i = 0; i < indices.size(); i += 3)
-	{
-		triangle& tri = preparation_data_.triangle_data[i / 3];
-		tri.indices[0] = indices[i + 0];
-		tri.indices[1] = indices[i + 1];
-		tri.indices[2] = indices[i + 2];
-	}
-
-	// We need to generate binormals / tangents?
-	// 	_preparation_data.compute_binormals = has_bitangents;
-	// 	_preparation_data.compute_tangents = has_tangents;
-	// 	_preparation_data.compute_tangents = has_normals;
+	create_mesh(vertex_format_, mesh, preparation_data_, bbox_);
 	// Finish up
 	return end_prepare(hardware_copy, false, false);
 }
@@ -2159,69 +1079,12 @@ bool mesh::create_icosahedron(const gfx::vertex_layout& format, bool hardware_co
 	prepare_status_ = mesh_status::preparing;
 	vertex_format_ = format;
 
-	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = vertex_format_.has(gfx::attribute::Position);
-	bool has_texcoord0 = vertex_format_.has(gfx::attribute::TexCoord0);
-	bool has_texcoord1 = vertex_format_.has(gfx::attribute::TexCoord1);
-	bool has_normals = vertex_format_.has(gfx::attribute::Normal);
-	bool has_tangents = vertex_format_.has(gfx::attribute::Tangent);
-	bool has_bitangents = vertex_format_.has(gfx::attribute::Bitangent);
-	std::uint16_t vertex_stride = vertex_format_.getStride();
+	using namespace generator;
+	icosahedron_mesh_t icosahedron;
+	math::quat rot(math::vec3(math::radians(-90.0f), 0.f, 0.0f));
+	auto mesh = rotate_mesh(icosahedron, rot);
 
-	RMC_DEFINE_DATA
-	triangle_mesh_tools::create_icosahedron(vertices, indices, false);
-	RMC_RESIZE_NTTT
-
-	triangle_mesh_tools::generate_normals(normals, vertices, indices, false);
-	triangle_mesh_tools::fill_dummy_ttt(vertices, normals, tangents, texcoords0, texcoords1);
-	triangle_mesh_tools::generate_tangents(tangents, bitangents, vertices, normals, texcoords0, indices);
-	// Compute the number of faces and vertices that will be required for this box
-	preparation_data_.triangle_count = std::uint32_t(indices.size()) / 3;
-	preparation_data_.vertex_count = std::uint32_t(vertices.size());
-
-	// Allocate enough space for the new vertex and triangle data
-	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
-	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
-	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
-
-	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
-	for(std::size_t i = 0; i < vertices.size(); ++i)
-	{
-		// Store vertex components
-		if(has_position)
-			gfx::vertex_pack(&vertices[i][0], false, gfx::attribute::Position, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_normals)
-			gfx::vertex_pack(&normals[i][0], true, gfx::attribute::Normal, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_texcoord0)
-			gfx::vertex_pack(&texcoords0[i][0], true, gfx::attribute::TexCoord0, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_texcoord1)
-			gfx::vertex_pack(&texcoords1[i][0], true, gfx::attribute::TexCoord1, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_tangents)
-			gfx::vertex_pack(&tangents[i][0], true, gfx::attribute::Tangent, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_bitangents)
-			gfx::vertex_pack(&bitangents[i][0], true, gfx::attribute::Bitangent, format, current_vertex_ptr,
-							 std::uint32_t(i));
-
-		bbox_.add_point(vertices[i]);
-	}
-
-	for(std::size_t i = 0; i < indices.size(); i += 3)
-	{
-		triangle& tri = preparation_data_.triangle_data[i / 3];
-		tri.indices[0] = indices[i + 0];
-		tri.indices[1] = indices[i + 1];
-		tri.indices[2] = indices[i + 2];
-	}
-
-	// We need to generate binormals / tangents?
-	// 	_preparation_data.compute_binormals = has_bitangents;
-	// 	_preparation_data.compute_tangents = has_tangents;
-	// 	_preparation_data.compute_tangents = has_normals;
+	create_mesh(vertex_format_, mesh, preparation_data_, bbox_);
 	// Finish up
 	return end_prepare(hardware_copy, false, false);
 }
@@ -2235,69 +1098,12 @@ bool mesh::create_dodecahedron(const gfx::vertex_layout& format, bool hardware_c
 	prepare_status_ = mesh_status::preparing;
 	vertex_format_ = format;
 
-	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = vertex_format_.has(gfx::attribute::Position);
-	bool has_texcoord0 = vertex_format_.has(gfx::attribute::TexCoord0);
-	bool has_texcoord1 = vertex_format_.has(gfx::attribute::TexCoord1);
-	bool has_normals = vertex_format_.has(gfx::attribute::Normal);
-	bool has_tangents = vertex_format_.has(gfx::attribute::Tangent);
-	bool has_bitangents = vertex_format_.has(gfx::attribute::Bitangent);
-	std::uint16_t vertex_stride = vertex_format_.getStride();
+	using namespace generator;
+	dodecahedron_mesh_t dodecahedron;
+	math::quat rot(math::vec3(math::radians(-90.0f), 0.f, 0.0f));
+	auto mesh = rotate_mesh(dodecahedron, rot);
 
-	RMC_DEFINE_DATA
-	triangle_mesh_tools::create_dodecahedron(vertices, indices, false);
-	RMC_RESIZE_NTTT
-
-	triangle_mesh_tools::generate_normals(normals, vertices, indices, false);
-	triangle_mesh_tools::fill_dummy_ttt(vertices, normals, tangents, texcoords0, texcoords1);
-	triangle_mesh_tools::generate_tangents(tangents, bitangents, vertices, normals, texcoords0, indices);
-	// Compute the number of faces and vertices that will be required for this box
-	preparation_data_.triangle_count = std::uint32_t(indices.size()) / 3;
-	preparation_data_.vertex_count = std::uint32_t(vertices.size());
-
-	// Allocate enough space for the new vertex and triangle data
-	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
-	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
-	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
-
-	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
-	for(std::size_t i = 0; i < vertices.size(); ++i)
-	{
-		// Store vertex components
-		if(has_position)
-			gfx::vertex_pack(&vertices[i][0], false, gfx::attribute::Position, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_normals)
-			gfx::vertex_pack(&normals[i][0], true, gfx::attribute::Normal, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_texcoord0)
-			gfx::vertex_pack(&texcoords0[i][0], true, gfx::attribute::TexCoord0, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_texcoord1)
-			gfx::vertex_pack(&texcoords1[i][0], true, gfx::attribute::TexCoord1, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_tangents)
-			gfx::vertex_pack(&tangents[i][0], true, gfx::attribute::Tangent, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_bitangents)
-			gfx::vertex_pack(&bitangents[i][0], true, gfx::attribute::Bitangent, format, current_vertex_ptr,
-							 std::uint32_t(i));
-
-		bbox_.add_point(vertices[i]);
-	}
-
-	for(std::size_t i = 0; i < indices.size(); i += 3)
-	{
-		triangle& tri = preparation_data_.triangle_data[i / 3];
-		tri.indices[0] = indices[i + 0];
-		tri.indices[1] = indices[i + 1];
-		tri.indices[2] = indices[i + 2];
-	}
-
-	// We need to generate binormals / tangents?
-	// 	_preparation_data.compute_binormals = has_bitangents;
-	// 	_preparation_data.compute_tangents = has_tangents;
-	// 	_preparation_data.compute_tangents = has_normals;
+	create_mesh(vertex_format_, mesh, preparation_data_, bbox_);
 	// Finish up
 	return end_prepare(hardware_copy, false, false);
 }
@@ -2312,80 +1118,20 @@ bool mesh::create_icosphere(const gfx::vertex_layout& format, int tesselation_le
 	prepare_status_ = mesh_status::preparing;
 	vertex_format_ = format;
 
-	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = vertex_format_.has(gfx::attribute::Position);
-	bool has_texcoord0 = vertex_format_.has(gfx::attribute::TexCoord0);
-	bool has_texcoord1 = vertex_format_.has(gfx::attribute::TexCoord1);
-	bool has_normals = vertex_format_.has(gfx::attribute::Normal);
-	bool has_tangents = vertex_format_.has(gfx::attribute::Tangent);
-	bool has_bitangents = vertex_format_.has(gfx::attribute::Bitangent);
-	std::uint16_t vertex_stride = vertex_format_.getStride();
+	using namespace generator;
+	ico_sphere_mesh_t icosphere(1, tesselation_level + 1);
+	math::quat rot(math::vec3(math::radians(-90.0f), 0.f, 0.0f));
+	auto mesh = rotate_mesh(icosphere, rot);
 
-	RMC_DEFINE_DATA
-	triangle_mesh_tools::create_icosphere(vertices, indices, tesselation_level, false);
-	RMC_RESIZE_NTTT
-
-	triangle_mesh_tools::generate_normals(normals, vertices, indices, false);
-	triangle_mesh_tools::fill_dummy_ttt(vertices, normals, tangents, texcoords0, texcoords1);
-	triangle_mesh_tools::generate_tangents(tangents, bitangents, vertices, normals, texcoords0, indices);
-	// Compute the number of faces and vertices that will be required for this box
-	preparation_data_.triangle_count = std::uint32_t(indices.size()) / 3;
-	preparation_data_.vertex_count = std::uint32_t(vertices.size());
-
-	// Allocate enough space for the new vertex and triangle data
-	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
-	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
-	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
-
-	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
-	for(std::size_t i = 0; i < vertices.size(); ++i)
-	{
-		// Store vertex components
-		if(has_position)
-			gfx::vertex_pack(&vertices[i].x, false, gfx::attribute::Position, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_normals)
-			gfx::vertex_pack(&normals[i].x, true, gfx::attribute::Normal, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_texcoord0)
-			gfx::vertex_pack(&texcoords0[i].x, true, gfx::attribute::TexCoord0, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_texcoord1)
-			gfx::vertex_pack(&texcoords1[i].x, true, gfx::attribute::TexCoord1, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_tangents)
-			gfx::vertex_pack(&tangents[i].x, true, gfx::attribute::Tangent, format, current_vertex_ptr,
-							 std::uint32_t(i));
-		if(has_bitangents)
-			gfx::vertex_pack(&bitangents[i].x, true, gfx::attribute::Bitangent, format, current_vertex_ptr,
-							 std::uint32_t(i));
-
-		bbox_.add_point(vertices[i]);
-	}
-
-	for(std::size_t i = 0; i < indices.size(); i += 3)
-	{
-		triangle& tri = preparation_data_.triangle_data[i / 3];
-		tri.indices[0] = indices[i + 0];
-		tri.indices[1] = indices[i + 1];
-		tri.indices[2] = indices[i + 2];
-	}
-
-	// We need to generate binormals / tangents?
-	// 	_preparation_data.compute_binormals = has_bitangents;
-	// 	_preparation_data.compute_tangents = has_tangents;
-	// 	_preparation_data.compute_tangents = has_normals;
+	create_mesh(vertex_format_, mesh, preparation_data_, bbox_);
 	// Finish up
 	return end_prepare(hardware_copy, false, false);
 }
 
 bool mesh::create_cone(const gfx::vertex_layout& format, float radius, float radius_tip, float height,
-					   std::uint32_t stacks, std::uint32_t slices, bool inverted, mesh_create_origin origin,
+					   std::uint32_t stacks, std::uint32_t slices, mesh_create_origin origin,
 					   bool hardware_copy /* = true */)
 {
-	math::vec3 vec_position, vec_normal;
-	math::vec2 vec_tex_coords;
-
 	// Clear out old data.
 	dispose();
 
@@ -2393,320 +1139,42 @@ bool mesh::create_cone(const gfx::vertex_layout& format, float radius, float rad
 	prepare_status_ = mesh_status::preparing;
 	vertex_format_ = format;
 
-	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = vertex_format_.has(gfx::attribute::Position);
-	bool has_texcoord = vertex_format_.has(gfx::attribute::TexCoord0);
-	bool has_normal = vertex_format_.has(gfx::attribute::Normal);
-	std::uint16_t vertex_stride = vertex_format_.getStride();
+	using namespace generator;
+	capped_cone_mesh_t cone(radius, 1.0, stacks, slices);
+	math::quat rot(math::vec3(math::radians(-90.0f), 0.f, 0.0f));
+	auto mesh = rotate_mesh(cone, rot);
 
-	// Compute the number of faces and vertices that will be required for this
-	// cone
-	preparation_data_.triangle_count = (slices * stacks) * 2;
-	preparation_data_.vertex_count = (slices + 1) * (stacks + 1);
+	create_mesh(vertex_format_, mesh, preparation_data_, bbox_);
+	// Finish up
+	return end_prepare(hardware_copy, false, false);
+}
 
-	// Add vertices and faces for caps
-	if(radius_tip < 0.001f)
-		radius_tip = 0.0f;
-	std::uint32_t num_caps = (radius_tip > 0.0f) ? 2 : 1;
-	std::uint32_t caps_start = preparation_data_.vertex_count;
-	preparation_data_.vertex_count += slices * num_caps;
-	preparation_data_.triangle_count += (slices - 2) * num_caps;
+bool mesh::create_plane(const gfx::vertex_layout& format, float width, float height,
+						std::uint32_t width_segments, std::uint32_t height_segments,
+						mesh_create_origin origin, bool hardware_copy /* = true */)
+{
+	// Clear out old data.
+	dispose();
 
-	// Allocate enough space for the new vertex and triangle data
-	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
-	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
-	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
+	// We are in the process of preparing.
+	prepare_status_ = mesh_status::preparing;
+	vertex_format_ = format;
 
-	// Generate vertex data. For each stack
-	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
-	std::uint8_t* current_flags_ptr = &preparation_data_.vertex_flags[0];
-	for(std::uint32_t stack = 0; stack <= stacks; ++stack)
-	{
-		// Generate a ring of vertices which describe the top edges of that stack's
-		// geometry
-		// The last vertex is a duplicate of the first to ensure we have correct
-		// texturing
-		for(std::uint32_t slice = 0; slice <= slices; ++slice)
-		{
-			// Precompute any reusable values
-			float a = (math::two_pi<float>() / static_cast<float>(slices)) * static_cast<float>(slice);
-			float b =
-				radius + ((radius_tip - radius) * (static_cast<float>(stack) / static_cast<float>(stacks)));
+	using namespace generator;
+	plane_mesh_t plane({width * 0.5f, height * 0.5f}, {width_segments, height_segments});
+	math::quat rot(math::vec3(math::radians(-90.0f), 0.f, 0.0f));
+	auto mesh = rotate_mesh(plane, rot);
 
-			// Compute the vertex components
-			vec_position.x = math::sin(a);
-			vec_position.y = static_cast<float>(stack) * (height / static_cast<float>(stacks));
-			vec_position.z = math::cos(a);
-			vec_normal = math::vec3(vec_position.x, 0.0f, vec_position.z);
-			vec_position.x *= b;
-			vec_position.z *= b;
-
-			// Position in center or at base/tip?
-			if(origin == mesh_create_origin::center)
-				vec_position.y -= height * 0.5f;
-			else if(origin == mesh_create_origin::top)
-				vec_position.y -= height;
-
-			// Inverting the normal?
-			if(inverted)
-				vec_normal = -vec_normal;
-
-			// Store vertex components
-			if(has_position)
-			{
-				gfx::vertex_pack(&vec_position[0], false, gfx::attribute::Position, format,
-								 current_vertex_ptr);
-			}
-			if(has_normal)
-			{
-				math::vec4 norm(vec_normal, 0.0f);
-				gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format,
-								 current_vertex_ptr);
-			}
-			if(has_texcoord)
-			{
-				gfx::vertex_pack(&math::vec2((1 / static_cast<float>(slices)) * static_cast<float>(slice),
-											 (1 / static_cast<float>(stacks)) * static_cast<float>(stack))[0],
-								 true, gfx::attribute::TexCoord0, format, current_vertex_ptr);
-			}
-			// Set flags for this vertex (we want to generate tangents
-			// and binormals if we need them).
-			*current_flags_ptr++ = preparation_data::source_contains_normal;
-
-			// Grow the object space bounding box for this mesh
-			// by including the computed position.
-			bbox_.add_point(vec_position);
-
-			// Move on to next vertex
-			current_vertex_ptr += vertex_stride;
-
-		} // Next Slice
-
-	} // Next Stack
-
-	// Now cmpute the vertices for the base cylinder cap geometry.
-	for(std::uint32_t slice = 0; slice < slices; ++slice)
-	{
-		// Precompute any reusable values
-		float a = (math::two_pi<float>() / static_cast<float>(slices)) * static_cast<float>(slice);
-
-		// Compute the vertex components
-		vec_position = math::vec3(math::sin(a), 0, math::cos(a));
-		vec_normal = (height >= 0) ? math::vec3(0, -1, 0) : math::vec3(0, 1, 0);
-		vec_tex_coords = math::vec2((vec_position.x * 0.5f) + 0.5f, (vec_position.z * 0.5f) + 0.5f);
-		vec_position.x *= radius;
-		vec_position.z *= radius;
-
-		// Position in center or at base/tip?
-		if(origin == mesh_create_origin::center)
-			vec_position.y -= height * 0.5f;
-		else if(origin == mesh_create_origin::top)
-			vec_position.y -= height;
-
-		// Inverting the normal?
-		if(inverted)
-			vec_normal = -vec_normal;
-
-		// Store vertex components
-		if(has_position)
-			gfx::vertex_pack(&vec_position[0], false, gfx::attribute::Position, format, current_vertex_ptr);
-		if(has_normal)
-		{
-			math::vec4 norm(vec_normal, 0.0f);
-			gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format, current_vertex_ptr);
-		}
-		if(has_texcoord)
-			gfx::vertex_pack(&vec_tex_coords[0], true, gfx::attribute::TexCoord0, format, current_vertex_ptr);
-
-		// Set flags for this vertex (we want to generate tangents
-		// and binormals if we need them).
-		*current_flags_ptr++ = preparation_data::source_contains_normal;
-
-		// Grow the object space bounding box for this mesh
-		// by including the computed position.
-		bbox_.add_point(vec_position);
-
-		// Move on to next vertex
-		current_vertex_ptr += vertex_stride;
-
-	} // Next Slice
-
-	// And the vertices for the end cylinder cap geometry.
-	if(num_caps > 1)
-	{
-		for(std::uint32_t slice = 0; slice < slices; ++slice)
-		{
-			// Precompute any reusable values
-			float a = (math::two_pi<float>() / static_cast<float>(slices)) * static_cast<float>(slice);
-
-			// Compute the vertex components
-			vec_position = math::vec3(math::sin(a), height, math::cos(a));
-			vec_normal = (height >= 0) ? math::vec3(0, 1, 0) : math::vec3(0, -1, 0);
-			vec_tex_coords = math::vec2((vec_position.x * -0.5f) + 0.5f, (vec_position.z * -0.5f) + 0.5f);
-			vec_position.x *= radius_tip;
-			vec_position.z *= radius_tip;
-
-			// Position in center or at base/tip?
-			if(origin == mesh_create_origin::center)
-				vec_position.y -= height * 0.5f;
-			else if(origin == mesh_create_origin::top)
-				vec_position.y -= height;
-
-			// Inverting the normal?
-			if(inverted)
-				vec_normal = -vec_normal;
-
-			// Store vertex components
-			if(has_position)
-				gfx::vertex_pack(&vec_position[0], false, gfx::attribute::Position, format,
-								 current_vertex_ptr);
-			if(has_normal)
-			{
-				math::vec4 norm(vec_normal, 0.0f);
-				gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format,
-								 current_vertex_ptr);
-			}
-			if(has_texcoord)
-				gfx::vertex_pack(&vec_tex_coords[0], true, gfx::attribute::TexCoord0, format,
-								 current_vertex_ptr);
-
-			// Set flags for this vertex (we want to generate tangents
-			// and binormals if we need them).
-			*current_flags_ptr++ = preparation_data::source_contains_normal;
-
-			// Grow the object space bounding box for this mesh
-			// by including the computed position.
-			bbox_.add_point(vec_position);
-
-			// Move on to next vertex
-			current_vertex_ptr += vertex_stride;
-
-		} // Next Slice
-
-	} // End if add end cap
-
-	// Now generate indices. Process each stack (except the top and bottom)
-	triangle* current_triangle_ptr = &preparation_data_.triangle_data[0];
-	for(std::uint32_t stack = 0; stack < stacks; ++stack)
-	{
-		// Generate two triangles for the quad on each slice
-		for(std::uint32_t slice = 0; slice < slices; ++slice)
-		{
-			// If height was negative (i.e. faces are inverted)
-			// we need to flip the order of the indices
-			if(((!inverted) && height < 0) || (inverted && height > 0))
-			{
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = (stack * (slices + 1)) + slice;
-				current_triangle_ptr->indices[1] = ((stack + 1) * (slices + 1)) + slice;
-				current_triangle_ptr->indices[2] = (stack * (slices + 1)) + slice + 1;
-				current_triangle_ptr++;
-
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = ((stack + 1) * (slices + 1)) + slice;
-				current_triangle_ptr->indices[1] = ((stack + 1) * (slices + 1)) + slice + 1;
-				current_triangle_ptr->indices[2] = (stack * (slices + 1)) + slice + 1;
-				current_triangle_ptr++;
-
-			} // End if inverted
-			else
-			{
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = (stack * (slices + 1)) + slice + 1;
-				current_triangle_ptr->indices[1] = ((stack + 1) * (slices + 1)) + slice;
-				current_triangle_ptr->indices[2] = (stack * (slices + 1)) + slice;
-				current_triangle_ptr++;
-
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = (stack * (slices + 1)) + slice + 1;
-				current_triangle_ptr->indices[1] = ((stack + 1) * (slices + 1)) + slice + 1;
-				current_triangle_ptr->indices[2] = ((stack + 1) * (slices + 1)) + slice;
-				current_triangle_ptr++;
-
-			} // End if not inverted
-
-		} // Next Slice
-
-	} // Next Stack
-
-	// Add cylinder cap geometry
-	for(std::uint32_t slice = 0; slice < slices - 2; ++slice)
-	{
-		// If height was negative (i.e. faces are inverted)
-		// we need to flip the order of the indices
-		if(((!inverted) && height < 0) || (inverted && height > 0))
-		{
-			// Base Cap
-			current_triangle_ptr->data_group_id = 0;
-			current_triangle_ptr->indices[0] = caps_start;
-			current_triangle_ptr->indices[1] = caps_start + slice + 1;
-			current_triangle_ptr->indices[2] = caps_start + slice + 2;
-			current_triangle_ptr++;
-
-			// End Cap
-			if(num_caps > 1)
-			{
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = caps_start + slices + slice + 2;
-				current_triangle_ptr->indices[1] = caps_start + slices + slice + 1;
-				current_triangle_ptr->indices[2] = caps_start + slices;
-				current_triangle_ptr++;
-
-			} // End if add second cap
-
-		} // End if inverted
-		else
-		{
-			// Base Cap
-			current_triangle_ptr->data_group_id = 0;
-			current_triangle_ptr->indices[0] = caps_start + slice + 2;
-			current_triangle_ptr->indices[1] = caps_start + slice + 1;
-			current_triangle_ptr->indices[2] = caps_start;
-			current_triangle_ptr++;
-
-			// End Cap
-			if(num_caps > 1)
-			{
-				current_triangle_ptr->data_group_id = 0;
-				current_triangle_ptr->indices[0] = caps_start + slices;
-				current_triangle_ptr->indices[1] = caps_start + slices + slice + 1;
-				current_triangle_ptr->indices[2] = caps_start + slices + slice + 2;
-				current_triangle_ptr++;
-
-			} // End if add second cap
-
-		} // End if not inverted
-
-	} // Next Slice
-
-	// We need to generate binormals / tangents?
-	preparation_data_.compute_binormals = vertex_format_.has(gfx::attribute::Bitangent);
-	preparation_data_.compute_tangents = vertex_format_.has(gfx::attribute::Tangent);
-
+	create_mesh(vertex_format_, mesh, preparation_data_, bbox_);
 	// Finish up
 	return end_prepare(hardware_copy, false, false);
 }
 
 bool mesh::create_cube(const gfx::vertex_layout& format, float width, float height, float depth,
 					   std::uint32_t width_segments, std::uint32_t height_segments,
-					   std::uint32_t depth_segments, bool inverted, mesh_create_origin origin,
+					   std::uint32_t depth_segments, mesh_create_origin origin,
 					   bool hardware_copy /* = true */)
 {
-	return create_cube(format, width, height, depth, width_segments, height_segments, depth_segments, 1.0f,
-					   1.0f, inverted, origin, hardware_copy);
-}
-
-bool mesh::create_cube(const gfx::vertex_layout& format, float width, float height, float depth,
-					   std::uint32_t width_segments, std::uint32_t height_segments,
-					   std::uint32_t depth_segments, float tex_u_scale, float tex_v_scale, bool inverted,
-					   mesh_create_origin origin, bool hardware_copy /* = true */)
-{
-	std::uint32_t x_count = 0;
-	std::uint32_t y_count = 0;
-	std::uint32_t counter = 0;
-	math::vec3 current_pos, delta_pos_x, delta_pos_y, normal_vec;
-	math::vec2 current_tex, delta_tex;
-
 	// Clear out old data.
 	dispose();
 
@@ -2714,226 +1182,13 @@ bool mesh::create_cube(const gfx::vertex_layout& format, float width, float heig
 	prepare_status_ = mesh_status::preparing;
 	vertex_format_ = format;
 
-	// Determine the correct offset to any relevant elements in the vertex
-	bool has_position = vertex_format_.has(gfx::attribute::Position);
-	bool has_texcoord = vertex_format_.has(gfx::attribute::TexCoord0);
-	bool has_normal = vertex_format_.has(gfx::attribute::Normal);
-	std::uint16_t vertex_stride = vertex_format_.getStride();
+	using namespace generator;
+	box_mesh_t box({width * 0.5f, height * 0.5f, depth * 0.5f},
+				   {width_segments, height_segments, depth_segments});
+	math::quat rot(math::vec3(math::radians(-90.0f), 0.f, 0.0f));
+	auto mesh = rotate_mesh(box, rot);
 
-	// Compute the number of faces and vertices that will be required for this box
-	preparation_data_.triangle_count = (4 * (width_segments * depth_segments)) +
-									   (4 * (width_segments * height_segments)) +
-									   (4 * (height_segments * depth_segments));
-	preparation_data_.vertex_count = (2 * ((width_segments + 1) * (depth_segments + 1))) +
-									 (2 * ((width_segments + 1) * (height_segments + 1))) +
-									 (2 * ((height_segments + 1) * (depth_segments + 1)));
-
-	// Allocate enough space for the new vertex and triangle data
-	preparation_data_.vertex_data.resize(preparation_data_.vertex_count * vertex_stride);
-	preparation_data_.vertex_flags.resize(preparation_data_.vertex_count);
-	preparation_data_.triangle_data.resize(preparation_data_.triangle_count);
-
-	// Ensure width and depth are absolute (prevent inverting on those axes)
-	width = math::abs(width);
-	depth = math::abs(depth);
-
-	// Generate faces
-	std::uint8_t* current_vertex_ptr = &preparation_data_.vertex_data[0];
-	std::uint8_t* current_flags_ptr = &preparation_data_.vertex_flags[0];
-	float half_width = width / 2, half_depth = depth / 2;
-	for(std::uint32_t i = 0; i < 6; ++i)
-	{
-		switch(i)
-		{
-			case 0: // +X
-				x_count = depth_segments + 1;
-				y_count = height_segments + 1;
-				delta_pos_x = math::vec3(0, 0, depth / static_cast<float>(depth_segments));
-				delta_pos_y = math::vec3(0, -height / static_cast<float>(height_segments), 0);
-				current_pos = math::vec3(half_width, height, -half_depth);
-				normal_vec = math::vec3(1, 0, 0);
-				break;
-
-			case 1: // +Y
-				x_count = width_segments + 1;
-				y_count = depth_segments + 1;
-				delta_pos_x = math::vec3(width / static_cast<float>(width_segments), 0, 0);
-				delta_pos_y = math::vec3(0, 0, -depth / static_cast<float>(depth_segments));
-				current_pos = math::vec3(-half_width, height, half_depth);
-				normal_vec = (height > 0.0f) ? math::vec3(0, 1, 0) : math::vec3(0, -1, 0);
-				break;
-
-			case 2: // +Z
-				x_count = width_segments + 1;
-				y_count = height_segments + 1;
-				delta_pos_x = math::vec3(-width / static_cast<float>(width_segments), 0, 0);
-				delta_pos_y = math::vec3(0, -height / static_cast<float>(height_segments), 0);
-				current_pos = math::vec3(half_width, height, half_depth);
-				normal_vec = math::vec3(0, 0, 1);
-				break;
-
-			case 3: // -X
-				x_count = depth_segments + 1;
-				y_count = height_segments + 1;
-				delta_pos_x = math::vec3(0, 0, -depth / static_cast<float>(depth_segments));
-				delta_pos_y = math::vec3(0, -height / static_cast<float>(height_segments), 0);
-				current_pos = math::vec3(-half_width, height, half_depth);
-				normal_vec = math::vec3(-1, 0, 0);
-				break;
-
-			case 4: // -Y
-				x_count = width_segments + 1;
-				y_count = depth_segments + 1;
-				delta_pos_x = math::vec3(width / static_cast<float>(width_segments), 0, 0);
-				delta_pos_y = math::vec3(0, 0, depth / static_cast<float>(depth_segments));
-				current_pos = math::vec3(-half_width, 0, -half_depth);
-				normal_vec = (height > 0.0f) ? math::vec3(0, -1, 0) : math::vec3(0, 1, 0);
-				break;
-
-			case 5: // -Z
-				x_count = width_segments + 1;
-				y_count = height_segments + 1;
-				delta_pos_x = math::vec3(width / static_cast<float>(width_segments), 0, 0);
-				delta_pos_y = math::vec3(0, -height / static_cast<float>(height_segments), 0);
-				current_pos = math::vec3(-half_width, height, -half_depth);
-				normal_vec = math::vec3(0, 0, -1);
-				break;
-
-		} // End Face Switch
-
-		// Should we invert the vertex normal
-		if(inverted)
-			normal_vec = -normal_vec;
-
-		// Add faces
-		current_tex = math::vec2(0, 0);
-		delta_tex =
-			math::vec2(1.0f / static_cast<float>(x_count - 1), 1.0f / static_cast<float>(y_count - 1));
-		for(std::uint32_t y = 0; y < y_count; ++y)
-		{
-			for(std::uint32_t x = 0; x < x_count; ++x)
-			{
-				math::vec3 output_pos = current_pos;
-				if(origin == mesh_create_origin::center)
-					output_pos.y -= height * 0.5f;
-				else if(origin == mesh_create_origin::top)
-					output_pos.y -= height;
-
-				// Store vertex components
-				if(has_position)
-					gfx::vertex_pack(&output_pos[0], false, gfx::attribute::Position, format,
-									 current_vertex_ptr);
-				if(has_normal)
-				{
-					math::vec4 norm(normal_vec, 0.0f);
-					gfx::vertex_pack(math::value_ptr(norm), true, gfx::attribute::Normal, format,
-									 current_vertex_ptr);
-				}
-				if(has_texcoord)
-					gfx::vertex_pack(&math::vec2(current_tex.x * tex_u_scale, current_tex.y * tex_v_scale)[0],
-									 true, gfx::attribute::TexCoord0, format, current_vertex_ptr);
-
-				// Set flags for this vertex (we want to generate tangents
-				// and binormals if we need them).
-				*current_flags_ptr++ = preparation_data::source_contains_normal;
-
-				// Grow the object space bounding box for this mesh
-				// by including the computed position.
-				bbox_.add_point(output_pos);
-
-				// Move to next vertex position
-				current_pos += delta_pos_x;
-				current_tex.x += delta_tex.x;
-				current_vertex_ptr += vertex_stride;
-
-			} // Next Column
-
-			// Move to next row
-			current_pos += delta_pos_y;
-			current_pos -= delta_pos_x * static_cast<float>(x_count);
-			current_tex.x = 0.0f;
-			current_tex.y += delta_tex.y;
-
-		} // Next Row
-
-	} // Next Face
-
-	// Now generate indices. For each box face.
-	counter = 0;
-	triangle* current_triangle_ptr = &preparation_data_.triangle_data[0];
-	for(std::uint32_t i = 0; i < 6; ++i)
-	{
-		switch(i)
-		{
-			case 0: // +X
-			case 3: // -X
-				x_count = depth_segments + 1;
-				y_count = height_segments + 1;
-				break;
-
-			case 1: // +Y
-			case 4: // -Y
-				x_count = width_segments + 1;
-				y_count = depth_segments + 1;
-				break;
-
-			case 2: // +Z
-			case 5: // -Z
-				x_count = width_segments + 1;
-				y_count = height_segments + 1;
-				break;
-
-		} // End Face Switch
-
-		for(std::uint32_t y = 0; y < y_count - 1; ++y)
-		{
-			for(std::uint32_t x = 0; x < x_count - 1; ++x)
-			{
-				// If height was negative (i.e. faces are inverted)
-				// we need to flip the order of the indices
-				if((!inverted && height < 0) || (inverted && height > 0))
-				{
-					current_triangle_ptr->data_group_id = 0;
-					current_triangle_ptr->indices[0] = x + 1 + ((y + 1) * x_count) + counter;
-					current_triangle_ptr->indices[1] = x + 1 + (y * x_count) + counter;
-					current_triangle_ptr->indices[2] = x + (y * x_count) + counter;
-					current_triangle_ptr++;
-
-					current_triangle_ptr->data_group_id = 0;
-					current_triangle_ptr->indices[0] = x + ((y + 1) * x_count) + counter;
-					current_triangle_ptr->indices[1] = x + 1 + ((y + 1) * x_count) + counter;
-					current_triangle_ptr->indices[2] = x + (y * x_count) + counter;
-					current_triangle_ptr++;
-
-				} // End if inverted
-				else
-				{
-					current_triangle_ptr->data_group_id = 0;
-					current_triangle_ptr->indices[0] = x + (y * x_count) + counter;
-					current_triangle_ptr->indices[1] = x + 1 + (y * x_count) + counter;
-					current_triangle_ptr->indices[2] = x + 1 + ((y + 1) * x_count) + counter;
-					current_triangle_ptr++;
-
-					current_triangle_ptr->data_group_id = 0;
-					current_triangle_ptr->indices[0] = x + (y * x_count) + counter;
-					current_triangle_ptr->indices[1] = x + 1 + ((y + 1) * x_count) + counter;
-					current_triangle_ptr->indices[2] = x + ((y + 1) * x_count) + counter;
-					current_triangle_ptr++;
-
-				} // End if normal
-
-			} // Next Column
-
-		} // Next Row
-
-		// Compute vertex start for next face.
-		counter += x_count * y_count;
-
-	} // Next Face
-
-	// We need to generate binormals / tangents?
-	preparation_data_.compute_binormals = vertex_format_.has(gfx::attribute::Bitangent);
-	preparation_data_.compute_tangents = vertex_format_.has(gfx::attribute::Tangent);
+	create_mesh(vertex_format_, mesh, preparation_data_, bbox_);
 	// Finish up
 	return end_prepare(hardware_copy, false, false);
 }

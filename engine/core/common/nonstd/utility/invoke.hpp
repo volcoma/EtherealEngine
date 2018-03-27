@@ -119,7 +119,7 @@ struct result_of<F(ArgTypes...)> : detail::invoke_result<void, F, ArgTypes...>
 {
 };
 
-template<typename F, typename ...Args>
+template <typename F, typename... Args>
 using result_of_t = typename result_of<F(Args...)>::type;
 
 template <class F, class... ArgTypes>
@@ -127,7 +127,6 @@ struct invoke_result : detail::invoke_result<void, F, ArgTypes...>
 {
 };
 
-template<typename F, typename ...Args>
+template <typename F, typename... Args>
 using invoke_result_t = typename invoke_result<F, Args...>::type;
-
 }

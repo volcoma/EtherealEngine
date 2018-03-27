@@ -1,8 +1,8 @@
 #pragma once
 #include <cstddef>
-#include <type_traits>
-#include <tuple>
 #include <functional>
+#include <tuple>
+#include <type_traits>
 
 namespace nonstd
 {
@@ -32,7 +32,7 @@ struct function_traits<R(Args...)>
 {
 	using result_type = R;
 	using return_type = result_type;
-	using function_type = result_type (Args...);
+	using function_type = result_type(Args...);
 	constexpr static const std::size_t arity = sizeof...(Args);
 
 	using arg_types = std::tuple<Args...>;
@@ -47,25 +47,25 @@ struct function_traits<R (*)(Args...)> : public function_traits<R(Args...)>
 template <typename C, typename R, typename... Args>
 struct function_traits<R (C::*)(Args...)> : public function_traits<R(Args...)>
 {
-	using owner_type = C &;
+	using owner_type = C&;
 };
 
 template <typename C, typename R, typename... Args>
 struct function_traits<R (C::*)(Args...) const> : public function_traits<R(Args...)>
 {
-	using owner_type = const C &;
+	using owner_type = const C&;
 };
 
 template <typename C, typename R, typename... Args>
 struct function_traits<R (C::*)(Args...) volatile> : public function_traits<R(Args...)>
 {
-	using owner_type = volatile C &;
+	using owner_type = volatile C&;
 };
 
 template <typename C, typename R, typename... Args>
 struct function_traits<R (C::*)(Args...) const volatile> : public function_traits<R(Args...)>
 {
-	using owner_type = const volatile C &;
+	using owner_type = const volatile C&;
 };
 
 template <typename Functor>
@@ -141,5 +141,4 @@ using param_types_decayed_t = typename param_types_decayed<T, Index>::type;
 
 template <typename T, size_t Index>
 using param_types_t = typename param_types<T, Index>::type;
-
 }

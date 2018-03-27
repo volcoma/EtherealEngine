@@ -428,6 +428,8 @@ void handle_camera_movement()
 		{
 			transform->move_local({0.0f, delta_move.y * movement_speed * dt, 0.0f});
 		}
+
+		transform->resolve(true);
 	}
 
 	if(input.is_mouse_button_down(mml::mouse::right))

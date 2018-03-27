@@ -148,7 +148,7 @@ static context_action check_context_menu(runtime::entity entity)
 			{
 				static const std::map<std::string, std::vector<std::string>> menu_objects = {
 					{"BASIC", {"SPHERE", "CUBE", "PLANE", "CYLINDER", "CAPSULE", "CONE", "TORUS", "TEAPOT"}},
-					{"POLYGONS", {"TETRAHEDRON", "OCTAHEDRON", "ICOSAHEDRON", "DODECAHEDRON"}},
+					{"POLYGONS", {"ICOSAHEDRON", "DODECAHEDRON"}},
 					{"ICOSPHERES",
 					 {"ICOSPHERE0", "ICOSPHERE1", "ICOSPHERE2", "ICOSPHERE3", "ICOSPHERE4", "ICOSPHERE5"}}};
 

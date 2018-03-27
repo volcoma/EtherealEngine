@@ -538,10 +538,9 @@ public:
 	/// Create cube geometry.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	bool create_cube(const gfx::vertex_layout& format, float width, float height, float depth,
-					 std::uint32_t width_segments, std::uint32_t height_segments,
-					 std::uint32_t depth_segments, bool inverted, mesh_create_origin origin,
-					 bool hardware_copy = true);
+	bool create_plane(const gfx::vertex_layout& format, float width, float height,
+					  std::uint32_t width_segments, std::uint32_t height_segments, mesh_create_origin origin,
+					  bool hardware_copy = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : create_cube ()
@@ -551,8 +550,7 @@ public:
 	//-----------------------------------------------------------------------------
 	bool create_cube(const gfx::vertex_layout& format, float width, float height, float depth,
 					 std::uint32_t width_segments, std::uint32_t height_segments,
-					 std::uint32_t depth_segments, float tex_u_scale, float tex_v_scale, bool inverted,
-					 mesh_create_origin origin, bool hardware_copy = true);
+					 std::uint32_t depth_segments, mesh_create_origin origin, bool hardware_copy = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : create_sphere ()
@@ -561,8 +559,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	bool create_sphere(const gfx::vertex_layout& format, float radius, std::uint32_t stacks,
-					   std::uint32_t slices, bool inverted, mesh_create_origin origin,
-					   bool hardware_copy = true);
+					   std::uint32_t slices, mesh_create_origin origin, bool hardware_copy = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : create_cylinder ()
@@ -571,8 +568,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	bool create_cylinder(const gfx::vertex_layout& format, float radius, float height, std::uint32_t stacks,
-						 std::uint32_t slices, bool inverted, mesh_create_origin origin,
-						 bool hardware_copy = true);
+						 std::uint32_t slices, mesh_create_origin origin, bool hardware_copy = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : create_capsule ()
@@ -581,8 +577,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	bool create_capsule(const gfx::vertex_layout& format, float radius, float height, std::uint32_t stacks,
-						std::uint32_t slices, bool inverted, mesh_create_origin origin,
-						bool hardware_copy = true);
+						std::uint32_t slices, mesh_create_origin origin, bool hardware_copy = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : create_cone ()
@@ -591,7 +586,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	bool create_cone(const gfx::vertex_layout& format, float radius, float radiusTip, float height,
-					 std::uint32_t stacks, std::uint32_t slices, bool inverted, mesh_create_origin origin,
+					 std::uint32_t stacks, std::uint32_t slices, mesh_create_origin origin,
 					 bool hardware_copy = true);
 
 	//-----------------------------------------------------------------------------
@@ -601,7 +596,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	bool create_torus(const gfx::vertex_layout& format, float outer_radius, float inner_radius,
-					  std::uint32_t bands, std::uint32_t sides, bool inverted, mesh_create_origin origin,
+					  std::uint32_t bands, std::uint32_t sides, mesh_create_origin origin,
 					  bool hardware_copy = true);
 
 	//-----------------------------------------------------------------------------
@@ -611,22 +606,6 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	bool create_teapot(const gfx::vertex_layout& format, bool hardware_copy = true);
-
-	//-----------------------------------------------------------------------------
-	//  Name : create_tetrahedron ()
-	/// <summary>
-	/// Create tetrahedron geometry.
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	bool create_tetrahedron(const gfx::vertex_layout& format, bool hardware_copy = true);
-
-	//-----------------------------------------------------------------------------
-	//  Name : create_octahedron ()
-	/// <summary>
-	/// Create octahedron geometry.
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	bool create_octahedron(const gfx::vertex_layout& format, bool hardware_copy = true);
 
 	//-----------------------------------------------------------------------------
 	//  Name : create_icosahedron ()
@@ -807,7 +786,6 @@ public:
 		return mesh_subsets_.size();
 	}
 
-protected:
 	//-------------------------------------------------------------------------
 	// Protected Structures, Typedefs and Enumerations
 	//-------------------------------------------------------------------------
@@ -859,7 +837,7 @@ protected:
 		bool compute_barycentric = false;
 
 	}; // End Struct preparation_data
-
+protected:
 	// mesh Sorting / Optimization structures
 	struct optimizer_vertex_info
 	{
