@@ -62,7 +62,7 @@ class type_index_t
 	using construct_t = const type_index_t&();
 #endif
 	construct_t* _info = nullptr;
-	type_index_t(construct_t* info) noexcept
+	explicit type_index_t(construct_t* info) noexcept
 		: _info{info}
 	{
 	}

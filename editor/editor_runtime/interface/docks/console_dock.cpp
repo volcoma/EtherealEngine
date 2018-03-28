@@ -2,7 +2,7 @@
 #include "../../console/console_log.h"
 
 console_dock::console_dock(const std::string& dtitle, bool close_button, const ImVec2& min_size,
-						   std::shared_ptr<console_log> log)
+						   const std::shared_ptr<console_log>& log)
 	: console_log_(log)
 
 {

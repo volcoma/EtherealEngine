@@ -21,7 +21,7 @@ public:
 		void next();
 
 	private:
-		edges_t(const parametric_shape_t& shape);
+		explicit edges_t(const parametric_shape_t& shape);
 
 		const parametric_shape_t* shape_;
 
@@ -38,7 +38,7 @@ public:
 		void next();
 
 	private:
-		vertices_t(const parametric_shape_t& shape);
+		explicit vertices_t(const parametric_shape_t& shape);
 
 		const parametric_shape_t* shape_;
 

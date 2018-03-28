@@ -9,7 +9,7 @@ struct half
 {
 public:
 	half() = default;
-	half(float f)
+	explicit half(float f)
 	{
 		const std::uint32_t data = (std::uint32_t&)f;
 		const std::uint32_t signBit = (data >> 31);
@@ -100,7 +100,7 @@ struct range
 	}
 
 	template <typename U, typename = typename std::enable_if<std::is_convertible<U, T>::value, void>::type>
-	range(const std::array<U, 2>& data)
+	explicit range(const std::array<U, 2>& data)
 		: min(data[0])
 		, max(data[1])
 	{
@@ -136,7 +136,7 @@ struct size
 	}
 
 	template <typename U, typename = typename std::enable_if<std::is_convertible<U, T>::value, void>::type>
-	size(const std::array<U, 2>& data)
+	explicit size(const std::array<U, 2>& data)
 		: width(data[0])
 		, height(data[1])
 	{
@@ -193,7 +193,7 @@ struct point
 	{
 	}
 	template <typename U, typename = typename std::enable_if<std::is_convertible<U, T>::value, void>::type>
-	point(const std::array<U, 2>& data)
+	explicit point(const std::array<U, 2>& data)
 		: x(data[0])
 		, y(data[1])
 	{

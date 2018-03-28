@@ -57,7 +57,7 @@ public:
 
 		bool all_done_;
 
-		triangles_t(const merge_mesh_t& mesh)
+		explicit triangles_t(const merge_mesh_t& mesh)
 			: head_{mesh.head_.triangles()}
 			, tail_(mesh.tail_.triangles())
 			, head_vertex_count_{count(mesh.head_.vertices())}
@@ -99,7 +99,7 @@ public:
 
 		bool all_done_;
 
-		vertices_t(const merge_mesh_t& mesh)
+		explicit vertices_t(const merge_mesh_t& mesh)
 			: head_{mesh.head_.vertices()}
 			, tail_(mesh.tail_.vertices())
 			, all_done_{tail_.done() && head_.done()}
@@ -117,12 +117,12 @@ public:
 
 	triangles_t triangles() const noexcept
 	{
-		return *this;
+        return triangles_t{*this};
 	}
 
 	vertices_t vertices() const noexcept
 	{
-		return *this;
+        return vertices_t{*this};
 	}
 
 private:

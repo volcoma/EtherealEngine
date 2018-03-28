@@ -64,10 +64,10 @@ parametric_path_t::parametric_path_t(std::function<path_vertex_t(double)> eval, 
 
 parametric_path_t::edges_t parametric_path_t::edges() const noexcept
 {
-	return *this;
+    return edges_t{*this};
 }
 
 parametric_path_t::vertices_t parametric_path_t::vertices() const noexcept
 {
-	return *this;
+    return vertices_t{*this};
 }

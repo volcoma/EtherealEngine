@@ -23,8 +23,8 @@ gfx::view_id generate_id()
 }
 
 render_pass::render_pass(const std::string& n)
+    : id(generate_id())
 {
-	id = generate_id();
 	reset_view(id);
 	set_view_name(id, n.c_str());
 }

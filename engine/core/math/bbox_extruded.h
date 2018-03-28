@@ -4,6 +4,7 @@
 #include "math_types.h"
 #include "plane.h"
 #include "transform.h"
+#include <array>
 namespace math
 {
 using namespace glm;
@@ -46,9 +47,9 @@ struct bbox_extruded
 	/// Distance to extrude / project.
 	float projection_range;
 	/// The 6 final extruded planes.
-	plane extruded_planes[6];
+	std::array<plane, 6> extruded_planes;
 	/// Flags denoting the points used for each extruded (silhouette) edge.
-	unsigned int silhouette_edges[6][2];
+	std::array<std::array<unsigned int, 2>, 6> silhouette_edges;
 	/// Number of edges extruded
 	unsigned int edge_count;
 };

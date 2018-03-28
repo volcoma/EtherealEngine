@@ -39,7 +39,7 @@ public:
 	private:
 		typename triangle_generator_type<transform_mesh_t<mesh_t>>::type triangles_;
 
-		triangles_t(const transform_mesh_t<mesh_t>& mesh)
+		explicit triangles_t(const transform_mesh_t<mesh_t>& mesh)
 			: triangles_{mesh.triangles()}
 		{
 		}
@@ -55,7 +55,7 @@ public:
 
 	triangles_t triangles() const noexcept
 	{
-		return this->transform_mesh_;
+		return triangles_t{this->transform_mesh_};
 	}
 
 	using vertices_t = typename impl_t::vertices_t;

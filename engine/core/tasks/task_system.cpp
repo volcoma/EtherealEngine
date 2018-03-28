@@ -88,8 +88,8 @@ bool task_system::task_queue::try_push(task& t)
 std::pair<bool, task> task_system::task_queue::pop(duration_t pop_timeout)
 {
 	std::unique_lock<std::mutex> lock(mutex_);
-	bool wait = pop_timeout > decltype(pop_timeout)(0);
-	bool timed_wait = pop_timeout != decltype(pop_timeout)::max();
+	bool wait = pop_timeout > duration_t(0);
+	bool timed_wait = pop_timeout != duration_t::max();
 	if(wait && tasks_.empty())
 	{
 		if(timed_wait)

@@ -39,7 +39,7 @@ public:
 	private:
 		typename edge_generator_type<transform_path_t<path_t>>::type edges_;
 
-		edges_t(const transform_path_t<path_t>& path)
+		explicit edges_t(const transform_path_t<path_t>& path)
 			: edges_{path.edges()}
 		{
 		}
@@ -58,7 +58,7 @@ public:
 
 	edges_t edges() const noexcept
 	{
-		return {*this};
+		return edges_t{*this};
 	}
 
 	using vertices_t = typename impl_t::vertices_t;

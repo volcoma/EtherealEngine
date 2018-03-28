@@ -29,7 +29,7 @@ public:
 		int col_;
 		int i_;
 
-		triangles_t(const spherical_triangle_mesh_t& mesh);
+		explicit triangles_t(const spherical_triangle_mesh_t& mesh);
 
 		friend class spherical_triangle_mesh_t;
 	};
@@ -48,7 +48,7 @@ public:
 		int row_;
 		int col_;
 
-		vertices_t(const spherical_triangle_mesh_t& mesh);
+		explicit vertices_t(const spherical_triangle_mesh_t& mesh);
 
 		friend class spherical_triangle_mesh_t;
 	};

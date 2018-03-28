@@ -139,10 +139,10 @@ icosahedron_mesh_t::icosahedron_mesh_t(double radius, int segments)
 
 icosahedron_mesh_t::triangles_t icosahedron_mesh_t::triangles() const noexcept
 {
-	return {*this};
+	return triangles_t{*this};
 }
 
 icosahedron_mesh_t::vertices_t icosahedron_mesh_t::vertices() const noexcept
 {
-	return {*this};
+	return vertices_t{*this};
 }

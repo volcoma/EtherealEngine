@@ -228,6 +228,7 @@ void bbox_extruded::reset()
 	projection_point = vec3(0, 0, 0);
 	projection_range = 0.0f;
 	edge_count = 0;
+    silhouette_edges.fill({{0, 0}});
 }
 
 //-----------------------------------------------------------------------------
@@ -336,24 +337,20 @@ bool bbox_extruded::get_edge(unsigned int nEdge, vec3& vPoint1, vec3& vPoint2) c
 bool bbox_extruded::test_line(const vec3& v1, const vec3& v2) const
 {
 	unsigned int nCode1 = 0, nCode2 = 0;
-	float fDist1, fDist2, t;
-	int nSide1, nSide2;
-	vec3 vDir, vIntersect;
-	unsigned int i;
 
 	// Test each plane
-	for(i = 0; i < edge_count; ++i)
+	for(unsigned int i = 0; i < edge_count; ++i)
 	{
 		// Classify each point of the line against the plane.
-		fDist1 = plane::dot_coord(extruded_planes[i], v1);
-		fDist2 = plane::dot_coord(extruded_planes[i], v2);
-		nSide1 = (fDist1 >= 0) ? 1 : 0;
-		nSide2 = (fDist2 >= 0) ? 1 : 0;
+		float fDist1 = plane::dot_coord(extruded_planes[i], v1);
+		float fDist2 = plane::dot_coord(extruded_planes[i], v2);
+		int nSide1 = (fDist1 >= 0) ? 1 : 0;
+		int nSide2 = (fDist2 >= 0) ? 1 : 0;
 
 		// Accumulate the classification info to determine
 		// if the edge was spanning any of the planes.
-		nCode1 |= (nSide1 << i);
-		nCode2 |= (nSide2 << i);
+		nCode1 |= unsigned(nSide1 << i);
+		nCode2 |= unsigned(nSide2 << i);
 
 		// If the line is completely in front of any plane
 		// then it cannot possibly be intersecting.
@@ -364,13 +361,13 @@ bool bbox_extruded::test_line(const vec3& v1, const vec3& v2) const
 		if(nSide1 ^ nSide2)
 		{
 			// Compute the point at which the line intersects this plane.
-			vDir = v2 - v1;
-			t = -plane::dot_coord(extruded_planes[i], v1) / plane::dot_normal(extruded_planes[i], vDir);
+			vec3 vDir = v2 - v1;
+			float t = -plane::dot_coord(extruded_planes[i], v1) / plane::dot_normal(extruded_planes[i], vDir);
 
 			// Truly spanning?
 			if((t >= 0.0f) && (t <= 1.0f))
 			{
-				vIntersect = v1 + (vDir * t);
+				vec3 vIntersect = v1 + (vDir * t);
 				if(test_sphere(vIntersect, 0.01f))
 					return true;
 
@@ -385,17 +382,15 @@ bool bbox_extruded::test_line(const vec3& v1, const vec3& v2) const
 }
 
 //-----------------------------------------------------------------------------
-//  Name : testSphere ()
+//  Name : test_sphere ()
 /// <summary>
 /// Determine whether or not the sphere passed is within the box.
 /// </summary>
 //-----------------------------------------------------------------------------
 bool bbox_extruded::test_sphere(const vec3& vecCenter, float fRadius) const
 {
-	unsigned int i;
-
 	// Test box planes
-	for(i = 0; i < edge_count; ++i)
+	for(unsigned int i = 0; i < edge_count; ++i)
 	{
 		float fDot = plane::dot_coord(extruded_planes[i], vecCenter);
 

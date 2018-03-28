@@ -121,7 +121,7 @@ public:
 
 		mutable triangle_t triangle_;
 
-		triangles_t(const subdivide_mesh_t& mesh)
+		explicit triangles_t(const subdivide_mesh_t& mesh)
 			: mesh_{&mesh}
 			, i_{0}
 			, triangles_{mesh.mesh_.triangles()}
@@ -176,7 +176,7 @@ public:
 		int edge_index_;
 		int vertex_index_;
 
-		vertices_t(const subdivide_mesh_t& mesh)
+		explicit vertices_t(const subdivide_mesh_t& mesh)
 			: mesh_{&mesh}
 			, edge_index_{0}
 			, vertex_index_{0}
@@ -215,12 +215,12 @@ public:
 
 	triangles_t triangles() const noexcept
 	{
-		return *this;
+        return triangles_t{*this};
 	}
 
 	vertices_t vertices() const noexcept
 	{
-		return *this;
+        return vertices_t{*this};
 	}
 
 private:

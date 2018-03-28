@@ -503,9 +503,9 @@ void request_screen_shot(frame_buffer_handle _handle, const char* _filePath);
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
-void set_info_logger(std::function<void(const std::string& log_msg)> logger);
-void set_warning_logger(std::function<void(const std::string& log_msg)> logger);
-void set_error_logger(std::function<void(const std::string& log_msg)> logger);
+void set_info_logger(const std::function<void(const std::string&)>& logger);
+void set_warning_logger(const std::function<void(const std::string&)>& logger);
+void set_error_logger(const std::function<void(const std::string&)>& logger);
 
 void flush();
 

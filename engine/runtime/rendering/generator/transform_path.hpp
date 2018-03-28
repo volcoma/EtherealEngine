@@ -39,7 +39,7 @@ public:
 		}
 
 	private:
-		vertices_t(const transform_path_t& path)
+		explicit vertices_t(const transform_path_t& path)
 			: path_{&path}
 			, vertices_{path.path_.vertices()}
 		{
@@ -62,7 +62,7 @@ public:
 
 	vertices_t vertices() const noexcept
 	{
-		return *this;
+        return vertices_t{*this};
 	}
 
 	using edges_t = typename impl_t::edges_t;

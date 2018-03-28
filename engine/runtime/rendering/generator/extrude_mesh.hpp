@@ -79,7 +79,7 @@ public:
 
 		bool odd_;
 
-		triangles_t(const extrude_mesh_t& mesh)
+		explicit triangles_t(const extrude_mesh_t& mesh)
 			: mesh_{&mesh}
 			, shape_edges_{mesh.shape_.edges()}
 			, path_edges_{mesh.path_.edges()}
@@ -135,7 +135,7 @@ public:
 
 		decltype(mesh_->path_.vertices()) path_vertices_;
 
-		vertices_t(const extrude_mesh_t& mesh)
+		explicit vertices_t(const extrude_mesh_t& mesh)
 			: mesh_{&mesh}
 			, shape_vertices_{mesh.shape_.vertices()}
 			, path_vertices_{mesh.path_.vertices()}
@@ -147,12 +147,12 @@ public:
 
 	triangles_t triangles() const noexcept
 	{
-		return *this;
+        return triangles_t{*this};
 	}
 
 	vertices_t vertices() const noexcept
 	{
-		return *this;
+        return vertices_t{*this};
 	}
 
 	/// @param shape shape_t to be extruded.

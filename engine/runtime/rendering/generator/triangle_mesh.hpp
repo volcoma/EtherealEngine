@@ -27,7 +27,7 @@ public:
 		int col_;
 		int i_;
 
-		triangles_t(const triangle_mesh_t& mesh);
+		explicit triangles_t(const triangle_mesh_t& mesh);
 
 		friend class triangle_mesh_t;
 	};
@@ -44,7 +44,7 @@ public:
 		int row_;
 		int col_;
 
-		vertices_t(const triangle_mesh_t& mesh);
+		explicit vertices_t(const triangle_mesh_t& mesh);
 
 		friend class triangle_mesh_t;
 	};

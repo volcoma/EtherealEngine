@@ -65,10 +65,10 @@ parametric_shape_t::parametric_shape_t(std::function<shape_vertex_t(double)> eva
 
 parametric_shape_t::edges_t parametric_shape_t::edges() const noexcept
 {
-	return *this;
+    return edges_t{*this};
 }
 
 parametric_shape_t::vertices_t parametric_shape_t::vertices() const noexcept
 {
-	return *this;
+    return vertices_t{*this};
 }

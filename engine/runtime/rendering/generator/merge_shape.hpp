@@ -57,7 +57,7 @@ public:
 
 		bool all_done_;
 
-		edges_t(const merge_shape_t& shape)
+		explicit edges_t(const merge_shape_t& shape)
 			: head_{shape.head_.edges()}
 			, tail_(shape.tail_.edges())
 			, head_vertex_count_{count(shape.head_.vertices())}
@@ -98,7 +98,7 @@ public:
 		typename vertex_generator_type<merge_shape_t<Tail...>>::type tail_;
 		bool all_done_;
 
-		vertices_t(const merge_shape_t& shape)
+		explicit vertices_t(const merge_shape_t& shape)
 			: head_{shape.head_.vertices()}
 			, tail_(shape.tail_.vertices())
 			, all_done_{tail_.done() && head_.done()}
@@ -116,12 +116,12 @@ public:
 
 	edges_t edges() const noexcept
 	{
-		return *this;
+        return edges_t{*this};
 	}
 
 	vertices_t vertices() const noexcept
 	{
-		return *this;
+        return vertices_t{*this};
 	}
 
 private:

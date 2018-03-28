@@ -45,7 +45,7 @@ public:
 
 		int i_;
 
-		edges_t(const subdivide_path_t& path)
+		explicit edges_t(const subdivide_path_t& path)
 			: path_{&path}
 			, edges_{path.path_.edges()}
 			, i_{0}
@@ -95,7 +95,7 @@ public:
 
 		typename edge_generator_type<path_t>::type edges_;
 
-		vertices_t(const subdivide_path_t& path)
+		explicit vertices_t(const subdivide_path_t& path)
 			: path_{&path}
 			, vertex_index_{0}
 			, edges_{path.path_.edges()}
@@ -117,12 +117,12 @@ public:
 
 	edges_t edges() const
 	{
-		return *this;
+        return edges_t{*this};
 	}
 
 	vertices_t vertices() const
 	{
-		return *this;
+        return vertices_t{*this};
 	}
 
 private:

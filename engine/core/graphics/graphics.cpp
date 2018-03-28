@@ -3,20 +3,20 @@
 #include <map>
 namespace gfx
 {
-static std::map<std::string, std::function<void(const std::string& log_msg)>> s_loggers;
+static std::map<std::string, std::function<void(const std::string&)>> s_loggers;
 static bool s_initted = false;
 
-void set_info_logger(std::function<void(const std::string& log_msg)> logger)
+void set_info_logger(const std::function<void(const std::string&)>& logger)
 {
 	s_loggers["info"] = logger;
 }
-static std::function<void(const std::string& log_msg)> warning_logger;
-void set_warning_logger(std::function<void(const std::string& log_msg)> logger)
+static std::function<void(const std::string&)> warning_logger;
+void set_warning_logger(const std::function<void(const std::string&)>& logger)
 {
 	s_loggers["warning"] = logger;
 }
-static std::function<void(const std::string& log_msg)> error_logger;
-void set_error_logger(std::function<void(const std::string& log_msg)> logger)
+static std::function<void(const std::string&)> error_logger;
+void set_error_logger(const std::function<void(const std::string&)>& logger)
 {
 	s_loggers["error"] = logger;
 }
@@ -30,9 +30,7 @@ void log(const std::string& category, const std::string& log_msg)
 
 struct gfx_callback : public bgfx::CallbackI
 {
-	~gfx_callback() final
-	{
-	}
+	~gfx_callback() final = default;
 
 	void traceVargs(const char* /*_filePath*/, std::uint16_t /*_line*/, const char* /*_format*/,
 					va_list /*_argList*/) final

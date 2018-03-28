@@ -21,7 +21,7 @@ public:
 		void next();
 
 	private:
-		edges_t(const parametric_path_t& path);
+		explicit edges_t(const parametric_path_t& path);
 
 		const parametric_path_t* path_;
 
@@ -38,7 +38,7 @@ public:
 		void next();
 
 	private:
-		vertices_t(const parametric_path_t& path);
+		explicit vertices_t(const parametric_path_t& path);
 
 		const parametric_path_t* path_;
 

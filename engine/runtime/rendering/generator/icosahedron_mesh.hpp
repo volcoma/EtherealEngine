@@ -35,7 +35,7 @@ public:
 
 		typename triangle_generator_type<triangle_mesh_t>::type triangles_;
 
-		triangles_t(const icosahedron_mesh_t& mesh);
+		explicit triangles_t(const icosahedron_mesh_t& mesh);
 
 		friend class icosahedron_mesh_t;
 	};
@@ -58,7 +58,7 @@ public:
 
 		typename vertex_generator_type<triangle_mesh_t>::type vertices_;
 
-		vertices_t(const icosahedron_mesh_t& mesh);
+		explicit vertices_t(const icosahedron_mesh_t& mesh);
 
 		friend class icosahedron_mesh_t;
 	};

@@ -45,7 +45,7 @@ public:
 
 		int i_;
 
-		edges_t(const subdivide_shape_t& shape)
+		explicit edges_t(const subdivide_shape_t& shape)
 			: shape_{&shape}
 			, edges_{shape.shape_.edges()}
 			, i_{0}
@@ -94,7 +94,7 @@ public:
 
 		typename edge_generator_type<shape_t>::type edges_;
 
-		vertices_t(const subdivide_shape_t& shape)
+		explicit vertices_t(const subdivide_shape_t& shape)
 			: shape_{&shape}
 			, vertex_index_{0}
 			, edges_{shape.shape_.edges()}
@@ -116,12 +116,12 @@ public:
 
 	edges_t edges() const noexcept
 	{
-		return *this;
+        return edges_t{*this};
 	}
 
 	vertices_t vertices() const noexcept
 	{
-		return *this;
+        return vertices_t{*this};
 	}
 
 private:

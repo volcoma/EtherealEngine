@@ -70,7 +70,7 @@ public:
 
 		int i_;
 
-		triangles_t(const lathe_mesh_t& mesh)
+		explicit triangles_t(const lathe_mesh_t& mesh)
 			: mesh_{&mesh}
 			, shape_edges_{mesh.shape_.edges()}
 			, i_{0}
@@ -129,7 +129,7 @@ public:
 
 		int i_;
 
-		vertices_t(const lathe_mesh_t& mesh)
+		explicit vertices_t(const lathe_mesh_t& mesh)
 			: mesh_{&mesh}
 			, shape_vertices_{mesh.shape_.vertices()}
 			, i_{0}
@@ -157,12 +157,12 @@ public:
 
 	triangles_t triangles() const noexcept
 	{
-		return *this;
+        return triangles_t{*this};
 	}
 
 	vertices_t vertices() const noexcept
 	{
-		return *this;
+        return vertices_t{*this};
 	}
 
 private:

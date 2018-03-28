@@ -39,7 +39,7 @@ public:
 	private:
 		typename edge_generator_type<transform_shape_t<shape_t>>::type edges_;
 
-		edges_t(const transform_shape_t<shape_t>& shape)
+		explicit edges_t(const transform_shape_t<shape_t>& shape)
 			: edges_{shape.edges()}
 		{
 		}
@@ -55,7 +55,7 @@ public:
 
 	edges_t edges() const noexcept
 	{
-		return {*this};
+		return edges_t{*this};
 	}
 
 	using vertices_t = typename impl_t::vertices_t;

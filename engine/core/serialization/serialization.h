@@ -14,7 +14,7 @@ namespace serialization
 {
 using namespace cereal;
 
-void set_warning_logger(std::function<void(const std::string& log_msg)> logger);
+void set_warning_logger(const std::function<void(const std::string&)>& logger);
 void log_warning(const std::string& log_msg);
 }
 

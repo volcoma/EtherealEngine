@@ -129,10 +129,10 @@ spherical_triangle_mesh_t::spherical_triangle_mesh_t(const gml::dvec3& v0, const
 
 spherical_triangle_mesh_t::triangles_t spherical_triangle_mesh_t::triangles() const noexcept
 {
-	return *this;
+    return triangles_t{*this};
 }
 
 spherical_triangle_mesh_t::vertices_t spherical_triangle_mesh_t::vertices() const noexcept
 {
-	return *this;
+    return vertices_t{*this};
 }

@@ -21,7 +21,7 @@ public:
 		void next();
 
 	private:
-		triangles_t(const parametric_mesh_t& mesh);
+		explicit triangles_t(const parametric_mesh_t& mesh);
 
 		const parametric_mesh_t* mesh_;
 
@@ -40,7 +40,7 @@ public:
 		void next();
 
 	private:
-		vertices_t(const parametric_mesh_t& mesh);
+		explicit vertices_t(const parametric_mesh_t& mesh);
 
 		const parametric_mesh_t* mesh_;
 

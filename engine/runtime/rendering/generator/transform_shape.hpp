@@ -42,7 +42,7 @@ public:
 
 		typename vertex_generator_type<shape_t>::type vertices_;
 
-		vertices_t(const transform_shape_t& shape)
+		explicit vertices_t(const transform_shape_t& shape)
 			: shape_{&shape}
 			, vertices_{shape.shape_.vertices()}
 		{
@@ -68,7 +68,7 @@ public:
 
 	vertices_t vertices() const noexcept
 	{
-		return *this;
+        return vertices_t{*this};
 	}
 
 private:

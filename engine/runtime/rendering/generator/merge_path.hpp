@@ -54,7 +54,7 @@ public:
 
 		bool all_done_;
 
-		edges_t(const merge_path_t& path)
+		explicit edges_t(const merge_path_t& path)
 			: head_{path.head_.triangles()}
 			, tail_(path.tail_.triangles())
 			, head_vertex_count_{count(path.head_.vertices())}
@@ -95,7 +95,7 @@ public:
 		typename vertex_generator_type<merge_path_t<Tail...>>::type tail_;
 		bool all_done_;
 
-		vertices_t(const merge_path_t& path)
+		explicit vertices_t(const merge_path_t& path)
 			: head_{path.head_.vertices()}
 			, tail_(path.tail_.vertices())
 			, all_done_{tail_.done() && head_.done()}
@@ -113,12 +113,12 @@ public:
 
 	edges_t edges() const noexcept
 	{
-		return *this;
+        return edges_t{*this};
 	}
 
 	vertices_t vertices() const noexcept
 	{
-		return *this;
+        return vertices_t{*this};
 	}
 
 private:

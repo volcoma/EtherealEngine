@@ -99,10 +99,10 @@ parametric_mesh_t::parametric_mesh_t(std::function<mesh_vertex_t(const gml::dvec
 
 parametric_mesh_t::triangles_t parametric_mesh_t::triangles() const noexcept
 {
-	return *this;
+    return triangles_t{*this};
 }
 
 parametric_mesh_t::vertices_t parametric_mesh_t::vertices() const noexcept
 {
-	return *this;
+    return vertices_t{*this};
 }
