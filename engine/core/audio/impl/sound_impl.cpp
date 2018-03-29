@@ -129,15 +129,19 @@ void sound_impl::unbind_from_source(source_impl* source)
 
 void sound_impl::unbind_from_all_sources()
 {
-	std::lock_guard<std::mutex> lock(mutex_);
-	for(auto& source : bound_to_sources_)
+    // We do this here to avoid recursive mutex lock.
+    mutex_.lock();
+    auto sources = std::move(bound_to_sources_);
+    bound_to_sources_.clear();
+    mutex_.unlock();
+    
+	for(auto& source : sources)
 	{
 		if(source != nullptr)
 		{
 			source->unbind();
 		}
 	}
-	bound_to_sources_.clear();
 }
 
 void sound_impl::cleanup()
