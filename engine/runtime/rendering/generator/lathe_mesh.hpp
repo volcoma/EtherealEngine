@@ -66,7 +66,7 @@ public:
 	private:
 		const lathe_mesh_t* mesh_;
 
-		decltype(mesh_->shape_.edges()) shape_edges_;
+		typename shape_t::edges_t shape_edges_;
 
 		int i_;
 
@@ -125,7 +125,7 @@ public:
 	private:
 		const lathe_mesh_t* mesh_;
 
-		decltype(mesh_->shape_.vertices()) shape_vertices_;
+        typename shape_t::vertices_t shape_vertices_;
 
 		int i_;
 

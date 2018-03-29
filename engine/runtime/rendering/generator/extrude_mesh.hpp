@@ -73,9 +73,9 @@ public:
 	private:
 		const extrude_mesh_t* mesh_;
 
-		decltype(mesh_->shape_.edges()) shape_edges_;
+		typename shape_t::edges_t shape_edges_;
 
-		decltype(mesh_->path_.edges()) path_edges_;
+        typename path_t::edges_t path_edges_;
 
 		bool odd_;
 
@@ -131,9 +131,9 @@ public:
 	private:
 		const extrude_mesh_t* mesh_;
 
-		decltype(mesh_->shape_.vertices()) shape_vertices_;
+        typename shape_t::vertices_t shape_vertices_;
 
-		decltype(mesh_->path_.vertices()) path_vertices_;
+        typename path_t::vertices_t path_vertices_;
 
 		explicit vertices_t(const extrude_mesh_t& mesh)
 			: mesh_{&mesh}
