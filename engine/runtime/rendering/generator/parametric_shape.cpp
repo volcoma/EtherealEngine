@@ -56,7 +56,7 @@ void parametric_shape_t::vertices_t::next()
 	++i_;
 }
 
-parametric_shape_t::parametric_shape_t(std::function<shape_vertex_t(double)> eval, int segments) noexcept
+parametric_shape_t::parametric_shape_t(const std::function<shape_vertex_t(double)>& eval, int segments) noexcept
 	: eval_{std::move(eval)}
 	, segments_{segments}
 	, delta_{1.0 / segments}

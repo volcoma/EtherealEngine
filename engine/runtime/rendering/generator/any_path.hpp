@@ -46,7 +46,7 @@ private:
 	class derived : public base
 	{
 	public:
-		derived(path_t path)
+		explicit derived(path_t path)
 			: path_(std::move(path))
 		{
 		}

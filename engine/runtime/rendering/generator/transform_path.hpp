@@ -54,7 +54,7 @@ public:
 
 	/// @param path Source data path.
 	/// @param mutate Callback function that gets called once per vertex.
-	transform_path_t(path_t path, std::function<void(path_vertex_t&)> mutate)
+	transform_path_t(path_t path, const std::function<void(path_vertex_t&)>& mutate)
 		: path_{std::move(path)}
 		, mutate_{mutate}
 	{
@@ -77,7 +77,7 @@ private:
 };
 
 template <typename path_t>
-transform_path_t<path_t> transform_path(path_t path, std::function<void(path_vertex_t&)> mutate)
+transform_path_t<path_t> transform_path(path_t path, const std::function<void(path_vertex_t&)>& mutate)
 {
 	return transform_path_t<path_t>{std::move(path), std::move(mutate)};
 }

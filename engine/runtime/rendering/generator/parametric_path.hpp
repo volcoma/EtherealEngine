@@ -50,7 +50,7 @@ public:
 	/// @param eval A callback that should return a PathVertex for a given value.
 	/// @param segments The number of segments along the path.
 	/// Should be >= 1. Zero yields an empry path.
-	explicit parametric_path_t(std::function<path_vertex_t(double)> eval, int segments = 16) noexcept;
+	explicit parametric_path_t(const std::function<path_vertex_t(double)>& eval, int segments = 16) noexcept;
 
 	edges_t edges() const noexcept;
 

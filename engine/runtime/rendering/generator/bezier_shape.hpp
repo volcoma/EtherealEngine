@@ -25,7 +25,7 @@ private:
 	{
 		gml::dvec2 data[D];
 
-		array_wrapper(const gml::dvec2 (&p)[D])
+		explicit array_wrapper(const gml::dvec2 (&p)[D])
 		{
 			std::copy(&p[0], &p[0] + D, &data[0]);
 		}

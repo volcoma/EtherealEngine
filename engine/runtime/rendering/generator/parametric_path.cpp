@@ -55,7 +55,7 @@ void parametric_path_t::vertices_t::next()
 	++i_;
 }
 
-parametric_path_t::parametric_path_t(std::function<path_vertex_t(double)> eval, int segments) noexcept
+parametric_path_t::parametric_path_t(const std::function<path_vertex_t(double)>& eval, int segments) noexcept
 	: eval_{std::move(eval)}
 	, segments_{segments}
 	, delta_{1.0 / segments}

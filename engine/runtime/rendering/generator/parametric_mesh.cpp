@@ -89,7 +89,7 @@ void parametric_mesh_t::vertices_t::next()
 	}
 }
 
-parametric_mesh_t::parametric_mesh_t(std::function<mesh_vertex_t(const gml::dvec2& t)> eval,
+parametric_mesh_t::parametric_mesh_t(const std::function<mesh_vertex_t(const gml::dvec2& t)>& eval,
 									 const gml::ivec2& segments) noexcept
 	: eval_{std::move(eval)}
 	, segments_{segments}

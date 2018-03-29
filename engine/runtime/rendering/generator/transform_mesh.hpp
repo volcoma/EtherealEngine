@@ -54,7 +54,7 @@ public:
 
 	/// @param mesh Source data mesh.
 	/// @param mutate Callback function that gets called once per vertex.
-	explicit transform_mesh_t(mesh_t mesh, std::function<void(mesh_vertex_t&)> mutate)
+	explicit transform_mesh_t(mesh_t mesh, const std::function<void(mesh_vertex_t&)>& mutate)
 		: mesh_{std::move(mesh)}
 		, mutate_{std::move(mutate)}
 	{

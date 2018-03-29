@@ -53,7 +53,7 @@ public:
 
 	/// @param shape Source data shape.
 	/// @param mutate Callback function that gets called once per vertex.
-	transform_shape_t(shape_t shape, std::function<void(shape_vertex_t&)> mutate)
+	transform_shape_t(shape_t shape, const std::function<void(shape_vertex_t&)>& mutate)
 		: shape_{std::move(shape)}
 		, mutate_{mutate}
 	{
@@ -76,7 +76,7 @@ private:
 };
 
 template <typename shape_t>
-transform_shape_t<shape_t> transform_shape(shape_t shape, std::function<void(shape_vertex_t&)> mutate)
+transform_shape_t<shape_t> transform_shape(shape_t shape, const std::function<void(shape_vertex_t&)>& mutate)
 {
 	return transform_shape_t<shape_t>{std::move(shape), std::move(mutate)};
 }

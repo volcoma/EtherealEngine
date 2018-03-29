@@ -50,7 +50,7 @@ public:
 	/// @param eval A callback that returns a ShapeVertex for a given value.
 	/// @param segments The number of segments along the shape.
 	/// Should be >= 1. Zero yields an empty shape.
-	explicit parametric_shape_t(std::function<shape_vertex_t(double)> eval, int segments = 16) noexcept;
+	explicit parametric_shape_t(const std::function<shape_vertex_t(double)>& eval, int segments = 16) noexcept;
 
 	edges_t edges() const noexcept;
 

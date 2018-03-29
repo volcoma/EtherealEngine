@@ -63,7 +63,7 @@ private:
 	class derived : public base
 	{
 	public:
-		derived(generator gen)
+		explicit derived(generator gen)
 			: generator_{std::move(gen)}
 		{
 		}

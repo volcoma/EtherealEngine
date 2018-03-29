@@ -43,7 +43,7 @@ public:
 	using view_type = ring_span<value_type>;
 	using policy_type = policy_t;
 
-	ring_buffer(size_type size = 0) noexcept(std::is_nothrow_default_constructible<container_type>::value)
+	explicit ring_buffer(size_type size = 0) noexcept(std::is_nothrow_default_constructible<container_type>::value)
 		: container_(policy_type::create_with_size(size))
 		, view_type(std::begin(container_), std::end(container_), std::begin(container_), 0)
 	{
@@ -59,12 +59,12 @@ public:
 	{
 	}
 
-	ring_buffer(const container_type& rhs) noexcept(std::is_nothrow_copy_constructible<container_type>::value)
+	explicit ring_buffer(const container_type& rhs) noexcept(std::is_nothrow_copy_constructible<container_type>::value)
 		: ring_buffer(0, rhs.size(), rhs)
 	{
 	}
 
-	ring_buffer(container_type&& rhs) noexcept(std::is_nothrow_move_constructible<container_type>::value)
+	explicit ring_buffer(container_type&& rhs) noexcept(std::is_nothrow_move_constructible<container_type>::value)
 		: ring_buffer(0, rhs.size(), std::move(rhs))
 	{
 	}

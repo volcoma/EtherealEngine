@@ -19,7 +19,7 @@ void for_each_impl(Tuple&& tuple, F&& f, std::index_sequence<Indices...>)
 template <typename Tuple, typename F>
 void for_each(Tuple&& tuple, F&& f)
 {
-	constexpr const std::size_t N = std::tuple_size<std::remove_reference_t<Tuple>>::value;
-	detail::for_each_impl(std::forward<Tuple>(tuple), std::forward<F>(f), std::make_index_sequence<N>{});
+	detail::for_each_impl(std::forward<Tuple>(tuple), std::forward<F>(f),
+						  std::make_index_sequence<std::tuple_size<std::remove_reference_t<Tuple>>::value>{});
 }
 }

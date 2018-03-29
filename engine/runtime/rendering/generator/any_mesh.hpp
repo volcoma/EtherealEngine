@@ -46,7 +46,7 @@ private:
 	class derived : public base
 	{
 	public:
-		derived(mesh_t mesh)
+		explicit derived(mesh_t mesh)
 			: mesh_(std::move(mesh))
 		{
 		}

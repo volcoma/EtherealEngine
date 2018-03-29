@@ -46,7 +46,7 @@ private:
 	class derived : public base
 	{
 	public:
-		derived(shape_t shape)
+		explicit derived(shape_t shape)
 			: shape_(std::move(shape))
 		{
 		}
