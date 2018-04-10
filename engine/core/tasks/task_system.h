@@ -70,24 +70,10 @@ public:
 		return future_.wait_until(abs_time);
 	}
 
-	static task_future<T> from_shared_future(const std::shared_future<T>& fut, std::uint64_t id = 0)
-	{
-		task_future<T> res;
-		res.future_ = fut;
-		res.id_ = id;
-		return res;
-	}
 	static task_future<T> from_shared_future(std::shared_future<T>&& fut, std::uint64_t id = 0)
 	{
 		task_future<T> res;
 		res.future_ = std::move(fut);
-		res.id_ = id;
-		return res;
-	}
-	static task_future<T> from_future(std::future<T>&& fut, std::uint64_t id = 0)
-	{
-		task_future<T> res;
-		res.future_ = fut.share();
 		res.id_ = id;
 		return res;
 	}
@@ -338,26 +324,14 @@ private:
 		}
 
 	private:
-		template <typename T>
+		template <typename T, typename std::enable_if_t<!is_future<T>::value>* = nullptr>
 		static inline decltype(auto) call_get(T&& t)
 		{
 			return std::forward<T>(t);
 		}
 
-		template <typename T>
-		static inline decltype(auto) call_get(task_future<T>&& t)
-		{
-			return t.get();
-		}
-
-		template <typename T>
-		static inline decltype(auto) call_get(std::future<T>&& t)
-		{
-			return t.get();
-		}
-
-		template <typename T>
-		static inline decltype(auto) call_get(std::shared_future<T>&& t)
+		template <typename T, typename std::enable_if_t<is_future<T>::value>* = nullptr>
+		static inline decltype(auto) call_get(T&& t)
 		{
 			return t.get();
 		}
@@ -375,27 +349,14 @@ private:
 			}
 		}
 
-		template <typename T>
+		template <typename T, typename std::enable_if_t<!is_future<T>::value>* = nullptr>
 		static inline bool call_ready(const T& /*unused*/) noexcept
 		{
 			return true;
 		}
-
-		template <typename T>
-		static inline bool call_ready(const task_future<T>& t) noexcept
-		{
-			return t.is_ready();
-		}
-
-		template <typename T>
-		static inline bool call_ready(const std::future<T>& t) noexcept
-		{
-			using namespace std::chrono_literals;
-			return t.valid() && t.wait_for(0s) == std::future_status::ready;
-		}
-
-		template <typename T>
-		static inline bool call_ready(const std::shared_future<T>& t) noexcept
+            
+		template <typename T, typename std::enable_if_t<is_future<T>::value>* = nullptr>
+		static inline bool call_ready(const T& t) noexcept
 		{
 			using namespace std::chrono_literals;
 			return t.valid() && t.wait_for(0s) == std::future_status::ready;
