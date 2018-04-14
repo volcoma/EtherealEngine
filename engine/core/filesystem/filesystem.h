@@ -64,8 +64,7 @@ bool has_known_protocol(const path& _path);
 //  Name : read_stream ()
 /// <summary>
 /// Load a byte_array_t with the contents of the specified file, be that file in
-/// a
-/// package or in the main file system.
+/// a package or in the main file system.
 /// </summary>
 //-----------------------------------------------------------------------------
 byte_array_t read_stream(std::istream& stream);
