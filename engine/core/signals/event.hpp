@@ -2,6 +2,7 @@
 #ifndef EVENT_HPP
 #define EVENT_HPP
 
+#include "../common/nonstd/slot_map.hpp"
 #include "delegate.hpp"
 #include <algorithm>
 #include <utility>
@@ -15,51 +16,53 @@ class event<void(Args...)>
 {
 public:
 	using slot_type = delegate<void(Args...)>;
+	using slot_container = nonstd::slot_map<slot_type>;
+	using slot_key = typename slot_container::key_type;
 
-	template <class C, typename = typename ::std::enable_if<::std::is_class<C>::value, C>::type>
-	void connect(C const* const o) noexcept
+	template <class C, typename = typename std::enable_if<std::is_class<C>::value, C>::type>
+	slot_key connect(C const* const o) noexcept
 	{
-		slots_.emplace_back(slot_type(o));
+		return slots_.emplace(o);
 	}
 
-	template <class C, typename = typename ::std::enable_if<::std::is_class<C>::value, C>::type>
-	void connect(C const& o) noexcept
+	template <class C, typename = typename std::enable_if<std::is_class<C>::value, C>::type>
+	slot_key connect(C const& o) noexcept
 	{
-		slots_.emplace_back(slot_type(o));
-	}
-
-	template <class C>
-	void connect(C* const object_ptr, void (C::*const method_ptr)(Args...))
-	{
-		slots_.emplace_back(slot_type(object_ptr, method_ptr));
+		return slots_.emplace(o);
 	}
 
 	template <class C>
-	void connect(C* const object_ptr, void (C::*const method_ptr)(Args...) const)
+	slot_key connect(C* const object_ptr, void (C::*const method_ptr)(Args...))
 	{
-		slots_.emplace_back(slot_type(object_ptr, method_ptr));
+		return slots_.emplace(object_ptr, method_ptr);
 	}
 
 	template <class C>
-	void connect(C& object, void (C::*const method_ptr)(Args...))
+	slot_key connect(C* const object_ptr, void (C::*const method_ptr)(Args...) const)
 	{
-		slots_.emplace_back(slot_type(object, method_ptr));
+		return slots_.emplace(object_ptr, method_ptr);
 	}
 
 	template <class C>
-	void connect(C const& object, void (C::*const method_ptr)(Args...) const)
+	slot_key connect(C& object, void (C::*const method_ptr)(Args...))
 	{
-		slots_.emplace_back(slot_type(object, method_ptr));
+		return slots_.emplace(object, method_ptr);
 	}
 
-	template <typename T, typename = typename ::std::enable_if<
-							  !::std::is_same<event, typename ::std::decay<T>::type>::value>::type>
-	void connect(T&& f)
+	template <class C>
+	slot_key connect(C const& object, void (C::*const method_ptr)(Args...) const)
 	{
-		slots_.emplace_back(slot_type(std::forward<T>(f)));
+		return slots_.emplace(object, method_ptr);
 	}
 
-	template <class C, typename = typename ::std::enable_if<::std::is_class<C>::value, C>::type>
+	template <typename T, typename = typename std::enable_if<
+							  !std::is_same<event, typename std::decay<T>::type>::value>::type>
+	slot_key connect(T&& f)
+	{
+		return slots_.emplace(std::forward<T>(f));
+	}
+
+	template <class C, typename = typename std::enable_if<std::is_class<C>::value, C>::type>
 	void disconnect(C const* const o) noexcept
 	{
 		slot_type slot(o);
@@ -68,7 +71,7 @@ public:
 					 std::end(slots_));
 	}
 
-	template <class C, typename = typename ::std::enable_if<::std::is_class<C>::value, C>::type>
+	template <class C, typename = typename std::enable_if<std::is_class<C>::value, C>::type>
 	void disconnect(C const& o) noexcept
 	{
 		slot_type slot(o);
@@ -113,14 +116,20 @@ public:
 					 std::end(slots_));
 	}
 
-	template <typename T, typename = typename ::std::enable_if<
-							  !::std::is_same<event, typename ::std::decay<T>::type>::value>::type>
+	template <typename T, typename = typename std::enable_if<
+							  !std::is_same<event, typename std::decay<T>::type>::value &&
+							  !std::is_same<slot_key, typename std::decay<T>::type>::value>::type>
 	void disconnect(T&& f)
 	{
 		slot_type slot(std::forward<T>(f));
 		slots_.erase(std::remove_if(std::begin(slots_), std::end(slots_),
 									[&slot](const slot_type& other) { return slot == other; }),
 					 std::end(slots_));
+	}
+
+	void disconnect(const slot_key& key) noexcept
+	{
+		slots_.erase(key);
 	}
 
 	/// Emits the events you wish to send to the call-backs
@@ -155,11 +164,8 @@ public:
 	}
 
 private:
-	/// defines an array of slots
-	using slot_array = std::vector<slot_type>;
-
 	/// The slots connected to the signal
-	slot_array slots_;
+	slot_container slots_;
 };
 
 #endif // EVENT_HPP

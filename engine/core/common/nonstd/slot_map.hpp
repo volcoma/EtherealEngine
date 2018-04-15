@@ -404,15 +404,15 @@ private:
 			auto slot_back_iter = slot_iter_from_value_iter(value_back_iter);
 			*value_iter = std::move(*value_back_iter);
 			this->set_index(*slot_back_iter, value_index);
-			auto reverse_map_iter = std::next(reverse_map_.begin(), value_index);
-			*reverse_map_iter = std::distance(slots_.begin(), slot_back_iter);
+			auto reverse_map_iter = std::next(reverse_map_.begin(), value_index);		
+            *reverse_map_iter = static_cast<key_size_type>(std::distance(slots_.begin(), slot_back_iter));
 		}
 		values_.pop_back();
 		reverse_map_.pop_back();
 		// Expire this key.
 		this->set_index(*slot_iter, next_available_slot_index_);
 		this->increment_generation(*slot_iter);
-		next_available_slot_index_ = slot_index;
+		next_available_slot_index_ = static_cast<key_size_type>(slot_index);
 		return std::next(values_.begin(), value_index);
 	}
 

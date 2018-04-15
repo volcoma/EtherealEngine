@@ -203,12 +203,12 @@ public:
 	{
 	}
 
-	virtual nonstd::any invoke(const std::vector<nonstd::any>& params) const
+	nonstd::any invoke(const std::vector<nonstd::any>& params) const override
 	{
 		return invoke_variadic_impl(std::make_index_sequence<nonstd::function_traits<F>::arity>(), params);
 	}
 
-	virtual bool owns(const nonstd::any& any_delegate) const
+	bool owns(const nonstd::any& any_delegate) const override
 	{
 		if(any_delegate.type() == rtti::type_id<delegate_t>())
 		{
