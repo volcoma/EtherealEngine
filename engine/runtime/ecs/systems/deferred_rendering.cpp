@@ -192,12 +192,12 @@ visibility_set_models_t deferred_rendering::gather_visible_models(entity_compone
 				{
 					if(transform_comp_ptr->is_touched() || model_comp_ptr->is_touched())
 					{
-						result.push_back(std::make_tuple(entity, transform_comp_handle, model_comp_handle));
+						result.emplace_back(entity, transform_comp_handle, model_comp_handle);
 					}
 				} // End if dirty_only
 				else
 				{
-					result.push_back(std::make_tuple(entity, transform_comp_handle, model_comp_handle));
+					result.emplace_back(std::make_tuple(entity, transform_comp_handle, model_comp_handle));
 				}
 
 			} // Enf if visble
@@ -209,12 +209,12 @@ visibility_set_models_t deferred_rendering::gather_visible_models(entity_compone
 			{
 				if(transform_comp_ptr->is_touched() || model_comp_ptr->is_touched())
 				{
-					result.push_back(std::make_tuple(entity, transform_comp_handle, model_comp_handle));
+					result.emplace_back(std::make_tuple(entity, transform_comp_handle, model_comp_handle));
 				}
 			} // End if dirty_only
 			else
 			{
-				result.push_back(std::make_tuple(entity, transform_comp_handle, model_comp_handle));
+				result.emplace_back(std::make_tuple(entity, transform_comp_handle, model_comp_handle));
 			}
 		}
 	}
@@ -405,7 +405,7 @@ deferred_rendering::g_buffer_pass(std::shared_ptr<gfx::frame_buffer> input, came
 		{
 			model.render(
 				pass.id, world_transform, bone_transforms, true, true, true, 0, target_lod_index, nullptr,
-				[&camera, &clip_planes, &params_inv](auto& p) { p.set_uniform("u_lod_params", params_inv); });
+				[&params_inv](auto& p) { p.set_uniform("u_lod_params", params_inv); });
 		}
 	}
 

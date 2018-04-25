@@ -53,18 +53,18 @@ struct action_mapper
 //
 //	// You can map different type of events to the same action
 // 	mappings.event_map.map("some_action",
-// mml::platform_event::text_entered);
+//  mml::platform_event::text_entered);
 // 	mappings.mouse_button_map.map("some_action", mml::mouse::Right);
 // 	mappings.keyboard_map.map("some_action", mml::keyboard::Space);
 //
 // 	//you can subscribe to a callback for a specific event and action type
 // 	mappings.actions["some_action"][action_type::pressed].connect([](const
-// mml::platform_event& e)
+//  mml::platform_event& e)
 // 	{
 // 		//do some stuff
 // 	});
 // 	mappings.actions["some_action"][action_type::changed].connect([](const
-// mml::platform_event& e)
+//  mml::platform_event& e)
 // 	{
 // 		//do some stuff
 // 	});
