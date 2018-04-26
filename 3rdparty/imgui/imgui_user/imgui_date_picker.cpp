@@ -217,7 +217,7 @@ bool DateChooser(const char* label, tm& dateOut, const char* dateFormat,
 	const ImRect frame_bb(window->DC.CursorPos,
 						  window->DC.CursorPos + ImVec2(w, label_size.y) + style.FramePadding * 2.0f);
 
-	const int popup_max_height_in_items = 4 + 1 + 1 + 4;
+	//const int popup_max_height_in_items = 4 + 1 + 1 + 4;
 
 	const ImGuiWindowFlags flags = ImGuiComboFlags_HeightLargest;
 	if(!BeginCombo(label, currentText, flags))
@@ -307,7 +307,7 @@ bool DateChooser(const char* label, tm& dateOut, const char* dateFormat,
 	for(int dw = 0; dw < 7; dw++)
 	{
 		ImGui::BeginGroup();
-		if(dw == 0)
+		if(dw == 0 || dw == 6)
 		{
 			const ImVec4& tc = style.Colors[ImGuiCol_Text];
 			const float l = (tc.x + tc.y + tc.z) * 0.33334f;
@@ -332,7 +332,7 @@ bool DateChooser(const char* label, tm& dateOut, const char* dateFormat,
 				else
 					sprintf(curDayStr, "%d", cday + 1);
                 
-                tm d1 = dateOut;
+                tm d1 = d;
                 d1.tm_mday = cday + 1;
                 RecalculateDateDependentFields(d1);
                 bool selected = memcmp(&d1, &dateOut, sizeof(dateOut)) == 0; 
@@ -368,7 +368,7 @@ bool DateChooser(const char* label, tm& dateOut, const char* dateFormat,
 
 		//-----------------------------------------------------------------------
 		ImGui::Separator();
-		if(dw == 0)
+		if(dw == 0 || dw == 6)
 			ImGui::PopStyleColor();
 		ImGui::EndGroup();
 		if(dw != 6)
@@ -378,11 +378,6 @@ bool DateChooser(const char* label, tm& dateOut, const char* dateFormat,
 
 	style.WindowRounding = oldWindowRounding;
 	ImGui::PopStyleColor(2);
-
-	if((!combo_item_active && g.ActiveId != 0))
-	{
-		d = dateOut;
-	}
 
 	ImGui::PopStyleColor();
 
