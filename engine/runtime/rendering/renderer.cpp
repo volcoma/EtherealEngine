@@ -137,6 +137,8 @@ bool renderer::init_backend(cmd_line::parser& parser)
 	desktop.height = 100;
 	init_window_ = std::make_unique<mml::window>(desktop, "App", mml::style::none);
 	init_window_->set_visible(false);
+	const auto sz = init_window_->get_size();
+
 	gfx::platform_data pd{
 		reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(init_window_->get_system_handle_specific())),
 		reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(init_window_->get_system_handle())),
@@ -172,7 +174,20 @@ bool renderer::init_backend(cmd_line::parser& parser)
 		}
 	}
 
-	if(!gfx::init(preferred_renderer_type))
+	gfx::init_type init_data;
+	init_data.type = preferred_renderer_type;
+	init_data.resolution.width = sz[0];
+	init_data.resolution.height = sz[1];
+	init_data.resolution.reset = BGFX_RESET_VSYNC;
+
+	bool novsync = false;
+	parser.try_get("novsync", novsync);
+	if(novsync)
+	{
+		init_data.resolution.reset = 0;
+	}
+
+	if(!gfx::init(init_data))
 	{
 		APPLOG_ERROR("Could not initialize rendering backend!");
 		return false;
@@ -182,17 +197,6 @@ bool renderer::init_backend(cmd_line::parser& parser)
 		APPLOG_ERROR("Does not support dx9. Minimum supported is dx11.");
 		return false;
 	}
-	const auto sz = init_window_->get_size();
-
-	bool novsync = false;
-	parser.try_get("novsync", novsync);
-
-	std::uint32_t flags = BGFX_RESET_VSYNC;
-	if(novsync)
-	{
-		flags = 0;
-	}
-	gfx::reset(sz[0], sz[1], flags);
 
 	APPLOG_INFO("Using {0} rendering backend.", gfx::get_renderer_name(gfx::get_renderer_type()));
 

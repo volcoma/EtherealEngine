@@ -217,8 +217,11 @@ void imgui_set_context(ImGuiContext* context)
 	{
 		std::memcpy(&context->Style, &last_context->Style, sizeof(ImGuiStyle));
 		std::memcpy(&context->IO.KeyMap, &last_context->IO.KeyMap, sizeof(last_context->IO.KeyMap));
+		std::memcpy(&context->IO.NavInputs, &last_context->IO.NavInputs, sizeof(last_context->IO.NavInputs));
+
 		context->IO.IniFilename = last_context->IO.IniFilename;
 		context->IO.ConfigFlags = last_context->IO.ConfigFlags;
+		context->IO.BackendFlags = last_context->IO.BackendFlags;
 		context->IO.FontAllowUserScaling = last_context->IO.FontAllowUserScaling;
 		context->Initialized = last_context->Initialized;
 	}

@@ -13,6 +13,7 @@
 namespace gfx
 {
 static const uint16_t invalid_handle = bgfx::kInvalidHandle;
+using init_type = bgfx::Init;
 using view_id = bgfx::ViewId;
 using renderer_type = bgfx::RendererType::Enum;
 using backbuffer_ratio = bgfx::BackbufferRatio::Enum;
@@ -54,8 +55,7 @@ using instance_data_buffer = bgfx::InstanceDataBuffer;
 void set_platform_data(const platform_data& _data);
 
 /**/
-bool init(renderer_type _type = renderer_type::Count, uint16_t _vendorId = BGFX_PCI_ID_NONE,
-		  uint16_t _deviceId = 0);
+bool init(init_type init_data);
 
 /**/
 void shutdown();

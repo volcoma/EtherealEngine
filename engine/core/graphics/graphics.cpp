@@ -102,11 +102,15 @@ void shutdown()
 	}
 }
 
-bool init(renderer_type _type, std::uint16_t _vendorId, std::uint16_t _deviceId)
+bool init(init_type init_data)
 {
-	static gfx_callback callback;
+	if(init_data.callback == nullptr)
+	{
+		static gfx_callback callback;
+		init_data.callback = &callback;
+	}
 
-	s_initted = bgfx::init(_type, _vendorId, _deviceId, &callback);
+	s_initted = bgfx::init(init_data);
 
 	return s_initted;
 }
