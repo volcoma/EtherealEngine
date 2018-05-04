@@ -200,12 +200,6 @@ void window::set_size(const std::array<std::uint32_t, 2>& size)
         if(_size[0] != size[0] || _size[1] != size[1])
         {
             _impl->set_size(size);
-    
-            // Cache the new size
-            _size = size;
-    
-            // Notify the derived class
-            on_resize();
         }
     }
 }

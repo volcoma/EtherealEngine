@@ -32,7 +32,7 @@ public:
 	/// Destructor.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual ~render_window();
+	~render_window() override;
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_surface ()
@@ -82,7 +82,7 @@ protected:
 	/// perform custom actions when the size of the window changes.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void on_resize();
+	void on_resize() override;
 
 	/// Window id.
 	std::uint32_t id_ = 0;
