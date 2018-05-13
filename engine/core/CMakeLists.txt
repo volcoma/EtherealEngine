@@ -19,8 +19,6 @@ add_subdirectory(uuid)
 
 add_library (core core.cpp)
 target_include_directories (core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
-include(target_warning_support)
-set_warning_level(core high)
 
 target_link_libraries(core PUBLIC common_lib)
 target_link_libraries(core PUBLIC cmd_line)
