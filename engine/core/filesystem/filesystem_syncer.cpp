@@ -8,12 +8,10 @@ static void ensure_directory_exists(const fs::path& path)
 	fs::error_code err;
 	if(path.has_extension())
 	{
-		fs::error_code err;
 		fs::create_directories(fs::path(path).parent_path(), err);
 	}
 	else
 	{
-		fs::error_code err;
 		fs::create_directories(path, err);
 	}
 }

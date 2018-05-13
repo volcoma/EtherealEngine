@@ -180,10 +180,10 @@ public:
 					auto& e = entries[idx];
 					if(e.size == fi.size)
 					{
-						using sys_clock = std::chrono::system_clock;
-						std::chrono::microseconds tolerance = 1000us;
-						auto diff = sys_clock::from_time_t(e.last_mod_time - fi.last_mod_time);
-						auto d = std::chrono::time_point_cast<std::chrono::microseconds>(diff);
+						//using sys_clock = std::chrono::system_clock;
+						//std::chrono::microseconds tolerance = 1000us;
+						//auto diff = sys_clock::from_time_t(e.last_mod_time - fi.last_mod_time);
+						//auto d = std::chrono::time_point_cast<std::chrono::microseconds>(diff);
 						if(e.last_mod_time == fi.last_mod_time)
 						{
 

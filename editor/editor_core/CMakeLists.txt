@@ -8,6 +8,4 @@ target_link_libraries(editor_core PUBLIC mesh_import)
 target_link_libraries(editor_core PUBLIC nativefd)
 target_link_libraries(editor_core PUBLIC gui)
 
-if(MINGW)
-	target_link_libraries(editor_core PUBLIC "-static")
-endif()
+target_include_directories (editor_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)

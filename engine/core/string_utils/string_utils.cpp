@@ -85,14 +85,20 @@ std::vector<std::string> string_utils::split(const std::string& text, char sep, 
 std::string string_utils::to_upper(const std::string& str)
 {
 	std::string s(str);
-	std::transform(s.begin(), s.end(), s.begin(), toupper);
+	std::transform(s.begin(), s.end(), s.begin(), [](char in)
+    {
+        return char(toupper(in));
+    });
 	return s;
 }
 
 std::string string_utils::to_lower(const std::string& str)
 {
 	std::string s(str);
-	std::transform(s.begin(), s.end(), s.begin(), tolower);
+    std::transform(s.begin(), s.end(), s.begin(), [](char in)
+    {
+        return char(tolower(in));
+    });
 	return s;
 }
 

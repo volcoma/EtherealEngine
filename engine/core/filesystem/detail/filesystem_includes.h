@@ -13,4 +13,4 @@ using namespace boost::filesystem;
 using error_code = boost::system::error_code;
 using file_time_type = std::time_t;
 using copy_options = boost::filesystem::copy_option;
-};
+}

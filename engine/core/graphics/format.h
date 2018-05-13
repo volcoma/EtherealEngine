@@ -25,7 +25,7 @@ enum e
 	full_precision_float = 0x2000,
 	floating_point = 0xF000,
 };
-};
+}
 
 bool is_format_supported(std::uint16_t flags, texture_format format);
 

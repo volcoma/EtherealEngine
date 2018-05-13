@@ -26,6 +26,7 @@ void device::enable()
 	{
 		impl_->enable();
 	}
+
 }
 
 void device::disable()

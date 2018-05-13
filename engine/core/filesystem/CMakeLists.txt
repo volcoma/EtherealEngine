@@ -9,3 +9,12 @@ target_link_libraries(filesystem PUBLIC boost_filesystem)
 #elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 #	target_link_libraries(filesystem PUBLIC c++experimental)
 #endif()
+
+set_target_properties(filesystem PROPERTIES
+    CXX_STANDARD 14
+    CXX_STANDARD_REQUIRED YES
+    CXX_EXTENSIONS NO
+)
+
+include(target_warning_support)
+set_warning_level(filesystem high)

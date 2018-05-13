@@ -66,17 +66,17 @@ static std::string al_extensions()
 	return ss.str();
 }
 
-static std::string alc_extensions()
-{
-	std::stringstream ss;
-	auto extensions = alcGetString(nullptr, ALC_EXTENSIONS);
-	if(extensions != nullptr)
-	{
-		ss << "OpenALC extensions: " << extensions;
-	}
+//static std::string alc_extensions()
+//{
+//	std::stringstream ss;
+//	auto extensions = alcGetString(nullptr, ALC_EXTENSIONS);
+//	if(extensions != nullptr)
+//	{
+//		ss << "OpenALC extensions: " << extensions;
+//	}
 
-	return ss.str();
-}
+//	return ss.str();
+//}
 }
 
 device_impl::device_impl(int devnum)

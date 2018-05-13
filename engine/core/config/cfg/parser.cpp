@@ -194,7 +194,7 @@ parser::Token parser::lex_newline(std::string& value)
 			if(c != value[0])
 			{
 				// \r\n or \n\r
-				value.push_back(c);
+				value.push_back(char(c));
 			}
 			else
 			{

@@ -19,4 +19,4 @@ path executable_path(const char* argv0);
 /// </summary>
 //-----------------------------------------------------------------------------
 void show_in_graphical_env(const path& _path);
-};
+}

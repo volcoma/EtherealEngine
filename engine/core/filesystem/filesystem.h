@@ -81,4 +81,5 @@ path replace(const path& _path, const path& _sequence, const path& _new_sequence
 std::vector<path> split_until(const path& _path, const path& _predicate);
 
 path reduce_trailing_extensions(const path& _path);
-};
+
+}
