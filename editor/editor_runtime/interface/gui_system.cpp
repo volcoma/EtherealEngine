@@ -40,6 +40,13 @@ void render_func(ImDrawData* _draw_data)
 	{
 		return;
 	}
+    auto& io = gui::GetIO();    
+	int fb_width = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
+	int fb_height = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+	if(fb_width == 0 || fb_height == 0)
+		return;
+
+	//_draw_data->ScaleClipRects(io.DisplayFramebufferScale);
 	s_draw_calls = 0;
 	auto program = s_program.get();
 	program->begin();
@@ -160,6 +167,10 @@ void imgui_handle_event(const mml::platform_event& event)
 	{
 		io.MousePos.x = float(event.mouse_move.x);
 		io.MousePos.y = float(event.mouse_move.y);
+
+		// Scale according to framebuffer display scale
+		io.MousePos.x *= io.DisplayFramebufferScale.x;
+		io.MousePos.y *= io.DisplayFramebufferScale.y;
 	}
 
 	if(event.type == mml::platform_event::text_entered)
@@ -232,18 +243,24 @@ void imgui_frame_update(render_window& window, delta_t dt)
 {
 	auto& io = gui::GetIO();
 	auto view_size = window.get_surface()->get_size();
+	auto display_w = view_size.width;
+	auto display_h = view_size.height;
 	auto window_size = window.get_size();
+	auto w = window_size[0];
+	auto h = window_size[1];
 
+	io.DisplayFramebufferScale =
+		ImVec2(w > 0 ? ((float)display_w / w) : 0, h > 0 ? ((float)display_h / h) : 0);
 	// Setup display size (every frame to accommodate for window resizing)
-	io.DisplaySize = ImVec2(static_cast<float>(view_size.width), static_cast<float>(view_size.height));
+	io.DisplaySize = ImVec2(float(w), float(h));
 	// Setup time step
 	io.DeltaTime = dt.count();
 
 	irect32_t relative_rect;
 	relative_rect.left = 0;
 	relative_rect.top = 0;
-	relative_rect.right = static_cast<std::int32_t>(window_size[0]);
-	relative_rect.bottom = static_cast<std::int32_t>(window_size[1]);
+	relative_rect.right = static_cast<std::int32_t>(w);
+	relative_rect.bottom = static_cast<std::int32_t>(h);
 	auto mouse_pos = mml::mouse::get_position(window);
 
 	if(window.has_focus() && relative_rect.contains({mouse_pos[0], mouse_pos[1]}))
