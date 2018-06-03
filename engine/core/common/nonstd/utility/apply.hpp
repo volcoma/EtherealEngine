@@ -14,6 +14,7 @@ template <class F, class T, std::size_t... I>
 constexpr inline decltype(auto) apply_(F&& f, T&& t, std::index_sequence<I...>) noexcept(
 	noexcept(nonstd::invoke(std::forward<F>(f), std::get<I>(std::forward<T>(t))...)))
 {
+    ignore(f, t);    
 	return nonstd::invoke(std::forward<F>(f), std::get<I>(std::forward<T>(t))...);
 }
 

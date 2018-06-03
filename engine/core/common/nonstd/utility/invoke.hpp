@@ -4,6 +4,11 @@
 #include <utility>
 namespace nonstd
 {
+template <typename... Args>
+inline void ignore(Args&&...)
+{
+}
+
 namespace detail
 {
 template <class T>
