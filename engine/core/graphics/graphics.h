@@ -166,7 +166,7 @@ dynamic_index_buffer_handle create_dynamic_index_buffer(const memory_view* _mem,
 														uint16_t _flags = BGFX_BUFFER_NONE);
 
 /**/
-void update_dynamic_index_buffer(dynamic_index_buffer_handle _handle, uint32_t _startIndex,
+void update(dynamic_index_buffer_handle _handle, uint32_t _startIndex,
 								 const memory_view* _mem);
 
 /**/
@@ -181,7 +181,7 @@ dynamic_vertex_buffer_handle create_dynamic_vertex_buffer(const memory_view* _me
 														  uint16_t _flags = BGFX_BUFFER_NONE);
 
 /**/
-void update_dynamic_vertex_buffer(dynamic_vertex_buffer_handle _handle, uint32_t _startVertex,
+void update(dynamic_vertex_buffer_handle _handle, uint32_t _startVertex,
 								  const memory_view* _mem);
 
 /**/

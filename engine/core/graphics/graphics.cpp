@@ -285,10 +285,10 @@ dynamic_index_buffer_handle create_dynamic_index_buffer(const memory_view* _mem,
 	return bgfx::createDynamicIndexBuffer(_mem, _flags);
 }
 
-void update_dynamic_index_buffer(dynamic_index_buffer_handle _handle, uint32_t _startIndex,
+void update(dynamic_index_buffer_handle _handle, uint32_t _startIndex,
 								 const memory_view* _mem)
 {
-	bgfx::updateDynamicIndexBuffer(_handle, _startIndex, _mem);
+	bgfx::update(_handle, _startIndex, _mem);
 }
 
 void destroy(dynamic_index_buffer_handle _handle)
@@ -308,10 +308,10 @@ dynamic_vertex_buffer_handle create_dynamic_vertex_buffer(const memory_view* _me
 	return bgfx::createDynamicVertexBuffer(_mem, _decl, _flags);
 }
 
-void update_dynamic_vertex_buffer(dynamic_vertex_buffer_handle _handle, uint32_t _startVertex,
+void update(dynamic_vertex_buffer_handle _handle, uint32_t _startVertex,
 								  const memory_view* _mem)
 {
-	bgfx::updateDynamicVertexBuffer(_handle, _startVertex, _mem);
+	bgfx::update(_handle, _startVertex, _mem);
 }
 
 void destroy(dynamic_vertex_buffer_handle _handle)
