@@ -43,8 +43,7 @@ IMGUI_API void LabelTextExV(const char* label, const char* fmt, va_list args);
 
 enum ImGuiMouseCursorEx_
 {
-	ImGuiMouseCursor_Hand = ImGuiMouseCursor_COUNT,
-	ImGuiMouseCursor_NotAllowed,
+	ImGuiMouseCursor_NotAllowed = ImGuiMouseCursor_COUNT,
 	ImGuiMouseCursor_Help,
 	ImGuiMouseCursor_Wait,
 	ImGuiMouseCursor_ArrowWait,

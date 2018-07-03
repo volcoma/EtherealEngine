@@ -44,9 +44,9 @@ public:
 	using policy_type = policy_t;
 
 	explicit ring_buffer(size_type size = 0) noexcept(std::is_nothrow_default_constructible<container_type>::value)
-		: container_(policy_type::create_with_size(size))
-		, view_type(std::begin(container_), std::end(container_), std::begin(container_), 0)
+        : container_(policy_type::create_with_size(size))
 	{
+        clear();
 	}
 
 	ring_buffer(const ring_buffer& rhs) noexcept(std::is_nothrow_copy_constructible<container_type>::value)
@@ -90,17 +90,22 @@ public:
 
 	void clear() noexcept
 	{
-		static_cast<view_type&>(*this) =
-			view_type(std::begin(container_), std::end(container_), std::begin(container_), 0);
-	}
+        reset(0, 0);
+    }
 
 private:
+    void reset(size_type first_idx, size_type size)
+    {
+        static_cast<view_type&>(*this) =
+			view_type(std::begin(container_), std::end(container_), std::begin(container_) + first_idx, size);
+    }
+
 	template <class... Args>
 	ring_buffer(size_type first_idx, size_type size,
 				Args&&... args) noexcept(noexcept(container_type(std::forward<Args>(args)...)))
 		: container_(std::forward<Args>(args)...)
-		, view_type(std::begin(container_), std::end(container_), std::begin(container_) + first_idx, size)
 	{
+        reset(first_idx, size);
 	}
 
 	container_type container_;

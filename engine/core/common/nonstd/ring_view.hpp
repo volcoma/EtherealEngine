@@ -49,7 +49,7 @@ public:
 
 	friend class ring_iterator<type, false>;
 	friend class ring_iterator<type, true>;
-
+	ring_span() = default;
 	template <class ContiguousIterator>
 	ring_span(ContiguousIterator begin, ContiguousIterator end, Popper p = Popper()) noexcept;
 
@@ -199,9 +199,7 @@ template <typename T, class Popper>
 template <class ContiguousIterator>
 nonstd::ring_span<T, Popper>::ring_span(ContiguousIterator begin, ContiguousIterator end, Popper p) noexcept
 	: m_data(&*begin)
-	, m_size(0)
 	, m_capacity(end - begin)
-	, m_front_idx(0)
 	, m_popper(std::move(p))
 {
 }
