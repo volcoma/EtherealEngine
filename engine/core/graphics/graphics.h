@@ -24,13 +24,13 @@ using uniform_info = bgfx::UniformInfo;
 using attachment = bgfx::Attachment;
 using platform_data = bgfx::PlatformData;
 using caps = bgfx::Caps;
-using hmd = bgfx::HMD;
 using stats = bgfx::Stats;
 using access = bgfx::Access::Enum;
 using view_mode = bgfx::ViewMode::Enum;
 using occlusion_query_result = bgfx::OcclusionQueryResult::Enum;
 using topology_conversion = bgfx::TopologyConvert::Enum;
 using topology_sort = bgfx::TopologySort::Enum;
+using topology = bgfx::Topology;
 using release_fn = bgfx::ReleaseFn;
 using encoder = bgfx::Encoder;
 
@@ -110,8 +110,6 @@ renderer_type get_renderer_type();
 
 /**/
 const caps* get_caps();
-/**/
-const hmd* get_hmd();
 
 /**/
 const stats* get_stats();

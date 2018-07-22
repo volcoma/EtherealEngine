@@ -2,6 +2,7 @@
 #include "meta/meta.h"
 #include "system/app.h"
 
+
 int main(int argc, char* argv[])
 {
 	fs::path engine_path = fs::system_complete(ENGINE_DIRECTORY);

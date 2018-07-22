@@ -198,11 +198,6 @@ const caps* get_caps()
 	return bgfx::getCaps();
 }
 
-const hmd* get_hmd()
-{
-	return bgfx::getHMD();
-}
-
 const stats* get_stats()
 {
 	return bgfx::getStats();

@@ -43,6 +43,22 @@ struct ImGuiBigStorage
     }
 };
 
+void ShadeVertsLinearAlphaGradientForLeftToRightText(ImDrawVert* vert_start, ImDrawVert* vert_end, float gradient_p0_x, float gradient_p1_x)
+{
+    float gradient_extent_x = gradient_p1_x - gradient_p0_x;
+    float gradient_inv_length2 = 1.0f / (gradient_extent_x * gradient_extent_x);
+    int full_alpha_count = 0;
+    for (ImDrawVert* vert = vert_end - 1; vert >= vert_start; vert--)
+    {
+        float d = (vert->pos.x - gradient_p0_x) * (gradient_extent_x);
+        float alpha_mul = 1.0f - ImClamp(d * gradient_inv_length2, 0.0f, 1.0f);
+        if (alpha_mul >= 1.0f && ++full_alpha_count > 2)
+            return; // Early out
+        int a = (int)(((vert->col >> IM_COL32_A_SHIFT) & 0xFF) * alpha_mul);
+        vert->col = (vert->col & ~IM_COL32_A_MASK) | (a << IM_COL32_A_SHIFT);
+    }
+}
+
 // sizeof() = 60~
 struct ImGuiTabItem
 {
