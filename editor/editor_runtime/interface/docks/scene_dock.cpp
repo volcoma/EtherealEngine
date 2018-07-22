@@ -109,7 +109,7 @@ void scene_dock::show_statistics(const ImVec2& area, unsigned int fps, bool& sho
 
 		const auto& gui_sys = core::get_subsystem<gui_system>();
 		std::uint32_t ui_draw_calls = gui_sys.get_draw_calls();
-        std::uint32_t total_primitives = std::accumulate(std::begin(stats->numPrims), std::end(stats->numPrims), 0);
+        std::uint32_t total_primitives = std::accumulate(std::begin(stats->numPrims), std::end(stats->numPrims), 0u);
 
         gui::Text("Primitives %u", total_primitives);
 		gui::Text("Total Draw Calls: %u", stats->numDraw);
