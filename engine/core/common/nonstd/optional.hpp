@@ -44,7 +44,7 @@ using std::experimental::bad_optional_access;
 #ifndef STX_HAVE_IN_PLACE_T
 using std::experimental::in_place;
 using std::experimental::in_place_t;
-;
+
 #define STX_IN_PLACE_T 1
 #endif
 using std::experimental::make_optional;
@@ -361,7 +361,7 @@ union storage_t {
 	T value_;
 
 	constexpr storage_t(trivial_init_t) noexcept
-		: dummy_(){};
+		: dummy_(){}
 
 	template <class... Args>
 	constexpr storage_t(Args&&... args)
@@ -380,7 +380,7 @@ union constexpr_storage_t {
 	T value_;
 
 	constexpr constexpr_storage_t(trivial_init_t) noexcept
-		: dummy_(){};
+		: dummy_(){}
 
 	template <class... Args>
 	constexpr constexpr_storage_t(Args&&... args)
@@ -399,7 +399,7 @@ struct optional_base
 
 	constexpr optional_base() noexcept
 		: init_(false)
-		, storage_(trivial_init){};
+		, storage_(trivial_init){}
 
 	explicit constexpr optional_base(const T& v)
 		: init_(true)
@@ -443,7 +443,7 @@ struct constexpr_optional_base
 
 	constexpr constexpr_optional_base() noexcept
 		: init_(false)
-		, storage_(trivial_init){};
+		, storage_(trivial_init){}
 
 	explicit constexpr constexpr_optional_base(const T& v)
 		: init_(true)
@@ -565,9 +565,9 @@ public:
 
 	// 20.5.5.1, constructors
 	constexpr optional() noexcept
-		: OptionalBase<T>(){};
+		: OptionalBase<T>(){}
 	constexpr optional(nullopt_t) noexcept
-		: OptionalBase<T>(){};
+		: OptionalBase<T>(){}
 
 	optional(const optional& rhs)
 		: OptionalBase<T>()
@@ -1300,8 +1300,8 @@ namespace std
 template <typename T>
 struct hash<STX_NAMESPACE_NAME::optional<T>>
 {
-	typedef typename hash<T>::result_type result_type;
-	typedef STX_NAMESPACE_NAME::optional<T> argument_type;
+	using result_type = typename hash<T>::result_type;
+	using argument_type = nonstd::optional<T>;
 
 	constexpr result_type operator()(argument_type const& arg) const
 	{

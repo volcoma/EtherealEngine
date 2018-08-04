@@ -52,11 +52,11 @@ class delegate<R(A...)>
 	};
 
 	union nocopy_types {
+        pairtype pair;
+        void (undefined_class::*member_pointer)();
 		void* object;
 		const void* const_object;
 		void (*function_pointer)();
-		void (undefined_class::*member_pointer)();
-		pairtype pair;
 	};
 
 	union any_data {
@@ -333,7 +333,7 @@ public:
 		}
 	}
 
-	delegate(delegate&& d)
+	delegate(delegate&& d) noexcept
 	{
 		d.swap(*this);
 	}
@@ -392,7 +392,7 @@ public:
 		return *this;
 	}
 
-	delegate& operator=(delegate&& d)
+	delegate& operator=(delegate&& d) noexcept
 	{
 		delegate(std::move(d)).swap(*this);
 		return *this;

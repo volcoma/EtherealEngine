@@ -137,8 +137,6 @@ struct base_function_wrapper
 	virtual ~base_function_wrapper() = default;
 
 	virtual nonstd::any invoke(const std::vector<nonstd::any>& params) const = 0;
-
-	virtual bool owns(const nonstd::any& delegate) const = 0;
 };
 
 template <typename F, typename IndexSequence>
@@ -155,6 +153,7 @@ class function_wrapper<F, std::index_sequence<ArgCount...>> : public base_functi
 	nonstd::any invoke_variadic_impl(std::index_sequence<Arg_Idx...> /*seq*/,
 									 const std::vector<nonstd::any>& arg_list) const
 	{
+        (void)arg_list;
 		return invoke(is_void(),
 					  ((Arg_Idx < arg_list.size()) ? arg_list[Arg_Idx]
 												   : nonstd::param_types_decayed_t<F, Arg_Idx>())...);
@@ -169,7 +168,7 @@ class function_wrapper<F, std::index_sequence<ArgCount...>> : public base_functi
 		assert(all_params_are_convertible && "cannot convert all the parameters");
 		if(all_params_are_convertible)
 		{
-			_function(implicit_cast<nonstd::param_types_decayed_t<F, ArgCount>>(args)...);
+			function_(implicit_cast<nonstd::param_types_decayed_t<F, ArgCount>>(args)...);
 		}
 
 		return nonstd::any{};
@@ -184,7 +183,7 @@ class function_wrapper<F, std::index_sequence<ArgCount...>> : public base_functi
 		assert(all_params_are_convertible && "cannot convert all the parameters");
 		if(all_params_are_convertible)
 		{
-			return _function(implicit_cast<nonstd::param_types_decayed_t<F, ArgCount>>(args)...);
+			return function_(implicit_cast<nonstd::param_types_decayed_t<F, ArgCount>>(args)...);
 		}
 		return nonstd::any{};
 	}
@@ -194,12 +193,12 @@ public:
 
 	template <typename C>
 	function_wrapper(C* const object_ptr, F f)
-		: _function(object_ptr, f)
+		: function_(object_ptr, f)
 	{
 	}
 
 	function_wrapper(F f)
-		: _function(f)
+		: function_(f)
 	{
 	}
 
@@ -208,18 +207,8 @@ public:
 		return invoke_variadic_impl(std::make_index_sequence<nonstd::function_traits<F>::arity>(), params);
 	}
 
-	bool owns(const nonstd::any& any_delegate) const override
-	{
-		if(any_delegate.type() == rtti::type_id<delegate_t>())
-		{
-			auto del = nonstd::any_cast<delegate_t>(any_delegate);
-			return del == _function;
-		}
-		return false;
-	}
-
 private:
-	delegate_t _function;
+	delegate_t function_;
 };
 
 template <typename F>
@@ -243,6 +232,7 @@ class signals_t
 {
 	struct info_t
 	{
+        std::uint64_t id = 0;
 		/// Priority used for sorting
 		std::uint32_t priority = 0;
 		/// Sentinel used for life tracking
@@ -253,98 +243,125 @@ class signals_t
 
 public:
 	template <typename F>
-	void connect(const id_t& id, F&& f, std::uint32_t priority = 0)
+	std::uint64_t connect(const id_t& id, F&& f, std::uint32_t priority = 0)
 	{
 		static_assert(std::is_same<void, typename nonstd::function_traits<F>::result_type>::value,
 					  "signals cannot have a return type different from void");
 
-		info_t info;
+        auto& container = list_[id];
+        container.pending.emplace_back();
+		auto& info = container.pending.back();
 		info.priority = priority;
 		info.function = make_wrapper(std::forward<F>(f));
-		auto& container = list_[id];
-		container.emplace_back(std::move(info));
-		sort(container);
+		info.id = ++id_gen_;
+
+		return info.id;
 	}
 
 	template <typename C, typename F>
-	void connect(const id_t& id, C* const object_ptr, F f, std::uint32_t priority = 0)
+	std::uint64_t connect(const id_t& id, C* const object_ptr, F f, std::uint32_t priority = 0)
 	{
 		static_assert(std::is_same<void, typename nonstd::function_traits<F>::result_type>::value,
 					  "signals cannot have a return type different from void");
 
-		info_t info;
+		auto& container = list_[id];
+        container.pending.emplace_back();
+		auto& info = container.pending.back();
 		info.priority = priority;
 		info.function = make_wrapper(object_ptr, std::forward<F>(f));
-		auto& container = list_[id];
-		container.emplace_back(std::move(info));
-		sort(container);
+        info.id = ++id_gen_;
+
+		return info.id;
 	}
 
 	template <typename F>
-	void connect(const id_t& id, const sentinel_t& sentinel, F&& f, std::uint32_t priority = 0)
+	std::uint64_t connect(const id_t& id, const sentinel_t& sentinel, F&& f, std::uint32_t priority = 0)
 	{
 		static_assert(std::is_same<void, typename nonstd::function_traits<F>::result_type>::value,
 					  "signals cannot have a return type different from void");
 
-		info_t info;
+		auto& container = list_[id];
+        container.pending.emplace_back();
+		auto& info = container.pending.back();
 		info.priority = priority;
 		info.sentinel = sentinel;
 		info.function = make_wrapper(std::forward<F>(f));
-		auto& container = list_[id];
-		container.emplace_back(std::move(info));
-		sort(container);
+		info.id = ++id_gen_;
+
+		return info.id;
 	}
 
 	template <typename C, typename F>
-	void connect(const id_t& id, const sentinel_t& sentinel, C* const object_ptr, F&& f,
+	std::uint64_t connect(const id_t& id, const sentinel_t& sentinel, C* const object_ptr, F&& f,
 				 std::uint32_t priority = 0)
 	{
 		static_assert(std::is_same<void, typename nonstd::function_traits<F>::result_type>::value,
 					  "signals cannot have a return type different from void");
 
-		info_t info;
+		auto& container = list_[id];
+        container.pending.emplace_back();
+		auto& info = container.pending.back();
 		info.priority = priority;
 		info.sentinel = sentinel;
 		info.function = make_wrapper(object_ptr, std::forward<F>(f));
+		info.id = ++id_gen_;
 
-		auto& container = list_[id];
-		container.emplace_back(std::move(info));
-		sort(container);
+		return info.id;
 	}
 
-	template <typename C, typename F>
-	void disconnect(const id_t& id, C* const object_ptr, F&& f)
+	void disconnect(const id_t& id, std::uint64_t slot_id)
 	{
-		static_assert(std::is_same<void, typename nonstd::function_traits<F>::result_type>::value,
-					  "signals cannot have a return type different from void");
-
-		auto& container = list_[id];
-
-		using arg_index_sequence = std::make_index_sequence<nonstd::function_traits<F>::arity>;
-		auto slot =
-			typename function_wrapper<F, arg_index_sequence>::delegate_t(object_ptr, std::forward<F>(f));
-		auto it = std::find_if(std::begin(container), std::end(container),
-							   [&slot](const info_t& info) { return info.function->owns(slot); });
-
-		if(it != std::end(container))
-		{
-			auto& info = *it;
-			info.sentinel = sentinel_t();
-		}
+        auto find_it = list_.find(id);
+        if(find_it != std::end(list_))
+        {
+            const auto predicate = [&slot_id](const info_t& info) 
+            { 
+                return info.id == slot_id; 
+            };
+            bool found_it = false;
+            {
+                auto& container = list_[id].active;
+                
+                auto it = std::find_if(std::begin(container), std::end(container), predicate);
+                if(it != std::end(container))
+                {
+                    auto& info = *it;
+                    info.sentinel = sentinel_t();
+                    found_it = true;
+                }
+            }
+            if(!found_it)
+            {
+                auto& container = list_[id].pending;
+                container.erase(std::remove_if(std::begin(container), std::end(container), predicate), std::end(container));
+            }
+        }
 	}
 
 	template <typename... Args>
 	void emit(const id_t& id, Args&&... args)
-	{
-		auto& container = list_[id];
+	{ 
+		auto find_it = list_.find(id);
+        if(find_it == std::end(list_))
+        {
+            return;
+        }
+        auto& container_pending = find_it->second.pending;
+        auto& container = find_it->second.active;
+        
+        if(!container_pending.empty())
+        {
+            std::move(std::begin(container_pending), std::end(container_pending), std::back_inserter(container));
+            container_pending.clear();
+            sort(container);
+        }
 
 		auto any_args = fill_args(std::forward<Args>(args)...);
 		// Iterate this way to allow modification
 		bool collect_garbage = false;
-		for(size_t i = 0; i < container.size(); ++i)
+		for(const auto& info : container)
 		{
-			const auto& info = container[i];
-			if(info.sentinel.has_value() && info.sentinel.value().expired())
+			if(info.sentinel && info.sentinel.value().expired())
 			{
 				collect_garbage = true;
 				continue;
@@ -356,6 +373,7 @@ public:
 		{
 			check_sentinels(container);
 		}
+		
 	}
 
 	void clear()
@@ -375,14 +393,20 @@ private:
 		// remove expired subscribers
 		container.erase(std::remove_if(std::begin(container), std::end(container),
 									   [](const info_t& info) {
-										   return info.sentinel.has_value() &&
+										   return info.sentinel &&
 												  info.sentinel.value().expired();
 									   }),
 						std::end(container));
 	}
 
+    uint64_t id_gen_ = 0;
+    struct slots
+    {
+        std::vector<info_t> active;
+        std::vector<info_t> pending;
+    };
 	/// signal / slots
-	std::unordered_map<id_t, std::vector<info_t>> list_;
+	std::unordered_map<id_t, slots> list_;
 };
 
 template <typename id_t = std::string, typename sentinel_t = std::weak_ptr<void>>
