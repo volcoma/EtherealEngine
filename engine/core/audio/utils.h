@@ -16,7 +16,7 @@ namespace utils
 /// </summary>
 //-----------------------------------------------------------------------------
 std::vector<std::uint8_t> convert_to_mono(const std::vector<std::uint8_t>& input,
-										  std::uint8_t bytes_per_sample);
+                                          std::uint8_t bytes_per_sample);
 
 //-----------------------------------------------------------------------------
 //  Name : convert_to_stereo ()
@@ -25,6 +25,6 @@ std::vector<std::uint8_t> convert_to_mono(const std::vector<std::uint8_t>& input
 /// </summary>
 //-----------------------------------------------------------------------------
 std::vector<std::uint8_t> convert_to_stereo(const std::vector<std::uint8_t>& input,
-											std::uint8_t bytes_per_sample);
+                                            std::uint8_t bytes_per_sample);
 }
 }

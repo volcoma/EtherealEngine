@@ -8,17 +8,23 @@ namespace audio
 
 struct sound_info
 {
-	using seconds_t = std::chrono::duration<double>;
-	/// bytes per sample
-	std::uint8_t bytes_per_sample = 2;
+    using duration_t = std::chrono::duration<double>;
 
-	/// sample rate of the sound
-	std::uint32_t sample_rate = 0;
+    inline duration_t::rep get_duration() const
+    {
+        return duration.count();
+    }
 
-	/// channel count of the sound. e.g mono/stereo
-	std::uint32_t channels = 0;
+    /// bytes per sample
+    std::uint8_t bytes_per_sample = 2;
 
-	/// duration of the sound in seconds
-	seconds_t duration = seconds_t(0);
+    /// sample rate of the sound
+    std::uint32_t sample_rate = 0;
+
+    /// channel count of the sound. e.g mono/stereo
+    std::uint32_t channels = 0;
+
+    /// duration of the sound in seconds
+    duration_t duration = duration_t(0);
 };
 }

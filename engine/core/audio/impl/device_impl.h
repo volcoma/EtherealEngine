@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -12,31 +13,37 @@ namespace priv
 class device_impl
 {
 public:
-	device_impl(int devnum);
-	~device_impl();
+    device_impl(int devnum);
+    ~device_impl();
 
-	void enable();
-	void disable();
+    void enable();
+    void disable();
 
-	bool is_valid() const;
+    bool is_valid() const;
 
-	const std::string& get_device_id() const;
-	const std::string& get_version() const;
-	const std::string& get_vendor() const;
-	const std::string& get_extensions() const;
+    const std::string& get_device_id() const;
+    const std::string& get_version() const;
+    const std::string& get_vendor() const;
+    const std::string& get_extensions() const;
 
-	static std::vector<std::string> enumerate_playback_devices();
-	static std::vector<std::string> enumerate_capture_devices();
+    static std::vector<std::string> enumerate_playback_devices();
+    static std::vector<std::string> enumerate_capture_devices();
 
 private:
-	ALCdevice* device_ = nullptr;
-	ALCcontext* context_ = nullptr;
+    struct deleter
+    {
+        void operator()(ALCdevice *obj);
+        void operator()(ALCcontext *obj);
+    };
 
-	std::string device_id_;
+    std::unique_ptr<ALCdevice, deleter> device_;
+    std::unique_ptr<ALCcontext, deleter> context_;
 
-	std::string version_;
-	std::string vendor_;
-	std::string extensions_;
+    std::string device_id_;
+
+    std::string version_;
+    std::string vendor_;
+    std::string extensions_;
 };
 }
 }

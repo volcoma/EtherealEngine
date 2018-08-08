@@ -10,11 +10,11 @@ namespace priv
 ////////////////////////////////////////////////////////////
 // The do-while loop is needed so that al_check can be used as a single statement in if/else branches
 #define al_check(expr)                                                                                       \
-	do                                                                                                       \
-	{                                                                                                        \
-		expr;                                                                                                \
-		audio::priv::al_check_error(__FILE__, __LINE__, #expr);                                              \
-	} while(false)
+    do                                                                                                       \
+    {                                                                                                        \
+        expr;                                                                                                \
+        audio::priv::al_check_error(__FILE__, __LINE__, #expr);                                              \
+    } while(false)
 
 ////////////////////////////////////////////////////////////
 /// Check the last OpenAL error
