@@ -19,23 +19,23 @@ class slot_map
 #if __cplusplus >= 201703L
 	static auto get_index(const Key& k)
 	{
-		const auto & [ idx, gen ] = k;
+		const auto & [idx, gen] = k;
 		return idx;
 	}
 	static auto get_generation(const Key& k)
 	{
-		const auto & [ idx, gen ] = k;
+		const auto & [idx, gen] = k;
 		return gen;
 	}
 	template <class Integral>
 	static void set_index(Key& k, Integral value)
 	{
-		auto & [ idx, gen ] = k;
+		auto & [idx, gen] = k;
 		idx = value;
 	}
 	static void increment_generation(Key& k)
 	{
-		auto & [ idx, gen ] = k;
+		auto & [idx, gen] = k;
 		++gen;
 	}
 #else
@@ -89,9 +89,9 @@ public:
 
 	slot_map() = default;
 	slot_map(const slot_map&) = default;
-	slot_map(slot_map&&) = default;
+	slot_map(slot_map&&) noexcept = default;
 	slot_map& operator=(const slot_map&) = default;
-	slot_map& operator=(slot_map&&) = default;
+	slot_map& operator=(slot_map&&) noexcept = default;
 	~slot_map() = default;
 
 	// The at() functions have both generation counter checking
@@ -404,8 +404,8 @@ private:
 			auto slot_back_iter = slot_iter_from_value_iter(value_back_iter);
 			*value_iter = std::move(*value_back_iter);
 			this->set_index(*slot_back_iter, value_index);
-			auto reverse_map_iter = std::next(reverse_map_.begin(), value_index);		
-            *reverse_map_iter = static_cast<key_size_type>(std::distance(slots_.begin(), slot_back_iter));
+			auto reverse_map_iter = std::next(reverse_map_.begin(), value_index);
+			*reverse_map_iter = static_cast<key_size_type>(std::distance(slots_.begin(), slot_back_iter));
 		}
 		values_.pop_back();
 		reverse_map_.pop_back();

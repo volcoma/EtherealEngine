@@ -19,18 +19,6 @@ public:
 	using slot_container = nonstd::slot_map<slot_type>;
 	using slot_key = typename slot_container::key_type;
 
-	template <class C, typename = typename std::enable_if<std::is_class<C>::value, C>::type>
-	slot_key connect(C const* const o) noexcept
-	{
-		return slots_.emplace(o);
-	}
-
-	template <class C, typename = typename std::enable_if<std::is_class<C>::value, C>::type>
-	slot_key connect(C const& o) noexcept
-	{
-		return slots_.emplace(o);
-	}
-
 	template <class C>
 	slot_key connect(C* const object_ptr, void (C::*const method_ptr)(Args...))
 	{
@@ -62,58 +50,32 @@ public:
 		return slots_.emplace(std::forward<T>(f));
 	}
 
-	template <class C, typename = typename std::enable_if<std::is_class<C>::value, C>::type>
-	void disconnect(C const* const o) noexcept
-	{
-		slot_type slot(o);
-		slots_.erase(std::remove_if(std::begin(slots_), std::end(slots_),
-									[&slot](const slot_type& other) { return slot == other; }),
-					 std::end(slots_));
-	}
-
-	template <class C, typename = typename std::enable_if<std::is_class<C>::value, C>::type>
-	void disconnect(C const& o) noexcept
-	{
-		slot_type slot(o);
-		slots_.erase(std::remove_if(std::begin(slots_), std::end(slots_),
-									[&slot](const slot_type& other) { return slot == other; }),
-					 std::end(slots_));
-	}
-
 	template <class C>
 	void disconnect(C* const object_ptr, void (C::*const method_ptr)(Args...))
 	{
 		slot_type slot(object_ptr, method_ptr);
-		slots_.erase(std::remove_if(std::begin(slots_), std::end(slots_),
-									[&slot](const slot_type& other) { return slot == other; }),
-					 std::end(slots_));
+		disconnect_by_value(slot);
 	}
 
 	template <class C>
 	void disconnect(C* const object_ptr, void (C::*const method_ptr)(Args...) const)
 	{
 		slot_type slot(object_ptr, method_ptr);
-		slots_.erase(std::remove_if(std::begin(slots_), std::end(slots_),
-									[&slot](const slot_type& other) { return slot == other; }),
-					 std::end(slots_));
+		disconnect_by_value(slot);
 	}
 
 	template <class C>
 	void disconnect(C& object, void (C::*const method_ptr)(Args...))
 	{
 		slot_type slot(object, method_ptr);
-		slots_.erase(std::remove_if(std::begin(slots_), std::end(slots_),
-									[&slot](const slot_type& other) { return slot == other; }),
-					 std::end(slots_));
+		disconnect_by_value(slot);
 	}
 
 	template <class C>
 	void disconnect(C const& object, void (C::*const method_ptr)(Args...) const)
 	{
 		slot_type slot(object, method_ptr);
-		slots_.erase(std::remove_if(std::begin(slots_), std::end(slots_),
-									[&slot](const slot_type& other) { return slot == other; }),
-					 std::end(slots_));
+		disconnect_by_value(slot);
 	}
 
 	template <typename T, typename = typename std::enable_if<
@@ -122,14 +84,12 @@ public:
 	void disconnect(T&& f)
 	{
 		slot_type slot(std::forward<T>(f));
-		slots_.erase(std::remove_if(std::begin(slots_), std::end(slots_),
-									[&slot](const slot_type& other) { return slot == other; }),
-					 std::end(slots_));
+		disconnect_by_value(slot);
 	}
 
 	void disconnect(const slot_key& key) noexcept
 	{
-		slots_.erase(key);
+		disconnect_by_key(key);
 	}
 
 	/// Emits the events you wish to send to the call-backs
@@ -164,6 +124,21 @@ public:
 	}
 
 private:
+	void disconnect_by_value(const slot_type& slot)
+	{
+		auto it = std::find_if(std::begin(slots_), std::end(slots_),
+							   [&slot](const slot_type& other) { return slot == other; });
+
+		if(it != std::end(slots_))
+		{
+			slots_.erase(it);
+		}
+	}
+
+	void disconnect_by_key(const slot_key& key) noexcept
+	{
+		slots_.erase(key);
+	}
 	/// The slots connected to the signal
 	slot_container slots_;
 };

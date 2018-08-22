@@ -422,7 +422,7 @@ texture_format get_best_format(std::uint16_t type_flags, std::uint32_t search_fl
 
 uint32_t get_default_rt_sampler_flags()
 {
-	static std::uint32_t sampler_flags = 0 | BGFX_TEXTURE_RT | BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP;
+	static std::uint32_t sampler_flags = 0 | BGFX_TEXTURE_RT | BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
 
 	return sampler_flags;
 }

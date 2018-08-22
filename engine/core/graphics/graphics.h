@@ -292,11 +292,11 @@ void destroy(texture_handle _handle);
 
 /**/
 frame_buffer_handle create_frame_buffer(uint16_t _width, uint16_t _height, texture_format _format,
-										uint32_t _textureFlags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
+										uint32_t _textureFlags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
 
 /**/
 frame_buffer_handle create_frame_buffer(backbuffer_ratio _ratio, texture_format _format,
-										uint32_t _textureFlags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
+										uint32_t _textureFlags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
 
 /**/
 frame_buffer_handle create_frame_buffer(uint8_t _num, const texture_handle* _handles,

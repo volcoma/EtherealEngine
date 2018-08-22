@@ -38,7 +38,7 @@ struct frame_buffer : public handle_impl<frame_buffer_handle>
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	frame_buffer(std::uint16_t _width, std::uint16_t _height, texture_format _format,
-				 std::uint32_t _texture_flags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
+				 std::uint32_t _texture_flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
 
 	//-----------------------------------------------------------------------------
 	//  Name : frame_buffer ()
@@ -49,7 +49,7 @@ struct frame_buffer : public handle_impl<frame_buffer_handle>
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	frame_buffer(backbuffer_ratio _ratio, texture_format _format,
-				 std::uint32_t _textureFlags = BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
+				 std::uint32_t _textureFlags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
 
 	//-----------------------------------------------------------------------------
 	//  Name : frame_buffer ()

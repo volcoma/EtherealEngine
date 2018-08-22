@@ -137,8 +137,7 @@ install:
   #  fi
 
 script:
-  - git submodule init
-  - git submodule update
+  - git submodule update --init
   - mkdir build
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX=./install -DCMAKE_C_COMPILER=$COMPILERC -DCMAKE_CXX_COMPILER=$COMPILERCXX ..

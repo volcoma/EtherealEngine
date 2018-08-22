@@ -155,7 +155,7 @@ void picking_system::frame_render(delta_t dt)
 				continue;
 			}
 
-			std::uint32_t hash_key = static_cast<std::uint32_t>(rr + (gg << 8) + (bb << 16));
+			auto hash_key = static_cast<std::uint32_t>(rr + (gg << 8) + (bb << 16));
 			std::uint32_t amount = 1;
 			auto mapIter = ids.find(hash_key);
 			if(mapIter != ids.end())
@@ -200,13 +200,13 @@ picking_system::picking_system()
 	// Set up ID buffer, which has a color target and depth buffer
 	auto picking_rt = std::make_shared<gfx::texture>(
 		tex_id_dim, tex_id_dim, false, 1, gfx::texture_format::RGBA8,
-		0 | BGFX_TEXTURE_RT | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT |
-			BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
+		0 | BGFX_TEXTURE_RT | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT |
+			BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
 
 	auto picking_rt_depth = std::make_shared<gfx::texture>(
 		tex_id_dim, tex_id_dim, false, 1, gfx::texture_format::D24S8,
-		0 | BGFX_TEXTURE_RT | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT | BGFX_TEXTURE_MIP_POINT |
-			BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
+		0 | BGFX_TEXTURE_RT | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT |
+			BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
 
 	surface_ = std::make_shared<gfx::frame_buffer>(
 		std::vector<std::shared_ptr<gfx::texture>>{picking_rt, picking_rt_depth});
@@ -217,8 +217,8 @@ picking_system::picking_system()
 	// texture.
 	blit_tex_ = std::make_shared<gfx::texture>(
 		tex_id_dim, tex_id_dim, false, 1, gfx::texture_format::RGBA8,
-		0 | BGFX_TEXTURE_BLIT_DST | BGFX_TEXTURE_READ_BACK | BGFX_TEXTURE_MIN_POINT | BGFX_TEXTURE_MAG_POINT |
-			BGFX_TEXTURE_MIP_POINT | BGFX_TEXTURE_U_CLAMP | BGFX_TEXTURE_V_CLAMP);
+		0 | BGFX_TEXTURE_BLIT_DST | BGFX_TEXTURE_READ_BACK | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT |
+			BGFX_SAMPLER_MIP_POINT | BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
 
 	auto& ts = core::get_subsystem<core::task_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
