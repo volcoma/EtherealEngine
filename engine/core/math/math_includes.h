@@ -27,7 +27,7 @@ static inline std::vector<float> log_space(std::size_t start, std::size_t end, s
 
 inline bool is_negative_float(const float& A)
 {
-	return ((*(std::uint32_t*)&A) >= (std::uint32_t)0x80000000); // Detects sign bit.
+	return ((*(const std::uint32_t*)&A) >= std::uint32_t(0x80000000)); // Detects sign bit.
 }
 
 template <typename T>
@@ -45,8 +45,8 @@ inline bool compute_projected_sphere_shaft(float light_x, float light_z, float r
 										   const vec3& axis, float axis_sign, std::int32_t& in_out_min_x,
 										   std::int32_t& in_out_max_x)
 {
-	float view_x = float(in_out_min_x);
-	float view_size_x = float(in_out_max_x - in_out_min_x);
+	auto view_x = float(in_out_min_x);
+	auto view_size_x = float(in_out_max_x - in_out_min_x);
 
 	// Vertical planes: T = <Nx, 0, Nz, 0>
 	float discriminant = (square(light_x) - square(radius) + square(light_z)) * square(light_z);
@@ -104,11 +104,11 @@ inline bool compute_projected_sphere_shaft(float light_x, float light_z, float r
 }
 
 //@return 0: not visible, 1:use scissor rect, 2: no scissor rect needed
-inline uint32_t compute_projected_sphere_rect(std::int32_t& left, std::int32_t& right, std::int32_t& top,
+inline std::uint32_t compute_projected_sphere_rect(std::int32_t& left, std::int32_t& right, std::int32_t& top,
 											  std::int32_t& bottom, const vec3& sphere_center, float radius,
 											  const transform& view, const transform& proj)
 {
-	vec3 view_origin = (vec3&)math::inverse(view)[3];
+	vec3 view_origin = (const vec3&)math::inverse(view)[3];
 	// Calculate a screen rectangle for the sphere's radius.
 	if(math::length2(sphere_center - view_origin) > math::square(radius))
 	{
@@ -231,7 +231,7 @@ struct color
 	{
 		float r, g, b;
 		hsv_to_rgb(h, s, v, r, g, b);
-		return color(r, g, b, a);
+		return {r, g, b, a};
 	}
 
 	static vec4 u32_to_float4(std::uint32_t in)
@@ -290,8 +290,8 @@ struct color
 		}
 
 		h = glm::mod(h, 1.0f) / (60.0f / 360.0f);
-		int i = (int)h;
-		float f = h - (float)i;
+		auto i = int(h);
+		float f = h - float(i);
 		float p = v * (1.0f - s);
 		float q = v * (1.0f - s * f);
 		float t = v * (1.0f - s * (1.0f - f));
