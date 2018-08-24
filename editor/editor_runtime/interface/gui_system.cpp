@@ -24,6 +24,8 @@
 //////////////////////////////////////////////////////////////////////////
 #include "../meta/interface/gui_system.hpp"
 #include "core/serialization/associative_archive.h"
+
+#include <fstream>
 namespace
 {
 const gfx::embedded_shader s_embedded_shaders[] = {BGFX_EMBEDDED_SHADER(vs_ocornut_imgui),

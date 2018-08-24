@@ -840,7 +840,7 @@ void project_dock::set_cache_path(const fs::path& path)
 		return;
 	}
 	cache_.set_path(path);
-	cache_path_with_protocol_ = fs::convert_to_protocol(path).generic();
+	cache_path_with_protocol_ = fs::convert_to_protocol(path).generic_string();
 }
 
 void project_dock::import()

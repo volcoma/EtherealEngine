@@ -47,12 +47,12 @@ static std::uint64_t watch_assets(const fs::path& dir, const std::string& wildca
 	fs::path watch_dir = (dir / wildcard).make_preferred();
 
 	return fs::watcher::watch(
-		watch_dir, true, true, 500ms, [&am, &ts, reload_async](const auto& entries, bool is_initial_list) {
+		watch_dir, true, true, 500ms, [&am, &ts](const auto& entries, bool is_initial_list) {
 			for(const auto& entry : entries)
 			{
 				auto p = fs::reduce_trailing_extensions(entry.path);
 				auto data_key = fs::convert_to_protocol(p);
-				auto key = fs::replace(data_key.generic(), ":/cache", ":/data").string();
+				auto key = fs::replace(data_key.generic_string(), ":/cache", ":/data").string();
 
 				if(entry.type == fs::file_type::regular_file)
 				{
@@ -64,7 +64,7 @@ static std::uint64_t watch_assets(const fs::path& dir, const std::string& wildca
 					{
 						auto old_p = fs::reduce_trailing_extensions(entry.last_path);
 						auto old_data_key = fs::convert_to_protocol(old_p);
-						auto old_key = fs::replace(old_data_key.generic(), ":/cache", ":/data").string();
+						auto old_key = fs::replace(old_data_key.generic_string(), ":/cache", ":/data").string();
 						auto task = ts.push_on_owner_thread(
 							[old_key, key, &am]() { am.rename_asset<T>(old_key, key); });
 					}
@@ -84,8 +84,8 @@ static std::uint64_t watch_assets(const fs::path& dir, const std::string& wildca
 
 template <typename T>
 static void add_to_syncer(std::vector<uint64_t>& watchers, fs::syncer& syncer, const fs::path& dir,
-						  fs::syncer::on_entry_removed_t on_removed,
-						  fs::syncer::on_entry_renamed_t on_renamed)
+						  const fs::syncer::on_entry_removed_t& on_removed,
+						  const fs::syncer::on_entry_renamed_t& on_renamed)
 {
 	auto& ts = core::get_subsystem<core::task_system>();
 	auto on_modified = [&ts](const auto& ref_path, const auto& synced_paths, bool is_initial_listing) {
@@ -114,8 +114,8 @@ static void add_to_syncer(std::vector<uint64_t>& watchers, fs::syncer& syncer, c
 
 template <>
 void add_to_syncer<gfx::shader>(std::vector<uint64_t>& watchers, fs::syncer& syncer, const fs::path& dir,
-								fs::syncer::on_entry_removed_t on_removed,
-								fs::syncer::on_entry_renamed_t on_renamed)
+								const fs::syncer::on_entry_removed_t& on_removed,
+								const fs::syncer::on_entry_renamed_t& on_renamed)
 {
 	auto& ts = core::get_subsystem<core::task_system>();
 

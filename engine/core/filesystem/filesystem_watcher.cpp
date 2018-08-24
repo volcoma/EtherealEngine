@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "filesystem_watcher.h"
 namespace fs
 {
@@ -91,9 +93,9 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	impl(const fs::path& path, const std::string& filter, bool recursive, bool initial_list,
-		 clock_t::duration poll_interval, const notify_callback& list_callback)
+		 clock_t::duration poll_interval, notify_callback list_callback)
 		: filter_(filter)
-		, callback_(list_callback)
+		, callback_(std::move(list_callback))
 		, poll_interval_(poll_interval)
 		, recursive_(recursive)
 	{
@@ -290,7 +292,7 @@ static filesystem_watcher& get_watcher()
 }
 
 std::uint64_t filesystem_watcher::watch(const fs::path& path, bool recursive, bool initial_list,
-										clock_t::duration poll_interval, const notify_callback& callback)
+										clock_t::duration poll_interval, notify_callback callback)
 {
 	return watch_impl(path, recursive, initial_list, poll_interval, callback);
 }
@@ -393,7 +395,7 @@ void filesystem_watcher::start()
 
 std::uint64_t filesystem_watcher::watch_impl(const fs::path& path, bool recursive, bool initial_list,
 											 clock_t::duration poll_interval,
-											 const notify_callback& list_callback)
+											 notify_callback& list_callback)
 {
 	auto& wd = get_watcher();
 	// and start its thread
@@ -426,14 +428,14 @@ std::uint64_t filesystem_watcher::watch_impl(const fs::path& path, bool recursiv
 			}
 		}
 
-		static std::atomic<std::uint64_t> s_id = {1};
+		static std::atomic<std::uint64_t> free_id = {1};
 
-		auto key = s_id++;
+		auto key = free_id++;
 		{
 			// we do it like this because if initial_list is true we don't want
 			// to call a user callback on a locked mutex
 			auto imp =
-				std::make_shared<impl>(p, filter, recursive, initial_list, poll_interval, list_callback);
+				std::make_shared<impl>(p, filter, recursive, initial_list, poll_interval, std::move(list_callback));
 			std::lock_guard<std::mutex> lock(wd.mutex_);
 			wd.watchers_.emplace(key, std::move(imp));
 		}

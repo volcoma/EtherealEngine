@@ -9,6 +9,7 @@
 #include <mutex>
 #include <string>
 #include <thread>
+#include <functional>
 
 #include "filesystem.h"
 
@@ -52,7 +53,7 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	static std::uint64_t watch(const fs::path& path, bool recursive, bool initial_list,
-							   clock_t::duration poll_interval, const notify_callback& callback);
+							   clock_t::duration poll_interval, notify_callback callback);
 
 	//-----------------------------------------------------------------------------
 	//  Name : unwatch ()
@@ -79,7 +80,7 @@ public:
 	//-----------------------------------------------------------------------------
 	static void
 	touch(const fs::path& path, bool recursive,
-		  fs::file_time_type time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+		  fs::file_time_type time = fs::now());
 
 	//-----------------------------------------------------------------------------
 	//  Name : ~filesystem_watcher ()
@@ -122,7 +123,7 @@ protected:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	static std::uint64_t watch_impl(const fs::path& path, bool recursive, bool initialList,
-									clock_t::duration poll_interval, const notify_callback& listCallback);
+									clock_t::duration poll_interval, notify_callback& listCallback);
 
 	static void unwatch_impl(std::uint64_t key);
 

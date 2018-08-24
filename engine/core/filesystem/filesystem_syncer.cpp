@@ -103,7 +103,7 @@ void syncer::sync(const fs::path& reference_dir, const fs::path& synced_dir)
 	const auto on_change = [this](const auto& entries, bool is_initial_listing) {
 		for(const auto& entry : entries)
 		{
-			bool is_directory = (entry.type == fs::directory_file);
+			bool is_directory = (entry.type == fs::file_type::directory_file);
 			auto entry_path = entry.path;
 			std::string entry_extension;
 			while(entry_path.has_extension())

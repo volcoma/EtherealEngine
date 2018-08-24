@@ -37,7 +37,7 @@ public:
 		watch();
 	}
 
-	cache(cache&& rhs)
+	cache(cache&& rhs) noexcept
 		: path_(std::move(rhs.path_))
 		, scan_frequency_(std::move(rhs.scan_frequency_))
 		, entries_(std::move(rhs.entries_))
@@ -58,7 +58,7 @@ public:
 		return *this;
 	}
 
-	cache& operator=(cache&& rhs)
+	cache& operator=(cache&& rhs) noexcept
 	{
 		unwatch();
 		path_ = std::move(rhs.path_);
