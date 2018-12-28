@@ -1,21 +1,23 @@
 #include "picking_system.h"
-#include "core/graphics/render_pass.h"
-#include "core/graphics/texture.h"
-#include "core/logging/logging.h"
-#include "core/system/subsystem.h"
 #include "editing_system.h"
-#include "runtime/assets/asset_manager.h"
-#include "runtime/ecs/components/camera_component.h"
-#include "runtime/ecs/components/model_component.h"
-#include "runtime/ecs/components/transform_component.h"
-#include "runtime/input/input.h"
-#include "runtime/rendering/camera.h"
-#include "runtime/rendering/material.h"
-#include "runtime/rendering/mesh.h"
-#include "runtime/rendering/model.h"
-#include "runtime/rendering/render_window.h"
-#include "runtime/rendering/renderer.h"
-#include "runtime/system/events.h"
+
+#include <core/graphics/render_pass.h>
+#include <core/graphics/texture.h>
+#include <core/logging/logging.h>
+#include <core/system/subsystem.h>
+
+#include <runtime/assets/asset_manager.h>
+#include <runtime/ecs/components/camera_component.h>
+#include <runtime/ecs/components/model_component.h>
+#include <runtime/ecs/components/transform_component.h>
+#include <runtime/input/input.h>
+#include <runtime/rendering/camera.h>
+#include <runtime/rendering/material.h>
+#include <runtime/rendering/mesh.h>
+#include <runtime/rendering/model.h>
+#include <runtime/rendering/render_window.h>
+#include <runtime/rendering/renderer.h>
+#include <runtime/system/events.h>
 
 namespace editor
 {
@@ -200,16 +202,26 @@ picking_system::picking_system()
 	// Set up ID buffer, which has a color target and depth buffer
 	auto picking_rt = std::make_shared<gfx::texture>(
 		tex_id_dim, tex_id_dim, false, 1, gfx::texture_format::RGBA8,
-		0 | BGFX_TEXTURE_RT | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT |
-			BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
+		0
+		| BGFX_TEXTURE_RT
+		| BGFX_SAMPLER_MIN_POINT
+		| BGFX_SAMPLER_MAG_POINT
+		| BGFX_SAMPLER_MIP_POINT
+		| BGFX_SAMPLER_U_CLAMP
+		| BGFX_SAMPLER_V_CLAMP);
 
 	auto picking_rt_depth = std::make_shared<gfx::texture>(
 		tex_id_dim, tex_id_dim, false, 1, gfx::texture_format::D24S8,
-		0 | BGFX_TEXTURE_RT | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT |
-			BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
+		0
+		| BGFX_TEXTURE_RT
+		| BGFX_SAMPLER_MIN_POINT
+		| BGFX_SAMPLER_MAG_POINT
+		| BGFX_SAMPLER_MIP_POINT
+		| BGFX_SAMPLER_U_CLAMP
+		| BGFX_SAMPLER_V_CLAMP);
 
-	surface_ = std::make_shared<gfx::frame_buffer>(
-		std::vector<std::shared_ptr<gfx::texture>>{picking_rt, picking_rt_depth});
+    std::vector<std::shared_ptr<gfx::texture>> textures{picking_rt, picking_rt_depth};
+	surface_ = std::make_shared<gfx::frame_buffer>(textures);
 
 	// CPU texture for blitting to and reading ID buffer so we can see what was clicked on.
 	// Impossible to read directly from a render target, you *must* blit to a CPU texture
@@ -217,8 +229,14 @@ picking_system::picking_system()
 	// texture.
 	blit_tex_ = std::make_shared<gfx::texture>(
 		tex_id_dim, tex_id_dim, false, 1, gfx::texture_format::RGBA8,
-		0 | BGFX_TEXTURE_BLIT_DST | BGFX_TEXTURE_READ_BACK | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT |
-			BGFX_SAMPLER_MIP_POINT | BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
+		0
+		| BGFX_TEXTURE_BLIT_DST
+		| BGFX_TEXTURE_READ_BACK
+		| BGFX_SAMPLER_MIN_POINT
+		| BGFX_SAMPLER_MAG_POINT
+		| BGFX_SAMPLER_MIP_POINT
+		| BGFX_SAMPLER_U_CLAMP
+		| BGFX_SAMPLER_V_CLAMP);
 
 	auto& ts = core::get_subsystem<core::task_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();

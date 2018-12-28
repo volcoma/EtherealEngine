@@ -1,9 +1,13 @@
 #include "mesh_importer.h"
-#include "core/graphics/graphics.h"
-#include "core/logging/logging.h"
-#include "core/math/math_includes.h"
-#include "editor_core/mesh_import/mesh_import.h"
-#include "runtime/rendering/mesh.h"
+
+#include <core/graphics/graphics.h>
+#include <core/logging/logging.h>
+#include <core/math/math_includes.h>
+
+#include <runtime/rendering/mesh.h>
+
+#include <editor_core/mesh_import/mesh_import.h>
+
 #include <algorithm>
 
 math::transform process_matrix(const aiMatrix4x4& assimp_matrix)

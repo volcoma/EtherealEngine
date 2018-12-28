@@ -1,10 +1,11 @@
 #pragma once
 
 #include "../assets/asset_handle.h"
-#include "core/graphics/program.h"
-#include "core/math/math_includes.h"
-#include "core/reflection/registration.h"
-#include "core/serialization/serialization.h"
+
+#include <core/graphics/program.h>
+#include <core/math/math_includes.h>
+#include <core/reflection/registration.h>
+#include <core/serialization/serialization.h>
 
 class gpu_program
 {

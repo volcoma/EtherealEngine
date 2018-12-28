@@ -1,10 +1,12 @@
 #include "mesh.h"
 #include "camera.h"
-#include "core/graphics/index_buffer.h"
-#include "core/graphics/vertex_buffer.h"
-#include "core/logging/logging.h"
-#include "core/memory/checked_delete.h"
 #include "generator/generator.hpp"
+
+#include <core/graphics/index_buffer.h>
+#include <core/graphics/vertex_buffer.h>
+#include <core/logging/logging.h>
+#include <core/memory/checked_delete.h>
+
 #include <algorithm>
 #include <cmath>
 #include <cstring>

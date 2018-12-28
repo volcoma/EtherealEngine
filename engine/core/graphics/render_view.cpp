@@ -6,7 +6,7 @@ namespace gfx
 std::shared_ptr<texture> render_view::get_texture(const std::string& id, std::uint16_t _width,
 												  std::uint16_t _height, bool _hasMips,
 												  std::uint16_t _numLayers, texture_format _format,
-												  std::uint32_t _flags, const memory_view* _mem)
+												  std::uint64_t _flags, const memory_view* _mem)
 {
 	texture_key key;
 	calc_texture_size(key.info, _width, _height, 1, false, _hasMips, _numLayers, _format);
@@ -33,7 +33,7 @@ std::shared_ptr<texture> render_view::get_texture(const std::string& id, std::ui
 
 std::shared_ptr<texture> render_view::get_texture(const std::string& id, backbuffer_ratio _ratio,
 												  bool _hasMips, std::uint16_t _numLayers,
-												  texture_format _format, std::uint32_t _flags)
+												  texture_format _format, std::uint64_t _flags)
 {
 	texture_key key;
 	std::uint16_t _width = 0;
@@ -63,7 +63,7 @@ std::shared_ptr<texture> render_view::get_texture(const std::string& id, backbuf
 
 std::shared_ptr<texture> render_view::get_texture(const std::string& id, std::uint16_t _width,
 												  std::uint16_t _height, std::uint16_t _depth, bool _hasMips,
-												  texture_format _format, std::uint32_t _flags,
+												  texture_format _format, std::uint64_t _flags,
 												  const memory_view* _mem)
 {
 	texture_key key;
@@ -91,7 +91,7 @@ std::shared_ptr<texture> render_view::get_texture(const std::string& id, std::ui
 
 std::shared_ptr<texture> render_view::get_texture(const std::string& id, std::uint16_t _size, bool _hasMips,
 												  std::uint16_t _numLayers, texture_format _format,
-												  std::uint32_t _flags, const memory_view* _mem)
+												  std::uint64_t _flags, const memory_view* _mem)
 {
 	texture_key key;
 	calc_texture_size(key.info, _size, _size, _size, false, _hasMips, _numLayers, _format);
@@ -207,4 +207,4 @@ void render_view::release_unused_resources()
 	check_resources(fbos_);
 	check_resources(textures_);
 }
-}
+} // namespace gfx

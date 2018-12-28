@@ -12,5 +12,7 @@ struct dd_raii
 	dd_raii(view_id _viewId);
 
 	~dd_raii();
+
+	DebugDrawEncoder encoder;
 };
 }

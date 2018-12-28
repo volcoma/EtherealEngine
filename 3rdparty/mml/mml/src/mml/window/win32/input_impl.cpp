@@ -169,7 +169,7 @@ std::array<std::int32_t, 2> input_impl::get_mouse_position()
 ////////////////////////////////////////////////////////////
 std::array<std::int32_t, 2> input_impl::get_mouse_position(const window& relativeTo)
 {
-    window_handle handle = relativeTo.get_system_handle();
+    window_handle handle = relativeTo.native_handle();
     if (handle)
     {
         POINT point;
@@ -194,7 +194,7 @@ void input_impl::set_mouse_position(const std::array<std::int32_t, 2>& position)
 ////////////////////////////////////////////////////////////
 void input_impl::set_mouse_position(const std::array<std::int32_t, 2>& position, const window& relativeTo)
 {
-    window_handle handle = relativeTo.get_system_handle();
+    window_handle handle = relativeTo.native_handle();
     if (handle)
     {
         POINT point = {position[0], position[1]};

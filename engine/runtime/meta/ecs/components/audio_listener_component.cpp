@@ -1,8 +1,10 @@
 #include "audio_listener_component.hpp"
+#include "component.hpp"
+
 #include "../../assets/asset_handle.hpp"
 #include "../../core/common/basetypes.hpp"
-#include "component.hpp"
-#include "core/serialization/types/vector.hpp"
+
+#include <core/serialization/types/vector.hpp>
 
 REFLECT(audio_listener_component)
 {

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "core/common/basetypes.hpp"
-#include "runtime/assets/asset_handle.h"
-#include "runtime/rendering/gpu_program.h"
+#include <core/common/basetypes.hpp>
+#include <runtime/assets/asset_handle.h>
+#include <runtime/rendering/gpu_program.h>
 
 namespace gfx
 {

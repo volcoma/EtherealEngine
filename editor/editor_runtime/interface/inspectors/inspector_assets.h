@@ -1,7 +1,7 @@
 #pragma once
 
 #include "inspector.h"
-#include "runtime/assets/asset_handle.h"
+#include <runtime/assets/asset_handle.h>
 
 namespace gfx
 {

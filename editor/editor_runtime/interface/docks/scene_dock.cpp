@@ -2,23 +2,27 @@
 #include "../../assets/asset_extensions.h"
 #include "../../editing/editing_system.h"
 #include "../../system/project_manager.h"
-#include "core/graphics/render_pass.h"
-#include "core/simulation/simulation.h"
-#include "core/string_utils/string_utils.h"
-#include "core/system/subsystem.h"
-#include "runtime/assets/asset_handle.h"
-#include "runtime/assets/asset_manager.h"
-#include "runtime/ecs/components/camera_component.h"
-#include "runtime/ecs/components/model_component.h"
-#include "runtime/ecs/components/transform_component.h"
-#include "runtime/ecs/constructs/prefab.h"
-#include "runtime/ecs/constructs/utils.h"
-#include "runtime/input/input.h"
-#include "runtime/rendering/camera.h"
-#include "runtime/rendering/mesh.h"
-#include "runtime/rendering/render_window.h"
-#include "runtime/rendering/renderer.h"
+
+#include <core/graphics/render_pass.h>
+#include <core/simulation/simulation.h>
+#include <core/string_utils/string_utils.h>
+#include <core/system/subsystem.h>
+
+#include <runtime/assets/asset_handle.h>
+#include <runtime/assets/asset_manager.h>
+#include <runtime/ecs/components/camera_component.h>
+#include <runtime/ecs/components/model_component.h>
+#include <runtime/ecs/components/transform_component.h>
+#include <runtime/ecs/constructs/prefab.h>
+#include <runtime/ecs/constructs/utils.h>
+#include <runtime/input/input.h>
+#include <runtime/rendering/camera.h>
+#include <runtime/rendering/mesh.h>
+#include <runtime/rendering/render_window.h>
+#include <runtime/rendering/renderer.h>
+
 #include <numeric>
+
 static bool bar(float _width, float _maxWidth, float _height, const ImVec4& _color)
 {
 	const ImGuiStyle& style = gui::GetStyle();
@@ -77,19 +81,17 @@ void scene_dock::show_statistics(const ImVec2& area, unsigned int fps, bool& sho
 {
 	auto stat_pos = gui::GetCurrentWindow()->Pos + gui::GetCursorPos();
 	gui::SetNextWindowPos(stat_pos);
-	gui::SetNextWindowCollapsed(true, ImGuiCond_FirstUseEver);
 	gui::SetNextWindowSizeConstraints(ImVec2(0, 0), area - gui::GetStyle().WindowPadding);
-	gui::Begin(("STATISTICS###" + title).c_str(), nullptr,
+	gui::Begin((ICON_FA_HASHTAG"\tSTATISTICS##" + title).c_str(), nullptr,
 			   ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
 
 	auto stats = gfx::get_stats();
-	gui::Text("Fps  : %u", fps);
-	gui::Text("Frame time : %.3f ms ", 1000.0 / double(fps));
+	gui::Text("%u fps \t\t\t (%.3f ms)", fps, 1000.0 / double(fps));
 
 	const double to_cpu_ms = 1000.0 / double(stats->cpuTimerFreq);
 	const double to_gpu_ms = 1000.0 / double(stats->gpuTimerFreq);
 
-	if(gui::CollapsingHeader(ICON_FA_INFO_CIRCLE " Render Info"))
+	if(gui::CollapsingHeader(ICON_FA_INFO_CIRCLE "\tRender Info"))
 	{
 		gui::PushFont("default");
 
@@ -118,7 +120,7 @@ void scene_dock::show_statistics(const ImVec2& area, unsigned int fps, bool& sho
 
 		gui::PopFont();
 	}
-	if(gui::CollapsingHeader(ICON_FA_PUZZLE_PIECE " Resources"))
+	if(gui::CollapsingHeader(ICON_FA_PUZZLE_PIECE "\tResources"))
 	{
 		const auto caps = gfx::get_caps();
 
@@ -149,7 +151,7 @@ void scene_dock::show_statistics(const ImVec2& area, unsigned int fps, bool& sho
 		gui::PopFont();
 	}
 
-	if(gui::CollapsingHeader(ICON_FA_CLOCK_O " Profiler"))
+	if(gui::CollapsingHeader(ICON_FA_CLOCK_O "\tProfiler"))
 	{
 		gui::PushFont("default");
 

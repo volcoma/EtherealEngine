@@ -2,22 +2,24 @@
 #include "../../assets/asset_extensions.h"
 #include "../../editing/editing_system.h"
 #include "../../system/project_manager.h"
-#include "core/filesystem/filesystem.h"
-#include "core/logging/logging.h"
-#include "core/system/subsystem.h"
-#include "runtime/assets/asset_handle.h"
-#include "runtime/assets/asset_manager.h"
-#include "runtime/ecs/components/audio_source_component.h"
-#include "runtime/ecs/components/camera_component.h"
-#include "runtime/ecs/components/light_component.h"
-#include "runtime/ecs/components/model_component.h"
-#include "runtime/ecs/components/reflection_probe_component.h"
-#include "runtime/ecs/components/transform_component.h"
-#include "runtime/ecs/constructs/prefab.h"
-#include "runtime/ecs/constructs/utils.h"
-#include "runtime/ecs/systems/scene_graph.h"
-#include "runtime/input/input.h"
-#include "runtime/rendering/mesh.h"
+
+#include <core/filesystem/filesystem.h>
+#include <core/logging/logging.h>
+#include <core/system/subsystem.h>
+
+#include <runtime/assets/asset_handle.h>
+#include <runtime/assets/asset_manager.h>
+#include <runtime/ecs/components/audio_source_component.h>
+#include <runtime/ecs/components/camera_component.h>
+#include <runtime/ecs/components/light_component.h>
+#include <runtime/ecs/components/model_component.h>
+#include <runtime/ecs/components/reflection_probe_component.h>
+#include <runtime/ecs/components/transform_component.h>
+#include <runtime/ecs/constructs/prefab.h>
+#include <runtime/ecs/constructs/utils.h>
+#include <runtime/ecs/systems/scene_graph.h>
+#include <runtime/input/input.h>
+#include <runtime/rendering/mesh.h>
 namespace
 {
 math::bbox calc_bounds(runtime::entity entity)

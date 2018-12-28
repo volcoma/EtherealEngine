@@ -319,13 +319,13 @@ bool window::has_focus() const
 
 
 ////////////////////////////////////////////////////////////
-window_handle window::get_system_handle() const
+window_handle window::native_handle() const
 {
-    return _impl ? _impl->get_system_handle() : 0;
+    return _impl ? _impl->native_handle() : nullptr;
 }
-void* window::get_system_handle_specific() const
+void* window::native_display_handle() const
 {
-    return _impl ? _impl->get_system_handle_specific() : 0;
+    return _impl ? _impl->native_display_handle() : nullptr;
 }
 ////////////////////////////////////////////////////////////
 void window::on_create()

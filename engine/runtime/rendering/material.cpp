@@ -1,11 +1,11 @@
 #include "material.h"
-#include "core/graphics/texture.h"
-#include "core/graphics/uniform.h"
-#include "core/system/subsystem.h"
-
 #include "gpu_program.h"
 
 #include "../assets/asset_manager.h"
+
+#include <core/graphics/texture.h>
+#include <core/graphics/uniform.h>
+#include <core/system/subsystem.h>
 
 material::material()
 {

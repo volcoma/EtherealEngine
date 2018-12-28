@@ -1,30 +1,30 @@
 #include "gui_system.h"
 
-#include "core/filesystem/filesystem.h"
-#include "core/graphics/index_buffer.h"
-#include "core/graphics/render_pass.h"
-#include "core/graphics/shader.h"
-#include "core/graphics/texture.h"
-#include "core/graphics/uniform.h"
-#include "core/graphics/vertex_buffer.h"
-#include "core/logging/logging.h"
-#include "core/system/subsystem.h"
+#include <core/filesystem/filesystem.h>
+#include <core/graphics/index_buffer.h>
+#include <core/graphics/render_pass.h>
+#include <core/graphics/shader.h>
+#include <core/graphics/texture.h>
+#include <core/graphics/uniform.h>
+#include <core/graphics/vertex_buffer.h>
+#include <core/logging/logging.h>
+#include <core/system/subsystem.h>
+#include <core/serialization/associative_archive.h>
 
-#include "runtime/assets/asset_manager.h"
-#include "runtime/input/input.h"
-#include "runtime/rendering/gpu_program.h"
-#include "runtime/rendering/render_window.h"
-#include <unordered_map>
+#include <runtime/assets/asset_manager.h>
+#include <runtime/input/input.h>
+#include <runtime/rendering/gpu_program.h>
+#include <runtime/rendering/render_window.h>
 
-#include "editor_core/gui/embedded/editor_default.ttf.h"
-#include "editor_core/gui/embedded/fontawesome_webfont.ttf.h"
-#include "editor_core/gui/embedded/fs_ocornut_imgui.bin.h"
-#include "editor_core/gui/embedded/vs_ocornut_imgui.bin.h"
-#include "editor_core/gui/gui.h"
+#include <editor_core/gui/embedded/editor_default.ttf.h>
+#include <editor_core/gui/embedded/fontawesome_webfont.ttf.h>
+#include <editor_core/gui/embedded/fs_ocornut_imgui.bin.h>
+#include <editor_core/gui/embedded/vs_ocornut_imgui.bin.h>
+#include <editor_core/gui/gui.h>
 //////////////////////////////////////////////////////////////////////////
 #include "../meta/interface/gui_system.hpp"
-#include "core/serialization/associative_archive.h"
 
+#include <unordered_map>
 #include <fstream>
 namespace
 {
@@ -292,7 +292,10 @@ void imgui_frame_update(render_window& window, delta_t dt)
 void imgui_frame_end()
 {
 	gui::End();
+    //auto old = ImGui::GetCurrentContext()->DragDropActive;
+    ImGui::GetCurrentContext()->DragDropSourceFrameCount = ImGui::GetCurrentContext()->FrameCount;
 	gui::Render();
+	//ImGui::GetCurrentContext()->DragDropActive = old;
 	render_func(gui::GetDrawData());
 }
 

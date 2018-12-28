@@ -80,7 +80,8 @@ struct frame_buffer : public handle_impl<frame_buffer_handle>
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	frame_buffer(void* _nwh, std::uint16_t _width, std::uint16_t _height,
-				 texture_format _depth_format = texture_format::UnknownDepth);
+				 texture_format _format = texture_format::Count,
+				 texture_format _depth_format = texture_format::Count);
 
 	//-----------------------------------------------------------------------------
 	//  Name : populate ()
@@ -139,4 +140,4 @@ struct frame_buffer : public handle_impl<frame_buffer_handle>
 	/// Texture attachments to the frame buffer
 	std::vector<fbo_attachment> textures_;
 };
-}
+} // namespace gfx

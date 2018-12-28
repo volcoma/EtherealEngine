@@ -1,7 +1,8 @@
 #pragma once
 
 #include "../ecs.h"
-#include "core/math/math_includes.h"
+
+#include <core/math/math_includes.h>
 
 //-----------------------------------------------------------------------------
 // Main Class Declarations

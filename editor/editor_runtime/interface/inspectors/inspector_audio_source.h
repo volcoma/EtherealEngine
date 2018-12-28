@@ -1,6 +1,7 @@
 #pragma once
 #include "inspector.h"
-#include "runtime/ecs/components/audio_source_component.h"
+
+#include <runtime/ecs/components/audio_source_component.h>
 
 struct inspector_audio_source_component : public inspector
 {

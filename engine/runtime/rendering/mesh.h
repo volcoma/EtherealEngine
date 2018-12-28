@@ -1,10 +1,10 @@
 #pragma once
 
-#include "core/common/basetypes.hpp"
-#include "core/graphics/graphics.h"
-#include "core/math/math_includes.h"
-#include "core/reflection/registration.h"
-#include "core/serialization/serialization.h"
+#include <core/common/basetypes.hpp>
+#include <core/graphics/graphics.h>
+#include <core/math/math_includes.h>
+#include <core/reflection/registration.h>
+#include <core/serialization/serialization.h>
 
 #include <map>
 #include <memory>

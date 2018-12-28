@@ -6,19 +6,21 @@
 #include "../../meta/rendering/material.hpp"
 #include "../../meta/rendering/mesh.hpp"
 #include "../asset_manager.h"
-#include "core/audio/sound.h"
-#include "core/filesystem/filesystem.h"
-#include "core/graphics/index_buffer.h"
-#include "core/graphics/shader.h"
-#include "core/graphics/texture.h"
-#include "core/graphics/uniform.h"
-#include "core/graphics/vertex_buffer.h"
-#include "core/logging/logging.h"
-#include "core/serialization/associative_archive.h"
-#include "core/serialization/binary_archive.h"
-#include "core/serialization/serialization.h"
-#include "core/serialization/types/map.hpp"
-#include "core/serialization/types/vector.hpp"
+
+#include <core/audio/sound.h>
+#include <core/filesystem/filesystem.h>
+#include <core/graphics/index_buffer.h>
+#include <core/graphics/shader.h>
+#include <core/graphics/texture.h>
+#include <core/graphics/uniform.h>
+#include <core/graphics/vertex_buffer.h>
+#include <core/logging/logging.h>
+#include <core/serialization/associative_archive.h>
+#include <core/serialization/binary_archive.h>
+#include <core/serialization/serialization.h>
+#include <core/serialization/types/map.hpp>
+#include <core/serialization/types/vector.hpp>
+
 #include <cstdint>
 
 namespace runtime

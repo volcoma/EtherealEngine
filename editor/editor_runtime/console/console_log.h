@@ -1,8 +1,9 @@
 #pragma once
 
-#include "core/common/nonstd/ring_buffer.hpp"
-#include "core/console/console.h"
-#include "core/logging/logging.h"
+#include <core/common/nonstd/ring_buffer.hpp>
+#include <core/console/console.h>
+#include <core/logging/logging.h>
+
 #include <array>
 #include <atomic>
 #include <string>

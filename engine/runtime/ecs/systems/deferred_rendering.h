@@ -4,7 +4,8 @@
 #include "../components/model_component.h"
 #include "../components/transform_component.h"
 #include "../ecs.h"
-#include "core/common/basetypes.hpp"
+
+#include <core/common/basetypes.hpp>
 
 #include <chrono>
 #include <memory>

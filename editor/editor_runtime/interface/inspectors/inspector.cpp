@@ -38,8 +38,7 @@ property_layout::property_layout(const rttr::property& prop, bool columns /*= tr
 
 	if(columns)
 	{
-		gui::Columns(1);
-		gui::Columns(2, nullptr, false);
+		gui::BeginColumns("properties", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
 	}
 
 	gui::AlignTextToFramePadding();
@@ -57,8 +56,7 @@ property_layout::property_layout(const std::string& name, bool columns /*= true*
 {
 	if(columns)
 	{
-		gui::Columns(1);
-		gui::Columns(2, nullptr, false);
+		gui::BeginColumns("properties", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
 	}
 
 	gui::AlignTextToFramePadding();
@@ -74,8 +72,7 @@ property_layout::property_layout(const std::string& name, const std::string& too
 {
 	if(columns)
 	{
-		gui::Columns(1);
-		gui::Columns(2, nullptr, false);
+		gui::BeginColumns("properties", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
 	}
 
 	gui::AlignTextToFramePadding();
@@ -93,5 +90,5 @@ property_layout::~property_layout()
 {
 	gui::PopItemWidth();
 	gui::PopID();
-	gui::Columns(1);
+	gui::EndColumns();
 }

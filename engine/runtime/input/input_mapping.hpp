@@ -1,15 +1,18 @@
 #pragma once
 
-#include "core/common/hash.hpp"
-#include "mml/window/event.hpp"
-#include "mml/window/joystick.hpp"
-#include "mml/window/keyboard.hpp"
-#include "mml/window/mouse.hpp"
-#include "mml/window/sensor.hpp"
-#include "mml/window/touch.hpp"
+#include <core/common/hash.hpp>
+
+#include <mml/window/event.hpp>
+#include <mml/window/joystick.hpp>
+#include <mml/window/keyboard.hpp>
+#include <mml/window/mouse.hpp>
+#include <mml/window/sensor.hpp>
+#include <mml/window/touch.hpp>
+
 #include <map>
 #include <string>
 #include <vector>
+
 namespace std
 {
 template <typename S, typename T>

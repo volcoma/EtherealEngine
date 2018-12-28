@@ -1,8 +1,9 @@
 #pragma once
 
-#include "core/reflection/reflection.h"
-#include "core/reflection/registration.h"
-#include "editor_core/gui/gui.h"
+#include <core/reflection/reflection.h>
+#include <core/reflection/registration.h>
+
+#include <editor_core/gui/gui.h>
 
 struct inspector
 {
@@ -24,6 +25,8 @@ struct property_layout
 	property_layout(const std::string& name, const std::string& tooltip, bool columns = true);
 
 	~property_layout();
+
+	std::string name_;
 };
 
 REFLECT_INLINE(inspector)

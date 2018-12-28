@@ -3,9 +3,9 @@
 #include <functional>
 #include <unordered_map>
 
-#include "core/common/nonstd/type_index.hpp"
-#include "core/string_utils/string_utils.h"
-#include "core/tasks/task_system.h"
+#include <core/common/nonstd/type_index.hpp>
+#include <core/string_utils/string_utils.h>
+#include <core/tasks/task_system.h>
 
 #include "asset_handle.h"
 #include <cassert>

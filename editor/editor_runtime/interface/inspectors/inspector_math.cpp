@@ -91,7 +91,7 @@ bool inspector_transform::inspect(rttr::variant& var, bool read_only, const meta
 		euler_angles = local_euler_angles;
 		old_quat = rotation;
 	}
-	gui::Columns(1);
+	gui::EndColumns();
 	if(gui::Button("P", ImVec2(ImGui::GetFrameHeightWithSpacing(), ImGui::GetFrameHeightWithSpacing())))
 	{
 		data.set_position({0.0f, 0.0f, 0.0f});
@@ -155,6 +155,9 @@ bool inspector_transform::inspect(rttr::variant& var, bool read_only, const meta
 		changed = true;
 	}
 	gui::PopID();
+
+	gui::BeginColumns("properties", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
+
 	var = data;
 
 	return changed;

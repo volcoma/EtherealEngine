@@ -1,10 +1,12 @@
 #include "renderer.h"
+
 #include "../system/events.h"
-#include "core/common/assert.hpp"
-#include "core/graphics/graphics.h"
-#include "core/graphics/render_pass.h"
-#include "core/logging/logging.h"
-#include "core/string_utils/string_utils.h"
+
+#include <core/common/assert.hpp>
+#include <core/graphics/graphics.h>
+#include <core/graphics/render_pass.h>
+#include <core/logging/logging.h>
+
 #include <algorithm>
 #include <cstdarg>
 
@@ -23,7 +25,7 @@ renderer::renderer(cmd_line::parser& parser)
 	mml::video_mode desktop = mml::video_mode::get_desktop_mode();
 	desktop.width = 1280;
 	desktop.height = 720;
-	auto window = std::make_unique<render_window>(desktop, "App", mml::style::standard);
+	auto window = std::make_unique<render_window>(desktop, "ETHEREAL", mml::style::standard);
 	window->request_focus();
 	register_window(std::move(window));
 	process_pending_windows();
@@ -139,14 +141,9 @@ bool renderer::init_backend(cmd_line::parser& parser)
 	init_window_->set_visible(false);
 	const auto sz = init_window_->get_size();
 
-	gfx::platform_data pd{
-		reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(init_window_->get_system_handle_specific())),
-		reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(init_window_->get_system_handle())),
-		nullptr,
-		nullptr,
-		nullptr,
-		nullptr,
-	};
+	gfx::platform_data pd;
+	pd.ndt = init_window_->native_display_handle();
+	pd.nwh = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(init_window_->native_handle()));
 
 	gfx::set_platform_data(pd);
 

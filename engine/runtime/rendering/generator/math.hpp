@@ -7,7 +7,7 @@
 #include <limits>
 #include <stdexcept>
 
-#include "core/math/math_includes.h"
+#include <core/math/math_includes.h>
 
 namespace gml
 {

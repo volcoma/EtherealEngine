@@ -1,7 +1,8 @@
 #pragma once
 
 #include "../../system/project_manager.h"
-#include "core/serialization/serialization.h"
+
+#include <core/serialization/serialization.h>
 
 namespace editor
 {

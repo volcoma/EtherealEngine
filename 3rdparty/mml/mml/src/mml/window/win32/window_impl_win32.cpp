@@ -256,7 +256,7 @@ window_impl_win32::~window_impl_win32()
 
 
 ////////////////////////////////////////////////////////////
-window_handle window_impl_win32::get_system_handle() const
+window_handle window_impl_win32::native_handle() const
 {
     return _handle;
 }
@@ -404,7 +404,7 @@ void make_opaque(HWND hwnd)
 }
 void window_impl_win32::set_opacity(float opacity)
 {
-	HWND hwnd = get_system_handle();
+	HWND hwnd = native_handle();
 	if (opacity >= 1.0f)
 	{
 		make_opaque(hwnd);
@@ -413,7 +413,7 @@ void window_impl_win32::set_opacity(float opacity)
 	{
 		make_transparent(hwnd);
         const BYTE alpha = (BYTE) ((int) (opacity * 255.0f));
-        SetLayeredWindowAttributes(get_system_handle(), 0, alpha, LWA_ALPHA);
+        SetLayeredWindowAttributes(native_handle(), 0, alpha, LWA_ALPHA);
 	}
 }
 

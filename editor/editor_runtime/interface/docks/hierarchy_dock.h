@@ -1,7 +1,8 @@
 #pragma once
 
 #include "imguidock.h"
-#include "runtime/ecs/ecs.h"
+
+#include <runtime/ecs/ecs.h>
 
 struct hierarchy_dock : public imguidock::dock
 {

@@ -1,19 +1,21 @@
 #include "debugdraw_system.h"
 #include "../editing/editing_system.h"
-#include "core/graphics/debugdraw.h"
-#include "core/graphics/render_pass.h"
-#include "core/system/subsystem.h"
-#include "runtime/assets/asset_manager.h"
-#include "runtime/ecs/components/camera_component.h"
-#include "runtime/ecs/components/light_component.h"
-#include "runtime/ecs/components/model_component.h"
-#include "runtime/ecs/components/reflection_probe_component.h"
-#include "runtime/ecs/components/transform_component.h"
-#include "runtime/rendering/camera.h"
-#include "runtime/rendering/gpu_program.h"
-#include "runtime/rendering/mesh.h"
-#include "runtime/rendering/model.h"
-#include "runtime/system/events.h"
+
+#include <core/graphics/debugdraw.h>
+#include <core/graphics/render_pass.h>
+#include <core/system/subsystem.h>
+
+#include <runtime/assets/asset_manager.h>
+#include <runtime/ecs/components/camera_component.h>
+#include <runtime/ecs/components/light_component.h>
+#include <runtime/ecs/components/model_component.h>
+#include <runtime/ecs/components/reflection_probe_component.h>
+#include <runtime/ecs/components/transform_component.h>
+#include <runtime/rendering/camera.h>
+#include <runtime/rendering/gpu_program.h>
+#include <runtime/rendering/mesh.h>
+#include <runtime/rendering/model.h>
+#include <runtime/system/events.h>
 
 namespace editor
 {
@@ -42,10 +44,9 @@ void debugdraw_system::frame_render(delta_t)
 
 	if(es.show_grid)
 	{
-		auto draw_grid = [](std::uint32_t grid_color, float height, float height_intervals,
-							std::uint32_t size_intervals, std::uint32_t iteration,
-							std::uint32_t max_iterations) {
-
+		auto draw_grid = [&](std::uint32_t grid_color, float height, float height_intervals,
+							 std::uint32_t size_intervals, std::uint32_t iteration,
+							 std::uint32_t max_iterations) {
 			bool should_render = true;
 			if(iteration + 1 != max_iterations)
 			{
@@ -69,16 +70,16 @@ void debugdraw_system::frame_render(delta_t)
 				const auto grid_size = static_cast<std::uint32_t>(math::pow(size_intervals, max_iterations));
 				const auto sz = grid_size / step;
 
-				ddPush();
-				ddSetState(true, false, true);
-				ddSetColor(grid_color);
+				dd.encoder.push();
+				dd.encoder.setState(true, false, true);
+				dd.encoder.setColor(grid_color);
 				math::vec3 center = {0.0f, 0.0f, 0.0f};
 				math::vec3 normal = {0.0f, 1.0f, 0.0f};
 
-				ddDrawGrid(&normal, &center, sz, float(step));
-				ddPop();
+				dd.encoder.drawGrid({normal.x, normal.y, normal.z}, {center.x, center.y, center.z}, sz,
+									float(step));
+				dd.encoder.pop();
 			}
-
 		};
 
 		static const auto divison = 5;
@@ -110,29 +111,29 @@ void debugdraw_system::frame_render(delta_t)
 		auto& selected_camera = selected_camera_comp_ptr->get_camera();
 		const auto view_proj = selected_camera.get_view_projection();
 		const auto bounds = selected_camera.get_local_bounding_box();
-		ddPush();
-		ddSetColor(0xffffffff);
-		ddSetWireframe(true);
+		dd.encoder.push();
+		dd.encoder.setColor(0xffffffff);
+		dd.encoder.setWireframe(true);
 		if(selected_camera.get_projection_mode() == projection_mode::perspective)
 		{
-			ddSetTransform(nullptr);
-			ddDrawFrustum(&view_proj);
+			dd.encoder.setTransform(nullptr);
+			dd.encoder.drawFrustum(&view_proj);
 		}
 		else
 		{
 			Aabb aabb;
-			aabb.m_min[0] = bounds.min.x;
-			aabb.m_min[1] = bounds.min.y;
-			aabb.m_min[2] = bounds.min.z;
-			aabb.m_max[0] = bounds.max.x;
-			aabb.m_max[1] = bounds.max.y;
-			aabb.m_max[2] = bounds.max.z;
-			ddSetTransform(&world_transform);
-			ddDraw(aabb);
-			ddSetTransform(nullptr);
+			aabb.m_min.x = bounds.min.x;
+			aabb.m_min.y = bounds.min.y;
+			aabb.m_min.z = bounds.min.z;
+			aabb.m_max.x = bounds.max.x;
+			aabb.m_max.y = bounds.max.y;
+			aabb.m_max.z = bounds.max.z;
+			dd.encoder.setTransform(&world_transform);
+			dd.encoder.draw(aabb);
+			dd.encoder.setTransform(nullptr);
 		}
 
-		ddPop();
+		dd.encoder.pop();
 	}
 
 	if(selected_entity.has_component<light_component>())
@@ -147,55 +148,54 @@ void debugdraw_system::frame_render(delta_t)
 				auto tan_angle = math::tan(math::radians(light.spot_data.get_outer_angle() * 0.5f));
 				// oposite = tan * adjacent
 				auto oposite = tan_angle * adjacent;
-				ddPush();
-				ddSetColor(0xff00ff00);
-				ddSetWireframe(true);
-				ddSetLod(3);
+				dd.encoder.push();
+				dd.encoder.setColor(0xff00ff00);
+				dd.encoder.setWireframe(true);
+				dd.encoder.setLod(3);
 				math::vec3 from = transform_comp_ptr->get_position();
 				math::vec3 to = from + transform_comp_ptr->get_z_axis() * adjacent;
-				ddDrawCone(&to, &from, oposite);
-				ddPop();
+				dd.encoder.drawCone({to.x, to.y, to.z}, {from.x, from.y, from.z}, oposite);
+				dd.encoder.pop();
 			}
 			{
 				auto tan_angle = math::tan(math::radians(light.spot_data.get_inner_angle() * 0.5f));
 				// oposite = tan * adjacent
 				auto oposite = tan_angle * adjacent;
-				ddPush();
-				ddSetColor(0xff00ffff);
-				ddSetWireframe(true);
-				ddSetLod(3);
+				dd.encoder.push();
+				dd.encoder.setColor(0xff00ffff);
+				dd.encoder.setWireframe(true);
+				dd.encoder.setLod(3);
 				math::vec3 from = transform_comp_ptr->get_position();
 				math::vec3 to = from + transform_comp_ptr->get_z_axis() * adjacent;
-				ddDrawCone(&to, &from, oposite);
-				ddPop();
+				dd.encoder.drawCone({to.x, to.y, to.z}, {from.x, from.y, from.z}, oposite);
+				dd.encoder.pop();
 			}
 		}
 		else if(light.type == light_type::point)
 		{
 			auto radius = light.point_data.range;
-			ddPush();
-			ddSetColor(0xff00ff00);
-			ddSetWireframe(true);
+			dd.encoder.push();
+			dd.encoder.setColor(0xff00ff00);
+			dd.encoder.setWireframe(true);
 			math::vec3 center = transform_comp_ptr->get_position();
-			ddDrawCircle(Axis::X, center.x, center.y, center.z, radius);
-			ddDrawCircle(Axis::Y, center.x, center.y, center.z, radius);
-			ddDrawCircle(Axis::Z, center.x, center.y, center.z, radius);
-			ddPop();
+			dd.encoder.drawCircle(Axis::X, center.x, center.y, center.z, radius);
+			dd.encoder.drawCircle(Axis::Y, center.x, center.y, center.z, radius);
+			dd.encoder.drawCircle(Axis::Z, center.x, center.y, center.z, radius);
+			dd.encoder.pop();
 		}
 		else if(light.type == light_type::directional)
 		{
-			ddPush();
-			ddSetLod(255);
-			ddSetColor(0xff00ff00);
-			ddSetWireframe(true);
+			dd.encoder.push();
+			dd.encoder.setLod(255);
+			dd.encoder.setColor(0xff00ff00);
+			dd.encoder.setWireframe(true);
 			math::vec3 from1 = transform_comp_ptr->get_position();
 			math::vec3 to1 = from1 + transform_comp_ptr->get_z_axis() * 2.0f;
-			ddDrawCylinder(&from1, &to1, 0.1f);
+			dd.encoder.drawCylinder({from1.x, from1.y, from1.z}, {to1.x, to1.y, to1.z}, 0.1f);
 			math::vec3 from2 = to1;
 			math::vec3 to2 = from2 + transform_comp_ptr->get_z_axis() * 1.5f;
-			;
-			ddDrawCone(&from2, &to2, 0.5f);
-			ddPop();
+			dd.encoder.drawCone({from2.x, from2.y, from2.z}, {to2.x, to2.y, to2.z}, 0.5f);
+			dd.encoder.pop();
 		}
 	}
 
@@ -206,32 +206,32 @@ void debugdraw_system::frame_render(delta_t)
 		const auto& probe = probe_comp_ptr->get_probe();
 		if(probe.type == probe_type::box)
 		{
-			ddPush();
-			ddSetColor(0xff00ff00);
-			ddSetWireframe(true);
-			ddSetTransform(&world_transform);
+			dd.encoder.push();
+			dd.encoder.setColor(0xff00ff00);
+			dd.encoder.setWireframe(true);
+			dd.encoder.setTransform(&world_transform);
 			Aabb aabb;
-			aabb.m_min[0] = -probe.box_data.extents.x;
-			aabb.m_min[1] = -probe.box_data.extents.y;
-			aabb.m_min[2] = -probe.box_data.extents.z;
-			aabb.m_max[0] = probe.box_data.extents.x;
-			aabb.m_max[1] = probe.box_data.extents.y;
-			aabb.m_max[2] = probe.box_data.extents.z;
-			ddDraw(aabb);
-			ddSetTransform(nullptr);
-			ddPop();
+			aabb.m_min.x = -probe.box_data.extents.x;
+			aabb.m_min.y = -probe.box_data.extents.y;
+			aabb.m_min.z = -probe.box_data.extents.z;
+			aabb.m_max.x = probe.box_data.extents.x;
+			aabb.m_max.y = probe.box_data.extents.y;
+			aabb.m_max.z = probe.box_data.extents.z;
+			dd.encoder.draw(aabb);
+			dd.encoder.setTransform(nullptr);
+			dd.encoder.pop();
 		}
 		else
 		{
 			auto radius = probe.sphere_data.range;
-			ddPush();
-			ddSetColor(0xff00ff00);
-			ddSetWireframe(true);
+			dd.encoder.push();
+			dd.encoder.setColor(0xff00ff00);
+			dd.encoder.setWireframe(true);
 			math::vec3 center = transform_comp_ptr->get_position();
-			ddDrawCircle(Axis::X, center.x, center.y, center.z, radius);
-			ddDrawCircle(Axis::Y, center.x, center.y, center.z, radius);
-			ddDrawCircle(Axis::Z, center.x, center.y, center.z, radius);
-			ddPop();
+			dd.encoder.drawCircle(Axis::X, center.x, center.y, center.z, radius);
+			dd.encoder.drawCircle(Axis::Y, center.x, center.y, center.z, radius);
+			dd.encoder.drawCircle(Axis::Z, center.x, center.y, center.z, radius);
+			dd.encoder.pop();
 		}
 	}
 
@@ -276,20 +276,20 @@ void debugdraw_system::frame_render(delta_t)
 			//}
 			// else
 			{
-				ddPush();
-				ddSetColor(0xff00ff00);
-				ddSetWireframe(true);
-				ddSetTransform(&world_transform);
+				dd.encoder.push();
+				dd.encoder.setColor(0xff00ff00);
+				dd.encoder.setWireframe(true);
+				dd.encoder.setTransform(&world_transform);
 				Aabb aabb;
-				aabb.m_min[0] = bounds.min.x;
-				aabb.m_min[1] = bounds.min.y;
-				aabb.m_min[2] = bounds.min.z;
-				aabb.m_max[0] = bounds.max.x;
-				aabb.m_max[1] = bounds.max.y;
-				aabb.m_max[2] = bounds.max.z;
-				ddDraw(aabb);
-				ddSetTransform(nullptr);
-				ddPop();
+				aabb.m_min.x = bounds.min.x;
+				aabb.m_min.y = bounds.min.y;
+				aabb.m_min.z = bounds.min.z;
+				aabb.m_max.x = bounds.max.x;
+				aabb.m_max.y = bounds.max.y;
+				aabb.m_max.z = bounds.max.z;
+				dd.encoder.draw(aabb);
+				dd.encoder.setTransform(nullptr);
+				dd.encoder.pop();
 			}
 		}
 	}
@@ -309,7 +309,6 @@ debugdraw_system::debugdraw_system()
 	ts.push_or_execute_on_owner_thread(
 		[this](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
 			program_ = std::make_unique<gpu_program>(vs, fs);
-
 		},
 		vs_wf_wireframe, fs_wf_wireframe);
 
@@ -321,4 +320,4 @@ debugdraw_system::~debugdraw_system()
 	ddShutdown();
 	runtime::on_frame_render.disconnect(this, &debugdraw_system::frame_render);
 }
-}
+} // namespace editor

@@ -1,8 +1,9 @@
 #pragma once
 
 #include "../ecs.h"
-#include "core/audio/listener.h"
-#include "core/math/math_includes.h"
+
+#include <core/audio/listener.h>
+#include <core/math/math_includes.h>
 
 //-----------------------------------------------------------------------------
 // Main Class Declarations

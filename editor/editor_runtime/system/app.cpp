@@ -13,21 +13,25 @@
 #include "../interface/gui_system.h"
 #include "../rendering/debugdraw_system.h"
 #include "../system/project_manager.h"
-#include "core/filesystem/filesystem.h"
-#include "core/logging/logging.h"
-#include "editor_core/nativefd/filedialog.h"
-#include "runtime/assets/asset_manager.h"
-#include "runtime/ecs/components/camera_component.h"
-#include "runtime/ecs/components/light_component.h"
-#include "runtime/ecs/components/model_component.h"
-#include "runtime/ecs/components/reflection_probe_component.h"
-#include "runtime/ecs/components/transform_component.h"
-#include "runtime/ecs/constructs/scene.h"
-#include "runtime/ecs/constructs/utils.h"
-#include "runtime/ecs/systems/scene_graph.h"
-#include "runtime/input/input.h"
-#include "runtime/rendering/renderer.h"
-#include "runtime/system/events.h"
+
+#include <core/filesystem/filesystem.h>
+#include <core/logging/logging.h>
+
+#include <runtime/assets/asset_manager.h>
+#include <runtime/ecs/components/camera_component.h>
+#include <runtime/ecs/components/light_component.h>
+#include <runtime/ecs/components/model_component.h>
+#include <runtime/ecs/components/reflection_probe_component.h>
+#include <runtime/ecs/components/transform_component.h>
+#include <runtime/ecs/constructs/scene.h>
+#include <runtime/ecs/constructs/utils.h>
+#include <runtime/ecs/systems/scene_graph.h>
+#include <runtime/input/input.h>
+#include <runtime/rendering/renderer.h>
+#include <runtime/system/events.h>
+
+#include <editor_core/nativefd/filedialog.h>
+
 namespace editor
 {
 namespace
@@ -451,7 +455,7 @@ void app::create_docks()
 	auto& rend = core::get_subsystem<runtime::renderer>();
 	auto& main_window = rend.get_main_window();
 
-	main_window->set_title("ETHEREAL");
+	main_window->set_title("ETHEREAL EDITOR");
 
 	console_dock_name_ = "CONSOLE";
 	auto scene = std::make_unique<scene_dock>("SCENE", true, ImVec2(200.0f, 200.0f));
@@ -566,7 +570,7 @@ void app::draw_footer(render_window&, imguidock::dockspace& dockspace)
 	const auto items = console_log_->get_items();
 
 	const auto total_width = gui::GetContentRegionAvailWidth();
-	gui::Columns(2, "footer");
+	gui::BeginColumns("footer", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
 	gui::SetColumnWidth(0, total_width * 0.8f);
 
 	if(items.size() > 0)
@@ -607,7 +611,7 @@ void app::draw_footer(render_window&, imguidock::dockspace& dockspace)
 
 		gui::PopFont();
 	}
-	gui::Columns(1);
+	gui::EndColumns();
 }
 
 void app::draw_start_page(render_window& window)

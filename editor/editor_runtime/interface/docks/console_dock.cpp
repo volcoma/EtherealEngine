@@ -57,7 +57,7 @@ void console_dock::render(const ImVec2&)
 		gui::PopStyleColor();
 	}
 	if(console_log_->has_new_entries())
-		gui::SetScrollHere();
+		gui::SetScrollHereY();
 
 	console_log_->set_has_new_entries(false);
 

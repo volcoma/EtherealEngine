@@ -1,9 +1,9 @@
 #pragma once
-
-#include "core/math/math_includes.h"
-#include "core/serialization/serialization.h"
 #include "quaternion.hpp"
 #include "vector.hpp"
+
+#include <core/math/math_includes.h>
+#include <core/serialization/serialization.h>
 
 namespace cereal
 {

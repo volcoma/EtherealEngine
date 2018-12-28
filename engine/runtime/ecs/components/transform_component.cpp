@@ -1,5 +1,7 @@
 #include "transform_component.h"
-#include "core/logging/logging.h"
+
+#include <core/logging/logging.h>
+
 #include <algorithm>
 
 void transform_component::on_entity_set()

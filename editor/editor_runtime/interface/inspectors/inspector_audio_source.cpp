@@ -1,5 +1,4 @@
 #include "inspector_audio_source.h"
-#include "core/string_utils/string_utils.h"
 #include "inspectors.h"
 
 bool inspector_audio_source_component::inspect(rttr::variant& var, bool read_only,

@@ -1,7 +1,8 @@
 #include "reflection_probe_system.h"
 #include "../../system/events.h"
 #include "../components/reflection_probe_component.h"
-#include "core/system/subsystem.h"
+
+#include <core/system/subsystem.h>
 
 namespace runtime
 {

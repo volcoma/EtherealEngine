@@ -1,4 +1,7 @@
 #include "app.h"
+#include "app_setup.h"
+#include "events.h"
+
 #include "../assets/asset_manager.h"
 #include "../ecs/ecs.h"
 #include "../ecs/systems/audio_system.h"
@@ -10,13 +13,13 @@
 #include "../input/input.h"
 #include "../rendering/render_window.h"
 #include "../rendering/renderer.h"
-#include "app_setup.h"
-#include "core/audio/library.h"
-#include "core/logging/logging.h"
-#include "core/serialization/serialization.h"
-#include "core/simulation/simulation.h"
-#include "core/tasks/task_system.h"
-#include "events.h"
+
+#include <core/audio/library.h>
+#include <core/logging/logging.h>
+#include <core/serialization/serialization.h>
+#include <core/simulation/simulation.h>
+#include <core/tasks/task_system.h>
+
 #include <sstream>
 
 namespace runtime

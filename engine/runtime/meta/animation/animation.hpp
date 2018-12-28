@@ -1,9 +1,11 @@
 #pragma once
 
 #include "../../animation/animation.h"
-#include "core/reflection/reflection.h"
-#include "core/serialization/serialization.h"
-#include "core/serialization/types/chrono.hpp"
+
+#include <core/reflection/reflection.h>
+#include <core/serialization/serialization.h>
+#include <core/serialization/types/chrono.hpp>
+
 namespace runtime
 {
 SAVE_EXTERN(animation);

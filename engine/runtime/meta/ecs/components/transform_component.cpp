@@ -1,8 +1,10 @@
 #include "transform_component.hpp"
+#include "component.hpp"
+
 #include "../../core/math/transform.hpp"
 #include "../../core/math/vector.hpp"
-#include "component.hpp"
-#include "core/serialization/types/vector.hpp"
+
+#include <core/serialization/types/vector.hpp>
 
 REFLECT(transform_component)
 {
@@ -12,11 +14,11 @@ REFLECT(transform_component)
 		.property("local", &transform_component::get_local_transform,
 				  &transform_component::set_local_transform)(
 			rttr::metadata("pretty_name", "Local"),
-			rttr::metadata("tooltip", "This is the local transformation. It is "
-									  "relative to the parent."))
+			rttr::metadata("tooltip", "This is the local transformation.\n"
+                                      "It is relative to the parent."))
 		.property("world", &transform_component::get_transform, &transform_component::set_transform)(
 			rttr::metadata("pretty_name", "World"),
-			rttr::metadata("tooltip", "This is the world transformation. "
+			rttr::metadata("tooltip", "This is the world transformation.\n"
 									  "Affected by parent transformation."));
 }
 

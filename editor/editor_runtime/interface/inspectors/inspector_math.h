@@ -1,6 +1,7 @@
 #pragma once
-#include "core/math/math_includes.h"
 #include "inspector.h"
+
+#include <core/math/math_includes.h>
 
 struct inspector_vec2 : public inspector
 {

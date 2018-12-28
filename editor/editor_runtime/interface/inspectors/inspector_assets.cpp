@@ -1,17 +1,20 @@
 #include "inspector_assets.h"
+#include "inspectors.h"
+
 #include "../../assets/asset_extensions.h"
 #include "../../editing/editing_system.h"
-#include "core/audio/sound.h"
-#include "core/filesystem/filesystem.h"
-#include "core/graphics/texture.h"
-#include "core/system/subsystem.h"
-#include "inspectors.h"
-#include "runtime/animation/animation.h"
-#include "runtime/assets/asset_manager.h"
-#include "runtime/assets/impl/asset_writer.h"
-#include "runtime/ecs/constructs/prefab.h"
-#include "runtime/rendering/material.h"
-#include "runtime/rendering/mesh.h"
+
+#include <core/audio/sound.h>
+#include <core/filesystem/filesystem.h>
+#include <core/graphics/texture.h>
+#include <core/system/subsystem.h>
+
+#include <runtime/animation/animation.h>
+#include <runtime/assets/asset_manager.h>
+#include <runtime/assets/impl/asset_writer.h>
+#include <runtime/ecs/constructs/prefab.h>
+#include <runtime/rendering/material.h>
+#include <runtime/rendering/mesh.h>
 
 template <typename asset_t>
 static bool process_drag_drop_target(asset_handle<asset_t>& entry)
@@ -38,7 +41,7 @@ static bool process_drag_drop_target(asset_handle<asset_t>& entry)
 										  std::size_t(payload->DataSize));
 
 				std::string key = fs::convert_to_protocol(fs::path(absolute_path)).string();
-				auto entry_future = am.find_asset_entry<asset_t>(key);
+				auto entry_future = am.template find_asset_entry<asset_t>(key);
 				if(entry_future.is_ready())
 				{
 					entry = entry_future.get();
@@ -151,27 +154,34 @@ bool inspector_asset_handle_texture::inspect(rttr::variant& var, bool read_only,
 		return changed;
 	}
 
-	gui::BeginTabBar("asset_handle_texture", ImGuiTabBarFlags_SizingPolicyEqual | ImGuiTabBarFlags_NoReorder |
-												 ImGuiTabBarFlags_NoCloseWithMiddleMouseButton);
+	if(gui::BeginTabBar("asset_handle_texture",
+						ImGuiTabBarFlags_NoCloseWithMiddleMouseButton | ImGuiTabBarFlags_FittingPolicyScroll))
+	{
 
-	if(gui::TabItem("Info"))
-	{
-		if(!draw_image())
+		if(gui::BeginTabItem("\tInfo\t"))
 		{
-			return false;
+			if(!draw_image())
+			{
+				ImGui::EndTabItem();
+				gui::EndTabBar();
+
+				return false;
+			}
+			if(data)
+			{
+				auto info = data.get()->info;
+				rttr::variant vari = info;
+				changed |= inspect_var(vari);
+			}
+			ImGui::EndTabItem();
 		}
-		if(data)
+		if(gui::BeginTabItem("\tImport\t"))
 		{
-			auto info = data.get()->info;
-			rttr::variant vari = info;
-			changed |= inspect_var(vari);
+			gui::TextUnformatted("Import options");
+			ImGui::EndTabItem();
 		}
+		gui::EndTabBar();
 	}
-	if(gui::TabItem("Import"))
-	{
-		gui::TextUnformatted("Import options");
-	}
-	gui::EndTabBar();
 
 	return changed;
 }
@@ -273,26 +283,30 @@ bool inspector_asset_handle_mesh::inspect(rttr::variant& var, bool read_only, co
 
 	bool changed = false;
 
-	gui::BeginTabBar("asset_handle_mesh", ImGuiTabBarFlags_SizingPolicyEqual | ImGuiTabBarFlags_NoReorder |
-											  ImGuiTabBarFlags_NoCloseWithMiddleMouseButton);
+	if(gui::BeginTabBar("asset_handle_mesh", ImGuiTabBarFlags_FittingPolicyResizeDown |
+												 ImGuiTabBarFlags_NoCloseWithMiddleMouseButton))
+	{
 
-	if(gui::TabItem("Info"))
-	{
-		if(data)
+		if(gui::BeginTabItem("\tInfo\t"))
 		{
-			mesh::info info;
-			info.vertices = data->get_vertex_count();
-			info.primitives = data->get_face_count();
-			info.subsets = static_cast<std::uint32_t>(data->get_subset_count());
-			rttr::variant vari = info;
-			changed |= inspect_var(vari);
+			if(data)
+			{
+				mesh::info info;
+				info.vertices = data->get_vertex_count();
+				info.primitives = data->get_face_count();
+				info.subsets = static_cast<std::uint32_t>(data->get_subset_count());
+				rttr::variant vari = info;
+				changed |= inspect_var(vari);
+			}
+			gui::EndTabItem();
 		}
+		if(gui::BeginTabItem("\tImport\t"))
+		{
+			gui::TextUnformatted("Import options");
+			gui::EndTabItem();
+		}
+		gui::EndTabBar();
 	}
-	if(gui::TabItem("Import"))
-	{
-		gui::TextUnformatted("Import options");
-	}
-	gui::EndTabBar();
 
 	return changed;
 }
@@ -387,22 +401,25 @@ bool inspector_asset_handle_sound::inspect(rttr::variant& var, bool read_only,
 
 	bool changed = false;
 
-	gui::BeginTabBar("asset_handle_sound", ImGuiTabBarFlags_SizingPolicyEqual | ImGuiTabBarFlags_NoReorder |
-											   ImGuiTabBarFlags_NoCloseWithMiddleMouseButton);
-
-	if(gui::TabItem("Info"))
+	if(gui::BeginTabBar("asset_handle_sound", ImGuiTabBarFlags_FittingPolicyResizeDown |
+												  ImGuiTabBarFlags_NoCloseWithMiddleMouseButton))
 	{
-		if(data)
+		if(gui::BeginTabItem("\tInfo\t"))
 		{
-			rttr::variant vari = data.get()->get_info();
-			changed |= inspect_var(vari);
+			if(data)
+			{
+				rttr::variant vari = data.get()->get_info();
+				changed |= inspect_var(vari);
+			}
+			gui::EndTabItem();
 		}
+		if(gui::BeginTabItem("\tImport\t"))
+		{
+			gui::TextUnformatted("Import options");
+			gui::EndTabItem();
+		}
+		gui::EndTabBar();
 	}
-	if(gui::TabItem("Import"))
-	{
-		gui::TextUnformatted("Import options");
-	}
-	gui::EndTabBar();
 
 	return changed;
 }

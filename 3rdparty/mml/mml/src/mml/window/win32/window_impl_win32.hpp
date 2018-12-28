@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////
 #include <mml/window/event.hpp>
 #include <mml/window/window_impl.hpp>
-#include <windows.h>
+#include <Windows.h>
 
 
 namespace mml
@@ -52,8 +52,8 @@ public:
     /// \return Handle of the window
     ///
     ////////////////////////////////////////////////////////////
-    virtual window_handle get_system_handle() const;
-	virtual void* get_system_handle_specific() const { return nullptr; }
+    virtual window_handle native_handle() const;
+	virtual void* native_display_handle() const { return nullptr; }
     ////////////////////////////////////////////////////////////
     /// \brief Get the position of the window
     ///

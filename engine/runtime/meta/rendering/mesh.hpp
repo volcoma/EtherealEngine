@@ -1,7 +1,8 @@
 #pragma once
 #include "../../rendering/mesh.h"
-#include "core/reflection/reflection.h"
-#include "core/serialization/serialization.h"
+
+#include <core/reflection/reflection.h>
+#include <core/serialization/serialization.h>
 
 REFLECT_EXTERN(mesh::info);
 

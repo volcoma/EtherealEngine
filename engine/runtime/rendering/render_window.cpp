@@ -65,6 +65,6 @@ void render_window::prepare_surface()
 	auto size = get_size();
 
 	surface_ = std::make_shared<gfx::frame_buffer>(
-		reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(get_system_handle())),
+		reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(native_handle())),
 		static_cast<std::uint16_t>(size[0]), static_cast<std::uint16_t>(size[1]));
 }

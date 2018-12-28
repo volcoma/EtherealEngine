@@ -1,12 +1,13 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imguidock.h"
+#include "docking.h"
 
 // user includes
-#include "core/string_utils/string_utils.h"
-#include "core/system/subsystem.h"
-#include "docking.h"
-#include "runtime/input/input.h"
-#include "runtime/rendering/renderer.h"
+#include <core/string_utils/string_utils.h>
+#include <core/system/subsystem.h>
+
+#include <runtime/input/input.h>
+#include <runtime/rendering/renderer.h>
 
 namespace imguidock
 {

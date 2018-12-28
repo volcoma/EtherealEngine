@@ -11,12 +11,13 @@
 #include "../components/model_component.h"
 #include "../components/reflection_probe_component.h"
 #include "../components/transform_component.h"
-#include "core/graphics/index_buffer.h"
-#include "core/graphics/render_pass.h"
-#include "core/graphics/render_view.h"
-#include "core/graphics/texture.h"
-#include "core/graphics/vertex_buffer.h"
-#include "core/system/subsystem.h"
+
+#include <core/graphics/index_buffer.h>
+#include <core/graphics/render_pass.h>
+#include <core/graphics/render_view.h>
+#include <core/graphics/texture.h>
+#include <core/graphics/vertex_buffer.h>
+#include <core/system/subsystem.h>
 
 namespace runtime
 {

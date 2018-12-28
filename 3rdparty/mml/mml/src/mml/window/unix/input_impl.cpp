@@ -218,7 +218,7 @@ std::array<std::int32_t, 2> input_impl::get_mouse_position()
 ////////////////////////////////////////////////////////////
 std::array<std::int32_t, 2> input_impl::get_mouse_position(const window& relativeTo)
 {
-    window_handle handle = relativeTo.get_system_handle();
+    window_handle handle = relativeTo.native_handle();
     if (handle)
     {
         // Open a connection with the X server
@@ -265,7 +265,7 @@ void input_impl::set_mouse_position(const std::array<std::int32_t, 2>& position,
     // Open a connection with the X server
     Display* display = open_display();
 
-    window_handle handle = relativeTo.get_system_handle();
+    window_handle handle = relativeTo.native_handle();
     if (handle)
     {
         XWarpPointer(display, None, handle, 0, 0, 0, 0, position[0], position[1]);

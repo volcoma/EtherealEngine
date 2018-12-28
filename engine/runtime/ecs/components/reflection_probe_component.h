@@ -4,9 +4,10 @@
 //-----------------------------------------------------------------------------
 #include "../../rendering/reflection_probe.h"
 #include "../ecs.h"
-#include "core/common/basetypes.hpp"
-#include "core/graphics/render_pass.h"
-#include "core/graphics/render_view.h"
+
+#include <core/common/basetypes.hpp>
+#include <core/graphics/render_pass.h>
+#include <core/graphics/render_view.h>
 #include <array>
 //-----------------------------------------------------------------------------
 // Forward Declarations

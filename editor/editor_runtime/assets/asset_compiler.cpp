@@ -2,30 +2,32 @@
 #include "asset_extensions.h"
 #include "mesh_importer.h"
 
-#include "bx/error.h"
-#include "bx/process.h"
-#include "bx/string.h"
-#include "core/audio/loaders/loader.h"
-#include "core/audio/sound.h"
-#include "core/filesystem/filesystem.h"
-#include "core/graphics/graphics.h"
-#include "core/graphics/shader.h"
-#include "core/graphics/texture.h"
-#include "core/logging/logging.h"
-#include "core/serialization/associative_archive.h"
-#include "core/serialization/binary_archive.h"
-#include "core/serialization/serialization.h"
-#include "core/serialization/types/map.hpp"
-#include "core/serialization/types/unordered_map.hpp"
-#include "core/serialization/types/vector.hpp"
-#include "core/string_utils/string_utils.h"
-#include "core/uuid/uuid.hpp"
-#include "runtime/ecs/constructs/prefab.h"
-#include "runtime/ecs/constructs/scene.h"
-#include "runtime/meta/animation/animation.hpp"
-#include "runtime/meta/audio/sound.hpp"
-#include "runtime/meta/rendering/material.hpp"
-#include "runtime/meta/rendering/mesh.hpp"
+#include <bx/error.h>
+#include <bx/process.h>
+#include <bx/string.h>
+
+#include <core/audio/loaders/loader.h>
+#include <core/audio/sound.h>
+#include <core/filesystem/filesystem.h>
+#include <core/graphics/graphics.h>
+#include <core/graphics/shader.h>
+#include <core/graphics/texture.h>
+#include <core/logging/logging.h>
+#include <core/serialization/associative_archive.h>
+#include <core/serialization/binary_archive.h>
+#include <core/serialization/serialization.h>
+#include <core/serialization/types/map.hpp>
+#include <core/serialization/types/unordered_map.hpp>
+#include <core/serialization/types/vector.hpp>
+#include <core/string_utils/string_utils.h>
+#include <core/uuid/uuid.hpp>
+
+#include <runtime/ecs/constructs/prefab.h>
+#include <runtime/ecs/constructs/scene.h>
+#include <runtime/meta/animation/animation.hpp>
+#include <runtime/meta/audio/sound.hpp>
+#include <runtime/meta/rendering/material.hpp>
+#include <runtime/meta/rendering/mesh.hpp>
 
 #include <array>
 #include <fstream>

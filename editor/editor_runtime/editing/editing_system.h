@@ -1,8 +1,10 @@
 #pragma once
 #include "../interface/docks/imguidock.h"
-#include "core/math/math_includes.h"
-#include "runtime/assets/asset_handle.h"
-#include "runtime/ecs/ecs.h"
+
+#include <core/math/math_includes.h>
+
+#include <runtime/assets/asset_handle.h>
+#include <runtime/ecs/ecs.h>
 
 class render_window;
 

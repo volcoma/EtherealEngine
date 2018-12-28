@@ -1,9 +1,11 @@
 #include "model_component.hpp"
+#include "component.hpp"
+
 #include "../../rendering/material.hpp"
 #include "../../rendering/mesh.hpp"
 #include "../../rendering/model.hpp"
-#include "component.hpp"
-#include "core/serialization/types/vector.hpp"
+
+#include <core/serialization/types/vector.hpp>
 
 REFLECT(model_component)
 {

@@ -50,9 +50,10 @@ struct gfx_callback : public bgfx::CallbackI
 	void profilerEnd() final
 	{
 	}
-	void fatal(bgfx::Fatal::Enum /*_code*/, const char* _str) final
+	void fatal(const char* _filePath
+			, uint16_t _line, bgfx::Fatal::Enum /*_code*/, const char* _str) final
 	{
-		log("error", _str);
+		log("error", std::string(_filePath) + "["+ std::to_string(_line) + "]" + _str);
 	}
 
 	std::uint32_t cacheReadSize(std::uint64_t /*_id*/) final
@@ -401,7 +402,7 @@ void destroy(program_handle _handle)
 }
 
 bool is_texture_valid(uint16_t _depth, bool _cubeMap, uint16_t _numLayers, texture_format _format,
-					  uint32_t _flags)
+					  uint64_t _flags)
 {
 	return bgfx::isTextureValid(_depth, _cubeMap, _numLayers, _format, _flags);
 }
@@ -412,31 +413,31 @@ void calc_texture_size(texture_info& _info, uint16_t _width, uint16_t _height, u
 	bgfx::calcTextureSize(_info, _width, _height, _depth, _cubeMap, _hasMips, _numLayers, _format);
 }
 
-texture_handle create_texture(const memory_view* _mem, uint32_t _flags, uint8_t _skip, texture_info* _info)
+texture_handle create_texture(const memory_view* _mem, uint64_t _flags, uint8_t _skip, texture_info* _info)
 {
 	return bgfx::createTexture(_mem, _flags, _skip, _info);
 }
 
 texture_handle create_texture_2d(uint16_t _width, uint16_t _height, bool _hasMips, uint16_t _numLayers,
-								 texture_format _format, uint32_t _flags, const memory_view* _mem)
+								 texture_format _format, uint64_t _flags, const memory_view* _mem)
 {
 	return bgfx::createTexture2D(_width, _height, _hasMips, _numLayers, _format, _flags, _mem);
 }
 
 texture_handle create_texture_2d(backbuffer_ratio _ratio, bool _hasMips, uint16_t _numLayers,
-								 texture_format _format, uint32_t _flags)
+								 texture_format _format, uint64_t _flags)
 {
 	return bgfx::createTexture2D(_ratio, _hasMips, _numLayers, _format, _flags);
 }
 
 texture_handle create_texture_3d(uint16_t _width, uint16_t _height, uint16_t _depth, bool _hasMips,
-								 texture_format _format, uint32_t _flags, const memory_view* _mem)
+								 texture_format _format, uint64_t _flags, const memory_view* _mem)
 {
 	return bgfx::createTexture3D(_width, _height, _depth, _hasMips, _format, _flags, _mem);
 }
 
 texture_handle create_texture_cube(uint16_t _size, bool _hasMips, uint16_t _numLayers, texture_format _format,
-								   uint32_t _flags, const memory_view* _mem)
+								   uint64_t _flags, const memory_view* _mem)
 {
 	return bgfx::createTextureCube(_size, _hasMips, _numLayers, _format, _flags, _mem);
 }
@@ -476,13 +477,13 @@ void destroy(texture_handle _handle)
 }
 
 frame_buffer_handle create_frame_buffer(uint16_t _width, uint16_t _height, texture_format _format,
-										uint32_t _textureFlags)
+										uint64_t _textureFlags)
 {
 	return bgfx::createFrameBuffer(_width, _height, _format, _textureFlags);
 }
 
 frame_buffer_handle create_frame_buffer(backbuffer_ratio _ratio, texture_format _format,
-										uint32_t _textureFlags)
+										uint64_t _textureFlags)
 {
 	return bgfx::createFrameBuffer(_ratio, _format, _textureFlags);
 }
@@ -498,9 +499,9 @@ frame_buffer_handle create_frame_buffer(uint8_t _num, const attachment* _attachm
 }
 
 frame_buffer_handle create_frame_buffer(void* _nwh, uint16_t _width, uint16_t _height,
-										texture_format _depthFormat)
+										texture_format _format, texture_format _depthFormat)
 {
-	return bgfx::createFrameBuffer(_nwh, _width, _height, _depthFormat);
+	return bgfx::createFrameBuffer(_nwh, _width, _height, _format, _depthFormat);
 }
 
 texture_handle get_texture(frame_buffer_handle _handle, uint8_t _attachment)
@@ -597,12 +598,6 @@ void set_view_frame_buffer(view_id _id, frame_buffer_handle _handle)
 void set_view_transform(view_id _id, const void* _view, const void* _proj)
 {
 	bgfx::setViewTransform(_id, _view, _proj);
-}
-
-void set_view_transform(view_id _id, const void* _view, const void* _projL, uint8_t _flags,
-						const void* _projR)
-{
-	bgfx::setViewTransform(_id, _view, _projL, _flags, _projR);
 }
 
 void set_view_order(view_id _id, uint16_t _num, const view_id* _order)
@@ -770,16 +765,15 @@ void set_buffer(uint8_t _stage, indirect_buffer_handle _handle, access _access)
 	bgfx::setBuffer(_stage, _handle, _access);
 }
 
-void dispatch(view_id _id, program_handle _handle, uint32_t _numX, uint32_t _numY, uint32_t _numZ,
-			  uint8_t _flags)
+void dispatch(view_id _id, program_handle _handle, uint32_t _numX, uint32_t _numY, uint32_t _numZ)
 {
-	bgfx::dispatch(_id, _handle, _numX, _numY, _numZ, _flags);
+	bgfx::dispatch(_id, _handle, _numX, _numY, _numZ);
 }
 
 void dispatch(view_id _id, program_handle _handle, indirect_buffer_handle _indirectHandle, uint16_t _start,
-			  uint16_t _num, uint8_t _flags)
+			  uint16_t _num)
 {
-	bgfx::dispatch(_id, _handle, _indirectHandle, _start, _num, _flags);
+	bgfx::dispatch(_id, _handle, _indirectHandle, _start, _num);
 }
 
 void discard()

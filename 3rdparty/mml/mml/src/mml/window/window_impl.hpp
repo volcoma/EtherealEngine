@@ -94,8 +94,8 @@ public:
     /// \return Handle of the window
     ///
     ////////////////////////////////////////////////////////////
-    virtual window_handle get_system_handle() const = 0;
-    virtual void* get_system_handle_specific() const = 0;
+    virtual window_handle native_handle() const = 0;
+    virtual void* native_display_handle() const = 0;
     ////////////////////////////////////////////////////////////
     /// \brief Get the position of the window
     ///

@@ -1,7 +1,8 @@
 #pragma once
-#include "core/math/math_includes.h"
-#include "core/reflection/registration.h"
-#include "core/serialization/serialization.h"
+#include <core/math/math_includes.h>
+#include <core/reflection/registration.h>
+#include <core/serialization/serialization.h>
+
 #include <cstdint>
 
 enum class probe_type : std::uint8_t

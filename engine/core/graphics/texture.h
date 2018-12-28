@@ -26,7 +26,7 @@ struct texture : public handle_impl<texture_handle>
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	texture(const memory_view* _mem, std::uint32_t _flags = BGFX_TEXTURE_NONE, std::uint8_t _skip = 0,
+	texture(const memory_view* _mem, std::uint64_t _flags = BGFX_TEXTURE_NONE|BGFX_SAMPLER_NONE, std::uint8_t _skip = 0,
 			texture_info* _info = nullptr);
 
 	//-----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ struct texture : public handle_impl<texture_handle>
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	texture(std::uint16_t _width, std::uint16_t _height, bool _hasMips, std::uint16_t _numLayers,
-			texture_format _format, std::uint32_t _flags = BGFX_TEXTURE_NONE,
+			texture_format _format, std::uint64_t _flags = BGFX_TEXTURE_NONE|BGFX_SAMPLER_NONE,
 			const memory_view* _mem = nullptr);
 
 	//-----------------------------------------------------------------------------
@@ -50,7 +50,7 @@ struct texture : public handle_impl<texture_handle>
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	texture(backbuffer_ratio _ratio, bool _hasMips, std::uint16_t _numLayers, texture_format _format,
-			std::uint32_t _flags = BGFX_TEXTURE_NONE);
+			std::uint64_t _flags = BGFX_TEXTURE_NONE|BGFX_SAMPLER_NONE);
 
 	//-----------------------------------------------------------------------------
 	//  Name : Texture ()
@@ -61,7 +61,7 @@ struct texture : public handle_impl<texture_handle>
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	texture(std::uint16_t _width, std::uint16_t _height, std::uint16_t _depth, bool _hasMips,
-			texture_format _format, std::uint32_t _flags = BGFX_TEXTURE_NONE,
+			texture_format _format, std::uint64_t _flags = BGFX_TEXTURE_NONE|BGFX_SAMPLER_NONE,
 			const memory_view* _mem = nullptr);
 
 	//-----------------------------------------------------------------------------
@@ -73,7 +73,7 @@ struct texture : public handle_impl<texture_handle>
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	texture(std::uint16_t _size, bool _hasMips, std::uint16_t _numLayers, texture_format _format,
-			std::uint32_t _flags = BGFX_TEXTURE_NONE, const memory_view* _mem = nullptr);
+			std::uint64_t _flags = BGFX_TEXTURE_NONE|BGFX_SAMPLER_NONE, const memory_view* _mem = nullptr);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_size ()
@@ -98,7 +98,7 @@ struct texture : public handle_impl<texture_handle>
 	/// Texture detail info.
 	texture_info info;
 	/// Creation flags.
-	std::uint32_t flags = BGFX_TEXTURE_NONE;
+	std::uint64_t flags = BGFX_TEXTURE_NONE;
 	/// Back buffer ratio if any.
 	backbuffer_ratio ratio = backbuffer_ratio::Count;
 };

@@ -1,10 +1,12 @@
 #include "model.h"
-#include "../assets/asset_manager.h"
-#include "core/math/math_includes.h"
-#include "core/system/subsystem.h"
 #include "gpu_program.h"
 #include "material.h"
 #include "mesh.h"
+
+#include "../assets/asset_manager.h"
+
+#include <core/math/math_includes.h>
+#include <core/system/subsystem.h>
 
 model::model()
 {

@@ -1,22 +1,26 @@
 #include "project_dock.h"
 #include "../../assets/asset_extensions.h"
 #include "../../editing/editing_system.h"
-#include "core/audio/sound.h"
-#include "core/graphics/shader.h"
-#include "core/graphics/texture.h"
-#include "core/string_utils/string_utils.h"
-#include "core/system/subsystem.h"
-#include "core/tasks/task_system.h"
-#include "editor_core/nativefd/filedialog.h"
-#include "runtime/animation/animation.h"
-#include "runtime/assets/asset_manager.h"
-#include "runtime/assets/impl/asset_writer.h"
-#include "runtime/ecs/constructs/prefab.h"
-#include "runtime/ecs/constructs/scene.h"
-#include "runtime/ecs/constructs/utils.h"
-#include "runtime/ecs/ecs.h"
-#include "runtime/rendering/material.h"
-#include "runtime/rendering/mesh.h"
+
+#include <core/audio/sound.h>
+#include <core/graphics/shader.h>
+#include <core/graphics/texture.h>
+#include <core/string_utils/string_utils.h>
+#include <core/system/subsystem.h>
+#include <core/tasks/task_system.h>
+
+#include <runtime/animation/animation.h>
+#include <runtime/assets/asset_manager.h>
+#include <runtime/assets/impl/asset_writer.h>
+#include <runtime/ecs/constructs/prefab.h>
+#include <runtime/ecs/constructs/scene.h>
+#include <runtime/ecs/constructs/utils.h>
+#include <runtime/ecs/ecs.h>
+#include <runtime/rendering/material.h>
+#include <runtime/rendering/mesh.h>
+
+#include <editor_core/nativefd/filedialog.h>
+
 #include <chrono>
 
 using namespace std::literals;
@@ -286,7 +290,7 @@ static bool draw_entry(asset_handle<gfx::texture> icon, bool is_loading, const s
 		}
 		gui::PushItemWidth(150.0f);
 		if(gui::InputText("##NAME", input_buff.data(), input_buff.size(),
-						  ImGuiInputTextFlags_EnterReturnsTrue))
+						  ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
 		{
 			action = entry_action::renamed;
 			gui::CloseCurrentPopup();
@@ -476,7 +480,6 @@ void project_dock::render(const ImVec2& /*unused*/)
 											  [&]() // on_click
 											  {
 												  es.select(entry);
-
 											  },
 											  [&]() // on_double_click
 											  {
@@ -495,7 +498,6 @@ void project_dock::render(const ImVec2& /*unused*/)
 											  {
 												  fs::error_code err;
 												  fs::remove_all(absolute_path, err);
-
 											  });
 			}
 			else
@@ -527,7 +529,6 @@ void project_dock::render(const ImVec2& /*unused*/)
 									   [&]() // on_click
 									   {
 										   es.select(entry);
-
 									   },
 									   nullptr, // on_double_click
 									   on_rename, on_delete);
@@ -559,7 +560,6 @@ void project_dock::render(const ImVec2& /*unused*/)
 									   [&]() // on_click
 									   {
 										   es.select(entry);
-
 									   },
 									   nullptr, // on_double_click
 									   on_rename, on_delete);
@@ -591,7 +591,6 @@ void project_dock::render(const ImVec2& /*unused*/)
 									   [&]() // on_click
 									   {
 										   es.select(entry);
-
 									   },
 									   nullptr, // on_double_click
 									   on_rename, on_delete);
@@ -622,7 +621,6 @@ void project_dock::render(const ImVec2& /*unused*/)
 									   [&]() // on_click
 									   {
 										   es.select(entry);
-
 									   },
 									   nullptr, // on_double_click
 									   on_rename, on_delete);
@@ -653,7 +651,6 @@ void project_dock::render(const ImVec2& /*unused*/)
 									   [&]() // on_click
 									   {
 										   es.select(entry);
-
 									   },
 									   nullptr, // on_double_click
 									   on_rename, on_delete);
@@ -685,7 +682,6 @@ void project_dock::render(const ImVec2& /*unused*/)
 									   [&]() // on_click
 									   {
 										   es.select(entry);
-
 									   },
 									   nullptr, // on_double_click
 									   on_rename, on_delete);
@@ -717,7 +713,6 @@ void project_dock::render(const ImVec2& /*unused*/)
 									   [&]() // on_click
 									   {
 										   es.select(entry);
-
 									   },
 									   nullptr, // on_double_click
 									   on_rename, on_delete);
@@ -748,7 +743,6 @@ void project_dock::render(const ImVec2& /*unused*/)
 									   [&]() // on_click
 									   {
 										   es.select(entry);
-
 									   },
 									   [&]() // on_double_click
 									   {
@@ -760,7 +754,6 @@ void project_dock::render(const ImVec2& /*unused*/)
 										   entry->instantiate(scene::mode::standard);
 										   es.scene = fs::resolve_protocol(entry.id()).string();
 										   es.load_editor_camera();
-
 									   },
 									   on_rename, on_delete);
 					}

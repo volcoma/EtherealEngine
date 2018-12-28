@@ -1,5 +1,7 @@
 #include "gpu_program.h"
-#include "core/graphics/shader.h"
+
+#include <core/graphics/shader.h>
+
 #include <algorithm>
 
 gpu_program::gpu_program(asset_handle<gfx::shader> compute_shader)

@@ -3,7 +3,7 @@
 namespace gfx
 {
 
-texture::texture(const memory_view* _mem, std::uint32_t _flags /*= BGFX_TEXTURE_NONE */,
+texture::texture(const memory_view* _mem, std::uint64_t _flags,
 				 std::uint8_t _skip /*= 0 */, texture_info* _info /*= nullptr*/)
 {
 	texture_info* pInfo = _info;
@@ -24,7 +24,7 @@ texture::texture(const memory_view* _mem, std::uint32_t _flags /*= BGFX_TEXTURE_
 }
 
 texture::texture(std::uint16_t _width, std::uint16_t _height, bool _hasMips, std::uint16_t _numLayers,
-				 texture_format _format, std::uint32_t _flags /*= BGFX_TEXTURE_NONE */,
+				 texture_format _format, std::uint64_t _flags /*= BGFX_TEXTURE_NONE */,
 				 const memory_view* _mem /*= nullptr */)
 {
 	handle = create_texture_2d(_width, _height, _hasMips, _numLayers, _format, _flags, _mem);
@@ -36,7 +36,7 @@ texture::texture(std::uint16_t _width, std::uint16_t _height, bool _hasMips, std
 }
 
 texture::texture(std::uint16_t _width, std::uint16_t _height, std::uint16_t _depth, bool _hasMips,
-				 texture_format _format, std::uint32_t _flags /*= BGFX_TEXTURE_NONE */,
+				 texture_format _format, std::uint64_t _flags /*= BGFX_TEXTURE_NONE */,
 				 const memory_view* _mem /*= nullptr */)
 {
 	handle = create_texture_3d(_width, _height, _depth, _hasMips, _format, _flags, _mem);
@@ -48,7 +48,7 @@ texture::texture(std::uint16_t _width, std::uint16_t _height, std::uint16_t _dep
 }
 
 texture::texture(std::uint16_t _size, bool _hasMips, std::uint16_t _numLayers, texture_format _format,
-				 std::uint32_t _flags /*= BGFX_TEXTURE_NONE */, const memory_view* _mem /*= nullptr */)
+				 std::uint64_t _flags /*= BGFX_TEXTURE_NONE */, const memory_view* _mem /*= nullptr */)
 {
 	handle = create_texture_cube(_size, _hasMips, _numLayers, _format, _flags, _mem);
 
@@ -59,7 +59,7 @@ texture::texture(std::uint16_t _size, bool _hasMips, std::uint16_t _numLayers, t
 }
 
 texture::texture(backbuffer_ratio _ratio, bool _hasMips, std::uint16_t _numLayers, texture_format _format,
-				 std::uint32_t _flags /*= BGFX_TEXTURE_NONE */)
+				 std::uint64_t _flags /*= BGFX_TEXTURE_NONE */)
 {
 	handle = create_texture_2d(_ratio, _hasMips, _numLayers, _format, _flags);
 

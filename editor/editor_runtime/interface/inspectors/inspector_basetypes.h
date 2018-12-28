@@ -1,7 +1,8 @@
 #pragma once
 
-#include "core/common/basetypes.hpp"
 #include "inspector.h"
+
+#include <core/common/basetypes.hpp>
 
 struct inspector_irect32_t : public inspector
 {

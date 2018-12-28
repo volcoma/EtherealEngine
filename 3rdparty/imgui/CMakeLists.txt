@@ -3,12 +3,11 @@ imgui/imgui_internal.h
 imgui/imconfig.h
 imgui/imgui.cpp
 imgui/imgui.h
+imgui/imgui_widgets.cpp
 imgui/imgui_draw.cpp
 imgui/imgui_demo.cpp
 imgui_user/imgui_user.cpp
 imgui_user/imgui_user.h
-imgui_user/imgui_tabs.cpp
-imgui_user/imgui_tabs.h
 imgui_user/imgui_date_picker.cpp
 imgui_user/imgui_date_picker.h
 imguizmo/imguizmo.cpp

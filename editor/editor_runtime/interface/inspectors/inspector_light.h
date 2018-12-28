@@ -1,6 +1,8 @@
 #pragma once
 #include "inspector.h"
-#include "runtime/ecs/components/light_component.h"
+
+#include <runtime/ecs/components/light_component.h>
+#include <runtime/ecs/components/reflection_probe_component.h>
 
 struct inspector_light_component : public inspector
 {
@@ -11,7 +13,6 @@ struct inspector_light_component : public inspector
 
 INSPECTOR_REFLECT(inspector_light_component, light_component)
 
-#include "runtime/ecs/components/reflection_probe_component.h"
 
 struct inspector_reflection_probe_component : public inspector
 {

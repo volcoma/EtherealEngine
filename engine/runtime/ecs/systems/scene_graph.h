@@ -1,7 +1,9 @@
 #pragma once
 
 #include "../ecs.h"
-#include "core/common/basetypes.hpp"
+
+#include <core/common/basetypes.hpp>
+
 #include <vector>
 
 namespace runtime

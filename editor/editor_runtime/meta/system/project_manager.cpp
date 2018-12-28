@@ -1,7 +1,8 @@
 #include "project_manager.hpp"
-#include "core/serialization/associative_archive.h"
-#include "core/serialization/types/deque.hpp"
-#include "core/serialization/types/string.hpp"
+
+#include <core/serialization/associative_archive.h>
+#include <core/serialization/types/deque.hpp>
+#include <core/serialization/types/string.hpp>
 
 namespace editor
 {

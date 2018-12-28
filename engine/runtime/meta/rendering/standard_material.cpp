@@ -1,10 +1,12 @@
 #include "standard_material.hpp"
+#include "material.hpp"
+
 #include "../assets/asset_handle.hpp"
 #include "../core/math/vector.hpp"
-#include "core/serialization/types/string.hpp"
-#include "core/serialization/types/unordered_map.hpp"
-#include "core/serialization/types/utility.hpp"
-#include "material.hpp"
+
+#include <core/serialization/types/string.hpp>
+#include <core/serialization/types/unordered_map.hpp>
+#include <core/serialization/types/utility.hpp>
 
 REFLECT(standard_material)
 {

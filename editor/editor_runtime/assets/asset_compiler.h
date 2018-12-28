@@ -1,5 +1,5 @@
 #pragma once
-#include "core/filesystem/filesystem.h"
+#include <core/filesystem/filesystem.h>
 
 namespace asset_compiler
 {

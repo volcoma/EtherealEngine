@@ -1,5 +1,6 @@
 #include "gui_system.hpp"
-#include "core/serialization/associative_archive.h"
+
+#include <core/serialization/associative_archive.h>
 
 SAVE(gui_style::hsv_setup)
 {

@@ -1,16 +1,17 @@
 #include "app_setup.h"
+
 #include "../assets/asset_manager.h"
 #include "../assets/impl/asset_reader.h"
 #include "../assets/impl/asset_writer.h"
-
 #include "../animation/animation.h"
 #include "../ecs/constructs/prefab.h"
 #include "../ecs/constructs/scene.h"
 #include "../rendering/material.h"
 #include "../rendering/mesh.h"
-#include "core/audio/sound.h"
-#include "core/graphics/shader.h"
-#include "core/graphics/texture.h"
+
+#include <core/audio/sound.h>
+#include <core/graphics/shader.h>
+#include <core/graphics/texture.h>
 
 namespace runtime
 {

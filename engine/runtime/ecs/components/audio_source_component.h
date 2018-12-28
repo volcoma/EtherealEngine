@@ -2,9 +2,10 @@
 
 #include "../../assets/asset_handle.h"
 #include "../ecs.h"
-#include "core/audio/source.h"
-#include "core/common/basetypes.hpp"
-#include "core/math/math_includes.h"
+
+#include <core/audio/source.h>
+#include <core/common/basetypes.hpp>
+#include <core/math/math_includes.h>
 
 //-----------------------------------------------------------------------------
 // Main Class Declarations

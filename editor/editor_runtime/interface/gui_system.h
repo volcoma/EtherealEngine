@@ -1,10 +1,12 @@
 #pragma once
 
-#include "editor_core/gui/gui.h"
-#include "runtime/system/events.h"
+#include <core/graphics/texture.h>
 
-#include "core/graphics/texture.h"
-#include "runtime/assets/asset_handle.h"
+#include <runtime/system/events.h>
+#include <runtime/assets/asset_handle.h>
+
+#include <editor_core/gui/gui.h>
+
 #include <map>
 #include <memory>
 

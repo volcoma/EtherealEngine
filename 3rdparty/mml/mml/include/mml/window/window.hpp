@@ -419,8 +419,8 @@ public:
     /// \return System handle of the window
     ///
     ////////////////////////////////////////////////////////////
-    window_handle get_system_handle() const;
-    void* get_system_handle_specific() const;
+    window_handle native_handle() const;
+    void* native_display_handle() const;
 protected:
 
     ////////////////////////////////////////////////////////////

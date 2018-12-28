@@ -632,7 +632,7 @@ window_impl_x11::~window_impl_x11()
 
 
 ////////////////////////////////////////////////////////////
-window_handle window_impl_x11::get_system_handle() const
+window_handle window_impl_x11::native_handle() const
 {
 	return _window;
 }

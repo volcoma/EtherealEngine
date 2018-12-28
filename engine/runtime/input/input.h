@@ -1,8 +1,9 @@
 #pragma once
-
-#include "core/common/basetypes.hpp"
-#include "core/signals/event.hpp"
 #include "input_mapping.hpp"
+
+#include <core/common/basetypes.hpp>
+#include <core/signals/event.hpp>
+
 #include <map>
 #include <unordered_map>
 

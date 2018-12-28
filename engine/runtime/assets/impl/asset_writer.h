@@ -1,7 +1,7 @@
 #pragma once
 #include "../asset_handle.h"
-#include "core/filesystem/filesystem.h"
-#include <string>
+
+#include <core/filesystem/filesystem.h>
 
 namespace runtime
 {

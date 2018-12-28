@@ -1,8 +1,9 @@
 #pragma once
-
-#include "core/cmd_line/parser.hpp"
-#include "core/common/basetypes.hpp"
 #include "render_window.h"
+
+#include <core/cmd_line/parser.hpp>
+#include <core/common/basetypes.hpp>
+
 #include <memory>
 #include <vector>
 
@@ -91,4 +92,4 @@ protected:
 	std::vector<std::unique_ptr<render_window>> windows_;
 	std::vector<std::unique_ptr<render_window>> windows_pending_addition_;
 };
-}
+} // namespace runtime

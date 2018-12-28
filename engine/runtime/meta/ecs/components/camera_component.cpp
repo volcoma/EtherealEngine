@@ -14,9 +14,9 @@ REFLECT(camera_component)
 											  rttr::metadata("min", 5.0f), rttr::metadata("max", 180.0f))
 		.property("orthographic_size", &camera_component::get_ortho_size, &camera_component::set_ortho_size)(
 			rttr::metadata("pretty_name", "Orthographic Size"),
-			rttr::metadata("tooltip", "This is half of the vertical size of the viewing volume. "
-									  "Horizontal "
-									  "viewing size varies depending on viewport's aspect ratio. "
+			rttr::metadata("tooltip", "This is half of the vertical size of the viewing volume.\n"
+									  "Horizontal\n"
+									  "viewing size varies depending on viewport's aspect ratio.\n"
 									  "Orthographic size is ignored when camera is not orthographic."))
 		.property_readonly("pixels_per_unit", &camera_component::get_ppu)(
 			rttr::metadata("pretty_name", "Pixels Per Unit"),

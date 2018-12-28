@@ -16,7 +16,7 @@ struct texture_key
 	/// Texture detail info.
 	texture_info info;
 	/// Creation flags.
-	std::uint32_t flags = BGFX_TEXTURE_NONE;
+	std::uint64_t flags = BGFX_TEXTURE_NONE;
 	/// Back buffer ratio if any.
 	backbuffer_ratio ratio = backbuffer_ratio::Count;
 };
