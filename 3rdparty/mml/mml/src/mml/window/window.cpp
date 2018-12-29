@@ -321,7 +321,7 @@ bool window::has_focus() const
 ////////////////////////////////////////////////////////////
 window_handle window::native_handle() const
 {
-    return _impl ? _impl->native_handle() : nullptr;
+    return _impl ? _impl->native_handle() : window_handle{};
 }
 void* window::native_display_handle() const
 {
