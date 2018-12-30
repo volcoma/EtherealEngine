@@ -1,9 +1,9 @@
 #pragma once
 
-#include "bgfx/bgfx.h"
-#include "bgfx/embedded_shader.h"
-#include "bgfx/platform.h"
-#include "bx/string.h"
+#include <bgfx/bgfx.h>
+#include <bgfx/embedded_shader.h>
+#include <bgfx/platform.h>
+#include <bx/string.h>
 #include "format.h"
 #include "vertex_decl.h"
 #include <cstdint>

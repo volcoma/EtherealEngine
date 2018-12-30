@@ -1,6 +1,6 @@
 #pragma once
 
-#include "bgfx/bgfx.h"
+#include <bgfx/bgfx.h>
 #include <cstdint>
 namespace gfx
 {

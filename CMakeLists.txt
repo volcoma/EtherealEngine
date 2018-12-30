@@ -21,6 +21,7 @@ if(NOT BUILD_SHARED_LIBS)
     add_definitions(-DETH_STATIC)
 	add_definitions(-DETH_API_EXPORTS)
 endif()
+add_definitions(-DNOMINMAX)
 
 #enable_sanitizers("custom")
 
@@ -31,6 +32,5 @@ set_output_paths()
 add_subdirectory_ex(3rdparty)
 set_project_custom_defines()
 
-#set_clang_tidy_args("-checks=-*,clang-analyzer-*,bugprone-*,performance-*,modernize-*,-modernize-use-equals-default")
 add_subdirectory_ex(engine)
 add_subdirectory_ex(editor)

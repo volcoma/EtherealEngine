@@ -10,6 +10,7 @@ public:
 	void render(const ImVec2& area);
 
 private:
+
 	void context_menu();
 	void context_create_menu();
 	void set_cache_path(const fs::path& path);

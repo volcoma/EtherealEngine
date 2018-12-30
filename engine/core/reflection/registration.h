@@ -1,8 +1,8 @@
 #ifndef REFLECTION_REGISTRATION_H
 #define REFLECTION_REGISTRATION_H
 
-#include "rttr/registration_friend.h"
-#include "rttr/rttr_enable.h"
+#include <rttr/registration_friend.h>
+#include <rttr/rttr_enable.h>
 
 #define RTTR_REGISTRATION_FRIEND_NON_INTRUSIVE(cls)                                                          \
 	template <typename T>                                                                                    \

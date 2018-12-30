@@ -129,4 +129,4 @@ private:
 	fs::syncer engine_cache_syncer_;
 	std::vector<std::uint64_t> engine_watchers_;
 };
-}
+} // namespace editor
