@@ -101,6 +101,24 @@ public:
 		return entries_.end();
 	}
 
+	decltype(auto) size() const
+	{
+		if(should_refresh())
+		{
+			refresh();
+		}
+		return entries_.size();
+	}
+
+	decltype(auto) at(size_t idx) const
+	{
+		if(should_refresh())
+		{
+			refresh();
+		}
+		return entries_.at(idx);
+	}
+
 	//-----------------------------------------------------------------------------
 	//  Name : refresh ()
 	/// <summary>
@@ -173,10 +191,10 @@ public:
 
 	struct entry_info
 	{
-        directory_entry entry;
-        std::string relative;
-        std::string name;
-        std::string extension;
+		directory_entry entry;
+		std::string relative;
+		std::string name;
+		std::string extension;
 	};
 
 private:
@@ -235,4 +253,4 @@ using recursive_directory_cache = cache<recursive_directory_iterator>;
 /// 	{
 /// 	}
 /// }
-}
+} // namespace fs

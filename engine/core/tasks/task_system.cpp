@@ -310,11 +310,11 @@ task_system::system_info task_system::get_info() const
 	info.queue_infos.reserve(queues_.size());
 	for(const auto& queue : queues_)
 	{
-		queue_info q_info;
+		info.queue_infos.emplace_back();
+		auto& q_info = info.queue_infos.back();
 		q_info.pending_tasks = queue.get_pending_tasks();
 		info.pending_tasks += q_info.pending_tasks;
-		info.queue_infos.emplace_back(std::move(q_info));
 	}
 	return info;
 }
-}
+} // namespace core

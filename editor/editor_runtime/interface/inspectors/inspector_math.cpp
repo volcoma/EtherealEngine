@@ -85,7 +85,7 @@ bool inspector_transform::inspect(rttr::variant& var, bool read_only, const meta
 	static math::quat old_quat(1.0f, 0.0f, 0.0f, 0.0f);
 	static math::vec3 euler_angles(0.0f, 0.0f, 0.0f);
 	bool changed = false;
-	bool equal = math::epsilonEqual(math::abs(math::dot(old_quat, rotation)), 1.0f, math::epsilon<float>());
+	bool equal = math::all(math::equal(old_quat, rotation, math::epsilon<float>()));
 	if(!equal && (!gui::IsMouseDragging() || imguizmo::is_using()))
 	{
 		euler_angles = local_euler_angles;

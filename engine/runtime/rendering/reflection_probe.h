@@ -46,9 +46,9 @@ struct reflection_probe
 inline bool operator==(const reflection_probe& pr1, const reflection_probe& pr2)
 {
 	return pr1.type == pr2.type && pr1.method == pr2.method && pr1.box_data.extents == pr2.box_data.extents &&
-		   math::epsilonEqual(pr1.box_data.transition_distance, pr2.box_data.transition_distance,
+		   math::equal(pr1.box_data.transition_distance, pr2.box_data.transition_distance,
 							  math::epsilon<float>()) &&
-		   math::epsilonEqual(pr1.sphere_data.range, pr2.sphere_data.range, math::epsilon<float>());
+		   math::equal(pr1.sphere_data.range, pr2.sphere_data.range, math::epsilon<float>());
 }
 
 inline bool operator!=(const reflection_probe& pr1, const reflection_probe& pr2)

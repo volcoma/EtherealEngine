@@ -29,6 +29,7 @@ transform_component::~transform_component()
 			parent_transform->remove_child(get_entity());
 		}
 	}
+
 	for(auto& child : children_)
 	{
 		if(child.valid())
@@ -40,52 +41,48 @@ transform_component::~transform_component()
 
 void transform_component::move(const math::vec3& amount)
 {
-	math::vec3 new_pos = get_position();
+	auto new_pos = get_position();
 	new_pos += get_x_axis() * amount.x;
 	new_pos += get_y_axis() * amount.y;
 	new_pos += get_z_axis() * amount.z;
 
-	// Pass through to set_position so that any derived classes need not
-	// override the 'move' method in order to catch this position change.
 	set_position(new_pos);
 }
 
 void transform_component::move_local(const math::vec3& amount)
 {
-	math::vec3 new_pos = get_local_position();
+	auto new_pos = get_local_position();
 	new_pos += get_local_x_axis() * amount.x;
 	new_pos += get_local_y_axis() * amount.y;
 	new_pos += get_local_z_axis() * amount.z;
 
-	// Pass through to set_position so that any derived classes need not
-	// override the 'move' method in order to catch this position change.
 	set_local_position(new_pos);
 }
 
 void transform_component::set_local_position(const math::vec3& position)
 {
-	// Set new cell relative position
+	const auto& this_pos = local_transform_.get_position();
+	if(math::all(math::equal(this_pos, position, math::epsilon<float>())))
+	{
+		return;
+	}
+
 	local_transform_.set_position(position);
-	set_local_transform(local_transform_);
+	apply_local_transform(local_transform_);
 }
 
 void transform_component::set_position(const math::vec3& position)
 {
-	// Rotate a copy of the current math::transform.
-	math::transform m = get_transform();
-	m.set_position(position);
-
-	if(parent_.valid())
+	const auto& this_pos = get_transform().get_position();
+	if(math::all(math::equal(this_pos, position, math::epsilon<float>())))
 	{
-		auto parent_transform = parent_.get_component<transform_component>().lock();
-		if(parent_transform)
-		{
-			math::transform inv_parent_transform = math::inverse(parent_transform->get_transform());
-			m = inv_parent_transform * m;
-		}
+		return;
 	}
 
-	set_local_transform(m);
+	auto m = get_transform();
+	m.set_position(position);
+
+	apply_transform(m);
 }
 
 math::vec3 transform_component::get_local_scale()
@@ -168,131 +165,87 @@ void transform_component::look_at(float x, float y, float z)
 
 void transform_component::look_at(const math::vec3& point)
 {
-	math::vec3 eye = get_position();
+	auto eye = get_position();
 	math::transform m = math::lookAt(eye, point, math::vec3{0.0f, 1.0f, 0.0f});
 	m = math::inverse(m);
+
 	set_rotation(m.get_rotation());
 }
 
 void transform_component::rotate_local(float x, float y, float z)
 {
-	local_transform_.rotate_local(math::radians(x), math::radians(y), math::radians(z));
-	set_local_transform(local_transform_);
+	auto m = get_local_transform();
+	m.rotate_local(math::radians(x), math::radians(y), math::radians(z));
+
+	set_local_transform(m);
 }
 
 void transform_component::rotate_axis(float degrees, const math::vec3& axis)
 {
-
-	// Rotate a copy of the current math::transform.
-	math::transform m = get_transform();
+	auto m = get_transform();
 	m.rotate_axis(math::radians(degrees), axis);
 
-	if(parent_.valid())
-	{
-		auto parent_transform = parent_.get_component<transform_component>().lock();
-		if(parent_transform)
-		{
-			math::transform inv_parent_transform = math::inverse(parent_transform->get_transform());
-			m = inv_parent_transform * m;
-		}
-	}
-
-	set_local_transform(m);
+	set_transform(m);
 }
 
 void transform_component::rotate(float x, float y, float z)
 {
-
-	// Scale a copy of the cell math::transform
-	// Set orientation of new math::transform
-	math::transform m = get_transform();
+	auto m = get_transform();
 	m.rotate(math::radians(x), math::radians(y), math::radians(z));
 
-	if(parent_.valid())
-	{
-		auto parent_transform = parent_.get_component<transform_component>().lock();
-		if(parent_transform)
-		{
-			math::transform inv_parent_transform = math::inverse(parent_transform->get_transform());
-			m = inv_parent_transform * m;
-		}
-	}
-
-	set_local_transform(m);
+	set_transform(m);
 }
 
-void transform_component::rotate(float x, float y, float z, const math::vec3& center)
+void transform_component::set_scale(const math::vec3& scale)
 {
-
-	// Scale a copy of the cell math::transform
-	// Set orientation of new math::transform
-	math::transform m = get_transform();
-	m.rotate(math::radians(x), math::radians(y), math::radians(z));
-
-	if(parent_.valid())
+	const auto& this_scale = get_transform().get_scale();
+	if(math::all(math::equal(this_scale, scale, math::epsilon<float>())))
 	{
-		auto parent_transform = parent_.get_component<transform_component>().lock();
-		if(parent_transform)
-		{
-			math::transform inv_parent_transform = math::inverse(parent_transform->get_transform());
-			m = inv_parent_transform * m;
-		}
+		return;
 	}
 
-	set_local_transform(m);
-}
+	auto m = get_transform();
+	m.set_scale(scale);
 
-void transform_component::set_scale(const math::vec3& s)
-{
-	// Scale a copy of the cell math::transform
-	// Set orientation of new math::transform
-	math::transform m = get_transform();
-	m.set_scale(s);
-
-	if(parent_.valid())
-	{
-		auto parent_transform = parent_.get_component<transform_component>().lock();
-		if(parent_transform)
-		{
-			math::transform inv_parent_transform = math::inverse(parent_transform->get_transform());
-			m = inv_parent_transform * m;
-		}
-	}
-
-	set_local_transform(m);
+	apply_transform(m);
 }
 
 void transform_component::set_local_scale(const math::vec3& scale)
 {
-	// Do nothing if scaling is disallowed.
+	const auto& this_scale = local_transform_.get_scale();
+	if(math::all(math::equal(this_scale, scale, math::epsilon<float>())))
+	{
+		return;
+	}
+
 	local_transform_.set_scale(scale);
-	set_local_transform(local_transform_);
+	apply_local_transform(local_transform_);
 }
 
 void transform_component::set_rotation(const math::quat& rotation)
 {
-	// Set orientation of new math::transform
-	math::transform m = get_transform();
-	m.set_rotation(rotation);
-
-	if(parent_.valid())
+	const auto& this_rotation = get_transform().get_rotation();
+	if(math::all(math::equal(this_rotation, rotation, math::epsilon<float>())))
 	{
-		auto parent_transform = parent_.get_component<transform_component>().lock();
-		if(parent_transform)
-		{
-			math::transform inv_parent_transform = math::inverse(parent_transform->get_transform());
-			m = inv_parent_transform * m;
-		}
+		return;
 	}
 
-	set_local_transform(m);
+	auto m = get_transform();
+	m.set_rotation(rotation);
+
+	apply_transform(m);
 }
 
 void transform_component::set_local_rotation(const math::quat& rotation)
 {
-	// Set orientation of new math::transform
+	const auto& this_rotation = local_transform_.get_rotation();
+	if(math::all(math::equal(this_rotation, rotation, math::epsilon<float>())))
+	{
+		return;
+	}
+
 	local_transform_.set_rotation(rotation);
-	set_local_transform(local_transform_);
+	apply_local_transform(local_transform_);
 }
 
 void transform_component::reset_rotation()
@@ -445,44 +398,56 @@ void transform_component::cleanup_dead_children()
 
 void transform_component::set_transform(const math::transform& tr)
 {
-	if(world_transform_.compare(tr, 0.0001f) == 0)
+	if(world_transform_.is_equal(tr, math::epsilon<float>()))
 	{
 		return;
 	}
 
-	math::vec3 position = tr.get_position();
-	math::vec3 scaling = tr.get_scale();
-	math::quat orientation = tr.get_rotation();
+	const auto& position = tr.get_position();
+	const auto& scaling = tr.get_scale();
+	const auto& orientation = tr.get_rotation();
 	// tr.decompose(scaling, orientation, position);
 
-	math::transform m = get_transform();
+	auto m = get_transform();
 	m.set_scale(scaling);
 	m.set_rotation(orientation);
 	m.set_position(position);
 
+	apply_transform(m);
+}
+
+void transform_component::apply_transform(math::transform& trans)
+{
 	if(parent_.valid())
 	{
 		auto parent_transform = parent_.get_component<transform_component>().lock();
 		if(parent_transform)
 		{
-			math::transform inv_parent_transform = math::inverse(parent_transform->get_transform());
-			m = inv_parent_transform * m;
+			auto inv_parent_transform = math::inverse(parent_transform->get_transform());
+			trans = inv_parent_transform * trans;
 		}
 	}
 
-	set_local_transform(m);
+	set_local_transform(trans);
+}
+
+void transform_component::apply_local_transform(const math::transform& trans)
+{
+	set_dirty(true);
+
+	local_transform_ = trans;
 }
 
 void transform_component::set_local_transform(const math::transform& trans)
 {
-	if(local_transform_.compare(trans, 0.0001f) == 0)
+    const auto& this_matrix = local_transform_.get_matrix();
+    const auto& rhs_matrix = trans.get_matrix();
+	if(math::all(math::equal(this_matrix, rhs_matrix, math::epsilon<float>())))
 	{
 		return;
 	}
 
-	set_dirty(true);
-
-	local_transform_ = trans;
+	apply_local_transform(trans);
 }
 
 void transform_component::resolve(bool force)

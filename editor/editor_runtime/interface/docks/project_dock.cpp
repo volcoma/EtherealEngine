@@ -197,11 +197,6 @@ static bool draw_entry(const asset_handle<gfx::texture>& icon, bool is_loading, 
 		}
 	}
 
-	if(gui::GetContentRegionAvailWidth() < size)
-	{
-		gui::NewLine();
-	}
-
 	ImVec2 item_size = {size, size};
 	ImVec2 texture_size = item_size;
 	if(icon)
@@ -216,7 +211,7 @@ static bool draw_entry(const asset_handle<gfx::texture>& icon, bool is_loading, 
 	gui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(col.x, col.y, col.z, 0.86f));
 	gui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(col.x, col.y, col.z, 1.0f));
 
-	const int padding = 6;
+	const int padding = 0;
 	auto pos = gui::GetCursorScreenPos();
 	pos.y += item_size.y + padding * 2.0f;
 	if(gui::ImageButtonWithAspectAndTextDOWN(gui::get_info(icon), name, texture_size, item_size, uv0, uv1,
@@ -295,6 +290,11 @@ static bool draw_entry(const asset_handle<gfx::texture>& icon, bool is_loading, 
 			action = entry_action::renamed;
 			gui::CloseCurrentPopup();
 		}
+
+		if(open_rename_menu)
+		{
+			gui::ActivateItem(gui::GetItemID());
+		}
 		gui::PopItemWidth();
 		gui::EndPopup();
 	}
@@ -357,7 +357,6 @@ static bool draw_entry(const asset_handle<gfx::texture>& icon, bool is_loading, 
 	}
 
 	gui::PopID();
-	gui::SameLine();
 	return is_popup_opened;
 }
 
@@ -373,7 +372,7 @@ fs::path get_new_file(const fs::path& path, const std::string& name, const std::
 	return path / (string_utils::format("%s (%d)", name.c_str(), i) + ext);
 }
 
-void project_dock::render(const ImVec2& /*unused*/)
+void project_dock::render(const ImVec2& /*area*/)
 {
 	const auto root_path = fs::resolve_protocol("app:/data");
 
@@ -390,8 +389,8 @@ void project_dock::render(const ImVec2& /*unused*/)
 	}
 	gui::SameLine();
 	gui::PushItemWidth(80.0f);
-	gui::SliderFloat("", &scale_, 0.3f, 1.0f);
-	const float size = 128.0f * scale_;
+	gui::SliderFloat("", &scale_, 0.5f, 1.0f);
+	const float size = gui::GetFrameHeight() * 4.0f * scale_;
 	if(gui::IsItemHovered())
 	{
 		gui::BeginTooltip();
@@ -402,7 +401,7 @@ void project_dock::render(const ImVec2& /*unused*/)
 
 	const auto hierarchy = fs::split_until(cache_.get_path(), root_path);
 
-	int i = 0;
+	int id = 0;
 	for(const auto& dir : hierarchy)
 	{
 		gui::SameLine();
@@ -410,7 +409,7 @@ void project_dock::render(const ImVec2& /*unused*/)
 		gui::TextUnformatted("/");
 		gui::SameLine();
 
-		gui::PushID(i++);
+		gui::PushID(id++);
 		bool clicked = gui::Button(dir.filename().string().c_str());
 		gui::PopID();
 
@@ -441,8 +440,7 @@ void project_dock::render(const ImVec2& /*unused*/)
 
 		bool is_popup_opened = false;
 
-
-        const auto& loading_preview = es.icons["loading"];
+		const auto& loading_preview = es.icons["loading"];
 		const auto& folder_preview = es.icons["folder"];
 		const auto& mesh_preview = es.icons["mesh"];
 		const auto& shader_preview = es.icons["shader"];
@@ -452,8 +450,7 @@ void project_dock::render(const ImVec2& /*unused*/)
 		const auto& prefab_preview = es.icons["prefab"];
 		const auto& scene_preview = es.icons["scene"];
 
-		for(const auto& cache_entry : cache_)
-		{
+		auto process_cache_entry = [&](const auto& cache_entry) {
 			const auto& absolute_path = cache_entry.entry.path();
 			const auto& name = cache_entry.name;
 			const auto& relative = cache_entry.relative;
@@ -502,7 +499,7 @@ void project_dock::render(const ImVec2& /*unused*/)
 												  fs::remove_all(absolute_path, err);
 											  });
 
-				continue;
+				return;
 			}
 
 			if(ex::is_format<gfx::texture>(file_ext))
@@ -515,14 +512,14 @@ void project_dock::render(const ImVec2& /*unused*/)
 				{
 					entry = entry_future.get();
 				}
-                const auto& icon = entry ? entry : loading_preview;
+				const auto& icon = entry ? entry : loading_preview;
 				bool is_loading = !entry;
 				is_popup_opened |= draw_entry(icon, is_loading, name, absolute_path, is_selected(entry), size,
 											  [&]() // on_click
 											  { es.select(entry); },
 											  nullptr, // on_double_click
 											  on_rename, on_delete);
-				continue;
+				return;
 			}
 
 			if(ex::is_format<mesh>(file_ext))
@@ -544,7 +541,7 @@ void project_dock::render(const ImVec2& /*unused*/)
 											  nullptr, // on_double_click
 											  on_rename, on_delete);
 
-				continue;
+				return;
 			}
 
 			if(ex::is_format<audio::sound>(file_ext))
@@ -564,7 +561,7 @@ void project_dock::render(const ImVec2& /*unused*/)
 											  { es.select(entry); },
 											  nullptr, // on_double_click
 											  on_rename, on_delete);
-				continue;
+				return;
 			}
 
 			if(ex::is_format<gfx::shader>(file_ext))
@@ -585,7 +582,7 @@ void project_dock::render(const ImVec2& /*unused*/)
 											  nullptr, // on_double_click
 											  on_rename, on_delete);
 
-				continue;
+				return;
 			}
 
 			if(ex::is_format<material>(file_ext))
@@ -606,7 +603,7 @@ void project_dock::render(const ImVec2& /*unused*/)
 											  nullptr, // on_double_click
 											  on_rename, on_delete);
 
-				continue;
+				return;
 			}
 
 			if(ex::is_format<runtime::animation>(file_ext))
@@ -627,7 +624,7 @@ void project_dock::render(const ImVec2& /*unused*/)
 											  nullptr, // on_double_click
 											  on_rename, on_delete);
 
-				continue;
+				return;
 			}
 
 			if(ex::is_format<prefab>(file_ext))
@@ -648,7 +645,7 @@ void project_dock::render(const ImVec2& /*unused*/)
 											  nullptr, // on_double_click
 											  on_rename, on_delete);
 
-				continue;
+				return;
 			}
 
 			if(ex::is_format<scene>(file_ext))
@@ -678,10 +675,46 @@ void project_dock::render(const ImVec2& /*unused*/)
 												  es.load_editor_camera();
 											  },
 											  on_rename, on_delete);
-				continue;
+				return;
+			}
+		};
+		gui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(10, 10));
+		const auto& style = gui::GetStyle();
+		auto avail = gui::GetContentRegionAvailWidth();
+		auto item_size = size + style.ItemSpacing.x;
+		auto items_per_line_exact = avail / item_size;
+		auto items_per_line_floor = ImFloor(items_per_line_exact);
+		auto count = cache_.size();
+		auto items_per_line = std::min(size_t(items_per_line_floor), count);
+		auto extra = ((items_per_line_exact - items_per_line_floor) * item_size) /
+					 std::max(1.0f, items_per_line_floor - 1);
+		auto lines = std::max<int>(1, int(ImCeil(float(count) / float(items_per_line))));
+		ImGuiListClipper clipper(lines, size + style.ItemSpacing.y);
+
+		while(clipper.Step())
+		{
+			for(int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
+			{
+				auto start = size_t(i) * items_per_line;
+				auto end = start + std::min(count - start, items_per_line);
+				for(size_t j = start; j < end; ++j)
+				{
+					const auto& cache_entry = cache_.at(j);
+
+					gui::PushID(int(j));
+
+					process_cache_entry(cache_entry);
+
+					gui::PopID();
+
+					if(j != end - 1)
+					{
+						ImGui::SameLine(0.0f, style.ItemSpacing.x + extra);
+					}
+				}
 			}
 		}
-
+		gui::PopStyleVar();
 		if(!is_popup_opened)
 		{
 			context_menu();

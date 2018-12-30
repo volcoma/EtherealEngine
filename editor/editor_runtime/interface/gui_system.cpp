@@ -8,8 +8,8 @@
 #include <core/graphics/uniform.h>
 #include <core/graphics/vertex_buffer.h>
 #include <core/logging/logging.h>
-#include <core/system/subsystem.h>
 #include <core/serialization/associative_archive.h>
+#include <core/system/subsystem.h>
 
 #include <runtime/assets/asset_manager.h>
 #include <runtime/input/input.h>
@@ -24,8 +24,8 @@
 //////////////////////////////////////////////////////////////////////////
 #include "../meta/interface/gui_system.hpp"
 
-#include <unordered_map>
 #include <fstream>
+#include <unordered_map>
 namespace
 {
 const gfx::embedded_shader s_embedded_shaders[] = {BGFX_EMBEDDED_SHADER(vs_ocornut_imgui),
@@ -42,7 +42,7 @@ void render_func(ImDrawData* _draw_data)
 	{
 		return;
 	}
-    auto& io = gui::GetIO();    
+	auto& io = gui::GetIO();
 	int fb_width = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
 	int fb_height = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
 	if(fb_width == 0 || fb_height == 0)
@@ -292,10 +292,10 @@ void imgui_frame_update(render_window& window, delta_t dt)
 void imgui_frame_end()
 {
 	gui::End();
-    //auto old = ImGui::GetCurrentContext()->DragDropActive;
-    ImGui::GetCurrentContext()->DragDropSourceFrameCount = ImGui::GetCurrentContext()->FrameCount;
+	// auto old = ImGui::GetCurrentContext()->DragDropActive;
+	ImGui::GetCurrentContext()->DragDropSourceFrameCount = ImGui::GetCurrentContext()->FrameCount;
 	gui::Render();
-	//ImGui::GetCurrentContext()->DragDropActive = old;
+	// ImGui::GetCurrentContext()->DragDropActive = old;
 	render_func(gui::GetDrawData());
 }
 
@@ -325,7 +325,6 @@ void imgui_init()
 	ts.push_or_execute_on_owner_thread(
 		[](asset_handle<gfx::shader> vs, asset_handle<gfx::shader> fs) {
 			s_program = std::make_unique<gpu_program>(vs, fs);
-
 		},
 		vs_ocornut_imgui, fs_ocornut_imgui);
 
@@ -405,7 +404,7 @@ void imgui_dispose()
 	s_program.reset();
 	s_font_texture.reset();
 }
-}
+} // namespace
 
 gui_system::gui_system()
 {
@@ -527,8 +526,8 @@ void gui_style::set_style_colors(const hsv_setup& _setup)
 	style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.68f);
 	style.Colors[ImGuiCol_FrameBgActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
 	style.Colors[ImGuiCol_TitleBg] = ImVec4(col_main.x, col_main.y, col_main.z, 1.0f);
-	style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(col_main.x, col_main.y, col_main.z, 1.0f);
 	style.Colors[ImGuiCol_TitleBgActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.0f);
+	style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(col_main.x, col_main.y, col_main.z, 1.0f);
 	style.Colors[ImGuiCol_MenuBarBg] = ImVec4(col_area.x, col_area.y, col_area.z, 1.0f);
 	style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(col_area.x, col_area.y, col_area.z, 1.00f);
 	style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(col_main.x, col_main.y, col_main.z, 0.31f);
@@ -540,9 +539,17 @@ void gui_style::set_style_colors(const hsv_setup& _setup)
 	style.Colors[ImGuiCol_Button] = ImVec4(col_main.x, col_main.y, col_main.z, 0.44f);
 	style.Colors[ImGuiCol_ButtonHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.86f);
 	style.Colors[ImGuiCol_ButtonActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
-	style.Colors[ImGuiCol_Header] = ImVec4(col_main.x, col_main.y, col_main.z, 0.76f);
-	style.Colors[ImGuiCol_HeaderHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.86f);
-	style.Colors[ImGuiCol_HeaderActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+	style.Colors[ImGuiCol_Header] = ImVec4(col_main.x, col_main.y, col_main.z, 0.46f);
+	style.Colors[ImGuiCol_HeaderActive] = ImVec4(col_main.x, col_main.y, col_main.z, 0.86f);
+	style.Colors[ImGuiCol_HeaderHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+	style.Colors[ImGuiCol_Separator] = ImVec4(col_main.x, col_main.y, col_main.z, 0.44f);
+	style.Colors[ImGuiCol_SeparatorHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.86f);
+	style.Colors[ImGuiCol_SeparatorActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+	style.Colors[ImGuiCol_Tab] = style.Colors[ImGuiCol_Header];
+	style.Colors[ImGuiCol_TabHovered] = style.Colors[ImGuiCol_HeaderHovered];
+	style.Colors[ImGuiCol_TabActive] = style.Colors[ImGuiCol_HeaderActive];
+	style.Colors[ImGuiCol_TabUnfocused] = style.Colors[ImGuiCol_Tab];
+	style.Colors[ImGuiCol_TabUnfocusedActive] = style.Colors[ImGuiCol_TabActive];
 	style.Colors[ImGuiCol_ResizeGrip] = ImVec4(col_main.x, col_main.y, col_main.z, 0.20f);
 	style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.78f);
 	style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
@@ -551,6 +558,7 @@ void gui_style::set_style_colors(const hsv_setup& _setup)
 	style.Colors[ImGuiCol_PlotHistogram] = ImVec4(col_text.x, col_text.y, col_text.z, 0.63f);
 	style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
 	style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(col_main.x, col_main.y, col_main.z, 0.43f);
+	style.Colors[ImGuiCol_NavHighlight] = style.Colors[ImGuiCol_HeaderHovered];
 }
 
 void gui_style::load_style()

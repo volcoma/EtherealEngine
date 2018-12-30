@@ -70,8 +70,8 @@ public:
 	void translate_local(T x, T y, T z);
 	void translate_local(const vec3_t& v);
 
-	int compare(const transform_t& t) const;
-	int compare(const transform_t& t, T tolerance) const;
+	bool is_equal(const transform_t& t) const;
+	bool is_equal(const transform_t& t, T tolerance) const;
 	vec3_t transform_coord(const vec3_t& v) const;
 	vec3_t inverse_transform_coord(const vec3_t& v) const;
 	vec3_t transform_normal(const vec3_t& v) const;
@@ -361,30 +361,15 @@ inline void transform_t<T, Q>::translate_local(const typename transform_t::vec3_
 }
 
 template <typename T, qualifier Q>
-inline int transform_t<T, Q>::compare(const transform_t& t) const
+inline bool transform_t<T, Q>::is_equal(const transform_t& t) const
 {
-	return static_cast<int>(get_matrix() == t.get_matrix());
+	return glm::all(glm::equal(get_matrix(), t.get_matrix()));
 }
 
 template <typename T, qualifier Q>
-inline int transform_t<T, Q>::compare(const transform_t& t, T tolerance) const
+inline bool transform_t<T, Q>::is_equal(const transform_t& t, T tolerance) const
 {
-	const auto& m1 = get_matrix();
-	const auto& m2 = t.get_matrix();
-	for(int i = 0; i < 4; ++i)
-	{
-		for(int j = 0; j < 4; ++j)
-		{
-			float diff = m1[i][j] - m2[i][j];
-			if(glm::abs<T>(diff) > tolerance)
-			{
-				return (diff < 0) ? -1 : 1;
-			}
-		}
-	}
-
-	// Equivalent
-	return 0;
+	return glm::all(glm::equal(get_matrix(), t.get_matrix(), tolerance));
 }
 
 template <typename T, qualifier Q>
@@ -488,4 +473,4 @@ inline transform_t<T, Q>::operator const mat4_t&() const
 }
 
 using affine_transform = transform_t<float>;
-}
+} // namespace math

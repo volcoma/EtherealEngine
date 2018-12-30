@@ -14,6 +14,7 @@ namespace runtime
 extern event<void(delta_t)> on_frame_begin;
 extern event<void(delta_t)> on_frame_update;
 extern event<void(delta_t)> on_frame_render;
+extern event<void(delta_t)> on_frame_ui_render;
 extern event<void(delta_t)> on_frame_end;
 
 /// platform events

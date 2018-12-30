@@ -85,7 +85,7 @@ void poll_events()
 		mml::platform_event e;
 		while(window->poll_event(e))
 		{
-			events.emplace_back(std::move(e));
+			events.emplace_back(e);
 		}
 
 		if(window->has_focus())
@@ -139,6 +139,8 @@ void app::run_one_frame()
 	on_frame_update(dt);
 
 	on_frame_render(dt);
+
+	on_frame_ui_render(dt);
 
 	on_frame_end(dt);
 }
@@ -205,4 +207,4 @@ void app::quit(int exitcode)
 	running_ = false;
 	exitcode_ = exitcode;
 }
-}
+} // namespace runtime

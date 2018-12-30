@@ -42,7 +42,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	~transform_component();
+	~transform_component() override;
 
 	//-------------------------------------------------------------------------
 	// Public Static Methods
@@ -75,7 +75,7 @@ public:
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void on_entity_set();
+	virtual void on_entity_set() override;
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_local_transform ()
@@ -281,16 +281,6 @@ public:
 	/// </summary>
 	//-----------------------------------------------------------------------------
 	void rotate(float x, float y, float z);
-
-	//-----------------------------------------------------------------------------
-	//  Name : rotate ( )
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void rotate(float x, float y, float z, const math::vec3& center);
 
 	//-----------------------------------------------------------------------------
 	//  Name : rotate_local ( )
@@ -543,6 +533,9 @@ public:
 	void cleanup_dead_children();
 
 protected:
+    void apply_transform(math::transform& trans);
+    void apply_local_transform(const math::transform& trans);
+
 	//-------------------------------------------------------------------------
 	// Protected Member Variables
 	//-------------------------------------------------------------------------

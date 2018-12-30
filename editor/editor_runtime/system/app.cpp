@@ -427,7 +427,7 @@ void app::setup(cmd_line::parser& parser)
 {
 	runtime::app::setup(parser);
 
-	runtime::on_frame_update.connect(this, &editor::app::draw_docks);
+	runtime::on_frame_ui_render.connect(this, &editor::app::draw_docks);
 }
 
 void app::start(cmd_line::parser& parser)
@@ -494,7 +494,7 @@ void app::register_console_commands()
 
 void app::stop()
 {
-	runtime::on_frame_update.disconnect(this, &editor::app::draw_docks);
+	runtime::on_frame_ui_render.disconnect(this, &editor::app::draw_docks);
 
 	runtime::app::stop();
 }

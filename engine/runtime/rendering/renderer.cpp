@@ -183,7 +183,6 @@ bool renderer::init_backend(cmd_line::parser& parser)
 	{
 		init_data.resolution.reset = 0;
 	}
-
 	if(!gfx::init(init_data))
 	{
 		APPLOG_ERROR("Could not initialize rendering backend!");
@@ -201,6 +200,7 @@ bool renderer::init_backend(cmd_line::parser& parser)
 	{
 		APPLOG_WARNING("Directx 12 support is experimental and unstable.");
 	}
+
 	return true;
 }
 
@@ -214,4 +214,4 @@ void renderer::frame_end(delta_t /*unused*/)
 
 	gfx::render_pass::reset();
 }
-}
+} // namespace runtime

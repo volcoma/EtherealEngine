@@ -35,7 +35,7 @@ void camera::set_orthographic_size(float size)
 void camera::set_fov(float fFOVY)
 {
 	// Skip if no-op
-	if(math::epsilonEqual(fFOVY, fov_, math::epsilon<float>()))
+	if(math::equal(fFOVY, fov_, math::epsilon<float>()))
 	{
 		return;
 	}
@@ -63,7 +63,7 @@ void camera::set_projection_mode(projection_mode mode)
 void camera::set_near_clip(float distance)
 {
 	// Skip if this is a no-op
-	if(math::epsilonEqual(distance, near_clip_, math::epsilon<float>()))
+	if(math::equal(distance, near_clip_, math::epsilon<float>()))
 	{
 		return;
 	}
@@ -83,7 +83,7 @@ void camera::set_near_clip(float distance)
 void camera::set_far_clip(float distance)
 {
 	// Skip if this is a no-op
-	if(math::epsilonEqual(distance, far_clip_, math::epsilon<float>()))
+	if(math::equal(distance, far_clip_, math::epsilon<float>()))
 	{
 		return;
 	}
@@ -119,7 +119,7 @@ math::bbox camera::get_local_bounding_box()
 void camera::set_aspect_ratio(float aspect, bool bLocked /* = false */)
 {
 	// Is this a no-op?
-	if(math::epsilonEqual(aspect, aspect_ratio_, math::epsilon<float>()))
+	if(math::equal(aspect, aspect_ratio_, math::epsilon<float>()))
 	{
 		aspect_locked_ = bLocked;
 		return;
