@@ -35,32 +35,26 @@ bool ImageButtonWithAspectAndTextDOWN(ImTextureID texId, const std::string& name
 
     
     ImVec2 size_name = ImGui::CalcTextSize(name.c_str(), nullptr, true);
-
-	std::array<char, 64> input_buff;
-	input_buff.fill(0);
-	auto name_sz = std::min(name.size(), input_buff.size() - 1);
-	std::memcpy(input_buff.data(), name.c_str(), name_sz);
+    auto name_sz = name.size();
+    std::string label_str = name;
 
 	if(size_name.x > imageSize.x)
 	{
-		for(auto ds = name_sz; ds > 4; ds--)
+		for(auto ds = name_sz; ds > 3; --ds)
 		{
-			auto str = std::string(input_buff.data());
-			size_name = ImGui::CalcTextSize(str.c_str(), nullptr, true);
+			size_name = ImGui::CalcTextSize(label_str.c_str(), nullptr, true);
 			if(size_name.x < imageSize.x)
 			{
-				input_buff[ds - 3] = '.';
-				input_buff[ds - 2] = '.';
-				input_buff[ds - 1] = '.';
-				input_buff[ds] = '\0';
+				label_str[ds - 2] = '.';
+				label_str[ds - 1] = '.';
+				label_str[ds] = '.';
 				break;
 			}
 
-			input_buff[ds - 1] = 0;
+			label_str.pop_back();
 		}
 	}
     
-    std::string label_str(input_buff.data());
     const char* label = label_str.c_str();
     
 	const ImGuiID id = window->GetID(label);

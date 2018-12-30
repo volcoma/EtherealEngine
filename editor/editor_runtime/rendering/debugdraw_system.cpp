@@ -116,7 +116,6 @@ void debugdraw_system::frame_render(delta_t)
 		dd.encoder.setWireframe(true);
 		if(selected_camera.get_projection_mode() == projection_mode::perspective)
 		{
-			dd.encoder.setTransform(nullptr);
 			dd.encoder.drawFrustum(&view_proj);
 		}
 		else
@@ -128,9 +127,9 @@ void debugdraw_system::frame_render(delta_t)
 			aabb.m_max.x = bounds.max.x;
 			aabb.m_max.y = bounds.max.y;
 			aabb.m_max.z = bounds.max.z;
-			dd.encoder.setTransform(&world_transform);
+			dd.encoder.pushTransform(&world_transform);
 			dd.encoder.draw(aabb);
-			dd.encoder.setTransform(nullptr);
+			dd.encoder.popTransform();
 		}
 
 		dd.encoder.pop();
@@ -209,7 +208,7 @@ void debugdraw_system::frame_render(delta_t)
 			dd.encoder.push();
 			dd.encoder.setColor(0xff00ff00);
 			dd.encoder.setWireframe(true);
-			dd.encoder.setTransform(&world_transform);
+			dd.encoder.pushTransform(&world_transform);
 			Aabb aabb;
 			aabb.m_min.x = -probe.box_data.extents.x;
 			aabb.m_min.y = -probe.box_data.extents.y;
@@ -218,7 +217,7 @@ void debugdraw_system::frame_render(delta_t)
 			aabb.m_max.y = probe.box_data.extents.y;
 			aabb.m_max.z = probe.box_data.extents.z;
 			dd.encoder.draw(aabb);
-			dd.encoder.setTransform(nullptr);
+			dd.encoder.popTransform();
 			dd.encoder.pop();
 		}
 		else
@@ -279,7 +278,7 @@ void debugdraw_system::frame_render(delta_t)
 				dd.encoder.push();
 				dd.encoder.setColor(0xff00ff00);
 				dd.encoder.setWireframe(true);
-				dd.encoder.setTransform(&world_transform);
+				dd.encoder.pushTransform(&world_transform);
 				Aabb aabb;
 				aabb.m_min.x = bounds.min.x;
 				aabb.m_min.y = bounds.min.y;
@@ -288,7 +287,7 @@ void debugdraw_system::frame_render(delta_t)
 				aabb.m_max.y = bounds.max.y;
 				aabb.m_max.z = bounds.max.z;
 				dd.encoder.draw(aabb);
-				dd.encoder.setTransform(nullptr);
+				dd.encoder.popTransform();
 				dd.encoder.pop();
 			}
 		}

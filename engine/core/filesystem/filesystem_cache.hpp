@@ -118,11 +118,25 @@ public:
 		iterator_t it(path_, err);
 		for(const auto& p : it)
 		{
-			entries_.push_back(p);
+			entries_.emplace_back();
+			auto& cache_entry = entries_.back();
+			cache_entry.entry = p;
+			const auto& absolute_path = cache_entry.entry.path();
+			cache_entry.relative = fs::convert_to_protocol(absolute_path).generic_string();
+			cache_entry.extension = absolute_path.extension().string();
+
+			auto filename = absolute_path.filename();
+			cache_entry.name = filename.string();
+
+			while(filename.has_extension())
+			{
+				filename = filename.stem();
+				cache_entry.name = filename.string();
+			}
 		}
 
 		std::sort(std::begin(entries_), std::end(entries_), [](const auto& lhs, const auto& rhs) {
-			return fs::is_directory(lhs.status()) > fs::is_directory(rhs.status());
+			return fs::is_directory(lhs.entry.status()) > fs::is_directory(rhs.entry.status());
 		});
 
 		should_refresh_ = false;
@@ -157,6 +171,14 @@ public:
 		watch();
 	}
 
+	struct entry_info
+	{
+        directory_entry entry;
+        std::string relative;
+        std::string name;
+        std::string extension;
+	};
+
 private:
 	//-----------------------------------------------------------------------------
 	//  Name : should_refresh ()
@@ -187,7 +209,7 @@ private:
 
 	clock_t::duration scan_frequency_ = std::chrono::milliseconds(500);
 	///
-	mutable std::vector<directory_entry> entries_;
+	mutable std::vector<entry_info> entries_;
 	///
 	mutable std::atomic_bool should_refresh_ = {true};
 	///

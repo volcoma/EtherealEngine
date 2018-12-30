@@ -99,4 +99,11 @@ inline const std::vector<std::vector<std::string>>& get_all_formats()
 
 	return types;
 }
+
+template<typename T>
+inline bool is_format(const std::string& ex)
+{
+    const auto& supported = ex::get_suported_formats<T>();
+    return std::find(std::begin(supported), std::end(supported), ex) != std::end(supported);
+}
 }
