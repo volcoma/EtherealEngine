@@ -15,7 +15,7 @@ using platform_sink_st = wincolor_stdout_sink_st;
 }
 }
 #elif ETH_ON(ETH_PLATFORM_LINUX) || ETH_ON(ETH_PLATFORM_APPLE)
-#include <spdlog/sinks/ansicolor_sinks.h>
+#include <spdlog/sinks/ansicolor_sink.h>
 namespace spdlog
 {
 namespace sinks
