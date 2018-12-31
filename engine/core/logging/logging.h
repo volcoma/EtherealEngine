@@ -1,22 +1,11 @@
 #pragma once
 
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 
 #include "../common/platform/config.hpp"
 
 #if ETH_ON(ETH_PLATFORM_WINDOWS)
-#if ETH_ON(ETH_COMPILER_MSVC)
-#include "spdlog/sinks/msvc_sink.h"
-namespace spdlog
-{
-namespace sinks
-{
-using platform_sink_mt = msvc_sink_mt;
-using platform_sink_st = msvc_sink_st;
-}
-}
-#else
-#include "spdlog/sinks/wincolor_sink.h"
+#include <spdlog/sinks/msvc_sink.h>
 namespace spdlog
 {
 namespace sinks
@@ -25,19 +14,18 @@ using platform_sink_mt = wincolor_stdout_sink_mt;
 using platform_sink_st = wincolor_stdout_sink_st;
 }
 }
-#endif
 #elif ETH_ON(ETH_PLATFORM_LINUX) || ETH_ON(ETH_PLATFORM_APPLE)
-#include "spdlog/sinks/stdout_sinks.h"
+#include <spdlog/sinks/ansicolor_sinks.h>
 namespace spdlog
 {
 namespace sinks
 {
-using platform_sink_mt = stdout_sink_mt;
-using platform_sink_st = stdout_sink_st;
+using platform_sink_mt = ansicolor_stdout_sink_mt;
+using platform_sink_st = ansicolor_stdout_sink_st;
 }
 }
 #elif ETH_ON(ETH_PLATFORM_ANDROID)
-#include "spdlog/sinks/android_sink.h"
+#include <spdlog/sinks/android_sink.h>
 namespace spdlog
 {
 namespace sinks
@@ -47,7 +35,7 @@ using platform_sink_st = android_sink_st;
 }
 }
 #else
-#include "spdlog/sinks/stdout_sinks.h"
+#include <spdlog/sinks/ansicolor_sink.h>
 namespace spdlog
 {
 namespace sinks
@@ -57,9 +45,8 @@ using platform_sink_st = stdout_sink_st;
 }
 }
 #endif
-#include "spdlog/sinks/dist_sink.h"
-#include "spdlog/sinks/file_sinks.h"
-
+#include <spdlog/sinks/dist_sink.h>
+#include <spdlog/sinks/file_sinks.h>
 namespace logging
 {
 using namespace spdlog;
@@ -69,10 +56,10 @@ inline std::shared_ptr<sinks::dist_sink_mt> get_mutable_logging_container()
 	return sink;
 }
 #define APPLOG "Log"
-#define APPLOG_INFO(...) spdlog::get("Log")->info(__VA_ARGS__)
-#define APPLOG_TRACE(...) spdlog::get("Log")->trace(__VA_ARGS__)
-#define APPLOG_ERROR(...) spdlog::get("Log")->error(__VA_ARGS__)
-#define APPLOG_WARNING(...) spdlog::get("Log")->warn(__VA_ARGS__)
-#define APPLOG_NOTICE(...) spdlog::get("Log")->notice(__VA_ARGS__)
+#define APPLOG_INFO(...) spdlog::get(APPLOG)->info(__VA_ARGS__)
+#define APPLOG_TRACE(...) spdlog::get(APPLOG)->trace(__VA_ARGS__)
+#define APPLOG_ERROR(...) spdlog::get(APPLOG)->error(__VA_ARGS__)
+#define APPLOG_WARNING(...) spdlog::get(APPLOG)->warn(__VA_ARGS__)
+#define APPLOG_NOTICE(...) spdlog::get(APPLOG)->notice(__VA_ARGS__)
 #define APPLOG_SEPARATOR() APPLOG_INFO("-----------------------------")
 }
