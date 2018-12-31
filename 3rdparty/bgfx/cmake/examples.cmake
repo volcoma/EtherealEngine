@@ -102,7 +102,7 @@ function( add_example ARG_NAME )
 
 	# Add target
 	if( ARG_COMMON )
-		add_library( example-${ARG_NAME} STATIC EXCLUDE_FROM_ALL ${SOURCES} )
+		add_library( example-${ARG_NAME} EXCLUDE_FROM_ALL ${SOURCES} )
 		target_include_directories( example-${ARG_NAME} PUBLIC ${BGFX_DIR}/examples/common )
 		target_link_libraries( example-${ARG_NAME} PUBLIC bgfx ib-compress ocornut-imgui )
 		if( UNIX AND NOT APPLE )

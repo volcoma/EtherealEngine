@@ -14,6 +14,6 @@ endif()
 
 file( GLOB REMOTERY_SOURCES ${BGFX_DIR}/3rdparty/remotery/lib/*.c ${BGFX_DIR}/3rdparty/remotery/lib/*.h )
 
-add_library( remotery STATIC ${REMOTERY_SOURCES} )
+add_library( remotery ${REMOTERY_SOURCES} )
 target_include_directories( remotery PUBLIC ${BGFX_DIR}/3rdparty )
 set_target_properties( remotery PROPERTIES FOLDER "bgfx/3rdparty" )

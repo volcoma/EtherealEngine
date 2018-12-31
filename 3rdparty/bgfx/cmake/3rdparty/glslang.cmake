@@ -27,7 +27,7 @@ else()
 	list( APPEND GLSLANG_SOURCES ${BGFX_DIR}/3rdparty/glslang/glslang/OSDependent/Unix/ossource.cpp )
 endif()
 
-add_library( glslang STATIC EXCLUDE_FROM_ALL ${GLSLANG_SOURCES} )
+add_library( glslang EXCLUDE_FROM_ALL ${GLSLANG_SOURCES} )
 target_include_directories( glslang PUBLIC ${BGFX_DIR}/3rdparty/glslang ${BGFX_DIR}/3rdparty/glslang/glslang/Include ${BGFX_DIR}/3rdparty/glslang/glslang/Public )
 set_target_properties( glslang PROPERTIES FOLDER "bgfx/3rdparty" )
 

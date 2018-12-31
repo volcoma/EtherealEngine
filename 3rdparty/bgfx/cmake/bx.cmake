@@ -28,7 +28,7 @@ else()
 endif()
 
 # Create the bx target
-add_library( bx STATIC ${BX_SOURCES} )
+add_library( bx ${BX_SOURCES} )
 
 # Link against psapi on Windows
 if( WIN32 )

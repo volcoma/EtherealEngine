@@ -28,7 +28,7 @@ endif()
 file( GLOB BIMG_SOURCES ${BIMG_DIR}/src/*.cpp )
 
 # Create the bimg target
-add_library( bimg STATIC ${BIMG_SOURCES} )
+add_library( bimg ${BIMG_SOURCES} )
 
 # Add include directory of bimg
 target_include_directories( bimg PUBLIC ${BIMG_DIR}/include )

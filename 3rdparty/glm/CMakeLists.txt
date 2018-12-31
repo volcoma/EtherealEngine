@@ -9,4 +9,3 @@ set(GLM_DISABLE_AUTO_DETECTION ON CACHE BOOL "Force 'pure' instructions" FORCE)
 
 add_definitions(-DGLM_FORCE_LEFT_HANDED)
 add_subdirectory( glm )
-target_include_directories (glm_static PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/glm)

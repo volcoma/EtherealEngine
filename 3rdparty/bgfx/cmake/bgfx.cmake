@@ -29,7 +29,7 @@ else()
 endif()
 
 # Create the bgfx target
-add_library( bgfx STATIC ${BGFX_SOURCES} )
+add_library( bgfx ${BGFX_SOURCES} )
 
 # Enable BGFX_CONFIG_DEBUG in Debug configuration
 target_compile_definitions( bgfx PRIVATE "$<$<CONFIG:Debug>:BGFX_CONFIG_DEBUG=1>" )

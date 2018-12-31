@@ -10,8 +10,8 @@ source::source()
 
 source::~source() = default;
 
-source::source(source&& rhs) noexcept = default;
-source& source::operator=(source&& rhs) noexcept = default;
+source::source(source&&) noexcept = default;
+source& source::operator=(source&&) noexcept = default;
 
 void source::play()
 {

@@ -14,7 +14,7 @@ endif()
 
 file( GLOB FCPP_SOURCES ${BGFX_DIR}/3rdparty/fcpp/*.c ${BGFX_DIR}/3rdparty/fcpp/*.h )
 
-add_library( fcpp STATIC ${FCPP_SOURCES} )
+add_library( fcpp ${FCPP_SOURCES} )
 target_include_directories( fcpp PUBLIC ${BGFX_DIR}/3rdparty/fcpp )
 target_compile_definitions( fcpp PRIVATE
 		"NINCLUDE=64"
