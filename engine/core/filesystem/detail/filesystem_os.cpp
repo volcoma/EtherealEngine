@@ -12,7 +12,7 @@ static path executable_path_fallback(const char* argv0)
 		return "";
 	}
 	fs::error_code err;
-	path full_path(system_complete(path(std::string(argv0)), err));
+	path full_path(absolute(path(std::string(argv0)), err));
 	return full_path;
 }
 }
@@ -51,7 +51,7 @@ path executable_path(const char* argv0)
 		return executable_path_fallback(argv0);
 	}
 	fs::error_code err;
-	path full_path(system_complete(fs::canonical(path(std::string(buf.data()))), err));
+	path full_path(absolute(fs::absolute(path(std::string(buf.data()))), err));
 	return full_path;
 }
 void show_in_graphical_env(const path& _path)
@@ -75,7 +75,7 @@ path executable_path(const char* argv0)
 	}
 	std::string p(buf.data(), size);
 	fs::error_code err;
-	path full_path(system_complete(fs::canonical(path(p)), err));
+	path full_path(absolute(fs::absolute(path(p)), err));
 	return full_path;
 }
 void show_in_graphical_env(const path& _path)

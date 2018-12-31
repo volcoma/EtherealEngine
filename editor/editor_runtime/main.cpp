@@ -6,8 +6,8 @@
 
 int main(int argc, char* argv[])
 {
-	fs::path engine_path = fs::system_complete(ENGINE_DIRECTORY);
-	fs::path shader_include_path = fs::system_complete(SHADER_INCLUDE_DIRECTORY);
+	fs::path engine_path = fs::absolute(fs::path(ENGINE_DIRECTORY));
+	fs::path shader_include_path = fs::absolute(fs::path(SHADER_INCLUDE_DIRECTORY));
 
 	fs::path engine = engine_path / "engine_data";
 	fs::path editor = engine_path / "editor_data";

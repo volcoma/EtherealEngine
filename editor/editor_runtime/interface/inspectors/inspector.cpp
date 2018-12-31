@@ -38,6 +38,10 @@ property_layout::property_layout(const rttr::property& prop, bool columns /*= tr
 
 	if(columns)
 	{
+		if(gui::GetColumnsCount() > 1)
+		{
+			gui::EndColumns();
+		}
 		gui::BeginColumns("properties", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
 	}
 
@@ -56,6 +60,10 @@ property_layout::property_layout(const std::string& name, bool columns /*= true*
 {
 	if(columns)
 	{
+		if(gui::GetColumnsCount() > 1)
+		{
+			gui::EndColumns();
+		}
 		gui::BeginColumns("properties", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
 	}
 
@@ -72,6 +80,10 @@ property_layout::property_layout(const std::string& name, const std::string& too
 {
 	if(columns)
 	{
+		if(gui::GetColumnsCount() > 1)
+		{
+			gui::EndColumns();
+		}
 		gui::BeginColumns("properties", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
 	}
 
@@ -90,5 +102,8 @@ property_layout::~property_layout()
 {
 	gui::PopItemWidth();
 	gui::PopID();
-	gui::EndColumns();
+	if(gui::GetColumnsCount() > 1)
+	{
+		gui::EndColumns();
+	}
 }

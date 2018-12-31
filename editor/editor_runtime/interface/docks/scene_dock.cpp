@@ -537,7 +537,7 @@ static void process_drag_drop_target(std::shared_ptr<camera_component> camera_co
 				std::string absolute_path(reinterpret_cast<const char*>(payload->Data),
 										  std::size_t(payload->DataSize));
 
-				std::string key = fs::convert_to_protocol(fs::path(absolute_path)).string();
+				std::string key = fs::convert_to_protocol(fs::path(absolute_path)).generic_string();
 				using asset_t = prefab;
 				using entry_t = asset_handle<asset_t>;
 				auto entry = entry_t{};
@@ -576,7 +576,7 @@ static void process_drag_drop_target(std::shared_ptr<camera_component> camera_co
 				std::string absolute_path(reinterpret_cast<const char*>(payload->Data),
 										  std::size_t(payload->DataSize));
 
-				std::string key = fs::convert_to_protocol(fs::path(absolute_path)).string();
+				std::string key = fs::convert_to_protocol(fs::path(absolute_path)).generic_string();
 				using asset_t = mesh;
 				using entry_t = asset_handle<asset_t>;
 				auto entry = entry_t{};

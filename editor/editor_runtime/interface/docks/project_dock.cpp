@@ -390,7 +390,7 @@ void project_dock::render(const ImVec2& /*area*/)
 	gui::SameLine();
 	gui::PushItemWidth(80.0f);
 	gui::SliderFloat("", &scale_, 0.5f, 1.0f);
-	const float size = gui::GetFrameHeight() * 4.0f * scale_;
+	const float size = gui::GetFrameHeight() * 5.0f * scale_;
 	if(gui::IsItemHovered())
 	{
 		gui::BeginTooltip();
@@ -699,18 +699,21 @@ void project_dock::render(const ImVec2& /*area*/)
 				auto end = start + std::min(count - start, items_per_line);
 				for(size_t j = start; j < end; ++j)
 				{
-					const auto& cache_entry = cache_.at(j);
+                    if(j < cache_.size())
+                    {
+                        const auto& cache_entry = cache_.at(j);
 
-					gui::PushID(int(j));
+                        gui::PushID(int(j));
 
-					process_cache_entry(cache_entry);
+                        process_cache_entry(cache_entry);
 
-					gui::PopID();
+                        gui::PopID();
 
-					if(j != end - 1)
-					{
-						ImGui::SameLine(0.0f, style.ItemSpacing.x + extra);
-					}
+                        if(j != end - 1)
+                        {
+                            ImGui::SameLine(0.0f, style.ItemSpacing.x + extra);
+                        }
+                    }
 				}
 			}
 		}
@@ -806,7 +809,7 @@ void project_dock::import()
 				[opened = cache_.get_path()](const fs::path& path, const fs::path& filename) {
 					fs::error_code err;
 					fs::path dir = opened / filename;
-					fs::copy_file(path, dir, fs::copy_options::overwrite_if_exists, err);
+					fs::copy_file(path, dir, fs::copy_options::overwrite_existing, err);
 				},
 				p, filename);
 		}

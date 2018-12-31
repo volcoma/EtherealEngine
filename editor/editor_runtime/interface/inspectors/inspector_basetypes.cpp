@@ -7,13 +7,9 @@ bool inspector_irect32_t::inspect(rttr::variant& var, bool read_only, const meta
 	const char* namesLT[] = {"L", "T"};
 	const char* namesRB[] = {"R", "B"};
 
-	std::string format = "%.0f";
 	std::int32_t min = 0;
 	std::int32_t max = 0;
 
-	auto format_var = get_metadata("format");
-	if(format_var)
-		format = format_var.to_string();
 	auto min_var = get_metadata("min");
 	if(min_var)
 		min = min_var.to_int32();
@@ -21,8 +17,8 @@ bool inspector_irect32_t::inspect(rttr::variant& var, bool read_only, const meta
 	if(max_var)
 		max = max_var.to_int32();
 
-	changed |= gui::DragIntNEx(namesLT, &data.left, 2, 0.05f, min, max, format.c_str());
-	changed |= gui::DragIntNEx(namesRB, &data.right, 2, 0.05f, min, max, format.c_str());
+	changed |= gui::DragIntNEx(namesLT, &data.left, 2, 0.05f, min, max);
+	changed |= gui::DragIntNEx(namesRB, &data.right, 2, 0.05f, min, max);
 	if(changed)
 	{
 		var = data;
@@ -38,13 +34,9 @@ bool inspector_urect32_t::inspect(rttr::variant& var, bool read_only, const meta
 	const char* namesLT[] = {"L", "T"};
 	const char* namesRB[] = {"R", "B"};
 
-	std::string format = "%.0f";
 	std::uint32_t min = 0;
 	std::uint32_t max = 0;
 
-	auto format_var = get_metadata("format");
-	if(format_var)
-		format = format_var.to_string();
 	auto min_var = get_metadata("min");
 	if(min_var)
 		min = min_var.to_uint32();
@@ -52,8 +44,8 @@ bool inspector_urect32_t::inspect(rttr::variant& var, bool read_only, const meta
 	if(max_var)
 		max = max_var.to_uint32();
 
-	changed |= gui::DragUIntNEx(namesLT, &data.left, 2, 0.05f, min, max, format.c_str());
-	changed |= gui::DragUIntNEx(namesRB, &data.right, 2, 0.05f, min, max, format.c_str());
+	changed |= gui::DragUIntNEx(namesLT, &data.left, 2, 0.05f, min, max);
+	changed |= gui::DragUIntNEx(namesRB, &data.right, 2, 0.05f, min, max);
 	if(changed)
 	{
 		var = data;
@@ -99,13 +91,9 @@ bool inspector_ipoint32_t::inspect(rttr::variant& var, bool read_only, const met
 	bool changed = false;
 	const char* names[] = {"X", "Y"};
 
-	std::string format = "%.0f";
 	std::int32_t min = 0;
 	std::int32_t max = 0;
 
-	auto format_var = get_metadata("format");
-	if(format_var)
-		format = format_var.to_string();
 	auto min_var = get_metadata("min");
 	if(min_var)
 		min = min_var.to_int32();
@@ -113,7 +101,7 @@ bool inspector_ipoint32_t::inspect(rttr::variant& var, bool read_only, const met
 	if(max_var)
 		max = max_var.to_int32();
 
-	changed |= gui::DragIntNEx(names, &data.x, 2, 0.05f, min, max, format.c_str());
+	changed |= gui::DragIntNEx(names, &data.x, 2, 0.05f, min, max);
 	if(changed)
 	{
 		var = data;
@@ -128,13 +116,9 @@ bool inspector_upoint32_t::inspect(rttr::variant& var, bool read_only, const met
 	bool changed = false;
 	const char* names[] = {"X", "Y"};
 
-	std::string format = "%.0f";
 	std::uint32_t min = 0;
 	std::uint32_t max = 0;
 
-	auto format_var = get_metadata("format");
-	if(format_var)
-		format = format_var.to_string();
 	auto min_var = get_metadata("min");
 	if(min_var)
 		min = min_var.to_uint32();
@@ -142,7 +126,7 @@ bool inspector_upoint32_t::inspect(rttr::variant& var, bool read_only, const met
 	if(max_var)
 		max = max_var.to_uint32();
 
-	changed |= gui::DragUIntNEx(names, &data.x, 2, 0.05f, min, max, format.c_str());
+	changed |= gui::DragUIntNEx(names, &data.x, 2, 0.05f, min, max);
 	if(changed)
 	{
 		var = data;
@@ -186,13 +170,10 @@ bool inspector_isize32_t::inspect(rttr::variant& var, bool read_only, const meta
 	bool changed = false;
 	const char* names[] = {"W", "H"};
 
-	std::string format = "%.0f";
 	std::int32_t min = 0;
 	std::int32_t max = 0;
 
-	auto format_var = get_metadata("format");
-	if(format_var)
-		format = format_var.to_string();
+
 	auto min_var = get_metadata("min");
 	if(min_var)
 		min = min_var.to_int32();
@@ -200,7 +181,7 @@ bool inspector_isize32_t::inspect(rttr::variant& var, bool read_only, const meta
 	if(max_var)
 		max = max_var.to_int32();
 
-	changed |= gui::DragIntNEx(names, &data.width, 2, 0.05f, min, max, format.c_str());
+	changed |= gui::DragIntNEx(names, &data.width, 2, 0.05f, min, max);
 	if(changed)
 	{
 		var = data;
@@ -215,13 +196,9 @@ bool inspector_usize32_t::inspect(rttr::variant& var, bool read_only, const meta
 	bool changed = false;
 	const char* names[] = {"W", "H"};
 
-	std::string format = "%.0f";
 	std::uint32_t min = 0;
 	std::uint32_t max = 0;
 
-	auto format_var = get_metadata("format");
-	if(format_var)
-		format = format_var.to_string();
 	auto min_var = get_metadata("min");
 	if(min_var)
 		min = min_var.to_uint32();
@@ -229,7 +206,7 @@ bool inspector_usize32_t::inspect(rttr::variant& var, bool read_only, const meta
 	if(max_var)
 		max = max_var.to_uint32();
 
-	changed |= gui::DragUIntNEx(names, &data.width, 2, 0.05f, min, max, format.c_str());
+	changed |= gui::DragUIntNEx(names, &data.width, 2, 0.05f, min, max);
 	if(changed)
 	{
 		var = data;
@@ -272,13 +249,9 @@ bool inspector_irange32_t::inspect(rttr::variant& var, bool read_only, const met
 	bool changed = false;
 	const char* names[] = {"Min", "Max"};
 
-	std::string format = "%.0f";
 	std::int32_t min = 0;
 	std::int32_t max = 0;
 
-	auto format_var = get_metadata("format");
-	if(format_var)
-		format = format_var.to_string();
 	auto min_var = get_metadata("min");
 	if(min_var)
 		min = min_var.to_int32();
@@ -286,7 +259,7 @@ bool inspector_irange32_t::inspect(rttr::variant& var, bool read_only, const met
 	if(max_var)
 		max = max_var.to_int32();
 
-	changed |= gui::DragIntNEx(names, &data.min, 2, 0.05f, min, max, format.c_str());
+	changed |= gui::DragIntNEx(names, &data.min, 2, 0.05f, min, max);
 	if(changed)
 	{
 		var = data;
@@ -301,13 +274,9 @@ bool inspector_urange32_t::inspect(rttr::variant& var, bool read_only, const met
 	bool changed = false;
 	const char* names[] = {"Min", "Max"};
 
-	std::string format = "%.0f";
 	std::uint32_t min = 0;
 	std::uint32_t max = 0;
 
-	auto format_var = get_metadata("format");
-	if(format_var)
-		format = format_var.to_string();
 	auto min_var = get_metadata("min");
 	if(min_var)
 		min = min_var.to_uint32();
@@ -315,7 +284,7 @@ bool inspector_urange32_t::inspect(rttr::variant& var, bool read_only, const met
 	if(max_var)
 		max = max_var.to_uint32();
 
-	changed |= gui::DragUIntNEx(names, &data.min, 2, 0.05f, min, max, format.c_str());
+	changed |= gui::DragUIntNEx(names, &data.min, 2, 0.05f, min, max);
 	if(changed)
 	{
 		var = data;

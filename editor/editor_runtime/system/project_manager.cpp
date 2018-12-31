@@ -55,9 +55,9 @@ static std::uint64_t watch_assets(const fs::path& dir, const std::string& wildca
 			{
 				auto p = fs::reduce_trailing_extensions(entry.path);
 				auto data_key = fs::convert_to_protocol(p);
-				auto key = fs::replace(data_key.generic_string(), ":/cache", ":/data").string();
+				auto key = fs::replace(data_key.generic_string(), ":/cache", ":/data").generic_string();
 
-				if(entry.type == fs::file_type::regular_file)
+				if(entry.type == fs::file_type::regular)
 				{
 					if(entry.status == fs::watcher::entry_status::removed)
 					{
@@ -68,7 +68,7 @@ static std::uint64_t watch_assets(const fs::path& dir, const std::string& wildca
 						auto old_p = fs::reduce_trailing_extensions(entry.last_path);
 						auto old_data_key = fs::convert_to_protocol(old_p);
 						auto old_key =
-							fs::replace(old_data_key.generic_string(), ":/cache", ":/data").string();
+							fs::replace(old_data_key.generic_string(), ":/cache", ":/data").generic_string();
 						auto task = ts.push_on_owner_thread(
 							[old_key, key, &am]() { am.rename_asset<T>(old_key, key); });
 					}

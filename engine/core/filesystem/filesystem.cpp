@@ -153,8 +153,11 @@ path resolve_protocol(const path& _path)
 		return path{};
 	};
 
-	const auto resolved = it->second;
-	auto result = resolved / relative_path.make_preferred();
+	auto result = it->second;
+	if(!relative_path.empty())
+	{
+        result = result / relative_path.make_preferred();
+	}
 	return result;
 }
 
