@@ -17,7 +17,7 @@ Bool checkEvent(::Display*, XEvent* event, XPointer userData)
 }
 } // namespace
 
-namespace sf
+namespace mml
 {
 namespace priv
 {
@@ -316,4 +316,4 @@ void clipboard_impl::process_event(XEvent& windowEvent)
 
 } // namespace priv
 
-} // namespace sf
+} // namespace mml
