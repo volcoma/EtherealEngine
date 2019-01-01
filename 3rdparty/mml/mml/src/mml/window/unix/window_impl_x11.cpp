@@ -3,7 +3,7 @@
 ////////////////////////////////////////////////////////////
 #include <mml/window/window_style.hpp> // important to be included first (conflict with None)
 #include <mml/window/unix/window_impl_x11.hpp>
-#include <mml/window/unix/clipboard_impl_x11.hpp>
+#include <mml/window/unix/clipboard_impl.hpp>
 #include <mml/window/unix/display.hpp>
 #include <mml/window/unix/input_impl.hpp>
 #include <mml/system/utf.hpp>
