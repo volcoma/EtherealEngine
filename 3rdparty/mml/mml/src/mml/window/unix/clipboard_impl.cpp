@@ -6,6 +6,7 @@
 #include <mml/window/unix/clipboard_impl.hpp>
 #include <mml/window/unix/display.hpp>
 #include <vector>
+#include <chrono>
 
 namespace
 {
@@ -46,7 +47,7 @@ clipboard_impl::clipboard_impl()
 	, m_requestResponded(false)
 {
 	// Open a connection with the X server
-	m_display = OpenDisplay();
+	m_display = open_display();
 
 	// Get the atoms we need to make use of the clipboard
 	m_clipboard = get_atom("CLIPBOARD", false);
@@ -73,7 +74,7 @@ clipboard_impl::~clipboard_impl()
 	}
 
 	// Close the connection with the X server
-	CloseDisplay(m_display);
+	close_display(m_display);
 }
 
 ////////////////////////////////////////////////////////////
@@ -105,7 +106,6 @@ std::string clipboard_impl::get_string_impl()
 	XConvertSelection(m_display, m_clipboard, (m_utf8String != None) ? m_utf8String : XA_STRING,
 					  m_targetProperty, m_window, CurrentTime);
 
-	Clock clock;
 
 	auto last = std::chrono::steady_clock::now();
 	// Wait for a response for up to 1000ms
