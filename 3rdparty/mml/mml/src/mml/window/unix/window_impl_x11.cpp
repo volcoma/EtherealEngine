@@ -272,7 +272,7 @@ namespace
         if (!ewmhSupported())
             return false;
 
-        Atom frameExtents = get_atom("_NET_FRAME_EXTENTS", true);
+        Atom frameExtents = mml::priv::get_atom("_NET_FRAME_EXTENTS", true);
 
         if (frameExtents == None)
             return false;
@@ -798,7 +798,7 @@ std::array<std::int32_t, 2> window_impl_x11::get_position() const
     // it to, even with decorations and such, which get shifted back.
     // In these rare cases, we can use the absolute value directly.
     if (isWMAbsolutePositionGood())
-        return std::array<std::int32_t, 2>{{xAbsRelToRoot, yAbsRelToRoot}};
+        return std::array<std::int32_t, 2>{{std::int32_t(xAbsRelToRoot), std::int32_t(yAbsRelToRoot)}};
 
     // CASE 2: most modern WMs support EWMH and can define _NET_FRAME_EXTENTS
     // with the exact frame size to subtract, so if present, we prefer it and
@@ -809,7 +809,7 @@ std::array<std::int32_t, 2> window_impl_x11::get_position() const
     {
         // Get final X/Y coordinates: subtract EWMH frame extents from
         // absolute window position.
-        return std::array<std::int32_t, 2>{{(xAbsRelToRoot - xFrameExtent), (yAbsRelToRoot - yFrameExtent)}};
+        return std::array<std::int32_t, 2>{{std::int32_t(xAbsRelToRoot - xFrameExtent), std::int32_t(yAbsRelToRoot - yFrameExtent)}};
     }
 
     // CASE 3: EWMH frame extents were not available, use geometry.
@@ -842,7 +842,7 @@ std::array<std::int32_t, 2> window_impl_x11::get_position() const
     XGetGeometry(_display, ancestor, &root, &xRelToRoot, &yRelToRoot,
         &width, &height, &borderWidth, &depth);
 
-    return std::array<std::int32_t, 2>{{xRelToRoot, yRelToRoot}};
+    return std::array<std::int32_t, 2>{{std::int32_t(xRelToRoot), std::int32_t(yRelToRoot)}};
 }
 
 
