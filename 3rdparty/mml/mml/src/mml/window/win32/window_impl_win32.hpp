@@ -6,7 +6,7 @@
 ////////////////////////////////////////////////////////////
 #include <mml/window/event.hpp>
 #include <mml/window/window_impl.hpp>
-#include <Windows.h>
+#include <windows.h>
 
 
 namespace mml

@@ -706,9 +706,9 @@ public:
 #include <mml/system/utf.inl>
 
 // Make typedefs to get rid of the template syntax
-typedef utf<8>  utf8;
-typedef utf<16> utf16;
-typedef utf<32> utf32;
+using utf8 = utf<8>;
+using utf16 = utf<16>;
+using utf32 = utf<32>;
 
 } // namespace mml
 

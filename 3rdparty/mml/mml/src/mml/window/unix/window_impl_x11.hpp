@@ -9,6 +9,7 @@
 #include <mml/window/window_style.hpp>
 #include <X11/Xlib.h>
 #include <deque>
+#include <X11/extensions/Xrandr.h>
 
 
 namespace mml
@@ -243,7 +244,37 @@ private:
     ///
     ////////////////////////////////////////////////////////////
     bool process_event(XEvent& windowEvent);
-	//static void set_window_maximized(window_impl_x11& window, bool maximized);
+	////////////////////////////////////////////////////////////
+    /// \brief Check if a valid version of XRandR extension is present
+    ///
+    /// \param xRandRMajor XRandR major version
+    /// \param xRandRMinor XRandR minor version
+    ///
+    /// \return True if a valid XRandR version found, false otherwise
+    ///
+    ////////////////////////////////////////////////////////////
+    bool checkXRandR(int& xRandRMajor, int& xRandRMinor);
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Get the RROutput of the primary monitor
+    ///
+    /// \param rootWindow the root window
+    /// \param res screen resources
+    /// \param xRandRMajor XRandR major version
+    /// \param xRandRMinor XRandR minor version
+    ///
+    /// \return RROutput of the primary monitor
+    ///
+    ////////////////////////////////////////////////////////////
+    RROutput getOutputPrimary(::Window& rootWindow, XRRScreenResources* res, int xRandRMajor, int xRandRMinor);
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Get coordinates of the primary monitor
+    ///
+    /// \return Position of the primary monitor
+    ///
+    ////////////////////////////////////////////////////////////
+    std::array<std::int32_t, 2> getPrimaryMonitorPosition();
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
@@ -252,8 +283,10 @@ private:
     int        _screen;         ///< Screen identifier
     XIM        _input_method;    ///< Input method linked to the X display
     XIC        _input_context;   ///< Input context used to get unicode input in our window
+    std::deque<XEvent> _events; ///< Queue we use to store pending events for this window
     bool       _is_external;     ///< Tell whether the window has been created externally or by mml
     int        _old_video_mode;   ///< Video mode in use before we switch to fullscreen
+    RRCrtc     _old_rrc_rtc;      ///< RRCrtc in use before we switch to fullscreen
     ::Cursor   _hidden_cursor;   ///< As X11 doesn't provide cursor hiding, we must create a transparent one
     ::Cursor   _last_cursor;     ///< Last cursor used -- this data is not owned by the window and is required to be always valid
     bool       _key_repeat;      ///< Is the KeyRepeat feature enabled?

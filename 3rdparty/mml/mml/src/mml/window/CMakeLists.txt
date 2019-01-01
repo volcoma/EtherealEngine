@@ -5,6 +5,8 @@ set(SRCROOT ${PROJECT_SOURCE_DIR}/src/mml/window)
 
 # all source files
 set(SRC
+	${SRCROOT}/clipboard.cpp
+    ${SRCROOT}/clipboard_impl.hpp
     ${SRCROOT}/cursor.cpp
     ${INCROOT}/cursor.hpp
     ${SRCROOT}/cursor_impl.hpp
@@ -43,6 +45,8 @@ source_group("" FILES ${SRC})
 # add platform specific sources
 if(MML_OS_WINDOWS)
     set(PLATFORM_SRC
+        ${SRCROOT}/win32/clipboard_impl.hpp
+        ${SRCROOT}/win32/clipboard_impl.cpp
         ${SRCROOT}/win32/cursor_impl.hpp
         ${SRCROOT}/win32/cursor_impl.cpp
         ${SRCROOT}/win32/input_impl.cpp
@@ -59,8 +63,10 @@ if(MML_OS_WINDOWS)
 
     # make sure that we use the Unicode version of the Win API functions
     add_definitions(-DUNICODE -D_UNICODE)
-elseif(MML_OS_LINUX OR MML_OS_FREEBSD)
+elseif(MML_OS_LINUX OR MML_OS_FREEBSD OR MML_OS_OPENBSD)
     set(PLATFORM_SRC
+        ${SRCROOT}/unix/clipboard_impl.cpp
+        ${SRCROOT}/unix/clipboard_impl.hpp
         ${SRCROOT}/unix/cursor_impl.hpp
         ${SRCROOT}/unix/cursor_impl.cpp
         ${SRCROOT}/unix/display.cpp

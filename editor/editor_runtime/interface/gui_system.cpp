@@ -343,9 +343,9 @@ void imgui_init()
 	io.KeyMap[ImGuiKey_End] = mml::keyboard::End;
 	io.KeyMap[ImGuiKey_Insert] = mml::keyboard::Insert;
 	io.KeyMap[ImGuiKey_Delete] = mml::keyboard::Delete;
-	io.KeyMap[ImGuiKey_Backspace] = mml::keyboard::BackSpace;
+	io.KeyMap[ImGuiKey_Backspace] = mml::keyboard::Backspace;
 	io.KeyMap[ImGuiKey_Space] = mml::keyboard::Space;
-	io.KeyMap[ImGuiKey_Enter] = mml::keyboard::Return;
+	io.KeyMap[ImGuiKey_Enter] = mml::keyboard::Enter;
 	io.KeyMap[ImGuiKey_Escape] = mml::keyboard::Escape;
 	io.KeyMap[ImGuiKey_A] = mml::keyboard::A;
 	io.KeyMap[ImGuiKey_C] = mml::keyboard::C;

@@ -16,7 +16,7 @@
 #include <mml/system/utf.hpp>
 #include <vector>
 #include <cstring>
-
+#include <dbt.h>
 // MinGW lacks the definition of some Win32 constants
 #ifndef XBUTTON1
     #define XBUTTON1 0x0001
@@ -29,11 +29,6 @@
 #endif
 #ifndef MAPVK_VK_TO_VSC
     #define MAPVK_VK_TO_VSC (0)
-#endif
-
-// Avoid including <Dbt.h> just for one define
-#ifndef DBT_DEVNODES_CHANGED
-    #define DBT_DEVNODES_CHANGED 0x0007
 #endif
 
 namespace
@@ -190,9 +185,13 @@ _cursor_grabbed   (_fullscreen)
 	std::wstring wtitle;
 	wtitle.reserve(title.length() + 1);
 	// Convert
-	utf32::to_wide(title.begin(), title.end(), std::back_inserter(wtitle), 0);
+	utf8::to_wide(title.begin(), title.end(), std::back_inserter(wtitle), 0);
     // Create the window
     _handle = CreateWindowW(className, wtitle.c_str(), win32Style, left, top, width, height, NULL, NULL, GetModuleHandle(NULL), this);
+    // Register to receive device interface change notifications (used for joystick connection handling)
+    DEV_BROADCAST_HDR deviceBroadcastHeader = {sizeof(DEV_BROADCAST_HDR), DBT_DEVTYP_DEVICEINTERFACE, 0};
+    RegisterDeviceNotification(_handle, &deviceBroadcastHeader, DEVICE_NOTIFY_WINDOW_HANDLE | DEVICE_NOTIFY_ALL_INTERFACE_CLASSES);
+
 
     // If we're the first window handle, we only need to poll for joysticks when WM_DEVICECHANGE message is received
     if (_handle)
@@ -330,7 +329,7 @@ void window_impl_win32::set_title(const std::string& title)
 	wtitle.reserve(title.length() + 1);
 
 	// Convert
-	utf32::to_wide(title.begin(), title.end(), std::back_inserter(wtitle), 0);
+	utf8::to_wide(title.begin(), title.end(), std::back_inserter(wtitle), 0);
     SetWindowTextW(_handle, wtitle.c_str());
 }
 
@@ -755,10 +754,10 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
             {
                 platform_event event;
                 event.type        = platform_event::key_pressed;
-                event.key.alt     = HIWORD(GetAsyncKeyState(VK_MENU))    != 0;
-                event.key.control = HIWORD(GetAsyncKeyState(VK_CONTROL)) != 0;
-                event.key.shift   = HIWORD(GetAsyncKeyState(VK_SHIFT))   != 0;
-                event.key.system  = HIWORD(GetAsyncKeyState(VK_LWIN)) || HIWORD(GetAsyncKeyState(VK_RWIN));
+                event.key.alt     = HIWORD(GetKeyState(VK_MENU))    != 0;
+                event.key.control = HIWORD(GetKeyState(VK_CONTROL)) != 0;
+                event.key.shift   = HIWORD(GetKeyState(VK_SHIFT))   != 0;
+                event.key.system  = HIWORD(GetKeyState(VK_LWIN)) || HIWORD(GetKeyState(VK_RWIN));
                 event.key.code    = virtual_key_code_to_mml(wParam, lParam);
                 push_event(event);
             }
@@ -771,10 +770,10 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
         {
             platform_event event;
             event.type        = platform_event::key_released;
-            event.key.alt     = HIWORD(GetAsyncKeyState(VK_MENU))    != 0;
-            event.key.control = HIWORD(GetAsyncKeyState(VK_CONTROL)) != 0;
-            event.key.shift   = HIWORD(GetAsyncKeyState(VK_SHIFT))   != 0;
-            event.key.system  = HIWORD(GetAsyncKeyState(VK_LWIN)) || HIWORD(GetAsyncKeyState(VK_RWIN));
+            event.key.alt     = HIWORD(GetKeyState(VK_MENU))    != 0;
+            event.key.control = HIWORD(GetKeyState(VK_CONTROL)) != 0;
+            event.key.shift   = HIWORD(GetKeyState(VK_SHIFT))   != 0;
+            event.key.system  = HIWORD(GetKeyState(VK_LWIN)) || HIWORD(GetKeyState(VK_RWIN));
             event.key.code    = virtual_key_code_to_mml(wParam, lParam);
             push_event(event);
             break;
@@ -1004,8 +1003,14 @@ void window_impl_win32::process_event(UINT message, WPARAM wParam, LPARAM lParam
         case WM_DEVICECHANGE:
         {
             // Some sort of device change has happened, update joystick connections
-            if (wParam == DBT_DEVNODES_CHANGED)
-                joystick_impl::update_connections();
+            if ((wParam == DBT_DEVICEARRIVAL) || (wParam == DBT_DEVICEREMOVECOMPLETE))
+            {
+                // Some sort of device change has happened, update joystick connections if it is a device interface
+                DEV_BROADCAST_HDR* deviceBroadcastHeader = reinterpret_cast<DEV_BROADCAST_HDR*>(lParam);
+
+                if (deviceBroadcastHeader && (deviceBroadcastHeader->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE))
+                    joystick_impl::update_connections();
+            }
             break;
         }
     }
@@ -1035,21 +1040,21 @@ keyboard::key window_impl_win32::virtual_key_code_to_mml(WPARAM key, LPARAM flag
         case VK_LWIN:       return keyboard::LSystem;
         case VK_RWIN:       return keyboard::RSystem;
         case VK_APPS:       return keyboard::Menu;
-        case VK_OEM_1:      return keyboard::SemiColon;
+        case VK_OEM_1:      return keyboard::Semicolon;
         case VK_OEM_2:      return keyboard::Slash;
         case VK_OEM_PLUS:   return keyboard::Equal;
-        case VK_OEM_MINUS:  return keyboard::Dash;
+        case VK_OEM_MINUS:  return keyboard::Hyphen;
         case VK_OEM_4:      return keyboard::LBracket;
         case VK_OEM_6:      return keyboard::RBracket;
         case VK_OEM_COMMA:  return keyboard::Comma;
         case VK_OEM_PERIOD: return keyboard::Period;
         case VK_OEM_7:      return keyboard::Quote;
-        case VK_OEM_5:      return keyboard::BackSlash;
+        case VK_OEM_5:      return keyboard::Backslash;
         case VK_OEM_3:      return keyboard::Tilde;
         case VK_ESCAPE:     return keyboard::Escape;
         case VK_SPACE:      return keyboard::Space;
-        case VK_RETURN:     return keyboard::Return;
-        case VK_BACK:       return keyboard::BackSpace;
+        case VK_RETURN:     return keyboard::Enter;
+        case VK_BACK:       return keyboard::Backspace;
         case VK_TAB:        return keyboard::Tab;
         case VK_PRIOR:      return keyboard::PageUp;
         case VK_NEXT:       return keyboard::PageDown;

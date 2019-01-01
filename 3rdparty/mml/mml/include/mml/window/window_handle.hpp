@@ -16,17 +16,17 @@ namespace mml
 #if defined(MML_SYSTEM_WINDOWS)
 
     // window handle is HWND (HWND__*) on Windows
-    typedef HWND__* window_handle;
+    using window_handle = HWND__ *;
 
-#elif defined(MML_SYSTEM_LINUX) || defined(MML_SYSTEM_FREEBSD)
+#elif defined(MML_SYSTEM_LINUX) || defined(MML_SYSTEM_FREEBSD) || defined(MML_SYSTEM_OPENBSD)
 
     // window handle is window (unsigned long) on Unix - X11
-    typedef unsigned long window_handle;
+    using window_handle =unsigned long;
 
 #elif defined(MML_SYSTEM_MACOS)
 
     // window handle is NSWindow or NSView (void*) on Mac OS X - Cocoa
-    typedef void* window_handle;
+    using window_handle = void*;
 
 #endif
 

@@ -45,7 +45,7 @@ bool cursor_impl::load_from_pixels(const std::uint8_t* pixels, const std::array<
     bitmapHeader.bV5BlueMask    = 0x000000ff;
     bitmapHeader.bV5AlphaMask   = 0xff000000;
 
-    std::uint8_t* bitmapData = NULL;
+    std::uint32_t* bitmapData = NULL;
 
     HDC screenDC = GetDC(NULL);
     HBITMAP color = CreateDIBSection(
@@ -65,7 +65,11 @@ bool cursor_impl::load_from_pixels(const std::uint8_t* pixels, const std::array<
     }
 
     // Fill our bitmap with the cursor color data
-    std::memcpy(bitmapData, pixels, size[0] * size[1] * 4);
+    std::uint32_t* bitmapOffset = bitmapData;
+    for (std::size_t remaining = size[0] * size[1]; remaining > 0; --remaining, pixels += 4)
+    {
+        *bitmapOffset++ = (pixels[3] << 24) | (pixels[0] << 16) | (pixels[1] << 8) | pixels[2];
+    }
 
     // Create a dummy mask bitmap (it won't be used)
     HBITMAP mask = CreateBitmap(size[0], size[1], 1, 1, NULL);
