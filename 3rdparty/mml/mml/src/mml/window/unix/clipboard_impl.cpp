@@ -109,7 +109,7 @@ std::string clipboard_impl::get_string_impl()
 
 	auto last = std::chrono::steady_clock::now();
 	// Wait for a response for up to 1000ms
-	while(!m_requestResponded && (std::chrono::duration_cast<std::chrono::milliseconds>(now - last) <
+	while(!m_requestResponded && (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - last) <
 								  std::chrono::milliseconds(1000)))
 		process_events();
 
