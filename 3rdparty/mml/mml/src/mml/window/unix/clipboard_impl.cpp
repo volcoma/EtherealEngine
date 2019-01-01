@@ -25,19 +25,19 @@ namespace priv
 ////////////////////////////////////////////////////////////
 std::string clipboard_impl::get_string()
 {
-	return getInstance().get_string_impl();
+	return get_instance().get_string_impl();
 }
 
 ////////////////////////////////////////////////////////////
 void clipboard_impl::set_string(const std::string& text)
 {
-	getInstance().set_string_impl(text);
+	get_instance().set_string_impl(text);
 }
 
 ////////////////////////////////////////////////////////////
 void clipboard_impl::process_events()
 {
-	getInstance().process_events_impl();
+	get_instance().process_events_impl();
 }
 
 ////////////////////////////////////////////////////////////
