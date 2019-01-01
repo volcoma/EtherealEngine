@@ -536,8 +536,8 @@ _last_input_time  (0)
 	}
 	else
 	{
-        windowPosition[0] = (DisplayWidth(_display, m_screen)  - mode.width) / 2;
-        windowPosition[1] = (DisplayWidth(_display, m_screen)  - mode.height) / 2;
+        windowPosition[0] = (DisplayWidth(_display, _screen)  - mode.width) / 2;
+        windowPosition[1] = (DisplayWidth(_display, _screen)  - mode.height) / 2;
 	}
 
 	int width  = mode.width;
@@ -1793,7 +1793,7 @@ bool window_impl_x11::process_event(XEvent& windowEvent)
         if (iter != _events.end())
         {
             // If we don't want repeated events, remove the next KeyPress from the queue
-            if (!m_keyRepeat)
+            if (!_key_repeat)
                 _events.erase(iter);
 
             // This KeyRelease is a repeated event and we don't want it
