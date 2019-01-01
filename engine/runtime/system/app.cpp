@@ -29,7 +29,7 @@ void app::setup(cmd_line::parser& parser)
 {
 	auto logging_container = logging::get_mutable_logging_container();
 	logging_container->add_sink(std::make_shared<logging::sinks::platform_sink_mt>());
-	logging_container->add_sink(std::make_shared<logging::sinks::daily_file_sink_mt>("Log", 23, 59));
+	logging_container->add_sink(std::make_shared<logging::sinks::simple_file_sink_mt>("Log.txt", true));
 
 	logging::create(APPLOG, logging_container);
 

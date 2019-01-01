@@ -17,7 +17,7 @@ namespace core
 //-----------------------------------------------------------------------------
 struct simulation
 {
-	using clock_t = std::chrono::high_resolution_clock;
+	using clock_t = std::chrono::steady_clock;
 	using timepoint_t = clock_t::time_point;
 	using duration_t = clock_t::duration;
 
@@ -53,7 +53,7 @@ struct simulation
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_min_fps(unsigned);
+	void set_min_fps(std::uint32_t fps);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_max_fps ()
@@ -62,7 +62,7 @@ struct simulation
 	/// this.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_max_fps(unsigned int);
+	void set_max_fps(std::uint32_t fps);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_max_inactive_fps ()
@@ -71,7 +71,7 @@ struct simulation
 	/// focus.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_max_inactive_fps(unsigned int);
+	void set_max_inactive_fps(std::uint32_t fps);
 
 	//-----------------------------------------------------------------------------
 	//  Name : set_time_smoothing_step ()
@@ -79,7 +79,7 @@ struct simulation
 	/// Set how many frames to average for timestep smoothing.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	void set_time_smoothing_step(unsigned int);
+	void set_time_smoothing_step(std::uint32_t step);
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_time_since_launch ()
@@ -95,7 +95,7 @@ struct simulation
 	/// Returns frames per second.
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	unsigned get_fps() const;
+	std::uint32_t get_fps() const;
 
 	//-----------------------------------------------------------------------------
 	//  Name : get_delta_time ()
@@ -107,11 +107,11 @@ struct simulation
 
 protected:
 	/// minimum/maximum frames per second
-	unsigned int min_fps_ = 0;
+	std::uint32_t min_fps_ = 0;
 	///
-	unsigned int max_fps_ = 200;
+	std::uint32_t max_fps_ = 200;
 	///
-	unsigned int max_inactive_fps_ = 20;
+	std::uint32_t max_inactive_fps_ = 20;
 	/// previous time steps for smoothing in seconds
 	std::vector<duration_t> previous_timesteps_;
 	/// next frame time step in seconds
@@ -119,7 +119,7 @@ protected:
 	/// current frame
 	std::uint64_t frame_ = 0;
 	/// how many frames to average for the smoothed time step
-	unsigned int smoothing_step_ = 11;
+	std::uint32_t smoothing_step_ = 11;
 	/// frame update timer
 	timepoint_t last_frame_timepoint_ = clock_t::now();
 	/// time point when we launched

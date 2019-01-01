@@ -17,7 +17,8 @@ public:
 					  std::is_same<iterator_t, directory_iterator>::value,
 				  "T must be a valid directory iterator type");
 
-	using clock_t = std::chrono::high_resolution_clock;
+	using clock_t = std::chrono::steady_clock;
+
 	cache() = default;
 
 	cache(const fs::path& p, clock_t::duration scan_frequency)
@@ -101,6 +102,12 @@ public:
 		return entries_.end();
 	}
 
+    //-----------------------------------------------------------------------------
+	//  Name : size ()
+	/// <summary>
+	/// Returns the size for the underlying cached container.
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	decltype(auto) size() const
 	{
 		if(should_refresh())
@@ -110,14 +117,20 @@ public:
 		return entries_.size();
 	}
 
+    //-----------------------------------------------------------------------------
+	//  Name : at ()
+	/// <summary>
+	/// Directly index into the underlying cached container.
+	/// </summary>
+	//-----------------------------------------------------------------------------
 	decltype(auto) at(size_t idx) const
 	{
-		if(should_refresh())
-		{
-			refresh();
-		}
 		return entries_.at(idx);
 	}
+    decltype(auto) operator[](size_t idx) const
+    {
+        return entries_[idx];
+    }
 
 	//-----------------------------------------------------------------------------
 	//  Name : refresh ()
@@ -140,16 +153,16 @@ public:
 			auto& cache_entry = entries_.back();
 			cache_entry.entry = p;
 			const auto& absolute_path = cache_entry.entry.path();
-			cache_entry.relative = fs::convert_to_protocol(absolute_path).generic_string();
-			cache_entry.extension = absolute_path.extension().string();
-
-			auto filename = absolute_path.filename();
-			cache_entry.name = filename.string();
+            auto filename = absolute_path.filename();
+			cache_entry.protocol_path = fs::convert_to_protocol(absolute_path).generic_string();
+            cache_entry.filename = absolute_path.filename().string();
+			cache_entry.extension = filename.extension().string();
+			cache_entry.stem = filename.string();
 
 			while(filename.has_extension())
 			{
 				filename = filename.stem();
-				cache_entry.name = filename.string();
+				cache_entry.stem = filename.string();
 			}
 		}
 
@@ -189,12 +202,14 @@ public:
 		watch();
 	}
 
-	struct entry_info
+
+	struct cache_entry
 	{
 		directory_entry entry;
-		std::string relative;
-		std::string name;
-		std::string extension;
+        std::string filename;
+        std::string stem;
+        std::string extension;
+        std::string protocol_path;
 	};
 
 private:
@@ -227,7 +242,7 @@ private:
 
 	clock_t::duration scan_frequency_ = std::chrono::milliseconds(500);
 	///
-	mutable std::vector<entry_info> entries_;
+	mutable std::vector<cache_entry> entries_;
 	///
 	mutable std::atomic_bool should_refresh_ = {true};
 	///

@@ -452,8 +452,8 @@ void project_dock::render(const ImVec2& /*area*/)
 
 		auto process_cache_entry = [&](const auto& cache_entry) {
 			const auto& absolute_path = cache_entry.entry.path();
-			const auto& name = cache_entry.name;
-			const auto& relative = cache_entry.relative;
+			const auto& name = cache_entry.stem;
+			const auto& relative = cache_entry.protocol_path;
 			const auto& file_ext = cache_entry.extension;
 
 			const auto on_rename = [&](const std::string& new_name) {
@@ -699,21 +699,18 @@ void project_dock::render(const ImVec2& /*area*/)
 				auto end = start + std::min(count - start, items_per_line);
 				for(size_t j = start; j < end; ++j)
 				{
-                    if(j < cache_.size())
-                    {
-                        const auto& cache_entry = cache_.at(j);
+					const auto& cache_entry = cache_[j];
 
-                        gui::PushID(int(j));
+					gui::PushID(int(j));
 
-                        process_cache_entry(cache_entry);
+					process_cache_entry(cache_entry);
 
-                        gui::PopID();
+					gui::PopID();
 
-                        if(j != end - 1)
-                        {
-                            ImGui::SameLine(0.0f, style.ItemSpacing.x + extra);
-                        }
-                    }
+					if(j != end - 1)
+					{
+						ImGui::SameLine(0.0f, style.ItemSpacing.x + extra);
+					}
 				}
 			}
 		}

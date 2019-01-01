@@ -66,7 +66,7 @@ struct asset_storage : public basic_storage
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	~asset_storage() = default;
+	~asset_storage() override = default;
 
 	void clear_with_condition(const predicate_t& predicate)
 	{
@@ -91,7 +91,7 @@ struct asset_storage : public basic_storage
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void clear() final
+	void clear() final
 	{
 		clear_with_condition([](const auto& it) {
 			const auto& task = it.second;
@@ -108,13 +108,13 @@ struct asset_storage : public basic_storage
 	///
 	/// </summary>
 	//-----------------------------------------------------------------------------
-	virtual void clear(const std::string& group) final
+	void clear(const std::string& group) final
 	{
 		clear_with_condition([&group](const auto& it) {
 			const auto& id = it.first;
 			const auto& task = it.second;
 
-			if(string_utils::begins_with(id, group, true))
+			if(string_utils::begins_with(id, group))
 			{
 				task.cancel();
 				return true;

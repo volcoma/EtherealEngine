@@ -4,7 +4,7 @@
 
 namespace core
 {
-using namespace std::literals;
+using namespace std::chrono_literals;
 
 simulation::simulation()
 {
@@ -99,22 +99,22 @@ void simulation::run_one_frame(bool is_active)
 	++frame_;
 }
 
-void simulation::set_min_fps(unsigned int fps)
+void simulation::set_min_fps(std::uint32_t fps)
 {
-	min_fps_ = std::max<unsigned int>(fps, 0);
+	min_fps_ = std::max<std::uint32_t>(fps, 0);
 }
 
-void simulation::set_max_fps(unsigned int fps)
+void simulation::set_max_fps(std::uint32_t fps)
 {
-	max_fps_ = std::max<unsigned int>(fps, 0);
+	max_fps_ = std::max<std::uint32_t>(fps, 0);
 }
 
-void simulation::set_max_inactive_fps(unsigned int fps)
+void simulation::set_max_inactive_fps(std::uint32_t fps)
 {
-	max_inactive_fps_ = std::max<unsigned int>(fps, 0);
+	max_inactive_fps_ = std::max<std::uint32_t>(fps, 0);
 }
 
-void simulation::set_time_smoothing_step(unsigned int step)
+void simulation::set_time_smoothing_step(std::uint32_t step)
 {
 	smoothing_step_ = step;
 }
@@ -124,10 +124,10 @@ simulation::duration_t simulation::get_time_since_launch() const
 	return clock_t::now() - launch_timepoint_;
 }
 
-unsigned simulation::get_fps() const
+std::uint32_t simulation::get_fps() const
 {
 	auto dt = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(timestep_).count();
-	return static_cast<unsigned>(dt == 0.0f ? 0 : 1000.0f / dt);
+	return static_cast<std::uint32_t>(dt == 0.0f ? 0 : 1000.0f / dt);
 }
 
 std::chrono::duration<float> simulation::get_delta_time() const

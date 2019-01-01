@@ -2,9 +2,9 @@
 #include <chrono>
 #include <thread>
 
-int string_utils::compare(const std::string& s1, const std::string& s2, bool ignoreCase)
+int string_utils::compare(const std::string& s1, const std::string& s2, bool ignore_case)
 {
-	if(!ignoreCase)
+	if(!ignore_case)
 	{
 		return s1.compare(s2);
 	}
@@ -53,33 +53,26 @@ std::string string_utils::trim(const std::string& str)
 	return s;
 }
 
-std::vector<std::string> string_utils::split(const std::string& text, char sep, bool skipEmpty)
-{
-	std::vector<std::string> tokens;
-	std::size_t start = 0, end = 0;
-	while((end = text.find(sep, start)) != std::string::npos)
-	{
-		std::string temp = text.substr(start, end - start);
-		if(!temp.empty())
-		{
-			tokens.push_back(temp);
-		}
-		start = end + 1;
-	}
-	std::string temp = text.substr(start);
-	if(skipEmpty)
-	{
-		if(!temp.empty())
-		{
-			tokens.push_back(temp);
-		}
-	}
-	else
-	{
-		tokens.push_back(temp);
-	}
 
-	return tokens;
+std::vector<std::string> tokenize(const std::string& str, const std::string& delimiters)
+{
+    std::vector<std::string> tokens;
+    // Skip delimiters at beginning.
+    auto last_pos = str.find_first_not_of(delimiters, 0);
+    // Find first "non-delimiter".
+    auto pos = str.find_first_of(delimiters, last_pos);
+
+    while (std::string::npos != pos || std::string::npos != last_pos)
+    {
+        // Found a token, add it to the vector.
+        tokens.emplace_back(str.substr(last_pos, pos - last_pos));
+        // Skip delimiters.  Note the "not_of"
+        last_pos = str.find_first_not_of(delimiters, pos);
+        // Find next "non-delimiter"
+        pos = str.find_first_of(delimiters, last_pos);
+    }
+
+    return tokens;
 }
 
 std::string string_utils::to_upper(const std::string& str)
@@ -102,7 +95,7 @@ std::string string_utils::to_lower(const std::string& str)
 	return s;
 }
 
-bool string_utils::begins_with(const std::string& str, const std::string& value, bool ignoreCase /*= false*/)
+bool string_utils::begins_with(const std::string& str, const std::string& value, bool ignore_case /*= false*/)
 {
 	// Validate requirements
 	if(str.length() < value.length())
@@ -115,10 +108,10 @@ bool string_utils::begins_with(const std::string& str, const std::string& value,
 	}
 
 	// Do the subsets match?
-	return (compare(std::string(str.substr(0, value.length())), value, ignoreCase) == 0);
+	return (compare(std::string(str.substr(0, value.length())), value, ignore_case) == 0);
 }
 
-bool string_utils::ends_with(const std::string& str, const std::string& value, bool ignoreCase /*= false*/)
+bool string_utils::ends_with(const std::string& str, const std::string& value, bool ignore_case /*= false*/)
 {
 	// Validate requirements
 	if(str.size() < value.size())
@@ -131,24 +124,24 @@ bool string_utils::ends_with(const std::string& str, const std::string& value, b
 	}
 
 	// Do the subsets match?
-	return (compare(std::string(str.substr(str.length() - value.length())), value, ignoreCase) == 0);
+	return (compare(std::string(str.substr(str.length() - value.length())), value, ignore_case) == 0);
 }
 
-std::string string_utils::replace(const std::string& str, const std::string& oldSequence,
-								  const std::string& newSequence)
+std::string string_utils::replace(const std::string& str, const std::string& old_seq,
+								  const std::string& new_seq)
 {
 	std::string s = str;
 	std::string::size_type location = 0;
-	std::string::size_type oldLength = oldSequence.length();
-	std::string::size_type newLength = newSequence.length();
+	std::string::size_type old_length = old_seq.length();
+	std::string::size_type new_length = new_seq.length();
 
 	// Search for all replace std::string occurances.
 	if(!s.empty())
 	{
-		while(std::string::npos != (location = s.find(oldSequence, location)))
+		while(std::string::npos != (location = s.find(old_seq, location)))
 		{
-			s.replace(location, oldLength, newSequence);
-			location += newLength;
+			s.replace(location, old_length, new_seq);
+			location += new_length;
 
 			// Break out if we're done
 			if(location >= s.length())
@@ -163,8 +156,8 @@ std::string string_utils::replace(const std::string& str, const std::string& old
 	return s;
 }
 
-std::string string_utils::replace(const std::string& str, std::string::value_type oldCharacter,
-								  std::string::value_type newCharacter)
+std::string string_utils::replace(const std::string& str, std::string::value_type old_char,
+								  std::string::value_type new_char)
 {
 	std::string s = str;
 	std::string::size_type location = 0;
@@ -172,9 +165,9 @@ std::string string_utils::replace(const std::string& str, std::string::value_typ
 	// Search for all replace std::string occurances.
 	if(!s.empty())
 	{
-		while(std::string::npos != (location = s.find(oldCharacter, location)))
+		while(std::string::npos != (location = s.find(old_char, location)))
 		{
-			s.replace(location, 1, 1, newCharacter);
+			s.replace(location, 1, 1, new_char);
 			location += 1;
 
 			// Break out if we're done
@@ -205,12 +198,12 @@ std::string string_utils::format(const char* format, va_list args)
 	return str;
 }
 
-std::string string_utils::word_wrap(const std::string& value, std::string::size_type maximumLength,
-									const std::string& linePadding /*= ""*/)
+std::string string_utils::word_wrap(const std::string& value, std::string::size_type max_length,
+									const std::string& line_padding /*= ""*/)
 {
-	std::string wrapString, currentLine;
-	auto lastSpace = std::string::size_type(-1);
-	auto lineLength = std::string::size_type(0);
+	std::string wrap_string, current_line;
+	auto last_space = std::string::size_type(-1);
+	auto line_length = std::string::size_type(0);
 
 	// TODO: Add support for tab character to wrapping method.
 
@@ -225,92 +218,92 @@ std::string string_utils::word_wrap(const std::string& value, std::string::size_
 
 			case ' ':
 				// A space was found, firstly does it exceed the max line length?
-				if(lineLength == maximumLength)
+				if(line_length == max_length)
 				{
 					// Simply wrap without inserting anything
-					wrapString += currentLine + "\n";
-					currentLine = std::string();
-					lineLength = 0;
-					lastSpace = std::string::size_type(-1);
+					wrap_string += current_line + "\n";
+					current_line = std::string();
+					line_length = 0;
+					last_space = std::string::size_type(-1);
 
 				} // End if will exceed line length
 				else
 				{
 					// Add padding if we haven'value2 already
-					if(!wrapString.empty() && lineLength == 0)
+					if(!wrap_string.empty() && line_length == 0)
 					{
-						currentLine = linePadding;
-						lineLength = currentLine.length();
+						current_line = line_padding;
+						line_length = current_line.length();
 
 					} // End if padding required
 
 					// Record it's position and insert the space
-					currentLine += character;
-					lastSpace = lineLength;
-					lineLength++;
+					current_line += character;
+					last_space = line_length;
+					line_length++;
 
 				} // End if no length exceed
 				break;
 
 			case '\n':
 				// When we encounter a newline, just break automatically
-				wrapString += currentLine + "\n";
-				currentLine = std::string();
-				lineLength = 0;
-				lastSpace = std::string::size_type(-1);
+				wrap_string += current_line + "\n";
+				current_line = std::string();
+				line_length = 0;
+				last_space = std::string::size_type(-1);
 				break;
 
 			default:
 				// Exceeding line length?
-				if(lineLength == maximumLength)
+				if(line_length == max_length)
 				{
 					// No space found on this line yet?
-					if(lastSpace == std::string::size_type(-1))
+					if(last_space == std::string::size_type(-1))
 					{
 						// Just break onto a new line
-						wrapString += currentLine + "\n";
-						currentLine = std::string();
-						lineLength = 0;
-						lastSpace = std::string::size_type(-1);
+						wrap_string += current_line + "\n";
+						current_line = std::string();
+						line_length = 0;
+						last_space = std::string::size_type(-1);
 
 					} // End if no space found
 					else
 					{
 						// Break onto a new-line where the space was found
-						if(lastSpace > 0)
+						if(last_space > 0)
 						{
-							wrapString += currentLine.substr(0, lastSpace) + "\n";
+							wrap_string += current_line.substr(0, last_space) + "\n";
 						}
-						currentLine = linePadding;
-						currentLine.append(currentLine.substr(lastSpace + 1));
-						lineLength = currentLine.length();
-						lastSpace = std::string::size_type(-1);
+						current_line = line_padding;
+						current_line.append(current_line.substr(last_space + 1));
+						line_length = current_line.length();
+						last_space = std::string::size_type(-1);
 
 					} // End if space found on line
 
 				} // End if exceeding line length
 
 				// Add padding if we haven'value2 already
-				if(!wrapString.empty() && lineLength == 0)
+				if(!wrap_string.empty() && line_length == 0)
 				{
-					currentLine = linePadding;
-					lineLength = currentLine.length();
+					current_line = line_padding;
+					line_length = current_line.length();
 
 				} // End if padding required
 
 				// Add character
-				currentLine += character;
-				lineLength++;
+				current_line += character;
+				line_length++;
 
 		} // End character switch
 
 	} // Next character
 
 	// Add anything that's left to the wrap std::string
-	wrapString += currentLine;
+	wrap_string += current_line;
 
 	// Return it
-	return wrapString;
+	return wrap_string;
 }
 
 std::string string_utils::random_string(std::string::size_type length)
@@ -348,38 +341,38 @@ std::string string_utils::random_string(std::string::size_type length)
 
 std::string string_utils::command_line_args(int _argc, char* _argv[])
 {
-	std::string cmdLine;
+	std::string cmd_line;
 	for(int i = 1; i < _argc - 1; ++i)
 	{
-		cmdLine.append(_argv[i]).append(" ");
+		cmd_line.append(_argv[i]).append(" ");
 	}
-	cmdLine.append(_argv[_argc - 1]);
-	return cmdLine;
+	cmd_line.append(_argv[_argc - 1]);
+	return cmd_line;
 }
 
-bool string_utils::parse_command_line(const std::string& strCommandLine,
-									  std::vector<std::string>& ArgumentsOut)
+bool string_utils::parse_command_line(const std::string& cmd_line,
+									  std::vector<std::string>& args)
 {
 	// Be polite and clear output array
-	ArgumentsOut.clear();
+	args.clear();
 
 	// Parse one character at a time
-	bool bInQuotes = false;
-	bool bConstructingArgument = false;
-	for(auto c : strCommandLine)
+	bool in_quotes = false;
+	bool construct_argument = false;
+	for(auto c : cmd_line)
 	{
-		if(bInQuotes)
+		if(in_quotes)
 		{
 			if(c == '\"')
 			{
 				// Quotes are now closed
-				bInQuotes = false;
+				in_quotes = false;
 
 			} // End if quote
 			else
 			{
 				// Append to current argument.
-				ArgumentsOut.back() += c;
+				args.back() += c;
 
 			} // End if !quote
 
@@ -390,15 +383,15 @@ bool string_utils::parse_command_line(const std::string& strCommandLine,
 			{
 				case '\"':
 					// Opened quotes
-					bInQuotes = true;
+					in_quotes = true;
 
 					// If we haven't started constructing an argument yet
 					// create space for one.
-					if(!bConstructingArgument)
+					if(!construct_argument)
 					{
-						ArgumentsOut.resize(ArgumentsOut.size() + 1);
+						args.resize(args.size() + 1);
 					}
-					bConstructingArgument = true;
+					construct_argument = true;
 					break;
 
 				case ' ':
@@ -406,20 +399,20 @@ bool string_utils::parse_command_line(const std::string& strCommandLine,
 				case '\r':
 				case '\n':
 					// White space. Finish constructing current argument.
-					bConstructingArgument = false;
+					construct_argument = false;
 					break;
 
 				default:
 					// If we haven't started constructing an argument yet
 					// create space for one.
-					if(!bConstructingArgument)
+					if(!construct_argument)
 					{
-						ArgumentsOut.resize(ArgumentsOut.size() + 1);
+						args.resize(args.size() + 1);
 					}
-					bConstructingArgument = true;
+					construct_argument = true;
 
 					// Append character to current argument.
-					ArgumentsOut.back() += c;
+					args.back() += c;
 					break;
 
 			} // End switch c

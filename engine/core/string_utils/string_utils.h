@@ -1,14 +1,11 @@
 #pragma once
 
-//-----------------------------------------------------------------------------
-// std::string Header Includes
-//-----------------------------------------------------------------------------
 #include <algorithm>
 #include <cctype> // toupper / tolower
 #include <locale>
 #include <random>
-#include <stdarg.h>
-#include <stdio.h>
+#include <cstdarg>
+#include <cstdio>
 #include <string> // std::string / std::wstd::string
 #include <vector>
 namespace string_utils
@@ -89,7 +86,7 @@ private:
 /// Compare the two std::strings with optional case ignore.
 /// </summary>
 //-------------------------------------------------------------------------
-int compare(const std::string& s1, const std::string& s2, bool ignoreCase);
+int compare(const std::string& s1, const std::string& s2, bool ignore_case);
 //-------------------------------------------------------------------------
 //  Name : trim()
 /// <summary>
@@ -100,13 +97,12 @@ int compare(const std::string& s1, const std::string& s2, bool ignoreCase);
 std::string trim(const std::string& str);
 
 //-------------------------------------------------------------------------
-//  Name : split()
+//  Name : tokenize()
 /// <summary>
-/// Splits the string into multiple substrings.
+/// Tokenize the string by the delimiters
 /// </summary>
 //-------------------------------------------------------------------------
-std::vector<std::string> split(const std::string& text, char sep, bool skipEmpty = true);
-
+std::vector<std::string> tokenize(const std::string& str, const std::string& delimiters);
 //-------------------------------------------------------------------------
 //  Name : to_upper()
 /// <summary>
@@ -131,7 +127,7 @@ std::string to_lower(const std::string& str);
 /// Determine if this std::string begins with the std::string provided.
 /// </summary>
 //-------------------------------------------------------------------------
-bool begins_with(const std::string& str, const std::string& value, bool ignoreCase = false);
+bool begins_with(const std::string& str, const std::string& value, bool ignore_case = false);
 
 //-------------------------------------------------------------------------
 //  Name : ends_with ()
@@ -139,7 +135,7 @@ bool begins_with(const std::string& str, const std::string& value, bool ignoreCa
 /// Determine if this std::string ends with the std::string provided.
 /// </summary>
 //-------------------------------------------------------------------------
-bool ends_with(const std::string& str, const std::string& value, bool ignoreCase = false);
+bool ends_with(const std::string& str, const std::string& value, bool ignore_case = false);
 
 //-------------------------------------------------------------------------
 //  Name : replace ()
@@ -148,7 +144,7 @@ bool ends_with(const std::string& str, const std::string& value, bool ignoreCase
 /// another.
 /// </summary>
 //-------------------------------------------------------------------------
-std::string replace(const std::string& str, const std::string& oldSequence, const std::string& newSequence);
+std::string replace(const std::string& str, const std::string& old_seq, const std::string& new_seq);
 
 //-------------------------------------------------------------------------
 //  Name : replace ()
@@ -156,8 +152,8 @@ std::string replace(const std::string& str, const std::string& oldSequence, cons
 /// Replacing any occurances of the specified character with another.
 /// </summary>
 //-------------------------------------------------------------------------
-std::string replace(const std::string& str, std::string::value_type oldCharacter,
-					std::string::value_type newCharacter);
+std::string replace(const std::string& str, std::string::value_type old_char,
+					std::string::value_type new_char);
 
 //-------------------------------------------------------------------------
 //  Name : format ()
@@ -172,14 +168,13 @@ std::string format(const char* format, Args&&... args)
 	auto length = std::snprintf(nullptr, 0, format, std::forward<Args>(args)...);
 	if(length == 0)
 	{
-		return std::string();
+		return {};
 	}
 
-	char* buf = new char[length + 1];
-	length = std::snprintf(buf, length + 1, format, std::forward<Args>(args)...);
+	std::vector<char> buf(length + 1);
+	length = std::snprintf(buf.data(), buf.size(), format, std::forward<Args>(args)...);
+	std::string str(buf.data());
 
-	std::string str(buf);
-	delete[] buf;
 	return str;
 }
 
@@ -199,8 +194,8 @@ std::string format(const char* format, va_list args);
 /// aribitrary padding std::string at the beginning of each new line
 /// </summary>
 //-------------------------------------------------------------------------
-std::string word_wrap(const std::string& value, std::string::size_type maximumLength,
-					  const std::string& linePadding = "");
+std::string word_wrap(const std::string& value, std::string::size_type max_length,
+					  const std::string& line_padding = "");
 
 //-------------------------------------------------------------------------
 //  Name : random_string ()
@@ -225,5 +220,5 @@ std::string command_line_args(int _argc, char* _argv[]);
 /// Split single string command line into its component parts.
 /// </summary>
 //-----------------------------------------------------------------------------
-bool parse_command_line(const std::string& strCommandLine, std::vector<std::string>& ArgumentsOut);
+bool parse_command_line(const std::string& cmd_line, std::vector<std::string>& args);
 }

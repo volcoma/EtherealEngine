@@ -31,18 +31,6 @@ public:
 		return slots_.emplace(object_ptr, method_ptr);
 	}
 
-	template <class C>
-	slot_key connect(C& object, void (C::*const method_ptr)(Args...))
-	{
-		return slots_.emplace(object, method_ptr);
-	}
-
-	template <class C>
-	slot_key connect(C const& object, void (C::*const method_ptr)(Args...) const)
-	{
-		return slots_.emplace(object, method_ptr);
-	}
-
 	template <typename T, typename = typename std::enable_if<
 							  !std::is_same<event, typename std::decay<T>::type>::value>::type>
 	slot_key connect(T&& f)
@@ -61,20 +49,6 @@ public:
 	void disconnect(C* const object_ptr, void (C::*const method_ptr)(Args...) const)
 	{
 		slot_type slot(object_ptr, method_ptr);
-		disconnect_by_value(slot);
-	}
-
-	template <class C>
-	void disconnect(C& object, void (C::*const method_ptr)(Args...))
-	{
-		slot_type slot(object, method_ptr);
-		disconnect_by_value(slot);
-	}
-
-	template <class C>
-	void disconnect(C const& object, void (C::*const method_ptr)(Args...) const)
-	{
-		slot_type slot(object, method_ptr);
 		disconnect_by_value(slot);
 	}
 
