@@ -272,7 +272,7 @@ namespace
         if (!ewmhSupported())
             return false;
 
-        Atom frameExtents = sf::priv::get_atom("_NET_FRAME_EXTENTS", true);
+        Atom frameExtents = get_atom("_NET_FRAME_EXTENTS", true);
 
         if (frameExtents == None)
             return false;
@@ -530,14 +530,14 @@ _last_input_time  (0)
 
 	// Compute position and size
 	std::array<std::int32_t, 2> windowPosition{{0, 0}};
-	if(m_fullscreen)
+	if(_fullscreen)
 	{
         windowPosition = getPrimaryMonitorPosition();
 	}
 	else
 	{
-        windowPosition[0] = (DisplayWidth(m_display, m_screen)  - mode.width) / 2;
-        windowPosition[1] = (DisplayWidth(m_display, m_screen)  - mode.height) / 2;
+        windowPosition[0] = (DisplayWidth(_display, m_screen)  - mode.width) / 2;
+        windowPosition[1] = (DisplayWidth(_display, m_screen)  - mode.height) / 2;
 	}
 
 	int width  = mode.width;
@@ -2190,14 +2190,14 @@ bool window_impl_x11::checkXRandR(int& xRandRMajor, int& xRandRMinor)
 {
     // Check if the XRandR extension is present
     int version;
-    if (!XQueryExtension(m_display, "RANDR", &version, &version, &version))
+    if (!XQueryExtension(_display, "RANDR", &version, &version, &version))
     {
         err() << "XRandR extension is not supported" << std::endl;
         return false;
     }
 
     // Check XRandR version, 1.2 required
-    if (!XRRQueryVersion(m_display, &xRandRMajor, &xRandRMinor) || xRandRMajor < 1 || (xRandRMajor == 1 && xRandRMinor < 2 ))
+    if (!XRRQueryVersion(_display, &xRandRMajor, &xRandRMinor) || xRandRMajor < 1 || (xRandRMajor == 1 && xRandRMinor < 2 ))
     {
         err() << "XRandR is too old" << std::endl;
         return false;
@@ -2213,7 +2213,7 @@ RROutput window_impl_x11::getOutputPrimary(::Window& rootWindow, XRRScreenResour
     // if xRandR version >= 1.3 get the primary screen else take the first screen
     if ((xRandRMajor == 1 && xRandRMinor >= 3) || xRandRMajor > 1)
     {
-        RROutput output = XRRGetOutputPrimary(m_display, rootWindow);
+        RROutput output = XRRGetOutputPrimary(_display, rootWindow);
 
         // Check if returned output is valid, otherwise use the first screen
         if (output == None)
