@@ -312,7 +312,7 @@ public:
 	//-----------------------------------------------------------------------------
 	bool is_touched() const
 	{
-		return last_touched_ >= static_cast<std::uint32_t>(ecs::get_frame());
+		return last_touched_ == static_cast<std::uint32_t>(ecs::get_frame()) - 1;
 	}
 
 	//-----------------------------------------------------------------------------

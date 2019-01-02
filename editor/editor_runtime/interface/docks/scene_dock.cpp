@@ -163,7 +163,7 @@ void scene_dock::show_statistics(const ImVec2& area, unsigned int fps, bool& sho
 
 		if(gui::CollapsingHeader(ICON_FA_CLOCK_O "\tProfiler"))
 		{
-			gfx::set_debug(BGFX_DEBUG_PROFILER);
+			//gfx::set_debug(BGFX_DEBUG_PROFILER);
 
 			gui::PushFont("default");
 
@@ -254,7 +254,7 @@ void scene_dock::show_statistics(const ImVec2& area, unsigned int fps, bool& sho
 		}
 		else
 		{
-			gfx::set_debug(BGFX_DEBUG_NONE);
+			//gfx::set_debug(BGFX_DEBUG_NONE);
 		}
 
 		gui::Separator();
