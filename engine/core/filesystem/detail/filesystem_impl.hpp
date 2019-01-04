@@ -65,8 +65,8 @@
 #ifdef GHC_OS_WINDOWS
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <cwchar>
-#include <Windows.h>
+#include <wchar.h>
+#include <windows.h>
 #include <winioctl.h>
 #include <shellapi.h>
 #else
@@ -104,7 +104,7 @@
 #define LWG_2937_BEHAVIOUR
 
 // ghc::filesystem version in decimal (major * 10000 + minor * 100 + patch)
-#define GHC_FILESYSTEM_VERSION 10004L
+#define GHC_FILESYSTEM_VERSION 10005L
 
 namespace ghc {
 namespace filesystem {
@@ -628,7 +628,7 @@ class recursive_directory_iterator
 public:
     using iterator_category = std::input_iterator_tag;
     using value_type = directory_entry;
-    using difference_type = std::ptrdiff_t;
+    using difference_type = ptrdiff_t;
     using pointer = const directory_entry*;
     using reference = const directory_entry&;
 
@@ -2812,8 +2812,13 @@ inline void copy(const path& from, const path& to, copy_options options, std::er
                 return;
             }
         }
-        for (const directory_entry& x : directory_iterator(from, ec)) {
-            copy(x.path(), to / x.path().filename(), options | static_cast<copy_options>(0x8000));
+        for (auto iter = directory_iterator(from, ec); iter != directory_iterator(); iter.increment(ec)) {
+            if(!ec) {
+                copy(iter->path(), to / iter->path().filename(), options | static_cast<copy_options>(0x8000), ec);
+            }
+            if(ec) {
+                return;
+            }
         }
     }
     return;
@@ -3685,22 +3690,27 @@ inline uintmax_t remove_all(const path& p, std::error_code& ec) noexcept
         ec = detail::make_error_code(detail::portable_error::not_supported);
         return static_cast<uintmax_t>(-1);
     }
-    for (const directory_entry& de : directory_iterator(p, ec)) {
-        if (!de.is_symlink() && de.is_directory()) {
-            count += remove_all(de.path(), ec);
+    for (auto iter = directory_iterator(p, ec); iter != directory_iterator(); iter.increment(ec)) {
+        if(ec) {
+            break;
+        }
+        if (!iter->is_symlink() && iter->is_directory()) {
+            count += remove_all(iter->path(), ec);
             if (ec) {
                 return static_cast<uintmax_t>(-1);
             }
         }
         else {
-            remove(de.path(), ec);
+            remove(iter->path(), ec);
             if (ec) {
                 return static_cast<uintmax_t>(-1);
             }
             ++count;
         }
     }
-    remove(p, ec);
+    if(!ec) {
+        remove(p, ec);
+    }
     if (ec) {
         return static_cast<uintmax_t>(-1);
     }

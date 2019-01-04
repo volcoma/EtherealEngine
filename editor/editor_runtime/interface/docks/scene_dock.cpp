@@ -163,7 +163,17 @@ void scene_dock::show_statistics(const ImVec2& area, unsigned int fps, bool& sho
 
 		if(gui::CollapsingHeader(ICON_FA_CLOCK_O "\tProfiler"))
 		{
-			//gfx::set_debug(BGFX_DEBUG_PROFILER);
+            if(gui::Checkbox("Enable profiler", &enable_profiler))
+            {
+                if(enable_profiler)
+                {
+                    gfx::set_debug(BGFX_DEBUG_PROFILER);
+                }
+                else
+                {
+                    gfx::set_debug(BGFX_DEBUG_NONE);
+                }
+            }
 
 			gui::PushFont("default");
 
@@ -251,10 +261,6 @@ void scene_dock::show_statistics(const ImVec2& area, unsigned int fps, bool& sho
 				}
 			}
 			gui::PopFont();
-		}
-		else
-		{
-			//gfx::set_debug(BGFX_DEBUG_NONE);
 		}
 
 		gui::Separator();

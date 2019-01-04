@@ -23,7 +23,6 @@ if(BX_AMALGAMATED)
 		set_source_files_properties( ${BX_SRC} PROPERTIES HEADER_FILE_ONLY ON )
 	endforeach()
 else()
-	list(REMOVE_ITEM BX_SOURCES ${BX_DIR}/src/amalgamated.cpp)
 	set_source_files_properties( ${BX_DIR}/src/amalgamated.cpp PROPERTIES HEADER_FILE_ONLY ON )
 endif()
 
@@ -61,6 +60,10 @@ if( UNIX AND NOT APPLE )
 
 	# Real time (for clock_gettime)
 	target_link_libraries( bx rt )
+elseif(APPLE)
+	find_library( FOUNDATION_LIBRARY Foundation)
+	mark_as_advanced( FOUNDATION_LIBRARY )
+	target_link_libraries( bx PUBLIC ${FOUNDATION_LIBRARY} )
 endif()
 
 # Put in a "bgfx" folder in Visual Studio
