@@ -416,6 +416,56 @@ void handle_camera_movement()
 	auto& es = core::get_subsystem<editor::editing_system>();
 	auto& input = core::get_subsystem<runtime::input>();
 	auto& sim = core::get_subsystem<core::simulation>();
+    auto& rend = core::get_subsystem<runtime::renderer>();
+
+
+    if(input.is_mouse_button_down(mml::mouse::right))
+	{
+        auto wnd = rend.get_focused_window();
+        if(wnd)
+        {
+            auto pos = mml::mouse::get_position(*wnd);
+            auto result = pos;
+            auto win_pos = gui::GetWindowPos();
+            auto win_size = gui::GetWindowSize();
+            auto max_x = int32_t(win_pos.x + win_size.x);
+            auto max_y = int32_t(win_pos.y + win_size.y);
+            auto min_x = int32_t(win_pos.x);
+            auto min_y = int32_t(win_pos.y);
+            auto& x = result[0];
+            auto& y = result[1];
+
+            if(x > max_x)
+            {
+                x = min_x;
+            }
+            if(x < min_x)
+            {
+                x = max_x;
+            }
+
+            if(y > max_y)
+            {
+                y = min_y;
+            }
+            if(y < min_y)
+            {
+                y = max_y;
+            }
+
+            if(result != pos)
+            {
+                mml::mouse::set_position(result, *wnd);
+                mml::platform_event ev;
+                ev.type = mml::platform_event::event_type::mouse_moved;
+
+                ev.mouse_move.x = result[0];
+                ev.mouse_move.y = result[1];
+                input.mouse_event(ev);
+                input.mouse_event(ev);
+            }
+        }
+    }
 
 	auto& editor_camera = es.camera;
 	auto dt = sim.get_delta_time().count();
@@ -443,6 +493,8 @@ void handle_camera_movement()
 		}
 
 	}
+
+
 
 	if(input.is_mouse_button_down(mml::mouse::right))
 	{
@@ -500,8 +552,8 @@ void handle_camera_movement()
 			transform->move_local({0.0f, -movement_speed * dt, 0.0f});
 		}
 
-		float x = static_cast<float>(delta_move.x);
-		float y = static_cast<float>(delta_move.y);
+		auto x = static_cast<float>(delta_move.x);
+		auto y = static_cast<float>(delta_move.y);
 
 		// if(x != 0.0f|| y != 0.0f)
 		{
@@ -518,7 +570,7 @@ void handle_camera_movement()
 	}
 }
 
-static void process_drag_drop_target(std::shared_ptr<camera_component> camera_comp)
+static void process_drag_drop_target(const std::shared_ptr<camera_component>& camera_comp)
 {
 	auto& ecs = core::get_subsystem<runtime::entity_component_system>();
 	auto& am = core::get_subsystem<runtime::asset_manager>();
