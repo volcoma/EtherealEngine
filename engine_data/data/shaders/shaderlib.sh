@@ -381,9 +381,9 @@ vec3 getTangentSpaceNormal( sampler2D bumpTexture, vec2 texCoords, float bumpine
 #ifdef NORMAL_MAP_2CHANNEL
   	normal.z  = sqrt(1.0 - dot(normal.xy, normal.xy) );
 #elif NORMAL_MAP_Y_UP
-	normal.y = -normal.y;
+  	normal.y = -normal.y;
 #endif
-	normal.xy *= bumpiness;
+	  normal.xy *= bumpiness;
     return normalize(normal);
 }
 
@@ -429,7 +429,7 @@ int[](
 );
 #endif
 
-float limit = (bayer_matrix[x * 16 + y])/256.0f;
+float limit = (bayer_matrix[x + y * 16])/256.0f;
 return limit;
 }
 
@@ -464,7 +464,7 @@ int[](
 );
 #endif
 
-float limit = (bayer_matrix8x8[x * 8 + y])/64.0f;
+float limit = (bayer_matrix8x8[x + y * 8])/64.0f;
 return limit;
 }
 
