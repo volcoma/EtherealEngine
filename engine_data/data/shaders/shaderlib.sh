@@ -398,58 +398,74 @@ return Dither;
 
 float dither16x16(vec2 fragCoord)
 {
-#if BGFX_SHADER_LANGUAGE_GLSL >= 130 || BGFX_SHADER_LANGUAGE_HLSL
+  int x = int(mod(fragCoord.x, 16));
+  int y = int(mod(fragCoord.y, 16));
 
-
-int x = int(mod(fragCoord.x, 16));
-int y = int(mod(fragCoord.y, 16));
-CONST(int) bayer_matrix[16][16] = {
-  {   0,192, 48,240, 12,204, 60,252,  3,195, 51,243, 15,207, 63,255 },
-  { 128, 64,176,112,140, 76,188,124,131, 67,179,115,143, 79,191,127 },
-  {  32,224, 16,208, 44,236, 28,220, 35,227, 19,211, 47,239, 31,223 },
-  { 160, 96,144, 80,172,108,156, 92,163, 99,147, 83,175,111,159, 95 },
-  {   8,200, 56,248,  4,196, 52,244, 11,203, 59,251,  7,199, 55,247 },
-  { 136, 72,184,120,132, 68,180,116,139, 75,187,123,135, 71,183,119 },
-  {  40,232, 24,216, 36,228, 20,212, 43,235, 27,219, 39,231, 23,215 },
-  { 168,104,152, 88,164,100,148, 84,171,107,155, 91,167,103,151, 87 },
-  {   2,194, 50,242, 14,206, 62,254,  1,193, 49,241, 13,205, 61,253 },
-  { 130, 66,178,114,142, 78,190,126,129, 65,177,113,141, 77,189,125 },
-  {  34,226, 18,210, 46,238, 30,222, 33,225, 17,209, 45,237, 29,221 },
-  { 162, 98,146, 82,174,110,158, 94,161, 97,145, 81,173,109,157, 93 },
-  {  10,202, 58,250,  6,198, 54,246,  9,201, 57,249,  5,197, 53,245 },
-  { 138, 74,186,122,134, 70,182,118,137, 73,185,121,133, 69,181,117 },
-  {  42,234, 26,218, 38,230, 22,214, 41,233, 25,217, 37,229, 21,213 },
-  { 170,106,154, 90,166,102,150, 86,169,105,153, 89,165,101,149, 85 }
-};
-float limit = (bayer_matrix[x][y] + 1)/256.0f;
-return limit;
+CONST(int) bayer_matrix[16*16] =
+#if BGFX_SHADER_LANGUAGE_HLSL
+{
 #else
-return dither5x5(fragCoord);
+int[](
 #endif
+     0,192, 48,240, 12,204, 60,252,  3,195, 51,243, 15,207, 63,255,
+   128, 64,176,112,140, 76,188,124,131, 67,179,115,143, 79,191,127,
+    32,224, 16,208, 44,236, 28,220, 35,227, 19,211, 47,239, 31,223,
+   160, 96,144, 80,172,108,156, 92,163, 99,147, 83,175,111,159, 95,
+     8,200, 56,248,  4,196, 52,244, 11,203, 59,251,  7,199, 55,247,
+   136, 72,184,120,132, 68,180,116,139, 75,187,123,135, 71,183,119,
+    40,232, 24,216, 36,228, 20,212, 43,235, 27,219, 39,231, 23,215,
+   168,104,152, 88,164,100,148, 84,171,107,155, 91,167,103,151, 87,
+     2,194, 50,242, 14,206, 62,254,  1,193, 49,241, 13,205, 61,253,
+   130, 66,178,114,142, 78,190,126,129, 65,177,113,141, 77,189,125,
+    34,226, 18,210, 46,238, 30,222, 33,225, 17,209, 45,237, 29,221,
+   162, 98,146, 82,174,110,158, 94,161, 97,145, 81,173,109,157, 93,
+    10,202, 58,250,  6,198, 54,246,  9,201, 57,249,  5,197, 53,245,
+   138, 74,186,122,134, 70,182,118,137, 73,185,121,133, 69,181,117,
+    42,234, 26,218, 38,230, 22,214, 41,233, 25,217, 37,229, 21,213,
+   170,106,154, 90,166,102,150, 86,169,105,153, 89,165,101,149, 85
+#if BGFX_SHADER_LANGUAGE_HLSL
+};
+#else
+);
+#endif
+
+float limit = (bayer_matrix[x * 16 + y])/256.0f;
+return limit;
 }
 
 float dither8x8(vec2 fragCoord)
 {
-#if BGFX_SHADER_LANGUAGE_GLSL >= 130 || BGFX_SHADER_LANGUAGE_HLSL
 
 int x = int(mod(fragCoord.x, 8));
 int y = int(mod(fragCoord.y, 8));
 
-
-CONST(int) bayer_matrix[8][8] = {
-{ 0, 32, 8, 40, 2, 34, 10, 42}, /* 8x8 Bayer ordered dithering */
-{48, 16, 56, 24, 50, 18, 58, 26}, /* pattern. Each input pixel */
-{12, 44, 4, 36, 14, 46, 6, 38}, /* is scaled to the 0..63 range */
-{60, 28, 52, 20, 62, 30, 54, 22}, /* before looking in this table */
-{ 3, 35, 11, 43, 1, 33, 9, 41}, /* to determine the action. */
-{51, 19, 59, 27, 49, 17, 57, 25},
-{15, 47, 7, 39, 13, 45, 5, 37},
-{63, 31, 55, 23, 61, 29, 53, 21} };
-float limit = (bayer_matrix[x][y] + 1)/64.0f;
-return limit;
+/* 8x8 Bayer ordered dithering */
+/* pattern. Each input pixel */
+/* is scaled to the 0..63 range */
+/* before looking in this table */
+/* to determine the action. */
+const int bayer_matrix8x8[8*8] =
+#if BGFX_SHADER_LANGUAGE_HLSL
+{
 #else
-return dither5x5(fragCoord);
+int[](
 #endif
+     0, 32, 8,  40, 2,  34, 10, 42,
+    48, 16, 56, 24, 50, 18, 58, 26,
+    12, 44, 4,  36, 14, 46, 6,  38,
+    60, 28, 52, 20, 62, 30, 54, 22,
+     3, 35, 11, 43, 1,  33, 9,  41,
+    51, 19, 59, 27, 49, 17, 57, 25,
+    15, 47, 7,  39, 13, 45, 5,  37,
+    63, 31, 55, 23, 61, 29, 53, 21
+#if BGFX_SHADER_LANGUAGE_HLSL
+};
+#else
+);
+#endif
+
+float limit = (bayer_matrix8x8[x * 8 + y])/64.0f;
+return limit;
 }
 
 
@@ -476,14 +492,14 @@ vec3 clipToWorld(mat4 _invViewProj, vec3 _clipPos)
 	return wpos.xyz / wpos.w;
 }
 
-mat3 invert_3x3( mat3 M ) 
+mat3 invert_3x3( mat3 M )
 {
 	float det = dot( cross(M[0], M[1]), M[2] );
 	mat3 T = transpose(M);
 	return mat3( cross(T[1], T[2]), cross(T[2], T[0]), cross(T[0], T[1]) ) / det;
 }
 
-mat3 invert_3x3( mat4 M4 ) 
+mat3 invert_3x3( mat4 M4 )
 {
 #if BGFX_SHADER_LANGUAGE_HLSL
 	mat3 M = (mat3)M4;
@@ -525,7 +541,7 @@ mat3 computeTangentToWorldSpaceMatrix( vec3 N, vec3 p, vec2 uv )
 	vec3 dp1perp = cross( N, dp1 );
 	vec3 T = dp2perp * duv1.x + dp1perp * duv2.x;
 	vec3 B = dp2perp * duv1.y + dp1perp * duv2.y;
-    
+
 	/* construct a scale-invariant frame */
 	float invmax = inversesqrt( max( dot(T,T), dot(B,B) ) );
 	mat3 TBN =  mat3( T * invmax, B * invmax, N );
@@ -544,7 +560,7 @@ vec3 evalSh(vec3 _dir)
 #	define k03 1.0925484306 // sqrt(15/PI)/2
 #	define k04 0.3153915652 // sqrt( 5/PI)/4
 #	define k05 0.5462742153 // sqrt(15/PI)/4
-	
+
 	vec3 shEnv[9];
 	shEnv[0] = vec3( 0.967757057878229854,  0.976516067990363390,  0.891218272348969998); /* Band 0 */
 	shEnv[1] = vec3(-0.384163503608655643, -0.423492289131209787, -0.425532726148547868); /* Band 1 */
@@ -558,7 +574,7 @@ vec3 evalSh(vec3 _dir)
 
 	vec3 nn = _dir.zxy;
 
-	
+
 	float sh[9];
 	sh[0] =  k01;
 	sh[1] = -k02*nn.y;
