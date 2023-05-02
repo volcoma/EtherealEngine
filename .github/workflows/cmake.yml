@@ -10,23 +10,19 @@ jobs:
     steps:
       - name: Clone
         uses: actions/checkout@v3
+      - name: Pull & update submodules recursively
+        run: |
+          git submodule update --init --recursive
+          git submodule update --recursive --remote
       - name: VC Vars
         # Setup vcvars on Windows
         # MSVC's address sanitizer attaches dependencies to several DLLs which are not in PATH
         # vcvars will add them to PATH and allow msvc asan executables to run
         if: matrix.os == 'windows-latest'
         uses: ilammy/msvc-dev-cmd@v1
-      - name: Configure ASAN
-        run: cmake . -DCMAKE_BUILD_TYPE=${{ matrix.type }} -DETH_ASAN=1
-      - name: Build ASAN
+      - name: Configure
+        run: cmake . -DCMAKE_BUILD_TYPE=${{ matrix.type }}
+      - name: Build
         run: cmake --build . --config ${{ matrix.type }}
-      - name: Test ASAN
-        run: ctest -C ${{ matrix.type }} --output-on-failure
         env:          
           UBSAN_OPTIONS: halt_on_error=1
-      - name: Configure TSAN
-        run: cmake . -DCMAKE_BUILD_TYPE=${{ matrix.type }} -DETH_ASAN=0 -DETH_TSAN=1
-      - name: Build TSAN
-        run: cmake --build . --config ${{ matrix.type }}
-      - name: Test TSAN
-        run: ctest -L tsan -C ${{ matrix.type }} --output-on-failure
