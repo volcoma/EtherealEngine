@@ -29,6 +29,7 @@ void Tooltip(const std::string& tooltip)
 }
 property_layout::property_layout(const rttr::property& prop, bool columns /*= true*/)
 {
+    columns_ = columns;
 	std::string pretty_name = prop.get_name().to_string();
 	auto meta_pretty_name = prop.get_metadata("pretty_name");
 	if(meta_pretty_name)
@@ -36,74 +37,77 @@ property_layout::property_layout(const rttr::property& prop, bool columns /*= tr
 		pretty_name = meta_pretty_name.get_value<std::string>();
 	}
 
-	if(columns)
-	{
-		if(gui::GetColumnsCount() > 1)
-		{
-			gui::EndColumns();
-		}
-		gui::BeginColumns("properties", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
-	}
+    name_ = pretty_name;
 
-	gui::AlignTextToFramePadding();
-	gui::TextUnformatted(pretty_name.c_str());
-
-	Tooltip(prop);
-
-	gui::NextColumn();
-
-	gui::PushID(pretty_name.c_str());
-	gui::PushItemWidth(gui::GetContentRegionAvailWidth());
+    push_layout();
 }
 
 property_layout::property_layout(const std::string& name, bool columns /*= true*/)
 {
-	if(columns)
-	{
-		if(gui::GetColumnsCount() > 1)
-		{
-			gui::EndColumns();
-		}
-		gui::BeginColumns("properties", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
-	}
+    columns_ = columns;
 
-	gui::AlignTextToFramePadding();
-	gui::TextUnformatted(name.c_str());
-
-	gui::NextColumn();
-
-	gui::PushID(name.c_str());
-	gui::PushItemWidth(gui::GetContentRegionAvailWidth());
+    push_layout();
 }
 
 property_layout::property_layout(const std::string& name, const std::string& tooltip, bool columns /*= true*/)
 {
-	if(columns)
-	{
-		if(gui::GetColumnsCount() > 1)
-		{
-			gui::EndColumns();
-		}
-		gui::BeginColumns("properties", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
-	}
+    columns_ = columns;
+    name_ = name;
 
-	gui::AlignTextToFramePadding();
-	gui::TextUnformatted(name.c_str());
-
-	Tooltip(tooltip);
-
-	gui::NextColumn();
-
-	gui::PushID(name.c_str());
-	gui::PushItemWidth(gui::GetContentRegionAvailWidth());
+    push_layout();
 }
 
 property_layout::~property_layout()
 {
-	gui::PopItemWidth();
-	gui::PopID();
-	if(gui::GetColumnsCount() > 1)
+    pop_layout();
+}
+
+void property_layout::push_layout()
+{
+    if(columns_)
 	{
-		gui::EndColumns();
+//        if(gui::TableGetColumnCount() > 1)
+//		{
+//            gui::PopID();
+//            gui::PopItemWidth();
+//			gui::EndTable();
+//		}
+		gui::BeginTable(("properties##" + name_).c_str(), 2);
+        gui::TableNextRow();
+        gui::TableNextColumn();
 	}
+
+	gui::AlignTextToFramePadding();
+	gui::TextUnformatted(name_.c_str());
+
+    if(columns_)
+    {
+        gui::TableNextColumn();
+    }
+
+    gui::PushID(name_.c_str());
+	gui::PushItemWidth(gui::GetContentRegionAvail().x);
+}
+
+void property_layout::pop_layout()
+{
+    gui::PopID();
+	gui::PopItemWidth();
+    if(columns_)
+    {
+        if(gui::TableGetColumnCount() > 1)
+        {
+            gui::EndTable();
+        }
+    }
+}
+
+void inspector::before_inspect(const rttr::property& prop)
+{
+    layout_ = std::make_unique<property_layout>(prop);
+}
+
+void inspector::after_inspect(const rttr::property& prop)
+{
+    layout_.reset();
 }

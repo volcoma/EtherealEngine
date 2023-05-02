@@ -484,7 +484,7 @@ void hierarchy_dock::draw_entity(runtime::entity entity)
 					name.size() < input_buff.size() ? name.size() : input_buff.size());
 
 		gui::SetCursorScreenPos(pos);
-		gui::PushItemWidth(gui::GetContentRegionAvailWidth());
+		gui::PushItemWidth(gui::GetContentRegionAvail().x);
 
 		gui::PushID(static_cast<int>(entity.id().index()));
 		gui::PushID(static_cast<int>(entity.id().version()));
@@ -497,7 +497,7 @@ void hierarchy_dock::draw_entity(runtime::entity entity)
 
 		gui::PopItemWidth();
 
-		if(!gui::IsItemActive() && (gui::IsMouseClicked(0) || gui::IsMouseDragging()))
+		if(!gui::IsItemActive() && (gui::IsMouseClicked(0) || gui::IsMouseDragging(0)))
 		{
 			edit_label_ = false;
 		}

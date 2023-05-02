@@ -5,7 +5,7 @@
 namespace gfx
 {
 
-using vertex_layout = bgfx::VertexDecl;
+using vertex_layout = bgfx::VertexLayout;
 using attribute = bgfx::Attrib::Enum;
 using attribute_type = bgfx::AttribType::Enum;
 

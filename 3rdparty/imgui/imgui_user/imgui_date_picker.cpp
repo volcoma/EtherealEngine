@@ -262,7 +262,7 @@ bool DateChooser(const char* label, tm& dateOut, const char* dateFormat,
 	}
 	ImGui::PopID();
 
-	ImGui::SameLine(ImGui::GetContentRegionAvailWidth() - yearPartWidth - ImGui::GetStyle().WindowPadding.x -
+	ImGui::SameLine(ImGui::GetContentRegionAvail().x - yearPartWidth - ImGui::GetStyle().WindowPadding.x -
 					ImGui::GetStyle().ItemSpacing.x * 4.f);
 	ImGui::PushID(1235);
 	if(ImGui::Button(arrowLeft))
@@ -372,8 +372,8 @@ bool DateChooser(const char* label, tm& dateOut, const char* dateFormat,
 			ImGui::PopStyleColor();
 		ImGui::EndGroup();
 		if(dw != 6)
-			ImGui::SameLine(ImGui::GetContentRegionAvailWidth() -
-							(6 - dw) * (ImGui::GetContentRegionAvailWidth() / 7.f));
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x -
+							(6 - dw) * (ImGui::GetContentRegionAvail().x / 7.f));
 	}
 
 	style.WindowRounding = oldWindowRounding;

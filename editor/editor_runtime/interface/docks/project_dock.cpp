@@ -389,7 +389,7 @@ void project_dock::render(const ImVec2& /*area*/)
 	}
 	gui::SameLine();
 	gui::PushItemWidth(80.0f);
-	gui::SliderFloat("", &scale_, 0.5f, 1.0f);
+	gui::SliderFloat("##scale", &scale_, 0.5f, 1.0f);
 	const float size = gui::GetFrameHeight() * 5.0f * scale_;
 	if(gui::IsItemHovered())
 	{
@@ -680,7 +680,7 @@ void project_dock::render(const ImVec2& /*area*/)
 		};
 		gui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(10, 10));
 		const auto& style = gui::GetStyle();
-		auto avail = gui::GetContentRegionAvailWidth();
+		auto avail = gui::GetContentRegionAvail().x;
 		auto item_size = size + style.ItemSpacing.x;
 		auto items_per_line_exact = avail / item_size;
 		auto items_per_line_floor = ImFloor(items_per_line_exact);
@@ -688,9 +688,9 @@ void project_dock::render(const ImVec2& /*area*/)
 		auto items_per_line = std::min(size_t(items_per_line_floor), count);
 		auto extra = ((items_per_line_exact - items_per_line_floor) * item_size) /
 					 std::max(1.0f, items_per_line_floor - 1);
-		auto lines = std::max<int>(1, int(ImCeil(float(count) / float(items_per_line))));
-		ImGuiListClipper clipper(lines);
-
+		auto lines = std::max<int>(0, int(ImCeil(float(count) / float(items_per_line))));
+		ImGuiListClipper clipper;
+        clipper.Begin(lines);
 		while(clipper.Step())
 		{
 			for(int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)

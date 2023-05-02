@@ -8,8 +8,8 @@ REFLECT_EXTERN(mesh::info);
 
 namespace bgfx
 {
-SAVE_EXTERN(VertexDecl);
-LOAD_EXTERN(VertexDecl);
+SAVE_EXTERN(VertexLayout);
+LOAD_EXTERN(VertexLayout);
 }
 
 SAVE_EXTERN(mesh::triangle);

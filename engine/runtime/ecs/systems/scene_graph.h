@@ -11,33 +11,33 @@ namespace runtime
 class scene_graph
 {
 public:
-	scene_graph();
-	~scene_graph();
-	//-----------------------------------------------------------------------------
-	//  Name : frame_update (virtual )
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void frame_update(delta_t dt);
+    scene_graph();
+    ~scene_graph();
+    //-----------------------------------------------------------------------------
+    //  Name : frame_update (virtual )
+    /// <summary>
+    ///
+    ///
+    ///
+    /// </summary>
+    //-----------------------------------------------------------------------------
+    void frame_update(delta_t dt);
 
-	//-----------------------------------------------------------------------------
-	//  Name : getRoots ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	const std::vector<entity>& get_roots() const
-	{
-		return roots_;
-	}
+    //-----------------------------------------------------------------------------
+    //  Name : getRoots ()
+    /// <summary>
+    ///
+    ///
+    ///
+    /// </summary>
+    //-----------------------------------------------------------------------------
+    const std::vector<entity>& get_roots() const
+    {
+        return roots_;
+    }
 
 private:
-	/// scene roots
-	std::vector<entity> roots_;
+    /// scene roots
+    std::vector<entity> roots_;
 };
-}
+} // namespace runtime

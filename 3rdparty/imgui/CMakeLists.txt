@@ -4,6 +4,7 @@ imgui/imconfig.h
 imgui/imgui.cpp
 imgui/imgui.h
 imgui/imgui_widgets.cpp
+imgui/imgui_tables.cpp
 imgui/imgui_draw.cpp
 imgui/imgui_demo.cpp
 imgui_user/imgui_user.cpp

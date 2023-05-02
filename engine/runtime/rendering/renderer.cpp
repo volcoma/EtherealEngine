@@ -141,11 +141,11 @@ bool renderer::init_backend(cmd_line::parser& parser)
 	init_window_->set_visible(false);
 	const auto sz = init_window_->get_size();
 
-	gfx::platform_data pd;
-	pd.ndt = init_window_->native_display_handle();
-	pd.nwh = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(init_window_->native_handle()));
+//	gfx::platform_data pd;
+//	pd.ndt = init_window_->native_display_handle();
+//	pd.nwh = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(init_window_->native_handle()));
 
-	gfx::set_platform_data(pd);
+////	gfx::set_platform_data(pd);
 
 	// auto detect
 	auto preferred_renderer_type = gfx::renderer_type::Count;
@@ -176,6 +176,8 @@ bool renderer::init_backend(cmd_line::parser& parser)
 	init_data.resolution.width = sz[0];
 	init_data.resolution.height = sz[1];
 	init_data.resolution.reset = BGFX_RESET_VSYNC;
+    init_data.platformData.ndt = init_window_->native_display_handle();;
+    init_data.platformData.nwh = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(init_window_->native_handle()));
 
 	bool novsync = false;
 	parser.try_get("novsync", novsync);

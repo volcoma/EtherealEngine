@@ -30,6 +30,80 @@ std::shared_ptr<inspector> get_inspector(rttr::type type)
 	return registry.type_map[type];
 }
 
+bool inspect_property(rttr::instance& object, const rttr::property& prop)
+{
+
+    bool prop_changed = false;
+    auto prop_var = prop.get_value(object);
+    bool is_readonly = prop.is_readonly();
+    bool is_array = prop_var.is_sequential_container();
+    bool is_associative_container = prop_var.is_associative_container();
+    bool is_enum = prop.is_enumeration();
+    rttr::instance prop_object = prop_var;
+    auto prop_inspector = get_inspector(prop_object.get_derived_type());
+    bool has_inspector = prop_inspector != nullptr;
+    bool details = !has_inspector && !is_enum;
+
+
+    if(prop_inspector)
+    {
+        prop_inspector->before_inspect(prop);
+    }
+
+    bool open = true;
+    if(details)
+    {
+        ImGui::BeginColumns("##stuff", 2, ImGuiOldColumnFlags_NoBorder);
+        property_layout layout(prop, false);
+        ImGui::NextColumn();
+        gui::AlignTextToFramePadding();
+        open = gui::TreeNode("details");
+        ImGui::EndColumns();
+    }
+
+    if(open)
+    {
+        auto get_meta = [&prop](const rttr::variant& name) -> rttr::variant {
+            return prop.get_metadata(name);
+        };
+        if(is_array)
+        {
+            prop_changed |= inspect_array(prop_var, is_readonly, get_meta);
+        }
+        else if(is_associative_container)
+        {
+            prop_changed |= inspect_associative_container(prop_var, is_readonly);
+        }
+        else if(is_enum)
+        {
+            auto enumeration = prop.get_enumeration();
+            property_layout layout(prop);
+            prop_changed |= inspect_enum(prop_var, enumeration, is_readonly);
+        }
+        else
+        {
+            prop_changed |= inspect_var(prop_var, false, is_readonly, get_meta);
+        }
+
+        if(details && open)
+        {
+            gui::TreePop();
+        }
+    }
+
+    if(prop_changed && !is_readonly)
+    {
+        prop.set_value(object, prop_var);
+    }
+
+    if(prop_inspector)
+    {
+        prop_inspector->after_inspect(prop);
+    }
+
+    return prop_changed;
+}
+
 bool inspect_var(rttr::variant& var, bool skip_custom, bool read_only,
 				 const inspector::meta_getter& get_metadata)
 {
@@ -56,56 +130,7 @@ bool inspect_var(rttr::variant& var, bool skip_custom, bool read_only,
 	{
 		for(auto& prop : properties)
 		{
-			bool prop_changed = false;
-			auto prop_var = prop.get_value(object);
-			bool is_readonly = prop.is_readonly();
-			bool is_array = prop_var.is_sequential_container();
-			bool is_associative_container = prop_var.is_associative_container();
-			bool is_enum = prop.is_enumeration();
-			rttr::instance prop_object = prop_var;
-			bool has_inspector = !!get_inspector(prop_object.get_derived_type());
-			bool details = !has_inspector && !is_enum;
-			property_layout layout(prop);
-			bool open = true;
-			if(details)
-			{
-				gui::AlignTextToFramePadding();
-				open = gui::TreeNode("details");
-			}
-
-			if(open)
-			{
-				auto get_meta = [&prop](const rttr::variant& name) -> rttr::variant {
-					return prop.get_metadata(name);
-				};
-				if(is_array)
-				{
-					prop_changed |= inspect_array(prop_var, is_readonly, get_meta);
-				}
-				else if(is_associative_container)
-				{
-					prop_changed |= inspect_associative_container(prop_var, is_readonly);
-				}
-				else if(is_enum)
-				{
-					auto enumeration = prop.get_enumeration();
-					prop_changed |= inspect_enum(prop_var, enumeration, is_readonly);
-				}
-				else
-				{
-					prop_changed |= inspect_var(prop_var, false, is_readonly, get_meta);
-				}
-
-				if(details && open)
-					gui::TreePop();
-			}
-
-			if(prop_changed && !is_readonly)
-			{
-				prop.set_value(object, prop_var);
-			}
-
-			changed |= prop_changed;
+            changed |= inspect_property(object, prop);
 		}
 	}
 
@@ -185,7 +210,7 @@ bool inspect_enum(rttr::variant& var, rttr::enumeration& data, bool read_only)
 	{
 		int listbox_item_current = var.to_int();
 		int listbox_item_size = static_cast<int>(cstrings.size());
-		if(gui::Combo("", &listbox_item_current, cstrings.data(), listbox_item_size, listbox_item_size))
+		if(gui::Combo("##enum", &listbox_item_current, cstrings.data(), listbox_item_size, listbox_item_size))
 		{
 			rttr::variant arg(listbox_item_current);
 			arg.convert(var.get_type());

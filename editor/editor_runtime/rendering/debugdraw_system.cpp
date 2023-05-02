@@ -120,13 +120,13 @@ void debugdraw_system::frame_render(delta_t)
 		}
 		else
 		{
-			Aabb aabb;
-			aabb.m_min.x = bounds.min.x;
-			aabb.m_min.y = bounds.min.y;
-			aabb.m_min.z = bounds.min.z;
-			aabb.m_max.x = bounds.max.x;
-			aabb.m_max.y = bounds.max.y;
-			aabb.m_max.z = bounds.max.z;
+			bx::Aabb aabb;
+			aabb.min.x = bounds.min.x;
+			aabb.min.y = bounds.min.y;
+			aabb.min.z = bounds.min.z;
+			aabb.max.x = bounds.max.x;
+			aabb.max.y = bounds.max.y;
+			aabb.max.z = bounds.max.z;
 			dd.encoder.pushTransform(&world_transform);
 			dd.encoder.draw(aabb);
 			dd.encoder.popTransform();
@@ -209,13 +209,13 @@ void debugdraw_system::frame_render(delta_t)
 			dd.encoder.setColor(0xff00ff00);
 			dd.encoder.setWireframe(true);
 			dd.encoder.pushTransform(&world_transform);
-			Aabb aabb;
-			aabb.m_min.x = -probe.box_data.extents.x;
-			aabb.m_min.y = -probe.box_data.extents.y;
-			aabb.m_min.z = -probe.box_data.extents.z;
-			aabb.m_max.x = probe.box_data.extents.x;
-			aabb.m_max.y = probe.box_data.extents.y;
-			aabb.m_max.z = probe.box_data.extents.z;
+			bx::Aabb aabb;
+			aabb.min.x = -probe.box_data.extents.x;
+			aabb.min.y = -probe.box_data.extents.y;
+			aabb.min.z = -probe.box_data.extents.z;
+			aabb.max.x = probe.box_data.extents.x;
+			aabb.max.y = probe.box_data.extents.y;
+			aabb.max.z = probe.box_data.extents.z;
 			dd.encoder.draw(aabb);
 			dd.encoder.popTransform();
 			dd.encoder.pop();
@@ -279,13 +279,13 @@ void debugdraw_system::frame_render(delta_t)
 				dd.encoder.setColor(0xff00ff00);
 				dd.encoder.setWireframe(true);
 				dd.encoder.pushTransform(&world_transform);
-				Aabb aabb;
-				aabb.m_min.x = bounds.min.x;
-				aabb.m_min.y = bounds.min.y;
-				aabb.m_min.z = bounds.min.z;
-				aabb.m_max.x = bounds.max.x;
-				aabb.m_max.y = bounds.max.y;
-				aabb.m_max.z = bounds.max.z;
+				bx::Aabb aabb;
+				aabb.min.x = bounds.min.x;
+				aabb.min.y = bounds.min.y;
+				aabb.min.z = bounds.min.z;
+				aabb.max.x = bounds.max.x;
+				aabb.max.y = bounds.max.y;
+				aabb.max.z = bounds.max.z;
 				dd.encoder.draw(aabb);
 				dd.encoder.popTransform();
 				dd.encoder.pop();

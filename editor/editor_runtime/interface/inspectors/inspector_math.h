@@ -41,6 +41,8 @@ INSPECTOR_REFLECT(inspector_quaternion, math::quat)
 struct inspector_transform : public inspector
 {
 	REFLECTABLEV(inspector_transform, inspector)
+
+    void before_inspect(const rttr::property& prop);
 	bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata);
 };
 INSPECTOR_REFLECT(inspector_transform, math::transform)

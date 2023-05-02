@@ -11,8 +11,9 @@ static gfx::view_id& get_counter()
 }
 gfx::view_id generate_id()
 {
+    const auto& limits = gfx::get_caps()->limits;
 	auto& counter = get_counter();
-	if(counter == MAX_RENDER_PASSES - 1)
+	if(counter == limits.maxViews - 1)
 	{
 		frame();
 		counter = 0;
@@ -79,10 +80,11 @@ void render_pass::reset()
 
 gfx::view_id render_pass::get_pass()
 {
+    const auto& limits = gfx::get_caps()->limits;
 	auto counter = get_counter();
 	if(counter == 0)
 	{
-		counter = MAX_RENDER_PASSES;
+		counter = limits.maxViews;
 	}
 	return counter - 1;
 }

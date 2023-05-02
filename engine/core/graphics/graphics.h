@@ -4,6 +4,8 @@
 #include <bgfx/embedded_shader.h>
 #include <bgfx/platform.h>
 #include <bx/string.h>
+#include <bx/allocator.h>
+#include <bx/bounds.h>
 #include "format.h"
 #include "vertex_decl.h"
 #include <cstdint>
@@ -46,7 +48,7 @@ using shader_handle = bgfx::ShaderHandle;
 using texture_handle = bgfx::TextureHandle;
 using uniform_handle = bgfx::UniformHandle;
 using vertex_buffer_handle = bgfx::VertexBufferHandle;
-using vertex_decl_handle = bgfx::VertexDeclHandle;
+using vertex_layout_handle = bgfx::VertexLayoutHandle;
 using embedded_shader = bgfx::EmbeddedShader;
 using transient_vertex_buffer = bgfx::TransientVertexBuffer;
 using transient_index_buffer = bgfx::TransientIndexBuffer;
@@ -497,6 +499,7 @@ void request_screen_shot(frame_buffer_handle _handle, const char* _filePath);
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
+void set_trace_logger(const std::function<void(const std::string&)>& logger);
 void set_info_logger(const std::function<void(const std::string&)>& logger);
 void set_warning_logger(const std::function<void(const std::string&)>& logger);
 void set_error_logger(const std::function<void(const std::string&)>& logger);

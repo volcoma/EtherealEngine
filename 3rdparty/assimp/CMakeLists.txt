@@ -2,7 +2,7 @@ set( ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "Build assimp tools" FORCE)
 set( ASSIMP_BUILD_TESTS OFF CACHE BOOL "Build assimp tests" FORCE)
 set( ASSIMP_BUILD_SAMPLES OFF CACHE BOOL "Build assimp samples" FORCE)
 set( ASSIMP_NO_EXPORT ON CACHE BOOL "Disable Assimp's export functionality." FORCE)
-set( ASSIMP_BUILD_ZLIB OFF CACHE BOOL "Build your own zlib" FORCE)
+set( ASSIMP_BUILD_ZLIB ON CACHE BOOL "Build your own zlib" FORCE)
 
 set( ASSIMP_BUILD_3DS_IMPORTER ON CACHE BOOL "Build importer" FORCE)
 add_definitions(-DASSIMP_BUILD_NO_3DS_EXPORTER)
@@ -146,7 +146,11 @@ set( ASSIMP_BUILD_3MF_IMPORTER OFF CACHE BOOL "Build importer" FORCE)
 add_definitions(-DASSIMP_BUILD_NO_3MF_EXPORTER)
 
 
+if(MSVC)
+  add_compile_options(/wd4702)
+endif()
+
 add_subdirectory( assimp )
 
-target_include_directories (assimp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/assimp/include)
-target_include_directories (assimp PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/assimp/include)
+#target_include_directories (assimp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/assimp/include)
+#target_include_directories (assimp PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/assimp/include)

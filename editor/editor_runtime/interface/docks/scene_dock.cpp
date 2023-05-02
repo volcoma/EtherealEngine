@@ -38,11 +38,11 @@ static bool bar(float _width, float _maxWidth, float _height, const ImVec4& _col
 
 	bool itemHovered = false;
 
-	gui::Button("", ImVec2(_width, _height));
+	gui::Button("##barbtn", ImVec2(_width, _height));
 	itemHovered |= gui::IsItemHovered();
 
 	gui::SameLine();
-	gui::InvisibleButton("", ImVec2(_maxWidth - _width + 1, _height));
+	gui::InvisibleButton("##barinvis", ImVec2(_maxWidth - _width + 1, _height));
 	itemHovered |= gui::IsItemHovered();
 
 	gui::PopStyleVar(2);
@@ -156,7 +156,7 @@ void scene_dock::show_statistics(const ImVec2& area, unsigned int fps, bool& sho
 						 itemHeight);
 			resource_bar(" VB", "Vertex buffers", stats->numVertexBuffers, caps->limits.maxVertexBuffers,
 						 maxWidth, itemHeight);
-			resource_bar(" VD", "Vertex declarations", stats->numVertexDecls, caps->limits.maxVertexDecls,
+			resource_bar(" VD", "Vertex layouts", stats->numVertexLayouts, caps->limits.maxVertexLayouts,
 						 maxWidth, itemHeight);
 			gui::PopFont();
 		}
@@ -192,73 +192,83 @@ void scene_dock::show_statistics(const ImVec2& area, unsigned int fps, bool& sho
 				const double toGpuMs = 1000.0 / double(stats->gpuTimerFreq);
 				const float scale = 3.0f;
 
-				if(ImGui::ListBoxHeader("Encoders", ImVec2(0, stats->numEncoders * itemHeightWithSpacing)))
-				{
-					ImGuiListClipper clipper(stats->numEncoders, itemHeight);
+                if (ImGui::BeginListBox("Encoders", ImVec2(ImGui::GetWindowWidth(), stats->numEncoders*itemHeightWithSpacing) ) )
+                {
+                    ImGuiListClipper clipper;
+                    clipper.Begin(stats->numEncoders, itemHeight);
 
-					while(clipper.Step())
-					{
-						for(int32_t pos = clipper.DisplayStart; pos < clipper.DisplayEnd; ++pos)
-						{
-							const bgfx::EncoderStats& encoderStats = stats->encoderStats[pos];
+                    while (clipper.Step() )
+                    {
+                        for (int32_t pos = clipper.DisplayStart; pos < clipper.DisplayEnd; ++pos)
+                        {
+                            const bgfx::EncoderStats& encoderStats = stats->encoderStats[pos];
 
-							ImGui::Text("%3d", pos);
-							ImGui::SameLine(64.0f);
+                            ImGui::Text("%3d", pos);
+                            ImGui::SameLine(64.0f);
 
-							const float maxWidth = 30.0f * scale;
-							const float cpuMs =
-								float((encoderStats.cpuTimeEnd - encoderStats.cpuTimeBegin) * toCpuMs);
-							const float cpuWidth = bx::clamp(cpuMs * scale, 1.0f, maxWidth);
+                            const float maxWidth = 30.0f*scale;
+                            const float cpuMs    = float( (encoderStats.cpuTimeEnd-encoderStats.cpuTimeBegin)*toCpuMs);
+                            const float cpuWidth = bx::clamp(cpuMs*scale, 1.0f, maxWidth);
 
-							if(bar(cpuWidth, maxWidth, itemHeight, cpuColor))
-							{
-								ImGui::SetTooltip("Encoder %d, CPU: %f [ms]", pos, cpuMs);
-							}
-						}
-					}
+                            if (bar(cpuWidth, maxWidth, itemHeight, cpuColor) )
+                            {
+                                ImGui::SetTooltip("Encoder %d, CPU: %f [ms]"
+                                    , pos
+                                    , cpuMs
+                                    );
+                            }
+                        }
+                    }
 
-					ImGui::ListBoxFooter();
-				}
+                    ImGui::EndListBox();
+                }
 
 				ImGui::Separator();
 
-				if(ImGui::ListBoxHeader("Views", ImVec2(0, stats->numViews * itemHeightWithSpacing)))
-				{
-					ImGuiListClipper clipper(stats->numViews, itemHeight);
+                if (ImGui::BeginListBox("Views", ImVec2(ImGui::GetWindowWidth(), stats->numViews*itemHeightWithSpacing) ) )
+                {
+                    ImGuiListClipper clipper;
+                    clipper.Begin(stats->numViews, itemHeight);
 
-					while(clipper.Step())
-					{
-						for(int32_t pos = clipper.DisplayStart; pos < clipper.DisplayEnd; ++pos)
-						{
-							const auto& viewStats = stats->viewStats[pos];
+                    while (clipper.Step() )
+                    {
+                        for (int32_t pos = clipper.DisplayStart; pos < clipper.DisplayEnd; ++pos)
+                        {
+                            const bgfx::ViewStats& viewStats = stats->viewStats[pos];
 
-							ImGui::Text("%3d %3d %s", pos, viewStats.view, viewStats.name);
+                            ImGui::Text("%3d %3d %s", pos, viewStats.view, viewStats.name);
 
-							const float maxWidth = 30.0f * scale;
-							const float cpuWidth =
-								bx::clamp(float(viewStats.cpuTimeElapsed * toCpuMs) * scale, 1.0f, maxWidth);
-							const float gpuWidth =
-								bx::clamp(float(viewStats.gpuTimeElapsed * toGpuMs) * scale, 1.0f, maxWidth);
+                            const float maxWidth = 30.0f*scale;
+                            const float cpuTimeElapsed = float((viewStats.cpuTimeEnd - viewStats.cpuTimeBegin) * toCpuMs);
+                            const float gpuTimeElapsed = float((viewStats.gpuTimeEnd - viewStats.gpuTimeBegin) * toGpuMs);
+                            const float cpuWidth = bx::clamp(cpuTimeElapsed*scale, 1.0f, maxWidth);
+                            const float gpuWidth = bx::clamp(gpuTimeElapsed*scale, 1.0f, maxWidth);
 
-							ImGui::SameLine(64.0f);
+                            ImGui::SameLine(64.0f);
 
-							if(bar(cpuWidth, maxWidth, itemHeight, cpuColor))
-							{
-								ImGui::SetTooltip("View %d \"%s\", CPU: %f [ms]", pos, viewStats.name,
-												  viewStats.cpuTimeElapsed * toCpuMs);
-							}
+                            if (bar(cpuWidth, maxWidth, itemHeight, cpuColor) )
+                            {
+                                ImGui::SetTooltip("View %d \"%s\", CPU: %f [ms]"
+                                    , pos
+                                    , viewStats.name
+                                    , cpuTimeElapsed
+                                    );
+                            }
 
-							ImGui::SameLine();
-							if(bar(gpuWidth, maxWidth, itemHeight, gpuColor))
-							{
-								ImGui::SetTooltip("View: %d \"%s\", GPU: %f [ms]", pos, viewStats.name,
-												  viewStats.gpuTimeElapsed * toGpuMs);
-							}
-						}
-					}
+                            ImGui::SameLine();
+                            if (bar(gpuWidth, maxWidth, itemHeight, gpuColor) )
+                            {
+                                ImGui::SetTooltip("View: %d \"%s\", GPU: %f [ms]"
+                                    , pos
+                                    , viewStats.name
+                                    , gpuTimeElapsed
+                                    );
+                            }
+                        }
+                    }
 
-					ImGui::ListBoxFooter();
-				}
+                    ImGui::EndListBox();
+                }
 			}
 			gui::PopFont();
 		}
@@ -413,6 +423,12 @@ void handle_camera_movement()
 	{
 		return;
 	}
+
+    if(!gui::IsWindowHovered())
+    {
+        return;
+    }
+
 	auto& es = core::get_subsystem<editor::editing_system>();
 	auto& input = core::get_subsystem<runtime::input>();
 	auto& sim = core::get_subsystem<core::simulation>();

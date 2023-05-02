@@ -83,7 +83,7 @@ std::shared_ptr<gfx::uniform> program::get_uniform(const std::string& _name, boo
 	{
 		if(texture)
 		{
-			hUniform = std::make_shared<gfx::uniform>(_name, gfx::uniform_type::Int1, 1);
+			hUniform = std::make_shared<gfx::uniform>(_name, gfx::uniform_type::Sampler, 1);
 			uniforms[_name] = hUniform;
 		}
 	}

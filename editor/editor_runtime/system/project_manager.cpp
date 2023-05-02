@@ -147,7 +147,7 @@ void add_to_syncer<gfx::shader>(std::vector<uint64_t>& watchers, fs::syncer& syn
 
 	for(const auto& type : ex::get_suported_formats<gfx::shader>())
 	{
-		syncer.set_mapping(type + ".meta", {".dx11.asset", ".dx12.asset", ".gl.asset"}, on_modified,
+		syncer.set_mapping(type + ".meta", {".dx11.asset", ".dx12.asset", ".gl.asset", ".vlk.asset"}, on_modified,
 						   on_modified, on_removed, on_renamed);
 
 		const auto watch_id = watch_assets<gfx::shader>(dir, "*" + type, true);

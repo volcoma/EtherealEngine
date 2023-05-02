@@ -71,6 +71,12 @@ bool inspector_quaternion::inspect(rttr::variant& var, bool read_only, const met
 	return false;
 }
 
+void inspector_transform::before_inspect(const rttr::property& prop)
+{
+    layout_ = std::make_unique<property_layout>(prop, false);
+
+}
+
 bool inspector_transform::inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata)
 {
 	auto data = var.get_value<math::transform>();
@@ -86,12 +92,12 @@ bool inspector_transform::inspect(rttr::variant& var, bool read_only, const meta
 	static math::vec3 euler_angles(0.0f, 0.0f, 0.0f);
 	bool changed = false;
 	bool equal = math::all(math::equal(old_quat, rotation, math::epsilon<float>()));
-	if(!equal && (!gui::IsMouseDragging() || imguizmo::is_using()))
+	if(!equal && (!gui::IsMouseDragging(0) || imguizmo::is_using()))
 	{
 		euler_angles = local_euler_angles;
 		old_quat = rotation;
 	}
-	gui::EndColumns();
+
 	if(gui::Button("P", ImVec2(ImGui::GetFrameHeightWithSpacing(), ImGui::GetFrameHeightWithSpacing())))
 	{
 		data.set_position({0.0f, 0.0f, 0.0f});
@@ -155,8 +161,6 @@ bool inspector_transform::inspect(rttr::variant& var, bool read_only, const meta
 		changed = true;
 	}
 	gui::PopID();
-
-	gui::BeginColumns("properties", 2, ImGuiColumnsFlags_NoBorder | ImGuiColumnsFlags_NoResize);
 
 	var = data;
 

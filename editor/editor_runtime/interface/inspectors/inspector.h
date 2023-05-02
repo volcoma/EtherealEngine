@@ -5,17 +5,6 @@
 
 #include <editor_core/gui/gui.h>
 
-struct inspector
-{
-	REFLECTABLEV(inspector)
-
-	using meta_getter = std::function<rttr::variant(const rttr::variant&)>;
-
-	virtual ~inspector() = default;
-
-	virtual bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata) = 0;
-};
-
 struct property_layout
 {
 	property_layout(const rttr::property& prop, bool columns = true);
@@ -26,7 +15,28 @@ struct property_layout
 
 	~property_layout();
 
+    void push_layout();
+    void pop_layout();
+
 	std::string name_;
+    bool columns_{};
+};
+
+
+struct inspector
+{
+	REFLECTABLEV(inspector)
+
+	using meta_getter = std::function<rttr::variant(const rttr::variant&)>;
+
+	virtual ~inspector() = default;
+
+    virtual void before_inspect(const rttr::property& prop);
+    virtual void after_inspect(const rttr::property& prop);
+	virtual bool inspect(rttr::variant& var, bool read_only, const meta_getter& get_metadata) = 0;
+
+
+    std::unique_ptr<property_layout> layout_{};
 };
 
 REFLECT_INLINE(inspector)

@@ -18,23 +18,23 @@ REFLECT(mesh::info)
 
 namespace bgfx
 {
-SAVE(VertexDecl)
+SAVE(VertexLayout)
 {
 	try_save(ar, cereal::make_nvp("hash", obj.m_hash));
 	try_save(ar, cereal::make_nvp("stride", obj.m_stride));
 	try_save(ar, cereal::make_nvp("offset", obj.m_offset));
 	try_save(ar, cereal::make_nvp("attributes", obj.m_attributes));
 }
-SAVE_INSTANTIATE(VertexDecl, cereal::oarchive_binary_t);
+SAVE_INSTANTIATE(VertexLayout, cereal::oarchive_binary_t);
 
-LOAD(VertexDecl)
+LOAD(VertexLayout)
 {
 	try_load(ar, cereal::make_nvp("hash", obj.m_hash));
 	try_load(ar, cereal::make_nvp("stride", obj.m_stride));
 	try_load(ar, cereal::make_nvp("offset", obj.m_offset));
 	try_load(ar, cereal::make_nvp("attributes", obj.m_attributes));
 }
-LOAD_INSTANTIATE(VertexDecl, cereal::iarchive_binary_t);
+LOAD_INSTANTIATE(VertexLayout, cereal::iarchive_binary_t);
 }
 
 SAVE(mesh::triangle)

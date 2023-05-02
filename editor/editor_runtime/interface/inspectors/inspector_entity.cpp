@@ -34,7 +34,7 @@ bool inspector_entity::inspect(rttr::variant& var, bool read_only, const meta_ge
 			name = meta_id.to_string();
 		}
 		gui::PushID(component);
-		gui::SetNextTreeNodeOpen(true, ImGuiCond_FirstUseEver);
+		gui::SetNextItemOpen(true, ImGuiCond_FirstUseEver);
 		if(gui::CollapsingHeader(name.c_str(), &opened))
 		{
 			gui::PushStyleVar(ImGuiStyleVar_IndentSpacing, 8.0f);
@@ -65,7 +65,7 @@ bool inspector_entity::inspect(rttr::variant& var, bool read_only, const meta_ge
 		static ImGuiTextFilter filter;
 		filter.Draw("Filter", 180);
 		gui::Separator();
-		gui::BeginChild("COMPONENT_MENU_CONTEXT", ImVec2(gui::GetContentRegionAvailWidth(), 200.0f));
+		gui::BeginChild("COMPONENT_MENU_CONTEXT", ImVec2(gui::GetContentRegionAvail().x, 200.0f));
 
 		auto component_types = rttr::type::get<runtime::component>().get_derived_classes();
 

@@ -127,6 +127,13 @@ void compile<gfx::shader>(const fs::path& absolute_meta_key, const fs::path& out
 	bool cs = string_utils::begins_with(file, "cs_");
 
 	auto renderer = gfx::get_renderer_type();
+
+    if(renderer == gfx::renderer_type::Vulkan)
+    {
+        str_platform = "windows";
+        str_profile = "spirv";
+    }
+
 	if(renderer == gfx::renderer_type::Direct3D11 || renderer == gfx::renderer_type::Direct3D12)
 	{
 		str_platform = "windows";

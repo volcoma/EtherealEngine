@@ -6,6 +6,11 @@ namespace gfx
 static std::map<std::string, std::function<void(const std::string&)>> s_loggers;
 static bool s_initted = false;
 
+void set_trace_logger(const std::function<void(const std::string&)>& logger)
+{
+	s_loggers["trace"] = logger;
+}
+
 void set_info_logger(const std::function<void(const std::string&)>& logger)
 {
 	s_loggers["info"] = logger;
@@ -32,9 +37,21 @@ struct gfx_callback : public bgfx::CallbackI
 {
 	~gfx_callback() final = default;
 
-	void traceVargs(const char* /*_filePath*/, std::uint16_t /*_line*/, const char* /*_format*/,
-					va_list /*_argList*/) final
+	void traceVargs(const char* _filePath, std::uint16_t _line, const char* _format,
+					va_list _argList) final
 	{
+        char temp[8192];
+		char* out = temp;
+		int32_t len = vsnprintf(out, sizeof(temp), _format, _argList);
+		if ( (int32_t)sizeof(temp) < len)
+		{
+			out = (char*)alloca(len+1);
+			len = vsnprintf(out, len, _format, _argList);
+		}
+		out[len] = '\0';
+
+        log("info", /*std::string(_filePath) +*/ "["+ std::to_string(_line) + "]" + std::string(out));
+
 	}
 
 	void profilerBegin(const char* /*_name*/, std::uint32_t /*_abgr*/, const char* /*_filePath*/,
@@ -720,7 +737,7 @@ void touch(view_id _id)
 
 void submit(view_id _id, program_handle _handle, int32_t _depth, bool _preserveState)
 {
-	bgfx::submit(_id, _handle, _depth, _preserveState);
+	bgfx::submit(_id, _handle, _depth, _preserveState ? BGFX_DISCARD_NONE : BGFX_DISCARD_ALL);
 }
 
 void submit(view_id _id, program_handle _program, occlusion_query_handle _occlusionQuery, int32_t _depth,
@@ -968,7 +985,8 @@ const std::string& get_renderer_filename_extension()
 {
 	static const std::map<renderer_type, std::string> types = {
 		{renderer_type::Direct3D9, ".dx9"},   {renderer_type::Direct3D11, ".dx11"},
-		{renderer_type::Direct3D12, ".dx12"}, {renderer_type::Gnm, ".gnm"},
+		{renderer_type::Direct3D12, ".dx12"}, {renderer_type::Vulkan, ".vlk"},
+        {renderer_type::Gnm, ".gnm"},
 		{renderer_type::Metal, ".metal"},	 {renderer_type::OpenGL, ".gl"},
 		{renderer_type::OpenGLES, ".gles"},   {renderer_type::Noop, ".noop"}};
 

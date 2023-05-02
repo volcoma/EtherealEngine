@@ -35,6 +35,7 @@ void app::setup(cmd_line::parser& parser)
 
 	serialization::set_warning_logger([](const std::string& msg) { APPLOG_WARNING(msg); });
 
+    gfx::set_trace_logger([](const std::string& msg) { APPLOG_TRACE(msg); });
 	gfx::set_info_logger([](const std::string& msg) { APPLOG_INFO(msg); });
 	gfx::set_warning_logger([](const std::string& msg) { APPLOG_WARNING(msg); });
 	gfx::set_error_logger([](const std::string& msg) { APPLOG_ERROR(msg); });
