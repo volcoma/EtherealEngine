@@ -5,7 +5,6 @@
 #include <bgfx/platform.h>
 #include <bx/string.h>
 #include <bx/allocator.h>
-#include <bx/bounds.h>
 #include "format.h"
 #include "vertex_decl.h"
 #include <cstdint>
