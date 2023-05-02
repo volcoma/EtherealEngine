@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace nonstd
+namespace hpp
 {
 /// CONJUNCTION
 template <class...>

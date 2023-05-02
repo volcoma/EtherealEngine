@@ -3,7 +3,7 @@
 #pragma once
 
 #include <core/common/assert.hpp>
-#include <core/common/nonstd/type_index.hpp>
+#include <core/common/hpp/type_index.hpp>
 #include <core/reflection/registration.h>
 #include <core/serialization/serialization.h>
 #include <core/signals/event.hpp>
@@ -377,10 +377,10 @@ public:
     }
 };
 
-extern event<void(entity)> on_entity_created;
-extern event<void(entity)> on_entity_destroyed;
-extern event<void(entity, chandle<component>)> on_component_added;
-extern event<void(entity, chandle<component>)> on_component_removed;
+extern hpp::event<void(entity)> on_entity_created;
+extern hpp::event<void(entity)> on_entity_destroyed;
+extern hpp::event<void(entity, chandle<component>)> on_component_added;
+extern hpp::event<void(entity, chandle<component>)> on_component_removed;
 
 /**
  * Manages entity::Id creation and component assignment.

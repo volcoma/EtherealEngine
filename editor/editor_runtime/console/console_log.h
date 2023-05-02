@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/common/nonstd/ring_buffer.hpp>
+#include <core/common/hpp/ring_buffer.hpp>
 #include <core/console/console.h>
 #include <core/logging/logging.h>
 
@@ -12,7 +12,7 @@ class console_log : public logging::sinks::base_sink<std::mutex>, public console
 {
 public:
 	template <typename T>
-	using ring_buffer = nonstd::stack_ringbuffer<T, 150>;
+	using ring_buffer = hpp::stack_ringbuffer<T, 150>;
 	using entries_t = ring_buffer<std::pair<std::string, logging::level::level_enum>>;
 
 	//-----------------------------------------------------------------------------

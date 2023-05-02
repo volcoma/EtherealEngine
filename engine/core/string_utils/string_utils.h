@@ -2,91 +2,22 @@
 
 #include <algorithm>
 #include <cctype> // toupper / tolower
-#include <locale>
-#include <random>
 #include <cstdarg>
 #include <cstdio>
+#include <locale>
+#include <random>
 #include <string> // std::string / std::wstd::string
 #include <vector>
 namespace string_utils
 {
-class StrICmp
-{
-public:
-	StrICmp() = default;
-	//---------------------------------------------------------------------
-	// Constructors & Destructors
-	//---------------------------------------------------------------------
-	StrICmp(const char* lpszLang)
-		: locale_(lpszLang)
-	{
-	}
 
-	//---------------------------------------------------------------------
-	// Public Classes
-	//---------------------------------------------------------------------
-	//---------------------------------------------------------------------
-	// Name : CharLessI (Class)
-	// Desc : Case insensitive character less-than operator
-	//---------------------------------------------------------------------
-	class CharLessI
-	{
-	public:
-		//-----------------------------------------------------------------
-		// Constructors & Destructors
-		//-----------------------------------------------------------------
-		CharLessI(std::locale& Locale)
-			: locale_(Locale)
-		{
-		}
-
-		//-----------------------------------------------------------------
-		// Public Operators
-		//-----------------------------------------------------------------
-		template <typename T>
-		bool operator()(T c1, T c2)
-		{
-			return std::tolower(c1, locale_) < std::tolower(c2, locale_);
-
-		} // End Operator
-
-	private:
-		//-----------------------------------------------------------------
-		// Private Member Variables
-		//-----------------------------------------------------------------
-		std::locale& locale_;
-	};
-
-	//---------------------------------------------------------------------
-	// Public Operators
-	//---------------------------------------------------------------------
-	int operator()(const std::string& s1, const std::string& s2)
-	{
-		if(std::lexicographical_compare(s1.begin(), s1.end(), s2.begin(), s2.end(), CharLessI(locale_)))
-		{
-			return -1;
-		}
-		if(std::lexicographical_compare(s2.begin(), s2.end(), s1.begin(), s1.end(), CharLessI(locale_)))
-		{
-			return 1;
-		}
-		return 0;
-
-	} // End Operator
-
-private:
-	//---------------------------------------------------------------------
-	// Private Member Variables
-	//---------------------------------------------------------------------
-	std::locale locale_;
-};
 //-------------------------------------------------------------------------
 //  Name : compare ()
 /// <summary>
 /// Compare the two std::strings with optional case ignore.
 /// </summary>
 //-------------------------------------------------------------------------
-int compare(const std::string& s1, const std::string& s2, bool ignore_case);
+auto compare(const std::string& s1, const std::string& s2, bool ignore_case) -> int;
 //-------------------------------------------------------------------------
 //  Name : trim()
 /// <summary>
@@ -94,7 +25,7 @@ int compare(const std::string& s1, const std::string& s2, bool ignore_case);
 /// and tail of this std::string.
 /// </summary>
 //-------------------------------------------------------------------------
-std::string trim(const std::string& str);
+auto trim(const std::string& str) -> std::string;
 
 //-------------------------------------------------------------------------
 //  Name : tokenize()
@@ -102,7 +33,7 @@ std::string trim(const std::string& str);
 /// Tokenize the string by the delimiters
 /// </summary>
 //-------------------------------------------------------------------------
-std::vector<std::string> tokenize(const std::string& str, const std::string& delimiters);
+auto tokenize(const std::string& str, const std::string& delimiters) -> std::vector<std::string>;
 //-------------------------------------------------------------------------
 //  Name : to_upper()
 /// <summary>
@@ -110,7 +41,7 @@ std::vector<std::string> tokenize(const std::string& str, const std::string& del
 /// appropriate.
 /// </summary>
 //-------------------------------------------------------------------------
-std::string to_upper(const std::string& str);
+auto to_upper(const std::string& str) -> std::string;
 
 //-------------------------------------------------------------------------
 //  Name : to_lower()
@@ -119,7 +50,7 @@ std::string to_upper(const std::string& str);
 /// appropriate.
 /// </summary>
 //-------------------------------------------------------------------------
-std::string to_lower(const std::string& str);
+auto to_lower(const std::string& str) -> std::string;
 
 //-------------------------------------------------------------------------
 //  Name : begins_with ()
@@ -127,7 +58,7 @@ std::string to_lower(const std::string& str);
 /// Determine if this std::string begins with the std::string provided.
 /// </summary>
 //-------------------------------------------------------------------------
-bool begins_with(const std::string& str, const std::string& value, bool ignore_case = false);
+auto begins_with(const std::string& str, const std::string& value, bool ignore_case = false) -> bool;
 
 //-------------------------------------------------------------------------
 //  Name : ends_with ()
@@ -135,7 +66,7 @@ bool begins_with(const std::string& str, const std::string& value, bool ignore_c
 /// Determine if this std::string ends with the std::string provided.
 /// </summary>
 //-------------------------------------------------------------------------
-bool ends_with(const std::string& str, const std::string& value, bool ignore_case = false);
+auto ends_with(const std::string& str, const std::string& value, bool ignore_case = false) -> bool;
 
 //-------------------------------------------------------------------------
 //  Name : replace ()
@@ -144,7 +75,7 @@ bool ends_with(const std::string& str, const std::string& value, bool ignore_cas
 /// another.
 /// </summary>
 //-------------------------------------------------------------------------
-std::string replace(const std::string& str, const std::string& old_seq, const std::string& new_seq);
+auto replace(const std::string& str, const std::string& old_seq, const std::string& new_seq) -> std::string;
 
 //-------------------------------------------------------------------------
 //  Name : replace ()
@@ -152,8 +83,7 @@ std::string replace(const std::string& str, const std::string& old_seq, const st
 /// Replacing any occurances of the specified character with another.
 /// </summary>
 //-------------------------------------------------------------------------
-std::string replace(const std::string& str, std::string::value_type old_char,
-					std::string::value_type new_char);
+auto replace(const std::string& str, std::string::value_type old_char, std::string::value_type new_char) -> std::string;
 
 //-------------------------------------------------------------------------
 //  Name : format ()
@@ -162,20 +92,20 @@ std::string replace(const std::string& str, std::string::value_type old_char,
 /// an optional variable length list of arguments.
 /// </summary>
 //-------------------------------------------------------------------------
-template <typename... Args>
-std::string format(const char* format, Args&&... args)
+template<typename... Args>
+auto format(const char* format, Args&&... args) -> std::string
 {
-	auto length = std::snprintf(nullptr, 0, format, std::forward<Args>(args)...);
-	if(length == 0)
-	{
-		return {};
-	}
+    auto length = std::snprintf(nullptr, 0, format, std::forward<Args>(args)...);
+    if(length == 0)
+    {
+        return {};
+    }
 
-	std::vector<char> buf(length + 1);
-	length = std::snprintf(buf.data(), buf.size(), format, std::forward<Args>(args)...);
-	std::string str(buf.data());
+    std::vector<char> buf(length + 1);
+    length = std::snprintf(buf.data(), buf.size(), format, std::forward<Args>(args)...);
+    std::string str(buf.data());
 
-	return str;
+    return str;
 }
 
 //-------------------------------------------------------------------------
@@ -185,7 +115,7 @@ std::string format(const char* format, Args&&... args)
 /// an optional variable bufferLength list of arguments.
 /// </summary>
 //-------------------------------------------------------------------------
-std::string format(const char* format, va_list args);
+auto format(const char* format, va_list args) -> std::string;
 
 //-------------------------------------------------------------------------
 //  Name : word_wrap ()
@@ -194,8 +124,8 @@ std::string format(const char* format, va_list args);
 /// aribitrary padding std::string at the beginning of each new line
 /// </summary>
 //-------------------------------------------------------------------------
-std::string word_wrap(const std::string& value, std::string::size_type max_length,
-					  const std::string& line_padding = "");
+auto word_wrap(const std::string& value, std::string::size_type max_length, const std::string& line_padding = "")
+    -> std::string;
 
 //-------------------------------------------------------------------------
 //  Name : random_string ()
@@ -204,7 +134,7 @@ std::string word_wrap(const std::string& value, std::string::size_type max_lengt
 /// aribitrary padding std::string at the beginning of each new line
 /// </summary>
 //-------------------------------------------------------------------------
-std::string random_string(std::string::size_type length);
+auto random_string(std::string::size_type length) -> std::string;
 
 //-----------------------------------------------------------------------------
 //  Name : command_line_args ()
@@ -212,7 +142,7 @@ std::string random_string(std::string::size_type length);
 /// Creates a single string command line.
 /// </summary>
 //-----------------------------------------------------------------------------
-std::string command_line_args(int _argc, char* _argv[]);
+auto command_line_args(int _argc, char* _argv[]) -> std::string;
 
 //-----------------------------------------------------------------------------
 //  Name : parse_command_line ()
@@ -220,5 +150,5 @@ std::string command_line_args(int _argc, char* _argv[]);
 /// Split single string command line into its component parts.
 /// </summary>
 //-----------------------------------------------------------------------------
-bool parse_command_line(const std::string& cmd_line, std::vector<std::string>& args);
-}
+auto parse_command_line(const std::string& cmd_line, std::vector<std::string>& args) -> bool;
+} // namespace string_utils

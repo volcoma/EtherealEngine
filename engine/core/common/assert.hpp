@@ -16,31 +16,31 @@
 //
 #define THROW_ON_CONTRACT_VIOLATION
 
-#if !(defined(THROW_ON_CONTRACT_VIOLATION) ^ defined(TERMINATE_ON_CONTRACT_VIOLATION) ^                      \
-	  defined(UNENFORCED_ON_CONTRACT_VIOLATION))
+#if !(defined(THROW_ON_CONTRACT_VIOLATION) ^ defined(TERMINATE_ON_CONTRACT_VIOLATION) ^                                \
+      defined(UNENFORCED_ON_CONTRACT_VIOLATION))
 #define TERMINATE_ON_CONTRACT_VIOLATION
 #endif
 
 #define STRINGIFY_DETAIL(x) #x
-#define STRINGIFY(x) STRINGIFY_DETAIL(x)
+#define STRINGIFY(x)        STRINGIFY_DETAIL(x)
 
 #if defined(THROW_ON_CONTRACT_VIOLATION)
 
-#define expects(cond)                                                                                        \
-	if(!(cond))                                                                                              \
-	throw std::runtime_error("Precondition failure at " __FILE__ ": " STRINGIFY(__LINE__))
-#define ensures(cond)                                                                                        \
-	if(!(cond))                                                                                              \
-	throw std::runtime_error("Postcondition failure at " __FILE__ ": " STRINGIFY(__LINE__))
+#define expects(cond)                                                                                                  \
+    if(!(cond))                                                                                                        \
+    throw std::runtime_error("Precondition failure at " __FILE__ ": " STRINGIFY(__LINE__))
+#define ensures(cond)                                                                                                  \
+    if(!(cond))                                                                                                        \
+    throw std::runtime_error("Postcondition failure at " __FILE__ ": " STRINGIFY(__LINE__))
 
 #elif defined(TERMINATE_ON_CONTRACT_VIOLATION)
 
-#define expects(cond)                                                                                        \
-	if(!(cond))                                                                                              \
-	std::terminate()
-#define ensures(cond)                                                                                        \
-	if(!(cond))                                                                                              \
-	std::terminate()
+#define expects(cond)                                                                                                  \
+    if(!(cond))                                                                                                        \
+    std::terminate()
+#define ensures(cond)                                                                                                  \
+    if(!(cond))                                                                                                        \
+    std::terminate()
 
 #elif defined(UNENFORCED_ON_CONTRACT_VIOLATION)
 

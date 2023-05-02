@@ -2,5 +2,5 @@
 
 int logging_obj_export_symbols()
 {
-	return 0;
+    return 0;
 }

@@ -1,6 +1,6 @@
 #pragma once
-#include "../common/nonstd/type_traits.hpp"
-#include "../common/nonstd/utility.hpp"
+#include "../common/hpp/type_traits.hpp"
+#include "../common/hpp/utility.hpp"
 
 #include <chrono>
 #include <future>
@@ -30,9 +30,9 @@ namespace v2
 
 template <typename T>
 using is_future_impl =
-	nonstd::conjunction<nonstd::is_detected<has_get, T>, nonstd::is_detected<has_wait, T>,
-						nonstd::is_detected<has_valid, T>, nonstd::is_detected<has_wait_for, T>,
-						nonstd::is_detected<has_wait_until, T>>;
+	hpp::conjunction<hpp::is_detected<has_get, T>, hpp::is_detected<has_wait, T>,
+						hpp::is_detected<has_valid, T>, hpp::is_detected<has_wait_for, T>,
+						hpp::is_detected<has_wait_until, T>>;
 
 template <typename T>
 using is_future = is_future_impl<std::decay_t<T>>;

@@ -15,80 +15,84 @@ struct uniform;
 
 struct program : public handle_impl<program_handle>
 {
-	//-----------------------------------------------------------------------------
-	//  Name : program ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	program() = default;
+    //-----------------------------------------------------------------------------
+    //  Name : program ()
+    /// <summary>
+    ///
+    ///
+    ///
+    /// </summary>
+    //-----------------------------------------------------------------------------
+    program() = default;
 
-	//-----------------------------------------------------------------------------
-	//  Name : program ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	program(const std::shared_ptr<shader>& compute_shader);
+    //-----------------------------------------------------------------------------
+    //  Name : program ()
+    /// <summary>
+    ///
+    ///
+    ///
+    /// </summary>
+    //-----------------------------------------------------------------------------
+    program(const std::shared_ptr<shader>& compute_shader);
 
-	//-----------------------------------------------------------------------------
-	//  Name : program ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	program(const std::shared_ptr<shader>& vertex_shader, const std::shared_ptr<shader>& fragment_shader);
+    //-----------------------------------------------------------------------------
+    //  Name : program ()
+    /// <summary>
+    ///
+    ///
+    ///
+    /// </summary>
+    //-----------------------------------------------------------------------------
+    program(const std::shared_ptr<shader>& vertex_shader, const std::shared_ptr<shader>& fragment_shader);
 
-	//-----------------------------------------------------------------------------
-	//  Name : set_texture ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::frame_buffer* _handle,
-					 uint8_t _attachment = 0,
-					 std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
+    //-----------------------------------------------------------------------------
+    //  Name : set_texture ()
+    /// <summary>
+    ///
+    ///
+    ///
+    /// </summary>
+    //-----------------------------------------------------------------------------
+    void set_texture(std::uint8_t _stage,
+                     const std::string& _sampler,
+                     gfx::frame_buffer* _handle,
+                     uint8_t _attachment = 0,
+                     std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
 
-	//-----------------------------------------------------------------------------
-	//  Name : set_texture ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void set_texture(std::uint8_t _stage, const std::string& _sampler, gfx::texture* _texture,
-					 std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
+    //-----------------------------------------------------------------------------
+    //  Name : set_texture ()
+    /// <summary>
+    ///
+    ///
+    ///
+    /// </summary>
+    //-----------------------------------------------------------------------------
+    void set_texture(std::uint8_t _stage,
+                     const std::string& _sampler,
+                     gfx::texture* _texture,
+                     std::uint32_t _flags = std::numeric_limits<std::uint32_t>::max());
 
-	//-----------------------------------------------------------------------------
-	//  Name : set_uniform ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	void set_uniform(const std::string& _name, const void* _value, std::uint16_t _num = 1);
+    //-----------------------------------------------------------------------------
+    //  Name : set_uniform ()
+    /// <summary>
+    ///
+    ///
+    ///
+    /// </summary>
+    //-----------------------------------------------------------------------------
+    void set_uniform(const std::string& _name, const void* _value, std::uint16_t _num = 1);
 
-	//-----------------------------------------------------------------------------
-	//  Name : get_uniform ()
-	/// <summary>
-	///
-	///
-	///
-	/// </summary>
-	//-----------------------------------------------------------------------------
-	std::shared_ptr<gfx::uniform> get_uniform(const std::string& _name, bool texture = false);
+    //-----------------------------------------------------------------------------
+    //  Name : get_uniform ()
+    /// <summary>
+    ///
+    ///
+    ///
+    /// </summary>
+    //-----------------------------------------------------------------------------
+    std::shared_ptr<gfx::uniform> get_uniform(const std::string& _name, bool texture = false);
 
-	/// All uniforms for this program.
-	std::unordered_map<std::string, std::shared_ptr<gfx::uniform>> uniforms;
+    /// All uniforms for this program.
+    std::unordered_map<std::string, std::shared_ptr<gfx::uniform>> uniforms;
 };
-}
+} // namespace gfx

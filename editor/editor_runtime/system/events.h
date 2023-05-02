@@ -8,6 +8,6 @@
 
 namespace editor
 {
-extern event<void(const fs::path&)> on_open_project;
-extern event<void()> on_close_project;
+extern hpp::event<void(const fs::path&)> on_open_project;
+extern hpp::event<void()> on_close_project;
 }

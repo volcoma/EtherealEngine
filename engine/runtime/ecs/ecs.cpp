@@ -30,10 +30,10 @@ uint64_t get_frame()
 }
 } // namespace ecs
 
-event<void(entity)> on_entity_created;
-event<void(entity)> on_entity_destroyed;
-event<void(entity, chandle<component>)> on_component_added;
-event<void(entity, chandle<component>)> on_component_removed;
+hpp::event<void(entity)> on_entity_created;
+hpp::event<void(entity)> on_entity_destroyed;
+hpp::event<void(entity, chandle<component>)> on_component_added;
+hpp::event<void(entity, chandle<component>)> on_component_removed;
 
 component_storage::component_storage(std::size_t size)
 {

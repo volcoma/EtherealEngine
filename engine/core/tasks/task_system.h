@@ -130,7 +130,7 @@ class task
 	using decay_if_future_t = typename std::conditional<is_future<T>::value, decay_future_t<T>, T>::type;
 
 	template <typename F, typename... Args>
-	using invoke_result_t = typename nonstd::function_traits<F>::result_type;
+	using invoke_result_t = typename hpp::function_traits<F>::result_type;
 
 	struct ready_task_tag
 	{
@@ -264,7 +264,7 @@ private:
 
 		void invoke_() override
 		{
-			nonstd::apply(f_, args_);
+			hpp::apply(f_, args_);
 		}
 
 		bool ready_() const noexcept override
@@ -274,7 +274,7 @@ private:
 
 	private:
 		std::packaged_task<R(Args...)> f_;
-		std::tuple<nonstd::special_decay_t<Args>...> args_;
+		std::tuple<hpp::special_decay_t<Args>...> args_;
 	};
 
 	template <class...>
@@ -341,7 +341,7 @@ private:
 		{
 			try
 			{
-				nonstd::invoke(f_, call_get(std::get<I>(std::move(args_)))...);
+				hpp::invoke(f_, call_get(std::get<I>(std::move(args_)))...);
 			}
 			catch(const std::future_error& e)
 			{
@@ -365,11 +365,11 @@ private:
 		template <std::size_t... I>
 		inline bool do_ready_(std::index_sequence<I...> /*unused*/) const noexcept
 		{
-			return nonstd::check_all_true(call_ready(std::get<I>(args_))...);
+			return hpp::check_all_true(call_ready(std::get<I>(args_))...);
 		}
 
 		std::packaged_task<R(CallArgs...)> f_;
-		std::tuple<nonstd::special_decay_t<FutArgs>...> args_;
+		std::tuple<hpp::special_decay_t<FutArgs>...> args_;
 	};
 
 	std::unique_ptr<task_concept> t_;
@@ -495,7 +495,7 @@ public:
 	template <class F, class... Args>
 	decltype(auto) push_on_thread(const std::size_t idx, F&& f, Args&&... args)
 	{
-		using is_ready_task = nonstd::conjunction<nonstd::negation<is_future<Args>>...>;
+		using is_ready_task = hpp::conjunction<hpp::negation<is_future<Args>>...>;
 		return push_impl(is_ready_task(), idx, false, std::forward<F>(f), std::forward<Args>(args)...);
 	}
 
@@ -542,7 +542,7 @@ public:
 	template <class F, class... Args>
 	decltype(auto) push_or_execute_on_thread(const std::size_t idx, F&& f, Args&&... args)
 	{
-		using is_ready_task = nonstd::conjunction<nonstd::negation<is_future<Args>>...>;
+		using is_ready_task = hpp::conjunction<hpp::negation<is_future<Args>>...>;
 		return push_impl(is_ready_task(), idx, true, std::forward<F>(f), std::forward<Args>(args)...);
 	}
 

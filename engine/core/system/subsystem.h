@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../common/assert.hpp"
-#include "../common/nonstd/type_index.hpp"
+#include "../common/hpp/type_index.hpp"
 
 #include <algorithm>
 #include <memory>

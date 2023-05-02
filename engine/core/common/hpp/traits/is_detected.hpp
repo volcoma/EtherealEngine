@@ -2,7 +2,7 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace nonstd
+namespace hpp
 {
 
 template <typename... Ts>

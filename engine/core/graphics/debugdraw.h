@@ -9,12 +9,10 @@ namespace gfx
 {
 struct dd_raii
 {
-	dd_raii(view_id _viewId);
+    dd_raii(view_id _viewId);
 
-	~dd_raii();
+    ~dd_raii();
 
-	DebugDrawEncoder encoder;
+    DebugDrawEncoder encoder;
 };
-}
-
-
+} // namespace gfx

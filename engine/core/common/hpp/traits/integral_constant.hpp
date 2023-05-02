@@ -1,7 +1,7 @@
 #pragma once
 #include <type_traits>
 
-namespace nonstd
+namespace hpp
 {
 /// BOOL CONSTANT
 template <bool B>

@@ -10,7 +10,7 @@ namespace fs
 /// Retrieve the directory of the currently running application.
 /// </summary>
 //-----------------------------------------------------------------------------
-path executable_path(const char* argv0);
+auto executable_path(const char* argv0) -> path;
 
 //-----------------------------------------------------------------------------
 //  Name : show_in_graphical_env ()
@@ -19,4 +19,4 @@ path executable_path(const char* argv0);
 /// </summary>
 //-----------------------------------------------------------------------------
 void show_in_graphical_env(const path& _path);
-}
+} // namespace fs

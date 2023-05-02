@@ -10,7 +10,7 @@
 namespace runtime
 {
 using action_map_t =
-	std::unordered_map<std::string, std::map<action_type, event<void(const mml::platform_event&)>>>;
+	std::unordered_map<std::string, std::map<action_type, hpp::event<void(const mml::platform_event&)>>>;
 
 struct action_mapper
 {

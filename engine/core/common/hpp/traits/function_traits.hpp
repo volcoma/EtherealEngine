@@ -4,7 +4,7 @@
 #include <tuple>
 #include <type_traits>
 
-namespace nonstd
+namespace hpp
 {
 
 template <class T>

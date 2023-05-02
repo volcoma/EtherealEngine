@@ -1,12 +1,11 @@
-#ifndef NONSTD_TYPE_TRAITS
-#define NONSTD_TYPE_TRAITS
+#pragma once
 
 #include "traits/function_traits.hpp"
 #include "traits/integral_constant.hpp"
 #include "traits/is_detected.hpp"
 #include "traits/logical.hpp"
 
-namespace nonstd
+namespace hpp
 {
 
 inline bool check_all_true()
@@ -24,6 +23,4 @@ template <bool...>
 struct bool_pack;
 template <bool... v>
 using all_true = std::is_same<bool_pack<true, v...>, bool_pack<v..., true>>;
-}
-
-#endif
+} // namespace hpp

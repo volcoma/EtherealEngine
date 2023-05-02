@@ -22,7 +22,7 @@ using byte_array_t = std::vector<std::uint8_t>;
 /// relevant mapped path.
 /// </summary>
 //-----------------------------------------------------------------------------
-bool add_path_protocol(const std::string& protocol, const path& directory);
+auto add_path_protocol(const std::string& protocol, const path& directory) -> bool;
 
 //-----------------------------------------------------------------------------
 //  Name : get_path_protocols ()
@@ -30,7 +30,7 @@ bool add_path_protocol(const std::string& protocol, const path& directory);
 /// Returns the registered path protocols.
 /// </summary>
 //-----------------------------------------------------------------------------
-protocols_t& get_path_protocols();
+auto get_path_protocols() -> protocols_t&;
 
 //-----------------------------------------------------------------------------
 //  Name : resolve_protocol()
@@ -41,7 +41,7 @@ protocols_t& get_path_protocols();
 /// filename.
 /// </summary>
 //-----------------------------------------------------------------------------
-path resolve_protocol(const path& _path);
+auto resolve_protocol(const path& _path) -> path;
 
 //-----------------------------------------------------------------------------
 //  Name : convert_to_protocol()
@@ -50,7 +50,7 @@ path resolve_protocol(const path& _path);
 /// path from an absolute one.
 /// </summary>
 //-----------------------------------------------------------------------------
-path convert_to_protocol(const path& _path);
+auto convert_to_protocol(const path& _path) -> path;
 
 //-----------------------------------------------------------------------------
 //  Name : has_known_protocol()
@@ -58,7 +58,7 @@ path convert_to_protocol(const path& _path);
 /// Checks whether the path has a known protocol.
 /// </summary>
 //-----------------------------------------------------------------------------
-bool has_known_protocol(const path& _path);
+auto has_known_protocol(const path& _path) -> bool;
 
 //-----------------------------------------------------------------------------
 //  Name : read_stream ()
@@ -67,7 +67,7 @@ bool has_known_protocol(const path& _path);
 /// a package or in the main file system.
 /// </summary>
 //-----------------------------------------------------------------------------
-byte_array_t read_stream(std::istream& stream);
+auto read_stream(std::istream& stream) -> byte_array_t;
 
 //-------------------------------------------------------------------------
 //  Name : replace ()
@@ -76,10 +76,22 @@ byte_array_t read_stream(std::istream& stream);
 /// another.
 /// </summary>
 //-------------------------------------------------------------------------
-path replace(const path& _path, const path& _sequence, const path& _new_sequence);
+auto replace(const path& _path, const path& _sequence, const path& _new_sequence) -> path;
 
-std::vector<path> split_until(const path& _path, const path& _predicate);
+//-------------------------------------------------------------------------
+//  Name : split_until ()
+/// <summary>
+/// another.
+/// </summary>
+//-------------------------------------------------------------------------
+auto split_until(const path& _path, const path& _predicate) -> std::vector<path>;
 
-path reduce_trailing_extensions(const path& _path);
+//-------------------------------------------------------------------------
+//  Name : reduce_trailing_extensions ()
+/// <summary>
+/// another.
+/// </summary>
+//-------------------------------------------------------------------------
+auto reduce_trailing_extensions(const path& _path) -> path;
 
-}
+} // namespace fs

@@ -4,31 +4,31 @@ namespace gfx
 {
 void pos_texcoord0_vertex::init(gfx::vertex_layout& decl)
 {
-	decl.begin()
-		.add(attribute::Position, 3, attribute_type::Float)
-		.add(attribute::TexCoord0, 2, attribute_type::Float)
-		.end();
+    decl.begin()
+        .add(attribute::Position, 3, attribute_type::Float)
+        .add(attribute::TexCoord0, 2, attribute_type::Float)
+        .end();
 }
 
 void mesh_vertex::init(vertex_layout& decl)
 {
-	decl.begin()
-		.add(attribute::Position, 3, attribute_type::Float)
-		// this is for barycentric coords eventually
-		//.add(attribute::Color1, 4, attribute_type::Uint8, true)
-		.add(attribute::Normal, 3, attribute_type::Uint8, true, true)
-		.add(attribute::Tangent, 3, attribute_type::Uint8, true, true)
-		.add(attribute::Bitangent, 3, attribute_type::Uint8, true, true)
-		.add(attribute::TexCoord0, 2, attribute_type::Float)
-		.end();
+    decl.begin()
+        .add(attribute::Position, 3, attribute_type::Float)
+        // this is for barycentric coords eventually
+        //.add(attribute::Color1, 4, attribute_type::Uint8, true)
+        .add(attribute::Normal, 3, attribute_type::Uint8, true, true)
+        .add(attribute::Tangent, 3, attribute_type::Uint8, true, true)
+        .add(attribute::Bitangent, 3, attribute_type::Uint8, true, true)
+        .add(attribute::TexCoord0, 2, attribute_type::Float)
+        .end();
 }
 
 void pos_texcoord0_color0_vertex::init(vertex_layout& decl)
 {
-	decl.begin()
-		.add(attribute::Position, 2, attribute_type::Float)
-		.add(attribute::TexCoord0, 2, attribute_type::Float)
-		.add(attribute::Color0, 4, attribute_type::Uint8, true)
-		.end();
+    decl.begin()
+        .add(attribute::Position, 2, attribute_type::Float)
+        .add(attribute::TexCoord0, 2, attribute_type::Float)
+        .add(attribute::Color0, 4, attribute_type::Uint8, true)
+        .end();
 }
-}
+} // namespace gfx

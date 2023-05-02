@@ -1,12 +1,48 @@
+
 #ifndef STX_ANY_HPP_INCLUDED
 #define STX_ANY_HPP_INCLUDED
 
-#include "type_index.hpp"
+#ifndef STX_NAMESPACE_NAME
+#define STX_NAMESPACE_NAME hpp
+#endif
+#define STX_NO_STD_ANY
+// libstdc++ std::experimental::any only works in C++14 mode
+#if !defined(STX_NO_STD_ANY) && defined(__GNUC__) && (__cplusplus < 201402)
+#define STX_NO_STD_ANY
+#endif
+
+#if defined(__has_include) && !defined(STX_NO_STD_ANY)
+#if __has_include(<any>) && (__cplusplus > 201402)
+#include <any>
+namespace STX_NAMESPACE_NAME
+{
+using std::any;
+using std::any_cast;
+using std::bad_any_cast;
+}
+#define STX_HAVE_STD_ANY 1
+#elif __has_include(<experimental/any>)
+#include <experimental/any>
+namespace STX_NAMESPACE_NAME
+{
+using std::experimental::any;
+using std::experimental::any_cast;
+using std::experimental::bad_any_cast;
+}
+#define STX_HAVE_STD_ANY 1
+#endif // __hasinclude(any)
+#endif // defined(__hasinclude)
+
+#ifndef STX_HAVE_STD_ANY
+
+#include <new>
 #include <stdexcept>
 #include <type_traits>
 #include <typeinfo>
 
-namespace nonstd
+#include "utility/if_constexpr.hpp"
+
+namespace STX_NAMESPACE_NAME
 {
 
 class bad_any_cast : public std::bad_cast
@@ -37,8 +73,7 @@ public:
 		}
 	}
 
-	/// Constructs an object of type any with a state equivalent to the original
-	/// state of other.
+	/// Constructs an object of type any with a state equivalent to the original state of other.
 	/// rhs is left in a valid but otherwise unspecified state.
 	any(any&& rhs) noexcept
 		: vtable(rhs.vtable)
@@ -56,13 +91,12 @@ public:
 		this->clear();
 	}
 
-	/// Constructs an object of type any that contains an object of type T
-	/// direct-initialized with std::forward<ValueType>(value).
+	/// Constructs an object of type any that contains an object of type T direct-initialized with
+	/// std::forward<ValueType>(value).
 	///
-	/// T shall satisfy the CopyConstructible requirements, otherwise the program
-	/// is ill-formed.
-	/// This is because an `any` may be copy constructed into another `any` at any
-	/// time, so a copy should always be allowed.
+	/// T shall satisfy the CopyConstructible requirements, otherwise the program is ill-formed.
+	/// This is because an `any` may be copy constructed into another `any` at any time, so a copy should
+	/// always be allowed.
 	template <typename ValueType, typename = typename std::enable_if<
 									  !std::is_same<typename std::decay<ValueType>::type, any>::value>::type>
 	any(ValueType&& value)
@@ -72,8 +106,7 @@ public:
 		this->construct(std::forward<ValueType>(value));
 	}
 
-	/// Has the same effect as any(rhs).swap(*this). No effects if an exception is
-	/// thrown.
+	/// Has the same effect as any(rhs).swap(*this). No effects if an exception is thrown.
 	any& operator=(const any& rhs)
 	{
 		any(rhs).swap(*this);
@@ -82,8 +115,7 @@ public:
 
 	/// Has the same effect as any(std::move(rhs)).swap(*this).
 	///
-	/// The state of *this is equivalent to the original state of rhs and rhs is
-	/// left in a valid
+	/// The state of *this is equivalent to the original state of rhs and rhs is left in a valid
 	/// but otherwise unspecified state.
 	any& operator=(any&& rhs) noexcept
 	{
@@ -91,13 +123,12 @@ public:
 		return *this;
 	}
 
-	/// Has the same effect as any(std::forward<ValueType>(value)).swap(*this). No
-	/// effect if a exception is thrown.
+	/// Has the same effect as any(std::forward<ValueType>(value)).swap(*this). No effect if a exception is
+	/// thrown.
 	///
-	/// T shall satisfy the CopyConstructible requirements, otherwise the program
-	/// is ill-formed.
-	/// This is because an `any` may be copy constructed into another `any` at any
-	/// time, so a copy should always be allowed.
+	/// T shall satisfy the CopyConstructible requirements, otherwise the program is ill-formed.
+	/// This is because an `any` may be copy constructed into another `any` at any time, so a copy should
+	/// always be allowed.
 	template <typename ValueType, typename = typename std::enable_if<
 									  !std::is_same<typename std::decay<ValueType>::type, any>::value>::type>
 	any& operator=(ValueType&& value)
@@ -124,11 +155,10 @@ public:
 		return this->vtable == nullptr;
 	}
 
-	/// If *this has a contained object of type T, nonstd::type_info::id<T>();
-	/// otherwise nonstd::type_info::id<void>().
-	const rtti::type_index_t& type() const noexcept
+	/// If *this has a contained object of type T, typeid(T); otherwise typeid(void).
+	const std::type_info& type() const noexcept
 	{
-		return empty() ? rtti::type_id<void>() : this->vtable->type();
+		return empty() ? typeid(void) : this->vtable->type();
 	}
 
 	/// Exchange the states of *this and rhs.
@@ -137,6 +167,7 @@ public:
 		if(this->vtable != rhs.vtable)
 		{
 			any tmp(std::move(rhs));
+
 			// move from *this to rhs.
 			rhs.vtable = this->vtable;
 			if(this->vtable != nullptr)
@@ -172,26 +203,22 @@ private: // Storage and Virtual Method Table
 	/// Base VTable specification.
 	struct vtable_type
 	{
-		// Note: The caller is responssible for doing .vtable = nullptr after
-		// destructful operations
+		// Note: The caller is responssible for doing .vtable = nullptr after destructful operations
 		// such as destroy() and/or move().
+
 		/// The type of the object this vtable is for.
-		const rtti::type_index_t& (*type)() noexcept;
+		const std::type_info& (*type)() noexcept;
 
 		/// Destroys the object in the union.
-		/// The state of the union after this call is unspecified, caller must
-		/// ensure not to use src anymore.
+		/// The state of the union after this call is unspecified, caller must ensure not to use src anymore.
 		void (*destroy)(storage_union&) noexcept;
 
-		/// Copies the **inner** content of the src union into the yet unitialized
-		/// dest union.
-		/// As such, both inner objects will have the same state, but on separate
-		/// memory locations.
+		/// Copies the **inner** content of the src union into the yet unitialized dest union.
+		/// As such, both inner objects will have the same state, but on separate memory locations.
 		void (*copy)(const storage_union& src, storage_union& dest);
 
 		/// Moves the storage from src to the yet unitialized dest union.
-		/// The state of src after this call is unspecified, caller must ensure not
-		/// to use src anymore.
+		/// The state of src after this call is unspecified, caller must ensure not to use src anymore.
 		void (*move)(storage_union& src, storage_union& dest) noexcept;
 
 		/// Exchanges the storage between lhs and rhs.
@@ -202,9 +229,9 @@ private: // Storage and Virtual Method Table
 	template <typename T>
 	struct vtable_dynamic
 	{
-		static const rtti::type_index_t& type() noexcept
+		static const std::type_info& type() noexcept
 		{
-			return rtti::type_id<T>();
+			return typeid(T);
 		}
 
 		static void destroy(storage_union& storage) noexcept
@@ -235,9 +262,9 @@ private: // Storage and Virtual Method Table
 	template <typename T>
 	struct vtable_stack
 	{
-		static const rtti::type_index_t& type() noexcept
+		static const std::type_info& type() noexcept
 		{
-			return rtti::type_id<T>();
+			return typeid(T);
 		}
 
 		static void destroy(storage_union& storage) noexcept
@@ -252,8 +279,7 @@ private: // Storage and Virtual Method Table
 
 		static void move(storage_union& src, storage_union& dest) noexcept
 		{
-			// one of the conditions for using vtable_stack is a nothrow move
-			// constructor,
+			// one of the conditions for using vtable_stack is a nothrow move constructor,
 			// so this move constructor will never throw a exception.
 			new(&dest.stack) T(std::move(reinterpret_cast<T&>(src.stack)));
 			destroy(src);
@@ -265,13 +291,11 @@ private: // Storage and Virtual Method Table
 		}
 	};
 
-	/// Whether the type T must be dynamically allocated or can be stored on the
-	/// stack.
+	/// Whether the type T must be dynamically allocated or can be stored on the stack.
 	template <typename T>
 	struct requires_allocation
 		: std::integral_constant<bool,
-								 !(std::is_nothrow_move_constructible<T>::value // N4562 6.3/3
-																				// [any.class]
+								 !(std::is_nothrow_move_constructible<T>::value // N4562 §6.3/3 [any.class]
 								   && sizeof(T) <= sizeof(storage_union::stack) &&
 								   std::alignment_of<T>::value <=
 									   std::alignment_of<storage_union::stack_storage_t>::value)>
@@ -287,7 +311,6 @@ private: // Storage and Virtual Method Table
 		static vtable_type table = {
 			VTableType::type, VTableType::destroy, VTableType::copy, VTableType::move, VTableType::swap,
 		};
-
 		return &table;
 	}
 
@@ -298,22 +321,24 @@ protected:
 	friend T* any_cast(any* operand) noexcept;
 
 	/// Same effect as is_same(this->type(), t);
-	bool is_typed(const rtti::type_index_t& t) const
+	bool is_typed(const std::type_info& t) const
 	{
 		return is_same(this->type(), t);
 	}
 
 	/// Checks if two type infos are the same.
 	///
-	/// If ANY_IMPL_FAST_TYPE_INFO_COMPARE is defined, checks only the address of
-	/// the
+	/// If ANY_IMPL_FAST_TYPE_INFO_COMPARE is defined, checks only the address of the
 	/// type infos, otherwise does an actual comparision. Checking addresses is
 	/// only a valid approach when there's no interaction with outside sources
 	/// (other shared libraries and such).
-
-	static bool is_same(const rtti::type_index_t& a, const rtti::type_index_t& b)
+	static bool is_same(const std::type_info& a, const std::type_info& b)
 	{
+#ifdef ANY_IMPL_FAST_TYPE_INFO_COMPARE
+		return &a == &b;
+#else
 		return a == b;
+#endif
 	}
 
 	/// Casts (with no type_info checks) the storage pointer as const T*.
@@ -338,27 +363,24 @@ private:
 	storage_union storage; // on offset(0) so no padding for align
 	vtable_type* vtable;
 
-	template <typename ValueType, typename T>
-	typename std::enable_if<requires_allocation<T>::value>::type do_construct(ValueType&& value)
-	{
-		storage.dynamic = new T(std::forward<ValueType>(value));
-	}
-
-	template <typename ValueType, typename T>
-	typename std::enable_if<!requires_allocation<T>::value>::type do_construct(ValueType&& value)
-	{
-		new(&storage.stack) T(std::forward<ValueType>(value));
-	}
-
-	/// Chooses between stack and dynamic allocation for the type
-	/// decay_t<ValueType>,
+	/// Chooses between stack and dynamic allocation for the type decay_t<ValueType>,
 	/// assigns the correct vtable, and constructs the object on our storage.
 	template <typename ValueType>
 	void construct(ValueType&& value)
 	{
 		using T = typename std::decay<ValueType>::type;
-		this->vtable = vtable_for_type<T>();
-		do_construct<ValueType, T>(std::forward<ValueType>(value));
+
+        this->vtable = vtable_for_type<T>();
+
+        if_constexpr(requires_allocation<T>::value)
+        {
+            storage.dynamic = new T(std::forward<ValueType>(value));
+        }
+        else_constexpr
+        {
+            new(&storage.stack) T(std::forward<ValueType>(value));
+        }
+        end_if_constexpr;
 	}
 };
 
@@ -377,8 +399,8 @@ inline ValueType any_cast_move_if_true(typename std::remove_reference<ValueType>
 }
 }
 
-/// Performs *any_cast<add_const_t<remove_reference_t<ValueType>>>(&operand), or
-/// throws bad_any_cast on failure.
+/// Performs *any_cast<add_const_t<remove_reference_t<ValueType>>>(&operand), or throws bad_any_cast on
+/// failure.
 template <typename ValueType>
 inline ValueType any_cast(const any& operand)
 {
@@ -389,8 +411,7 @@ inline ValueType any_cast(const any& operand)
 	return *p;
 }
 
-/// Performs *any_cast<remove_reference_t<ValueType>>(&operand), or throws
-/// bad_any_cast on failure.
+/// Performs *any_cast<remove_reference_t<ValueType>>(&operand), or throws bad_any_cast on failure.
 template <typename ValueType>
 inline ValueType any_cast(any& operand)
 {
@@ -402,14 +423,12 @@ inline ValueType any_cast(any& operand)
 
 ///
 /// If ANY_IMPL_ANYCAST_MOVEABLE is not defined, does as N4562 specifies:
-///     Performs *any_cast<remove_reference_t<ValueType>>(&operand), or throws
-///     bad_any_cast on failure.
+///     Performs *any_cast<remove_reference_t<ValueType>>(&operand), or throws bad_any_cast on failure.
 ///
 /// If ANY_IMPL_ANYCAST_MOVEABLE is defined, does as LWG Defect 2509 specifies:
 ///     If ValueType is MoveConstructible and isn't a lvalue reference, performs
 ///     std::move(*any_cast<remove_reference_t<ValueType>>(&operand)), otherwise
-///     *any_cast<remove_reference_t<ValueType>>(&operand). Throws bad_any_cast
-///     on failure.
+///     *any_cast<remove_reference_t<ValueType>>(&operand). Throws bad_any_cast on failure.
 ///
 template <typename ValueType>
 inline ValueType any_cast(any&& operand)
@@ -421,42 +440,45 @@ inline ValueType any_cast(any&& operand)
 #else
 	using can_move = std::false_type;
 #endif
+
 	auto p = any_cast<typename std::remove_reference<ValueType>::type>(&operand);
 	if(p == nullptr)
 		throw bad_any_cast();
 	return detail::any_cast_move_if_true<ValueType>(p, can_move());
 }
 
-/// If operand != nullptr && operand->type() == rtti::type_id<ValueType>(), a
-/// pointer to the object
+/// If operand != nullptr && operand->type() == typeid(ValueType), a pointer to the object
 /// contained by operand, otherwise nullptr.
 template <typename T>
 inline const T* any_cast(const any* operand) noexcept
 {
-	if(operand == nullptr || !operand->is_typed(rtti::type_id<T>()))
+	if(operand == nullptr || !operand->is_typed(typeid(T)))
 		return nullptr;
 	else
 		return operand->cast<T>();
 }
 
-/// If operand != nullptr && operand->type() == rtti::type_id<ValueType>(), a
-/// pointer to the object
+/// If operand != nullptr && operand->type() == typeid(ValueType), a pointer to the object
 /// contained by operand, otherwise nullptr.
 template <typename T>
 inline T* any_cast(any* operand) noexcept
 {
-	if(operand == nullptr || !operand->is_typed(rtti::type_id<T>()))
+	if(operand == nullptr || !operand->is_typed(typeid(T)))
 		return nullptr;
 	else
 		return operand->cast<T>();
 }
-}
+
+} // end namespace
 
 namespace std
 {
-inline void swap(nonstd::any& lhs, nonstd::any& rhs) noexcept
+inline void swap(STX_NAMESPACE_NAME::any& lhs, STX_NAMESPACE_NAME::any& rhs) noexcept
 {
 	lhs.swap(rhs);
 }
 }
-#endif
+
+#endif // STX_HAVE_STD_ANY
+
+#endif //  STX_ANY_HPP_INCLUDED
