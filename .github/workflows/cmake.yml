@@ -1,11 +1,36 @@
 name: Build
 on: [push]
 jobs:
-  build-and-test:
+  build-linux:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, windows-latest]
+        os: [ubuntu-20.04]
+        type: [Debug, Release]
+        compiler: [gcc, clang-10, clang-12]
+    steps:
+      - name: Clone
+        uses: actions/checkout@v3
+      - name: Pull & update submodules recursively
+        run: |
+          git submodule update --init --recursive
+          git submodule update --recursive --remote
+      - name: Install Dependencies
+        run: |
+          sudo apt-get install -y libglew-dev
+          sudo apt-get install libgtk-3-dev
+          sudo apt-get install libudev-dev
+      - name: Configure
+        run: cmake . -DCMAKE_BUILD_TYPE=${{ matrix.type }}
+      - name: Build
+        run: cmake --build . --config ${{ matrix.type }}
+        env:          
+          UBSAN_OPTIONS: halt_on_error=1
+  build-windows:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest]
         type: [Debug, Release]
     steps:
       - name: Clone
@@ -15,11 +40,6 @@ jobs:
           git submodule update --init --recursive
           git submodule update --recursive --remote
       - name: Install Dependencies
-        if: matrix.os == 'ubuntu-20.04'
-        run: |
-          sudo apt-get install -y libglew-dev
-          sudo apt-get install libgtk-3-dev
-          sudo apt-get install libudev-dev
       - name: VC Vars
         # Setup vcvars on Windows
         # MSVC's address sanitizer attaches dependencies to several DLLs which are not in PATH
