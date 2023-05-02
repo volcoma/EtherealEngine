@@ -19,3 +19,6 @@
 [submodule "3rdparty/openal/openal-soft"]
 	path = 3rdparty/openal/openal-soft
 	url = https://github.com/kcat/openal-soft.git
+[submodule "3rdparty/bgfx/bgfx"]
+	path = 3rdparty/bgfx/bgfx
+	url = https://github.com/widberg/bgfx.cmake.git

@@ -1,5 +1,5 @@
 add_subdirectory_ex(assimp)
-add_subdirectory_ex(bgfx-cmake)
+add_subdirectory_ex(bgfx)
 add_subdirectory_ex(rttr)
 add_subdirectory_ex(cereal)
 add_subdirectory_ex(mml)
