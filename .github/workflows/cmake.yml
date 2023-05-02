@@ -39,7 +39,6 @@ jobs:
         run: |
           git submodule update --init --recursive
           git submodule update --recursive --remote
-      - name: Install Dependencies
       - name: VC Vars
         # Setup vcvars on Windows
         # MSVC's address sanitizer attaches dependencies to several DLLs which are not in PATH
