@@ -2,7 +2,6 @@ name: Build
 on: [push]
 jobs:
   build-linux:
-    
     strategy:
       matrix:
         os: [ubuntu-20.04]
@@ -10,7 +9,7 @@ jobs:
         compiler: [ 
         {C_COMPILER: 'gcc', CXX_COMPILER: 'g++' },
         {C_COMPILER: 'clang-10', CXX_COMPILER: 'clang++-10'},
-        {C_COMPILER: 'clang-12', CXX_COMPILER: 'clang++-12' }
+        #{C_COMPILER: 'clang-12', CXX_COMPILER: 'clang++-12' }
         ]
     runs-on: ${{ matrix.os }}
     steps:
@@ -31,11 +30,12 @@ jobs:
         env:          
           UBSAN_OPTIONS: halt_on_error=1
   build-windows:
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [windows-latest]
         type: [Debug, Release]
+        compiler: [msvc, mingw]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Clone
         uses: actions/checkout@v3
@@ -48,8 +48,16 @@ jobs:
         # vcvars will add them to PATH and allow msvc asan executables to run
         if: matrix.os == 'windows-latest'
         uses: ilammy/msvc-dev-cmd@v1
+        
+      if: matrix.compiler == 'mingw'
+        - name: Set up MinGW
+          uses: egor-tensin/setup-mingw@v2
+        #- name: Configure
+        #  run: cmake . -G "MinGW Makefiles" -D CMAKE_BUILD_TYPE=${{ matrix.type }}
+
       - name: Configure
         run: cmake . -DCMAKE_BUILD_TYPE=${{ matrix.type }}
+          
       - name: Build
         run: cmake --build . --config ${{ matrix.type }}
         env:          
