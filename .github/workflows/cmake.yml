@@ -14,7 +14,6 @@ jobs:
       - name: Pull & update submodules recursively
         run: |
           git submodule update --init --recursive
-          git submodule update --recursive --remote
       - name: Install Dependencies
         run: |
           sudo apt-get install -y libglew-dev
@@ -38,7 +37,6 @@ jobs:
       - name: Pull & update submodules recursively
         run: |
           git submodule update --init --recursive
-          git submodule update --recursive --remote
       - name: VC Vars
         # Setup vcvars on Windows
         # MSVC's address sanitizer attaches dependencies to several DLLs which are not in PATH
