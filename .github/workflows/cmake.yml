@@ -53,10 +53,10 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         
       if: matrix.compiler == 'mingw'
-        - name: Set up MinGW
-          uses: egor-tensin/setup-mingw@v2
-        #- name: Configure
-        #  run: cmake . -G "MinGW Makefiles" -D CMAKE_BUILD_TYPE=${{ matrix.type }}
+      - name: Set up MinGW
+        uses: egor-tensin/setup-mingw@v2
+      #- name: Configure
+      #  run: cmake . -G "MinGW Makefiles" -D CMAKE_BUILD_TYPE=${{ matrix.type }}
 
       - name: Configure
         run: cmake . -DCMAKE_BUILD_TYPE=${{ matrix.type }}
