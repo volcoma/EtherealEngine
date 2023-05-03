@@ -7,7 +7,11 @@ jobs:
       matrix:
         os: [ubuntu-20.04]
         type: [Debug, Release]
-        compiler: [gcc, clang-10, clang-12]
+        include: [
+          { C_COMPILER: gcc, CXX_COMPILER: g++ },
+          { C_COMPILER: clang-10, CXX_COMPILER: clang++-10 },
+          { C_COMPILER: clang-12, CXX_COMPILER: clang++-12 }
+        ]
     steps:
       - name: Clone
         uses: actions/checkout@v3
@@ -20,7 +24,7 @@ jobs:
           sudo apt-get install libgtk-3-dev
           sudo apt-get install libudev-dev
       - name: Configure
-        run: cmake . -DCMAKE_BUILD_TYPE=${{ matrix.type }}
+        run: cmake . -DCMAKE_BUILD_TYPE=${{ matrix.type }} -DCMAKE_C_COMPILER=${{ matrix.C_COMPILER }} -DCMAKE_CXX_COMPILER=${{ matrix.CXX_COMPILER }}
       - name: Build
         run: cmake --build . --config ${{ matrix.type }}
         env:          
