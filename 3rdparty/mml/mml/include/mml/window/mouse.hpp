@@ -6,6 +6,7 @@
 ////////////////////////////////////////////////////////////
 #include <mml/window/export.hpp>
 #include <array>
+#include <cstdint>
 
 namespace mml
 {
