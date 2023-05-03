@@ -7,10 +7,10 @@ jobs:
       matrix:
         os: [ubuntu-20.04]
         type: [Debug, Release]
-        include: [
-          { msystem: GCC, C_COMPILER: 'gcc', CXX_COMPILER: 'g++' },
-          { msystem: CLANG-10, C_COMPILER: 'clang-10', CXX_COMPILER: 'clang++-10' },
-          { msystem: CLANG-12, C_COMPILER: 'clang-12', CXX_COMPILER: 'clang++-12' }
+        compiler: [ 
+        {C_COMPILER: 'gcc', CXX_COMPILER: 'g++' },
+        {C_COMPILER: 'clang-10', CXX_COMPILER: 'clang++-10'},
+        {C_COMPILER: 'clang-12', CXX_COMPILER: 'clang++-12' }
         ]
     runs-on: ${{ matrix.os }}
     steps:
