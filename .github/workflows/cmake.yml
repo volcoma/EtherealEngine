@@ -45,12 +45,20 @@ jobs:
       - name: Pull & update submodules recursively
         run: |
           git submodule update --init --recursive
+          
       - name: VC Vars
         # Setup vcvars on Windows
         # MSVC's address sanitizer attaches dependencies to several DLLs which are not in PATH
         # vcvars will add them to PATH and allow msvc asan executables to run
         if: matrix.os == 'windows-latest'
         uses: ilammy/msvc-dev-cmd@v1
+
+        
+      if: matrix.compiler == 'mingw'
+      uses: egor-tensin/setup-mingw@v2
+      #- name: Configure
+      #  run: cmake . -G "MinGW Makefiles" -D CMAKE_BUILD_TYPE=${{ matrix.type }}
+
 
       - name: Configure
         run: cmake . -DCMAKE_BUILD_TYPE=${{ matrix.type }}
