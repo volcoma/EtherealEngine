@@ -12,7 +12,6 @@ jobs:
           { msystem: CLANG-10, C_COMPILER: 'clang-10', CXX_COMPILER: 'clang++-10' },
           { msystem: CLANG-12, C_COMPILER: 'clang-12', CXX_COMPILER: 'clang++-12' }
         ]
-    name: COMPILER-${{ matrix.msystem }}   
     runs-on: ${{ matrix.os }}
     steps:
       - name: Clone
