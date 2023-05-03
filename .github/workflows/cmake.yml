@@ -29,12 +29,15 @@ jobs:
         run: cmake --build . --config ${{ matrix.type }}
         env:          
           UBSAN_OPTIONS: halt_on_error=1
+          
   build-windows:
+  
     strategy:
       matrix:
         os: [windows-latest]
         type: [Debug, Release]
         compiler: [msvc, mingw]
+        
     runs-on: ${{ matrix.os }}
     steps:
       - name: Clone
