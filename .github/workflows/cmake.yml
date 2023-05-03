@@ -5,7 +5,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-20.04]
-        type: [Debug, Release]
+        type: [Release]
         compiler: [ 
         {C_COMPILER: 'gcc', CXX_COMPILER: 'g++' },
         {C_COMPILER: 'clang-10', CXX_COMPILER: 'clang++-10'},
@@ -32,7 +32,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest]
-        type: [Debug, Release]
+        type: [Release]
         
     runs-on: ${{ matrix.os }}
     steps:
@@ -60,11 +60,11 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest]
-        type: [Debug, Release]
+        type: [Release]
         compiler: [ 
         {C_COMPILER: 'gcc', CXX_COMPILER: 'g++' },
         ]
-        version: ['','11','10'] #empty means latest
+        version: ['','11.0.0','10.0.0'] #empty means latest
     runs-on: ${{ matrix.os }}
     steps:
       - name: Clone
