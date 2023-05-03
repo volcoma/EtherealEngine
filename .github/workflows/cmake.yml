@@ -57,13 +57,11 @@ jobs:
       - name: Setup Compiler
         if: matrix.compiler == 'mingw'
         uses: egor-tensin/setup-mingw@v2
-        #- name: Configure
-        #  run: cmake . -G "MinGW Makefiles" -D CMAKE_BUILD_TYPE=${{ matrix.type }}
 
       - name: Configure
         if: matrix.compiler == 'mingw'
         run: cmake . -G "Ninja" -D CMAKE_BUILD_TYPE=${{ matrix.type }} -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
-        else:
+        if: matrix.compiler != 'mingw'
         run: cmake . -G "Ninja" -DCMAKE_BUILD_TYPE=${{ matrix.type }}
           
       - name: Build
