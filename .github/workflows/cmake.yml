@@ -1,7 +1,7 @@
 name: Build
 on: [push]
 jobs:
-  build-linux:
+  linux:
     strategy:
       matrix:
         os: [ubuntu-20.04]
@@ -27,16 +27,12 @@ jobs:
         run: cmake . -G "Ninja" -DCMAKE_BUILD_TYPE=${{ matrix.type }} -DCMAKE_C_COMPILER=${{ matrix.compiler.C_COMPILER }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.CXX_COMPILER }}
       - name: Build
         run: cmake --build . --config ${{ matrix.type }}
-        env:          
-          UBSAN_OPTIONS: halt_on_error=1
           
-  build-windows:
-  
+  msvc-latest:  
     strategy:
       matrix:
         os: [windows-latest]
         type: [Debug, Release]
-        compiler: [msvc, mingw]
         
     runs-on: ${{ matrix.os }}
     steps:
@@ -53,18 +49,33 @@ jobs:
         # vcvars will add them to PATH and allow msvc asan executables to run
         if: matrix.os == 'windows-latest'
         uses: ilammy/msvc-dev-cmd@v1
-        
-      - name: Setup Compiler
-        if: matrix.compiler == 'mingw'
-        uses: egor-tensin/setup-mingw@v2
 
       - name: Configure
-        if: matrix.compiler == 'mingw'
-        run: cmake . -G "Ninja" -D CMAKE_BUILD_TYPE=${{ matrix.type }} -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
-        if: matrix.compiler != 'mingw'
         run: cmake . -G "Ninja" -DCMAKE_BUILD_TYPE=${{ matrix.type }}
           
       - name: Build
         run: cmake --build . --config ${{ matrix.type }}
-        env:          
-          UBSAN_OPTIONS: halt_on_error=1
+          
+  mingw-w64:
+    strategy:
+      matrix:
+        os: [windows-latest]
+        type: [Debug, Release]
+        
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Clone
+        uses: actions/checkout@v3
+        
+      - name: Pull & update submodules recursively
+        run: |
+          git submodule update --init --recursive
+ 
+      - name: Setup Compiler
+        uses: egor-tensin/setup-mingw@v2
+
+      - name: Configure
+        run: cmake . -G "Ninja" -D CMAKE_BUILD_TYPE=${{ matrix.type }} -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++
+
+      - name: Build
+        run: cmake --build . --config ${{ matrix.type }}
