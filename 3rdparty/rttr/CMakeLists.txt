@@ -12,4 +12,6 @@ set(USE_PCH OFF CACHE BOOL "Use precompiled header files for compilation" FORCE)
 set(CUSTOM_DOXYGEN_STYLE OFF CACHE BOOL "Enable this option to use a custom doxygen style for HTML documentation; Otherwise the default will be used" FORCE)
 set(BUILD_WEBSITE_DOCU OFF CACHE BOOL "Enable this option to create the special docu for the website" FORCE)
 set(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_CXX14_STANDARD_COMPILE_OPTION})
+
+set(MAX_CXX_STANDARD 14)
 add_subdirectory( rttr )
