@@ -56,15 +56,14 @@ jobs:
       - name: Build
         run: cmake --build . --config ${{ matrix.type }}
           
-  mingw-w64:
+  mingw-w64-latest:
     strategy:
       matrix:
         os: [windows-latest]
         type: [Release]
         compiler: [ 
         {C_COMPILER: 'gcc', CXX_COMPILER: 'g++' },
-        ]
-        version: ['','11.0.0','10.0.0'] #empty means latest
+        ]--                           
     runs-on: ${{ matrix.os }}
     steps:
       - name: Clone
@@ -76,8 +75,7 @@ jobs:
  
       - name: Setup Compiler
         uses: egor-tensin/setup-mingw@v2
-        with:
-          version: ${{ matrix.version }}
+
       - name: Configure
         run: cmake . -G "Ninja" -D CMAKE_BUILD_TYPE=${{ matrix.type }} -DCMAKE_C_COMPILER=${{ matrix.compiler.C_COMPILER }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler.CXX_COMPILER }}
       - name: Build
