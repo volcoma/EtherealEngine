@@ -63,7 +63,7 @@ jobs:
         type: [Release]
         compiler: [ 
         {C_COMPILER: 'gcc', CXX_COMPILER: 'g++' },
-        ]--                           
+        ]                           
     runs-on: ${{ matrix.os }}
     steps:
       - name: Clone
