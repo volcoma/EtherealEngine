@@ -1,4 +1,7 @@
 [Ethereal Engine](https://github.com/volcoma/EtherealEngine) - Cross-platform C++ Game Engine
+
+THIS REPO IS NO LONGER MAINTAINED. IT can be used for educational purposes...
+Development has been moved to https://github.com/volcoma/ace
 ============================================================================
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/1c46ea696a3a43e4a0199673de0db4bb)](https://www.codacy.com/app/volcoma/EtherealEngine?utm_source=github.com&utm_medium=referral&utm_content=volcoma/EtherealEngine&utm_campaign=badger)
